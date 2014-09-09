@@ -34,14 +34,14 @@ Timer::~Timer()
 //////////////////////////////////////////////////
 void Timer::Start()
 {
-  this->start = Time::GetWallTime();
+  this->start = Time::SystemTime();
   this->running = true;
 }
 
 //////////////////////////////////////////////////
 void Timer::Stop()
 {
-  this->stop = Time::GetWallTime();
+  this->stop = Time::SystemTime();
   this->running = false;
 }
 
@@ -57,7 +57,7 @@ Time Timer::GetElapsed() const
   if (this->running)
   {
     Time currentTime;
-    currentTime = Time::GetWallTime();
+    currentTime = Time::SystemTime();
 
     return currentTime - this->start;
   }

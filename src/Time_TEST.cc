@@ -14,8 +14,6 @@
  * limitations under the License.
  *
 */
-
-#include <sys/time.h>
 #include <gtest/gtest.h>
 
 #include <ignition/common/Timer.hh>
@@ -27,17 +25,12 @@ TEST(TimeTest, Time)
 {
   common::Timer timer;
   timer.Start();
-  common::Time::MSleep(100);
+  ign_sleep_ms(100);
   EXPECT_TRUE(timer.GetElapsed() > common::Time(0, 100000000));
 
-  struct timeval tv;
-  gettimeofday(&tv, NULL);
-  common::Time time(tv);
-  EXPECT_EQ(time.sec, tv.tv_sec);
-  EXPECT_EQ(time.nsec, tv.tv_usec * 1000);
-
-  time.SetToWallTime();
-  EXPECT_TRUE(common::Time::GetWallTime() - time < common::Time(0, 1000000));
+  common::Time time;
+  time = common::Time::SystemTime();
+  EXPECT_TRUE(common::Time::SystemTime() - time < common::Time(0, 1000000));
 
   time = common::Time(1, 1000) + common::Time(1.5, 1000000000);
   EXPECT_TRUE(time == common::Time(3.5, 1000));
@@ -52,70 +45,24 @@ TEST(TimeTest, Time)
 
   time.Set(1, 1000);
   time *= common::Time(2, 2);
-  EXPECT_TRUE(time == common::Time(2, 2002));
+  EXPECT_EQ(time, common::Time(2, 2000));
 
   time.Set(2, 4000);
   time /= common::Time(2, 2);
-  EXPECT_TRUE(time == common::Time(1, 1999));
-  EXPECT_FALSE(time != common::Time(1, 1999));
+  EXPECT_TRUE(time == common::Time(1, 2000));
+  EXPECT_FALSE(time != common::Time(1, 2000));
 
   time += common::Time(0, 1);
-  tv.tv_sec = 1;
-  tv.tv_usec = 2;
-  EXPECT_TRUE(time == tv);
-  EXPECT_FALSE(time != tv);
 
-  tv.tv_sec = 2;
-  EXPECT_TRUE(time < tv);
-
-  tv.tv_sec = 0;
-  EXPECT_TRUE(time > tv);
-  EXPECT_TRUE(time >= tv);
-
-
-  EXPECT_TRUE(time == 1.0 + 2000*1e-9);
+  EXPECT_EQ(time, 1.0 + 2000*1e-9);
   EXPECT_FALSE(time != 1.0 + 2000*1e-9);
   EXPECT_TRUE(time < 2.0);
   EXPECT_TRUE(time > 0.1);
   EXPECT_TRUE(time >= 0.1);
 
-
-  tv.tv_sec = 2;
-  tv.tv_usec = 1000000;
-  time = common::Time(1, 1000) + tv;
-  EXPECT_TRUE(time == common::Time(4.0, 1000));
-
-  time.Set(1, 1000);
-  time += tv;
-  EXPECT_TRUE(time == common::Time(4, 1000));
-
-  time = common::Time(1, 1000) - tv;
-  EXPECT_TRUE(time == common::Time(-2, 1000));
-
-  time.Set(1, 1000);
-  time -= tv;
-  EXPECT_TRUE(time == common::Time(-2, 1000));
-
-  tv.tv_sec = 2;
-  tv.tv_usec = 1000;
-  time = common::Time(1, 1000) * tv;
-  EXPECT_TRUE(time == common::Time(2, 1002001));
-
-  time.Set(1, 1000);
-  time *= tv;
-  EXPECT_TRUE(time == common::Time(2, 1002001));
-
   time.Set(1, 1000);
   time = common::Time(1, 1000) * common::Time(2, 2);
   EXPECT_TRUE(time == common::Time(2, 2002));
-
-
-  time = common::Time(1, 2000000) / tv;
-  EXPECT_TRUE(time == common::Time(0, 500749625));
-
-  time.Set(1, 2000000);
-  time /= tv;
-  EXPECT_TRUE(time == common::Time(0, 500749625));
 
   time.Set(1, 1000);
   time = common::Time(1, 1000) / common::Time(2, 2);
@@ -125,11 +72,10 @@ TEST(TimeTest, Time)
   double msec = sec * 1e3;
   double usec = sec * 1e6;
   double nsec = sec * 1e9;
-  EXPECT_DOUBLE_EQ(nsec, common::Time::SecToNano(sec));
-  EXPECT_DOUBLE_EQ(nsec, common::Time::MilToNano(msec));
-  EXPECT_DOUBLE_EQ(nsec, common::Time::MicToNano(usec));
+  EXPECT_DOUBLE_EQ(nsec, IGN_SEC_TO_NANO * sec);
+  EXPECT_DOUBLE_EQ(nsec, IGN_MS_TO_NANO * msec);
+  EXPECT_DOUBLE_EQ(nsec, IGN_US_TO_NANO * usec);
 }
-
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

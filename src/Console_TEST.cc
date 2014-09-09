@@ -19,8 +19,8 @@
 #include <stdlib.h>
 #include <boost/filesystem.hpp>
 
-#include <ignition/common/Time.hh>
-#include <ignition/common/Console.hh>
+#include "ignition/common/Time.hh"
+#include "ignition/common/Console.hh"
 
 const int g_messageRepeat = 4;
 
@@ -50,6 +50,8 @@ std::string GetLogContent(const std::string &_filename)
 /// \brief Test Console::Init and Console::Log
 TEST(Console_TEST, NoInitAndLog)
 {
+  std::cout << "(" << ignition::common::SystemTimeISO() << ")\n";
+
   // Log the string
   std::string logString = "this is a test";
   ignlog << logString << std::endl;

@@ -14,13 +14,13 @@
  * limitations under the License.
  *
  */
-#include <string>
-#include <sstream>
+// \todo Replace this with functionality from c++1y, when available.
 #include <boost/filesystem.hpp>
 
-#include <ignition/common/Time.hh>
-#include <ignition/common/Console.hh>
+#include <string>
+#include <sstream>
 
+#include <ignition/common/Console.hh>
 #include <ignition/common/config.hh>
 
 using namespace ignition;
@@ -62,7 +62,7 @@ Logger::~Logger()
 /////////////////////////////////////////////////
 Logger &Logger::operator()()
 {
-  Console::log << "(" << Time::GetWallTime() << ") ";
+  Console::log << "(" << ignition::common::SystemTimeISO() << ") ";
   (*this) << this->prefix;
 
   return (*this);
@@ -73,7 +73,7 @@ Logger &Logger::operator()(const std::string &_file, int _line)
 {
   int index = _file.find_last_of("/") + 1;
 
-  Console::log << "(" << Time::GetWallTime() << ") ";
+  Console::log << "(" << ign_system_time_ns() << ") ";
   (*this) << this->prefix
     << "[" << _file.substr(index , _file.size() - index) << ":"
     << _line << "] ";
@@ -177,7 +177,7 @@ FileLogger &FileLogger::operator()()
   if (!this->initialized)
     this->Init(".ignition", "auto_default.log");
 
-  (*this) << "(" << Time::GetWallTime() << ") ";
+  (*this) << "(" << ign_system_time_ns() << ") ";
   return (*this);
 }
 
@@ -188,7 +188,7 @@ FileLogger &FileLogger::operator()(const std::string &_file, int _line)
     this->Init(".ignition", "auto_default.log");
 
   int index = _file.find_last_of("/") + 1;
-  (*this) << "(" << Time::GetWallTime() << ") ["
+  (*this) << "(" << ign_system_time_ns() << ") ["
     << _file.substr(index , _file.size() - index) << ":" << _line << "]";
 
   return (*this);

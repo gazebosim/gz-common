@@ -24,7 +24,7 @@ TEST(Exception, Exception)
 {
   try
   {
-    ignthrow("test");
+    ign_throw("test");
   }
   catch(std::runtime_error &_e)
   {
@@ -35,20 +35,20 @@ TEST(Exception, Exception)
 /////////////////////////////////////////////////
 TEST(Exception, InternalError_DefaultConstructor_Throw)
 {
-  ASSERT_THROW(ignthrow("exception"), ignition::common::exception);
+  ASSERT_THROW(ign_throw("exception"), ignition::common::exception);
 }
 
 /////////////////////////////////////////////////
 TEST(Exception, InternalError_FileLineMsgConstructor_Throw)
 {
-  ASSERT_THROW(ignthrow("exception"), ignition::common::exception);
+  ASSERT_THROW(ign_throw("exception"), ignition::common::exception);
 }
 
 /////////////////////////////////////////////////
 TEST(Exception, Assert)
 {
   ASSERT_NO_THROW(ASSERT_DEATH(
-        ignassert(true == false, "Assert thrown"), "Assert thrown"));
+        ign_assert(true == false, "Assert thrown"), "Assert thrown"));
 }
 
 /////////////////////////////////////////////////

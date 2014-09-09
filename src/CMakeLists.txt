@@ -5,6 +5,7 @@ set (sources
   Console.cc
   Time.cc
   Timer.cc
+  Util.cc
 )
 
 set (gtest_sources

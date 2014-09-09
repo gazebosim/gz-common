@@ -61,7 +61,8 @@ SUPPRESS=/tmp/cpp_check.suppress
 # The follow suppression is useful when checking for missing includes.
 # It's disable for now because checking for missing includes is very
 # time consuming. See CPPCHECK_CMD3.
-echo "missingIncludeSystem" >> $SUPPRESS
+# echo "missingIncludeSystem" >> $SUPPRESS
+echo "" > $SUPPRESS
 
 #cppcheck
 CPPCHECK_BASE="cppcheck -q --suppressions-list=$SUPPRESS"
