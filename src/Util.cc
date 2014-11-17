@@ -14,7 +14,11 @@
  * limitations under the License.
  *
 */
-#include "ignition/common/Util.hh"
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/path.hpp>
+#include <ignition/common/config.hh>
+#include <ignition/common/SystemPaths.hh>
+#include <ignition/common/Util.hh>
 
 /////////////////////////////////////////////////
 std::string ignition::common::SystemTimeISO()
@@ -29,4 +33,42 @@ std::string ignition::common::SystemTimeISO()
   std::strftime(isoStr, sizeof(isoStr), "%FT%T", std::localtime(&sec));
 
   return std::string(isoStr) + "." + std::to_string(nano);
+}
+
+/////////////////////////////////////////////////
+void ignition::common::addSearchPathSuffix(const std::string & /*_suffix*/)
+{
+  // common::SystemPaths::Instance()->AddSearchPathSuffix(_suffix);
+}
+
+/////////////////////////////////////////////////
+std::string ignition::common::findFile(const std::string & /*_file*/)
+{
+  return "";
+  // return common::SystemPaths::Instance()->FindFile(_file, true);
+}
+
+/////////////////////////////////////////////////
+std::string ignition::common::findFile(const std::string & /*_file*/,
+    bool /*_searchLocalPath*/)
+{
+  return "";
+  // return common::SystemPaths::Instance()->FindFile(_file, _searchLocalPath);
+}
+
+/////////////////////////////////////////////////
+std::string ignition::common::findFilePath(const std::string &_file)
+{
+  std::string filepath = findFile(_file);
+
+  boost::filesystem::path path(filepath);
+  if (boost::filesystem::is_directory(path))
+  {
+    return filepath;
+  }
+  else
+  {
+    int index = filepath.find_last_of("/");
+    return filepath.substr(0, index);
+  }
 }

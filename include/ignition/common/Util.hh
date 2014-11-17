@@ -17,6 +17,9 @@
 #ifndef _IGNITION_COMMON_UTIL_HH_
 #define _IGNITION_COMMON_UTIL_HH_
 
+#include <boost/uuid/sha1.hpp>
+#include <iomanip>
+#include <sstream>
 #include <cassert>
 #include <memory>
 #include <string>
@@ -133,12 +136,84 @@ namespace ignition
 {
   namespace common
   {
+    /// \brief Enumeration of the transform types
+    enum NodeTransformType {TRANSLATE, ROTATE, SCALE, MATRIX};
+
     /// \brief A runtime error.
     typedef std::runtime_error exception;
 
     /// \brief Get the wall time as an ISO string: YYYY-MM-DDTHH:MM:SS.NS
     /// \return The current wall time as an ISO string.
+    IGNITION_VISIBLE
     std::string SystemTimeISO();
+
+    /// \brief add path sufix to common::SystemPaths
+    /// \param[in] _suffix The suffix to add.
+    IGNITION_VISIBLE
+    void addSearchPathSuffix(const std::string &_suffix);
+
+    /// \brief search for file in common::SystemPaths
+    /// \param[in] _file Name of the file to find.
+    /// \return The path containing the file.
+    IGNITION_VISIBLE
+    std::string findFile(const std::string &_file);
+
+    /// \brief search for file in common::SystemPaths
+    /// \param[in] _file Name of the file to find.
+    /// \param[in] _searchLocalPath True to search in the current working
+    /// directory.
+    /// \return The path containing the file.
+    IGNITION_VISIBLE
+    std::string findFile(const std::string &_file,
+                         bool _searchLocalPath);
+
+    /// \brief search for a file in common::SystemPaths
+    /// \param[in] _file the file name to look for.
+    /// \return The path containing the file.
+    IGNITION_VISIBLE
+    std::string findFilePath(const std::string &_file);
+
+    /// \brief Compute the SHA1 hash of an array of bytes.
+    /// \param[in] _buffer Input sequence. The permitted data types for this
+    /// function are std::string and any STL container.
+    /// \return The string representation (40 character) of the SHA1 hash.
+    template<typename T>
+    IGNITION_VISIBLE
+    std::string getSha1(const T &_buffer);
   }
+
 }
+
+///////////////////////////////////////////////
+// Implementation of get_sha1
+template<typename T>
+IGNITION_VISIBLE
+std::string ignition::common::getSha1(const T &_buffer)
+{
+  boost::uuids::detail::sha1 sha1;
+  unsigned int hash[5];
+  std::stringstream stream;
+
+  if (_buffer.size() == 0)
+  {
+    sha1.process_bytes(NULL, 0);
+  }
+  else
+  {
+    sha1.process_bytes(&(_buffer[0]), _buffer.size() * sizeof(_buffer[0]));
+  }
+
+  sha1.get_digest(hash);
+
+  for (std::size_t i = 0; i < sizeof(hash) / sizeof(hash[0]); ++i)
+  {
+    stream << std::setfill('0')
+            << std::setw(sizeof(hash[0]) * 2)
+            << std::hex
+            << hash[i];
+   }
+
+   return stream.str();
+ }
+
 #endif

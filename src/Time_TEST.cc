@@ -49,24 +49,24 @@ TEST(TimeTest, Time)
 
   time.Set(2, 4000);
   time /= common::Time(2, 2);
-  EXPECT_TRUE(time == common::Time(1, 2000));
-  EXPECT_FALSE(time != common::Time(1, 2000));
+  EXPECT_TRUE(time == common::Time(1, 200));
+  EXPECT_FALSE(time != common::Time(1, 200));
 
   time += common::Time(0, 1);
 
-  EXPECT_EQ(time, 1.0 + 2000*1e-9);
-  EXPECT_FALSE(time != 1.0 + 2000*1e-9);
+  EXPECT_EQ(time, 1.0 + 201*1e-9);
+  EXPECT_FALSE(time != 1.0 + 201*1e-9);
   EXPECT_TRUE(time < 2.0);
   EXPECT_TRUE(time > 0.1);
   EXPECT_TRUE(time >= 0.1);
 
   time.Set(1, 1000);
   time = common::Time(1, 1000) * common::Time(2, 2);
-  EXPECT_TRUE(time == common::Time(2, 2002));
+  EXPECT_TRUE(time == common::Time(2, 2000));
 
   time.Set(1, 1000);
   time = common::Time(1, 1000) / common::Time(2, 2);
-  EXPECT_TRUE(time == common::Time(0, 500000499));
+  EXPECT_TRUE(time == common::Time(0, 500000050));
 
   double sec = 1.0 + 1e-9;
   double msec = sec * 1e3;

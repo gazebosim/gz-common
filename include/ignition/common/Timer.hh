@@ -14,10 +14,9 @@
  * limitations under the License.
  *
 */
-#ifndef _IGNITION_TIMER_HH_
-#define _IGNITION_TIMER_HH_
+#ifndef _IGNITION_COMMON_TIMER_HH_
+#define _IGNITION_COMMON_TIMER_HH_
 
-#include <ignition/common/Console.hh>
 #include <ignition/common/Time.hh>
 
 namespace ignition

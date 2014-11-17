@@ -20,6 +20,10 @@ set (project_cmake_dir ${PROJECT_SOURCE_DIR}/cmake
 
 include (${project_cmake_dir}/Utils.cmake)
 
+set (FREEIMAGE_MAJOR_VERSION 3 CACHE INTERNAL "FreeImage major version requirement" FORCE)
+set (FREEIMAGE_MINOR_VERSION 9 CACHE INTERNAL "FreeImage minor version requirement" FORCE)
+set (MIN_FREEIMAGE_VERSION ${FREEIMAGE_MAJOR_VERSION}.${FREEIMAGE_MINOR_VERSION}.0 CACHE INTERNAL "FreeImage version requirement" FORCE)
+
 ########################################
 # Package Creation:
 include (${project_cmake_dir}/cpack.cmake)
@@ -234,6 +238,7 @@ else (build_errors)
 
   include_directories(
     ${PROJECT_SOURCE_DIR}
+    ${PROJECT_BINARY_DIR}
     ${PROJECT_SOURCE_DIR}/include
     ${PROJECT_BINARY_DIR}/include
   )

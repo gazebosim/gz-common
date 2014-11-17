@@ -3,6 +3,7 @@ include (CheckCXXSourceCompiles)
 
 include (${project_cmake_dir}/FindOS.cmake)
 include (FindPkgConfig)
+include (${project_cmake_dir}/FindFreeimage.cmake)
 
 ########################################
 find_package(ignition-math QUIET)

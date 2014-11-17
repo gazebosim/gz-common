@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _IGNITION_TIME_HH_
-#define _IGNITION_TIME_HH_
+#ifndef _IGNITION_COMMON_TIME_HH_
+#define _IGNITION_COMMON_TIME_HH_
 
 #include <string>
 #include <iostream>
@@ -152,12 +152,12 @@ namespace ignition
       /// \brief Equal to operator
       /// \param[in] _time the time to compare to
       /// \return true if values are the same, false otherwise
-      public: bool operator ==(const Time &_time) const;
+      public: bool operator==(const Time &_time) const;
 
       /// \brief Equal to operator
       /// \param[in] _time the time to compare to
       /// \return true if values are the same, false otherwise
-      public: bool operator ==(double _time) const;
+      public: bool operator==(double _time) const;
 
       /// \brief Equal to operator
       /// \param[in] _time the time to compare to

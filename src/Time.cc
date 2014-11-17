@@ -184,7 +184,7 @@ Time Time::operator+(const Time &_time) const
 }
 
 /////////////////////////////////////////////////
-const Time &Time::operator +=(const Time &_time)
+const Time &Time::operator+=(const Time &_time)
 {
   this->sec += _time.sec;
   this->nsec += _time.nsec;
@@ -233,10 +233,7 @@ Time Time::operator/(const Time &_time) const
   if (_time.sec == 0 && _time.nsec == 0)
     ignerr << "Time divide by zero\n";
   else
-  {
-    result.Set(this->sec / _time.sec, this->nsec / _time.nsec);
-    result.Correct();
-  }
+    result.Set(this->Double() / _time.Double());
 
   return result;
 }

@@ -1,8 +1,19 @@
 include (${project_cmake_dir}/Utils.cmake)
 
 set (headers
+  Animation.hh
+  AudioDecoder.hh
+  BVHLoader.hh
+  Color.hh
   Console.hh
+  ffmpeg_inc.h
+  Image.hh
+  KeyFrame.hh
+  NodeTransform.hh
   SingletonT.hh
+  Skeleton.hh
+  SkeletonAnimation.hh
+  SkeletonNode.hh
   Time.hh
   Timer.hh
   Util.hh

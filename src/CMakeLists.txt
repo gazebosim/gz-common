@@ -2,21 +2,37 @@ include (${project_cmake_dir}/Utils.cmake)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 set (sources
+  Animation.cc
+  AudioDecoder.cc
+  BVHLoader.cc
+  Color.cc
   Console.cc
+  Image.cc
+  KeyFrame.cc
+  NodeTransform.cc
+  Skeleton.cc
   Time.cc
   Timer.cc
   Util.cc
 )
 
 set (gtest_sources
+  Animation_TEST.cc
+  AudioDecoder_TEST.cc
+  Color_TEST.cc
   Console_TEST.cc
   Exception_TEST.cc
+  Image_TEST.cc
   Time_TEST.cc
+  Util_TEST.cc
 )
 
 ign_add_library(ignition-common ${sources})
 ign_install_library(ignition-common)
 
-target_link_libraries(ignition-common ${Boost_LIBRARIES})
+target_link_libraries(ignition-common
+  ${Boost_LIBRARIES}
+  ${freeimage_LIBRARIES}
+)
 
 ign_build_tests(${gtest_sources})

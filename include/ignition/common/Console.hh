@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _IGNTION_CONSOLE_HH_
-#define _IGNTION_CONSOLE_HH_
+#ifndef _IGNTION_COMMON_CONSOLE_HH_
+#define _IGNTION_COMMON_CONSOLE_HH_
 
 #include <iostream>
 #include <fstream>
@@ -29,8 +29,6 @@ namespace ignition
 {
   namespace common
   {
-    /// \addtogroup ignition_common Common
-    /// \{
     /// \brief Output a message
     #define ignmsg (ignition::common::Console::msg())
 
@@ -207,7 +205,6 @@ namespace ignition
       /// \brief Indicates if console messages should be quiet.
       private: static bool quiet;
     };
-    /// \}
   }
 }
 #endif
