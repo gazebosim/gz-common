@@ -48,7 +48,7 @@ namespace ignition
 
       /// \brief Changes the name
       /// \param[in] _name the new name
-      public: void Name(const std::string& _name);
+      public: void SetName(const std::string& _name);
 
       /// \brief Returns the name
       /// \return the name

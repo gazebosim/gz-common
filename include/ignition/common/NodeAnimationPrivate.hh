@@ -17,7 +17,9 @@
 #ifndef _IGNITION_COMMON_NODE_ANIMATION_PRIVATE_HH_
 #define _IGNITION_COMMON_NODE_ANIMATION_PRIVATE_HH_
 
+#include <map>
 #include <string>
+
 #include <ignition/math/Matrix4.hh>
 
 namespace ignition

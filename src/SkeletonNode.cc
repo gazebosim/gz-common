@@ -15,14 +15,17 @@
  *
 */
 
-#include <ignition/common/SkeletonNodePrivate.hh>
-#include <ignition/common/SkeletonNode.hh>
+#include <list>
+
+#include "ignition/common/Console.hh"
+#include "ignition/common/SkeletonNodePrivate.hh"
+#include "ignition/common/SkeletonNode.hh"
 
 using namespace ignition;
 using namespace common;
 
 //////////////////////////////////////////////////
-SkeletonNode::SkeletonNode(const SkeletonNode *_parent)
+SkeletonNode::SkeletonNode(SkeletonNode *_parent)
   : data(new SkeletonNodePrivate)
 {
   this->data->parent = _parent;
@@ -32,7 +35,7 @@ SkeletonNode::SkeletonNode(const SkeletonNode *_parent)
 }
 
 //////////////////////////////////////////////////
-SkeletonNode::SkeletonNode(const SkeletonNode *_parent,
+SkeletonNode::SkeletonNode(SkeletonNode *_parent,
     const std::string &_name, const std::string &_id,
     const SkeletonNodeType _type)
   : data(new SkeletonNodePrivate)
@@ -80,7 +83,7 @@ std::string SkeletonNode::Id() const
 }
 
 //////////////////////////////////////////////////
-void SkeletonNode::Type(const SkeletonNodeType _type)
+void SkeletonNode::SetType(const SkeletonNodeType _type)
 {
   this->data->type = _type;
 }
@@ -95,7 +98,7 @@ bool SkeletonNode::IsJoint() const
 }
 
 //////////////////////////////////////////////////
-void SkeletonNode::Transform(const math::Matrix4d &_trans,
+void SkeletonNode::SetTransform(const math::Matrix4d &_trans,
     const bool _updateChildren)
 {
   this->data->transform = _trans;
@@ -116,10 +119,10 @@ void SkeletonNode::Transform(const math::Matrix4d &_trans,
 }
 
 //////////////////////////////////////////////////
-void SkeletonNode::InitialTransform(const math::Matrix4d &_trans)
+void SkeletonNode::SetInitialTransform(const math::Matrix4d &_trans)
 {
   this->data->initialTransform = _trans;
-  this->Transform(_trans);
+  this->SetTransform(_trans);
 }
 
 //////////////////////////////////////////////////
@@ -149,7 +152,8 @@ void SkeletonNode::UpdateChildrenTransforms()
     for (int i = (node->ChildCount() - 1); i >= 0; --i)
       toVisit.push_front(node->Child(i));
 
-    node->modelTransform = node->Parent()->modelTransform * node->transform;
+    node->data->modelTransform =
+        node->Parent()->data->modelTransform * node->data->transform;
   }
 }
 
@@ -160,7 +164,7 @@ math::Matrix4d SkeletonNode::Transform() const
 }
 
 //////////////////////////////////////////////////
-void SkeletonNode::ModelTransform(const math::Matrix4d &_trans,
+void SkeletonNode::SetModelTransform(const math::Matrix4d &_trans,
     const bool _updateChildren)
 {
   this->data->modelTransform = _trans;
@@ -185,7 +189,7 @@ math::Matrix4d SkeletonNode::ModelTransform() const
 }
 
 //////////////////////////////////////////////////
-void SkeletonNode::Parent(const SkeletonNode *_parent)
+void SkeletonNode::SetParent(SkeletonNode *_parent)
 {
   this->data->parent = _parent;
 }
@@ -206,7 +210,7 @@ bool SkeletonNode::IsRootNode() const
 }
 
 //////////////////////////////////////////////////
-void SkeletonNode::AddChild(const SkeletonNode *_child)
+void SkeletonNode::AddChild(SkeletonNode *_child)
 {
   this->data->children.push_back(_child);
 }
@@ -235,7 +239,7 @@ SkeletonNode *SkeletonNode::ChildByName(const std::string &_name) const
 {
   for (unsigned int i = 0; i < this->data->children.size(); ++i)
   {
-    if (this->data->children[i]->GetName() == _name)
+    if (this->data->children[i]->Name() == _name)
       return this->data->children[i];
   }
 
@@ -247,7 +251,7 @@ SkeletonNode *SkeletonNode::ChildById(const std::string &_id) const
 {
   for (unsigned int i = 0; i < this->data->children.size(); ++i)
   {
-    if (this->data->children[i]->GetId() == _id)
+    if (this->data->children[i]->Id() == _id)
       return this->data->children[i];
   }
 
@@ -267,7 +271,7 @@ unsigned int SkeletonNode::Handle() const
 }
 
 //////////////////////////////////////////////////
-void SkeletonNode::InverseBindTransform(const math::Matrix4d &_invBM)
+void SkeletonNode::SetInverseBindTransform(const math::Matrix4d &_invBM)
 {
   this->data->invBindTransform = _invBM;
 }
@@ -291,7 +295,7 @@ unsigned int SkeletonNode::RawTransformCount() const
 }
 
 //////////////////////////////////////////////////
-NodeTransform SkeletonNode::GetRawTransform(const unsigned int _i)
+NodeTransform SkeletonNode::RawTransform(const unsigned int _i) const
 {
   return this->data->rawTransforms[_i];
 }

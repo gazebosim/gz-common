@@ -15,8 +15,11 @@
  *
 */
 
-#include <ignition/common/SkeletonAnimation.hh>
-#include <ignition/common/Console.hh>
+#include "ignition/common/Console.hh"
+#include "ignition/common/NodeAnimationPrivate.hh"
+#include "ignition/common/NodeAnimation.hh"
+#include "ignition/common/SkeletonAnimationPrivate.hh"
+#include "ignition/common/SkeletonAnimation.hh"
 
 using namespace ignition;
 using namespace common;
@@ -38,32 +41,32 @@ NodeAnimation::~NodeAnimation()
 }
 
 //////////////////////////////////////////////////
-void NodeAnimation::Name(const std::string& _name)
+void NodeAnimation::SetName(const std::string &_name)
 {
-  this->name = _name;
+  this->data->name = _name;
 }
 
 //////////////////////////////////////////////////
 std::string NodeAnimation::Name() const
 {
-  return this->name;
+  return this->data->name;
 }
 
 //////////////////////////////////////////////////
 void NodeAnimation::AddKeyFrame(const double _time,
     const math::Matrix4d &_trans)
 {
-  if (_time > this->length)
-    this->length = _time;
+  if (_time > this->data->length)
+    this->data->length = _time;
 
-  this->keyFrames[_time] = _trans;
+  this->data->keyFrames[_time] = _trans;
 }
 
 //////////////////////////////////////////////////
-void NodeAnimation::AddKeyFrame(const double _time, const math::Pose &_pose)
+void NodeAnimation::AddKeyFrame(const double _time, const math::Pose3d &_pose)
 {
-  math::Matrix4d mat(_pose.rot);
-  mat.Translate(_pose.pos);
+  math::Matrix4d mat(_pose.Rot());
+  mat.Translate(_pose.Pos());
 
   this->AddKeyFrame(_time, mat);
 }
@@ -71,14 +74,14 @@ void NodeAnimation::AddKeyFrame(const double _time, const math::Pose &_pose)
 //////////////////////////////////////////////////
 unsigned int NodeAnimation::FrameCount() const
 {
-  return this->keyFrames.size();
+  return this->data->keyFrames.size();
 }
 
 //////////////////////////////////////////////////
-void NodeAnimation::GetKeyFrame(const unsigned int _i, double &_time,
+void NodeAnimation::KeyFrame(const unsigned int _i, double &_time,
         math::Matrix4d &_trans) const
 {
-  if (_i >= this->keyFrames.size())
+  if (_i >= this->data->keyFrames.size())
   {
     ignerr << "Invalid key frame index " << _i << "\n";
     _time = -1.0;
@@ -86,7 +89,7 @@ void NodeAnimation::GetKeyFrame(const unsigned int _i, double &_time,
   else
   {
     std::map<double, math::Matrix4d>::const_iterator iter =
-      this->keyFrames.begin();
+      this->data->keyFrames.begin();
 
     std::advance(iter, _i);
 
@@ -96,11 +99,11 @@ void NodeAnimation::GetKeyFrame(const unsigned int _i, double &_time,
 }
 
 //////////////////////////////////////////////////
-std::pair<double, math::Matrix4> NodeAnimation::KeyFrame(
+std::pair<double, math::Matrix4d> NodeAnimation::KeyFrame(
   const unsigned int _i) const
 {
   double t;
-  math::Matrix4d mat(math::Matrix4d::IDENTITY);
+  math::Matrix4d mat(math::Matrix4d::Identity);
   this->KeyFrame(_i, t, mat);
 
   return std::make_pair(t, mat);
@@ -109,38 +112,38 @@ std::pair<double, math::Matrix4> NodeAnimation::KeyFrame(
 //////////////////////////////////////////////////
 double NodeAnimation::Length() const
 {
-  return this->length;
+  return this->data->length;
 }
 
 //////////////////////////////////////////////////
-math::Matrix4d NodeAnimation::GetFrameAt(double _time, bool _loop) const
+math::Matrix4d NodeAnimation::FrameAt(double _time, bool _loop) const
 {
   double time = _time;
-  if (time > this->length)
+  if (time > this->data->length)
   {
     if (_loop)
     {
-      while (time > this->length)
-        time = time - this->length;
+      while (time > this->data->length)
+        time = time - this->data->length;
     }
     else
     {
-      time = this->length;
+      time = this->data->length;
     }
   }
 
-  if (math::equal(time, this->length))
-    return this->keyFrames.rbegin()->second;
+  if (math::equal(time, this->data->length))
+    return this->data->keyFrames.rbegin()->second;
 
-  std::map<double, math::Matrix4>::const_iterator it1 =
-    this->keyFrames.upper_bound(time);
+  std::map<double, math::Matrix4d>::const_iterator it1 =
+    this->data->keyFrames.upper_bound(time);
 
-  if (it1 == this->keyFrames.begin() || math::equal(it1->first, time))
+  if (it1 == this->data->keyFrames.begin() || math::equal(it1->first, time))
     return it1->second;
 
-  std::map<double, math::Matrix4>::const_iterator it2 = it1--;
+  std::map<double, math::Matrix4d>::const_iterator it2 = it1--;
 
-  if (it1 == this->keyFrames.begin() || math::equal(it1->first, time))
+  if (it1 == this->data->keyFrames.begin() || math::equal(it1->first, time))
     return it1->second;
 
   double nextKey = it2->first;
@@ -153,7 +156,7 @@ math::Matrix4d NodeAnimation::GetFrameAt(double _time, bool _loop) const
   if (t >= 0.0 && t <= 1.0)
   {
     ignerr << "Invalid time range\n";
-    return math::Matrix4d;
+    return math::Matrix4d();
   }
 
   math::Vector3d nextPos = nextTrans.Translation();
@@ -177,7 +180,8 @@ math::Matrix4d NodeAnimation::GetFrameAt(double _time, bool _loop) const
 void NodeAnimation::Scale(const double _scale)
 {
   for (std::map<double, math::Matrix4d>::iterator iter =
-      this->keyFrames.begin(); iter != this->keyFrames.end(); ++iter)
+      this->data->keyFrames.begin();
+      iter != this->data->keyFrames.end(); ++iter)
   {
     math::Matrix4d *mat = &iter->second;
     math::Vector3d pos = mat->Translation();
@@ -189,13 +193,13 @@ void NodeAnimation::Scale(const double _scale)
 double NodeAnimation::TimeAtX(const double _x) const
 {
   std::map<double, math::Matrix4d>::const_iterator it1 =
-    this->keyFrames.begin();
+    this->data->keyFrames.begin();
 
-  while (it1->second.Translation().x < _x)
+  while (it1->second.Translation().X() < _x)
     ++it1;
 
-  if (it1 == this->keyFrames.begin() ||
-      math::equal(it1->second.Translation().x, _x))
+  if (it1 == this->data->keyFrames.begin() ||
+      math::equal(it1->second.Translation().X(), _x))
   {
     return it1->first;
   }
@@ -213,75 +217,75 @@ double NodeAnimation::TimeAtX(const double _x) const
 SkeletonAnimation::SkeletonAnimation(const std::string &_name)
   : data(new SkeletonAnimationPrivate)
 {
-  this->name = _name;
+  this->data->name = _name;
 }
 
 //////////////////////////////////////////////////
 SkeletonAnimation::~SkeletonAnimation()
 {
-  this->animations.clear();
+  this->data->animations.clear();
   delete this->data;
   this->data = NULL;
 }
 
 //////////////////////////////////////////////////
-void SkeletonAnimation::Name(const std::string &_name)
+void SkeletonAnimation::SetName(const std::string &_name)
 {
-  this->name = _name;
+  this->data->name = _name;
 }
 
 //////////////////////////////////////////////////
 std::string SkeletonAnimation::Name() const
 {
-  return this->name;
+  return this->data->name;
 }
 
 //////////////////////////////////////////////////
 unsigned int SkeletonAnimation::NodeCount() const
 {
-  return this->animations.size();
+  return this->data->animations.size();
 }
 
 //////////////////////////////////////////////////
 bool SkeletonAnimation::HasNode(const std::string &_node) const
 {
-  return (this->animations.find(_node) != this->animations.end());
+  return (this->data->animations.find(_node) != this->data->animations.end());
 }
 
 //////////////////////////////////////////////////
 void SkeletonAnimation::AddKeyFrame(const std::string &_node,
     const double _time, const math::Matrix4d &_mat)
 {
-  if (this->animations.find(_node) == this->animations.end())
-    this->animations[_node] = new NodeAnimation(_node);
+  if (this->data->animations.find(_node) == this->data->animations.end())
+    this->data->animations[_node] = new NodeAnimation(_node);
 
-  if (_time > this->length)
-    this->length = _time;
+  if (_time > this->data->length)
+    this->data->length = _time;
 
-  this->animations[_node]->AddKeyFrame(_time, _mat);
+  this->data->animations[_node]->AddKeyFrame(_time, _mat);
 }
 
 //////////////////////////////////////////////////
 void SkeletonAnimation::AddKeyFrame(const std::string &_node,
-      const double _time, const math::Pose &_pose)
+      const double _time, const math::Pose3d &_pose)
 {
-  if (this->animations.find(_node) == this->animations.end())
-    this->animations[_node] = new NodeAnimation(_node);
+  if (this->data->animations.find(_node) == this->data->animations.end())
+    this->data->animations[_node] = new NodeAnimation(_node);
 
-  if (_time > this->length)
-    this->length = _time;
+  if (_time > this->data->length)
+    this->data->length = _time;
 
-  this->animations[_node]->AddKeyFrame(_time, _pose);
+  this->data->animations[_node]->AddKeyFrame(_time, _pose);
 }
 
 //////////////////////////////////////////////////
 math::Matrix4d SkeletonAnimation::NodePoseAt(const std::string &_node,
-    const double _time, const bool _loop)
+    const double _time, const bool _loop) const
 {
   math::Matrix4d mat;
 
-  if (this->animations[_node])
-    mat = this->animations[_node]->FrameAt(_time, _loop);
+  if (this->data->animations[_node])
+    mat = this->data->animations[_node]->FrameAt(_time, _loop);
 
   return mat;
 }
@@ -298,7 +302,8 @@ std::map<std::string, math::Matrix4d> SkeletonAnimation::PoseAt(
   ///  doing it only once per time step.
   std::map<std::string, math::Matrix4d> pose;
   for (std::map<std::string, NodeAnimation*>::const_iterator iter =
-          this->animations.begin(); iter != this->animations.end(); ++iter)
+          this->data->animations.begin();
+          iter != this->data->animations.end(); ++iter)
   {
     pose[iter->first] = iter->second->FrameAt(_time, _loop);
   }
@@ -311,9 +316,9 @@ std::map<std::string, math::Matrix4d> SkeletonAnimation::PoseAtX(
              const double _x, const std::string &_node, const bool _loop) const
 {
   std::map<std::string, NodeAnimation*>::const_iterator nodeAnim =
-      this->animations.find(_node);
+      this->data->animations.find(_node);
   math::Matrix4d lastPos = nodeAnim->second->KeyFrame(
-      nodeAnim->second->GetFrameCount() - 1).second;
+      nodeAnim->second->FrameCount() - 1).second;
 
   math::Matrix4d firstPos = nodeAnim->second->KeyFrame(0).second;
 
@@ -321,7 +326,7 @@ std::map<std::string, math::Matrix4d> SkeletonAnimation::PoseAtX(
   if (x < firstPos.Translation().X())
     x = firstPos.Translation().X();
 
-  double lastX = lastPos.GetTranslation().X();
+  double lastX = lastPos.Translation().X();
   if (x > lastX && !_loop)
     x = lastX;
   while (x > lastX)
@@ -336,12 +341,12 @@ std::map<std::string, math::Matrix4d> SkeletonAnimation::PoseAtX(
 void SkeletonAnimation::Scale(const double _scale)
 {
   for (std::map<std::string, NodeAnimation*>::iterator iter =
-        this->animations.begin(); iter != this->animations.end(); ++iter)
+        this->data->animations.begin(); iter != this->data->animations.end(); ++iter)
     iter->second->Scale(_scale);
 }
 
 //////////////////////////////////////////////////
 double SkeletonAnimation::Length() const
 {
-  return this->length;
+  return this->data->length;
 }

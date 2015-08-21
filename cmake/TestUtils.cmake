@@ -11,13 +11,11 @@ macro (ign_build_tests)
 
     add_dependencies(${BINARY_NAME}
       ${PROJECT_NAME_LOWER}
-      ignition-math
       gtest gtest_main
       )
 
     target_link_libraries(${BINARY_NAME}
       ${PROJECT_NAME_LOWER}
-      ignition-math
       libgtest.a
       libgtest_main.a
       rt

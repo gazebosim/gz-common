@@ -95,7 +95,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, const double _scale)
               math::parseFloat(words[3]) * _scale);
           math::Matrix4d transform(math::Matrix4d::Identity);
           transform.Translate(offset);
-          node->Transform(transform);
+          node->SetTransform(transform);
         }
         else
           if (words[0] == "CHANNELS")

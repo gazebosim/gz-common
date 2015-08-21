@@ -20,6 +20,8 @@
 #include <string>
 #include <vector>
 
+#include <ignition/common/SkeletonNode.hh>
+
 namespace ignition
 {
   namespace common
@@ -35,7 +37,7 @@ namespace ignition
       public: std::string id;
 
       /// \brief the type fo node
-      public: SkeletonNodeType type;
+      public: SkeletonNode::SkeletonNodeType type;
 
       /// \brief the transform
       public: math::Matrix4d transform;

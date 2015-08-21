@@ -6,11 +6,16 @@ include (FindPkgConfig)
 include (${project_cmake_dir}/FindFreeimage.cmake)
 
 ########################################
-find_package(ignition-math QUIET)
-if (NOT ignition-math_FOUND)
-  BUILD_ERROR ("Missing: Ignition math library.")
-else()
-  message(STATUS "Looking for ignition_math - found")
+# Find ignition math in unix platforms
+# In Windows we expect a call from configure.bat script with the paths
+if (NOT WIN32)
+  find_package(ignition-math2 QUIET)
+  if (NOT ignition-math2_FOUND)
+    message(STATUS "Looking for ignition-math2-config.cmake - not found")
+    BUILD_ERROR ("Missing: Ignition math2 library.")
+  else()
+    message(STATUS "Looking for ignition-math2-config.cmake - found")
+  endif()
 endif()
 
 ########################################
