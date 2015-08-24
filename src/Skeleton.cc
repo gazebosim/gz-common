@@ -121,7 +121,7 @@ void Skeleton::Scale(const double _scale)
     math::Matrix4d trans = node->Transform();
     math::Vector3d pos = trans.Translation();
     trans.Translate(pos * _scale);
-    node->Transform(trans, false);
+    node->SetTransform(trans, false);
   }
 
   //  update the nodes' model transforms
@@ -145,8 +145,8 @@ void Skeleton::BuildNodeMap()
     SkeletonNode *node = toVisit.front();
     toVisit.pop_front();
 
-    for (int i = (node->GetChildCount() - 1); i >= 0; --i)
-      toVisit.push_front(node->GetChild(i));
+    for (int i = (node->ChildCount() - 1); i >= 0; --i)
+      toVisit.push_front(node->Child(i));
 
     node->Handle(handle);
     this->data->nodes[handle] = node;
@@ -155,15 +155,15 @@ void Skeleton::BuildNodeMap()
 }
 
 //////////////////////////////////////////////////
-void Skeleton::BindShapeTransform(const math::Matrix4d &_trans)
+void Skeleton::SetBindShapeTransform(const math::Matrix4d &_trans)
 {
-  this->root->bindShapeTransform = _trans;
+  this->data->bindShapeTransform = _trans;
 }
 
 //////////////////////////////////////////////////
 math::Matrix4d Skeleton::BindShapeTransform() const
 {
-  return this->root->bindShapeTransform;
+  return this->data->bindShapeTransform;
 }
 
 //////////////////////////////////////////////////
@@ -179,19 +179,19 @@ void Skeleton::PrintTransforms() const
     {
       NodeTransform nt = node->RawTransform(i);
       std::cout << "\t" << nt.SID();
-      if (nt.Type() == NodeTransform::MATRIX)
+      if (nt.Type() == NodeTransformType::MATRIX)
       {
         std::cout << " MATRIX\n";
       }
       else
       {
-        if (nt.Type() == NodeTransform::TRANSLATE)
+        if (nt.Type() == NodeTransformType::TRANSLATE)
         {
           std::cout << " TRANSLATE\n";
         }
         else
         {
-          if (nt.Type() == NodeTransform::ROTATE)
+          if (nt.Type() == NodeTransformType::ROTATE)
             std::cout << " ROTATE\n";
           else
             std::cout << " SCALE\n";
@@ -214,7 +214,7 @@ const SkeletonNodeMap &Skeleton::Nodes() const
 }
 
 //////////////////////////////////////////////////
-void Skeleton::NumVertAttached(const unsigned int _vertices)
+void Skeleton::SetNumVertAttached(const unsigned int _vertices)
 {
   this->data->rawNodeWeights.resize(_vertices);
 }
@@ -225,14 +225,17 @@ void Skeleton::AddVertNodeWeight(
     const double _weight)
 {
   if (_vertex < this->data->rawNodeWeights.size())
-    iter->second.push_back(std::make_pair(_node, _weight));
+  {
+    this->data->rawNodeWeights[_vertex].push_back(
+        std::make_pair(_node, _weight));
+  }
 }
 
 //////////////////////////////////////////////////
 unsigned int Skeleton::VertNodeWeightCount(const unsigned int _vertex) const
 {
   if (_vertex < this->data->rawNodeWeights.size())
-    return this->data->rawNodeWeights[_vertex];
+    return this->data->rawNodeWeights[_vertex].size();
   else
     return 0;
 }
@@ -259,7 +262,7 @@ unsigned int Skeleton::AnimationCount() const
 }
 
 //////////////////////////////////////////////////
-SkeletonAnimation *Skeleton::Animation(const unsigned int _i)
+SkeletonAnimation *Skeleton::Animation(const unsigned int _i) const
 {
   if (_i < this->data->anims.size())
     return this->data->anims[_i];
@@ -268,7 +271,7 @@ SkeletonAnimation *Skeleton::Animation(const unsigned int _i)
 }
 
 //////////////////////////////////////////////////
-void Skeleton::AddAnimation(const SkeletonAnimation *_anim)
+void Skeleton::AddAnimation(SkeletonAnimation *_anim)
 {
   this->data->anims.push_back(_anim);
 }

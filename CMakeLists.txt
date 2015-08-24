@@ -200,6 +200,12 @@ if(APPLE)
   ign_setup_apple()
 endif()
 
+# Main includes for compilation
+include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
+include_directories(SYSTEM
+  ${IGNITION-MATH_INCLUDE_DIRS}
+)
+
 #################################################
 # Print warnings and errors
 if ( build_warnings )
@@ -274,7 +280,7 @@ else (build_errors)
   set(PKG_NAME ${PROJECT_NAME_UPPER})
   set(PKG_LIBRARIES ${PROJECT_NAME_LOWER})
 
-  set(PKG_DEPENDS ignition-math)
+  set(PKG_DEPENDS)
 
   configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/ignition-config.cmake.in"

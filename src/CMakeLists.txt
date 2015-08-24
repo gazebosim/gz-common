@@ -11,6 +11,8 @@ set (sources
   KeyFrame.cc
   NodeTransform.cc
   Skeleton.cc
+  SkeletonAnimation.cc
+  SkeletonNode.cc
   Time.cc
   Timer.cc
   Util.cc
@@ -31,6 +33,7 @@ ign_add_library(ignition-common ${sources})
 ign_install_library(ignition-common)
 
 target_link_libraries(ignition-common
+  ${IGNITION-MATH_LIBRARIES}
   ${Boost_LIBRARIES}
   ${freeimage_LIBRARIES}
 )

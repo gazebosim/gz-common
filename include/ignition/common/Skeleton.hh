@@ -85,7 +85,7 @@ namespace ignition
 
       /// \brief Set the bind pose skeletal transform
       /// \param[in] _trans the transform
-      public: void BindShapeTransform(const math::Matrix4d &_trans);
+      public: void SetBindShapeTransform(const math::Matrix4d &_trans);
 
       /// \brief Return bind pose skeletal transform
       /// \return A matrix
@@ -100,14 +100,14 @@ namespace ignition
 
       /// \brief Resizes the raw node weight array
       /// \param[in] _vertices the new size
-      public: void NumVertAttached(const unsigned int _vertices);
+      public: void SetNumVertAttached(const unsigned int _vertices);
 
       /// \brief Add a new weight to a node (bone)
       /// \param[in] _vertex index of the vertex
       /// \param[in] _node name of the bone
       /// \param[in] _weight the new weight (range 0 to 1)
       public: void AddVertNodeWeight(const unsigned int _vertex,
-                  const std::string _node, const double _weight);
+                  const std::string &_node, const double _weight);
 
       /// \brief Returns the number of bone weights for a vertex
       /// \param[in] _vertex the index of the vertex
@@ -134,7 +134,7 @@ namespace ignition
       /// \brief Add an animation. The skeleton does not take ownership of the
       /// animation
       /// \param[in] _anim the animation to add
-      public: void AddAnimation(const SkeletonAnimation *_anim);
+      public: void AddAnimation(SkeletonAnimation *_anim);
 
       /// \brief Initializes the hande numbers for each node in the map
       /// using breadth first traversal
@@ -146,4 +146,3 @@ namespace ignition
   }
 }
 #endif
-

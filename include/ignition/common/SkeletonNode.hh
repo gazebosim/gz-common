@@ -17,8 +17,10 @@
 #ifndef _IGNITION_COMMON_SKELETON_NODE_HH_
 #define _IGNITION_COMMON_SKELETON_NODE_HH_
 
+#include <map>
 #include <string>
 #include <vector>
+
 #include <ignition/common/NodeTransform.hh>
 #include <ignition/common/Util.hh>
 
@@ -38,14 +40,14 @@ namespace ignition
 
       /// \brief Constructor
       /// \param[in] _parent The parent node
-      public: SkeletonNode(const SkeletonNode *_parent);
+      public: SkeletonNode(SkeletonNode *_parent);
 
       /// \brief Constructor
       /// \param[in] _parent the parent node
       /// \param[in] _name name of node
       /// \param[in] _id Id of node
       /// \param[in] _type The type of this node
-      public: SkeletonNode(const SkeletonNode *_parent,
+      public: SkeletonNode(SkeletonNode *_parent,
                   const std::string &_name,
                   const std::string &_id,
                   const SkeletonNodeType _type = JOINT);
@@ -71,7 +73,7 @@ namespace ignition
 
       /// \brief Change the skeleton node type
       /// \param[in] _type the new type
-      public: void Type(const SkeletonNodeType _type);
+      public: void SetType(const SkeletonNodeType _type);
 
       /// \brief Is a joint query
       /// \return true if the skeleton type is a joint, false otherwise
@@ -81,14 +83,14 @@ namespace ignition
       /// \param[in] _trans the transformation
       /// \param[in] _updateChildren when true the UpdateChildrenTransforms
       /// operation is performed
-      public: void Transform(const math::Matrix4d &_trans,
+      public: void SetTransform(const math::Matrix4d &_trans,
                  const bool _updateChildren = true);
 
       /// \brief Set the model transformation
       /// \param[in] _trans the transformation
       /// \param[in] _updateChildren when true the UpdateChildrenTransforms
       /// operation is performed
-      public: void ModelTransform(const math::Matrix4d &_trans,
+      public: void SetModelTransform(const math::Matrix4d &_trans,
                   const bool _updateChildren = true);
 
       /// \brief Apply model transformations in order for each node in the tree
@@ -96,7 +98,7 @@ namespace ignition
 
       /// \brief Sets the initial transformation
       /// \param[in] _trans the transfromation matrix
-      public: void InitialTransform(const math::Matrix4d &_trans);
+      public: void SetInitialTransform(const math::Matrix4d &_trans);
 
       /// \brief Reset the transformation to the initial transformation
       /// \param[in] _resetChildren when true, performs the operation for every
@@ -108,7 +110,7 @@ namespace ignition
 
       /// \brief Set the parent node
       /// \param[in] _parent the new parent
-      public: void Parent(const SkeletonNode *_parent);
+      public: void SetParent(SkeletonNode *_parent);
 
       /// \brief Returns the parent node
       /// \return the parent
@@ -120,7 +122,7 @@ namespace ignition
 
       /// \brief Add a new child
       /// \param[in] _child a child
-      public: void AddChild(const SkeletonNode *_child);
+      public: void AddChild(SkeletonNode *_child);
 
       /// \brief Returns the children count
       /// \return the count
@@ -151,7 +153,7 @@ namespace ignition
 
       /// \brief Assign the inverse of the bind pose skeletal transform
       /// \param[in] _invBM the transform
-      public: void InverseBindTransform(const math::Matrix4d &_invBM);
+      public: void SetInverseBindTransform(const math::Matrix4d &_invBM);
 
       /// \brief Retrieve the inverse of the bind pose skeletal transform
       /// \return the transform
@@ -167,7 +169,7 @@ namespace ignition
 
       /// \brief Return the raw transformations count
       /// \return the count
-      public: unsigned int GetRawTransformCount() const;
+      public: unsigned int RawTransformCount() const;
 
       /// \brief Find a raw transformation
       /// \param[in] _i the index of the transformation

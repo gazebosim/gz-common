@@ -17,10 +17,17 @@
 #ifndef _IGNITION_COMMON_NODE_ANIMATION_HH_
 #define _IGNITION_COMMON_NODE_ANIMATION_HH_
 
+#include <ignition/math/Matrix4.hh>
+#include <ignition/math/Pose3.hh>
+
+#include "ignition/common/Util.hh"
+
 namespace ignition
 {
   namespace common
   {
+    class NodeAnimationPrivate;
+
     /// \class NodeAnimation NodeAnimation.hh ignition/common/NodeAnimation.hh
     /// \brief Node animation
     class IGNITION_VISIBLE NodeAnimation
@@ -34,7 +41,7 @@ namespace ignition
 
       /// \brief Changes the name of the animation
       /// \param[in] the new name
-      public: void Name(const std::string &_name);
+      public: void SetName(const std::string &_name);
 
       /// \brief Returns the name
       /// \return the name

@@ -18,7 +18,8 @@
 #define _IGNITION_COMMON_SKELETONANIMATION_PRIVATE_HH_
 
 #include <string>
-#include <ignition/common/NodeAnimation.hh>
+
+#include "ignition/common/NodeAnimation.hh"
 
 namespace ignition
 {
@@ -27,13 +28,13 @@ namespace ignition
     class SkeletonAnimationPrivate
     {
       /// \brief the node name
-      protected: std::string name;
+      public: std::string name;
 
       /// \brief the duration of the longest animation
-      protected: double length;
+      public: double length;
 
       /// \brief a dictionary of node animations
-      protected: std::map<std::string, NodeAnimation*> animations;
+      public: std::map<std::string, NodeAnimation*> animations;
     };
   }
 }
