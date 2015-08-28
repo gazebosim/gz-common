@@ -39,9 +39,7 @@ namespace ignition
       /// \param[in] _file File name
       /// \param[in] _line Line number where the error occurred
       /// \param[in] _msg Error message
-      public: Exception(const char *_file,
-                          int _line,
-                          std::string _msg);
+      public: Exception(const char *_file, int _line, const std::string &_msg);
 
       /// \brief Destructor
       public: virtual ~Exception();
