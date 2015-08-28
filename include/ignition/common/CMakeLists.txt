@@ -9,6 +9,7 @@ set (headers
   ffmpeg_inc.h
   Image.hh
   KeyFrame.hh
+  Material.hh
   NodeTransform.hh
   SingletonT.hh
   Skeleton.hh
