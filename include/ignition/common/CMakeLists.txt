@@ -6,6 +6,7 @@ set (headers
   BVHLoader.hh
   Color.hh
   Console.hh
+  Exception.hh
   ffmpeg_inc.h
   Image.hh
   KeyFrame.hh
