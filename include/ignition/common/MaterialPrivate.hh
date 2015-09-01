@@ -62,12 +62,13 @@ namespace ignition
       /// \brief the shade mode
       public: Material::MaterialShadeMode shadeMode;
 
-      /// \brief the total number of instanciated Material instances
+      /// \brief the total number of instantiated Material instances
       public: static unsigned int counter;
 
       /// \brief flag to perform depth buffer write
       public: bool depthWrite;
 
+      /// \brief flag to inidcate if lighting is enabled for this material.
       public: bool lighting;
 
       /// \brief source blend factor

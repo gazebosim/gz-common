@@ -32,10 +32,52 @@ namespace ignition
     /// \brief Encapsulates description of a material
     class IGNITION_VISIBLE Material
     {
-      public: enum MaterialShadeMode {FLAT, GOURAUD, PHONG, BLINN, SHADE_COUNT};
+      /// \brief Enum used to indicate the type of material shading, i.e.
+      /// what interpolation techinique to be applied to the colors of the
+      /// surface
+      public: enum MaterialShadeMode
+      {
+        /// \brief Flat shading. No interpolation.
+        FLAT,
+
+        /// \brief Gouraud shading. Interpolation of vertex colors across
+        /// polygons.
+        GOURAUD,
+
+        /// \brief Phong shading. Interpolation of vertex normals across
+        /// polygons, and final color is obtained using the Phong reflection
+        /// model.
+        PHONG,
+
+        /// \brief Blinn-Phong shading. Gouraud shading with a modified Phong
+        /// reflection model (computationally more efficient).
+        BLINN,
+
+        /// \brief Number of entries in this enum
+        SHADE_COUNT
+      };
+
+      /// \brief an array with the shader mode enum as string
       public: static std::string ShadeModeStr[SHADE_COUNT];
 
-      public: enum MaterialBlendMode {ADD, MODULATE, REPLACE, BLEND_COUNT};
+      /// \brief Enum used to indicate the type of blend mode for a material
+      /// pass
+      public: enum MaterialBlendMode
+      {
+        /// \brief Color is added to the scene
+        ADD,
+
+        /// \brief Color is multiplied with the scene contents
+        MODULATE,
+
+        /// \brief Color replaces the scene contents
+        REPLACE,
+
+        /// \brief Number of entries in this enum
+        BLEND_COUNT
+      };
+
+      /// \brief
       public: static std::string BlendModeStr[BLEND_COUNT];
 
       /// \brief Constructor
@@ -116,15 +158,15 @@ namespace ignition
       /// \return The shininess value
       public: double Shininess() const;
 
-      /// \brief Set the blende factors. Will be interpreted as:
+      /// \brief Set the blend factors. Will be interpreted as:
       ///        (texture * _srcFactor) + (scene_pixel * _dstFactor)
       /// \param[in] _srcFactor The source factor
       /// \param[in] _dstFactor The destination factor
       public: void SetBlendFactors(double _srcFactor, double _dstFactor);
 
       /// \brief Get the blend factors
-      /// \param[in] _srcFactor Source factor is returned in this variable
-      /// \param[in] _dstFactor Destination factor is returned in this variable
+      /// \param[out] _srcFactor Source factor is returned in this variable
+      /// \param[out] _dstFactor Destination factor is returned in this variable
       public: void BlendFactors(double &_srcFactor, double &_dstFactor) const;
 
       /// \brief Set the blending mode
