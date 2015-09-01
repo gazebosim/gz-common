@@ -57,7 +57,7 @@ namespace ignition
         SHADE_COUNT
       };
 
-      /// \brief an array with the shader mode enum as string
+      /// \brief An array of strings for the shade mode enum.
       public: static std::string ShadeModeStr[SHADE_COUNT];
 
       /// \brief Enum used to indicate the type of blend mode for a material
@@ -77,7 +77,7 @@ namespace ignition
         BLEND_COUNT
       };
 
-      /// \brief
+      /// \brief An array of strings for the blend mode enum.
       public: static std::string BlendModeStr[BLEND_COUNT];
 
       /// \brief Constructor
