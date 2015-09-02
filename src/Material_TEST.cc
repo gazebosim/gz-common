@@ -15,6 +15,7 @@
 */
 
 #include <gtest/gtest.h>
+#include <string>
 
 #include "ignition/common/Material.hh"
 
@@ -90,20 +91,21 @@ TEST(MaterialTest, OperatorStreamOut)
   std::ostringstream stream;
   stream << m;
 
-  EXPECT_EQ(stream.str(),
-  "Material:\n\
-  Name: ign-common_material_2\n\
-  Texture: \n\
-  Ambient: 0.4 0.4 0.4 1\n\
-  Diffuse: 0.4 0.4 0.4 1\n\
-  Specular: 0 0 0 0\n\
-  Emissive: 0 0 0 0\n\
-  Transparency: 0\n\
-  Shininess: 0\n\
-  BlendMode: REPLACE\n\
-  ShadeMode: GOURAUD\n\
-  DepthWrite: 0\n");
+  std::string result = R"***(Material:
+  Name: ign-common_material_2
+  Texture:
+  Ambient: 0.4 0.4 0.4 1
+  Diffuse: 0.4 0.4 0.4 1
+  Specular: 0 0 0 0
+  Emissive: 0 0 0 0
+  Transparency: 0
+  Shininess: 0
+  BlendMode: REPLACE
+  ShadeMode: GOURAUD
+  DepthWrite: 0
+)***";
 
+  EXPECT_EQ(stream.str(), result);
 }
 
 /////////////////////////////////////////////////

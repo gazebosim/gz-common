@@ -218,7 +218,7 @@ namespace ignition
       {
         _out << "Material:\n";
         _out << "  Name: " << _m.Name() << "\n";
-        _out << "  Texture: " << _m.TextureImage() << "\n";
+        _out << "  Texture:" << _m.TextureImage() << "\n";
         _out << "  Ambient: " << _m.Ambient() << "\n";
         _out << "  Diffuse: " << _m.Diffuse() << "\n";
         _out << "  Specular: " << _m.Specular() << "\n";
