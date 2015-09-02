@@ -38,7 +38,7 @@ namespace ignition
       /// \brief the ambient light color
       public: Color ambient;
 
-      /// \brief the diffuse ligth color
+      /// \brief the diffuse light color
       public: Color diffuse;
 
       /// \brief the specular light color
