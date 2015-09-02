@@ -144,7 +144,7 @@ namespace ignition
 
       /// \brief Set the transparency percentage (0..1)
       /// \param[in] _t The amount of transparency (0..1)
-      public: void SetTransparency(double _t);
+      public: void SetTransparency(const double _t);
 
       /// \brief Get the transparency percentage (0..1)
       /// \return The transparency percentage
@@ -152,7 +152,7 @@ namespace ignition
 
       /// \brief Set the shininess
       /// \param[in] _t The shininess value
-      public: void SetShininess(double _t);
+      public: void SetShininess(const double _t);
 
       /// \brief Get the shininess
       /// \return The shininess value
@@ -162,7 +162,8 @@ namespace ignition
       ///        (texture * _srcFactor) + (scene_pixel * _dstFactor)
       /// \param[in] _srcFactor The source factor
       /// \param[in] _dstFactor The destination factor
-      public: void SetBlendFactors(double _srcFactor, double _dstFactor);
+      public: void SetBlendFactors(const double _srcFactor,
+                  const double _dstFactor);
 
       /// \brief Get the blend factors
       /// \param[out] _srcFactor Source factor is returned in this variable
@@ -171,7 +172,7 @@ namespace ignition
 
       /// \brief Set the blending mode
       /// \param[in] _b the blend mode
-      public: void SetBlendMode(MaterialBlendMode _b);
+      public: void SetBlendMode(const MaterialBlendMode _b);
 
       /// \brief Get the blending mode
       /// \return the blend mode
@@ -179,7 +180,7 @@ namespace ignition
 
       /// \brief Set the shading mode
       /// param[in] the shading mode
-      public: void SetShadeMode(MaterialShadeMode _b);
+      public: void SetShadeMode(const MaterialShadeMode _b);
 
       /// \brief Get the shading mode
       /// \return the shading mode
@@ -187,7 +188,7 @@ namespace ignition
 
       /// \brief Set the point size
       /// \param[in] _size the size
-      public: void SetPointSize(double _size);
+      public: void SetPointSize(const double _size);
 
       /// \brief Get the point size
       /// \return the point size
@@ -195,7 +196,7 @@ namespace ignition
 
       /// \brief Set depth write
       /// \param[in] _value the depth write enabled state
-      public: void SetDepthWrite(bool _value);
+      public: void SetDepthWrite(const bool _value);
 
       /// \brief Get depth write
       /// \return the depth write enabled state
@@ -203,7 +204,7 @@ namespace ignition
 
       /// \brief Set lighting enabled
       /// \param[in] _value the lighting enabled state
-      public: void SetLighting(bool _value);
+      public: void SetLighting(const bool _value);
 
       /// \brief Get lighting enabled
       /// \return the lighting enabled state

@@ -147,7 +147,7 @@ Color Material::Emissive() const
 }
 
 //////////////////////////////////////////////////
-void Material::SetTransparency(double _t)
+void Material::SetTransparency(const double _t)
 {
   this->dataPtr->transparency = std::min(_t, 1.0);
   this->dataPtr->transparency = std::max(this->dataPtr->transparency, 0.0);
@@ -161,7 +161,7 @@ double Material::Transparency() const
 }
 
 //////////////////////////////////////////////////
-void Material::SetShininess(double _s)
+void Material::SetShininess(const double _s)
 {
   this->dataPtr->shininess = _s;
   this->dataPtr->lighting = true;
@@ -174,7 +174,7 @@ double Material::Shininess() const
 }
 
 //////////////////////////////////////////////////
-void Material::SetBlendFactors(double _srcFactor, double _dstFactor)
+void Material::SetBlendFactors(const double _srcFactor, const double _dstFactor)
 {
   this->dataPtr->srcBlendFactor = _srcFactor;
   this->dataPtr->dstBlendFactor = _dstFactor;
@@ -188,7 +188,7 @@ void Material::BlendFactors(double &_srcFactor, double &_dstFactor) const
 }
 
 //////////////////////////////////////////////////
-void Material::SetBlendMode(MaterialBlendMode _b)
+void Material::SetBlendMode(const MaterialBlendMode _b)
 {
   this->dataPtr->blendMode = _b;
 }
@@ -200,7 +200,7 @@ Material::MaterialBlendMode Material::BlendMode() const
 }
 
 //////////////////////////////////////////////////
-void Material::SetShadeMode(MaterialShadeMode _s)
+void Material::SetShadeMode(const MaterialShadeMode _s)
 {
   this->dataPtr->shadeMode = _s;
 }
@@ -212,7 +212,7 @@ Material::MaterialShadeMode Material::ShadeMode() const
 }
 
 //////////////////////////////////////////////////
-void Material::SetPointSize(double _size)
+void Material::SetPointSize(const double _size)
 {
   this->dataPtr->pointSize = _size;
 }
@@ -223,7 +223,7 @@ double Material::PointSize() const
   return this->dataPtr->pointSize;
 }
 //////////////////////////////////////////////////
-void Material::SetDepthWrite(bool _value)
+void Material::SetDepthWrite(const bool _value)
 {
   this->dataPtr->depthWrite = _value;
 }
@@ -235,7 +235,7 @@ bool Material::DepthWrite() const
 }
 
 //////////////////////////////////////////////////
-void Material::SetLighting(bool _value)
+void Material::SetLighting(const bool _value)
 {
   this->dataPtr->lighting = _value;
 }
