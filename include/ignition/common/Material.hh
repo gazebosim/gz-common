@@ -214,7 +214,24 @@ namespace ignition
       /// param[in] _out the output stream to extract from
       /// param[out] _m the material information
       public: friend std::ostream &operator<<(std::ostream &_out,
-                  const Material &_m);
+                  const Material &_m)
+      {
+        _out << "Material:\n";
+        _out << "  Name: " << _m.Name() << "\n";
+        _out << "  Texture: " << _m.TextureImage() << "\n";
+        _out << "  Ambient: " << _m.Ambient() << "\n";
+        _out << "  Diffuse: " << _m.Diffuse() << "\n";
+        _out << "  Specular: " << _m.Specular() << "\n";
+        _out << "  Emissive: " << _m.Emissive() << "\n";
+        _out << "  Transparency: " << _m.Transparency() << "\n";
+        _out << "  Shininess: " << _m.Shininess() << "\n";
+        _out << "  BlendMode: "
+          << Material::BlendModeStr[_m.BlendMode()] << "\n";
+        _out << "  ShadeMode: "
+          << Material::ShadeModeStr[_m.ShadeMode()] << "\n";
+        _out << "  DepthWrite: " << _m.DepthWrite() << "\n";
+        return _out;
+      }
 
       /// \brief Private data pointer
       private: MaterialPrivate *dataPtr;
