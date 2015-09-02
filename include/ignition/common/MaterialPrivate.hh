@@ -18,6 +18,8 @@
 #ifndef _IGNITION_COMMON_MATERIAL_PRIVATE_HH_
 #define _IGNITION_COMMON_MATERIAL_PRIVATE_HH_
 
+#include <string>
+
 #include "ignition/common/Material.hh"
 #include "ignition/common/Color.hh"
 
@@ -68,7 +70,7 @@ namespace ignition
       /// \brief flag to perform depth buffer write
       public: bool depthWrite;
 
-      /// \brief flag to inidcate if lighting is enabled for this material.
+      /// \brief flag to indicate if lighting is enabled for this material.
       public: bool lighting;
 
       /// \brief source blend factor

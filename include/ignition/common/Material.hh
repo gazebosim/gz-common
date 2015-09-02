@@ -33,7 +33,7 @@ namespace ignition
     class IGNITION_VISIBLE Material
     {
       /// \brief Enum used to indicate the type of material shading, i.e.
-      /// what interpolation techinique to be applied to the colors of the
+      /// what interpolation technique to be applied to the colors of the
       /// surface
       public: enum MaterialShadeMode
       {
