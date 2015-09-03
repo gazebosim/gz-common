@@ -59,16 +59,28 @@ TEST(MaterialTest, Material)
                mat.TextureImage().c_str());
 
   mat.SetAmbient(common::Color(0.1, 0.2, 0.3, 0.4));
-  EXPECT_TRUE(mat.Ambient() == common::Color(0.1, 0.2, 0.3, 0.4));
+  EXPECT_EQ(mat.Ambient(), common::Color(0.1, 0.2, 0.3, 0.4));
+  EXPECT_EQ(mat.Diffuse(), common::Color(1.0, 0.5, 0.2, 1.0));
+  EXPECT_EQ(mat.Specular(), common::Color::Black);
+  EXPECT_EQ(mat.Emissive(), common::Color::Black);
 
   mat.SetDiffuse(common::Color(0.1, 0.2, 0.3, 0.4));
-  EXPECT_TRUE(mat.Diffuse() == common::Color(0.1, 0.2, 0.3, 0.4));
+  EXPECT_EQ(mat.Ambient(), common::Color(0.1, 0.2, 0.3, 0.4));
+  EXPECT_EQ(mat.Diffuse(), common::Color(0.1, 0.2, 0.3, 0.4));
+  EXPECT_EQ(mat.Specular(), common::Color::Black);
+  EXPECT_EQ(mat.Emissive(), common::Color::Black);
 
   mat.SetSpecular(common::Color(0.1, 0.2, 0.3, 0.4));
-  EXPECT_TRUE(mat.Specular() == common::Color(0.1, 0.2, 0.3, 0.4));
+  EXPECT_EQ(mat.Ambient(), common::Color(0.1, 0.2, 0.3, 0.4));
+  EXPECT_EQ(mat.Diffuse(), common::Color(0.1, 0.2, 0.3, 0.4));
+  EXPECT_EQ(mat.Specular(), common::Color(0.1, 0.2, 0.3, 0.4));
+  EXPECT_EQ(mat.Emissive(), common::Color::Black);
 
   mat.SetEmissive(common::Color(0.1, 0.2, 0.3, 0.4));
-  EXPECT_TRUE(mat.Emissive() == common::Color(0.1, 0.2, 0.3, 0.4));
+  EXPECT_EQ(mat.Ambient(), common::Color(0.1, 0.2, 0.3, 0.4));
+  EXPECT_EQ(mat.Diffuse(), common::Color(0.1, 0.2, 0.3, 0.4));
+  EXPECT_EQ(mat.Specular(), common::Color(0.1, 0.2, 0.3, 0.4));
+  EXPECT_EQ(mat.Emissive(), common::Color(0.1, 0.2, 0.3, 0.4));
 
   mat.SetTransparency(0.2);
   EXPECT_DOUBLE_EQ(0.2, mat.Transparency());
