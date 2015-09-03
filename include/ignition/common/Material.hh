@@ -80,13 +80,13 @@ namespace ignition
       /// \brief An array of strings for the blend mode enum.
       public: static std::string BlendModeStr[BLEND_COUNT];
 
-      /// \brief Constructor
+      /// \brief Constructor. Create material with a default white color.
       public: Material();
 
       /// \brief Destructor
       public: virtual ~Material();
 
-      /// \brief Create a material with a default color
+      /// \brief Create a material with specified color
       /// \param[in] _clr Color of the material
       public: Material(const Color &_clr);
 
@@ -201,12 +201,14 @@ namespace ignition
       /// \return the depth write enabled state
       public: bool DepthWrite() const;
 
-      /// \brief Set lighting enabled
-      /// \param[in] _value the lighting enabled state
+      /// \brief Set whether to enable dynamic lighting. Note that setting
+      /// other material properties such as ambient/diffuse/specular,
+      /// transparency, and shininess will also enable dynamic lighting.
+      /// \param[in] _value the dynamic lighting enabled state
       public: void SetLighting(bool _value);
 
-      /// \brief Get lighting enabled
-      /// \return the lighting enabled state
+      /// \brief Get whether dynamic lighting is enabled
+      /// \return the dynamic lighting enabled state
       public: bool Lighting() const;
 
       /// \brief Stream insertion operator

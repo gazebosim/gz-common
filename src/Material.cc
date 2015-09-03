@@ -33,7 +33,7 @@ std::string Material::BlendModeStr[BLEND_COUNT] = {"ADD", "MODULATE",
 
 //////////////////////////////////////////////////
 Material::Material()
-  : Material(common::Color(0.4, 0.4, 0.4, 1))
+  : Material(common::Color(1.0, 1.0, 1.0, 1.0))
 {
 }
 
