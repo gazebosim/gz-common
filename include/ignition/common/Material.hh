@@ -202,8 +202,7 @@ namespace ignition
       /// \return the depth write enabled state
       public: bool DepthWrite() const;
 
-      /// \brief Set whether to enable dynamic lighting. Note that setting
-      /// other material properties such as ambient/diffuse/specular,
+      /// \brief Set whether to enable dynamic lighting.
       public: void SetLighting(const bool _value);
       /// \param[in] _value the dynamic lighting enabled state
 

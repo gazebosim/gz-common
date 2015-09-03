@@ -25,8 +25,22 @@ using namespace ignition;
 TEST(MaterialTest, Constructor)
 {
   common::Material mat;
-  EXPECT_TRUE(mat.Ambient() == common::Color(0.4, 0.4, 0.4, 1.0));
-  EXPECT_TRUE(mat.Diffuse() == common::Color(0.4, 0.4, 0.4, 1.0));
+  EXPECT_TRUE(mat.Ambient() == common::Color::White);
+  EXPECT_TRUE(mat.Diffuse() == common::Color::White);
+  EXPECT_TRUE(mat.Specular() == common::Color::Black);
+  EXPECT_TRUE(mat.Emissive() == common::Color::Black);
+  EXPECT_TRUE(mat.Lighting());
+  EXPECT_DOUBLE_EQ(mat.Shininess(), 0.0);
+  EXPECT_DOUBLE_EQ(mat.Transparency(), 0.0);
+  EXPECT_EQ(mat.TextureImage(), "");
+  EXPECT_EQ(mat.BlendMode(), common::Material::REPLACE);
+  EXPECT_EQ(mat.ShadeMode(), common::Material::GOURAUD);
+
+  double srcBlenFactor = 0;
+  double dstBlenFactor = 0;
+  mat.BlendFactors(srcBlenFactor, dstBlenFactor);
+  EXPECT_DOUBLE_EQ(srcBlenFactor, 1.0);
+  EXPECT_DOUBLE_EQ(dstBlenFactor, 0.0);
 }
 
 /////////////////////////////////////////////////
@@ -94,15 +108,15 @@ TEST(MaterialTest, OperatorStreamOut)
   std::string result = R"***(Material:
   Name: ign-common_material_2
   Texture:
-  Ambient: 0.4 0.4 0.4 1
-  Diffuse: 0.4 0.4 0.4 1
-  Specular: 0 0 0 0
-  Emissive: 0 0 0 0
+  Ambient: 1 1 1 1
+  Diffuse: 1 1 1 1
+  Specular: 0 0 0 1
+  Emissive: 0 0 0 1
   Transparency: 0
   Shininess: 0
   BlendMode: REPLACE
   ShadeMode: GOURAUD
-  DepthWrite: 0
+  DepthWrite: 1
 )***";
 
   EXPECT_EQ(stream.str(), result);

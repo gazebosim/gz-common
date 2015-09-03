@@ -49,8 +49,14 @@ Material::Material(const Color &_clr)
   this->dataPtr->shininess = 0;
   this->dataPtr->ambient = _clr;
   this->dataPtr->diffuse = _clr;
-  this->dataPtr->lighting = false;
-  this->dataPtr->dstBlendFactor = this->dataPtr->srcBlendFactor = 1.0;
+  this->dataPtr->specular = Color::Black;
+  this->dataPtr->emissive = Color::Black;
+  this->dataPtr->lighting = true;
+  this->dataPtr->depthWrite = true;
+  this->dataPtr->pointSize = 1.0;
+  this->dataPtr->srcBlendFactor = 1.0;
+  this->dataPtr->dstBlendFactor = 0.0;
+
 }
 
 //////////////////////////////////////////////////
@@ -112,7 +118,6 @@ Color Material::Ambient() const
 void Material::SetDiffuse(const Color &_clr)
 {
   this->dataPtr->diffuse = _clr;
-  this->dataPtr->lighting = true;
 }
 
 //////////////////////////////////////////////////
@@ -125,7 +130,6 @@ Color Material::Diffuse() const
 void Material::SetSpecular(const Color &_clr)
 {
   this->dataPtr->specular = _clr;
-  this->dataPtr->lighting = true;
 }
 
 //////////////////////////////////////////////////
@@ -151,7 +155,6 @@ void Material::SetTransparency(const double _t)
 {
   this->dataPtr->transparency = std::min(_t, 1.0);
   this->dataPtr->transparency = std::max(this->dataPtr->transparency, 0.0);
-  this->dataPtr->lighting = true;
 }
 
 //////////////////////////////////////////////////
@@ -164,7 +167,6 @@ double Material::Transparency() const
 void Material::SetShininess(const double _s)
 {
   this->dataPtr->shininess = _s;
-  this->dataPtr->lighting = true;
 }
 
 //////////////////////////////////////////////////
