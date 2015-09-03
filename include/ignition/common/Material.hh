@@ -33,7 +33,7 @@ namespace ignition
     class IGNITION_VISIBLE Material
     {
       /// \brief Enum used to indicate the type of material shading, i.e.
-      /// what interpolation techinique to be applied to the colors of the
+      /// what interpolation technique to be applied to the colors of the
       /// surface
       public: enum MaterialShadeMode
       {
@@ -144,7 +144,7 @@ namespace ignition
 
       /// \brief Set the transparency percentage (0..1)
       /// \param[in] _t The amount of transparency (0..1)
-      public: void SetTransparency(double _t);
+      public: void SetTransparency(const double _t);
 
       /// \brief Get the transparency percentage (0..1)
       /// \return The transparency percentage
@@ -152,7 +152,7 @@ namespace ignition
 
       /// \brief Set the shininess
       /// \param[in] _t The shininess value
-      public: void SetShininess(double _t);
+      public: void SetShininess(const double _t);
 
       /// \brief Get the shininess
       /// \return The shininess value
@@ -162,7 +162,8 @@ namespace ignition
       ///        (texture * _srcFactor) + (scene_pixel * _dstFactor)
       /// \param[in] _srcFactor The source factor
       /// \param[in] _dstFactor The destination factor
-      public: void SetBlendFactors(double _srcFactor, double _dstFactor);
+      public: void SetBlendFactors(const double _srcFactor,
+                  const double _dstFactor);
 
       /// \brief Get the blend factors
       /// \param[out] _srcFactor Source factor is returned in this variable
@@ -171,7 +172,7 @@ namespace ignition
 
       /// \brief Set the blending mode
       /// \param[in] _b the blend mode
-      public: void SetBlendMode(MaterialBlendMode _b);
+      public: void SetBlendMode(const MaterialBlendMode _b);
 
       /// \brief Get the blending mode
       /// \return the blend mode
@@ -179,7 +180,7 @@ namespace ignition
 
       /// \brief Set the shading mode
       /// param[in] the shading mode
-      public: void SetShadeMode(MaterialShadeMode _b);
+      public: void SetShadeMode(const MaterialShadeMode _b);
 
       /// \brief Get the shading mode
       /// \return the shading mode
@@ -187,7 +188,7 @@ namespace ignition
 
       /// \brief Set the point size
       /// \param[in] _size the size
-      public: void SetPointSize(double _size);
+      public: void SetPointSize(const double _size);
 
       /// \brief Get the point size
       /// \return the point size
@@ -195,7 +196,7 @@ namespace ignition
 
       /// \brief Set depth write
       /// \param[in] _value the depth write enabled state
-      public: void SetDepthWrite(bool _value);
+      public: void SetDepthWrite(const bool _value);
 
       /// \brief Get depth write
       /// \return the depth write enabled state
@@ -203,9 +204,8 @@ namespace ignition
 
       /// \brief Set whether to enable dynamic lighting. Note that setting
       /// other material properties such as ambient/diffuse/specular,
-      /// transparency, and shininess will also enable dynamic lighting.
+      public: void SetLighting(const bool _value);
       /// \param[in] _value the dynamic lighting enabled state
-      public: void SetLighting(bool _value);
 
       /// \brief Get whether dynamic lighting is enabled
       /// \return the dynamic lighting enabled state
@@ -215,7 +215,24 @@ namespace ignition
       /// param[in] _out the output stream to extract from
       /// param[out] _m the material information
       public: friend std::ostream &operator<<(std::ostream &_out,
-                  const Material &_m);
+                  const Material &_m)
+      {
+        _out << "Material:\n";
+        _out << "  Name: " << _m.Name() << "\n";
+        _out << "  Texture:" << _m.TextureImage() << "\n";
+        _out << "  Ambient: " << _m.Ambient() << "\n";
+        _out << "  Diffuse: " << _m.Diffuse() << "\n";
+        _out << "  Specular: " << _m.Specular() << "\n";
+        _out << "  Emissive: " << _m.Emissive() << "\n";
+        _out << "  Transparency: " << _m.Transparency() << "\n";
+        _out << "  Shininess: " << _m.Shininess() << "\n";
+        _out << "  BlendMode: "
+          << Material::BlendModeStr[_m.BlendMode()] << "\n";
+        _out << "  ShadeMode: "
+          << Material::ShadeModeStr[_m.ShadeMode()] << "\n";
+        _out << "  DepthWrite: " << _m.DepthWrite() << "\n";
+        return _out;
+      }
 
       /// \brief Private data pointer
       private: MaterialPrivate *dataPtr;

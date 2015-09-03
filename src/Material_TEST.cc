@@ -15,17 +15,27 @@
 */
 
 #include <gtest/gtest.h>
+#include <string>
 
 #include "ignition/common/Material.hh"
 
 using namespace ignition;
 
+/////////////////////////////////////////////////
+TEST(MaterialTest, Constructor)
+{
+  common::Material mat;
+  EXPECT_TRUE(mat.Ambient() == common::Color(0.4, 0.4, 0.4, 1.0));
+  EXPECT_TRUE(mat.Diffuse() == common::Color(0.4, 0.4, 0.4, 1.0));
+}
+
+/////////////////////////////////////////////////
 TEST(MaterialTest, Material)
 {
   common::Material mat(common::Color(1.0, 0.5, 0.2, 1.0));
   EXPECT_TRUE(mat.Ambient() == common::Color(1.0, 0.5, 0.2, 1.0));
   EXPECT_TRUE(mat.Diffuse() == common::Color(1.0, 0.5, 0.2, 1.0));
-  EXPECT_STREQ("ign-common_material_0", mat.Name().c_str());
+  EXPECT_STREQ("ign-common_material_1", mat.Name().c_str());
 
   mat.SetTextureImage("texture_image");
   EXPECT_STREQ("texture_image", mat.TextureImage().c_str());
@@ -72,6 +82,30 @@ TEST(MaterialTest, Material)
 
   mat.SetLighting(true);
   EXPECT_TRUE(mat.Lighting());
+}
+
+/////////////////////////////////////////////////
+TEST(MaterialTest, OperatorStreamOut)
+{
+  common::Material m;
+  std::ostringstream stream;
+  stream << m;
+
+  std::string result = R"***(Material:
+  Name: ign-common_material_2
+  Texture:
+  Ambient: 0.4 0.4 0.4 1
+  Diffuse: 0.4 0.4 0.4 1
+  Specular: 0 0 0 0
+  Emissive: 0 0 0 0
+  Transparency: 0
+  Shininess: 0
+  BlendMode: REPLACE
+  ShadeMode: GOURAUD
+  DepthWrite: 0
+)***";
+
+  EXPECT_EQ(stream.str(), result);
 }
 
 /////////////////////////////////////////////////
