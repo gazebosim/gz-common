@@ -1603,17 +1603,17 @@ def CheckForHeaderGuard(filename, lines, error):
           cppvar)
     return
 
-  # The guard should be PATH_FILE_H_, but we also allow PATH_FILE_H__
+  # The guard should be _PATH_FILE_H_, but we also allow PATH_FILE_H__
   # for backward compatibility.
   if ifndef != cppvar:
     error_level = 0
     if ifndef != cppvar + '_':
       error_level = 5
 
-    ParseNolintSuppressions(filename, lines[ifndef_linenum], ifndef_linenum,
-                            error)
-    error(filename, ifndef_linenum, 'build/header_guard', error_level,
-          '#ifndef header guard has wrong style, please use: %s' % cppvar)
+    # ParseNolintSuppressions(filename, lines[ifndef_linenum], ifndef_linenum,
+    #                         error)
+    # error(filename, ifndef_linenum, 'build/header_guard', error_level,
+    #      '#ifndef header guard has wrong style, please use: %s' % cppvar)
 
   if define != ifndef:
     error(filename, 0, 'build/header_guard', 5,
@@ -1621,15 +1621,15 @@ def CheckForHeaderGuard(filename, lines, error):
           cppvar)
     return
 
-  if endif != ('#endif  // %s' % cppvar):
-    error_level = 0
-    if endif != ('#endif  // %s' % (cppvar + '_')):
-      error_level = 5
+  # if endif != ('#endif  // %s' % cppvar):
+  #   error_level = 0
+  #   if endif != ('#endif  // %s' % (cppvar + '_')):
+  #     error_level = 5
 
-    ParseNolintSuppressions(filename, lines[endif_linenum], endif_linenum,
-                            error)
-    error(filename, endif_linenum, 'build/header_guard', error_level,
-          '#endif line should be "#endif  // %s"' % cppvar)
+  #   ParseNolintSuppressions(filename, lines[endif_linenum], endif_linenum,
+  #                           error)
+  #   error(filename, endif_linenum, 'build/header_guard', error_level,
+  #         '#endif line should be "#endif  // %s"' % cppvar)
 
 
 def CheckForBadCharacters(filename, lines, error):
@@ -1969,18 +1969,18 @@ class _NamespaceInfo(_BlockInfo):
          error(filename, linenum, 'readability/namespace', 5,
                'Namespace should not be terminated with "// namespace %s"' %
                self.name)
-    else:
-      # Anonymous namespace
-      if not Match(r'};*\s*(//|/\*).*\bnamespace[\*/\.\\\s]*$', line):
-        # If "// namespace anonymous" or "// anonymous namespace (more text)",
-        # mention "// anonymous namespace" as an acceptable form
-        if Match(r'}.*\b(namespace anonymous|anonymous namespace)\b', line):
-          error(filename, linenum, 'readability/namespace', 5,
-                'Anonymous namespace should be terminated with "// namespace"'
-                ' or "// anonymous namespace"')
-        else:
-          error(filename, linenum, 'readability/namespace', 5,
-                'Anonymous namespace should be terminated with "// namespace"')
+    # else:
+    #   # Anonymous namespace
+    #   if not Match(r'};*\s*(//|/\*).*\bnamespace[\*/\.\\\s]*$', line):
+    #     # If "// namespace anonymous" or "// anonymous namespace (more text)",
+    #     # mention "// anonymous namespace" as an acceptable form
+    #     if Match(r'}.*\b(namespace anonymous|anonymous namespace)\b', line):
+    #       error(filename, linenum, 'readability/namespace', 5,
+    #             'Anonymous namespace should be terminated with "// namespace"'
+    #             ' or "// anonymous namespace"')
+    #     else:
+    #       error(filename, linenum, 'readability/namespace', 5,
+    #             'Anonymous namespace should be terminated with "// namespace"')
 
 
 class _PreprocessorInfo(object):
@@ -4212,9 +4212,9 @@ def CheckIncludeLine(filename, clean_lines, linenum, include_state, error):
   line = clean_lines.lines[linenum]
 
   # "include" should use the new style "foo/bar.h" instead of just "bar.h"
-  if _RE_PATTERN_INCLUDE_NEW_STYLE.search(line):
-    error(filename, linenum, 'build/include', 4,
-          'Include the directory when naming .h files')
+  # if _RE_PATTERN_INCLUDE_NEW_STYLE.search(line):
+  #   error(filename, linenum, 'build/include', 4,
+  #         'Include the directory when naming .h files')
 
   # we shouldn't include a file more than once. actually, there are a
   # handful of instances where doing so is okay, but in general it's

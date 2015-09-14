@@ -341,8 +341,11 @@ std::map<std::string, math::Matrix4d> SkeletonAnimation::PoseAtX(
 void SkeletonAnimation::Scale(const double _scale)
 {
   for (std::map<std::string, NodeAnimation*>::iterator iter =
-        this->data->animations.begin(); iter != this->data->animations.end(); ++iter)
+       this->data->animations.begin();
+       iter != this->data->animations.end(); ++iter)
+  {
     iter->second->Scale(_scale);
+  }
 }
 
 //////////////////////////////////////////////////

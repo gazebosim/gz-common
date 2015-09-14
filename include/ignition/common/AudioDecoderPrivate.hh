@@ -17,6 +17,8 @@
 #ifndef _IGNITION_COMMON_AUDIO_DECODER_PRIVATE_HH_
 #define _IGNITION_COMMON_AUDIO_DECODER_PRIVATE_HH_
 
+#include <string>
+
 struct AVFormatContext;
 struct AVCodecContext;
 struct AVCodec;

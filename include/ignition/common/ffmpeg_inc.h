@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_FFMPEG_INC_HH_
-#define _GAZEBO_FFMPEG_INC_HH_
+#ifndef _IGNITION__FFMPEG_INC_HH_
+#define _IGNITION__FFMPEG_INC_HH_
 
 #pragma GCC system_header
 
@@ -26,12 +26,12 @@
 #define UINT64_C(c) (c ## ULL)
 #endif
 
-extern "C" {
+extern "C"
+{
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libavutil/opt.h>
 #include <libswscale/swscale.h>
 }
-#endif  // ifdef HAVE_FFMPEG
-
-#endif  // ifndef _GAZEBO_FFMPEG_INC_HH
+#endif
+#endif

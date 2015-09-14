@@ -56,7 +56,6 @@ Material::Material(const Color &_clr)
   this->dataPtr->pointSize = 1.0;
   this->dataPtr->srcBlendFactor = 1.0;
   this->dataPtr->dstBlendFactor = 0.0;
-
 }
 
 //////////////////////////////////////////////////

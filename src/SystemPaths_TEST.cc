@@ -15,11 +15,11 @@
  *
 */
 #include <gtest/gtest.h>
-
-#include <string>
-#include <vector>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
+#include <string>
+#include <vector>
+
 
 #include "ignition/common/SystemPaths.hh"
 
