@@ -18,8 +18,8 @@
 #ifndef _IGNITION_COMMON_EXCEPTION_PRIVATE_HH_
 #define _IGNITION_COMMON_EXCEPTION_PRIVATE_HH_
 
-#include <string>
 #include <stdint.h>
+#include <string>
 
 namespace ignition
 {

@@ -18,10 +18,10 @@
 #ifndef _IGNITION_COMMON_EXCEPTION_HH_
 #define _IGNITION_COMMON_EXCEPTION_HH_
 
-#include <iostream>
-#include <sstream>
 #include <stdint.h>
 #include <string>
+#include <iostream>
+#include <sstream>
 
 #include "ignition/common/Util.hh"
 
@@ -33,7 +33,8 @@ namespace ignition
     /// an exception that contains the file name and line number.
     #define ignthrow(msg) {std::ostringstream throwStream;\
       throwStream << msg << std::endl << std::flush;\
-      throw sdf::Exception(__FILE__, __LINE__, throwStream.str()); }
+      throw ignition::common::Exception(__FILE__, __LINE__,\
+      throwStream.str()); }
 
     class ExceptionPrivate;
 

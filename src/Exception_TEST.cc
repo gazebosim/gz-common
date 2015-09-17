@@ -17,31 +17,31 @@
 
 #include <gtest/gtest.h>
 
-#include "ignition/common/Util.hh"
+#include "ignition/common/Exception.hh"
 
 /////////////////////////////////////////////////
 TEST(Exception, Exception)
 {
   try
   {
-    ign_throw("test");
+    ignthrow("test");
   }
-  catch(std::runtime_error &_e)
+  catch(ignition::common::Exception &_e)
   {
-    std::cout << _e.what() << std::endl;
+    _e.Print();
   }
 }
 
 /////////////////////////////////////////////////
 TEST(Exception, InternalError_DefaultConstructor_Throw)
 {
-  ASSERT_THROW(ign_throw("exception"), ignition::common::exception);
+  ASSERT_THROW(ignthrow("exception"), ignition::common::Exception);
 }
 
 /////////////////////////////////////////////////
 TEST(Exception, InternalError_FileLineMsgConstructor_Throw)
 {
-  ASSERT_THROW(ign_throw("exception"), ignition::common::exception);
+  ASSERT_THROW(ignthrow("exception"), ignition::common::Exception);
 }
 
 /////////////////////////////////////////////////
