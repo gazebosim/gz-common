@@ -33,7 +33,7 @@ namespace ignition
     /// an exception that contains the file name and line number.
     #define ignthrow(msg) {std::ostringstream throwStream;\
       throwStream << msg << std::endl << std::flush;\
-      throw ignition::common::Exception(__FILE__, __LINE__,\
+      throw ignition::common::Exception(__FILE__, __LINE__, \
       throwStream.str()); }
 
     class ExceptionPrivate;
