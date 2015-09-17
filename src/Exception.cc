@@ -21,7 +21,6 @@
 
 using namespace ignition;
 using namespace common;
-using namespace std;
 
 //////////////////////////////////////////////////
 Exception::Exception()
