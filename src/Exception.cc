@@ -16,6 +16,7 @@
  */
 
 #include "ignition/common/Console.hh"
+#include "ignition/common/ExceptionPrivate.hh"
 #include "ignition/common/Exception.hh"
 
 using namespace ignition;
@@ -24,40 +25,45 @@ using namespace std;
 
 //////////////////////////////////////////////////
 Exception::Exception()
+  : dataPtr(new ExceptionPrivate)
 {
 }
 
 //////////////////////////////////////////////////
-Exception::Exception(const char *_file, int _line, const std::string &_msg)
+Exception::Exception(const char *_file, int64_t _line, const std::string &_msg)
+  : dataPtr(new ExceptionPrivate)
 {
-  this->file = _file;
-  this->line = _line;
-  this->str = _msg;
+  this->dataPtr->file = _file;
+  this->dataPtr->line = _line;
+  this->dataPtr->str = _msg;
   this->Print();
 }
 
 //////////////////////////////////////////////////
 Exception::~Exception()
 {
+  delete this->dataPtr;
+  this->dataPtr = NULL;
 }
 
 //////////////////////////////////////////////////
 void Exception::Print() const
 {
-  (ignition::common::Console::err(this->file, this->line)) << "EXCEPTION: "
-      << *this << std::endl;
+  (ignition::common::Console::err(
+      this->dataPtr->file, static_cast<unsigned int>(this->dataPtr->line)))
+      << "EXCEPTION: " << *this << std::endl;
 }
 
 //////////////////////////////////////////////////
 std::string Exception::ErrorFile() const
 {
-  return this->file;
+  return this->dataPtr->file;
 }
 
 //////////////////////////////////////////////////
 std::string Exception::ErrorStr() const
 {
-  return this->str;
+  return this->dataPtr->str;
 }
 
 //////////////////////////////////////////////////
@@ -66,7 +72,7 @@ InternalError::InternalError()
 }
 
 //////////////////////////////////////////////////
-InternalError::InternalError(const char *_file, int _line,
+InternalError::InternalError(const char *_file, int64_t _line,
                              const std::string &_msg) :
   Exception(_file, _line, _msg)
 {
@@ -79,7 +85,7 @@ InternalError::~InternalError()
 
 //////////////////////////////////////////////////
 AssertionInternalError::AssertionInternalError(
-    const char * _file, int _line,
+    const char * _file, int64_t _line,
     const std::string &_expr,
     const std::string &_function,
     const std::string &_msg) :

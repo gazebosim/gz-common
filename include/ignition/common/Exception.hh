@@ -20,6 +20,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <stdint.h>
 #include <string>
 
 #include "ignition/common/Util.hh"
@@ -28,6 +29,14 @@ namespace ignition
 {
   namespace common
   {
+    /// \brief This macro logs an error to the throw stream and throws
+    /// an exception that contains the file name and line number.
+    #define ignthrow(msg) {std::ostringstream throwStream;\
+      throwStream << msg << std::endl << std::flush;\
+      throw sdf::Exception(__FILE__, __LINE__, throwStream.str()); }
+
+    class ExceptionPrivate;
+
     /// \class Exception Exception.hh common/Exception.hh
     /// \brief Class for generating exceptions
     class IGNITION_VISIBLE Exception
@@ -39,7 +48,9 @@ namespace ignition
       /// \param[in] _file File name
       /// \param[in] _line Line number where the error occurred
       /// \param[in] _msg Error message
-      public: Exception(const char *_file, int _line, const std::string &_msg);
+      public: Exception(const char *_file,
+                        int64_t _line,
+                        const std::string &_msg);
 
       /// \brief Destructor
       public: virtual ~Exception();
@@ -55,15 +66,6 @@ namespace ignition
       /// \brief Print the exception to std out.
       public: void Print() const;
 
-      /// \brief The error function
-      private: std::string file;
-
-      /// \brief Line the error occured on
-      private: int line;
-
-      /// \brief The error string
-      private: std::string str;
-
       /// \brief stream insertion operator for Ignition Error
       /// \param[in] _out the output stream
       /// \param[in] _err the exception
@@ -72,6 +74,9 @@ namespace ignition
               {
                 return _out << _err.ErrorStr();
               }
+
+      /// \brief Private data pointer.
+      private: ExceptionPrivate *dataPtr;
     };
 
     /// \class InternalError Exception.hh common/Exception.hh
@@ -87,7 +92,7 @@ namespace ignition
       /// \param[in] _file File name
       /// \param[in] _line Line number where the error occurred
       /// \param[in] _msg Error message
-      public: InternalError(const char *_file, int _line,
+      public: InternalError(const char *_file, int64_t _line,
                             const std::string &_msg);
 
       /// \brief Destructor
@@ -109,7 +114,7 @@ namespace ignition
       /// \param[in] _function Function where assertion failed
       /// \param[in] _msg Function where assertion failed
       public: AssertionInternalError(const char *_file,
-                                     int _line,
+                                     int64_t _line,
                                      const std::string &_expr,
                                      const std::string &_function,
                                      const std::string &_msg = "");
