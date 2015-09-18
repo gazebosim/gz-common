@@ -1551,10 +1551,10 @@ def GetHeaderGuardCPPVariable(filename):
   filename = re.sub(r'/\.flymake/([^/]*)$', r'/\1', filename)
 
   fileinfo = FileInfo(filename)
-  file_path_from_root = fileinfo.RepositoryName()
+  file_path_from_root = fileinfo.BaseName()
   if _root:
     file_path_from_root = re.sub('^' + _root + os.sep, '', file_path_from_root)
-  return re.sub(r'[-./\s]', '_', file_path_from_root).upper() + '_'
+  return re.sub(r'[-./\s]', '_', '__IGNITION_' + file_path_from_root).upper() + '_HH__'
 
 
 def CheckForHeaderGuard(filename, lines, error):
@@ -1603,17 +1603,17 @@ def CheckForHeaderGuard(filename, lines, error):
           cppvar)
     return
 
-  # The guard should be _PATH_FILE_H_, but we also allow PATH_FILE_H__
+  # The guard should be __FILE_H__
   # for backward compatibility.
   if ifndef != cppvar:
     error_level = 0
     if ifndef != cppvar + '_':
       error_level = 5
 
-    # ParseNolintSuppressions(filename, lines[ifndef_linenum], ifndef_linenum,
-    #                         error)
-    # error(filename, ifndef_linenum, 'build/header_guard', error_level,
-    #      '#ifndef header guard has wrong style, please use: %s' % cppvar)
+    ParseNolintSuppressions(filename, lines[ifndef_linenum], ifndef_linenum,
+                            error)
+    error(filename, ifndef_linenum, 'build/header_guard', error_level,
+          '#ifndef header guard has wrong style, please use: %s' % cppvar)
 
   if define != ifndef:
     error(filename, 0, 'build/header_guard', 5,
