@@ -208,12 +208,11 @@ std::string ignition::common::getSha1(const T &_buffer)
   for (std::size_t i = 0; i < sizeof(hash) / sizeof(hash[0]); ++i)
   {
     stream << std::setfill('0')
-            << std::setw(sizeof(hash[0]) * 2)
-            << std::hex
-            << hash[i];
-   }
+      << std::setw(sizeof(hash[0]) * 2)
+      << std::hex
+      << hash[i];
+  }
 
-   return stream.str();
- }
-
+  return stream.str();
+}
 #endif
