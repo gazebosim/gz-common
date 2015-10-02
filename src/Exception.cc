@@ -72,19 +72,9 @@ std::string Exception::ErrorStr() const
 }
 
 //////////////////////////////////////////////////
-InternalError::InternalError()
-{
-}
-
-//////////////////////////////////////////////////
 InternalError::InternalError(const std::string &_file, const int64_t _line,
                              const std::string &_msg) :
   Exception(_file, _line, _msg)
-{
-}
-
-//////////////////////////////////////////////////
-InternalError::~InternalError()
 {
 }
 
@@ -100,10 +90,5 @@ AssertionInternalError::AssertionInternalError(
       _msg                               + "\n" +
       "In function       : " + _function + "\n" +
       "Assert expression : " + _expr     + "\n")
-{
-}
-
-//////////////////////////////////////////////////
-AssertionInternalError::~AssertionInternalError()
 {
 }

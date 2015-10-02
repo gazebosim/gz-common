@@ -91,7 +91,7 @@ namespace ignition
     class IGNITION_VISIBLE InternalError : public Exception
     {
       /// \brief Constructor
-      public: InternalError();
+      public: InternalError() = default;
 
       /// \brief Default constructor
       /// \param[in] _file File name
@@ -102,7 +102,7 @@ namespace ignition
                             const std::string &_msg);
 
       /// \brief Destructor
-      public: virtual ~InternalError();
+      public: virtual ~InternalError() = default;
     };
 
     /// \class AssertionInternalError Exception.hh common/Exception.hh
@@ -118,14 +118,14 @@ namespace ignition
       /// \param[in] _expr Assertion expression failed resulting in an
       ///                  internal error
       /// \param[in] _function Function where assertion failed
-      /// \param[in] _msg Function where assertion failed
+      /// \param[in] _msg Error message
       public: AssertionInternalError(const std::string &_file,
                                      const int64_t _line,
                                      const std::string &_expr,
                                      const std::string &_function,
                                      const std::string &_msg = "");
       /// \brief Destructor
-      public: virtual ~AssertionInternalError();
+      public: virtual ~AssertionInternalError() = default;
     };
   }
 }
