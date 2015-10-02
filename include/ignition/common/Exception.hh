@@ -19,10 +19,10 @@
 #define _IGNITION_COMMON_EXCEPTION_HH_
 
 #include <cstdint>
-#include <memory>
-#include <string>
 #include <iostream>
+#include <memory>
 #include <sstream>
+#include <string>
 
 #include "ignition/common/Util.hh"
 
