@@ -86,7 +86,7 @@ namespace ignition
 
     /// \class InternalError Exception.hh common/Exception.hh
     /// \brief Class for generating Internal Ignition Errors:
-    ///        those errors which should never happend and
+    ///        those errors which should never happen and
     ///        represent programming bugs.
     class IGNITION_VISIBLE InternalError : public Exception
     {
