@@ -17,31 +17,76 @@
 
 #include <gtest/gtest.h>
 
-#include "ignition/common/Util.hh"
+#include "ignition/common/Exception.hh"
+
+/////////////////////////////////////////////////
+TEST(Exception, DefaultConstructor)
+{
+  ignition::common::Exception exception;
+  EXPECT_TRUE(exception.ErrorFile().empty());
+  EXPECT_TRUE(exception.ErrorStr().empty());
+}
+
+/////////////////////////////////////////////////
+TEST(Exception, InternalError)
+{
+  ignition::common::InternalError exception;
+  EXPECT_TRUE(exception.ErrorFile().empty());
+  EXPECT_TRUE(exception.ErrorStr().empty());
+
+  ignition::common::InternalError exception2(__FILE__, __LINE__, "my_msg");
+  EXPECT_FALSE(exception2.ErrorFile().empty());
+  EXPECT_EQ(exception2.ErrorStr(), "my_msg");
+}
+
+/////////////////////////////////////////////////
+TEST(Exception, AssertionInternalError)
+{
+  ignition::common::AssertionInternalError exception(__FILE__, __LINE__,
+      "expr", "function", "msg");
+  EXPECT_FALSE(exception.ErrorFile().empty());
+  EXPECT_FALSE(exception.ErrorStr().empty());
+  std::string result =
+    "IGNITION ASSERTION                   \n"
+    "msg\n"
+    "In function       : function\n"
+    "Assert expression : expr\n";
+  EXPECT_EQ(exception.ErrorStr(), result);
+}
+
 
 /////////////////////////////////////////////////
 TEST(Exception, Exception)
 {
+  std::string str = "test";
+
   try
   {
-    ign_throw("test");
+    ignthrow(str);
   }
-  catch(std::runtime_error &_e)
+  catch(ignition::common::Exception &_e)
   {
-    std::cout << _e.what() << std::endl;
+    _e.Print();
+
+    EXPECT_EQ(_e.ErrorFile(), __FILE__);
+    EXPECT_TRUE(_e.ErrorStr().find(str) != std::string::npos);
+    return;
   }
+
+  // should never get here
+  FAIL();
 }
 
 /////////////////////////////////////////////////
 TEST(Exception, InternalError_DefaultConstructor_Throw)
 {
-  ASSERT_THROW(ign_throw("exception"), ignition::common::exception);
+  ASSERT_THROW(ignthrow("exception"), ignition::common::Exception);
 }
 
 /////////////////////////////////////////////////
 TEST(Exception, InternalError_FileLineMsgConstructor_Throw)
 {
-  ASSERT_THROW(ign_throw("exception"), ignition::common::exception);
+  ASSERT_THROW(ignthrow("exception"), ignition::common::Exception);
 }
 
 /////////////////////////////////////////////////

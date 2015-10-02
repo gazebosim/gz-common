@@ -7,6 +7,7 @@ set (sources
   BVHLoader.cc
   Color.cc
   Console.cc
+  Exception.cc
   Image.cc
   KeyFrame.cc
   Material.cc

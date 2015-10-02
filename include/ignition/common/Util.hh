@@ -43,11 +43,6 @@
 /// \brief Speed of light.
 #define IGN_SPEED_OF_LIGHT = 299792458.0
 
-/// \brief This macro logs an error to the throw stream and throws
-/// an exception that contains the file name and line number.
-#define ign_throw(msg) (throw std::runtime_error(std::string("[") +\
-      __FILE__ + ":" + std::to_string(__LINE__) + "] " + msg))
-
 /// \brief Sleep for the specifed number of seconds
 #define ign_sleep_s(_s) (std::this_thread::sleep_for(\
                          std::chrono::seconds(_s)))
