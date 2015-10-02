@@ -16,6 +16,8 @@
 */
 #ifndef _IGNITION_COMMON_NODE_ANIMATION_HH_
 #define _IGNITION_COMMON_NODE_ANIMATION_HH_
+#include <string>
+#include <utility>
 
 #include <ignition/math/Matrix4.hh>
 #include <ignition/math/Pose3.hh>

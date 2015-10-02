@@ -17,6 +17,8 @@
 #ifndef _IGNITION_COMMON_IMAGE_PRIVATE_HH_
 #define _IGNITION_COMMON_IMAGE_PRIVATE_HH_
 
+#include <string>
+
 namespace ignition
 {
   namespace common

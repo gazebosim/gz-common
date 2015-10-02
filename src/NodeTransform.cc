@@ -127,7 +127,8 @@ void NodeTransform::RecalculateMatrix()
 {
   if (this->data->type == MATRIX)
   {
-    this->data->transform.Set(this->data->source[0], this->data->source[1], this->data->source[2],
+    this->data->transform.Set(this->data->source[0], this->data->source[1],
+        this->data->source[2],
         this->data->source[3], this->data->source[4], this->data->source[5],
         this->data->source[6], this->data->source[7], this->data->source[8],
         this->data->source[9], this->data->source[10], this->data->source[11],
@@ -154,7 +155,8 @@ void NodeTransform::RecalculateMatrix()
       }
       else
       {
-        this->data->transform.Scale(math::Vector3d(this->data->source[0], this->data->source[1],
+        this->data->transform.Scale(
+            math::Vector3d(this->data->source[0], this->data->source[1],
               this->data->source[2]));
       }
     }

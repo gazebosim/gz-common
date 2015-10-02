@@ -18,6 +18,7 @@
 #define _IGNITION_COMMON_SKELETONANIMATION_PRIVATE_HH_
 
 #include <string>
+#include <map>
 
 #include "ignition/common/NodeAnimation.hh"
 

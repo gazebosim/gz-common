@@ -10,6 +10,7 @@ set (sources
   Exception.cc
   Image.cc
   KeyFrame.cc
+  Material.cc
   NodeTransform.cc
   Skeleton.cc
   SkeletonAnimation.cc
@@ -26,6 +27,7 @@ set (gtest_sources
   Console_TEST.cc
   Exception_TEST.cc
   Image_TEST.cc
+  Material_TEST.cc
   Time_TEST.cc
   Util_TEST.cc
 )

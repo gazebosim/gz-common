@@ -86,12 +86,20 @@ int Image::Load(const std::string &_filename)
     this->data->bitmap = NULL;
 
     if (fifmt == FIF_PNG)
-      this->data->bitmap = FreeImage_Load(fifmt, this->data->fullName.c_str(), PNG_DEFAULT);
+    {
+      this->data->bitmap = FreeImage_Load(fifmt,
+          this->data->fullName.c_str(), PNG_DEFAULT);
+    }
     else if (fifmt == FIF_JPEG)
+    {
       this->data->bitmap =
         FreeImage_Load(fifmt, this->data->fullName.c_str(), JPEG_DEFAULT);
+    }
     else if (fifmt == FIF_BMP)
-      this->data->bitmap = FreeImage_Load(fifmt, this->data->fullName.c_str(), BMP_DEFAULT);
+    {
+      this->data->bitmap = FreeImage_Load(fifmt,
+          this->data->fullName.c_str(), BMP_DEFAULT);
+    }
     else
     {
       ignerr << "Unknown image format[" << this->data->fullName << "]\n";
@@ -305,7 +313,8 @@ Color Image::GetPixel(unsigned int _x, unsigned int _y) const
   else
   {
     BYTE byteValue;
-    if (FreeImage_GetPixelIndex(this->data->bitmap, _x, _y, &byteValue) == FALSE)
+    if (FreeImage_GetPixelIndex(
+          this->data->bitmap, _x, _y, &byteValue) == FALSE)
     {
       ignerr << "Image: Coordinates out of range ["
         << _x << " " << _y << "] \n";

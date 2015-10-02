@@ -15,9 +15,9 @@
 *
 */
 
+#include <ignition/common/ffmpeg_inc.h>
 #include <ignition/common/AudioDecoder.hh>
 #include <ignition/common/AudioDecoderPrivate.hh>
-#include <ignition/common/ffmpeg_inc.h>
 #include <ignition/common/Console.hh>
 
 #define AUDIO_INBUF_SIZE (20480 * 2)
@@ -195,7 +195,8 @@ bool AudioDecoder::SetFile(const std::string &_filename)
   this->data->formatCtx = avformat_alloc_context();
 
   // Open file
-  if (avformat_open_input(&this->data->formatCtx, _filename.c_str(), NULL, NULL) < 0)
+  if (avformat_open_input(&this->data->formatCtx,
+        _filename.c_str(), NULL, NULL) < 0)
   {
     ignerr << "Unable to open audio file[" << _filename << "]\n";
     this->data->formatCtx = NULL;
@@ -222,7 +223,8 @@ bool AudioDecoder::SetFile(const std::string &_filename)
   this->data->audioStream = -1;
   for (i = 0; i < this->data->formatCtx->nb_streams; ++i)
   {
-    if (this->data->formatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO)
+    if (this->data->formatCtx->streams[i]->codec->codec_type ==
+        AVMEDIA_TYPE_AUDIO)
     {
       this->data->audioStream = i;
       break;

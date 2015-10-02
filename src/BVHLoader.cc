@@ -14,11 +14,11 @@
  * limitations under the License.
  *
 */
+#include <boost/algorithm/string.hpp>
+
 #include <algorithm>
 #include <fstream>
 #include <sstream>
-
-#include <boost/algorithm/string.hpp>
 
 #include <ignition/common/SystemPaths.hh>
 #include <ignition/common/Skeleton.hh>
@@ -82,6 +82,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, const double _scale)
           nodes.push_back(node);
       }
       else
+      {
         if (words[0] == "OFFSET")
         {
           if (words.size() < 4)
@@ -98,6 +99,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, const double _scale)
           node->SetTransform(transform);
         }
         else
+        {
           if (words[0] == "CHANNELS")
           {
             if (words.size() < 3 ||
@@ -111,12 +113,19 @@ Skeleton *BVHLoader::Load(const std::string &_filename, const double _scale)
             totalChannels += math::parseInt(words[1]);
           }
           else
+          {
             if (words[0] == "{")
+            {
               parent = node;
+            }
             else
+            {
               if (words[0] == "}")
+              {
                 parent = parent->Parent();
+              }
               else
+              {
                 if (words.size() == 2 && words[0] == "End"
                         && words[1] == "Site")
                 {
@@ -135,6 +144,11 @@ Skeleton *BVHLoader::Load(const std::string &_filename, const double _scale)
                   skeleton = new Skeleton(nodes[0]);
                   break;
                 }
+              }
+            }
+          }
+        }
+      }
     }
   }
   getline(file, line);

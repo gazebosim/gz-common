@@ -17,6 +17,10 @@
 #ifndef _IGNITION_COMMON_SKELETON_PRIVATE_HH_
 #define _IGNITION_COMMON_SKELETON_PRIVATE_HH_
 
+#include <string>
+#include <utility>
+#include <vector>
+
 #include <ignition/common/SkeletonAnimation.hh>
 #include <ignition/common/SkeletonNode.hh>
 
