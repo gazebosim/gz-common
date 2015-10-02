@@ -29,7 +29,8 @@ Exception::Exception()
 }
 
 //////////////////////////////////////////////////
-Exception::Exception(const char *_file, int64_t _line, const std::string &_msg)
+Exception::Exception(const std::string &_file, int64_t _line,
+    const std::string &_msg)
   : dataPtr(new ExceptionPrivate)
 {
   this->dataPtr->file = _file;
@@ -39,10 +40,15 @@ Exception::Exception(const char *_file, int64_t _line, const std::string &_msg)
 }
 
 //////////////////////////////////////////////////
+Exception::Exception(const Exception &_other)
+  : dataPtr(new ExceptionPrivate)
+{
+  *dataPtr = *_other.dataPtr;
+}
+
+//////////////////////////////////////////////////
 Exception::~Exception()
 {
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -71,7 +77,7 @@ InternalError::InternalError()
 }
 
 //////////////////////////////////////////////////
-InternalError::InternalError(const char *_file, int64_t _line,
+InternalError::InternalError(const std::string &_file, int64_t _line,
                              const std::string &_msg) :
   Exception(_file, _line, _msg)
 {
@@ -84,7 +90,7 @@ InternalError::~InternalError()
 
 //////////////////////////////////////////////////
 AssertionInternalError::AssertionInternalError(
-    const char * _file, int64_t _line,
+    const std::string & _file, int64_t _line,
     const std::string &_expr,
     const std::string &_function,
     const std::string &_msg) :

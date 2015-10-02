@@ -18,7 +18,8 @@
 #ifndef _IGNITION_COMMON_EXCEPTION_HH_
 #define _IGNITION_COMMON_EXCEPTION_HH_
 
-#include <stdint.h>
+#include <cstdint>
+#include <memory>
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -45,11 +46,14 @@ namespace ignition
       /// \brief Constructor
       public: Exception();
 
+      /// \brief Copy constructor
+      public: Exception(const Exception &_other);
+
       /// \brief Default constructor
       /// \param[in] _file File name
       /// \param[in] _line Line number where the error occurred
       /// \param[in] _msg Error message
-      public: Exception(const char *_file,
+      public: Exception(const std::string &_file,
                         int64_t _line,
                         const std::string &_msg);
 
@@ -77,7 +81,7 @@ namespace ignition
               }
 
       /// \brief Private data pointer.
-      private: ExceptionPrivate *dataPtr;
+      private: std::unique_ptr<ExceptionPrivate> dataPtr;
     };
 
     /// \class InternalError Exception.hh common/Exception.hh
@@ -93,7 +97,7 @@ namespace ignition
       /// \param[in] _file File name
       /// \param[in] _line Line number where the error occurred
       /// \param[in] _msg Error message
-      public: InternalError(const char *_file, int64_t _line,
+      public: InternalError(const std::string &_file, int64_t _line,
                             const std::string &_msg);
 
       /// \brief Destructor
@@ -114,7 +118,7 @@ namespace ignition
       ///                  internal error
       /// \param[in] _function Function where assertion failed
       /// \param[in] _msg Function where assertion failed
-      public: AssertionInternalError(const char *_file,
+      public: AssertionInternalError(const std::string &_file,
                                      int64_t _line,
                                      const std::string &_expr,
                                      const std::string &_function,

@@ -22,14 +22,23 @@
 /////////////////////////////////////////////////
 TEST(Exception, Exception)
 {
+  std::string str = "test";
+
   try
   {
-    ignthrow("test");
+    ignthrow(str);
   }
   catch(ignition::common::Exception &_e)
   {
     _e.Print();
+
+    EXPECT_EQ(_e.ErrorFile(), __FILE__);
+    EXPECT_TRUE(_e.ErrorStr().find(str) != std::string::npos);
+    return;
   }
+
+  // should never get here
+  FAIL();
 }
 
 /////////////////////////////////////////////////
