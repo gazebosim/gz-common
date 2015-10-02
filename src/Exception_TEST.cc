@@ -20,6 +20,42 @@
 #include "ignition/common/Exception.hh"
 
 /////////////////////////////////////////////////
+TEST(Exception, DefaultConstructor)
+{
+  ignition::common::Exception exception;
+  EXPECT_TRUE(exception.ErrorFile().empty());
+  EXPECT_TRUE(exception.ErrorStr().empty());
+}
+
+/////////////////////////////////////////////////
+TEST(Exception, InternalError)
+{
+  ignition::common::InternalError exception;
+  EXPECT_TRUE(exception.ErrorFile().empty());
+  EXPECT_TRUE(exception.ErrorStr().empty());
+
+  ignition::common::InternalError exception2(__FILE__, __LINE__, "my_msg");
+  EXPECT_FALSE(exception2.ErrorFile().empty());
+  EXPECT_EQ(exception2.ErrorStr(), "my_msg");
+}
+
+/////////////////////////////////////////////////
+TEST(Exception, AssertionInternalError)
+{
+  ignition::common::AssertionInternalError exception(__FILE__, __LINE__,
+      "expr", "function", "msg");
+  EXPECT_FALSE(exception.ErrorFile().empty());
+  EXPECT_FALSE(exception.ErrorStr().empty());
+  std::string result =
+    "IGNITION ASSERTION                   \n"
+    "msg\n"
+    "In function       : function\n"
+    "Assert expression : expr\n";
+  EXPECT_EQ(exception.ErrorStr(), result);
+}
+
+
+/////////////////////////////////////////////////
 TEST(Exception, Exception)
 {
   std::string str = "test";
