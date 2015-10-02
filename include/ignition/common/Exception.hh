@@ -54,7 +54,7 @@ namespace ignition
       /// \param[in] _line Line number where the error occurred
       /// \param[in] _msg Error message
       public: Exception(const std::string &_file,
-                        int64_t _line,
+                        const int64_t _line,
                         const std::string &_msg);
 
       /// \brief Destructor
@@ -97,7 +97,8 @@ namespace ignition
       /// \param[in] _file File name
       /// \param[in] _line Line number where the error occurred
       /// \param[in] _msg Error message
-      public: InternalError(const std::string &_file, int64_t _line,
+      public: InternalError(const std::string &_file,
+                            const int64_t _line,
                             const std::string &_msg);
 
       /// \brief Destructor
@@ -119,7 +120,7 @@ namespace ignition
       /// \param[in] _function Function where assertion failed
       /// \param[in] _msg Function where assertion failed
       public: AssertionInternalError(const std::string &_file,
-                                     int64_t _line,
+                                     const int64_t _line,
                                      const std::string &_expr,
                                      const std::string &_function,
                                      const std::string &_msg = "");

@@ -29,7 +29,7 @@ Exception::Exception()
 }
 
 //////////////////////////////////////////////////
-Exception::Exception(const std::string &_file, int64_t _line,
+Exception::Exception(const std::string &_file, const int64_t _line,
     const std::string &_msg)
   : dataPtr(new ExceptionPrivate)
 {
@@ -77,7 +77,7 @@ InternalError::InternalError()
 }
 
 //////////////////////////////////////////////////
-InternalError::InternalError(const std::string &_file, int64_t _line,
+InternalError::InternalError(const std::string &_file, const int64_t _line,
                              const std::string &_msg) :
   Exception(_file, _line, _msg)
 {
@@ -90,7 +90,8 @@ InternalError::~InternalError()
 
 //////////////////////////////////////////////////
 AssertionInternalError::AssertionInternalError(
-    const std::string & _file, int64_t _line,
+    const std::string & _file,
+    const int64_t _line,
     const std::string &_expr,
     const std::string &_function,
     const std::string &_msg) :
