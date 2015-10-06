@@ -100,15 +100,15 @@ namespace ignition
       /// \param[in] _parent The parent element
       /// \param[in] _name String name of the element
       /// \param[out] _id String ID of the element
-      private: TiXmlElement *GetElementId(TiXmlElement *_parent,
-                                          const std::string &_name,
-                                          const std::string &_id);
+      private: TiXmlElement *ElementId(TiXmlElement *_parent,
+                                       const std::string &_name,
+                                       const std::string &_id);
 
       /// \brief Get an XML element by ID
       /// \param[in] _name String name of the element
       /// \param[out] _id String ID of the element
-      private: TiXmlElement *GetElementId(const std::string &_name,
-                                           const std::string &_id);
+      private: TiXmlElement *ElementId(const std::string &_name,
+                                       const std::string &_id);
 
       /// \brief Load a node
       /// \param[in] _elem Pointer to the node XML instance
