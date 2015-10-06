@@ -4,6 +4,7 @@ set (headers
   Animation.hh
   AudioDecoder.hh
   BVHLoader.hh
+  ColladaLoader.hh
   Color.hh
   Console.hh
   Exception.hh

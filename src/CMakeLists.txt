@@ -1,15 +1,20 @@
 include (${project_cmake_dir}/Utils.cmake)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
+include_directories(${tinyxml_INCLUDE_DIRS})
+link_directories(${tinyxml_LIBRARY_DIRS})
+
 set (sources
   Animation.cc
   AudioDecoder.cc
   BVHLoader.cc
+  ColladaLoader.cc
   Color.cc
   Console.cc
   Exception.cc
   Image.cc
   KeyFrame.cc
+  Mesh.cc
   Material.cc
   NodeTransform.cc
   Skeleton.cc
@@ -23,6 +28,7 @@ set (sources
 set (gtest_sources
   Animation_TEST.cc
   AudioDecoder_TEST.cc
+  ColladaLoader_TEST.cc
   Color_TEST.cc
   Console_TEST.cc
   Exception_TEST.cc
@@ -39,6 +45,7 @@ target_link_libraries(ignition-common
   ${IGNITION-MATH_LIBRARIES}
   ${Boost_LIBRARIES}
   ${freeimage_LIBRARIES}
+  ${tinyxml_LIBRARIES}
 )
 
 ign_build_tests(${gtest_sources})
