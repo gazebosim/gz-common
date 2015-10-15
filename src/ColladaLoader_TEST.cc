@@ -18,6 +18,7 @@
 
 #include "test_config.h"
 #include "ignition/common/Mesh.hh"
+#include "ignition/common/SubMesh.hh"
 #include "ignition/common/Material.hh"
 #include "ignition/common/ColladaLoader.hh"
 #include "test/util.hh"
@@ -60,7 +61,7 @@ TEST_F(ColladaLoader, ShareVertices)
   int shared = 0;
   for (unsigned int i = 0; i < mesh->SubMeshCount(); ++i)
   {
-    const common::SubMesh *subMesh = mesh->SubMeshByIndex(i);
+    const common::SubMeshPtr subMesh = mesh->SubMeshByIndex(i);
     for (unsigned int j = 0; j < subMesh->IndexCount(); ++j)
     {
       if (uniqueIndices.find(subMesh->Index(j)) == uniqueIndices.end())
@@ -75,7 +76,7 @@ TEST_F(ColladaLoader, ShareVertices)
   // check all vertices are unique
   for (unsigned int i = 0; i < mesh->SubMeshCount(); ++i)
   {
-    const common::SubMesh *subMesh = mesh->SubMeshByIndex(i);
+    const common::SubMeshPtr subMesh = mesh->SubMeshByIndex(i);
     for (unsigned int j = 0; j < subMesh->VertexCount(); ++j)
     {
       ignition::math::Vector3d v = subMesh->Vertex(j);
@@ -126,8 +127,8 @@ TEST_F(ColladaLoader, Specular)
 
   EXPECT_EQ(mesh->MaterialCount(), 1u);
 
-  const common::Material *mat = mesh->MaterialByIndex(0u);
-  ASSERT_TRUE(mat);
+  const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+  ASSERT_TRUE(mat != NULL);
 
   // Make sure we read the specular value
   EXPECT_EQ(mat->Specular(), common::Color(0.5, 0.5, 0.5, 1.0));

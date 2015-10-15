@@ -30,8 +30,10 @@
 #include "ignition/math/Vector3.hh"
 #include "ignition/math/Matrix4.hh"
 #include "ignition/math/Quaternion.hh"
+#include "ignition/common/CommonTypes.hh"
 #include "ignition/common/Console.hh"
 #include "ignition/common/Material.hh"
+#include "ignition/common/SubMesh.hh"
 #include "ignition/common/Mesh.hh"
 #include "ignition/common/Skeleton.hh"
 #include "ignition/common/SkeletonAnimation.hh"
@@ -142,7 +144,8 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
   this->LoadScene(mesh);
 
   // This will make the model the correct size.
-  mesh->Scale(this->dataPtr->meter);
+  mesh->Scale(ignition::math::Vector3d(
+      this->dataPtr->meter, this->dataPtr->meter, this->dataPtr->meter));
 
   return mesh;
 }
@@ -342,7 +345,7 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
       TiXmlElement *_skelXml,
       const ignition::math::Matrix4d &_transform, Mesh *_mesh)
 {
-  Skeleton *skeleton = new Skeleton(this->LoadSkeletonNodes(_skelXml, NULL));
+  SkeletonPtr skeleton(new Skeleton(this->LoadSkeletonNodes(_skelXml, NULL)));
   _mesh->SetSkeleton(skeleton);
 
   TiXmlElement *rootXml = _contrXml->GetDocument()->RootElement();
@@ -508,7 +511,7 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::LoadAnimations(TiXmlElement *_xml, Skeleton *_skel)
+void ColladaLoader::LoadAnimations(TiXmlElement *_xml, SkeletonPtr _skel)
 {
   TiXmlElement *childXml = _xml->FirstChildElement("animation");
   if (childXml->FirstChildElement("animation"))
@@ -524,7 +527,7 @@ void ColladaLoader::LoadAnimations(TiXmlElement *_xml, Skeleton *_skel)
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel)
+void ColladaLoader::LoadAnimationSet(TiXmlElement *_xml, SkeletonPtr _skel)
 {
   std::stringstream animName;
   if (_xml->Attribute("name"))
@@ -1230,7 +1233,7 @@ void ColladaLoader::LoadTexCoords(const std::string &_id,
 }
 
 /////////////////////////////////////////////////
-Material *ColladaLoader::LoadMaterial(const std::string &_name)
+MaterialPtr ColladaLoader::LoadMaterial(const std::string &_name)
 {
   if (this->dataPtr->materialIds.find(_name)
       != this->dataPtr->materialIds.end())
@@ -1242,7 +1245,7 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
   if (!matXml || !matXml->FirstChildElement("instance_effect"))
     return NULL;
 
-  Material *mat = new Material();
+  MaterialPtr mat(new Material());
   std::string effectName =
     matXml->FirstChildElement("instance_effect")->Attribute("url");
   TiXmlElement *effectXml = this->ElementId("effect", effectName);
@@ -1327,7 +1330,7 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
 
 /////////////////////////////////////////////////
 void ColladaLoader::LoadColorOrTexture(TiXmlElement *_elem,
-    const std::string &_type, Material *_mat)
+    const std::string &_type, MaterialPtr _mat)
 {
   if (!_elem || !_elem->FirstChildElement(_type))
     return;
@@ -1403,7 +1406,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
   // a set of triangle meshes.  The assumption is that
   // each polylist polygon is convex, and we do decomposion
   // by anchoring each triangle about vertex 0 or each polygon
-  SubMesh *subMesh = new SubMesh;
+  SubMeshPtr subMesh(new SubMesh());
   subMesh->SetName(this->dataPtr->currentNodeName);
   bool combinedVertNorms = false;
 
@@ -1419,9 +1422,9 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
     if (iter != this->dataPtr->materialMap.end())
       matStr = iter->second;
 
-    common::Material *mat = this->LoadMaterial(matStr);
+    MaterialPtr mat = this->LoadMaterial(matStr);
 
-    matIndex = _mesh->MaterialIndex(mat);
+    matIndex = _mesh->IndexOfMaterial(mat);
     if (matIndex < 0)
       matIndex = _mesh->AddMaterial(mat);
 
@@ -1645,7 +1648,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
             {
               subMesh->SetVertex(newVertIndex, bindShapeMat *
                   subMesh->Vertex(newVertIndex));
-              Skeleton *skel = _mesh->MeshSkeleton();
+              SkeletonPtr skel = _mesh->MeshSkeleton();
               for (unsigned int i = 0;
                   i < skel->VertNodeWeightCount(daeVertIndex); ++i)
               {
@@ -1703,7 +1706,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
                                   const ignition::math::Matrix4d &_transform,
                                   Mesh *_mesh)
 {
-  SubMesh *subMesh = new SubMesh;
+  SubMeshPtr subMesh(new SubMesh);
   subMesh->SetName(this->dataPtr->currentNodeName);
   bool combinedVertNorms = false;
 
@@ -1719,8 +1722,8 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
     if (iter != this->dataPtr->materialMap.end())
       matStr = iter->second;
 
-    common::Material *mat = this->LoadMaterial(matStr);
-    matIndex = _mesh->MaterialIndex(mat);
+    MaterialPtr mat = this->LoadMaterial(matStr);
+    matIndex = _mesh->IndexOfMaterial(mat);
     if (matIndex < 0)
       matIndex = _mesh->AddMaterial(mat);
 
@@ -1928,7 +1931,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
           subMesh->AddNormal(norms[daeVertIndex]);
         if (_mesh->HasSkeleton())
         {
-          Skeleton *skel = _mesh->MeshSkeleton();
+          SkeletonPtr skel = _mesh->MeshSkeleton();
           for (unsigned int i = 0;
               i < skel->VertNodeWeightCount(values[daeVertIndex]); ++i)
           {
@@ -1980,7 +1983,7 @@ void ColladaLoader::LoadLines(TiXmlElement *_xml,
     const ignition::math::Matrix4d &_transform,
     Mesh *_mesh)
 {
-  SubMesh *subMesh = new SubMesh;
+  SubMeshPtr subMesh(new SubMesh);
   subMesh->SetName(this->dataPtr->currentNodeName);
   subMesh->SetPrimitiveType(SubMesh::LINES);
 
@@ -2027,7 +2030,7 @@ float ColladaLoader::LoadFloat(TiXmlElement *_elem)
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::LoadTransparent(TiXmlElement *_elem, Material *_mat)
+void ColladaLoader::LoadTransparent(TiXmlElement *_elem, MaterialPtr _mat)
 {
   const char *opaqueCStr = _elem->Attribute("opaque");
   if (!opaqueCStr)

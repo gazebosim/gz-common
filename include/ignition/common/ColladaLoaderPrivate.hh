@@ -65,7 +65,7 @@ namespace ignition
               std::vector<ignition::math::Vector2d> >texcoordIds;
 
       /// \brief Map of collada Material ids to Gazebo materials.
-      public: std::map<std::string, Material *> materialIds;
+      public: std::map<std::string, MaterialPtr> materialIds;
 
       /// \brief Map of collada POSITION ids to a map of
       /// duplicate positions.

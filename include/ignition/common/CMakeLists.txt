@@ -11,12 +11,14 @@ set (headers
   ffmpeg_inc.h
   Image.hh
   KeyFrame.hh
+  Mesh.hh
   Material.hh
   NodeTransform.hh
   SingletonT.hh
   Skeleton.hh
   SkeletonAnimation.hh
   SkeletonNode.hh
+  SubMesh.hh
   Time.hh
   Timer.hh
   Util.hh

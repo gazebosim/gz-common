@@ -70,12 +70,12 @@ namespace ignition
       /// \brief Load animations for a skeleton
       /// \param[in] _xml Animation XML instance
       /// \param[in,out] _skel Pointer to the skeleton
-      private: void LoadAnimations(TiXmlElement *_xml, Skeleton *_skel);
+      private: void LoadAnimations(TiXmlElement *_xml, SkeletonPtr _skel);
 
       /// \brief Load a set of animations for a skeleton
       /// \param[in] _xml Pointer to the animation set XML instance
       /// \param[in,out] _skel Pointer to the skeleton
-      private: void LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel);
+      private: void LoadAnimationSet(TiXmlElement *_xml, SkeletonPtr _skel);
 
       /// \brief Load skeleton nodes
       /// \param[in] _xml Pointer to the XML instance
@@ -177,7 +177,7 @@ namespace ignition
       /// \brief Load a material
       /// \param _name Name of the material XML element
       /// \return A pointer to the new material
-      private: Material *LoadMaterial(const std::string &_name);
+      private: MaterialPtr LoadMaterial(const std::string &_name);
 
       /// \brief Load a color or texture
       /// \param[in] _eleme Pointer to the XML element
@@ -185,7 +185,7 @@ namespace ignition
       /// \param[out] _mat Material to load the texture or color into
       private: void LoadColorOrTexture(TiXmlElement *_elem,
                                        const std::string &_type,
-                                       Material *_mat);
+                                       MaterialPtr _mat);
 
       /// \brief Load triangles
       /// \param[in] _trianglesXml Pointer the triangles XML instance
@@ -223,7 +223,7 @@ namespace ignition
       /// \brief Load a transparent material. NOT IMPLEMENTED
       /// \param[in] _elem Pointer to the XML element
       /// \param[out] _mat Material to hold the transparent properties
-      private: void LoadTransparent(TiXmlElement *_elem, Material *_mat);
+      private: void LoadTransparent(TiXmlElement *_elem, MaterialPtr _mat);
 
       /// \internal
       /// \brief Pointer to private data.
