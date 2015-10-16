@@ -22,11 +22,11 @@ set (sources
 
 set (gtest_sources
   Animation_TEST.cc
-  AudioDecoder_TEST.cc
+  #AudioDecoder_TEST.cc
   Color_TEST.cc
   Console_TEST.cc
   Exception_TEST.cc
-  Image_TEST.cc
+  #Image_TEST.cc
   Material_TEST.cc
   Time_TEST.cc
   Util_TEST.cc
