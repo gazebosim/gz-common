@@ -36,6 +36,8 @@ using namespace common;
 Time Time::wallTime;
 
 const Time Time::Zero = common::Time(0, 0);
+const int32_t Time::nsInSec = 1000000000L;
+const int32_t Time::nsInMs = 1000000;
 
 
 /////////////////////////////////////////////////

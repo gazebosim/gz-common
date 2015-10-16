@@ -254,21 +254,28 @@ namespace ignition
                  // In the case sec and nsec have different signs, normalize
                  if (this->sec > 0 && this->nsec < 0)
                  {
-                   int32_t n = abs(this->nsec / 1e9) + 1;
+                   int32_t n = abs(this->nsec / this->nsInSec) + 1;
                    this->sec -= n;
-                   this->nsec += n * 1e9;
+                   this->nsec += n * this->nsInSec;
                  }
                  if (this->sec < 0 && this->nsec > 0)
                  {
-                   int32_t n = abs(this->nsec / 1e9) + 1;
+                   int32_t n = abs(this->nsec / this->nsInSec) + 1;
                    this->sec += n;
-                   this->nsec -= n * 1e9;
+                   this->nsec -= n * this->nsInSec;
                  }
 
                  // Make any corrections
-                 this->sec += this->nsec / static_cast<int32_t>(1e9);
-                 this->nsec = this->nsec % static_cast<int32_t>(1e9);
+                 this->sec += this->nsec / this->nsInSec;
+                 this->nsec = this->nsec % this->nsInSec;
                }
+
+      /// \brief Constant multiplier to convert from nanoseconds to seconds.
+      private: static const int32_t nsInSec;
+
+      /// \brief Constant multiplier to convert from nanoseconds to
+      /// milliseconds.
+      private: static const int32_t nsInMs;
     };
   }
 }
