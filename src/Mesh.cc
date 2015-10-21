@@ -43,7 +43,7 @@ Mesh::Mesh()
 Mesh::~Mesh()
 {
   this->dataPtr->submeshes.clear();
-  this->materials.clear();
+  this->dataPtr->materials.clear();
 }
 
 //////////////////////////////////////////////////
@@ -206,8 +206,8 @@ int Mesh::AddMaterial(const MaterialPtr &_mat)
 
   if (_mat)
   {
-    this->materials.push_back(_mat);
-    result = this->materials.size()-1;
+    this->dataPtr->materials.push_back(_mat);
+    result = this->dataPtr->materials.size()-1;
   }
 
   return result;
@@ -216,14 +216,14 @@ int Mesh::AddMaterial(const MaterialPtr &_mat)
 //////////////////////////////////////////////////
 unsigned int Mesh::MaterialCount() const
 {
-  return this->materials.size();
+  return this->dataPtr->materials.size();
 }
 
 //////////////////////////////////////////////////
 MaterialPtr Mesh::MaterialByIndex(const unsigned int index) const
 {
-  if (index < this->materials.size())
-    return this->materials[index];
+  if (index < this->dataPtr->materials.size())
+    return this->dataPtr->materials[index];
 
   return NULL;
 }
@@ -231,9 +231,9 @@ MaterialPtr Mesh::MaterialByIndex(const unsigned int index) const
 //////////////////////////////////////////////////
 int Mesh::IndexOfMaterial(const MaterialPtr &_mat) const
 {
-  for (unsigned int i = 0; i < this->materials.size(); ++i)
+  for (unsigned int i = 0; i < this->dataPtr->materials.size(); ++i)
   {
-    if (this->materials[i] == _mat)
+    if (this->dataPtr->materials[i] == _mat)
       return i;
   }
 

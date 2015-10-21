@@ -130,7 +130,7 @@ namespace ignition
       /// indices.
       public: void RecalculateNormals();
 
-      /// \brief Get AABB coordinate
+      /// \brief Get axis-aligned bounding box in the mesh frame
       /// \param[out] _center Center of the bounding box
       /// \param[out] _minXYZ Bounding box minimum values
       /// \param[out] _maxXYZ Bounding box maximum values
@@ -164,8 +164,8 @@ namespace ignition
       /// \param[in] _factor Scaling vector
       public: void SetScale(const ignition::math::Vector3d &_factor);
 
-      /// \brief Move the center of the mesh to the given coordinate. This
-      /// will move all the vertices in all submeshes.
+      /// \brief Move the center of the mesh to the given coordinate in the
+      /// mesh frame. This will move all the vertices in all submeshes.
       /// \param[in] _center Location of the mesh center.
       public: void Center(const ignition::math::Vector3d &_center =
                           ignition::math::Vector3d::Zero);
@@ -173,21 +173,6 @@ namespace ignition
       /// \brief Move all vertices in all submeshes by _vec.
       /// \param[in] _vec Amount to translate vertices.
       public: void Translate(const ignition::math::Vector3d &_vec);
-
-      /// \brief The name of the mesh
-      private: std::string name;
-
-      /// \brief The path of the mesh resource
-      private: std::string path;
-
-      /// \brief The sub mesh array.
-      private: std::vector<SubMeshPtr> submeshes;
-
-      /// \brief The materials array.
-      private: std::vector<MaterialPtr> materials;
-
-      /// \brief The skeleton (for animation)
-      private: Skeleton *skeleton;
 
       /// \brief Private data pointer.
       private: std::unique_ptr<MeshPrivate> dataPtr;
