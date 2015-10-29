@@ -60,7 +60,7 @@ namespace ignition
       public: std::string Name() const;
 
       /// \brief Get the maximun X, Y, Z values
-      /// \return the upper bounds of the bounding box
+      /// \return The upper bounds of the bounding box
       public: ignition::math::Vector3d Max() const;
 
       /// \brief Get the minimum X, Y, Z values
@@ -72,15 +72,15 @@ namespace ignition
       public: unsigned int VertexCount() const;
 
       /// \brief Get the number of normals
-      /// \return the number of nomrals
+      /// \return The number of normals
       public: unsigned int NormalCount() const;
 
       /// \brief Get the number of indices
-      /// \return the number of indices
+      /// \return The number of indices
       public: unsigned int IndexCount() const;
 
       /// \brief Get the number of texture coordinates
-      /// \return the number of texture coordinates
+      /// \return The number of texture coordinates
       public: unsigned int TexCoordCount() const;
 
       /// \brief Add a submesh mesh.
@@ -89,7 +89,7 @@ namespace ignition
       public: void AddSubMesh(const SubMeshPtr &_child);
 
       /// \brief Get the number of child submeshes.
-      /// \return the number of submeshes.
+      /// \return The number of submeshes.
       public: unsigned int SubMeshCount() const;
 
       /// \brief Add a material to the mesh
@@ -113,7 +113,7 @@ namespace ignition
 
       /// \brief Get a child submesh by index
       /// \param[in] _index Index of the submesh
-      /// \return the submesh or NULL if the index is out of bounds.
+      /// \return The submesh or NULL if the index is out of bounds.
       public: SubMeshPtr SubMeshByIndex(const unsigned int _index) const;
 
       /// \brief Get a child submesh by name.
