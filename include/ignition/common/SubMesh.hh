@@ -69,65 +69,65 @@ namespace ignition
       public: virtual ~SubMesh();
 
       /// \brief Set the name of this mesh
-      /// \param[in] _n the name to set
+      /// \param[in] _n The name to set
       public: void SetName(const std::string &_name);
 
       /// \brief Get the name of this mesh
-      /// \return the name
+      /// \return The name
       public: std::string Name() const;
 
       /// \brief Set the primitive type
-      /// \param[in] _type the primitive type
+      /// \param[in] _type The primitive type
       public: void SetPrimitiveType(PrimitiveType _type);
 
       /// \brief Get the primitive type
-      /// \return the primitive type
+      /// \return The primitive type
       public: PrimitiveType SubMeshPrimitiveType() const;
 
       /// \brief Add an index to the mesh
-      /// \param[in] _index the new vertex index
+      /// \param[in] _index The new vertex index
       public: void AddIndex(unsigned int _index);
 
       /// \brief Add a vertex to the mesh
-      /// \param[in] _v the new position
+      /// \param[in] _v The new position
       public: void AddVertex(const ignition::math::Vector3d &_v);
 
       /// \brief Add a vertex to the mesh
-      /// \param[in] _x position along x
-      /// \param[in] _y position along y
-      /// \param[in] _z position along z
+      /// \param[in] _x Position along x
+      /// \param[in] _y Position along y
+      /// \param[in] _z Position along z
       public: void AddVertex(const double _x, const double _y, const double _z);
 
       /// \brief Add a normal to the mesh
-      /// \param[in] _n the normal
+      /// \param[in] _n The normal
       public: void AddNormal(const ignition::math::Vector3d &_n);
 
       /// \brief Add a normal to the mesh
-      /// \param[in] _x position along x
-      /// \param[in] _y position along y
-      /// \param[in] _z position along z
+      /// \param[in] _x Position along x
+      /// \param[in] _y Position along y
+      /// \param[in] _z Position along z
       public: void AddNormal(const double _x, const double _y, const double _z);
 
       /// \brief Add a texture coord to the mesh
-      /// \param[in] _u position along u
-      /// \param[in] _v position along v
+      /// \param[in] _u Position along u
+      /// \param[in] _v Position along v
       public: void AddTexCoord(const double _u, const double _v);
 
       /// \brief Add a texture coordinate to the mesh
-      /// \param[in] _uv the texture coordinate
+      /// \param[in] _uv The texture coordinate
       public: void AddTexCoord(const ignition::math::Vector2d &_uv);
 
       /// \brief Add a vertex - skeleton node assignment
-      /// \param[in] _vertex the vertex index
-      /// \param[in] _node the node index
-      /// \param[in] _weight the weight (between 0 and 1)
+      /// \param[in] _vertex The vertex index
+      /// \param[in] _node The node index
+      /// \param[in] _weight The weight (between 0 and 1)
       public: void AddNodeAssignment(const unsigned int _vertex,
                                      const unsigned int _node,
                                      const float _weight);
 
       /// \brief Get a vertex
       /// \param[in] _index Index of the vertex
-      /// \return the coordinates of the vertex or zero if the index is out
+      /// \return The coordinates of the vertex or zero if the index is out
       /// of bounds.
       public: ignition::math::Vector3d Vertex(const unsigned int _index) const;
 
@@ -138,8 +138,8 @@ namespace ignition
                              const ignition::math::Vector3d &_v);
 
       /// \brief Get a normal
-      /// \param[in] _index the normal index
-      /// \return The normal direction or zero index is out of bounds.
+      /// \param[in] _index The normal index
+      /// \return The normal direction or zero if index is out of bounds.
       public: ignition::math::Vector3d Normal(const unsigned int _index) const;
 
       /// \brief Set a normal
@@ -172,7 +172,7 @@ namespace ignition
           const unsigned int _i);
 
       /// \brief Get a vertex - skeleton node assignment
-      /// \param[in] _index the index of the assignment
+      /// \param[in] _index The index of the assignment
       public: NodeAssignment NodeAssignmentByIndex(
           const unsigned int _index) const;
 
@@ -209,7 +209,7 @@ namespace ignition
       public: unsigned int MaxIndex() const;
 
       /// \brief Set the material index. Relates to the parent mesh material
-      /// list
+      /// list.
       /// \param[in] _index Index to set the material to.
       public: void SetMaterialIndex(const unsigned int _index);
 
@@ -228,8 +228,8 @@ namespace ignition
       public: int IndexOfVertex(const ignition::math::Vector3d &_v) const;
 
       /// \brief Put all the data into flat arrays
-      /// \param[in] _verArr the vertex array to be filled.
-      /// \param[in] _indexndArr the index array to be filled.
+      /// \param[in] _verArr The vertex array to be filled.
+      /// \param[in] _indexndArr The index array to be filled.
       public: void FillArrays(double **_vertArr, int **_indexndArr) const;
 
       /// \brief Recalculate all the normals.
@@ -270,13 +270,13 @@ namespace ignition
       /// \brief Constructor.
       public: NodeAssignment();
 
-      /// \brief index of the vertex
+      /// \brief Index of the vertex
       public: unsigned int vertexIndex;
 
-      /// \brief node (or bone) index
+      /// \brief Node (or bone) index
       public: unsigned int nodeIndex;
 
-      /// \brief the weight (between 0 and 1)
+      /// \brief The weight (between 0 and 1)
       public: float weight;
     };
   }
