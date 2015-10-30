@@ -276,7 +276,8 @@ namespace ignition
       /// \brief Node (or bone) index
       public: unsigned int nodeIndex;
 
-      /// \brief The weight (between 0 and 1)
+      /// \brief The weight (between 0 and 1). This determines how much the
+      /// node (bone) affects the vertex in animation.
       public: float weight;
     };
   }
