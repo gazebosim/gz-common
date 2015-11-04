@@ -11,11 +11,13 @@ set (headers
   Image.hh
   KeyFrame.hh
   Material.hh
+  Mesh.hh
   NodeTransform.hh
   SingletonT.hh
   Skeleton.hh
   SkeletonAnimation.hh
   SkeletonNode.hh
+  SubMesh.hh
   Time.hh
   Timer.hh
   Util.hh

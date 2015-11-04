@@ -26,6 +26,7 @@ using namespace common;
 Skeleton::Skeleton()
   : data(new SkeletonPrivate)
 {
+  this->data->root = NULL;
 }
 
 //////////////////////////////////////////////////
