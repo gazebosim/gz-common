@@ -513,3 +513,5 @@ NodeAssignment::NodeAssignment()
   : vertexIndex(0), nodeIndex(0), weight(0.0)
 {
 }
+
+NodeAssignment::~NodeAssignment(){}
