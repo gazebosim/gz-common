@@ -13,6 +13,7 @@ set (headers
   KeyFrame.hh
   Mesh.hh
   Material.hh
+  Mesh.hh
   NodeTransform.hh
   SingletonT.hh
   Skeleton.hh

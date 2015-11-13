@@ -16,6 +16,7 @@ set (sources
   KeyFrame.cc
   Mesh.cc
   Material.cc
+  Mesh.cc
   NodeTransform.cc
   Skeleton.cc
   SkeletonAnimation.cc
@@ -28,12 +29,12 @@ set (sources
 
 set (gtest_sources
   Animation_TEST.cc
-  AudioDecoder_TEST.cc
+  #AudioDecoder_TEST.cc
   ColladaLoader_TEST.cc
   Color_TEST.cc
   Console_TEST.cc
   Exception_TEST.cc
-  Image_TEST.cc
+  #Image_TEST.cc
   Material_TEST.cc
   Mesh_TEST.cc
   SubMesh_TEST.cc

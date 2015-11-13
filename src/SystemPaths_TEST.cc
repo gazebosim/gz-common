@@ -27,7 +27,6 @@ using namespace ignition;
 
 TEST(SystemPathsTest, SystemPaths)
 {
-  std::vector<std::string> tmpstrings;
   std::string pluginPathBackup = "IGN_PLUGIN_PATH=";
 
   if (getenv("IGN_PLUGIN_PATH"))
@@ -51,6 +50,7 @@ TEST(SystemPathsTest, SystemPaths)
   putenv(const_cast<char*>("IGN_PLUGIN_PATH="));
   paths->ClearPluginPaths();
   // In this case, we expect to get the compiled-in default
+  // std::vector<std::string> tmpstrings;
   // boost::split(tmpstrings, IGN_PLUGIN_PATH, boost::is_any_of(":"));
   // EXPECT_EQ(tmpstrings.size(), paths->GetPluginPaths().size());
 

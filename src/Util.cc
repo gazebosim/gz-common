@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 #include <ignition/common/config.hh>
@@ -30,7 +31,8 @@ std::string ignition::common::SystemTimeISO()
   auto nano = std::chrono::duration_cast<std::chrono::nanoseconds>(
       epoch).count() - sec * IGN_SEC_TO_NANO;
 
-  std::strftime(isoStr, sizeof(isoStr), "%FT%T", std::localtime(&sec));
+  time_t tmSec = static_cast<time_t>(sec);
+  std::strftime(isoStr, sizeof(isoStr), "%FT%T", std::localtime(&tmSec));
 
   return std::string(isoStr) + "." + std::to_string(nano);
 }
