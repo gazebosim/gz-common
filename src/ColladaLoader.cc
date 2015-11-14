@@ -19,7 +19,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include <tinyxml.h>
+//#include <tinyxml.h>
 #include <tinyxml2.h>
 #include <math.h>
 #include <sstream>
@@ -450,8 +450,7 @@ void ColladaLoader::LoadController(tinyxml2::XMLElement *_contrXml,
   {
     std::string semantic = inputXml->Attribute("semantic");
     std::string source = inputXml->Attribute("source");
-    int offset;
-    inputXml->Attribute("offset", &offset);
+    int offset = std::stoi(inputXml->Attribute("offset"));
 
     if (semantic == "JOINT")
     {
@@ -711,7 +710,7 @@ SkeletonNode* ColladaLoader::LoadSkeletonNodes(tinyxml2::XMLElement *_xml,
 
   this->SetSkeletonNodeTransform(_xml, node);
 
-  TiXmlElement *childXml = _xml->FirstChildElement("node");
+  tinyxml2::XMLElement *childXml = _xml->FirstChildElement("node");
   while (childXml)
   {
     this->LoadSkeletonNodes(childXml, node);
@@ -1282,7 +1281,8 @@ MaterialPtr ColladaLoader::LoadMaterial(const std::string &_name)
 
       if (lambertXml->FirstChildElement("transparent"))
       {
-        TiXmlElement *transXml = lambertXml->FirstChildElement("transparent");
+        tinyxml2::XMLElement *transXml =
+            lambertXml->FirstChildElement("transparent");
         this->LoadTransparent(transXml, mat);
       }
     }
@@ -1345,10 +1345,10 @@ MaterialPtr ColladaLoader::LoadMaterial(const std::string &_name)
 void ColladaLoader::LoadColorOrTexture(tinyxml2::XMLElement *_elem,
     const std::string &_type, MaterialPtr _mat)
 {
-  if (!_elem || !_elem->FirstChildElement(_type))
+  if (!_elem || !_elem->FirstChildElement(_type.c_str()))
     return;
 
-  tinyxml2::XMLElement *typeElem = _elem->FirstChildElement(_type);
+  tinyxml2::XMLElement *typeElem = _elem->FirstChildElement(_type.c_str());
 
   if (typeElem->FirstChildElement("color"))
   {
