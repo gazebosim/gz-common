@@ -17,13 +17,14 @@
 #ifndef _IGNITION_COMMON_COLLADALOADER_PRIVATE_HH_
 #define _IGNITION_COMMON_COLLADALOADER_PRIVATE_HH_
 
+#include <tinyxml2.h>
 #include <map>
 #include <string>
 #include <vector>
 
 #include <ignition/math/Vector3.hh>
 
-class TiXmlElement;
+//class tinyxml2::XMLElement;
 
 namespace ignition
 {
@@ -44,7 +45,7 @@ namespace ignition
       public: std::map<std::string, std::string> materialMap;
 
       /// \brief root xml element of COLLADA data
-      public: TiXmlElement *colladaXml;
+      public: tinyxml2::XMLElement *colladaXml;
 
       /// \brief directory of COLLADA file name
       public: std::string path;
