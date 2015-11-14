@@ -23,7 +23,10 @@
 
 #include <ignition/math/Vector3.hh>
 
-class TiXmlElement;
+namespace tinyxml2
+{
+  class XMLElement;
+}
 
 namespace ignition
 {
@@ -44,7 +47,7 @@ namespace ignition
       public: std::map<std::string, std::string> materialMap;
 
       /// \brief root xml element of COLLADA data
-      public: TiXmlElement *colladaXml;
+      public: tinyxml2::XMLElement *colladaXml;
 
       /// \brief directory of COLLADA file name
       public: std::string path;
