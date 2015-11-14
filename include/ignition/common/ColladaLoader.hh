@@ -22,13 +22,14 @@
 #include <string>
 #include <vector>
 
+#include <ignition/math/Matrix4.hh>
+#include <ignition/math/Vector2.hh>
+#include <ignition/math/Vector3.hh>
+
 #include "ignition/common/MeshLoader.hh"
 #include "ignition/common/Skeleton.hh"
 #include "ignition/common/SkeletonNode.hh"
 #include "ignition/common/Util.hh"
-#include <ignition/math/Matrix4.hh>
-#include <ignition/math/Vector2.hh>
-#include <ignition/math/Vector3.hh>
 
 namespace tinyxml2
 {
