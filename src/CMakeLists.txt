@@ -1,9 +1,6 @@
 include (${project_cmake_dir}/Utils.cmake)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-# include_directories(${tinyxml_INCLUDE_DIRS})
-# link_directories(${tinyxml_LIBRARY_DIRS})
-
 if (NOT USE_EXTERNAL_TINYXML2)
   include_directories (${CMAKE_SOURCE_DIR}/deps/win/tinyxml2)
   set (sources ${sources}
@@ -55,7 +52,6 @@ target_link_libraries(ignition-common
   ${IGNITION-MATH_LIBRARIES}
   ${Boost_LIBRARIES}
   ${freeimage_LIBRARIES}
-  #${tinyxml_LIBRARIES}
   ${tinyxml2_LIBRARIES}
 )
 

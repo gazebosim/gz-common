@@ -19,7 +19,6 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
-//#include <tinyxml.h>
 #include <tinyxml2.h>
 #include <math.h>
 #include <sstream>

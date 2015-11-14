@@ -18,28 +18,29 @@
 #ifndef _IGNITION_COMMON_COLLADALOADER_HH_
 #define _IGNITION_COMMON_COLLADALOADER_HH_
 
-#include <tinyxml2.h>
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
 
-#include <ignition/math/Matrix4.hh>
-#include <ignition/math/Vector3.hh>
-#include <ignition/math/Vector2.hh>
-
-#include "ignition/common/SkeletonNode.hh"
-#include "ignition/common/Skeleton.hh"
 #include "ignition/common/MeshLoader.hh"
+#include "ignition/common/Skeleton.hh"
+#include "ignition/common/SkeletonNode.hh"
 #include "ignition/common/Util.hh"
+#include <ignition/math/Matrix4.hh>
+#include <ignition/math/Vector2.hh>
+#include <ignition/math/Vector3.hh>
 
-//class tinyxml2::XMLElement;
+namespace tinyxml2
+{
+  class XMLElement;
+}
 
 namespace ignition
 {
   namespace common
   {
-    class Material;
     class ColladaLoaderPrivate;
+    class Material;
 
     using RawNodeAnim = std::map<double, std::vector<NodeTransform> >;
     using RawSkeletonAnim = std::map<std::string, RawNodeAnim>;

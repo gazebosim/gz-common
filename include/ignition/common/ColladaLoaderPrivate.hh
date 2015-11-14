@@ -17,14 +17,16 @@
 #ifndef _IGNITION_COMMON_COLLADALOADER_PRIVATE_HH_
 #define _IGNITION_COMMON_COLLADALOADER_PRIVATE_HH_
 
-#include <tinyxml2.h>
 #include <map>
 #include <string>
 #include <vector>
 
 #include <ignition/math/Vector3.hh>
 
-//class tinyxml2::XMLElement;
+namespace tinyxml2
+{
+  class XMLElement;
+}
 
 namespace ignition
 {
