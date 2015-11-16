@@ -50,7 +50,12 @@ namespace ignition
     /// \param[in] _dir Name of directory in which to store the log file.
     /// \param[in] _file Name of log file for ignlog messages.
     #define ignLogInit(_dir, _file)\
-    (ignition::common::Console::log.Init(_dir, _file))
+        (ignition::common::Console::log.Init(_dir, _file))
+
+    /// \brief Get the full path of the directory where the log files are stored
+    /// \return Full path of the directory
+    #define ignLogDirectory()\
+        (ignition::common::Console::log.LogDirectory())
 
     /// \class FileLogger FileLogger.hh common/common.hh
     /// \brief A logger that outputs messages to a file.
@@ -83,6 +88,11 @@ namespace ignition
       public: virtual FileLogger &operator()(
                   const std::string &_file, int _line);
 
+      /// \brief Get the full path of the directory where all the log files
+      /// are stored.
+      /// \return Full path of the directory.
+      public: std::string LogDirectory() const;
+
       /// \brief String buffer for the file logger.
       protected: class Buffer : public std::stringbuf
                  {
@@ -101,6 +111,10 @@ namespace ignition
                    /// \brief Stream to output information into.
                    public: std::ofstream *stream;
                  };
+
+      /// \brief Stores the full path of the directory where all the log files
+      /// are stored.
+      private: std::string logDirectory;
 
       /// \brief True if initialized.
       private: bool initialized;

@@ -119,7 +119,8 @@ int Logger::Buffer::sync()
 
 /////////////////////////////////////////////////
 FileLogger::FileLogger(const std::string &_filename)
-  : std::ostream(new Buffer(_filename))
+  : std::ostream(new Buffer(_filename)),
+    logDirectory("")
 {
   this->initialized = false;
   this->setf(std::ios_base::unitbuf);
@@ -145,24 +146,30 @@ void FileLogger::Init(const std::string &_directory,
   FileLogger::Buffer *buf = static_cast<FileLogger::Buffer*>(
       this->rdbuf());
 
-  std::string logPath = getenv("HOME");
-  logPath = logPath + "/" + _directory;
+  boost::filesystem::path logPath = getenv("HOME");
+  logPath = logPath / _directory;
 
   // Create the directory if it doesn't exist.
   // \todo: Replace this with c++1y, when it is released.
   if (!boost::filesystem::exists(logPath))
     boost::filesystem::create_directories(logPath);
 
-  logPath = logPath + "/" + _filename;
+  logPath = logPath / _filename;
 
   // Check if the Init method has been already called, and if so
   // remove current buffer.
   if (buf->stream)
     delete buf->stream;
 
-  buf->stream = new std::ofstream(logPath.c_str(), std::ios::out);
+  buf->stream = new std::ofstream(logPath.string().c_str(), std::ios::out);
   if (!buf->stream->is_open())
     std::cerr << "Error opening log file: " << logPath << std::endl;
+
+  // Update the log directory name.
+  if (boost::filesystem::is_directory(logPath))
+    this->logDirectory = logPath.string();
+  else
+    this->logDirectory = logPath.branch_path().string();
 
   this->initialized = true;
 
@@ -192,6 +199,12 @@ FileLogger &FileLogger::operator()(const std::string &_file, int _line)
     << _file.substr(index , _file.size() - index) << ":" << _line << "]";
 
   return (*this);
+}
+
+/////////////////////////////////////////////////
+std::string FileLogger::LogDirectory() const
+{
+  return this->logDirectory;
 }
 
 /////////////////////////////////////////////////

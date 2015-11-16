@@ -442,6 +442,25 @@ TEST(Console_TEST, ColorErr)
 }
 
 /////////////////////////////////////////////////
+/// \brief Test Console::LogDirectory
+TEST(Console_TEST, LogDirectory)
+{
+  // Create a unique directory path
+  boost::filesystem::path path = boost::filesystem::unique_path();
+
+  // Initialize logging
+  ignLogInit(path.string(), "test.log");
+
+  std::string logDir = ignLogDirectory();
+
+  // Get the absolute path
+  boost::filesystem::path absPath = getenv("HOME");
+  absPath /= path;
+
+  EXPECT_EQ(logDir, absPath.string());
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

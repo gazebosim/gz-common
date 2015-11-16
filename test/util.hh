@@ -50,11 +50,13 @@ namespace ignition
         std::string testName = testInfo->name();
         std::string testCaseName = testInfo->test_case_name();
         this->logFilename = testCaseName + "_" + testName + ".log";
-        this->logDirectory = logPath;
 
         // Initialize Console
         ignLogInit("test_logs", this->logFilename);
         ignition::common::Console::SetQuiet(false);
+
+        // Read the full path to the log directory.
+        this->logDirectory = ignLogDirectory();
       }
 
       /// \brief Get a string with the full log file path.
@@ -66,7 +68,7 @@ namespace ignition
 
       /// \brief Get a string with all the log content loaded from the disk.
       /// \return A string will all the log content.
-      protected: std::string GetLogContent() const
+      protected: std::string LogContent() const
       {
         std::cout << "2 Log Path[" <<this->GetFullLogPath() << "]\n";
         // Open the log file, and read back the string
