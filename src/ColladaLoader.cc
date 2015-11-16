@@ -248,7 +248,8 @@ void ColladaLoader::LoadNode(tinyxml2::XMLElement *_elem, Mesh *_mesh,
     std::string contrURL = instContrXml->Attribute("url");
     tinyxml2::XMLElement *contrXml = this->ElementId("controller", contrURL);
 
-    tinyxml2::XMLElement *instSkelXml = instContrXml->FirstChildElement("skeleton");
+    tinyxml2::XMLElement *instSkelXml =
+        instContrXml->FirstChildElement("skeleton");
     std::string rootURL = instSkelXml->GetText();
     tinyxml2::XMLElement *rootNodeXml = this->ElementId("node", rootURL);
 
