@@ -15,10 +15,12 @@
 
 @set IGN_MATH_PATH=%cd%\..\..\ign-math\build\install\%build_type%
 
+@set INCLUDE=%FREEIMAGE_INCLUDE_DIR%
+@set LIB=%FREEIMAGE_LIBRARY_DIR%
+
 @echo Configuring for build type %build_type% for %build_bitness% bits
 cmake -G "NMake Makefiles"^
     -DFREEIMAGE_RUNS=1^
-    -DPROTOBUF_SRC_ROOT_FOLDER="%PROTOBUF_PATH%"^
     -DBOOST_ROOT:STRING="%BOOST_PATH%"^
     -DBOOST_LIBRARYDIR:STRING="%BOOST_LIBRARY_DIR%"^
     -DIGNITION-MATH_INCLUDE_DIRS:STRING="%IGN_MATH_PATH%\include\ignition\math2"^
