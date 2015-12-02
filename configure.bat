@@ -15,8 +15,8 @@
 
 @set IGN_MATH_PATH=%cd%\..\..\ign-math\build\install\%build_type%
 
-@set INCLUDE=%FREEIMAGE_INCLUDE_DIR%
-@set LIB=%FREEIMAGE_LIBRARY_DIR%
+@set INCLUDE=%FREEIMAGE_INCLUDE_DIR%;%INCLUDE%
+@set LIB=%FREEIMAGE_LIBRARY_DIR%;%LIB%
 
 @echo Configuring for build type %build_type% for %build_bitness% bits
 cmake -G "NMake Makefiles"^
