@@ -1,6 +1,8 @@
 include (${project_cmake_dir}/Utils.cmake)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
+include_directories(${Boost_INCLUDE_DIR})
+
 set (sources
   Animation.cc
   AudioDecoder.cc

@@ -25,6 +25,7 @@ add_manpage_target()
 
 ########################################
 # Find Boost, if not specified manually
+include(FindBoost)
 find_package(Boost ${MIN_BOOST_VERSION} REQUIRED filesystem system)
 if (NOT Boost_FOUND)
   BUILD_ERROR ("Boost not found. Please install version "
