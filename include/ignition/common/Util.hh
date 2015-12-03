@@ -182,7 +182,6 @@ namespace ignition
 ///////////////////////////////////////////////
 // Implementation of get_sha1
 template<typename T>
-IGNITION_VISIBLE
 std::string ignition::common::getSha1(const T &_buffer)
 {
   boost::uuids::detail::sha1 sha1;
