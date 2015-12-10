@@ -231,7 +231,7 @@ namespace ignition
       /// \return The float value
       private: float LoadFloat(tinyxml2::XMLElement *_elem);
 
-      /// \brief Load a transparent material. NOT IMPLEMENTED
+      /// \brief Load a transparent material. NOT FULLY IMPLEMENTED
       /// \param[in] _elem Pointer to the XML element
       /// \param[out] _mat Material to hold the transparent properties
       private: void LoadTransparent(tinyxml2::XMLElement *_elem,
