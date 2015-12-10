@@ -81,7 +81,7 @@ struct Vector2dHash : std::unary_function<const ignition::math::Vector2d,
 };
 
 //////////////////////////////////////////////////
-  ColladaLoader::ColladaLoader()
+ColladaLoader::ColladaLoader()
 : MeshLoader(), dataPtr(new ColladaLoaderPrivate)
 {
   this->dataPtr->meter = 1.0;
@@ -2058,6 +2058,9 @@ void ColladaLoader::LoadTransparent(tinyxml2::XMLElement *_elem,
   }
 
   // TODO: Handle transparent textures
+  // https://www.khronos.org/files/collada_spec_1_5.pdf
+  // Determining Transparency (Opacity) section:
+  // opaque modes: RGB_ZERO, RGB_ONE, A_ONE
   if (_elem->FirstChildElement("color"))
   {
     const char *colorCStr = _elem->FirstChildElement("color")->GetText();
@@ -2076,6 +2079,7 @@ void ColladaLoader::LoadTransparent(tinyxml2::XMLElement *_elem,
 
     if (opaqueStr == "RGB_ZERO")
     {
+      // FIXME: should all channels be modulated independently?
       srcFactor = color.R() * _mat->Transparency();
       dstFactor = 1.0 - color.R() * _mat->Transparency();
     }

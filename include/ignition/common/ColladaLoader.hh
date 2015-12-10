@@ -85,8 +85,8 @@ namespace ignition
 
       /// \brief Load skeleton nodes
       /// \param[in] _xml Pointer to the XML instance
-      /// \param[in,out] _xml Pointer to the Skeleton node parent
-      private: SkeletonNode* LoadSkeletonNodes(tinyxml2::XMLElement *_xml,
+      /// \param[in,out] _parent Pointer to the Skeleton node parent
+      private: SkeletonNode *LoadSkeletonNodes(tinyxml2::XMLElement *_xml,
                                                SkeletonNode *_parent);
 
       /// \brief Set the tranform for a skeleton node
@@ -106,21 +106,23 @@ namespace ignition
       /// \brief Get an XML element by ID
       /// \param[in] _parent The parent element
       /// \param[in] _name String name of the element
-      /// \param[out] _id String ID of the element
+      /// \param[in] _id String ID of the element
+      ///\ return XML element with the specified ID
       private: tinyxml2::XMLElement *ElementId(tinyxml2::XMLElement *_parent,
                                                const std::string &_name,
                                                const std::string &_id);
 
       /// \brief Get an XML element by ID
       /// \param[in] _name String name of the element
-      /// \param[out] _id String ID of the element
+      /// \param[in] _id String ID of the element
+      ///\ return XML element with the specified ID
       private: tinyxml2::XMLElement *ElementId(const std::string &_name,
                                                const std::string &_id);
 
       /// \brief Load a node
       /// \param[in] _elem Pointer to the node XML instance
       /// \param[in,out] _mesh Pointer to the current mesh
-      /// \param[out] _transform Transform to apply to the node
+      /// \param[in] _transform Transform to apply to the node
       private: void LoadNode(tinyxml2::XMLElement *_elem,
                              Mesh *_mesh,
                              const ignition::math::Matrix4d &_transform);
@@ -159,7 +161,7 @@ namespace ignition
       /// \param[in] _id String id of the XML node
       /// \param[in] _transform Transform to apply to all positions
       /// \param[out] _values Holds the resulting position values
-      /// \param[out] _values Holds a map of duplicate position indices
+      /// \param[out] _duplicates Holds a map of duplicate position indices
       private: void LoadPositions(const std::string &_id,
                                   const ignition::math::Matrix4d &_transform,
                                  std::vector<ignition::math::Vector3d> &_values,
@@ -169,7 +171,7 @@ namespace ignition
       /// \param[in] _id String id of the XML node
       /// \param[in] _transform Transform to apply to all normals
       /// \param[out] _values Holds the resulting normal values
-      /// \param[out] _values Holds a map of duplicate normal indices
+      /// \param[out] _duplicates Holds a map of duplicate normal indices
       private: void LoadNormals(const std::string &_id,
                                 const ignition::math::Matrix4d &_transform,
                                 std::vector<ignition::math::Vector3d> &_values,
@@ -178,7 +180,7 @@ namespace ignition
       /// \brief Load texture coordinates
       /// \param[in] _id String id of the XML node
       /// \param[out] _values Holds the resulting uv values
-      /// \param[out] _values Holds a map of duplicate uv indices
+      /// \param[out] _duplicates Holds a map of duplicate uv indices
       private: void LoadTexCoords(const std::string &_id,
                                  std::vector<ignition::math::Vector2d> &_values,
                              std::map<unsigned int, unsigned int> &_duplicates);
@@ -189,7 +191,7 @@ namespace ignition
       private: MaterialPtr LoadMaterial(const std::string &_name);
 
       /// \brief Load a color or texture
-      /// \param[in] _eleme Pointer to the XML element
+      /// \param[in] _elem Pointer to the XML element
       /// \param[in] _type One of {diffuse, ambient, emission}
       /// \param[out] _mat Material to load the texture or color into
       private: void LoadColorOrTexture(tinyxml2::XMLElement *_elem,

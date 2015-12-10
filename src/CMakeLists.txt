@@ -17,7 +17,6 @@ set (sources
   Exception.cc
   Image.cc
   KeyFrame.cc
-  Mesh.cc
   Material.cc
   Mesh.cc
   NodeTransform.cc

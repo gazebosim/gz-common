@@ -11,7 +11,6 @@ set (headers
   ffmpeg_inc.h
   Image.hh
   KeyFrame.hh
-  Mesh.hh
   Material.hh
   Mesh.hh
   NodeTransform.hh
