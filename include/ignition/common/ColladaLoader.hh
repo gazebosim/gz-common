@@ -46,7 +46,7 @@ namespace ignition
     using RawNodeAnim = std::map<double, std::vector<NodeTransform> >;
     using RawSkeletonAnim = std::map<std::string, RawNodeAnim>;
 
-    /// \class ColladaLoader ColladaLoader.hh common/ColladaLoader.hh
+    /// \class ColladaLoader ColladaLoader.hh ignition/common/ColladaLoader.hh
     /// \brief Class used to load Collada mesh files
     class IGNITION_VISIBLE ColladaLoader : public MeshLoader
     {
@@ -90,7 +90,7 @@ namespace ignition
                                                SkeletonNode *_parent);
 
       /// \brief Set the tranform for a skeleton node
-      /// \param[in] _xml Pointer to the XML instance
+      /// \param[in] _elem Pointer to the XML instance
       /// \param[in,out] _node The skeleton node
       private: void SetSkeletonNodeTransform(tinyxml2::XMLElement *_elem,
                                              SkeletonNode *_node);
