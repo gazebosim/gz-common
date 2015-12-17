@@ -27,7 +27,7 @@ namespace ignition
   {
     class Mesh;
 
-    /// \class MeshLoader MeshLoader.hh common/MeshLoader.hh
+    /// \class MeshLoader MeshLoader.hh ignition/common/MeshLoader.hh
     /// \brief Base class for loading meshes
     class IGNITION_VISIBLE MeshLoader
     {
