@@ -36,7 +36,7 @@ namespace ignition
     /// \class SkeletonAnimation SkeletonAnimation.hh
     /// ignition/common/SkeletonAnimation.hh
     /// \brief Skeleton animation
-    class IGNITION_VISIBLE SkeletonAnimation
+    class IGNITION_COMMON_VISIBLE SkeletonAnimation
     {
       /// \brief The Constructor
       /// \param[in] _name the name of the animation

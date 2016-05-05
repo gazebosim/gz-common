@@ -26,7 +26,7 @@ namespace ignition
   {
     /// \class Color Color.hh ignition/common/Color.hh
     /// \brief Defines a color
-    class IGNITION_VISIBLE Color
+    class IGNITION_COMMON_VISIBLE Color
     {
       /// \brief (1, 1, 1)
       public: static const Color White;

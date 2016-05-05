@@ -30,7 +30,7 @@ namespace ignition
 
     /// \class Material Material.hh ignition/common/Material.hh
     /// \brief Encapsulates description of a material
-    class IGNITION_VISIBLE Material
+    class IGNITION_COMMON_VISIBLE Material
     {
       /// \brief Enum used to indicate the type of material shading, i.e.
       /// what interpolation technique to be applied to the colors of the

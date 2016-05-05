@@ -59,7 +59,7 @@ namespace ignition
 
     /// \class FileLogger FileLogger.hh common/common.hh
     /// \brief A logger that outputs messages to a file.
-    class IGNITION_VISIBLE FileLogger : public std::ostream
+    class IGNITION_COMMON_VISIBLE FileLogger : public std::ostream
     {
       /// \brief Constructor.
       /// \param[in] _filename Filename to write into. If empty,
@@ -122,7 +122,7 @@ namespace ignition
 
     /// \class Logger Logger.hh common/common.hh
     /// \brief Terminal logger.
-    class IGNITION_VISIBLE Logger : public std::ostream
+    class IGNITION_COMMON_VISIBLE Logger : public std::ostream
     {
       /// \enum LogType.
       /// \brief Output destination type.
@@ -191,7 +191,7 @@ namespace ignition
     /// \class Console Console.hh common/common.hh
     /// \brief Container for loggers, and global logging options
     /// (such as verbose vs. quiet output).
-    class IGNITION_VISIBLE Console
+    class IGNITION_COMMON_VISIBLE Console
     {
       /// \brief Set quiet output.
       /// \param[in] q True to prevent warning.

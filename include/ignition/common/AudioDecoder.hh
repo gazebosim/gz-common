@@ -30,7 +30,7 @@ namespace ignition
 
     /// \class AudioDecoder AudioDecoder.hh ignition/common/common.hh
     /// \brief An audio decoder based on FFMPEG.
-    class IGNITION_VISIBLE AudioDecoder
+    class IGNITION_COMMON_VISIBLE AudioDecoder
     {
       /// \brief Constructor.
       public: AudioDecoder();

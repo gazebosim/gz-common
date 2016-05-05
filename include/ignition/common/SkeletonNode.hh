@@ -33,7 +33,7 @@ namespace ignition
 
     /// \class SkeletonNode Skeleton.hh ignition/common/SkeletonNode.hh
     /// \brief A skeleton node
-    class IGNITION_VISIBLE SkeletonNode
+    class IGNITION_COMMON_VISIBLE SkeletonNode
     {
       /// \brief enumeration of node types
       public: enum SkeletonNodeType {NODE, JOINT};

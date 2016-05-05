@@ -29,7 +29,7 @@ namespace ignition
 
     /// \class MeshLoader MeshLoader.hh ignition/common/MeshLoader.hh
     /// \brief Base class for loading meshes
-    class IGNITION_VISIBLE MeshLoader
+    class IGNITION_COMMON_VISIBLE MeshLoader
     {
       /// \brief Constructor
       public: MeshLoader() = default;

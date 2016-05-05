@@ -32,7 +32,7 @@ namespace ignition
 
     /// \class NodeTransform NodeTransform.hh ignition/common/NodeTransform.hh
     /// \brief A transformation node
-    class IGNITION_VISIBLE NodeTransform
+    class IGNITION_COMMON_VISIBLE NodeTransform
     {
       /// \brief Constructor
       /// \param[in] _type the type of transform

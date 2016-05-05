@@ -32,7 +32,7 @@ namespace ignition
 
     /// \class NodeAnimation NodeAnimation.hh ignition/common/NodeAnimation.hh
     /// \brief Node animation
-    class IGNITION_VISIBLE NodeAnimation
+    class IGNITION_COMMON_VISIBLE NodeAnimation
     {
       /// \brief constructor
       /// \param[in] _name the name of the node

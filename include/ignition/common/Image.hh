@@ -57,7 +57,7 @@ namespace ignition
 
     /// \class Image Image.hh ignition/common/common.hh
     /// \brief Encapsulates an image
-    class IGNITION_VISIBLE Image
+    class IGNITION_COMMON_VISIBLE Image
     {
       /// \brief Pixel formats enumeration
       public: enum PixelFormat

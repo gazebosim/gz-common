@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifndef __IGNITION_FFMPEG_INC_HH__
 #define __IGNITION_FFMPEG_INC_HH__
 

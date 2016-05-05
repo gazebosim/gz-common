@@ -96,18 +96,18 @@ namespace ignition
 
     /// \brief Get the wall time as an ISO string: YYYY-MM-DDTHH:MM:SS.NS
     /// \return The current wall time as an ISO string.
-    IGNITION_VISIBLE
+    IGNITION_COMMON_VISIBLE
     std::string systemTimeISO();
 
     /// \brief add path sufix to common::SystemPaths
     /// \param[in] _suffix The suffix to add.
-    IGNITION_VISIBLE
+    IGNITION_COMMON_VISIBLE
     void addSearchPathSuffix(const std::string &_suffix);
 
     /// \brief search for file in common::SystemPaths
     /// \param[in] _file Name of the file to find.
     /// \return The path containing the file.
-    IGNITION_VISIBLE
+    IGNITION_COMMON_VISIBLE
     std::string findFile(const std::string &_file);
 
     /// \brief search for file in common::SystemPaths
@@ -115,14 +115,14 @@ namespace ignition
     /// \param[in] _searchLocalPath True to search in the current working
     /// directory.
     /// \return The path containing the file.
-    IGNITION_VISIBLE
+    IGNITION_COMMON_VISIBLE
     std::string findFile(const std::string &_file,
                          bool _searchLocalPath);
 
     /// \brief search for a file in common::SystemPaths
     /// \param[in] _file the file name to look for.
     /// \return The path containing the file.
-    IGNITION_VISIBLE
+    IGNITION_COMMON_VISIBLE
     std::string findFilePath(const std::string &_file);
 
     /// \brief Compute the SHA1 hash of an array of bytes.
@@ -130,7 +130,7 @@ namespace ignition
     /// function are std::string and any STL container.
     /// \return The string representation (40 character) of the SHA1 hash.
     template<typename T>
-    IGNITION_VISIBLE
+    IGNITION_COMMON_VISIBLE
     std::string sha1(const T &_buffer);
 
     /// \brief Compute the SHA1 hash of an array of bytes. Use std::string
@@ -139,20 +139,20 @@ namespace ignition
     /// function are std::string and any STL container.
     /// \return The string representation (40 character) of the SHA1 hash.
     /// \sa sha1(const T &_buffer)
-    IGNITION_VISIBLE
+    IGNITION_COMMON_VISIBLE
     std::string sha1(void const *_buffer, std::size_t _byteCount);
 
     /// \brief Find the environment variable '_name' and return its value.
     /// \param[in] _name Name of the environment variable.
     /// \param[out] _value Value if the variable was found.
     /// \return True if the variable was found or false otherwise.
-    IGNITION_VISIBLE
+    IGNITION_COMMON_VISIBLE
     bool env(const std::string &_name, std::string &_value);
 
     /// \brief Check if the given path is a directory.
     /// \param[in] _path Path to a directory.
     /// \return True if _path is a directory.
-    IGNITION_VISIBLE
+    IGNITION_COMMON_VISIBLE
     bool isDirectory(const std::string &_path);
   }
 }
@@ -163,8 +163,9 @@ template<typename T>
 std::string ignition::common::sha1(const T &_buffer)
 {
   if (_buffer.size() == 0)
-    return sha1(NULL, 0);
+    return ignition::common::sha1(NULL, 0);
   else
-    return sha1(&(_buffer[0]), _buffer.size() * sizeof(_buffer[0]));
+    return ignition::common::sha1(
+        &(_buffer[0]), _buffer.size() * sizeof(_buffer[0]));
 }
 #endif

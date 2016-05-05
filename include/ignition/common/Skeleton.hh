@@ -36,7 +36,7 @@ namespace ignition
 
     /// \class Skeleton Skeleton.hh ignition/common/Skeleton.hh
     /// \brief A skeleton, usually used for animation purposes.
-    class IGNITION_VISIBLE Skeleton
+    class IGNITION_COMMON_VISIBLE Skeleton
     {
       /// \brief Constructor
       public: Skeleton();

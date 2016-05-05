@@ -30,7 +30,7 @@ namespace ignition
 
     /// \class ColladaLoader ColladaLoader.hh ignition/common/ColladaLoader.hh
     /// \brief Class used to load Collada mesh files
-    class IGNITION_VISIBLE ColladaLoader : public MeshLoader
+    class IGNITION_COMMON_VISIBLE ColladaLoader : public MeshLoader
     {
       /// \brief Constructor
       public: ColladaLoader();

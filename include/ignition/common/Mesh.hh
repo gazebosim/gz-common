@@ -36,7 +36,7 @@ namespace ignition
 
     /// \class Mesh Mesh.hh ignition/common/Mesh.hh
     /// \brief A 3D mesh
-    class IGNITION_VISIBLE Mesh
+    class IGNITION_COMMON_VISIBLE Mesh
     {
       /// \brief Constructor
       public: Mesh();

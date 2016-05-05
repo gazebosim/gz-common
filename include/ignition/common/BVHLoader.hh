@@ -32,7 +32,7 @@ namespace ignition
 
     /// \class BVHLoader BVHLoader.hh ignition/common/BVHLoader.hh
     /// \brief Handles loading BVH animation files
-    class IGNITION_VISIBLE BVHLoader
+    class IGNITION_COMMON_VISIBLE BVHLoader
     {
       /// \brief Constructor
       public: BVHLoader();
