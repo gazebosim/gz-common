@@ -37,7 +37,7 @@ TEST(Util_TEST, GetSHA1)
   // Compute the SHA1 of the vector
   std::vector<float> v;
   for (int i = 0; i < 100; ++i)
-    v.push_back(i);
+    v.push_back(static_cast<float>(i));
 
   computedSHA1 = common::sha1<std::vector<float> >(v);
   precomputedSHA1 = "913283ec8502ba1423d38a7ea62cb8e492e87b23";

@@ -32,10 +32,16 @@ macro (ign_build_tests)
          ${PROJECT_NAME_LOWER}.lib
          ${IGNITION-MATH_LIBRARIES})
 
+      # Copy in ignition-math library
+      add_custom_command(TARGET ${BINARY_NAME}
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${IGNITION-MATH_LIBRARY_DIRS}/${IGNITION-MATH_LIBRARIES}.dll"
+        $<TARGET_FILE_DIR:${BINARY_NAME}> VERBATIM)
+
       # Copy in ignition-common library
       add_custom_command(TARGET ${BINARY_NAME}
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${CMAKE_BINARY_DIR}/ignition/common/${PROJECT_NAME}.dll"
+        "${CMAKE_BINARY_DIR}/src/${PROJECT_NAME}.dll"
         $<TARGET_FILE_DIR:${BINARY_NAME}> VERBATIM)
     else()
        message(FATAL_ERROR "Unsupported platform")
