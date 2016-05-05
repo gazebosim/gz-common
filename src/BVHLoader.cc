@@ -236,23 +236,24 @@ Skeleton *BVHLoader::Load(const std::string &_filename, const double _scale)
               if (channel == "Zrotation")
               {
                 zAngle = IGN_DTOR(value);
-                mats.push_back(math::Quaterniond(zAxis, zAngle));
+                mats.push_back(
+                    math::Matrix4d(math::Quaterniond(zAxis, zAngle)));
               }
               else
               {
                 if (channel == "Xrotation")
                 {
                   xAngle = IGN_DTOR(value);
-                  mats.push_back(
-                    math::Quaterniond(xAxis, xAngle));
+                  mats.push_back(math::Matrix4d(
+                    math::Quaterniond(xAxis, xAngle)));
                 }
                 else
                 {
                   if (channel == "Yrotation")
                   {
                     yAngle = IGN_DTOR(value);
-                    mats.push_back(
-                      math::Quaterniond(yAxis, yAngle));
+                    mats.push_back(math::Matrix4d(
+                      math::Quaterniond(yAxis, yAngle)));
                   }
                 }
               }
