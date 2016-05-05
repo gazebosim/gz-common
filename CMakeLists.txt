@@ -204,6 +204,7 @@ endif()
 include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
 include_directories(SYSTEM
   ${IGNITION-MATH_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS}
 )
 
 #################################################

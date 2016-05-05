@@ -163,7 +163,9 @@ Skeleton *BVHLoader::Load(const std::string &_filename, const double _scale)
     return NULL;
   }
   else
-    frameCount = math::parseInt(words[1]);
+  {
+    frameCount = static_cast<unsigned int>(math::parseInt(words[1]));
+  }
 
   getline(file, line);
   words.clear();
@@ -236,8 +238,8 @@ Skeleton *BVHLoader::Load(const std::string &_filename, const double _scale)
               if (channel == "Zrotation")
               {
                 zAngle = IGN_DTOR(value);
-                mats.push_back(
-                    math::Matrix4d(math::Quaterniond(zAxis, zAngle)));
+                mats.push_back(math::Matrix4d(
+		          math::Quaterniond(zAxis, zAngle)));
               }
               else
               {

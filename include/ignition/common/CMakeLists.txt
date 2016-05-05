@@ -9,7 +9,7 @@ set (headers
   Console.hh
   Exception.hh
   ffmpeg_inc.h
-  Image.hh
+  #Image.hh
   KeyFrame.hh
   Material.hh
   Mesh.hh

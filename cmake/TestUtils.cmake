@@ -23,12 +23,14 @@ macro (ign_build_tests)
          libgtest_main.a
          libgtest.a
          pthread
-         ${PROJECT_NAME_LOWER})
+         ${PROJECT_NAME_LOWER}
+	 ${IGNITION-MATH_LIBRARIES})
     elseif(WIN32)
       target_link_libraries(${BINARY_NAME}
          gtest.lib
          gtest_main.lib
-         ${PROJECT_NAME_LOWER}.lib)
+         ${PROJECT_NAME_LOWER}.lib
+         ${IGNITION-MATH_LIBRARIES})
     else()
        message(FATAL_ERROR "Unsupported platform")
     endif()
