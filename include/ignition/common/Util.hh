@@ -27,6 +27,12 @@
 /////////////////////////////////////////////////
 // Defines
 
+#ifdef WIN32
+# define IGN_HOMEDIR "HOMEPATH"
+#else
+# define IGN_HOMEDIR "HOME"
+#endif
+
 /// \brief Seconds in one nano second.
 #define IGN_NANO_TO_SEC 0.0000000001
 

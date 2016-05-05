@@ -35,10 +35,10 @@ namespace ignition
       /// \brief Setup the test fixture. This gets called by gtest.
       protected: virtual void SetUp()
       {
-        ASSERT_TRUE(getenv("HOME") != NULL);
+        std::string logPath;
+        ASSERT_TRUE(ignition::common::env(IGN_HOMEDIR, logPath));
 
         // We need to create the log directory if needed.
-        std::string logPath(getenv("HOME"));
         logPath = logPath + "/.ignition/test_logs";
 
         if (!ignition::common::exists(logPath))

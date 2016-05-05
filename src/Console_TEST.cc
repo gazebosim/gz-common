@@ -30,7 +30,7 @@ std::string GetLogContent(const std::string &_filename)
 {
   // Get the absolute path
   std::string path;
-  EXPECT_TRUE(ignition::common::env("HOME", path));
+  EXPECT_TRUE(ignition::common::env(IGN_HOMEDIR, path));
   path = path + "/" + _filename;
 
   // Open the log file, and read back the string
@@ -63,7 +63,7 @@ TEST(Console_TEST, NoInitAndLog)
 
   // Cleanup
   std::string path;
-  EXPECT_TRUE(ignition::common::env("HOME", path));
+  EXPECT_TRUE(ignition::common::env(IGN_HOMEDIR, path));
   path = path + "/" + logPath;
   ignition::common::removeAll(path);
 }
@@ -84,7 +84,7 @@ TEST(Console_TEST, InitAndLog)
 
   // Get the absolute path
   std::string basePath;
-  EXPECT_TRUE(ignition::common::env("HOME", basePath));
+  EXPECT_TRUE(ignition::common::env(IGN_HOMEDIR, basePath));
   basePath = basePath + "/" + path;
 
   // Get the absolute log file path
@@ -455,7 +455,7 @@ TEST(Console_TEST, LogDirectory)
 
   // Get the absolute path
   std::string absPath;
-  EXPECT_TRUE(ignition::common::env("HOME", absPath));
+  EXPECT_TRUE(ignition::common::env(IGN_HOMEDIR, absPath));
   absPath = absPath + "/" + path;
 
   EXPECT_EQ(logDir, absPath);
