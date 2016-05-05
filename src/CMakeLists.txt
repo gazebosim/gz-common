@@ -48,7 +48,6 @@ set (gtest_sources
 ign_add_library(${PROJECT_LIBRARY_TARGET_NAME} ${sources})
 target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
   ${IGNITION-MATH_LIBRARIES}
-  ${Boost_LIBRARIES}
   ${freeimage_LIBRARIES}
   ${tinyxml2_LIBRARIES}
   ${uuid_LIBRARIES})

@@ -20,15 +20,6 @@ endif()
 include (${project_cmake_dir}/Ronn2Man.cmake)
 add_manpage_target()
 
-########################################
-# Find Boost, if not specified manually
-include(FindBoost)
-find_package(Boost ${MIN_BOOST_VERSION} REQUIRED filesystem system)
-if (NOT Boost_FOUND)
-  BUILD_ERROR ("Boost not found. Please install version "
-    "${MIN_BOOST_VERSION} or higher.")
-endif()
-
 #################################################
 # Find tinyxml2. Only debian distributions package tinyxml with a pkg-config
 # Use pkg_check_modules and fallback to manual detection

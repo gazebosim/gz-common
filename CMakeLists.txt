@@ -257,10 +257,7 @@ else (build_errors)
     ${PROJECT_BINARY_DIR}
     ${PROJECT_BINARY_DIR}/include
   )
-  include_directories(SYSTEM
-    ${IGNITION-MATH_INCLUDE_DIRS}
-    ${Boost_INCLUDE_DIRS}
-    )
+  include_directories(SYSTEM ${IGNITION-MATH_INCLUDE_DIRS})
   
   link_directories(${PROJECT_BINARY_DIR}/src ${IGNITION-MATH_LINK_DIRS})
 
