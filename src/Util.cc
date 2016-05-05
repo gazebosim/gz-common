@@ -32,6 +32,7 @@
 #include <fstream>
 #include <cstdlib>
 #include <cstring>
+#include <cctype>
 #include <ignition/common/config.hh>
 #include <ignition/common/SystemPaths.hh>
 #include <ignition/common/Util.hh>
@@ -354,7 +355,7 @@ bool ignition::common::removeDirectory(const std::string &_path)
   if (ignition::common::isDirectory(_path))
   {
 #ifdef _WIN32
-    return RemoveDirectory(_path);
+    return RemoveDirectory(_path.c_str());
 #else
     return rmdir(_path.c_str()) == 0;
 #endif
@@ -409,7 +410,7 @@ bool ignition::common::exists(const std::string &_path)
 std::string ignition::common::cwd()
 {
   char buf[IGN_PATH_MAX + 1] = {'\0'};
-#ifdef WINDOWS
+#ifdef _WIN32
   return _getcwd(buf, sizeof(buf)) == nullptr ? "" : buf;
 #else
   return getcwd(buf, sizeof(buf)) == nullptr ? "" : buf;
@@ -426,10 +427,9 @@ bool ignition::common::createDirectories(const std::string &_path)
     std::string dir = _path.substr(0, end);
     if (!exists(dir))
     {
-#ifdef WINDOWS
-      _mkdir(dir);
+#ifdef _WIN32
+      _mkdir(dir.c_str());
 #else
-      mode_t mode;
       mkdir(dir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 #endif
     }
