@@ -53,6 +53,8 @@ target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
   ${uuid_LIBRARIES})
 
 if (UNIX)
+  target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME} rt)
+
   # Need to add default visibility to ignition-msgs
   get_target_property(current_property ${PROJECT_LIBRARY_TARGET_NAME}
     COMPILE_FLAGS)

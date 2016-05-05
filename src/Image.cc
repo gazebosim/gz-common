@@ -399,8 +399,8 @@ Color Image::GetMaxColor() const
 //////////////////////////////////////////////////
 void Image::Rescale(int _width, int _height)
 {
-  this->dataPtr->bitmap = FreeImage_Rescale(this->dataPtr->bitmap, _width, _height,
-      FILTER_LANCZOS3);
+  this->dataPtr->bitmap = FreeImage_Rescale(
+      this->dataPtr->bitmap, _width, _height, FILTER_LANCZOS3);
 }
 
 //////////////////////////////////////////////////
