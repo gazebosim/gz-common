@@ -19,8 +19,8 @@
 #include <limits.h>
 #include <climits>
 #else
-#include "ignition/common/win_dirent.h"
 #include <io.h>
+#include "ignition/common/win_dirent.h"
 #endif
 
 #include <sys/types.h>
@@ -419,7 +419,6 @@ std::string ignition::common::cwd()
 /////////////////////////////////////////////////
 bool ignition::common::createDirectories(const std::string &_path)
 {
-  //std::string f = "/home/nkoenig/parts/diff.txt";
   size_t index = 0;
   while (index < _path.size())
   {
