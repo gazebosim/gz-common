@@ -360,13 +360,17 @@ bool ignition::common::removeDirectory(const std::string &_path)
     return rmdir(_path.c_str()) == 0;
 #endif
   }
+
+  return false;
 }
 
 /////////////////////////////////////////////////
 bool ignition::common::removeDirectoryOrFile(const std::string &_path)
 {
   if (ignition::common::isDirectory(_path))
+  {
     return ignition::common::removeDirectory(_path);
+  }
   else if (ignition::common::isFile(_path))
   {
     return std::remove(_path.c_str()) == 0;
@@ -396,7 +400,7 @@ bool ignition::common::removeAll(const std::string &_path)
     closedir(dir);
   }
 
-  ignition::common::removeDirectoryOrFile(_path);
+  return ignition::common::removeDirectoryOrFile(_path);
 }
 
 /////////////////////////////////////////////////
@@ -435,6 +439,8 @@ bool ignition::common::createDirectories(const std::string &_path)
     }
     index = end;
   }
+
+  return true;
 }
 
 /////////////////////////////////////////////////
