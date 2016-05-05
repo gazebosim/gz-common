@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _IGNITION_COMMON_SKELETON_HH_
-#define _IGNITION_COMMON_SKELETON_HH_
+#ifndef IGNITION_COMMON_SKELETON_HH_
+#define IGNITION_COMMON_SKELETON_HH_
 
 #include <vector>
 #include <string>
@@ -24,7 +24,7 @@
 
 #include <ignition/math/Matrix4.hh>
 #include <ignition/common/SkeletonNode.hh>
-#include <ignition/common/Util.hh>
+#include <ignition/common/System.hh>
 
 namespace ignition
 {
@@ -36,7 +36,7 @@ namespace ignition
 
     /// \class Skeleton Skeleton.hh ignition/common/Skeleton.hh
     /// \brief A skeleton, usually used for animation purposes.
-    class IGNITION_VISIBLE Skeleton
+    class IGNITION_COMMON_VISIBLE Skeleton
     {
       /// \brief Constructor
       public: Skeleton();

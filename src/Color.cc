@@ -79,7 +79,7 @@ void Color::SetFromHSV(float _h, float _s, float _v)
   int i;
   float f, p , q, t;
 
-  _h = static_cast<int>(_h) % 360;
+  _h = static_cast<float>(static_cast<int>(_h) % 360);
 
   if (ignition::math::equal(_s, 0.0f))
   {

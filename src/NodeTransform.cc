@@ -53,13 +53,13 @@ void NodeTransform::Set(const math::Matrix4d &_mat)
 }
 
 //////////////////////////////////////////////////
-void NodeTransform::Type(const NodeTransformType _type)
+void NodeTransform::SetType(const NodeTransformType _type)
 {
   this->data->type = _type;
 }
 
 //////////////////////////////////////////////////
-void NodeTransform::SID(const std::string &_sid)
+void NodeTransform::SetSID(const std::string &_sid)
 {
   this->data->sid = _sid;
 }
@@ -83,13 +83,13 @@ std::string NodeTransform::SID() const
 }
 
 //////////////////////////////////////////////////
-void NodeTransform::Component(const unsigned int _idx, const double _value)
+void NodeTransform::SetComponent(const unsigned int _idx, const double _value)
 {
   this->data->source[_idx] = _value;
 }
 
 //////////////////////////////////////////////////
-void NodeTransform::SourceValues(const math::Matrix4d &_mat)
+void NodeTransform::SetSourceValues(const math::Matrix4d &_mat)
 {
   this->data->source.resize(16);
   unsigned int idx = 0;
@@ -103,7 +103,7 @@ void NodeTransform::SourceValues(const math::Matrix4d &_mat)
 }
 
 //////////////////////////////////////////////////
-void NodeTransform::SourceValues(const math::Vector3d &_vec)
+void NodeTransform::SetSourceValues(const math::Vector3d &_vec)
 {
   this->data->source.resize(3);
   this->data->source[0] = _vec.X();
@@ -112,7 +112,7 @@ void NodeTransform::SourceValues(const math::Vector3d &_vec)
 }
 
 //////////////////////////////////////////////////
-void NodeTransform::SourceValues(const math::Vector3d &_axis,
+void NodeTransform::SetSourceValues(const math::Vector3d &_axis,
     const double _angle)
 {
   this->data->source.resize(4);
@@ -127,8 +127,8 @@ void NodeTransform::RecalculateMatrix()
 {
   if (this->data->type == MATRIX)
   {
-    this->data->transform.Set(this->data->source[0], this->data->source[1],
-        this->data->source[2],
+    this->data->transform.Set(
+        this->data->source[0], this->data->source[1], this->data->source[2],
         this->data->source[3], this->data->source[4], this->data->source[5],
         this->data->source[6], this->data->source[7], this->data->source[8],
         this->data->source[9], this->data->source[10], this->data->source[11],
@@ -155,9 +155,8 @@ void NodeTransform::RecalculateMatrix()
       }
       else
       {
-        this->data->transform.Scale(
-            math::Vector3d(this->data->source[0], this->data->source[1],
-              this->data->source[2]));
+        this->data->transform.Scale(math::Vector3d(this->data->source[0],
+            this->data->source[1], this->data->source[2]));
       }
     }
   }

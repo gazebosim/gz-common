@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _IGNITION_SUBMESH_PRIVATE_HH_
-#define _IGNITION_SUBMESH_PRIVATE_HH_
+#ifndef IGNITION_SUBMESH_PRIVATE_HH_
+#define IGNITION_SUBMESH_PRIVATE_HH_
 
 #include <vector>
 #include <string>

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _IGNITION_SUBMESH_HH_
-#define _IGNITION_SUBMESH_HH_
+#ifndef IGNITION_COMMON_SUBMESH_HH_
+#define IGNITION_COMMON_SUBMESH_HH_
 
 #include <vector>
 #include <string>
@@ -24,6 +24,7 @@
 #include <ignition/math/Vector2.hh>
 
 #include <ignition/common/CommonTypes.hh>
+#include <ignition/common/System.hh>
 
 namespace ignition
 {
@@ -34,7 +35,7 @@ namespace ignition
     class NodeAssignment;
 
     /// \brief A child mesh
-    class IGNITION_VISIBLE SubMesh
+    class IGNITION_COMMON_VISIBLE SubMesh
     {
       /// \brief An enumeration of the geometric mesh primitives
       public: enum PrimitiveType
@@ -259,13 +260,23 @@ namespace ignition
       /// \param[in] _factor Scaling vector
       public: void SetScale(const ignition::math::Vector3d &_factor);
 
+#ifdef _WIN32
+// Disable warning C4251 which is triggered by
+// std::unique_ptr
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
+
       /// \brief Private data pointer.
       private: std::unique_ptr<SubMeshPrivate> dataPtr;
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
     };
 
     /// \brief Vertex to node weighted assignement for skeleton animation
     /// visualization
-    class IGNITION_VISIBLE NodeAssignment
+    class IGNITION_COMMON_VISIBLE NodeAssignment
     {
       /// \brief Constructor.
       public: NodeAssignment();

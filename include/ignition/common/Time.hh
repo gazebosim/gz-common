@@ -14,12 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef _IGNITION_COMMON_TIME_HH_
-#define _IGNITION_COMMON_TIME_HH_
+#ifndef IGNITION_COMMON_TIME_HH_
+#define IGNITION_COMMON_TIME_HH_
 
 #include <string>
 #include <iostream>
 
+#include <ignition/common/System.hh>
 #include <ignition/common/Util.hh>
 
 namespace ignition
@@ -29,7 +30,7 @@ namespace ignition
     /// \class Time Time.hh common/common.hh
     /// \brief A Time class, can be used to hold wall- or sim-time.
     ///        stored as sec and nano-sec.
-    class IGNITION_VISIBLE Time
+    class IGNITION_COMMON_VISIBLE Time
     {
       /// \brief A static zero time variable set to common::Time(0, 0).
       public: static const Time Zero;
@@ -40,6 +41,10 @@ namespace ignition
       /// \brief Copy constructor
       /// \param[in] time Time to copy
       public: Time(const Time &_time);
+
+      /// \brief Constructor
+      /// \param[in] _tv Time to initialize to
+      public: Time(const struct timespec &_tv);
 
       /// \brief Constructor
       /// \param[in] _sec Seconds
@@ -210,6 +215,11 @@ namespace ignition
       public: bool operator>=(const Time &_time) const;
 
       /// \brief Greater than or equal operator
+      /// \param[in] _tv the time to compare with
+      /// \return true if tv is greater than or equal to this, false otherwise
+      public: bool operator>=(const struct timespec &_tv) const;
+
+      /// \brief Greater than or equal operator
       /// \param[in] _time the time to compare with
       /// \return true if time is greater than or equal to this, false otherwise
       public: bool operator>=(double _time) const;
@@ -269,6 +279,12 @@ namespace ignition
                  this->sec += this->nsec / this->nsInSec;
                  this->nsec = this->nsec % this->nsInSec;
                }
+#ifdef _WIN32
+// Disable warning C4251 which is triggered by
+// std::unique_ptr
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
 
       /// \brief Constant multiplier to convert from nanoseconds to seconds.
       private: static const int32_t nsInSec;
@@ -276,6 +292,11 @@ namespace ignition
       /// \brief Constant multiplier to convert from nanoseconds to
       /// milliseconds.
       private: static const int32_t nsInMs;
+
+      private: static struct timespec clockResolution;
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
     };
   }
 }

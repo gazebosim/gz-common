@@ -18,7 +18,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include <boost/filesystem.hpp>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -135,61 +134,52 @@ std::string SystemPaths::FindFileHelper(const std::string & /*_filename*/)
 std::string SystemPaths::FindFile(const std::string &_filename,
                                   bool _searchLocalPath)
 {
-  boost::filesystem::path path;
+  std::string path;
 
   if (_filename.empty())
-    return path.string();
+    return path;
 
   if (_filename.find("://") != std::string::npos)
   {
-    path = boost::filesystem::path(this->FindFileURI(_filename));
+    path = this->FindFileURI(_filename);
   }
   else if (_filename[0] == '/')
   {
-    path = boost::filesystem::path(_filename);
+    path = _filename;
   }
   else
   {
     bool found = false;
 
-    try
-    {
-      path = boost::filesystem::operator/(boost::filesystem::current_path(),
-          _filename);
-    }
-    catch(boost::filesystem::filesystem_error &_e)
-    {
-      ignerr << "Filesystem error[" << _e.what() << "]\n";
-      return std::string();
-    }
+    path = cwd() + "/" + _filename;
 
-    if (_searchLocalPath && boost::filesystem::exists(path))
+    if (_searchLocalPath && exists(path))
     {
       found = true;
     }
     else if ((_filename[0] == '/' || _filename[0] == '.' || _searchLocalPath)
-             && boost::filesystem::exists(boost::filesystem::path(_filename)))
+             && exists(_filename))
     {
-      path = boost::filesystem::path(_filename);
+      path = _filename;
       found = true;
     }
     else
     {
       path = this->FindFileHelper(_filename);
-      found = !path.string().empty();
+      found = !path.empty();
     }
 
     if (!found)
       return std::string();
   }
 
-  if (!boost::filesystem::exists(path))
+  if (!exists(path))
   {
     ignerr << "File or path does not exist[" << path << "]\n";
     return std::string();
   }
 
-  return path.string();
+  return path;
 }
 
 /////////////////////////////////////////////////

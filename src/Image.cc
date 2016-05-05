@@ -19,7 +19,6 @@
 #endif
 #include <FreeImage.h>
 
-#include <boost/filesystem.hpp>
 #include <string>
 
 #include <ignition/common/Console.hh>
@@ -73,10 +72,10 @@ Image::~Image()
 int Image::Load(const std::string &_filename)
 {
   this->data->fullName = _filename;
-  if (!boost::filesystem::exists(boost::filesystem::path(this->data->fullName)))
+  if (!exists(this->data->fullName))
     this->data->fullName = common::findFile(_filename);
 
-  if (boost::filesystem::exists(boost::filesystem::path(this->data->fullName)))
+  if (exists(this->data->fullName))
   {
     FREE_IMAGE_FORMAT fifmt =
       FreeImage_GetFIFFromFilename(this->data->fullName.c_str());

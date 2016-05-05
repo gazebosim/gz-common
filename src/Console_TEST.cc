@@ -17,10 +17,10 @@
 
 #include <gtest/gtest.h>
 #include <stdlib.h>
-#include <boost/filesystem.hpp>
 
 #include "ignition/common/Time.hh"
 #include "ignition/common/Console.hh"
+#include "ignition/common/Util.hh"
 
 const int g_messageRepeat = 4;
 
@@ -29,11 +29,12 @@ class Console_TEST {};
 std::string GetLogContent(const std::string &_filename)
 {
   // Get the absolute path
-  boost::filesystem::path path = getenv("HOME");
-  path /= _filename;
+  std::string path;
+  EXPECT_TRUE(ignition::common::env(IGN_HOMEDIR, path));
+  path = path + "/" + _filename;
 
   // Open the log file, and read back the string
-  std::ifstream ifs(path.string().c_str(), std::ios::in);
+  std::ifstream ifs(path.c_str(), std::ios::in);
   std::string loggedString;
 
   while (!ifs.eof())
@@ -50,8 +51,6 @@ std::string GetLogContent(const std::string &_filename)
 /// \brief Test Console::Init and Console::Log
 TEST(Console_TEST, NoInitAndLog)
 {
-  std::cout << "(" << ignition::common::SystemTimeISO() << ")\n";
-
   // Log the string
   std::string logString = "this is a test";
   ignlog << logString << std::endl;
@@ -63,9 +62,10 @@ TEST(Console_TEST, NoInitAndLog)
   EXPECT_TRUE(GetLogContent(logPath).find(logString) != std::string::npos);
 
   // Cleanup
-  boost::filesystem::path path = getenv("HOME");
-  path /= logPath;
-  boost::filesystem::remove_all(path);
+  std::string path;
+  EXPECT_TRUE(ignition::common::env(IGN_HOMEDIR, path));
+  path = path + "/" + logPath;
+  ignition::common::removeAll(path);
 }
 
 /////////////////////////////////////////////////
@@ -73,42 +73,42 @@ TEST(Console_TEST, NoInitAndLog)
 TEST(Console_TEST, InitAndLog)
 {
   // Create a unique directory path
-  boost::filesystem::path path = boost::filesystem::unique_path();
+  std::string path = ignition::common::uuid();
 
   // Initialize logging
-  ignLogInit(path.string(), "test.log");
+  ignLogInit(path, "test.log");
 
   // Log the string
   std::string logString = "this is a test";
   ignlog << logString << std::endl;
 
   // Get the absolute path
-  boost::filesystem::path basePath = getenv("HOME");
-  basePath /= path;
+  std::string basePath;
+  EXPECT_TRUE(ignition::common::env(IGN_HOMEDIR, basePath));
+  basePath = basePath + "/" + path;
 
   // Get the absolute log file path
-  boost::filesystem::path logPath = path / "test.log";
+  std::string logPath = path + "/test.log";
 
   // Expect to find the string in the log file
-  EXPECT_TRUE(GetLogContent(logPath.string()).find(logString) !=
-              std::string::npos);
+  EXPECT_TRUE(GetLogContent(logPath).find(logString) != std::string::npos);
 
   // Cleanup
-  boost::filesystem::remove_all(basePath);
+  ignition::common::removeAll(basePath);
 }
-
+/*
 //////////////////////////////////////////////////
 /// \brief Test Console::Log with \n characters
 TEST(Console_TEST, LogSlashN)
 {
   // Create a unique directory path
-  boost::filesystem::path path = boost::filesystem::unique_path();
+  std::string path = ignition::common::uuid();
 
   // Initialize logging
-  ignLogInit(path.string(), "test.log");
+  ignLogInit(path, "test.log");
 
   // Get the absolute log file path
-  boost::filesystem::path logPath = path / "test.log";
+  std::string logPath = path + "/test.log";
 
   std::string logString = "this is a log test";
 
@@ -117,7 +117,7 @@ TEST(Console_TEST, LogSlashN)
     ignlog << logString << " _n__ " << i << '\n';
   }
 
-  std::string logContent = GetLogContent(logPath.string());
+  std::string logContent = GetLogContent(logPath);
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
@@ -132,13 +132,13 @@ TEST(Console_TEST, LogSlashN)
 TEST(Console_TEST, LogStdEndl)
 {
   // Create a unique directory path
-  boost::filesystem::path path = boost::filesystem::unique_path();
+  std::string path = ignition::common::uuid();
 
   // Initialize logging
-  ignLogInit(path.string(), "test.log");
+  ignLogInit(path, "test.log");
 
   // Get the absolute log file path
-  boost::filesystem::path logPath = path / "test.log";
+  std::string logPath = path + "/test.log";
 
   std::string logString = "this is a log test";
 
@@ -147,7 +147,7 @@ TEST(Console_TEST, LogStdEndl)
     ignlog << logString << " endl " << i << std::endl;
   }
 
-  std::string logContent = GetLogContent(logPath.string());
+  std::string logContent = GetLogContent(logPath);
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
@@ -162,13 +162,13 @@ TEST(Console_TEST, LogStdEndl)
 TEST(Console_TEST, ColorWarnSlashN)
 {
   // Create a unique directory path
-  boost::filesystem::path path = boost::filesystem::unique_path();
+  std::string path = ignition::common::uuid();
 
   // Initialize logging
-  ignLogInit(path.string(), "test.log");
+  ignLogInit(path, "test.log");
 
   // Get the absolute log file path
-  boost::filesystem::path logPath = path / "test.log";
+  std::string logPath = path + "/test.log";
 
   std::string logString = "this is a warning test";
 
@@ -177,7 +177,7 @@ TEST(Console_TEST, ColorWarnSlashN)
     ignwarn << logString << " _n__ " << i << '\n';
   }
 
-  std::string logContent = GetLogContent(logPath.string());
+  std::string logContent = GetLogContent(logPath);
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
@@ -192,13 +192,13 @@ TEST(Console_TEST, ColorWarnSlashN)
 TEST(Console_TEST, ColorWarnStdEndl)
 {
   // Create a unique directory path
-  boost::filesystem::path path = boost::filesystem::unique_path();
+  std::string path = ignition::common::uuid();
 
   // Initialize logging
-  ignLogInit(path.string(), "test.log");
+  ignLogInit(path, "test.log");
 
   // Get the absolute log file path
-  boost::filesystem::path logPath = path / "test.log";
+  std::string logPath = path + "/test.log";
 
   std::string logString = "this is a warning test";
 
@@ -207,7 +207,7 @@ TEST(Console_TEST, ColorWarnStdEndl)
     ignwarn << logString << " endl " << i << std::endl;
   }
 
-  std::string logContent = GetLogContent(logPath.string());
+  std::string logContent = GetLogContent(logPath);
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
@@ -222,13 +222,13 @@ TEST(Console_TEST, ColorWarnStdEndl)
 TEST(Console_TEST, ColorDbgSlashN)
 {
   // Create a unique directory path
-  boost::filesystem::path path = boost::filesystem::unique_path();
+  std::string path = ignition::common::uuid();
 
   // Initialize logging
-  ignLogInit(path.string(), "test.log");
+  ignLogInit(path, "test.log");
 
   // Get the absolute log file path
-  boost::filesystem::path logPath = path / "test.log";
+  std::string logPath = path + "/test.log";
 
   std::string logString = "this is a dbg test";
 
@@ -237,7 +237,7 @@ TEST(Console_TEST, ColorDbgSlashN)
     igndbg << logString << " _n__ " << i << '\n';
   }
 
-  std::string logContent = GetLogContent(logPath.string());
+  std::string logContent = GetLogContent(logPath);
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
@@ -252,13 +252,13 @@ TEST(Console_TEST, ColorDbgSlashN)
 TEST(Console_TEST, ColorDbgStdEndl)
 {
   // Create a unique directory path
-  boost::filesystem::path path = boost::filesystem::unique_path();
+  std::string path = ignition::common::uuid();
 
   // Initialize logging
-  ignLogInit(path.string(), "test.log");
+  ignLogInit(path, "test.log");
 
   // Get the absolute log file path
-  boost::filesystem::path logPath = path / "test.log";
+  std::string logPath = path + "/test.log";
 
   std::string logString = "this is a dbg test";
 
@@ -267,7 +267,7 @@ TEST(Console_TEST, ColorDbgStdEndl)
     igndbg << logString << " endl " << i << std::endl;
   }
 
-  std::string logContent = GetLogContent(logPath.string());
+  std::string logContent = GetLogContent(logPath);
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
@@ -282,13 +282,13 @@ TEST(Console_TEST, ColorDbgStdEndl)
 TEST(Console_TEST, ColorMsgSlashN)
 {
   // Create a unique directory path
-  boost::filesystem::path path = boost::filesystem::unique_path();
+  std::string path = ignition::common::uuid();
 
   // Initialize logging
-  ignLogInit(path.string(), "test.log");
+  ignLogInit(path, "test.log");
 
   // Get the absolute log file path
-  boost::filesystem::path logPath = path / "test.log";
+  std::string logPath = path + "/test.log";
 
   std::string logString = "this is a msg test";
 
@@ -297,7 +297,7 @@ TEST(Console_TEST, ColorMsgSlashN)
     ignmsg << logString << " _n__ " << i << '\n';
   }
 
-  std::string logContent = GetLogContent(logPath.string());
+  std::string logContent = GetLogContent(logPath);
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
@@ -312,13 +312,13 @@ TEST(Console_TEST, ColorMsgSlashN)
 TEST(Console_TEST, ColorMsgStdEndl)
 {
   // Create a unique directory path
-  boost::filesystem::path path = boost::filesystem::unique_path();
+  std::string path = ignition::common::uuid();
 
   // Initialize logging
-  ignLogInit(path.string(), "test.log");
+  ignLogInit(path, "test.log");
 
   // Get the absolute log file path
-  boost::filesystem::path logPath = path / "test.log";
+  std::string logPath = path + "/test.log";
 
   std::string logString = "this is a msg test";
 
@@ -327,7 +327,7 @@ TEST(Console_TEST, ColorMsgStdEndl)
     ignmsg << logString << " endl " << i << std::endl;
   }
 
-  std::string logContent = GetLogContent(logPath.string());
+  std::string logContent = GetLogContent(logPath);
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
@@ -342,13 +342,13 @@ TEST(Console_TEST, ColorMsgStdEndl)
 TEST(Console_TEST, ColorErrSlashN)
 {
   // Create a unique directory path
-  boost::filesystem::path path = boost::filesystem::unique_path();
+  std::string path = ignition::common::uuid();
 
   // Initialize logging
-  ignLogInit(path.string(), "test.log");
+  ignLogInit(path, "test.log");
 
   // Get the absolute log file path
-  boost::filesystem::path logPath = path / "test.log";
+  std::string logPath = path + "/test.log";
 
   std::string logString = "this is an error test";
 
@@ -357,7 +357,7 @@ TEST(Console_TEST, ColorErrSlashN)
     ignerr << logString << " _n__ " << i << '\n';
   }
 
-  std::string logContent = GetLogContent(logPath.string());
+  std::string logContent = GetLogContent(logPath);
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
@@ -372,13 +372,13 @@ TEST(Console_TEST, ColorErrSlashN)
 TEST(Console_TEST, ColorErrStdEndl)
 {
   // Create a unique directory path
-  boost::filesystem::path path = boost::filesystem::unique_path();
+  std::string path = ignition::common::uuid();
 
   // Initialize logging
-  ignLogInit(path.string(), "test.log");
+  ignLogInit(path, "test.log");
 
   // Get the absolute log file path
-  boost::filesystem::path logPath = path / "test.log";
+  std::string logPath = path + "/test.log";
 
   std::string logString = "this is an error test";
 
@@ -387,7 +387,7 @@ TEST(Console_TEST, ColorErrStdEndl)
     ignerr << logString << " endl " << i << std::endl;
   }
 
-  std::string logContent = GetLogContent(logPath.string());
+  std::string logContent = GetLogContent(logPath);
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
@@ -402,19 +402,19 @@ TEST(Console_TEST, ColorErrStdEndl)
 TEST(Console_TEST, ColorMsg)
 {
   // Create a unique directory path
-  boost::filesystem::path path = boost::filesystem::unique_path();
+  std::string path = ignition::common::uuid();
 
   // Initialize logging
-  ignLogInit(path.string(), "test.log");
+  ignLogInit(path, "test.log");
 
   // Get the absolute log file path
-  boost::filesystem::path logPath = path / "test.log";
+  std::string logPath = path + "/test.log";
 
   std::string logString = "this is a msg test";
 
   ignmsg << logString << std::endl;
 
-  std::string logContent = GetLogContent(logPath.string());
+  std::string logContent = GetLogContent(logPath);
 
   EXPECT_TRUE(logContent.find(logString) != std::string::npos);
 }
@@ -424,23 +424,43 @@ TEST(Console_TEST, ColorMsg)
 TEST(Console_TEST, ColorErr)
 {
   // Create a unique directory path
-  boost::filesystem::path path = boost::filesystem::unique_path();
+  std::string path = ignition::common::uuid();
 
   // Initialize logging
-  ignLogInit(path.string(), "test.log");
+  ignLogInit(path, "test.log");
 
   // Get the absolute log file path
-  boost::filesystem::path logPath = path / "test.log";
+  std::string logPath = path + "/test.log";
 
   std::string logString = "this is an error test";
 
   ignerr << logString << std::endl;
 
-  std::string logContent = GetLogContent(logPath.string());
+  std::string logContent = GetLogContent(logPath);
 
   EXPECT_TRUE(logContent.find(logString) != std::string::npos);
 }
 
+/////////////////////////////////////////////////
+/// \brief Test Console::LogDirectory
+TEST(Console_TEST, LogDirectory)
+{
+  // Create a unique directory path
+  std::string path = ignition::common::uuid();
+
+  // Initialize logging
+  ignLogInit(path, "test.log");
+
+  std::string logDir = ignLogDirectory();
+
+  // Get the absolute path
+  std::string absPath;
+  EXPECT_TRUE(ignition::common::env(IGN_HOMEDIR, absPath));
+  absPath = absPath + "/" + path;
+
+  EXPECT_EQ(logDir, absPath);
+}
+*/
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {

@@ -46,6 +46,7 @@ then
   QUICK_TMP=`mktemp -t asdfXXXXXXXXXX`
 else
   CHECK_DIRS="./src ./include ./test/integration ./test/regression ./test/performance"
+  EXCLUDE_DIRS="./src/tinyxml2"
   if [ $CPPCHECK_LT_157 -eq 1 ]; then
     # cppcheck is older than 1.57, so don't check header files (issue #907)
     CPPCHECK_FILES=`find $CHECK_DIRS -name "*.cc"`
@@ -53,7 +54,7 @@ else
     CPPCHECK_FILES=`find $CHECK_DIRS -name "*.cc" -o -name "*.hh"`
   fi
   CPPLINT_FILES=`\
-    find $CHECK_DIRS -name "*.cc" -o -name "*.hh" -o -name "*.c" -o -name "*.h"`
+    find $CHECK_DIRS -name "*.cc" -o -name "*.hh" -o -name "*.c" -o -name "*.h" ! -path "$EXCLUDE_DIRS/*"`
 fi
 
 SUPPRESS=/tmp/cpp_check.suppress
@@ -70,8 +71,8 @@ if [ $CPPCHECK_LT_157 -eq 0 ]; then
   # use --language argument if 1.57 or greater (issue #907)
   CPPCHECK_BASE="$CPPCHECK_BASE --language=c++"
 fi
-CPPCHECK_INCLUDES="-I . -I $builddir -I test"
-CPPCHECK_RULES="-DIGNITION_VISIBLE"
+CPPCHECK_INCLUDES="-I . -I ./include -I $builddir -I test"
+CPPCHECK_RULES="-DIGNITION_MSGS_VISIBLE"
 CPPCHECK_CMD1A="-j 4 --enable=style,performance,portability,information"
 CPPCHECK_CMD1B="$CPPCHECK_RULES $CPPCHECK_FILES"
 CPPCHECK_CMD1="$CPPCHECK_CMD1A $CPPCHECK_CMD1B"
@@ -79,9 +80,8 @@ CPPCHECK_CMD2="--enable=unusedFunction $CPPCHECK_FILES"
 
 # Checking for missing includes is very time consuming. This is disabled
 # for now
-# CPPCHECK_CMD3="-j 4 --enable=missingInclude $CPPCHECK_FILES"\
-# " $CPPCHECK_INCLUDES"
-CPPCHECK_CMD3=""
+CPPCHECK_CMD3="-j 4 --enable=missingInclude $CPPCHECK_FILES $CPPCHECK_INCLUDES"
+# CPPCHECK_CMD3=""
 
 if [ $xmlout -eq 1 ]; then
   # Performance, style, portability, and information
@@ -127,7 +127,7 @@ elif [ $QUICK_CHECK -eq 1 ]; then
   rm $QUICK_TMP
 else
   # Performance, style, portability, and information
-  $CPPCHECK_BASE $CPPCHECK_CMD1 2>&1
+  $CPPCHECK_BASE $CPPCHECK_INCLUDES $CPPCHECK_CMD1 2>&1
 
   # Check the configuration
   $CPPCHECK_BASE $CPPCHECK_CMD3 2>&1
@@ -135,8 +135,8 @@ fi
 
 # cpplint
 if [ $xmlout -eq 1 ]; then
-  (echo $CPPLINT_FILES | xargs python tools/cpplint.py 2>&1) \
+  (echo $CPPLINT_FILES | xargs python tools/cpplint.p --extensions=cc,hh 2>&1) \
     | python tools/cpplint_to_cppcheckxml.py 2> $xmldir/cpplint.xml
 elif [ $QUICK_CHECK -eq 0 ]; then
-  echo $CPPLINT_FILES | xargs python tools/cpplint.py 2>&1
+  echo $CPPLINT_FILES | xargs python tools/cpplint.py --extensions=cc,hh 2>&1
 fi

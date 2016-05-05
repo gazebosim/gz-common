@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _IGNITION_COMMON_EXCEPTION_HH_
-#define _IGNITION_COMMON_EXCEPTION_HH_
+#ifndef IGNITION_COMMON_EXCEPTION_HH_
+#define IGNITION_COMMON_EXCEPTION_HH_
 
 #include <cstdint>
 #include <iostream>
@@ -24,7 +23,8 @@
 #include <sstream>
 #include <string>
 
-#include "ignition/common/Util.hh"
+#include <ignition/common/System.hh>
+#include <ignition/common/Util.hh>
 
 namespace ignition
 {
@@ -41,7 +41,7 @@ namespace ignition
 
     /// \class Exception Exception.hh common/Exception.hh
     /// \brief Class for generating exceptions
-    class IGNITION_VISIBLE Exception
+    class IGNITION_COMMON_VISIBLE Exception
     {
       /// \brief Constructor
       public: Exception();
@@ -79,16 +79,24 @@ namespace ignition
               {
                 return _out << _err.ErrorStr();
               }
-
+#ifdef _WIN32
+// Disable warning C4251 which is triggered by
+// std::unique_ptr
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
       /// \brief Private data pointer.
       private: std::unique_ptr<ExceptionPrivate> dataPtr;
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
     };
 
     /// \class InternalError Exception.hh common/Exception.hh
     /// \brief Class for generating Internal Ignition Errors:
     ///        those errors which should never happen and
     ///        represent programming bugs.
-    class IGNITION_VISIBLE InternalError : public Exception
+    class IGNITION_COMMON_VISIBLE InternalError : public Exception
     {
       /// \brief Constructor
       public: InternalError() = default;
@@ -110,7 +118,7 @@ namespace ignition
     ///        ignition assertions. They include information about the
     ///        assertion expression violated, function where problem
     ///        appeared and assertion debug message.
-    class IGNITION_VISIBLE AssertionInternalError : public InternalError
+    class IGNITION_COMMON_VISIBLE AssertionInternalError : public InternalError
     {
       /// \brief Constructor for assertions
       /// \param[in] _file File name

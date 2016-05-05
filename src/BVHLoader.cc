@@ -14,8 +14,6 @@
  * limitations under the License.
  *
 */
-#include <boost/algorithm/string.hpp>
-
 #include <algorithm>
 #include <fstream>
 #include <sstream>
@@ -65,9 +63,8 @@ Skeleton *BVHLoader::Load(const std::string &_filename, const double _scale)
     while (!file.eof())
     {
       getline(file, line);
-      std::vector<std::string> words;
-      boost::trim(line);
-      boost::split(words, line, boost::is_any_of("   "));
+      trim(line);
+      std::vector<std::string> words = split(line, " ");
       if (words[0] == "ROOT" || words[0] == "JOINT")
       {
         if (words.size() < 2)
@@ -152,9 +149,8 @@ Skeleton *BVHLoader::Load(const std::string &_filename, const double _scale)
     }
   }
   getline(file, line);
-  std::vector<std::string> words;
-  boost::trim(line);
-  boost::split(words, line, boost::is_any_of("   "));
+  trim(line);
+  std::vector<std::string> words = split(line, " ");
   unsigned int frameCount = 0;
   double frameTime = 0.0;
   if (words[0] != "Frames:" || words.size() < 2)
@@ -163,12 +159,14 @@ Skeleton *BVHLoader::Load(const std::string &_filename, const double _scale)
     return NULL;
   }
   else
-    frameCount = math::parseInt(words[1]);
+  {
+    frameCount = static_cast<unsigned int>(math::parseInt(words[1]));
+  }
 
   getline(file, line);
   words.clear();
-  boost::trim(line);
-  boost::split(words, line, boost::is_any_of("   "));
+  trim(line);
+  words = split(line, " ");
 
   if (words.size() < 3 || words[0] != "Frame" || words[1] != "Time:")
   {
@@ -187,8 +185,8 @@ Skeleton *BVHLoader::Load(const std::string &_filename, const double _scale)
   {
     getline(file, line);
     words.clear();
-    boost::trim(line);
-    boost::split(words, line, boost::is_any_of("   "));
+    trim(line);
+    words = split(line, " ");
     if (words.size() < totalChannels)
     {
       ignwarn << "Frame " << frameNo << " invalid.\n";
@@ -236,23 +234,24 @@ Skeleton *BVHLoader::Load(const std::string &_filename, const double _scale)
               if (channel == "Zrotation")
               {
                 zAngle = IGN_DTOR(value);
-                mats.push_back(math::Quaterniond(zAxis, zAngle));
+                mats.push_back(math::Matrix4d(
+                      math::Quaterniond(zAxis, zAngle)));
               }
               else
               {
                 if (channel == "Xrotation")
                 {
                   xAngle = IGN_DTOR(value);
-                  mats.push_back(
-                    math::Quaterniond(xAxis, xAngle));
+                  mats.push_back(math::Matrix4d(
+                    math::Quaterniond(xAxis, xAngle)));
                 }
                 else
                 {
                   if (channel == "Yrotation")
                   {
                     yAngle = IGN_DTOR(value);
-                    mats.push_back(
-                      math::Quaterniond(yAxis, yAngle));
+                    mats.push_back(math::Matrix4d(
+                      math::Quaterniond(yAxis, yAngle)));
                   }
                 }
               }

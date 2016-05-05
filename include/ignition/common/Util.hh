@@ -14,19 +14,24 @@
  * limitations under the License.
  *
 */
-#ifndef _IGNITION_COMMON_UTIL_HH_
-#define _IGNITION_COMMON_UTIL_HH_
+#ifndef IGNITION_COMMON_UTIL_HH_
+#define IGNITION_COMMON_UTIL_HH_
 
-#include <boost/uuid/sha1.hpp>
-#include <iomanip>
-#include <sstream>
 #include <cassert>
 #include <memory>
 #include <string>
 #include <future>
+#include <vector>
+#include <ignition/common/System.hh>
 
 /////////////////////////////////////////////////
 // Defines
+
+#ifdef _WIN32
+# define IGN_HOMEDIR "HOMEPATH"
+#else
+# define IGN_HOMEDIR "HOME"
+#endif
 
 /// \brief Seconds in one nano second.
 #define IGN_NANO_TO_SEC 0.0000000001
@@ -85,47 +90,6 @@
 /// inside ignition.
 #define ign_assert(_expr, _msg) assert((_msg, _expr))
 
-#if defined(__GNUC__)
-#define IGN_DEPRECATED(version) __attribute__((deprecated))
-#define IGN_FORCEINLINE __attribute__((always_inline))
-#elif defined(MSVC)
-#define IGN_DEPRECATED(version) ()
-#define IGN_FORCEINLINE __forceinline
-#else
-#define IGN_DEPRECATED(version) ()
-#define IGN_FORCEINLINE
-#endif
-
-/// \def IGNITION_VISIBLE
-/// Use to represent "symbol visible" if supported
-
-/// \def IGNITION_HIDDEN
-/// Use to represent "symbol hidden" if supported
-#if defined _WIN32 || defined __CYGWIN__
-  #ifdef BUILDING_DLL
-    #ifdef __GNUC__
-      #define IGNITION_VISIBLE __attribute__ ((dllexport))
-    #else
-      #define IGNITION_VISIBLE __declspec(dllexport)
-    #endif
-  #else
-    #ifdef __GNUC__
-      #define IGNITION_VISIBLE __attribute__ ((dllimport))
-    #else
-      #define IGNITION_VISIBLE __declspec(dllimport)
-    #endif
-  #endif
-  #define IGNITION_HIDDEN
-#else
-  #if __GNUC__ >= 4
-    #define IGNITION_VISIBLE __attribute__ ((visibility ("default")))
-    #define IGNITION_HIDDEN  __attribute__ ((visibility ("hidden")))
-  #else
-    #define IGNITION_VISIBLE
-    #define IGNITION_HIDDEN
-  #endif
-#endif
-
 /// \brief Forward declarations for the common classes
 namespace ignition
 {
@@ -139,18 +103,18 @@ namespace ignition
 
     /// \brief Get the wall time as an ISO string: YYYY-MM-DDTHH:MM:SS.NS
     /// \return The current wall time as an ISO string.
-    IGNITION_VISIBLE
-    std::string SystemTimeISO();
+    IGNITION_COMMON_VISIBLE
+    std::string systemTimeISO();
 
     /// \brief add path sufix to common::SystemPaths
     /// \param[in] _suffix The suffix to add.
-    IGNITION_VISIBLE
+    IGNITION_COMMON_VISIBLE
     void addSearchPathSuffix(const std::string &_suffix);
 
     /// \brief search for file in common::SystemPaths
     /// \param[in] _file Name of the file to find.
     /// \return The path containing the file.
-    IGNITION_VISIBLE
+    IGNITION_COMMON_VISIBLE
     std::string findFile(const std::string &_file);
 
     /// \brief search for file in common::SystemPaths
@@ -158,14 +122,14 @@ namespace ignition
     /// \param[in] _searchLocalPath True to search in the current working
     /// directory.
     /// \return The path containing the file.
-    IGNITION_VISIBLE
+    IGNITION_COMMON_VISIBLE
     std::string findFile(const std::string &_file,
                          bool _searchLocalPath);
 
     /// \brief search for a file in common::SystemPaths
     /// \param[in] _file the file name to look for.
     /// \return The path containing the file.
-    IGNITION_VISIBLE
+    IGNITION_COMMON_VISIBLE
     std::string findFilePath(const std::string &_file);
 
     /// \brief Compute the SHA1 hash of an array of bytes.
@@ -173,40 +137,124 @@ namespace ignition
     /// function are std::string and any STL container.
     /// \return The string representation (40 character) of the SHA1 hash.
     template<typename T>
-    IGNITION_VISIBLE
-    std::string getSha1(const T &_buffer);
-  }
+    std::string sha1(const T &_buffer);
 
+    /// \brief Compute the SHA1 hash of an array of bytes. Use std::string
+    /// sha1(const T &_buffer) instead of this function
+    /// \param[in] _buffer Input sequence. The permitted data types for this
+    /// function are std::string and any STL container.
+    /// \return The string representation (40 character) of the SHA1 hash.
+    /// \sa sha1(const T &_buffer)
+    IGNITION_COMMON_VISIBLE
+    std::string sha1(void const *_buffer, std::size_t _byteCount);
+
+    /// \brief Find the environment variable '_name' and return its value.
+    /// \param[in] _name Name of the environment variable.
+    /// \param[out] _value Value if the variable was found.
+    /// \return True if the variable was found or false otherwise.
+    IGNITION_COMMON_VISIBLE
+    bool env(const std::string &_name, std::string &_value);
+
+    /// \brief Check if the given path is a directory.
+    /// \param[in] _path Path to a directory.
+    /// \return True if _path is a directory.
+    IGNITION_COMMON_VISIBLE
+    bool isDirectory(const std::string &_path);
+
+    /// \brief Check if the given path is a file.
+    /// \param[in] _path Path to a file.
+    /// \return True if _path is a file.
+    IGNITION_COMMON_VISIBLE
+    bool isFile(const std::string &_path);
+
+    /// \brief Returns true if _path is a file or directory
+    /// \param[in] _path Path to check.
+    /// \return true if _path is a file or directory
+    IGNITION_COMMON_VISIBLE
+    bool exists(const std::string &_path);
+
+    /// \brief Get the current working directory
+    /// \return Name of the current directory
+    IGNITION_COMMON_VISIBLE
+    std::string cwd();
+
+    /// \brief Remove a directory.
+    /// \param[in] _path Path to a directory.
+    /// \return True if _path is a directory and was removed.
+    IGNITION_COMMON_VISIBLE
+    bool removeDirectory(const std::string &_path);
+
+    /// \brief Remove a directory or file.
+    /// \param[in] _path Path to a directory or file.
+    /// \return True if _path was removed.
+    IGNITION_COMMON_VISIBLE
+    bool removeDirectoryOrFile(const std::string &_path);
+
+    /// \brief Remove a directory or file.
+    /// \param[in] _path Path to a directory or file.
+    /// \return True if _path was removed.
+    IGNITION_COMMON_VISIBLE
+    bool removeAll(const std::string &_path);
+
+    /// \brief Create directories for the given path
+    /// \param[in] _path Path to create directories from
+    /// \return true on success
+    IGNITION_COMMON_VISIBLE
+    bool createDirectories(const std::string &_path);
+
+    /// \brief Get a UUID
+    /// \return A UUID string
+    IGNITION_COMMON_VISIBLE
+    std::string uuid();
+
+    /// \brief Splits a string into tokens.
+    /// \param[in] _str Input string.
+    /// \param[in] _delim Token delimiter.
+    /// \return Vector of tokens.
+    IGNITION_COMMON_VISIBLE
+    std::vector<std::string> split(const std::string &_str,
+                                   const std::string &_delim);
+
+    /// \brief In place left trim
+    /// \param[in,out] _s String to trim
+    void ltrim(std::string &_s);
+
+    /// \brief In place right trim
+    /// \param[in,out] _s String to trim
+    void rtrim(std::string &_s);
+
+    /// \brief In place trim from both ends
+    /// \param[in,out] _s String to trim
+    void trim(std::string &_s);
+
+    /// \brief Copying left trim
+    /// \param[in] _s String to trim
+    /// \return Trimmed string
+    std::string ltrimmed(std::string _s);
+
+    /// \brief Copying right trim
+    /// \param[in] _s String to trim
+    /// \return Trimmed string
+    std::string rtrimmed(std::string _s);
+
+    /// \brief Copying trim from both ends
+    /// \param[in] _s String to trim
+    /// \return Trimmed string
+    std::string trimmed(std::string _s);
+  }
 }
 
 ///////////////////////////////////////////////
 // Implementation of get_sha1
 template<typename T>
-std::string ignition::common::getSha1(const T &_buffer)
+std::string ignition::common::sha1(const T &_buffer)
 {
-  boost::uuids::detail::sha1 sha1;
-  unsigned int hash[5];
-  std::stringstream stream;
-
   if (_buffer.size() == 0)
-  {
-    sha1.process_bytes(NULL, 0);
-  }
+    return ignition::common::sha1(NULL, 0);
   else
   {
-    sha1.process_bytes(&(_buffer[0]), _buffer.size() * sizeof(_buffer[0]));
+    return ignition::common::sha1(
+        &(_buffer[0]), _buffer.size() * sizeof(_buffer[0]));
   }
-
-  sha1.get_digest(hash);
-
-  for (std::size_t i = 0; i < sizeof(hash) / sizeof(hash[0]); ++i)
-  {
-    stream << std::setfill('0')
-      << std::setw(sizeof(hash[0]) * 2)
-      << std::hex
-      << hash[i];
-  }
-
-  return stream.str();
 }
 #endif

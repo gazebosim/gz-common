@@ -92,8 +92,10 @@ TEST(Exception, InternalError_FileLineMsgConstructor_Throw)
 /////////////////////////////////////////////////
 TEST(Exception, Assert)
 {
+#ifndef _WIN32
   ASSERT_NO_THROW(ASSERT_DEATH(
         ign_assert(true == false, "Assert thrown"), "Assert thrown"));
+#endif
 }
 
 /////////////////////////////////////////////////

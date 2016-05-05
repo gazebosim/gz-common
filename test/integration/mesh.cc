@@ -16,7 +16,6 @@
 */
 
 #include <gtest/gtest.h>
-#include <boost/filesystem.hpp>
 
 #include "test_config.h"
 #include "ignition/common/ColladaLoader.hh"
@@ -127,8 +126,8 @@ TEST_F(MeshTest, Mesh)
 {
   // Cleanup test directory.
   common::SystemPaths *paths = common::SystemPaths::Instance();
-  boost::filesystem::remove_all(paths->DefaultTestPath());
-  boost::filesystem::create_directories(paths->DefaultTestPath());
+  ignition::common::removeAll(paths->DefaultTestPath());
+  ignition::common::createDirectories(paths->DefaultTestPath());
 
   EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.mesh"));
   EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.3ds"));
@@ -247,7 +246,7 @@ TEST_F(MeshTest, Mesh)
   EXPECT_TRUE(max == ignition::math::Vector3d(1, 1, 1));
 
   // Cleanup test directory.
-  boost::filesystem::remove_all(paths->DefaultTestPath());
+  igntion::common::removeAll(paths->DefaultTestPath());
 }
 
 /////////////////////////////////////////////////

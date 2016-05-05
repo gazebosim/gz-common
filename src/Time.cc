@@ -17,6 +17,21 @@
 #include <ctime>
 #include <chrono>
 
+#ifdef _WIN32
+  #include <Windows.h>
+  #include <Winsock2.h>
+  #include <cstdint>
+  struct timespec
+  {
+    int64_t tv_sec;
+    int64_t tv_nsec;
+  };
+#else
+  #include <unistd.h>
+  #include <sys/time.h>
+#endif
+
+
 #ifdef __MACH__
 #include <mach/clock.h>
 #include <mach/mach.h>
@@ -33,6 +48,7 @@ using namespace common;
 
 Time Time::wallTime;
 
+struct timespec Time::clockResolution;
 const Time Time::Zero = common::Time(0, 0);
 const int32_t Time::nsInSec = 1000000000L;
 const int32_t Time::nsInMs = 1000000;
@@ -42,6 +58,13 @@ const int32_t Time::nsInMs = 1000000;
 Time::Time()
   : sec(0), nsec(0)
 {
+}
+
+/////////////////////////////////////////////////
+Time::Time(const struct timespec &_tv)
+{
+  this->sec = _tv.tv_sec;
+  this->nsec = _tv.tv_nsec;
 }
 
 /////////////////////////////////////////////////
@@ -114,16 +137,7 @@ Time Time::Sleep(const common::Time &_time)
 {
   Time result;
 
-  struct timespec clockResolution;
-#ifdef __MACH__
-  clockResolution.tv_sec = 1 / sysconf(_SC_CLK_TCK);
-#else
-  // get clock resolution, skip sleep if resolution is larger then
-  // requested sleep time
-  clock_getres(CLOCK_REALTIME, &clockResolution);
-#endif
-
-  if (_time >= Time(clockResolution.tv_sec, clockResolution.tv_nsec))
+  if (_time >= clockResolution)
   {
     struct timespec interval;
     struct timespec remainder;
@@ -148,13 +162,46 @@ Time Time::Sleep(const common::Time &_time)
 #ifdef __MACH__
     if (nanosleep(&interval, &remainder) == -1)
     {
-#else
-    if (clock_nanosleep(CLOCK_REALTIME, 0, &interval, &remainder) == -1)
-    {
-#endif
       result.sec = remainder.tv_sec;
       result.nsec = remainder.tv_nsec;
     }
+#elif defined(_WIN32)
+    // Borrowed from roscpp_core/rostime/src/time.cpp
+    HANDLE timer = NULL;
+    LARGE_INTEGER sleepTime;
+    sleepTime.QuadPart = -
+      static_cast<int64_t>(interval.tv_sec)*10000000LL -
+      static_cast<int64_t>(interval.tv_nsec) / 100LL;
+
+    timer = CreateWaitableTimer(NULL, TRUE, NULL);
+    if (timer == NULL)
+    {
+      ignerr << "Unable to create waitable timer. Sleep will be incorrect.\n";
+      return result;
+    }
+
+    if (!SetWaitableTimer (timer, &sleepTime, 0, NULL, NULL, 0))
+    {
+      ignerr << "Unable to use waitable timer. Sleep will be incorrect.\n";
+      return result;
+    }
+
+    if (WaitForSingleObject (timer, INFINITE) != WAIT_OBJECT_0)
+    {
+      ignerr <<
+        "Unable to wait for a single object. Sleep will be incorrect.\n";
+      return result;
+    }
+
+    result.sec = 0;
+    result.nsec = 0;
+#else
+    if (clock_nanosleep(CLOCK_REALTIME, 0, &interval, &remainder) == -1)
+    {
+      result.sec = remainder.tv_sec;
+      result.nsec = remainder.tv_nsec;
+    }
+#endif
   }
   else
   {
@@ -316,4 +363,10 @@ bool Time::operator>=(const Time &_time) const
 bool Time::operator>=(double _time) const
 {
   return *this >= Time(_time);
+}
+
+/////////////////////////////////////////////////
+bool Time::operator>=(const struct timespec &_tv) const
+{
+  return *this >= Time(_tv);
 }

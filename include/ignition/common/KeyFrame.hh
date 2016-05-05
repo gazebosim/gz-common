@@ -14,12 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef _IGNITION_COMMON_KEYFRAME_HH_
-#define _IGNITION_COMMON_KEYFRAME_HH_
+#ifndef IGNITION_COMMON_KEYFRAME_HH_
+#define IGNITION_COMMON_KEYFRAME_HH_
 
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Quaternion.hh>
-#include <ignition/common/Util.hh>
+#include <ignition/common/System.hh>
 
 namespace ignition
 {
@@ -27,7 +27,7 @@ namespace ignition
   {
     /// \class KeyFrame KeyFrame.hh ignition/common/KeyFrame.hh
     /// \brief A key frame in an animation
-    class IGNITION_VISIBLE KeyFrame
+    class IGNITION_COMMON_VISIBLE KeyFrame
     {
       /// \brief Constructor
       /// \param[in] _time Time of the keyframe in seconds
@@ -45,7 +45,7 @@ namespace ignition
     };
 
     /// \brief A keyframe for a PoseAnimation
-    class IGNITION_VISIBLE PoseKeyFrame : public KeyFrame
+    class IGNITION_COMMON_VISIBLE PoseKeyFrame : public KeyFrame
     {
       /// \brief Constructor
       /// \param[in] _time of the keyframe
@@ -70,15 +70,24 @@ namespace ignition
       /// \return The rotation amount
       public: const math::Quaterniond &Rotation() const;
 
+#ifdef _WIN32
+// Disable warning C4251 which is triggered by
+// std::unique_ptr
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
       /// \brief the translation vector
       protected: math::Vector3d translate;
 
       /// \brief the rotation quaternion
       protected: math::Quaterniond rotate;
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
     };
 
     /// \brief A keyframe for a NumericAnimation
-    class IGNITION_VISIBLE NumericKeyFrame : public KeyFrame
+    class IGNITION_COMMON_VISIBLE NumericKeyFrame : public KeyFrame
     {
       /// \brief Constructor
       /// \param[in] _time Time of the keyframe

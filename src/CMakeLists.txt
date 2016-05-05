@@ -1,16 +1,16 @@
 include (${project_cmake_dir}/Utils.cmake)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-
-include_directories(${Boost_INCLUDE_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}
+                    ${tinyxml2_INCLUDE_DIRS})
 
 set (sources
   Animation.cc
   AudioDecoder.cc
   BVHLoader.cc
+  ColladaLoader.cc
   Color.cc
   Console.cc
   Exception.cc
-  Image.cc
+  #Image.cc
   KeyFrame.cc
   Material.cc
   Mesh.cc
@@ -22,11 +22,17 @@ set (sources
   Time.cc
   Timer.cc
   Util.cc
+  Uuid.cc
 )
+
+if (NOT USE_EXTERNAL_TINYXML2)
+    list (APPEND sources ${CMAKE_SOURCE_DIR}/src/tinyxml2/ignition/tinyxml2.cpp)
+endif()
 
 set (gtest_sources
   Animation_TEST.cc
   #AudioDecoder_TEST.cc
+  ColladaLoader_TEST.cc
   Color_TEST.cc
   Console_TEST.cc
   Exception_TEST.cc
@@ -36,15 +42,51 @@ set (gtest_sources
   SubMesh_TEST.cc
   Time_TEST.cc
   Util_TEST.cc
+  Uuid_TEST.cc
 )
 
-ign_add_library(ignition-common ${sources})
-ign_install_library(ignition-common)
-
-target_link_libraries(ignition-common
+ign_add_library(${PROJECT_LIBRARY_TARGET_NAME} ${sources})
+target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
   ${IGNITION-MATH_LIBRARIES}
-  ${Boost_LIBRARIES}
   ${freeimage_LIBRARIES}
-)
+  ${tinyxml2_LIBRARIES}
+  ${uuid_LIBRARIES})
+
+if (UNIX)
+  # Need to add default visibility to ignition-msgs
+  get_target_property(current_property ${PROJECT_LIBRARY_TARGET_NAME}
+    COMPILE_FLAGS)
+
+  # property non-existent or empty
+  if(NOT current_property)
+    set_target_properties(${PROJECT_LIBRARY_TARGET_NAME}
+      PROPERTIES GENERATED TRUE
+      COMPILE_FLAGS "-fvisibility=default")
+  else()
+    set_target_properties(${PROJECT_LIBRARY_TARGET_NAME}
+      PROPERTIES COMPILE_FLAGS
+      "${current_property} -fvisibility=default")
+  endif()
+endif()
+
+# When the minimum CMake required version will be >= 3.1 
+# we could use the target_compile_features() command 
+# to enable C++11 support in a platform-independent way. 
+if(NOT MSVC)
+  target_compile_options(${PROJECT_LIBRARY_TARGET_NAME} PUBLIC "-std=c++11")
+endif()
+
+target_include_directories(${PROJECT_LIBRARY_TARGET_NAME}
+  PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR_FULL}>)
+
+ign_install_library(${PROJECT_LIBRARY_TARGET_NAME} ${PROJECT_EXPORT_NAME})
+
+#ign_add_library(ignition-common ${sources})
+#ign_install_library(ignition-common)
+
+#target_link_libraries(ignition-common
+#  ${IGNITION-MATH_LIBRARIES}
+#)
 
 ign_build_tests(${gtest_sources})

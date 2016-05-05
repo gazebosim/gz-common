@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _IGNITION_COMMON_SKELETONANIMATION_HH_
-#define _IGNITION_COMMON_SKELETONANIMATION_HH_
+#ifndef IGNITION_COMMON_SKELETONANIMATION_HH_
+#define IGNITION_COMMON_SKELETONANIMATION_HH_
 
 #include <map>
 #include <utility>
@@ -24,7 +24,7 @@
 #include <ignition/math/Matrix4.hh>
 #include <ignition/math/Pose3.hh>
 
-#include <ignition/common/Util.hh>
+#include <ignition/common/System.hh>
 
 namespace ignition
 {
@@ -36,7 +36,7 @@ namespace ignition
     /// \class SkeletonAnimation SkeletonAnimation.hh
     /// ignition/common/SkeletonAnimation.hh
     /// \brief Skeleton animation
-    class IGNITION_VISIBLE SkeletonAnimation
+    class IGNITION_COMMON_VISIBLE SkeletonAnimation
     {
       /// \brief The Constructor
       /// \param[in] _name the name of the animation

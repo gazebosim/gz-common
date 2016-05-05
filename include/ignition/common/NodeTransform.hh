@@ -14,12 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef _IGNITION_COMMON_NODE_TRANSFORM_HH_
-#define _IGNITION_COMMON_NODE_TRANSFORM_HH_
+#ifndef IGNITION_COMMON_NODE_TRANSFORM_HH_
+#define IGNITION_COMMON_NODE_TRANSFORM_HH_
 #include <string>
 
 #include <ignition/math/Matrix4.hh>
 #include <ignition/math/Vector3.hh>
+#include <ignition/common/System.hh>
 #include <ignition/common/Util.hh>
 
 namespace ignition
@@ -31,7 +32,7 @@ namespace ignition
 
     /// \class NodeTransform NodeTransform.hh ignition/common/NodeTransform.hh
     /// \brief A transformation node
-    class IGNITION_VISIBLE NodeTransform
+    class IGNITION_COMMON_VISIBLE NodeTransform
     {
       /// \brief Constructor
       /// \param[in] _type the type of transform
@@ -58,7 +59,7 @@ namespace ignition
 
       /// \brief Set transform type
       /// \param[in] _type the type
-      public: void Type(const NodeTransformType _type);
+      public: void SetType(const NodeTransformType _type);
 
       /// \brief Returns the transformation type
       /// \return the type
@@ -66,7 +67,7 @@ namespace ignition
 
       /// \brief Set the SID
       /// \param[in] _sid the sid
-      public: void SID(const std::string &_sid);
+      public: void SetSID(const std::string &_sid);
 
       /// \brief Returns the SID
       /// \return the SID
@@ -75,20 +76,20 @@ namespace ignition
       /// \brief Set a transformation matrix component value
       /// \param[in] _idx the component index
       /// \param[in] _value the value
-      public: void Component(const unsigned int _idx, const double _value);
+      public: void SetComponent(const unsigned int _idx, const double _value);
 
       /// \brief Set source data values
       /// \param[in] _mat the values
-      public: void SourceValues(const math::Matrix4d &_mat);
+      public: void SetSourceValues(const math::Matrix4d &_mat);
 
       /// \brief Set source data values
       /// \param[in] _vec the values
-      public: void SourceValues(const math::Vector3d &_vec);
+      public: void SetSourceValues(const math::Vector3d &_vec);
 
       /// \brief Sets source matrix values from roation
       /// \param[in] _axis of rotation
       /// \param[in] _angle of rotation
-      public: void SourceValues(const math::Vector3d &_axis,
+      public: void SetSourceValues(const math::Vector3d &_axis,
                   const double _angle);
 
       /// \brief Sets the transform matrix from the source according to the type

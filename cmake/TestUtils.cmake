@@ -1,7 +1,7 @@
 #################################################
 macro (ign_build_tests)
-  # Find the Python interpreter for running the
-  # check_test_ran.py script
+  # Find the Python interpreter for running the 
+  # check_test_ran.py script 
   find_package(PythonInterp QUIET)
 
   # Build all the tests
@@ -14,7 +14,7 @@ macro (ign_build_tests)
     add_executable(${BINARY_NAME} ${GTEST_SOURCE_file})
 
     add_dependencies(${BINARY_NAME}
-      ${PROJECT_NAME_LOWER}
+      ${PROJECT_LIBRARY_TARGET_NAME}
       gtest gtest_main
       )
 
@@ -23,12 +23,26 @@ macro (ign_build_tests)
          libgtest_main.a
          libgtest.a
          pthread
-         ${PROJECT_NAME_LOWER})
+         ${PROJECT_NAME_LOWER}
+	 ${IGNITION-MATH_LIBRARIES})
     elseif(WIN32)
       target_link_libraries(${BINARY_NAME}
          gtest.lib
          gtest_main.lib
-         ${PROJECT_NAME_LOWER}.lib)
+         ${PROJECT_NAME_LOWER}.lib
+         ${IGNITION-MATH_LIBRARIES})
+
+      # Copy in ignition-math library
+      add_custom_command(TARGET ${BINARY_NAME}
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${IGNITION-MATH_LIBRARY_DIRS}/${IGNITION-MATH_LIBRARIES}.dll"
+        $<TARGET_FILE_DIR:${BINARY_NAME}> VERBATIM)
+
+      # Copy in ignition-common library
+      add_custom_command(TARGET ${BINARY_NAME}
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_BINARY_DIR}/src/${PROJECT_NAME}.dll"
+        $<TARGET_FILE_DIR:${BINARY_NAME}> VERBATIM)
     else()
        message(FATAL_ERROR "Unsupported platform")
     endif()

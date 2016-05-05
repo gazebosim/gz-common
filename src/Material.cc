@@ -15,8 +15,6 @@
  *
  */
 
-#include <boost/filesystem.hpp>
-
 #include "ignition/common/Console.hh"
 #include "ignition/common/MaterialPrivate.hh"
 #include "ignition/common/Material.hh"
@@ -84,10 +82,10 @@ void Material::SetTextureImage(const std::string &_tex,
   this->dataPtr->texImage = _resourcePath + "/" + _tex;
 
   // If the texture image doesn't exist then try the next most likely path.
-  if (!boost::filesystem::exists(this->dataPtr->texImage))
+  if (!exists(this->dataPtr->texImage))
   {
     this->dataPtr->texImage = _resourcePath + "/../materials/textures/" + _tex;
-    if (!boost::filesystem::exists(this->dataPtr->texImage))
+    if (!exists(this->dataPtr->texImage))
     {
       ignerr << "Unable to find texture[" << _tex << "] in path["
             << _resourcePath << "]\n";

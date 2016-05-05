@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _IGNITION_COMMON_TYPES_HH_
-#define _IGNITION_COMMON_TYPES_HH_
+#ifndef IGNITION_COMMON_TYPES_HH_
+#define IGNITION_COMMON_TYPES_HH_
 
 #include <memory>
 

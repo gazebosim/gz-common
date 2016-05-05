@@ -14,13 +14,13 @@
  * limitations under the License.
  *
 */
-
-#ifndef _IGNITION_COMMON_MATERIAL_HH_
-#define _IGNITION_COMMON_MATERIAL_HH_
+#ifndef IGNITION_COMMON_MATERIAL_HH_
+#define IGNITION_COMMON_MATERIAL_HH_
 
 #include <string>
 
-#include "ignition/common/Color.hh"
+#include <ignition/common/System.hh>
+#include <ignition/common/Color.hh>
 
 namespace ignition
 {
@@ -30,7 +30,7 @@ namespace ignition
 
     /// \class Material Material.hh ignition/common/Material.hh
     /// \brief Encapsulates description of a material
-    class IGNITION_VISIBLE Material
+    class IGNITION_COMMON_VISIBLE Material
     {
       /// \brief Enum used to indicate the type of material shading, i.e.
       /// what interpolation technique to be applied to the colors of the
@@ -57,6 +57,13 @@ namespace ignition
         SHADE_COUNT
       };
 
+#ifdef _WIN32
+// Disable warning C4251 which is triggered by
+// std::unique_ptr
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
+
       /// \brief An array of strings for the shade mode enum.
       public: static std::string ShadeModeStr[SHADE_COUNT];
 
@@ -79,6 +86,10 @@ namespace ignition
 
       /// \brief An array of strings for the blend mode enum.
       public: static std::string BlendModeStr[BLEND_COUNT];
+
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
 
       /// \brief Constructor. Create material with a default white color.
       public: Material();

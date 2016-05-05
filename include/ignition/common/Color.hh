@@ -14,10 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _IGNITION_COMMON_COLOR_HH_
-#define _IGNITION_COMMON_COLOR_HH_
+#ifndef IGNITION_COMMON_COLOR_HH_
+#define IGNITION_COMMON_COLOR_HH_
 
-#include <ignition/common/Util.hh>
+#include <ignition/common/System.hh>
 #include <ignition/math/Vector3.hh>
 
 namespace ignition
@@ -26,7 +26,7 @@ namespace ignition
   {
     /// \class Color Color.hh ignition/common/Color.hh
     /// \brief Defines a color
-    class IGNITION_VISIBLE Color
+    class IGNITION_COMMON_VISIBLE Color
     {
       /// \brief (1, 1, 1)
       public: static const Color White;

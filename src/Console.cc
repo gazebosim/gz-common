@@ -14,9 +14,6 @@
  * limitations under the License.
  *
  */
-// \todo Replace this with functionality from c++1y, when available.
-#include <boost/filesystem.hpp>
-
 #include <string>
 #include <sstream>
 
@@ -62,7 +59,7 @@ Logger::~Logger()
 /////////////////////////////////////////////////
 Logger &Logger::operator()()
 {
-  Console::log << "(" << ignition::common::SystemTimeISO() << ") ";
+  Console::log << "(" << ignition::common::systemTimeISO() << ") ";
   (*this) << this->prefix;
 
   return (*this);
@@ -119,7 +116,8 @@ int Logger::Buffer::sync()
 
 /////////////////////////////////////////////////
 FileLogger::FileLogger(const std::string &_filename)
-  : std::ostream(new Buffer(_filename))
+  : std::ostream(new Buffer(_filename)),
+    logDirectory("")
 {
   this->initialized = false;
   this->setf(std::ios_base::unitbuf);
@@ -135,7 +133,9 @@ FileLogger::~FileLogger()
 void FileLogger::Init(const std::string &_directory,
                       const std::string &_filename)
 {
-  if (!getenv("HOME"))
+  std::string logPath;
+
+  if (!env(IGN_HOMEDIR, logPath))
   {
     ignerr << "Missing HOME environment variable."
            << "No log file will be generated.";
@@ -145,13 +145,12 @@ void FileLogger::Init(const std::string &_directory,
   FileLogger::Buffer *buf = static_cast<FileLogger::Buffer*>(
       this->rdbuf());
 
-  std::string logPath = getenv("HOME");
   logPath = logPath + "/" + _directory;
 
   // Create the directory if it doesn't exist.
   // \todo: Replace this with c++1y, when it is released.
-  if (!boost::filesystem::exists(logPath))
-    boost::filesystem::create_directories(logPath);
+  if (!exists(logPath))
+    createDirectories(logPath);
 
   logPath = logPath + "/" + _filename;
 
@@ -163,6 +162,12 @@ void FileLogger::Init(const std::string &_directory,
   buf->stream = new std::ofstream(logPath.c_str(), std::ios::out);
   if (!buf->stream->is_open())
     std::cerr << "Error opening log file: " << logPath << std::endl;
+
+  // Update the log directory name.
+  if (isDirectory(logPath))
+    this->logDirectory = logPath;
+  else
+    this->logDirectory = logPath.substr(0, logPath.rfind('/'));
 
   this->initialized = true;
 
@@ -192,6 +197,12 @@ FileLogger &FileLogger::operator()(const std::string &_file, int _line)
     << _file.substr(index , _file.size() - index) << ":" << _line << "]";
 
   return (*this);
+}
+
+/////////////////////////////////////////////////
+std::string FileLogger::LogDirectory() const
+{
+  return this->logDirectory;
 }
 
 /////////////////////////////////////////////////

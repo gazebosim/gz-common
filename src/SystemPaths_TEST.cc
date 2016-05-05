@@ -15,8 +15,6 @@
  *
 */
 #include <gtest/gtest.h>
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/classification.hpp>
 #include <string>
 #include <vector>
 
@@ -49,10 +47,6 @@ TEST(SystemPathsTest, SystemPaths)
 
   putenv(const_cast<char*>("IGN_PLUGIN_PATH="));
   paths->ClearPluginPaths();
-  // In this case, we expect to get the compiled-in default
-  // std::vector<std::string> tmpstrings;
-  // boost::split(tmpstrings, IGN_PLUGIN_PATH, boost::is_any_of(":"));
-  // EXPECT_EQ(tmpstrings.size(), paths->GetPluginPaths().size());
 
   putenv(const_cast<char*>(pluginPathBackup.c_str()));
 

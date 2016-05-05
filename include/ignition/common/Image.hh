@@ -14,11 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef _IGNITION_COMMON_IMAGE_HH_
-#define _IGNITION_COMMON_IMAGE_HH_
+#ifndef IGNITION_COMMON_IMAGE_HH_
+#define IGNITION_COMMON_IMAGE_HH_
 
 #include <string>
 #include <ignition/common/Color.hh>
+#include <ignition/common/System.hh>
 
 struct FIBITMAP;
 
@@ -56,7 +57,7 @@ namespace ignition
 
     /// \class Image Image.hh ignition/common/common.hh
     /// \brief Encapsulates an image
-    class IGNITION_VISIBLE Image
+    class IGNITION_COMMON_VISIBLE Image
     {
       /// \brief Pixel formats enumeration
       public: enum PixelFormat

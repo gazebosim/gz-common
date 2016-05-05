@@ -14,13 +14,12 @@
 * limitations under the License.
 *
 */
-
-#ifndef _IGNITION_COMMON_AUDIO_DECODER_HH_
-#define _IGNITION_COMMON_AUDIO_DECODER_HH_
+#ifndef IGNITION_COMMON_AUDIO_DECODER_HH_
+#define IGNITION_COMMON_AUDIO_DECODER_HH_
 
 #include <stdint.h>
 #include <string>
-#include <ignition/common/Util.hh>
+#include <ignition/common/System.hh>
 
 namespace ignition
 {
@@ -31,7 +30,7 @@ namespace ignition
 
     /// \class AudioDecoder AudioDecoder.hh ignition/common/common.hh
     /// \brief An audio decoder based on FFMPEG.
-    class IGNITION_VISIBLE AudioDecoder
+    class IGNITION_COMMON_VISIBLE AudioDecoder
     {
       /// \brief Constructor.
       public: AudioDecoder();

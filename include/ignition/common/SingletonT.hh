@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _IGNITION_SINGLETONT_HH_
-#define _IGNITION_SINGLETONT_HH_
+#ifndef IGNITION_COMMON_SINGLETONT_HH_
+#define IGNITION_COMMON_SINGLETONT_HH_
 
 namespace ignition
 {

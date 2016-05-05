@@ -14,15 +14,15 @@
  * limitations under the License.
  *
 */
-#ifndef _IGNITION_COMMON_NODE_ANIMATION_HH_
-#define _IGNITION_COMMON_NODE_ANIMATION_HH_
+#ifndef IGNITION_COMMON_NODE_ANIMATION_HH_
+#define IGNITION_COMMON_NODE_ANIMATION_HH_
 #include <string>
 #include <utility>
 
 #include <ignition/math/Matrix4.hh>
 #include <ignition/math/Pose3.hh>
 
-#include "ignition/common/Util.hh"
+#include <ignition/common/System.hh>
 
 namespace ignition
 {
@@ -32,7 +32,7 @@ namespace ignition
 
     /// \class NodeAnimation NodeAnimation.hh ignition/common/NodeAnimation.hh
     /// \brief Node animation
-    class IGNITION_VISIBLE NodeAnimation
+    class IGNITION_COMMON_VISIBLE NodeAnimation
     {
       /// \brief constructor
       /// \param[in] _name the name of the node

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _IGNITION_MESH_HH_
-#define _IGNITION_MESH_HH_
+#ifndef IGNITION_COMMON_MESH_HH_
+#define IGNITION_COMMON_MESH_HH_
 
 #include <vector>
 #include <string>
@@ -24,6 +24,7 @@
 #include <ignition/math/Vector2.hh>
 
 #include <ignition/common/CommonTypes.hh>
+#include <ignition/common/System.hh>
 
 namespace ignition
 {
@@ -35,7 +36,7 @@ namespace ignition
 
     /// \class Mesh Mesh.hh ignition/common/Mesh.hh
     /// \brief A 3D mesh
-    class IGNITION_VISIBLE Mesh
+    class IGNITION_COMMON_VISIBLE Mesh
     {
       /// \brief Constructor
       public: Mesh();
@@ -174,8 +175,17 @@ namespace ignition
       /// \param[in] _vec Amount to translate vertices.
       public: void Translate(const ignition::math::Vector3d &_vec);
 
+#ifdef _WIN32
+// Disable warning C4251 which is triggered by
+// std::unique_ptr
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
       /// \brief Private data pointer.
       private: std::unique_ptr<MeshPrivate> dataPtr;
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
     };
   }
 }

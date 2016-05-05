@@ -14,10 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef _IGNITION_COMMON_TIMER_HH_
-#define _IGNITION_COMMON_TIMER_HH_
+#ifndef IGNITION_COMMON_TIMER_HH_
+#define IGNITION_COMMON_TIMER_HH_
 
 #include <ignition/common/Time.hh>
+#include <ignition/common/System.hh>
 
 namespace ignition
 {
@@ -25,7 +26,7 @@ namespace ignition
   {
     /// \class Timer Timer.hh common/common.hh
     /// \brief A timer class, used to time things in real world walltime
-    class IGNITION_VISIBLE Timer
+    class IGNITION_COMMON_VISIBLE Timer
     {
       /// \brief Constructor
       public: Timer();

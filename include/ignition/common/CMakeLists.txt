@@ -4,11 +4,12 @@ set (headers
   Animation.hh
   AudioDecoder.hh
   BVHLoader.hh
+  ColladaLoader.hh
   Color.hh
   Console.hh
   Exception.hh
   ffmpeg_inc.h
-  Image.hh
+  #Image.hh
   KeyFrame.hh
   Material.hh
   Mesh.hh
@@ -18,9 +19,11 @@ set (headers
   SkeletonAnimation.hh
   SkeletonNode.hh
   SubMesh.hh
+  System.hh
   Time.hh
   Timer.hh
   Util.hh
+  Uuid.hh
 )
 
 set (ign_headers "" CACHE INTERNAL "Ignition headers" FORCE)

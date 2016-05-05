@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _IGNTION_COMMON_CONSOLE_HH_
-#define _IGNTION_COMMON_CONSOLE_HH_
+#ifndef IGNTION_COMMON_CONSOLE_HH_
+#define IGNTION_COMMON_CONSOLE_HH_
 
 #include <iostream>
 #include <fstream>
@@ -24,6 +23,7 @@
 #include <string>
 
 #include <ignition/common/Util.hh>
+#include <ignition/common/System.hh>
 
 namespace ignition
 {
@@ -50,11 +50,16 @@ namespace ignition
     /// \param[in] _dir Name of directory in which to store the log file.
     /// \param[in] _file Name of log file for ignlog messages.
     #define ignLogInit(_dir, _file)\
-    (ignition::common::Console::log.Init(_dir, _file))
+        (ignition::common::Console::log.Init(_dir, _file))
+
+    /// \brief Get the full path of the directory where the log files are stored
+    /// \return Full path of the directory
+    #define ignLogDirectory()\
+        (ignition::common::Console::log.LogDirectory())
 
     /// \class FileLogger FileLogger.hh common/common.hh
     /// \brief A logger that outputs messages to a file.
-    class IGNITION_VISIBLE FileLogger : public std::ostream
+    class IGNITION_COMMON_VISIBLE FileLogger : public std::ostream
     {
       /// \brief Constructor.
       /// \param[in] _filename Filename to write into. If empty,
@@ -83,6 +88,11 @@ namespace ignition
       public: virtual FileLogger &operator()(
                   const std::string &_file, int _line);
 
+      /// \brief Get the full path of the directory where all the log files
+      /// are stored.
+      /// \return Full path of the directory.
+      public: std::string LogDirectory() const;
+
       /// \brief String buffer for the file logger.
       protected: class Buffer : public std::stringbuf
                  {
@@ -102,13 +112,26 @@ namespace ignition
                    public: std::ofstream *stream;
                  };
 
+#ifdef _WIN32
+// Disable warning C4251 which is triggered by
+// std::unique_ptr
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
+      /// \brief Stores the full path of the directory where all the log files
+      /// are stored.
+      private: std::string logDirectory;
+
       /// \brief True if initialized.
       private: bool initialized;
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
     };
 
     /// \class Logger Logger.hh common/common.hh
     /// \brief Terminal logger.
-    class IGNITION_VISIBLE Logger : public std::ostream
+    class IGNITION_COMMON_VISIBLE Logger : public std::ostream
     {
       /// \enum LogType.
       /// \brief Output destination type.
@@ -170,14 +193,23 @@ namespace ignition
       /// \brief Color for the output.
       public: int color;
 
+#ifdef _WIN32
+// Disable warning C4251 which is triggered by
+// std::unique_ptr
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
       /// \brief Prefix to use when logging to file.
       private: std::string prefix;
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
     };
 
     /// \class Console Console.hh common/common.hh
     /// \brief Container for loggers, and global logging options
     /// (such as verbose vs. quiet output).
-    class IGNITION_VISIBLE Console
+    class IGNITION_COMMON_VISIBLE Console
     {
       /// \brief Set quiet output.
       /// \param[in] q True to prevent warning.

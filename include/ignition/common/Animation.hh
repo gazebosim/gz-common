@@ -14,12 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef _IGNITION_COMMON_ANIMATION_HH_
-#define _IGNITION_COMMON_ANIMATION_HH_
+#ifndef IGNITION_COMMON_ANIMATION_HH_
+#define IGNITION_COMMON_ANIMATION_HH_
 
 #include <string>
 #include <vector>
-#include <ignition/common/Util.hh>
+#include <ignition/common/System.hh>
 
 namespace ignition
 {
@@ -38,7 +38,7 @@ namespace ignition
     /// \class Animation Animation.hh ignition/common/Animation.hh
     /// \brief Manages an animation, which is a collection of keyframes and
     /// the ability to interpolate between the keyframes
-    class IGNITION_VISIBLE Animation
+    class IGNITION_COMMON_VISIBLE Animation
     {
       /// \brief Constructor
       /// \param[in] _name Name of the animation, should be unique
@@ -90,6 +90,12 @@ namespace ignition
                      common::KeyFrame **_kf2,
                      unsigned int &_firstKeyIndex) const;
 
+#ifdef _WIN32
+// Disable warning C4251 which is triggered by
+// std::unique_ptr
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
 
       /// \brief animation name
       protected: std::string name;
@@ -111,10 +117,13 @@ namespace ignition
 
       /// \brief array of key frames
       protected: KeyFrame_V keyFrames;
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
     };
 
     /// \brief A pose animation.
-    class IGNITION_VISIBLE PoseAnimation : public Animation
+    class IGNITION_COMMON_VISIBLE PoseAnimation : public Animation
     {
       /// \brief Constructor
       /// \param[in] _name String name of the animation. This should be unique.
@@ -152,7 +161,7 @@ namespace ignition
     };
 
     /// \brief A numeric animation.
-    class IGNITION_VISIBLE NumericAnimation : public Animation
+    class IGNITION_COMMON_VISIBLE NumericAnimation : public Animation
     {
       /// \brief Constructor
       /// \param[in] _name String name of the animation. This should be unique.
