@@ -193,8 +193,17 @@ namespace ignition
       /// \brief Color for the output.
       public: int color;
 
+#ifdef _WIN32
+// Disable warning C4251 which is triggered by
+// std::unique_ptr
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
       /// \brief Prefix to use when logging to file.
       private: std::string prefix;
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
     };
 
     /// \class Console Console.hh common/common.hh

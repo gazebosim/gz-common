@@ -79,9 +79,17 @@ namespace ignition
               {
                 return _out << _err.ErrorStr();
               }
-
+#ifdef _WIN32
+// Disable warning C4251 which is triggered by
+// std::unique_ptr
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
       /// \brief Private data pointer.
       private: std::unique_ptr<ExceptionPrivate> dataPtr;
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
     };
 
     /// \class InternalError Exception.hh common/Exception.hh

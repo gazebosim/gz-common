@@ -24,7 +24,7 @@ using namespace ignition;
 /////////////////////////////////////////////////
 TEST(Color, Color)
 {
-  common::Color clr(.1, .2, .3, 1.0);
+  common::Color clr(.1f, .2f, .3f, 1.0f);
   EXPECT_FLOAT_EQ(0.1f, clr.R());
   EXPECT_FLOAT_EQ(0.2f, clr.G());
   EXPECT_FLOAT_EQ(0.3f, clr.B());
@@ -75,78 +75,79 @@ TEST(Color, Color)
   EXPECT_FLOAT_EQ(0.0f, clr[3]);
   EXPECT_FLOAT_EQ(0.0f, clr[4]);
 
-  clr.R() = 0.1;
-  clr.G() = 0.2;
-  clr.B() = 0.3;
-  clr.A() = 0.4;
+  clr.R() = 0.1f;
+  clr.G() = 0.2f;
+  clr.B() = 0.3f;
+  clr.A() = 0.4f;
   EXPECT_FLOAT_EQ(0.1f, clr[0]);
   EXPECT_FLOAT_EQ(0.2f, clr[1]);
   EXPECT_FLOAT_EQ(0.3f, clr[2]);
   EXPECT_FLOAT_EQ(0.4f, clr[3]);
 
-  clr.Set(0.1, 0.2, 0.3, 0.4);
-  clr = clr + 0.2;
-  EXPECT_TRUE(clr == common::Color(0.3, 0.4, 0.5, 0.6));
+  clr.Set(0.1f, 0.2f, 0.3f, 0.4f);
+  clr = clr + 0.2f;
+  EXPECT_TRUE(clr == common::Color(0.3f, 0.4f, 0.5f, 0.6f));
 
-  clr.Set(0.1, 0.2, 0.3, 0.4);
-  clr += common::Color(0.2, 0.2, 0.2, 0.2);
-  EXPECT_TRUE(clr == common::Color(0.3, 0.4, 0.5, 0.6));
-
-
-  clr.Set(0.1, 0.2, 0.3, 0.4);
-  clr = clr - 0.1;
-  EXPECT_TRUE(clr == common::Color(0.0, 0.1, 0.2, 0.3));
-
-  clr.Set(0.1, 0.2, 0.3, 0.4);
-  clr -= common::Color(0.1, 0.1, 0.1, 0.1);
-  EXPECT_TRUE(clr == common::Color(0.0, 0.1, 0.2, 0.3));
+  clr.Set(0.1f, 0.2f, 0.3f, 0.4f);
+  clr += common::Color(0.2f, 0.2f, 0.2f, 0.2f);
+  EXPECT_TRUE(clr == common::Color(0.3f, 0.4f, 0.5f, 0.6f));
 
 
-  clr.Set(1, 1, 1, 1.);
-  clr = clr / 1.6;
-  EXPECT_TRUE(clr == common::Color(0.625, 0.625, 0.625, 0.625));
+  clr.Set(0.1f, 0.2f, 0.3f, 0.4f);
+  clr = clr - 0.1f;
+  EXPECT_TRUE(clr == common::Color(0.0f, 0.1f, 0.2f, 0.3f));
 
-  clr.Set(1, 1, 1, 1);
-  clr /= common::Color(1, 1, 1, 1);
-  EXPECT_TRUE(clr == common::Color(1, 1, 1, 1));
-
-
-  clr.Set(.1, .2, .3, .4);
-  clr = clr * .1;
-  EXPECT_TRUE(clr == common::Color(0.01, 0.02, 0.03, 0.04));
-
-  clr.Set(.1, .2, .3, .4);
-  clr *= common::Color(0.1, 0.1, 0.1, 0.1);
-  EXPECT_TRUE(clr == common::Color(0.01, 0.02, 0.03, 0.04));
+  clr.Set(0.1f, 0.2f, 0.3f, 0.4f);
+  clr -= common::Color(0.1f, 0.1f, 0.1f, 0.1f);
+  EXPECT_TRUE(clr == common::Color(0.0f, 0.1f, 0.2f, 0.3f));
 
 
-  clr.SetFromYUV(0.5, 0.2, 0.8);
+  clr.Set(1.f, 1.f, 1.f, 1.f);
+  clr = clr / 1.6f;
+  EXPECT_TRUE(clr == common::Color(0.625f, 0.625f, 0.625f, 0.625f));
+
+  clr.Set(1.f, 1.f, 1.f, 1.f);
+  clr /= common::Color(1.f, 1.f, 1.f, 1.f);
+  EXPECT_TRUE(clr == common::Color(1.f, 1.f, 1.f, 1.f));
+
+
+  clr.Set(.1f, .2f, .3f, .4f);
+  clr = clr * .1f;
+  EXPECT_TRUE(clr == common::Color(0.01f, 0.02f, 0.03f, 0.04f));
+
+  clr.Set(.1f, .2f, .3f, .4f);
+  clr *= common::Color(0.1f, 0.1f, 0.1f, 0.1f);
+  EXPECT_TRUE(clr == common::Color(0.01f, 0.02f, 0.03f, 0.04f));
+
+
+  clr.SetFromYUV(0.5f, 0.2f, 0.8f);
   EXPECT_TRUE(math::equal(0.00553f, clr.R(), 1e-3f));
   EXPECT_TRUE(math::equal(0.0f, clr.G()));
   EXPECT_TRUE(math::equal(0.9064f, clr.B(), 1e-3f));
   EXPECT_TRUE(math::equal(0.04f, clr.A()));
 
-  EXPECT_TRUE(clr.GetAsYUV() == math::Vector3f(0.104985, 0.95227, 0.429305));
+  EXPECT_TRUE(clr.GetAsYUV() == math::Vector3f(0.104985f, 0.95227f, 0.429305f));
 
-  clr = common::Color(1.0, 0.0, 0.5, 1.0) + common::Color(0.1, 0.3, 0.4, 1.0);
+  clr = common::Color(1.0f, 0.0f, 0.5f, 1.0f) +
+    common::Color(0.1f, 0.3f, 0.4f, 1.0f);
   EXPECT_TRUE(math::equal(0.00431373f, clr.R()));
   EXPECT_TRUE(math::equal(0.3f, clr.G()));
   EXPECT_TRUE(math::equal(0.9f, clr.B()));
   EXPECT_TRUE(math::equal(2.0f, clr.A()));
 
-  clr = common::Color(1.0, 0.0, 0.5, 1.0) - common::Color(0.1, 0.3, 0.4, 1.0);
+  clr = common::Color(1.0f, 0.0f, 0.5f, 1.0f) -
+    common::Color(0.1f, 0.3f, 0.4f, 1.0f);
   EXPECT_TRUE(math::equal(0.9f, clr.R()));
   EXPECT_TRUE(math::equal(0.0f, clr.G()));
   EXPECT_TRUE(math::equal(0.1f, clr.B()));
   EXPECT_TRUE(math::equal(0.0f, clr.A()));
 
-  clr = common::Color(0.5, 0.2, 0.4, 0.6) / 2.0;
+  clr = common::Color(0.5f, 0.2f, 0.4f, 0.6f) / 2.0f;
   EXPECT_TRUE(math::equal(0.25f, clr.R()));
   EXPECT_TRUE(math::equal(0.1f, clr.G()));
   EXPECT_TRUE(math::equal(0.2f, clr.B()));
   EXPECT_TRUE(math::equal(0.3f, clr.A()));
 }
-
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

@@ -175,8 +175,17 @@ namespace ignition
       /// \param[in] _vec Amount to translate vertices.
       public: void Translate(const ignition::math::Vector3d &_vec);
 
+#ifdef _WIN32
+// Disable warning C4251 which is triggered by
+// std::unique_ptr
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
       /// \brief Private data pointer.
       private: std::unique_ptr<MeshPrivate> dataPtr;
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
     };
   }
 }
