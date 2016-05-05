@@ -14,15 +14,25 @@
  * limitations under the License.
  *
 */
+#ifndef _WIN32
+#include <dirent.h>
+#else
+#include "ignition/common/win_dirent.h"
+#endif
+
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/stat.h>
 #include <iomanip>
 #include <array>
 #include <sstream>
+#include <fstream>
 #include <cstdlib>
+#include <cstring>
 #include <ignition/common/config.hh>
 #include <ignition/common/SystemPaths.hh>
 #include <ignition/common/Util.hh>
+#include <ignition/common/Uuid.hh>
 
 #define LEFT_ROTATE(x, n) (((x) << (n)) ^ ((x) >> (32-(n))))
 
@@ -303,4 +313,67 @@ std::string ignition::common::sha1(void const *_buffer, std::size_t _byteCount)
   }
 
   return stream.str();
+}
+
+/////////////////////////////////////////////////
+std::string ignition::common::uuid()
+{
+  ignition::common::Uuid uuid;
+  return uuid.String();
+}
+
+/////////////////////////////////////////////////
+bool ignition::common::isFile(const std::string &_path)
+{
+  std::ifstream f(_path);
+  return f.good();
+}
+
+/////////////////////////////////////////////////
+bool ignition::common::removeDirectory(const std::string &_path)
+{
+  if (ignition::common::isDirectory(_path))
+  {
+#ifdef _WIN32
+    return RemoveDirectory(_path);
+#else
+    return rmdir(_path.c_str()) == 0;
+#endif
+  }
+}
+
+/////////////////////////////////////////////////
+bool ignition::common::removeDirectoryOrFile(const std::string &_path)
+{
+  if (ignition::common::isDirectory(_path))
+    return ignition::common::removeDirectory(_path);
+  else if (ignition::common::isFile(_path))
+  {
+    return std::remove(_path.c_str()) == 0;
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool ignition::common::removeAll(const std::string &_path)
+{
+  std::cout << "Remove All[" << _path << "]\n";
+  if (ignition::common::isDirectory(_path))
+  {
+    DIR *dir = opendir(_path.c_str());
+    if (dir)
+    {
+      struct dirent *p;
+      while (p=readdir(dir))
+      {
+        // Skip special files.
+        if (!std::strcmp(p->d_name, ".") || !std::strcmp(p->d_name, ".."))
+          continue;
+
+        ignition::common::removeAll(_path + "/" + p->d_name);
+      }
+    }
+  }
+
+  ignition::common::removeDirectoryOrFile(_path);
 }

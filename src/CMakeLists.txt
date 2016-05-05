@@ -22,6 +22,7 @@ set (sources
   Time.cc
   Timer.cc
   Util.cc
+  Uuid.cc
 )
 
 if (NOT USE_EXTERNAL_TINYXML2)
@@ -41,6 +42,7 @@ set (gtest_sources
   SubMesh_TEST.cc
   Time_TEST.cc
   Util_TEST.cc
+  Uuid_TEST.cc
 )
 
 ign_add_library(${PROJECT_LIBRARY_TARGET_NAME} ${sources})
@@ -48,7 +50,8 @@ target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
   ${IGNITION-MATH_LIBRARIES}
   ${Boost_LIBRARIES}
   ${freeimage_LIBRARIES}
-  ${tinyxml2_LIBRARIES})
+  ${tinyxml2_LIBRARIES}
+  ${uuid_LIBRARIES})
 
 if (UNIX)
   # Need to add default visibility to ignition-msgs

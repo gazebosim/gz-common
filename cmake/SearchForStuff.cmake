@@ -85,3 +85,24 @@ macro (check_gcc_visibility)
   include (CheckCXXCompilerFlag)
   check_cxx_compiler_flag(-fvisibility=hidden GCC_SUPPORTS_VISIBILITY)
 endmacro()
+
+#################################################
+# Find uuid
+#  - In UNIX we use uuid library
+#  - In Windows the native RPC call, no dependency needed
+if (UNIX)
+  include (FindPkgConfig REQUIRED)
+  pkg_check_modules(uuid uuid)
+
+  if (NOT uuid_FOUND)
+    message (STATUS "Looking for uuid pkgconfig file - not found")
+    BUILD_ERROR ("uuid not found, Please install uuid")
+  else ()
+    message (STATUS "Looking for uuid pkgconfig file - found")
+    include_directories(${uuid_INCLUDE_DIRS})
+    link_directories(${uuid_LIBRARY_DIRS})
+  endif ()
+elseif (MSVC)
+  message (STATUS "Using Windows RPC UuidCreate function")
+endif()
+

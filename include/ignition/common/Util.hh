@@ -153,6 +153,35 @@ namespace ignition
     /// \return True if _path is a directory.
     IGNITION_COMMON_VISIBLE
     bool isDirectory(const std::string &_path);
+
+    /// \brief Check if the given path is a file.
+    /// \param[in] _path Path to a file.
+    /// \return True if _path is a file.
+    IGNITION_COMMON_VISIBLE
+    bool isFile(const std::string &_path);
+
+    /// \brief Remove a directory.
+    /// \param[in] _path Path to a directory.
+    /// \return True if _path is a directory and was removed.
+    IGNITION_COMMON_VISIBLE
+    bool removeDirectory(const std::string &_path);
+
+    /// \brief Remove a directory or file.
+    /// \param[in] _path Path to a directory or file.
+    /// \return True if _path was removed.
+    IGNITION_COMMON_VISIBLE
+    bool removeDirectoryOrFile(const std::string &_path);
+
+    /// \brief Remove a directory or file.
+    /// \param[in] _path Path to a directory or file.
+    /// \return True if _path was removed.
+    IGNITION_COMMON_VISIBLE
+    bool removeAll(const std::string &_path);
+
+    /// \brief Get a UUID
+    /// \return A UUID string
+    IGNITION_COMMON_VISIBLE
+    std::string uuid();
   }
 }
 

@@ -1,5 +1,4 @@
 include (${project_cmake_dir}/Utils.cmake)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/boost)
 
 set (headers
   Animation.hh
@@ -24,6 +23,7 @@ set (headers
   Time.hh
   Timer.hh
   Util.hh
+  Uuid.hh
 )
 
 set (ign_headers "" CACHE INTERNAL "Ignition headers" FORCE)
