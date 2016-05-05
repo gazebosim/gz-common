@@ -18,7 +18,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include <boost/filesystem.hpp>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -152,22 +151,14 @@ std::string SystemPaths::FindFile(const std::string &_filename,
   {
     bool found = false;
 
-    try
-    {
-      path = boost::filesystem::current_path().string() + "/" + _filename;
-    }
-    catch(boost::filesystem::filesystem_error &_e)
-    {
-      ignerr << "Filesystem error[" << _e.what() << "]\n";
-      return std::string();
-    }
+    path = cwd() + "/" + _filename;
 
-    if (_searchLocalPath && boost::filesystem::exists(path))
+    if (_searchLocalPath && exists(path))
     {
       found = true;
     }
     else if ((_filename[0] == '/' || _filename[0] == '.' || _searchLocalPath)
-             && boost::filesystem::exists(boost::filesystem::path(_filename)))
+             && exists(_filename))
     {
       path = _filename;
       found = true;
@@ -182,7 +173,7 @@ std::string SystemPaths::FindFile(const std::string &_filename,
       return std::string();
   }
 
-  if (!boost::filesystem::exists(path))
+  if (!exists(path))
   {
     ignerr << "File or path does not exist[" << path << "]\n";
     return std::string();

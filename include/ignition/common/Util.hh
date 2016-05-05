@@ -160,6 +160,17 @@ namespace ignition
     IGNITION_COMMON_VISIBLE
     bool isFile(const std::string &_path);
 
+    /// \brief Returns true if _path is a file or directory
+    /// \param[in] _path Path to check.
+    /// \return true if _path is a file or directory
+    IGNITION_COMMON_VISIBLE
+    bool exists(const std::string &_path);
+
+    /// \brief Get the current working directory
+    /// \return Name of the current directory
+    IGNITION_COMMON_VISIBLE
+    std::string cwd();
+
     /// \brief Remove a directory.
     /// \param[in] _path Path to a directory.
     /// \return True if _path is a directory and was removed.

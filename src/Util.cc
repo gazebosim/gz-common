@@ -16,12 +16,14 @@
 */
 #ifndef _WIN32
 #include <dirent.h>
+#include <limits.h>
+#include <climits>
 #else
 #include "ignition/common/win_dirent.h"
+#include <io.h>
 #endif
 
 #include <sys/types.h>
-#include <sys/stat.h>
 #include <sys/stat.h>
 #include <iomanip>
 #include <array>
@@ -35,6 +37,16 @@
 #include <ignition/common/Uuid.hh>
 
 #define LEFT_ROTATE(x, n) (((x) << (n)) ^ ((x) >> (32-(n))))
+
+#ifdef _WIN32
+# define IGN_PATH_MAX _MAX_PATH
+#elif defined(PATH_MAX)
+# define IGN_PATH_MAX PATH_MAX
+#elif defined(_XOPEN_PATH_MAX)
+# define IGN_PATH_MAX _XOPEN_PATH_MAX
+#else
+# define IGN_PATH_MAX _POSIX_PATH_MAX
+#endif
 
 /////////////////////////////////////////////////
 // Internal class for SHA1 computation
@@ -373,7 +385,26 @@ bool ignition::common::removeAll(const std::string &_path)
         ignition::common::removeAll(_path + "/" + p->d_name);
       }
     }
+    closedir(dir);
   }
 
   ignition::common::removeDirectoryOrFile(_path);
+}
+
+/////////////////////////////////////////////////
+bool ignition::common::exists(const std::string &_path)
+{
+  return ignition::common::isFile(_path) ||
+         ignition::common::isDirectory(_path);
+}
+
+/////////////////////////////////////////////////
+std::string ignition::common::cwd()
+{
+  char buf[IGN_PATH_MAX + 1] = {'\0'};
+#ifdef WINDOWS
+  return _getcwd(buf, sizeof(buf)) == nullptr ? "" : buf;
+#else
+  return getcwd(buf, sizeof(buf)) == nullptr ? "" : buf;
+#endif
 }
