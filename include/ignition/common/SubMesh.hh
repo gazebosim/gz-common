@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _IGNITION_SUBMESH_HH_
-#define _IGNITION_SUBMESH_HH_
+#ifndef IGNITION_COMMON_SUBMESH_HH_
+#define IGNITION_COMMON_SUBMESH_HH_
 
 #include <vector>
 #include <string>
@@ -24,6 +24,7 @@
 #include <ignition/math/Vector2.hh>
 
 #include <ignition/common/CommonTypes.hh>
+#include <ignition/common/System.hh>
 
 namespace ignition
 {

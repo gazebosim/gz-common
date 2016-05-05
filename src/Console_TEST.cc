@@ -50,7 +50,7 @@ std::string GetLogContent(const std::string &_filename)
 /// \brief Test Console::Init and Console::Log
 TEST(Console_TEST, NoInitAndLog)
 {
-  std::cout << "(" << ignition::common::SystemTimeISO() << ")\n";
+  std::cout << "(" << ignition::common::systemTimeISO() << ")\n";
 
   // Log the string
   std::string logString = "this is a test";

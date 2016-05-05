@@ -1,5 +1,6 @@
 include (${project_cmake_dir}/Utils.cmake)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}
+                    ${tinyxml2_INCLUDE_DIRS})
 
 set (sources
   Animation.cc
@@ -20,9 +21,12 @@ set (sources
   SubMesh.cc
   Time.cc
   Timer.cc
-  tinyxml2.cpp
   Util.cc
 )
+
+if (NOT USE_EXTERNAL_TINYXML2)
+    list (APPEND sources ${CMAKE_SOURCE_DIR}/src/tinyxml2/ignition/tinyxml2.cpp)
+endif()
 
 set (gtest_sources
   Animation_TEST.cc

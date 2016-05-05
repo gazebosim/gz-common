@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _IGNTION_COMMON_CONSOLE_HH_
-#define _IGNTION_COMMON_CONSOLE_HH_
+#ifndef IGNTION_COMMON_CONSOLE_HH_
+#define IGNTION_COMMON_CONSOLE_HH_
 
 #include <iostream>
 #include <fstream>
@@ -24,6 +23,7 @@
 #include <string>
 
 #include <ignition/common/Util.hh>
+#include <ignition/common/System.hh>
 
 namespace ignition
 {

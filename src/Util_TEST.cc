@@ -27,7 +27,7 @@ using namespace ignition;
 
 /////////////////////////////////////////////////
 /// \brief Test Util::GetSHA1
-/*TEST(Util_TEST, GetSHA1)
+TEST(Util_TEST, GetSHA1)
 {
   // Do not forget to update 'precomputedSHA1' if you modify the SHA1 input.
   std::string precomputedSHA1;
@@ -39,7 +39,7 @@ using namespace ignition;
   for (int i = 0; i < 100; ++i)
     v.push_back(i);
 
-  computedSHA1 = common::getSha1<std::vector<float> >(v);
+  computedSHA1 = common::sha1<std::vector<float> >(v);
   precomputedSHA1 = "913283ec8502ba1423d38a7ea62cb8e492e87b23";
   EXPECT_EQ(precomputedSHA1, computedSHA1);
 
@@ -48,13 +48,13 @@ using namespace ignition;
       " built a time machine... out of a DeLorean?\n"
       "Dr. Emmett Brown: The way I see it, if you're gonna build a time"
       " machine into a car, why not do it with some style?";
-  computedSHA1 = common::getSha1<std::string>(s);
+  computedSHA1 = common::sha1<std::string>(s);
   precomputedSHA1 = "a370ddc4d61d936b2bb40f98bae061dc15fd8923";
   EXPECT_EQ(precomputedSHA1, computedSHA1);
 
   // Compute the SHA1 of an empty string
   s = "";
-  computedSHA1 = common::getSha1<std::string>(s);
+  computedSHA1 = common::sha1<std::string>(s);
   precomputedSHA1 = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
   EXPECT_EQ(precomputedSHA1, computedSHA1);
 
@@ -63,10 +63,10 @@ using namespace ignition;
   {
     std::stringstream stream;
     stream << i << '\n';
-    std::string sha = common::getSha1<std::string>(stream.str());
+    std::string sha = common::sha1<std::string>(stream.str());
     EXPECT_EQ(sha.length(), 40u);
   }
-}*/
+}
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

@@ -14,12 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef _IGNITION_COMMON_TIME_HH_
-#define _IGNITION_COMMON_TIME_HH_
+#ifndef IGNITION_COMMON_TIME_HH_
+#define IGNITION_COMMON_TIME_HH_
 
 #include <string>
 #include <iostream>
 
+#include <ignition/common/System.hh>
 #include <ignition/common/Util.hh>
 
 namespace ignition

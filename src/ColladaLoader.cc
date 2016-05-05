@@ -15,21 +15,21 @@
  *
  */
 
-
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include <math.h>
+#include <ignition/tinyxml2.h>
+
 #include <sstream>
 #include <unordered_map>
+#include <map>
+#include <vector>
 
-#include "ignition/math/Helpers.hh"
-#include "ignition/math/Angle.hh"
-#include "ignition/math/Vector2.hh"
-#include "ignition/math/Vector3.hh"
-#include "ignition/math/Matrix4.hh"
-#include "ignition/math/Quaternion.hh"
-#include "ignition/common/tinyxml2.h"
+#include <ignition/math/Helpers.hh>
+#include <ignition/math/Matrix4.hh>
+#include <ignition/math/Vector2.hh>
+#include <ignition/math/Vector3.hh>
+
 #include "ignition/common/CommonTypes.hh"
 #include "ignition/common/Console.hh"
 #include "ignition/common/Material.hh"
@@ -39,12 +39,262 @@
 #include "ignition/common/SkeletonAnimation.hh"
 #include "ignition/common/SystemPaths.hh"
 #include "ignition/common/Exception.hh"
-#include "ignition/common/ColladaLoaderPrivate.hh"
 #include "ignition/common/ColladaLoader.hh"
 
 using namespace ignition;
 using namespace common;
+using RawNodeAnim = std::map<double, std::vector<NodeTransform> >;
+using RawSkeletonAnim = std::map<std::string, RawNodeAnim>;
 
+namespace ignition
+{
+  namespace common
+  {
+    /// \brief Private data for the ColladaLoader class
+    class  ColladaLoaderPrivate
+    {
+      /// \brief scaling factor
+      public: double meter;
+
+      /// \brief COLLADA file name
+      public: std::string filename;
+
+      /// \brief material dictionary indexed by name
+      public: std::map<std::string, std::string> materialMap;
+
+      /// \brief root xml element of COLLADA data
+      public: tinyxml2::XMLElement *colladaXml;
+
+      /// \brief directory of COLLADA file name
+      public: std::string path;
+
+      /// \brief Name of the current node.
+      public: std::string currentNodeName;
+
+      /// \brief Map of collada POSITION ids to list of vectors.
+      public: std::map<std::string,
+              std::vector<ignition::math::Vector3d> > positionIds;
+
+      /// \brief Map of collada NORMAL ids to list of normals.
+      public: std::map<std::string,
+              std::vector<ignition::math::Vector3d> > normalIds;
+
+      /// \brief Map of collada TEXCOORD ids to list of texture coordinates.
+      public: std::map<std::string,
+              std::vector<ignition::math::Vector2d> >texcoordIds;
+
+      /// \brief Map of collada Material ids to Gazebo materials.
+      public: std::map<std::string, MaterialPtr> materialIds;
+
+      /// \brief Map of collada POSITION ids to a map of
+      /// duplicate positions.
+      public: std::map<std::string, std::map<unsigned int, unsigned int> >
+          positionDuplicateMap;
+
+      /// \brief Map of collada NORMAL ids to a map of
+      /// duplicate normals.
+      public: std::map<std::string, std::map<unsigned int, unsigned int> >
+          normalDuplicateMap;
+
+      /// \brief Map of collada TEXCOORD ids to a map of
+      /// duplicate texture coordinates.
+      public: std::map<std::string, std::map<unsigned int, unsigned int> >
+          texcoordDuplicateMap;
+
+      /// \brief Load a controller instance
+      /// \param[in] _contrXml Pointer to the control XML instance
+      /// \param[in] _skelXml Pointer the skeleton xml instance
+      /// \param[in] _transform A tranform to apply
+      /// \param[in,out] _mesh The mesh being loaded
+      public: void LoadController(tinyxml2::XMLElement *_contrXml,
+                                   tinyxml2::XMLElement *_skelXml,
+                                   const ignition::math::Matrix4d &_transform,
+                                   Mesh *_mesh);
+
+      /// \brief Load animations for a skeleton
+      /// \param[in] _xml Animation XML instance
+      /// \param[in,out] _skel Pointer to the skeleton
+      public: void LoadAnimations(tinyxml2::XMLElement *_xml,
+                                   SkeletonPtr _skel);
+
+      /// \brief Load a set of animations for a skeleton
+      /// \param[in] _xml Pointer to the animation set XML instance
+      /// \param[in,out] _skel Pointer to the skeleton
+      public: void LoadAnimationSet(tinyxml2::XMLElement *_xml,
+                                     SkeletonPtr _skel);
+
+      /// \brief Load skeleton nodes
+      /// \param[in] _xml Pointer to the XML instance
+      /// \param[in,out] _parent Pointer to the Skeleton node parent
+      public: SkeletonNode *LoadSkeletonNodes(tinyxml2::XMLElement *_xml,
+                                               SkeletonNode *_parent);
+
+      /// \brief Set the tranform for a skeleton node
+      /// \param[in] _elem Pointer to the XML instance
+      /// \param[in,out] _node The skeleton node
+      public: void SetSkeletonNodeTransform(tinyxml2::XMLElement *_elem,
+                                             SkeletonNode *_node);
+
+      /// \brief Load geometry elements
+      /// \param[in] _xml Pointer to the XML instance
+      /// \param[in] _tranform Transform to apply to the loaded geometry
+      /// \param[in,out] _mesh Pointer to the mesh currently being loaded
+      public: void LoadGeometry(tinyxml2::XMLElement *_xml,
+                                 const ignition::math::Matrix4d &_transform,
+                                 Mesh *_mesh);
+
+      /// \brief Get an XML element by ID
+      /// \param[in] _parent The parent element
+      /// \param[in] _name String name of the element
+      /// \param[in] _id String ID of the element
+      ///\ return XML element with the specified ID
+      public: tinyxml2::XMLElement *ElementId(tinyxml2::XMLElement *_parent,
+                                               const std::string &_name,
+                                               const std::string &_id);
+
+      /// \brief Get an XML element by ID
+      /// \param[in] _name String name of the element
+      /// \param[in] _id String ID of the element
+      ///\ return XML element with the specified ID
+      public: tinyxml2::XMLElement *ElementId(const std::string &_name,
+                                               const std::string &_id);
+
+      /// \brief Load a node
+      /// \param[in] _elem Pointer to the node XML instance
+      /// \param[in,out] _mesh Pointer to the current mesh
+      /// \param[in] _transform Transform to apply to the node
+      public: void LoadNode(tinyxml2::XMLElement *_elem,
+                             Mesh *_mesh,
+                             const ignition::math::Matrix4d &_transform);
+
+      /// \brief Load a transform
+      /// \param[in] _elem Pointer to the transform XML instance
+      /// \return A Matrix4 transform
+      public: ignition::math::Matrix4d LoadNodeTransform(
+          tinyxml2::XMLElement *_elem);
+
+      /// \brief Load vertices
+      /// \param[in] _id String id of the vertices XML node
+      /// \param[in] _transform Transform to apply to all vertices
+      /// \param[out] _verts Holds the resulting vertices
+      /// \param[out] _norms Holds the resulting normals
+      public: void LoadVertices(const std::string &_id,
+          const ignition::math::Matrix4d &_transform,
+          std::vector<ignition::math::Vector3d> &_verts,
+          std::vector<ignition::math::Vector3d> &_norms);
+
+      /// \brief Load vertices
+      /// \param[in] _id String id of the vertices XML node
+      /// \param[in] _transform Transform to apply to all vertices
+      /// \param[out] _verts Holds the resulting vertices
+      /// \param[out] _norms Holds the resulting normals
+      /// \param[out] _vertDup Holds a map of duplicate position indices
+      /// \param[out] _normDup Holds a map of duplicate normal indices
+      public: void LoadVertices(const std::string &_id,
+                                 const ignition::math::Matrix4d &_transform,
+                                 std::vector<ignition::math::Vector3d> &_verts,
+                                 std::vector<ignition::math::Vector3d> &_norms,
+                                 std::map<unsigned int, unsigned int> &_vertDup,
+                                std::map<unsigned int, unsigned int> &_normDup);
+
+      /// \brief Load positions
+      /// \param[in] _id String id of the XML node
+      /// \param[in] _transform Transform to apply to all positions
+      /// \param[out] _values Holds the resulting position values
+      /// \param[out] _duplicates Holds a map of duplicate position indices
+      public: void LoadPositions(const std::string &_id,
+                                  const ignition::math::Matrix4d &_transform,
+                                 std::vector<ignition::math::Vector3d> &_values,
+                             std::map<unsigned int, unsigned int> &_duplicates);
+
+      /// \brief Load normals
+      /// \param[in] _id String id of the XML node
+      /// \param[in] _transform Transform to apply to all normals
+      /// \param[out] _values Holds the resulting normal values
+      /// \param[out] _duplicates Holds a map of duplicate normal indices
+      public: void LoadNormals(const std::string &_id,
+                                const ignition::math::Matrix4d &_transform,
+                                std::vector<ignition::math::Vector3d> &_values,
+                             std::map<unsigned int, unsigned int> &_duplicates);
+
+      /// \brief Load texture coordinates
+      /// \param[in] _id String id of the XML node
+      /// \param[out] _values Holds the resulting uv values
+      /// \param[out] _duplicates Holds a map of duplicate uv indices
+      public: void LoadTexCoords(const std::string &_id,
+                                 std::vector<ignition::math::Vector2d> &_values,
+                             std::map<unsigned int, unsigned int> &_duplicates);
+
+      /// \brief Load a material
+      /// \param _name Name of the material XML element
+      /// \return A pointer to the new material
+      public: MaterialPtr LoadMaterial(const std::string &_name);
+
+      /// \brief Load a color or texture
+      /// \param[in] _elem Pointer to the XML element
+      /// \param[in] _type One of {diffuse, ambient, emission}
+      /// \param[out] _mat Material to load the texture or color into
+      public: void LoadColorOrTexture(tinyxml2::XMLElement *_elem,
+                                       const std::string &_type,
+                                       MaterialPtr _mat);
+
+      /// \brief Load triangles
+      /// \param[in] _trianglesXml Pointer the triangles XML instance
+      /// \param[in] _transform Transform to apply to all triangles
+      /// \param[out] _mesh Mesh that is currently being loaded
+      public: void LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
+                                  const ignition::math::Matrix4d &_transform,
+                                  Mesh *_mesh);
+
+      /// \brief Load a polygon list
+      /// \param[in] _polylistXml Pointer to the XML element
+      /// \param[in] _transform Transform to apply to each polygon
+      /// \param[out] _mesh Mesh that is currently being loaded
+      public: void LoadPolylist(tinyxml2::XMLElement *_polylistXml,
+                                   const ignition::math::Matrix4d &_transform,
+                                   Mesh *_mesh);
+
+      /// \brief Load lines
+      /// \param[in] _xml Pointer to the XML element
+      /// \param[in] _transform Transform to apply
+      /// \param[out] _mesh Mesh that is currently being loaded
+      public: void LoadLines(tinyxml2::XMLElement *_xml,
+                              const ignition::math::Matrix4d &_transform,
+                              Mesh *_mesh);
+
+      /// \brief Load an entire scene
+      /// \param[out] _mesh Mesh that is currently being loaded
+      public: void LoadScene(Mesh *_mesh);
+
+      /// \brief Load a float value
+      /// \param[out] _elem Pointer to the XML element
+      /// \return The float value
+      public: float LoadFloat(tinyxml2::XMLElement *_elem);
+
+      /// \brief Load a transparent material. NOT FULLY IMPLEMENTED
+      /// \param[in] _elem Pointer to the XML element
+      /// \param[out] _mat Material to hold the transparent properties
+      public: void LoadTransparent(tinyxml2::XMLElement *_elem,
+                                    MaterialPtr _mat);
+    };
+
+    /// \brief Helper data structure for loading collada geometries.
+    class GeometryIndices
+    {
+      /// \brief Index of a vertex in the collada <p> element
+      public: unsigned int vertexIndex;
+
+      /// \brief Index of a normal in the collada <p> element
+      public: unsigned int normalIndex;
+
+      /// \brief Index of a texture coordinate in the collada <p> element
+      public: unsigned int texcoordIndex;
+
+      /// \brief Index of a vertex in the Gazebo mesh
+      public: unsigned int mappedIndex;
+    };
+  }
+}
 
 /////////////////////////////////////////////////
 void hash_combine(std::size_t &_seed, const double &_v)
@@ -141,7 +391,7 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
   Mesh *mesh = new Mesh();
   mesh->SetPath(this->dataPtr->path);
 
-  this->LoadScene(mesh);
+  this->dataPtr->LoadScene(mesh);
 
   // This will make the model the correct size.
   mesh->Scale(ignition::math::Vector3d(
@@ -151,9 +401,9 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::LoadScene(Mesh *_mesh)
+void ColladaLoaderPrivate::LoadScene(Mesh *_mesh)
 {
-  auto *sceneXml = this->dataPtr->colladaXml->FirstChildElement("scene");
+  auto *sceneXml = this->colladaXml->FirstChildElement("scene");
   std::string sceneURL =
       sceneXml->FirstChildElement("instance_visual_scene")->Attribute("url");
 
@@ -174,7 +424,7 @@ void ColladaLoader::LoadScene(Mesh *_mesh)
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::LoadNode(tinyxml2::XMLElement *_elem, Mesh *_mesh,
+void ColladaLoaderPrivate::LoadNode(tinyxml2::XMLElement *_elem, Mesh *_mesh,
     const ignition::math::Matrix4d &_transform)
 {
   tinyxml2::XMLElement *nodeXml;
@@ -185,7 +435,7 @@ void ColladaLoader::LoadNode(tinyxml2::XMLElement *_elem, Mesh *_mesh,
 
   if (_elem->Attribute("name"))
   {
-    this->dataPtr->currentNodeName = _elem->Attribute("name");
+    this->currentNodeName = _elem->Attribute("name");
   }
 
   nodeXml = _elem->FirstChildElement("node");
@@ -218,7 +468,7 @@ void ColladaLoader::LoadNode(tinyxml2::XMLElement *_elem, Mesh *_mesh,
     std::string geomURL = instGeomXml->Attribute("url");
     tinyxml2::XMLElement *geomXml = this->ElementId("geometry", geomURL);
 
-    this->dataPtr->materialMap.clear();
+    this->materialMap.clear();
     tinyxml2::XMLElement *bindMatXml, *techniqueXml, *matXml;
     bindMatXml = instGeomXml->FirstChildElement("bind_material");
     while (bindMatXml)
@@ -230,7 +480,7 @@ void ColladaLoader::LoadNode(tinyxml2::XMLElement *_elem, Mesh *_mesh,
         {
           std::string symbol = matXml->Attribute("symbol");
           std::string target = matXml->Attribute("target");
-          this->dataPtr->materialMap[symbol] = target;
+          this->materialMap[symbol] = target;
           matXml = matXml->NextSiblingElement("instance_material");
         }
       }
@@ -253,7 +503,7 @@ void ColladaLoader::LoadNode(tinyxml2::XMLElement *_elem, Mesh *_mesh,
     std::string rootURL = instSkelXml->GetText();
     tinyxml2::XMLElement *rootNodeXml = this->ElementId("node", rootURL);
 
-    this->dataPtr->materialMap.clear();
+    this->materialMap.clear();
     tinyxml2::XMLElement *bindMatXml, *techniqueXml, *matXml;
     bindMatXml = instContrXml->FirstChildElement("bind_material");
     while (bindMatXml)
@@ -265,7 +515,7 @@ void ColladaLoader::LoadNode(tinyxml2::XMLElement *_elem, Mesh *_mesh,
         {
           std::string symbol = matXml->Attribute("symbol");
           std::string target = matXml->Attribute("target");
-          this->dataPtr->materialMap[symbol] = target;
+          this->materialMap[symbol] = target;
           matXml = matXml->NextSiblingElement("instance_material");
         }
       }
@@ -278,7 +528,7 @@ void ColladaLoader::LoadNode(tinyxml2::XMLElement *_elem, Mesh *_mesh,
 }
 
 /////////////////////////////////////////////////
-ignition::math::Matrix4d ColladaLoader::LoadNodeTransform(
+ignition::math::Matrix4d ColladaLoaderPrivate::LoadNodeTransform(
     tinyxml2::XMLElement *_elem)
 {
   ignition::math::Matrix4d transform(ignition::math::Matrix4d::Identity);
@@ -302,7 +552,7 @@ ignition::math::Matrix4d ColladaLoader::LoadNodeTransform(
       std::string transStr = _elem->FirstChildElement("translate")->GetText();
       ignition::math::Vector3d translate;
       translate = boost::lexical_cast<ignition::math::Vector3d>(transStr);
-      // translate *= this->dataPtr->meter;
+      // translate *= this->meter;
       transform.Translate(translate);
     }
 
@@ -342,7 +592,7 @@ ignition::math::Matrix4d ColladaLoader::LoadNodeTransform(
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::LoadController(tinyxml2::XMLElement *_contrXml,
+void ColladaLoaderPrivate::LoadController(tinyxml2::XMLElement *_contrXml,
     tinyxml2::XMLElement *_skelXml, const ignition::math::Matrix4d &_transform,
     Mesh *_mesh)
 {
@@ -512,7 +762,7 @@ void ColladaLoader::LoadController(tinyxml2::XMLElement *_contrXml,
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::LoadAnimations(tinyxml2::XMLElement *_xml,
+void ColladaLoaderPrivate::LoadAnimations(tinyxml2::XMLElement *_xml,
     SkeletonPtr _skel)
 {
   tinyxml2::XMLElement *childXml = _xml->FirstChildElement("animation");
@@ -529,7 +779,7 @@ void ColladaLoader::LoadAnimations(tinyxml2::XMLElement *_xml,
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::LoadAnimationSet(tinyxml2::XMLElement *_xml,
+void ColladaLoaderPrivate::LoadAnimationSet(tinyxml2::XMLElement *_xml,
     SkeletonPtr _skel)
 {
   std::stringstream animName;
@@ -694,8 +944,8 @@ void ColladaLoader::LoadAnimationSet(tinyxml2::XMLElement *_xml,
 }
 
 /////////////////////////////////////////////////
-SkeletonNode* ColladaLoader::LoadSkeletonNodes(tinyxml2::XMLElement *_xml,
-      SkeletonNode *_parent)
+SkeletonNode *ColladaLoaderPrivate::LoadSkeletonNodes(
+    tinyxml2::XMLElement *_xml, SkeletonNode *_parent)
 {
   std::string name;
   if (_xml->Attribute("sid"))
@@ -720,7 +970,7 @@ SkeletonNode* ColladaLoader::LoadSkeletonNodes(tinyxml2::XMLElement *_xml,
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::SetSkeletonNodeTransform(tinyxml2::XMLElement *_elem,
+void ColladaLoaderPrivate::SetSkeletonNodeTransform(tinyxml2::XMLElement *_elem,
       SkeletonNode *_node)
 {
   ignition::math::Matrix4d transform(ignition::math::Matrix4d::Identity);
@@ -750,7 +1000,7 @@ void ColladaLoader::SetSkeletonNodeTransform(tinyxml2::XMLElement *_elem,
       std::string transStr = _elem->FirstChildElement("translate")->GetText();
       ignition::math::Vector3d translate;
       translate = boost::lexical_cast<ignition::math::Vector3d>(transStr);
-      // translate *= this->dataPtr->meter;
+      // translate *= this->meter;
       transform.Translate(translate);
 
       NodeTransform nt(transform);
@@ -812,7 +1062,7 @@ void ColladaLoader::SetSkeletonNodeTransform(tinyxml2::XMLElement *_elem,
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::LoadGeometry(tinyxml2::XMLElement *_xml,
+void ColladaLoaderPrivate::LoadGeometry(tinyxml2::XMLElement *_xml,
     const ignition::math::Matrix4d &_transform, Mesh *_mesh)
 {
   tinyxml2::XMLElement *meshXml = _xml->FirstChildElement("mesh");
@@ -844,14 +1094,15 @@ void ColladaLoader::LoadGeometry(tinyxml2::XMLElement *_xml,
 }
 
 /////////////////////////////////////////////////
-tinyxml2::XMLElement *ColladaLoader::ElementId(const std::string &_name,
+tinyxml2::XMLElement *ColladaLoaderPrivate::ElementId(const std::string &_name,
     const std::string &_id)
 {
-  return this->ElementId(this->dataPtr->colladaXml, _name, _id);
+  return this->ElementId(this->colladaXml, _name, _id);
 }
 
 /////////////////////////////////////////////////
-tinyxml2::XMLElement *ColladaLoader::ElementId(tinyxml2::XMLElement *_parent,
+tinyxml2::XMLElement *ColladaLoaderPrivate::ElementId(
+    tinyxml2::XMLElement *_parent,
     const std::string &_name, const std::string &_id)
 {
   std::string id = _id;
@@ -881,7 +1132,7 @@ tinyxml2::XMLElement *ColladaLoader::ElementId(tinyxml2::XMLElement *_parent,
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::LoadVertices(const std::string &_id,
+void ColladaLoaderPrivate::LoadVertices(const std::string &_id,
     const ignition::math::Matrix4d &_transform,
     std::vector<ignition::math::Vector3d> &_verts,
     std::vector<ignition::math::Vector3d> &_norms)
@@ -892,14 +1143,14 @@ void ColladaLoader::LoadVertices(const std::string &_id,
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::LoadVertices(const std::string &_id,
+void ColladaLoaderPrivate::LoadVertices(const std::string &_id,
     const ignition::math::Matrix4d &_transform,
     std::vector<ignition::math::Vector3d> &_verts,
     std::vector<ignition::math::Vector3d> &_norms,
     std::map<unsigned int, unsigned int> &_vertDups,
     std::map<unsigned int, unsigned int> &_normDups)
 {
-  tinyxml2::XMLElement *verticesXml = this->ElementId(this->dataPtr->colladaXml,
+  tinyxml2::XMLElement *verticesXml = this->ElementId(this->colladaXml,
       "vertices", _id);
 
   if (!verticesXml)
@@ -927,15 +1178,15 @@ void ColladaLoader::LoadVertices(const std::string &_id,
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::LoadPositions(const std::string &_id,
+void ColladaLoaderPrivate::LoadPositions(const std::string &_id,
     const ignition::math::Matrix4d &_transform,
     std::vector<ignition::math::Vector3d> &_values,
     std::map<unsigned int, unsigned int> &_duplicates)
 {
-  if (this->dataPtr->positionIds.find(_id) != this->dataPtr->positionIds.end())
+  if (this->positionIds.find(_id) != this->positionIds.end())
   {
-    _values = this->dataPtr->positionIds[_id];
-    _duplicates = this->dataPtr->positionDuplicateMap[_id];
+    _values = this->positionIds[_id];
+    _duplicates = this->positionDuplicateMap[_id];
     return;
   }
 
@@ -1002,20 +1253,20 @@ void ColladaLoader::LoadPositions(const std::string &_id,
       unique[vec] = _values.size()-1;
   }
 
-  this->dataPtr->positionDuplicateMap[_id] = _duplicates;
-  this->dataPtr->positionIds[_id] = _values;
+  this->positionDuplicateMap[_id] = _duplicates;
+  this->positionIds[_id] = _values;
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::LoadNormals(const std::string &_id,
+void ColladaLoaderPrivate::LoadNormals(const std::string &_id,
     const ignition::math::Matrix4d &_transform,
     std::vector<ignition::math::Vector3d> &_values,
     std::map<unsigned int, unsigned int> &_duplicates)
 {
-  if (this->dataPtr->normalIds.find(_id) != this->dataPtr->normalIds.end())
+  if (this->normalIds.find(_id) != this->normalIds.end())
   {
-    _values = this->dataPtr->normalIds[_id];
-    _duplicates = this->dataPtr->normalDuplicateMap[_id];
+    _values = this->normalIds[_id];
+    _duplicates = this->normalDuplicateMap[_id];
     return;
   }
 
@@ -1083,19 +1334,19 @@ void ColladaLoader::LoadNormals(const std::string &_id,
     }
   } while (iss);
 
-  this->dataPtr->normalDuplicateMap[_id] = _duplicates;
-  this->dataPtr->normalIds[_id] = _values;
+  this->normalDuplicateMap[_id] = _duplicates;
+  this->normalIds[_id] = _values;
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::LoadTexCoords(const std::string &_id,
+void ColladaLoaderPrivate::LoadTexCoords(const std::string &_id,
     std::vector<ignition::math::Vector2d> &_values,
     std::map<unsigned int, unsigned int> &_duplicates)
 {
-  if (this->dataPtr->texcoordIds.find(_id) != this->dataPtr->texcoordIds.end())
+  if (this->texcoordIds.find(_id) != this->texcoordIds.end())
   {
-    _values = this->dataPtr->texcoordIds[_id];
-    _duplicates = this->dataPtr->texcoordDuplicateMap[_id];
+    _values = this->texcoordIds[_id];
+    _duplicates = this->texcoordDuplicateMap[_id];
     return;
   }
 
@@ -1235,17 +1486,17 @@ void ColladaLoader::LoadTexCoords(const std::string &_id,
       unique[vec] = _values.size()-1;
   }
 
-  this->dataPtr->texcoordDuplicateMap[_id] = _duplicates;
-  this->dataPtr->texcoordIds[_id] = _values;
+  this->texcoordDuplicateMap[_id] = _duplicates;
+  this->texcoordIds[_id] = _values;
 }
 
 /////////////////////////////////////////////////
-MaterialPtr ColladaLoader::LoadMaterial(const std::string &_name)
+MaterialPtr ColladaLoaderPrivate::LoadMaterial(const std::string &_name)
 {
-  if (this->dataPtr->materialIds.find(_name)
-      != this->dataPtr->materialIds.end())
+  if (this->materialIds.find(_name)
+      != this->materialIds.end())
   {
-    return this->dataPtr->materialIds[_name];
+    return this->materialIds[_name];
   }
 
   tinyxml2::XMLElement *matXml = this->ElementId("material", _name);
@@ -1336,13 +1587,13 @@ MaterialPtr ColladaLoader::LoadMaterial(const std::string &_name)
   if (cgXml)
     ignerr << "profile_CG unsupported\n";
 
-  this->dataPtr->materialIds[_name] = mat;
+  this->materialIds[_name] = mat;
 
   return mat;
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::LoadColorOrTexture(tinyxml2::XMLElement *_elem,
+void ColladaLoaderPrivate::LoadColorOrTexture(tinyxml2::XMLElement *_elem,
     const std::string &_type, MaterialPtr _mat)
 {
   if (!_elem || !_elem->FirstChildElement(_type.c_str()))
@@ -1408,13 +1659,13 @@ void ColladaLoader::LoadColorOrTexture(tinyxml2::XMLElement *_elem,
     {
       std::string imgFile =
         imageXml->FirstChildElement("init_from")->GetText();
-      _mat->SetTextureImage(imgFile, this->dataPtr->path);
+      _mat->SetTextureImage(imgFile, this->path);
     }
   }
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
+void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
     const ignition::math::Matrix4d &_transform,
     Mesh *_mesh)
 {
@@ -1423,7 +1674,7 @@ void ColladaLoader::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
   // each polylist polygon is convex, and we do decomposion
   // by anchoring each triangle about vertex 0 or each polygon
   SubMeshPtr subMesh(new SubMesh());
-  subMesh->SetName(this->dataPtr->currentNodeName);
+  subMesh->SetName(this->currentNodeName);
   bool combinedVertNorms = false;
 
   subMesh->SetPrimitiveType(SubMesh::TRIANGLES);
@@ -1434,8 +1685,8 @@ void ColladaLoader::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
     std::string matStr = _polylistXml->Attribute("material");
 
     int matIndex = -1;
-    iter = this->dataPtr->materialMap.find(matStr);
-    if (iter != this->dataPtr->materialMap.end())
+    iter = this->materialMap.find(matStr);
+    if (iter != this->materialMap.end())
       matStr = iter->second;
 
     MaterialPtr mat = this->LoadMaterial(matStr);
@@ -1719,12 +1970,11 @@ void ColladaLoader::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
-                                  const ignition::math::Matrix4d &_transform,
-                                  Mesh *_mesh)
+void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
+    const ignition::math::Matrix4d &_transform, Mesh *_mesh)
 {
   SubMeshPtr subMesh(new SubMesh);
-  subMesh->SetName(this->dataPtr->currentNodeName);
+  subMesh->SetName(this->currentNodeName);
   bool combinedVertNorms = false;
 
   subMesh->SetPrimitiveType(SubMesh::TRIANGLES);
@@ -1735,8 +1985,8 @@ void ColladaLoader::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
     std::string matStr = _trianglesXml->Attribute("material");
 
     int matIndex = -1;
-    iter = this->dataPtr->materialMap.find(matStr);
-    if (iter != this->dataPtr->materialMap.end())
+    iter = this->materialMap.find(matStr);
+    if (iter != this->materialMap.end())
       matStr = iter->second;
 
     MaterialPtr mat = this->LoadMaterial(matStr);
@@ -1831,7 +2081,7 @@ void ColladaLoader::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
     // should not output an error message
     if (count)
     {
-      ignerr << "Collada file[" << this->dataPtr->filename
+      ignerr << "Collada file[" << this->filename
         << "] is invalid. Loading what we can...\n";
     }
     else
@@ -1997,11 +2247,11 @@ void ColladaLoader::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::LoadLines(tinyxml2::XMLElement *_xml,
+void ColladaLoaderPrivate::LoadLines(tinyxml2::XMLElement *_xml,
     const ignition::math::Matrix4d &_transform, Mesh *_mesh)
 {
   SubMeshPtr subMesh(new SubMesh);
-  subMesh->SetName(this->dataPtr->currentNodeName);
+  subMesh->SetName(this->currentNodeName);
   subMesh->SetPrimitiveType(SubMesh::LINES);
 
   tinyxml2::XMLElement *inputXml = _xml->FirstChildElement("input");
@@ -2033,7 +2283,7 @@ void ColladaLoader::LoadLines(tinyxml2::XMLElement *_xml,
 }
 
 /////////////////////////////////////////////////
-float ColladaLoader::LoadFloat(tinyxml2::XMLElement *_elem)
+float ColladaLoaderPrivate::LoadFloat(tinyxml2::XMLElement *_elem)
 {
   float value = 0;
 
@@ -2047,7 +2297,7 @@ float ColladaLoader::LoadFloat(tinyxml2::XMLElement *_elem)
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::LoadTransparent(tinyxml2::XMLElement *_elem,
+void ColladaLoaderPrivate::LoadTransparent(tinyxml2::XMLElement *_elem,
     MaterialPtr _mat)
 {
   const char *opaqueCStr = _elem->Attribute("opaque");

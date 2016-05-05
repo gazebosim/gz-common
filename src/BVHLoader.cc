@@ -239,7 +239,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, const double _scale)
               {
                 zAngle = IGN_DTOR(value);
                 mats.push_back(math::Matrix4d(
-		          math::Quaterniond(zAxis, zAngle)));
+                      math::Quaterniond(zAxis, zAngle)));
               }
               else
               {

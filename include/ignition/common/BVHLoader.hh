@@ -14,15 +14,15 @@
  * limitations under the License.
  *
 */
-#ifndef _IGNITION_COMMON_BVHLOADER_HH_
-#define _IGNITION_COMMON_BVHLOADER_HH_
+#ifndef IGNITION_COMMON_BVHLOADER_HH_
+#define IGNITION_COMMON_BVHLOADER_HH_
 
 #include <vector>
 #include <map>
 #include <string>
 
 #include <ignition/math/Pose3.hh>
-#include <ignition/common/Util.hh>
+#include <ignition/common/System.hh>
 
 namespace ignition
 {

@@ -14,12 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef _IGNITION_COMMON_KEYFRAME_HH_
-#define _IGNITION_COMMON_KEYFRAME_HH_
+#ifndef IGNITION_COMMON_KEYFRAME_HH_
+#define IGNITION_COMMON_KEYFRAME_HH_
 
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Quaternion.hh>
-#include <ignition/common/Util.hh>
+#include <ignition/common/System.hh>
 
 namespace ignition
 {

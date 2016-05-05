@@ -14,11 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef _IGNITION_COMMON_IMAGE_HH_
-#define _IGNITION_COMMON_IMAGE_HH_
+#ifndef IGNITION_COMMON_IMAGE_HH_
+#define IGNITION_COMMON_IMAGE_HH_
 
 #include <string>
 #include <ignition/common/Color.hh>
+#include <ignition/common/System.hh>
 
 struct FIBITMAP;
 

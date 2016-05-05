@@ -17,13 +17,12 @@
 #ifndef IGNITION_COMMON_UTIL_HH_
 #define IGNITION_COMMON_UTIL_HH_
 
-#include <boost/uuid/sha1.hpp>
-#include <iomanip>
-#include <sstream>
 #include <cassert>
 #include <memory>
 #include <string>
 #include <future>
+#include <ignition/common/Sha1.hh>
+#include <ignition/common/System.hh>
 
 /////////////////////////////////////////////////
 // Defines
@@ -85,47 +84,6 @@
 /// inside ignition.
 #define ign_assert(_expr, _msg) assert((_msg, _expr))
 
-#if defined(__GNUC__)
-#define IGN_DEPRECATED(version) __attribute__((deprecated))
-#define IGN_FORCEINLINE __attribute__((always_inline))
-#elif defined(MSVC)
-#define IGN_DEPRECATED(version) ()
-#define IGN_FORCEINLINE __forceinline
-#else
-#define IGN_DEPRECATED(version) ()
-#define IGN_FORCEINLINE
-#endif
-
-/// \def IGNITION_VISIBLE
-/// Use to represent "symbol visible" if supported
-
-/// \def IGNITION_HIDDEN
-/// Use to represent "symbol hidden" if supported
-#if defined _WIN32 || defined __CYGWIN__
-  #ifdef BUILDING_DLL
-    #ifdef __GNUC__
-      #define IGNITION_VISIBLE __attribute__ ((dllexport))
-    #else
-      #define IGNITION_VISIBLE __declspec(dllexport)
-    #endif
-  #else
-    #ifdef __GNUC__
-      #define IGNITION_VISIBLE __attribute__ ((dllimport))
-    #else
-      #define IGNITION_VISIBLE __declspec(dllimport)
-    #endif
-  #endif
-  #define IGNITION_HIDDEN
-#else
-  #if __GNUC__ >= 4
-    #define IGNITION_VISIBLE __attribute__ ((visibility ("default")))
-    #define IGNITION_HIDDEN  __attribute__ ((visibility ("hidden")))
-  #else
-    #define IGNITION_VISIBLE
-    #define IGNITION_HIDDEN
-  #endif
-#endif
-
 /// \brief Forward declarations for the common classes
 namespace ignition
 {
@@ -140,7 +98,7 @@ namespace ignition
     /// \brief Get the wall time as an ISO string: YYYY-MM-DDTHH:MM:SS.NS
     /// \return The current wall time as an ISO string.
     IGNITION_VISIBLE
-    std::string SystemTimeISO();
+    std::string systemTimeISO();
 
     /// \brief add path sufix to common::SystemPaths
     /// \param[in] _suffix The suffix to add.
@@ -172,42 +130,42 @@ namespace ignition
     /// \param[in] _buffer Input sequence. The permitted data types for this
     /// function are std::string and any STL container.
     /// \return The string representation (40 character) of the SHA1 hash.
-    /*template<typename T>
+    template<typename T>
     IGNITION_VISIBLE
-    std::string getSha1(const T &_buffer);
-    */
-  }
+    std::string sha1(const T &_buffer);
 
+    /// \brief Compute the SHA1 hash of an array of bytes. Use std::string
+    /// sha1(const T &_buffer) instead of this function
+    /// \param[in] _buffer Input sequence. The permitted data types for this
+    /// function are std::string and any STL container.
+    /// \return The string representation (40 character) of the SHA1 hash.
+    /// \sa sha1(const T &_buffer)
+    IGNITION_VISIBLE
+    std::string sha1(void const *_buffer, std::size_t _byteCount);
+
+    /// \brief Find the environment variable '_name' and return its value.
+    /// \param[in] _name Name of the environment variable.
+    /// \param[out] _value Value if the variable was found.
+    /// \return True if the variable was found or false otherwise.
+    IGNITION_VISIBLE
+    bool env(const std::string &_name, std::string &_value);
+
+    /// \brief Check if the given path is a directory.
+    /// \param[in] _path Path to a directory.
+    /// \return True if _path is a directory.
+    IGNITION_VISIBLE
+    bool isDirectory(const std::string &_path);
+  }
 }
 
 ///////////////////////////////////////////////
 // Implementation of get_sha1
-/*template<typename T>
-std::string ignition::common::getSha1(const T &_buffer)
+template<typename T>
+std::string ignition::common::sha1(const T &_buffer)
 {
-  boost::uuids::detail::sha1 sha1;
-  unsigned int hash[5];
-  std::stringstream stream;
-
   if (_buffer.size() == 0)
-  {
-    sha1.process_bytes(NULL, 0);
-  }
+    return sha1(NULL, 0);
   else
-  {
-    sha1.process_bytes(&(_buffer[0]), _buffer.size() * sizeof(_buffer[0]));
-  }
-
-  sha1.get_digest(hash);
-
-  for (std::size_t i = 0; i < sizeof(hash) / sizeof(hash[0]); ++i)
-  {
-    stream << std::setfill('0')
-      << std::setw(sizeof(hash[0]) * 2)
-      << std::hex
-      << hash[i];
-  }
-
-  return stream.str();
-}*/
+    return sha1(&(_buffer[0]), _buffer.size() * sizeof(_buffer[0]));
+}
 #endif

@@ -14,15 +14,15 @@
  * limitations under the License.
  *
 */
-#ifndef _IGNITION_COMMON_SKELETON_NODE_HH_
-#define _IGNITION_COMMON_SKELETON_NODE_HH_
+#ifndef IGNITION_COMMON_SKELETON_NODE_HH_
+#define IGNITION_COMMON_SKELETON_NODE_HH_
 
 #include <map>
 #include <string>
 #include <vector>
 
 #include <ignition/common/NodeTransform.hh>
-#include <ignition/common/Util.hh>
+#include <ignition/common/System.hh>
 
 namespace ignition
 {

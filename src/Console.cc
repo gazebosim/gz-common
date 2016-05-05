@@ -62,7 +62,7 @@ Logger::~Logger()
 /////////////////////////////////////////////////
 Logger &Logger::operator()()
 {
-  Console::log << "(" << ignition::common::SystemTimeISO() << ") ";
+  Console::log << "(" << ignition::common::systemTimeISO() << ") ";
   (*this) << this->prefix;
 
   return (*this);

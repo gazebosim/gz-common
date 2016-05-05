@@ -1,4 +1,5 @@
 include (${project_cmake_dir}/Utils.cmake)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/boost)
 
 set (headers
   Animation.hh
@@ -19,6 +20,7 @@ set (headers
   SkeletonAnimation.hh
   SkeletonNode.hh
   SubMesh.hh
+  System.hh
   Time.hh
   Timer.hh
   Util.hh

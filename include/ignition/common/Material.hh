@@ -14,13 +14,13 @@
  * limitations under the License.
  *
 */
-
-#ifndef _IGNITION_COMMON_MATERIAL_HH_
-#define _IGNITION_COMMON_MATERIAL_HH_
+#ifndef IGNITION_COMMON_MATERIAL_HH_
+#define IGNITION_COMMON_MATERIAL_HH_
 
 #include <string>
 
-#include "ignition/common/Color.hh"
+#include <ignition/common/System.hh>
+#include <ignition/common/Color.hh>
 
 namespace ignition
 {

@@ -14,10 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef _IGNITION_COMMON_TIMER_HH_
-#define _IGNITION_COMMON_TIMER_HH_
+#ifndef IGNITION_COMMON_TIMER_HH_
+#define IGNITION_COMMON_TIMER_HH_
 
 #include <ignition/common/Time.hh>
+#include <ignition/common/System.hh>
 
 namespace ignition
 {

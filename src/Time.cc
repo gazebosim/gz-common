@@ -188,7 +188,7 @@ Time Time::Sleep(const common::Time &_time)
 
     if (WaitForSingleObject (timer, INFINITE) != WAIT_OBJECT_0)
     {
-      ignerr << 
+      ignerr <<
         "Unable to wait for a single object. Sleep will be incorrect.\n";
       return result;
     }
@@ -210,7 +210,6 @@ Time Time::Sleep(const common::Time &_time)
   }
 
   return result;
-
 }
 
 /////////////////////////////////////////////////
