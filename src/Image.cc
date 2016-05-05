@@ -24,10 +24,29 @@
 #include <ignition/common/Console.hh>
 #include <ignition/common/Util.hh>
 #include <ignition/common/Image.hh>
-#include <ignition/common/ImagePrivate.hh>
 
 using namespace ignition;
 using namespace common;
+
+namespace ignition
+{
+  namespace common
+  {
+    /// \brief Private data class
+    class ImagePrivate
+    {
+      /// \brief bitmap data
+      public: FIBITMAP *bitmap;
+
+      /// \brief path name of the image file
+      public: std::string fullName;
+
+      /// \brief Implementation of GetData
+      public: void DataImpl(unsigned char **_data, unsigned int &_count,
+          FIBITMAP *_img) const;
+    };
+  }
+}
 
 static int count = 0;
 
@@ -40,7 +59,7 @@ Image::Image(const std::string &_filename)
 
   count++;
 
-  this->data->bitmap = NULL;
+  this->dataPtr->bitmap = NULL;
   if (!_filename.empty())
   {
     std::string filename = ignition::common::findFile(_filename);
@@ -56,9 +75,9 @@ Image::~Image()
 {
   count--;
 
-  if (this->data->bitmap)
-    FreeImage_Unload(this->data->bitmap);
-  this->data->bitmap = NULL;
+  if (this->dataPtr->bitmap)
+    FreeImage_Unload(this->dataPtr->bitmap);
+  this->dataPtr->bitmap = NULL;
 
   if (count == 0)
     FreeImage_DeInitialise();
@@ -71,44 +90,44 @@ Image::~Image()
 //////////////////////////////////////////////////
 int Image::Load(const std::string &_filename)
 {
-  this->data->fullName = _filename;
-  if (!exists(this->data->fullName))
-    this->data->fullName = common::findFile(_filename);
+  this->dataPtr->fullName = _filename;
+  if (!exists(this->dataPtr->fullName))
+    this->dataPtr->fullName = common::findFile(_filename);
 
-  if (exists(this->data->fullName))
+  if (exists(this->dataPtr->fullName))
   {
     FREE_IMAGE_FORMAT fifmt =
-      FreeImage_GetFIFFromFilename(this->data->fullName.c_str());
+      FreeImage_GetFIFFromFilename(this->dataPtr->fullName.c_str());
 
-    if (this->data->bitmap)
-      FreeImage_Unload(this->data->bitmap);
-    this->data->bitmap = NULL;
+    if (this->dataPtr->bitmap)
+      FreeImage_Unload(this->dataPtr->bitmap);
+    this->dataPtr->bitmap = NULL;
 
     if (fifmt == FIF_PNG)
     {
-      this->data->bitmap = FreeImage_Load(fifmt,
-          this->data->fullName.c_str(), PNG_DEFAULT);
+      this->dataPtr->bitmap = FreeImage_Load(fifmt,
+          this->dataPtr->fullName.c_str(), PNG_DEFAULT);
     }
     else if (fifmt == FIF_JPEG)
     {
-      this->data->bitmap =
-        FreeImage_Load(fifmt, this->data->fullName.c_str(), JPEG_DEFAULT);
+      this->dataPtr->bitmap =
+        FreeImage_Load(fifmt, this->dataPtr->fullName.c_str(), JPEG_DEFAULT);
     }
     else if (fifmt == FIF_BMP)
     {
-      this->data->bitmap = FreeImage_Load(fifmt,
-          this->data->fullName.c_str(), BMP_DEFAULT);
+      this->dataPtr->bitmap = FreeImage_Load(fifmt,
+          this->dataPtr->fullName.c_str(), BMP_DEFAULT);
     }
     else
     {
-      ignerr << "Unknown image format[" << this->data->fullName << "]\n";
+      ignerr << "Unknown image format[" << this->dataPtr->fullName << "]\n";
       return -1;
     }
 
     return 0;
   }
 
-  ignerr << "Unable to open image file[" << this->data->fullName
+  ignerr << "Unable to open image file[" << this->dataPtr->fullName
         << "], check your IGNITION_RESOURCE_PATH settings.\n";
   return -1;
 }
@@ -116,16 +135,16 @@ int Image::Load(const std::string &_filename)
 //////////////////////////////////////////////////
 void Image::SavePNG(const std::string &_filename)
 {
-  FreeImage_Save(FIF_PNG, this->data->bitmap, _filename.c_str(), 0);
+  FreeImage_Save(FIF_PNG, this->dataPtr->bitmap, _filename.c_str(), 0);
 }
 
 //////////////////////////////////////////////////
 void Image::SetFromData(const unsigned char *_data, unsigned int _width,
     unsigned int _height, PixelFormat _format)
 {
-  if (this->data->bitmap)
-    FreeImage_Unload(this->data->bitmap);
-  this->data->bitmap = NULL;
+  if (this->dataPtr->bitmap)
+    FreeImage_Unload(this->dataPtr->bitmap);
+  this->dataPtr->bitmap = NULL;
 
   // int redmask = FI_RGBA_RED_MASK;
   int redmask = 0x0000ff;
@@ -174,32 +193,32 @@ void Image::SetFromData(const unsigned char *_data, unsigned int _width,
     return;
   }
 
-  this->data->bitmap = FreeImage_ConvertFromRawBits(const_cast<BYTE*>(_data),
+  this->dataPtr->bitmap = FreeImage_ConvertFromRawBits(const_cast<BYTE*>(_data),
       _width, _height, scanlineBytes, bpp, redmask, greenmask, bluemask, true);
 }
 
 //////////////////////////////////////////////////
 int Image::GetPitch() const
 {
-  return FreeImage_GetLine(this->data->bitmap);
+  return FreeImage_GetLine(this->dataPtr->bitmap);
 }
 
 //////////////////////////////////////////////////
 void Image::GetRGBData(unsigned char **_data, unsigned int &_count) const
 {
-  FIBITMAP *tmp = FreeImage_ConvertTo24Bits(this->data->bitmap);
-  this->GetDataImpl(_data, _count, tmp);
+  FIBITMAP *tmp = FreeImage_ConvertTo24Bits(this->dataPtr->bitmap);
+  this->dataPtr->GetDataImpl(_data, _count, tmp);
   FreeImage_Unload(tmp);
 }
 
 //////////////////////////////////////////////////
 void Image::GetData(unsigned char **_data, unsigned int &_count) const
 {
-  this->GetDataImpl(_data, _count, this->data->bitmap);
+  this->dataPtr->GetDataImpl(_data, _count, this->dataPtr->bitmap);
 }
 
 //////////////////////////////////////////////////
-void Image::GetDataImpl(unsigned char **_data, unsigned int &_count,
+void ImagePrivate::GetDataImpl(unsigned char **_data, unsigned int &_count,
                         FIBITMAP *_img) const
 {
   int redmask = FI_RGBA_RED_MASK;
@@ -233,18 +252,18 @@ void Image::GetDataImpl(unsigned char **_data, unsigned int &_count,
   {
 #endif
 #endif
-/*  FIXME:  why shift by 2 pixels?  this breaks heighmaps by wrapping artificially
-    int i = 0;
-    for (unsigned int y = 0; y < this->GetHeight(); ++y)
-    {
-      for (unsigned int x = 0; x < this->GetWidth(); ++x)
-      {
-        std::swap((*_data)[i], (*_data)[i+2]);
-        unsigned int d = FreeImage_GetBPP(this->data->bitmap)/8;
-        i += d;
-      }
-    }
-*/
+//  FIXME:  why shift by 2 pixels?
+//  this breaks heighmaps by wrapping artificially
+//    int i = 0;
+//    for (unsigned int y = 0; y < this->GetHeight(); ++y)
+//    {
+//      for (unsigned int x = 0; x < this->GetWidth(); ++x)
+//      {
+//        std::swap((*_data)[i], (*_data)[i+2]);
+//        unsigned int d = FreeImage_GetBPP(this->dataPtr->bitmap)/8;
+//        i += d;
+//      }
+//    }
   }
 }
 
@@ -254,7 +273,7 @@ unsigned int Image::GetWidth() const
   if (!this->Valid())
     return 0;
 
-  return FreeImage_GetWidth(this->data->bitmap);
+  return FreeImage_GetWidth(this->dataPtr->bitmap);
 }
 
 //////////////////////////////////////////////////
@@ -263,7 +282,7 @@ unsigned int Image::GetHeight() const
   if (!this->Valid())
     return 0;
 
-  return FreeImage_GetHeight(this->data->bitmap);
+  return FreeImage_GetHeight(this->dataPtr->bitmap);
 }
 
 //////////////////////////////////////////////////
@@ -272,7 +291,7 @@ unsigned int Image::GetBPP() const
   if (!this->Valid())
     return 0;
 
-  return FreeImage_GetBPP(this->data->bitmap);
+  return FreeImage_GetBPP(this->dataPtr->bitmap);
 }
 
 //////////////////////////////////////////////////
@@ -283,13 +302,13 @@ Color Image::GetPixel(unsigned int _x, unsigned int _y) const
   if (!this->Valid())
     return clr;
 
-  FREE_IMAGE_COLOR_TYPE type = FreeImage_GetColorType(this->data->bitmap);
+  FREE_IMAGE_COLOR_TYPE type = FreeImage_GetColorType(this->dataPtr->bitmap);
 
   if (type == FIC_RGB || type == FIC_RGBALPHA)
   {
     RGBQUAD firgb;
 
-    if (FreeImage_GetPixelColor(this->data->bitmap, _x, _y, &firgb) == FALSE)
+    if (FreeImage_GetPixelColor(this->dataPtr->bitmap, _x, _y, &firgb) == FALSE)
     {
       ignerr << "Image: Coordinates out of range["
         << _x << " " << _y << "] \n";
@@ -313,7 +332,7 @@ Color Image::GetPixel(unsigned int _x, unsigned int _y) const
   {
     BYTE byteValue;
     if (FreeImage_GetPixelIndex(
-          this->data->bitmap, _x, _y, &byteValue) == FALSE)
+          this->dataPtr->bitmap, _x, _y, &byteValue) == FALSE)
     {
       ignerr << "Image: Coordinates out of range ["
         << _x << " " << _y << "] \n";
@@ -380,29 +399,29 @@ Color Image::GetMaxColor() const
 //////////////////////////////////////////////////
 void Image::Rescale(int _width, int _height)
 {
-  this->data->bitmap = FreeImage_Rescale(this->data->bitmap, _width, _height,
+  this->dataPtr->bitmap = FreeImage_Rescale(this->dataPtr->bitmap, _width, _height,
       FILTER_LANCZOS3);
 }
 
 //////////////////////////////////////////////////
 bool Image::Valid() const
 {
-  return this->data->bitmap != NULL;
+  return this->dataPtr->bitmap != NULL;
 }
 
 //////////////////////////////////////////////////
 std::string Image::GetFilename() const
 {
-  return this->data->fullName;
+  return this->dataPtr->fullName;
 }
 
 //////////////////////////////////////////////////
 Image::PixelFormat Image::GetPixelFormat() const
 {
   Image::PixelFormat fmt = UNKNOWN_PIXEL_FORMAT;
-  FREE_IMAGE_TYPE type = FreeImage_GetImageType(this->data->bitmap);
+  FREE_IMAGE_TYPE type = FreeImage_GetImageType(this->dataPtr->bitmap);
 
-  unsigned int redMask = FreeImage_GetRedMask(this->data->bitmap);
+  unsigned int redMask = FreeImage_GetRedMask(this->dataPtr->bitmap);
   unsigned int bpp = this->GetBPP();
 
   if (type == FIT_BITMAP)
