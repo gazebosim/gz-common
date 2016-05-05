@@ -21,7 +21,6 @@
 #include <memory>
 #include <string>
 #include <future>
-#include <ignition/common/Sha1.hh>
 #include <ignition/common/System.hh>
 
 /////////////////////////////////////////////////

@@ -21,6 +21,7 @@
 
 #include "ignition/common/Time.hh"
 #include "ignition/common/Console.hh"
+#include "ignition/common/Util.hh"
 
 const int g_messageRepeat = 4;
 
@@ -29,11 +30,12 @@ class Console_TEST {};
 std::string GetLogContent(const std::string &_filename)
 {
   // Get the absolute path
-  boost::filesystem::path path = getenv("HOME");
-  path /= _filename;
+  std::string path;
+  EXPECT_TRUE(ignition::common::env("HOME", path));
+  path = path + "/" + _filename;
 
   // Open the log file, and read back the string
-  std::ifstream ifs(path.string().c_str(), std::ios::in);
+  std::ifstream ifs(path.c_str(), std::ios::in);
   std::string loggedString;
 
   while (!ifs.eof())
@@ -63,8 +65,9 @@ TEST(Console_TEST, NoInitAndLog)
   EXPECT_TRUE(GetLogContent(logPath).find(logString) != std::string::npos);
 
   // Cleanup
-  boost::filesystem::path path = getenv("HOME");
-  path /= logPath;
+  std::string path;
+  EXPECT_TRUE(ignition::common::env("HOME", path));
+  path = path + "/" + logPath;
   boost::filesystem::remove_all(path);
 }
 
@@ -83,7 +86,9 @@ TEST(Console_TEST, InitAndLog)
   ignlog << logString << std::endl;
 
   // Get the absolute path
-  boost::filesystem::path basePath = getenv("HOME");
+  std::string tmpPath;
+  EXPECT_TRUE(ignition::common::env("HOME", tmpPath));
+  boost::filesystem::path basePath = tmpPath;
   basePath /= path;
 
   // Get the absolute log file path
@@ -454,10 +459,11 @@ TEST(Console_TEST, LogDirectory)
   std::string logDir = ignLogDirectory();
 
   // Get the absolute path
-  boost::filesystem::path absPath = getenv("HOME");
-  absPath /= path;
+  std::string absPath;
+  EXPECT_TRUE(ignition::common::env("HOME", absPath));
+  absPath = absPath + "/" + path.string();
 
-  EXPECT_EQ(logDir, absPath.string());
+  EXPECT_EQ(logDir, absPath);
 }
 
 /////////////////////////////////////////////////
