@@ -27,7 +27,7 @@
 /////////////////////////////////////////////////
 // Defines
 
-#ifdef WIN32
+#ifdef _WIN32
 # define IGN_HOMEDIR "HOMEPATH"
 #else
 # define IGN_HOMEDIR "HOME"

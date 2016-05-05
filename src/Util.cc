@@ -304,14 +304,18 @@ bool ignition::common::isDirectory(const std::string &_path)
 /////////////////////////////////////////////////
 bool ignition::common::env(const std::string &_name, std::string &_value)
 {
-  char *v;
-#ifdef _MSC_VER
-  size_t sz = 0;
-  _dupenv_s(&v, &sz, _name.c_str());
+  std::string v;
+#ifdef _WIN32
+  const DWORD buffSize = 65535;
+  static char buffer[buffSize];
+  if (GetEnvironmentVariable(_name.c_str(), buffer, buffSize))
+  {
+    v = buffer;
+  }
 #else
   v = std::getenv(_name.c_str());
 #endif
-  if (v)
+  if (!v.empty())
   {
     _value = v;
     return true;
