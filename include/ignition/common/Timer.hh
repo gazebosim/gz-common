@@ -25,7 +25,7 @@ namespace ignition
   {
     /// \class Timer Timer.hh common/common.hh
     /// \brief A timer class, used to time things in real world walltime
-    class Timer
+    class IGNITION_VISIBLE Timer
     {
       /// \brief Constructor
       public: Timer();
@@ -67,5 +67,3 @@ namespace ignition
   }
 }
 #endif
-
-

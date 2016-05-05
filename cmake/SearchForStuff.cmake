@@ -25,6 +25,7 @@ add_manpage_target()
 
 ########################################
 # Find Boost, if not specified manually
+include(FindBoost)
 find_package(Boost ${MIN_BOOST_VERSION} REQUIRED filesystem system)
 if (NOT Boost_FOUND)
   BUILD_ERROR ("Boost not found. Please install version "
@@ -82,3 +83,10 @@ else()
   set (tinyxml2_LIBRARIES "")
   set (tinyxml2_LIBRARY_DIRS "")
 endif()
+
+# Macro to check for visibility capability in compiler
+# Original idea from: https://gitorious.org/ferric-cmake-stuff/ 
+macro (check_gcc_visibility)
+  include (CheckCXXCompilerFlag)
+  check_cxx_compiler_flag(-fvisibility=hidden GCC_SUPPORTS_VISIBILITY)
+endmacro()

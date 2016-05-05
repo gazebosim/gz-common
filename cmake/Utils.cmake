@@ -51,6 +51,7 @@ endmacro (BUILD_WARNING)
 
 #################################################
 macro (ign_add_library _name)
+  set_source_files_properties(${ARGN} PROPERTIES COMPILE_DEFINITIONS "BUILDING_DLL")
   add_library(${_name} SHARED ${ARGN})
   target_link_libraries (${_name} ${general_libraries})
 endmacro ()
