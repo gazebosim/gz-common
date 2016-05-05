@@ -1,27 +1,37 @@
-cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 
 set(IGN_PROJECT_NAME "common")
-
-project (ignition-${IGN_PROJECT_NAME})
-string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
-string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
 set (PROJECT_MAJOR_VERSION 0)
 set (PROJECT_MINOR_VERSION 1)
 set (PROJECT_PATCH_VERSION 0)
 
-set (PROJECT_VERSION ${PROJECT_MAJOR_VERSION}.${PROJECT_MINOR_VERSION})
-set (PROJECT_VERSION_FULL ${PROJECT_MAJOR_VERSION}.${PROJECT_MINOR_VERSION}.${PROJECT_PATCH_VERSION})
+project (ignition-${IGN_PROJECT_NAME}${PROJECT_MAJOR_VERSION})
+set(PROJECT_NAME_NO_VERSION "ignition-${IGN_PROJECT_NAME}")
+string (TOLOWER ${PROJECT_NAME_NO_VERSION} PROJECT_NAME_NO_VERSION_LOWER)
+string (TOUPPER ${PROJECT_NAME_NO_VERSION} PROJECT_NAME_NO_VERSION_UPPER)
+string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
+string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
+set(PROJECT_EXPORT_NAME ${PROJECT_NAME_LOWER})
+set(PROJECT_LIBRARY_TARGET_NAME ${PROJECT_NAME_LOWER})
 
-message (STATUS "${PROJECT_NAME} version ${PROJECT_VERSION_FULL}")
+set (PROJECT_VERSION ${PROJECT_MAJOR_VERSION}.${PROJECT_MINOR_VERSION})
+set (PROJECT_VERSION_FULL
+  ${PROJECT_MAJOR_VERSION}.${PROJECT_MINOR_VERSION}.${PROJECT_PATCH_VERSION})
+
+
+message (STATUS "${PROJECT_NAME_NO_VERSION} version ${PROJECT_VERSION_FULL}")
 
 set (project_cmake_dir ${PROJECT_SOURCE_DIR}/cmake
   CACHE PATH "Location of CMake scripts")
 
 include (${project_cmake_dir}/Utils.cmake)
+include (CMakePackageConfigHelpers)
 
-set (FREEIMAGE_MAJOR_VERSION 3 CACHE INTERNAL "FreeImage major version requirement" FORCE)
-set (FREEIMAGE_MINOR_VERSION 9 CACHE INTERNAL "FreeImage minor version requirement" FORCE)
+set (FREEIMAGE_MAJOR_VERSION 3
+  CACHE INTERNAL "FreeImage major version requirement" FORCE)
+set (FREEIMAGE_MINOR_VERSION 9
+  CACHE INTERNAL "FreeImage minor version requirement" FORCE)
 set (MIN_FREEIMAGE_VERSION ${FREEIMAGE_MAJOR_VERSION}.${FREEIMAGE_MINOR_VERSION}.0 CACHE INTERNAL "FreeImage version requirement" FORCE)
 
 ########################################
@@ -52,6 +62,10 @@ endif()
 #################################################
 # Documentation:
 add_subdirectory(doc)
+
+# Configure documentation uploader
+configure_file("${project_cmake_dir}/upload_doc.sh.in"
+  ${CMAKE_BINARY_DIR}/upload_doc.sh @ONLY)
 
 # If we're configuring only to build docs, stop here
 if (DOC_ONLY)
@@ -91,9 +105,12 @@ if(LD_LIBRARY_PATH)
 endif()
 
 
-set (INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}/ignition")
+set (INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}")
+set (INCLUDE_INSTALL_DIR_POSTFIX 
+  "ignition/${IGN_PROJECT_NAME}${PROJECT_MAJOR_VERSION}")
+set (INCLUDE_INSTALL_DIR_FULL
+  "${INCLUDE_INSTALL_DIR}/${INCLUDE_INSTALL_DIR_POSTFIX}")
 set (LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR})
-set (LIB_INSTALL_DIR_ARCH_INDEPENDENT "lib/")
 set (BIN_INSTALL_DIR ${CMAKE_INSTALL_BINDIR})
 
 set (USE_FULL_RPATH OFF CACHE BOOL "Set to true to enable full rpath")
@@ -120,7 +137,7 @@ if (USE_FULL_RPATH)
 endif()
 
 set (BUILD_IGNITION ON CACHE INTERNAL
-  "Build Ignition ${IGN_PROJECT_NAME}" FORCE)
+  "Build Ignition Common" FORCE)
 set (build_errors "" CACHE INTERNAL "build errors" FORCE)
 set (build_warnings "" CACHE INTERNAL "build warnings" FORCE)
 
@@ -167,26 +184,23 @@ endif()
 unset (CMAKE_C_FLAGS_ALL CACHE)
 unset (CMAKE_CXX_FLAGS CACHE)
 
-# USE_HOST_CFLAGS (default TRUE)
-# Will check building host machine for proper cflags
-if(NOT DEFINED USE_HOST_CFLAGS OR USE_HOST_CFLAGS)
-  message(STATUS "Enable host CFlags")
-  include (${project_cmake_dir}/HostCFlags.cmake)
-endif()
-
-# USE_UPSTREAM_CFLAGS (default TRUE)
-# Will use predefined ignition developers cflags
-if(NOT DEFINED USE_UPSTREAM_CFLAGS OR USE_UPSTREAM_CFLAGS)
-  message(STATUS "Enable upstream CFlags")
-  include(${project_cmake_dir}/DefaultCFlags.cmake)
-endif()
-
 # Check if warning options are avaliable for the compiler and return WARNING_CXX_FLAGS variable
-filter_valid_compiler_warnings(-Wall -Wextra -Wno-long-long
+# MSVC generates tons of warnings on gtest code.
+# Recommended to use /W4 instead of /Wall
+if (MSVC)
+  set(WARN_LEVEL "/W2")
+else()
+  set(WARN_LEVEL "-Wall")
+endif()
+
+filter_valid_compiler_warnings(${WARN_LEVEL} -Wextra -Wno-long-long
   -Wno-unused-value -Wno-unused-value -Wno-unused-value -Wno-unused-value
   -Wfloat-equal -Wshadow -Winit-self -Wswitch-default
   -Wmissing-include-dirs -pedantic)
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}${WARNING_CXX_FLAGS}")
+if (DEFINED EXTRA_CMAKE_CXX_FLAGS)
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_CMAKE_CXX_FLAGS}")
+endif()
 
 #################################################
 # OS Specific initialization
@@ -199,13 +213,6 @@ endif()
 if(APPLE)
   ign_setup_apple()
 endif()
-
-# Main includes for compilation
-include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
-include_directories(SYSTEM
-  ${IGNITION-MATH_INCLUDE_DIRS}
-  ${Boost_INCLUDE_DIRS}
-)
 
 #################################################
 # Print warnings and errors
@@ -238,18 +245,24 @@ else (build_errors)
 
   ########################################
   # Write the config.h file
-  configure_file (${project_cmake_dir}/config.hh.in
-    ${PROJECT_BINARY_DIR}/include/ignition/${IGN_PROJECT_NAME}/config.hh)
-  ign_install_includes(${IGN_PROJECT_NAME}
-    ${PROJECT_BINARY_DIR}/include/ignition/${IGN_PROJECT_NAME}/config.hh)
+  configure_file ("${project_cmake_dir}/config.hh.in"
+    "${PROJECT_BINARY_DIR}/include/ignition/${IGN_PROJECT_NAME}/config.hh")
+  ign_install_includes(
+    "${INCLUDE_INSTALL_DIR_POSTFIX}/ignition/${IGN_PROJECT_NAME}"
+    "${PROJECT_BINARY_DIR}/include/ignition/${IGN_PROJECT_NAME}/config.hh")
 
   include_directories(
     ${PROJECT_SOURCE_DIR}
-    ${PROJECT_BINARY_DIR}
     ${PROJECT_SOURCE_DIR}/include
+    ${PROJECT_BINARY_DIR}
     ${PROJECT_BINARY_DIR}/include
   )
-  link_directories(${PROJECT_BINARY_DIR}/src)
+  include_directories(SYSTEM
+    ${IGNITION-MATH_INCLUDE_DIRS}
+    ${Boost_INCLUDE_DIRS}
+    )
+  
+  link_directories(${PROJECT_BINARY_DIR}/src ${IGNITION-MATH_LINK_DIRS})
 
   if (DEFINED CMAKE_CXX_FLAGS)
     message (STATUS "Custom CFlags:${CMAKE_CXX_FLAGS}")
@@ -269,36 +282,73 @@ else (build_errors)
 
   ########################################
   # Make the package config files
-  configure_file(
-    ${CMAKE_SOURCE_DIR}/cmake/pkgconfig/ignition.in
-    ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${PROJECT_NAME_LOWER}.pc @ONLY)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${PROJECT_NAME_LOWER}.pc
-    DESTINATION ${LIB_INSTALL_DIR_ARCH_INDEPENDENT}/pkgconfig
-    COMPONENT pkgconfig)
+  set (pkgconfig_files ${PROJECT_NAME_NO_VERSION_LOWER})
+
+  foreach (pkgconfig ${pkgconfig_files})
+    configure_file(${CMAKE_SOURCE_DIR}/cmake/pkgconfig/${pkgconfig}.in
+      ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}${PROJECT_MAJOR_VERSION}.pc @ONLY)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}${PROJECT_MAJOR_VERSION}.pc
+      DESTINATION ${LIB_INSTALL_DIR}/pkgconfig COMPONENT pkgconfig)
+  endforeach()
 
   ########################################
   # Make the cmake config files
-  set(PKG_NAME ${PROJECT_NAME_UPPER})
-  set(PKG_LIBRARIES ${PROJECT_NAME_LOWER})
+  set(PKG_NAME ${PROJECT_NAME_NO_VERSION_UPPER})
+  set(cmake_conf_file "${PROJECT_NAME_LOWER}-config.cmake")
+  set(cmake_conf_version_file "${PROJECT_NAME_LOWER}-config-version.cmake")
+  set(cmake_targets_file      "${PROJECT_NAME_LOWER}-targets.cmake")
 
   set(PKG_DEPENDS)
 
-  configure_file(
+  if(WIN32 AND NOT CYGWIN)
+    set(CMAKE_CONFIG_INSTALL_DIR CMake)
+  else()
+    set(CMAKE_CONFIG_INSTALL_DIR
+      ${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME_LOWER}/)
+  endif()
+
+  configure_package_config_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/ignition-config.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME_LOWER}-config.cmake" @ONLY)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME_LOWER}-config.cmake
-    DESTINATION ${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME_LOWER}
-    COMPONENT cmake)
+    "${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file}"
+    PATH_VARS LIB_INSTALL_DIR INCLUDE_INSTALL_DIR_FULL
+    INSTALL_DESTINATION ${CMAKE_CONFIG_INSTALL_DIR})
+
+  # Use write_basic_package_version_file to generate a ConfigVersion file that
+  # allow users of gazebo to specify the API or version to depend on
+  # TODO: keep this instruction until deprecate Ubuntu/Precise and update with
+  # https://github.com/Kitware/CMake/blob/v2.8.8/Modules/CMakePackageConfigHelpers.cmake
+  include(WriteBasicConfigVersionFile)
+  write_basic_config_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_version_file}
+    VERSION "${PROJECT_VERSION_FULL}"
+    COMPATIBILITY SameMajorVersion)
+
+  install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file}
+    ${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_version_file}
+    DESTINATION ${CMAKE_CONFIG_INSTALL_DIR} COMPONENT cmake)
+    
+  # Create *-targets.cmake file for build directory
+  # TODO: keep this instruction until we depend on CMake 3
+  #       then change the first line from TARGETS ...  
+  #       to EXPORT ... to match the format used in install(EXPORT
+  export(TARGETS ${PROJECT_LIBRARY_TARGET_NAME}
+         FILE  ${CMAKE_BINARY_DIR}/${cmake_targets_file})
+
+  # Install *-targets.cmake file
+  install(EXPORT ${PROJECT_EXPORT_NAME}
+          DESTINATION ${CMAKE_CONFIG_INSTALL_DIR}
+          FILE ${cmake_targets_file})
 
   ########################################
   # If present, load platform-specific build hooks.  This system is used,
-  # for example, by the Ubuntu overlay, to arrange for installation of
-  # Ubuntu-specific application-launching configuration.
+  # for example, by the Ubuntu overlay, to
+  # arrange for installation of Ubuntu-specific application-launching
+  # configuration.
   if (EXISTS ${PROJECT_SOURCE_DIR}/cmake/packager-hooks/CMakeLists.txt)
     message(STATUS "Loading packager build hooks from cmake/packager-hooks")
     add_subdirectory(cmake/packager-hooks)
   endif()
 
-  message(STATUS "Configuration successful. Type make to compile
-  ${PROJECT_NAME_LOWER}")
+  message(STATUS "Configuration successful.")
 endif(build_errors)
