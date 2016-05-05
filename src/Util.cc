@@ -48,6 +48,12 @@
 # define IGN_PATH_MAX _POSIX_PATH_MAX
 #endif
 
+#ifdef _WIN32
+  const auto &ignstrtok = strtok_s;
+#else
+  const auto &ignstrtok = strtok_r;
+#endif
+
 /////////////////////////////////////////////////
 // Internal class for SHA1 computation
 class Sha1
@@ -429,6 +435,24 @@ bool ignition::common::createDirectories(const std::string &_path)
     }
     index = end;
   }
+}
 
+/////////////////////////////////////////////////
+std::vector<std::string> ignition::common::split(const std::string &_str,
+    const std::string &_delim)
+{
+  std::vector<std::string> tokens;
+  char *saveptr;
+  char *str = strdup(_str.c_str());
 
+  auto token = ignstrtok(str, _delim.c_str(), &saveptr);
+
+  while (token)
+  {
+    tokens.push_back(token);
+    token = ignstrtok(NULL, _delim.c_str(), &saveptr);
+  }
+
+  free(str);
+  return tokens;
 }

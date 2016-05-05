@@ -21,6 +21,7 @@
 #include <memory>
 #include <string>
 #include <future>
+#include <vector>
 #include <ignition/common/System.hh>
 
 /////////////////////////////////////////////////
@@ -199,6 +200,14 @@ namespace ignition
     /// \return A UUID string
     IGNITION_COMMON_VISIBLE
     std::string uuid();
+
+    /// \brief Splits a string into tokens.
+    /// \param[in] _str Input string.
+    /// \param[in] _delim Token delimiter.
+    /// \return Vector of tokens.
+    IGNITION_COMMON_VISIBLE
+    std::vector<std::string> split(const std::string &_str,
+                                   const std::string &_delim);
   }
 }
 

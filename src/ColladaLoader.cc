@@ -14,10 +14,6 @@
  * limitations under the License.
  *
  */
-
-#include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
-
 #include <ignition/tinyxml2.h>
 
 #include <sstream>
@@ -38,7 +34,7 @@
 #include "ignition/common/Skeleton.hh"
 #include "ignition/common/SkeletonAnimation.hh"
 #include "ignition/common/SystemPaths.hh"
-#include "ignition/common/Exception.hh"
+#include "ignition/common/Util.hh"
 #include "ignition/common/ColladaLoader.hh"
 
 using namespace ignition;
@@ -551,7 +547,8 @@ ignition::math::Matrix4d ColladaLoaderPrivate::LoadNodeTransform(
     {
       std::string transStr = _elem->FirstChildElement("translate")->GetText();
       ignition::math::Vector3d translate;
-      translate = boost::lexical_cast<ignition::math::Vector3d>(transStr);
+      std::istringstream stream(transStr);
+      stream >> translate;
       // translate *= this->meter;
       transform.Translate(translate);
     }
@@ -581,7 +578,8 @@ ignition::math::Matrix4d ColladaLoaderPrivate::LoadNodeTransform(
     {
       std::string scaleStr = _elem->FirstChildElement("scale")->GetText();
       ignition::math::Vector3d scale;
-      scale = boost::lexical_cast<ignition::math::Vector3d>(scaleStr);
+      std::istringstream stream(scaleStr);
+      stream >> scale;
       ignition::math::Matrix4d scaleMat;
       scaleMat.Scale(scale);
       transform = transform * scaleMat;
@@ -649,8 +647,7 @@ void ColladaLoaderPrivate::LoadController(tinyxml2::XMLElement *_contrXml,
 
   std::string jointsStr = jointsXml->FirstChildElement("Name_array")->GetText();
 
-  std::vector<std::string> joints;
-  boost::split(joints, jointsStr, boost::is_any_of("   "));
+  std::vector<std::string> joints = split(jointsStr, " ");
 
   tinyxml2::XMLElement *invBMXml = this->ElementId("source", invBindMatURL);
 
@@ -662,8 +659,7 @@ void ColladaLoaderPrivate::LoadController(tinyxml2::XMLElement *_contrXml,
 
   std::string posesStr = invBMXml->FirstChildElement("float_array")->GetText();
 
-  std::vector<std::string> strs;
-  boost::split(strs, posesStr, boost::is_any_of("   "));
+  std::vector<std::string> strs = split(posesStr, " ");
 
   for (unsigned int i = 0; i < joints.size(); ++i)
   {
@@ -720,8 +716,7 @@ void ColladaLoaderPrivate::LoadController(tinyxml2::XMLElement *_contrXml,
   tinyxml2::XMLElement *weightsXml = this->ElementId("source", weightsURL);
 
   std::string wString = weightsXml->FirstChildElement("float_array")->GetText();
-  std::vector<std::string> wStrs;
-  boost::split(wStrs, wString, boost::is_any_of("   "));
+  std::vector<std::string> wStrs = split(wString, " ");
 
   std::vector<float> weights;
   for (unsigned int i = 0; i < wStrs.size(); ++i)
@@ -729,11 +724,8 @@ void ColladaLoaderPrivate::LoadController(tinyxml2::XMLElement *_contrXml,
 
   std::string cString = vertWeightsXml->FirstChildElement("vcount")->GetText();
   std::string vString = vertWeightsXml->FirstChildElement("v")->GetText();
-  std::vector<std::string> vCountStrs;
-  std::vector<std::string> vStrs;
-
-  boost::split(vCountStrs, cString, boost::is_any_of("   "));
-  boost::split(vStrs, vString, boost::is_any_of("   "));
+  std::vector<std::string> vCountStrs = split(cString, " ");
+  std::vector<std::string> vStrs = split(vString, " ");
 
   std::vector<unsigned int> vCount;
   std::vector<unsigned int> v;
@@ -867,8 +859,7 @@ void ColladaLoaderPrivate::LoadAnimationSet(tinyxml2::XMLElement *_xml,
       tinyxml2::XMLElement *timeArray =
           frameTimesXml->FirstChildElement("float_array");
       std::string timeStr = timeArray->GetText();
-      std::vector<std::string> timeStrs;
-      boost::split(timeStrs, timeStr, boost::is_any_of("   "));
+      std::vector<std::string> timeStrs = split(timeStr, " ");
 
       std::vector<double> times;
       for (unsigned int i = 0; i < timeStrs.size(); ++i)
@@ -877,8 +868,7 @@ void ColladaLoaderPrivate::LoadAnimationSet(tinyxml2::XMLElement *_xml,
       tinyxml2::XMLElement *output =
           frameTransXml->FirstChildElement("float_array");
       std::string outputStr = output->GetText();
-      std::vector<std::string> outputStrs;
-      boost::split(outputStrs, outputStr, boost::is_any_of("   "));
+      std::vector<std::string> outputStrs = split(outputStr, " ");
 
       std::vector<double> values;
       for (unsigned int i = 0; i < outputStrs.size(); ++i)
@@ -999,7 +989,8 @@ void ColladaLoaderPrivate::SetSkeletonNodeTransform(tinyxml2::XMLElement *_elem,
     {
       std::string transStr = _elem->FirstChildElement("translate")->GetText();
       ignition::math::Vector3d translate;
-      translate = boost::lexical_cast<ignition::math::Vector3d>(transStr);
+      std::istringstream stream(transStr);
+      stream >> translate;
       // translate *= this->meter;
       transform.Translate(translate);
 
@@ -1043,7 +1034,8 @@ void ColladaLoaderPrivate::SetSkeletonNodeTransform(tinyxml2::XMLElement *_elem,
     {
       std::string scaleStr = _elem->FirstChildElement("scale")->GetText();
       ignition::math::Vector3d scale;
-      scale = boost::lexical_cast<ignition::math::Vector3d>(scaleStr);
+      std::istringstream stream(scaleStr);
+      stream >> scale;
       ignition::math::Matrix4d scaleMat;
       scaleMat.Scale(scale);
 
@@ -1206,7 +1198,7 @@ void ColladaLoaderPrivate::LoadPositions(const std::string &_id,
     {
       try
       {
-        count = boost::lexical_cast<int>(floatArrayXml->Attribute("count"));
+        count = std::stoi(floatArrayXml->Attribute("count"));
       }
       catch(...)
       {
@@ -1232,9 +1224,8 @@ void ColladaLoaderPrivate::LoadPositions(const std::string &_id,
   std::unordered_map<ignition::math::Vector3d,
       unsigned int, Vector3Hash> unique;
 
-  std::vector<std::string> strs;
   std::vector<std::string>::iterator iter, end;
-  boost::split(strs, valueStr, boost::is_any_of("   "));
+  std::vector<std::string> strs = split(valueStr, " ");
 
   end = strs.end();
   for (iter = strs.begin(); iter != end; iter += 3)
@@ -1289,7 +1280,7 @@ void ColladaLoaderPrivate::LoadNormals(const std::string &_id,
     {
       try
       {
-        count = boost::lexical_cast<int>(floatArrayXml->Attribute("count"));
+        count = std::stoi(floatArrayXml->Attribute("count"));
       }
       catch(...)
       {
@@ -1372,7 +1363,7 @@ void ColladaLoaderPrivate::LoadTexCoords(const std::string &_id,
     {
       try
       {
-        count = boost::lexical_cast<int>(floatArrayXml->Attribute("count"));
+        count = std::stoi(floatArrayXml->Attribute("count"));
       }
       catch(...)
       {
@@ -1395,7 +1386,7 @@ void ColladaLoaderPrivate::LoadTexCoords(const std::string &_id,
   }
   // Read in the total number of texture coordinate values
   else if (floatArrayXml->Attribute("count"))
-    totCount = boost::lexical_cast<int>(floatArrayXml->Attribute("count"));
+    totCount = std::stoi(floatArrayXml->Attribute("count"));
   else
   {
     ignerr << "<float_array> has no count attribute in texture coordinate "
@@ -1427,7 +1418,7 @@ void ColladaLoaderPrivate::LoadTexCoords(const std::string &_id,
   // a complete texture coordinate.
   if (xml->Attribute("stride"))
   {
-    stride = boost::lexical_cast<int>(xml->Attribute("stride"));
+    stride = std::stoi(xml->Attribute("stride"));
   }
   else
   {
@@ -1438,7 +1429,7 @@ void ColladaLoaderPrivate::LoadTexCoords(const std::string &_id,
 
   // Read in the count of texture coordinates.
   if (xml->Attribute("count"))
-    texCount = boost::lexical_cast<int>(xml->Attribute("count"));
+    texCount = std::stoi(xml->Attribute("count"));
   else
   {
     ignerr << "<accessor> has no count attribute in texture coordinate element "
@@ -1466,15 +1457,14 @@ void ColladaLoaderPrivate::LoadTexCoords(const std::string &_id,
 
   // Read the raw texture values, and split them on spaces.
   std::string valueStr = floatArrayXml->GetText();
-  std::vector<std::string> values;
-  boost::split(values, valueStr, boost::is_any_of(" "));
+  std::vector<std::string> values = split(valueStr, " ");
 
   // Read in all the texture coordinates.
   for (int i = 0; i < totCount; i += stride)
   {
     // We only handle 2D texture coordinates right now.
-    ignition::math::Vector2d vec(boost::lexical_cast<double>(values[i]),
-          1.0 - boost::lexical_cast<double>(values[i+1]));
+    ignition::math::Vector2d vec(std::stod(values[i]),
+          1.0 - std::stod(values[i+1]));
     _values.push_back(vec);
 
     // create a map of duplicate indices
@@ -1604,7 +1594,9 @@ void ColladaLoaderPrivate::LoadColorOrTexture(tinyxml2::XMLElement *_elem,
   if (typeElem->FirstChildElement("color"))
   {
     std::string colorStr = typeElem->FirstChildElement("color")->GetText();
-    Color color = boost::lexical_cast<Color>(colorStr);
+    std::istringstream stream(colorStr);
+    Color color;
+    stream >> color;
     if (_type == "diffuse")
       _mat->SetDiffuse(color);
     else if (_type == "ambient")
@@ -1769,10 +1761,9 @@ void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
   // break poly into triangles
   // if vcount >= 4, anchor around 0 (note this is bad for concave elements)
   //   e.g. if vcount = 4, break into triangle 1: [0,1,2], triangle 2: [0,2,3]
-  std::vector<std::string> vcountStrs;
   tinyxml2::XMLElement *vcountXml = _polylistXml->FirstChildElement("vcount");
   std::string vcountStr = vcountXml->GetText();
-  boost::split(vcountStrs, vcountStr, boost::is_any_of("   "));
+  std::vector<std::string> vcountStrs = split(vcountStr, " ");
   std::vector<int> vcounts;
   for (unsigned int j = 0; j < vcountStrs.size(); ++j)
     vcounts.push_back(math::parseInt(vcountStrs[j]));
@@ -1786,8 +1777,7 @@ void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
   std::map<unsigned int, std::vector<GeometryIndices> > vertexIndexMap;
   unsigned int *values = new unsigned int[inputs.size()];
 
-  std::vector<std::string> strs;
-  boost::split(strs, pStr, boost::is_any_of("   "));
+  std::vector<std::string> strs = split(pStr, " ");
   std::vector<std::string>::iterator strs_iter = strs.begin();
   for (unsigned int l = 0; l < vcounts.size(); ++l)
   {
@@ -2069,7 +2059,7 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
     {
       try
       {
-        count = boost::lexical_cast<int>(_trianglesXml->Attribute("count"));
+        count = std::stoi(_trianglesXml->Attribute("count"));
       }
       catch(...)
       {
@@ -2105,9 +2095,7 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
   std::map<unsigned int, std::vector<GeometryIndices> > vertexIndexMap;
 
   unsigned int *values = new unsigned int[offsetSize];
-  std::vector<std::string> strs;
-
-  boost::split(strs, pStr, boost::is_any_of("   "));
+  std::vector<std::string> strs = split(pStr, " ");
 
   for (unsigned int j = 0; j < strs.size(); j += offsetSize)
   {
@@ -2322,7 +2310,9 @@ void ColladaLoaderPrivate::LoadTransparent(tinyxml2::XMLElement *_elem,
 
     std::string opaqueStr = opaqueCStr;
     std::string colorStr = colorCStr;
-    Color color = boost::lexical_cast<Color>(colorStr);
+    Color color;
+    std::istringstream stream(colorStr);
+    stream >> color;
 
     double srcFactor = 0;
     double dstFactor = 0;
