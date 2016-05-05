@@ -130,7 +130,6 @@ namespace ignition
     /// function are std::string and any STL container.
     /// \return The string representation (40 character) of the SHA1 hash.
     template<typename T>
-    IGNITION_COMMON_VISIBLE
     std::string sha1(const T &_buffer);
 
     /// \brief Compute the SHA1 hash of an array of bytes. Use std::string
