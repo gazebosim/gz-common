@@ -265,7 +265,6 @@ extern "C"
   static void rewinddir(DIR* dirp);
   static struct dirent *readdir(DIR *dir);
 
-
   // Internal utility functions
   static WIN32_FIND_DATAW *dirent_first(_WDIR *dirp);
   static WIN32_FIND_DATAW *dirent_next(_WDIR *dirp);
@@ -626,6 +625,26 @@ extern "C"
       dirp = NULL;
     }
     return dirp;
+  }
+
+  struct dirent *readdir(DIR *dir)
+  {
+    struct dirent *result = 0;
+
+    if (dir && dir->handle != -1)
+    {
+      if(!dir->result.d_name || _findnext(dir->handle, &dir->info) != -1)
+      {
+        result         = &dir->result;
+        result->d_name = dir->info.name;
+      }
+    }
+    else
+    {
+      errno = EBADF;
+    }
+
+    return result;
   }
 
   // Close directory stream.
