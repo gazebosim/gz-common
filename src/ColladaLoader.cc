@@ -19,7 +19,6 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include <tinyxml2.h>
 #include <math.h>
 #include <sstream>
 #include <unordered_map>
@@ -30,6 +29,7 @@
 #include "ignition/math/Vector3.hh"
 #include "ignition/math/Matrix4.hh"
 #include "ignition/math/Quaternion.hh"
+#include "ignition/common/tinyxml2.h"
 #include "ignition/common/CommonTypes.hh"
 #include "ignition/common/Console.hh"
 #include "ignition/common/Material.hh"

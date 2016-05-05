@@ -42,6 +42,10 @@ namespace ignition
       public: Time(const Time &_time);
 
       /// \brief Constructor
+      /// \param[in] _tv Time to initialize to
+      public: Time(const struct timespec &_tv);
+
+      /// \brief Constructor
       /// \param[in] _sec Seconds
       /// \param[in] _nsec Nanoseconds
       public: Time(int32_t _sec, int32_t _nsec);
@@ -210,6 +214,11 @@ namespace ignition
       public: bool operator>=(const Time &_time) const;
 
       /// \brief Greater than or equal operator
+      /// \param[in] _tv the time to compare with
+      /// \return true if tv is greater than or equal to this, false otherwise
+      public: bool operator>=(const struct timespec &_tv) const;
+
+      /// \brief Greater than or equal operator
       /// \param[in] _time the time to compare with
       /// \return true if time is greater than or equal to this, false otherwise
       public: bool operator>=(double _time) const;
@@ -276,6 +285,8 @@ namespace ignition
       /// \brief Constant multiplier to convert from nanoseconds to
       /// milliseconds.
       private: static const int32_t nsInMs;
+
+      private: static struct timespec clockResolution;
     };
   }
 }

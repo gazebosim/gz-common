@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _IGNITION_COMMON_UTIL_HH_
-#define _IGNITION_COMMON_UTIL_HH_
+#ifndef IGNITION_COMMON_UTIL_HH_
+#define IGNITION_COMMON_UTIL_HH_
 
 #include <boost/uuid/sha1.hpp>
 #include <iomanip>
@@ -172,16 +172,17 @@ namespace ignition
     /// \param[in] _buffer Input sequence. The permitted data types for this
     /// function are std::string and any STL container.
     /// \return The string representation (40 character) of the SHA1 hash.
-    template<typename T>
+    /*template<typename T>
     IGNITION_VISIBLE
     std::string getSha1(const T &_buffer);
+    */
   }
 
 }
 
 ///////////////////////////////////////////////
 // Implementation of get_sha1
-template<typename T>
+/*template<typename T>
 std::string ignition::common::getSha1(const T &_buffer)
 {
   boost::uuids::detail::sha1 sha1;
@@ -208,5 +209,5 @@ std::string ignition::common::getSha1(const T &_buffer)
   }
 
   return stream.str();
-}
+}*/
 #endif

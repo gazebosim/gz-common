@@ -1,13 +1,6 @@
 include (${project_cmake_dir}/Utils.cmake)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-include_directories(${Boost_INCLUDE_DIR})
-if (NOT USE_EXTERNAL_TINYXML2)
-  include_directories (${CMAKE_SOURCE_DIR}/deps/win/tinyxml2)
-  set (sources ${sources}
-       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml2/tinyxml2.cpp)
-endif()
-
 set (sources
   Animation.cc
   AudioDecoder.cc
@@ -16,7 +9,7 @@ set (sources
   Color.cc
   Console.cc
   Exception.cc
-  Image.cc
+  #Image.cc
   KeyFrame.cc
   Material.cc
   Mesh.cc
@@ -27,6 +20,7 @@ set (sources
   SubMesh.cc
   Time.cc
   Timer.cc
+  tinyxml2.cpp
   Util.cc
 )
 

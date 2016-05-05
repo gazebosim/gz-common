@@ -27,7 +27,7 @@ using namespace ignition;
 
 /////////////////////////////////////////////////
 /// \brief Test Util::GetSHA1
-TEST(Util_TEST, GetSHA1)
+/*TEST(Util_TEST, GetSHA1)
 {
   // Do not forget to update 'precomputedSHA1' if you modify the SHA1 input.
   std::string precomputedSHA1;
@@ -66,7 +66,7 @@ TEST(Util_TEST, GetSHA1)
     std::string sha = common::getSha1<std::string>(stream.str());
     EXPECT_EQ(sha.length(), 40u);
   }
-}
+}*/
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
