@@ -408,3 +408,27 @@ std::string ignition::common::cwd()
   return getcwd(buf, sizeof(buf)) == nullptr ? "" : buf;
 #endif
 }
+
+/////////////////////////////////////////////////
+bool ignition::common::createDirectories(const std::string &_path)
+{
+  //std::string f = "/home/nkoenig/parts/diff.txt";
+  size_t index = 0;
+  while (index < _path.size())
+  {
+    size_t end = _path.find('/', index+1);
+    std::string dir = _path.substr(0, end);
+    if (!exists(dir))
+    {
+#ifdef WINDOWS
+      _mkdir(dir);
+#else
+      mode_t mode;
+      mkdir(dir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+#endif
+    }
+    index = end;
+  }
+
+
+}

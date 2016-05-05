@@ -189,6 +189,12 @@ namespace ignition
     IGNITION_COMMON_VISIBLE
     bool removeAll(const std::string &_path);
 
+    /// \brief Create directories for the given path
+    /// \param[in] _path Path to create directories from
+    /// \return true on success
+    IGNITION_COMMON_VISIBLE
+    bool createDirectories(const std::string &_path);
+
     /// \brief Get a UUID
     /// \return A UUID string
     IGNITION_COMMON_VISIBLE
