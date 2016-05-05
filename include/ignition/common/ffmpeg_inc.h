@@ -17,7 +17,9 @@
 #ifndef __IGNITION_FFMPEG_INC_HH__
 #define __IGNITION_FFMPEG_INC_HH__
 
+#ifndef _WIN32
 #pragma GCC system_header
+#endif
 
 #ifdef HAVE_FFMPEG
 #ifndef INT64_C

@@ -70,11 +70,20 @@ namespace ignition
       /// \return The rotation amount
       public: const math::Quaterniond &Rotation() const;
 
+#ifdef _WIN32
+// Disable warning C4251 which is triggered by
+// std::unique_ptr
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
       /// \brief the translation vector
       protected: math::Vector3d translate;
 
       /// \brief the rotation quaternion
       protected: math::Quaterniond rotate;
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
     };
 
     /// \brief A keyframe for a NumericAnimation

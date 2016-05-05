@@ -112,12 +112,21 @@ namespace ignition
                    public: std::ofstream *stream;
                  };
 
+#ifdef _WIN32
+// Disable warning C4251 which is triggered by
+// std::unique_ptr
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
       /// \brief Stores the full path of the directory where all the log files
       /// are stored.
       private: std::string logDirectory;
 
       /// \brief True if initialized.
       private: bool initialized;
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
     };
 
     /// \class Logger Logger.hh common/common.hh

@@ -260,8 +260,18 @@ namespace ignition
       /// \param[in] _factor Scaling vector
       public: void SetScale(const ignition::math::Vector3d &_factor);
 
+#ifdef _WIN32
+// Disable warning C4251 which is triggered by
+// std::unique_ptr
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
+
       /// \brief Private data pointer.
       private: std::unique_ptr<SubMeshPrivate> dataPtr;
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
     };
 
     /// \brief Vertex to node weighted assignement for skeleton animation

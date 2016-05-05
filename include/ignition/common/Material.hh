@@ -57,6 +57,13 @@ namespace ignition
         SHADE_COUNT
       };
 
+#ifdef _WIN32
+// Disable warning C4251 which is triggered by
+// std::unique_ptr
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
+
       /// \brief An array of strings for the shade mode enum.
       public: static std::string ShadeModeStr[SHADE_COUNT];
 
@@ -79,6 +86,10 @@ namespace ignition
 
       /// \brief An array of strings for the blend mode enum.
       public: static std::string BlendModeStr[BLEND_COUNT];
+
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
 
       /// \brief Constructor. Create material with a default white color.
       public: Material();

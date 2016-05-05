@@ -90,6 +90,12 @@ namespace ignition
                      common::KeyFrame **_kf2,
                      unsigned int &_firstKeyIndex) const;
 
+#ifdef _WIN32
+// Disable warning C4251 which is triggered by
+// std::unique_ptr
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
 
       /// \brief animation name
       protected: std::string name;
@@ -111,6 +117,9 @@ namespace ignition
 
       /// \brief array of key frames
       protected: KeyFrame_V keyFrames;
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
     };
 
     /// \brief A pose animation.
