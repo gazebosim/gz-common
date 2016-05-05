@@ -75,9 +75,10 @@ macro (ign_install_includes _subdir)
 endmacro()
 
 #################################################
-macro (ign_install_library _name)
+macro (ign_install_library _name _exportName)
   set_target_properties(${_name} PROPERTIES SOVERSION ${PROJECT_MAJOR_VERSION} VERSION ${PROJECT_VERSION_FULL})
-  install (TARGETS ${_name} DESTINATION ${LIB_INSTALL_DIR} COMPONENT shlib)
+  install (TARGETS ${_name} EXPORT ${_exportName}
+           DESTINATION ${LIB_INSTALL_DIR} COMPONENT shlib)
 endmacro ()
 
 #################################################

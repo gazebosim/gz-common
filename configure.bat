@@ -26,6 +26,7 @@ cmake -G "NMake Makefiles"^
     -DBOOST_LIBRARYDIR:STRING="%BOOST_LIBRARY_DIR%"^
     -DCMAKE_INSTALL_PREFIX="install/%build_type%"^
     -DCMAKE_BUILD_TYPE="%build_type%"^
+  -DENABLE_TESTS_COMPILATION:BOOL=True ..
     ..
 
 @if %errorlevel% neq 0 exit /b %errorlevel%
