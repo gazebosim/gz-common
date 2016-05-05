@@ -135,18 +135,18 @@ std::string SystemPaths::FindFileHelper(const std::string & /*_filename*/)
 std::string SystemPaths::FindFile(const std::string &_filename,
                                   bool _searchLocalPath)
 {
-  boost::filesystem::path path;
+  std::string path;
 
   if (_filename.empty())
-    return path.string();
+    return path;
 
   if (_filename.find("://") != std::string::npos)
   {
-    path = boost::filesystem::path(this->FindFileURI(_filename));
+    path = this->FindFileURI(_filename);
   }
   else if (_filename[0] == '/')
   {
-    path = boost::filesystem::path(_filename);
+    path = _filename;
   }
   else
   {
@@ -154,8 +154,7 @@ std::string SystemPaths::FindFile(const std::string &_filename,
 
     try
     {
-      path = boost::filesystem::operator/(boost::filesystem::current_path(),
-          _filename);
+      path = boost::filesystem::current_path().string() + "/" + _filename;
     }
     catch(boost::filesystem::filesystem_error &_e)
     {
@@ -170,13 +169,13 @@ std::string SystemPaths::FindFile(const std::string &_filename,
     else if ((_filename[0] == '/' || _filename[0] == '.' || _searchLocalPath)
              && boost::filesystem::exists(boost::filesystem::path(_filename)))
     {
-      path = boost::filesystem::path(_filename);
+      path = _filename;
       found = true;
     }
     else
     {
       path = this->FindFileHelper(_filename);
-      found = !path.string().empty();
+      found = !path.empty();
     }
 
     if (!found)
@@ -189,7 +188,7 @@ std::string SystemPaths::FindFile(const std::string &_filename,
     return std::string();
   }
 
-  return path.string();
+  return path;
 }
 
 /////////////////////////////////////////////////
