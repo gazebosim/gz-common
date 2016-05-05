@@ -34,13 +34,13 @@ TEST(TimeTest, Time)
 
   time = common::Time(1, 1000)
        + common::Time(1.5)
-       + common::Time(0, 1e9);
-  EXPECT_TRUE(time == common::Time(3, 5e8 + 1000));
+       + common::Time(0, static_cast<int32_t>(1e9));
+  EXPECT_TRUE(time == common::Time(3,  static_cast<int32_t>(5e8 + 1000)));
 
   time.Set(1, 1000);
   time += common::Time(1.5);
-  time += common::Time(0, 1e9);
-  EXPECT_TRUE(time == common::Time(3, 5e8 + 1000));
+  time += common::Time(0,  static_cast<int32_t>(1e9));
+  EXPECT_TRUE(time == common::Time(3,  static_cast<int32_t>(5e8 + 1000)));
 
   time.Set(1, 1000);
   time -= common::Time(1, 1000);
