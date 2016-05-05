@@ -21,8 +21,6 @@
 #include <ignition/common/Color.hh>
 #include <ignition/common/System.hh>
 
-struct FIBITMAP;
-
 namespace ignition
 {
   namespace common
@@ -177,12 +175,8 @@ namespace ignition
       /// \return true if image has a bitmap
       public: bool Valid() const;
 
-      /// \brief Implementation of GetData
-      private: void GetDataImpl(unsigned char **_data, unsigned int &_count,
-          FIBITMAP *_img) const;
-
       /// \brief Private data pointer
-      private: ImagePrivate *data;
+      private: ImagePrivate *dataPtr;
     };
   }
 }
