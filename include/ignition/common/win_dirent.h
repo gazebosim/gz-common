@@ -263,6 +263,7 @@ extern "C"
   static DIR *opendir(const char *dirname);
   static int closedir(DIR *dirp);
   static void rewinddir(DIR* dirp);
+  static struct dirent *readdir(DIR *dir);
 
 
   // Internal utility functions
