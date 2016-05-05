@@ -14,13 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef _IGNITION_TEST_UTIL_HH_
-#define _IGNITION_TEST_UTIL_HH_
+#ifndef IGNITION_TEST_UTIL_HH_
+#define IGNITION_TEST_UTIL_HH_
 
 #include <gtest/gtest.h>
-#include <boost/filesystem.hpp>
 #include <string>
 #include <ignition/common/Console.hh>
+#include <ignition/common/Util.hh>
 
 namespace ignition
 {
@@ -41,8 +41,8 @@ namespace ignition
         std::string logPath(getenv("HOME"));
         logPath = logPath + "/.ignition/test_logs";
 
-        if (!boost::filesystem::exists(logPath))
-          boost::filesystem::create_directories(logPath);
+        if (!ignition::common::exists(logPath))
+          ignition::common::createDirectories(logPath);
 
         const ::testing::TestInfo *const testInfo =
           ::testing::UnitTest::GetInstance()->current_test_info();

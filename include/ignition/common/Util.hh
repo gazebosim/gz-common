@@ -208,6 +208,33 @@ namespace ignition
     IGNITION_COMMON_VISIBLE
     std::vector<std::string> split(const std::string &_str,
                                    const std::string &_delim);
+
+    /// \brief In place left trim
+    /// \param[in,out] _s String to trim
+    void ltrim(std::string &_s);
+
+    /// \brief In place right trim
+    /// \param[in,out] _s String to trim
+    void rtrim(std::string &_s);
+
+    /// \brief In place trim from both ends
+    /// \param[in,out] _s String to trim
+    void trim(std::string &_s);
+
+    /// \brief Copying left trim
+    /// \param[in] _s String to trim
+    /// \return Trimmed string
+    std::string ltrimmed(std::string _s);
+
+    /// \brief Copying right trim
+    /// \param[in] _s String to trim
+    /// \return Trimmed string
+    std::string rtrimmed(std::string _s);
+
+    /// \brief Copying trim from both ends
+    /// \param[in] _s String to trim
+    /// \return Trimmed string
+    std::string trimmed(std::string _s);
   }
 }
 

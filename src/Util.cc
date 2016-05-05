@@ -27,6 +27,7 @@
 #include <sys/stat.h>
 #include <iomanip>
 #include <array>
+#include <algorithm>
 #include <sstream>
 #include <fstream>
 #include <cstdlib>
@@ -455,4 +456,47 @@ std::vector<std::string> ignition::common::split(const std::string &_str,
 
   free(str);
   return tokens;
+}
+
+/////////////////////////////////////////////////
+void ignition::common::ltrim(std::string &_s)
+{
+  _s.erase(_s.begin(), std::find_if(_s.begin(), _s.end(),
+        std::not1(std::ptr_fun<int, int>(std::isspace))));
+}
+
+/////////////////////////////////////////////////
+void ignition::common::rtrim(std::string &_s)
+{
+  _s.erase(std::find_if(_s.rbegin(), _s.rend(),
+        std::not1(std::ptr_fun<int, int>(std::isspace))).base(),
+      _s.end());
+}
+
+/////////////////////////////////////////////////
+void ignition::common::trim(std::string &_s)
+{
+  ignition::common::ltrim(_s);
+  ignition::common::rtrim(_s);
+}
+
+/////////////////////////////////////////////////
+std::string ignition::common::ltrimmed(std::string _s)
+{
+  ignition::common::ltrim(_s);
+  return _s;
+}
+
+/////////////////////////////////////////////////
+std::string ignition::common::rtrimmed(std::string _s)
+{
+  ignition::common::rtrim(_s);
+  return _s;
+}
+
+/////////////////////////////////////////////////
+std::string ignition::common::trimmed(std::string _s)
+{
+  ignition::common::trim(_s);
+  return _s;
 }

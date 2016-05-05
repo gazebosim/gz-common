@@ -14,8 +14,6 @@
  * limitations under the License.
  *
 */
-#include <boost/algorithm/string.hpp>
-
 #include <algorithm>
 #include <fstream>
 #include <sstream>
@@ -65,9 +63,8 @@ Skeleton *BVHLoader::Load(const std::string &_filename, const double _scale)
     while (!file.eof())
     {
       getline(file, line);
-      std::vector<std::string> words;
-      boost::trim(line);
-      boost::split(words, line, boost::is_any_of("   "));
+      trim(line);
+      std::vector<std::string> words = split(line, " ");
       if (words[0] == "ROOT" || words[0] == "JOINT")
       {
         if (words.size() < 2)
@@ -152,9 +149,8 @@ Skeleton *BVHLoader::Load(const std::string &_filename, const double _scale)
     }
   }
   getline(file, line);
-  std::vector<std::string> words;
-  boost::trim(line);
-  boost::split(words, line, boost::is_any_of("   "));
+  trim(line);
+  std::vector<std::string> words = split(line, " ");
   unsigned int frameCount = 0;
   double frameTime = 0.0;
   if (words[0] != "Frames:" || words.size() < 2)
@@ -169,8 +165,8 @@ Skeleton *BVHLoader::Load(const std::string &_filename, const double _scale)
 
   getline(file, line);
   words.clear();
-  boost::trim(line);
-  boost::split(words, line, boost::is_any_of("   "));
+  trim(line);
+  words = split(line, " ");
 
   if (words.size() < 3 || words[0] != "Frame" || words[1] != "Time:")
   {
@@ -189,8 +185,8 @@ Skeleton *BVHLoader::Load(const std::string &_filename, const double _scale)
   {
     getline(file, line);
     words.clear();
-    boost::trim(line);
-    boost::split(words, line, boost::is_any_of("   "));
+    trim(line);
+    words = split(line, " ");
     if (words.size() < totalChannels)
     {
       ignwarn << "Frame " << frameNo << " invalid.\n";
