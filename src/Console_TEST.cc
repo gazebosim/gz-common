@@ -22,6 +22,7 @@
 #include "ignition/common/Console.hh"
 #include "ignition/common/Util.hh"
 
+#ifndef _WIN32
 const int g_messageRepeat = 4;
 
 class Console_TEST {};
@@ -51,7 +52,6 @@ std::string GetLogContent(const std::string &_filename)
 /// \brief Test Console::Init and Console::Log
 TEST(Console_TEST, NoInitAndLog)
 {
-#ifndef _WIN32
   // Log the string
   std::string logString = "this is a test";
   ignlog << logString << std::endl;
@@ -67,14 +67,12 @@ TEST(Console_TEST, NoInitAndLog)
   EXPECT_TRUE(ignition::common::env(IGN_HOMEDIR, path));
   path = path + "/" + logPath;
   ignition::common::removeAll(path);
-#endif
 }
 
 /////////////////////////////////////////////////
 /// \brief Test Console::Init and Console::Log
 TEST(Console_TEST, InitAndLog)
 {
-#ifndef _WIN32
   // Create a unique directory path
   std::string path = ignition::common::uuid();
 
@@ -98,7 +96,6 @@ TEST(Console_TEST, InitAndLog)
 
   // Cleanup
   ignition::common::removeAll(basePath);
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -121,7 +118,6 @@ TEST(Console_TEST, LogSlashN)
     ignlog << logString << " _n__ " << i << '\n';
   }
 
-#ifndef _WIN32
   std::string logContent = GetLogContent(logPath);
 
   for (int i = 0; i < g_messageRepeat; ++i)
@@ -130,7 +126,6 @@ TEST(Console_TEST, LogSlashN)
     stream << logString << " _n__ " << i;
     EXPECT_TRUE(logContent.find(stream.str()) != std::string::npos);
   }
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -153,7 +148,6 @@ TEST(Console_TEST, LogStdEndl)
     ignlog << logString << " endl " << i << std::endl;
   }
 
-#ifndef _WIN32
   std::string logContent = GetLogContent(logPath);
 
   for (int i = 0; i < g_messageRepeat; ++i)
@@ -162,7 +156,6 @@ TEST(Console_TEST, LogStdEndl)
     stream << logString << " endl " << i;
     EXPECT_TRUE(logContent.find(stream.str()) != std::string::npos);
   }
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -185,7 +178,6 @@ TEST(Console_TEST, ColorWarnSlashN)
     ignwarn << logString << " _n__ " << i << '\n';
   }
 
-#ifndef _WIN32
   std::string logContent = GetLogContent(logPath);
 
   for (int i = 0; i < g_messageRepeat; ++i)
@@ -194,7 +186,6 @@ TEST(Console_TEST, ColorWarnSlashN)
     stream << logString << " _n__ " << i;
     EXPECT_TRUE(logContent.find(stream.str()) != std::string::npos);
   }
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -217,7 +208,6 @@ TEST(Console_TEST, ColorWarnStdEndl)
     ignwarn << logString << " endl " << i << std::endl;
   }
 
-#ifndef _WIN32
   std::string logContent = GetLogContent(logPath);
 
   for (int i = 0; i < g_messageRepeat; ++i)
@@ -226,7 +216,6 @@ TEST(Console_TEST, ColorWarnStdEndl)
     stream << logString << " endl " << i;
     EXPECT_TRUE(logContent.find(stream.str()) != std::string::npos);
   }
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -249,7 +238,6 @@ TEST(Console_TEST, ColorDbgSlashN)
     igndbg << logString << " _n__ " << i << '\n';
   }
 
-#ifndef _WIN32
   std::string logContent = GetLogContent(logPath);
 
   for (int i = 0; i < g_messageRepeat; ++i)
@@ -258,7 +246,6 @@ TEST(Console_TEST, ColorDbgSlashN)
     stream << logString << " _n__ " << i;
     EXPECT_TRUE(logContent.find(stream.str()) != std::string::npos);
   }
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -281,7 +268,6 @@ TEST(Console_TEST, ColorDbgStdEndl)
     igndbg << logString << " endl " << i << std::endl;
   }
 
-#ifndef _WIN32
   std::string logContent = GetLogContent(logPath);
 
   for (int i = 0; i < g_messageRepeat; ++i)
@@ -290,7 +276,6 @@ TEST(Console_TEST, ColorDbgStdEndl)
     stream << logString << " endl " << i;
     EXPECT_TRUE(logContent.find(stream.str()) != std::string::npos);
   }
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -313,7 +298,6 @@ TEST(Console_TEST, ColorMsgSlashN)
     ignmsg << logString << " _n__ " << i << '\n';
   }
 
-#ifndef _WIN32
   std::string logContent = GetLogContent(logPath);
 
   for (int i = 0; i < g_messageRepeat; ++i)
@@ -322,7 +306,6 @@ TEST(Console_TEST, ColorMsgSlashN)
     stream << logString << " _n__ " << i;
     EXPECT_TRUE(logContent.find(stream.str()) != std::string::npos);
   }
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -345,7 +328,6 @@ TEST(Console_TEST, ColorMsgStdEndl)
     ignmsg << logString << " endl " << i << std::endl;
   }
 
-#ifndef _WIN32
   std::string logContent = GetLogContent(logPath);
 
   for (int i = 0; i < g_messageRepeat; ++i)
@@ -354,7 +336,6 @@ TEST(Console_TEST, ColorMsgStdEndl)
     stream << logString << " endl " << i;
     EXPECT_TRUE(logContent.find(stream.str()) != std::string::npos);
   }
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -377,7 +358,6 @@ TEST(Console_TEST, ColorErrSlashN)
     ignerr << logString << " _n__ " << i << '\n';
   }
 
-#ifndef _WIN32
   std::string logContent = GetLogContent(logPath);
 
   for (int i = 0; i < g_messageRepeat; ++i)
@@ -386,7 +366,6 @@ TEST(Console_TEST, ColorErrSlashN)
     stream << logString << " _n__ " << i;
     EXPECT_TRUE(logContent.find(stream.str()) != std::string::npos);
   }
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -409,7 +388,6 @@ TEST(Console_TEST, ColorErrStdEndl)
     ignerr << logString << " endl " << i << std::endl;
   }
 
-#ifndef _WIN32
   std::string logContent = GetLogContent(logPath);
 
   for (int i = 0; i < g_messageRepeat; ++i)
@@ -418,7 +396,6 @@ TEST(Console_TEST, ColorErrStdEndl)
     stream << logString << " endl " << i;
     EXPECT_TRUE(logContent.find(stream.str()) != std::string::npos);
   }
-#endif
 }
 
 /////////////////////////////////////////////////
@@ -438,11 +415,9 @@ TEST(Console_TEST, ColorMsg)
 
   ignmsg << logString << std::endl;
 
-#ifndef _WIN32
   std::string logContent = GetLogContent(logPath);
 
   EXPECT_TRUE(logContent.find(logString) != std::string::npos);
-#endif
 }
 
 /////////////////////////////////////////////////
@@ -462,11 +437,9 @@ TEST(Console_TEST, ColorErr)
 
   ignerr << logString << std::endl;
 
-#ifndef _WIN32
   std::string logContent = GetLogContent(logPath);
 
   EXPECT_TRUE(logContent.find(logString) != std::string::npos);
-#endif
 }
 
 /////////////////////////////////////////////////
@@ -481,14 +454,12 @@ TEST(Console_TEST, LogDirectory)
 
   std::string logDir = ignLogDirectory();
 
-#ifndef _WIN32
   // Get the absolute path
   std::string absPath;
   EXPECT_TRUE(ignition::common::env(IGN_HOMEDIR, absPath));
   absPath = absPath + "/" + path;
 
   EXPECT_EQ(logDir, absPath);
-#endif
 }
 
 /////////////////////////////////////////////////
@@ -497,3 +468,4 @@ int main(int argc, char **argv)
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
+#endif
