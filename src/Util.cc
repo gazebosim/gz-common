@@ -306,7 +306,7 @@ bool ignition::common::env(const std::string &_name, std::string &_value)
 {
   std::string v;
 #ifdef _WIN32
-  const DWORD buffSize = 65535;
+  const DWORD buffSize = 32767;
   static char buffer[buffSize];
   if (GetEnvironmentVariable(_name.c_str(), buffer, buffSize))
   {

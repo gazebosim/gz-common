@@ -35,6 +35,7 @@ namespace ignition
       /// \brief Setup the test fixture. This gets called by gtest.
       protected: virtual void SetUp()
       {
+#ifndef _WIN32
         std::string logPath;
         ASSERT_TRUE(ignition::common::env(IGN_HOMEDIR, logPath));
 
@@ -57,23 +58,29 @@ namespace ignition
 
         // Read the full path to the log directory.
         this->logDirectory = ignLogDirectory();
+#endif
       }
 
       /// \brief Get a string with the full log file path.
       /// \return The full log file path as a string.
       protected: std::string GetFullLogPath() const
       {
+#ifndef _WIN32
         return this->logDirectory + "/" + this->logFilename;
+#else
+        return std::string();
+#endif
       }
 
       /// \brief Get a string with all the log content loaded from the disk.
       /// \return A string will all the log content.
       protected: std::string LogContent() const
       {
+        std::string loggedString;
+#ifndef _WIN32
         std::cout << "2 Log Path[" <<this->GetFullLogPath() << "]\n";
         // Open the log file, and read back the string
         std::ifstream ifs(this->GetFullLogPath().c_str(), std::ios::in);
-        std::string loggedString;
 
         while (!ifs.eof())
         {
@@ -81,7 +88,7 @@ namespace ignition
           std::getline(ifs, line);
           loggedString += line;
         }
-
+#endif
         return loggedString;
       }
 
