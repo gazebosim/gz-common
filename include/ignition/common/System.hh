@@ -47,14 +47,14 @@
       #define IGNITION_COMMON_VISIBLE __declspec(dllimport)
     #endif
   #endif
-  #define IGNITION_HIDDEN
+  #define IGNITION_COMMON_HIDDEN
 #else
   #if __GNUC__ >= 4
     #define IGNITION_COMMON_VISIBLE __attribute__ ((visibility ("default")))
-    #define IGNITION_HIDDEN  __attribute__ ((visibility ("hidden")))
+    #define IGNITION_COMMON_HIDDEN  __attribute__ ((visibility ("hidden")))
   #else
     #define IGNITION_COMMON_VISIBLE
-    #define IGNITION_HIDDEN
+    #define IGNITION_COMMON_HIDDEN
   #endif
 #endif
 
