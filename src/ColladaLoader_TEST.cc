@@ -101,7 +101,7 @@ TEST_F(ColladaLoader, LoadZeroCount)
   common::Mesh *mesh = loader.Load(
       std::string(PROJECT_SOURCE_PATH) + "/test/data/zero_count.dae");
   ASSERT_TRUE(mesh);
-
+#ifndef _WIN32
   std::string log = LogContent();
 
   // Expect no errors about missing values
@@ -115,6 +115,7 @@ TEST_F(ColladaLoader, LoadZeroCount)
       std::string::npos);
   EXPECT_NE(log.find("Normal source has a float_array with a count of zero"),
       std::string::npos);
+#endif
 }
 
 /////////////////////////////////////////////////
