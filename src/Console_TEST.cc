@@ -51,6 +51,7 @@ std::string GetLogContent(const std::string &_filename)
 /// \brief Test Console::Init and Console::Log
 TEST(Console_TEST, NoInitAndLog)
 {
+#ifndef _WIN32
   // Log the string
   std::string logString = "this is a test";
   ignlog << logString << std::endl;
@@ -58,22 +59,22 @@ TEST(Console_TEST, NoInitAndLog)
   // Get the absolute log file path
   std::string logPath = ".ignition/auto_default.log";
 
-#ifndef _WIN32
   // Expect to find the string in the log file
   EXPECT_TRUE(GetLogContent(logPath).find(logString) != std::string::npos);
-#endif
 
   // Cleanup
   std::string path;
   EXPECT_TRUE(ignition::common::env(IGN_HOMEDIR, path));
   path = path + "/" + logPath;
   ignition::common::removeAll(path);
+#endif
 }
 
 /////////////////////////////////////////////////
 /// \brief Test Console::Init and Console::Log
 TEST(Console_TEST, InitAndLog)
 {
+#ifndef _WIN32
   // Create a unique directory path
   std::string path = ignition::common::uuid();
 
@@ -92,13 +93,12 @@ TEST(Console_TEST, InitAndLog)
   // Get the absolute log file path
   std::string logPath = path + "/test.log";
 
-#ifndef _WIN32
   // Expect to find the string in the log file
   EXPECT_TRUE(GetLogContent(logPath).find(logString) != std::string::npos);
-#endif
 
   // Cleanup
   ignition::common::removeAll(basePath);
+#endif
 }
 
 //////////////////////////////////////////////////
