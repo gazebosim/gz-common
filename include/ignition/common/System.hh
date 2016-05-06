@@ -31,7 +31,7 @@
 /// \def IGNITION_COMMON_VISIBLE
 /// Use to represent "symbol visible" if supported
 
-/// \def IGNITION_HIDDEN
+/// \def IGNITION_COMMON_HIDDEN
 /// Use to represent "symbol hidden" if supported
 #if defined _WIN32 || defined __CYGWIN__
   #ifdef BUILDING_DLL
