@@ -16,7 +16,7 @@ fi
 
 # Identify cppcheck version
 CPPCHECK_VERSION=`cppcheck --version | sed -e 's@Cppcheck @@'`
-CPPCHECK_LT_157=`echo "$CPPCHECK_VERSION 1.57" | \
+CPPCHECK_LT_161=`echo "$CPPCHECK_VERSION 1.61" | \
                  awk '{if ($1 < $2) print 1; else print 0}'`
 
 QUICK_CHECK=0
@@ -47,7 +47,7 @@ then
 else
   CHECK_DIRS="./src ./include ./test/integration ./test/regression ./test/performance"
   EXCLUDE_DIRS="./src/tinyxml2"
-  if [ $CPPCHECK_LT_157 -eq 1 ]; then
+  if [ $CPPCHECK_LT_161 -eq 1 ]; then
     # cppcheck is older than 1.57, so don't check header files (issue #907)
     CPPCHECK_FILES=`find $CHECK_DIRS -name "*.cc"`
   else
@@ -67,7 +67,7 @@ echo "" > $SUPPRESS
 
 #cppcheck
 CPPCHECK_BASE="cppcheck -q --suppressions-list=$SUPPRESS"
-if [ $CPPCHECK_LT_157 -eq 0 ]; then
+if [ $CPPCHECK_LT_161 -eq 0 ]; then
   # use --language argument if 1.57 or greater (issue #907)
   CPPCHECK_BASE="$CPPCHECK_BASE --language=c++"
 fi
@@ -104,7 +104,7 @@ elif [ $QUICK_CHECK -eq 1 ]; then
     DO_CPPCHECK=0
     if [ $ext = 'cc' ]; then
       DO_CPPCHECK=1
-    elif [ $CPPCHECK_LT_157 -eq 0 ]; then
+    elif [ $CPPCHECK_LT_161 -eq 0 ]; then
       DO_CPPCHECK=1
     fi 
 
