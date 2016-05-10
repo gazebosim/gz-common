@@ -95,7 +95,7 @@ Time::~Time()
 /////////////////////////////////////////////////
 const Time &Time::SystemTime()
 {
-  auto duration = ign_system_time().time_since_epoch();
+  auto duration = IGN_SYSTEM_TIME().time_since_epoch();
   wallTime.sec = std::chrono::duration_cast<std::chrono::seconds>(
       duration).count();
   wallTime.nsec = std::chrono::duration_cast<std::chrono::nanoseconds>(

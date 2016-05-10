@@ -70,7 +70,7 @@ Logger &Logger::operator()(const std::string &_file, int _line)
 {
   int index = _file.find_last_of("/") + 1;
 
-  Console::log << "(" << ign_system_time_ns() << ") ";
+  Console::log << "(" << IGN_SYSTEM_TIME_NS() << ") ";
   (*this) << this->prefix
     << "[" << _file.substr(index , _file.size() - index) << ":"
     << _line << "] ";
@@ -182,7 +182,7 @@ FileLogger &FileLogger::operator()()
   if (!this->initialized)
     this->Init(".ignition", "auto_default.log");
 
-  (*this) << "(" << ign_system_time_ns() << ") ";
+  (*this) << "(" << IGN_SYSTEM_TIME_NS() << ") ";
   return (*this);
 }
 
@@ -193,7 +193,7 @@ FileLogger &FileLogger::operator()(const std::string &_file, int _line)
     this->Init(".ignition", "auto_default.log");
 
   int index = _file.find_last_of("/") + 1;
-  (*this) << "(" << ign_system_time_ns() << ") ["
+  (*this) << "(" << IGN_SYSTEM_TIME_NS() << ") ["
     << _file.substr(index , _file.size() - index) << ":" << _line << "]";
 
   return (*this);

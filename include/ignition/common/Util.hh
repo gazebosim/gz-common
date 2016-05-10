@@ -49,46 +49,46 @@
 #define IGN_SPEED_OF_LIGHT = 299792458.0
 
 /// \brief Sleep for the specifed number of seconds
-#define ign_sleep_s(_s) (std::this_thread::sleep_for(\
+#define IGN_SLEEP_S(_s) (std::this_thread::sleep_for(\
                          std::chrono::seconds(_s)))
 
 /// \brief Sleep for the specifed number of microseconds
-#define ign_sleep_us(_us) (std::this_thread::sleep_for(\
+#define IGN_SLEEP_US(_us) (std::this_thread::sleep_for(\
                            std::chrono::microseconds(_us)))
 
 /// \brief Sleep for the specifed number of milliseconds
-#define ign_sleep_ms(_ms) (std::this_thread::sleep_for(\
+#define IGN_SLEEP_MS(_ms) (std::this_thread::sleep_for(\
                            std::chrono::milliseconds(_ms)))
 
 /// \brief Sleep for the specifed number of nanoseconds
-#define ign_sleep_ns(_ns) (std::this_thread::sleep_for(\
+#define IGN_SLEEP_NS(_ns) (std::this_thread::sleep_for(\
                            std::chrono::nanoseconds(_ns)))
 
 /// \brief Get the system time.
-#define ign_system_time() (std::chrono::system_clock::now())
+#define IGN_SYSTEM_TIME() (std::chrono::system_clock::now())
 
 /// \brief Get the system time in seconds since epoch.
-#define ign_system_time_s() (std::chrono::duration_cast<std::chrono::seconds>(\
+#define IGN_SYSTEM_TIME_S() (std::chrono::duration_cast<std::chrono::seconds>(\
       std::chrono::system_clock::now().time_since_epoch()).count())
 
 /// \brief Get the system time in microseconds since epoch.
-#define ign_system_time_us() (std::chrono::duration_cast<\
+#define IGN_SYSTEM_TIME_US() (std::chrono::duration_cast<\
     std::chrono::microseconds>(\
       std::chrono::system_clock::now().time_since_epoch()).count())
 
 /// \brief Get the system time in milliseconds since epoch.
-#define ign_system_time_ms() (std::chrono::duration_cast<\
+#define IGN_SYSTEM_TIME_MS() (std::chrono::duration_cast<\
     std::chrono::milliseconds>(\
       std::chrono::system_clock::now().time_since_epoch()).count())
 
 /// \brief Get the system time in nanoseconds since epoch.
-#define ign_system_time_ns() (std::chrono::duration_cast<\
+#define IGN_SYSTEM_TIME_NS() (std::chrono::duration_cast<\
     std::chrono::nanoseconds>(\
       std::chrono::system_clock::now().time_since_epoch()).count())
 
 /// \brief This macro defines the standard way of launching an exception
 /// inside ignition.
-#define ign_assert(_expr, _msg) assert((_msg, _expr))
+#define IGN_ASSERT(_expr, _msg) assert((_msg, _expr))
 
 /// \brief Forward declarations for the common classes
 namespace ignition
