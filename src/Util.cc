@@ -385,7 +385,6 @@ bool ignition::common::removeDirectoryOrFile(const std::string &_path)
 /////////////////////////////////////////////////
 bool ignition::common::removeAll(const std::string &_path)
 {
-  std::cout << "Remove All[" << _path << "]\n";
   if (ignition::common::isDirectory(_path))
   {
     DIR *dir = opendir(_path.c_str());

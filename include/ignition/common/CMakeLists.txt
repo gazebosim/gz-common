@@ -6,6 +6,7 @@ set (headers
   Base64.hh
   Battery.hh
   BVHLoader.hh
+  ColladaExporter.hh
   ColladaLoader.hh
   Color.hh
   Console.hh
@@ -15,6 +16,7 @@ set (headers
   KeyFrame.hh
   Material.hh
   Mesh.hh
+  MeshExporter.hh
   NodeTransform.hh
   SingletonT.hh
   Skeleton.hh
