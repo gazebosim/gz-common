@@ -1665,7 +1665,7 @@ void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
   // a set of triangle meshes.  The assumption is that
   // each polylist polygon is convex, and we do decomposion
   // by anchoring each triangle about vertex 0 or each polygon
-  SubMeshPtr subMesh(new SubMesh());
+  std::unique_ptr<SubMesh> subMesh(new SubMesh);
   subMesh->SetName(this->currentNodeName);
   bool combinedVertNorms = false;
 
@@ -1956,14 +1956,14 @@ void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
   }
   delete [] values;
 
-  _mesh->AddSubMesh(subMesh);
+  _mesh->AddSubMesh(std::move(subMesh));
 }
 
 /////////////////////////////////////////////////
 void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
     const ignition::math::Matrix4d &_transform, Mesh *_mesh)
 {
-  SubMeshPtr subMesh(new SubMesh);
+  std::unique_ptr<SubMesh> subMesh(new SubMesh);
   subMesh->SetName(this->currentNodeName);
   bool combinedVertNorms = false;
 
@@ -2231,14 +2231,14 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
   }
 
   delete [] values;
-  _mesh->AddSubMesh(subMesh);
+  _mesh->AddSubMesh(std::move(subMesh));
 }
 
 /////////////////////////////////////////////////
 void ColladaLoaderPrivate::LoadLines(tinyxml2::XMLElement *_xml,
     const ignition::math::Matrix4d &_transform, Mesh *_mesh)
 {
-  SubMeshPtr subMesh(new SubMesh);
+  std::unique_ptr<SubMesh> subMesh(new SubMesh);
   subMesh->SetName(this->currentNodeName);
   subMesh->SetPrimitiveType(SubMesh::LINES);
 
@@ -2267,7 +2267,7 @@ void ColladaLoaderPrivate::LoadLines(tinyxml2::XMLElement *_xml,
     subMesh->AddIndex(subMesh->VertexCount() - 1);
   } while (iss);
 
-  _mesh->AddSubMesh(subMesh);
+  _mesh->AddSubMesh(std::move(subMesh));
 }
 
 /////////////////////////////////////////////////

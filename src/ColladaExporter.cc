@@ -46,7 +46,7 @@ class ignition::common::ColladaExporterPrivate
   /// \param[in] _type POSITION, NORMAL or UVMAP
   /// \param[in] _meshID Mesh ID (mesh_<number>)
   public: void ExportGeometrySource(
-      const ignition::common::SubMesh *_subMesh,
+      const SubMesh *_subMesh,
       tinyxml2::XMLElement *_meshXml, GeometryType _type, const char *_meshID);
 
   /// \brief Export library geometries element
@@ -346,7 +346,9 @@ void ColladaExporterPrivate::ExportGeometries(
       _libraryGeometriesXml->GetDocument()->NewElement("mesh");
     geometryXml->LinkEndChild(meshXml);
 
-    const ignition::common::SubMeshPtr subMesh = this->mesh->SubMeshByIndex(i);
+    std::shared_ptr<SubMesh> subMesh = this->mesh->SubMeshByIndex(i).lock();
+    if (!subMesh)
+      continue;
 
     this->ExportGeometrySource(subMesh.get(), meshXml, POSITION, meshId);
     this->ExportGeometrySource(subMesh.get(), meshXml, NORMAL, meshId);

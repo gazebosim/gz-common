@@ -37,7 +37,7 @@ namespace ignition
       public: std::string path;
 
       /// \brief The sub mesh array.
-      public: std::vector<SubMeshPtr> submeshes;
+      public: std::vector<std::shared_ptr<SubMesh>> submeshes;
 
       /// \brief The materials array.
       public: std::vector<MaterialPtr> materials;

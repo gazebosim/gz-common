@@ -42,7 +42,6 @@ Mesh::Mesh()
 //////////////////////////////////////////////////
 Mesh::~Mesh()
 {
-  this->dataPtr->submeshes.clear();
   this->dataPtr->materials.clear();
 }
 
@@ -161,9 +160,19 @@ unsigned int Mesh::TexCoordCount() const
 }
 
 //////////////////////////////////////////////////
-void Mesh::AddSubMesh(const SubMeshPtr &_sub)
+std::weak_ptr<SubMesh> Mesh::AddSubMesh(const SubMesh &_sub)
 {
-  this->dataPtr->submeshes.push_back(_sub);
+  auto sub = std::shared_ptr<SubMesh>(new SubMesh(_sub));
+  this->dataPtr->submeshes.push_back(sub);
+  return sub;
+}
+
+//////////////////////////////////////////////////
+std::weak_ptr<SubMesh> Mesh::AddSubMesh(std::unique_ptr<SubMesh> _sub)
+{
+  auto sub = std::shared_ptr<SubMesh>(std::move(_sub));
+  this->dataPtr->submeshes.push_back(sub);
+  return sub;
 }
 
 //////////////////////////////////////////////////
@@ -173,21 +182,19 @@ unsigned int Mesh::SubMeshCount() const
 }
 
 //////////////////////////////////////////////////
-SubMeshPtr Mesh::SubMeshByIndex(unsigned int _index) const
+std::weak_ptr<SubMesh> Mesh::SubMeshByIndex(unsigned int _index) const
 {
   if (_index < this->dataPtr->submeshes.size())
     return this->dataPtr->submeshes[_index];
 
-  std::stringstream msg;
-  msg << "Invalid index: " << _index << " >= " <<
-      this->dataPtr->submeshes.size();
-  ignerr << msg.str() << std::endl;
+  ignerr << "Invalid index: " << _index << " >= " <<
+      this->dataPtr->submeshes.size() << std::endl;
 
-  return NULL;
+  return std::shared_ptr<SubMesh>(nullptr);
 }
 
 //////////////////////////////////////////////////
-SubMeshPtr Mesh::SubMeshByName(const std::string &_name) const
+std::weak_ptr<SubMesh> Mesh::SubMeshByName(const std::string &_name) const
 {
   // Find the submesh with the provided name.
   for (const auto &submesh : this->dataPtr->submeshes)
@@ -196,7 +203,7 @@ SubMeshPtr Mesh::SubMeshByName(const std::string &_name) const
       return submesh;
   }
 
-  return NULL;
+  return std::shared_ptr<SubMesh>(nullptr);
 }
 
 //////////////////////////////////////////////////
@@ -367,7 +374,7 @@ void Mesh::AABB(ignition::math::Vector3d &_center,
   _center.Y(0);
   _center.Z(0);
 
-  for (auto &submesh : this->dataPtr->submeshes)
+  for (auto const &submesh : this->dataPtr->submeshes)
   {
     ignition::math::Vector3d max = submesh->Max();
     ignition::math::Vector3d min = submesh->Min();

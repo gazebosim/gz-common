@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-
+#include <memory>
 #include "ignition/common/Battery.hh"
 #include "test/util.hh"
 
@@ -26,7 +26,7 @@ class BatteryTest : public ignition::testing::AutoLogFixture { };
 TEST_F(BatteryTest, Construction)
 {
   // Create the battery
-  common::BatteryPtr battery(new common::Battery());
+  std::unique_ptr<common::Battery> battery(new common::Battery());
   EXPECT_TRUE(battery != nullptr);
 
   EXPECT_DOUBLE_EQ(battery->Voltage(), 0.0);
@@ -37,7 +37,7 @@ TEST_F(BatteryTest, Construction)
 TEST_F(BatteryTest, AddConsumer)
 {
   // Create the battery
-  common::BatteryPtr battery(new common::Battery());
+  std::unique_ptr<common::Battery> battery(new common::Battery());
   EXPECT_TRUE(battery != nullptr);
 
   uint32_t consumerId = battery->AddConsumer();
@@ -65,7 +65,7 @@ TEST_F(BatteryTest, AddConsumer)
 TEST_F(BatteryTest, RemoveConsumer)
 {
   // Create the battery
-  common::BatteryPtr battery(new common::Battery());
+  std::unique_ptr<common::Battery> battery(new common::Battery());
   EXPECT_TRUE(battery != nullptr);
 
   uint32_t consumerId = battery->AddConsumer();
@@ -102,7 +102,7 @@ TEST_F(BatteryTest, RemoveConsumer)
 TEST_F(BatteryTest, SetPowerLoad)
 {
   // Create the battery
-  common::BatteryPtr battery(new common::Battery());
+  std::unique_ptr<common::Battery> battery(new common::Battery());
   EXPECT_TRUE(battery != nullptr);
 
   // Add two consumers
@@ -146,7 +146,7 @@ TEST_F(BatteryTest, SetUpdateFunc)
   const double initVoltage = 12.0;
 
   // Create the battery
-  common::BatteryPtr battery(new common::Battery());
+  std::unique_ptr<common::Battery> battery(new common::Battery());
   EXPECT_TRUE(battery != nullptr);
 
   battery->SetName("battery");

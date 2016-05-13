@@ -52,30 +52,30 @@ TEST_F(MeshTest, Mesh)
   EXPECT_EQ(mesh->SubMeshCount(), 0u);
 
   // add a submesh and verify
-  common::SubMeshPtr submesh0(new common::SubMesh());
-  EXPECT_TRUE(submesh0 != NULL);
+  common::SubMesh submesh0;
 
-  submesh0->SetName("new_submesh");
-  EXPECT_EQ(submesh0->Name(), "new_submesh");
+  submesh0.SetName("new_submesh");
+  EXPECT_EQ(submesh0.Name(), "new_submesh");
 
   math::Vector3d v0(0, 0, 2);
   math::Vector3d n0(1, 0, 0);
   math::Vector2d uv0(0, 0.1);
-  submesh0->AddVertex(v0);
-  submesh0->AddNormal(n0);
-  submesh0->AddTexCoord(uv0);
-  submesh0->AddIndex(0);
+  submesh0.AddVertex(v0);
+  submesh0.AddNormal(n0);
+  submesh0.AddTexCoord(uv0);
+  submesh0.AddIndex(0);
 
-  mesh->AddSubMesh(submesh0);
+  auto submesh = mesh->AddSubMesh(submesh0);
   EXPECT_EQ(mesh->VertexCount(), 1u);
   EXPECT_EQ(mesh->NormalCount(), 1u);
   EXPECT_EQ(mesh->TexCoordCount(), 1u);
   EXPECT_EQ(mesh->IndexCount(), 1u);
   EXPECT_EQ(mesh->SubMeshCount(), 1u);
-  EXPECT_EQ(mesh->SubMeshByIndex(0), submesh0);
-  EXPECT_EQ(mesh->SubMeshByName("new_submesh"), submesh0);
-  EXPECT_TRUE(mesh->SubMeshByIndex(1u) == NULL);
-  EXPECT_TRUE(mesh->SubMeshByName("no_such_submesh") == NULL);
+  EXPECT_EQ(mesh->SubMeshByIndex(0).lock().get(), submesh.lock().get());
+  EXPECT_EQ(mesh->SubMeshByName("new_submesh").lock().get(),
+      submesh.lock().get());
+  EXPECT_TRUE(mesh->SubMeshByIndex(1u).lock() == nullptr);
+  EXPECT_TRUE(mesh->SubMeshByName("no_such_submesh").lock() == nullptr);
 
   EXPECT_EQ(mesh->Min(), v0);
   EXPECT_EQ(mesh->Max(), v0);
@@ -92,28 +92,28 @@ TEST_F(MeshTest, Mesh)
   // scale
   math::Vector3d scale(2, 0.25, 4);
   mesh->SetScale(scale);
-  EXPECT_EQ(submesh0->Vertex(0), v0 * scale);
-  EXPECT_EQ(submesh0->Normal(0), n0);
-  EXPECT_EQ(submesh0->TexCoord(0), uv0);
+  EXPECT_EQ(submesh.lock()->Vertex(0), v0 * scale);
+  EXPECT_EQ(submesh.lock()->Normal(0), n0);
+  EXPECT_EQ(submesh.lock()->TexCoord(0), uv0);
 
   mesh->Scale(scale);
-  EXPECT_EQ(submesh0->Vertex(0), v0 * scale * scale);
-  EXPECT_EQ(submesh0->Normal(0), n0);
-  EXPECT_EQ(submesh0->TexCoord(0), uv0);
+  EXPECT_EQ(submesh.lock()->Vertex(0), v0 * scale * scale);
+  EXPECT_EQ(submesh.lock()->Normal(0), n0);
+  EXPECT_EQ(submesh.lock()->TexCoord(0), uv0);
 
   // translate
   math::Vector3d t0(2, 3, -12);
   mesh->Translate(t0);
-  EXPECT_EQ(submesh0->Vertex(0), v0 * scale * scale + t0);
-  EXPECT_EQ(submesh0->Normal(0), n0);
-  EXPECT_EQ(submesh0->TexCoord(0), uv0);
+  EXPECT_EQ(submesh.lock()->Vertex(0), v0 * scale * scale + t0);
+  EXPECT_EQ(submesh.lock()->Normal(0), n0);
+  EXPECT_EQ(submesh.lock()->TexCoord(0), uv0);
 
   // center
   math::Vector3d c0(0.1, 3, 1);
   mesh->Center(c0);
 
   math::Vector3d t = c0 - (min + t0 + (max-min)/2);
-  EXPECT_EQ(submesh0->Vertex(0), v0 + t0 + t);
+  EXPECT_EQ(submesh.lock()->Vertex(0), v0 + t0 + t);
 
   // add material
   common::MaterialPtr material(new common::Material());
@@ -137,11 +137,11 @@ TEST_F(MeshTest, Mesh)
   // recalculate normals
   // (should not have changed since it requires at least 3 normals)
   mesh->RecalculateNormals();
-  EXPECT_EQ(submesh0->Normal(0), n0);
+  EXPECT_EQ(submesh.lock()->Normal(0), n0);
 
   // GenSphericalTexCoord
   mesh->GenSphericalTexCoord(math::Vector3d::Zero);
-  EXPECT_NE(submesh0->TexCoord(0), uv0);
+  EXPECT_NE(submesh.lock()->TexCoord(0), uv0);
 
   // fill array
   double *vertices = NULL;
@@ -149,10 +149,10 @@ TEST_F(MeshTest, Mesh)
   vertices = new double[3];
   indices = new int[1];
   mesh->FillArrays(&vertices, &indices);
-  EXPECT_TRUE(math::equal(vertices[0], submesh0->Vertex(0).X()));
-  EXPECT_TRUE(math::equal(vertices[1], submesh0->Vertex(0).Y()));
-  EXPECT_TRUE(math::equal(vertices[2], submesh0->Vertex(0).Z()));
-  EXPECT_EQ(indices[0], submesh0->Index(0));
+  EXPECT_TRUE(math::equal(vertices[0], submesh.lock()->Vertex(0).X()));
+  EXPECT_TRUE(math::equal(vertices[1], submesh.lock()->Vertex(0).Y()));
+  EXPECT_TRUE(math::equal(vertices[2], submesh.lock()->Vertex(0).Z()));
+  EXPECT_EQ(indices[0], submesh.lock()->Index(0));
 }
 
 /////////////////////////////////////////////////

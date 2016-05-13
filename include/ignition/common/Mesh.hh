@@ -85,9 +85,18 @@ namespace ignition
       public: unsigned int TexCoordCount() const;
 
       /// \brief Add a submesh mesh.
-      /// The Mesh object takes ownership of the submesh.
+      /// This can be an expensive since _child is copied into this mesh.
+      /// \sa AddSubMesh(std::unique_ptr<SubMesh> _child);
       /// \param[in] _child the submesh
-      public: void AddSubMesh(const SubMeshPtr &_child);
+      /// \return Weak pointer to the added submesh
+      public: std::weak_ptr<SubMesh> AddSubMesh(const SubMesh &_child);
+
+      /// \brief Add a submesh mesh. This transfers ownership of _child
+      /// to this mesh. The value of _child after this call is nullptr.
+      /// \param[in] _child the submesh
+      /// \return Weak pointer to the added submesh
+      public: std::weak_ptr<SubMesh> AddSubMesh(
+                  std::unique_ptr<SubMesh> _child);
 
       /// \brief Get the number of child submeshes.
       /// \return The number of submeshes.
@@ -114,13 +123,15 @@ namespace ignition
 
       /// \brief Get a child submesh by index
       /// \param[in] _index Index of the submesh
-      /// \return The submesh or NULL if the index is out of bounds.
-      public: SubMeshPtr SubMeshByIndex(const unsigned int _index) const;
+      /// \return The submesh or nullptr if the index is out of bounds.
+      public: std::weak_ptr<SubMesh> SubMeshByIndex(
+                  const unsigned int _index) const;
 
       /// \brief Get a child submesh by name.
       /// \param[in] _name Name of the submesh.
-      /// \return The submesh or NULL if the _name is not found.
-      public: SubMeshPtr SubMeshByName(const std::string &_name) const;
+      /// \return The submesh or nullptr if the _name is not found.
+      public: std::weak_ptr<SubMesh> SubMeshByName(
+                  const std::string &_name) const;
 
       /// \brief Put all the data into flat arrays
       /// \param[out] _vertArr the vertex array
