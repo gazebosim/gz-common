@@ -28,6 +28,7 @@ namespace ignition
     class Mesh;
     class Skeleton;
     class SubMesh;
+    class Battery;
 
     /// \def MaterialPtr
     /// \brief Shared pointer to a Material object
@@ -44,6 +45,10 @@ namespace ignition
     /// \def SkeletonPtr
     /// \brief Shared pointer to a Skeleton object
     using SkeletonPtr = std::shared_ptr<Skeleton>;
+
+    /// \def BatteryPtr
+    /// \brief Shared pointer to a Battery object
+    using BatteryPtr = std::shared_ptr<Battery>;
   }
 }
 

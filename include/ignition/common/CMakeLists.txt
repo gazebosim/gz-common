@@ -4,6 +4,7 @@ set (headers
   Animation.hh
   AudioDecoder.hh
   Base64.hh
+  Battery.hh
   BVHLoader.hh
   ColladaLoader.hh
   Color.hh
@@ -23,6 +24,7 @@ set (headers
   System.hh
   Time.hh
   Timer.hh
+  Types.hh
   Util.hh
   Uuid.hh
   Video.hh

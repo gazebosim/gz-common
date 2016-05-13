@@ -6,6 +6,7 @@ set (sources
   Animation.cc
   AudioDecoder.cc
   Base64.cc
+  Battery.cc
   BVHLoader.cc
   ColladaLoader.cc
   Color.cc
@@ -35,6 +36,7 @@ endif()
 set (gtest_sources
   Animation_TEST.cc
   #AudioDecoder_TEST.cc
+  Battery_TEST.cc
   ColladaLoader_TEST.cc
   Color_TEST.cc
   Console_TEST.cc

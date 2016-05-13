@@ -14,13 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef _IGNITION_MESH_PRIVATE_HH_
-#define _IGNITION_MESH_PRIVATE_HH_
+#ifndef IGNITION_MESH_PRIVATE_HH_
+#define IGNITION_MESH_PRIVATE_HH_
 
 #include <string>
 #include <vector>
 
-#include <ignition/common/CommonTypes.hh>
+#include <ignition/common/Types.hh>
 
 namespace ignition
 {
