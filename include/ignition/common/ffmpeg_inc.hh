@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef __IGNITION_FFMPEG_INC_HH__
-#define __IGNITION_FFMPEG_INC_HH__
+#ifndef IGNITION_COMMON_FFMPEG_INC_HH_
+#define IGNITION_COMMON_FFMPEG_INC_HH_
 
-#ifndef _WIN32
+#include <ignition/common/config.hh>
+
 #pragma GCC system_header
-#endif
 
 #ifdef HAVE_FFMPEG
 #ifndef INT64_C
@@ -27,12 +27,34 @@
 #define UINT64_C(c) (c ## ULL)
 #endif
 
-extern "C"
-{
+extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
+#include <libavutil/imgutils.h>
 #include <libavutil/opt.h>
 #include <libswscale/swscale.h>
 }
+
+#include <ignition/common/System.hh>
+
+namespace ignition
+{
+  namespace common
+  {
+    /// \brief Helper function to avoid deprecation warnings.
+    IGNITION_COMMON_VISIBLE
+    AVFrame *AVFrameAlloc(void);
+
+    /// \brief Helper function to avoid deprecation warnings.
+    IGNITION_COMMON_VISIBLE
+    void AVFrameUnref(AVFrame *_frame);
+
+    /// \brief Helper function to avoid deprecation warnings.
+    /// \param[in] _packet AVPacket structure that stores compressed data
+    IGNITION_COMMON_VISIBLE
+    void AVPacketUnref(AVPacket *_packet);
+  }
+}
 #endif
+
 #endif

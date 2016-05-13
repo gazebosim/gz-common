@@ -24,6 +24,7 @@ set (headers
   Timer.hh
   Util.hh
   Uuid.hh
+  Video.hh
 )
 
 set (ign_headers "" CACHE INTERNAL "Ignition headers" FORCE)

@@ -10,6 +10,7 @@ set (sources
   Color.cc
   Console.cc
   Exception.cc
+  ffmpeg_inc.cc
   #Image.cc
   KeyFrame.cc
   Material.cc
@@ -23,6 +24,7 @@ set (sources
   Timer.cc
   Util.cc
   Uuid.cc
+  Video.cc
 )
 
 if (NOT USE_EXTERNAL_TINYXML2)
