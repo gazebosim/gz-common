@@ -15,12 +15,33 @@
  *
  */
 #include <list>
-
-#include <ignition/common/SkeletonPrivate.hh>
+#include <ignition/common/SkeletonAnimation.hh>
 #include <ignition/common/Skeleton.hh>
 
 using namespace ignition;
 using namespace common;
+
+/// Private data class
+class ignition::common::SkeletonPrivate
+{
+  typedef std::vector<std::vector<std::pair<std::string, double>>>
+    RawNodeWeights;
+
+  /// \brief the root node
+  public: SkeletonNode *root;
+
+  /// \brief The dictionary of nodes, indexed by name
+  public: SkeletonNodeMap nodes;
+
+  /// \brief the bind pose skeletal transform
+  public: math::Matrix4d bindShapeTransform;
+
+  /// \brief the node weight table
+  public: RawNodeWeights rawNodeWeights;
+
+  /// \brief the array of animations
+  public: std::vector<SkeletonAnimation*> anims;
+};
 
 //////////////////////////////////////////////////
 Skeleton::Skeleton()

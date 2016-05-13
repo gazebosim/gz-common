@@ -18,11 +18,23 @@
 #include "ignition/common/Console.hh"
 #include "ignition/common/NodeAnimationPrivate.hh"
 #include "ignition/common/NodeAnimation.hh"
-#include "ignition/common/SkeletonAnimationPrivate.hh"
 #include "ignition/common/SkeletonAnimation.hh"
 
 using namespace ignition;
 using namespace common;
+
+/// Prvate data class
+class ignition::common::SkeletonAnimationPrivate
+{
+  /// \brief the node name
+  public: std::string name;
+
+  /// \brief the duration of the longest animation
+  public: double length;
+
+  /// \brief a dictionary of node animations
+  public: std::map<std::string, NodeAnimation*> animations;
+};
 
 //////////////////////////////////////////////////
 NodeAnimation::NodeAnimation(const std::string &_name)

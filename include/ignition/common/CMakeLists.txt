@@ -3,6 +3,7 @@ include (${project_cmake_dir}/Utils.cmake)
 set (headers
   Animation.hh
   AudioDecoder.hh
+  Base64.hh
   BVHLoader.hh
   ColladaLoader.hh
   Color.hh

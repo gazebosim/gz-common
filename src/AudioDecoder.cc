@@ -17,7 +17,6 @@
 
 #include <ignition/common/ffmpeg_inc.hh>
 #include <ignition/common/AudioDecoder.hh>
-#include <ignition/common/AudioDecoderPrivate.hh>
 #include <ignition/common/Console.hh>
 
 #define AUDIO_INBUF_SIZE (20480 * 2)
@@ -25,6 +24,28 @@
 
 using namespace ignition;
 using namespace common;
+
+struct AVFormatContext;
+struct AVCodecContext;
+struct AVCodec;
+
+class ignition::common::AudioDecoderPrivate
+{
+  /// \brief libav Format I/O context.
+  public: AVFormatContext *formatCtx;
+
+  /// \brief libav main external API structure.
+  public: AVCodecContext *codecCtx;
+
+  /// \brief libavcodec audio codec.
+  public: AVCodec *codec;
+
+  /// \brief Index of the audio stream.
+  public: int audioStream;
+
+  /// \brief Audio file to decode.
+  public: std::string filename;
+};
 
 class Initializer
 {
