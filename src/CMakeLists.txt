@@ -20,6 +20,7 @@ set (sources
   Mesh.cc
   MeshExporter.cc
   NodeTransform.cc
+  PID.cc
   Skeleton.cc
   SkeletonAnimation.cc
   SkeletonNode.cc

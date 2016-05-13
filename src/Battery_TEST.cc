@@ -127,9 +127,12 @@ TEST_F(BatteryTest, SetPowerLoad)
 class BatteryUpdateFixture
 {
   /// \brief Update voltage by incrementing it.
-  public: double Update(const common::BatteryPtr _battery)
+  public: double Update(common::Battery *_battery)
           {
-            return _battery->Voltage() + this->step;
+            if (_battery)
+              return _battery->Voltage() + this->step;
+            else
+              return -1.0;
           }
 
   /// \brief Voltage amount to increment by.

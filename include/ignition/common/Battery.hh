@@ -41,8 +41,7 @@ namespace ignition
     /// simulation iteration. The update function takes the power loads for each
     /// consumer and current voltage value as inputs and returns a new voltage
     /// value.
-    class IGNITION_COMMON_VISIBLE Battery :
-      public std::enable_shared_from_this<Battery>
+    class IGNITION_COMMON_VISIBLE Battery
     {
       /// \brief Typedef the powerload map.
       /// \sa SetUpdateFunc
@@ -119,7 +118,7 @@ namespace ignition
       /// battery voltage as a double.
       /// \sa UpdateData
       public: void SetUpdateFunc(
-                  std::function<double(const BatteryPtr &)> _updateFunc);
+                  std::function<double(Battery *)> _updateFunc);
 
       /// \brief Update the battery. This will in turn trigger the function
       /// set using the SetUpdateFunc function.
@@ -132,7 +131,7 @@ namespace ignition
       /// \brief Update voltage using an ideal battery model.
       /// \param[in] _battery Pointer to the battery.
       /// \return New battery voltage.
-      private: double UpdateDefault(const BatteryPtr &_battery);
+      private: double UpdateDefault(Battery *_battery);
 
       /// \internal
       /// \brief Private data pointer.

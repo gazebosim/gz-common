@@ -38,7 +38,7 @@ class ignition::common::BatteryPrivate
 
   /// \brief The function used to to update the real voltage.
   /// It takes as inputs current voltage and list of power loads.
-  public: std::function<double(const BatteryPtr)> updateFunc;
+  public: std::function<double(Battery *)> updateFunc;
 
   /// \brief Name of the battery.
   public: std::string name = "";
@@ -176,20 +176,22 @@ double Battery::Voltage() const
 /////////////////////////////////////////////////
 void Battery::Update()
 {
-  this->dataPtr->realVoltage = std::max(0.0,
-      this->dataPtr->updateFunc(shared_from_this()));
+  this->dataPtr->realVoltage = std::max(0.0, this->dataPtr->updateFunc(this));
 }
 
 /////////////////////////////////////////////////
-double Battery::UpdateDefault(const BatteryPtr &_battery)
+double Battery::UpdateDefault(Battery *_battery)
 {
   // Ideal battery
-  return _battery->Voltage();
+  if (_battery)
+    return _battery->Voltage();
+  else
+    return 0.0;
 }
 
 /////////////////////////////////////////////////
 void Battery::SetUpdateFunc(
-    std::function<double(const BatteryPtr &)> _updateFunc)
+    std::function<double(Battery *)> _updateFunc)
 {
   this->dataPtr->updateFunc = _updateFunc;
 }

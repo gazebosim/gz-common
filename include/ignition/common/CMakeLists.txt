@@ -18,6 +18,7 @@ set (headers
   Mesh.hh
   MeshExporter.hh
   NodeTransform.hh
+  PID.hh
   SingletonT.hh
   Skeleton.hh
   SkeletonAnimation.hh
