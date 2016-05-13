@@ -169,7 +169,7 @@ math::Matrix4d NodeTransform::operator()() const
 }
 
 //////////////////////////////////////////////////
-math::Matrix4d NodeTransform::operator*(const NodeTransform _t) const
+math::Matrix4d NodeTransform::operator*(const NodeTransform &_t) const
 {
   return this->data->transform * _t();
 }

@@ -43,7 +43,7 @@ namespace ignition
 
       /// \brief Constructor
       /// \param[in] _root node
-      public: Skeleton(SkeletonNode *_root);
+      public: explicit Skeleton(SkeletonNode *_root);
 
       /// \brief Destructor
       public: virtual ~Skeleton();

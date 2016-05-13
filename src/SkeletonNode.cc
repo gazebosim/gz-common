@@ -301,7 +301,7 @@ NodeTransform SkeletonNode::RawTransform(const unsigned int _i) const
 }
 
 //////////////////////////////////////////////////
-void SkeletonNode::AddRawTransform(const NodeTransform _t)
+void SkeletonNode::AddRawTransform(const NodeTransform &_t)
 {
   this->data->rawTransforms.push_back(_t);
 }

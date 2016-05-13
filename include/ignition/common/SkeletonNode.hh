@@ -40,7 +40,7 @@ namespace ignition
 
       /// \brief Constructor
       /// \param[in] _parent The parent node
-      public: SkeletonNode(SkeletonNode *_parent);
+      public: explicit SkeletonNode(SkeletonNode *_parent);
 
       /// \brief Constructor
       /// \param[in] _parent the parent node
@@ -178,7 +178,7 @@ namespace ignition
 
       /// \brief Add a raw transform
       /// \param[in] _t the transform
-      public: void AddRawTransform(const NodeTransform _t);
+      public: void AddRawTransform(const NodeTransform &_t);
 
       /// \brief Returns a copy of the array of transformations.
       /// \return the array of transform (These are the same as the raw trans)

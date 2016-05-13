@@ -40,7 +40,7 @@ namespace ignition
     {
       /// \brief The Constructor
       /// \param[in] _name the name of the animation
-      public: SkeletonAnimation(const std::string &_name);
+      public: explicit SkeletonAnimation(const std::string &_name);
 
       /// \brief The destructor. Clears the list without destroying
       /// the animations

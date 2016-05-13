@@ -36,7 +36,7 @@ namespace ignition
     {
       /// \brief Constructor
       /// \param[in] _type the type of transform
-      public: NodeTransform(const NodeTransformType _type = MATRIX);
+      public: explicit NodeTransform(const NodeTransformType _type = MATRIX);
 
       /// \brief Constructor
       /// \param[in] _mat the matrix
@@ -105,7 +105,7 @@ namespace ignition
       /// \brief Node transform multiplication operator
       /// \param[in] _t a transform
       /// \return transform matrix multiplied by _t's transform
-      public: math::Matrix4d operator*(const NodeTransform _t) const;
+      public: math::Matrix4d operator*(const NodeTransform &_t) const;
 
       /// \brief Matrix multiplication operator
       /// \param[in] _m a matrix

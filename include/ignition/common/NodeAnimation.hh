@@ -36,7 +36,7 @@ namespace ignition
     {
       /// \brief constructor
       /// \param[in] _name the name of the node
-      public: NodeAnimation(const std::string &_name);
+      public: explicit NodeAnimation(const std::string &_name);
 
       /// \brief Destructor.
       public: ~NodeAnimation();

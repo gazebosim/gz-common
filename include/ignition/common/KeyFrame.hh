@@ -31,7 +31,7 @@ namespace ignition
     {
       /// \brief Constructor
       /// \param[in] _time Time of the keyframe in seconds
-      public: KeyFrame(const double _time);
+      public: explicit KeyFrame(const double _time);
 
       /// \brief Destructor
       public: virtual ~KeyFrame();
@@ -49,7 +49,7 @@ namespace ignition
     {
       /// \brief Constructor
       /// \param[in] _time of the keyframe
-      public: PoseKeyFrame(const double _time);
+      public: explicit PoseKeyFrame(const double _time);
 
       /// \brief Destructor
       public: virtual ~PoseKeyFrame();
@@ -91,7 +91,7 @@ namespace ignition
     {
       /// \brief Constructor
       /// \param[in] _time Time of the keyframe
-      public: NumericKeyFrame(const double _time);
+      public: explicit NumericKeyFrame(const double _time);
 
       /// \brief Destructor
       public: virtual ~NumericKeyFrame();

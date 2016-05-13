@@ -44,7 +44,7 @@ namespace ignition
 
       /// \brief Constructor
       /// \param[in] _tv Time to initialize to
-      public: Time(const struct timespec &_tv);
+      public: explicit Time(const struct timespec &_tv);
 
       /// \brief Constructor
       /// \param[in] _sec Seconds
@@ -53,7 +53,7 @@ namespace ignition
 
       /// \brief Constuctor
       /// \param[in] _time Time in double format sec.nsec
-      public: Time(double _time);
+      public: explicit Time(double _time);
 
       /// \brief Destructor
       public: virtual ~Time();
