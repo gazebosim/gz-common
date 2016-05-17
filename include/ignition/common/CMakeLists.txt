@@ -17,6 +17,7 @@ set (headers
   Material.hh
   Mesh.hh
   MeshExporter.hh
+  MovingWindowFilter.hh
   NodeTransform.hh
   PID.hh
   SingletonT.hh

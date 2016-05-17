@@ -48,6 +48,7 @@ set (gtest_sources
   #Image_TEST.cc
   Material_TEST.cc
   Mesh_TEST.cc
+  MovingWindowFilter_TEST.cc
   SubMesh_TEST.cc
   Time_TEST.cc
   Util_TEST.cc
