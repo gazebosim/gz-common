@@ -17,6 +17,7 @@
 #ifndef IGNITION_COMMON_IMAGE_HH_
 #define IGNITION_COMMON_IMAGE_HH_
 
+#include <memory>
 #include <string>
 #include <ignition/common/Color.hh>
 #include <ignition/common/System.hh>
@@ -58,7 +59,7 @@ namespace ignition
     class IGNITION_COMMON_VISIBLE Image
     {
       /// \brief Pixel formats enumeration
-      public: enum PixelFormat
+      public: enum PixelFormatType
               {
                 UNKNOWN_PIXEL_FORMAT = 0,
                 L_INT8,
@@ -86,7 +87,7 @@ namespace ignition
       /// \brief Convert a string to a Image::PixelFormat.
       /// \param[in] _format Pixel format string. \sa Image::PixelFormatNames
       /// \return Image::PixelFormat
-      public: static Image::PixelFormat ConvertPixelFormat(
+      public: static Image::PixelFormatType ConvertPixelFormat(
                   const std::string &_format);
 
       /// \brief Constructor
@@ -113,70 +114,70 @@ namespace ignition
       public: void SetFromData(const unsigned char *_data,
                                unsigned int _width,
                                unsigned int _height,
-                               Image::PixelFormat _format);
+                               Image::PixelFormatType _format);
 
       /// \brief Get the image as a data array
       /// \param[out] _data Pointer to a NULL array of char.
       /// \param[out] _count The resulting data array size
-      public: void GetData(unsigned char **_data,
-                           unsigned int &_count) const;
+      public: void Data(unsigned char **_data,
+                        unsigned int &_count) const;
 
       /// \brief Get only the RGB data from the image. This will drop the
       /// alpha channel if one is present.
       /// \param[out] _data Pointer to a NULL array of char.
       /// \param[out] _count The resulting data array size
-      public: void GetRGBData(unsigned char **_data,
-                              unsigned int &_count) const;
+      public: void RGBData(unsigned char **_data,
+                           unsigned int &_count) const;
 
       /// \brief Get the width
       /// \return The image width
-      public: unsigned int GetWidth() const;
+      public: unsigned int Width() const;
 
       /// \brief Get the height
       /// \return The image height
-      public: unsigned int GetHeight() const;
+      public: unsigned int Height() const;
 
       /// \brief Get the size of one pixel in bits
       /// \return The BPP of the image
-      public: unsigned int GetBPP() const;
+      public: unsigned int BPP() const;
 
       // \brief Get the size of a row of pixel
       /// \return The pitch of the image
-      public: int GetPitch() const;
+      public: int Pitch() const;
 
       /// \brief Get the full filename of the image
       /// \return The filename used to load the image
-      public: std::string GetFilename() const;
+      public: std::string Filename() const;
 
       /// \brief Get the pixel format
       /// \return PixelFormat
-      public: PixelFormat GetPixelFormat() const;
+      public: PixelFormatType PixelFormat() const;
 
       /// \brief Get a pixel color value
       /// \param[in] _x Column location in the image
       /// \param[in] _y Row location in the image
       /// \return The color of the given pixel
-      public: Color GetPixel(unsigned int _x, unsigned int _y) const;
+      public: Color Pixel(const unsigned int _x, const unsigned int _y) const;
 
       /// \brief Get the average color
       /// \return The average color
-      public: Color GetAvgColor();
+      public: Color AvgColor();
 
       /// \brief Get the max color
       /// \return The max color
-      public: Color GetMaxColor() const;
+      public: Color MaxColor() const;
 
       /// \brief Rescale the image
       /// \param[in] _width New image width
       /// \param[in] _height New image height
-      public: void Rescale(int _width, int _height);
+      public: void Rescale(const int _width, const int _height);
 
       /// \brief Returns whether this is a valid image
       /// \return true if image has a bitmap
       public: bool Valid() const;
 
       /// \brief Private data pointer
-      private: ImagePrivate *dataPtr;
+      private: std::unique_ptr<ImagePrivate> dataPtr;
     };
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,78 +14,80 @@
  * limitations under the License.
  *
  */
+#include <algorithm>
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/MaterialPrivate.hh"
 #include "ignition/common/Material.hh"
+#include "ignition/common/Console.hh"
 
 using namespace ignition;
 using namespace common;
 
-unsigned int MaterialPrivate::counter = 0;
+unsigned int Material::counter = 0;
 
-std::string Material::ShadeModeStr[SHADE_COUNT] = {"FLAT", "GOURAUD",
-  "PHONG", "BLINN"};
-std::string Material::BlendModeStr[BLEND_COUNT] = {"ADD", "MODULATE",
-  "REPLACE"};
+IGN_ENUM(Material::ShadeMode,
+    Material::SHADE_MODE_BEGIN, Material::SHADE_MODE_END,
+    "FLAT", "GOURAUD", "PHONG", "BLINN")
+
+IGN_ENUM(Material::BlendMode,
+    Material::BLEND_MODE_BEGIN, Material::BLEND_MODE_END,
+    "ADD", "MODULATE", "REPLACE")
 
 //////////////////////////////////////////////////
 Material::Material()
-  : Material(common::Color(1.0, 1.0, 1.0, 1.0))
 {
+  this->name = "ignition_material_" + std::to_string(counter++);
+  this->blendMode = REPLACE;
+  this->shadeMode = GOURAUD;
+  this->transparency = 0;
+  this->shininess = 0;
+  this->ambient.Set(0.4, 0.4, 0.4, 1);
+  this->diffuse.Set(0.5, 0.5, 0.5, 1);
+  this->specular.Set(0, 0, 0, 1);
+  this->lighting = false;
+  this->dstBlendFactor = this->srcBlendFactor = 1.0;
 }
 
 //////////////////////////////////////////////////
 Material::Material(const Color &_clr)
-  : dataPtr(new MaterialPrivate)
 {
-  this->dataPtr->name = "ign-common_material_" +
-      std::to_string(this->dataPtr->counter++);
-  this->dataPtr->blendMode = REPLACE;
-  this->dataPtr->shadeMode = GOURAUD;
-  this->dataPtr->transparency = 0;
-  this->dataPtr->shininess = 0;
-  this->dataPtr->ambient = _clr;
-  this->dataPtr->diffuse = _clr;
-  this->dataPtr->specular = Color::Black;
-  this->dataPtr->emissive = Color::Black;
-  this->dataPtr->lighting = true;
-  this->dataPtr->depthWrite = true;
-  this->dataPtr->pointSize = 1.0;
-  this->dataPtr->srcBlendFactor = 1.0;
-  this->dataPtr->dstBlendFactor = 0.0;
+  this->name = "ignition_material_" + std::to_string(counter++);
+  this->blendMode = REPLACE;
+  this->shadeMode = GOURAUD;
+  this->transparency = 0;
+  this->shininess = 0;
+  this->ambient = _clr;
+  this->diffuse = _clr;
+  this->lighting = false;
 }
 
 //////////////////////////////////////////////////
 Material::~Material()
 {
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 //////////////////////////////////////////////////
 std::string Material::Name() const
 {
-  return this->dataPtr->name;
+  return this->name;
 }
 
 //////////////////////////////////////////////////
 void Material::SetTextureImage(const std::string &_tex)
 {
-  this->dataPtr->texImage = _tex;
+  this->texImage = _tex;
 }
 
 //////////////////////////////////////////////////
 void Material::SetTextureImage(const std::string &_tex,
                                const std::string &_resourcePath)
 {
-  this->dataPtr->texImage = _resourcePath + "/" + _tex;
+  this->texImage = _resourcePath + "/" + _tex;
 
   // If the texture image doesn't exist then try the next most likely path.
-  if (!exists(this->dataPtr->texImage))
+  if (!exists(this->texImage))
   {
-    this->dataPtr->texImage = _resourcePath + "/../materials/textures/" + _tex;
-    if (!exists(this->dataPtr->texImage))
+    this->texImage = _resourcePath + "/../materials/textures/" + _tex;
+    if (!exists(this->texImage))
     {
       ignerr << "Unable to find texture[" << _tex << "] in path["
             << _resourcePath << "]\n";
@@ -96,151 +98,156 @@ void Material::SetTextureImage(const std::string &_tex,
 //////////////////////////////////////////////////
 std::string Material::TextureImage() const
 {
-  return this->dataPtr->texImage;
+  return this->texImage;
 }
 
 //////////////////////////////////////////////////
 void Material::SetAmbient(const Color &_clr)
 {
-  this->dataPtr->ambient = _clr;
+  this->ambient = _clr;
 }
 
 //////////////////////////////////////////////////
 Color Material::Ambient() const
 {
-  return this->dataPtr->ambient;
+  return this->ambient;
 }
 
 //////////////////////////////////////////////////
 void Material::SetDiffuse(const Color &_clr)
 {
-  this->dataPtr->diffuse = _clr;
+  this->diffuse = _clr;
+  this->lighting = true;
 }
 
 //////////////////////////////////////////////////
 Color Material::Diffuse() const
 {
-  return this->dataPtr->diffuse;
+  return this->diffuse;
 }
 
 //////////////////////////////////////////////////
 void Material::SetSpecular(const Color &_clr)
 {
-  this->dataPtr->specular = _clr;
+  this->specular = _clr;
+  this->lighting = true;
 }
 
 //////////////////////////////////////////////////
 Color Material::Specular() const
 {
-  return this->dataPtr->specular;
+  return this->specular;
 }
 
 //////////////////////////////////////////////////
 void Material::SetEmissive(const Color &_clr)
 {
-  this->dataPtr->emissive = _clr;
+  this->emissive = _clr;
 }
 
 //////////////////////////////////////////////////
 Color Material::Emissive() const
 {
-  return this->dataPtr->emissive;
+  return this->emissive;
 }
 
 //////////////////////////////////////////////////
-void Material::SetTransparency(const double _t)
+void Material::SetTransparency(double _t)
 {
-  this->dataPtr->transparency = std::min(_t, 1.0);
-  this->dataPtr->transparency = std::max(this->dataPtr->transparency, 0.0);
+  this->transparency = std::min(_t, 1.0);
+  this->transparency = std::max(this->transparency, 0.0);
+  this->lighting = true;
 }
 
 //////////////////////////////////////////////////
 double Material::Transparency() const
 {
-  return this->dataPtr->transparency;
+  return this->transparency;
 }
 
 //////////////////////////////////////////////////
-void Material::SetShininess(const double _s)
+void Material::SetShininess(double _s)
 {
-  this->dataPtr->shininess = _s;
+  this->shininess = _s;
+  this->lighting = true;
 }
 
 //////////////////////////////////////////////////
 double Material::Shininess() const
 {
-  return this->dataPtr->shininess;
+  return this->shininess;
 }
 
 //////////////////////////////////////////////////
-void Material::SetBlendFactors(const double _srcFactor, const double _dstFactor)
+void Material::SetBlendFactors(double _srcFactor, double _dstFactor)
 {
-  this->dataPtr->srcBlendFactor = _srcFactor;
-  this->dataPtr->dstBlendFactor = _dstFactor;
+  this->srcBlendFactor = _srcFactor;
+  this->dstBlendFactor = _dstFactor;
 }
 
 //////////////////////////////////////////////////
-void Material::BlendFactors(double &_srcFactor, double &_dstFactor) const
+void Material::BlendFactors(double &_srcFactor, double &_dstFactor)
 {
-  _srcFactor = this->dataPtr->srcBlendFactor;
-  _dstFactor = this->dataPtr->dstBlendFactor;
+  _srcFactor = this->srcBlendFactor;
+  _dstFactor = this->dstBlendFactor;
+}
+
+
+//////////////////////////////////////////////////
+void Material::SetBlend(Material::BlendMode _b)
+{
+  this->blendMode = _b;
 }
 
 //////////////////////////////////////////////////
-void Material::SetBlendMode(const MaterialBlendMode _b)
+Material::BlendMode Material::Blend() const
 {
-  this->dataPtr->blendMode = _b;
+  return this->blendMode;
 }
 
 //////////////////////////////////////////////////
-Material::MaterialBlendMode Material::BlendMode() const
+void Material::SetShade(Material::ShadeMode _s)
 {
-  return this->dataPtr->blendMode;
+  this->shadeMode = _s;
 }
 
 //////////////////////////////////////////////////
-void Material::SetShadeMode(const MaterialShadeMode _s)
+Material::ShadeMode Material::Shade() const
 {
-  this->dataPtr->shadeMode = _s;
+  return this->shadeMode;
 }
 
 //////////////////////////////////////////////////
-Material::MaterialShadeMode Material::ShadeMode() const
+void Material::SetPointSize(double _size)
 {
-  return this->dataPtr->shadeMode;
-}
-
-//////////////////////////////////////////////////
-void Material::SetPointSize(const double _size)
-{
-  this->dataPtr->pointSize = _size;
+  this->pointSize = _size;
 }
 
 //////////////////////////////////////////////////
 double Material::PointSize() const
 {
-  return this->dataPtr->pointSize;
+  return this->pointSize;
 }
 //////////////////////////////////////////////////
-void Material::SetDepthWrite(const bool _value)
+void Material::SetDepthWrite(bool _value)
 {
-  this->dataPtr->depthWrite = _value;
+  this->depthWrite = _value;
 }
 
 //////////////////////////////////////////////////
 bool Material::DepthWrite() const
 {
-  return this->dataPtr->depthWrite;
+  return this->depthWrite;
 }
 
 //////////////////////////////////////////////////
-void Material::SetLighting(const bool _value)
+void Material::SetLighting(bool _value)
 {
-  this->dataPtr->lighting = _value;
+  this->lighting = _value;
 }
 
 //////////////////////////////////////////////////
 bool Material::Lighting() const
 {
-  return this->dataPtr->lighting;
+  return this->lighting;
 }

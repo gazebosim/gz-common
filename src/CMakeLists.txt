@@ -12,9 +12,11 @@ set (sources
   ColladaLoader.cc
   Color.cc
   Console.cc
+  Dem.cc
   Exception.cc
   ffmpeg_inc.cc
-  #Image.cc
+  Image.cc
+  ImageHeightmap.cc
   KeyFrame.cc
   Material.cc
   Mesh.cc
@@ -44,8 +46,11 @@ set (gtest_sources
   ColladaLoader_TEST.cc
   Color_TEST.cc
   Console_TEST.cc
+  Dem_TEST.cc
+  EnumIface_TEST.cc
   Exception_TEST.cc
-  #Image_TEST.cc
+  Image_TEST.cc
+  ImageHeightmap_TEST.cc
   Material_TEST.cc
   Mesh_TEST.cc
   MovingWindowFilter_TEST.cc

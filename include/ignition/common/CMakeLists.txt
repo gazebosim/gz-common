@@ -10,9 +10,13 @@ set (headers
   ColladaLoader.hh
   Color.hh
   Console.hh
+  Dem.hh
+  EnumIface.hh
   Exception.hh
   ffmpeg_inc.h
-  #Image.hh
+  HeightmapData.hh
+  Image.hh
+  ImageHeightmap.hh
   KeyFrame.hh
   Material.hh
   Mesh.hh
