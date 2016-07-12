@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-
 #include <string>
 #include <algorithm>
 
@@ -22,15 +21,43 @@
 
 #include "ignition/common/Console.hh"
 #include "ignition/common/Material.hh"
-#include "ignition/common/SubMeshPrivate.hh"
 #include "ignition/common/SubMesh.hh"
 
 using namespace ignition;
 using namespace common;
 
+/// \brief Private data for SubMesh
+class ignition::common::SubMeshPrivate
+{
+  /// \brief the vertex array
+  public: std::vector<ignition::math::Vector3d> vertices;
+
+  /// \brief the normal array
+  public: std::vector<ignition::math::Vector3d> normals;
+
+  /// \brief the texture coordinate array
+  public: std::vector<ignition::math::Vector2d> texCoords;
+
+  /// \brief the vertex index array
+  public: std::vector<unsigned int> indices;
+
+  /// \brief node assignment array
+  public: std::vector<NodeAssignment> nodeAssignments;
+
+  /// \brief primitive type for the mesh
+  public: SubMesh::PrimitiveType primitiveType;
+
+  /// \brief The material index for this mesh. Relates to the parent
+  /// mesh material list.
+  public: int materialIndex;
+
+  /// \brief The name of the sub-mesh
+  public: std::string name;
+};
+
 //////////////////////////////////////////////////
 SubMesh::SubMesh()
-  : dataPtr(new SubMeshPrivate)
+: dataPtr(new SubMeshPrivate)
 {
   this->dataPtr->materialIndex = -1;
   this->dataPtr->primitiveType = TRIANGLES;
@@ -38,7 +65,7 @@ SubMesh::SubMesh()
 
 //////////////////////////////////////////////////
 SubMesh::SubMesh(const SubMesh &_submesh)
-  : dataPtr(new SubMeshPrivate)
+: dataPtr(new SubMeshPrivate)
 {
   this->dataPtr->name = _submesh.dataPtr->name;
   this->dataPtr->materialIndex = _submesh.dataPtr->materialIndex;

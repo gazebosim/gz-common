@@ -14,11 +14,26 @@
  * limitations under the License.
  *
  */
-#include <ignition/common/NodeTransformPrivate.hh>
 #include <ignition/common/NodeTransform.hh>
 
 using namespace ignition;
 using namespace common;
+
+/// \brief Private data for NodeTransform
+class ignition::common::NodeTransformPrivate
+{
+  /// \brief the sid
+  public: std::string sid;
+
+  /// \brief transform type
+  public: NodeTransformType type;
+
+  /// \brief transform
+  public: math::Matrix4d transform;
+
+  /// \brief source data values (can be a matrix, a position or rotation)
+  public: std::vector<double> source;
+};
 
 //////////////////////////////////////////////////
 NodeTransform::NodeTransform(const NodeTransformType _type)

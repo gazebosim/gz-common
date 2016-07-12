@@ -24,16 +24,33 @@
 #include "ignition/common/Material.hh"
 #include "ignition/common/Skeleton.hh"
 #include "ignition/common/SubMesh.hh"
-#include "ignition/common/MeshPrivate.hh"
 #include "ignition/common/Mesh.hh"
 
 using namespace ignition;
 using namespace common;
 
+/// \brief Private data for Mesh
+class ignition::common::MeshPrivate
+{
+  /// \brief The name of the mesh
+  public: std::string name;
+
+  /// \brief The path of the mesh resource
+  public: std::string path;
+
+  /// \brief The sub mesh array.
+  public: std::vector<std::shared_ptr<SubMesh>> submeshes;
+
+  /// \brief The materials array.
+  public: std::vector<MaterialPtr> materials;
+
+  /// \brief The skeleton (for animation)
+  public: SkeletonPtr skeleton;
+};
 
 //////////////////////////////////////////////////
 Mesh::Mesh()
-  : dataPtr(new MeshPrivate)
+: dataPtr(new MeshPrivate)
 {
   this->dataPtr->name = "unknown";
   this->dataPtr->skeleton = NULL;

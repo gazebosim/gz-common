@@ -16,11 +16,23 @@
  */
 
 #include "ignition/common/Console.hh"
-#include "ignition/common/ExceptionPrivate.hh"
 #include "ignition/common/Exception.hh"
 
 using namespace ignition;
 using namespace common;
+
+/// \brief Private data for Exception
+class ignition::common::ExceptionPrivate
+{
+  /// \brief The error function
+  public: std::string file;
+
+  /// \brief Line the error occured on
+  public: int64_t line;
+
+  /// \brief The error string
+  public: std::string str;
+};
 
 //////////////////////////////////////////////////
 Exception::Exception()

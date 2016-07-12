@@ -508,3 +508,18 @@ std::string ignition::common::trimmed(std::string _s)
   ignition::common::trim(_s);
   return _s;
 }
+
+/////////////////////////////////////////////////
+std::string ignition::common::lowercase(const std::string &_in)
+{
+  std::string out = _in;
+  std::transform(out.begin(), out.end(), out.begin(), ::tolower);
+  return out;
+}
+
+/////////////////////////////////////////////////
+std::string ignition::common::lowercase(const char *_in)
+{
+  std::string ins = _in;
+  return lowercase(ins);
+}

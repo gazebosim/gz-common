@@ -18,6 +18,7 @@
 #define IGNITION_COMMON_MATERIAL_HH_
 
 #include <iostream>
+#include <memory>
 #include <string>
 #include <ignition/common/EnumIface.hh>
 #include <ignition/common/Color.hh>
@@ -26,6 +27,9 @@ namespace ignition
 {
   namespace common
   {
+    // Forward declare private data class
+    class MaterialPrivate;
+
     /// \brief Encapsulates description of a material
     class IGNITION_COMMON_VISIBLE Material
     {
@@ -84,7 +88,7 @@ namespace ignition
       public: Material();
 
       /// \brief Destructor
-      public: virtual ~Material();
+      public: ~Material();
 
       /// \brief Create a material with a default color
       /// \param[in] _clr Color of the material
@@ -216,68 +220,33 @@ namespace ignition
                   const ignition::common::Material &_m)
               {
                 _out << "Material:\n";
-                _out << "  Name: " << _m.name << "\n";
-                _out << "  Texture: " << _m.texImage << "\n";
-                _out << "  Ambient: " << _m.ambient << "\n";
-                _out << "  Diffuse: " << _m.diffuse << "\n";
-                _out << "  Specular: " << _m.specular << "\n";
-                _out << "  Emissive: " << _m.emissive << "\n";
-                _out << "  Transparency: " << _m.transparency << "\n";
-                _out << "  Shininess: " << _m.shininess << "\n";
+                _out << "  Name: " << _m.Name() << "\n";
+                _out << "  Texture: " << _m.TextureImage() << "\n";
+                _out << "  Ambient: " << _m.Ambient() << "\n";
+                _out << "  Diffuse: " << _m.Diffuse() << "\n";
+                _out << "  Specular: " << _m.Specular() << "\n";
+                _out << "  Emissive: " << _m.Emissive() << "\n";
+                _out << "  Transparency: " << _m.Transparency() << "\n";
+                _out << "  Shininess: " << _m.Shininess() << "\n";
                 _out << "  BlendMode: "
-                  << EnumIface<BlendMode>::Str(_m.blendMode) << "\n";
+                  << EnumIface<BlendMode>::Str(_m.Blend()) << "\n";
                 _out << "  ShadeMode: "
-                  << EnumIface<ShadeMode>::Str(_m.shadeMode) << "\n";
-                _out << "  DepthWrite: " << _m.depthWrite << "\n";
+                  << EnumIface<ShadeMode>::Str(_m.Shade()) << "\n";
+                _out << "  DepthWrite: " << _m.DepthWrite() << "\n";
                 return _out;
               }
 
-      /// \brief the name of the material
-      protected: std::string name;
-
-      /// \brief the texture image file name
-      protected: std::string texImage;
-
-      /// \brief the ambient light color
-      protected: Color ambient;
-
-      /// \brief the diffuse ligth color
-      protected: Color diffuse;
-
-      /// \brief the specular light color
-      protected: Color specular;
-
-      /// \brief the emissive light color
-      protected: Color emissive;
-
-      /// \brief transparency value in the range 0 to 1
-      protected: double transparency;
-
-      /// \brief shininess value (0 to 1)
-      protected: double shininess;
-
-      /// \brief point size
-      protected: double pointSize;
-
-      /// \brief blend mode
-      protected: BlendMode blendMode;
-
-      /// \brief the shade mode
-      protected: ShadeMode shadeMode;
-
-      /// \brief the total number of instanciated Material instances
-      private: static unsigned int counter;
-
-      /// \brief flag to perform depth buffer write
-      private: bool depthWrite;
-
-      private: bool lighting;
-
-      /// \brief source blend factor
-      private: double srcBlendFactor;
-
+#ifdef _WIN32
+// Disable warning C4251 which is triggered by
+// std::unique_ptr
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
       /// \brief destination blend factor
-      private: double dstBlendFactor;
+      private: std::unique_ptr<MaterialPrivate> dataPtr;
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
     };
   }
 }

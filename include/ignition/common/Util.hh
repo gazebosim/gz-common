@@ -228,6 +228,16 @@ namespace ignition
     /// \param[in] _s String to trim
     /// \return Trimmed string
     std::string IGNITION_COMMON_VISIBLE trimmed(std::string _s);
+
+    /// \brief Transforms a string to its lowercase equivalent
+    /// \param[in] _in String to convert to lowercase
+    /// \return Lowercase equilvalent of _in.
+    std::string IGNITION_COMMON_VISIBLE lowercase(const std::string &_in);
+
+    /// \brief Transforms a string to its lowercase equivalent
+    /// \param[in] _in String to convert to lowercase
+    /// \return Lowercase equilvalent of _in.
+    std::string IGNITION_COMMON_VISIBLE lowercase(const char *_in);
   }
 }
 

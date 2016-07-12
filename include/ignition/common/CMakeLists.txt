@@ -22,18 +22,20 @@ set (headers
   Mesh.hh
   MeshExporter.hh
   MovingWindowFilter.hh
+  NodeAnimation.hh
   NodeTransform.hh
-  PID.hh
   SingletonT.hh
   Skeleton.hh
   SkeletonAnimation.hh
   SkeletonNode.hh
   SubMesh.hh
   System.hh
+  SVGLoader.hh
   Time.hh
   Timer.hh
   Types.hh
   Util.hh
+  URI.hh
   Uuid.hh
   Video.hh
 )

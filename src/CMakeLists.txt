@@ -21,14 +21,16 @@ set (sources
   Material.cc
   Mesh.cc
   MeshExporter.cc
+  NodeAnimation.cc
   NodeTransform.cc
-  PID.cc
   Skeleton.cc
   SkeletonAnimation.cc
   SkeletonNode.cc
   SubMesh.cc
+  SVGLoader.cc
   Time.cc
   Timer.cc
+  URI.cc
   Util.cc
   Uuid.cc
   Video.cc
@@ -55,7 +57,9 @@ set (gtest_sources
   Mesh_TEST.cc
   MovingWindowFilter_TEST.cc
   SubMesh_TEST.cc
+  SVGLoader_TEST.cc
   Time_TEST.cc
+  URI_TEST.cc
   Util_TEST.cc
   Uuid_TEST.cc
 )

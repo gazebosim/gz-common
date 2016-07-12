@@ -1,11 +1,11 @@
 /*
- * Copyright 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,29 +15,26 @@
  *
  */
 
-#ifndef _IGNITION_COMMON_EXCEPTION_PRIVATE_HH_
-#define _IGNITION_COMMON_EXCEPTION_PRIVATE_HH_
+#ifndef _GAZEBO_SVGLOADER_PRIVATE_HH_
+#define _GAZEBO_SVGLOADER_PRIVATE_HH_
 
-#include <cstdint>
 #include <string>
 
-namespace ignition
+#include <gazebo/math/Vector2d.hh>
+#include <gazebo/math/Matrix3.hh>
+
+namespace gazebo
 {
   namespace common
   {
-    /// \internal
-    /// \brief Private data for Exception
-    class ExceptionPrivate
+    class SVGLoaderPrivate
     {
-      /// \brief The error function
-      public: std::string file;
-
-      /// \brief Line the error occured on
-      public: int64_t line;
-
-      /// \brief The error string
-      public: std::string str;
+      /// \brief The step distance between 2 sampled points in a bezier curve
+      /// It is the inverse of the number of samples in the spline, and should
+      /// be between 0 and 1
+      public: double resolution;
     };
   }
 }
+
 #endif
