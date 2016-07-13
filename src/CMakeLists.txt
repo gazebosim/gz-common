@@ -17,15 +17,21 @@ set (sources
   ffmpeg_inc.cc
   Image.cc
   ImageHeightmap.cc
+  KeyEvent.cc
   KeyFrame.cc
   Material.cc
+  MaterialDensity.cc
   Mesh.cc
   MeshExporter.cc
+  MeshManager.cc
+  MouseEvent.cc
   NodeAnimation.cc
   NodeTransform.cc
+  SemanticVersion.cc
   Skeleton.cc
   SkeletonAnimation.cc
   SkeletonNode.cc
+  STLLoader.cc
   SubMesh.cc
   SVGLoader.cc
   Time.cc
@@ -53,9 +59,14 @@ set (gtest_sources
   Exception_TEST.cc
   Image_TEST.cc
   ImageHeightmap_TEST.cc
+  KeyEvent_TEST.cc
   Material_TEST.cc
+  MaterialDensity_TEST.cc
   Mesh_TEST.cc
+  MeshManager_TEST.cc
+  MouseEvent_TEST.cc
   MovingWindowFilter_TEST.cc
+  SemanticVersion_TEST.cc
   SubMesh_TEST.cc
   SVGLoader_TEST.cc
   Time_TEST.cc

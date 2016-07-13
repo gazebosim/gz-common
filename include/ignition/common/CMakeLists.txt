@@ -17,19 +17,25 @@ set (headers
   HeightmapData.hh
   Image.hh
   ImageHeightmap.hh
+  KeyEvent.cc
   KeyFrame.hh
   Material.hh
+  MaterialDensity.hh
   Mesh.hh
   MeshExporter.hh
+  MeshManager.hh
+  MouseEvent.hh
   MovingWindowFilter.hh
   NodeAnimation.hh
   NodeTransform.hh
+  SemanticVersion.hh
   SingletonT.hh
   Skeleton.hh
   SkeletonAnimation.hh
   SkeletonNode.hh
   SubMesh.hh
   System.hh
+  STLLoader.hh
   SVGLoader.hh
   Time.hh
   Timer.hh
