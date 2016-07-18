@@ -19,7 +19,9 @@
 
 #include <ignition/common/config.hh>
 
+#ifndef _WIN32
 #pragma GCC system_header
+#endif
 
 #ifdef HAVE_FFMPEG
 #ifndef INT64_C
