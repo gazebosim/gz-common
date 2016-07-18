@@ -79,8 +79,16 @@ namespace ignition
       /// \brief the id set in the constructor
       private: int id = -1;
 
+#ifdef _WIN32
+// Disable warning C4251
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
       /// \brief set during the constructor
       private: std::chrono::time_point<std::chrono::system_clock> creationTime;
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
 
       /// \brief Friend class.
       public: template<typename T> friend class EventT;

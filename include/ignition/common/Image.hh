@@ -176,8 +176,16 @@ namespace ignition
       /// \return true if image has a bitmap
       public: bool Valid() const;
 
+#ifdef _WIN32
+// Disable warning C4251
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
       /// \brief Private data pointer
       private: std::unique_ptr<ImagePrivate> dataPtr;
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
     };
   }
 }

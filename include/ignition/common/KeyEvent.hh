@@ -90,8 +90,16 @@ namespace ignition
       /// \param[in] _alt Status of the alt key
       public: void SetAlt(const bool _alt);
 
+#ifdef _WIN32
+// Disable warning C4251
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
       /// \brief Private data pointer
       private: std::unique_ptr<KeyEventPrivate> dataPtr;
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
     };
   }
 }

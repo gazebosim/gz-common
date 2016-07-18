@@ -105,10 +105,17 @@ namespace ignition
       public: void DumpPaths(const std::vector<SVGPath> &_paths,
                              std::ostream &_out) const;
 
-
+#ifdef _WIN32
+// Disable warning C4251
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
       /// \internal
       /// \brief Pointer to private data
       private: std::unique_ptr<SVGLoaderPrivate> dataPtr;
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
     };
   }
 }

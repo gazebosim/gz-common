@@ -46,9 +46,17 @@ namespace ignition
       public: virtual void Export(const Mesh *_mesh,
           const std::string &_filename, bool _exportTextures = false);
 
+#ifdef _WIN32
+// Disable warning C4251
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<ColladaExporterPrivate> dataPtr;
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
     };
   }
 }

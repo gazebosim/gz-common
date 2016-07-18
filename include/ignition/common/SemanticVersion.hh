@@ -143,8 +143,16 @@ namespace ignition
         return _out;
       }
 
+#ifdef _WIN32
+// Disable warning C4251
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
       /// \brief Pointer to private data
       private: std::unique_ptr<SemanticVersionPrivate> dataPtr;
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
     };
   }
 }
