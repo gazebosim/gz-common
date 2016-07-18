@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ TEST(Color, Color)
   EXPECT_FLOAT_EQ(0.5f, clr.B());
   EXPECT_FLOAT_EQ(0.0f, clr.A());
 
-  EXPECT_TRUE(clr.GetAsHSV() == math::Vector3f(6, 0.5, 1));
+  EXPECT_TRUE(clr.HSV() == math::Vector3f(6, 0.5, 1));
 
   clr.SetFromHSV(60, 0.0, 1.0);
   EXPECT_FLOAT_EQ(1.0f, clr.R());
@@ -126,7 +126,7 @@ TEST(Color, Color)
   EXPECT_TRUE(math::equal(0.9064f, clr.B(), 1e-3f));
   EXPECT_TRUE(math::equal(0.04f, clr.A()));
 
-  EXPECT_TRUE(clr.GetAsYUV() == math::Vector3f(0.104985f, 0.95227f, 0.429305f));
+  EXPECT_TRUE(clr.YUV() == math::Vector3f(0.104985f, 0.95227f, 0.429305f));
 
   clr = common::Color(1.0f, 0.0f, 0.5f, 1.0f) +
     common::Color(0.1f, 0.3f, 0.4f, 1.0f);

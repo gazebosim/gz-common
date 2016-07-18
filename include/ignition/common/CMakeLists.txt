@@ -12,8 +12,10 @@ set (headers
   Console.hh
   Dem.hh
   EnumIface.hh
+  Event.hh
   Exception.hh
-  ffmpeg_inc.h
+  ffmpeg_inc.hh
+  GTSMeshUtils.hh
   HeightmapData.hh
   Image.hh
   ImageHeightmap.hh
@@ -22,6 +24,7 @@ set (headers
   Material.hh
   MaterialDensity.hh
   Mesh.hh
+  MeshCSG.hh
   MeshExporter.hh
   MeshManager.hh
   MouseEvent.hh

@@ -85,7 +85,9 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
   while (fgets (input, LINE_MAX_LEN, _filein) != nullptr)
   {
     // Advance to the first nonspace character in INPUT.
-    for (next = input; *next != '\0' && iswspace(*next); next++);
+    for (next = input; *next != '\0' && iswspace(*next); ++next)
+    {
+    }
 
     // Skip blank lines and comments.
     if (*next == '\0' || *next == '#' || *next == '!' || *next == '$')

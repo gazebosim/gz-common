@@ -224,7 +224,6 @@ namespace ignition
       /// \param[in] _scale scaling factor for the camera
       public: void CreateCamera(const std::string &_name, const float _scale);
 
-#ifdef HAVE_GTS
       /// \brief Create a boolean mesh from two meshes
       /// \param[in] _name the name of the new mesh
       /// \param[in] _m1 the parent mesh in the boolean operation
@@ -234,7 +233,6 @@ namespace ignition
       public: void CreateBoolean(const std::string &_name, const Mesh *_m1,
           const Mesh *_m2, const int _operation,
           const ignition::math::Pose3d &_offset = ignition::math::Pose3d::Zero);
-#endif
 
       /// \brief Converts a vector of polylines into a table of vertices and
       /// a list of edges (each made of 2 points from the table of vertices.

@@ -49,9 +49,10 @@ TEST_F(DemTest, NotImage)
 TEST_F(ImageHeightmapTest, BasicAPI)
 {
   common::ImageHeightmap img;
-  std::string path;
+  std::string path("file://");
 
-  path = "file://media/materials/textures/heightmap_bowl.png";
+  path += std::string(TEST_PATH) + "/data/heightmap_bowl.png";
+  std::cout << "PATH[" << path << "]\n";
   EXPECT_EQ(0, img.Load(path));
 
   // Check the heights and widths
@@ -64,9 +65,9 @@ TEST_F(ImageHeightmapTest, BasicAPI)
 TEST_F(ImageHeightmapTest, FillHeightmap)
 {
   common::ImageHeightmap img;
-  std::string path;
+  std::string path("file://");
 
-  path = "file://media/materials/textures/heightmap_bowl.png";
+  path += std::string(TEST_PATH) + "/data/heightmap_bowl.png";
   EXPECT_EQ(0, img.Load(path));
 
   // Use FillHeightMap() to retrieve a vector<float> after some transformations

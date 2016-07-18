@@ -19,6 +19,7 @@
 
 #include "test_config.h"
 #include "ignition/common/Mesh.hh"
+#include "ignition/common/SubMesh.hh"
 #include "ignition/common/MeshManager.hh"
 #include "ignition/common/config.hh"
 #include "test/util.hh"
@@ -27,7 +28,6 @@ using namespace ignition;
 
 class MeshManager : public ignition::testing::AutoLogFixture { };
 
-#ifdef HAVE_GTS
 /////////////////////////////////////////////////
 TEST_F(MeshManager, CreateExtrudedPolyline)
 {
@@ -59,20 +59,21 @@ TEST_F(MeshManager, CreateExtrudedPolyline)
 
   // check mesh
   EXPECT_TRUE(common::MeshManager::Instance()->HasMesh(meshName));
-  const common::Mesh *mesh = common::MeshManager::Instance()->GetMesh(meshName);
+  const common::Mesh *mesh =
+    common::MeshManager::Instance()->MeshByName(meshName);
   EXPECT_TRUE(mesh != nullptr);
 
-  unsigned int submeshCount = mesh->GetSubMeshCount();
+  unsigned int submeshCount = mesh->SubMeshCount();
   EXPECT_EQ(submeshCount, 1u);
 
   // check submesh bounds
-  const common::SubMesh *submesh = mesh->GetSubMesh(0);
+  auto submesh = mesh->SubMeshByIndex(0).lock();
   EXPECT_TRUE(submesh != nullptr);
   EXPECT_EQ(ignition::math::Vector3d(0, 0, 0), submesh->Min());
   EXPECT_EQ(ignition::math::Vector3d(1.0, 1.0, 10.0), submesh->Max());
 
   // check vertices
-  for (unsigned int i = 0; i < submesh->GetVertexCount(); ++i)
+  for (unsigned int i = 0; i < submesh->VertexCount(); ++i)
   {
     ignition::math::Vector3d v = submesh->Vertex(i);
 
@@ -86,10 +87,10 @@ TEST_F(MeshManager, CreateExtrudedPolyline)
   }
 
   // verify same number of normals and vertices
-  EXPECT_EQ(submesh->GetVertexCount(), submesh->GetNormalCount());
+  EXPECT_EQ(submesh->VertexCount(), submesh->NormalCount());
 
   // check normals
-  for (unsigned int i = 0; i < submesh->GetNormalCount(); ++i)
+  for (unsigned int i = 0; i < submesh->NormalCount(); ++i)
   {
     ignition::math::Vector3d v = submesh->Vertex(i);
     ignition::math::Vector3d n = submesh->Normal(i);
@@ -162,19 +163,20 @@ TEST_F(MeshManager, CreateExtrudedPolylineClosedPath)
 
   // check mesh
   EXPECT_TRUE(common::MeshManager::Instance()->HasMesh(meshName));
-  const common::Mesh *mesh = common::MeshManager::Instance()->GetMesh(meshName);
+  const common::Mesh *mesh =
+    common::MeshManager::Instance()->MeshByName(meshName);
   EXPECT_TRUE(mesh != nullptr);
 
-  unsigned int submeshCount = mesh->GetSubMeshCount();
+  unsigned int submeshCount = mesh->SubMeshCount();
   EXPECT_EQ(submeshCount, 1u);
 
   // check submesh bounds
-  const common::SubMesh *submesh = mesh->GetSubMesh(0);
+  auto submesh = mesh->SubMeshByIndex(0).lock();
   EXPECT_TRUE(submesh != nullptr);
   EXPECT_EQ(submesh->Min(), ignition::math::Vector3d(1.11704, 0.7599, 0));
   EXPECT_EQ(submesh->Max(), ignition::math::Vector3d(3.4323, 3.28672, 2.0));
 
-  for (unsigned int i = 0; i < submesh->GetVertexCount(); ++i)
+  for (unsigned int i = 0; i < submesh->VertexCount(); ++i)
   {
     ignition::math::Vector3d v = submesh->Vertex(i);
 
@@ -200,10 +202,10 @@ TEST_F(MeshManager, CreateExtrudedPolylineClosedPath)
   }
 
   // verify same number of normals and vertices
-  EXPECT_EQ(submesh->GetVertexCount(), submesh->GetNormalCount());
+  EXPECT_EQ(submesh->VertexCount(), submesh->NormalCount());
 
   // check normals
-  for (unsigned int i = 0; i < submesh->GetNormalCount(); ++i)
+  for (unsigned int i = 0; i < submesh->NormalCount(); ++i)
   {
     ignition::math::Vector3d v = submesh->Vertex(i);
     ignition::math::Vector3d n = submesh->Normal(i);
@@ -243,7 +245,6 @@ TEST_F(MeshManager, CreateExtrudedPolylineClosedPath)
     }
   }
 }
-#endif
 
 /////////////////////////////////////////////////
 TEST_F(MeshManager, CreateExtrudedPolylineInvalid)

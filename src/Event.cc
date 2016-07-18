@@ -15,52 +15,63 @@
  *
  */
 
-#include <ignition/common/Timer.hh>
+#include "ignition/common/Console.hh"
+#include "ignition/common/Event.hh"
 
 using namespace ignition;
 using namespace common;
 
 //////////////////////////////////////////////////
-Timer::Timer()
-  : running(false)
+Event::Event()
+  : signaled(false)
 {
 }
 
 //////////////////////////////////////////////////
-Timer::~Timer()
+Event::~Event()
 {
 }
 
 //////////////////////////////////////////////////
-void Timer::Start()
+bool Event::Signaled() const
 {
-  this->start = Time::SystemTime();
-  this->running = true;
+  return this->signaled;
 }
 
 //////////////////////////////////////////////////
-void Timer::Stop()
+void Event::SetSignaled(const bool _sig)
 {
-  this->stop = Time::SystemTime();
-  this->running = false;
+  this->signaled = _sig;
 }
 
 //////////////////////////////////////////////////
-bool Timer::Running() const
+Connection::Connection(Event *_e, const int _i)
+: event(_e), id(_i)
 {
-  return this->running;
+  this->creationTime = IGN_SYSTEM_TIME();
 }
 
 //////////////////////////////////////////////////
-Time Timer::Elapsed() const
+Connection::~Connection()
 {
-  if (this->running)
+  auto diffTime = IGN_SYSTEM_TIME() - this->creationTime;
+  if ((this->event && !this->event->Signaled()) &&
+      diffTime < std::chrono::nanoseconds(10000))
   {
-    Time currentTime;
-    currentTime = Time::SystemTime();
-
-    return currentTime - this->start;
+    ignwarn << "Warning: Deleting a connection right after creation. "
+          << "Make sure to save the ConnectionPtr from a Connect call\n";
   }
-  else
-    return this->stop - this->start;
+
+  if (this->event && this->id >= 0)
+  {
+    this->event->Disconnect(this->id);
+    this->id = -1;
+    this->event = nullptr;
+  }
+}
+
+//////////////////////////////////////////////////
+int Connection::Id() const
+{
+  return this->id;
 }

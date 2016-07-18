@@ -105,6 +105,10 @@ namespace ignition
     /// \return The current wall time as an ISO string.
     std::string IGNITION_COMMON_VISIBLE systemTimeISO();
 
+    /// \brief Get the log path
+    /// \return the log path
+    std::string IGNITION_COMMON_VISIBLE logPath();
+
     /// \brief add path sufix to common::SystemPaths
     /// \param[in] _suffix The suffix to add.
     void IGNITION_COMMON_VISIBLE addSearchPathSuffix(

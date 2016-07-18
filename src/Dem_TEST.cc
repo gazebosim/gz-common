@@ -18,7 +18,6 @@
 #include <gtest/gtest.h>
 #include <ignition/math/Angle.hh>
 #include <ignition/math/Vector3.hh>
-#include <ignition/math/Angle.hh>
 
 #include "ignition/common/Dem.hh"
 #include "test_config.h"

@@ -138,7 +138,7 @@ void Color::SetFromHSV(float _h, float _s, float _v)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3f Color::GetAsHSV() const
+ignition::math::Vector3f Color::HSV() const
 {
   ignition::math::Vector3f hsv;
   float x, v, f, i;
@@ -175,7 +175,7 @@ ignition::math::Vector3f Color::GetAsHSV() const
 
 
 //////////////////////////////////////////////////
-ignition::math::Vector3f Color::GetAsYUV() const
+ignition::math::Vector3f Color::YUV() const
 {
   ignition::math::Vector3f yuv;
 
@@ -220,7 +220,7 @@ float Color::operator[](unsigned int index)
 }
 
 //////////////////////////////////////////////////
-Color::RGBA Color::GetAsRGBA() const
+Color::RGBA Color::AsRGBA() const
 {
   uint8_t val8;
   unsigned int val32;
@@ -244,7 +244,7 @@ Color::RGBA Color::GetAsRGBA() const
 }
 
 //////////////////////////////////////////////////
-Color::BGRA Color::GetAsBGRA() const
+Color::BGRA Color::AsBGRA() const
 {
   uint8_t val8;
   unsigned int val32 = 0;
@@ -268,7 +268,7 @@ Color::BGRA Color::GetAsBGRA() const
 }
 
 //////////////////////////////////////////////////
-Color::ARGB Color::GetAsARGB() const
+Color::ARGB Color::AsARGB() const
 {
   uint8_t val8;
   unsigned int val32 = 0;
@@ -292,7 +292,7 @@ Color::ARGB Color::GetAsARGB() const
 }
 
 //////////////////////////////////////////////////
-Color::ABGR Color::GetAsABGR() const
+Color::ABGR Color::AsABGR() const
 {
   uint8_t val8;
   unsigned int val32 = 0;

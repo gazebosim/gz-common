@@ -104,6 +104,7 @@ Material::Material()
 
 //////////////////////////////////////////////////
 Material::Material(const Color &_clr)
+: dataPtr(new MaterialPrivate)
 {
   this->dataPtr->name = "ignition_material_" +
     std::to_string(this->dataPtr->counter++);

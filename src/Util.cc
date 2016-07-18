@@ -56,6 +56,9 @@
   const auto &ignstrtok = strtok_r;
 #endif
 
+static std::unique_ptr<ignition::common::SystemPaths> gSystemPaths(
+    new ignition::common::SystemPaths);
+
 /////////////////////////////////////////////////
 // Internal class for SHA1 computation
 class Sha1
@@ -252,24 +255,28 @@ std::string ignition::common::systemTimeISO()
 }
 
 /////////////////////////////////////////////////
-void ignition::common::addSearchPathSuffix(const std::string & /*_suffix*/)
+std::string ignition::common::logPath()
 {
-  // common::SystemPaths::Instance()->AddSearchPathSuffix(_suffix);
+  return gSystemPaths->LogPath();
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::findFile(const std::string & /*_file*/)
+void ignition::common::addSearchPathSuffix(const std::string &_suffix)
 {
-  return "";
-  // return common::SystemPaths::Instance()->FindFile(_file, true);
+  gSystemPaths->AddSearchPathSuffix(_suffix);
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::findFile(const std::string & /*_file*/,
-    bool /*_searchLocalPath*/)
+std::string ignition::common::findFile(const std::string &_file)
 {
-  return "";
-  // return common::SystemPaths::Instance()->FindFile(_file, _searchLocalPath);
+  return gSystemPaths->FindFile(_file, true);
+}
+
+/////////////////////////////////////////////////
+std::string ignition::common::findFile(const std::string &_file,
+                                       const bool _searchLocalPath)
+{
+  return gSystemPaths->FindFile(_file, _searchLocalPath);
 }
 
 /////////////////////////////////////////////////

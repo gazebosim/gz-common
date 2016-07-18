@@ -26,11 +26,8 @@
 #include "ignition/common/ColladaExporter.hh"
 #include "ignition/common/STLLoader.hh"
 #include "ignition/common/config.hh"
-
-#ifdef HAVE_GTS
-  #include "ignition/common/MeshCSG.hh"
-  #include "ignition/common/GTSMeshUtils.hh"
-#endif
+#include "ignition/common/MeshCSG.hh"
+#include "ignition/common/GTSMeshUtils.hh"
 
 #include "ignition/common/MeshManager.hh"
 
@@ -474,10 +471,6 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
   // distance tolerence between 2 points. This is used when creating a list
   // of distinct points in the polylines.
   double tol = 1e-4;
-  #if !HAVE_GTS
-    ignerr << "GTS library not found. Can not extrude polyline" << std::endl;
-    return;
-  #endif
   auto polys = _polys;
   // close all the loops
   for (auto &poly : polys)
@@ -512,14 +505,12 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
                                                   tol,
                                                   vertices,
                                                   edges);
-  #if HAVE_GTS
-  if (!GTSMeshUtils::DelaunayTriangulation(vertices, edges, subMesh))
+  if (!GTSMeshUtils::DelaunayTriangulation(vertices, edges, &subMesh))
   {
     ignerr << "Unable to triangulate polyline." << std::endl;
     delete mesh;
     return;
   }
-  #endif
 
   std::vector<ignition::math::Vector3d> normals;
   for (unsigned int i  = 0; i < edges.size(); ++i)
@@ -1240,7 +1231,6 @@ void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
   }
 }
 
-#ifdef HAVE_GTS
 //////////////////////////////////////////////////
 void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
     const Mesh *_m2, int _operation, const ignition::math::Pose3d &_offset)
@@ -1253,7 +1243,6 @@ void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
   mesh->SetName(_name);
   this->meshes.insert(std::make_pair(_name, mesh));
 }
-#endif
 
 //////////////////////////////////////////////////
 size_t MeshManager::AddUniquePointToVerticesTable(

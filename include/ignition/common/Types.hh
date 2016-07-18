@@ -24,10 +24,15 @@ namespace ignition
 {
   namespace common
   {
+    class Connection;
     class Material;
     class Mesh;
     class Skeleton;
     class SubMesh;
+
+    /// \def ConnectionPtr
+    /// \brief Shared pointer to a Connection object
+    using ConnectionPtr = std::shared_ptr<Connection>;
 
     /// \def MaterialPtr
     /// \brief Shared pointer to a Material object

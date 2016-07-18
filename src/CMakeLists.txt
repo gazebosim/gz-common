@@ -14,15 +14,18 @@ set (sources
   Console.cc
   Dem.cc
   Exception.cc
+  Event.cc
   ffmpeg_inc.cc
   Image.cc
   ImageHeightmap.cc
+  GTSMeshUtils.cc
   KeyEvent.cc
   KeyFrame.cc
   Material.cc
   MaterialDensity.cc
   Mesh.cc
   MeshExporter.cc
+  MeshCSG.cc
   MeshManager.cc
   MouseEvent.cc
   NodeAnimation.cc
@@ -32,6 +35,7 @@ set (sources
   SkeletonAnimation.cc
   SkeletonNode.cc
   STLLoader.cc
+  SystemPaths.cc
   SubMesh.cc
   SVGLoader.cc
   Time.cc
@@ -57,8 +61,10 @@ set (gtest_sources
   Dem_TEST.cc
   EnumIface_TEST.cc
   Exception_TEST.cc
+  Event_TEST.cc
   Image_TEST.cc
   ImageHeightmap_TEST.cc
+  GTSMeshUtils_TEST.cc
   KeyEvent_TEST.cc
   Material_TEST.cc
   MaterialDensity_TEST.cc
@@ -69,6 +75,7 @@ set (gtest_sources
   SemanticVersion_TEST.cc
   SubMesh_TEST.cc
   SVGLoader_TEST.cc
+  SystemPaths_TEST.cc
   Time_TEST.cc
   URI_TEST.cc
   Util_TEST.cc
@@ -80,6 +87,7 @@ target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
   ${IGNITION-MATH_LIBRARIES}
   ${freeimage_LIBRARIES}
   ${tinyxml2_LIBRARIES}
+  ${gts_LIBRARIES}
   ${uuid_LIBRARIES})
 
 if (UNIX)

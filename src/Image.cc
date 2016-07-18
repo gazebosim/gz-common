@@ -89,7 +89,9 @@ int Image::Load(const std::string &_filename)
 {
   this->dataPtr->fullName = _filename;
   if (!exists(this->dataPtr->fullName))
+  {
     this->dataPtr->fullName = common::findFile(_filename);
+  }
 
   if (exists(this->dataPtr->fullName))
   {

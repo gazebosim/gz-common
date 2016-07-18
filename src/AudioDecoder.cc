@@ -198,7 +198,7 @@ bool AudioDecoder::Decode(uint8_t ** /*_outBuffer*/,
 #endif
 
 /////////////////////////////////////////////////
-int AudioDecoder::GetSampleRate()
+int AudioDecoder::SampleRate()
 {
 #ifdef HAVE_FFMPEG
   return this->data->codecCtx->sample_rate;
@@ -301,7 +301,7 @@ bool AudioDecoder::SetFile(const std::string & /*_filename*/)
 #endif
 
 /////////////////////////////////////////////////
-std::string AudioDecoder::GetFile() const
+std::string AudioDecoder::File() const
 {
   return this->data->filename;
 }

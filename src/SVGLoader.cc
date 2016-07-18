@@ -489,7 +489,7 @@ ignition::math::Vector2d SVGLoaderPrivate::SubpathToPolyline(
     return ignition::math::Vector2d::Zero;
   }
 
-  for (SVGCommand cmd: _subpath)
+  for (SVGCommand cmd : _subpath)
   {
     size_t i = 0;
     size_t count = cmd.numbers.size();
@@ -632,7 +632,7 @@ bool SVGLoaderPrivate::SplitSubpaths(const std::vector<SVGCommand> &_cmds,
     return false;
   }
 
-  for (SVGCommand cmd: _cmds)
+  for (SVGCommand cmd : _cmds)
   {
     if (tolower(cmd.cmd) == 'm')
     {
@@ -640,8 +640,10 @@ bool SVGLoaderPrivate::SplitSubpaths(const std::vector<SVGCommand> &_cmds,
       std::vector<SVGCommand> sub;
       _subpaths.push_back(sub);
     }
+
     // get a reference to the latest subpath
     std::vector<SVGCommand> &subpath = _subpaths.back();
+
     // give the cmd to the latest
     subpath.push_back(cmd);
   }
@@ -651,7 +653,7 @@ bool SVGLoaderPrivate::SplitSubpaths(const std::vector<SVGCommand> &_cmds,
 void SVGLoaderPrivate::ExpandCommands(
     const std::vector< std::vector<SVGCommand> > &_subpaths, SVGPath &_path)
 {
-  for (std::vector<SVGCommand> compressedSubpath :_subpaths)
+  for (const std::vector<SVGCommand> &compressedSubpath : _subpaths)
   {
     // add new subpath
     _path.subpaths.push_back(std::vector<SVGCommand>());
@@ -703,7 +705,7 @@ bool SVGLoaderPrivate::PathCommands(const std::vector<std::string> &_tokens,
   char lastCmd = 'x';
   std::vector<double> numbers;
 
-  for (std::string token: _tokens)
+  for (const std::string &token : _tokens)
   {
     // new command?
     if (lookup.find(token[0]) == std::string::npos)
