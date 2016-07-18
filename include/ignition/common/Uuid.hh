@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IGN_COMMON_UUID_HH_INCLUDED_
-#define IGN_COMMON_UUID_HH_INCLUDED_
+#ifndef IGNITION_COMMON_UUID_HH_INCLUDED_
+#define IGNITION_COMMON_UUID_HH_INCLUDED_
 
 #include <iostream>
 #include <string>

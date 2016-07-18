@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IGNTION_COMMON_CONSOLE_HH_
-#define IGNTION_COMMON_CONSOLE_HH_
+#ifndef IGNITION_COMMON_CONSOLE_HH_
+#define IGNITION_COMMON_CONSOLE_HH_
 
 #include <iostream>
 #include <fstream>
