@@ -231,7 +231,7 @@ void SubMesh::SetTexCoord(const unsigned int _index,
 {
   if (_index >= this->dataPtr->texCoords.size())
   {
-    ignerr << "Index too large" << std::endl;;
+    ignerr << "Index too large" << std::endl;
     return;
   }
 
@@ -243,7 +243,7 @@ unsigned int SubMesh::Index(const unsigned int _index) const
 {
   if (_index >= this->dataPtr->indices.size())
   {
-    ignerr << "Index too large" << std::endl;;
+    ignerr << "Index too large" << std::endl;
     return 0u;
   }
 
@@ -255,7 +255,7 @@ void SubMesh::SetIndex(const unsigned int _index, const unsigned int _i)
 {
   if (_index >= this->dataPtr->indices.size())
   {
-    ignerr << "Index too large" << std::endl;;
+    ignerr << "Index too large" << std::endl;
     return;
   }
 
@@ -413,7 +413,7 @@ void SubMesh::FillArrays(double **_vertArr, int **_indArr) const
   *_vertArr = new double[this->dataPtr->vertices.size() * 3];
   *_indArr = new int[this->dataPtr->indices.size()];
 
-  unsigned int vi = 0;;
+  unsigned int vi = 0;
   for (auto &v : this->dataPtr->vertices)
   {
     (*_vertArr)[vi++] = static_cast<float>(v.X());
@@ -421,7 +421,7 @@ void SubMesh::FillArrays(double **_vertArr, int **_indArr) const
     (*_vertArr)[vi++] = static_cast<float>(v.Z());
   }
 
-  unsigned int ii = 0;;
+  unsigned int ii = 0;
   for (auto &i : this->dataPtr->indices)
   {
     (*_indArr)[ii++] = i;

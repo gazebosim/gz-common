@@ -92,6 +92,7 @@ namespace ignition
 
       /// \brief Create a material with a default color
       /// \param[in] _clr Color of the material
+      // cppcheck-suppress noExplicitConstructor
       public: Material(const Color &_clr);
 
       /// \brief Get the name of the material

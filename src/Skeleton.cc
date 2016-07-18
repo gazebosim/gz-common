@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ using namespace common;
 /// Private data class
 class ignition::common::SkeletonPrivate
 {
-  typedef std::vector<std::vector<std::pair<std::string, double>>>
+  typedef std::vector<std::vector<std::pair<std::string, double> > >
     RawNodeWeights;
 
   /// \brief the root node

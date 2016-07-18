@@ -19,7 +19,7 @@ set (headers
   HeightmapData.hh
   Image.hh
   ImageHeightmap.hh
-  KeyEvent.cc
+  KeyEvent.hh
   KeyFrame.hh
   Material.hh
   MaterialDensity.hh

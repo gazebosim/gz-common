@@ -143,7 +143,7 @@ namespace ignition
       /// \param[in] _parent The parent element
       /// \param[in] _name String name of the element
       /// \param[in] _id String ID of the element
-      ///\ return XML element with the specified ID
+      /// \return XML element with the specified ID
       public: tinyxml2::XMLElement *ElementId(tinyxml2::XMLElement *_parent,
                                                const std::string &_name,
                                                const std::string &_id);
@@ -151,7 +151,7 @@ namespace ignition
       /// \brief Get an XML element by ID
       /// \param[in] _name String name of the element
       /// \param[in] _id String ID of the element
-      ///\ return XML element with the specified ID
+      /// \return XML element with the specified ID
       public: tinyxml2::XMLElement *ElementId(const std::string &_name,
                                                const std::string &_id);
 

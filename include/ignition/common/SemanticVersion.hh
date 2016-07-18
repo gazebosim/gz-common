@@ -41,10 +41,12 @@ namespace ignition
 
       /// \brief Constructor
       /// \param[in] _v the string version. ex: "0.3.2"
+      // cppcheck-suppress noExplicitConstructor
       public: SemanticVersion(const std::string &_v);
 
       /// \brief Copy constructor
       /// \param[in] _copy the other version
+      // cppcheck-suppress noExplicitConstructor
       public: SemanticVersion(const SemanticVersion  &_copy);
 
       /// \brief Assignment operator

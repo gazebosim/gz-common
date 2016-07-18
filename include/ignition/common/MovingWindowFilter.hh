@@ -37,7 +37,7 @@ namespace ignition
       public: MovingWindowFilterPrivate();
 
       /// \brief For moving window smoothed value
-      public: unsigned int valWindowSize;
+      public: unsigned int valWindowSize = 4;
 
       /// \brief buffer history of raw values
       public: std::vector<T> valHistory;
@@ -49,7 +49,7 @@ namespace ignition
       public: T sum;
 
       /// \brief keep track of number of elements
-      public: unsigned int samples;
+      public: unsigned int samples = 0;
     };
     /// \endcond
 
@@ -58,11 +58,9 @@ namespace ignition
     MovingWindowFilterPrivate<T>::MovingWindowFilterPrivate()
     {
       /// \TODO FIXME hardcoded initial value for now
-      this->valWindowSize = 4;
       this->valHistory.resize(this->valWindowSize);
       this->valIter = this->valHistory.begin();
       this->sum = T();
-      this->samples = 0;
     }
 
     /// \brief Base class for MovingWindowFilter
@@ -106,8 +104,9 @@ namespace ignition
 
     //////////////////////////////////////////////////
     template<typename T>
+    // cppcheck-suppress uninitMemberVar
     MovingWindowFilter<T>::MovingWindowFilter()
-      : dataPtr(new MovingWindowFilterPrivate<T>())
+    : dataPtr(new MovingWindowFilterPrivate<T>())
     {
     }
 

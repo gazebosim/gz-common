@@ -118,7 +118,7 @@ namespace ignition
       /// battery voltage as a double.
       /// \sa UpdateData
       public: void SetUpdateFunc(
-                  std::function<double(Battery *)> _updateFunc);
+                  std::function<double (Battery *)> _updateFunc);
 
       /// \brief Update the battery. This will in turn trigger the function
       /// set using the SetUpdateFunc function.

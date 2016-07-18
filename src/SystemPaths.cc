@@ -35,7 +35,7 @@ const std::string IGN_PLUGIN_PATH="/usr/lib/";
 class ignition::common::SystemPathsPrivate
 {
   /// \brief re-read SystemPaths#pluginPaths from environment variable
-  public: virtual void UpdatePluginPaths();
+  public: void UpdatePluginPaths();
 
   /// \brief if true, call UpdatePluginPaths() within PluginPaths()
   public: bool pluginPathsFromEnv;
@@ -245,7 +245,8 @@ void SystemPaths::AddPluginPaths(const std::string &_path)
     pos1 = pos2+1;
     pos2 = _path.find(delim, pos2+1);
   }
-  insertUnique(_path.substr(pos1, _path.size()-pos1), this->dataPtr->pluginPaths);
+  insertUnique(_path.substr(pos1, _path.size()-pos1),
+      this->dataPtr->pluginPaths);
 }
 
 /////////////////////////////////////////////////

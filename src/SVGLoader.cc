@@ -94,7 +94,7 @@ ignition::math::Matrix3d ParseTransformMatrixStr(
   if (_transformStr.empty())
   {
     ignerr << "no data for ParseTransformMatrixStr";
-    return ignition::math::Matrix3d::Identity;;
+    return ignition::math::Matrix3d::Identity;
   }
 
   // _transfromStr should not have a closing paren and look like this

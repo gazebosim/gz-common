@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ class ignition::common::BatteryPrivate
 
   /// \brief The function used to to update the real voltage.
   /// It takes as inputs current voltage and list of power loads.
-  public: std::function<double(Battery *)> updateFunc;
+  public: std::function<double (Battery *)> updateFunc;
 
   /// \brief Name of the battery.
   public: std::string name = "";
@@ -191,7 +191,7 @@ double Battery::UpdateDefault(Battery *_battery)
 
 /////////////////////////////////////////////////
 void Battery::SetUpdateFunc(
-    std::function<double(Battery *)> _updateFunc)
+    std::function<double (Battery *)> _updateFunc)
 {
   this->dataPtr->updateFunc = _updateFunc;
 }

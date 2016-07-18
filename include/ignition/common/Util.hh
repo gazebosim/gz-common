@@ -72,18 +72,18 @@
       std::chrono::system_clock::now().time_since_epoch()).count())
 
 /// \brief Get the system time in microseconds since epoch.
-#define IGN_SYSTEM_TIME_US() (std::chrono::duration_cast<\
-    std::chrono::microseconds>(\
+#define IGN_SYSTEM_TIME_US() (\
+    std::chrono::duration_cast<std::chrono::microseconds>(\
       std::chrono::system_clock::now().time_since_epoch()).count())
 
 /// \brief Get the system time in milliseconds since epoch.
-#define IGN_SYSTEM_TIME_MS() (std::chrono::duration_cast<\
-    std::chrono::milliseconds>(\
+#define IGN_SYSTEM_TIME_MS() (\
+    std::chrono::duration_cast<std::chrono::milliseconds>(\
       std::chrono::system_clock::now().time_since_epoch()).count())
 
 /// \brief Get the system time in nanoseconds since epoch.
-#define IGN_SYSTEM_TIME_NS() (std::chrono::duration_cast<\
-    std::chrono::nanoseconds>(\
+#define IGN_SYSTEM_TIME_NS() (\
+    std::chrono::duration_cast<std::chrono::nanoseconds>(\
       std::chrono::system_clock::now().time_since_epoch()).count())
 
 /// \brief This macro defines the standard way of launching an exception

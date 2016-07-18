@@ -14,15 +14,6 @@
  * limitations under the License.
  *
 */
-#ifndef _WIN32
-#include <dirent.h>
-#include <limits.h>
-#include <climits>
-#else
-#include <io.h>
-#include "ignition/common/win_dirent.h"
-#endif
-
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <iomanip>
@@ -33,10 +24,21 @@
 #include <cstdlib>
 #include <cstring>
 #include <cctype>
+
 #include <ignition/common/config.hh>
 #include <ignition/common/SystemPaths.hh>
 #include <ignition/common/Util.hh>
 #include <ignition/common/Uuid.hh>
+
+#ifndef _WIN32
+#include <dirent.h>
+#include <limits.h>
+#include <climits>
+#else
+#include <io.h>
+#include "ignition/common/win_dirent.h"
+#endif
+
 
 #define LEFT_ROTATE(x, n) (((x) << (n)) ^ ((x) >> (32-(n))))
 

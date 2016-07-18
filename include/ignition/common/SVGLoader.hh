@@ -75,6 +75,7 @@ namespace ignition
       /// \param[in] _samples The number of points for cubic spline segments
       /// Samples must be greater than zero. A value of one will be used if
       /// _samples is set to zero.
+      // cppcheck-suppress noExplicitConstructor
       public: SVGLoader(const unsigned int _samples);
 
       /// \brief destructor
