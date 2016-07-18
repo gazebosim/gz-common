@@ -181,7 +181,7 @@ namespace ignition
                               const float _height,
                               const int _rings,
                               const int _segments,
-                              const double _arc = 2.0 * M_PI);
+                              const double _arc = 2.0 * IGN_PI);
 
       /// \brief Create mesh for a plane
       /// \param[in] _name
@@ -260,6 +260,11 @@ namespace ignition
                       const ignition::math::Vector2d &_p,
                       const double _tol);
 
+#ifdef _WIN32
+// Disable warning C4251
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
       /// \brief 3D mesh loader for COLLADA files
       private: ColladaLoader *colladaLoader;
 
@@ -276,6 +281,9 @@ namespace ignition
       private: std::vector<std::string> fileExtensions;
 
       private: std::mutex mutex;
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
 
       /// \brief Singleton implementation
       private: friend class SingletonT<MeshManager>;

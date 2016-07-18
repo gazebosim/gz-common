@@ -127,8 +127,16 @@ namespace ignition
       public: static Type NearestMaterial(const double _value,
                   const double _epsilon = IGN_DBL_MAX);
 
+#ifdef _WIN32
+// Disable warning C4251
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
       /// \brief List of density entries
       private: static std::map<Type, double> materials;
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
     };
   }
 }

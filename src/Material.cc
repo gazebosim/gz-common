@@ -22,12 +22,11 @@
 using namespace ignition;
 using namespace common;
 
-
-IGN_ENUM(Material::ShadeMode,
+IGN_ENUM(shademode, Material::ShadeMode,
     Material::SHADE_MODE_BEGIN, Material::SHADE_MODE_END,
     "FLAT", "GOURAUD", "PHONG", "BLINN")
 
-IGN_ENUM(Material::BlendMode,
+IGN_ENUM(blendmode, Material::BlendMode,
     Material::BLEND_MODE_BEGIN, Material::BLEND_MODE_END,
     "ADD", "MODULATE", "REPLACE")
 
@@ -95,8 +94,8 @@ Material::Material()
   this->dataPtr->shadeMode = GOURAUD;
   this->dataPtr->transparency = 0;
   this->dataPtr->shininess = 0;
-  this->dataPtr->ambient.Set(0.4, 0.4, 0.4, 1);
-  this->dataPtr->diffuse.Set(0.5, 0.5, 0.5, 1);
+  this->dataPtr->ambient.Set(0.4f, 0.4f, 0.4f, 1.0f);
+  this->dataPtr->diffuse.Set(0.5f, 0.5f, 0.5f, 1.0f);
   this->dataPtr->specular.Set(0, 0, 0, 1);
   this->dataPtr->lighting = false;
   this->dataPtr->dstBlendFactor = this->dataPtr->srcBlendFactor = 1.0;

@@ -65,8 +65,16 @@ namespace ignition
       /// \brief free up open Video object, close files, streams
       private: void Cleanup();
 
+#ifdef _WIN32
+// Disable warning C4251
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
       /// \brief Private data pointer
       private: std::unique_ptr<VideoPrivate> dataPtr;
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
     };
   }
 }

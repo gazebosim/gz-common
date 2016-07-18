@@ -66,8 +66,8 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
   {
     // yf ranges between 0 and 4
     double yf = y / static_cast<double>(_subSampling);
-    int y1 = floor(yf);
-    int y2 = ceil(yf);
+    int y1 = static_cast<int>(std::floor(yf));
+    int y2 = static_cast<int>(std::ceil(yf));
     if (y2 >= imgHeight)
       y2 = imgHeight-1;
     double dy = yf - y1;
@@ -75,8 +75,8 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
     for (unsigned int x = 0; x < _vertSize; ++x)
     {
       double xf = x / static_cast<double>(_subSampling);
-      int x1 = floor(xf);
-      int x2 = ceil(xf);
+      int x1 = static_cast<int>(std::floor(xf));
+      int x2 = static_cast<int>(std::ceil(xf));
       if (x2 >= imgWidth)
         x2 = imgWidth-1;
       double dx = xf - x1;

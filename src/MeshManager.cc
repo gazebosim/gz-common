@@ -48,8 +48,8 @@ MeshManager::MeshManager()
       ignition::math::Vector2d(1, 1),
       ignition::math::Vector2d(1, 1));
 
-  this->CreateSphere("unit_sphere", 0.5, 32, 32);
-  this->CreateSphere("joint_anchor", 0.01, 32, 32);
+  this->CreateSphere("unit_sphere", 0.5f, 32, 32);
+  this->CreateSphere("joint_anchor", 0.01f, 32, 32);
   this->CreateBox("body_cg", ignition::math::Vector3d(0.014, 0.014, 0.014),
       ignition::math::Vector2d(0.014, 0.014));
   this->CreateBox("unit_box", ignition::math::Vector3d(1, 1, 1),
@@ -58,10 +58,10 @@ MeshManager::MeshManager()
   this->CreateCone("unit_cone", 0.5, 1.0, 5, 32);
   this->CreateCamera("unit_camera", 0.5);
 
-  this->CreateCylinder("axis_shaft", 0.01, 0.2, 1, 16);
-  this->CreateCone("axis_head", 0.02, 0.08, 1, 16);
+  this->CreateCylinder("axis_shaft", 0.01f, 0.2f, 1, 16);
+  this->CreateCone("axis_head", 0.02f, 0.08f, 1, 16);
 
-  this->CreateTube("selection_tube", 1.0, 1.2, 0.01, 1, 64);
+  this->CreateTube("selection_tube", 1.0f, 1.2f, 0.01f, 1, 64);
 
   this->fileExtensions.push_back("stl");
   this->fileExtensions.push_back("dae");
@@ -225,8 +225,8 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
   }
 
   int ring, seg;
-  float deltaSegAngle = (2.0 * M_PI / segments);
-  float deltaRingAngle = (M_PI / rings);
+  float deltaSegAngle = (2.0 * IGN_PI / segments);
+  float deltaRingAngle = (IGN_PI / rings);
   ignition::math::Vector3d vert, norm;
   unsigned int verticeIndex = 0;
 
@@ -357,7 +357,9 @@ void MeshManager::CreatePlane(const std::string &_name,
     }
   }
 
-  this->Tesselate2DMesh(&subMesh, _segments.X() + 1, _segments.Y() + 1, false);
+  this->Tesselate2DMesh(&subMesh, 
+    static_cast<int>(_segments.X() + 1),
+    static_cast<int>(_segments.Y() + 1), false);
   mesh->AddSubMesh(subMesh);
 }
 
@@ -700,14 +702,14 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
   // Normals for each vertex
   float n[8][3]=
   {
-    {-0.577350, -0.577350, -0.577350},
-    {-0.577350, -0.577350, 0.577350},
-    {0.577350, -0.577350, 0.577350},
-    {0.577350, -0.577350, -0.577350},
-    {-0.577350, 0.577350, -0.577350},
-    {-0.577350, 0.577350, 0.577350},
-    {0.577350, 0.577350, 0.577350},
-    {0.577350, 0.577350, -0.577350}
+    {-0.577350f, -0.577350f, -0.577350f},
+    {-0.577350f, -0.577350f, 0.577350f},
+    {0.577350f, -0.577350f, 0.577350f},
+    {0.577350f, -0.577350f, -0.577350f},
+    {-0.577350f, 0.577350f, -0.577350f},
+    {-0.577350f, 0.577350f, 0.577350f},
+    {0.577350f, 0.577350f, 0.577350f},
+    {0.577350f, 0.577350f, -0.577350f}
   };
 
   // Texture coords
@@ -778,7 +780,7 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
   ignition::math::Vector3d vert, norm;
   unsigned int verticeIndex = 0;
   int ring, seg;
-  float deltaSegAngle = (2.0 * M_PI / segments);
+  float deltaSegAngle = (2.0 * IGN_PI / segments);
 
   if (this->HasMesh(name))
   {
@@ -911,7 +913,7 @@ void MeshManager::CreateCone(const std::string &name, float radius,
   if (segments <3)
     segments = 3;
 
-  float deltaSegAngle = (2.0 * M_PI / segments);
+  float deltaSegAngle = (2.0 * IGN_PI / segments);
 
   // Generate the group of rings for the cone
   for (ring = 0; ring < rings; ring++)
@@ -1137,7 +1139,7 @@ void MeshManager::CreateTube(const std::string &_name, float _innerRadius,
   }
 
   // Close ends in case it's not a full circle
-  if (!ignition::math::equal(_arc, 2.0 * M_PI))
+  if (!ignition::math::equal(_arc, 2.0 * IGN_PI))
   {
     for (ring = 0; ring < rings; ++ring)
     {

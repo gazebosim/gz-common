@@ -22,7 +22,7 @@ using namespace ignition;
 using namespace common;
 
 // Initialize enum iterator, and string converter
-IGN_ENUM(MaterialDensity::Type,
+IGN_ENUM(materialdensity, MaterialDensity::Type,
   MaterialDensity::Type::BEGIN,
   MaterialDensity::Type::END,
   "Styrofoam",

@@ -340,7 +340,7 @@ void arcPath(const ignition::math::Vector2d &_p0,
   // Ported from canvg (https://code.google.com/p/canvg/)
   double rx = _rx;
   double ry = _ry;
-  double rotx = _rotxDeg / 180.0 * M_PI;
+  double rotx = _rotxDeg / 180.0 * IGN_PI;
 
   double x1, y1, x2, y2, cx, cy, dx, dy, d;
   double x1p, y1p, cxp, cyp, s, sa, sb;
@@ -414,18 +414,18 @@ void arcPath(const ignition::math::Vector2d &_p0,
   {
     // Choose large arc
     if (da > 0.0)
-      da = da - 2 * M_PI;
+      da = da - 2 * IGN_PI;
     else
-      da = 2 * M_PI + da;
+      da = 2 * IGN_PI + da;
   }
 
   // rounding errors for half circles
-  if (M_PI - fabs(da) < 0.001)
+  if (IGN_PI - fabs(da) < 0.001)
   {
     if (_sweepDirection)
-      da = M_PI;
+      da = IGN_PI;
     else
-      da = -M_PI;
+      da = -IGN_PI;
   }
 
   // Approximate the arc using cubic spline segments.
@@ -439,7 +439,7 @@ void arcPath(const ignition::math::Vector2d &_p0,
   // Split arc into max 90 degree segments.
   // The loop assumes an iteration per end point
   // (including start and end), this +1.
-  size_t ndivs = static_cast<int>(fabs(da) / (M_PI * 0.5) + 1.0);
+  size_t ndivs = static_cast<int>(fabs(da) / (IGN_PI * 0.5) + 1.0);
   hda = (da / ndivs) / 2.0;
   kappa = fabs(4.0 / 3.0 * (1.0 - cos(hda)) / sin(hda));
   if (da < 0.0)
@@ -562,8 +562,8 @@ ignition::math::Vector2d SVGLoaderPrivate::SubpathToPolyline(
           double rx = cmd.numbers[i+0];
           double ry = cmd.numbers[i+1];
           double xRot = cmd.numbers[i+2];
-          unsigned int arc(cmd.numbers[i+3]);
-          unsigned int sweep(cmd.numbers[i+4]);
+          unsigned int arc(static_cast<unsigned int>(cmd.numbers[i+3]));
+          unsigned int sweep(static_cast<unsigned int>(cmd.numbers[i+4]));
           ignition::math::Vector2d pEnd;
           pEnd.X(cmd.numbers[i+5]);
           pEnd.Y(cmd.numbers[i+6]);
@@ -580,8 +580,8 @@ ignition::math::Vector2d SVGLoaderPrivate::SubpathToPolyline(
           double rx = cmd.numbers[i+0];
           double ry = cmd.numbers[i+1];
           double xRot = cmd.numbers[i+2];
-          unsigned int arc(cmd.numbers[i+3]);
-          unsigned int sweep(cmd.numbers[i+4]);
+          unsigned int arc(static_cast<unsigned int>(cmd.numbers[i+3]));
+          unsigned int sweep(static_cast<unsigned int>(cmd.numbers[i+4]));
           ignition::math::Vector2d pEnd;
           pEnd.X(cmd.numbers[i+5] + _last.X());
           pEnd.Y(cmd.numbers[i+6] + _last.Y());
@@ -647,6 +647,8 @@ bool SVGLoaderPrivate::SplitSubpaths(const std::vector<SVGCommand> &_cmds,
     // give the cmd to the latest
     subpath.push_back(cmd);
   }
+
+  return true;
 }
 
 /////////////////////////////////////////////////

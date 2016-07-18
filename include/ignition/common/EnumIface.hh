@@ -36,17 +36,28 @@ namespace ignition
     /// \param[in] names A vector of strings, one for each enum value.
     /// \sa EnumIface
     /// \sa EnumIterator
-    #define IGN_ENUM(enumType, begin, end, ...) \
+    /*#define IGN_ENUM(enumType, begin, end, ...) \
     template<> IGNITION_COMMON_VISIBLE enumType \
     common::EnumIface<enumType>::range[] = {begin, end}; \
     template<> IGNITION_COMMON_VISIBLE \
-    std::vector<std::string> common::EnumIface<enumType>::names = {__VA_ARGS__};
+    std::vector<std::string> common::EnumIface<enumType>::names = \
+    {__VA_ARGS__};
+    */
+    #define IGN_ENUM(name, enumType, begin, end, ...) \
+    static ignition::common::EnumIface<enumType> name(begin, end, {__VA_ARGS__});
 
     /// \brief Enum interface. Use this interface to convert an enum to
     /// a string, and set an enum from a string.
     template<typename T>
     class EnumIface
     {
+      public: EnumIface(T _start, T _end, std::vector<std::string> _names)
+      {
+        this->range[0] = _start;
+	this->range[1] = _end;
+	this->names = _names;
+      }
+
       /// \brief Get the beginning enum value.
       /// \return Enum value that marks the beginning of the enum list.
       public: static T Begin()

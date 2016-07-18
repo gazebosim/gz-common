@@ -45,13 +45,27 @@ namespace ignition
       /// \brief A letter that describe the segment
       public: char cmd;
 
+#ifdef _WIN32
+// Disable warning C4251
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
       /// \brief Coordinates for the command
       public: std::vector<double> numbers;
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
     };
 
     /// \brief An SVG path element data structure
     struct IGNITION_COMMON_VISIBLE SVGPath
     {
+#ifdef _WIN32
+// Disable warning C4251
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
+
       /// \brief An id or name
       std::string id;
 
@@ -66,6 +80,9 @@ namespace ignition
 
       /// \brief The polylines described by the commands
       std::vector< std::vector<ignition::math::Vector2d> > polylines;
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
     };
 
     /// \brief A loader for SVG files
