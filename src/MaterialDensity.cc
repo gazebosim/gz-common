@@ -22,7 +22,7 @@ using namespace ignition;
 using namespace common;
 
 // Initialize enum iterator, and string converter
-IGN_ENUM(materialdensity, MaterialDensity::Type,
+IGN_ENUM(materialDensityIface, MaterialDensity::Type,
   MaterialDensity::Type::BEGIN,
   MaterialDensity::Type::END,
   "Styrofoam",
@@ -73,7 +73,7 @@ const std::map<MaterialDensity::Type, double> &MaterialDensity::Materials()
 double MaterialDensity::Density(const std::string &_material)
 {
   MaterialDensity::Type type = MaterialDensity::Type::END;
-  EnumIface<MaterialDensity::Type>::Set(type, _material);
+  materialDensityIface.Set(type, _material);
 
   if (type != MaterialDensity::Type::END)
     return materials[type];

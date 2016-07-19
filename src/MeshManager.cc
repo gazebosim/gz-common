@@ -357,9 +357,9 @@ void MeshManager::CreatePlane(const std::string &_name,
     }
   }
 
-  this->Tesselate2DMesh(&subMesh, 
-    static_cast<int>(_segments.X() + 1),
-    static_cast<int>(_segments.Y() + 1), false);
+  this->Tesselate2DMesh(&subMesh,
+      static_cast<int>(_segments.X() + 1),
+      static_cast<int>(_segments.Y() + 1), false);
   mesh->AddSubMesh(subMesh);
 }
 

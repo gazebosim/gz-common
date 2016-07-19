@@ -22,11 +22,11 @@
 using namespace ignition;
 using namespace common;
 
-IGN_ENUM(shademode, Material::ShadeMode,
+IGN_ENUM(shadeModeIface, Material::ShadeMode,
     Material::SHADE_MODE_BEGIN, Material::SHADE_MODE_END,
     "FLAT", "GOURAUD", "PHONG", "BLINN")
 
-IGN_ENUM(blendmode, Material::BlendMode,
+IGN_ENUM(blendModeIface, Material::BlendMode,
     Material::BLEND_MODE_BEGIN, Material::BLEND_MODE_END,
     "ADD", "MODULATE", "REPLACE")
 
@@ -306,3 +306,16 @@ bool Material::Lighting() const
 {
   return this->dataPtr->lighting;
 }
+
+//////////////////////////////////////////////////
+std::string Material::BlendStr() const
+{
+  return blendModeIface.Str(this->Blend());
+}
+
+//////////////////////////////////////////////////
+std::string Material::ShadeStr() const
+{
+  return shadeModeIface.Str(this->Shade());
+}
+

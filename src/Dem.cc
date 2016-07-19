@@ -88,10 +88,10 @@ int Dem::Load(const std::string &_filename)
 
   // Sanity check
   std::string fullName = _filename;
-  if (!boost::filesystem::exists(boost::filesystem::path(fullName)))
+  if (!exists(findFilePath(fullName)))
     fullName = common::find_file(_filename);
 
-  if (!boost::filesystem::exists(boost::filesystem::path(fullName)))
+  if (!exists(findFilePath(fullName)))
   {
     gzerr << "Unable to open DEM file[" << _filename
           << "], check your GAZEBO_RESOURCE_PATH settings." << std::endl;

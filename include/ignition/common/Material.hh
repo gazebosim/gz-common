@@ -182,6 +182,12 @@ namespace ignition
       /// \return the blend mode
       public: BlendMode Blend() const;
 
+      /// \brief Get the blend mode string
+      public: std::string BlendStr() const;
+
+      /// \brief Get the shade mode string
+      public: std::string ShadeStr() const;
+
       /// \brief Set the shading mode
       /// param[in] the shading mode
       public: void SetShade(ShadeMode _b);
@@ -229,10 +235,8 @@ namespace ignition
                 _out << "  Emissive: " << _m.Emissive() << "\n";
                 _out << "  Transparency: " << _m.Transparency() << "\n";
                 _out << "  Shininess: " << _m.Shininess() << "\n";
-                _out << "  BlendMode: "
-                  << EnumIface<BlendMode>::Str(_m.Blend()) << "\n";
-                _out << "  ShadeMode: "
-                  << EnumIface<ShadeMode>::Str(_m.Shade()) << "\n";
+                _out << "  BlendMode: " << _m.BlendStr() << "\n";
+                _out << "  ShadeMode: " << _m.ShadeStr() << "\n";
                 _out << "  DepthWrite: " << _m.DepthWrite() << "\n";
                 return _out;
               }

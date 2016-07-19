@@ -33,7 +33,7 @@ enum MyType
   MY_TYPE_END
 };
 
-IGN_ENUM(MyType, MY_TYPE_BEGIN, MY_TYPE_END,
+IGN_ENUM(myTypeIface, MyType, MY_TYPE_BEGIN, MY_TYPE_END,
   "TYPE1",
   "TYPE2",
   "MY_TYPE_END"
@@ -45,26 +45,24 @@ TEST_F(EnumIfaceTest, StringCoversion)
   MyType type;
 
   // Set value from string
-  common::EnumIface<MyType>::Set(type, "TYPE1");
+  myTypeIface.Set(type, "TYPE1");
   EXPECT_EQ(type, TYPE1);
 
   // Convert value to string
-  std::string typeStr = common::EnumIface<MyType>::Str(type);
+  std::string typeStr = myTypeIface.Str(type);
   EXPECT_EQ(typeStr, "TYPE1");
 
-  EXPECT_TRUE(common::EnumIface<MyType>::Str(static_cast<MyType>(4)).empty());
+  EXPECT_TRUE(myTypeIface.Str(static_cast<MyType>(4)).empty());
 }
 
 /////////////////////////////////////////////////
 TEST_F(EnumIfaceTest, Iterator)
 {
-  common::EnumIterator<MyType> end;
-  EXPECT_EQ(end.Value(), MY_TYPE_END);
-  EXPECT_EQ(common::EnumIterator<MyType>::End(), MY_TYPE_END);
+  common::EnumIterator<MyType> end = MY_TYPE_END;
+  ASSERT_EQ(end.Value(), MY_TYPE_END);
 
-  common::EnumIterator<MyType> begin(MY_TYPE_BEGIN);
-  EXPECT_EQ(*begin, MY_TYPE_BEGIN);
-  EXPECT_EQ(common::EnumIterator<MyType>::Begin(), MY_TYPE_BEGIN);
+  common::EnumIterator<MyType> begin = MY_TYPE_BEGIN;
+  ASSERT_EQ(*begin, MY_TYPE_BEGIN);
 
   int i = 0;
 
@@ -72,11 +70,11 @@ TEST_F(EnumIfaceTest, Iterator)
   for (common::EnumIterator<MyType> typeIter = MY_TYPE_BEGIN;
        typeIter != end; ++typeIter, ++i)
   {
-    EXPECT_EQ(*typeIter, i);
+    ASSERT_EQ(*typeIter, i);
     if (i == 0)
-      EXPECT_EQ(common::EnumIface<MyType>::Str(*typeIter), "TYPE1");
+      ASSERT_EQ(myTypeIface.Str(*typeIter), "TYPE1");
     else
-      EXPECT_EQ(common::EnumIface<MyType>::Str(*typeIter), "TYPE2");
+      ASSERT_EQ(myTypeIface.Str(*typeIter), "TYPE2");
   }
 
   // Postfix ++ operator
@@ -84,11 +82,11 @@ TEST_F(EnumIfaceTest, Iterator)
   for (common::EnumIterator<MyType> typeIter = MY_TYPE_BEGIN;
        typeIter != end; ++typeIter, ++i)
   {
-    EXPECT_EQ(typeIter.Value(), i);
+    ASSERT_EQ(typeIter.Value(), i);
     if (i == 0)
-      EXPECT_EQ(common::EnumIface<MyType>::Str(*typeIter), "TYPE1");
+      ASSERT_EQ(myTypeIface.Str(*typeIter), "TYPE1");
     else
-      EXPECT_EQ(common::EnumIface<MyType>::Str(*typeIter), "TYPE2");
+      ASSERT_EQ(myTypeIface.Str(*typeIter), "TYPE2");
   }
 
   // Prefix -- operator
@@ -96,23 +94,23 @@ TEST_F(EnumIfaceTest, Iterator)
   for (common::EnumIterator<MyType> typeIter = --end;
        typeIter != begin; --typeIter, --i)
   {
-    EXPECT_EQ(*typeIter, i);
+    ASSERT_EQ(*typeIter, i);
     if (i == 0)
-      EXPECT_EQ(common::EnumIface<MyType>::Str(*typeIter), "TYPE1");
+      ASSERT_EQ(myTypeIface.Str(*typeIter), "TYPE1");
     else
-      EXPECT_EQ(common::EnumIface<MyType>::Str(*typeIter), "TYPE2");
+      ASSERT_EQ(myTypeIface.Str(*typeIter), "TYPE2");
   }
 
   // Postfix -- operator
   i = MY_TYPE_END - 1;
-  common::EnumIterator<MyType> end2;
+  common::EnumIterator<MyType> end2 = MY_TYPE_END;
   for (common::EnumIterator<MyType> typeIter = --end2;
        typeIter != begin; --typeIter, --i)
   {
-    EXPECT_EQ(*typeIter, i);
+    ASSERT_EQ(*typeIter, i);
     if (i == 0)
-      EXPECT_EQ(common::EnumIface<MyType>::Str(*typeIter), "TYPE1");
+      ASSERT_EQ(myTypeIface.Str(*typeIter), "TYPE1");
     else
-      EXPECT_EQ(common::EnumIface<MyType>::Str(*typeIter), "TYPE2");
+      ASSERT_EQ(myTypeIface.Str(*typeIter), "TYPE2");
   }
 }

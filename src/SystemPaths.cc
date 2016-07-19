@@ -14,19 +14,18 @@
  * limitations under the License.
  *
  */
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <iostream>
+#include <algorithm>
+#include <fstream>
+#include <sstream>
+
 #ifndef _WIN32
 #include <dirent.h>
 #else
 #include "ignition/common/win_dirent.h"
 #endif
-
-#include <sys/stat.h>
-#include <sys/types.h>
-
-#include <iostream>
-#include <algorithm>
-#include <fstream>
-#include <sstream>
 
 #include "ignition/common/SystemPaths.hh"
 #include "ignition/common/Console.hh"

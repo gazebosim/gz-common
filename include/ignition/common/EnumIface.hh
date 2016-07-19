@@ -29,6 +29,7 @@ namespace ignition
   {
     /// \brief A macro that allows an enum to have an iterator and string
     /// conversion.
+    /// \param[in] name EnumIface instance name.
     /// \param[in] enumType Enum type
     /// \param[in] begin Enum value that marks the beginning of the enum
     /// values.
@@ -36,38 +37,36 @@ namespace ignition
     /// \param[in] names A vector of strings, one for each enum value.
     /// \sa EnumIface
     /// \sa EnumIterator
-    /*#define IGN_ENUM(enumType, begin, end, ...) \
-    template<> IGNITION_COMMON_VISIBLE enumType \
-    common::EnumIface<enumType>::range[] = {begin, end}; \
-    template<> IGNITION_COMMON_VISIBLE \
-    std::vector<std::string> common::EnumIface<enumType>::names = \
-    {__VA_ARGS__};
-    */
     #define IGN_ENUM(name, enumType, begin, end, ...) \
-    static ignition::common::EnumIface<enumType> name(begin, end, {__VA_ARGS__});
+    static ignition::common::EnumIface<enumType> name( \
+        begin, end, {__VA_ARGS__});
 
     /// \brief Enum interface. Use this interface to convert an enum to
     /// a string, and set an enum from a string.
     template<typename T>
     class EnumIface
     {
+      /// \brief Constructor
+      /// \param[in] _start Starting enum value.
+      /// \param[in] _end Ending enum value.
+      /// \param[in] _names Name of each enum value.
       public: EnumIface(T _start, T _end, std::vector<std::string> _names)
+              : names(_names)
       {
         this->range[0] = _start;
-	this->range[1] = _end;
-	this->names = _names;
+        this->range[1] = _end;
       }
 
       /// \brief Get the beginning enum value.
       /// \return Enum value that marks the beginning of the enum list.
-      public: static T Begin()
+      public: T Begin()
       {
         return range[0];
       }
 
       /// \brief Get the end enum value.
       /// \return Enum value that marks the end of the enum list.
-      public: static T End()
+      public: T End()
       {
         return range[1];
       }
@@ -77,7 +76,7 @@ namespace ignition
       /// \return String representation of the enum. An empty string is
       /// returned if _e is invalid, or the names for the enum have not been
       /// set.
-      static std::string Str(T const &_e)
+      public: std::string Str(T const &_e)
       {
         if (static_cast<unsigned int>(_e) < names.size())
           return names[static_cast<unsigned int>(_e)];
@@ -90,10 +89,10 @@ namespace ignition
       /// \param[in] _str String value to convert to enum value.
       /// \param[in] _e Enum variable to set.
       /// \sa EnumIterator
-      static void Set(T &_e, const std::string &_str)
+      public: void Set(T &_e, const std::string &_str)
       {
-        static auto begin = std::begin(names);
-        static auto end = std::end(names);
+        auto begin = std::begin(names);
+        auto end = std::end(names);
 
         auto find = std::find(begin, end, _str);
         if (find != end)
@@ -104,12 +103,12 @@ namespace ignition
 
       /// \internal
       /// \brief The beginning and end values. Do not use this directly.
-      public: static T range[2];
+      public: T range[2];
 
       /// \internal
       /// \brief Array of string names for each element in the enum. Do not
       /// use this directly.
-      public: static std::vector<std::string> names;
+      public: std::vector<std::string> names;
     };
 
     /// \brief An iterator over enum types.
@@ -125,19 +124,19 @@ namespace ignition
     ///   MY_TYPE_END
     /// };
     ///
-    /// GZ_ENUM(MyType, MY_TYPE_BEGIN, MY_TYPE_END,
+    /// GZ_ENUM(myTypeIface, MyType, MY_TYPE_BEGIN, MY_TYPE_END,
     ///  "TYPE1",
     ///  "TYPE2",
     ///  "MY_TYPE_END")
     ///
     /// int main()
     /// {
-    ///   EnumIface<MyType> i = MY_TYPE_BEGIN;
+    ///   EnumIterator<MyType> i = MY_TYPE_BEGIN;
     ///   std::cout << "Type Number[" << *i << "]\n";
-    ///   std::cout << "Type Name[" << EnumIface::Str(*i) << "]\n";
+    ///   std::cout << "Type Name[" << myTypeIface.Str(*i) << "]\n";
     ///   i++;
     ///   std::cout << "Type++ Number[" << *i << "]\n";
-    ///   std::cout << "Type++ Name[" << EnumIface::Str(*i) << "]\n";
+    ///   std::cout << "Type++ Name[" << myTypeIface.Str(*i) << "]\n";
     /// }
     /// \verbatim
     template<typename Enum>
@@ -145,7 +144,7 @@ namespace ignition
     : std::iterator<std::bidirectional_iterator_tag, Enum>
     {
       /// \brief Constructor
-      public: EnumIterator() : c(this->End())
+      public: EnumIterator()
       {
       }
 
@@ -154,40 +153,20 @@ namespace ignition
       // cppcheck-suppress noExplicitConstructor
       public: EnumIterator(const Enum _c) : c(_c)
       {
-        IGN_ASSERT(this->c >= this->Begin() && this->c <= this->End(),
-            "Invalid enum value in EnumIterator constructor");
       }
 
       /// \brief Equal operator
       /// \param[in] _c Enum value to copy
       public: EnumIterator &operator=(const Enum _c)
       {
-        IGN_ASSERT(_c >= this->Begin() && _c <= this->End(),
-            "Invalid operator= value in EnumIterator");
         this->c = _c;
         return *this;
-      }
-
-      /// \brief Get the beginning of the enum
-      /// \return Value at the beginning of the enum list
-      public: static Enum Begin()
-      {
-        return EnumIface<Enum>::Begin();
-      }
-
-      /// \brief Get the end of the enum
-      /// \return Value at the end of the enum list
-      public: static Enum End()
-      {
-        return EnumIface<Enum>::End();
       }
 
       /// \brief Prefix increment operator.
       /// \return Iterator pointing to the next value in the enum.
       public: EnumIterator &operator++()
       {
-        IGN_ASSERT(this->c != this->End(),
-            "Incrementing past end of enum");
         this->c = static_cast<Enum>(static_cast<int>(this->c) + 1);
         return *this;
       }
@@ -196,8 +175,6 @@ namespace ignition
       /// \return Iterator pointing to the next value in the enum.
       public: EnumIterator operator++(const int)
       {
-        IGN_ASSERT(this->c != this->End(),
-            "Incrementing past end of enum");
         EnumIterator cpy(*this);
         ++*this;
         return cpy;
@@ -207,8 +184,6 @@ namespace ignition
       /// \return Iterator pointing to the previous value in the enum
       public: EnumIterator &operator--()
       {
-        IGN_ASSERT(this->c != this->Begin(),
-            "decrementing beyond begin?");
         this->c = static_cast<Enum>(static_cast<int>(this->c) - 1);
         return *this;
       }
@@ -217,8 +192,6 @@ namespace ignition
       /// \return Iterator pointing to the previous value in the enum
       public: EnumIterator operator--(const int)
       {
-        IGN_ASSERT(this->c != this->Begin(),
-            "Decrementing beyond beginning.");
         EnumIterator cpy(*this);
         --*this;
         return cpy;
@@ -228,8 +201,6 @@ namespace ignition
       /// \return Value of the iterator
       public: Enum operator*() const
       {
-        IGN_ASSERT(this->c != this->End(),
-            "Cannot dereference end iterator");
         return c;
       }
 
