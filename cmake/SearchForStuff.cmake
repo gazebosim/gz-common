@@ -85,6 +85,21 @@ if (UNIX)
   include (FindPkgConfig REQUIRED)
   pkg_check_modules(uuid uuid)
 
+  ########################################
+  # Find GNU Triangulation Surface Library
+  pkg_check_modules(gts gts)
+  if (gts_FOUND)
+    message (STATUS "Looking for GTS - found")
+    set (HAVE_GTS TRUE)
+    include_directories(${gts_INCLUDE_DIRS})
+    link_directories(${gts_LIBRARY_DIRS})
+    add_definitions(${gts_CFLAGS})
+  else ()
+    message (STATUS "Looking for GTS - not found")
+    set (HAVE_GTS FALSE)
+    BUILD_ERROR ("GNU Triangulation Surface library not found.")
+  endif ()
+
   if (NOT uuid_FOUND)
     message (STATUS "Looking for uuid pkgconfig file - not found")
     BUILD_ERROR ("uuid not found, Please install uuid")
@@ -96,4 +111,27 @@ if (UNIX)
 elseif (MSVC)
   message (STATUS "Using Windows RPC UuidCreate function")
 endif()
+
+# In Visual Studio we use configure.bat to trick all path cmake
+# variables so let's consider that as a replacement for pkgconfig
+if (MSVC)
+  set (PKG_CONFIG_FOUND TRUE)
+endif()
+
+if (PKG_CONFIG_FOUND)
+  ########################################
+  # Find avutil
+  pkg_check_modules(libavutil libavutil)
+  if (NOT libavutil_FOUND)
+    BUILD_WARNING ("libavutil not found. Audio-video capabilities will be disabled.")
+  endif ()
+
+  if (libavutil_FOUND AND libavformat_FOUND AND libavcodec_FOUND AND libswscale_FOUND)
+    set (HAVE_FFMPEG TRUE)
+  else ()
+    set (HAVE_FFMPEG FALSE)
+  endif ()
+endif(PKG_CONFIG_FOUND)
+
+
 

@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2014 Open Source Robotics Foundation
+* Copyright (C) 2016 Open Source Robotics Foundation
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ namespace ignition
       /// \brief Get the audio filename that was set.
       /// \return The name of the set audio file.
       /// \sa AudioDecoder::SetFile
-      public: std::string GetFile() const;
+      public: std::string File() const;
 
       /// \brief Decode the loaded audio file.
       /// \sa AudioDecoder::SetFile
@@ -57,7 +57,7 @@ namespace ignition
 
       /// \brief Get the sample rate from the latest decoded file.
       /// \return Integer sample rate, such as 44100.
-      public: int GetSampleRate();
+      public: int SampleRate();
 
       /// \brief Free audio object, close files, streams.
       private: void Cleanup();

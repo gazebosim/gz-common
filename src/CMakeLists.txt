@@ -5,24 +5,45 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}
 set (sources
   Animation.cc
   AudioDecoder.cc
+  Base64.cc
+  Battery.cc
   BVHLoader.cc
+  ColladaExporter.cc
   ColladaLoader.cc
   Color.cc
   Console.cc
+  Dem.cc
   Exception.cc
-  #Image.cc
+  Event.cc
+  ffmpeg_inc.cc
+  Image.cc
+  ImageHeightmap.cc
+  GTSMeshUtils.cc
+  KeyEvent.cc
   KeyFrame.cc
   Material.cc
+  MaterialDensity.cc
   Mesh.cc
+  MeshExporter.cc
+  MeshCSG.cc
+  MeshManager.cc
+  MouseEvent.cc
+  NodeAnimation.cc
   NodeTransform.cc
+  SemanticVersion.cc
   Skeleton.cc
   SkeletonAnimation.cc
   SkeletonNode.cc
+  STLLoader.cc
+  SystemPaths.cc
   SubMesh.cc
+  SVGLoader.cc
   Time.cc
   Timer.cc
+  URI.cc
   Util.cc
   Uuid.cc
+  Video.cc
 )
 
 if (NOT USE_EXTERNAL_TINYXML2)
@@ -32,15 +53,31 @@ endif()
 set (gtest_sources
   Animation_TEST.cc
   #AudioDecoder_TEST.cc
+  Battery_TEST.cc
+  ColladaExporter_TEST.cc
   ColladaLoader_TEST.cc
   Color_TEST.cc
   Console_TEST.cc
+  Dem_TEST.cc
+  EnumIface_TEST.cc
   Exception_TEST.cc
-  #Image_TEST.cc
+  Event_TEST.cc
+  Image_TEST.cc
+  ImageHeightmap_TEST.cc
+  GTSMeshUtils_TEST.cc
+  KeyEvent_TEST.cc
   Material_TEST.cc
+  MaterialDensity_TEST.cc
   Mesh_TEST.cc
+  MeshManager_TEST.cc
+  MouseEvent_TEST.cc
+  MovingWindowFilter_TEST.cc
+  SemanticVersion_TEST.cc
   SubMesh_TEST.cc
+  SVGLoader_TEST.cc
+  SystemPaths_TEST.cc
   Time_TEST.cc
+  URI_TEST.cc
   Util_TEST.cc
   Uuid_TEST.cc
 )
@@ -50,6 +87,7 @@ target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
   ${IGNITION-MATH_LIBRARIES}
   ${freeimage_LIBRARIES}
   ${tinyxml2_LIBRARIES}
+  ${gts_LIBRARIES}
   ${uuid_LIBRARIES})
 
 if (UNIX)

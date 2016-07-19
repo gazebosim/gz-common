@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@
 #include <ignition/math/Vector2.hh>
 #include <ignition/math/Vector3.hh>
 
-#include "ignition/common/CommonTypes.hh"
+#include "ignition/common/Types.hh"
 #include "ignition/common/Console.hh"
 #include "ignition/common/Material.hh"
 #include "ignition/common/SubMesh.hh"
@@ -143,7 +143,7 @@ namespace ignition
       /// \param[in] _parent The parent element
       /// \param[in] _name String name of the element
       /// \param[in] _id String ID of the element
-      ///\ return XML element with the specified ID
+      /// \return XML element with the specified ID
       public: tinyxml2::XMLElement *ElementId(tinyxml2::XMLElement *_parent,
                                                const std::string &_name,
                                                const std::string &_id);
@@ -151,7 +151,7 @@ namespace ignition
       /// \brief Get an XML element by ID
       /// \param[in] _name String name of the element
       /// \param[in] _id String ID of the element
-      ///\ return XML element with the specified ID
+      /// \return XML element with the specified ID
       public: tinyxml2::XMLElement *ElementId(const std::string &_name,
                                                const std::string &_id);
 
@@ -1665,7 +1665,7 @@ void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
   // a set of triangle meshes.  The assumption is that
   // each polylist polygon is convex, and we do decomposion
   // by anchoring each triangle about vertex 0 or each polygon
-  SubMeshPtr subMesh(new SubMesh());
+  std::unique_ptr<SubMesh> subMesh(new SubMesh);
   subMesh->SetName(this->currentNodeName);
   bool combinedVertNorms = false;
 
@@ -1956,14 +1956,14 @@ void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
   }
   delete [] values;
 
-  _mesh->AddSubMesh(subMesh);
+  _mesh->AddSubMesh(std::move(subMesh));
 }
 
 /////////////////////////////////////////////////
 void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
     const ignition::math::Matrix4d &_transform, Mesh *_mesh)
 {
-  SubMeshPtr subMesh(new SubMesh);
+  std::unique_ptr<SubMesh> subMesh(new SubMesh);
   subMesh->SetName(this->currentNodeName);
   bool combinedVertNorms = false;
 
@@ -2231,14 +2231,14 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
   }
 
   delete [] values;
-  _mesh->AddSubMesh(subMesh);
+  _mesh->AddSubMesh(std::move(subMesh));
 }
 
 /////////////////////////////////////////////////
 void ColladaLoaderPrivate::LoadLines(tinyxml2::XMLElement *_xml,
     const ignition::math::Matrix4d &_transform, Mesh *_mesh)
 {
-  SubMeshPtr subMesh(new SubMesh);
+  std::unique_ptr<SubMesh> subMesh(new SubMesh);
   subMesh->SetName(this->currentNodeName);
   subMesh->SetPrimitiveType(SubMesh::LINES);
 
@@ -2267,7 +2267,7 @@ void ColladaLoaderPrivate::LoadLines(tinyxml2::XMLElement *_xml,
     subMesh->AddIndex(subMesh->VertexCount() - 1);
   } while (iss);
 
-  _mesh->AddSubMesh(subMesh);
+  _mesh->AddSubMesh(std::move(subMesh));
 }
 
 /////////////////////////////////////////////////

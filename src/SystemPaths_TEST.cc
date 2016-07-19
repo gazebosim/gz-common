@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,14 +36,14 @@ TEST(SystemPathsTest, SystemPaths)
   paths->ClearPluginPaths();
 
   putenv(const_cast<char*>("IGN_PLUGIN_PATH=/tmp/plugin:/test/plugin/now"));
-  const std::list<std::string> pathList3 = paths->GetPluginPaths();
+  const std::list<std::string> pathList3 = paths->PluginPaths();
   EXPECT_EQ(static_cast<unsigned int>(2), pathList3.size());
   EXPECT_STREQ("/tmp/plugin", pathList3.front().c_str());
   EXPECT_STREQ("/test/plugin/now", pathList3.back().c_str());
 
   paths->ClearPluginPaths();
 
-  EXPECT_EQ(static_cast<unsigned int>(2), paths->GetPluginPaths().size());
+  EXPECT_EQ(static_cast<unsigned int>(2), paths->PluginPaths().size());
 
   putenv(const_cast<char*>("IGN_PLUGIN_PATH="));
   paths->ClearPluginPaths();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-
 #include <string>
 #include <algorithm>
 
@@ -22,15 +21,43 @@
 
 #include "ignition/common/Console.hh"
 #include "ignition/common/Material.hh"
-#include "ignition/common/SubMeshPrivate.hh"
 #include "ignition/common/SubMesh.hh"
 
 using namespace ignition;
 using namespace common;
 
+/// \brief Private data for SubMesh
+class ignition::common::SubMeshPrivate
+{
+  /// \brief the vertex array
+  public: std::vector<ignition::math::Vector3d> vertices;
+
+  /// \brief the normal array
+  public: std::vector<ignition::math::Vector3d> normals;
+
+  /// \brief the texture coordinate array
+  public: std::vector<ignition::math::Vector2d> texCoords;
+
+  /// \brief the vertex index array
+  public: std::vector<unsigned int> indices;
+
+  /// \brief node assignment array
+  public: std::vector<NodeAssignment> nodeAssignments;
+
+  /// \brief primitive type for the mesh
+  public: SubMesh::PrimitiveType primitiveType;
+
+  /// \brief The material index for this mesh. Relates to the parent
+  /// mesh material list.
+  public: int materialIndex;
+
+  /// \brief The name of the sub-mesh
+  public: std::string name;
+};
+
 //////////////////////////////////////////////////
 SubMesh::SubMesh()
-  : dataPtr(new SubMeshPrivate)
+: dataPtr(new SubMeshPrivate)
 {
   this->dataPtr->materialIndex = -1;
   this->dataPtr->primitiveType = TRIANGLES;
@@ -38,7 +65,7 @@ SubMesh::SubMesh()
 
 //////////////////////////////////////////////////
 SubMesh::SubMesh(const SubMesh &_submesh)
-  : dataPtr(new SubMeshPrivate)
+: dataPtr(new SubMeshPrivate)
 {
   this->dataPtr->name = _submesh.dataPtr->name;
   this->dataPtr->materialIndex = _submesh.dataPtr->materialIndex;
@@ -204,7 +231,7 @@ void SubMesh::SetTexCoord(const unsigned int _index,
 {
   if (_index >= this->dataPtr->texCoords.size())
   {
-    ignerr << "Index too large" << std::endl;;
+    ignerr << "Index too large" << std::endl;
     return;
   }
 
@@ -216,7 +243,7 @@ unsigned int SubMesh::Index(const unsigned int _index) const
 {
   if (_index >= this->dataPtr->indices.size())
   {
-    ignerr << "Index too large" << std::endl;;
+    ignerr << "Index too large" << std::endl;
     return 0u;
   }
 
@@ -228,7 +255,7 @@ void SubMesh::SetIndex(const unsigned int _index, const unsigned int _i)
 {
   if (_index >= this->dataPtr->indices.size())
   {
-    ignerr << "Index too large" << std::endl;;
+    ignerr << "Index too large" << std::endl;
     return;
   }
 
@@ -386,7 +413,7 @@ void SubMesh::FillArrays(double **_vertArr, int **_indArr) const
   *_vertArr = new double[this->dataPtr->vertices.size() * 3];
   *_indArr = new int[this->dataPtr->indices.size()];
 
-  unsigned int vi = 0;;
+  unsigned int vi = 0;
   for (auto &v : this->dataPtr->vertices)
   {
     (*_vertArr)[vi++] = static_cast<float>(v.X());
@@ -394,7 +421,7 @@ void SubMesh::FillArrays(double **_vertArr, int **_indArr) const
     (*_vertArr)[vi++] = static_cast<float>(v.Z());
   }
 
-  unsigned int ii = 0;;
+  unsigned int ii = 0;
   for (auto &i : this->dataPtr->indices)
   {
     (*_indArr)[ii++] = i;

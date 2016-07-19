@@ -1,11 +1,11 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,25 +14,17 @@
  * limitations under the License.
  *
 */
-#ifndef __IGNITION_FFMPEG_INC_HH__
-#define __IGNITION_FFMPEG_INC_HH__
+#include "ignition/common/MeshExporter.hh"
 
-#ifndef _WIN32
-#pragma GCC system_header
-#endif
+using namespace ignition;
+using namespace common;
 
-#ifdef HAVE_FFMPEG
-#ifndef INT64_C
-#define INT64_C(c) (c ## LL)
-#define UINT64_C(c) (c ## ULL)
-#endif
-
-extern "C"
+//////////////////////////////////////////////////
+MeshExporter::MeshExporter()
 {
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
-#include <libavutil/opt.h>
-#include <libswscale/swscale.h>
 }
-#endif
-#endif
+
+//////////////////////////////////////////////////
+MeshExporter::~MeshExporter()
+{
+}

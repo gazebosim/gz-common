@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,13 +46,13 @@ void Timer::Stop()
 }
 
 //////////////////////////////////////////////////
-bool Timer::GetRunning() const
+bool Timer::Running() const
 {
   return this->running;
 }
 
 //////////////////////////////////////////////////
-Time Timer::GetElapsed() const
+Time Timer::Elapsed() const
 {
   if (this->running)
   {

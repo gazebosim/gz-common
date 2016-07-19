@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,26 @@
  * limitations under the License.
  *
  */
-#include <ignition/common/NodeTransformPrivate.hh>
 #include <ignition/common/NodeTransform.hh>
 
 using namespace ignition;
 using namespace common;
+
+/// \brief Private data for NodeTransform
+class ignition::common::NodeTransformPrivate
+{
+  /// \brief the sid
+  public: std::string sid;
+
+  /// \brief transform type
+  public: NodeTransformType type;
+
+  /// \brief transform
+  public: math::Matrix4d transform;
+
+  /// \brief source data values (can be a matrix, a position or rotation)
+  public: std::vector<double> source;
+};
 
 //////////////////////////////////////////////////
 NodeTransform::NodeTransform(const NodeTransformType _type)

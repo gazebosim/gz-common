@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #include <gtest/gtest.h>
 
 #include <ignition/common/Image.hh>
+#include "test_config.h"
 #include "test/util.hh"
 
 using namespace ignition;
@@ -28,26 +29,29 @@ TEST_F(ImageTest, Image)
 {
   common::Image img;
   EXPECT_EQ(-1, img.Load("/file/shouldn/never/exist.png"));
-  EXPECT_EQ(0, img.Load("file://media/materials/textures/wood.jpg"));
-  EXPECT_EQ(static_cast<unsigned int>(496), img.GetWidth());
-  EXPECT_EQ(static_cast<unsigned int>(329), img.GetHeight());
-  EXPECT_EQ(static_cast<unsigned int>(24), img.GetBPP());
-  EXPECT_TRUE(img.GetPixel(10, 10) ==
-      common::Color(0.133333, 0.376471, 0.654902, 1));
-  EXPECT_TRUE(img.GetAvgColor() ==
-      common::Color(0.260456, 0.506047, 0.758062, 1));
-  EXPECT_TRUE(img.GetMaxColor() ==
-      common::Color(0.807843, 0.909804, 0.964706, 1));
+  std::string filename =  "file://";
+  filename += PROJECT_SOURCE_PATH;
+  filename += "/test/data/cordless_drill/materials/textures/cordless_drill.png";
+  EXPECT_EQ(0, img.Load(filename));
+  EXPECT_EQ(static_cast<unsigned int>(128), img.Width());
+  EXPECT_EQ(static_cast<unsigned int>(128), img.Height());
+  EXPECT_EQ(static_cast<unsigned int>(32), img.BPP());
+  EXPECT_TRUE(img.Pixel(10, 10) ==
+      common::Color(0.141176, 0.172549, 0.133333, 1));
+  EXPECT_TRUE(img.AvgColor() ==
+      common::Color(0.259651, 0.271894, 0.414959, 1));
+  EXPECT_TRUE(img.MaxColor() ==
+      common::Color(0.929412, 0.921569, 0.917647, 1));
   EXPECT_TRUE(img.Valid());
-  EXPECT_TRUE(img.GetFilename().find("materials/textures/wood.jpg") !=
+  EXPECT_TRUE(img.Filename().find("cordless_drill.png") !=
       std::string::npos);
 
   unsigned char *data = NULL;
   unsigned int size = 0;
-  img.GetData(&data, size);
-  EXPECT_EQ(static_cast<unsigned int>(489552), size);
+  img.Data(&data, size);
+  EXPECT_EQ(static_cast<unsigned int>(65536), size);
 
-  img.SetFromData(data, img.GetWidth(), img.GetHeight(),
+  img.SetFromData(data, img.Width(), img.Height(),
                   common::Image::RGB_INT8);
 }
 

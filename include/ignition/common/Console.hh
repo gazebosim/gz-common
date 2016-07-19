@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IGNTION_COMMON_CONSOLE_HH_
-#define IGNTION_COMMON_CONSOLE_HH_
+#ifndef IGNITION_COMMON_CONSOLE_HH_
+#define IGNITION_COMMON_CONSOLE_HH_
 
 #include <iostream>
 #include <fstream>
@@ -217,7 +217,7 @@ namespace ignition
 
       /// \brief Get whether quiet output is set.
       /// \return True to if quiet output is set.
-      public: static bool GetQuiet();
+      public: static bool Quiet();
 
       /// \brief Global instance of the message logger.
       public: static Logger msg;

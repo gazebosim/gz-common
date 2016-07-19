@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,18 +72,18 @@
       std::chrono::system_clock::now().time_since_epoch()).count())
 
 /// \brief Get the system time in microseconds since epoch.
-#define IGN_SYSTEM_TIME_US() (std::chrono::duration_cast<\
-    std::chrono::microseconds>(\
+#define IGN_SYSTEM_TIME_US() (\
+    std::chrono::duration_cast<std::chrono::microseconds>(\
       std::chrono::system_clock::now().time_since_epoch()).count())
 
 /// \brief Get the system time in milliseconds since epoch.
-#define IGN_SYSTEM_TIME_MS() (std::chrono::duration_cast<\
-    std::chrono::milliseconds>(\
+#define IGN_SYSTEM_TIME_MS() (\
+    std::chrono::duration_cast<std::chrono::milliseconds>(\
       std::chrono::system_clock::now().time_since_epoch()).count())
 
 /// \brief Get the system time in nanoseconds since epoch.
-#define IGN_SYSTEM_TIME_NS() (std::chrono::duration_cast<\
-    std::chrono::nanoseconds>(\
+#define IGN_SYSTEM_TIME_NS() (\
+    std::chrono::duration_cast<std::chrono::nanoseconds>(\
       std::chrono::system_clock::now().time_since_epoch()).count())
 
 /// \brief This macro defines the standard way of launching an exception
@@ -104,6 +104,10 @@ namespace ignition
     /// \brief Get the wall time as an ISO string: YYYY-MM-DDTHH:MM:SS.NS
     /// \return The current wall time as an ISO string.
     std::string IGNITION_COMMON_VISIBLE systemTimeISO();
+
+    /// \brief Get the log path
+    /// \return the log path
+    std::string IGNITION_COMMON_VISIBLE logPath();
 
     /// \brief add path sufix to common::SystemPaths
     /// \param[in] _suffix The suffix to add.
@@ -228,6 +232,16 @@ namespace ignition
     /// \param[in] _s String to trim
     /// \return Trimmed string
     std::string IGNITION_COMMON_VISIBLE trimmed(std::string _s);
+
+    /// \brief Transforms a string to its lowercase equivalent
+    /// \param[in] _in String to convert to lowercase
+    /// \return Lowercase equilvalent of _in.
+    std::string IGNITION_COMMON_VISIBLE lowercase(const std::string &_in);
+
+    /// \brief Transforms a string to its lowercase equivalent
+    /// \param[in] _in String to convert to lowercase
+    /// \return Lowercase equilvalent of _in.
+    std::string IGNITION_COMMON_VISIBLE lowercase(const char *_in);
   }
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IGN_COMMON_UUID_HH_INCLUDED_
-#define IGN_COMMON_UUID_HH_INCLUDED_
+#ifndef IGNITION_COMMON_UUID_HH_INCLUDED_
+#define IGNITION_COMMON_UUID_HH_INCLUDED_
 
 #include <iostream>
 #include <string>

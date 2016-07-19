@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ TEST_F(ColladaLoader, LoadBox)
   EXPECT_EQ(1u, mesh->MaterialCount());
 
   // Make sure we can read a submesh name
-  EXPECT_STREQ("Cube", mesh->SubMeshByIndex(0)->Name().c_str());
+  EXPECT_STREQ("Cube", mesh->SubMeshByIndex(0).lock()->Name().c_str());
 }
 
 /////////////////////////////////////////////////
@@ -61,7 +61,8 @@ TEST_F(ColladaLoader, ShareVertices)
   int shared = 0;
   for (unsigned int i = 0; i < mesh->SubMeshCount(); ++i)
   {
-    const common::SubMeshPtr subMesh = mesh->SubMeshByIndex(i);
+    const std::shared_ptr<common::SubMesh> subMesh =
+      mesh->SubMeshByIndex(i).lock();
     for (unsigned int j = 0; j < subMesh->IndexCount(); ++j)
     {
       if (uniqueIndices.find(subMesh->Index(j)) == uniqueIndices.end())
@@ -76,7 +77,8 @@ TEST_F(ColladaLoader, ShareVertices)
   // check all vertices are unique
   for (unsigned int i = 0; i < mesh->SubMeshCount(); ++i)
   {
-    const common::SubMeshPtr subMesh = mesh->SubMeshByIndex(i);
+    const std::shared_ptr<common::SubMesh> subMesh =
+      mesh->SubMeshByIndex(i).lock();
     for (unsigned int j = 0; j < subMesh->VertexCount(); ++j)
     {
       ignition::math::Vector3d v = subMesh->Vertex(j);

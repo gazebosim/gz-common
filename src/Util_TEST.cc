@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@
 using namespace ignition;
 
 /////////////////////////////////////////////////
-/// \brief Test Util::GetSHA1
-TEST(Util_TEST, GetSHA1)
+/// \brief Test Util::SHA1
+TEST(Util_TEST, SHA1)
 {
   // Do not forget to update 'precomputedSHA1' if you modify the SHA1 input.
   std::string precomputedSHA1;

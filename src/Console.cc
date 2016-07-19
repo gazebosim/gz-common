@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ void Console::SetQuiet(bool _quiet)
 }
 
 //////////////////////////////////////////////////
-bool Console::GetQuiet()
+bool Console::Quiet()
 {
   return quiet;
 }
@@ -98,7 +98,7 @@ int Logger::Buffer::sync()
   Console::log.flush();
 
   // Output to terminal
-  if (!Console::GetQuiet())
+  if (!Console::Quiet())
   {
     if (this->type == Logger::STDOUT)
     {

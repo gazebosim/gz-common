@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2014 Open Source Robotics Foundation
+* Copyright (C) 2016 Open Source Robotics Foundation
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,9 +15,8 @@
 *
 */
 
-#include <ignition/common/ffmpeg_inc.h>
+#include <ignition/common/ffmpeg_inc.hh>
 #include <ignition/common/AudioDecoder.hh>
-#include <ignition/common/AudioDecoderPrivate.hh>
 #include <ignition/common/Console.hh>
 
 #define AUDIO_INBUF_SIZE (20480 * 2)
@@ -25,6 +24,28 @@
 
 using namespace ignition;
 using namespace common;
+
+struct AVFormatContext;
+struct AVCodecContext;
+struct AVCodec;
+
+class ignition::common::AudioDecoderPrivate
+{
+  /// \brief libav Format I/O context.
+  public: AVFormatContext *formatCtx;
+
+  /// \brief libav main external API structure.
+  public: AVCodecContext *codecCtx;
+
+  /// \brief libavcodec audio codec.
+  public: AVCodec *codec;
+
+  /// \brief Index of the audio stream.
+  public: int audioStream;
+
+  /// \brief Audio file to decode.
+  public: std::string filename;
+};
 
 class Initializer
 {
@@ -177,7 +198,7 @@ bool AudioDecoder::Decode(uint8_t ** /*_outBuffer*/,
 #endif
 
 /////////////////////////////////////////////////
-int AudioDecoder::GetSampleRate()
+int AudioDecoder::SampleRate()
 {
 #ifdef HAVE_FFMPEG
   return this->data->codecCtx->sample_rate;
@@ -280,7 +301,7 @@ bool AudioDecoder::SetFile(const std::string & /*_filename*/)
 #endif
 
 /////////////////////////////////////////////////
-std::string AudioDecoder::GetFile() const
+std::string AudioDecoder::File() const
 {
   return this->data->filename;
 }

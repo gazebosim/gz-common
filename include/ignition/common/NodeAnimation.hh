@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 */
 #ifndef IGNITION_COMMON_NODE_ANIMATION_HH_
 #define IGNITION_COMMON_NODE_ANIMATION_HH_
+
 #include <string>
 #include <utility>
 
@@ -91,7 +92,7 @@ namespace ignition
       /// \param[in] _time the time
       /// \param[in] _loop when true, the time is divided by the duration
       /// (see GetLength)
-      public: math::Matrix4d FrameAt(const double _time,
+      public: ignition::math::Matrix4d FrameAt(const double _time,
                   const bool _loop = true) const;
 
       /// \brief Scales each transformation in the key frames. This only affects

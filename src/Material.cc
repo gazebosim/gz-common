@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,53 +14,111 @@
  * limitations under the License.
  *
  */
+#include <algorithm>
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/MaterialPrivate.hh"
 #include "ignition/common/Material.hh"
+#include "ignition/common/Console.hh"
 
 using namespace ignition;
 using namespace common;
 
-unsigned int MaterialPrivate::counter = 0;
+IGN_ENUM(shadeModeIface, Material::ShadeMode,
+    Material::SHADE_MODE_BEGIN, Material::SHADE_MODE_END,
+    "FLAT", "GOURAUD", "PHONG", "BLINN")
 
-std::string Material::ShadeModeStr[SHADE_COUNT] = {"FLAT", "GOURAUD",
-  "PHONG", "BLINN"};
-std::string Material::BlendModeStr[BLEND_COUNT] = {"ADD", "MODULATE",
-  "REPLACE"};
+IGN_ENUM(blendModeIface, Material::BlendMode,
+    Material::BLEND_MODE_BEGIN, Material::BLEND_MODE_END,
+    "ADD", "MODULATE", "REPLACE")
+
+/// \brief Private data for Material
+class ignition::common::MaterialPrivate
+{
+  /// \brief the name of the material
+  public: std::string name;
+
+  /// \brief the texture image file name
+  public: std::string texImage;
+
+  /// \brief the ambient light color
+  public: Color ambient;
+
+  /// \brief the diffuse light color
+  public: Color diffuse;
+
+  /// \brief the specular light color
+  public: Color specular;
+
+  /// \brief the emissive light color
+  public: Color emissive;
+
+  /// \brief transparency value in the range 0 to 1
+  public: double transparency;
+
+  /// \brief shininess value (0 to 1)
+  public: double shininess;
+
+  /// \brief point size
+  public: double pointSize;
+
+  /// \brief blend mode
+  public: Material::BlendMode blendMode;
+
+  /// \brief the shade mode
+  public: Material::ShadeMode shadeMode;
+
+  /// \brief the total number of instantiated Material instances
+  public: static unsigned int counter;
+
+  /// \brief flag to perform depth buffer write
+  public: bool depthWrite;
+
+  /// \brief flag to indicate if lighting is enabled for this material.
+  public: bool lighting;
+
+  /// \brief source blend factor
+  public: double srcBlendFactor;
+
+  /// \brief destination blend factor
+  public: double dstBlendFactor;
+};
+
+unsigned int MaterialPrivate::counter = 0;
 
 //////////////////////////////////////////////////
 Material::Material()
-  : Material(common::Color(1.0, 1.0, 1.0, 1.0))
+: dataPtr(new MaterialPrivate)
 {
+  this->dataPtr->name = "ignition_material_" +
+    std::to_string(this->dataPtr->counter++);
+  this->dataPtr->blendMode = REPLACE;
+  this->dataPtr->shadeMode = GOURAUD;
+  this->dataPtr->transparency = 0;
+  this->dataPtr->shininess = 0;
+  this->dataPtr->ambient.Set(0.4f, 0.4f, 0.4f, 1.0f);
+  this->dataPtr->diffuse.Set(0.5f, 0.5f, 0.5f, 1.0f);
+  this->dataPtr->specular.Set(0, 0, 0, 1);
+  this->dataPtr->lighting = false;
+  this->dataPtr->dstBlendFactor = this->dataPtr->srcBlendFactor = 1.0;
 }
 
 //////////////////////////////////////////////////
 Material::Material(const Color &_clr)
-  : dataPtr(new MaterialPrivate)
+: dataPtr(new MaterialPrivate)
 {
-  this->dataPtr->name = "ign-common_material_" +
-      std::to_string(this->dataPtr->counter++);
+  this->dataPtr->name = "ignition_material_" +
+    std::to_string(this->dataPtr->counter++);
   this->dataPtr->blendMode = REPLACE;
   this->dataPtr->shadeMode = GOURAUD;
   this->dataPtr->transparency = 0;
   this->dataPtr->shininess = 0;
   this->dataPtr->ambient = _clr;
   this->dataPtr->diffuse = _clr;
-  this->dataPtr->specular = Color::Black;
-  this->dataPtr->emissive = Color::Black;
-  this->dataPtr->lighting = true;
-  this->dataPtr->depthWrite = true;
-  this->dataPtr->pointSize = 1.0;
-  this->dataPtr->srcBlendFactor = 1.0;
-  this->dataPtr->dstBlendFactor = 0.0;
+  this->dataPtr->lighting = false;
 }
 
 //////////////////////////////////////////////////
 Material::~Material()
 {
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -115,6 +173,7 @@ Color Material::Ambient() const
 void Material::SetDiffuse(const Color &_clr)
 {
   this->dataPtr->diffuse = _clr;
+  this->dataPtr->lighting = true;
 }
 
 //////////////////////////////////////////////////
@@ -127,6 +186,7 @@ Color Material::Diffuse() const
 void Material::SetSpecular(const Color &_clr)
 {
   this->dataPtr->specular = _clr;
+  this->dataPtr->lighting = true;
 }
 
 //////////////////////////////////////////////////
@@ -148,10 +208,11 @@ Color Material::Emissive() const
 }
 
 //////////////////////////////////////////////////
-void Material::SetTransparency(const double _t)
+void Material::SetTransparency(double _t)
 {
   this->dataPtr->transparency = std::min(_t, 1.0);
   this->dataPtr->transparency = std::max(this->dataPtr->transparency, 0.0);
+  this->dataPtr->lighting = true;
 }
 
 //////////////////////////////////////////////////
@@ -161,9 +222,10 @@ double Material::Transparency() const
 }
 
 //////////////////////////////////////////////////
-void Material::SetShininess(const double _s)
+void Material::SetShininess(double _s)
 {
   this->dataPtr->shininess = _s;
+  this->dataPtr->lighting = true;
 }
 
 //////////////////////////////////////////////////
@@ -173,45 +235,45 @@ double Material::Shininess() const
 }
 
 //////////////////////////////////////////////////
-void Material::SetBlendFactors(const double _srcFactor, const double _dstFactor)
+void Material::SetBlendFactors(double _srcFactor, double _dstFactor)
 {
   this->dataPtr->srcBlendFactor = _srcFactor;
   this->dataPtr->dstBlendFactor = _dstFactor;
 }
 
 //////////////////////////////////////////////////
-void Material::BlendFactors(double &_srcFactor, double &_dstFactor) const
+void Material::BlendFactors(double &_srcFactor, double &_dstFactor)
 {
   _srcFactor = this->dataPtr->srcBlendFactor;
   _dstFactor = this->dataPtr->dstBlendFactor;
 }
 
 //////////////////////////////////////////////////
-void Material::SetBlendMode(const MaterialBlendMode _b)
+void Material::SetBlend(Material::BlendMode _b)
 {
   this->dataPtr->blendMode = _b;
 }
 
 //////////////////////////////////////////////////
-Material::MaterialBlendMode Material::BlendMode() const
+Material::BlendMode Material::Blend() const
 {
   return this->dataPtr->blendMode;
 }
 
 //////////////////////////////////////////////////
-void Material::SetShadeMode(const MaterialShadeMode _s)
+void Material::SetShade(Material::ShadeMode _s)
 {
   this->dataPtr->shadeMode = _s;
 }
 
 //////////////////////////////////////////////////
-Material::MaterialShadeMode Material::ShadeMode() const
+Material::ShadeMode Material::Shade() const
 {
   return this->dataPtr->shadeMode;
 }
 
 //////////////////////////////////////////////////
-void Material::SetPointSize(const double _size)
+void Material::SetPointSize(double _size)
 {
   this->dataPtr->pointSize = _size;
 }
@@ -222,7 +284,7 @@ double Material::PointSize() const
   return this->dataPtr->pointSize;
 }
 //////////////////////////////////////////////////
-void Material::SetDepthWrite(const bool _value)
+void Material::SetDepthWrite(bool _value)
 {
   this->dataPtr->depthWrite = _value;
 }
@@ -234,7 +296,7 @@ bool Material::DepthWrite() const
 }
 
 //////////////////////////////////////////////////
-void Material::SetLighting(const bool _value)
+void Material::SetLighting(bool _value)
 {
   this->dataPtr->lighting = _value;
 }
@@ -244,3 +306,16 @@ bool Material::Lighting() const
 {
   return this->dataPtr->lighting;
 }
+
+//////////////////////////////////////////////////
+std::string Material::BlendStr() const
+{
+  return blendModeIface.Str(this->Blend());
+}
+
+//////////////////////////////////////////////////
+std::string Material::ShadeStr() const
+{
+  return shadeModeIface.Str(this->Shade());
+}
+

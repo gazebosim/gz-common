@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,15 @@ namespace ignition
 {
   namespace common
   {
+    class Connection;
     class Material;
     class Mesh;
     class Skeleton;
     class SubMesh;
+
+    /// \def ConnectionPtr
+    /// \brief Shared pointer to a Connection object
+    using ConnectionPtr = std::shared_ptr<Connection>;
 
     /// \def MaterialPtr
     /// \brief Shared pointer to a Material object

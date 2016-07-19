@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _IGNITION_COMMON_SYSTEMPATHS_HH_
-#define _IGNITION_COMMON_SYSTEMPATHS_HH_
+#ifndef IGNITION_COMMON_SYSTEMPATHS_HH_
+#define IGNITION_COMMON_SYSTEMPATHS_HH_
 
 #include <stdio.h>
 
@@ -28,13 +28,18 @@
 #endif
 
 #include <string>
+#include <memory>
 #include <list>
+#include <functional>
 
 namespace ignition
 {
   namespace common
   {
-    /// \class SystemPaths SystemPaths.hh common/common.hh
+    // Forward declare private data class
+    class SystemPathsPrivate;
+
+    /// \class SystemPaths SystemPaths.hh ignition/common/SystemPaths.hh
     /// \brief Functions to handle getting system paths, keeps track of:
     ///        \li SystemPaths#pluginPaths - plugin library paths
     ///            for common::WorldPlugin
@@ -48,11 +53,11 @@ namespace ignition
 
       /// \brief Get the log path
       /// \return the path
-      public: std::string GetLogPath() const;
+      public: std::string LogPath() const;
 
       /// \brief Get the plugin paths
       /// \return a list of paths
-      public: const std::list<std::string> &GetPluginPaths();
+      public: const std::list<std::string> &PluginPaths();
 
       /// \brief Find a file or path using a URI
       /// \param[in] _uri the uniform resource identifier
@@ -78,36 +83,30 @@ namespace ignition
       /// \param[in] _suffix The suffix to add
       public: void AddSearchPathSuffix(const std::string &_suffix);
 
-      /// \brief Find a file or path using a URI
-      /// \param[in] _uri the uniform resource identifier
-      /// \return Returns full path name to file
-      protected: virtual std::string FindFileURIHelper(
-                     const std::string &_uri);
+      /// \brief Set the callback to use when ignition can't find a file.
+      /// The callback should return a complete path to the requested file, or
+      /// and empty string if the file was not found in the callback.
+      /// \param[in] _cb The callback function.
+      public: void SetFindFileCallback(
+                  std::function<std::string (const std::string &)> _cb);
 
-      /// \brief Find a file in the gazebo paths
-      /// \param[in] _filename Name of the file to find.
-      /// \return Returns full path name to file
-      protected: virtual std::string FindFileHelper(
-                     const std::string &_filename);
+      /// \brief Set the callback to use when ignition can't find a file uri.
+      /// The callback should return a complete path to the requested file, or
+      /// and empty string if the file was not found in the callback.
+      /// \param[in] _cb The callback function.
+      public: void SetFindFileURICallback(
+                  std::function<std::string (const std::string &)> _cb);
 
-      /// \brief re-read SystemPaths#pluginPaths from environment variable
-      protected: virtual void UpdatePluginPaths();
-
-      /// \brief adds a path to the list if not already present
-      /// \param[in]_path the path
-      /// \param[in]_list the list
-      protected: void InsertUnique(const std::string &_path,
-                                 std::list<std::string> &_list);
-
-      /// \brief if true, call UpdatePluginPaths() within GetPluginPaths()
-      protected: bool pluginPathsFromEnv;
-
-      /// \brief Paths to plugins
-      protected: std::list<std::string> pluginPaths;
-
-      protected: std::list<std::string> suffixPaths;
-
-      protected: std::string logPath;
+#ifdef _WIN32
+// Disable warning C4251
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
+      /// \brief Private data pointer
+      private: std::unique_ptr<SystemPathsPrivate> dataPtr;
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
     };
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,23 @@
  */
 
 #include "ignition/common/Console.hh"
-#include "ignition/common/ExceptionPrivate.hh"
 #include "ignition/common/Exception.hh"
 
 using namespace ignition;
 using namespace common;
+
+/// \brief Private data for Exception
+class ignition::common::ExceptionPrivate
+{
+  /// \brief The error function
+  public: std::string file;
+
+  /// \brief Line the error occured on
+  public: int64_t line;
+
+  /// \brief The error string
+  public: std::string str;
+};
 
 //////////////////////////////////////////////////
 Exception::Exception()

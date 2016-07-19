@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ TEST(TimeTest, Time)
   common::Timer timer;
   timer.Start();
   IGN_SLEEP_MS(100);
-  EXPECT_TRUE(timer.GetElapsed() > common::Time(0, 100000000));
+  EXPECT_TRUE(timer.Elapsed() > common::Time(0, 100000000));
 
   common::Time time;
   time = common::Time::SystemTime();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,89 +17,83 @@
 #ifndef IGNITION_COMMON_MATERIAL_HH_
 #define IGNITION_COMMON_MATERIAL_HH_
 
+#include <iostream>
+#include <memory>
 #include <string>
-
-#include <ignition/common/System.hh>
+#include <ignition/common/EnumIface.hh>
 #include <ignition/common/Color.hh>
 
 namespace ignition
 {
   namespace common
   {
+    // Forward declare private data class
     class MaterialPrivate;
 
-    /// \class Material Material.hh ignition/common/Material.hh
     /// \brief Encapsulates description of a material
     class IGNITION_COMMON_VISIBLE Material
     {
-      /// \brief Enum used to indicate the type of material shading, i.e.
-      /// what interpolation technique to be applied to the colors of the
-      /// surface
-      public: enum MaterialShadeMode
+      /// \def Shade modes
+      /// \brief Enumeration of shade mode types
+      public: enum ShadeMode
       {
-        /// \brief Flat shading. No interpolation.
-        FLAT,
+        /// \internal
+        /// \brief Indicator used to create an iterator over the
+        /// enum. Do not use this.
+        SHADE_MODE_BEGIN = 0,
 
-        /// \brief Gouraud shading. Interpolation of vertex colors across
-        /// polygons.
-        GOURAUD,
+        /// \brief Flat shading
+        FLAT = 0,
 
-        /// \brief Phong shading. Interpolation of vertex normals across
-        /// polygons, and final color is obtained using the Phong reflection
-        /// model.
-        PHONG,
+        /// \brief Gouraud shading
+        GOURAUD = 1,
 
-        /// \brief Blinn-Phong shading. Gouraud shading with a modified Phong
-        /// reflection model (computationally more efficient).
-        BLINN,
+        /// \brief Phong shading
+        PHONG = 2,
 
-        /// \brief Number of entries in this enum
-        SHADE_COUNT
+        /// \brief Blinn shading
+        BLINN = 3,
+
+        /// \internal
+        /// \brief Indicator used to create an iterator over the
+        /// enum. Do not use this.
+        SHADE_MODE_END
       };
 
-#ifdef _WIN32
-// Disable warning C4251 which is triggered by
-// std::unique_ptr
-#pragma warning(push)
-#pragma warning(disable: 4251)
-#endif
-
-      /// \brief An array of strings for the shade mode enum.
-      public: static std::string ShadeModeStr[SHADE_COUNT];
-
-      /// \brief Enum used to indicate the type of blend mode for a material
-      /// pass
-      public: enum MaterialBlendMode
+      /// \def Blend modes
+      /// \brief Enumeration of blend mode types
+      public: enum BlendMode
       {
-        /// \brief Color is added to the scene
-        ADD,
+        /// \internal
+        /// \brief Indicator used to create an iterator over the
+        /// enum. Do not use this.
+        BLEND_MODE_BEGIN = 0,
 
-        /// \brief Color is multiplied with the scene contents
-        MODULATE,
+        /// \brief Add mode
+        ADD = 0,
 
-        /// \brief Color replaces the scene contents
-        REPLACE,
+        /// \brief Modulate mode
+        MODULATE = 1,
 
-        /// \brief Number of entries in this enum
-        BLEND_COUNT
+        /// \brief Replace mode
+        REPLACE = 2,
+
+        /// \internal
+        /// \brief Indicator used to create an iterator over the
+        /// enum. Do not use this.
+        BLEND_MODE_END
       };
 
-      /// \brief An array of strings for the blend mode enum.
-      public: static std::string BlendModeStr[BLEND_COUNT];
-
-#ifdef _WIN32
-#pragma warning(pop)
-#endif
-
-      /// \brief Constructor. Create material with a default white color.
+      /// \brief Constructor
       public: Material();
 
       /// \brief Destructor
-      public: virtual ~Material();
+      public: ~Material();
 
-      /// \brief Create a material with specified color
+      /// \brief Create a material with a default color
       /// \param[in] _clr Color of the material
-      public: explicit Material(const Color &_clr);
+      // cppcheck-suppress noExplicitConstructor
+      public: Material(const Color &_clr);
 
       /// \brief Get the name of the material
       /// \return The name of the material
@@ -107,7 +101,7 @@ namespace ignition
 
       /// \brief Set a texture image
       /// \param[in] _tex The name of the texture, which must be in the
-      ///             resource path
+      /// resource path
       public: void SetTextureImage(const std::string &_tex);
 
       /// \brief Set a texture image
@@ -155,7 +149,7 @@ namespace ignition
 
       /// \brief Set the transparency percentage (0..1)
       /// \param[in] _t The amount of transparency (0..1)
-      public: void SetTransparency(const double _t);
+      public: void SetTransparency(double _t);
 
       /// \brief Get the transparency percentage (0..1)
       /// \return The transparency percentage
@@ -163,43 +157,48 @@ namespace ignition
 
       /// \brief Set the shininess
       /// \param[in] _t The shininess value
-      public: void SetShininess(const double _t);
+      public: void SetShininess(double _t);
 
       /// \brief Get the shininess
       /// \return The shininess value
       public: double Shininess() const;
 
-      /// \brief Set the blend factors. Will be interpreted as:
+      /// \brief Set the blende factors. Will be interpreted as:
       ///        (texture * _srcFactor) + (scene_pixel * _dstFactor)
       /// \param[in] _srcFactor The source factor
       /// \param[in] _dstFactor The destination factor
-      public: void SetBlendFactors(const double _srcFactor,
-                  const double _dstFactor);
+      public: void SetBlendFactors(double _srcFactor, double _dstFactor);
 
       /// \brief Get the blend factors
-      /// \param[out] _srcFactor Source factor is returned in this variable
-      /// \param[out] _dstFactor Destination factor is returned in this variable
-      public: void BlendFactors(double &_srcFactor, double &_dstFactor) const;
+      /// \param[in] _srcFactor Source factor is returned in this variable
+      /// \param[in] _dstFactor Destination factor is returned in this variable
+      public: void BlendFactors(double &_srcFactor, double &_dstFactor);
 
       /// \brief Set the blending mode
       /// \param[in] _b the blend mode
-      public: void SetBlendMode(const MaterialBlendMode _b);
+      public: void SetBlend(BlendMode _b);
 
       /// \brief Get the blending mode
       /// \return the blend mode
-      public: MaterialBlendMode BlendMode() const;
+      public: BlendMode Blend() const;
+
+      /// \brief Get the blend mode string
+      public: std::string BlendStr() const;
+
+      /// \brief Get the shade mode string
+      public: std::string ShadeStr() const;
 
       /// \brief Set the shading mode
       /// param[in] the shading mode
-      public: void SetShadeMode(const MaterialShadeMode _b);
+      public: void SetShade(ShadeMode _b);
 
       /// \brief Get the shading mode
       /// \return the shading mode
-      public: MaterialShadeMode ShadeMode() const;
+      public: ShadeMode Shade() const;
 
       /// \brief Set the point size
       /// \param[in] _size the size
-      public: void SetPointSize(const double _size);
+      public: void SetPointSize(double _size);
 
       /// \brief Get the point size
       /// \return the point size
@@ -207,45 +206,52 @@ namespace ignition
 
       /// \brief Set depth write
       /// \param[in] _value the depth write enabled state
-      public: void SetDepthWrite(const bool _value);
+      public: void SetDepthWrite(bool _value);
 
       /// \brief Get depth write
       /// \return the depth write enabled state
       public: bool DepthWrite() const;
 
-      /// \brief Set whether to enable dynamic lighting.
-      public: void SetLighting(const bool _value);
-      /// \param[in] _value the dynamic lighting enabled state
+      /// \brief Set lighting enabled
+      /// \param[in] _value the lighting enabled state
+      public: void SetLighting(bool _value);
 
-      /// \brief Get whether dynamic lighting is enabled
-      /// \return the dynamic lighting enabled state
+      /// \brief Get lighting enabled
+      /// \return the lighting enabled state
       public: bool Lighting() const;
 
       /// \brief Stream insertion operator
       /// param[in] _out the output stream to extract from
       /// param[out] _m the material information
       public: friend std::ostream &operator<<(std::ostream &_out,
-                  const Material &_m)
-      {
-        _out << "Material:\n";
-        _out << "  Name: " << _m.Name() << "\n";
-        _out << "  Texture:" << _m.TextureImage() << "\n";
-        _out << "  Ambient: " << _m.Ambient() << "\n";
-        _out << "  Diffuse: " << _m.Diffuse() << "\n";
-        _out << "  Specular: " << _m.Specular() << "\n";
-        _out << "  Emissive: " << _m.Emissive() << "\n";
-        _out << "  Transparency: " << _m.Transparency() << "\n";
-        _out << "  Shininess: " << _m.Shininess() << "\n";
-        _out << "  BlendMode: "
-          << Material::BlendModeStr[_m.BlendMode()] << "\n";
-        _out << "  ShadeMode: "
-          << Material::ShadeModeStr[_m.ShadeMode()] << "\n";
-        _out << "  DepthWrite: " << _m.DepthWrite() << "\n";
-        return _out;
-      }
+                  const ignition::common::Material &_m)
+              {
+                _out << "Material:\n";
+                _out << "  Name: " << _m.Name() << "\n";
+                _out << "  Texture: " << _m.TextureImage() << "\n";
+                _out << "  Ambient: " << _m.Ambient() << "\n";
+                _out << "  Diffuse: " << _m.Diffuse() << "\n";
+                _out << "  Specular: " << _m.Specular() << "\n";
+                _out << "  Emissive: " << _m.Emissive() << "\n";
+                _out << "  Transparency: " << _m.Transparency() << "\n";
+                _out << "  Shininess: " << _m.Shininess() << "\n";
+                _out << "  BlendMode: " << _m.BlendStr() << "\n";
+                _out << "  ShadeMode: " << _m.ShadeStr() << "\n";
+                _out << "  DepthWrite: " << _m.DepthWrite() << "\n";
+                return _out;
+              }
 
-      /// \brief Private data pointer
-      private: MaterialPrivate *dataPtr;
+#ifdef _WIN32
+// Disable warning C4251 which is triggered by
+// std::unique_ptr
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
+      /// \brief destination blend factor
+      private: std::unique_ptr<MaterialPrivate> dataPtr;
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
     };
   }
 }

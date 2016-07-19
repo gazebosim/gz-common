@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,47 @@
 #include <list>
 
 #include "ignition/common/Console.hh"
-#include "ignition/common/SkeletonNodePrivate.hh"
 #include "ignition/common/SkeletonNode.hh"
 
 using namespace ignition;
 using namespace common;
+
+/// \brief SkeletonNode private data
+class ignition::common::SkeletonNodePrivate
+{
+  /// \brief the name of the skeletal node
+  public: std::string name;
+
+  /// \brief a string identifier
+  public: std::string id;
+
+  /// \brief the type fo node
+  public: SkeletonNode::SkeletonNodeType type;
+
+  /// \brief the transform
+  public: math::Matrix4d transform;
+
+  /// \brief the initial transformation
+  public: math::Matrix4d initialTransform;
+
+  /// \brief the model transformation
+  public: math::Matrix4d modelTransform;
+
+  /// \brief the inverse of the bind pose skeletal transform
+  public: math::Matrix4d invBindTransform;
+
+  /// \brief the parent node
+  public: SkeletonNode *parent;
+
+  /// \brief the children nodes
+  public: std::vector<SkeletonNode*> children;
+
+  /// \brief handle index number
+  public: unsigned int handle;
+
+  /// \brief the raw transformation
+  public: std::vector<NodeTransform> rawTransforms;
+};
 
 //////////////////////////////////////////////////
 SkeletonNode::SkeletonNode(SkeletonNode *_parent)

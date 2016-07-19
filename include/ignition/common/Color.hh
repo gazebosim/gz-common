@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,7 +88,7 @@ namespace ignition
 
       /// \brief Get the color in HSV colorspace
       /// \return HSV values in a ignition::math::Vector3f format
-      public: ignition::math::Vector3f GetAsHSV() const;
+      public: ignition::math::Vector3f HSV() const;
 
       /// \brief Set a color based on HSV values
       /// \param[in] _h Hue(0..360)
@@ -98,7 +98,7 @@ namespace ignition
 
       /// \brief Get the color in YUV colorspace
       /// \return the YUV  color
-      public: ignition::math::Vector3f GetAsYUV() const;
+      public: ignition::math::Vector3f YUV() const;
 
       /// \brief Set from yuv
       /// \param[in] _y value
@@ -118,19 +118,19 @@ namespace ignition
 
       /// \brief Get as uint32 RGBA packed value
       /// \return the color
-      public: RGBA GetAsRGBA() const;
+      public: RGBA AsRGBA() const;
 
       /// \brief Get as uint32 BGRA packed value
       /// \return the color
-      public: BGRA GetAsBGRA() const;
+      public: BGRA AsBGRA() const;
 
       /// \brief Get as uint32 ARGB packed value
       /// \return the color
-      public: ARGB GetAsARGB() const;
+      public: ARGB AsARGB() const;
 
       /// \brief Get as uint32 ABGR packed value
       /// \return the color
-      public: ABGR GetAsABGR() const;
+      public: ABGR AsABGR() const;
 
       /// \brief Set from uint32 RGBA packed value
       /// \param[in] _v the new color

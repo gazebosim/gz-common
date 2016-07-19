@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,17 +42,17 @@ namespace ignition
 
       /// \brief Returns true if the timer is running.
       /// \return Tue if the timer has been started and not stopped.
-      public: bool GetRunning() const;
+      public: bool Running() const;
 
       /// \brief Get the elapsed time
       /// \return The time
-      public: Time GetElapsed() const;
+      public: Time Elapsed() const;
 
       /// \brief Stream operator friendly
       public: friend std::ostream &operator<<(std::ostream &out,
                                               const ignition::common::Timer &t)
               {
-                out << t.GetElapsed();
+                out << t.Elapsed();
                 return out;
               }
 

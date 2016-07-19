@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,27 +14,67 @@
  * limitations under the License.
  *
  */
-#include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-
 #include <iostream>
+#include <algorithm>
 #include <fstream>
 #include <sstream>
 
-#include <sdf/sdf.hh>
+#ifndef _WIN32
+#include <dirent.h>
+#else
+#include "ignition/common/win_dirent.h"
+#endif
 
 #include "ignition/common/SystemPaths.hh"
-#include "ignition/common/Exception.hh"
 #include "ignition/common/Console.hh"
 
 using namespace ignition;
 using namespace common;
 
+const std::string IGN_PLUGIN_PATH="/usr/lib/";
+
+// Private data class
+class ignition::common::SystemPathsPrivate
+{
+  /// \brief re-read SystemPaths#pluginPaths from environment variable
+  public: void UpdatePluginPaths();
+
+  /// \brief if true, call UpdatePluginPaths() within PluginPaths()
+  public: bool pluginPathsFromEnv;
+
+  /// \brief Paths to plugins
+  public: std::list<std::string> pluginPaths;
+
+  /// \brief Suffix paths
+  public: std::list<std::string> suffixPaths;
+
+  /// \brief Log path
+  public: std::string logPath;
+
+  /// \brief Find file callback.
+  public: std::function<std::string (const std::string &)> findFileCB;
+
+  /// \brief Find file URI callback.
+  public: std::function<std::string (const std::string &)> findFileURICB;
+};
+
+//////////////////////////////////////////////////
+/// \brief adds a path to the list if not already present
+/// \param[in]_path the path
+/// \param[in]_list the list
+void insertUnique(const std::string &_path, std::list<std::string> &_list)
+{
+  if (std::find(_list.begin(), _list.end(), _path) == _list.end())
+    _list.push_back(_path);
+}
+
 //////////////////////////////////////////////////
 SystemPaths::SystemPaths()
+: dataPtr(new SystemPathsPrivate)
 {
-  this->pluginPaths.clear();
+  this->dataPtr->pluginPaths.clear();
 
   char *homePath = getenv("HOME");
   std::string home;
@@ -43,12 +83,12 @@ SystemPaths::SystemPaths()
   else
     home = homePath;
 
-  char *path = getenv("GAZEBO_LOG_PATH");
+  char *path = getenv("IGN_LOG_PATH");
   std::string fullPath;
   if (!path)
   {
-    if (home != "/tmp/gazebo")
-      fullPath = home + "/.gazebo";
+    if (home != "/tmp/ignition")
+      fullPath = home + "/.ignition";
     else
       fullPath = home;
   }
@@ -58,16 +98,20 @@ SystemPaths::SystemPaths()
   DIR *dir = opendir(fullPath.c_str());
   if (!dir)
   {
+#ifdef _WIN32
+    mkdir(fullPath.c_str());
+#else
     mkdir(fullPath.c_str(), S_IRWXU | S_IRGRP | S_IROTH);
+#endif
   }
   else
     closedir(dir);
 
-  this->logPath = fullPath;
+  this->dataPtr->logPath = fullPath;
 
-  this->UpdatePluginPaths();
+  this->dataPtr->UpdatePluginPaths();
 
-  this->pluginPathsFromEnv = true;
+  this->dataPtr->pluginPathsFromEnv = true;
 }
 
 /////////////////////////////////////////////////
@@ -76,22 +120,43 @@ SystemPaths::~SystemPaths()
 }
 
 /////////////////////////////////////////////////
-std::string SystemPaths::GetLogPath() const
+std::string SystemPaths::LogPath() const
 {
-  return this->logPath;
+  return this->dataPtr->logPath;
 }
 
 /////////////////////////////////////////////////
-const std::list<std::string> &SystemPaths::GetPluginPaths()
+const std::list<std::string> &SystemPaths::PluginPaths()
 {
-  if (this->pluginPathsFromEnv)
-    this->UpdatePluginPaths();
-  return this->pluginPaths;
+  if (this->dataPtr->pluginPathsFromEnv)
+    this->dataPtr->UpdatePluginPaths();
+  return this->dataPtr->pluginPaths;
 }
 
 //////////////////////////////////////////////////
-void SystemPaths::UpdatePluginPaths()
+void SystemPathsPrivate::UpdatePluginPaths()
 {
+  std::string delim(":");
+  std::string path;
+
+  char *pathCStr = getenv("IGN_PLUGIN_PATH");
+  if (!pathCStr || *pathCStr == '\0')
+  {
+    // No env var; take the compile-time default.
+    path = IGN_PLUGIN_PATH;
+  }
+  else
+    path = pathCStr;
+
+  size_t pos1 = 0;
+  size_t pos2 = path.find(delim);
+  while (pos2 != std::string::npos)
+  {
+    insertUnique(path.substr(pos1, pos2-pos1), this->pluginPaths);
+    pos1 = pos2+1;
+    pos2 = path.find(delim, pos2+1);
+  }
+  insertUnique(path.substr(pos1, path.size()-pos1), this->pluginPaths);
 }
 
 //////////////////////////////////////////////////
@@ -109,25 +174,13 @@ std::string SystemPaths::FindFileURI(const std::string &_uri)
   }
   else
   {
-    filename = this->FindFileURIHelper(_uri);
+    filename = this->dataPtr->findFileURICB(_uri);
   }
 
   if (filename.empty())
     ignerr << "Unable to find file with URI [" << _uri << "]\n";
 
   return filename;
-}
-
-//////////////////////////////////////////////////
-std::string SystemPaths::FindFileURIHelper(const std::string & /*_uri*/)
-{
-  return std::string();
-}
-
-//////////////////////////////////////////////////
-std::string SystemPaths::FindFileHelper(const std::string & /*_filename*/)
-{
-  return std::string();
 }
 
 //////////////////////////////////////////////////
@@ -165,7 +218,7 @@ std::string SystemPaths::FindFile(const std::string &_filename,
     }
     else
     {
-      path = this->FindFileHelper(_filename);
+      path = this->dataPtr->findFileCB(_filename);
       found = !path.empty();
     }
 
@@ -185,7 +238,7 @@ std::string SystemPaths::FindFile(const std::string &_filename,
 /////////////////////////////////////////////////
 void SystemPaths::ClearPluginPaths()
 {
-  this->pluginPaths.clear();
+  this->dataPtr->pluginPaths.clear();
 }
 
 /////////////////////////////////////////////////
@@ -196,19 +249,12 @@ void SystemPaths::AddPluginPaths(const std::string &_path)
   size_t pos2 = _path.find(delim);
   while (pos2 != std::string::npos)
   {
-    this->InsertUnique(_path.substr(pos1, pos2-pos1), this->pluginPaths);
+    insertUnique(_path.substr(pos1, pos2-pos1), this->dataPtr->pluginPaths);
     pos1 = pos2+1;
     pos2 = _path.find(delim, pos2+1);
   }
-  this->InsertUnique(_path.substr(pos1, _path.size()-pos1), this->pluginPaths);
-}
-
-/////////////////////////////////////////////////
-void SystemPaths::InsertUnique(const std::string &_path,
-                               std::list<std::string> &_list)
-{
-  if (std::find(_list.begin(), _list.end(), _path) == _list.end())
-    _list.push_back(_path);
+  insertUnique(_path.substr(pos1, _path.size()-pos1),
+      this->dataPtr->pluginPaths);
 }
 
 /////////////////////////////////////////////////
@@ -224,5 +270,19 @@ void SystemPaths::AddSearchPathSuffix(const std::string &_suffix)
   if (_suffix[_suffix.size()-1] != '/')
     s += "/";
 
-  this->suffixPaths.push_back(s);
+  this->dataPtr->suffixPaths.push_back(s);
+}
+
+/////////////////////////////////////////////////
+void SystemPaths::SetFindFileCallback(
+    std::function<std::string (const std::string &)> _cb)
+{
+  this->dataPtr->findFileCB = _cb;
+}
+
+/////////////////////////////////////////////////
+void SystemPaths::SetFindFileURICallback(
+    std::function<std::string (const std::string &)> _cb)
+{
+  this->dataPtr->findFileURICB = _cb;
 }

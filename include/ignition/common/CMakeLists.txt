@@ -3,27 +3,50 @@ include (${project_cmake_dir}/Utils.cmake)
 set (headers
   Animation.hh
   AudioDecoder.hh
+  Base64.hh
+  Battery.hh
   BVHLoader.hh
+  ColladaExporter.hh
   ColladaLoader.hh
   Color.hh
   Console.hh
+  Dem.hh
+  EnumIface.hh
+  Event.hh
   Exception.hh
-  ffmpeg_inc.h
-  #Image.hh
+  ffmpeg_inc.hh
+  GTSMeshUtils.hh
+  HeightmapData.hh
+  Image.hh
+  ImageHeightmap.hh
+  KeyEvent.hh
   KeyFrame.hh
   Material.hh
+  MaterialDensity.hh
   Mesh.hh
+  MeshCSG.hh
+  MeshExporter.hh
+  MeshManager.hh
+  MouseEvent.hh
+  MovingWindowFilter.hh
+  NodeAnimation.hh
   NodeTransform.hh
+  SemanticVersion.hh
   SingletonT.hh
   Skeleton.hh
   SkeletonAnimation.hh
   SkeletonNode.hh
   SubMesh.hh
   System.hh
+  STLLoader.hh
+  SVGLoader.hh
   Time.hh
   Timer.hh
+  Types.hh
   Util.hh
+  URI.hh
   Uuid.hh
+  Video.hh
 )
 
 set (ign_headers "" CACHE INTERNAL "Ignition headers" FORCE)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ static int count = 0;
 
 //////////////////////////////////////////////////
 Image::Image(const std::string &_filename)
-  : data(new ImagePrivate)
+  : dataPtr(new ImagePrivate)
 {
   if (count == 0)
     FreeImage_Initialise();
@@ -81,9 +81,6 @@ Image::~Image()
 
   if (count == 0)
     FreeImage_DeInitialise();
-
-  delete this->data;
-  this->data = NULL;
 }
 
 
@@ -92,7 +89,9 @@ int Image::Load(const std::string &_filename)
 {
   this->dataPtr->fullName = _filename;
   if (!exists(this->dataPtr->fullName))
+  {
     this->dataPtr->fullName = common::findFile(_filename);
+  }
 
   if (exists(this->dataPtr->fullName))
   {
@@ -139,8 +138,10 @@ void Image::SavePNG(const std::string &_filename)
 }
 
 //////////////////////////////////////////////////
-void Image::SetFromData(const unsigned char *_data, unsigned int _width,
-    unsigned int _height, PixelFormat _format)
+void Image::SetFromData(const unsigned char *_data,
+    unsigned int _width,
+    unsigned int _height,
+    Image::PixelFormatType _format)
 {
   if (this->dataPtr->bitmap)
     FreeImage_Unload(this->dataPtr->bitmap);
@@ -198,27 +199,27 @@ void Image::SetFromData(const unsigned char *_data, unsigned int _width,
 }
 
 //////////////////////////////////////////////////
-int Image::GetPitch() const
+int Image::Pitch() const
 {
   return FreeImage_GetLine(this->dataPtr->bitmap);
 }
 
 //////////////////////////////////////////////////
-void Image::GetRGBData(unsigned char **_data, unsigned int &_count) const
+void Image::RGBData(unsigned char **_data, unsigned int &_count) const
 {
   FIBITMAP *tmp = FreeImage_ConvertTo24Bits(this->dataPtr->bitmap);
-  this->dataPtr->GetDataImpl(_data, _count, tmp);
+  this->dataPtr->DataImpl(_data, _count, tmp);
   FreeImage_Unload(tmp);
 }
 
 //////////////////////////////////////////////////
-void Image::GetData(unsigned char **_data, unsigned int &_count) const
+void Image::Data(unsigned char **_data, unsigned int &_count) const
 {
-  this->dataPtr->GetDataImpl(_data, _count, this->dataPtr->bitmap);
+  this->dataPtr->DataImpl(_data, _count, this->dataPtr->bitmap);
 }
 
 //////////////////////////////////////////////////
-void ImagePrivate::GetDataImpl(unsigned char **_data, unsigned int &_count,
+void ImagePrivate::DataImpl(unsigned char **_data, unsigned int &_count,
                         FIBITMAP *_img) const
 {
   int redmask = FI_RGBA_RED_MASK;
@@ -255,9 +256,9 @@ void ImagePrivate::GetDataImpl(unsigned char **_data, unsigned int &_count,
 //  FIXME:  why shift by 2 pixels?
 //  this breaks heighmaps by wrapping artificially
 //    int i = 0;
-//    for (unsigned int y = 0; y < this->GetHeight(); ++y)
+//    for (unsigned int y = 0; y < this->Height(); ++y)
 //    {
-//      for (unsigned int x = 0; x < this->GetWidth(); ++x)
+//      for (unsigned int x = 0; x < this->Width(); ++x)
 //      {
 //        std::swap((*_data)[i], (*_data)[i+2]);
 //        unsigned int d = FreeImage_GetBPP(this->dataPtr->bitmap)/8;
@@ -268,7 +269,7 @@ void ImagePrivate::GetDataImpl(unsigned char **_data, unsigned int &_count,
 }
 
 //////////////////////////////////////////////////
-unsigned int Image::GetWidth() const
+unsigned int Image::Width() const
 {
   if (!this->Valid())
     return 0;
@@ -277,7 +278,7 @@ unsigned int Image::GetWidth() const
 }
 
 //////////////////////////////////////////////////
-unsigned int Image::GetHeight() const
+unsigned int Image::Height() const
 {
   if (!this->Valid())
     return 0;
@@ -286,7 +287,7 @@ unsigned int Image::GetHeight() const
 }
 
 //////////////////////////////////////////////////
-unsigned int Image::GetBPP() const
+unsigned int Image::BPP() const
 {
   if (!this->Valid())
     return 0;
@@ -295,7 +296,7 @@ unsigned int Image::GetBPP() const
 }
 
 //////////////////////////////////////////////////
-Color Image::GetPixel(unsigned int _x, unsigned int _y) const
+Color Image::Pixel(unsigned int _x, unsigned int _y) const
 {
   Color clr;
 
@@ -346,33 +347,33 @@ Color Image::GetPixel(unsigned int _x, unsigned int _y) const
 }
 
 //////////////////////////////////////////////////
-Color Image::GetAvgColor()
+Color Image::AvgColor()
 {
   unsigned int x, y;
   double rsum, gsum, bsum;
   common::Color pixel;
 
   rsum = gsum = bsum = 0.0;
-  for (y = 0; y < this->GetHeight(); ++y)
+  for (y = 0; y < this->Height(); ++y)
   {
-    for (x = 0; x < this->GetWidth(); ++x)
+    for (x = 0; x < this->Width(); ++x)
     {
-      pixel = this->GetPixel(x, y);
+      pixel = this->Pixel(x, y);
       rsum += pixel.R();
       gsum += pixel.G();
       bsum += pixel.B();
     }
   }
 
-  rsum /= (this->GetWidth() * this->GetHeight());
-  gsum /= (this->GetWidth() * this->GetHeight());
-  bsum /= (this->GetWidth() * this->GetHeight());
+  rsum /= (this->Width() * this->Height());
+  gsum /= (this->Width() * this->Height());
+  bsum /= (this->Width() * this->Height());
 
   return Color(rsum, gsum, bsum);
 }
 
 //////////////////////////////////////////////////
-Color Image::GetMaxColor() const
+Color Image::MaxColor() const
 {
   unsigned int x, y;
   Color clr;
@@ -380,11 +381,11 @@ Color Image::GetMaxColor() const
 
   maxClr.Set(0, 0, 0, 0);
 
-  for (y = 0; y < this->GetHeight(); y++)
+  for (y = 0; y < this->Height(); y++)
   {
-    for (x = 0; x < this->GetWidth(); x++)
+    for (x = 0; x < this->Width(); x++)
     {
-      clr = this->GetPixel(x, y);
+      clr = this->Pixel(x, y);
 
       if (clr.R() + clr.G() + clr.B() > maxClr.R() + maxClr.G() + maxClr.B())
       {
@@ -410,19 +411,19 @@ bool Image::Valid() const
 }
 
 //////////////////////////////////////////////////
-std::string Image::GetFilename() const
+std::string Image::Filename() const
 {
   return this->dataPtr->fullName;
 }
 
 //////////////////////////////////////////////////
-Image::PixelFormat Image::GetPixelFormat() const
+Image::PixelFormatType Image::PixelFormat() const
 {
-  Image::PixelFormat fmt = UNKNOWN_PIXEL_FORMAT;
+  Image::PixelFormatType fmt = UNKNOWN_PIXEL_FORMAT;
   FREE_IMAGE_TYPE type = FreeImage_GetImageType(this->dataPtr->bitmap);
 
   unsigned int redMask = FreeImage_GetRedMask(this->dataPtr->bitmap);
-  unsigned int bpp = this->GetBPP();
+  unsigned int bpp = this->BPP();
 
   if (type == FIT_BITMAP)
   {
@@ -449,7 +450,7 @@ Image::PixelFormat Image::GetPixelFormat() const
 }
 
 /////////////////////////////////////////////////
-Image::PixelFormat Image::ConvertPixelFormat(const std::string &_format)
+Image::PixelFormatType Image::ConvertPixelFormat(const std::string &_format)
 {
   // Handle old format strings
   if (_format == "L8" || _format == "L_INT8")
@@ -459,7 +460,7 @@ Image::PixelFormat Image::ConvertPixelFormat(const std::string &_format)
 
   for (unsigned int i = 0; i < PIXEL_FORMAT_COUNT; ++i)
     if (PixelFormatNames[i] == _format)
-      return static_cast<PixelFormat>(i);
+      return static_cast<PixelFormatType>(i);
 
   return UNKNOWN_PIXEL_FORMAT;
 }
