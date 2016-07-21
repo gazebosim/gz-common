@@ -7,7 +7,7 @@ include (${project_cmake_dir}/FindFreeimage.cmake)
 
 ########################################
 # Find ignition math
-find_package(ignition-math2 QUIET)
+find_package(ignition-math2 2.5 QUIET)
 if (NOT ignition-math2_FOUND)
   message(STATUS "Looking for ignition-math2-config.cmake - not found")
   BUILD_ERROR ("Missing: Ignition math2 library.")
