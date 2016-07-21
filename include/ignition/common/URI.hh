@@ -227,7 +227,7 @@ namespace ignition
 
       /// \brief Get a const reference of the path component.
       /// \return A const reference of the path.
-      public: URIPath &Path() const;
+      public: const URIPath &Path() const;
 
       /// \brief Get a mutable version of the query component
       /// \return A reference to the query
@@ -235,7 +235,7 @@ namespace ignition
 
       /// \brief Get a const reference of the query component.
       /// \return A const reference of the query.
-      public: URIQuery &Query() const;
+      public: const URIQuery &Query() const;
 
       /// \brief Equal operator.
       /// \param[in] _uri Another URI.
