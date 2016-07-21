@@ -184,6 +184,21 @@ TEST(URITEST, Path)
 }
 
 /////////////////////////////////////////////////
+TEST(URITEST, PathCopy)
+{
+  URI uri;
+  uri.SetScheme("data");
+  uri.Path().PushFront("world");
+
+  auto pathCopy = uri.Path();
+  pathCopy = pathCopy / "default";
+
+  EXPECT_NE(uri.Path().Str(), pathCopy.Str());
+  EXPECT_EQ(uri.Path().Str(), "world");
+  EXPECT_EQ(pathCopy.Str(), "world/default");
+}
+
+/////////////////////////////////////////////////
 TEST(URITEST, Query)
 {
   URI uri;
@@ -209,6 +224,21 @@ TEST(URITEST, Query)
   uri.Clear();
   uri2.Clear();
   EXPECT_EQ(uri, uri2);
+}
+
+/////////////////////////////////////////////////
+TEST(URITEST, QueryCopy)
+{
+  URI uri;
+  uri.SetScheme("data");
+  uri.Query().Insert("a", "b");
+
+  auto queryCopy = uri.Query();
+  queryCopy.Insert("c", "d");
+
+  EXPECT_NE(uri.Query().Str(), queryCopy.Str());
+  EXPECT_EQ(uri.Query().Str(), "?a=b");
+  EXPECT_EQ(queryCopy.Str(), "?a=b&c=d");
 }
 
 /////////////////////////////////////////////////
