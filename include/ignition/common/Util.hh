@@ -170,6 +170,20 @@ namespace ignition
     /// \return true if _path is a file or directory
     bool IGNITION_COMMON_VISIBLE exists(const std::string &_path);
 
+    /// \brief Copy a file.
+    /// \param[in] _existingFilename Path to an existing file.
+    /// \param[in] _newFilename Path of the new file.
+    /// \return True on success.
+    bool IGNITION_COMMON_VISIBLE copyFile(const std::string &_existingFilename,
+                  const std::string &_newFilename);
+
+    /// \brief Move a file.
+    /// \param[in] _existingFilename Full path to an existing file.
+    /// \param[in] _newFilename Full path of the new file.
+    /// \return True on success.
+    bool IGNITION_COMMON_VISIBLE moveFile(const std::string &_existingFilename,
+                  const std::string &_newFilename);
+
     /// \brief Get the current working directory
     /// \return Name of the current directory
     std::string IGNITION_COMMON_VISIBLE cwd();

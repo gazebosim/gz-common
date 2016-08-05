@@ -16,6 +16,12 @@
 */
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <fcntl.h>
+
+#ifdef __linux__
+#include <sys/sendfile.h>
+#endif
+
 #include <iomanip>
 #include <array>
 #include <algorithm>
@@ -420,6 +426,59 @@ bool ignition::common::exists(const std::string &_path)
 {
   return ignition::common::isFile(_path) ||
          ignition::common::isDirectory(_path);
+}
+
+/////////////////////////////////////////////////
+bool ignition::common::moveFile(const std::string &_existingFilename,
+                                const std::string &_newFilename)
+{
+  return copyFile(_existingFilename, _newFilename) &&
+         std::remove(_existingFilename.c_str()) == 0;
+}
+
+/////////////////////////////////////////////////
+bool ignition::common::copyFile(const std::string &_existingFilename,
+                                const std::string &_newFilename)
+{
+#ifdef _WIN32
+  return CopyFile(_existingFilename, _newFilename, false);
+#elif defined(__APPLE__)
+  std::ifstream in(_existingFilename.c_str(), std::ifstream::binary);
+  std::ofstream out(_newFilename.c_str(),
+      std::ifstream::trunc | std::ifstream::binary);
+  out << in.rdbuf();
+  out.close();
+  in.close();
+  return common::isFile(_newFilename);
+#else
+  int readFd = 0;
+  int writeFd = 0;
+  struct stat statBuf;
+  off_t offset = 0;
+
+  // Open the input file.
+  readFd = open(_existingFilename.c_str(), O_RDONLY);
+
+  // Stat the input file to obtain its size.
+  fstat(readFd, &statBuf);
+
+  // Open the output file for writing, with the same permissions as the
+  // source file.
+  writeFd = open(_newFilename.c_str(), O_WRONLY | O_CREAT, statBuf.st_mode);
+
+  while (offset >= 0 && offset < statBuf.st_size)
+  {
+    // Send the bytes from one file to the other.
+    ssize_t written = sendfile(writeFd, readFd, &offset, statBuf.st_size);
+    if (written < 0)
+      break;
+  }
+
+  close(readFd);
+  close(writeFd);
+
+  return offset == statBuf.st_size;
+#endif
 }
 
 /////////////////////////////////////////////////
