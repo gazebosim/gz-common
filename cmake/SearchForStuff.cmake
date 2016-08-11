@@ -119,45 +119,49 @@ if (MSVC)
 endif()
 
 if (PKG_CONFIG_FOUND)
-  ########################################
-  # Find libswscale format
-  pkg_check_modules(libswscale libswscale)
-  if (NOT libswscale_FOUND)
-    BUILD_ERROR("libswscale not found.")
-  else()
-    include_directories(${libswscale_INCLUDE_DIRS})
-    link_directories(${libswscale_LIBRARY_DIRS})
-  endif ()
 
-  ########################################
-  # Find AV format
-  pkg_check_modules(libavformat libavformat)
-  if (NOT libavformat_FOUND)
-    BUILD_ERROR("libavformat not found.")
-  else()
-    include_directories(${libavformat_INCLUDE_DIRS})
-    link_directories(${libavformat_LIBRARY_DIRS})
-  endif ()
+  if (NOT MSVC)
+    ########################################
+    # Find libswscale format
+    pkg_check_modules(libswscale libswscale)
+    if (NOT libswscale_FOUND)
+      BUILD_ERROR("libswscale not found.")
+    endif ()
 
-  ########################################
-  # Find avcodec
-  pkg_check_modules(libavcodec libavcodec)
-  if (NOT libavcodec_FOUND)
-    BUILD_ERROR("libavcodec not found.")
-  else()
-    include_directories(${libavcodec_INCLUDE_DIRS})
-    link_directories(${libavcodec_LIBRARY_DIRS})
-  endif ()
+    ########################################
+    # Find AV format
+    pkg_check_modules(libavformat libavformat)
+    if (NOT libavformat_FOUND)
+      BUILD_ERROR("libavformat not found.")
+    endif()
+
+    ########################################
+    # Find avcodec
+    pkg_check_modules(libavcodec libavcodec)
+    if (NOT libavcodec_FOUND)
+      BUILD_ERROR("libavcodec not found.")
+    endif()
 
 
-  ########################################
-  # Find avutil
-  pkg_check_modules(libavutil libavutil)
-  if (NOT libavutil_FOUND)
-    BUILD_ERROR("libavutil not found.")
-  else()
-    include_directories(${libavutil_INCLUDE_DIRS})
-    link_directories(${libavutil_LIBRARY_DIRS})
-  endif ()
+    ########################################
+    # Find avutil
+    pkg_check_modules(libavutil libavutil)
+    if (NOT libavutil_FOUND)
+      BUILD_ERROR("libavutil not found.")
+    endif ()
+  endif()
+
+
+  include_directories(${libswscale_INCLUDE_DIRS})
+  link_directories(${libswscale_LIBRARY_DIRS})
+
+  include_directories(${libavformat_INCLUDE_DIRS})
+  link_directories(${libavformat_LIBRARY_DIRS})
+
+  include_directories(${libavcodec_INCLUDE_DIRS})
+  link_directories(${libavcodec_LIBRARY_DIRS})
+
+  include_directories(${libavutil_INCLUDE_DIRS})
+  link_directories(${libavutil_LIBRARY_DIRS})
 
 endif(PKG_CONFIG_FOUND)

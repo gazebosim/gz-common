@@ -251,9 +251,16 @@ bool VideoEncoder::Start(const unsigned int _width,
 
   this->dataPtr->formatCtx = avformat_alloc_context();
   this->dataPtr->formatCtx->oformat = outputFormat;
+
+#ifdef _WIN32
+  _snprintf(this->dataPtr->formatCtx->filename,
+      sizeof(this->dataPtr->formatCtx->filename),
+      "%s", tmpFileNameFull.c_str());
+#else
   snprintf(this->dataPtr->formatCtx->filename,
       sizeof(this->dataPtr->formatCtx->filename),
       "%s", tmpFileNameFull.c_str());
+#endif
 
   this->dataPtr->videoStream =
     avformat_new_stream(this->dataPtr->formatCtx, encoder);
@@ -296,7 +303,7 @@ bool VideoEncoder::Start(const unsigned int _width,
         "preset", "slow", 0);
   }
 
-  if (this->dataPtr->videoStream->codec->codec_id == CODEC_ID_MPEG1VIDEO)
+  if (this->dataPtr->videoStream->codec->codec_id == AV_CODEC_ID_MPEG1VIDEO)
   {
     // Needed to avoid using macroblocks in which some coeffs overflow.
     // This does not happen with normal video, it just happens here as
@@ -436,14 +443,14 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
     {
       this->dataPtr->avInPicture = new AVPicture;
       avpicture_alloc(this->dataPtr->avInPicture,
-          PIX_FMT_RGB24, this->dataPtr->inWidth,
+          AV_PIX_FMT_RGB24, this->dataPtr->inWidth,
           this->dataPtr->inHeight);
     }
 
     this->dataPtr->swsCtx = sws_getContext(
         this->dataPtr->inWidth,
         this->dataPtr->inHeight,
-        PIX_FMT_RGB24,
+        AV_PIX_FMT_RGB24,
         this->dataPtr->videoStream->codec->width,
         this->dataPtr->videoStream->codec->height,
         this->dataPtr->videoStream->codec->pix_fmt,
