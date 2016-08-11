@@ -44,6 +44,7 @@ set (sources
   Util.cc
   Uuid.cc
   Video.cc
+  VideoEncoder.cc
 )
 
 if (NOT USE_EXTERNAL_TINYXML2)
@@ -80,6 +81,7 @@ set (gtest_sources
   URI_TEST.cc
   Util_TEST.cc
   Uuid_TEST.cc
+  VideoEncoder_TEST.cc
 )
 
 ign_add_library(${PROJECT_LIBRARY_TARGET_NAME} ${sources})
@@ -88,7 +90,12 @@ target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
   ${freeimage_LIBRARIES}
   ${tinyxml2_LIBRARIES}
   ${gts_LIBRARIES}
-  ${uuid_LIBRARIES})
+  ${uuid_LIBRARIES}
+  ${libavcodec_LIBRARIES}
+  ${libavformat_LIBRARIES}
+  ${libavutil_LIBRARIES}
+  ${libswscale_LIBRARIES}
+  )
 
 if (UNIX)
   target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME} rt)
