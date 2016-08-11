@@ -170,6 +170,11 @@ namespace ignition
     /// \return true if _path is a file or directory
     bool IGNITION_COMMON_VISIBLE exists(const std::string &_path);
 
+    /// \brief Get the absolute path of a provided path.
+    /// \param[in] _path Relative or absolute path.
+    /// \return Absolute path
+    std::string IGNITION_COMMON_VISIBLE absPath(const std::string &_path);
+
     /// \brief Copy a file.
     /// \param[in] _existingFilename Path to an existing file.
     /// \param[in] _newFilename Path of the new file.
@@ -256,6 +261,31 @@ namespace ignition
     /// \param[in] _in String to convert to lowercase
     /// \return Lowercase equilvalent of _in.
     std::string IGNITION_COMMON_VISIBLE lowercase(const char *_in);
+
+    /// \brief Replace all occurances of _key with _replacement.
+    /// \param[out] _result The new string that has had _key replaced
+    /// with _replacement.
+    /// \param[in] _orig Original string.
+    /// \param[in] _key String to replace.
+    /// \param[in] _replacement The string that replaces _key.
+    /// \sa  std::string replaceAll(const std::string &_orig,
+    /// const std::string &_key, const std::string &_replacement)
+    void IGNITION_COMMON_VISIBLE replaceAll(std::string &_result,
+        const std::string &_orig,
+        const std::string &_key,
+        const std::string &_replacement);
+
+    /// \brief Replace all occurances of _key with _replacement.
+    /// \param[in] _orig Original string.
+    /// \param[in] _key String to replace.
+    /// \param[in] _replacement The string that replaces _key.
+    /// \return The new string that has had _key replaced with _replacement.
+    /// \sa void common::replaceAll(std::string &_result,
+    /// const std::string &_orig, const std::string &_key,
+    /// const std::string &_replacement)
+    std::string IGNITION_COMMON_VISIBLE replaceAll(const std::string &_orig,
+        const std::string &_key,
+        const std::string &_replacement);
   }
 }
 
