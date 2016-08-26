@@ -50,7 +50,7 @@ namespace ignition
     /// \param[in] _dir Name of directory in which to store the log file.
     /// \param[in] _file Name of log file for ignlog messages.
     #define ignLogInit(_dir, _file)\
-        (ignition::common::Console::log.Init(_dir, _file))
+        ignition::common::Console::log.Init(_dir, _file)
 
     /// \brief Get the full path of the directory where the log files are stored
     /// \return Full path of the directory

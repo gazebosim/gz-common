@@ -1,17 +1,15 @@
 cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 
-set(IGN_PROJECT_NAME "common")
+project (ignition-common)
+
+string (SUBSTRING ${PROJECT_NAME} 9 -1 IGN_PROJECT_NAME)
+string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
+string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
 set (PROJECT_MAJOR_VERSION 0)
 set (PROJECT_MINOR_VERSION 1)
 set (PROJECT_PATCH_VERSION 0)
 
-project (ignition-${IGN_PROJECT_NAME}${PROJECT_MAJOR_VERSION})
-set(PROJECT_NAME_NO_VERSION "ignition-${IGN_PROJECT_NAME}")
-string (TOLOWER ${PROJECT_NAME_NO_VERSION} PROJECT_NAME_NO_VERSION_LOWER)
-string (TOUPPER ${PROJECT_NAME_NO_VERSION} PROJECT_NAME_NO_VERSION_UPPER)
-string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
-string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 set(PROJECT_EXPORT_NAME ${PROJECT_NAME_LOWER})
 set(PROJECT_LIBRARY_TARGET_NAME ${PROJECT_NAME_LOWER})
 
@@ -20,7 +18,7 @@ set (PROJECT_VERSION_FULL
   ${PROJECT_MAJOR_VERSION}.${PROJECT_MINOR_VERSION}.${PROJECT_PATCH_VERSION})
 
 
-message (STATUS "${PROJECT_NAME_NO_VERSION} version ${PROJECT_VERSION_FULL}")
+message (STATUS "${PROJECT_NAME} version ${PROJECT_VERSION_FULL}")
 
 set (project_cmake_dir ${PROJECT_SOURCE_DIR}/cmake
   CACHE PATH "Location of CMake scripts")
@@ -104,12 +102,7 @@ if(LD_LIBRARY_PATH)
   set (ENV{LD_LIBRARY_PATH} ${LD_LIBRARY_PATH}:$ENV{LD_LIBRARY_PATH})
 endif()
 
-
-set (INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}")
-set (INCLUDE_INSTALL_DIR_POSTFIX 
-  "ignition/${IGN_PROJECT_NAME}${PROJECT_MAJOR_VERSION}")
-set (INCLUDE_INSTALL_DIR_FULL
-  "${INCLUDE_INSTALL_DIR}/${INCLUDE_INSTALL_DIR_POSTFIX}")
+set (INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}/ignition")
 set (LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR})
 set (BIN_INSTALL_DIR ${CMAKE_INSTALL_BINDIR})
 
@@ -290,25 +283,14 @@ else (build_errors)
 
   ########################################
   # Make the cmake config files
-  set(PKG_NAME ${PROJECT_NAME_NO_VERSION_UPPER})
-  set(cmake_conf_file "${PROJECT_NAME_LOWER}-config.cmake")
-  set(cmake_conf_version_file "${PROJECT_NAME_LOWER}-config-version.cmake")
-  set(cmake_targets_file      "${PROJECT_NAME_LOWER}-targets.cmake")
+  set(PKG_NAME ${PROJECT_NAME_UPPER})
+  set(PKG_LIBRARIES ${PROJECT_NAME_LOWER}${PROJECT_MAJOR_VERSION})
+  set(cmake_conf_file "${PROJECT_NAME_LOWER}${PROJECT_MAJOR_VERSION}-config.cmake")
+  set(cmake_conf_version_file "${PROJECT_NAME_LOWER}${PROJECT_MAJOR_VERSION}-config-version.cmake")
 
-  set(PKG_DEPENDS)
-
-  if(WIN32 AND NOT CYGWIN)
-    set(CMAKE_CONFIG_INSTALL_DIR CMake)
-  else()
-    set(CMAKE_CONFIG_INSTALL_DIR
-      ${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME_LOWER}/)
-  endif()
-
-  configure_package_config_file(
+  configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/ignition-config.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file}"
-    PATH_VARS LIB_INSTALL_DIR INCLUDE_INSTALL_DIR_FULL
-    INSTALL_DESTINATION ${CMAKE_CONFIG_INSTALL_DIR})
+    "${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file}" @ONLY)
 
   # Use write_basic_package_version_file to generate a ConfigVersion file that
   # allow users of gazebo to specify the API or version to depend on
@@ -323,19 +305,7 @@ else (build_errors)
   install(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file}
     ${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_version_file}
-    DESTINATION ${CMAKE_CONFIG_INSTALL_DIR} COMPONENT cmake)
-    
-  # Create *-targets.cmake file for build directory
-  # TODO: keep this instruction until we depend on CMake 3
-  #       then change the first line from TARGETS ...  
-  #       to EXPORT ... to match the format used in install(EXPORT
-  export(TARGETS ${PROJECT_LIBRARY_TARGET_NAME}
-         FILE  ${CMAKE_BINARY_DIR}/${cmake_targets_file})
-
-  # Install *-targets.cmake file
-  install(EXPORT ${PROJECT_EXPORT_NAME}
-          DESTINATION ${CMAKE_CONFIG_INSTALL_DIR}
-          FILE ${cmake_targets_file})
+    DESTINATION ${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME_LOWER}${PROJECT_MAJOR_VERSION}/ COMPONENT cmake)
 
   ########################################
   # If present, load platform-specific build hooks.  This system is used,
