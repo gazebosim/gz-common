@@ -32,6 +32,8 @@
 #include <list>
 #include <functional>
 
+#include <ignition/common/System.hh>
+
 namespace ignition
 {
   namespace common
@@ -43,7 +45,7 @@ namespace ignition
     /// \brief Functions to handle getting system paths, keeps track of:
     ///        \li SystemPaths#pluginPaths - plugin library paths
     ///            for common::WorldPlugin
-    class SystemPaths
+    class IGNITION_COMMON_VISIBLE  SystemPaths
     {
       /// \brief Constructor for SystemPaths
       public: SystemPaths();

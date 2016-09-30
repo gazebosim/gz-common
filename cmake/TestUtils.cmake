@@ -1,7 +1,7 @@
 #################################################
 macro (ign_build_tests)
-  # Find the Python interpreter for running the 
-  # check_test_ran.py script 
+  # Find the Python interpreter for running the
+  # check_test_ran.py script
   find_package(PythonInterp QUIET)
 
   # Build all the tests
@@ -11,6 +11,11 @@ macro (ign_build_tests)
     if(USE_LOW_MEMORY_TESTS)
       add_definitions(-DUSE_LOW_MEMORY_TESTS=1)
     endif(USE_LOW_MEMORY_TESTS)
+
+    if (BINARY_NAME STREQUAL "UNIT_ColladaExporter_TEST")
+	    list (APPEND GTEST_SOURCE_file ${CMAKE_SOURCE_DIR}/src/tinyxml2/ignition/tinyxml2.cpp)
+    endif()
+
     add_executable(${BINARY_NAME} ${GTEST_SOURCE_file})
 
     add_dependencies(${BINARY_NAME}

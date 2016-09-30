@@ -97,7 +97,7 @@ target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
   ${libswscale_LIBRARIES}
   )
 
-if (UNIX)
+if (UNIX AND NOT APPLE)
   target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME} rt)
 
   # Need to add default visibility to ignition-msgs
