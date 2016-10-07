@@ -117,18 +117,18 @@ TEST_F(MeshTest, Mesh)
 
   // add material
   common::MaterialPtr material(new common::Material());
-  EXPECT_TRUE(material != NULL);
+  EXPECT_TRUE(material != nullptr);
 
   mesh->AddMaterial(material);
   EXPECT_EQ(mesh->MaterialCount(), 1u);
   EXPECT_EQ(mesh->MaterialByIndex(0u), material);
-  EXPECT_TRUE(mesh->MaterialByIndex(1u) == NULL);
-  EXPECT_EQ(mesh->IndexOfMaterial(material), 0);
-  EXPECT_EQ(mesh->IndexOfMaterial(NULL), -1);
+  EXPECT_TRUE(mesh->MaterialByIndex(1u) == nullptr);
+  EXPECT_EQ(mesh->IndexOfMaterial(material.get()), 0);
+  EXPECT_EQ(mesh->IndexOfMaterial(nullptr), -1);
 
   // skeleton
   common::SkeletonPtr skeleton(new common::Skeleton());
-  EXPECT_TRUE(skeleton != NULL);
+  EXPECT_TRUE(skeleton != nullptr);
   EXPECT_FALSE(mesh->HasSkeleton());
   mesh->SetSkeleton(skeleton);
   EXPECT_TRUE(mesh->HasSkeleton());

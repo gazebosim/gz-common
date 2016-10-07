@@ -31,6 +31,7 @@ set (headers
   MovingWindowFilter.hh
   NodeAnimation.hh
   NodeTransform.hh
+  OBJLoader.hh
   SemanticVersion.hh
   SingletonT.hh
   Skeleton.hh

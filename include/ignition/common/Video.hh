@@ -45,8 +45,7 @@ namespace ignition
 
       /// \brief Load a video file
       /// \param[in] _filename Full path of the video file
-      /// \return false if HAVE_FFMPEG is not defined or if a video stream
-      /// can't be found
+      /// \return false if  a video stream can't be found
       public: bool Load(const std::string &_filename);
 
       /// \brief Get the width of the video in pixels
@@ -59,7 +58,7 @@ namespace ignition
 
       /// \brief Get the next frame of the video.
       /// \param[out] _img Image in which the frame is stored
-      /// \return false if HAVE_FFMPEG is not defined, true otherwise
+      /// \return  false on error
       public: bool NextFrame(unsigned char **_buffer);
 
       /// \brief free up open Video object, close files, streams

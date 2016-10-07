@@ -19,6 +19,7 @@
 
 #include <stdint.h>
 #include <string>
+#include <memory>
 #include <ignition/common/System.hh>
 
 namespace ignition
@@ -63,7 +64,7 @@ namespace ignition
       private: void Cleanup();
 
       /// \brief Private data pointer
-      private: AudioDecoderPrivate *data;
+      private: std::unique_ptr<AudioDecoderPrivate> data;
     };
   }
 }

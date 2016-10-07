@@ -129,6 +129,21 @@ if (PKG_CONFIG_FOUND)
     endif ()
 
     ########################################
+    # Find AV device. Only check for this on linux.
+    if (UNIX)
+      pkg_check_modules(libavdevice libavdevice>="56.4.100")
+      if (NOT libavdevice_FOUND)
+        BUILD_WARNING ("libavdevice not found. Recording to a video device will be disabled.")
+      endif ()
+    endif ()
+  
+    if (NOT libavdevice_FOUND)
+      set (HAVE_AVDEVICE False)
+    else()
+      set (HAVE_AVDEVICE True)
+    endif()
+
+    ########################################
     # Find AV format
     pkg_check_modules(libavformat libavformat)
     if (NOT libavformat_FOUND)
@@ -142,7 +157,6 @@ if (PKG_CONFIG_FOUND)
       BUILD_ERROR("libavcodec not found.")
     endif()
 
-
     ########################################
     # Find avutil
     pkg_check_modules(libavutil libavutil)
@@ -150,7 +164,6 @@ if (PKG_CONFIG_FOUND)
       BUILD_ERROR("libavutil not found.")
     endif ()
   endif()
-
 
   include_directories(${libswscale_INCLUDE_DIRS})
   link_directories(${libswscale_LIBRARY_DIRS})
@@ -163,5 +176,8 @@ if (PKG_CONFIG_FOUND)
 
   include_directories(${libavutil_INCLUDE_DIRS})
   link_directories(${libavutil_LIBRARY_DIRS})
+
+  include_directories(${libavdevice_INCLUDE_DIRS})
+  link_directories(${libavdevice_LIBRARY_DIRS})
 
 endif(PKG_CONFIG_FOUND)

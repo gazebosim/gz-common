@@ -118,8 +118,9 @@ namespace ignition
 
       /// \brief Get the index of material
       /// \param[in] _mat The material
-      /// \return The index of the material or -1 if not found.
-      public: int IndexOfMaterial(const MaterialPtr &_mat) const;
+      /// \return The index of the material or -1 if not found, or _mat is
+      /// null.
+      public: int IndexOfMaterial(const Material *_mat) const;
 
       /// \brief Get a child submesh by index
       /// \param[in] _index Index of the submesh

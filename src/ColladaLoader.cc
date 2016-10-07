@@ -20,6 +20,7 @@
 #include <unordered_map>
 #include <map>
 #include <vector>
+#include <set>
 
 #include <ignition/math/Helpers.hh>
 #include <ignition/math/Matrix4.hh>
@@ -1683,7 +1684,7 @@ void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
 
     MaterialPtr mat = this->LoadMaterial(matStr);
 
-    matIndex = _mesh->IndexOfMaterial(mat);
+    matIndex = _mesh->IndexOfMaterial(mat.get());
     if (matIndex < 0)
       matIndex = _mesh->AddMaterial(mat);
 
@@ -1716,7 +1717,7 @@ void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
 
   // read input elements. A vector of int is used because there can be
   // multiple TEXCOORD inputs.
-  std::map<const unsigned int, std::vector<int>> inputs;
+  std::map<const unsigned int, std::set<int>> inputs;
   unsigned int inputSize = 0;
   while (polylistInputXml)
   {
@@ -1730,32 +1731,31 @@ void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
           positionDupMap, normalDupMap);
       if (norms.size() > count)
         combinedVertNorms = true;
-      inputs[VERTEX].push_back(ignition::math::parseInt(offset));
-      inputSize++;
+      inputs[VERTEX].insert(ignition::math::parseInt(offset));
     }
     else if (semantic == "NORMAL")
     {
       this->LoadNormals(source, _transform, norms, normalDupMap);
       combinedVertNorms = false;
-      inputs[NORMAL].push_back(ignition::math::parseInt(offset));
-      inputSize++;
+      inputs[NORMAL].insert(ignition::math::parseInt(offset));
     }
     else if (semantic == "TEXCOORD")
     {
       this->LoadTexCoords(source, texcoords, texDupMap);
-      inputs[TEXCOORD].push_back(ignition::math::parseInt(offset));
-      inputSize++;
+      inputs[TEXCOORD].insert(ignition::math::parseInt(offset));
     }
     else
     {
-      inputs[otherSemantics++].push_back(ignition::math::parseInt(offset));
-      inputSize++;
+      inputs[otherSemantics++].insert(ignition::math::parseInt(offset));
       ignwarn << "Polylist input semantic: '" << semantic << "' is currently"
           << " not supported" << std::endl;
     }
 
     polylistInputXml = polylistInputXml->NextSiblingElement("input");
   }
+
+  for (const auto &input : inputs)
+    inputSize += input.second.size();
 
   // read vcount
   // break poly into triangles
@@ -1776,15 +1776,17 @@ void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
   // indices, used for identifying vertices that can be shared.
   std::map<unsigned int, std::vector<GeometryIndices> > vertexIndexMap;
   unsigned int *values = new unsigned int[inputSize];
+  memset(values, 0, inputSize);
 
   std::vector<std::string> strs = split(pStr, " ");
   std::vector<std::string>::iterator strs_iter = strs.begin();
   for (unsigned int l = 0; l < vcounts.size(); ++l)
   {
     // put us at the beginning of the polygon list
-    if (l > 0) strs_iter += inputSize * vcounts[l-1];
+    if (l > 0)
+      strs_iter += inputSize * vcounts[l-1];
 
-    for (unsigned int k = 2; k < (unsigned int)vcounts[l]; ++k)
+    for (unsigned int k = 2; k < static_cast<unsigned int>(vcounts[l]); ++k)
     {
       // if vcounts[l] = 5, then read 0,1,2, then 0,2,3, 0,3,4,...
       // here k = the last number in the series
@@ -1804,16 +1806,7 @@ void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
         for (unsigned int i = 0; i < inputSize; ++i)
         {
           values[i] = ignition::math::parseInt(strs_iter[triangle_index+i]);
-          /*ignerr << "debug parsing "
-                << " poly-i[" << l
-                << "] tri-end-index[" << k
-                << "] tri-vertex-i[" << j
-                << "] triangle[" << triangle_index
-                << "] input[" << i
-                << "] value[" << values[i]
-                << "]\n"; */
         }
-
 
         unsigned int daeVertIndex = 0;
         bool addIndex = inputs[VERTEX].empty();
@@ -1824,7 +1817,7 @@ void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
         {
           // Get the vertex position index value. If it is a duplicate then use
           // the existing index instead
-          daeVertIndex = values[inputs[VERTEX][0]];
+          daeVertIndex = values[*inputs[VERTEX].begin()];
           if (positionDupMap.find(daeVertIndex) != positionDupMap.end())
             daeVertIndex = positionDupMap[daeVertIndex];
 
@@ -1853,7 +1846,8 @@ void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
                 // Get the vertex normal index value. If the normal is a
                 // duplicate then reset the index to the first instance of the
                 // duplicated position
-                unsigned int remappedNormalIndex = values[inputs[NORMAL][0]];
+                unsigned int remappedNormalIndex =
+                  values[*inputs[NORMAL].begin()];
                 if (normalDupMap.find(remappedNormalIndex)
                     != normalDupMap.end())
                  {
@@ -1863,13 +1857,15 @@ void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
                 if (iv.normalIndex == remappedNormalIndex)
                   normEqual = true;
               }
+
               if (!inputs[TEXCOORD].empty())
               {
                 // Get the vertex texcoord index value. If the texcoord is a
                 // duplicate then reset the index to the first instance of the
                 // duplicated texcoord
                 unsigned int remappedTexcoordIndex =
-                  values[inputs[TEXCOORD][0]];
+                  values[*inputs[TEXCOORD].begin()];
+
                 if (texDupMap.find(remappedTexcoordIndex) != texDupMap.end())
                   remappedTexcoordIndex = texDupMap[remappedTexcoordIndex];
 
@@ -1924,17 +1920,24 @@ void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
           }
           if (!inputs[VERTEX].empty())
           {
-            unsigned int inputRemappedNormalIndex = values[inputs[NORMAL][0]];
+            unsigned int inputRemappedNormalIndex =
+              values[*inputs[NORMAL].begin()];
+
             if (normalDupMap.find(inputRemappedNormalIndex)
                 != normalDupMap.end())
+            {
               inputRemappedNormalIndex = normalDupMap[inputRemappedNormalIndex];
+            }
+
             subMesh->AddNormal(norms[inputRemappedNormalIndex]);
             input.normalIndex = inputRemappedNormalIndex;
           }
+
           if (!inputs[TEXCOORD].empty())
           {
             unsigned int inputRemappedTexcoordIndex =
-              values[inputs[TEXCOORD][0]];
+              values[*inputs[TEXCOORD].begin()];
+
             if (texDupMap.find(inputRemappedTexcoordIndex) != texDupMap.end())
             {
               inputRemappedTexcoordIndex =
@@ -1982,7 +1985,7 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
       matStr = iter->second;
 
     MaterialPtr mat = this->LoadMaterial(matStr);
-    matIndex = _mesh->IndexOfMaterial(mat);
+    matIndex = _mesh->IndexOfMaterial(mat.get());
     if (matIndex < 0)
       matIndex = _mesh->AddMaterial(mat);
 

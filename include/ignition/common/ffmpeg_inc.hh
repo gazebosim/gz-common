@@ -23,18 +23,27 @@
 #pragma GCC system_header
 #endif
 
-#ifdef HAVE_FFMPEG
 #ifndef INT64_C
 #define INT64_C(c) (c ## LL)
 #define UINT64_C(c) (c ## ULL)
 #endif
 
+#ifndef AV_ERROR_MAX_STRING_SIZE
+#define AV_ERROR_MAX_STRING_SIZE 64
+#endif
+
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
-#include <libavutil/imgutils.h>
-#include <libavutil/opt.h>
 #include <libswscale/swscale.h>
+#include <libavutil/mathematics.h>
+#include <libavutil/opt.h>
+#include <libavutil/error.h>
+#include <libavutil/imgutils.h>
+
+#if defined(__linux__) && defined(HAVE_AVDEVICE)
+#include <libavdevice/avdevice.h>
+#endif
 }
 
 #include <ignition/common/System.hh>
@@ -57,6 +66,5 @@ namespace ignition
     void AVPacketUnref(AVPacket *_packet);
   }
 }
-#endif
 
 #endif

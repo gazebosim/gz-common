@@ -30,6 +30,7 @@ set (sources
   MouseEvent.cc
   NodeAnimation.cc
   NodeTransform.cc
+  OBJLoader.cc
   SemanticVersion.cc
   Skeleton.cc
   SkeletonAnimation.cc
@@ -73,6 +74,7 @@ set (gtest_sources
   MeshManager_TEST.cc
   MouseEvent_TEST.cc
   MovingWindowFilter_TEST.cc
+  OBJLoader_TEST.cc
   SemanticVersion_TEST.cc
   SubMesh_TEST.cc
   SVGLoader_TEST.cc

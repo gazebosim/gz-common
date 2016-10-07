@@ -16,7 +16,6 @@
 */
 #include "ignition/common/ffmpeg_inc.hh"
 
-#ifdef HAVE_FFMPEG
 using namespace ignition;
 
 //////////////////////////////////////////////////
@@ -48,6 +47,3 @@ void common::AVPacketUnref(AVPacket *_packet)
   av_free_packet(_packet);
 #endif
 }
-
-// ifdef HAVE_FFMPEG
-#endif

@@ -25,10 +25,6 @@
 using namespace ignition;
 using namespace common;
 
-struct AVFormatContext;
-struct AVCodecContext;
-struct AVCodec;
-
 class ignition::common::AudioDecoderPrivate
 {
   /// \brief libav Format I/O context.
@@ -47,30 +43,15 @@ class ignition::common::AudioDecoderPrivate
   public: std::string filename;
 };
 
-class Initializer
-{
-  public: Initializer()
-  {
-#ifdef HAVE_FFMPEG
-    static bool first = true;
-    if (first)
-    {
-      first = false;
-      avcodec_register_all();
-      av_register_all();
-    }
-#endif
-  }
-};
-static Initializer init;
-
 /////////////////////////////////////////////////
 AudioDecoder::AudioDecoder()
   : data(new AudioDecoderPrivate)
 {
-  this->data->formatCtx = NULL;
-  this->data->codecCtx = NULL;
-  this->data->codec = NULL;
+  ignition::common::load();
+
+  this->data->formatCtx = nullptr;
+  this->data->codecCtx = nullptr;
+  this->data->codec = nullptr;
   this->data->audioStream = 0;
 }
 
@@ -78,14 +59,11 @@ AudioDecoder::AudioDecoder()
 AudioDecoder::~AudioDecoder()
 {
   this->Cleanup();
-  delete this->data;
-  this->data = NULL;
 }
 
 /////////////////////////////////////////////////
 void AudioDecoder::Cleanup()
 {
-#ifdef HAVE_FFMPEG
   // Close the codec
   if (this->data->codecCtx)
     avcodec_close(this->data->codecCtx);
@@ -93,27 +71,25 @@ void AudioDecoder::Cleanup()
   // Close the audio file
   if (this->data->formatCtx)
     avformat_close_input(&this->data->formatCtx);
-#endif
 }
 
 /////////////////////////////////////////////////
-#ifdef HAVE_FFMPEG
 bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
 {
   AVPacket packet, packet1;
   int bytesDecoded = 0;
   unsigned int maxBufferSize = 0;
-  AVFrame *decodedFrame = NULL;
+  AVFrame *decodedFrame = nullptr;
 
-  if (this->data->codec == NULL)
+  if (this->data->codec == nullptr)
   {
     ignerr << "Set an audio file before decoding.\n";
     return false;
   }
 
-  if (_outBufferSize == NULL)
+  if (_outBufferSize == nullptr)
   {
-    ignerr << "outBufferSize is NULL!!\n";
+    ignerr << "outBufferSize is null!!\n";
     return false;
   }
 
@@ -122,21 +98,21 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
   if (*_outBuffer)
   {
     delete [] *_outBuffer;
-    *_outBuffer = NULL;
+    *_outBuffer = nullptr;
   }
 
   bool result = true;
 
   if (!decodedFrame)
   {
-    if (!(decodedFrame = avcodec_alloc_frame()))
+    if (!(decodedFrame = common::AVFrameAlloc()))
     {
       ignerr << "Audio decoder out of memory\n";
       result = false;
     }
   }
   else
-    avcodec_get_frame_defaults(decodedFrame);
+    common::AVFrameUnref(decodedFrame);
 
   av_init_packet(&packet);
   while (av_read_frame(this->data->formatCtx, &packet) == 0)
@@ -150,8 +126,15 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
       {
         // Some frames rely on multiple packets, so we have to make sure
         // the frame is finished before we can use it
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         bytesDecoded = avcodec_decode_audio4(this->data->codecCtx, decodedFrame,
             &gotFrame, &packet1);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 
         if (gotFrame)
         {
@@ -179,36 +162,24 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
         packet1.size -= bytesDecoded;
       }
     }
-    av_free_packet(&packet);
+    AVPacketUnref(&packet);
   }
 
-  av_free_packet(&packet);
+  AVPacketUnref(&packet);
 
   // Seek to the beginning so that it can be decoded again, if necessary.
   av_seek_frame(this->data->formatCtx, this->data->audioStream, 0, 0);
 
   return result;
 }
-#else
-bool AudioDecoder::Decode(uint8_t ** /*_outBuffer*/,
-    unsigned int * /*_outBufferSize*/)
-{
-  return true;
-}
-#endif
 
 /////////////////////////////////////////////////
 int AudioDecoder::SampleRate()
 {
-#ifdef HAVE_FFMPEG
   return this->data->codecCtx->sample_rate;
-#else
-  return 0;
-#endif
 }
 
 /////////////////////////////////////////////////
-#ifdef HAVE_FFMPEG
 bool AudioDecoder::SetFile(const std::string &_filename)
 {
   unsigned int i;
@@ -217,10 +188,10 @@ bool AudioDecoder::SetFile(const std::string &_filename)
 
   // Open file
   if (avformat_open_input(&this->data->formatCtx,
-        _filename.c_str(), NULL, NULL) < 0)
+        _filename.c_str(), nullptr, nullptr) < 0)
   {
     ignerr << "Unable to open audio file[" << _filename << "]\n";
-    this->data->formatCtx = NULL;
+    this->data->formatCtx = nullptr;
     return false;
   }
 
@@ -228,11 +199,11 @@ bool AudioDecoder::SetFile(const std::string &_filename)
   av_log_set_level(0);
 
   // Retrieve some information
-  if (avformat_find_stream_info(this->data->formatCtx, NULL) < 0)
+  if (avformat_find_stream_info(this->data->formatCtx, nullptr) < 0)
   {
     ignerr << "Unable to find stream info.\n";
     avformat_close_input(&this->data->formatCtx);
-    this->data->formatCtx = NULL;
+    this->data->formatCtx = nullptr;
 
     return false;
   }
@@ -244,8 +215,15 @@ bool AudioDecoder::SetFile(const std::string &_filename)
   this->data->audioStream = -1;
   for (i = 0; i < this->data->formatCtx->nb_streams; ++i)
   {
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     if (this->data->formatCtx->streams[i]->codec->codec_type ==
         AVMEDIA_TYPE_AUDIO)
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
     {
       this->data->audioStream = i;
       break;
@@ -256,22 +234,30 @@ bool AudioDecoder::SetFile(const std::string &_filename)
   {
     ignerr << "Couldn't find audio stream.\n";
     avformat_close_input(&this->data->formatCtx);
-    this->data->formatCtx = NULL;
+    this->data->formatCtx = nullptr;
 
     return false;
   }
 
   // Get the audio stream codec
-  this->data->codecCtx = this->data->formatCtx->streams[audioStream]->codec;
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->data->codecCtx = this->data->formatCtx->streams[
+    this->data->audioStream]->codec;
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 
   // Find a decoder
-  this->data->codec = avcodec_find_decoder(codecCtx->codec_id);
+  this->data->codec = avcodec_find_decoder(this->data->codecCtx->codec_id);
 
-  if (this->data->codec == NULL)
+  if (this->data->codec == nullptr)
   {
     ignerr << "Couldn't find codec for audio stream.\n";
     avformat_close_input(&this->data->formatCtx);
-    this->data->formatCtx = NULL;
+    this->data->formatCtx = nullptr;
 
     return false;
   }
@@ -280,11 +266,11 @@ bool AudioDecoder::SetFile(const std::string &_filename)
     this->data->codecCtx->flags |= CODEC_FLAG_TRUNCATED;
 
   // Open codec
-  if (avcodec_open2(this->data->codecCtx, this->data->codec, NULL) < 0)
+  if (avcodec_open2(this->data->codecCtx, this->data->codec, nullptr) < 0)
   {
     ignerr << "Couldn't open audio codec.\n";
     avformat_close_input(&this->data->formatCtx);
-    this->data->formatCtx = NULL;
+    this->data->formatCtx = nullptr;
 
     return false;
   }
@@ -293,12 +279,6 @@ bool AudioDecoder::SetFile(const std::string &_filename)
 
   return true;
 }
-#else
-bool AudioDecoder::SetFile(const std::string & /*_filename*/)
-{
-  return false;
-}
-#endif
 
 /////////////////////////////////////////////////
 std::string AudioDecoder::File() const

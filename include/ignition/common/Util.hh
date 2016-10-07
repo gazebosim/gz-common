@@ -101,6 +101,10 @@ namespace ignition
     /// \brief A runtime error.
     typedef std::runtime_error exception;
 
+    /// \brief Load external libraries, such as libav. It is safe to call
+    /// this multiple times.
+    void load();
+
     /// \brief Get the wall time as an ISO string: YYYY-MM-DDTHH:MM:SS.NS
     /// \return The current wall time as an ISO string.
     std::string IGNITION_COMMON_VISIBLE systemTimeISO();

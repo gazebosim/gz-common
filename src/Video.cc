@@ -59,7 +59,6 @@ Video::~Video()
 /////////////////////////////////////////////////
 void Video::Cleanup()
 {
-#ifdef HAVE_FFMPEG
   // Free the YUV frame
   av_free(this->dataPtr->avFrame);
 
@@ -70,11 +69,9 @@ void Video::Cleanup()
   avcodec_close(this->dataPtr->codecCtx);
 
   av_free(this->dataPtr->avFrameDst);
-#endif
 }
 
 /////////////////////////////////////////////////
-#ifdef HAVE_FFMPEG
 bool Video::Load(const std::string &_filename)
 {
   AVCodec *codec = nullptr;
@@ -185,15 +182,8 @@ bool Video::Load(const std::string &_filename)
 
   return true;
 }
-#else
-bool Video::Load(const std::string &/*_filename*/)
-{
-  return false;
-}
-#endif
 
 /////////////////////////////////////////////////
-#ifdef HAVE_FFMPEG
 bool Video::NextFrame(unsigned char **_buffer)
 {
   AVPacket packet, tmpPacket;
@@ -229,7 +219,7 @@ bool Video::NextFrame(unsigned char **_buffer)
       // processing the image if available
       if (frameAvailable)
       {
-        sws_scale(swsCtx, this->dataPtr->avFrame->data,
+        sws_scale(this->dataPtr->swsCtx, this->dataPtr->avFrame->data,
             this->dataPtr->avFrame->linesize, 0,
             this->dataPtr->codecCtx->height, this->dataPtr->avFrameDst->data,
             this->dataPtr->avFrameDst->linesize);
@@ -249,29 +239,15 @@ bool Video::NextFrame(unsigned char **_buffer)
 
   return true;
 }
-#else
-bool Video::NextFrame(unsigned char ** /*_buffer*/)
-{
-  return false;
-}
-#endif
 
 /////////////////////////////////////////////////
 int Video::Width() const
 {
-#ifdef HAVE_FFMPEG
   return this->dataPtr->codecCtx->width;
-#else
-  return 0;
-#endif
 }
 
 /////////////////////////////////////////////////
 int Video::Height() const
 {
-#ifdef HAVE_FFMPEG
   return this->dataPtr->codecCtx->height;
-#else
-  return 0;
-#endif
 }

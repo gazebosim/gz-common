@@ -253,12 +253,15 @@ MaterialPtr Mesh::MaterialByIndex(const unsigned int index) const
 }
 
 //////////////////////////////////////////////////
-int Mesh::IndexOfMaterial(const MaterialPtr &_mat) const
+int Mesh::IndexOfMaterial(const Material *_mat) const
 {
-  for (unsigned int i = 0; i < this->dataPtr->materials.size(); ++i)
+  if (_mat)
   {
-    if (this->dataPtr->materials[i] == _mat)
-      return i;
+    for (unsigned int i = 0; i < this->dataPtr->materials.size(); ++i)
+    {
+      if (this->dataPtr->materials[i].get() == _mat)
+        return i;
+    }
   }
 
   return -1;

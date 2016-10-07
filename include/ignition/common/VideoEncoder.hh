@@ -48,18 +48,27 @@ namespace ignition
       public: virtual ~VideoEncoder();
 
       /// \brief Start the encoder. This should be called once. Add new
-      /// frames to the video using the AddFrame function.
+      /// frames to the video using the AddFrame function. Use SaveToFile
+      /// when the video is complete.
       /// \param[in] _width Width in pixels of the output video.
       /// \param[in] _height Height in pixels of the output video.
       /// \param[in] _format String that represents the video type.
-      /// Supported types include: "avi", "ogv", mp4".
+      /// Supported types include: "avi", "ogv", mp4", "v4l2". If using
+      /// "v4l2", you must also specify a _filename.
       /// \param[in] _bitRate Bit rate to encode the video. A value of zero
       /// will cause this function to automatically compute a bitrate.
+      /// \param[in] _filename Name of the file that stores the video while it
+      /// is being created. This is a temporary file when recording to
+      /// disk, or a video4linux loopback device like /dev/video0 when
+      /// the _format is "v4l2". If blank, a default temporary file is used.
+      /// However, the "v4l2" _format must be accompanied with a video
+      /// loopback device filename.
       /// \return True on success
       public: bool Start(
+                const std::string &_format = VIDEO_ENCODER_FORMAT_DEFAULT,
+                const std::string &_filename = "",
                 const unsigned int _width = VIDEO_ENCODER_WIDTH_DEFAULT,
                 const unsigned int _height = VIDEO_ENCODER_HEIGHT_DEFAULT,
-                const std::string &_format = VIDEO_ENCODER_FORMAT_DEFAULT,
                 const unsigned int _fps = VIDEO_ENCODER_FPS_DEFAULT,
                 const unsigned int _bitRate = VIDEO_ENCODER_BITRATE_DEFAULT);
 
@@ -70,12 +79,13 @@ namespace ignition
 
       /// \brief True if the enoder has been started, false otherwise
       /// \return True if Start has been called.
-      public: bool IsEncoding();
+      public: bool IsEncoding() const;
 
       /// \brief Add a single frame to be encoded
       /// \param[in] _frame Image buffer to be encoded
       /// \param[in] _width Input frame width
       /// \param[in] _height Input frame height
+      /// \return True on success
       public: bool AddFrame(const unsigned char *_frame,
                             const unsigned int _width,
                             const unsigned int _height);
@@ -91,7 +101,7 @@ namespace ignition
                   const unsigned int _height,
                   const std::chrono::steady_clock::time_point &_timestamp);
 
-      /// \brief Write the video to to disk
+      /// \brief Write the video to disk
       /// param[in] _filename File in which to save the encoded data
       /// \return True on success.
       public: bool SaveToFile(const std::string &_filename);
@@ -108,18 +118,9 @@ namespace ignition
       /// memory. This will also delete any temporary files.
       public: void Reset();
 
-#ifdef _WIN32
-// Disable warning C4251
-#pragma warning(push)
-#pragma warning(disable: 4251)
-#endif
       /// \internal
       /// \brief Private data pointer
       private: std::unique_ptr<VideoEncoderPrivate> dataPtr;
-#ifdef _WIN32
-#pragma warning(pop)
-#endif
-
     };
   }
 }
