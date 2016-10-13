@@ -192,7 +192,6 @@ bool VideoEncoder::Start(const std::string &_format,
 
   // The remainder of this function handles FFMPEG initialization of a video
   // stream
-  AVOutputFormat *outputFormat = nullptr;
 
   // This 'if' and 'free' are just for safety. We chech the value of formatCtx
   // below.
@@ -204,6 +203,7 @@ bool VideoEncoder::Start(const std::string &_format,
   if (this->dataPtr->format.compare("v4l2") == 0)
   {
 #if LIBAVDEVICE_VERSION_INT >= AV_VERSION_INT(56, 4, 100)
+    AVOutputFormat *outputFormat = nullptr;
     while ((outputFormat = av_output_video_device_next(outputFormat))
            != nullptr)
     {
@@ -224,19 +224,26 @@ bool VideoEncoder::Start(const std::string &_format,
   }
   else
   {
-    outputFormat = av_guess_format(nullptr,
+    AVOutputFormat *outputFormat = av_guess_format(nullptr,
                                    this->dataPtr->filename.c_str(), nullptr);
 
     if (!outputFormat)
     {
       ignwarn << "Could not deduce output format from file extension."
         << "Using MPEG.\n";
-      outputFormat = av_guess_format("mpeg", nullptr, nullptr);
     }
 
 #if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(56, 40, 1)
         this->dataPtr->formatCtx = avformat_alloc_context();
-        this->dataPtr->formatCtx->oformat = outputFormat;
+        if (outputFormat)
+        {
+          this->dataPtr->formatCtx->oformat = outputFormat;
+        }
+        else
+        {
+          this->dataPtr->formatCtx->oformat =
+            av_guess_format("mpeg", nullptr, nullptr);
+        }
 #ifdef WIN32
         _sprintf(this->dataPtr->formatCtx->filename,
                  sizeof(this->dataPtr->formatCtx->filename),

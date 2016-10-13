@@ -151,13 +151,13 @@ namespace ignition
       /// \brief Constructor
       /// \param[in] _c Enum value
       // cppcheck-suppress noExplicitConstructor
-      public: EnumIterator(const Enum _c) : c(_c)
+      public: EnumIterator(const Enum &_c) : c(_c)
       {
       }
 
       /// \brief Equal operator
       /// \param[in] _c Enum value to copy
-      public: EnumIterator &operator=(const Enum _c)
+      public: EnumIterator &operator=(const Enum &_c)
       {
         this->c = _c;
         return *this;
