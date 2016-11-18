@@ -41,6 +41,9 @@
 */
 #include "ignition/common/Base64.hh"
 
+using namespace ignition;
+using namespace common;
+
 static const std::string base64Chars =
 "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 "abcdefghijklmnopqrstuvwxyz"
@@ -53,8 +56,8 @@ static inline bool IsBase64(unsigned char _c)
 }
 
 /////////////////////////////////////////////////
-void Base64Encode(const char *_bytesToEncode, unsigned int _inLen,
-    std::string &_result)
+void Base64::Encode(const char *_bytesToEncode, unsigned int _inLen,
+                    std::string &_result)
 {
   int i = 0;
   unsigned char charArray3[3];
@@ -99,7 +102,7 @@ void Base64Encode(const char *_bytesToEncode, unsigned int _inLen,
 }
 
 /////////////////////////////////////////////////
-std::string Base64Decode(const std::string &_encodedString)
+std::string Base64::Decode(const std::string &_encodedString)
 {
   int inLen = _encodedString.size();
   int i = 0;

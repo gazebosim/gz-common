@@ -344,11 +344,20 @@ void MeshManager::CreatePlane(const std::string &_name,
         vec.X() = (x * xSpace) - halfWidth;
         vec.Y() = (y * ySpace) - halfHeight;
         vec.Z() = -z;
-        vec = xform.TransformAffine(vec);
+        if (!xform.TransformAffine(vec, vec))
+        {
+          ignerr << "Unable tor transform matrix4d\n";
+          continue;
+        }
         subMesh.AddVertex(vec);
 
         // Compute the normal
-        vec = xform.TransformAffine(norm);
+        if (!xform.TransformAffine(norm, vec))
+        {
+          ignerr << "Unable to tranform matrix4d\n";
+          continue;
+        }
+
         subMesh.AddNormal(vec);
 
         // Compute the texture coordinate

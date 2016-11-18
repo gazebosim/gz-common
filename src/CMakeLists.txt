@@ -55,6 +55,7 @@ endif()
 set (gtest_sources
   Animation_TEST.cc
   #AudioDecoder_TEST.cc
+  Base64_TEST.cc
   Battery_TEST.cc
   ColladaExporter_TEST.cc
   ColladaLoader_TEST.cc

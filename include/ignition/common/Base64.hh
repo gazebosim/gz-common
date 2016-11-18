@@ -14,24 +14,31 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_BASE_64_HH_
-#define IGNITION_COMMON_BASE_64_HH_
+#ifndef IGNITION_COMMON_BASE64_HH_
+#define IGNITION_COMMON_BASE64_HH_
 
 #include <string>
 #include <ignition/common/System.hh>
 
-/// \brief Encode a binary string into base 64.
-/// \param[in] _bytesToEncode String of bytes to encode.
-/// \param[in] _len Length of _bytesToEncode.
-/// \param[out] _result Based64 string is appended to this string.
-IGNITION_COMMON_VISIBLE
-void Base64Encode(const char *_bytesToEncode, unsigned int _len,
-    std::string &_result);
+namespace ignition
+{
+  namespace common
+  {
+    class IGNITION_COMMON_VISIBLE Base64
+    {
+      /// \brief Encode a binary string into base 64.
+      /// \param[in] _bytesToEncode String of bytes to encode.
+      /// \param[in] _len Length of _bytesToEncode.
+      /// \param[out] _result Based64 string is appended to this string.
+      public: static void Encode(const char *_bytesToEncode, unsigned int _len,
+                                 std::string &_result);
 
 
-/// \brief Decode a base64 string.
-/// \param[in] _encodedString A base 64 encoded string.
-/// \return The decoded string.
-IGNITION_COMMON_VISIBLE
-std::string Base64Decode(const std::string &_encodedString);
+      /// \brief Decode a base64 string.
+      /// \param[in] _encodedString A base 64 encoded string.
+      /// \return The decoded string.
+      public: static std::string Decode(const std::string &_encodedString);
+    };
+  }
+}
 #endif
