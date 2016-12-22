@@ -20,7 +20,7 @@
 #if defined(__GNUC__)
 #define IGNITION_COMMON_DEPRECATED(version) __attribute__((deprecated))
 #define IGNITION_COMMON_FORCEINLINE __attribute__((always_inline))
-#elif defined(MSVC)
+#elif defined(_WIN32)
 #define IGNITION_COMMON_DEPRECATED(version) ()
 #define IGNITION_COMMON_FORCEINLINE __forceinline
 #else
