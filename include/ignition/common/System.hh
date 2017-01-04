@@ -18,14 +18,14 @@
 #define IGNITION_COMMON_SYSTEM_HH_
 
 #if defined(__GNUC__)
-#define IGN_DEPRECATED(version) __attribute__((deprecated))
-#define IGN_FORCEINLINE __attribute__((always_inline))
-#elif defined(MSVC)
-#define IGN_DEPRECATED(version) ()
-#define IGN_FORCEINLINE __forceinline
+#define IGNITION_COMMON_DEPRECATED(version) __attribute__((deprecated))
+#define IGNITION_COMMON_FORCEINLINE __attribute__((always_inline))
+#elif defined(_WIN32)
+#define IGNITION_COMMON_DEPRECATED(version) ()
+#define IGNITION_COMMON_FORCEINLINE __forceinline
 #else
-#define IGN_DEPRECATED(version) ()
-#define IGN_FORCEINLINE
+#define IGNITION_COMMON_DEPRECATED(version) ()
+#define IGNITION_COMMON_FORCEINLINE
 #endif
 
 /// \def IGNITION_COMMON_VISIBLE
