@@ -7,7 +7,7 @@ include (${project_cmake_dir}/FindFreeimage.cmake)
 
 ########################################
 # Find ignition math
-find_package(ignition-math3 3.0 QUIET)
+find_package(ignition-math3 QUIET)
 if (NOT ignition-math3_FOUND)
   message(STATUS "Looking for ignition-math3-config.cmake - not found")
   BUILD_ERROR ("Missing: Ignition math3 library.")
