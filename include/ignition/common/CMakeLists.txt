@@ -26,6 +26,7 @@ set (headers
   Mesh.hh
   MeshCSG.hh
   MeshExporter.hh
+  MeshLoader.hh
   MeshManager.hh
   MouseEvent.hh
   MovingWindowFilter.hh
@@ -39,6 +40,7 @@ set (headers
   SkeletonNode.hh
   SubMesh.hh
   System.hh
+  SystemPaths.hh
   STLLoader.hh
   SVGLoader.hh
   Time.hh
