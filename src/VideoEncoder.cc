@@ -416,10 +416,11 @@ bool VideoEncoder::Start(const std::string &_format,
   }
 
   // Copy parameters from the context to the video stream
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
+#if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(57, 40, 101)
 //  ret = avcodec_copy_context(this->dataPtr->videoStream->codec,
 //                       this->dataPtr->codecCtx);
 #else
+  // codecpar was implemented in ffmpeg version 3.1
   ret = avcodec_parameters_from_context(
       this->dataPtr->videoStream->codecpar, this->dataPtr->codecCtx);
 #endif
@@ -579,7 +580,7 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
 
   this->dataPtr->avOutFrame->pts = this->dataPtr->frameCount++;
 
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 40, 101)
   int gotOutput = 0;
   AVPacket avPacket;
   av_init_packet(&avPacket);
@@ -619,7 +620,7 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
     }
   }
 
-  av_free_packet(&avPacket);
+  av_packet_unref(&avPacket);
 
 // #else for libavcodec version check
 #else
@@ -666,7 +667,7 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
     }
   }
 
-  av_packet_free(&avPacket);
+  av_packet_unref(avPacket);
 #endif
   return true;
 }
