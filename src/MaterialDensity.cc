@@ -91,7 +91,7 @@ double MaterialDensity::Density(const MaterialDensity::Type _material)
 std::tuple<MaterialDensity::Type, double> MaterialDensity::Nearest(
     const double _value, const double _epsilon)
 {
-  double min = IGN_DBL_MAX;
+  double min = ignition::math::MAX_D;
   std::tuple<MaterialDensity::Type, double> result
   {
     MaterialDensity::Type::END, -1.0
