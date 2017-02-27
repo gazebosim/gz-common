@@ -92,27 +92,33 @@ TEST_F(SubMeshTest, SubMesh)
   submesh->AddNormal(n0);
   EXPECT_EQ(submesh->NormalCount(), 1u);
   EXPECT_EQ(submesh->Normal(0u), n0);
+  EXPECT_TRUE(submesh->HasNormal(0u));
 
   submesh->AddNormal(n1);
   EXPECT_EQ(submesh->NormalCount(), 2u);
   EXPECT_EQ(submesh->Normal(1u), n1);
+  EXPECT_TRUE(submesh->HasNormal(1u));
 
   submesh->AddNormal(n2.X(), n2.Y(), n2.Z());
   EXPECT_EQ(submesh->NormalCount(), 3u);
   EXPECT_EQ(submesh->Normal(2u), n2);
+  EXPECT_TRUE(submesh->HasNormal(2u));
 
   // add texcoord
   submesh->AddTexCoord(uv0);
   EXPECT_EQ(submesh->TexCoordCount(), 1u);
   EXPECT_EQ(submesh->TexCoord(0u), uv0);
+  EXPECT_TRUE(submesh->HasTexCoord(0u));
 
   submesh->AddTexCoord(uv1);
   EXPECT_EQ(submesh->TexCoordCount(), 2u);
   EXPECT_EQ(submesh->TexCoord(1u), uv1);
+  EXPECT_TRUE(submesh->HasTexCoord(1u));
 
   submesh->AddTexCoord(uv2.X(), uv2.Y());
   EXPECT_EQ(submesh->TexCoordCount(), 3u);
   EXPECT_EQ(submesh->TexCoord(2u), uv2);
+  EXPECT_TRUE(submesh->HasTexCoord(2u));
 
   // add index
   submesh->AddIndex(0u);
@@ -157,6 +163,7 @@ TEST_F(SubMeshTest, SubMesh)
   EXPECT_EQ(submesh->Normal(2u), n2);
   submesh->SetNormal(3u, math::Vector3d(20, 3, 0.4));
   EXPECT_EQ(submesh->Normal(3u), math::Vector3d::Zero);
+  EXPECT_FALSE(submesh->HasNormal(4u));
 
   submesh->SetTexCoord(2u, uv1);
   EXPECT_EQ(submesh->TexCoord(2u), uv1);
@@ -170,12 +177,12 @@ TEST_F(SubMeshTest, SubMesh)
   submesh->SetIndex(2u, 2u);
   EXPECT_EQ(submesh->Index(2u), 2u);
   submesh->SetIndex(3u, 999);
-  EXPECT_EQ(submesh->Index(3u), 0);
+  EXPECT_EQ(submesh->Index(3u), -1);
   EXPECT_EQ(submesh->MaxIndex(), 2u);
 
   // scale
   math::Vector3d scale(1, 0.5, 2);
-  submesh->SetScale(scale);
+  submesh->Scale(scale);
 
   EXPECT_EQ(submesh->Vertex(0), v0 * scale);
   EXPECT_EQ(submesh->Vertex(1), v1 * scale);
@@ -253,7 +260,8 @@ TEST_F(SubMeshTest, SubMesh)
     EXPECT_EQ(submeshCopy->Index(i), submesh->Index(i));
   for (unsigned int i = 0; i < submeshCopy->NodeAssignmentsCount(); ++i)
   {
-    common::NodeAssignment nodeCopy = submeshCopy->NodeAssignmentByIndex(i);
+    common::NodeAssignment nodeCopy =
+      submeshCopy->NodeAssignmentByIndex(i);
     EXPECT_EQ(nodeCopy.vertexIndex, 1u);
     EXPECT_EQ(nodeCopy.nodeIndex, 0u);
     EXPECT_DOUBLE_EQ(nodeCopy.weight, 0.5f);
@@ -292,7 +300,8 @@ TEST_F(SubMeshTest, SubMesh)
     EXPECT_EQ(submeshCopy->Index(i), submesh->Index(i));
   for (unsigned int i = 0; i < submeshCopy->NodeAssignmentsCount(); ++i)
   {
-    common::NodeAssignment nodeCopy = submeshCopy->NodeAssignmentByIndex(i);
+    common::NodeAssignment nodeCopy =
+      submeshCopy->NodeAssignmentByIndex(i);
     EXPECT_EQ(nodeCopy.vertexIndex, 1u);
     EXPECT_EQ(nodeCopy.nodeIndex, 0u);
     EXPECT_DOUBLE_EQ(nodeCopy.weight, 0.5f);
@@ -309,7 +318,8 @@ TEST_F(SubMeshTest, SubMesh)
     EXPECT_EQ(submeshCopy->Index(i), submesh->Index(i));
   for (unsigned int i = 0; i < submeshCopy->NodeAssignmentsCount(); ++i)
   {
-    common::NodeAssignment nodeCopy = submeshCopy->NodeAssignmentByIndex(i);
+    common::NodeAssignment nodeCopy =
+      submeshCopy->NodeAssignmentByIndex(i);
     EXPECT_EQ(nodeCopy.vertexIndex, 1u);
     EXPECT_EQ(nodeCopy.nodeIndex, 0u);
     EXPECT_DOUBLE_EQ(nodeCopy.weight, 0.5f);
@@ -327,7 +337,8 @@ TEST_F(SubMeshTest, SubMesh)
     EXPECT_EQ(submeshCopy->Index(i), submesh->Index(i));
   for (unsigned int i = 0; i < submeshCopy->NodeAssignmentsCount(); ++i)
   {
-    common::NodeAssignment nodeCopy = submeshCopy->NodeAssignmentByIndex(i);
+    common::NodeAssignment nodeCopy =
+      submeshCopy->NodeAssignmentByIndex(i);
     EXPECT_EQ(nodeCopy.vertexIndex, 1u);
     EXPECT_EQ(nodeCopy.nodeIndex, 0u);
     EXPECT_DOUBLE_EQ(nodeCopy.weight, 0.5f);

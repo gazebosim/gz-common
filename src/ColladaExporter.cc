@@ -411,8 +411,7 @@ void ColladaExporterPrivate::ExportGeometries(
     std::ostringstream fillData;
     for (unsigned int j = 0; j < indexCount; ++j)
     {
-      fillData << subMesh->Index(j) << " "
-               << subMesh->Index(j) << " ";
+      fillData << subMesh->Index(j) << " " << subMesh->Index(j) << " ";
       if (subMesh->TexCoordCount() != 0)
       {
         fillData << subMesh->Index(j) << " ";

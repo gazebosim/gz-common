@@ -45,11 +45,11 @@ class ignition::common::SubMeshPrivate
   public: std::vector<NodeAssignment> nodeAssignments;
 
   /// \brief primitive type for the mesh
-  public: SubMesh::PrimitiveType primitiveType;
+  public: SubMesh::PrimitiveType primitiveType = SubMesh::TRIANGLES;
 
   /// \brief The material index for this mesh. Relates to the parent
   /// mesh material list.
-  public: int materialIndex;
+  public: int materialIndex = -1;
 
   /// \brief The name of the sub-mesh
   public: std::string name;
@@ -59,8 +59,13 @@ class ignition::common::SubMeshPrivate
 SubMesh::SubMesh()
 : dataPtr(new SubMeshPrivate)
 {
-  this->dataPtr->materialIndex = -1;
-  this->dataPtr->primitiveType = TRIANGLES;
+}
+
+//////////////////////////////////////////////////
+SubMesh::SubMesh(const std::string &_name)
+: dataPtr(new SubMeshPrivate)
+{
+  this->dataPtr->name = _name;
 }
 
 //////////////////////////////////////////////////
@@ -176,6 +181,12 @@ ignition::math::Vector3d SubMesh::Vertex(const unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
+bool SubMesh::HasVertex(const unsigned int _index) const
+{
+  return _index < this->dataPtr->vertices.size();
+}
+
+//////////////////////////////////////////////////
 void SubMesh::SetVertex(const unsigned int _index,
     const ignition::math::Vector3d &_v)
 {
@@ -201,6 +212,24 @@ ignition::math::Vector3d SubMesh::Normal(const unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
+bool SubMesh::HasNormal(const unsigned int _index) const
+{
+  return _index < this->dataPtr->normals.size();
+}
+
+//////////////////////////////////////////////////
+bool SubMesh::HasTexCoord(const unsigned int _index) const
+{
+  return _index < this->dataPtr->texCoords.size();
+}
+
+//////////////////////////////////////////////////
+bool SubMesh::HasNodeAssignment(const unsigned int _index) const
+{
+  return _index < this->dataPtr->nodeAssignments.size();
+}
+
+//////////////////////////////////////////////////
 void SubMesh::SetNormal(const unsigned int _index,
     const ignition::math::Vector3d &_n)
 {
@@ -219,7 +248,7 @@ ignition::math::Vector2d SubMesh::TexCoord(const unsigned int _index) const
   if (_index >= this->dataPtr->texCoords.size())
   {
     ignerr << "Index too large" << std::endl;
-    return math::Vector2d(0, 0);
+    return math::Vector2d::Zero;
   }
 
   return this->dataPtr->texCoords[_index];
@@ -239,12 +268,12 @@ void SubMesh::SetTexCoord(const unsigned int _index,
 }
 
 //////////////////////////////////////////////////
-unsigned int SubMesh::Index(const unsigned int _index) const
+int SubMesh::Index(const unsigned int _index) const
 {
   if (_index >= this->dataPtr->indices.size())
   {
     ignerr << "Index too large" << std::endl;
-    return 0u;
+    return -1;
   }
 
   return this->dataPtr->indices[_index];
@@ -263,13 +292,13 @@ void SubMesh::SetIndex(const unsigned int _index, const unsigned int _i)
 }
 
 //////////////////////////////////////////////////
-NodeAssignment SubMesh::NodeAssignmentByIndex(const unsigned int _index) const
+NodeAssignment SubMesh::NodeAssignmentByIndex(
+    const unsigned int _index) const
 {
   if (_index >= this->dataPtr->nodeAssignments.size())
   {
     ignerr << "Index too large" << std::endl;
-    NodeAssignment n;
-    return n;
+    return NodeAssignment();
   }
 
   return this->dataPtr->nodeAssignments[_index];
@@ -499,7 +528,7 @@ void SubMesh::Scale(const ignition::math::Vector3d &_factor)
 }
 
 //////////////////////////////////////////////////
-void SubMesh::SetScale(const ignition::math::Vector3d &_factor)
+void SubMesh::Scale(const double &_factor)
 {
   for (auto &v : this->dataPtr->vertices)
     v *= _factor;
@@ -540,3 +569,4 @@ NodeAssignment::NodeAssignment()
   : vertexIndex(0), nodeIndex(0), weight(0.0)
 {
 }
+

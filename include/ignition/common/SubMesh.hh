@@ -62,6 +62,10 @@ namespace ignition
       /// \brief Constructor
       public: SubMesh();
 
+      /// \brief Constructor
+      /// \param _name Name of the submesh.
+      public: explicit SubMesh(const std::string &_name);
+
       /// \brief Copy Constructor
       /// \brief _other Other mesh object
       public: SubMesh(const SubMesh &_other);
@@ -87,7 +91,7 @@ namespace ignition
 
       /// \brief Add an index to the mesh
       /// \param[in] _index The new vertex index
-      public: void AddIndex(unsigned int _index);
+      public: void AddIndex(const unsigned int _index);
 
       /// \brief Add a vertex to the mesh
       /// \param[in] _v The new position
@@ -125,11 +129,11 @@ namespace ignition
       public: void AddNodeAssignment(const unsigned int _vertex,
                                      const unsigned int _node,
                                      const float _weight);
-
       /// \brief Get a vertex
       /// \param[in] _index Index of the vertex
-      /// \return The coordinates of the vertex or zero if the index is out
-      /// of bounds.
+      /// \return Coordinates of the vertex or ignition::math::Vector3d::Zero
+      /// if the index is out of bounds.
+      /// \sa bool HasVertex(const unsigned int) const
       public: ignition::math::Vector3d Vertex(const unsigned int _index) const;
 
       /// \brief Set a vertex
@@ -140,7 +144,9 @@ namespace ignition
 
       /// \brief Get a normal
       /// \param[in] _index The normal index
-      /// \return The normal direction or zero if index is out of bounds.
+      /// \return The normal direction or ignition::math::Vector3d::Zero
+      ///  if index is out of bounds.
+      /// \sa bool HasNormal(const unsigned int _index);
       public: ignition::math::Vector3d Normal(const unsigned int _index) const;
 
       /// \brief Set a normal
@@ -151,9 +157,11 @@ namespace ignition
 
       /// \brief Get a texture coordinate
       /// \param[in] _index the texture index
-      /// \return The texture coordinate or zero if index is out of bounds.
+      /// \return The texture coordinate or ignition::math::Vector2d::Zero
+      /// if index is out of bounds.
+      /// \sa bool HasTexCoord(const unsigned int _index) const
       public: ignition::math::Vector2d TexCoord(
-          const unsigned int _index) const;
+                  const unsigned int _index) const;
 
       /// \brief Set a texture coordinate
       /// \param[in] _index Index of the texture coordinate that will be set.
@@ -163,8 +171,8 @@ namespace ignition
 
       /// \brief Get an index value from the index array
       /// \param[in] _index Array index.
-      /// \return The index value.
-      public: unsigned int Index(const unsigned int _index) const;
+      /// \return The index, or -1 if the _index is out of bounds.
+      public: int Index(const unsigned int _index) const;
 
       /// \brief Set an index
       /// \param[in] _index Index of the indices
@@ -174,6 +182,10 @@ namespace ignition
 
       /// \brief Get a vertex - skeleton node assignment
       /// \param[in] _index The index of the assignment
+      /// \return The skeleton node assignment, or a
+      /// default constructed skeleton node assignment when _index is
+      /// invalid.
+      /// \sa bool HasNodeAssignment(const unsigned int _index) const;
       public: NodeAssignment NodeAssignmentByIndex(
           const unsigned int _index) const;
 
@@ -223,6 +235,34 @@ namespace ignition
       /// \return Return true if this submesh has the vertex
       public: bool HasVertex(const ignition::math::Vector3d &_v) const;
 
+      /// \brief Return true if this submesh has the vertex with the given
+      /// index
+      /// \param[in] _index Vertex index
+      /// \return Return true if this submesh has the vertex with the given
+      /// _index.
+      public: bool HasVertex(const unsigned int _index) const;
+
+      /// \brief Return true if this submesh has the normal with the given
+      /// index
+      /// \param[in] _index Normal index
+      /// \return Return true if this submesh has the normal with the given
+      /// _index.
+      public: bool HasNormal(const unsigned int _index) const;
+
+      /// \brief Return true if this submesh has the texture coordinate with
+      /// the given index
+      /// \param[in] _index Texture coordinate index
+      /// \return Return true if this submesh has the texture coordinate with
+      /// the given _index.
+      public: bool HasTexCoord(const unsigned int _index) const;
+
+      /// \brief Return true if this submesh has the node assignment with
+      /// the given index
+      /// \param[in] _index Node assignment index
+      /// \return Return true if this submesh has the node assignment with
+      /// the given _index.
+      public: bool HasNodeAssignment(const unsigned int _index) const;
+
       /// \brief Get the index of the vertex
       /// \param[in] _v Vertex to check
       /// \return Index of the vertex that matches _v.
@@ -246,6 +286,10 @@ namespace ignition
       /// \param[in] _factor Scaling factor
       public: void Scale(const ignition::math::Vector3d &_factor);
 
+      /// \brief Scale all vertices by _factor
+      /// \param[in] _factor Scaling factor
+      public: void Scale(const double &_factor);
+
       /// \brief Move the center of the submesh to the given coordinate. This
       /// will move all the vertices.
       /// \param[in] _center Location of the mesh center.
@@ -255,10 +299,6 @@ namespace ignition
       /// \brief Move all vertices by _vec.
       /// \param[in] _vec Amount to translate vertices.
       public: void Translate(const ignition::math::Vector3d &_vec);
-
-      /// \brief Set the scale of all vertices by the _factor
-      /// \param[in] _factor Scaling vector
-      public: void SetScale(const ignition::math::Vector3d &_factor);
 
 #ifdef _WIN32
 // Disable warning C4251 which is triggered by

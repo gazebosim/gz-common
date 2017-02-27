@@ -350,7 +350,7 @@ void Mesh::Scale(const ignition::math::Vector3d &_factor)
 void Mesh::SetScale(const ignition::math::Vector3d &_factor)
 {
   for (auto &submesh : this->dataPtr->submeshes)
-    submesh->SetScale(_factor);
+    submesh->Scale(_factor);
 }
 
 //////////////////////////////////////////////////
