@@ -94,9 +94,9 @@ ignition::math::Vector3d Mesh::Max() const
 
   ignition::math::Vector3d max;
 
-  max.X(-IGN_FLT_MAX);
-  max.Y(-IGN_FLT_MAX);
-  max.Z(-IGN_FLT_MAX);
+  max.X(-ignition::math::MAX_F);
+  max.Y(-ignition::math::MAX_F);
+  max.Z(-ignition::math::MAX_F);
 
   for (const auto &submesh : this->dataPtr->submeshes)
   {
@@ -117,9 +117,9 @@ ignition::math::Vector3d Mesh::Min() const
 
   ignition::math::Vector3d min;
 
-  min.X(IGN_FLT_MAX);
-  min.Y(IGN_FLT_MAX);
-  min.Z(IGN_FLT_MAX);
+  min.X(ignition::math::MAX_F);
+  min.Y(ignition::math::MAX_F);
+  min.Z(ignition::math::MAX_F);
 
   for (const auto &submesh : this->dataPtr->submeshes)
   {

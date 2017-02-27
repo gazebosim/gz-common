@@ -116,7 +116,7 @@ namespace ignition
       /// returned on error.
       public: static std::tuple<Type, double> Nearest(
                   const double _value,
-                  const double _epsilon = IGN_DBL_MAX);
+                  const double _epsilon = ignition::math::MAX_D);
 
       /// \brief Return the material with the closest density value within
       /// _epsilon, or MATERIAL_TYPE_END if not found.
@@ -125,7 +125,7 @@ namespace ignition
       /// and a material's density.
       /// \return The nearest material type. MATERIAL_TYPE_END on error.
       public: static Type NearestMaterial(const double _value,
-                  const double _epsilon = IGN_DBL_MAX);
+                  const double _epsilon = ignition::math::MAX_D);
 
 #ifdef _WIN32
 // Disable warning C4251
