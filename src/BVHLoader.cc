@@ -42,7 +42,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, const double _scale)
 {
   std::string fullname = common::findFile(_filename);
 
-  Skeleton *skeleton = NULL;
+  std::unique_ptr<Skeleton> skeleton;
   std::ifstream file;
   file.open(fullname.c_str());
   std::vector<SkeletonNode*> nodes;
@@ -55,11 +55,11 @@ Skeleton *BVHLoader::Load(const std::string &_filename, const double _scale)
     if (line.find("HIERARCHY") == std::string::npos)
     {
       file.close();
-      return NULL;
+      return nullptr;
     }
 
-    SkeletonNode *parent = NULL;
-    SkeletonNode *node = NULL;
+    SkeletonNode *parent = nullptr;
+    SkeletonNode *node = nullptr;
     while (!file.eof())
     {
       getline(file, line);
@@ -70,7 +70,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, const double _scale)
         if (words.size() < 2)
         {
           file.close();
-          return NULL;
+          return nullptr;
         }
         SkeletonNode::SkeletonNodeType type = SkeletonNode::JOINT;
         std::string name = words[1];
@@ -85,7 +85,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, const double _scale)
           if (words.size() < 4)
           {
             file.close();
-            return NULL;
+            return nullptr;
           }
           math::Vector3d offset = math::Vector3d(
               math::parseFloat(words[1]) * _scale,
@@ -104,7 +104,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, const double _scale)
                  words.size())
             {
               file.close();
-              return NULL;
+              return nullptr;
             }
             nodeChannels.push_back(words);
             totalChannels += math::parseInt(words[1]);
@@ -136,9 +136,9 @@ Skeleton *BVHLoader::Load(const std::string &_filename, const double _scale)
                   if (nodes.empty())
                   {
                     file.close();
-                    return NULL;
+                    return nullptr;
                   }
-                  skeleton = new Skeleton(nodes[0]);
+                  skeleton.reset(new Skeleton(nodes[0]));
                   break;
                 }
               }
@@ -156,7 +156,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, const double _scale)
   if (words[0] != "Frames:" || words.size() < 2)
   {
     file.close();
-    return NULL;
+    return nullptr;
   }
   else
   {
@@ -171,7 +171,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, const double _scale)
   if (words.size() < 3 || words[0] != "Frame" || words[1] != "Time:")
   {
     file.close();
-    return NULL;
+    return nullptr;
   }
   else
     frameTime = math::parseFloat(words[2]);
@@ -196,7 +196,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, const double _scale)
     }
 
     unsigned int cursor = 0;
-    for (unsigned int i = 0; i < nodes.size(); i++)
+    for (unsigned int i = 0; i < nodes.size(); ++i)
     {
       SkeletonNode *node = nodes[i];
       std::vector<std::string> channels = nodeChannels[i];
@@ -210,7 +210,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, const double _scale)
       math::Matrix4d transform(math::Matrix4d::Identity);
       std::vector<math::Matrix4d> mats;
       unsigned int chanCount = math::parseInt(channels[1]);
-      for (unsigned int j = 2; j < (2 + chanCount); j++)
+      for (unsigned int j = 2; j < (2 + chanCount); ++j)
       {
         double value = math::parseFloat(words[cursor]);
         cursor++;
@@ -281,5 +281,5 @@ Skeleton *BVHLoader::Load(const std::string &_filename, const double _scale)
   skeleton->AddAnimation(animation);
 
   file.close();
-  return skeleton;
+  return skeleton.release();
 }
