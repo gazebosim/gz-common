@@ -13,7 +13,6 @@ set (sources
   Color.cc
   Console.cc
   Dem.cc
-  Exception.cc
   Event.cc
   ffmpeg_inc.cc
   Image.cc
@@ -63,7 +62,6 @@ set (gtest_sources
   Console_TEST.cc
   Dem_TEST.cc
   EnumIface_TEST.cc
-  Exception_TEST.cc
   Event_TEST.cc
   Image_TEST.cc
   ImageHeightmap_TEST.cc

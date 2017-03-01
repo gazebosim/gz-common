@@ -13,7 +13,6 @@ set (headers
   Dem.hh
   EnumIface.hh
   Event.hh
-  Exception.hh
   ffmpeg_inc.hh
   GTSMeshUtils.hh
   HeightmapData.hh

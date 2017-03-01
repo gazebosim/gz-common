@@ -1,2 +1,0 @@
-/home/osrf/work/ignition/ign-common/examples/build/CMakeFiles/assert_example.dir
-/home/osrf/work/ignition/ign-common/examples/build/CMakeFiles/exception_example.dir
