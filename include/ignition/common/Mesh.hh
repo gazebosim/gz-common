@@ -158,7 +158,7 @@ namespace ignition
                   const ignition::math::Vector3d &_center);
 
       /// \brief Get the skeleton to which this mesh is attached.
-      /// \return Pointer to skeleton or NULL if none is present.
+      /// \return Pointer to skeleton or nullptr if none is present.
       public: SkeletonPtr MeshSkeleton() const;
 
       /// \brief Set the mesh skeleton

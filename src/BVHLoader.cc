@@ -38,7 +38,8 @@ BVHLoader::~BVHLoader()
 }
 
 /////////////////////////////////////////////////
-Skeleton *BVHLoader::Load(const std::string &_filename, const double _scale)
+std::unique_ptr<Skeleton> BVHLoader::Load(const std::string &_filename,
+    const double _scale)
 {
   std::string fullname = common::findFile(_filename);
 
@@ -281,5 +282,5 @@ Skeleton *BVHLoader::Load(const std::string &_filename, const double _scale)
   skeleton->AddAnimation(animation);
 
   file.close();
-  return skeleton.release();
+  return std::move(skeleton);
 }

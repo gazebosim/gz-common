@@ -336,7 +336,7 @@ SkeletonPtr Mesh::MeshSkeleton() const
 //////////////////////////////////////////////////
 bool Mesh::HasSkeleton() const
 {
-  return this->dataPtr->skeleton != NULL;
+  return this->dataPtr->skeleton != nullptr;
 }
 
 //////////////////////////////////////////////////
