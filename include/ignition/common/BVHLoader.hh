@@ -17,8 +17,7 @@
 #ifndef IGNITION_COMMON_BVHLOADER_HH_
 #define IGNITION_COMMON_BVHLOADER_HH_
 
-#include <vector>
-#include <map>
+#include <memory>
 #include <string>
 
 #include <ignition/math/Pose3.hh>
@@ -44,7 +43,8 @@ namespace ignition
       /// \param[in] _filename BVH file to load
       /// \param[in] _scale Scaling factor to apply to the skeleton
       /// \return A pointer to a new Skeleton
-      public: Skeleton* Load(const std::string &_filename, const double _scale);
+      public: std::unique_ptr<Skeleton> Load(
+                  const std::string &_filename, const double _scale);
     };
   }
 }

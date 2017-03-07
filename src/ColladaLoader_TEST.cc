@@ -66,9 +66,13 @@ TEST_F(ColladaLoader, ShareVertices)
     for (unsigned int j = 0; j < subMesh->IndexCount(); ++j)
     {
       if (uniqueIndices.find(subMesh->Index(j)) == uniqueIndices.end())
+      {
         uniqueIndices.insert(subMesh->Index(j));
+      }
       else
+      {
         shared++;
+      }
     }
   }
   EXPECT_EQ(shared, 12);
