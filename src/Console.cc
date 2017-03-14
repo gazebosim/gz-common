@@ -24,28 +24,29 @@ using namespace ignition;
 using namespace common;
 
 FileLogger ignition::common::Console::log("");
-Logger Console::msg("[Msg] ", 32, Logger::STDOUT);
-Logger Console::err("[Err] ", 31, Logger::STDERR);
-Logger Console::dbg("[Dbg] ", 36, Logger::STDOUT);
-Logger Console::warn("[Wrn] ", 33, Logger::STDERR);
+Logger Console::err("[Err] ", 31, Logger::STDERR, 1);
+Logger Console::warn("[Wrn] ", 33, Logger::STDERR, 2);
+Logger Console::msg("[Msg] ", 32, Logger::STDOUT, 3);
+Logger Console::dbg("[Dbg] ", 36, Logger::STDOUT, 4);
 
-bool Console::quiet = true;
+int Console::verbosity = 1;
 
 //////////////////////////////////////////////////
-void Console::SetQuiet(bool _quiet)
+void Console::SetVerbosity(const int _level)
 {
-  quiet = _quiet;
+  verbosity = _level;
 }
 
 //////////////////////////////////////////////////
-bool Console::Quiet()
+int Console::Verbosity()
 {
-  return quiet;
+  return verbosity;
 }
 
 /////////////////////////////////////////////////
-Logger::Logger(const std::string &_prefix, int _color, LogType _type)
-  : std::ostream(new Buffer(_type, _color)), color(_color), prefix(_prefix)
+Logger::Logger(const std::string &_prefix, const int _color,
+               const LogType _type, const int _verbosity)
+: std::ostream(new Buffer(_type, _color, _verbosity)), prefix(_prefix)
 {
   this->setf(std::ios_base::unitbuf);
 }
@@ -79,8 +80,8 @@ Logger &Logger::operator()(const std::string &_file, int _line)
 }
 
 /////////////////////////////////////////////////
-Logger::Buffer::Buffer(LogType _type, int _color)
-  :  type(_type), color(_color)
+Logger::Buffer::Buffer(LogType _type, const int _color, const int _verbosity)
+  :  type(_type), color(_color), verbosity(_verbosity)
 {
 }
 
@@ -98,7 +99,7 @@ int Logger::Buffer::sync()
   Console::log.flush();
 
   // Output to terminal
-  if (!Console::Quiet())
+  if (Console::Verbosity() >= this->verbosity)
   {
     if (this->type == Logger::STDOUT)
     {

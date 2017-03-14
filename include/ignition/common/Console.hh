@@ -29,19 +29,19 @@ namespace ignition
 {
   namespace common
   {
-    /// \brief Output a message
-    #define ignmsg (ignition::common::Console::msg())
-
-    /// \brief Output a debug message
-    #define igndbg (ignition::common::Console::dbg(__FILE__, __LINE__))
-
-    /// \brief Output a warning message
-    #define ignwarn (ignition::common::Console::warn(__FILE__, __LINE__))
-
-    /// \brief Output an error message
+    /// \brief Output an error message, if the verbose level is >= 0
     #define ignerr (ignition::common::Console::err(__FILE__, __LINE__))
 
-    /// \brief Output a message to a log file
+    /// \brief Output a warning message, if the verbose level is >= 1
+    #define ignwarn (ignition::common::Console::warn(__FILE__, __LINE__))
+
+    /// \brief Output a message, if the verbose level is >= 2
+    #define ignmsg (ignition::common::Console::msg())
+
+    /// \brief Output a debug message, if the verbose level is >= 3
+    #define igndbg (ignition::common::Console::dbg(__FILE__, __LINE__))
+
+    /// \brief Output a message to a log file, regardless of verbosity level
     #define ignlog (ignition::common::Console::log())
 
     /// \brief Initialize log file with filename given by _str.
@@ -112,21 +112,12 @@ namespace ignition
                    public: std::ofstream *stream;
                  };
 
-#ifdef _WIN32
-// Disable warning C4251 which is triggered by
-// std::unique_ptr
-#pragma warning(push)
-#pragma warning(disable: 4251)
-#endif
       /// \brief Stores the full path of the directory where all the log files
       /// are stored.
       private: std::string logDirectory;
 
       /// \brief True if initialized.
       private: bool initialized;
-#ifdef _WIN32
-#pragma warning(pop)
-#endif
     };
 
     /// \class Logger Logger.hh common/common.hh
@@ -147,7 +138,9 @@ namespace ignition
       /// \param[in] _prefix String to use as prefix when logging to file.
       /// \param[in] _color Color of the output stream.
       /// \param[in] _type Output destination type (STDOUT, or STDERR)
-      public: Logger(const std::string &_prefix, int _color, LogType _type);
+      /// \param[in] _verbosity Verbosity level.
+      public: Logger(const std::string &_prefix, const int _color,
+                     const LogType _type, const int _verbosity);
 
       /// \brief Destructor.
       public: virtual ~Logger();
@@ -171,7 +164,9 @@ namespace ignition
                    /// \param[in] _type Output destination type
                    /// (STDOUT, or STDERR)
                    /// \param[in] _color Color of the output stream.
-                   public: Buffer(LogType _type, int _color);
+                   /// \param[in] _verbosity Verbosity level.
+                   public: Buffer(LogType _type, const int _color,
+                                  const int _verbosity);
 
                    /// \brief Destructor.
                    public: virtual ~Buffer();
@@ -188,22 +183,13 @@ namespace ignition
                    /// parameters (SGR). See
                    /// http://en.wikipedia.org/wiki/ANSI_escape_code#Colors
                    public: int color;
+
+                   /// \brief Level of verbosity;
+                   public: int verbosity;
                  };
 
-      /// \brief Color for the output.
-      public: int color;
-
-#ifdef _WIN32
-// Disable warning C4251 which is triggered by
-// std::unique_ptr
-#pragma warning(push)
-#pragma warning(disable: 4251)
-#endif
       /// \brief Prefix to use when logging to file.
       private: std::string prefix;
-#ifdef _WIN32
-#pragma warning(pop)
-#endif
     };
 
     /// \class Console Console.hh common/common.hh
@@ -211,13 +197,19 @@ namespace ignition
     /// (such as verbose vs. quiet output).
     class IGNITION_COMMON_VISIBLE Console
     {
-      /// \brief Set quiet output.
-      /// \param[in] q True to prevent warning.
-      public: static void SetQuiet(bool _q);
+      /// \brief Set verbosity, where
+      /// <= 0: No output,
+      /// 1: Error messages,
+      /// 2: Error and warning messages,
+      /// 3: Error, warning, and info messages,
+      /// 4: Error, warning, info, and debug messages.
+      /// \param[in] _level The new verbose level.
+      public: static void SetVerbosity(const int _level);
 
-      /// \brief Get whether quiet output is set.
-      /// \return True to if quiet output is set.
-      public: static bool Quiet();
+      /// \brief Get the verbose level.
+      /// \return The level of verbosity.
+      /// \sa SetVerbosity(const int _level)
+      public: static int Verbosity();
 
       /// \brief Global instance of the message logger.
       public: static Logger msg;
@@ -234,8 +226,8 @@ namespace ignition
       /// \brief Global instance of the file logger.
       public: static FileLogger log;
 
-      /// \brief Indicates if console messages should be quiet.
-      private: static bool quiet;
+      /// \brief The level of verbosity, the default level is 1.
+      private: static int verbosity;
     };
   }
 }
