@@ -184,7 +184,7 @@ namespace ignition
                    /// http://en.wikipedia.org/wiki/ANSI_escape_code#Colors
                    public: int color;
 
-                   /// \brief Level of verbosity;
+                   /// \brief Level of verbosity
                    public: int verbosity;
                  };
 
@@ -202,7 +202,7 @@ namespace ignition
       /// 1: Error messages,
       /// 2: Error and warning messages,
       /// 3: Error, warning, and info messages,
-      /// 4: Error, warning, info, and debug messages.
+      /// >= 4: Error, warning, info, and debug messages.
       /// \param[in] _level The new verbose level.
       public: static void SetVerbosity(const int _level);
 
