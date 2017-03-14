@@ -24,9 +24,17 @@ using namespace ignition;
 using namespace common;
 
 FileLogger ignition::common::Console::log("");
+
+// 31 == Red
 Logger Console::err("[Err] ", 31, Logger::STDERR, 1);
+
+// 33 == yellow
 Logger Console::warn("[Wrn] ", 33, Logger::STDERR, 2);
+
+// 32 == green
 Logger Console::msg("[Msg] ", 32, Logger::STDOUT, 3);
+
+// 36 ==  blue
 Logger Console::dbg("[Dbg] ", 36, Logger::STDOUT, 4);
 
 int Console::verbosity = 1;
