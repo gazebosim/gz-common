@@ -444,6 +444,19 @@ TEST(Console_TEST, ColorErr)
 
 /////////////////////////////////////////////////
 /// \brief Test Console::LogDirectory
+TEST(Console_TEST, Verbosity)
+{
+  EXPECT_EQ(ignition::common::Console::Verbosity(), 1);
+
+  ignition::common::Console::SetVerbosity(2);
+  EXPECT_EQ(ignition::common::Console::Verbosity(), 2);
+
+  ignition::common::Console::SetVerbosity(-1);
+  EXPECT_EQ(ignition::common::Console::Verbosity(), -1);
+}
+
+/////////////////////////////////////////////////
+/// \brief Test Console::LogDirectory
 TEST(Console_TEST, LogDirectory)
 {
   // Create a unique directory path
