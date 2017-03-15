@@ -15,6 +15,7 @@
  *
  */
 #include <algorithm>
+#include <ignition/math/Color.hh>
 
 #include "ignition/common/Material.hh"
 #include "ignition/common/Console.hh"
@@ -40,16 +41,16 @@ class ignition::common::MaterialPrivate
   public: std::string texImage;
 
   /// \brief the ambient light color
-  public: Color ambient;
+  public: math::Color ambient;
 
   /// \brief the diffuse light color
-  public: Color diffuse;
+  public: math::Color diffuse;
 
   /// \brief the specular light color
-  public: Color specular;
+  public: math::Color specular;
 
   /// \brief the emissive light color
-  public: Color emissive;
+  public: math::Color emissive;
 
   /// \brief transparency value in the range 0 to 1
   public: double transparency;
@@ -102,7 +103,7 @@ Material::Material()
 }
 
 //////////////////////////////////////////////////
-Material::Material(const Color &_clr)
+Material::Material(const math::Color &_clr)
 : dataPtr(new MaterialPrivate)
 {
   this->dataPtr->name = "ignition_material_" +
@@ -158,51 +159,51 @@ std::string Material::TextureImage() const
 }
 
 //////////////////////////////////////////////////
-void Material::SetAmbient(const Color &_clr)
+void Material::SetAmbient(const math::Color &_clr)
 {
   this->dataPtr->ambient = _clr;
 }
 
 //////////////////////////////////////////////////
-Color Material::Ambient() const
+math::Color Material::Ambient() const
 {
   return this->dataPtr->ambient;
 }
 
 //////////////////////////////////////////////////
-void Material::SetDiffuse(const Color &_clr)
+void Material::SetDiffuse(const math::Color &_clr)
 {
   this->dataPtr->diffuse = _clr;
   this->dataPtr->lighting = true;
 }
 
 //////////////////////////////////////////////////
-Color Material::Diffuse() const
+math::Color Material::Diffuse() const
 {
   return this->dataPtr->diffuse;
 }
 
 //////////////////////////////////////////////////
-void Material::SetSpecular(const Color &_clr)
+void Material::SetSpecular(const math::Color &_clr)
 {
   this->dataPtr->specular = _clr;
   this->dataPtr->lighting = true;
 }
 
 //////////////////////////////////////////////////
-Color Material::Specular() const
+math::Color Material::Specular() const
 {
   return this->dataPtr->specular;
 }
 
 //////////////////////////////////////////////////
-void Material::SetEmissive(const Color &_clr)
+void Material::SetEmissive(const math::Color &_clr)
 {
   this->dataPtr->emissive = _clr;
 }
 
 //////////////////////////////////////////////////
-Color Material::Emissive() const
+math::Color Material::Emissive() const
 {
   return this->dataPtr->emissive;
 }

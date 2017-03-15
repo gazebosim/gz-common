@@ -1594,9 +1594,8 @@ void ColladaLoaderPrivate::LoadColorOrTexture(tinyxml2::XMLElement *_elem,
 
   if (typeElem->FirstChildElement("color"))
   {
-    std::string colorStr = typeElem->FirstChildElement("color")->GetText();
-    std::istringstream stream(colorStr);
-    Color color;
+    std::istringstream stream(typeElem->FirstChildElement("color")->GetText());
+    math::Color color;
     stream >> color;
     if (_type == "diffuse")
       _mat->SetDiffuse(color);
@@ -2315,7 +2314,7 @@ void ColladaLoaderPrivate::LoadTransparent(tinyxml2::XMLElement *_elem,
 
     std::string opaqueStr = opaqueCStr;
     std::string colorStr = colorCStr;
-    Color color;
+    math::Color color;
     std::istringstream stream(colorStr);
     stream >> color;
 

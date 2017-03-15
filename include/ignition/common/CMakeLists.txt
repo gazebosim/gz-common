@@ -8,7 +8,6 @@ set (headers
   BVHLoader.hh
   ColladaExporter.hh
   ColladaLoader.hh
-  Color.hh
   Console.hh
   Dem.hh
   EnumIface.hh

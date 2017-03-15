@@ -20,8 +20,8 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <ignition/math/Color.hh>
 #include <ignition/common/EnumIface.hh>
-#include <ignition/common/Color.hh>
 
 namespace ignition
 {
@@ -93,7 +93,7 @@ namespace ignition
       /// \brief Create a material with a default color
       /// \param[in] _clr Color of the material
       // cppcheck-suppress noExplicitConstructor
-      public: Material(const Color &_clr);
+      public: Material(const math::Color &_clr);
 
       /// \brief Get the name of the material
       /// \return The name of the material
@@ -117,35 +117,35 @@ namespace ignition
 
       /// \brief Set the ambient color
       /// \param[in] _clr The ambient color
-      public: void SetAmbient(const Color &_clr);
+      public: void SetAmbient(const math::Color &_clr);
 
       /// \brief Get the ambient color
       /// \return The ambient color
-      public: Color Ambient() const;
+      public: math::Color Ambient() const;
 
       /// \brief Set the diffuse color
       /// \param[in] _clr The diffuse color
-      public: void SetDiffuse(const Color &_clr);
+      public: void SetDiffuse(const math::Color &_clr);
 
       /// \brief Get the diffuse color
       /// \return The diffuse color
-      public: Color Diffuse() const;
+      public: math::Color Diffuse() const;
 
       /// \brief Set the specular color
       /// \param[in] _clr The specular color
-      public: void SetSpecular(const Color &_clr);
+      public: void SetSpecular(const math::Color &_clr);
 
       /// \brief Get the specular color
       /// \return The specular color
-      public: Color Specular() const;
+      public: math::Color Specular() const;
 
       /// \brief Set the emissive color
       /// \param[in] _clr The emissive color
-      public: void SetEmissive(const Color &_clr);
+      public: void SetEmissive(const math::Color &_clr);
 
       /// \brief Get the emissive color
       /// \return The emissive color
-      public: Color Emissive() const;
+      public: math::Color Emissive() const;
 
       /// \brief Set the transparency percentage (0..1)
       /// \param[in] _t The amount of transparency (0..1)

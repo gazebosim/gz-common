@@ -296,9 +296,9 @@ unsigned int Image::BPP() const
 }
 
 //////////////////////////////////////////////////
-Color Image::Pixel(unsigned int _x, unsigned int _y) const
+math::Color Image::Pixel(unsigned int _x, unsigned int _y) const
 {
-  Color clr;
+  math::Color clr;
 
   if (!this->Valid())
     return clr;
@@ -347,11 +347,11 @@ Color Image::Pixel(unsigned int _x, unsigned int _y) const
 }
 
 //////////////////////////////////////////////////
-Color Image::AvgColor()
+math::Color Image::AvgColor()
 {
   unsigned int x, y;
   double rsum, gsum, bsum;
-  common::Color pixel;
+  math::Color pixel;
 
   rsum = gsum = bsum = 0.0;
   for (y = 0; y < this->Height(); ++y)
@@ -369,15 +369,15 @@ Color Image::AvgColor()
   gsum /= (this->Width() * this->Height());
   bsum /= (this->Width() * this->Height());
 
-  return Color(rsum, gsum, bsum);
+  return math::Color(rsum, gsum, bsum);
 }
 
 //////////////////////////////////////////////////
-Color Image::MaxColor() const
+math::Color Image::MaxColor() const
 {
   unsigned int x, y;
-  Color clr;
-  Color maxClr;
+  math::Color clr;
+  math::Color maxClr;
 
   maxClr.Set(0, 0, 0, 0);
 
