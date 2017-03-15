@@ -54,7 +54,7 @@ namespace ignition
 
         // Initialize Console
         ignLogInit("test_logs", this->logFilename);
-        ignition::common::Console::SetQuiet(false);
+        ignition::common::Console::SetVerbosity(4);
 
         // Read the full path to the log directory.
         this->logDirectory = ignLogDirectory();
