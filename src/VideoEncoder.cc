@@ -620,7 +620,7 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
     }
   }
 
-  av_packet_unref(&avPacket);
+  av_free_packet(&avPacket);
 
 // #else for libavcodec version check
 #else

@@ -95,6 +95,7 @@ target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
   ${libavcodec_LIBRARIES}
   ${libavformat_LIBRARIES}
   ${libavutil_LIBRARIES}
+  ${libavdevice_LIBRARIES}
   ${libswscale_LIBRARIES}
   )
 
