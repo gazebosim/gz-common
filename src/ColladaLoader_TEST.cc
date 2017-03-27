@@ -138,7 +138,7 @@ TEST_F(ColladaLoader, Specular)
   ASSERT_TRUE(mat != NULL);
 
   // Make sure we read the specular value
-  EXPECT_EQ(mat->Specular(), common::Color(0.5, 0.5, 0.5, 1.0));
+  EXPECT_EQ(mat->Specular(), math::Color(0.5, 0.5, 0.5, 1.0));
 }
 
 /////////////////////////////////////////////////

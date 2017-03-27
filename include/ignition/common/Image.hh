@@ -19,7 +19,7 @@
 
 #include <memory>
 #include <string>
-#include <ignition/common/Color.hh>
+#include <ignition/math/Color.hh>
 #include <ignition/common/System.hh>
 
 namespace ignition
@@ -157,15 +157,16 @@ namespace ignition
       /// \param[in] _x Column location in the image
       /// \param[in] _y Row location in the image
       /// \return The color of the given pixel
-      public: Color Pixel(const unsigned int _x, const unsigned int _y) const;
+      public: math::Color Pixel(const unsigned int _x,
+                  const unsigned int _y) const;
 
       /// \brief Get the average color
       /// \return The average color
-      public: Color AvgColor();
+      public: math::Color AvgColor();
 
       /// \brief Get the max color
       /// \return The max color
-      public: Color MaxColor() const;
+      public: math::Color MaxColor() const;
 
       /// \brief Rescale the image
       /// \param[in] _width New image width

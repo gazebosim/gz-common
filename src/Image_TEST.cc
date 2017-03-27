@@ -37,11 +37,11 @@ TEST_F(ImageTest, Image)
   EXPECT_EQ(static_cast<unsigned int>(128), img.Height());
   EXPECT_EQ(static_cast<unsigned int>(32), img.BPP());
   EXPECT_TRUE(img.Pixel(10, 10) ==
-      common::Color(0.141176, 0.172549, 0.133333, 1));
+      math::Color(0.141176, 0.172549, 0.133333, 1));
   EXPECT_TRUE(img.AvgColor() ==
-      common::Color(0.259651, 0.271894, 0.414959, 1));
+      math::Color(0.259651, 0.271894, 0.414959, 1));
   EXPECT_TRUE(img.MaxColor() ==
-      common::Color(0.929412, 0.921569, 0.917647, 1));
+      math::Color(0.929412, 0.921569, 0.917647, 1));
   EXPECT_TRUE(img.Valid());
   EXPECT_TRUE(img.Filename().find("cordless_drill.png") !=
       std::string::npos);

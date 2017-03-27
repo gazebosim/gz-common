@@ -10,7 +10,6 @@ set (sources
   BVHLoader.cc
   ColladaExporter.cc
   ColladaLoader.cc
-  Color.cc
   Console.cc
   Dem.cc
   Event.cc
@@ -58,7 +57,6 @@ set (gtest_sources
   Battery_TEST.cc
   ColladaExporter_TEST.cc
   ColladaLoader_TEST.cc
-  Color_TEST.cc
   Console_TEST.cc
   Dem_TEST.cc
   EnumIface_TEST.cc

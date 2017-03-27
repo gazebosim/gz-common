@@ -25,9 +25,9 @@ class MaterialTest : public ignition::testing::AutoLogFixture { };
 
 TEST_F(MaterialTest, Material)
 {
-  common::Material mat(common::Color(1.0, 0.5, 0.2, 1.0));
-  EXPECT_TRUE(mat.Ambient() == common::Color(1.0, 0.5, 0.2, 1.0));
-  EXPECT_TRUE(mat.Diffuse() == common::Color(1.0, 0.5, 0.2, 1.0));
+  common::Material mat(math::Color(1.0, 0.5, 0.2, 1.0));
+  EXPECT_TRUE(mat.Ambient() == math::Color(1.0, 0.5, 0.2, 1.0));
+  EXPECT_TRUE(mat.Diffuse() == math::Color(1.0, 0.5, 0.2, 1.0));
   EXPECT_STREQ("ignition_material_0", mat.Name().c_str());
 
   mat.SetTextureImage("texture_image");
@@ -37,17 +37,17 @@ TEST_F(MaterialTest, Material)
   EXPECT_STREQ("/path/../materials/textures/texture_image",
                mat.TextureImage().c_str());
 
-  mat.SetAmbient(common::Color(0.1, 0.2, 0.3, 0.4));
-  EXPECT_TRUE(mat.Ambient() == common::Color(0.1, 0.2, 0.3, 0.4));
+  mat.SetAmbient(math::Color(0.1, 0.2, 0.3, 0.4));
+  EXPECT_TRUE(mat.Ambient() == math::Color(0.1, 0.2, 0.3, 0.4));
 
-  mat.SetDiffuse(common::Color(0.1, 0.2, 0.3, 0.4));
-  EXPECT_TRUE(mat.Diffuse() == common::Color(0.1, 0.2, 0.3, 0.4));
+  mat.SetDiffuse(math::Color(0.1, 0.2, 0.3, 0.4));
+  EXPECT_TRUE(mat.Diffuse() == math::Color(0.1, 0.2, 0.3, 0.4));
 
-  mat.SetSpecular(common::Color(0.1, 0.2, 0.3, 0.4));
-  EXPECT_TRUE(mat.Specular() == common::Color(0.1, 0.2, 0.3, 0.4));
+  mat.SetSpecular(math::Color(0.1, 0.2, 0.3, 0.4));
+  EXPECT_TRUE(mat.Specular() == math::Color(0.1, 0.2, 0.3, 0.4));
 
-  mat.SetEmissive(common::Color(0.1, 0.2, 0.3, 0.4));
-  EXPECT_TRUE(mat.Emissive() == common::Color(0.1, 0.2, 0.3, 0.4));
+  mat.SetEmissive(math::Color(0.1, 0.2, 0.3, 0.4));
+  EXPECT_TRUE(mat.Emissive() == math::Color(0.1, 0.2, 0.3, 0.4));
 
   mat.SetTransparency(0.2);
   EXPECT_DOUBLE_EQ(0.2, mat.Transparency());
