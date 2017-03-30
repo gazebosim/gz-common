@@ -21,7 +21,7 @@
 
 #include <typeinfo>
 #include <type_traits>
-#include "ignition/common/plugin/PluginInfo.hh"
+#include "ignition/common/PluginInfo.hh"
 
 
 #if defined _WIN32 || defined __CYGWIN__

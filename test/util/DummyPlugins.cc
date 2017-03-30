@@ -15,7 +15,7 @@
  *
 */
 
-#include "ignition/common/plugin/RegisterMacros.hh"
+#include "ignition/common/PluginMacros.hh"
 #include "util/DummyPlugins.hh"
 
 

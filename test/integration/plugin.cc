@@ -18,7 +18,7 @@
 #include <algorithm>
 #include <gtest/gtest.h>
 #include <iostream>
-#include "ignition/common/plugin/PluginLoader.hh"
+#include "ignition/common/PluginLoader.hh"
 #include "util/DummyPlugins.hh"
 
 
