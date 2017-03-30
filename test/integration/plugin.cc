@@ -35,10 +35,8 @@ TEST(PluginLoader, LoadExistingLibrary)
   std::cout << pm.PrettyStr();
 
   ASSERT_EQ(1, pm.InterfacesImplemented().size());
-  ASSERT_EQ("::test::util::DummyPluginBase",
-            pm.InterfacesImplemented()[0]);
-  ASSERT_EQ(1,
-      pm.PluginsImplementing("::test::util::DummyPluginBase").size());
+  ASSERT_EQ("::test::util::DummyPluginBase", pm.InterfacesImplemented()[0]);
+  ASSERT_EQ(1, pm.PluginsImplementing("::test::util::DummyPluginBase").size());
   std::unique_ptr<test::util::DummyPluginBase> plugin =
     pm.Instantiate<test::util::DummyPluginBase>("test::util::DummyPlugin");
   ASSERT_NE(nullptr, plugin.get());
