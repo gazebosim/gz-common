@@ -29,15 +29,13 @@ namespace util
 
 class DummyPluginBase
 {
-  public:
-    virtual std::string MyNameIs() = 0;
+  public: virtual std::string MyNameIs() = 0;
 };
 
 
 class DummyPlugin : DummyPluginBase
 {
-  public:
-    virtual std::string MyNameIs();
+  public: virtual std::string MyNameIs();
 };
 
 }

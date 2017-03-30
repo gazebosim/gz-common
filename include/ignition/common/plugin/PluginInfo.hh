@@ -46,9 +46,9 @@ struct PluginInfo
   /// \brief the name of the type of plugin this implements
   std::string interface;
 
-  /// \brief returns an index that can be used to compare the base class type
+  /// \brief returns a hash that can be used to compare the base class type
   ///
-  /// This is only used to make the PluginLoader::Instantiate API easier to use
+  /// This is only used to make the PluginLoader::Instantiate API simpler
   std::size_t baseClassHash;
 
   /// \brief a method that instantiates a new instance of a plugin

@@ -38,49 +38,47 @@ class PluginLoaderPrivate;
 /// \brief Class for loading plugins
 class PluginLoader
 {
-  public:
-    /// \brief Constructor
-    PluginLoader();
+  /// \brief Constructor
+  public: PluginLoader();
 
-    /// \brief Destructor
-    ~PluginLoader();
+  /// \brief Destructor
+  public: ~PluginLoader();
 
-    /// \brief Returns a printable string with info about plugins
-    std::string PrettyStr() const;
+  /// \brief Returns a printable string with info about plugins
+  public: std::string PrettyStr() const;
 
-    /// \brief Adds a path to search for plugins
-    void AddSearchPath(std::string _path);
+  /// \brief Adds a path to search for plugins
+  public: void AddSearchPath(std::string _path);
 
-    /// \brief Returns paths that are being searched for plugins
-    std::vector<std::string> SearchPaths() const;
+  /// \brief Returns paths that are being searched for plugins
+  public: std::vector<std::string> SearchPaths() const;
 
-    /// \brief Returns a list of interfaces that the loader has plugins for
-    std::vector<std::string> InterfacesImplemented() const;
+  /// \brief Returns a list of interfaces that the loader has plugins for
+  public: std::vector<std::string> InterfacesImplemented() const;
 
-    /// \brief Returns a list of plugin names that implement the interface
-    std::vector<std::string> PluginsImplementing(std::string _interface) const;
+  /// \brief Returns a list of plugin names that implement the interface
+  public: std::vector<std::string> PluginsImplementing(
+               std::string _interface) const;
 
-    /// \brief Load a library with a plugin by name
-    bool LoadLibrary(std::string _libName);
+  /// \brief Load a library with a plugin by name
+  public: bool LoadLibrary(std::string _libName);
 
-    /// \brief Instantiates a plugin of the name and base class
-    ///
-    /// ex: pl.Instantiate<animals::AnimalBase>("animals::Donkey")
-    template <typename T>
-    std::unique_ptr<T> Instantiate(std::string _name) const
-    {
-      // type_index is used so the api doesn't have to take an interface name
-      std::unique_ptr<T> ptr;
-      ptr.reset(static_cast<T*>(
-          this->Instantiate(_name, typeid(T).hash_code())));
-      return ptr;
-    }
+  /// \brief Instantiates a plugin of the name and base class
+  ///
+  /// ex: pl.Instantiate<animals::AnimalBase>("animals::farm::Donkey")
+  public: template <typename T>
+  std::unique_ptr<T> Instantiate(std::string _name) const
+  {
+    // type hash used to simplify this API
+    std::unique_ptr<T> ptr;
+    ptr.reset(static_cast<T*>(
+        this->Instantiate(_name, typeid(T).hash_code())));
+    return ptr;
+  }
 
-  private:
+  private: void* Instantiate(std::string _name, std::size_t _baseId) const;
 
-    void* Instantiate(std::string _name, std::size_t _baseId) const;
-
-    std::shared_ptr<PluginLoaderPrivate> impl;
+  private: std::shared_ptr<PluginLoaderPrivate> impl;
 
 };
 
