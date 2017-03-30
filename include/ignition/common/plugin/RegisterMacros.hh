@@ -19,7 +19,6 @@
 #ifndef IGNITION_COMMON_PLUGIN_REGISTERMACROS_HH_
 #define IGNITION_COMMON_PLUGIN_REGISTERMACROS_HH_
 
-#include <typeindex>
 #include <typeinfo>
 #include <type_traits>
 #include "ignition/common/plugin/PluginInfo.hh"

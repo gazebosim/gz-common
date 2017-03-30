@@ -21,7 +21,6 @@
 
 #include <functional>
 #include <string>
-#include <typeindex>
 
 namespace ignition
 {

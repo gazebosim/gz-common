@@ -21,7 +21,6 @@
 
 #include <memory>
 #include <string>
-#include <typeindex>
 #include <typeinfo>
 #include <vector>
 
