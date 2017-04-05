@@ -25,7 +25,7 @@
 /////////////////////////////////////////////////
 TEST(PluginLoader, LoadExistingLibrary)
 {
-  ignition::common::plugin::PluginLoader pm;
+  ignition::common::PluginLoader pm;
   pm.AddSearchPath("../util");
   // The search path is a little fragile
   // It requires running from directory containing this test executable
