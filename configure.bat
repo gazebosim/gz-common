@@ -21,11 +21,15 @@
 @set FFMPEG_LIBRARY_DIR=%FFMPEG_PATH%\lib
 @set FFMPEG_INCLUDE_DIR=%FFMPEG_PATH%\include
 
+@set DLFCN_WIN32_PATH=%cd%\..\..\dlfcn-win32-vc12-x64-release-debug\build\install\%build_type%
+@set DLFCN_WIN32_LIBRARY_DIR=%DLFCN_WIN32_PATH%\lib
+@set DLFCN_WIN32_INCLUDE_DIR=%DLFCN_WIN32_PATH%\include
+
 @set IGN_MATH_PATH=%cd%\..\..\ign-math\build\install\%build_type%
 
-@set INCLUDE=%FREEIMAGE_INCLUDE_DIR%;%GTS_INCLUDE_DIR%;%GLIB_INCLUDE_DIR%;%INCLUDE%
+@set INCLUDE=%FREEIMAGE_INCLUDE_DIR%;%GTS_INCLUDE_DIR%;%GLIB_INCLUDE_DIR%;%DLFCN_WIN32_INCLUDE_DIR%;%INCLUDE%
 
-@set LIB=%FREEIMAGE_LIBRARY_DIR%;%GTS_LIBRARY_DIR%;%GLIB_LIBRARY_DIR%;%LIB%
+@set LIB=%FREEIMAGE_LIBRARY_DIR%;%GTS_LIBRARY_DIR%;%GLIB_LIBRARY_DIR%;%DLFCN_WIN32_LIBRARY_DIR%;%LIB%
 
 @echo Configuring for build type %build_type% for %build_bitness% bits
 cmake -G "NMake Makefiles"^
