@@ -39,6 +39,7 @@ set (headers
   Skeleton.hh
   SkeletonAnimation.hh
   SkeletonNode.hh
+  StringUtils.hh
   SubMesh.hh
   System.hh
   SystemPaths.hh
