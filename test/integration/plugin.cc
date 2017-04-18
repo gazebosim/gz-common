@@ -35,7 +35,7 @@ TEST(PluginLoader, LoadExistingLibrary)
 
   ignition::common::PluginLoader pm;
 
-  EXPECT_TRUE(pm.LoadLibrary(path));
+  EXPECT_EQ("::test::util::DummyPlugin", pm.LoadLibrary(path));
 
   std::cout << pm.PrettyStr();
 
