@@ -319,13 +319,13 @@ void SystemPaths::ClearPluginPaths()
 /////////////////////////////////////////////////
 void SystemPaths::AddPluginPaths(const std::string &_path)
 {
-#ifdef _WIN32
-  char delim = ';';
-#else
-  char delim = ':';
-#endif
   if (_path.size())
   {
+#ifdef _WIN32
+    char delim = ';';
+#else
+    char delim = ':';
+#endif
     std::vector<std::string> paths = Split(_path, delim);
     for (auto const &path : paths)
     {

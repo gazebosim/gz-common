@@ -25,7 +25,6 @@ using namespace ignition;
 
 class SystemPathsFixture : public ::testing::Test
 {
-
   public: virtual void SetUp()
     {
       this->backupPluginPath = "IGN_PLUGIN_PATH=";
@@ -96,7 +95,6 @@ TEST_F(SystemPathsFixture, SearchPathGetsTrailingSlash)
 /////////////////////////////////////////////////
 TEST_F(SystemPathsFixture, SearchPathUsesForwardSlashes)
 {
-
 #ifdef _WIN32
   std::string before = "C:\\user\\alice\\gazebolibs\\";
   std::string after = "C:/user/alice/gazebolibs/";
