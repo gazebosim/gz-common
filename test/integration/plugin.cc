@@ -18,30 +18,35 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include "ignition/common/PluginLoader.hh"
+#include "ignition/common/SystemPaths.hh"
 #include "util/DummyPlugins.hh"
 
 
 /////////////////////////////////////////////////
 TEST(PluginLoader, LoadExistingLibrary)
 {
-  ignition::common::PluginLoader pm;
-  pm.AddSearchPath("../util");
   // The search path is a little fragile
   // It requires running from directory containing this test executable
   // `make test` does this, so it's only an issue if running the test solo
-  EXPECT_TRUE(pm.LoadLibrary("IGNDummyPlugins"));
+  ignition::common::SystemPaths sp;
+  sp.AddPluginPaths("../util");
+  std::string path = sp.FindSharedLibrary("IGNDummyPlugins");
+  ASSERT_LT(0, path.size());
+
+  ignition::common::PluginLoader pm;
+
+  EXPECT_TRUE(pm.LoadLibrary(path));
 
   std::cout << pm.PrettyStr();
 
   ASSERT_EQ(1, pm.InterfacesImplemented().size());
-  ASSERT_EQ("::test::util::DummyPluginBase", pm.InterfacesImplemented()[0]);
+  EXPECT_EQ("::test::util::DummyPluginBase", pm.InterfacesImplemented()[0]);
   ASSERT_EQ(1, pm.PluginsImplementing("::test::util::DummyPluginBase").size());
   std::unique_ptr<test::util::DummyPluginBase> plugin =
     pm.Instantiate<test::util::DummyPluginBase>("test::util::DummyPlugin");
   ASSERT_NE(nullptr, plugin.get());
   EXPECT_EQ(std::string("DummyPlugin"), plugin->MyNameIs());
 }
-
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

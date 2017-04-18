@@ -27,22 +27,19 @@
 #include "ignition/common/win_dirent.h"
 #endif
 
+#include "ignition/common/StringUtils.hh"
 #include "ignition/common/SystemPaths.hh"
 #include "ignition/common/Console.hh"
 
 using namespace ignition;
 using namespace common;
 
-const std::string IGN_PLUGIN_PATH="/usr/lib/";
 
 // Private data class
 class ignition::common::SystemPathsPrivate
 {
-  /// \brief re-read SystemPaths#pluginPaths from environment variable
-  public: void UpdatePluginPaths();
-
-  /// \brief if true, call UpdatePluginPaths() within PluginPaths()
-  public: bool pluginPathsFromEnv;
+  /// \brief Name of the environment variable to check for plugin paths
+  public: std::string pluginPathEnv = "IGN_PLUGIN_PATH";
 
   /// \brief Paths to plugins
   public: std::list<std::string> pluginPaths;
@@ -58,6 +55,13 @@ class ignition::common::SystemPathsPrivate
 
   /// \brief Find file URI callback.
   public: std::function<std::string (const std::string &)> findFileURICB;
+
+  /// \brief format the path to use "/" as a separator with "/" at the end
+  public: std::string NormalizePath(const std::string &_path) const;
+
+  /// \brief generates paths to try searching for the named library
+  public: std::vector<std::string> GenerateLibraryPaths(
+              const std::string &_libName) const;
 };
 
 //////////////////////////////////////////////////
@@ -108,10 +112,6 @@ SystemPaths::SystemPaths()
     closedir(dir);
 
   this->dataPtr->logPath = fullPath;
-
-  this->dataPtr->UpdatePluginPaths();
-
-  this->dataPtr->pluginPathsFromEnv = true;
 }
 
 /////////////////////////////////////////////////
@@ -126,37 +126,106 @@ std::string SystemPaths::LogPath() const
 }
 
 /////////////////////////////////////////////////
+void SystemPaths::SetPluginPathEnv(const std::string &_env)
+{
+  this->dataPtr->pluginPathEnv = _env;
+}
+
+/////////////////////////////////////////////////
 const std::list<std::string> &SystemPaths::PluginPaths()
 {
-  if (this->dataPtr->pluginPathsFromEnv)
-    this->dataPtr->UpdatePluginPaths();
+  if (this->dataPtr->pluginPathEnv.size())
+  {
+    std::string paths = getenv(this->dataPtr->pluginPathEnv.c_str());
+    this->AddPluginPaths(paths);
+  }
   return this->dataPtr->pluginPaths;
 }
 
-//////////////////////////////////////////////////
-void SystemPathsPrivate::UpdatePluginPaths()
+/////////////////////////////////////////////////
+std::string SystemPaths::FindSharedLibrary(const std::string &_libName)
 {
-  std::string delim(":");
-  std::string path;
+  std::string pathToLibrary;
+  std::vector<std::string> searchNames =
+    this->dataPtr->GenerateLibraryPaths(_libName);
 
-  char *pathCStr = getenv("IGN_PLUGIN_PATH");
-  if (!pathCStr || *pathCStr == '\0')
+  // TODO return list of paths that match if more than one matches?
+  for (auto const &possibleName : searchNames)
   {
-    // No env var; take the compile-time default.
-    path = IGN_PLUGIN_PATH;
+    if (exists(possibleName))
+    {
+      pathToLibrary = possibleName;
+      break;
+    }
   }
-  else
-    path = pathCStr;
+  return pathToLibrary;
+}
 
-  size_t pos1 = 0;
-  size_t pos2 = path.find(delim);
-  while (pos2 != std::string::npos)
+/////////////////////////////////////////////////
+std::string SystemPathsPrivate::NormalizePath(const std::string &_path)
+  const
+{
+  std::string path = _path;
+  // Use '/' because it works on Linux, OSX, and Windows
+  std::replace(path.begin(), path.end(), '\\', '/');
+  // Make last character '/'
+  if (!EndsWith(path, "/"))
   {
-    insertUnique(path.substr(pos1, pos2-pos1), this->pluginPaths);
-    pos1 = pos2+1;
-    pos2 = path.find(delim, pos2+1);
+    path += '/';
   }
-  insertUnique(path.substr(pos1, path.size()-pos1), this->pluginPaths);
+  return path;
+}
+
+/////////////////////////////////////////////////
+std::vector<std::string> SystemPathsPrivate::GenerateLibraryPaths(
+    const std::string &_libName) const
+{
+  std::string lowercaseLibName = _libName;
+  for (int i = 0; i < _libName.size(); ++i)
+    lowercaseLibName[i] = std::tolower(_libName[i], std::locale());
+  // test for possible prefixes or extensions on the library name
+  bool hasLib = StartsWith(_libName, "lib");
+  bool hasDotSo = EndsWith(lowercaseLibName, ".so");
+  bool hasDotDll = EndsWith(lowercaseLibName, ".dll");
+  bool hasDotDylib = EndsWith(lowercaseLibName, ".dylib");
+
+  // Try removing non cross platform parts of names
+  std::vector<std::string> initNames;
+  initNames.push_back(_libName);
+  if (hasLib && hasDotSo)
+    initNames.push_back(_libName.substr(3, _libName.size() - 6));
+  if (hasDotDll)
+    initNames.push_back(_libName.substr(0, _libName.size() - 4));
+  if (hasLib && hasDotDylib)
+    initNames.push_back(_libName.substr(3, _libName.size() - 9));
+
+  // Create possible basenames on different platforms
+  std::vector<std::string> basenames;
+  for (auto const &name : initNames)
+  {
+    basenames.push_back(name);
+    basenames.push_back("lib" + name + ".so");
+    basenames.push_back(name + ".so");
+    basenames.push_back(name + ".dll");
+    basenames.push_back("lib" + name + ".dylib");
+    basenames.push_back(name + ".dylib");
+    basenames.push_back("lib" + name + ".SO");
+    basenames.push_back(name + ".SO");
+    basenames.push_back(name + ".DLL");
+    basenames.push_back("lib" + name + ".DYLIB");
+    basenames.push_back(name + ".DYLIB");
+  }
+
+  std::vector<std::string> searchNames;
+  // Concatenate these possible basenames with the search paths
+  for (auto const &path : this->pluginPaths)
+  {
+    for (auto const &name : basenames)
+    {
+      searchNames.push_back(path + name);
+    }
+  }
+  return searchNames;
 }
 
 //////////////////////////////////////////////////
@@ -244,17 +313,20 @@ void SystemPaths::ClearPluginPaths()
 /////////////////////////////////////////////////
 void SystemPaths::AddPluginPaths(const std::string &_path)
 {
-  std::string delim(":");
-  size_t pos1 = 0;
-  size_t pos2 = _path.find(delim);
-  while (pos2 != std::string::npos)
+#ifdef _WIN32
+  char delim = ';';
+#else
+  char delim = ':';
+#endif
+  if (_path.size())
   {
-    insertUnique(_path.substr(pos1, pos2-pos1), this->dataPtr->pluginPaths);
-    pos1 = pos2+1;
-    pos2 = _path.find(delim, pos2+1);
+    std::vector<std::string> paths = Split(_path, delim);
+    for (auto const &path : paths)
+    {
+      std::string normalPath = this->dataPtr->NormalizePath(path);
+      insertUnique(normalPath, this->dataPtr->pluginPaths);
+    }
   }
-  insertUnique(_path.substr(pos1, _path.size()-pos1),
-      this->dataPtr->pluginPaths);
 }
 
 /////////////////////////////////////////////////
