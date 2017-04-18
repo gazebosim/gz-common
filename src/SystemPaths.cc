@@ -136,8 +136,11 @@ const std::list<std::string> &SystemPaths::PluginPaths()
 {
   if (this->dataPtr->pluginPathEnv.size())
   {
-    std::string paths = getenv(this->dataPtr->pluginPathEnv.c_str());
-    this->AddPluginPaths(paths);
+    char *env = getenv(this->dataPtr->pluginPathEnv.c_str());
+    if (env != nullptr)
+    {
+      this->AddPluginPaths(std::string(env));
+    }
   }
   return this->dataPtr->pluginPaths;
 }
@@ -145,6 +148,9 @@ const std::list<std::string> &SystemPaths::PluginPaths()
 /////////////////////////////////////////////////
 std::string SystemPaths::FindSharedLibrary(const std::string &_libName)
 {
+  // Trigger loading paths from env
+  this->PluginPaths();
+
   std::string pathToLibrary;
   std::vector<std::string> searchNames =
     this->dataPtr->GenerateLibraryPaths(_libName);
