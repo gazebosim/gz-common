@@ -11,7 +11,6 @@ set (headers
   Dem.hh
   EnumIface.hh
   Event.hh
-  GTSMeshUtils.hh
   HeightmapData.hh
   Image.hh
   ImageHeightmap.hh
@@ -20,7 +19,6 @@ set (headers
   Material.hh
   MaterialDensity.hh
   Mesh.hh
-  MeshCSG.hh
   MeshExporter.hh
   MeshLoader.hh
   MeshManager.hh
@@ -54,6 +52,8 @@ if(NOT WIN32)
   set (headers ${headers}
     AudioDecoder.hh
     ffmpeg_inc.hh
+    GTSMeshUtils.hh
+    MeshCSG.hh
   )
 endif()
 

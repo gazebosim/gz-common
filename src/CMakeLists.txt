@@ -14,14 +14,12 @@ set (sources
   Event.cc
   Image.cc
   ImageHeightmap.cc
-  GTSMeshUtils.cc
   KeyEvent.cc
   KeyFrame.cc
   Material.cc
   MaterialDensity.cc
   Mesh.cc
   MeshExporter.cc
-  MeshCSG.cc
   MeshManager.cc
   MouseEvent.cc
   NodeAnimation.cc
@@ -49,6 +47,8 @@ if(NOT WIN32)
   set (sources ${sources}
     AudioDecoder.cc
     ffmpeg_inc.cc
+    GTSMeshUtils.cc
+    MeshCSG.cc
   )
 endif()
 
@@ -68,7 +68,6 @@ set (gtest_sources
   Event_TEST.cc
   Image_TEST.cc
   ImageHeightmap_TEST.cc
-  GTSMeshUtils_TEST.cc
   KeyEvent_TEST.cc
   Material_TEST.cc
   MaterialDensity_TEST.cc
@@ -92,6 +91,7 @@ set (gtest_sources
 if(NOT WIN32)
   set (gtest_sources ${gtest_sources}
     #AudioDecoder_TEST.cc
+    GTSMeshUtils_TEST.cc
   )
 endif()
 
