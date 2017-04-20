@@ -12,7 +12,6 @@ set (sources
   Console.cc
   Dem.cc
   Event.cc
-  ffmpeg_inc.cc
   Image.cc
   ImageHeightmap.cc
   GTSMeshUtils.cc
@@ -49,6 +48,7 @@ set (sources
 if(NOT WIN32)
   set (sources ${sources}
     AudioDecoder.cc
+    ffmpeg_inc.cc
   )
 endif()
 
