@@ -4,7 +4,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}
 
 set (sources
   Animation.cc
-  AudioDecoder.cc
   Base64.cc
   Battery.cc
   BVHLoader.cc
@@ -46,13 +45,19 @@ set (sources
   VideoEncoder.cc
 )
 
+# FIXME: Some classes fail to build on Windows
+if(NOT WIN32)
+  set (sources ${sources}
+    AudioDecoder.cc
+  )
+endif()
+
 if (NOT USE_EXTERNAL_TINYXML2)
     list (APPEND sources ${CMAKE_SOURCE_DIR}/src/tinyxml2/ignition/tinyxml2.cpp)
 endif()
 
 set (gtest_sources
   Animation_TEST.cc
-  #AudioDecoder_TEST.cc
   Base64_TEST.cc
   Battery_TEST.cc
   ColladaExporter_TEST.cc
@@ -82,6 +87,13 @@ set (gtest_sources
   Uuid_TEST.cc
   VideoEncoder_TEST.cc
 )
+
+# FIXME: Some classes fail to build on Windows
+if(NOT WIN32)
+  set (gtest_sources ${gtest_sources}
+    #AudioDecoder_TEST.cc
+  )
+endif()
 
 ign_add_library(${PROJECT_LIBRARY_TARGET_NAME} ${sources})
 target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
@@ -116,9 +128,9 @@ if (UNIX AND NOT APPLE)
   endif()
 endif()
 
-# When the minimum CMake required version will be >= 3.1 
-# we could use the target_compile_features() command 
-# to enable C++11 support in a platform-independent way. 
+# When the minimum CMake required version will be >= 3.1
+# we could use the target_compile_features() command
+# to enable C++11 support in a platform-independent way.
 if(NOT MSVC)
   target_compile_options(${PROJECT_LIBRARY_TARGET_NAME} PUBLIC "-std=c++11")
 endif()
