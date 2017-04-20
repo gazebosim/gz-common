@@ -19,17 +19,17 @@
 #include <iostream>
 #include "ignition/common/PluginLoader.hh"
 #include "ignition/common/SystemPaths.hh"
-#include "util/DummyPlugins.hh"
 
+#include "test_config.h"
+#include "util/DummyPlugins.hh"
 
 /////////////////////////////////////////////////
 TEST(PluginLoader, LoadExistingLibrary)
 {
-  // The search path is a little fragile
-  // It requires running from directory containing this test executable
-  // `make test` does this, so it's only an issue if running the test solo
+  std::string projectPath(PROJECT_BINARY_PATH);
+
   ignition::common::SystemPaths sp;
-  sp.AddPluginPaths("../util");
+  sp.AddPluginPaths(projectPath + "/test/util");
   std::string path = sp.FindSharedLibrary("IGNDummyPlugins");
   ASSERT_LT(0, path.size());
 
