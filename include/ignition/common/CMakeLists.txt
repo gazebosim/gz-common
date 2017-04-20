@@ -2,7 +2,6 @@ include (${project_cmake_dir}/Utils.cmake)
 
 set (headers
   Animation.hh
-  AudioDecoder.hh
   Base64.hh
   Battery.hh
   BVHLoader.hh
@@ -12,7 +11,6 @@ set (headers
   Dem.hh
   EnumIface.hh
   Event.hh
-  ffmpeg_inc.hh
   GTSMeshUtils.hh
   HeightmapData.hh
   Image.hh
@@ -50,6 +48,14 @@ set (headers
   Video.hh
   VideoEncoder.hh
 )
+
+# FIXME: Some classes fail to build on Windows
+if(NOT WIN32)
+  set (headers ${headers}
+    AudioDecoder.hh
+    ffmpeg_inc.hh
+  )
+endif()
 
 set (ign_headers "" CACHE INTERNAL "Ignition headers" FORCE)
 foreach (hdr ${headers})
