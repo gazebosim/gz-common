@@ -101,7 +101,6 @@ target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
   ${freeimage_LIBRARIES}
   ${tinyxml2_LIBRARIES}
   ${uuid_LIBRARIES}
-  ${libswscale_LIBRARIES}
   )
 
 if(NOT WIN32)
@@ -111,6 +110,7 @@ if(NOT WIN32)
     ${libavformat_LIBRARIES}
     ${libavutil_LIBRARIES}
     ${libavdevice_LIBRARIES}
+    ${libswscale_LIBRARIES}
   )
 endif()
 
