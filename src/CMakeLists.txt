@@ -100,18 +100,18 @@ target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
   ${IGNITION-MATH_LIBRARIES}
   ${freeimage_LIBRARIES}
   ${tinyxml2_LIBRARIES}
-  ${gts_LIBRARIES}
   ${uuid_LIBRARIES}
-  ${libavformat_LIBRARIES}
-  ${libavutil_LIBRARIES}
-  ${libavdevice_LIBRARIES}
   ${libswscale_LIBRARIES}
   )
 
 if(NOT WIN32)
-target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
-  ${libavcodec_LIBRARIES}
-)
+  target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
+    ${gts_LIBRARIES}
+    ${libavcodec_LIBRARIES}
+    ${libavformat_LIBRARIES}
+    ${libavutil_LIBRARIES}
+    ${libavdevice_LIBRARIES}
+  )
 endif()
 
 if (UNIX AND NOT APPLE)
