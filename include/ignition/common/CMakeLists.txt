@@ -12,8 +12,6 @@ set (headers
   EnumIface.hh
   Event.hh
   HeightmapData.hh
-  Image.hh
-  ImageHeightmap.hh
   KeyEvent.hh
   KeyFrame.hh
   Material.hh
@@ -51,6 +49,8 @@ if(NOT WIN32)
     AudioDecoder.hh
     ffmpeg_inc.hh
     GTSMeshUtils.hh
+    Image.hh
+    ImageHeightmap.hh
     MeshCSG.hh
     Video.hh
     VideoEncoder.hh

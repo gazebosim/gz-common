@@ -12,8 +12,6 @@ set (sources
   Console.cc
   Dem.cc
   Event.cc
-  Image.cc
-  ImageHeightmap.cc
   KeyEvent.cc
   KeyFrame.cc
   Material.cc
@@ -46,6 +44,8 @@ if(NOT WIN32)
     AudioDecoder.cc
     ffmpeg_inc.cc
     GTSMeshUtils.cc
+    Image.cc
+    ImageHeightmap.cc
     MeshCSG.cc
     Video.cc
     VideoEncoder.cc
@@ -66,8 +66,6 @@ set (gtest_sources
   Dem_TEST.cc
   EnumIface_TEST.cc
   Event_TEST.cc
-  Image_TEST.cc
-  ImageHeightmap_TEST.cc
   KeyEvent_TEST.cc
   Material_TEST.cc
   MaterialDensity_TEST.cc
@@ -91,6 +89,8 @@ if(NOT WIN32)
   set (gtest_sources ${gtest_sources}
     #AudioDecoder_TEST.cc
     GTSMeshUtils_TEST.cc
+    Image_TEST.cc
+    ImageHeightmap_TEST.cc
     VideoEncoder_TEST.cc
   )
 endif()
@@ -98,13 +98,13 @@ endif()
 ign_add_library(${PROJECT_LIBRARY_TARGET_NAME} ${sources})
 target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
   ${IGNITION-MATH_LIBRARIES}
-  ${freeimage_LIBRARIES}
   ${tinyxml2_LIBRARIES}
   ${uuid_LIBRARIES}
   )
 
 if(NOT WIN32)
   target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
+    ${freeimage_LIBRARIES}
     ${gts_LIBRARIES}
     ${libavcodec_LIBRARIES}
     ${libavformat_LIBRARIES}
