@@ -102,12 +102,17 @@ target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
   ${tinyxml2_LIBRARIES}
   ${gts_LIBRARIES}
   ${uuid_LIBRARIES}
-  ${libavcodec_LIBRARIES}
   ${libavformat_LIBRARIES}
   ${libavutil_LIBRARIES}
   ${libavdevice_LIBRARIES}
   ${libswscale_LIBRARIES}
   )
+
+if(NOT WIN32)
+target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
+  ${libavcodec_LIBRARIES}
+)
+endif()
 
 if (UNIX AND NOT APPLE)
   target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME} rt)
