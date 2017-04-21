@@ -31,11 +31,15 @@ set (headers
   NodeAnimation.hh
   NodeTransform.hh
   OBJLoader.hh
+  PluginInfo.hh
+  PluginLoader.hh
+  PluginMacros.hh
   SemanticVersion.hh
   SingletonT.hh
   Skeleton.hh
   SkeletonAnimation.hh
   SkeletonNode.hh
+  StringUtils.hh
   SubMesh.hh
   System.hh
   SystemPaths.hh

@@ -27,10 +27,12 @@
   #define GetCurrentDir getcwd
 #endif
 
-#include <string>
-#include <memory>
-#include <list>
 #include <functional>
+#include <list>
+#include <memory>
+#include <string>
+#include <type_traits>
+#include <vector>
 
 #include <ignition/common/System.hh>
 
@@ -66,6 +68,10 @@ namespace ignition
       /// \return Returns full path name to file
       public: std::string FindFileURI(const std::string &_uri);
 
+      /// \brief Set the plugin path environment variable to use
+      /// \param [in] _env name of the environment variable
+      public: void SetPluginPathEnv(const std::string &_env);
+
       /// \brief Find a file in the set search paths
       /// \param[in] _filename Name of the file to find.
       /// \param[in] _searchLocalPath True to search in the current working
@@ -74,7 +80,16 @@ namespace ignition
       public: std::string FindFile(const std::string &_filename,
                                    bool _searchLocalPath = true);
 
-      /// \brief Add colon delimited paths to plugins
+      /// \brief Find a shared library by name in the plugin paths
+      ///
+      /// This will try different combinations of library names on different
+      /// platforms. For example searching for "MyLibName" may try finding
+      /// "MyLibName", "libMyLibName.so", "MyLibName.dll", etc...
+      /// \param[in] _libName Name of shared libary to look for
+      /// \return path to file or empty string on error
+      public: std::string FindSharedLibrary(const std::string &_libName);
+
+      /// \brief Add colon (semicolon on windows) delimited paths to plugins
       /// \param[in] _path the directory to add
       public: void AddPluginPaths(const std::string &_path);
 

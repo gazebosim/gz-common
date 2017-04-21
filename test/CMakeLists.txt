@@ -4,6 +4,10 @@ include_directories (
   ${PROJECT_SOURCE_DIR}/test
 )
 
+if(NOT MSVC)
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+endif()
+
 configure_file (test_config.h.in ${PROJECT_BINARY_DIR}/test_config.h)
 
 # Build gtest
@@ -20,3 +24,5 @@ include_directories(${GTEST_INCLUDE_DIRS})
 add_subdirectory(integration)
 add_subdirectory(performance)
 add_subdirectory(regression)
+add_subdirectory(util)
+add_subdirectory(static_assertions)
