@@ -19,6 +19,10 @@
 #include <string>
 #include <map>
 
+#ifndef _WIN32
+  #include "ignition/common/MeshCSG.hh"
+#endif
+
 #include "ignition/common/Console.hh"
 #include "ignition/common/Mesh.hh"
 #include "ignition/common/SubMesh.hh"
@@ -26,7 +30,6 @@
 #include "ignition/common/ColladaExporter.hh"
 #include "ignition/common/STLLoader.hh"
 #include "ignition/common/config.hh"
-#include "ignition/common/MeshCSG.hh"
 #include "ignition/common/GTSMeshUtils.hh"
 
 #include "ignition/common/MeshManager.hh"
@@ -1249,10 +1252,12 @@ void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
   if (this->HasMesh(_name))
     return;
 
+#ifndef _WIN32
   MeshCSG csg;
   Mesh *mesh = csg.CreateBoolean(_m1, _m2, _operation, _offset);
   mesh->SetName(_name);
   this->meshes.insert(std::make_pair(_name, mesh));
+#endif
 }
 
 //////////////////////////////////////////////////
