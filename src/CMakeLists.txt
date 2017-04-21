@@ -38,8 +38,6 @@ set (sources
   URI.cc
   Util.cc
   Uuid.cc
-  Video.cc
-  VideoEncoder.cc
 )
 
 # FIXME: Some classes fail to build on Windows
@@ -49,6 +47,8 @@ if(NOT WIN32)
     ffmpeg_inc.cc
     GTSMeshUtils.cc
     MeshCSG.cc
+    Video.cc
+    VideoEncoder.cc
   )
 endif()
 
@@ -84,7 +84,6 @@ set (gtest_sources
   URI_TEST.cc
   Util_TEST.cc
   Uuid_TEST.cc
-  VideoEncoder_TEST.cc
 )
 
 # FIXME: Some classes fail to build on Windows
@@ -92,6 +91,7 @@ if(NOT WIN32)
   set (gtest_sources ${gtest_sources}
     #AudioDecoder_TEST.cc
     GTSMeshUtils_TEST.cc
+    VideoEncoder_TEST.cc
   )
 endif()
 

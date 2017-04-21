@@ -43,8 +43,6 @@ set (headers
   Util.hh
   URI.hh
   Uuid.hh
-  Video.hh
-  VideoEncoder.hh
 )
 
 # FIXME: Some classes fail to build on Windows
@@ -54,6 +52,8 @@ if(NOT WIN32)
     ffmpeg_inc.hh
     GTSMeshUtils.hh
     MeshCSG.hh
+    Video.hh
+    VideoEncoder.hh
   )
 endif()
 
