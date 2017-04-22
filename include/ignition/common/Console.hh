@@ -218,9 +218,9 @@ namespace ignition
       ///
       /// [Err], [Wrn], [Msg], [Dbg]
       ///
-      /// If you set a prefix as "my " (note the space), they become:
+      /// If you set the prefix to "-my-", for example, they become:
       ///
-      /// [my Err], [my Wrn], [my Msg], [my Dbg]
+      /// -my-[Err], -my-[Wrn], -my-[Msg], -my-[Dbg]
       ///
       /// \param[in] _customPrefix Prefix string.
       /// \sa std::string Prefix() const
