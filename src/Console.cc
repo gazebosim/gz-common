@@ -23,6 +23,8 @@
 using namespace ignition;
 using namespace common;
 
+std::string customPrefix;
+
 FileLogger ignition::common::Console::log("");
 
 // 31 == Red
@@ -51,6 +53,18 @@ int Console::Verbosity()
   return verbosity;
 }
 
+//////////////////////////////////////////////////
+void Console::SetPrefix(const std::string &_prefix)
+{
+  customPrefix = _prefix;
+}
+
+//////////////////////////////////////////////////
+std::string Console::Prefix()
+{
+  return customPrefix;
+}
+
 /////////////////////////////////////////////////
 Logger::Logger(const std::string &_prefix, const int _color,
                const LogType _type, const int _verbosity)
@@ -69,7 +83,7 @@ Logger::~Logger()
 Logger &Logger::operator()()
 {
   Console::log << "(" << ignition::common::systemTimeISO() << ") ";
-  (*this) << this->prefix;
+  (*this) << Console::Prefix() << this->prefix;
 
   return (*this);
 }
@@ -80,7 +94,7 @@ Logger &Logger::operator()(const std::string &_file, int _line)
   int index = _file.find_last_of("/") + 1;
 
   Console::log << "(" << IGN_SYSTEM_TIME_NS() << ") ";
-  (*this) << this->prefix
+  (*this) << Console::Prefix() << this->prefix
     << "[" << _file.substr(index , _file.size() - index) << ":"
     << _line << "] ";
 
