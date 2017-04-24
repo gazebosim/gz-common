@@ -16,3 +16,4 @@ pipelines:
           - cmake ..
           - make
           - make test
+          - make install
