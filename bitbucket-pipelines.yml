@@ -3,14 +3,19 @@
 # Only use spaces to indent your .yml configuration.
 # -----
 # You can specify a custom docker image from Docker Hub as your build environment.
-image: gcc:6.1
+image: ubuntu:16.04
 
 pipelines:
   default:
     - step:
-        script: # Modify the commands below to build your repository.
+        script:
+          - echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable xenial main" > /etc/apt/sources.list.d/gazebo-stable.list
+          - apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys D2486D2DD83DB69272AFE98867170598AF249743
           - apt-get update
-          - apt-get -y install cmake pkg-config python ruby-ronn uuid-dev libavcodec-dev libavdevice-dev libavformat-dev libavutil-dev libfreeimage-dev libgts-dev libswscale-dev
+          - apt-get -y install cmake pkg-config python ruby-ronn uuid-dev
+          - apt-get -y install libavcodec-dev libavdevice-dev libavformat-dev libavutil-dev
+          - apt-get -y install libfreeimage-dev libgts-dev libswscale-dev
+          - apt-get -y install libignition-math3-dev
           - mkdir build
           - cd build
           - cmake ..
