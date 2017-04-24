@@ -10,7 +10,7 @@ pipelines:
     - step:
         script: # Modify the commands below to build your repository.
           - apt-get update
-          - apt-get -y install cmake
+          - apt-get -y install cmake pkg-config python ruby-ronn uuid-dev libavcodec-dev libavdevice-dev libavformat-dev libavutil-dev libfreeimage-dev libgts-dev libswscale-dev
           - mkdir build
           - cd build
           - cmake ..
