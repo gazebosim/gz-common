@@ -20,7 +20,7 @@
 #include <string>
 #include <vector>
 
-#include <ignition/common/Util.hh>
+#include <ignition/common/System.hh>
 
 namespace ignition
 {
