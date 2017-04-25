@@ -23,11 +23,13 @@ set (sources
   NodeAnimation.cc
   NodeTransform.cc
   OBJLoader.cc
+  PluginLoader.cc
   SemanticVersion.cc
   Skeleton.cc
   SkeletonAnimation.cc
   SkeletonNode.cc
   STLLoader.cc
+  StringUtils.cc
   SystemPaths.cc
   SubMesh.cc
   SVGLoader.cc
@@ -74,7 +76,9 @@ set (gtest_sources
   MouseEvent_TEST.cc
   MovingWindowFilter_TEST.cc
   OBJLoader_TEST.cc
+  PluginLoader_TEST.cc
   SemanticVersion_TEST.cc
+  StringUtils_TEST.cc
   SubMesh_TEST.cc
   SVGLoader_TEST.cc
   SystemPaths_TEST.cc
