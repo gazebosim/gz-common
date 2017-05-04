@@ -26,6 +26,7 @@
 
 using namespace ignition;
 
+#ifndef _WIN32
 class MeshManager : public ignition::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
@@ -273,3 +274,4 @@ int main(int argc, char **argv)
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
+#endif

@@ -24,6 +24,10 @@
 #include "ignition/common/ColladaExporter.hh"
 #include "test/util.hh"
 
+#ifdef _WIN32
+  #define snprintf _snprintf
+#endif
+
 using namespace ignition;
 
 class ColladaExporter : public ignition::testing::AutoLogFixture { };

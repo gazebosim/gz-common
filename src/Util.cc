@@ -35,13 +35,13 @@
 #include <ignition/common/SystemPaths.hh>
 #include <ignition/common/Util.hh>
 #include <ignition/common/Uuid.hh>
-#include <ignition/common/ffmpeg_inc.hh>
 #include <ignition/common/Console.hh>
 
 #ifndef _WIN32
 #include <dirent.h>
 #include <limits.h>
 #include <climits>
+#include <ignition/common/ffmpeg_inc.hh>
 #else
 #include <io.h>
 #include "ignition/common/win_dirent.h"
@@ -69,6 +69,7 @@
 /////////////////////////////////////////////////
 // avcodec log callback. We use this to redirect message to gazebo's console
 // messages.
+#ifndef _WIN32
 void logCallback(void *_ptr, int _level, const char *_fmt, va_list _args)
 {
   static char message[8192];
@@ -107,6 +108,7 @@ void logCallback(void *_ptr, int _level, const char *_fmt, va_list _args)
       break;
   }
 }
+#endif
 
 static std::unique_ptr<ignition::common::SystemPaths> gSystemPaths(
     new ignition::common::SystemPaths);
@@ -294,6 +296,7 @@ bool Sha1::Digest(void const *_buffer, std::size_t _byteCount,
 void ignition::common::load()
 {
   static bool first = true;
+#ifndef _WIN32
   if (first)
   {
     first = false;
@@ -307,6 +310,7 @@ void ignition::common::load()
     // Set the log callback function.
     av_log_set_callback(logCallback);
   }
+#endif
 }
 
 /////////////////////////////////////////////////
