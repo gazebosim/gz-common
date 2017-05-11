@@ -55,7 +55,7 @@ if(NOT WIN32)
 endif()
 
 if (NOT USE_EXTERNAL_TINYXML2)
-    list (APPEND sources ${CMAKE_SOURCE_DIR}/src/tinyxml2/ignition/tinyxml2.cpp)
+    list (APPEND sources ${CMAKE_SOURCE_DIR}/src/tinyxml2/tinyxml2.cpp)
 endif()
 
 set (gtest_sources

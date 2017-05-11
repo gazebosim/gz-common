@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-#include <ignition/tinyxml2.h>
+#include "tinyxml2.h"
 #include <ignition/math/Vector3.hh>
 
 #include <ignition/common/Material.hh>

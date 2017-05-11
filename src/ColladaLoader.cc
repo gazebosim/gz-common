@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-#include <ignition/tinyxml2.h>
+#include "tinyxml2.h"
 
 #include <sstream>
 #include <unordered_map>
