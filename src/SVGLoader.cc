@@ -15,12 +15,12 @@
  *
  */
 
-#include "tinyxml2.h"
-
 #include <algorithm>
 #include <list>
 #include <utility>
 #include <cmath>
+
+#include "tinyxml2.h"
 
 #include "ignition/common/Console.hh"
 #include "ignition/common/Util.hh"

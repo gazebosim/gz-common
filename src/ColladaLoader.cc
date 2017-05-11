@@ -14,8 +14,6 @@
  * limitations under the License.
  *
  */
-#include "tinyxml2.h"
-
 #include <sstream>
 #include <unordered_map>
 #include <map>
@@ -26,6 +24,8 @@
 #include <ignition/math/Matrix4.hh>
 #include <ignition/math/Vector2.hh>
 #include <ignition/math/Vector3.hh>
+
+#include "tinyxml2.h"
 
 #include "ignition/common/Types.hh"
 #include "ignition/common/Console.hh"
