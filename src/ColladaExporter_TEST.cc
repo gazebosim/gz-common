@@ -15,7 +15,7 @@
  *
 */
 #include <gtest/gtest.h>
-#include <ignition/tinyxml2.h>
+#include "tinyxml2.h"
 
 #include "test_config.h"
 #include "ignition/common/Mesh.hh"

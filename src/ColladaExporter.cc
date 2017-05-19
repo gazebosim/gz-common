@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-#include <ignition/tinyxml2.h>
 #include <ignition/math/Vector3.hh>
 
 #include <ignition/common/Material.hh>
@@ -22,6 +21,8 @@
 #include <ignition/common/SubMesh.hh>
 #include <ignition/common/Console.hh>
 #include <ignition/common/ColladaExporter.hh>
+
+#include "tinyxml2.h"
 
 #ifdef _WIN32
   #define snprintf _snprintf

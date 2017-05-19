@@ -25,16 +25,18 @@ add_manpage_target()
 # Use pkg_check_modules and fallback to manual detection
 # (needed, at least, for MacOS)
 
-# Use system installation on UNIX and Apple, and internal copy on Windows
-if (UNIX OR APPLE)
-  message (STATUS "Using system tinyxml2.")
-  set (USE_EXTERNAL_TINYXML2 False)
-elseif(WIN32)
-  message (STATUS "Using internal tinyxml2.")
-  set (USE_EXTERNAL_TINYXML2 False)
-else()
-  message (STATUS "Unknown platform, unable to configure tinyxml2.")
-  BUILD_ERROR("Unknown platform")
+# By default use system installation on UNIX and Apple, and internal copy on Windows
+if (NOT DEFINED USE_EXTERNAL_TINYXML2)
+  if (UNIX OR APPLE)
+    message (STATUS "By default use system installation on UNIX and Apple")
+    set (USE_EXTERNAL_TINYXML2 True)
+  elseif(WIN32)
+    message (STATUS "By default use internal tinyxml2 on Windows")
+    set (USE_EXTERNAL_TINYXML2 False)
+  else()
+    message (STATUS "Unknown platform, unable to configure tinyxml2.")
+    BUILD_ERROR("Unknown platform")
+  endif()
 endif()
 
 if (USE_EXTERNAL_TINYXML2)
