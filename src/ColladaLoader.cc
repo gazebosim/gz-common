@@ -364,7 +364,7 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
   }
 
   this->dataPtr->filename = _filename;
-  if (xmlDoc.LoadFile(_filename.c_str()) != tinyxml2::XML_NO_ERROR)
+  if (xmlDoc.LoadFile(_filename.c_str()) != tinyxml2::XML_SUCCESS)
     ignerr << "Unable to load collada file[" << _filename << "]\n";
 
   this->dataPtr->colladaXml = xmlDoc.FirstChildElement("COLLADA");
