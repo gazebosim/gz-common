@@ -14,43 +14,98 @@
  * limitations under the License.
  *
 */
+#include <algorithm>
 #include <gtest/gtest.h>
 #include <string>
 #include <vector>
-
 
 #include "ignition/common/SystemPaths.hh"
 
 using namespace ignition;
 
-TEST(SystemPathsTest, SystemPaths)
+class SystemPathsFixture : public ::testing::Test
 {
-  std::string pluginPathBackup = "IGN_PLUGIN_PATH=";
+  public: virtual void SetUp()
+    {
+      this->backupPluginPath = "IGN_PLUGIN_PATH=";
 
-  if (getenv("IGN_PLUGIN_PATH"))
-    pluginPathBackup += getenv("IGN_PLUGIN_PATH");
+      if (getenv("IGN_PLUGIN_PATH"))
+        this->backupPluginPath += getenv("IGN_PLUGIN_PATH");
 
-  putenv(const_cast<char*>("IGN_LOG_PATH="));
-  common::SystemPaths *paths = new common::SystemPaths();
+      putenv(const_cast<char*>("IGN_PLUGIN_PATH="));
+    }
 
-  paths->ClearPluginPaths();
+  public: virtual void TearDown()
+    {
+      putenv(const_cast<char*>(this->backupPluginPath.c_str()));
+    }
 
+  public: std::string backupPluginPath;
+};
+
+TEST_F(SystemPathsFixture, SystemPaths)
+{
+  common::SystemPaths paths;
   putenv(const_cast<char*>("IGN_PLUGIN_PATH=/tmp/plugin:/test/plugin/now"));
-  const std::list<std::string> pathList3 = paths->PluginPaths();
+  const std::list<std::string> pathList3 = paths.PluginPaths();
   EXPECT_EQ(static_cast<unsigned int>(2), pathList3.size());
-  EXPECT_STREQ("/tmp/plugin", pathList3.front().c_str());
-  EXPECT_STREQ("/test/plugin/now", pathList3.back().c_str());
+  EXPECT_STREQ("/tmp/plugin/", pathList3.front().c_str());
+  EXPECT_STREQ("/test/plugin/now/", pathList3.back().c_str());
 
-  paths->ClearPluginPaths();
+  paths.ClearPluginPaths();
 
-  EXPECT_EQ(static_cast<unsigned int>(2), paths->PluginPaths().size());
+  EXPECT_EQ(static_cast<unsigned int>(2), paths.PluginPaths().size());
+}
 
-  putenv(const_cast<char*>("IGN_PLUGIN_PATH="));
-  paths->ClearPluginPaths();
+/////////////////////////////////////////////////
+TEST_F(SystemPathsFixture, InitialNoSearchPaths)
+{
+  common::SystemPaths sp;
+  EXPECT_EQ(0, sp.PluginPaths().size());
+}
 
-  putenv(const_cast<char*>(pluginPathBackup.c_str()));
+/////////////////////////////////////////////////
+TEST_F(SystemPathsFixture, AddOneSearchPath)
+{
+  common::SystemPaths sp;
+  sp.AddPluginPaths("./");
+  auto paths = sp.PluginPaths();
+  EXPECT_EQ(1, std::count(paths.begin(), paths.end(), "./"));
+}
 
-  delete paths;
+/////////////////////////////////////////////////
+TEST_F(SystemPathsFixture, ClearSearchPaths)
+{
+  common::SystemPaths sp;
+  sp.AddPluginPaths("./");
+  EXPECT_EQ(1, sp.PluginPaths().size());
+  sp.ClearPluginPaths();
+  EXPECT_EQ(0, sp.PluginPaths().size());
+}
+
+/////////////////////////////////////////////////
+TEST_F(SystemPathsFixture, SearchPathGetsTrailingSlash)
+{
+  common::SystemPaths sp;
+  sp.AddPluginPaths("/usr/local/lib");
+  auto paths = sp.PluginPaths();
+  EXPECT_EQ(1, std::count(paths.begin(), paths.end(), "/usr/local/lib/"));
+}
+
+/////////////////////////////////////////////////
+TEST_F(SystemPathsFixture, SearchPathUsesForwardSlashes)
+{
+#ifdef _WIN32
+  std::string before = "C:\\user\\alice\\gazebolibs\\";
+  std::string after = "C:/user/alice/gazebolibs/";
+#else
+  std::string before = "\\usr\\lib\\";
+  std::string after = "/usr/lib/";
+#endif
+  common::SystemPaths sp;
+  sp.AddPluginPaths(before);
+  auto paths = sp.PluginPaths();
+  EXPECT_EQ(after, *paths.begin());
 }
 
 /////////////////////////////////////////////////

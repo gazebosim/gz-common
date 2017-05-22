@@ -28,16 +28,18 @@ add_manpage_target()
 # Use pkg_check_modules and fallback to manual detection
 # (needed, at least, for MacOS)
 
-# Use system installation on UNIX and Apple, and internal copy on Windows
-if (UNIX OR APPLE)
-  message (STATUS "Using system tinyxml2.")
-  set (USE_EXTERNAL_TINYXML2 False)
-elseif(WIN32)
-  message (STATUS "Using internal tinyxml2.")
-  set (USE_EXTERNAL_TINYXML2 False)
-else()
-  message (STATUS "Unknown platform, unable to configure tinyxml2.")
-  BUILD_ERROR("Unknown platform")
+# By default use system installation on UNIX and Apple, and internal copy on Windows
+if (NOT DEFINED USE_EXTERNAL_TINYXML2)
+  if (UNIX OR APPLE)
+    message (STATUS "By default use system installation on UNIX and Apple")
+    set (USE_EXTERNAL_TINYXML2 True)
+  elseif(WIN32)
+    message (STATUS "By default use internal tinyxml2 on Windows")
+    set (USE_EXTERNAL_TINYXML2 False)
+  else()
+    message (STATUS "Unknown platform, unable to configure tinyxml2.")
+    BUILD_ERROR("Unknown platform")
+  endif()
 endif()
 
 if (USE_EXTERNAL_TINYXML2)
@@ -79,6 +81,26 @@ macro (check_gcc_visibility)
   include (CheckCXXCompilerFlag)
   check_cxx_compiler_flag(-fvisibility=hidden GCC_SUPPORTS_VISIBILITY)
 endmacro()
+
+########################################
+# Find libdl
+find_path(libdl_include_dir dlfcn.h /usr/include /usr/local/include)
+if (NOT libdl_include_dir)
+  message (STATUS "Looking for dlfcn.h - not found")
+  BUILD_ERROR ("Missing libdl: Required for plugins.")
+  set (libdl_include_dir /usr/include)
+else (NOT libdl_include_dir)
+  message (STATUS "Looking for dlfcn.h - found")
+endif ()
+
+find_library(libdl_library dl /usr/lib /usr/local/lib)
+if (NOT libdl_library)
+  message (STATUS "Looking for libdl - not found")
+  BUILD_ERROR ("Missing libdl: Required for plugins.")
+  set(libdl_library "")
+else (NOT libdl_library)
+  message (STATUS "Looking for libdl - found")
+endif ()
 
 #################################################
 # Find uuid
