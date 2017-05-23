@@ -80,6 +80,13 @@ namespace ignition
       public: std::string FindFile(const std::string &_filename,
                                    bool _searchLocalPath = true);
 
+      /// \brief look for a file in a set of search paths
+      /// \param[in] _filename Name of the file to find
+      /// \param[in] _paths paths to look for the file
+      /// \return Returns a path that will work from the current directory
+      public: std::string FindFile(const std::string &_filename,
+                                   const std::vector<std::string> &_paths);
+
       /// \brief Find a shared library by name in the plugin paths
       ///
       /// This will try different combinations of library names on different

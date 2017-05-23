@@ -15,6 +15,8 @@
  *
 */
 #include <algorithm>
+#include <cstring>
+#include <fstream>
 #include <gtest/gtest.h>
 #include <string>
 #include <vector>
@@ -106,6 +108,23 @@ TEST_F(SystemPathsFixture, SearchPathUsesForwardSlashes)
   sp.AddPluginPaths(before);
   auto paths = sp.PluginPaths();
   EXPECT_EQ(after, *paths.begin());
+}
+
+//////////////////////////////////////////////////
+TEST_F(SystemPathsFixture, findFile)
+{
+  std::string file = std::tmpnam(nullptr);
+
+  std::ofstream fout;
+  fout.open(file, std::ofstream::out);
+  fout << "asdf";
+  fout.close();
+
+  common::SystemPaths sp;
+  std::string foundFile = sp.FindFile(file, {""});
+  EXPECT_EQ(file, foundFile);
+
+  std::remove(file.c_str());
 }
 
 /////////////////////////////////////////////////
