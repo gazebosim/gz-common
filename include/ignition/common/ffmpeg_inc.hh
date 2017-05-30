@@ -58,14 +58,14 @@ namespace ignition
     AVFrame *AVFrameAlloc(void);
 
     /// \brief Helper function to avoid deprecation warnings.
-    IGNITION_COMMON_VISIBLE
     // cppcheck-suppress constStatement
+    IGNITION_COMMON_VISIBLE
     void AVFrameUnref(AVFrame *_frame);
 
     /// \brief Helper function to avoid deprecation warnings.
     /// \param[in] _packet AVPacket structure that stores compressed data
-    IGNITION_COMMON_VISIBLE
     // cppcheck-suppress constStatement
+    IGNITION_COMMON_VISIBLE
     void AVPacketUnref(AVPacket *_packet);
   }
 }
