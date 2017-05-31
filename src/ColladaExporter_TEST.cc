@@ -15,7 +15,7 @@
  *
 */
 #include <gtest/gtest.h>
-#include <ignition/tinyxml2.h>
+#include "tinyxml2.h"
 
 #include "test_config.h"
 #include "ignition/common/Mesh.hh"
@@ -23,6 +23,10 @@
 #include "ignition/common/ColladaLoader.hh"
 #include "ignition/common/ColladaExporter.hh"
 #include "test/util.hh"
+
+#ifdef _WIN32
+  #define snprintf _snprintf
+#endif
 
 using namespace ignition;
 

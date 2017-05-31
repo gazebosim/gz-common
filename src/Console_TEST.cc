@@ -443,7 +443,7 @@ TEST(Console_TEST, ColorErr)
 }
 
 /////////////////////////////////////////////////
-/// \brief Test Console::LogDirectory
+/// \brief Test Console::Verbosity
 TEST(Console_TEST, Verbosity)
 {
   EXPECT_EQ(ignition::common::Console::Verbosity(), 1);
@@ -453,6 +453,45 @@ TEST(Console_TEST, Verbosity)
 
   ignition::common::Console::SetVerbosity(-1);
   EXPECT_EQ(ignition::common::Console::Verbosity(), -1);
+}
+
+/////////////////////////////////////////////////
+/// \brief Test Console::Prefix
+TEST(Console_TEST, Prefix)
+{
+  // Max verbosity
+  ignition::common::Console::SetVerbosity(4);
+
+  // Path to log file
+  std::string path = ignition::common::uuid();
+  ignLogInit(path, "test.log");
+  std::string logPath = path + "/test.log";
+
+  // Check default prefix
+  EXPECT_EQ(ignition::common::Console::Prefix(), "");
+
+  // Set new prefix
+  ignition::common::Console::SetPrefix("**test** ");
+  EXPECT_EQ(ignition::common::Console::Prefix(), "**test** ");
+
+  // Use the console
+  ignerr << "error" << std::endl;
+  ignwarn << "warning" << std::endl;
+  ignmsg << "message" << std::endl;
+  igndbg << "debug" << std::endl;
+
+  // Get the logged content
+  std::string logContent = GetLogContent(logPath);
+
+  // Check
+  EXPECT_TRUE(logContent.find("**test** [Err]") != std::string::npos);
+  EXPECT_TRUE(logContent.find("**test** [Wrn]") != std::string::npos);
+  EXPECT_TRUE(logContent.find("**test** [Msg]") != std::string::npos);
+  EXPECT_TRUE(logContent.find("**test** [Dbg]") != std::string::npos);
+
+  // Reset
+  ignition::common::Console::SetPrefix("");
+  EXPECT_EQ(ignition::common::Console::Prefix(), "");
 }
 
 /////////////////////////////////////////////////

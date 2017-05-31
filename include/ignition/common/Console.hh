@@ -211,6 +211,26 @@ namespace ignition
       /// \sa SetVerbosity(const int _level)
       public: static int Verbosity();
 
+      /// \brief Add a custom prefix in front of the default prefixes.
+      ///
+      /// By default, the custom prefix is an empty string, so the messages
+      /// start as:
+      ///
+      /// [Err], [Wrn], [Msg], [Dbg]
+      ///
+      /// If you set the prefix to "-my-", for example, they become:
+      ///
+      /// -my-[Err], -my-[Wrn], -my-[Msg], -my-[Dbg]
+      ///
+      /// \param[in] _customPrefix Prefix string.
+      /// \sa std::string Prefix() const
+      public: static void SetPrefix(const std::string &_customPrefix);
+
+      /// \brief Get custom prefix. This is empty by default.
+      /// \return The custom prefix.
+      /// \sa void SetPrefix(const std::string &_customPrefix)
+      public: static std::string Prefix();
+
       /// \brief Global instance of the message logger.
       public: static Logger msg;
 

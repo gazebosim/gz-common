@@ -7,12 +7,15 @@ include (${project_cmake_dir}/FindFreeimage.cmake)
 
 ########################################
 # Find ignition math
-find_package(ignition-math3 QUIET)
-if (NOT ignition-math3_FOUND)
-  message(STATUS "Looking for ignition-math3-config.cmake - not found")
-  BUILD_ERROR ("Missing: Ignition math3 library.")
-else()
-  message(STATUS "Looking for ignition-math3-config.cmake - found")
+set(IGNITION-MATH_REQUIRED_MAJOR_VERSION 3)
+if (NOT DEFINED IGNITION-MATH_LIBRARY_DIRS AND NOT DEFINED IGNITION-MATH_INCLUDE_DIRS AND NOT DEFINED IGNITION-MATH_LIBRARIES)
+  find_package(ignition-math${IGNITION-MATH_REQUIRED_MAJOR_VERSION} QUIET)
+  if (NOT ignition-math${IGNITION-MATH_REQUIRED_MAJOR_VERSION}_FOUND)
+    message(STATUS "Looking for ignition-math${IGNITION-MATH_REQUIRED_MAJOR_VERSION}-config.cmake - not found")
+    BUILD_ERROR ("Missing: Ignition math${IGNITION-MATH_REQUIRED_MAJOR_VERSION} library.")
+  else()
+    message(STATUS "Looking for ignition-math${IGNITION-MATH_REQUIRED_MAJOR_VERSION}-config.cmake - found")
+  endif()
 endif()
 
 ########################################
@@ -25,16 +28,18 @@ add_manpage_target()
 # Use pkg_check_modules and fallback to manual detection
 # (needed, at least, for MacOS)
 
-# Use system installation on UNIX and Apple, and internal copy on Windows
-if (UNIX OR APPLE)
-  message (STATUS "Using system tinyxml2.")
-  set (USE_EXTERNAL_TINYXML2 False)
-elseif(WIN32)
-  message (STATUS "Using internal tinyxml2.")
-  set (USE_EXTERNAL_TINYXML2 False)
-else()
-  message (STATUS "Unknown platform, unable to configure tinyxml2.")
-  BUILD_ERROR("Unknown platform")
+# By default use system installation on UNIX and Apple, and internal copy on Windows
+if (NOT DEFINED USE_EXTERNAL_TINYXML2)
+  if (UNIX OR APPLE)
+    message (STATUS "By default use system installation on UNIX and Apple")
+    set (USE_EXTERNAL_TINYXML2 True)
+  elseif(WIN32)
+    message (STATUS "By default use internal tinyxml2 on Windows")
+    set (USE_EXTERNAL_TINYXML2 False)
+  else()
+    message (STATUS "Unknown platform, unable to configure tinyxml2.")
+    BUILD_ERROR("Unknown platform")
+  endif()
 endif()
 
 if (USE_EXTERNAL_TINYXML2)
