@@ -53,6 +53,7 @@ set (headers
   Uuid.hh
   Video.hh
   VideoEncoder.hh
+  WorkerPool.hh
 )
 
 set (ign_headers "" CACHE INTERNAL "Ignition headers" FORCE)
