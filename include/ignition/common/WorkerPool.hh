@@ -42,8 +42,8 @@ namespace ignition
       /// \brief Adds work to the worker pool with optional callback
       /// \param[in] _work function to do one piece of work
       /// \param[in] _cb optional callback when the work is done
-      /// \remark _work should be bound with arguments so it does the work and
-      //               returns within a finite amount of time
+      /// \remark Typical work is a function bound with arguments. It must
+      //               return within a finite amount of time.
       public: void AddWork(std::function<void()> _work,
                   std::function<void()> _cb = std::function<void()>());
 
