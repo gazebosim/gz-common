@@ -46,6 +46,7 @@ set (sources
   Uuid.cc
   Video.cc
   VideoEncoder.cc
+  WorkerPool.cc
 )
 
 if (NOT USE_EXTERNAL_TINYXML2)
@@ -85,6 +86,7 @@ set (gtest_sources
   Util_TEST.cc
   Uuid_TEST.cc
   VideoEncoder_TEST.cc
+  WorkerPool_TEST.cc
 )
 
 ign_add_library(${PROJECT_LIBRARY_TARGET_NAME} ${sources})
