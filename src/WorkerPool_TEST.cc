@@ -108,6 +108,26 @@ TEST(WorkerPool, WaitWithTimeoutThatTimesOut)
 }
 
 //////////////////////////////////////////////////
+TEST(WorkerPool, ThingsRunInParallel)
+{
+  WorkerPool pool;
+  std::atomic<int> sentinel(0);
+  pool.AddWork([&sentinel] ()
+      {
+        ++sentinel;
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+      });
+  pool.AddWork([&sentinel] ()
+      {
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        ++sentinel;
+      });
+  Time time(0.006);
+  EXPECT_TRUE(pool.WaitForResults(time));
+  EXPECT_EQ(2, sentinel);
+}
+
+//////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
