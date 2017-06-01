@@ -72,7 +72,7 @@ namespace ignition
       /// \param [in] _env name of the environment variable
       public: void SetPluginPathEnv(const std::string &_env);
 
-      /// \brief Find a file in the set search paths
+      /// \brief Find a file in the set search paths (not recursive)
       /// \param[in] _filename Name of the file to find.
       /// \param[in] _searchLocalPath True to search in the current working
       /// directory.
@@ -80,10 +80,11 @@ namespace ignition
       public: std::string FindFile(const std::string &_filename,
                                    bool _searchLocalPath = true);
 
-      /// \brief look for a file in a set of search paths
+      /// \brief look for a file in a set of search paths (not recursive)
       /// \param[in] _filename Name of the file to find
       /// \param[in] _paths paths to look for the file
       /// \return Returns a path that will work from the current directory
+      //          or an empty string if the file was not found
       public: std::string FindFile(const std::string &_filename,
                                    const std::vector<std::string> &_paths);
 
