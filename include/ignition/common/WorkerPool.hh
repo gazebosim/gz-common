@@ -21,6 +21,7 @@
 #include <functional>
 #include <memory>
 
+#include <ignition/common/System.hh>
 #include <ignition/common/Time.hh>
 
 namespace ignition
@@ -31,7 +32,7 @@ namespace ignition
     class WorkerPoolPrivate;
 
     /// \brief A pool of worker threads that do stuff in parallel
-    class WorkerPool
+    class IGNITION_COMMON_VISIBLE WorkerPool
     {
       /// \brief creates worker threads
       public: WorkerPool();
