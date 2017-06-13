@@ -109,7 +109,6 @@ TEST_F(SystemPathsFixture, SearchPathUsesForwardSlashes)
   auto paths = sp.PluginPaths();
   EXPECT_EQ(after, *paths.begin());
 }
-
 //////////////////////////////////////////////////
 TEST_F(SystemPathsFixture, findFile)
 {
@@ -125,6 +124,9 @@ TEST_F(SystemPathsFixture, findFile)
   EXPECT_EQ(file, foundFile);
 
   std::remove(file.c_str());
+
+  foundFile = sp.FindFile(file, {""});
+  EXPECT_TRUE(foundFile.empty());
 }
 
 /////////////////////////////////////////////////
