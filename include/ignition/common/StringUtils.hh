@@ -30,6 +30,7 @@ namespace ignition
     /// \param[in] _orig The string to split
     /// \param[in] _delim a character to split the string at
     /// \returns vector of split pieces of the string excluding the delimiter
+    // cppcheck-suppress constStatement
     IGNITION_COMMON_VISIBLE
     std::vector<std::string> Split(const std::string &_orig, char _delim);
 
@@ -37,6 +38,7 @@ namespace ignition
     /// \param[in] _s1 the string to check
     /// \param[in] _s2 the possible prefix
     /// \returns true if _s1 starts with _s2
+    // cppcheck-suppress constStatement
     IGNITION_COMMON_VISIBLE
     bool StartsWith(const std::string &_s1, const std::string &_s2);
 
@@ -44,6 +46,7 @@ namespace ignition
     /// \param[in] _s1 the string to check
     /// \param[in] _s2 the possible suffix
     /// \returns  true if _s1 ends with _s2
+    // cppcheck-suppress constStatement
     IGNITION_COMMON_VISIBLE
     bool EndsWith(const std::string &_s1, const std::string &_s2);
   }
