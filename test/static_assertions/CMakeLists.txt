@@ -1,6 +1,6 @@
 set(static_assert_tests
   plugin_no_base_class
- # TODO Fix FQN name check
+  # TODO Fix FQN name check
   # plugin_not_fully_qualified_class
   # plugin_not_fully_qualified_base
   plugin_wrong_base_class
