@@ -33,10 +33,10 @@ namespace ignition
     struct WorkOrder
     {
       /// \brief method that does the work
-      std::function<void()> work;
+      std::function<void()> work = std::function<void()>();
 
       /// \brief callback to invoke after working
-      std::function<void()> callback;
+      std::function<void()> callback = std::function<void()>();
     };
 
     /// \brief Private implementation
@@ -63,7 +63,7 @@ namespace ignition
       /// \brief used to signal when the pool is being shut down
       public: bool done = false;
 
-    /// \brief Does work until signaled to shut down
+      /// \brief Does work until signaled to shut down
       public: void Worker();
     };
   }
@@ -72,11 +72,11 @@ namespace ignition
 //////////////////////////////////////////////////
 void WorkerPoolPrivate::Worker()
 {
+  WorkOrder order;
+
   // Run until pool is destructed, waiting for work
   while (true)
   {
-    WorkOrder order;
-
     // Scoped to release lock before doing work
     {
       std::unique_lock<std::mutex> queueLock(this->queueMtx);
@@ -92,12 +92,14 @@ void WorkerPoolPrivate::Worker()
 
       // Take a work order from the queue
       ++(this->activeOrders);
-      order = workOrders.front();
+      order = std::move(workOrders.front());
       workOrders.pop();
     }
 
     // Do the work
-    order.work();
+    if (order.work)
+      order.work();
+
     if (order.callback)
       order.callback();
 
@@ -112,9 +114,7 @@ void WorkerPoolPrivate::Worker()
 //////////////////////////////////////////////////
 WorkerPool::WorkerPool() : dataPtr(new WorkerPoolPrivate)
 {
-  unsigned int numWorkers = std::thread::hardware_concurrency();
-  if (numWorkers < 1)
-    numWorkers = 1;
+  unsigned int numWorkers = std::max(std::thread::hardware_concurrency(), 1u);
 
   // create worker threads
   for (unsigned int w = 0; w < numWorkers; ++w)
@@ -156,7 +156,7 @@ void WorkerPool::AddWork(std::function<void()> _work,
   order.callback = _cb;
   {
     std::unique_lock<std::mutex> queueLock(this->dataPtr->queueMtx);
-    this->dataPtr->workOrders.push(order);
+    this->dataPtr->workOrders.push(std::move(order));
   }
   this->dataPtr->signalNewWork.notify_one();
 }
