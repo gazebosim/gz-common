@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 
+#include "ignition/common/Util.hh"
 #include "ignition/common/SystemPaths.hh"
 
 using namespace ignition;
@@ -109,10 +110,12 @@ TEST_F(SystemPathsFixture, SearchPathUsesForwardSlashes)
   auto paths = sp.PluginPaths();
   EXPECT_EQ(after, *paths.begin());
 }
+
 //////////////////////////////////////////////////
 TEST_F(SystemPathsFixture, findFile)
 {
-  std::string file = std::tmpnam(nullptr);
+  std::string file = ignition::common::absPath(
+      "system_paths_fixture_find_file_test");
 
   std::ofstream fout;
   fout.open(file, std::ofstream::out);
