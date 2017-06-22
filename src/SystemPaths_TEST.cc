@@ -114,22 +114,27 @@ TEST_F(SystemPathsFixture, SearchPathUsesForwardSlashes)
 //////////////////////////////////////////////////
 TEST_F(SystemPathsFixture, findFile)
 {
-  std::string file = ignition::common::absPath(
-      "system_paths_fixture_find_file_test");
+  std::string dir1 = ignition::common::absPath("test_dir1");
+  std::string dir2 = ignition::common::absPath("test_dir2");
+  ignition::common::createDirectories(dir1);
+  ignition::common::createDirectories(dir2);
+  std::string file1 = ignition::common::absPath(
+      ignition::common::joinPaths(dir1, "test_f1"));
+  std::string file2 = ignition::common::absPath(
+      ignition::common::joinPaths(dir2, "test_f2"));
 
   std::ofstream fout;
-  fout.open(file, std::ofstream::out);
+  fout.open(file1, std::ofstream::out);
+  fout << "asdf";
+  fout.close();
+  fout.open(file2, std::ofstream::out);
   fout << "asdf";
   fout.close();
 
   common::SystemPaths sp;
-  std::string foundFile = sp.FindFile(file, {""});
-  EXPECT_EQ(file, foundFile);
-
-  std::remove(file.c_str());
-
-  foundFile = sp.FindFile(file, {""});
-  EXPECT_TRUE(foundFile.empty());
+  EXPECT_EQ(file1, sp.FindFile("test_f1", {dir1, dir2}));
+  EXPECT_EQ(file2, sp.FindFile("test_f2", {dir1, dir2}));
+  EXPECT_EQ(std::string(), sp.FindFile("test_f3", {dir1, dir2}));
 }
 
 /////////////////////////////////////////////////
