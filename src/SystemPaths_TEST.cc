@@ -132,9 +132,9 @@ TEST_F(SystemPathsFixture, findFile)
   fout.close();
 
   common::SystemPaths sp;
-  EXPECT_EQ(file1, sp.FindFile("test_f1", {dir1, dir2}));
-  EXPECT_EQ(file2, sp.FindFile("test_f2", {dir1, dir2}));
-  EXPECT_EQ(std::string(), sp.FindFile("test_f3", {dir1, dir2}));
+  EXPECT_EQ(file1, sp.LocateLocalFile("test_f1", {dir1, dir2}));
+  EXPECT_EQ(file2, sp.LocateLocalFile("test_f2", {dir1, dir2}));
+  EXPECT_EQ(std::string(), sp.LocateLocalFile("test_f3", {dir1, dir2}));
 }
 
 /////////////////////////////////////////////////

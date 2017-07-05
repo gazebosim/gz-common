@@ -311,7 +311,7 @@ std::string SystemPaths::FindFile(const std::string &_filename,
 }
 
 //////////////////////////////////////////////////
-std::string SystemPaths::FindFile(const std::string &_filename,
+std::string SystemPaths::LocateLocalFile(const std::string &_filename,
     const std::vector<std::string> &_paths)
 {
   std::string foundPath = "";

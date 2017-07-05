@@ -81,11 +81,15 @@ namespace ignition
                                    bool _searchLocalPath = true);
 
       /// \brief look for a file in a set of search paths (not recursive)
+      /// \description This method checks if a file exists in given directories.
+      ///              It does so by joining each path with the filename and
+      ///              checking if the file exists. If the file exists in
+      ///              multiple paths the first one is found.
       /// \param[in] _filename Name of the file to find
       /// \param[in] _paths paths to look for the file
       /// \return Returns a path that will work from the current directory
       //          or an empty string if the file was not found
-      public: std::string FindFile(const std::string &_filename,
+      public: std::string LocateLocalFile(const std::string &_filename,
                                    const std::vector<std::string> &_paths);
 
       /// \brief Find a shared library by name in the plugin paths
