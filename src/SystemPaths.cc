@@ -310,6 +310,23 @@ std::string SystemPaths::FindFile(const std::string &_filename,
   return path;
 }
 
+//////////////////////////////////////////////////
+std::string SystemPaths::LocateLocalFile(const std::string &_filename,
+    const std::vector<std::string> &_paths)
+{
+  std::string foundPath = "";
+  for (auto const &path : _paths)
+  {
+    std::string checkPath = this->dataPtr->NormalizePath(path) + _filename;
+    if (exists(checkPath))
+    {
+      foundPath = checkPath;
+      break;
+    }
+  }
+  return foundPath;
+}
+
 /////////////////////////////////////////////////
 void SystemPaths::ClearPluginPaths()
 {

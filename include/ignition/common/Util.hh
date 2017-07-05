@@ -179,6 +179,13 @@ namespace ignition
     /// \return Absolute path
     std::string IGNITION_COMMON_VISIBLE absPath(const std::string &_path);
 
+    /// \brief Join two strings together to form a path
+    /// \param[in] _path1 the left portion of the path
+    /// \param[in] _path2 the right portion of the path
+    /// \return Joined path
+    std::string IGNITION_COMMON_VISIBLE joinPaths(const std::string &_path1,
+                                                  const std::string &_path2);
+
     /// \brief Copy a file.
     /// \param[in] _existingFilename Path to an existing file.
     /// \param[in] _newFilename Path of the new file.

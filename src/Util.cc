@@ -532,6 +532,16 @@ std::string ignition::common::absPath(const std::string &_path)
   return result;
 }
 
+//////////////////////////////////////////////////
+std::string ignition::common::joinPaths(const std::string &_path1,
+                                        const std::string &_path2)
+{
+  // todo #ifdef _WIN32 use PathCchCombine()
+  std::string result = _path1 + "/" + _path2;
+  ignition::common::replaceAll(result, result, "//", "/");
+  return result;
+}
+
 /////////////////////////////////////////////////
 bool ignition::common::copyFile(const std::string &_existingFilename,
                                 const std::string &_newFilename)
