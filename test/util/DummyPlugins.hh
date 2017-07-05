@@ -21,13 +21,15 @@
 
 #include <string>
 
+#include <ignition/common/System.hh>
+
 
 namespace test
 {
 namespace util
 {
 
-class DummyPluginBase
+class IGNITION_COMMON_VISIBLE DummyPluginBase
 {
   public: virtual std::string MyNameIs() = 0;
 };
