@@ -15,10 +15,13 @@
  *
 */
 #include <algorithm>
+#include <cstring>
+#include <fstream>
 #include <gtest/gtest.h>
 #include <string>
 #include <vector>
 
+#include "ignition/common/Util.hh"
 #include "ignition/common/SystemPaths.hh"
 
 using namespace ignition;
@@ -106,6 +109,32 @@ TEST_F(SystemPathsFixture, SearchPathUsesForwardSlashes)
   sp.AddPluginPaths(before);
   auto paths = sp.PluginPaths();
   EXPECT_EQ(after, *paths.begin());
+}
+
+//////////////////////////////////////////////////
+TEST_F(SystemPathsFixture, findFile)
+{
+  std::string dir1 = ignition::common::absPath("test_dir1");
+  std::string dir2 = ignition::common::absPath("test_dir2");
+  ignition::common::createDirectories(dir1);
+  ignition::common::createDirectories(dir2);
+  std::string file1 = ignition::common::absPath(
+      ignition::common::joinPaths(dir1, "test_f1"));
+  std::string file2 = ignition::common::absPath(
+      ignition::common::joinPaths(dir2, "test_f2"));
+
+  std::ofstream fout;
+  fout.open(file1, std::ofstream::out);
+  fout << "asdf";
+  fout.close();
+  fout.open(file2, std::ofstream::out);
+  fout << "asdf";
+  fout.close();
+
+  common::SystemPaths sp;
+  EXPECT_EQ(file1, sp.LocateLocalFile("test_f1", {dir1, dir2}));
+  EXPECT_EQ(file2, sp.LocateLocalFile("test_f2", {dir1, dir2}));
+  EXPECT_EQ(std::string(), sp.LocateLocalFile("test_f3", {dir1, dir2}));
 }
 
 /////////////////////////////////////////////////
