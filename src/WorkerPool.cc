@@ -42,6 +42,9 @@ namespace ignition
     /// \brief Private implementation
     class WorkerPoolPrivate
     {
+      /// \brief Does work until signaled to shut down
+      public: void Worker();
+
       /// \brief threads that do work
       public: std::vector<std::thread> workers;
 
@@ -62,9 +65,6 @@ namespace ignition
 
       /// \brief used to signal when the pool is being shut down
       public: bool done = false;
-
-      /// \brief Does work until signaled to shut down
-      public: void Worker();
     };
   }
 }
