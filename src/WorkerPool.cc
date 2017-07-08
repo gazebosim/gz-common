@@ -127,24 +127,20 @@ WorkerPool::WorkerPool() : dataPtr(new WorkerPoolPrivate)
 //////////////////////////////////////////////////
 WorkerPool::~WorkerPool()
 {
-  // dataPtr could be null if WorkerPool was moved
-  if (this->dataPtr)
+  // shutdown worker threads
   {
-    // shutdown worker threads
-    {
-      std::unique_lock<std::mutex> queueLock(this->dataPtr->queueMtx);
-      this->dataPtr->done = true;
-    }
-    this->dataPtr->signalNewWork.notify_all();
-
-    for (auto &t : this->dataPtr->workers)
-    {
-      t.join();
-    }
-
-    // Signal in case anyone is still waiting for work to finish
-    this->dataPtr->signalWorkDone.notify_all();
+    std::unique_lock<std::mutex> queueLock(this->dataPtr->queueMtx);
+    this->dataPtr->done = true;
   }
+  this->dataPtr->signalNewWork.notify_all();
+
+  for (auto &t : this->dataPtr->workers)
+  {
+    t.join();
+  }
+
+  // Signal in case anyone is still waiting for work to finish
+  this->dataPtr->signalWorkDone.notify_all();
 }
 
 //////////////////////////////////////////////////
