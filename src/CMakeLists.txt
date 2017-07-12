@@ -12,7 +12,7 @@ set (sources
   Console.cc
   Dem.cc
   Event.cc
-  Filesystem.cc
+  FilesystemBoost.cc
   FilesystemOSRF.cc
   KeyEvent.cc
   KeyFrame.cc
