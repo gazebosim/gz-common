@@ -13,6 +13,7 @@ set (sources
   Dem.cc
   Event.cc
   Filesystem.cc
+  FilesystemOSRF.cc
   KeyEvent.cc
   KeyFrame.cc
   Material.cc
