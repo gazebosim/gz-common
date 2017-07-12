@@ -45,6 +45,7 @@ set (headers
   Util.hh
   URI.hh
   Uuid.hh
+  WorkerPool.hh
 )
 
 # FIXME: Some classes fail to build on Windows
