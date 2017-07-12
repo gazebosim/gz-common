@@ -176,7 +176,11 @@ bool create_new_file_hardlink(const std::string &_hardlink,
 
 #endif
 
-#include "sdf/Filesystem.hh"
+#include "ignition/common/Filesystem.hh"
+
+namespace igncmn = ignition::common;
+using namespace ignition;
+using namespace igncmn;
 
 /////////////////////////////////////////////////
 TEST(Filesystem, exists)
@@ -184,16 +188,16 @@ TEST(Filesystem, exists)
   std::string new_temp_dir;
   ASSERT_TRUE(create_and_switch_to_temp_dir(new_temp_dir));
   ASSERT_TRUE(create_new_empty_file("newfile"));
-  ASSERT_TRUE(sdf::filesystem::create_directory("fstestexists"));
+  ASSERT_TRUE(createDirectory("fstestexists"));
 
-  EXPECT_TRUE(sdf::filesystem::exists("fstestexists"));
-  EXPECT_TRUE(sdf::filesystem::is_directory("fstestexists"));
+  EXPECT_TRUE(exists("fstestexists"));
+  EXPECT_TRUE(isDirectory("fstestexists"));
 
-  EXPECT_FALSE(sdf::filesystem::exists("notcreated"));
-  EXPECT_FALSE(sdf::filesystem::is_directory("notcreated"));
+  EXPECT_FALSE(exists("notcreated"));
+  EXPECT_FALSE(isDirectory("notcreated"));
 
-  EXPECT_TRUE(sdf::filesystem::exists("newfile"));
-  EXPECT_FALSE(sdf::filesystem::is_directory("newfile"));
+  EXPECT_TRUE(exists("newfile"));
+  EXPECT_FALSE(isDirectory("newfile"));
 }
 
 /////////////////////////////////////////////////
@@ -209,36 +213,36 @@ TEST(Filesystem, symlink_exists)
   std::string new_temp_dir;
   ASSERT_TRUE(create_and_switch_to_temp_dir(new_temp_dir));
   ASSERT_TRUE(create_new_empty_file("newfile"));
-  ASSERT_TRUE(sdf::filesystem::create_directory("newdir"));
+  ASSERT_TRUE(createDirectory("newdir"));
 
   // Case 1
   ASSERT_TRUE(create_new_file_symlink("symlink-file", "newfile"));
-  EXPECT_TRUE(sdf::filesystem::exists("symlink-file"));
+  EXPECT_TRUE(exists("symlink-file"));
 
   // Case 2
   ASSERT_TRUE(create_new_file_symlink("symlink-file-broken", "nonexistent"));
-  EXPECT_FALSE(sdf::filesystem::exists("symlink-file-broken"));
+  EXPECT_FALSE(exists("symlink-file-broken"));
 
   // Case 3
   ASSERT_TRUE(create_new_dir_symlink("symlink-dir", "newdir"));
-  EXPECT_TRUE(sdf::filesystem::exists("symlink-dir"));
+  EXPECT_TRUE(exists("symlink-dir"));
 
   // Case 4
   ASSERT_TRUE(create_new_dir_symlink("symlink-dir-broken", "nonexistent-dir"));
-  EXPECT_FALSE(sdf::filesystem::exists("symlink-dir-broken"));
+  EXPECT_FALSE(exists("symlink-dir-broken"));
 
   // Case 5
   ASSERT_TRUE(create_new_file_hardlink("hardlink-file", "newfile"));
-  EXPECT_TRUE(sdf::filesystem::exists("hardlink-file"));
+  EXPECT_TRUE(exists("hardlink-file"));
 }
 
 /////////////////////////////////////////////////
-TEST(Filesystem, current_path)
+TEST(Filesystem, cwd)
 {
   std::string new_temp_dir;
   ASSERT_TRUE(create_and_switch_to_temp_dir(new_temp_dir));
 
-  std::string path = sdf::filesystem::current_path();
+  std::string path = cwd();
   EXPECT_EQ(path, new_temp_dir);
 }
 
@@ -246,23 +250,23 @@ TEST(Filesystem, current_path)
 TEST(Filesystem, append)
 {
   std::string path = "tmp";
-  path = sdf::filesystem::append(path, "hello");
+  path = joinPaths(path, "hello");
 
-  ASSERT_EQ(path, sdf::filesystem::separator("tmp") + "hello");
+  ASSERT_EQ(path, separator("tmp") + "hello");
 
-  path = sdf::filesystem::append(path, "there", "again");
+  path = joinPaths(joinPaths(path, "there"), "again");
 
-  EXPECT_EQ(path, sdf::filesystem::separator("tmp") +
-            sdf::filesystem::separator("hello") +
-            sdf::filesystem::separator("there") + "again");
+  EXPECT_EQ(path, separator("tmp") +
+            separator("hello") +
+            separator("there") + "again");
 }
 
 /////////////////////////////////////////////////
-TEST(Filesystem, current_path_error)
+TEST(Filesystem, cwd_error)
 {
   // This test intentionally creates a directory, switches to it, removes
-  // the directory, and then tries to call current_path() on it to cause
-  // current_path() to fail.  Windows does not allow you to remove an
+  // the directory, and then tries to call cwd() on it to cause
+  // cwd() to fail.  Windows does not allow you to remove an
   // in-use directory, so this test is restricted to Unix.
 #ifndef _WIN32
   std::string new_temp_dir;
@@ -270,43 +274,44 @@ TEST(Filesystem, current_path_error)
 
   ASSERT_EQ(rmdir(new_temp_dir.c_str()), 0);
 
-  EXPECT_EQ(sdf::filesystem::current_path(), "");
+  EXPECT_EQ(cwd(), "");
 #endif
 }
 
 /////////////////////////////////////////////////
 TEST(Filesystem, basename)
 {
-  std::string absolute = sdf::filesystem::append("", "home", "bob", "foo");
-  EXPECT_EQ(sdf::filesystem::basename(absolute), "foo");
+  std::string absolute = separator("") + separator("home")
+    + separator("bob") + separator("foo");
+  EXPECT_EQ(basename(absolute), "foo");
 
-  std::string relative = sdf::filesystem::append("baz", "foobar");
-  EXPECT_EQ(sdf::filesystem::basename(relative), "foobar");
+  std::string relative = separator("baz") + separator("foobar");
+  EXPECT_EQ(basename(relative), "foobar");
 
-  std::string basename = "bzzz";
-  EXPECT_EQ(sdf::filesystem::basename(basename), "bzzz");
+  std::string bname = "bzzz";
+  EXPECT_EQ(basename(bname), "bzzz");
 
-  std::string nobase = sdf::filesystem::append("baz", "");
-  EXPECT_EQ(sdf::filesystem::basename(nobase), "baz");
+  std::string nobase = separator("baz") + separator("");
+  EXPECT_EQ(basename(nobase), "baz");
 
-  std::string multiple_slash = sdf::filesystem::append("baz", "", "", "");
-  EXPECT_EQ(sdf::filesystem::basename(multiple_slash), "baz");
+  std::string multiple_slash = separator("baz") + separator("") + separator("")
+    + separator("");
+  EXPECT_EQ(basename(multiple_slash), "baz");
 
-  std::string multiple_slash_middle = sdf::filesystem::append("", "home", "",
-                                                              "", "bob", "foo");
-  EXPECT_EQ(sdf::filesystem::basename(multiple_slash_middle), "foo");
+  std::string multiple_slash_middle = separator("") + separator("home")
+    + separator("") + separator("") + separator("bob") + separator("foo");
+  EXPECT_EQ(basename(multiple_slash_middle), "foo");
 
-  std::string multiple_slash_start = sdf::filesystem::append("", "", "", "home",
-                                                             "bob", "foo");
-  EXPECT_EQ(sdf::filesystem::basename(multiple_slash_start), "foo");
+  std::string multiple_slash_start = separator("") + separator("")
+    + separator("") + separator("home") + separator("bob") + separator("foo");
+  EXPECT_EQ(basename(multiple_slash_start), "foo");
 
-  std::string slash_only = sdf::filesystem::append("", "");
-  EXPECT_EQ(sdf::filesystem::basename(slash_only),
-            sdf::filesystem::append("", ""));
+  std::string slash_only = separator("") + separator("");
+  EXPECT_EQ(basename(slash_only), separator(""));
 
-  std::string multiple_slash_only = sdf::filesystem::append("", "", "", "");
-  EXPECT_EQ(sdf::filesystem::basename(multiple_slash_only),
-            sdf::filesystem::append("", ""));
+  std::string multiple_slash_only = separator("") + separator("")
+    + separator("") + separator("");
+  EXPECT_EQ(basename(multiple_slash_only), separator(""));
 }
 
 /////////////////////////////////////////////////
@@ -315,7 +320,7 @@ TEST(Filesystem, directory_iterator)
   std::string new_temp_dir;
   ASSERT_TRUE(create_and_switch_to_temp_dir(new_temp_dir));
   ASSERT_TRUE(create_new_empty_file("newfile"));
-  ASSERT_TRUE(sdf::filesystem::create_directory("newdir"));
+  ASSERT_TRUE(createDirectory("newdir"));
   ASSERT_TRUE(create_new_file_symlink("symlink-file", "newfile"));
   ASSERT_TRUE(create_new_file_symlink("symlink-file-broken", "nonexistent"));
   ASSERT_TRUE(create_new_dir_symlink("symlink-dir", "newdir"));
@@ -324,10 +329,10 @@ TEST(Filesystem, directory_iterator)
 
   std::set<std::string> found_items;
 
-  sdf::filesystem::DirIter endIter;
-  for (sdf::filesystem::DirIter dirIter("."); dirIter != endIter; ++dirIter)
+  DirIter endIter;
+  for (DirIter dirIter("."); dirIter != endIter; ++dirIter)
   {
-    found_items.insert(sdf::filesystem::basename(*dirIter));
+    found_items.insert(basename(*dirIter));
   }
 
   EXPECT_FALSE(found_items.find("newfile") == found_items.end());
@@ -339,9 +344,9 @@ TEST(Filesystem, directory_iterator)
   EXPECT_FALSE(found_items.find("hardlink-file") == found_items.end());
 
   found_items.clear();
-  for (sdf::filesystem::DirIter dirIter(""); dirIter != endIter; ++dirIter)
+  for (DirIter dirIter(""); dirIter != endIter; ++dirIter)
   {
-    found_items.insert(sdf::filesystem::basename(*dirIter));
+    found_items.insert(basename(*dirIter));
   }
 
   EXPECT_EQ(found_items.size(), 0UL);
