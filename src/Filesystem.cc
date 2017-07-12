@@ -53,523 +53,500 @@
 #include <winnt.h>
 #endif
 
-#include "sdf/Filesystem.hh"
+#include "ignition/common/Filesystem.hh"
 
-namespace sdf
+namespace ignition
 {
-namespace filesystem
-{
-/// \internal
-/// \brief Private data for the DirIter class.
-class DirIterPrivate
-{
-  /// \def current
-  /// \brief The current directory item.
-  public: std::string current;
+  namespace common
+  {
+    /// \internal
+    /// \brief Private data for the DirIter class.
+    class DirIterPrivate
+    {
+      /// \def current
+      /// \brief The current directory item.
+      public: std::string current;
 
-  /// \def dirname
-  /// \brief The original path to the directory.
-  public: std::string dirname;
+      /// \def dirname
+      /// \brief The original path to the directory.
+      public: std::string dirname;
 
-  /// \def handle
-  /// \brief Opaque handle for holding the directory iterator.
-  public: void *handle;
+      /// \def handle
+      /// \brief Opaque handle for holding the directory iterator.
+      public: void *handle;
 
-  /// \def end
-  /// \brief Private variable to indicate whether the iterator has reached
-  ///        the end.
-  public: bool end;
-};
+      /// \def end
+      /// \brief Private variable to indicate whether the iterator has reached
+      ///        the end.
+      public: bool end;
+    };
 
 #ifndef _WIN32
 
-static const char preferred_separator = '/';
+    static const char preferred_separator = '/';
 
-//////////////////////////////////////////////////
-bool exists(const std::string &_path)
-{
-  struct stat path_stat;
-
-  return ::stat(_path.c_str(), &path_stat) == 0;
-}
-
-//////////////////////////////////////////////////
-bool is_directory(const std::string &_path)
-{
-  struct stat path_stat;
-
-  if (::stat(_path.c_str(), &path_stat) != 0)
-  {
-    return false;
-  }
-
-  return S_ISDIR(path_stat.st_mode);
-}
-
-//////////////////////////////////////////////////
-bool create_directory(const std::string &_path)
-{
-  return ::mkdir(_path.c_str(), S_IRWXU|S_IRWXG|S_IRWXO) == 0;
-}
-
-//////////////////////////////////////////////////
-std::string current_path()
-{
-  std::string cur;
-
-  for (int32_t path_max = 128;; path_max *= 2)  // loop 'til buffer large enough
-  {
-    std::vector<char> buf(path_max);
-
-    if (::getcwd(buf.data(), buf.size()) == 0)
+    //////////////////////////////////////////////////
+    bool createDirectory(const std::string &_path)
     {
-      if (errno != ERANGE)
-      {
-        break;
-      }
+      return ::mkdir(_path.c_str(), S_IRWXU|S_IRWXG|S_IRWXO) == 0;
     }
-    else
-    {
-      char resolved[PATH_MAX];
 
-      if (realpath(buf.data(), resolved) != nullptr)
+    //////////////////////////////////////////////////
+    std::string currentPath()
+    {
+      std::string cur;
+
+      for (int32_t path_max = 128;; path_max *= 2)  // loop 'til buffer large enough
       {
-        cur = std::string(resolved);
+        std::vector<char> buf(path_max);
+
+        if (::getcwd(buf.data(), buf.size()) == 0)
+        {
+          if (errno != ERANGE)
+          {
+            break;
+          }
+        }
+        else
+        {
+          char resolved[PATH_MAX];
+
+          if (realpath(buf.data(), resolved) != nullptr)
+          {
+            cur = std::string(resolved);
+          }
+          break;
+        }
       }
-      break;
+      return cur;
     }
-  }
-  return cur;
-}
 
-//////////////////////////////////////////////////
-DirIter::DirIter(const std::string &_in) : dataPtr(new DirIterPrivate)
-{
-  this->dataPtr->dirname = _in;
-
-  this->dataPtr->current = "";
-
-  this->dataPtr->handle = opendir(_in.c_str());
-
-  this->dataPtr->end = false;
-
-  if (this->dataPtr->handle == nullptr)
-  {
-    this->dataPtr->end = true;
-  }
-  else
-  {
-    next();
-  }
-}
-
-//////////////////////////////////////////////////
-void DirIter::next()
-{
-  struct dirent entry;
-  struct dirent *result;
-
-  while (true)
-  {
-    if (readdir_r(reinterpret_cast<DIR*>(this->dataPtr->handle), &entry,
-                  &result) != 0
-        || result == nullptr)
+    //////////////////////////////////////////////////
+    DirIter::DirIter(const std::string &_in) : dataPtr(new DirIterPrivate)
     {
-      this->dataPtr->end = true;
+      this->dataPtr->dirname = _in;
+
       this->dataPtr->current = "";
-      break;
+
+      this->dataPtr->handle = opendir(_in.c_str());
+
+      this->dataPtr->end = false;
+
+      if (this->dataPtr->handle == nullptr)
+      {
+        this->dataPtr->end = true;
+      }
+      else
+      {
+        Next();
+      }
     }
 
-    if ((strcmp(entry.d_name, ".") != 0) && (strcmp(entry.d_name, "..") != 0))
+    //////////////////////////////////////////////////
+    void DirIter::Next()
     {
-      this->dataPtr->current = std::string(entry.d_name);
-      break;
-    }
-  }
-}
+      struct dirent entry;
+      struct dirent *result;
 
-//////////////////////////////////////////////////
-void DirIter::close_handle()
-{
-  closedir(reinterpret_cast<DIR*>(this->dataPtr->handle));
-}
+      while (true)
+      {
+        if (readdir_r(reinterpret_cast<DIR*>(this->dataPtr->handle), &entry,
+                      &result) != 0
+            || result == nullptr)
+        {
+          this->dataPtr->end = true;
+          this->dataPtr->current = "";
+          break;
+        }
+
+        if ((strcmp(entry.d_name, ".") != 0) && (strcmp(entry.d_name, "..") != 0))
+        {
+          this->dataPtr->current = std::string(entry.d_name);
+          break;
+        }
+      }
+    }
+
+    //////////////////////////////////////////////////
+    void DirIter::CloseHandle()
+    {
+      closedir(reinterpret_cast<DIR*>(this->dataPtr->handle));
+    }
 
 #else  // Windows
 
-static const char preferred_separator = '\\';
+    static const char preferred_separator = '\\';
 
-//////////////////////////////////////////////////
-static bool not_found_error(int _errval)
-{
-  return _errval == ERROR_FILE_NOT_FOUND
-    || _errval == ERROR_PATH_NOT_FOUND
-    || _errval == ERROR_INVALID_NAME  // "tools/jam/src/:sys:stat.h", "//foo"
-    || _errval == ERROR_INVALID_DRIVE  // USB card reader with no card inserted
-    || _errval == ERROR_NOT_READY  // CD/DVD drive with no disc inserted
-    || _errval == ERROR_INVALID_PARAMETER  // ":sys:stat.h"
-    || _errval == ERROR_BAD_PATHNAME  // "//nosuch" on Win64
-    || _errval == ERROR_BAD_NETPATH;  // "//nosuch" on Win32
-}
-
-//////////////////////////////////////////////////
-static bool process_status_failure()
-{
-  int errval(::GetLastError());
-
-  if (not_found_error(errval))
-  {
-    return false;
-  }
-  else if ((errval == ERROR_SHARING_VIOLATION))
-  {
-    return true;  // odd, but this is what boost does
-  }
-  return false;
-}
-
-struct handle_wrapper
-{
-  HANDLE handle;
-  explicit handle_wrapper(HANDLE h)
-    : handle(h) {}
-  ~handle_wrapper()
-  {
-    if (handle != INVALID_HANDLE_VALUE)
+    //////////////////////////////////////////////////
+    static bool not_found_error(int _errval)
     {
-      ::CloseHandle(handle);
+      return _errval == ERROR_FILE_NOT_FOUND
+        || _errval == ERROR_PATH_NOT_FOUND
+        || _errval == ERROR_INVALID_NAME  // "tools/jam/src/:sys:stat.h", "//foo"
+        || _errval == ERROR_INVALID_DRIVE  // USB card reader with no card inserted
+        || _errval == ERROR_NOT_READY  // CD/DVD drive with no disc inserted
+        || _errval == ERROR_INVALID_PARAMETER  // ":sys:stat.h"
+        || _errval == ERROR_BAD_PATHNAME  // "//nosuch" on Win64
+        || _errval == ERROR_BAD_NETPATH;  // "//nosuch" on Win32
     }
-  }
-};
 
-//  REPARSE_DATA_BUFFER related definitions are found in ntifs.h, which is part
-//  of the Windows Device Driver Kit. Since that's inconvenient, the definitions
-//  are provided here. See http://msdn.microsoft.com/en-us/library/ms791514.aspx
+    //////////////////////////////////////////////////
+    static bool process_status_failure()
+    {
+      int errval(::GetLastError());
 
-typedef struct _REPARSE_DATA_BUFFER {
-  ULONG  ReparseTag;
-  USHORT  ReparseDataLength;
-  USHORT  Reserved;
-  union {
-    struct {
-      USHORT  SubstituteNameOffset;
-      USHORT  SubstituteNameLength;
-      USHORT  PrintNameOffset;
-      USHORT  PrintNameLength;
-      ULONG  Flags;
-      WCHAR  PathBuffer[1];
-  /*  Example of distinction between substitute and print names:
-        mklink /d ldrive c:\
-        SubstituteName: c:\\??\
-        PrintName: c:\
-  */
-    } SymbolicLinkReparseBuffer;
-    struct {
-      USHORT  SubstituteNameOffset;
-      USHORT  SubstituteNameLength;
-      USHORT  PrintNameOffset;
-      USHORT  PrintNameLength;
-      WCHAR  PathBuffer[1];
-    } MountPointReparseBuffer;
-    struct {
-      UCHAR  DataBuffer[1];
-    } GenericReparseBuffer;
-  };
-} REPARSE_DATA_BUFFER, *PREPARSE_DATA_BUFFER;
+      if (not_found_error(errval))
+      {
+        return false;
+      }
+      else if ((errval == ERROR_SHARING_VIOLATION))
+      {
+        return true;  // odd, but this is what boost does
+      }
+      return false;
+    }
 
-//////////////////////////////////////////////////
-HANDLE create_file_handle(const std::string &_path, DWORD _dwDesiredAccess,
-                          DWORD _dwShareMode,
-                          LPSECURITY_ATTRIBUTES _lpSecurityAttributes,
-                          DWORD _dwCreationDisposition,
-                          DWORD _dwFlagsAndAttributes,
-                          HANDLE _hTemplateFile)
-{
-  return ::CreateFileA(_path.c_str(), _dwDesiredAccess,
-                       _dwShareMode, _lpSecurityAttributes,
-                       _dwCreationDisposition, _dwFlagsAndAttributes,
-                       _hTemplateFile);
-}
+    struct handle_wrapper
+    {
+      HANDLE handle;
+      explicit handle_wrapper(HANDLE h)
+        : handle(h) {}
+      ~handle_wrapper()
+      {
+        if (handle != INVALID_HANDLE_VALUE)
+        {
+          ::CloseHandle(handle);
+        }
+      }
+    };
+
+    //  REPARSE_DATA_BUFFER related definitions are found in ntifs.h, which is part
+    //  of the Windows Device Driver Kit. Since that's inconvenient, the definitions
+    //  are provided here. See http://msdn.microsoft.com/en-us/library/ms791514.aspx
+
+    typedef struct _REPARSE_DATA_BUFFER {
+      ULONG  ReparseTag;
+      USHORT  ReparseDataLength;
+      USHORT  Reserved;
+      union {
+        struct {
+          USHORT  SubstituteNameOffset;
+          USHORT  SubstituteNameLength;
+          USHORT  PrintNameOffset;
+          USHORT  PrintNameLength;
+          ULONG  Flags;
+          WCHAR  PathBuffer[1];
+      /*  Example of distinction between substitute and print names:
+            mklink /d ldrive c:\
+            SubstituteName: c:\\??\
+            PrintName: c:\
+      */
+        } SymbolicLinkReparseBuffer;
+        struct {
+          USHORT  SubstituteNameOffset;
+          USHORT  SubstituteNameLength;
+          USHORT  PrintNameOffset;
+          USHORT  PrintNameLength;
+          WCHAR  PathBuffer[1];
+        } MountPointReparseBuffer;
+        struct {
+          UCHAR  DataBuffer[1];
+        } GenericReparseBuffer;
+      };
+    } REPARSE_DATA_BUFFER, *PREPARSE_DATA_BUFFER;
+
+    //////////////////////////////////////////////////
+    HANDLE create_file_handle(const std::string &_path, DWORD _dwDesiredAccess,
+                              DWORD _dwShareMode,
+                              LPSECURITY_ATTRIBUTES _lpSecurityAttributes,
+                              DWORD _dwCreationDisposition,
+                              DWORD _dwFlagsAndAttributes,
+                              HANDLE _hTemplateFile)
+    {
+      return ::CreateFileA(_path.c_str(), _dwDesiredAccess,
+                           _dwShareMode, _lpSecurityAttributes,
+                           _dwCreationDisposition, _dwFlagsAndAttributes,
+                           _hTemplateFile);
+    }
 
 #ifndef MAXIMUM_REPARSE_DATA_BUFFER_SIZE
 #define MAXIMUM_REPARSE_DATA_BUFFER_SIZE  (16 * 1024)
 #endif
 
-//////////////////////////////////////////////////
-bool is_reparse_point_a_symlink(const std::string &_path)
-{
-  handle_wrapper h(create_file_handle(_path, FILE_READ_EA,
-                    FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                    nullptr, OPEN_EXISTING,
-                    FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT,
-                    nullptr));
-  if (h.handle == INVALID_HANDLE_VALUE)
-  {
-    return false;
-  }
-
-  std::vector<wchar_t> buf(MAXIMUM_REPARSE_DATA_BUFFER_SIZE);
-
-  // Query the reparse data
-  DWORD dwRetLen;
-  BOOL result = ::DeviceIoControl(h.handle, FSCTL_GET_REPARSE_POINT, nullptr,
-                                  0, buf.data(), (DWORD)buf.size(),
-                                  &dwRetLen, nullptr);
-  if (!result)
-  {
-    return false;
-  }
-
-  return reinterpret_cast<const REPARSE_DATA_BUFFER*>(&buf[0])->ReparseTag
-    == IO_REPARSE_TAG_SYMLINK
-    // Issue 9016 asked that NTFS directory junctions be recognized as
-    // directories.  That is equivalent to recognizing them as symlinks, and
-    // then the normal symlink mechanism will take care of recognizing them as
-    // directories.
-    //
-    // Directory junctions are very similar to symlinks, but have some
-    // performance and other advantages over symlinks. They can be created from
-    // the command line with "mklink /j junction-name target-path".
-    || reinterpret_cast<const REPARSE_DATA_BUFFER*>(&buf[0])->ReparseTag
-    == IO_REPARSE_TAG_MOUNT_POINT;  // aka "directory junction" or "junction"
-}
-
-//////////////////////////////////////////////////
-bool internal_check_path(const std::string &_path, DWORD &attr)
-{
-  attr = ::GetFileAttributesA(_path.c_str());
-  if (attr == 0xFFFFFFFF)
-  {
-    return process_status_failure();
-  }
-
-  //  reparse point handling;
-  //    since GetFileAttributesW does not resolve symlinks, try to open a file
-  //    handle to discover if the file exists
-  if (attr & FILE_ATTRIBUTE_REPARSE_POINT)
-  {
-    handle_wrapper h(
-      create_file_handle(
-        _path,
-        0,  // dwDesiredAccess; attributes only
-        FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE,
-        0,  // lpSecurityAttributes
-        OPEN_EXISTING,
-        FILE_FLAG_BACKUP_SEMANTICS,
-        0));  // hTemplateFile
-    if (h.handle == INVALID_HANDLE_VALUE)
+    //////////////////////////////////////////////////
+    bool is_reparse_point_a_symlink(const std::string &_path)
     {
-      return process_status_failure();
+      handle_wrapper h(create_file_handle(_path, FILE_READ_EA,
+                        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                        nullptr, OPEN_EXISTING,
+                        FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT,
+                        nullptr));
+      if (h.handle == INVALID_HANDLE_VALUE)
+      {
+        return false;
+      }
+
+      std::vector<wchar_t> buf(MAXIMUM_REPARSE_DATA_BUFFER_SIZE);
+
+      // Query the reparse data
+      DWORD dwRetLen;
+      BOOL result = ::DeviceIoControl(h.handle, FSCTL_GET_REPARSE_POINT, nullptr,
+                                      0, buf.data(), (DWORD)buf.size(),
+                                      &dwRetLen, nullptr);
+      if (!result)
+      {
+        return false;
+      }
+
+      return reinterpret_cast<const REPARSE_DATA_BUFFER*>(&buf[0])->ReparseTag
+        == IO_REPARSE_TAG_SYMLINK
+        // Issue 9016 asked that NTFS directory junctions be recognized as
+        // directories.  That is equivalent to recognizing them as symlinks, and
+        // then the normal symlink mechanism will take care of recognizing them as
+        // directories.
+        //
+        // Directory junctions are very similar to symlinks, but have some
+        // performance and other advantages over symlinks. They can be created from
+        // the command line with "mklink /j junction-name target-path".
+        || reinterpret_cast<const REPARSE_DATA_BUFFER*>(&buf[0])->ReparseTag
+        == IO_REPARSE_TAG_MOUNT_POINT;  // aka "directory junction" or "junction"
     }
 
-    if (!is_reparse_point_a_symlink(_path))
+    //////////////////////////////////////////////////
+    bool internal_check_path(const std::string &_path, DWORD &attr)
     {
+      attr = ::GetFileAttributesA(_path.c_str());
+      if (attr == 0xFFFFFFFF)
+      {
+        return process_status_failure();
+      }
+
+      //  reparse point handling;
+      //    since GetFileAttributesW does not resolve symlinks, try to open a file
+      //    handle to discover if the file exists
+      if (attr & FILE_ATTRIBUTE_REPARSE_POINT)
+      {
+        handle_wrapper h(
+          create_file_handle(
+            _path,
+            0,  // dwDesiredAccess; attributes only
+            FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE,
+            0,  // lpSecurityAttributes
+            OPEN_EXISTING,
+            FILE_FLAG_BACKUP_SEMANTICS,
+            0));  // hTemplateFile
+        if (h.handle == INVALID_HANDLE_VALUE)
+        {
+          return process_status_failure();
+        }
+
+        if (!is_reparse_point_a_symlink(_path))
+        {
+          return true;
+        }
+      }
+
       return true;
     }
-  }
 
-  return true;
-}
+    //////////////////////////////////////////////////
+    bool exists(const std::string &_path)
+    {
+      DWORD attr;
+      return internal_check_path(_path, attr);
+    }
 
-//////////////////////////////////////////////////
-bool exists(const std::string &_path)
-{
-  DWORD attr;
+    //////////////////////////////////////////////////
+    bool isDirectory(const std::string &_path)
+    {
+      DWORD attr;
 
-  return internal_check_path(_path, attr);
-}
+      if (internal_check_path(_path, attr))
+      {
+        return (attr & FILE_ATTRIBUTE_DIRECTORY) != 0;
+      }
 
-//////////////////////////////////////////////////
-bool is_directory(const std::string &_path)
-{
-  DWORD attr;
+      return false;
+    }
 
-  if (internal_check_path(_path, attr))
-  {
-    return (attr & FILE_ATTRIBUTE_DIRECTORY) != 0;
-  }
+    //////////////////////////////////////////////////
+    bool createDirectory(const std::string &_path)
+    {
+      return ::CreateDirectoryA(_path.c_str(), 0) != 0;
+    }
 
-  return false;
-}
+    //////////////////////////////////////////////////
+    std::string currentPath()
+    {
+      DWORD sz;
+      if ((sz = ::GetCurrentDirectoryA(0, nullptr)) == 0)
+      {
+        sz = 1;
+      }
 
-//////////////////////////////////////////////////
-bool create_directory(const std::string &_path)
-{
-  return ::CreateDirectoryA(_path.c_str(), 0) != 0;
-}
+      std::vector<char> buf(sz);
 
-//////////////////////////////////////////////////
-std::string current_path()
-{
-  DWORD sz;
-  if ((sz = ::GetCurrentDirectoryA(0, nullptr)) == 0)
-  {
-    sz = 1;
-  }
+      if (::GetCurrentDirectoryA(sz, buf.data()) == 0)
+      {
+        // error
+        return std::string("");
+      }
+      else
+      {
+        return buf.data();
+      }
+    }
 
-  std::vector<char> buf(sz);
+    //////////////////////////////////////////////////
+    DirIter::DirIter(const std::string &_in) : dataPtr(new DirIterPrivate)
+    {
+      // use a form of search Sebastian Martel reports will work with Win98
+      this->dataPtr->dirname = _in;
 
-  if (::GetCurrentDirectoryA(sz, buf.data()) == 0)
-  {
-    // error
-    return std::string("");
-  }
-  else
-  {
-    return buf.data();
-  }
-}
+      this->dataPtr->current = "";
 
-//////////////////////////////////////////////////
-DirIter::DirIter(const std::string &_in) : dataPtr(new DirIterPrivate)
-{
-  // use a form of search Sebastian Martel reports will work with Win98
-  this->dataPtr->dirname = _in;
+      this->dataPtr->end = false;
 
-  this->dataPtr->current = "";
+      if (_in.empty())
+      {
+        // To be compatible with Unix, if we are given an empty string, assume this
+        // is the end.
+        this->dataPtr->end = true;
+        return;
+      }
 
-  this->dataPtr->end = false;
+      std::string dirpath(_in);
+      dirpath += (dirpath.empty()
+                  || (dirpath[dirpath.size()-1] != '\\'
+                      && dirpath[dirpath.size()-1] != '/'
+                      && dirpath[dirpath.size()-1] != ':'))? "\\*" : "*";
 
-  if (_in.empty())
-  {
-    // To be compatible with Unix, if we are given an empty string, assume this
-    // is the end.
-    this->dataPtr->end = true;
-    return;
-  }
+      WIN32_FIND_DATAA data;
+      if ((this->dataPtr->handle = ::FindFirstFileA(dirpath.c_str(), &data))
+          == INVALID_HANDLE_VALUE)
+      {
+        this->dataPtr->handle = nullptr;  // signal eof
+        this->dataPtr->end = true;
+      }
+      else
+      {
+        this->dataPtr->current = std::string(data.cFileName);
+      }
+    }
 
-  std::string dirpath(_in);
-  dirpath += (dirpath.empty()
-              || (dirpath[dirpath.size()-1] != '\\'
-                  && dirpath[dirpath.size()-1] != '/'
-                  && dirpath[dirpath.size()-1] != ':'))? "\\*" : "*";
+    //////////////////////////////////////////////////
+    void DirIter::Next()
+    {
+      WIN32_FIND_DATAA data;
+      if (::FindNextFileA(this->dataPtr->handle, &data) == 0)  // fails
+      {
+        this->dataPtr->end = true;
+        this->dataPtr->current = "";
+      }
+      else
+      {
+        this->dataPtr->current = std::string(data.cFileName);
+      }
+    }
 
-  WIN32_FIND_DATAA data;
-  if ((this->dataPtr->handle = ::FindFirstFileA(dirpath.c_str(), &data))
-      == INVALID_HANDLE_VALUE)
-  {
-    this->dataPtr->handle = nullptr;  // signal eof
-    this->dataPtr->end = true;
-  }
-  else
-  {
-    this->dataPtr->current = std::string(data.cFileName);
-  }
-}
-
-//////////////////////////////////////////////////
-void DirIter::next()
-{
-  WIN32_FIND_DATAA data;
-  if (::FindNextFileA(this->dataPtr->handle, &data) == 0)  // fails
-  {
-    this->dataPtr->end = true;
-    this->dataPtr->current = "";
-  }
-  else
-  {
-    this->dataPtr->current = std::string(data.cFileName);
-  }
-}
-
-//////////////////////////////////////////////////
-void DirIter::close_handle()
-{
-  ::FindClose(this->dataPtr->handle);
-}
+    //////////////////////////////////////////////////
+    void DirIter::CloseHandle()
+    {
+      ::FindClose(this->dataPtr->handle);
+    }
 
 #endif  // _WIN32
 
-//////////////////////////////////////////////////
-const std::string separator(const std::string &_p)
-{
-  return _p + preferred_separator;
-}
-
-//////////////////////////////////////////////////
-std::string basename(const std::string &_path)
-{
-  bool last_was_slash = false;
-  std::string basename;
-
-  basename.reserve(_path.length());
-
-  for (size_t i = 0; i < _path.length(); ++i)
-  {
-    if (_path[i] == preferred_separator)
+    //////////////////////////////////////////////////
+    const std::string separator(const std::string &_p)
     {
-      if (i == (_path.length() - 1))
+      return _p + preferred_separator;
+    }
+
+    //////////////////////////////////////////////////
+    std::string basename(const std::string &_path)
+    {
+      bool last_was_slash = false;
+      std::string basename;
+
+      basename.reserve(_path.length());
+
+      for (size_t i = 0; i < _path.length(); ++i)
       {
-        // if this is the last character, then according to basename we
-        // should return the portion of the path *before* the slash, i.e.
-        // the one we were just building.  However, as a special case, if
-        // basename is empty, we return just a "/".
-        if (basename.size() == 0)
+        if (_path[i] == preferred_separator)
         {
-          basename.push_back(preferred_separator);
+          if (i == (_path.length() - 1))
+          {
+            // if this is the last character, then according to basename we
+            // should return the portion of the path *before* the slash, i.e.
+            // the one we were just building.  However, as a special case, if
+            // basename is empty, we return just a "/".
+            if (basename.size() == 0)
+            {
+              basename.push_back(preferred_separator);
+            }
+            break;
+          }
+
+          last_was_slash = true;
         }
-        break;
+        else
+        {
+          if (last_was_slash)
+          {
+            last_was_slash = false;
+            basename.clear();
+          }
+
+          basename.push_back(_path[i]);
+        }
       }
 
-      last_was_slash = true;
+      return basename;
     }
-    else
+
+    //////////////////////////////////////////////////
+    DirIter::DirIter() : dataPtr(new DirIterPrivate)
     {
-      if (last_was_slash)
-      {
-        last_was_slash = false;
-        basename.clear();
-      }
+      this->dataPtr->current = "";
 
-      basename.push_back(_path[i]);
+      this->dataPtr->dirname = "";
+
+      this->dataPtr->handle = nullptr;
+
+      this->dataPtr->end = true;
+    }
+
+    //////////////////////////////////////////////////
+    std::string DirIter::operator*() const
+    {
+      return this->dataPtr->dirname + preferred_separator +
+        this->dataPtr->current;
+    }
+
+    //////////////////////////////////////////////////
+    // prefix operator; note that we don't support the postfix operator
+    // because it is complicated to do so
+    const DirIter& DirIter::operator++()
+    {
+      Next();
+      return *this;
+    }
+
+    //////////////////////////////////////////////////
+    bool DirIter::operator!=(const DirIter &_other) const
+    {
+      return this->dataPtr->end != _other.dataPtr->end;
+    }
+
+    //////////////////////////////////////////////////
+    DirIter::~DirIter()
+    {
+      if (this->dataPtr->handle != nullptr)
+      {
+        CloseHandle();
+        this->dataPtr->handle = nullptr;
+      }
     }
   }
-
-  return basename;
 }
-
-//////////////////////////////////////////////////
-DirIter::DirIter() : dataPtr(new DirIterPrivate)
-{
-  this->dataPtr->current = "";
-
-  this->dataPtr->dirname = "";
-
-  this->dataPtr->handle = nullptr;
-
-  this->dataPtr->end = true;
-}
-
-//////////////////////////////////////////////////
-std::string DirIter::operator*() const
-{
-  return this->dataPtr->dirname + preferred_separator +
-    this->dataPtr->current;
-}
-
-//////////////////////////////////////////////////
-// prefix operator; note that we don't support the postfix operator
-// because it is complicated to do so
-const DirIter& DirIter::operator++()
-{
-  next();
-
-  return *this;
-}
-
-//////////////////////////////////////////////////
-bool DirIter::operator!=(const DirIter &_other) const
-{
-  return this->dataPtr->end != _other.dataPtr->end;
-}
-
-//////////////////////////////////////////////////
-DirIter::~DirIter()
-{
-  if (this->dataPtr->handle != nullptr)
-  {
-    close_handle();
-    this->dataPtr->handle = nullptr;
-  }
-}
-}  // namespace filesystem
-}  // namespace sdf

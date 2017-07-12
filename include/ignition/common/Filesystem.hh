@@ -15,13 +15,13 @@
  *
  */
 
-#ifndef _SDF_FILESYSTEM_HH_
-#define _SDF_FILESYSTEM_HH_
+#ifndef _IGNITION_COMMON_FILESYSTEM_HH_
+#define _IGNITION_COMMON_FILESYSTEM_HH_
 
 #include <memory>
 #include <string>
 
-#include "sdf/system_util.hh"
+#include <ignition/common/System.hh>
 
 #ifdef _WIN32
 // Disable warning C4251 which is triggered by
@@ -30,28 +30,38 @@
 #pragma warning(disable: 4251)
 #endif
 
-namespace sdf
+namespace ignition
 {
-  namespace filesystem
+  namespace common
   {
     /// \brief Determine whether the given path exists on the filesystem.
     /// \param[in] _path  The path to check for existence
     /// \return True if the path exists on the filesystem, false otherwise.
-    SDFORMAT_VISIBLE
+    IGNITION_COMMON_VISIBLE
     bool exists(const std::string &_path);
 
     /// \brief Determine whether the given path is a directory.
     /// \param[in] _path  The path to check
     /// \return True if given path exists and is a directory, false otherwise.
-    SDFORMAT_VISIBLE
-    bool is_directory(const std::string &_path);
+    IGNITION_COMMON_VISIBLE
+    bool isDirectory(const std::string &_path);
+
+    /// \brief Check if the given path is a file.
+    /// \param[in] _path Path to a file.
+    /// \return True if _path is a file.
+    bool IGNITION_COMMON_VISIBLE isFile(const std::string &_path);
 
     /// \brief Create a new directory on the filesystem.  Intermediate
     ///        directories must already exist.
     /// \param[in] _path  The new directory path to create
     /// \return True if directory creation was successful, false otherwise.
-    SDFORMAT_VISIBLE
-    bool create_directory(const std::string &_path);
+    IGNITION_COMMON_VISIBLE
+    bool createDirectory(const std::string &_path);
+
+    /// \brief Create directories for the given path
+    /// \param[in] _path Path to create directories from
+    /// \return true on success
+    bool IGNITION_COMMON_VISIBLE createDirectories(const std::string &_path);
 
     // The below is C++ variadic template magic to allow an append
     // method that takes 1-n number of arguments to append together.
@@ -60,40 +70,67 @@ namespace sdf
     ///        onto the passed-in string.
     /// \param[in] _s  The path to start with.
     /// \return The original path with the platform path separator appended.
-    SDFORMAT_VISIBLE
+    IGNITION_COMMON_VISIBLE
     std::string const separator(std::string const &_s);
 
-    /// \brief Append one or more additional path elements to the first
-    ///        passed in argument.
-    /// \param[in] args  The paths to append together
-    /// \return A new string with the paths appended together.
-    template<typename... Args>
-    std::string append(Args const &... args)
-    {
-      std::string result;
-      int unpack[] {
-        0, (result += separator(args), 0)...};
-      static_cast<void>(unpack);
-      return result.substr(0, result.length() - 1);
-    }
+    /// \brief Get the absolute path of a provided path.
+    /// \param[in] _path Relative or absolute path.
+    /// \return Absolute path
+    std::string IGNITION_COMMON_VISIBLE absPath(const std::string &_path);
 
-    /// \brief Get the current working path.
-    /// \return Current working path if successful, the empty path on error.
-    SDFORMAT_VISIBLE
-    std::string current_path();
+    /// \brief Join two strings together to form a path
+    /// \param[in] _path1 the left portion of the path
+    /// \param[in] _path2 the right portion of the path
+    /// \return Joined path
+    std::string IGNITION_COMMON_VISIBLE joinPaths(const std::string &_path1,
+                                                  const std::string &_path2);
+
+    /// \brief Get the current working directory
+    /// \return Name of the current directory
+    std::string IGNITION_COMMON_VISIBLE cwd();
 
     /// \brief Given a path, get just the basename portion.
     /// \param[in] _path  The full path.
     /// \return A new string with just the basename portion of the path.
-    SDFORMAT_VISIBLE
+    IGNITION_COMMON_VISIBLE
     std::string basename(const std::string &_path);
+
+    /// \brief Copy a file.
+    /// \param[in] _existingFilename Path to an existing file.
+    /// \param[in] _newFilename Path of the new file.
+    /// \return True on success.
+    bool IGNITION_COMMON_VISIBLE copyFile(const std::string &_existingFilename,
+                  const std::string &_newFilename);
+
+    /// \brief Move a file.
+    /// \param[in] _existingFilename Full path to an existing file.
+    /// \param[in] _newFilename Full path of the new file.
+    /// \return True on success.
+    bool IGNITION_COMMON_VISIBLE moveFile(const std::string &_existingFilename,
+                  const std::string &_newFilename);
+
+    /// \brief Remove a directory.
+    /// \param[in] _path Path to a directory.
+    /// \return True if _path is a directory and was removed.
+    bool IGNITION_COMMON_VISIBLE removeDirectory(const std::string &_path);
+
+    /// \brief Remove a directory or file.
+    /// \param[in] _path Path to a directory or file.
+    /// \return True if _path was removed.
+    bool IGNITION_COMMON_VISIBLE removeDirectoryOrFile(
+        const std::string &_path);
+
+    /// \brief Remove a directory or file.
+    /// \param[in] _path Path to a directory or file.
+    /// \return True if _path was removed.
+    bool IGNITION_COMMON_VISIBLE removeAll(const std::string &_path);
 
     /// \internal
     class DirIterPrivate;
 
     /// \class DirIter Filesystem.hh
     /// \brief A class for iterating over all items in a directory.
-    class SDFORMAT_VISIBLE DirIter
+    class IGNITION_COMMON_VISIBLE DirIter
     {
       /// \brief Constructor.
       /// \param[in] _in  Directory to iterate over.
@@ -120,13 +157,13 @@ namespace sdf
       public: ~DirIter();
 
       /// \brief Move to the next directory record, skipping . and .. records.
-      private: void next();
+      private: void Next();
 
       /// \brief Set the internal variable to the empty string.
-      private: void set_internal_empty();
+      private: void SetInternalEmpty();
 
       /// \brief Close an open directory handle.
-      private: void close_handle();
+      private: void CloseHandle();
 
       /// \brief Private data.
       private: std::unique_ptr<DirIterPrivate> dataPtr;
