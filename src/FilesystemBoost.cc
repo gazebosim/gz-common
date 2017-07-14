@@ -108,8 +108,8 @@ namespace ignition
     std::string currentPath()
     {
       std::string cur;
-
-      for (int32_t path_max = 128;; path_max *= 2)  // loop 'til buffer large enough
+      // loop 'til buffer large enough
+      for (int32_t path_max = 128;; path_max *= 2)
       {
         std::vector<char> buf(path_max);
 
@@ -172,7 +172,8 @@ namespace ignition
           break;
         }
 
-        if ((strcmp(entry.d_name, ".") != 0) && (strcmp(entry.d_name, "..") != 0))
+        if ((strcmp(entry.d_name, ".") != 0)
+            && (strcmp(entry.d_name, "..") != 0))
         {
           this->dataPtr->current = std::string(entry.d_name);
           break;
@@ -195,8 +196,8 @@ namespace ignition
     {
       return _errval == ERROR_FILE_NOT_FOUND
         || _errval == ERROR_PATH_NOT_FOUND
-        || _errval == ERROR_INVALID_NAME  // "tools/jam/src/:sys:stat.h", "//foo"
-        || _errval == ERROR_INVALID_DRIVE  // USB card reader with no card inserted
+        || _errval == ERROR_INVALID_NAME  // "tools/src/:sys:stat.h", "//foo"
+        || _errval == ERROR_INVALID_DRIVE  // USB card reader with no card
         || _errval == ERROR_NOT_READY  // CD/DVD drive with no disc inserted
         || _errval == ERROR_INVALID_PARAMETER  // ":sys:stat.h"
         || _errval == ERROR_BAD_PATHNAME  // "//nosuch" on Win64
@@ -233,9 +234,9 @@ namespace ignition
       }
     };
 
-    //  REPARSE_DATA_BUFFER related definitions are found in ntifs.h, which is part
-    //  of the Windows Device Driver Kit. Since that's inconvenient, the definitions
-    //  are provided here. See http://msdn.microsoft.com/en-us/library/ms791514.aspx
+    // REPARSE_DATA_BUFFER related definitions are in ntifs.h, which is part of
+    // the Windows Device Driver Kit. Since it's inconvenient, the definitions
+    // are provided here. http://msdn.microsoft.com/en-us/library/ms791514.aspx
 
     typedef struct _REPARSE_DATA_BUFFER {
       ULONG  ReparseTag;
@@ -290,10 +291,10 @@ namespace ignition
     bool is_reparse_point_a_symlink(const std::string &_path)
     {
       handle_wrapper h(create_file_handle(_path, FILE_READ_EA,
-                        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                        nullptr, OPEN_EXISTING,
-                        FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT,
-                        nullptr));
+          FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+          nullptr, OPEN_EXISTING,
+          FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT,
+          nullptr));
       if (h.handle == INVALID_HANDLE_VALUE)
       {
         return false;
@@ -303,9 +304,8 @@ namespace ignition
 
       // Query the reparse data
       DWORD dwRetLen;
-      BOOL result = ::DeviceIoControl(h.handle, FSCTL_GET_REPARSE_POINT, nullptr,
-                                      0, buf.data(), (DWORD)buf.size(),
-                                      &dwRetLen, nullptr);
+      BOOL result = ::DeviceIoControl(h.handle, FSCTL_GET_REPARSE_POINT,
+          nullptr, 0, buf.data(), (DWORD)buf.size(), &dwRetLen, nullptr);
       if (!result)
       {
         return false;
@@ -315,14 +315,13 @@ namespace ignition
         == IO_REPARSE_TAG_SYMLINK
         // Issue 9016 asked that NTFS directory junctions be recognized as
         // directories.  That is equivalent to recognizing them as symlinks, and
-        // then the normal symlink mechanism will take care of recognizing them as
-        // directories.
+        // then the normal symlink mechanism will recognize them as directories.
         //
         // Directory junctions are very similar to symlinks, but have some
-        // performance and other advantages over symlinks. They can be created from
-        // the command line with "mklink /j junction-name target-path".
+        // performance and other advantages over symlinks. They can be created
+        // from the command line with "mklink /j junction-name target-path".
         || reinterpret_cast<const REPARSE_DATA_BUFFER*>(&buf[0])->ReparseTag
-        == IO_REPARSE_TAG_MOUNT_POINT;  // aka "directory junction" or "junction"
+        == IO_REPARSE_TAG_MOUNT_POINT;  // "directory junction" or "junction"
     }
 
     //////////////////////////////////////////////////
@@ -334,9 +333,9 @@ namespace ignition
         return process_status_failure();
       }
 
-      //  reparse point handling;
-      //    since GetFileAttributesW does not resolve symlinks, try to open a file
-      //    handle to discover if the file exists
+      // reparse point handling;
+      //   since GetFileAttributesW does not resolve symlinks, try to open file
+      //   handle to discover if the file exists
       if (attr & FILE_ATTRIBUTE_REPARSE_POINT)
       {
         handle_wrapper h(
@@ -422,7 +421,7 @@ namespace ignition
 
       if (_in.empty())
       {
-        // To be compatible with Unix, if we are given an empty string, assume this
+        // To be compatible with Unix, if given an empty string, assume this
         // is the end.
         this->dataPtr->end = true;
         return;

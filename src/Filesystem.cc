@@ -49,7 +49,7 @@
 #include "ignition/common/win_dirent.h"
 #endif
 
-#include <ignition/common/Filesystem.hh>
+#include "ignition/common/Filesystem.hh"
 
 #ifdef _WIN32
 # define IGN_PATH_MAX _MAX_PATH
