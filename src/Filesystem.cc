@@ -127,13 +127,6 @@ bool ignition::common::removeAll(const std::string &_path)
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::exists(const std::string &_path)
-{
-  return ignition::common::isFile(_path) ||
-         ignition::common::isDirectory(_path);
-}
-
-/////////////////////////////////////////////////
 bool ignition::common::moveFile(const std::string &_existingFilename,
                                 const std::string &_newFilename)
 {

@@ -86,6 +86,13 @@ namespace ignition
     static const char preferred_separator = '/';
 
     //////////////////////////////////////////////////
+    bool exists(const std::string &_path)
+    {
+      struct stat path_stat;
+      return ::stat(_path.c_str(), &path_stat) == 0;
+    }
+
+    //////////////////////////////////////////////////
     bool isDirectory(const std::string &_path)
     {
       struct stat path_stat;
