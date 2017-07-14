@@ -168,9 +168,7 @@ std::string ignition::common::joinPaths(const std::string &_path1,
                                         const std::string &_path2)
 {
   // todo #ifdef _WIN32 use PathCchCombine()
-  std::string result = _path1 + "/" + _path2;
-  ignition::common::replaceAll(result, result, "//", "/");
-  return result;
+  return separator(_path1) + _path2;
 }
 
 /////////////////////////////////////////////////

@@ -85,6 +85,25 @@ namespace ignition
     std::string IGNITION_COMMON_VISIBLE joinPaths(const std::string &_path1,
                                                   const std::string &_path2);
 
+    /// \brief base case for joinPaths(...) below
+    inline std::string joinPaths(const std::string &_path1)
+    {
+      return _path1;
+    }
+
+    /// \brief Append one or more additional path elements to the first
+    ///        passed in argument.
+    /// \param[in] args  The paths to append together
+    /// \return A new string with the paths appended together.
+    template<typename... Args>
+    inline std::string joinPaths(const std::string &_path1,
+                            const std::string &_path2,
+                            Args const &..._args)
+    {
+      return joinPaths(joinPaths(_path1, _path2),
+                       joinPaths(_args...));
+    }
+
     /// \brief Get the current working directory
     /// \return Name of the current directory
     std::string IGNITION_COMMON_VISIBLE cwd();

@@ -322,7 +322,7 @@ TEST(Filesystem, append)
 
   ASSERT_EQ(path, separator("tmp") + "hello");
 
-  path = joinPaths(joinPaths(path, "there"), "again");
+  path = joinPaths(path, "there", "again");
 
   EXPECT_EQ(path, separator("tmp") +
             separator("hello") +
@@ -349,17 +349,16 @@ TEST(Filesystem, cwd_error)
 /////////////////////////////////////////////////
 TEST(Filesystem, basename)
 {
-  std::string absolute = separator("") + separator("home")
-    + separator("bob") + separator("foo");
+  std::string absolute = joinPaths("", "home", "bob", "foo");
   EXPECT_EQ(basename(absolute), "foo");
 
-  std::string relative = separator("baz") + separator("foobar");
+  std::string relative = joinPaths("baz", "foobar");
   EXPECT_EQ(basename(relative), "foobar");
 
   std::string bname = "bzzz";
   EXPECT_EQ(basename(bname), "bzzz");
 
-  std::string nobase = separator("baz") + separator("");
+  std::string nobase = joinPaths("baz", "");
   EXPECT_EQ(basename(nobase), "baz");
 
   std::string multiple_slash = separator("baz") + separator("") + separator("")
