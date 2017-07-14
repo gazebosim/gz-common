@@ -112,7 +112,7 @@ namespace ignition
     }
 
     //////////////////////////////////////////////////
-    std::string currentPath()
+    std::string cwd()
     {
       std::string cur;
       // loop 'til buffer large enough
@@ -395,7 +395,7 @@ namespace ignition
     }
 
     //////////////////////////////////////////////////
-    std::string currentPath()
+    std::string cwd()
     {
       DWORD sz;
       if ((sz = ::GetCurrentDirectoryA(0, nullptr)) == 0)

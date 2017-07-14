@@ -236,17 +236,6 @@ bool ignition::common::copyFile(const std::string &_existingFilename,
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::cwd()
-{
-  char buf[IGN_PATH_MAX + 1] = {'\0'};
-#ifdef _WIN32
-  return _getcwd(buf, sizeof(buf)) == nullptr ? "" : buf;
-#else
-  return getcwd(buf, sizeof(buf)) == nullptr ? "" : buf;
-#endif
-}
-
-/////////////////////////////////////////////////
 bool ignition::common::createDirectories(const std::string &_path)
 {
   size_t index = 0;
