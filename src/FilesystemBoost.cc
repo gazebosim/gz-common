@@ -86,6 +86,19 @@ namespace ignition
     static const char preferred_separator = '/';
 
     //////////////////////////////////////////////////
+    bool isDirectory(const std::string &_path)
+    {
+      struct stat path_stat;
+
+      if (::stat(_path.c_str(), &path_stat) != 0)
+      {
+        return false;
+      }
+
+      return S_ISDIR(path_stat.st_mode);
+    }
+
+    //////////////////////////////////////////////////
     bool createDirectory(const std::string &_path)
     {
       return ::mkdir(_path.c_str(), S_IRWXU|S_IRWXG|S_IRWXO) == 0;

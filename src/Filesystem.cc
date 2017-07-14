@@ -67,19 +67,6 @@ using namespace igncmn;
 
 
 /////////////////////////////////////////////////
-bool ignition::common::isDirectory(const std::string &_path)
-{
-  struct stat info;
-
-  if (stat(_path.c_str(), &info) != 0)
-    return false;
-  else if (info.st_mode & S_IFDIR)
-    return true;
-  else
-    return false;
-}
-
-/////////////////////////////////////////////////
 bool ignition::common::isFile(const std::string &_path)
 {
   std::ifstream f(_path);
