@@ -190,6 +190,7 @@ TEST(Util_TEST, fileOps)
   EXPECT_FALSE(common::cwd().empty());
   EXPECT_TRUE(common::exists(common::cwd()));
   EXPECT_TRUE(common::isDirectory(common::cwd()));
+  EXPECT_FALSE(common::isFile(common::cwd()));
 
   EXPECT_TRUE(common::isFile(__FILE__));
   EXPECT_FALSE(common::isDirectory(__FILE__));

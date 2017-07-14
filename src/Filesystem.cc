@@ -83,7 +83,7 @@ bool ignition::common::isDirectory(const std::string &_path)
 bool ignition::common::isFile(const std::string &_path)
 {
   std::ifstream f(_path);
-  return f.good();
+  return (!isDirectory(_path)) && f.good();
 }
 
 /////////////////////////////////////////////////
