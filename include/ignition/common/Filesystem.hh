@@ -86,9 +86,9 @@ namespace ignition
                                                   const std::string &_path2);
 
     /// \brief base case for joinPaths(...) below
-    inline std::string joinPaths(const std::string &_path1)
+    inline std::string joinPaths(const std::string &_path)
     {
-      return _path1;
+      return _path;
     }
 
     /// \brief Append one or more additional path elements to the first
@@ -97,8 +97,8 @@ namespace ignition
     /// \return A new string with the paths appended together.
     template<typename... Args>
     inline std::string joinPaths(const std::string &_path1,
-                            const std::string &_path2,
-                            Args const &..._args)
+                                 const std::string &_path2,
+                                 Args const &..._args)
     {
       return joinPaths(joinPaths(_path1, _path2),
                        joinPaths(_args...));
