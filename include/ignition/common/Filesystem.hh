@@ -109,7 +109,8 @@ namespace ignition
     bool IGNITION_COMMON_VISIBLE moveFile(const std::string &_existingFilename,
                   const std::string &_newFilename);
 
-    /// \brief Remove a directory.
+    /// \brief Remove an empty directory
+    /// \remarks the directory must be empty to be removed
     /// \param[in] _path Path to a directory.
     /// \return True if _path is a directory and was removed.
     bool IGNITION_COMMON_VISIBLE removeDirectory(const std::string &_path);
