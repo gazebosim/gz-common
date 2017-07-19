@@ -14,8 +14,10 @@
  * limitations under the License.
  *
  */
+
 #include <ctime>
 #include <chrono>
+#include <iomanip>
 
 #ifdef _WIN32
   #include <Windows.h>
@@ -206,8 +208,7 @@ Time Time::Sleep(const common::Time &_time)
   }
   else
   {
-    /// \TODO Make this a gzlog
-    ignwarn << "Sleep time is larger than clock resolution, skipping sleep\n";
+    ignlog << "Sleep time is larger than clock resolution, skipping sleep\n";
   }
 
   return result;
@@ -370,4 +371,95 @@ bool Time::operator>=(double _time) const
 bool Time::operator>=(const struct timespec &_tv) const
 {
   return *this >= Time(_tv);
+}
+
+/////////////////////////////////////////////////
+std::string Time::FormattedString(FormatOption _start, FormatOption _end) const
+{
+  if (_end < _start)
+  {
+    ignwarn << "End can't come before start, using same end and start."
+        << std::endl;
+    _end = _start;
+  }
+
+  std::ostringstream stream;
+  unsigned int s, msec;
+
+  stream.str("");
+
+  // Get seconds
+  s = this->sec;
+
+  // Get milliseconds
+  msec = this->nsec / nsInMs;
+
+  // Get seconds from milliseconds
+  int seconds = msec / 1000;
+  msec -= seconds * 1000;
+  s += seconds;
+
+  // Days
+  if (_start <= FormatOption::DAYS)
+  {
+    unsigned int day = s / 86400;
+    s -= day * 86400;
+    stream << std::setw(2) << std::setfill('0') << day;
+  }
+
+  // Hours
+  if (_end >= FormatOption::HOURS)
+  {
+    if (_start <  FormatOption::HOURS)
+      stream << " ";
+
+    if (_start <=  FormatOption::HOURS)
+    {
+      unsigned int hour = s / 3600;
+      s -= hour * 3600;
+      stream << std::setw(2) << std::setfill('0') << hour;
+    }
+  }
+
+  // Minutes
+  if (_end >= FormatOption::MINUTES)
+  {
+    if (_start < FormatOption::MINUTES)
+      stream << ":";
+
+    if (_start <= FormatOption::MINUTES)
+    {
+      unsigned int min = s / 60;
+      s -= min * 60;
+      stream << std::setw(2) << std::setfill('0') << min;
+    }
+  }
+
+  // Seconds
+  if (_end >= FormatOption::SECONDS)
+  {
+    if (_start < FormatOption::SECONDS)
+      stream << ":";
+
+    if (_start <= FormatOption::SECONDS)
+    {
+      stream << std::setw(2) << std::setfill('0') << s;
+    }
+  }
+
+  // Milliseconds
+  if (_end >= FormatOption::MILLISECONDS)
+  {
+    if (_start < FormatOption::MILLISECONDS)
+      stream << ".";
+    else
+      msec = msec + s * 1000;
+
+    if (_start <= FormatOption::MILLISECONDS)
+    {
+      stream << std::setw(3) << std::setfill('0') << msec;
+    }
+  }
+
+  return stream.str();
 }
