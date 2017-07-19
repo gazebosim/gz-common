@@ -376,25 +376,11 @@ bool Time::operator>=(const struct timespec &_tv) const
 /////////////////////////////////////////////////
 std::string Time::FormattedString(FormatOption _start, FormatOption _end) const
 {
-  if (_start > MILLISECONDS)
-  {
-    ignwarn << "Invalid start [" << _start << "], using millisecond [4]." <<
-        std::endl;
-    _start = MILLISECONDS;
-  }
-
   if (_end < _start)
   {
-    ignwarn << "Invalid end [" << _end << "], using start [" << _start << "]."
+    ignwarn << "End can't come before start, using same end and start."
         << std::endl;
     _end = _start;
-  }
-
-  if (_end > MILLISECONDS)
-  {
-    ignwarn << "Invalid end [" << _end << "], using millisecond [4]." <<
-        std::endl;
-    _end = MILLISECONDS;
   }
 
   std::ostringstream stream;
@@ -414,7 +400,7 @@ std::string Time::FormattedString(FormatOption _start, FormatOption _end) const
   s += seconds;
 
   // Days
-  if (_start <= 0)
+  if (_start <= FormatOption::DAYS)
   {
     unsigned int day = s / 86400;
     s -= day * 86400;
@@ -422,12 +408,12 @@ std::string Time::FormattedString(FormatOption _start, FormatOption _end) const
   }
 
   // Hours
-  if (_end >= 1)
+  if (_end >= FormatOption::HOURS)
   {
-    if (_start < 1)
+    if (_start <  FormatOption::HOURS)
       stream << " ";
 
-    if (_start <= 1)
+    if (_start <=  FormatOption::HOURS)
     {
       unsigned int hour = s / 3600;
       s -= hour * 3600;
@@ -436,12 +422,12 @@ std::string Time::FormattedString(FormatOption _start, FormatOption _end) const
   }
 
   // Minutes
-  if (_end >= 2)
+  if (_end >= FormatOption::MINUTES)
   {
-    if (_start < 2)
+    if (_start < FormatOption::MINUTES)
       stream << ":";
 
-    if (_start <= 2)
+    if (_start <= FormatOption::MINUTES)
     {
       unsigned int min = s / 60;
       s -= min * 60;
@@ -450,26 +436,26 @@ std::string Time::FormattedString(FormatOption _start, FormatOption _end) const
   }
 
   // Seconds
-  if (_end >= 3)
+  if (_end >= FormatOption::SECONDS)
   {
-    if (_start < 3)
+    if (_start < FormatOption::SECONDS)
       stream << ":";
 
-    if (_start <= 3)
+    if (_start <= FormatOption::SECONDS)
     {
       stream << std::setw(2) << std::setfill('0') << s;
     }
   }
 
   // Milliseconds
-  if (_end >= 4)
+  if (_end >= FormatOption::MILLISECONDS)
   {
-    if (_start < 4)
+    if (_start < FormatOption::MILLISECONDS)
       stream << ".";
     else
       msec = msec + s * 1000;
 
-    if (_start <= 4)
+    if (_start <= FormatOption::MILLISECONDS)
     {
       stream << std::setw(3) << std::setfill('0') << msec;
     }

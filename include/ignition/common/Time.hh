@@ -37,7 +37,7 @@ namespace ignition
 
       /// \enum Format options
       /// \brief Options for formatting time as a string.
-      public: enum FormatOption
+      public: enum class FormatOption
       {
         /// \brief Days
         DAYS = 0,
@@ -105,8 +105,9 @@ namespace ignition
       /// \param[in] _start Start point.
       /// \param[in] _end End point.
       /// \return String representing time.
-      public: std::string FormattedString(FormatOption _start = DAYS,
-          FormatOption _end = MILLISECONDS) const;
+      public: std::string FormattedString(
+          FormatOption _start = FormatOption::DAYS,
+          FormatOption _end = FormatOption::MILLISECONDS) const;
 
       /// \brief Assignment operator
       /// \param[in] _time the new time
