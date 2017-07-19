@@ -35,6 +35,22 @@ namespace ignition
       /// \brief A static zero time variable set to common::Time(0, 0).
       public: static const Time Zero;
 
+      /// \enum Format options
+      /// \brief Options for formatting time as a string.
+      public: enum FormatOption
+      {
+        /// \brief Days
+        DAYS = 0,
+        /// \brief Hours
+        HOURS = 1,
+        /// \brief Minutes
+        MINUTES = 2,
+        /// \brief Seconds
+        SECONDS = 3,
+        /// \brief Milliseconds
+        MILLISECONDS = 4
+      };
+
       /// \brief Constructors
       public: Time();
 
@@ -83,6 +99,14 @@ namespace ignition
       /// \param[in] _time Sleep time
       /// \return Time actually slept
       public: static Time Sleep(const common::Time &_time);
+
+      /// \brief Get the time as a string formatted as "DD hh:mm:ss.mmm", with
+      /// the option to choose the start/end.
+      /// \param[in] _start Start point.
+      /// \param[in] _end End point.
+      /// \return String representing time.
+      public: std::string FormattedString(FormatOption _start = DAYS,
+          FormatOption _end = MILLISECONDS) const;
 
       /// \brief Assignment operator
       /// \param[in] _time the new time

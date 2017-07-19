@@ -14,8 +14,10 @@
  * limitations under the License.
  *
  */
+
 #include <ctime>
 #include <chrono>
+#include <iomanip>
 
 #ifdef _WIN32
   #include <Windows.h>
@@ -206,8 +208,7 @@ Time Time::Sleep(const common::Time &_time)
   }
   else
   {
-    /// \TODO Make this a gzlog
-    ignwarn << "Sleep time is larger than clock resolution, skipping sleep\n";
+    ignlog << "Sleep time is larger than clock resolution, skipping sleep\n";
   }
 
   return result;
@@ -370,4 +371,109 @@ bool Time::operator>=(double _time) const
 bool Time::operator>=(const struct timespec &_tv) const
 {
   return *this >= Time(_tv);
+}
+
+/////////////////////////////////////////////////
+std::string Time::FormattedString(FormatOption _start, FormatOption _end) const
+{
+  if (_start > MILLISECONDS)
+  {
+    ignwarn << "Invalid start [" << _start << "], using millisecond [4]." <<
+        std::endl;
+    _start = MILLISECONDS;
+  }
+
+  if (_end < _start)
+  {
+    ignwarn << "Invalid end [" << _end << "], using start [" << _start << "]."
+        << std::endl;
+    _end = _start;
+  }
+
+  if (_end > MILLISECONDS)
+  {
+    ignwarn << "Invalid end [" << _end << "], using millisecond [4]." <<
+        std::endl;
+    _end = MILLISECONDS;
+  }
+
+  std::ostringstream stream;
+  unsigned int s, msec;
+
+  stream.str("");
+
+  // Get seconds
+  s = this->sec;
+
+  // Get milliseconds
+  msec = this->nsec / nsInMs;
+
+  // Get seconds from milliseconds
+  int seconds = msec / 1000;
+  msec -= seconds * 1000;
+  s += seconds;
+
+  // Days
+  if (_start <= 0)
+  {
+    unsigned int day = s / 86400;
+    s -= day * 86400;
+    stream << std::setw(2) << std::setfill('0') << day;
+  }
+
+  // Hours
+  if (_end >= 1)
+  {
+    if (_start < 1)
+      stream << " ";
+
+    if (_start <= 1)
+    {
+      unsigned int hour = s / 3600;
+      s -= hour * 3600;
+      stream << std::setw(2) << std::setfill('0') << hour;
+    }
+  }
+
+  // Minutes
+  if (_end >= 2)
+  {
+    if (_start < 2)
+      stream << ":";
+
+    if (_start <= 2)
+    {
+      unsigned int min = s / 60;
+      s -= min * 60;
+      stream << std::setw(2) << std::setfill('0') << min;
+    }
+  }
+
+  // Seconds
+  if (_end >= 3)
+  {
+    if (_start < 3)
+      stream << ":";
+
+    if (_start <= 3)
+    {
+      stream << std::setw(2) << std::setfill('0') << s;
+    }
+  }
+
+  // Milliseconds
+  if (_end >= 4)
+  {
+    if (_start < 4)
+      stream << ".";
+    else
+      msec = msec + s * 1000;
+
+    if (_start <= 4)
+    {
+      stream << std::setw(3) << std::setfill('0') << msec;
+    }
+  }
+
+  return stream.str();
 }
