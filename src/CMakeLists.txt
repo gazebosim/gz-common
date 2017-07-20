@@ -40,6 +40,7 @@ set (sources
   URI.cc
   Util.cc
   Uuid.cc
+  WorkerPool.cc
 )
 
 # FIXME: Some classes fail to build on Windows
@@ -89,6 +90,7 @@ set (gtest_sources
   URI_TEST.cc
   Util_TEST.cc
   Uuid_TEST.cc
+  WorkerPool_TEST.cc
 )
 
 # FIXME: Some classes fail to build on Windows
