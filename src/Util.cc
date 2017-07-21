@@ -395,7 +395,9 @@ bool ignition::common::env(const std::string &_name, std::string &_value)
     v = buffer;
   }
 #else
-  v = std::getenv(_name.c_str());
+  const char *cvar = std::getenv(_name.c_str());
+  if (cvar)
+    v = cvar;
 #endif
   if (!v.empty())
   {
