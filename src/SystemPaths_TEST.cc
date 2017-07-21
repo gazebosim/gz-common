@@ -64,7 +64,7 @@ TEST_F(SystemPathsFixture, SystemPaths)
 TEST_F(SystemPathsFixture, InitialNoSearchPaths)
 {
   common::SystemPaths sp;
-  EXPECT_EQ(0, sp.PluginPaths().size());
+  EXPECT_EQ(0u, sp.PluginPaths().size());
 }
 
 /////////////////////////////////////////////////
@@ -81,9 +81,9 @@ TEST_F(SystemPathsFixture, ClearSearchPaths)
 {
   common::SystemPaths sp;
   sp.AddPluginPaths("./");
-  EXPECT_EQ(1, sp.PluginPaths().size());
+  EXPECT_EQ(1u, sp.PluginPaths().size());
   sp.ClearPluginPaths();
-  EXPECT_EQ(0, sp.PluginPaths().size());
+  EXPECT_EQ(0u, sp.PluginPaths().size());
 }
 
 /////////////////////////////////////////////////

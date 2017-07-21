@@ -475,7 +475,7 @@ bool ignition::common::removeAll(const std::string &_path)
     if (dir)
     {
       struct dirent *p;
-      while (p=readdir(dir))
+      while ( (p=readdir(dir)) != nullptr)
       {
         // Skip special files.
         if (!std::strcmp(p->d_name, ".") || !std::strcmp(p->d_name, ".."))
