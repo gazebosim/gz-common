@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 
-project (ignition-common0)
+project (ignition-common1)
 
 string (SUBSTRING ${PROJECT_NAME} 9 6 IGN_PROJECT_NAME)
 string (SUBSTRING ${PROJECT_NAME} 15 -1 PROJECT_MAJOR_VERSION)
