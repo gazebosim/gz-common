@@ -39,5 +39,5 @@ class A : public Base
 }
 
 
-IGN_COMMON_REGISTER_SINGLE_PLUGIN(ns::A, ns::WrongBase);
+IGN_COMMON_REGISTER_SINGLE_PLUGIN(ns::A, ns::WrongBase)
 

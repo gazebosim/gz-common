@@ -28,5 +28,5 @@ class NotBase
   int test3;
 };
 
-IGN_COMMON_REGISTER_SINGLE_PLUGIN(A, NotBase);
+IGN_COMMON_REGISTER_SINGLE_PLUGIN(A, NotBase)
 
