@@ -56,9 +56,6 @@ class ignition::common::SystemPathsPrivate
   /// \brief Find file URI callback.
   public: std::function<std::string (const std::string &)> findFileURICB;
 
-  /// \brief format the path to use "/" as a separator with "/" at the end
-  public: std::string NormalizePath(const std::string &_path) const;
-
   /// \brief generates paths to try searching for the named library
   public: std::vector<std::string> GenerateLibraryPaths(
               const std::string &_libName) const;
@@ -168,8 +165,7 @@ std::string SystemPaths::FindSharedLibrary(const std::string &_libName)
 }
 
 /////////////////////////////////////////////////
-std::string SystemPathsPrivate::NormalizePath(const std::string &_path)
-  const
+std::string SystemPaths::NormalizeDirectoryPath(const std::string &_path)
 {
   std::string path = _path;
   // Use '/' because it works on Linux, OSX, and Windows
@@ -317,7 +313,7 @@ std::string SystemPaths::LocateLocalFile(const std::string &_filename,
   std::string foundPath = "";
   for (auto const &path : _paths)
   {
-    std::string checkPath = this->dataPtr->NormalizePath(path) + _filename;
+    std::string checkPath = NormalizeDirectoryPath(path) + _filename;
     if (exists(checkPath))
     {
       foundPath = checkPath;
@@ -346,7 +342,7 @@ void SystemPaths::AddPluginPaths(const std::string &_path)
     std::vector<std::string> paths = Split(_path, delim);
     for (auto const &path : paths)
     {
-      std::string normalPath = this->dataPtr->NormalizePath(path);
+      std::string normalPath = NormalizeDirectoryPath(path);
       insertUnique(normalPath, this->dataPtr->pluginPaths);
     }
   }
@@ -381,3 +377,35 @@ void SystemPaths::SetFindFileURICallback(
 {
   this->dataPtr->findFileURICB = _cb;
 }
+
+/////////////////////////////////////////////////
+std::list<std::string> SystemPaths::PathsFromEnv(const std::string &_env)
+{
+  std::list<std::string> paths;
+
+  char *envPaths = getenv(_env.c_str());
+
+  if (envPaths == nullptr)
+    return paths;
+
+  std::string envPathsStr = std::string(envPaths);
+
+  if (envPathsStr.empty())
+    return paths;
+
+#ifdef _WIN32
+  char delim = ';';
+#else
+  char delim = ':';
+#endif
+
+  auto ps = ignition::common::Split(envPathsStr, delim);
+  for (auto const &path : ps)
+  {
+    std::string normalPath = NormalizeDirectoryPath(path);
+    insertUnique(normalPath, paths);
+  }
+
+  return paths;
+}
+
