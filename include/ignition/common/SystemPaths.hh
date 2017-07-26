@@ -130,12 +130,14 @@ namespace ignition
       /// at the end.
       /// \param[in] _path Path to normalize
       /// \return Normalized path
-      public: static std::string NormalizeDirectoryPath(const std::string &_path);
+      public: static std::string NormalizeDirectoryPath(
+                const std::string &_path);
 
       /// \brief Return all paths given by an environment variable.
       /// \param[in] _env Environment variable.
       /// \return A list of paths listed by the environment variable.
-      public: static std::list<std::string> PathsFromEnv(const std::string &_env);
+      public: static std::list<std::string> PathsFromEnv(
+                const std::string &_env);
 
 #ifdef _WIN32
 // Disable warning C4251
