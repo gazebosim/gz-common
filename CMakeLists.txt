@@ -182,6 +182,20 @@ endif()
 unset (CMAKE_C_FLAGS_ALL CACHE)
 unset (CMAKE_CXX_FLAGS CACHE)
 
+# USE_HOST_CFLAGS (default TRUE)
+# Will check building host machine for proper cflags
+if(NOT DEFINED USE_HOST_CFLAGS OR USE_HOST_CFLAGS)
+  message(STATUS "Enable host CFlags")
+  include (${project_cmake_dir}/HostCFlags.cmake)
+endif()
+
+# USE_UPSTREAM_CFLAGS (default TRUE)
+# Will use predefined ignition developers cflags
+if(NOT DEFINED USE_UPSTREAM_CFLAGS OR USE_UPSTREAM_CFLAGS)
+  message(STATUS "Enable upstream CFlags")
+  include(${project_cmake_dir}/DefaultCFlags.cmake)
+endif()
+
 # Check if warning options are avaliable for the compiler and return WARNING_CXX_FLAGS variable
 # MSVC generates tons of warnings on gtest code.
 # Recommended to use /W4 instead of /Wall
@@ -256,7 +270,7 @@ else (build_errors)
     ${PROJECT_BINARY_DIR}/include
   )
   include_directories(SYSTEM ${IGNITION-MATH_INCLUDE_DIRS})
-  
+
   link_directories(${PROJECT_BINARY_DIR}/src ${IGNITION-MATH_LINK_DIRS})
 
   if (DEFINED CMAKE_CXX_FLAGS)
@@ -322,7 +336,7 @@ else (build_errors)
 
   # Create *-targets.cmake file for build directory
   # TODO: keep this instruction until we depend on CMake 3
-  #       then change the first line from TARGETS ...  
+  #       then change the first line from TARGETS ...
   #       to EXPORT ... to match the format used in install(EXPORT
   export(TARGETS ${PROJECT_LIBRARY_TARGET_NAME}
          FILE  ${CMAKE_BINARY_DIR}/${cmake_targets_file})

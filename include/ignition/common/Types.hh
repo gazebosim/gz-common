@@ -18,6 +18,7 @@
 #define IGNITION_COMMON_TYPES_HH_
 
 #include <memory>
+#include <experimental/optional>
 
 /// \brief Forward declarations for the common classes
 namespace ignition
@@ -49,6 +50,12 @@ namespace ignition
     /// \def SkeletonPtr
     /// \brief Shared pointer to a Skeleton object
     using SkeletonPtr = std::shared_ptr<Skeleton>;
+
+    /// \def ignition::common::optional alias to
+    /// std::experimental::optional. This can be updated to std::optional
+    /// when support is present.
+    template<typename T>
+    using optional = std::experimental::optional<T>;
   }
 }
 

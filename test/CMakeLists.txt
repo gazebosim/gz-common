@@ -5,7 +5,7 @@ include_directories (
 )
 
 if(NOT MSVC)
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z")
 endif()
 
 configure_file (test_config.h.in ${PROJECT_BINARY_DIR}/test_config.h)

@@ -1535,8 +1535,7 @@ bool LoadObj(attrib_t *attrib, std::vector<shape_t> *shapes,
         token += n;
       }
 
-      // replace with emplace_back + std::move on C++11
-      faceGroup.push_back(std::vector<vertex_index>());
+      faceGroup.emplace_back(std::move(std::vector<vertex_index>()));
       faceGroup[faceGroup.size() - 1].swap(face);
 
       continue;
