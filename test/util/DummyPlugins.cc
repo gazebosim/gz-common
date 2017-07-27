@@ -33,4 +33,4 @@ std::string DummyPlugin::MyNameIs()
 }
 
 IGN_COMMON_REGISTER_SINGLE_PLUGIN(test::util::DummyPlugin,
-    test::util::DummyPluginBase);
+    test::util::DummyPluginBase)

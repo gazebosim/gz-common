@@ -31,7 +31,7 @@ TEST(PluginLoader, LoadExistingLibrary)
   ignition::common::SystemPaths sp;
   sp.AddPluginPaths(projectPath + "/test/util");
   std::string path = sp.FindSharedLibrary("IGNDummyPlugins");
-  ASSERT_LT(0, path.size());
+  ASSERT_LT(0u, path.size());
 
   ignition::common::PluginLoader pm;
 
@@ -39,9 +39,9 @@ TEST(PluginLoader, LoadExistingLibrary)
 
   std::cout << pm.PrettyStr();
 
-  ASSERT_EQ(1, pm.InterfacesImplemented().size());
+  ASSERT_EQ(1u, pm.InterfacesImplemented().size());
   EXPECT_EQ("::test::util::DummyPluginBase", pm.InterfacesImplemented()[0]);
-  ASSERT_EQ(1, pm.PluginsImplementing("::test::util::DummyPluginBase").size());
+  ASSERT_EQ(1u, pm.PluginsImplementing("::test::util::DummyPluginBase").size());
   std::unique_ptr<test::util::DummyPluginBase> plugin =
     pm.Instantiate<test::util::DummyPluginBase>("test::util::DummyPlugin");
   ASSERT_NE(nullptr, plugin.get());

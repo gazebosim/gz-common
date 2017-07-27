@@ -68,19 +68,19 @@ TEST_F(SubMeshTest, SubMesh)
   EXPECT_EQ(submesh->VertexCount(), 1u);
   EXPECT_EQ(submesh->Vertex(0u), v0);
   EXPECT_TRUE(submesh->HasVertex(v0));
-  EXPECT_EQ(submesh->IndexOfVertex(v0), 0u);
+  EXPECT_EQ(submesh->IndexOfVertex(v0), 0);
 
   submesh->AddVertex(v1);
   EXPECT_EQ(submesh->VertexCount(), 2u);
   EXPECT_EQ(submesh->Vertex(1u), v1);
   EXPECT_TRUE(submesh->HasVertex(v1));
-  EXPECT_EQ(submesh->IndexOfVertex(v1), 1u);
+  EXPECT_EQ(submesh->IndexOfVertex(v1), 1);
 
   submesh->AddVertex(v2.X(), v2.Y(), v2.Z());
   EXPECT_EQ(submesh->VertexCount(), 3u);
   EXPECT_EQ(submesh->Vertex(2u), v2);
   EXPECT_TRUE(submesh->HasVertex(v2));
-  EXPECT_EQ(submesh->IndexOfVertex(v2), 2u);
+  EXPECT_EQ(submesh->IndexOfVertex(v2), 2);
 
   // max / min
   math::Vector3d max(2, 3, 3);
@@ -127,11 +127,11 @@ TEST_F(SubMeshTest, SubMesh)
 
   submesh->AddIndex(2u);
   EXPECT_EQ(submesh->IndexCount(), 2u);
-  EXPECT_EQ(submesh->Index(1u), 2u);
+  EXPECT_EQ(submesh->Index(1u), 2);
 
   submesh->AddIndex(1u);
   EXPECT_EQ(submesh->IndexCount(), 3u);
-  EXPECT_EQ(submesh->Index(2u), 1u);
+  EXPECT_EQ(submesh->Index(2u), 1);
 
   // add node assignment
   submesh->AddNodeAssignment(1u, 0u, 0.5f);
@@ -173,9 +173,9 @@ TEST_F(SubMeshTest, SubMesh)
   EXPECT_EQ(submesh->TexCoord(3u), math::Vector2d(0, 0));
 
   submesh->SetIndex(2u, 9u);
-  EXPECT_EQ(submesh->Index(2u), 9u);
+  EXPECT_EQ(submesh->Index(2u), 9);
   submesh->SetIndex(2u, 2u);
-  EXPECT_EQ(submesh->Index(2u), 2u);
+  EXPECT_EQ(submesh->Index(2u), 2);
   submesh->SetIndex(3u, 999);
   EXPECT_EQ(submesh->Index(3u), -1);
   EXPECT_EQ(submesh->MaxIndex(), 2u);
