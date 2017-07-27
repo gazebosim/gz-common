@@ -35,9 +35,22 @@ class IGNITION_COMMON_VISIBLE DummyPluginBase
 };
 
 
-class DummyPlugin : DummyPluginBase
+class DummyPlugin : public DummyPluginBase
 {
-  public: virtual std::string MyNameIs();
+  public: virtual std::string MyNameIs() override;
+};
+
+
+class IGNITION_COMMON_VISIBLE DummyOtherBase
+{
+  public: virtual double MyValueIs() = 0;
+};
+
+
+class DummyMultiPlugin : public DummyPluginBase, public DummyOtherBase
+{
+  public: virtual std::string MyNameIs() override;
+  public: virtual double MyValueIs() override;
 };
 
 }

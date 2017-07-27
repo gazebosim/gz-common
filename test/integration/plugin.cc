@@ -19,6 +19,7 @@
 #include <iostream>
 #include "ignition/common/PluginLoader.hh"
 #include "ignition/common/SystemPaths.hh"
+#include "ignition/common/Plugin.hh"
 
 #include "test_config.h"
 #include "util/DummyPlugins.hh"
@@ -35,17 +36,43 @@ TEST(PluginLoader, LoadExistingLibrary)
 
   ignition::common::PluginLoader pm;
 
-  EXPECT_EQ("::test::util::DummyPlugin", pm.LoadLibrary(path));
+  std::unordered_set<std::string> pluginNames = pm.LoadLibrary(path);
+  EXPECT_EQ(1u, pluginNames.count("::test::util::DummyPlugin"));
+  EXPECT_EQ(1u, pluginNames.count("::test::util::DummyMultiPlugin"));
 
   std::cout << pm.PrettyStr();
 
-  ASSERT_EQ(1, pm.InterfacesImplemented().size());
-  EXPECT_EQ("::test::util::DummyPluginBase", pm.InterfacesImplemented()[0]);
-  ASSERT_EQ(1, pm.PluginsImplementing("::test::util::DummyPluginBase").size());
-  std::unique_ptr<test::util::DummyPluginBase> plugin =
-    pm.Instantiate<test::util::DummyPluginBase>("test::util::DummyPlugin");
-  ASSERT_NE(nullptr, plugin.get());
-  EXPECT_EQ(std::string("DummyPlugin"), plugin->MyNameIs());
+  ASSERT_EQ(2u, pm.InterfacesImplemented().size());
+  EXPECT_EQ(1u, pm.InterfacesImplemented().count("::test::util::DummyPluginBase"));
+  EXPECT_EQ(2u, pm.PluginsImplementing("::test::util::DummyPluginBase").size());
+  EXPECT_EQ(1u, pm.PluginsImplementing("::test::util::DummyOtherBase").size());
+
+
+  std::unique_ptr<ignition::common::Plugin> firstPlugin =
+      pm.Instantiate("test::util::DummyPlugin");
+  std::unique_ptr<ignition::common::Plugin> secondPlugin =
+      pm.Instantiate("test::util::DummyMultiPlugin");
+
+  test::util::DummyPluginBase* dummyBase =
+      firstPlugin->GetInterface<test::util::DummyPluginBase>(
+        "test::util::DummyPluginBase");
+  ASSERT_NE(nullptr, dummyBase);
+  EXPECT_EQ(std::string("DummyPlugin"), dummyBase->MyNameIs());
+
+  test::util::DummyOtherBase* otherBase =
+      firstPlugin->GetInterface<test::util::DummyOtherBase>(
+        "test::util::DummyOtherBase");
+  EXPECT_EQ(nullptr, otherBase);
+
+  otherBase = secondPlugin->GetInterface<test::util::DummyOtherBase>(
+        "test::util::DummyOtherBase");
+  ASSERT_NE(nullptr, otherBase);
+  EXPECT_EQ(3.14159, otherBase->MyValueIs());
+
+  dummyBase = secondPlugin->GetInterface<test::util::DummyPluginBase>(
+        "test::util::DummyPluginBase");
+  ASSERT_NE(nullptr, otherBase);
+  EXPECT_EQ(std::string("DummyMultiPlugin"), dummyBase->MyNameIs());
 }
 
 /////////////////////////////////////////////////

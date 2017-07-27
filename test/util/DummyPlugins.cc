@@ -29,8 +29,21 @@ std::string DummyPlugin::MyNameIs()
   return std::string("DummyPlugin");
 }
 
+std::string DummyMultiPlugin::MyNameIs()
+{
+  return std::string("DummyMultiPlugin");
+}
+
+double DummyMultiPlugin::MyValueIs()
+{
+  return 3.14159;
+}
+
 }
 }
 
-IGN_COMMON_REGISTER_SINGLE_PLUGIN(test::util::DummyPlugin,
-    test::util::DummyPluginBase);
+IGN_COMMON_BEGIN_ADDING_PLUGINS
+  IGN_COMMON_ADD_PLUGIN(test::util::DummyPlugin, test::util::DummyPluginBase)
+  IGN_COMMON_ADD_PLUGIN(test::util::DummyMultiPlugin, test::util::DummyPluginBase)
+  IGN_COMMON_ADD_PLUGIN(test::util::DummyMultiPlugin, test::util::DummyOtherBase)
+IGN_COMMON_FINISH_ADDING_PLUGINS

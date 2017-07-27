@@ -25,6 +25,7 @@ set (headers
   NodeAnimation.hh
   NodeTransform.hh
   OBJLoader.hh
+  Plugin.hh
   PluginInfo.hh
   PluginLoader.hh
   PluginMacros.hh
