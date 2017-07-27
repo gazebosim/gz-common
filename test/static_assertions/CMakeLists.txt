@@ -4,7 +4,6 @@ set(static_assert_tests
   # plugin_not_fully_qualified_class
   # plugin_not_fully_qualified_base
   plugin_wrong_base_class
-  plugin_class_repeated
   plugin_not_global_ns
   )
 
@@ -23,14 +22,11 @@ if (UNIX)
   # Tests pass if the output contains the expected error
 
   set_tests_properties(STATIC_ASSERT_plugin_no_base_class PROPERTIES
-    PASS_REGULAR_EXPRESSION "A must inherit from NotBase")
-
-  set_tests_properties(STATIC_ASSERT_plugin_class_repeated PROPERTIES
-    PASS_REGULAR_EXPRESSION "Class and Base class must be different")
+    PASS_REGULAR_EXPRESSION "is not a base class of")
 
   set_tests_properties(STATIC_ASSERT_plugin_not_global_ns PROPERTIES
     PASS_REGULAR_EXPRESSION "IGN_macro_must_be_used_in_global_namespace")
 
   set_tests_properties(STATIC_ASSERT_plugin_wrong_base_class PROPERTIES
-    PASS_REGULAR_EXPRESSION "ns::A must inherit from ns::WrongBase")
+    PASS_REGULAR_EXPRESSION "is not a base class of")
 endif()
