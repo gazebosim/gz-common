@@ -29,8 +29,8 @@ TEST(StringUtils, SplitNoDelimiterPresent)
   char delim = ':';
   std::string orig = "Hello World!";
   std::vector<std::string> pieces = common::Split(orig, delim);
-  ASSERT_LT(0, pieces.size());
-  EXPECT_EQ(1, pieces.size());
+  ASSERT_LT(0u, pieces.size());
+  EXPECT_EQ(1u, pieces.size());
   EXPECT_EQ(orig, pieces[0]);
 }
 
@@ -40,8 +40,8 @@ TEST(StringUtils, SplitOneDelimiterInMiddle)
   char delim = ' ';
   std::string orig = "Hello World!";
   std::vector<std::string> pieces = common::Split(orig, delim);
-  ASSERT_LT(1, pieces.size());
-  EXPECT_EQ(2, pieces.size());
+  ASSERT_LT(1u, pieces.size());
+  EXPECT_EQ(2u, pieces.size());
   EXPECT_EQ("Hello", pieces[0]);
   EXPECT_EQ("World!", pieces[1]);
 }
@@ -52,8 +52,8 @@ TEST(StringUtils, SplitOneDelimiterAtBeginning)
   char delim = ':';
   std::string orig = ":Hello World!";
   std::vector<std::string> pieces = common::Split(orig, delim);
-  ASSERT_LT(1, pieces.size());
-  EXPECT_EQ(2, pieces.size());
+  ASSERT_LT(1u, pieces.size());
+  EXPECT_EQ(2u, pieces.size());
   EXPECT_EQ("", pieces[0]);
   EXPECT_EQ("Hello World!", pieces[1]);
 }
@@ -64,8 +64,8 @@ TEST(StringUtils, SplitOneDelimiterAtEnd)
   char delim = '!';
   std::string orig = "Hello World!";
   std::vector<std::string> pieces = common::Split(orig, delim);
-  ASSERT_LT(1, pieces.size());
-  EXPECT_EQ(2, pieces.size());
+  ASSERT_LT(1u, pieces.size());
+  EXPECT_EQ(2u, pieces.size());
   EXPECT_EQ("Hello World", pieces[0]);
   EXPECT_EQ("", pieces[1]);
 }

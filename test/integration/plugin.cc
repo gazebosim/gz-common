@@ -32,7 +32,7 @@ TEST(PluginLoader, LoadExistingLibrary)
   ignition::common::SystemPaths sp;
   sp.AddPluginPaths(projectPath + "/test/util");
   std::string path = sp.FindSharedLibrary("IGNDummyPlugins");
-  ASSERT_LT(0, path.size());
+  ASSERT_LT(0u, path.size());
 
   ignition::common::PluginLoader pm;
 
@@ -67,7 +67,7 @@ TEST(PluginLoader, LoadExistingLibrary)
   otherBase = secondPlugin->GetInterface<test::util::DummyOtherBase>(
         "test::util::DummyOtherBase");
   ASSERT_NE(nullptr, otherBase);
-  EXPECT_EQ(3.14159, otherBase->MyValueIs());
+  EXPECT_NEAR(3.14159, otherBase->MyValueIs(), 1e-8);
 
   dummyBase = secondPlugin->GetInterface<test::util::DummyPluginBase>(
         "test::util::DummyPluginBase");
