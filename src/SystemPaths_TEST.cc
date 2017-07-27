@@ -163,7 +163,7 @@ TEST_F(SystemPathsFixture, PathsFromEnv)
 
   auto paths = ignition::common::SystemPaths::PathsFromEnv("IGN_PLUGIN_PATH");
 
-  EXPECT_EQ(paths.size(), 2);
+  EXPECT_EQ(paths.size(), 2u);
 
   unsigned int count = 0;
   for (auto const &path : paths)

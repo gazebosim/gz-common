@@ -77,16 +77,11 @@ SystemPaths::SystemPaths()
 {
   this->dataPtr->pluginPaths.clear();
 
-  char *homePath = getenv("HOME");
-  std::string home;
-  if (!homePath)
+  std::string home, path, fullPath;
+  if (!env("HOME", home))
     home = "/tmp/gazebo";
-  else
-    home = homePath;
 
-  char *path = getenv("IGN_LOG_PATH");
-  std::string fullPath;
-  if (!path)
+  if (!env("IGN_LOG_PATH", path))
   {
     if (home != "/tmp/ignition")
       fullPath = home + "/.ignition";
