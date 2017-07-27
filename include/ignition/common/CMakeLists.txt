@@ -36,6 +36,7 @@ set (headers
   SkeletonNode.hh
   StringUtils.hh
   SubMesh.hh
+  SuppressWarning.hh
   System.hh
   SystemPaths.hh
   STLLoader.hh
@@ -47,6 +48,10 @@ set (headers
   URI.hh
   Uuid.hh
   WorkerPool.hh
+
+  detail/Plugin.hh
+  detail/PluginLoader.hh
+  detail/SuppressWarning.hh
 )
 
 # FIXME: Some classes fail to build on Windows
