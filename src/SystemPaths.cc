@@ -128,10 +128,10 @@ const std::list<std::string> &SystemPaths::PluginPaths()
 {
   if (this->dataPtr->pluginPathEnv.size())
   {
-    char *env = getenv(this->dataPtr->pluginPathEnv.c_str());
-    if (env != nullptr)
+    std::string result;
+    if (env(this->dataPtr->pluginPathEnv, result))
     {
-      this->AddPluginPaths(std::string(env));
+      this->AddPluginPaths(result);
     }
   }
   return this->dataPtr->pluginPaths;
@@ -378,12 +378,9 @@ std::list<std::string> SystemPaths::PathsFromEnv(const std::string &_env)
 {
   std::list<std::string> paths;
 
-  char *envPaths = getenv(_env.c_str());
-
-  if (envPaths == nullptr)
+  std::string envPathsStr;
+  if (!env(_env, envPathsStr))
     return paths;
-
-  std::string envPathsStr = std::string(envPaths);
 
   if (envPathsStr.empty())
     return paths;
