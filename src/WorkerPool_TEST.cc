@@ -18,6 +18,7 @@
 #include <atomic>
 #include <gtest/gtest.h>
 
+#include "ignition/common/Console.hh"
 #include "ignition/common/WorkerPool.hh"
 
 namespace igncmn = ignition::common;
@@ -110,6 +111,15 @@ TEST(WorkerPool, WaitWithTimeoutThatTimesOut)
 //////////////////////////////////////////////////
 TEST(WorkerPool, ThingsRunInParallel)
 {
+  const unsigned int hc = std::thread::hardware_concurrency();
+  if (2 > hc)
+  {
+    igndbg << "Skipping the ThingsRunInParallel test because hardware "
+           << "concurrency (" << hc << ") is too low (min: 2), making the test "
+           << "less likely to succeed.\n";
+    return;
+  }
+
   WorkerPool pool;
   std::atomic<int> sentinel(0);
   pool.AddWork([&sentinel] ()
@@ -122,7 +132,7 @@ TEST(WorkerPool, ThingsRunInParallel)
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
         ++sentinel;
       });
-  Time time(0.006);
+  Time time(0.009);
   EXPECT_TRUE(pool.WaitForResults(time));
   EXPECT_EQ(2, sentinel);
 }
