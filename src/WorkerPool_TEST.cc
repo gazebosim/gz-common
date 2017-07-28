@@ -116,7 +116,7 @@ TEST(WorkerPool, ThingsRunInParallel)
   {
     igndbg << "Skipping the ThingsRunInParallel test because hardware "
            << "concurrency (" << hc << ") is too low (min: 2), making the test "
-           << "less likley to succeed.\n";
+           << "less likely to succeed.\n";
     return;
   }
 
