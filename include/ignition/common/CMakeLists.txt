@@ -39,6 +39,7 @@ set (headers
   SuppressWarning.hh
   System.hh
   SystemPaths.hh
+  SpecializedPlugin.hh
   STLLoader.hh
   SVGLoader.hh
   Time.hh
@@ -51,6 +52,7 @@ set (headers
 
   detail/Plugin.hh
   detail/PluginLoader.hh
+  detail/SpecializedPlugin.hh
   detail/SuppressWarning.hh
 )
 

@@ -20,6 +20,7 @@
 #include "ignition/common/PluginLoader.hh"
 #include "ignition/common/SystemPaths.hh"
 #include "ignition/common/Plugin.hh"
+#include "ignition/common/SpecializedPlugin.hh"
 
 #include "test_config.h"
 #include "util/DummyPlugins.hh"
@@ -73,6 +74,22 @@ TEST(PluginLoader, LoadExistingLibrary)
         "test::util::DummyPluginBase");
   ASSERT_NE(nullptr, otherBase);
   EXPECT_EQ(std::string("DummyMultiPlugin"), dummyBase->MyNameIs());
+}
+
+
+class SomeInterface
+{
+  public: static constexpr const char* InterfaceName = "SomeInterface";
+};
+
+using SomeSpecializedPlugin =
+    ignition::common::SpecializedPlugin<SomeInterface>;
+
+TEST(SpecializedPlugin, Construction)
+{
+  ignition::common::PluginLoader pl;
+  std::unique_ptr<SomeSpecializedPlugin> plugin =
+      pl.Instantiate<SomeSpecializedPlugin>("SomeInterface");
 }
 
 /////////////////////////////////////////////////
