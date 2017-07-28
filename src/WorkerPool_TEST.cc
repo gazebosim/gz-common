@@ -112,10 +112,11 @@ TEST(WorkerPool, WaitWithTimeoutThatTimesOut)
 TEST(WorkerPool, ThingsRunInParallel)
 {
   const unsigned int hc = std::thread::hardware_concurrency();
-  if(2 <= hc)
+  if(2 > hc)
   {
     igndbg << "Skipping the ThingsRunInParallel test because hardware "
-           << "concurrency (" << hc << ") is too low (min: 2).\n";
+           << "concurrency (" << hc << ") is too low (min: 2), making the test "
+           << "less likley to succeed.\n";
     return;
   }
 
