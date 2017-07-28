@@ -137,6 +137,14 @@ TEST(Util_TEST, replaceAll)
 }
 
 /////////////////////////////////////////////////
+TEST(Util_TEST, emptyENV)
+{
+  std::string var;
+  EXPECT_FALSE(common::env("!!SHOULD_NOT_EXIST!!", var));
+  EXPECT_TRUE(var.empty());
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

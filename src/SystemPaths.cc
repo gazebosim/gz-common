@@ -56,9 +56,6 @@ class ignition::common::SystemPathsPrivate
   /// \brief Find file URI callback.
   public: std::function<std::string (const std::string &)> findFileURICB;
 
-  /// \brief format the path to use "/" as a separator with "/" at the end
-  public: std::string NormalizePath(const std::string &_path) const;
-
   /// \brief generates paths to try searching for the named library
   public: std::vector<std::string> GenerateLibraryPaths(
               const std::string &_libName) const;
@@ -80,16 +77,11 @@ SystemPaths::SystemPaths()
 {
   this->dataPtr->pluginPaths.clear();
 
-  char *homePath = getenv("HOME");
-  std::string home;
-  if (!homePath)
+  std::string home, path, fullPath;
+  if (!env("HOME", home))
     home = "/tmp/gazebo";
-  else
-    home = homePath;
 
-  char *path = getenv("IGN_LOG_PATH");
-  std::string fullPath;
-  if (!path)
+  if (!env("IGN_LOG_PATH", path))
   {
     if (home != "/tmp/ignition")
       fullPath = home + "/.ignition";
@@ -136,10 +128,10 @@ const std::list<std::string> &SystemPaths::PluginPaths()
 {
   if (this->dataPtr->pluginPathEnv.size())
   {
-    char *env = getenv(this->dataPtr->pluginPathEnv.c_str());
-    if (env != nullptr)
+    std::string result;
+    if (env(this->dataPtr->pluginPathEnv, result))
     {
-      this->AddPluginPaths(std::string(env));
+      this->AddPluginPaths(result);
     }
   }
   return this->dataPtr->pluginPaths;
@@ -168,8 +160,7 @@ std::string SystemPaths::FindSharedLibrary(const std::string &_libName)
 }
 
 /////////////////////////////////////////////////
-std::string SystemPathsPrivate::NormalizePath(const std::string &_path)
-  const
+std::string SystemPaths::NormalizeDirectoryPath(const std::string &_path)
 {
   std::string path = _path;
   // Use '/' because it works on Linux, OSX, and Windows
@@ -187,7 +178,7 @@ std::vector<std::string> SystemPathsPrivate::GenerateLibraryPaths(
     const std::string &_libName) const
 {
   std::string lowercaseLibName = _libName;
-  for (int i = 0; i < _libName.size(); ++i)
+  for (size_t i = 0; i < _libName.size(); ++i)
     lowercaseLibName[i] = std::tolower(_libName[i], std::locale());
   // test for possible prefixes or extensions on the library name
   bool hasLib = StartsWith(_libName, "lib");
@@ -317,7 +308,7 @@ std::string SystemPaths::LocateLocalFile(const std::string &_filename,
   std::string foundPath = "";
   for (auto const &path : _paths)
   {
-    std::string checkPath = this->dataPtr->NormalizePath(path) + _filename;
+    std::string checkPath = NormalizeDirectoryPath(path) + _filename;
     if (exists(checkPath))
     {
       foundPath = checkPath;
@@ -346,7 +337,7 @@ void SystemPaths::AddPluginPaths(const std::string &_path)
     std::vector<std::string> paths = Split(_path, delim);
     for (auto const &path : paths)
     {
-      std::string normalPath = this->dataPtr->NormalizePath(path);
+      std::string normalPath = NormalizeDirectoryPath(path);
       insertUnique(normalPath, this->dataPtr->pluginPaths);
     }
   }
@@ -381,3 +372,32 @@ void SystemPaths::SetFindFileURICallback(
 {
   this->dataPtr->findFileURICB = _cb;
 }
+
+/////////////////////////////////////////////////
+std::list<std::string> SystemPaths::PathsFromEnv(const std::string &_env)
+{
+  std::list<std::string> paths;
+
+  std::string envPathsStr;
+  if (!env(_env, envPathsStr))
+    return paths;
+
+  if (envPathsStr.empty())
+    return paths;
+
+#ifdef _WIN32
+  char delim = ';';
+#else
+  char delim = ':';
+#endif
+
+  auto ps = ignition::common::Split(envPathsStr, delim);
+  for (auto const &path : ps)
+  {
+    std::string normalPath = NormalizeDirectoryPath(path);
+    insertUnique(normalPath, paths);
+  }
+
+  return paths;
+}
+

@@ -35,4 +35,4 @@ class A : public Base
 
 using ns::Base;
 
-IGN_COMMON_REGISTER_SINGLE_PLUGIN(ns::A, Base);
+IGN_COMMON_REGISTER_SINGLE_PLUGIN(ns::A, Base)
