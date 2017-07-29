@@ -83,13 +83,29 @@ class SomeInterface
 };
 
 using SomeSpecializedPlugin =
-    ignition::common::SpecializedPlugin<SomeInterface>;
+    ignition::common::SpecializedPlugin<
+        SomeInterface,
+        test::util::DummyFooBase,
+        test::util::DummySetterBase>;
 
 TEST(SpecializedPlugin, Construction)
 {
+  std::string projectPath(PROJECT_BINARY_PATH);
+
+  ignition::common::SystemPaths sp;
+  sp.AddPluginPaths(projectPath + "/test/util");
+  std::string path = sp.FindSharedLibrary("IGNDummyPlugins");
+  ASSERT_LT(0u, path.size());
+
   ignition::common::PluginLoader pl;
+  pl.LoadLibrary(path);
+
+
   std::unique_ptr<SomeSpecializedPlugin> plugin =
-      pl.Instantiate<SomeSpecializedPlugin>("SomeInterface");
+      pl.Instantiate<SomeSpecializedPlugin>("::test::util::DummyMultiPlugin");
+
+  std::cout << plugin->GetInterface<test::util::DummyFooBase>()->MyIntegerValueIs()
+            << std::endl;
 }
 
 /////////////////////////////////////////////////

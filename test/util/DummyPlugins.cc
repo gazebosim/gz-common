@@ -31,12 +31,40 @@ std::string DummyPlugin::MyNameIs()
 
 std::string DummyMultiPlugin::MyNameIs()
 {
-  return std::string("DummyMultiPlugin");
+  return name;
 }
 
 double DummyMultiPlugin::MyValueIs()
 {
-  return 3.14159;
+  return val;
+}
+
+int DummyMultiPlugin::MyIntegerValueIs()
+{
+  return intVal;
+}
+
+void DummyMultiPlugin::SetName(const std::string &_name)
+{
+  name = _name;
+}
+
+void DummyMultiPlugin::SetValue(const double _val)
+{
+  val = _val;
+}
+
+void DummyMultiPlugin::SetIntegerValue(const int _val)
+{
+  intVal = _val;
+}
+
+DummyMultiPlugin::DummyMultiPlugin()
+  : name("DummyMultiPlugin"),
+    val(3.14159),
+    intVal(5)
+{
+  // Do nothing
 }
 
 }

@@ -22,7 +22,7 @@
 #include <string>
 
 #include <ignition/common/System.hh>
-
+#include <ignition/common/PluginMacros.hh>
 
 namespace test
 {
@@ -46,11 +46,39 @@ class IGNITION_COMMON_VISIBLE DummyOtherBase
   public: virtual double MyValueIs() = 0;
 };
 
+class DummyFooBase
+{
+  public: virtual int MyIntegerValueIs() = 0;
+  IGN_COMMON_SPECIALIZE_INTERFACE(test::util::DummyFooBase)
+};
 
-class DummyMultiPlugin : public DummyPluginBase, public DummyOtherBase
+class DummySetterBase
+{
+  public: virtual void SetName(const std::string &_name) = 0;
+  public: virtual void SetValue(const double _val) = 0;
+  public: virtual void SetIntegerValue(const int _val) = 0;
+  IGN_COMMON_SPECIALIZE_INTERFACE(test::util::DummyFooBase)
+};
+
+class DummyMultiPlugin
+    : public DummyPluginBase,
+      public DummyOtherBase,
+      public DummyFooBase,
+      public DummySetterBase
 {
   public: virtual std::string MyNameIs() override;
   public: virtual double MyValueIs() override;
+  public: virtual int MyIntegerValueIs() override;
+
+  public: virtual void SetName(const std::string &_name) override;
+  public: virtual void SetValue(const double _val) override;
+  public: virtual void SetIntegerValue(const int _val) override;
+
+  public: DummyMultiPlugin();
+
+  private: std::string name;
+  private: double val;
+  private: int intVal;
 };
 
 }

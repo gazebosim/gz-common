@@ -34,12 +34,12 @@ set (headers
   Skeleton.hh
   SkeletonAnimation.hh
   SkeletonNode.hh
+  SpecializedPlugin.hh
   StringUtils.hh
   SubMesh.hh
   SuppressWarning.hh
   System.hh
   SystemPaths.hh
-  SpecializedPlugin.hh
   STLLoader.hh
   SVGLoader.hh
   Time.hh
@@ -52,6 +52,7 @@ set (headers
 
   detail/Plugin.hh
   detail/PluginLoader.hh
+  detail/PluginMacros.hh
   detail/SpecializedPlugin.hh
   detail/SuppressWarning.hh
 )

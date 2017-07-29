@@ -59,10 +59,11 @@
 // ---- List of available tokens ----
 
 /// \brief Compilers might warn about deleting a pointer to a class that has
-/// virtual functions without a virtual destructor, because the pointer might
-/// secretly be pointing to a more derived class type. We might want to suppress
-/// this warning if we know for certain (via the design of our implementation)
-/// that the pointer is definitely not pointing to a more derived type.
+/// virtual functions without a virtual destructor or a `final` declaration,
+/// because the pointer might secretly be pointing to a more derived class type.
+/// We want to suppress this warning when we know for certain (via the design
+/// of our implementation) that the pointer is definitely not pointing to a more
+/// derived type.
 #define IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR\
   DETAIL_IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR
 
