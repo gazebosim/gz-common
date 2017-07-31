@@ -24,9 +24,9 @@ namespace test
 namespace util
 {
 
-std::string DummyPlugin::MyNameIs()
+std::string DummySinglePlugin::MyNameIs()
 {
-  return std::string("DummyPlugin");
+  return std::string("DummySinglePlugin");
 }
 
 std::string DummyMultiPlugin::MyNameIs()
@@ -34,7 +34,7 @@ std::string DummyMultiPlugin::MyNameIs()
   return name;
 }
 
-double DummyMultiPlugin::MyValueIs()
+double DummyMultiPlugin::MyDoubleValueIs()
 {
   return val;
 }
@@ -49,7 +49,7 @@ void DummyMultiPlugin::SetName(const std::string &_name)
   name = _name;
 }
 
-void DummyMultiPlugin::SetValue(const double _val)
+void DummyMultiPlugin::SetDoubleValue(const double _val)
 {
   val = _val;
 }
@@ -71,7 +71,9 @@ DummyMultiPlugin::DummyMultiPlugin()
 }
 
 IGN_COMMON_BEGIN_ADDING_PLUGINS
-  IGN_COMMON_ADD_PLUGIN(test::util::DummyPlugin, test::util::DummyPluginBase)
-  IGN_COMMON_ADD_PLUGIN(test::util::DummyMultiPlugin, test::util::DummyPluginBase)
-  IGN_COMMON_ADD_PLUGIN(test::util::DummyMultiPlugin, test::util::DummyOtherBase)
+  IGN_COMMON_ADD_PLUGIN(test::util::DummySinglePlugin, test::util::DummyNameBase)
+  IGN_COMMON_ADD_PLUGIN(test::util::DummyMultiPlugin, test::util::DummyNameBase)
+  IGN_COMMON_ADD_PLUGIN(test::util::DummyMultiPlugin, test::util::DummyDoubleBase)
+  IGN_COMMON_ADD_PLUGIN(test::util::DummyMultiPlugin, test::util::DummyIntBase)
+  IGN_COMMON_ADD_PLUGIN(test::util::DummyMultiPlugin, test::util::DummySetterBase)
 IGN_COMMON_FINISH_ADDING_PLUGINS
