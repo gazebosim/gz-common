@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-/// \brief This file contains Apache 2.0 licensed code for filesystem functions
 
 #include <sys/types.h>
 #include <sys/stat.h>
