@@ -25,7 +25,7 @@ set (headers
   NodeAnimation.hh
   NodeTransform.hh
   OBJLoader.hh
-  Plugin.hh
+  PluginPtr.hh
   PluginInfo.hh
   PluginLoader.hh
   PluginMacros.hh
@@ -34,7 +34,7 @@ set (headers
   Skeleton.hh
   SkeletonAnimation.hh
   SkeletonNode.hh
-  SpecializedPlugin.hh
+  SpecializedPluginPtr.hh
   StringUtils.hh
   SubMesh.hh
   SuppressWarning.hh
@@ -50,10 +50,10 @@ set (headers
   Uuid.hh
   WorkerPool.hh
 
-  detail/Plugin.hh
+  detail/PluginPtr.hh
   detail/PluginLoader.hh
   detail/PluginMacros.hh
-  detail/SpecializedPlugin.hh
+  detail/SpecializedPluginPtr.hh
   detail/SuppressWarning.hh
 )
 

@@ -15,7 +15,7 @@
  *
 */
 
-// Defining this macro before including ignition/common/SpecializedPlugin.hh
+// Defining this macro before including ignition/common/SpecializedPluginPtr.hh
 // allows us to test that the low-cost routines are being used are being used to
 // access the specialized plugin interfaces.
 #define IGNITION_UNITTEST_SPECIALIZED_PLUGIN_ACCESS
@@ -24,8 +24,8 @@
 #include <iostream>
 #include "ignition/common/PluginLoader.hh"
 #include "ignition/common/SystemPaths.hh"
-#include "ignition/common/Plugin.hh"
-#include "ignition/common/SpecializedPlugin.hh"
+#include "ignition/common/PluginPtr.hh"
+#include "ignition/common/SpecializedPluginPtr.hh"
 
 #include "test_config.h"
 #include "util/DummyPlugins.hh"
@@ -58,38 +58,38 @@ TEST(PluginLoader, LoadExistingLibrary)
   EXPECT_EQ(1u, pl.PluginsImplementing("::test::util::DummyDoubleBase").size());
 
 
-  std::unique_ptr<ignition::common::Plugin> firstPlugin =
+  ignition::common::PluginPtr firstPlugin =
       pl.Instantiate("test::util::DummySinglePlugin");
-  EXPECT_NE(nullptr, firstPlugin);
+  EXPECT_TRUE(firstPlugin.IsValid());
 
-  std::unique_ptr<ignition::common::Plugin> secondPlugin =
+  ignition::common::PluginPtr secondPlugin =
       pl.Instantiate("test::util::DummyMultiPlugin");
-  EXPECT_NE(nullptr, secondPlugin);
+  EXPECT_TRUE(secondPlugin.IsValid());
 
   // Check that the DummyNameBase interface exists and that it returns the
   // correct value.
   test::util::DummyNameBase* nameBase =
-      firstPlugin->GetInterface<test::util::DummyNameBase>(
+      firstPlugin.GetInterface<test::util::DummyNameBase>(
         "test::util::DummyNameBase");
   ASSERT_NE(nullptr, nameBase);
   EXPECT_EQ(std::string("DummySinglePlugin"), nameBase->MyNameIs());
 
   // Check that DummyDoubleBase does not exist for this plugin
   test::util::DummyDoubleBase* doubleBase =
-      firstPlugin->GetInterface<test::util::DummyDoubleBase>(
+      firstPlugin.GetInterface<test::util::DummyDoubleBase>(
         "test::util::DummyDoubleBase");
   EXPECT_EQ(nullptr, doubleBase);
 
   // Check that DummyDoubleBase does exist for this function and that it returns
   // the correct value.
-  doubleBase = secondPlugin->GetInterface<test::util::DummyDoubleBase>(
+  doubleBase = secondPlugin.GetInterface<test::util::DummyDoubleBase>(
         "test::util::DummyDoubleBase");
   ASSERT_NE(nullptr, doubleBase);
   EXPECT_NEAR(3.14159, doubleBase->MyDoubleValueIs(), 1e-8);
 
   // Check that the DummyNameBase interface exists for this plugin and that it
   // returns the correct value.
-  nameBase = secondPlugin->GetInterface<test::util::DummyNameBase>(
+  nameBase = secondPlugin.GetInterface<test::util::DummyNameBase>(
         "test::util::DummyNameBase");
   ASSERT_NE(nullptr, doubleBase);
   EXPECT_EQ(std::string("DummyMultiPlugin"), nameBase->MyNameIs());
@@ -101,13 +101,13 @@ class SomeInterface
   public: static constexpr const char* InterfaceName = "SomeInterface";
 };
 
-using SomeSpecializedPlugin =
+using SomeSpecializedPluginPtr =
     ignition::common::SpecializedPlugin<
         SomeInterface,
         test::util::DummyIntBase,
         test::util::DummySetterBase>;
 
-TEST(SpecializedPlugin, Construction)
+TEST(SpecializedPluginPtr, Construction)
 {
   std::string projectPath(PROJECT_BINARY_PATH);
 
@@ -119,15 +119,15 @@ TEST(SpecializedPlugin, Construction)
   ignition::common::PluginLoader pl;
   pl.LoadLibrary(path);
 
-  std::unique_ptr<SomeSpecializedPlugin> plugin =
-      pl.Instantiate<SomeSpecializedPlugin>("::test::util::DummyMultiPlugin");
-  EXPECT_NE(nullptr, plugin);
+  SomeSpecializedPluginPtr plugin =
+      pl.Instantiate<SomeSpecializedPluginPtr>("::test::util::DummyMultiPlugin");
+  EXPECT_TRUE(plugin.IsValid());
 
   // Make sure the specialized interface is available, that it is accessed using
   // the specialized access, and that it returns the expected value.
   usedSpecializedInterfaceAccess = false;
   test::util::DummyIntBase *fooBase =
-      plugin->GetInterface<test::util::DummyIntBase>();
+      plugin.GetInterface<test::util::DummyIntBase>();
   EXPECT_TRUE(usedSpecializedInterfaceAccess);
   EXPECT_NE(nullptr, fooBase);
   EXPECT_EQ(5, fooBase->MyIntegerValueIs());
@@ -136,7 +136,7 @@ TEST(SpecializedPlugin, Construction)
   // using the specialized access.
   usedSpecializedInterfaceAccess = false;
   test::util::DummySetterBase *setterBase =
-      plugin->GetInterface<test::util::DummySetterBase>();
+      plugin.GetInterface<test::util::DummySetterBase>();
   EXPECT_TRUE(usedSpecializedInterfaceAccess);
   EXPECT_NE(nullptr, setterBase);
 
@@ -149,7 +149,7 @@ TEST(SpecializedPlugin, Construction)
   // the specialized access, and that it returns the expected value.
   usedSpecializedInterfaceAccess = false;
   test::util::DummyDoubleBase *doubleBase =
-      plugin->GetInterface<test::util::DummyDoubleBase>(
+      plugin.GetInterface<test::util::DummyDoubleBase>(
         "test::util::DummyDoubleBase");
   EXPECT_FALSE(usedSpecializedInterfaceAccess);
   EXPECT_NE(nullptr, doubleBase);
@@ -164,9 +164,15 @@ TEST(SpecializedPlugin, Construction)
   // plugin was specialized for it. Also make sure that the specialized access
   // is being used.
   usedSpecializedInterfaceAccess = false;
-  SomeInterface *someInterface = plugin->GetInterface<SomeInterface>();
+  SomeInterface *someInterface = plugin.GetInterface<SomeInterface>();
   EXPECT_TRUE(usedSpecializedInterfaceAccess);
   EXPECT_EQ(nullptr, someInterface);
+}
+
+TEST(PluginPtr, CopyMoveSemantics)
+{
+  EXPECT_TRUE(false);
+  // TODO(MXG): Write tests for copying and moving PluginPtrs
 }
 
 /////////////////////////////////////////////////

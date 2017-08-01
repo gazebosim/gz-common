@@ -19,7 +19,7 @@
 #ifndef IGNITION_COMMON_DETAIL_SPECIALIZEDPLUGIN_HH_
 #define IGNITION_COMMON_DETAIL_SPECIALIZEDPLUGIN_HH_
 
-#include "ignition/common/SpecializedPlugin.hh"
+#include "ignition/common/SpecializedPluginPtr.hh"
 
 // This preprocessor token should only be used by the unittest that is
 // responsible for checking that the specialized routines are being used to
@@ -71,7 +71,7 @@ namespace ignition
     Interface *SpecializedPlugin<SpecInterface>::PrivateGetSpecInterface(
         type<Interface>)
     {
-      return this->Plugin::GetInterface<Interface>();
+      return this->PluginPtr::GetInterface<Interface>();
     }
 
     /////////////////////////////////////////////////
@@ -92,7 +92,7 @@ namespace ignition
     const Interface *SpecializedPlugin<SpecInterface>::
     PrivateGetSpecInterface(type<Interface>) const
     {
-      return this->Plugin::GetInterface<Interface>();
+      return this->PluginPtr::GetInterface<Interface>();
     }
 
     /////////////////////////////////////////////////
@@ -113,7 +113,7 @@ namespace ignition
     bool SpecializedPlugin<SpecInterface>::PrivateHasSpecInterface(
         type<Interface>) const
     {
-      return this->Plugin::HasInterface<Interface>();
+      return this->PluginPtr::HasInterface<Interface>();
     }
 
     /////////////////////////////////////////////////
@@ -147,7 +147,7 @@ namespace ignition
     template <class SpecInterface>
     SpecializedPlugin<SpecInterface>::SpecializedPlugin(
         const PluginInfo *info)
-      : Plugin(info),
+      : PluginPtr(info),
         privateSpecInterfaceIterator(
           this->PrivateGetOrCreateIterator(SpecInterface::InterfaceName))
     {
@@ -176,7 +176,7 @@ namespace ignition
         /// ComposePlugin<Base1,Base2> for why we do not use perfect forwarding.
         private: template <typename T>
                  ComposePlugin(const T &arg)
-                   : Plugin(arg),
+                   : PluginPtr(arg),
                      Base1(arg)
                  {
                    // Do nothing
@@ -205,8 +205,8 @@ namespace ignition
         public: virtual ~ComposePlugin() = default;
 
         // Inherit function overloads
-        using Plugin::GetInterface;
-        using Plugin::HasInterface;
+        using PluginPtr::GetInterface;
+        using PluginPtr::HasInterface;
 
         // Implement the various functions that need to be dispatched to the
         // base classes.
@@ -229,7 +229,7 @@ namespace ignition
         /// the constructor of SpecializedPlugin without modifying this class.
         private: template <typename T>
                  ComposePlugin(const T &arg)
-                   : Plugin(arg),
+                   : PluginPtr(arg),
                      Base1(arg),
                      Base2(arg)
                  {
@@ -258,7 +258,7 @@ namespace ignition
         /// perfect forwarding.
         private: template <typename T>
                  ComposePlugin(const T &arg)
-                   : Plugin(arg),
+                   : PluginPtr(arg),
                      Base(arg)
                  {
                    // Do nothing
@@ -291,7 +291,7 @@ namespace ignition
       /// perfect forwarding.
       private: template <typename T>
                SpecializedPlugin(const T &arg)
-                 : Plugin(arg),
+                 : PluginPtr(arg),
                    Base(arg)
                {
                  // Do nothing
