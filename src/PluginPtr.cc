@@ -30,16 +30,16 @@ namespace ignition
     class PluginPtrPrivate
     {
       /// \brief Constructor that uses a PluginInfo instance
-      public: PluginPtrPrivate(const PluginInfo *info)
+      public: PluginPtrPrivate(const PluginInfo *_info)
                 : pluginInstancePtr(nullptr)
               {
-                Initialize(info);
+                Initialize(_info);
               }
 
       /// \brief Constructor that uses another PluginPtrPrivate instance
-      public: PluginPtrPrivate(const PluginPtrPrivate *other)
+      public: PluginPtrPrivate(const PluginPtrPrivate *_other)
               {
-                Initialize(other);
+                Initialize(_other);
               }
 
 
@@ -81,17 +81,20 @@ namespace ignition
               }
 
       /// \brief Initialize this PluginPtrPrivate using some PluginInfo instance
-      public: void Initialize(const PluginInfo *info)
+      public: void Initialize(const PluginInfo *_info)
               {
                 Clear();
 
+                if(!_info)
+                  return;
+
                 this->pluginInstancePtr =
-                    std::shared_ptr<void>(info->factory(), info->deleter);
+                    std::shared_ptr<void>(_info->factory(), _info->deleter);
 
                 void * const instance = this->pluginInstancePtr.get();
                 if(this->pluginInstancePtr)
                 {
-                  for(const auto &entry : info->interfaces)
+                  for(const auto &entry : _info->interfaces)
                   {
                     // entry.first:  name of the interface
                     // entry.second: function which casts the pluginInstance
@@ -103,15 +106,24 @@ namespace ignition
               }
 
       /// \brief Initialize this PluginPtrPrivate using another instance
-      public: void Initialize(const PluginPtrPrivate *other)
+      public: void Initialize(const PluginPtrPrivate *_other)
               {
                 Clear();
 
-                this->pluginInstancePtr = other->pluginInstancePtr;
+                if(!_other)
+                {
+                  ignerr << "Received a nullptr _other in the constructor "
+                         << "which uses `const PluginPtrPrivate*`. This should "
+                         << "not be possible! Please report this bug."
+                         << std::endl;
+                  assert(false);
+                }
+
+                this->pluginInstancePtr = _other->pluginInstancePtr;
 
                 if(this->pluginInstancePtr)
                 {
-                  for(const auto &entry : other->interfaces)
+                  for(const auto &entry : _other->interfaces)
                   {
                     // entry.first:  name of the interface
                     // entry.second: pointer to the location of that interface
@@ -125,6 +137,19 @@ namespace ignition
     PluginPtr::~PluginPtr()
     {
       delete dataPtr;
+    }
+
+    PluginPtr::PluginPtr()
+      : dataPtr(new PluginPtrPrivate(
+                  static_cast<const PluginInfo*>(nullptr)))
+    {
+      // Do nothing
+
+      // Dev note (MXG): We static_cast to a `const PluginInfo*` to ensure that
+      // the constructor which expects a `const PluginInfo*` gets used. That
+      // constructor is designed to accept a nullptr, whereas the constructor
+      // which expects a `const PluginPtrPrivate*` should never receive a
+      // nullptr because that would be indicative of a bug.
     }
 
     PluginPtr::PluginPtr(const PluginPtr &_other)
@@ -157,6 +182,26 @@ namespace ignition
       return *this;
 
       // Same note as the move constructor above.
+    }
+
+    #define IGN_COMMON_PLUGINPTR_IMPLEMENT_OPERATOR( op )\
+      bool PluginPtr::operator op (const PluginPtr &_other) const\
+      {\
+        return (this->dataPtr->pluginInstancePtr op \
+                _other.dataPtr->pluginInstancePtr);\
+      }
+
+    IGN_COMMON_PLUGINPTR_IMPLEMENT_OPERATOR(==)
+    IGN_COMMON_PLUGINPTR_IMPLEMENT_OPERATOR(<)
+    IGN_COMMON_PLUGINPTR_IMPLEMENT_OPERATOR(>)
+    IGN_COMMON_PLUGINPTR_IMPLEMENT_OPERATOR(!=)
+    IGN_COMMON_PLUGINPTR_IMPLEMENT_OPERATOR(<=)
+    IGN_COMMON_PLUGINPTR_IMPLEMENT_OPERATOR(>=)
+
+    std::size_t PluginPtr::Hash() const
+    {
+      return std::hash<std::shared_ptr<void>>()(
+                   this->dataPtr->pluginInstancePtr);
     }
 
     bool PluginPtr::HasInterface(const std::string &_interfaceName) const

@@ -26,6 +26,7 @@
 #include "ignition/common/SystemPaths.hh"
 #include "ignition/common/PluginPtr.hh"
 #include "ignition/common/SpecializedPluginPtr.hh"
+#include "ignition/common/Console.hh"
 
 #include "test_config.h"
 #include "util/DummyPlugins.hh"
@@ -102,7 +103,7 @@ class SomeInterface
 };
 
 using SomeSpecializedPluginPtr =
-    ignition::common::SpecializedPlugin<
+    ignition::common::SpecializedPluginPtr<
         SomeInterface,
         test::util::DummyIntBase,
         test::util::DummySetterBase>;
@@ -119,8 +120,7 @@ TEST(SpecializedPluginPtr, Construction)
   ignition::common::PluginLoader pl;
   pl.LoadLibrary(path);
 
-  SomeSpecializedPluginPtr plugin =
-      pl.Instantiate<SomeSpecializedPluginPtr>("::test::util::DummyMultiPlugin");
+  SomeSpecializedPluginPtr plugin(pl.Instantiate("::test::util::DummyMultiPlugin"));
   EXPECT_TRUE(plugin.IsValid());
 
   // Make sure the specialized interface is available, that it is accessed using
@@ -169,10 +169,125 @@ TEST(SpecializedPluginPtr, Construction)
   EXPECT_EQ(nullptr, someInterface);
 }
 
+template <typename PluginPtrType1, typename PluginPtrType2>
+void TestSetAndMapUsage(
+    const ignition::common::PluginLoader &loader,
+    const ignition::common::PluginPtr &plugin)
+{
+  PluginPtrType1 plugin1 = plugin;
+  PluginPtrType2 plugin2 = plugin1;
+
+  EXPECT_TRUE(plugin1 == plugin);
+  EXPECT_TRUE(plugin1 == plugin2);
+  EXPECT_FALSE(plugin1 != plugin2);
+
+  EXPECT_TRUE(plugin2 == plugin);
+  EXPECT_TRUE(plugin2 == plugin1);
+  EXPECT_FALSE(plugin2 != plugin1);
+
+  std::set<ignition::common::PluginPtr> orderedSet;
+  EXPECT_TRUE(orderedSet.insert(plugin1).second);
+  EXPECT_FALSE(orderedSet.insert(plugin1).second);
+  EXPECT_FALSE(orderedSet.insert(plugin2).second);
+
+  std::unordered_set<ignition::common::PluginPtr> unorderedSet;
+  EXPECT_TRUE(unorderedSet.insert(plugin1).second);
+  EXPECT_FALSE(unorderedSet.insert(plugin1).second);
+  EXPECT_FALSE(unorderedSet.insert(plugin2).second);
+
+  std::map<ignition::common::PluginPtr, std::string> orderedMap;
+  EXPECT_TRUE(orderedMap.insert(std::make_pair(plugin1, "some string")).second);
+  EXPECT_FALSE(orderedMap.insert(std::make_pair(plugin1, "a string")).second);
+  EXPECT_FALSE(orderedMap.insert(std::make_pair(plugin2, "chars")).second);
+
+  std::unordered_map<ignition::common::PluginPtr, std::string> unorderedMap;
+  EXPECT_TRUE(unorderedMap.insert(std::make_pair(plugin1, "strings")).second);
+  EXPECT_FALSE(unorderedMap.insert(std::make_pair(plugin1, "letters")).second);
+  EXPECT_FALSE(unorderedMap.insert(std::make_pair(plugin2, "")).second);
+
+
+  plugin2 = loader.Instantiate("test::util::DummyMultiPlugin");
+  EXPECT_TRUE(plugin1 != plugin2);
+  EXPECT_FALSE(plugin1 == plugin2);
+  EXPECT_TRUE(plugin2 != plugin1);
+  EXPECT_FALSE(plugin2 == plugin1);
+
+  EXPECT_TRUE(orderedSet.insert(plugin2).second);
+  EXPECT_FALSE(orderedSet.insert(plugin2).second);
+
+  EXPECT_TRUE(unorderedSet.insert(plugin2).second);
+  EXPECT_FALSE(unorderedSet.insert(plugin2).second);
+
+  EXPECT_TRUE(orderedMap.insert(std::make_pair(plugin2, "letters")).second);
+  EXPECT_FALSE(orderedMap.insert(std::make_pair(plugin2, "chars")).second);
+
+  EXPECT_TRUE(unorderedMap.insert(std::make_pair(plugin2, "abc")).second);
+  EXPECT_FALSE(unorderedMap.insert(std::make_pair(plugin2, "def")).second);
+}
+
+using SingleSpecializedPluginPtr =
+    ignition::common::SpecializedPluginPtr<SomeInterface>;
+
+using AnotherSpecializedPluginPtr =
+    ignition::common::SpecializedPluginPtr<
+        SomeInterface,
+        test::util::DummyIntBase>;
+
 TEST(PluginPtr, CopyMoveSemantics)
 {
-  EXPECT_TRUE(false);
-  // TODO(MXG): Write tests for copying and moving PluginPtrs
+  ignition::common::PluginPtr plugin;
+  EXPECT_FALSE(plugin.IsValid());
+
+  std::string projectPath(PROJECT_BINARY_PATH);
+
+  ignition::common::SystemPaths sp;
+  sp.AddPluginPaths(projectPath + "/test/util");
+  std::string path = sp.FindSharedLibrary("IGNDummyPlugins");
+  ASSERT_FALSE(path.empty());
+
+  ignition::common::PluginLoader pl;
+  pl.LoadLibrary(path);
+
+  plugin = pl.Instantiate("test::util::DummySinglePlugin");
+  EXPECT_TRUE(plugin.IsValid());
+
+  ignition::common::PluginPtr otherPlugin =
+      pl.Instantiate("test::util::DummySinglePlugin");
+  EXPECT_TRUE(otherPlugin.IsValid());
+
+  EXPECT_TRUE(plugin != otherPlugin);
+  EXPECT_FALSE(plugin == otherPlugin);
+
+  otherPlugin = plugin;
+  EXPECT_TRUE(plugin == otherPlugin);
+  EXPECT_FALSE(plugin != otherPlugin);
+
+  igndbg << "Testing sets and maps with PluginPtr and PluginPtr\n";
+  TestSetAndMapUsage<
+      ignition::common::PluginPtr,
+      ignition::common::PluginPtr>(
+        pl, plugin);
+
+  igndbg << "Testing sets and maps with PluginPtr and "
+         << "SomeSpecializedPluginPtr\n";
+  TestSetAndMapUsage<
+      ignition::common::PluginPtr,
+      SomeSpecializedPluginPtr>(
+        pl, plugin);
+
+  igndbg << "Testing sets and maps with SomeSpecializedPluginPtr and "
+         << "AnotherSpecializedPluginPtr\n";
+  TestSetAndMapUsage<
+      SomeSpecializedPluginPtr,
+      AnotherSpecializedPluginPtr>(
+        pl, plugin);
+
+  igndbg << "Testing sets and maps with AnotherSpecializedPluginPtr and "
+         << "SingleSpecializedPluginPtr\n";
+  TestSetAndMapUsage<
+      AnotherSpecializedPluginPtr,
+      SingleSpecializedPluginPtr>(
+        pl, plugin);
 }
 
 /////////////////////////////////////////////////

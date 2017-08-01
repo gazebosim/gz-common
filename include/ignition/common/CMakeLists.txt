@@ -54,6 +54,7 @@ set (headers
   detail/PluginLoader.hh
   detail/PluginMacros.hh
   detail/SpecializedPluginPtr.hh
+  detail/SpecializedPluginPtrMacros.hh
   detail/SuppressWarning.hh
 )
 
