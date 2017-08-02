@@ -136,7 +136,9 @@ namespace ignition
 
     PluginPtr::~PluginPtr()
     {
-      delete dataPtr;
+      // Do nothing. We need to define this destructor in the .cc file so that
+      // the definition of PluginPtrPrivate is visible for the std::unique_ptr
+      // to destruct it.
     }
 
     PluginPtr::PluginPtr()
@@ -153,19 +155,19 @@ namespace ignition
     }
 
     PluginPtr::PluginPtr(const PluginPtr &_other)
-      : dataPtr(new PluginPtrPrivate(_other.dataPtr))
+      : dataPtr(new PluginPtrPrivate(_other.dataPtr.get()))
     {
       // Do nothing
     }
 
     PluginPtr& PluginPtr::operator =(const PluginPtr &_other)
     {
-      this->dataPtr->Initialize(_other.dataPtr);
+      this->dataPtr->Initialize(_other.dataPtr.get());
       return *this;
     }
 
     PluginPtr::PluginPtr(PluginPtr &&_other)
-      : dataPtr(new PluginPtrPrivate(_other.dataPtr))
+      : dataPtr(new PluginPtrPrivate(_other.dataPtr.get()))
     {
       // Do nothing
 
@@ -178,7 +180,7 @@ namespace ignition
 
     PluginPtr& PluginPtr::operator =(PluginPtr &&_other)
     {
-      this->dataPtr->Initialize(_other.dataPtr);
+      this->dataPtr->Initialize(_other.dataPtr.get());
       return *this;
 
       // Same note as the move constructor above.
