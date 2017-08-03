@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef _IGNITION_COMMON_FILESYSTEM_HH_
-#define _IGNITION_COMMON_FILESYSTEM_HH_
+#ifndef IGNITION_COMMON_FILESYSTEM_HH_
+#define IGNITION_COMMON_FILESYSTEM_HH_
 
 #include <memory>
 #include <string>
