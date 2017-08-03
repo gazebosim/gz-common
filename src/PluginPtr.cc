@@ -30,14 +30,14 @@ namespace ignition
     class PluginPtrPrivate
     {
       /// \brief Constructor that uses a PluginInfo instance
-      public: PluginPtrPrivate(const PluginInfo *_info)
+      public: explicit PluginPtrPrivate(const PluginInfo *_info)
                 : pluginInstancePtr(nullptr)
               {
                 Initialize(_info);
               }
 
       /// \brief Constructor that uses another PluginPtrPrivate instance
-      public: PluginPtrPrivate(const PluginPtrPrivate *_other)
+      public: explicit PluginPtrPrivate(const PluginPtrPrivate *_other)
               {
                 Initialize(_other);
               }
@@ -76,7 +76,7 @@ namespace ignition
                 // to map entries. This would break any specialized plugins that
                 // provide instant access to specialized interfaces. Instead, we
                 // simply overwrite the map entries with a nullptr.
-                for(auto& entry : this->interfaces)
+                for (auto& entry : this->interfaces)
                   entry.second = nullptr;
               }
 
@@ -85,16 +85,16 @@ namespace ignition
               {
                 Clear();
 
-                if(!_info)
+                if (!_info)
                   return;
 
                 this->pluginInstancePtr =
                     std::shared_ptr<void>(_info->factory(), _info->deleter);
 
                 void * const instance = this->pluginInstancePtr.get();
-                if(this->pluginInstancePtr)
+                if (this->pluginInstancePtr)
                 {
-                  for(const auto &entry : _info->interfaces)
+                  for (const auto &entry : _info->interfaces)
                   {
                     // entry.first:  name of the interface
                     // entry.second: function which casts the pluginInstance
@@ -110,20 +110,21 @@ namespace ignition
               {
                 Clear();
 
-                if(!_other)
+                if (!_other)
                 {
                   ignerr << "Received a nullptr _other in the constructor "
                          << "which uses `const PluginPtrPrivate*`. This should "
                          << "not be possible! Please report this bug."
                          << std::endl;
                   assert(false);
+                  return;
                 }
 
                 this->pluginInstancePtr = _other->pluginInstancePtr;
 
-                if(this->pluginInstancePtr)
+                if (this->pluginInstancePtr)
                 {
-                  for(const auto &entry : _other->interfaces)
+                  for (const auto &entry : _other->interfaces)
                   {
                     // entry.first:  name of the interface
                     // entry.second: pointer to the location of that interface
@@ -186,23 +187,23 @@ namespace ignition
       // Same note as the move constructor above.
     }
 
-    #define IGN_COMMON_PLUGINPTR_IMPLEMENT_OPERATOR( op )\
+    #define IGN_COMMON_PLUGINPTR_IMPLEMENT_OPERATOR(op)\
       bool PluginPtr::operator op (const PluginPtr &_other) const\
       {\
         return (this->dataPtr->pluginInstancePtr op \
                 _other.dataPtr->pluginInstancePtr);\
       }
 
-    IGN_COMMON_PLUGINPTR_IMPLEMENT_OPERATOR(==)
-    IGN_COMMON_PLUGINPTR_IMPLEMENT_OPERATOR(<)
-    IGN_COMMON_PLUGINPTR_IMPLEMENT_OPERATOR(>)
-    IGN_COMMON_PLUGINPTR_IMPLEMENT_OPERATOR(!=)
-    IGN_COMMON_PLUGINPTR_IMPLEMENT_OPERATOR(<=)
-    IGN_COMMON_PLUGINPTR_IMPLEMENT_OPERATOR(>=)
+    IGN_COMMON_PLUGINPTR_IMPLEMENT_OPERATOR( == )
+    IGN_COMMON_PLUGINPTR_IMPLEMENT_OPERATOR( < )
+    IGN_COMMON_PLUGINPTR_IMPLEMENT_OPERATOR( > )
+    IGN_COMMON_PLUGINPTR_IMPLEMENT_OPERATOR( != )
+    IGN_COMMON_PLUGINPTR_IMPLEMENT_OPERATOR( <= )
+    IGN_COMMON_PLUGINPTR_IMPLEMENT_OPERATOR( >= )
 
     std::size_t PluginPtr::Hash() const
     {
-      return std::hash<std::shared_ptr<void>>()(
+      return std::hash< std::shared_ptr<void> >()(
                    this->dataPtr->pluginInstancePtr);
     }
 
@@ -222,11 +223,12 @@ namespace ignition
       this->dataPtr->Clear();
     }
 
-    void *PluginPtr::PrivateGetInterface(const std::string &_interfaceName) const
+    void *PluginPtr::PrivateGetInterface(
+        const std::string &_interfaceName) const
     {
       const std::string interfaceName = NormalizeName(_interfaceName);
       const auto &it = this->dataPtr->interfaces.find(interfaceName);
-      if(this->dataPtr->interfaces.end() == it)
+      if (this->dataPtr->interfaces.end() == it)
         return nullptr;
 
       return it->second;

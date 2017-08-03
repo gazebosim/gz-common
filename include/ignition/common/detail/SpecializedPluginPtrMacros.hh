@@ -50,16 +50,16 @@
 /// \brief Implement functions whose only role is to dispatch its functionality
 /// between two base classes, depending on which base is specialized for the
 /// template type. This must only be called within the ComposePlugin class.
-#define DETAIL_IGN_COMMON_COMPOSEPLUGIN_DISPATCH_IMPL(\
+#define DETAIL_IGN_COMMON_COMPOSEPLUGIN_DISPATCH(\
               ReturnType, Function, Suffix, Args)\
   public:\
   template <class T>\
   ReturnType Function Suffix\
   {\
-    if(Base1::template IsSpecializedFor<T>())\
+    if (Base1::template IsSpecializedFor<T>())\
       return Base1::template Function <T> Args ;\
   \
     return Base2::template Function <T> Args ;\
   }
 
-#endif // IGNITION_COMMON_DETAIL_SPECIALIZEDPLUGINPTRMACROS_HH_
+#endif

@@ -65,7 +65,7 @@ namespace ignition
                            const std::string &_plural,
                            const int _N)
     {
-      return std::abs(_N)==1? _singular : _plural;
+      return std::abs(_N) == 1? _singular : _plural;
     }
   }
 }

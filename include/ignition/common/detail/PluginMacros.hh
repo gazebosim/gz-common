@@ -19,6 +19,7 @@
 #ifndef IGNITION_COMMON_DETAIL_PLUGINMACROS_HH_
 #define IGNITION_COMMON_DETAIL_PLUGINMACROS_HH_
 
+#include <string>
 #include <typeinfo>
 #include <type_traits>
 #include <unordered_set>
@@ -41,7 +42,7 @@
 #endif
 
 #define DETAIL_IGN_COMMON_SPECIALIZE_INTERFACE(interfaceName)\
-  static_assert(std::is_same<interfaceName, ::interfaceName>::value,\
+  static_assert(std::is_same<interfaceName, ::interfaceName>::value, \
       #interfaceName " must be fully qualified like ::ns::MyClass");\
   static constexpr const char* InterfaceName = #interfaceName;
 
@@ -56,79 +57,79 @@
     ignition::common::PLUGIN_API_VERSION;
 
 
-#define DETAIL_IGN_COMMON_BEGIN_ADDING_PLUGINS\
-  DETAIL_IGN_COMMON_REGISTER_PLUGININFO_META_DATA\
-  IGN_COMMON_BEGIN_WARNING_SUPPRESSION(IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR)\
+#define DETAIL_IGN_COMMON_BEGIN_ADDING_PLUGINS \
+  DETAIL_IGN_COMMON_REGISTER_PLUGININFO_META_DATA \
+IGN_COMMON_BEGIN_WARNING_SUPPRESSION(IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR)\
   struct IGN_macro_must_be_used_in_global_namespace;\
-  static_assert(std::is_same < IGN_macro_must_be_used_in_global_namespace,\
-      ::IGN_macro_must_be_used_in_global_namespace>::value,\
-      "Macro for registering plugins must be used in global namespace");\
-  extern "C" DETAIL_IGN_PLUGIN_VISIBLE\
-  std::size_t IGNCOMMONMultiPluginInfo(\
-      void *_outputInfo, const std::size_t _pluginId, const std::size_t _size)\
-  {\
-    if (_size != sizeof(ignition::common::PluginInfo))\
-    {\
-      return 0u;\
-    }\
-    std::size_t pluginCount = 0;\
-    std::unordered_set<std::string> visitedPlugins;\
+  static_assert(std::is_same < IGN_macro_must_be_used_in_global_namespace, \
+      ::IGN_macro_must_be_used_in_global_namespace>::value, \
+      "Macro for registering plugins must be used in global namespace"); \
+  extern "C" DETAIL_IGN_PLUGIN_VISIBLE \
+  std::size_t IGNCOMMONMultiPluginInfo( \
+      void *_outputInfo, const std::size_t _pluginId, const std::size_t _size) \
+  { \
+    if (_size != sizeof(ignition::common::PluginInfo)) \
+    { \
+      return 0u; \
+    } \
+    std::size_t pluginCount = 0; \
+    std::unordered_set<std::string> visitedPlugins; \
     ignition::common::PluginInfo *plugin = \
-        static_cast<ignition::common::PluginInfo*>(_outputInfo);\
+        static_cast<ignition::common::PluginInfo*>(_outputInfo); \
     plugin->name.clear();
 
 
-#define DETAIL_IGN_COMMON_ADD_PLUGIN(pluginName, interface)\
+#define DETAIL_IGN_COMMON_ADD_PLUGIN(pluginName, interface) \
   /* cppcheck-suppress */ \
-  static_assert(std::is_same<pluginName, ::pluginName>::value,\
-      #pluginName " must be fully qualified like ::ns::MyClass");\
-  static_assert(std::is_same<interface, ::interface>::value,\
-      #interface " must be fully qualified like ::ns::MyClass");\
+  static_assert(std::is_same<pluginName, ::pluginName>::value, \
+      #pluginName " must be fully qualified like ::ns::MyClass"); \
+  static_assert(std::is_same<interface, ::interface>::value, \
+      #interface " must be fully qualified like ::ns::MyClass"); \
   \
-  static_assert(!std::is_abstract<pluginName>::value,\
-      "[" #pluginName "] must not be an abstract class. It contains at least one "\
-      "pure virtual function!");\
-  static_assert(std::is_base_of<interface, pluginName>::value,\
-      "[" #interface "] is not a base class of [" #pluginName "], so it cannot "\
-      "be used as a plugin interface for [" #pluginName "]!");\
-  {\
-    const bool insertion = visitedPlugins.insert( #pluginName ).second;\
-    if(insertion)\
-    {\
-      ++pluginCount;\
-      if(_pluginId == pluginCount-1)\
-      {\
-        plugin->name = #pluginName;\
-        plugin->interfaces.insert( std::make_pair(\
+  static_assert(!std::is_abstract<pluginName>::value, \
+      "[" #pluginName "] must not be an abstract class. It contains at least " \
+      "one pure virtual function!"); \
+  static_assert(std::is_base_of<interface, pluginName>::value, \
+      "[" #interface "] is not a base class of [" #pluginName "], so it " \
+      "cannot be used as a plugin interface for [" #pluginName "]!"); \
+  { \
+    const bool insertion = visitedPlugins.insert(#pluginName).second; \
+    if (insertion) \
+    { \
+      ++pluginCount; \
+      if (_pluginId == pluginCount-1) \
+      { \
+        plugin->name = #pluginName; \
+        plugin->interfaces.insert(std::make_pair( \
             #interface , [=](void* v_ptr) { \
-                pluginName * d_ptr = static_cast< pluginName *>(v_ptr);\
-                return static_cast< interface *>(d_ptr);\
-            }));\
-        plugin->factory = []() {\
-          return static_cast<void*>( new pluginName() );\
-        };\
-        plugin->deleter = [](void* ptr) {\
-          delete static_cast< pluginName* >(ptr);\
-        };\
-      }\
-    }\
-    else if( #pluginName == plugin->name )\
-    {\
-      plugin->interfaces.insert( std::make_pair(\
-          #interface , [&](void* v_ptr) {\
-              pluginName * d_ptr = static_cast< pluginName *>(v_ptr);\
-              return static_cast< interface *>(d_ptr);\
-          }));\
-    }\
+                pluginName * d_ptr = static_cast< pluginName *>(v_ptr); \
+                return static_cast< interface *>(d_ptr); \
+            })); \
+        plugin->factory = []() { \
+          return static_cast<void*>(new pluginName()); \
+        }; \
+        plugin->deleter = [](void* ptr) { \
+          delete static_cast< pluginName* >(ptr); \
+        }; \
+      } \
+    } \
+    else if ( #pluginName == plugin->name ) \
+    { \
+      plugin->interfaces.insert(std::make_pair( \
+          #interface , [&](void* v_ptr) { \
+              pluginName * d_ptr = static_cast< pluginName *>(v_ptr); \
+              return static_cast< interface *>(d_ptr); \
+          })); \
+    } \
   }
 
 
-#define DETAIL_IGN_COMMON_FINISH_ADDING_PLUGINS\
-    if(_pluginId > pluginCount)\
-      return 0u;\
-    return pluginCount - _pluginId;\
-  }\
-  IGN_COMMON_FINISH_WARNING_SUPPRESSION(IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR)
+#define DETAIL_IGN_COMMON_FINISH_ADDING_PLUGINS \
+    if (_pluginId > pluginCount) \
+      return 0u; \
+    return pluginCount - _pluginId; \
+  } \
+IGN_COMMON_FINISH_WARNING_SUPPRESSION(IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR)
 
 
-#endif // IGNITION_COMMON_DETAIL_PLUGINMACROS_HH_
+#endif

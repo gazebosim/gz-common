@@ -27,46 +27,57 @@
 #if defined __GNUC__
 
 
-  #define DETAIL_IGN_COMMON_BEGIN_WARN_SUP_PUSH _Pragma("GCC diagnostic push")
+  #define DETAIL_IGN_COMMON_BEGIN_WARN_SUP_PUSH \
+    _Pragma("GCC diagnostic push")
 
 
-  #define DETAIL_IGN_COMMON_WARN_SUP_HELPER_2(w) DETAIL_IGN_COMMON_STRINGIFY(GCC diagnostic ignored w)
+  #define DETAIL_IGN_COMMON_WARN_SUP_HELPER_2(w) \
+    DETAIL_IGN_COMMON_STRINGIFY(GCC diagnostic ignored w)
 
 
-  #define DETAIL_IGN_COMMON_WARN_SUP_HELPER(w) _Pragma(DETAIL_IGN_COMMON_WARN_SUP_HELPER_2(w))
+  #define DETAIL_IGN_COMMON_WARN_SUP_HELPER(w) \
+    _Pragma(DETAIL_IGN_COMMON_WARN_SUP_HELPER_2(w))
 
 
-  #define DETAIL_IGN_COMMON_FINISH_WARNING_SUPPRESSION( warning_token ) _Pragma("GCC diagnostic pop")
+  #define DETAIL_IGN_COMMON_FINISH_WARNING_SUPPRESSION( warning_token ) \
+    _Pragma("GCC diagnostic pop")
 
 
 #elif defined __clang__
 
 
-  #define DETAIL_IGN_COMMON_BEGIN_WARN_SUP_PUSH _Pragma("clang diagnostic push")
+  #define DETAIL_IGN_COMMON_BEGIN_WARN_SUP_PUSH \
+    _Pragma("clang diagnostic push")
 
 
-  #define DETAIL_IGN_COMMON_WARN_SUP_HELPER_2(w) DETAIL_IGN_COMMON_STRINGIFY(clang diagnostic ignored w)
+  #define DETAIL_IGN_COMMON_WARN_SUP_HELPER_2(w) \
+    DETAIL_IGN_COMMON_STRINGIFY(clang diagnostic ignored w)
 
 
-  #define DETAIL_IGN_COMMON_WARN_SUP_HELPER(w) _Pragma(DETAIL_IGN_COMMON_WARN_SUP_HELPER_2(w))
+  #define DETAIL_IGN_COMMON_WARN_SUP_HELPER(w) \
+    _Pragma(DETAIL_IGN_COMMON_WARN_SUP_HELPER_2(w))
 
 
-  #define DETAIL_IGN_COMMON_FINISH_WARNING_SUPPRESSION( warning_token ) _Pragma("clang diagnostic pop")
+  #define DETAIL_IGN_COMMON_FINISH_WARNING_SUPPRESSION( warning_token ) \
+    _Pragma("clang diagnostic pop")
 
 
 #elif defined _MSC_VER
 
 
-  #define DETAIL_IGN_COMMON_BEGIN_WARN_SUP_PUSH _Pragma("warning(push)")
+  #define DETAIL_IGN_COMMON_BEGIN_WARN_SUP_PUSH \
+    _Pragma("warning(push)")
 
 
-  #define DETAIL_IGN_COMMON_WARN_SUP_HELPER_2(w) DETAIL_IGN_COMMON_STRINGIFY(warning(disable: w))
+  #define DETAIL_IGN_COMMON_WARN_SUP_HELPER_2(w) \
+    DETAIL_IGN_COMMON_STRINGIFY(warning(disable: w))
 
 
-  #define DETAIL_IGN_COMMON_WARN_SUP_HELPER(w) _Pragma(DETAIL_IGN_COMMON_WARN_SUP_HELPER(w))
+  #define DETAIL_IGN_COMMON_WARN_SUP_HELPER(w) \
+    _Pragma(DETAIL_IGN_COMMON_WARN_SUP_HELPER(w))
 
 
-  #define DETAIL_IGN_COMMON_FINISH_WARNING_SUPPRESSION( warning_token )\
+  #define DETAIL_IGN_COMMON_FINISH_WARNING_SUPPRESSION( warning_token ) \
     _Pragma("warning(pop)")
 
 
@@ -86,8 +97,8 @@
 #endif // Checking compiler type
 
 
-#define DETAIL_IGN_COMMON_BEGIN_WARNING_SUPPRESSION( warning_token )\
-  DETAIL_IGN_COMMON_BEGIN_WARN_SUP_PUSH\
+#define DETAIL_IGN_COMMON_BEGIN_WARNING_SUPPRESSION( warning_token ) \
+  DETAIL_IGN_COMMON_BEGIN_WARN_SUP_PUSH \
   DETAIL_IGN_COMMON_WARN_SUP_HELPER(warning_token)
 
 
@@ -95,7 +106,8 @@
 // Warning Tokens
 #if defined __GNUC__ || defined __clang__
 
-  #define DETAIL_IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR "-Wdelete-non-virtual-dtor"
+  #define DETAIL_IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR \
+    "-Wdelete-non-virtual-dtor"
 
 
 #elif defined _MSC_VER

@@ -26,7 +26,7 @@
 // access specialized plugin interfaces.
 #ifdef IGNITION_UNITTEST_SPECIALIZED_PLUGIN_ACCESS
 bool usedSpecializedInterfaceAccess;
-#endif // IGNITION_UNITTEST_SPECIALIZED_PLUGIN_ACCESS
+#endif
 
 
 namespace ignition
@@ -89,7 +89,7 @@ namespace ignition
     {
       #ifdef IGNITION_UNITTEST_SPECIALIZED_PLUGIN_ACCESS
       usedSpecializedInterfaceAccess = true;
-      #endif // IGNITION_UNITTEST_SPECIALIZED_PLUGIN_ACCESS
+      #endif
       return static_cast<SpecInterface*>(
             this->privateSpecInterfaceIterator->second);
     }
@@ -110,7 +110,7 @@ namespace ignition
     {
       #ifdef IGNITION_UNITTEST_SPECIALIZED_PLUGIN_ACCESS
       usedSpecializedInterfaceAccess = true;
-      #endif // IGNITION_UNITTEST_SPECIALIZED_PLUGIN_ACCESS
+      #endif
       return static_cast<SpecInterface*>(
             this->privateSpecInterfaceIterator->second);
     }
@@ -131,7 +131,7 @@ namespace ignition
     {
       #ifdef IGNITION_UNITTEST_SPECIALIZED_PLUGIN_ACCESS
       usedSpecializedInterfaceAccess = true;
-      #endif // IGNITION_UNITTEST_SPECIALIZED_PLUGIN_ACCESS
+      #endif
       return (nullptr != this->privateSpecInterfaceIterator->second);
     }
 
@@ -182,13 +182,14 @@ namespace ignition
         /// \brief Default destructor
         public: virtual ~ComposePlugin() = default;
 
-        ComposePlugin() = default;
+        public: ComposePlugin() = default;
       };
 
 
-
       template <class Base1, class Base2>
-      class ComposePlugin<Base1, Base2> : public virtual Base1, public virtual Base2
+      class ComposePlugin<Base1, Base2> :
+          public virtual Base1,
+          public virtual Base2
       {
         // Declare friendship
         template <class...> friend class SpecializedPluginPtr;
@@ -203,9 +204,9 @@ namespace ignition
 
         // Implement the various functions that need to be dispatched to the
         // base classes.
-        DETAIL_IGN_COMMON_COMPOSEPLUGIN_DISPATCH_IMPL(T*, GetInterface, (), ())
-        DETAIL_IGN_COMMON_COMPOSEPLUGIN_DISPATCH_IMPL(const T*, GetInterface, () const, ())
-        DETAIL_IGN_COMMON_COMPOSEPLUGIN_DISPATCH_IMPL(bool, HasInterface, () const, ())
+DETAIL_IGN_COMMON_COMPOSEPLUGIN_DISPATCH(T*, GetInterface, (), ())
+DETAIL_IGN_COMMON_COMPOSEPLUGIN_DISPATCH(const T*, GetInterface, () const, ())
+DETAIL_IGN_COMMON_COMPOSEPLUGIN_DISPATCH(bool, HasInterface, () const, ())
 
         public: template<class T>
                 static constexpr bool IsSpecializedFor()
@@ -214,22 +215,7 @@ namespace ignition
                   || Base2::template IsSpecializedFor<T>());
         }
 
-        /// \brief Imperfect forwarding constructor. We do not use a perfect
-        /// forwarding constructor here because arg will be getting split down
-        /// two different branches in the inhertiance structure, so passing
-        /// along an rvalue reference could be problematic. Nevertheless, this
-        /// function is templated so that we can change the arguments used by
-        /// the constructor of SpecializedPluginPtr without modifying this class.
-        private: template <typename T>
-                 ComposePlugin(const T &arg)
-                   : PluginPtr(arg),
-                     Base1(arg),
-                     Base2(arg)
-                 {
-                   // Do nothing
-                 }
-
-        private: ComposePlugin() = default;
+        public: ComposePlugin() = default;
       };
 
       template <class Base1, class Base2, class... OtherBases>
@@ -246,18 +232,7 @@ namespace ignition
 
         using Base = ComposePlugin<Base1, ComposePlugin<Base2, OtherBases...>>;
 
-        /// \brief Imperfect forwarding constructor. See the note in
-        /// ComposePlugin<Base1, Base2> for the reason that we do not use
-        /// perfect forwarding.
-        private: template <typename T>
-                 ComposePlugin(const T &arg)
-                   : PluginPtr(arg),
-                     Base(arg)
-                 {
-                   // Do nothing
-                 }
-
-        private: ComposePlugin() = default;
+        public: ComposePlugin() = default;
       };
     } // namespace detail
 
@@ -281,7 +256,7 @@ namespace ignition
 
       DETAIL_IGN_COMMON_PLUGIN_CONSTRUCT_DESTRUCT_ASSIGN(SpecializedPluginPtr)
 
-      private: SpecializedPluginPtr(const PluginInfo *_info)
+      private: explicit SpecializedPluginPtr(const PluginInfo *_info)
                  : PluginPtr(_info),
                    Base()
                 {
