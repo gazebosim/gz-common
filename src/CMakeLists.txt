@@ -23,6 +23,7 @@ set (sources
   NodeAnimation.cc
   NodeTransform.cc
   OBJLoader.cc
+  Plugin.cc
   PluginPtr.cc
   PluginLoader.cc
   SemanticVersion.cc

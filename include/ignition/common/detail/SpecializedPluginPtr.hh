@@ -155,7 +155,7 @@ namespace ignition
     template <class SpecInterface>
     SpecializedPluginPtr<SpecInterface>::SpecializedPluginPtr(
         const PluginInfo *_info)
-      : PluginPtr(_info),
+      : TemplatePluginPtr(_info),
         privateSpecInterfaceIterator(
           this->PrivateGetOrCreateIterator(SpecInterface::InterfaceName))
     {
@@ -199,8 +199,8 @@ namespace ignition
         public: virtual ~ComposePlugin() = default;
 
         // Inherit function overloads
-        using PluginPtr::GetInterface;
-        using PluginPtr::HasInterface;
+        using TemplatePluginPtr::GetInterface;
+        using TemplatePluginPtr::HasInterface;
 
         // Implement the various functions that need to be dispatched to the
         // base classes.
@@ -257,7 +257,7 @@ DETAIL_IGN_COMMON_COMPOSEPLUGIN_DISPATCH(bool, HasInterface, () const, ())
       DETAIL_IGN_COMMON_PLUGIN_CONSTRUCT_DESTRUCT_ASSIGN(SpecializedPluginPtr)
 
       private: explicit SpecializedPluginPtr(const PluginInfo *_info)
-                 : PluginPtr(_info),
+                 : TemplatePluginPtr(_info),
                    Base()
                 {
                   // Do nothing

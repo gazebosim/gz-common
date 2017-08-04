@@ -15,11 +15,29 @@
  *
  */
 
-#include <map>
 
-#include "ignition/common/PluginPtr.hh"
-#include "ignition/common/PluginInfo.hh"
-#include "ignition/common/Console.hh"
-#include "PluginUtils.hh"
+#ifndef IGNITION_COMMON_DETAIL_TEMPLATEHELPERS_HH_
+#define IGNITION_COMMON_DETAIL_TEMPLATEHELPERS_HH_
 
 
+#include <type_traits>
+
+namespace ignition
+{
+  namespace common
+  {
+    namespace detail
+    {
+      //////////////////////////////////////////////////
+      template <typename To, typename From>
+      struct ConstCompatible : std::true_type { };
+
+      //////////////////////////////////////////////////
+      template <typename To, typename From>
+      struct ConstCompatible<To, const From>
+          : std::integral_constant<bool, std::is_const<To>::value> { };
+    }
+  }
+}
+
+#endif

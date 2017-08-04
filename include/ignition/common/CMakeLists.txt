@@ -25,6 +25,7 @@ set (headers
   NodeAnimation.hh
   NodeTransform.hh
   OBJLoader.hh
+  Plugin.hh
   PluginPtr.hh
   PluginInfo.hh
   PluginLoader.hh
@@ -42,6 +43,7 @@ set (headers
   SystemPaths.hh
   STLLoader.hh
   SVGLoader.hh
+  TemplateHelpers.hh
   Time.hh
   Timer.hh
   Types.hh
@@ -50,12 +52,14 @@ set (headers
   Uuid.hh
   WorkerPool.hh
 
+  detail/Plugin.hh
   detail/PluginPtr.hh
   detail/PluginLoader.hh
   detail/PluginMacros.hh
   detail/SpecializedPluginPtr.hh
   detail/SpecializedPluginPtrMacros.hh
   detail/SuppressWarning.hh
+  detail/TemplateHelpers.hh
 )
 
 # FIXME: Some classes fail to build on Windows

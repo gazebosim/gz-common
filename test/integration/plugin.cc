@@ -59,11 +59,11 @@ TEST(PluginLoader, LoadExistingLibrary)
   EXPECT_EQ(1u, pl.PluginsImplementing("::test::util::DummyDoubleBase").size());
 
 
-  ignition::common::PluginPtr firstPlugin =
+  ignition::common::TemplatePluginPtr firstPlugin =
       pl.Instantiate("test::util::DummySinglePlugin");
   EXPECT_TRUE(firstPlugin.IsValid());
 
-  ignition::common::PluginPtr secondPlugin =
+  ignition::common::TemplatePluginPtr secondPlugin =
       pl.Instantiate("test::util::DummyMultiPlugin");
   EXPECT_TRUE(secondPlugin.IsValid());
 
@@ -172,7 +172,7 @@ TEST(SpecializedPluginPtr, Construction)
 template <typename PluginPtrType1, typename PluginPtrType2>
 void TestSetAndMapUsage(
     const ignition::common::PluginLoader &loader,
-    const ignition::common::PluginPtr &plugin)
+    const ignition::common::TemplatePluginPtr &plugin)
 {
   PluginPtrType1 plugin1 = plugin;
   PluginPtrType2 plugin2 = plugin1;
@@ -185,22 +185,22 @@ void TestSetAndMapUsage(
   EXPECT_TRUE(plugin2 == plugin1);
   EXPECT_FALSE(plugin2 != plugin1);
 
-  std::set<ignition::common::PluginPtr> orderedSet;
+  std::set<ignition::common::TemplatePluginPtr> orderedSet;
   EXPECT_TRUE(orderedSet.insert(plugin1).second);
   EXPECT_FALSE(orderedSet.insert(plugin1).second);
   EXPECT_FALSE(orderedSet.insert(plugin2).second);
 
-  std::unordered_set<ignition::common::PluginPtr> unorderedSet;
+  std::unordered_set<ignition::common::TemplatePluginPtr> unorderedSet;
   EXPECT_TRUE(unorderedSet.insert(plugin1).second);
   EXPECT_FALSE(unorderedSet.insert(plugin1).second);
   EXPECT_FALSE(unorderedSet.insert(plugin2).second);
 
-  std::map<ignition::common::PluginPtr, std::string> orderedMap;
+  std::map<ignition::common::TemplatePluginPtr, std::string> orderedMap;
   EXPECT_TRUE(orderedMap.insert(std::make_pair(plugin1, "some string")).second);
   EXPECT_FALSE(orderedMap.insert(std::make_pair(plugin1, "a string")).second);
   EXPECT_FALSE(orderedMap.insert(std::make_pair(plugin2, "chars")).second);
 
-  std::unordered_map<ignition::common::PluginPtr, std::string> unorderedMap;
+  std::unordered_map<ignition::common::TemplatePluginPtr, std::string> unorderedMap;
   EXPECT_TRUE(unorderedMap.insert(std::make_pair(plugin1, "strings")).second);
   EXPECT_FALSE(unorderedMap.insert(std::make_pair(plugin1, "letters")).second);
   EXPECT_FALSE(unorderedMap.insert(std::make_pair(plugin2, "")).second);
@@ -235,7 +235,7 @@ using AnotherSpecializedPluginPtr =
 
 TEST(PluginPtr, CopyMoveSemantics)
 {
-  ignition::common::PluginPtr plugin;
+  ignition::common::TemplatePluginPtr plugin;
   EXPECT_FALSE(plugin.IsValid());
 
   std::string projectPath(PROJECT_BINARY_PATH);
@@ -251,7 +251,7 @@ TEST(PluginPtr, CopyMoveSemantics)
   plugin = pl.Instantiate("test::util::DummySinglePlugin");
   EXPECT_TRUE(plugin.IsValid());
 
-  ignition::common::PluginPtr otherPlugin =
+  ignition::common::TemplatePluginPtr otherPlugin =
       pl.Instantiate("test::util::DummySinglePlugin");
   EXPECT_TRUE(otherPlugin.IsValid());
 
@@ -264,14 +264,14 @@ TEST(PluginPtr, CopyMoveSemantics)
 
   igndbg << "Testing sets and maps with PluginPtr and PluginPtr\n";
   TestSetAndMapUsage<
-      ignition::common::PluginPtr,
-      ignition::common::PluginPtr>(
+      ignition::common::TemplatePluginPtr,
+      ignition::common::TemplatePluginPtr>(
         pl, plugin);
 
   igndbg << "Testing sets and maps with PluginPtr and "
          << "SomeSpecializedPluginPtr\n";
   TestSetAndMapUsage<
-      ignition::common::PluginPtr,
+      ignition::common::TemplatePluginPtr,
       SomeSpecializedPluginPtr>(
         pl, plugin);
 
