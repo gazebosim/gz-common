@@ -288,6 +288,89 @@ TEST(PluginPtr, CopyMoveSemantics)
       AnotherSpecializedPluginPtr,
       SingleSpecializedPluginPtr>(
         pl, plugin);
+
+  ignition::common::ConstPluginPtr c_plugin(plugin);
+  EXPECT_FALSE(c_plugin.IsEmpty());
+  EXPECT_TRUE(c_plugin == plugin);
+
+  c_plugin = nullptr;
+  EXPECT_TRUE(c_plugin.IsEmpty());
+
+  c_plugin = otherPlugin;
+  EXPECT_FALSE(c_plugin.IsEmpty());
+  EXPECT_TRUE(c_plugin == otherPlugin);
+}
+
+void SetSomeValues(std::shared_ptr<test::util::DummySetterBase> setter)
+{
+  setter->SetIntegerValue(2468);
+  setter->SetDoubleValue(6.28);
+  setter->SetName("Changed using shared_ptr");
+}
+
+void CheckSomeValues(
+    std::shared_ptr<test::util::DummyIntBase> getInt,
+    std::shared_ptr<test::util::DummyDoubleBase> getDouble,
+    std::shared_ptr<test::util::DummyNameBase> getName)
+{
+  EXPECT_EQ(2468, getInt->MyIntegerValueIs());
+  EXPECT_NEAR(6.28, getDouble->MyDoubleValueIs(), 1e-8);
+  EXPECT_EQ(std::string("Changed using shared_ptr"), getName->MyNameIs());
+}
+
+TEST(PluginPtr, as_shared_ptr)
+{
+  std::string projectPath(PROJECT_BINARY_PATH);
+
+  ignition::common::SystemPaths sp;
+  sp.AddPluginPaths(projectPath + "/test/util");
+  std::string path = sp.FindSharedLibrary("IGNDummyPlugins");
+  ASSERT_FALSE(path.empty());
+
+  ignition::common::PluginLoader pl;
+  pl.LoadLibrary(path);
+
+  std::shared_ptr<test::util::DummyIntBase> int_ptr =
+      pl.Instantiate("test::util::DummyMultiPlugin")->
+        as_shared_ptr<test::util::DummyIntBase>(
+          "test::util::DummyIntBase");
+  EXPECT_TRUE(int_ptr.get());
+  EXPECT_EQ(5, int_ptr->MyIntegerValueIs());
+
+  SomeSpecializedPluginPtr plugin =
+      pl.Instantiate("test::util::DummyMultiPlugin");
+
+
+  usedSpecializedInterfaceAccess = false;
+  std::shared_ptr<test::util::DummySetterBase> setter =
+      plugin->as_shared_ptr<test::util::DummySetterBase>();
+  EXPECT_TRUE(usedSpecializedInterfaceAccess);
+  ASSERT_TRUE(setter.get());
+
+  usedSpecializedInterfaceAccess = false;
+  std::shared_ptr<SomeInterface> someInterface =
+      plugin->as_shared_ptr<SomeInterface>();
+  EXPECT_TRUE(usedSpecializedInterfaceAccess);
+  EXPECT_FALSE(someInterface.get());
+
+  usedSpecializedInterfaceAccess = false;
+  std::shared_ptr<test::util::DummyIntBase> getInt =
+      plugin->as_shared_ptr<test::util::DummyIntBase>();
+  EXPECT_TRUE(usedSpecializedInterfaceAccess);
+  ASSERT_TRUE(getInt.get());
+
+  std::shared_ptr<test::util::DummyDoubleBase> getDouble =
+      plugin->as_shared_ptr<test::util::DummyDoubleBase>(
+        "test::util::DummyDoubleBase");
+  ASSERT_TRUE(getDouble.get());
+
+  std::shared_ptr<test::util::DummyNameBase> getName =
+      plugin->as_shared_ptr<test::util::DummyNameBase>(
+        "test::util::DummyNameBase");
+  ASSERT_TRUE(getName.get());
+
+  SetSomeValues(setter);
+  CheckSomeValues(getInt, getDouble, getName);
 }
 
 /////////////////////////////////////////////////

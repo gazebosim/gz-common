@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- */
-
-#include <map>
+*/
 
 #include "ignition/common/PluginPtr.hh"
-#include "ignition/common/PluginInfo.hh"
-#include "ignition/common/Console.hh"
-#include "PluginUtils.hh"
 
-
+int main()
+{
+  ignition::common::PluginPtr ptr{ignition::common::ConstPluginPtr()};
+}

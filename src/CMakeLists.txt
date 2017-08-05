@@ -24,7 +24,6 @@ set (sources
   NodeTransform.cc
   OBJLoader.cc
   Plugin.cc
-  PluginPtr.cc
   PluginLoader.cc
   SemanticVersion.cc
   Skeleton.cc
