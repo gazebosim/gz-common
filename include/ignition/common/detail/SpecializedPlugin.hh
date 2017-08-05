@@ -16,10 +16,10 @@
  */
 
 
-#ifndef IGNITION_COMMON_DETAIL_SPECIALIZEDPLUGINPTR_HH_
-#define IGNITION_COMMON_DETAIL_SPECIALIZEDPLUGINPTR_HH_
+#ifndef IGNITION_COMMON_DETAIL_SPECIALIZEDPLUGIN_HH_
+#define IGNITION_COMMON_DETAIL_SPECIALIZEDPLUGIN_HH_
 
-#include "ignition/common/SpecializedPluginPtr.hh"
+#include "ignition/common/SpecializedPlugin.hh"
 
 // This preprocessor token should only be used by the unittest that is
 // responsible for checking that the specialized routines are being used to
@@ -35,16 +35,8 @@ namespace ignition
   {
     /////////////////////////////////////////////////
     template <class SpecInterface>
-    SpecializedPluginPtr<SpecInterface>::SpecializedPluginPtr()
-      : SpecializedPluginPtr(nullptr)
-    {
-      // Do nothing
-    }
-
-    /////////////////////////////////////////////////
-    template <class SpecInterface>
     template <class Interface>
-    Interface *SpecializedPluginPtr<SpecInterface>::GetInterface()
+    Interface *SpecializedPlugin<SpecInterface>::GetInterface()
     {
       return this->PrivateGetSpecInterface(type<Interface>());
     }
@@ -52,7 +44,7 @@ namespace ignition
     /////////////////////////////////////////////////
     template <class SpecInterface>
     template <class Interface>
-    const Interface *SpecializedPluginPtr<SpecInterface>::GetInterface() const
+    const Interface *SpecializedPlugin<SpecInterface>::GetInterface() const
     {
       return this->PrivateGetSpecInterface(type<Interface>());
     }
@@ -60,7 +52,7 @@ namespace ignition
     /////////////////////////////////////////////////
     template <class SpecInterface>
     template <class Interface>
-    bool SpecializedPluginPtr<SpecInterface>::HasInterface() const
+    bool SpecializedPlugin<SpecInterface>::HasInterface() const
     {
       return this->PrivateHasSpecInterface(type<Interface>());
     }
@@ -68,7 +60,7 @@ namespace ignition
     /////////////////////////////////////////////////
     template <class SpecInterface>
     template <class Interface>
-    constexpr bool SpecializedPluginPtr<SpecInterface>::IsSpecializedFor()
+    constexpr bool SpecializedPlugin<SpecInterface>::IsSpecializedFor()
     {
       return PrivateIsSpecializedFor(type<Interface>());
     }
@@ -76,15 +68,15 @@ namespace ignition
     /////////////////////////////////////////////////
     template <class SpecInterface>
     template <class Interface>
-    Interface *SpecializedPluginPtr<SpecInterface>::PrivateGetSpecInterface(
+    Interface *SpecializedPlugin<SpecInterface>::PrivateGetSpecInterface(
         type<Interface>)
     {
-      return this->PluginPtr::GetInterface<Interface>();
+      return this->Plugin::GetInterface<Interface>();
     }
 
     /////////////////////////////////////////////////
     template <class SpecInterface>
-    SpecInterface *SpecializedPluginPtr<SpecInterface>::PrivateGetSpecInterface(
+    SpecInterface *SpecializedPlugin<SpecInterface>::PrivateGetSpecInterface(
         type<SpecInterface>)
     {
       #ifdef IGNITION_UNITTEST_SPECIALIZED_PLUGIN_ACCESS
@@ -97,15 +89,15 @@ namespace ignition
     /////////////////////////////////////////////////
     template <class SpecInterface>
     template <class Interface>
-    const Interface *SpecializedPluginPtr<SpecInterface>::
+    const Interface *SpecializedPlugin<SpecInterface>::
     PrivateGetSpecInterface(type<Interface>) const
     {
-      return this->PluginPtr::GetInterface<Interface>();
+      return this->Plugin::GetInterface<Interface>();
     }
 
     /////////////////////////////////////////////////
     template <class SpecInterface>
-    const SpecInterface *SpecializedPluginPtr<SpecInterface>::
+    const SpecInterface *SpecializedPlugin<SpecInterface>::
     PrivateGetSpecInterface(type<SpecInterface>) const
     {
       #ifdef IGNITION_UNITTEST_SPECIALIZED_PLUGIN_ACCESS
@@ -118,15 +110,15 @@ namespace ignition
     /////////////////////////////////////////////////
     template <class SpecInterface>
     template <class Interface>
-    bool SpecializedPluginPtr<SpecInterface>::PrivateHasSpecInterface(
+    bool SpecializedPlugin<SpecInterface>::PrivateHasSpecInterface(
         type<Interface>) const
     {
-      return this->PluginPtr::HasInterface<Interface>();
+      return this->Plugin::HasInterface<Interface>();
     }
 
     /////////////////////////////////////////////////
     template <class SpecInterface>
-    bool SpecializedPluginPtr<SpecInterface>::PrivateHasSpecInterface(
+    bool SpecializedPlugin<SpecInterface>::PrivateHasSpecInterface(
         type<SpecInterface>) const
     {
       #ifdef IGNITION_UNITTEST_SPECIALIZED_PLUGIN_ACCESS
@@ -138,14 +130,14 @@ namespace ignition
     /////////////////////////////////////////////////
     template <class SpecInterface>
     template <class Interface>
-    constexpr bool SpecializedPluginPtr<SpecInterface>::PrivateIsSpecializedFor(
+    constexpr bool SpecializedPlugin<SpecInterface>::PrivateIsSpecializedFor(
         type<Interface>)
     {
       return false;
     }
 
     template <class SpecInterface>
-    constexpr bool SpecializedPluginPtr<SpecInterface>::PrivateIsSpecializedFor(
+    constexpr bool SpecializedPlugin<SpecInterface>::PrivateIsSpecializedFor(
         type<SpecInterface>)
     {
       return true;
@@ -153,14 +145,11 @@ namespace ignition
 
     /////////////////////////////////////////////////
     template <class SpecInterface>
-    SpecializedPluginPtr<SpecInterface>::SpecializedPluginPtr(
-        const PluginInfo *_info)
-      : TemplatePluginPtr(_info),
-        privateSpecInterfaceIterator(
+    SpecializedPlugin<SpecInterface>::SpecializedPlugin()
+      : privateSpecInterfaceIterator(
           this->PrivateGetOrCreateIterator(SpecInterface::InterfaceName))
     {
-      // Do nothing. We are delegating to the default constructor in the
-      // initialization list.
+      // Do nothing
     }
 
 
@@ -176,7 +165,7 @@ namespace ignition
       class ComposePlugin<Base1> : public virtual Base1
       {
         // Declare friendship
-        template <class...> friend class SpecializedPluginPtr;
+        template <class...> friend class SpecializedPlugin;
         template <class...> friend class ComposePlugin;
 
         /// \brief Default destructor
@@ -192,18 +181,31 @@ namespace ignition
           public virtual Base2
       {
         // Declare friendship
-        template <class...> friend class SpecializedPluginPtr;
+        template <class...> friend class SpecializedPlugin;
         template <class...> friend class ComposePlugin;
 
         /// \brief Default destructor
         public: virtual ~ComposePlugin() = default;
 
         // Inherit function overloads
-        using TemplatePluginPtr::GetInterface;
-        using TemplatePluginPtr::HasInterface;
+        using Plugin::GetInterface;
+        using Plugin::HasInterface;
 
-        // Implement the various functions that need to be dispatched to the
-        // base classes.
+        /// \brief Implement functions whose only role is to dispatch its functionality
+        /// between two base classes, depending on which base is specialized for the
+        /// template type. This must only be called within the ComposePlugin class.
+        #define DETAIL_IGN_COMMON_COMPOSEPLUGIN_DISPATCH(\
+                      ReturnType, Function, Suffix, Args)\
+          public:\
+          template <class T>\
+          ReturnType Function Suffix\
+          {\
+            if (Base1::template IsSpecializedFor<T>())\
+              return Base1::template Function <T> Args ;\
+          \
+            return Base2::template Function <T> Args ;\
+          }
+
 DETAIL_IGN_COMMON_COMPOSEPLUGIN_DISPATCH(T*, GetInterface, (), ())
 DETAIL_IGN_COMMON_COMPOSEPLUGIN_DISPATCH(const T*, GetInterface, () const, ())
 DETAIL_IGN_COMMON_COMPOSEPLUGIN_DISPATCH(bool, HasInterface, () const, ())
@@ -215,7 +217,11 @@ DETAIL_IGN_COMMON_COMPOSEPLUGIN_DISPATCH(bool, HasInterface, () const, ())
                   || Base2::template IsSpecializedFor<T>());
         }
 
-        public: ComposePlugin() = default;
+        // Declare friendship
+        template <class...> friend class SpecializedPlugin;
+        template <class...> friend class ComposePlugin;
+
+        private: ComposePlugin() = default;
       };
 
       template <class Base1, class Base2, class... OtherBases>
@@ -224,46 +230,37 @@ DETAIL_IGN_COMMON_COMPOSEPLUGIN_DISPATCH(bool, HasInterface, () const, ())
             Base1, ComposePlugin<Base2, OtherBases...> >
       {
         // Declare friendship
-        template <class...> friend class SpecializedPluginPtr;
+        template <class...> friend class SpecializedPlugin;
         template <class...> friend class ComposePlugin;
 
-        /// \brief Default destructor
+        /// \brief Virtual destructor
         public: virtual ~ComposePlugin() = default;
 
         using Base = ComposePlugin<Base1, ComposePlugin<Base2, OtherBases...>>;
 
-        public: ComposePlugin() = default;
+        /// \brief Default constructor
+        private: ComposePlugin() = default;
       };
-    } // namespace detail
+    }
 
     template <class SpecInterface1, class... OtherSpecInterfaces>
-    class SpecializedPluginPtr<SpecInterface1, OtherSpecInterfaces...> :
+    class SpecializedPlugin<SpecInterface1, OtherSpecInterfaces...> :
         public virtual detail::ComposePlugin<
-          SpecializedPluginPtr<SpecInterface1>,
-          SpecializedPluginPtr<OtherSpecInterfaces...> >
+          SpecializedPlugin<SpecInterface1>,
+          SpecializedPlugin<OtherSpecInterfaces...> >
     {
       // Declare friendship
-      template <class...> friend class SpecializedPluginPtr;
+      template <class...> friend class SpecializedPlugin;
       template <class...> friend class detail::ComposePlugin;
-      friend class PluginLoader;
-
-      using Base = detail::ComposePlugin<
-                      SpecializedPluginPtr<SpecInterface1>,
-                      SpecializedPluginPtr<OtherSpecInterfaces...> >;
+      template <class> friend class TemplatePluginPtr;
 
       /// \brief Default constructor
-      public: SpecializedPluginPtr() = default;
+      private: SpecializedPlugin() = default;
 
-      DETAIL_IGN_COMMON_PLUGIN_CONSTRUCT_DESTRUCT_ASSIGN(SpecializedPluginPtr)
-
-      private: explicit SpecializedPluginPtr(const PluginInfo *_info)
-                 : TemplatePluginPtr(_info),
-                   Base()
-                {
-                  // Do nothing
-                }
+      /// \brief Virtual destructor
+      public: virtual ~SpecializedPlugin() = default;
     };
   }
 }
 
-#endif // IGNITION_COMMON_DETAIL_SPECIALIZEDPLUGINPTR_HH_
+#endif

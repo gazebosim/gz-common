@@ -59,38 +59,38 @@ TEST(PluginLoader, LoadExistingLibrary)
   EXPECT_EQ(1u, pl.PluginsImplementing("::test::util::DummyDoubleBase").size());
 
 
-  ignition::common::TemplatePluginPtr firstPlugin =
+  ignition::common::PluginPtr firstPlugin =
       pl.Instantiate("test::util::DummySinglePlugin");
-  EXPECT_TRUE(firstPlugin.IsValid());
+  EXPECT_TRUE(!firstPlugin.IsEmpty());
 
-  ignition::common::TemplatePluginPtr secondPlugin =
+  ignition::common::PluginPtr secondPlugin =
       pl.Instantiate("test::util::DummyMultiPlugin");
-  EXPECT_TRUE(secondPlugin.IsValid());
+  EXPECT_TRUE(!secondPlugin.IsEmpty());
 
   // Check that the DummyNameBase interface exists and that it returns the
   // correct value.
   test::util::DummyNameBase* nameBase =
-      firstPlugin.GetInterface<test::util::DummyNameBase>(
+      firstPlugin->GetInterface<test::util::DummyNameBase>(
         "test::util::DummyNameBase");
   ASSERT_NE(nullptr, nameBase);
   EXPECT_EQ(std::string("DummySinglePlugin"), nameBase->MyNameIs());
 
   // Check that DummyDoubleBase does not exist for this plugin
   test::util::DummyDoubleBase* doubleBase =
-      firstPlugin.GetInterface<test::util::DummyDoubleBase>(
+      firstPlugin->GetInterface<test::util::DummyDoubleBase>(
         "test::util::DummyDoubleBase");
   EXPECT_EQ(nullptr, doubleBase);
 
   // Check that DummyDoubleBase does exist for this function and that it returns
   // the correct value.
-  doubleBase = secondPlugin.GetInterface<test::util::DummyDoubleBase>(
+  doubleBase = secondPlugin->GetInterface<test::util::DummyDoubleBase>(
         "test::util::DummyDoubleBase");
   ASSERT_NE(nullptr, doubleBase);
   EXPECT_NEAR(3.14159, doubleBase->MyDoubleValueIs(), 1e-8);
 
   // Check that the DummyNameBase interface exists for this plugin and that it
   // returns the correct value.
-  nameBase = secondPlugin.GetInterface<test::util::DummyNameBase>(
+  nameBase = secondPlugin->GetInterface<test::util::DummyNameBase>(
         "test::util::DummyNameBase");
   ASSERT_NE(nullptr, doubleBase);
   EXPECT_EQ(std::string("DummyMultiPlugin"), nameBase->MyNameIs());
@@ -121,13 +121,13 @@ TEST(SpecializedPluginPtr, Construction)
   pl.LoadLibrary(path);
 
   SomeSpecializedPluginPtr plugin(pl.Instantiate("::test::util::DummyMultiPlugin"));
-  EXPECT_TRUE(plugin.IsValid());
+  EXPECT_TRUE(!plugin.IsEmpty());
 
   // Make sure the specialized interface is available, that it is accessed using
   // the specialized access, and that it returns the expected value.
   usedSpecializedInterfaceAccess = false;
   test::util::DummyIntBase *fooBase =
-      plugin.GetInterface<test::util::DummyIntBase>();
+      plugin->GetInterface<test::util::DummyIntBase>();
   EXPECT_TRUE(usedSpecializedInterfaceAccess);
   EXPECT_NE(nullptr, fooBase);
   EXPECT_EQ(5, fooBase->MyIntegerValueIs());
@@ -136,7 +136,7 @@ TEST(SpecializedPluginPtr, Construction)
   // using the specialized access.
   usedSpecializedInterfaceAccess = false;
   test::util::DummySetterBase *setterBase =
-      plugin.GetInterface<test::util::DummySetterBase>();
+      plugin->GetInterface<test::util::DummySetterBase>();
   EXPECT_TRUE(usedSpecializedInterfaceAccess);
   EXPECT_NE(nullptr, setterBase);
 
@@ -149,7 +149,7 @@ TEST(SpecializedPluginPtr, Construction)
   // the specialized access, and that it returns the expected value.
   usedSpecializedInterfaceAccess = false;
   test::util::DummyDoubleBase *doubleBase =
-      plugin.GetInterface<test::util::DummyDoubleBase>(
+      plugin->GetInterface<test::util::DummyDoubleBase>(
         "test::util::DummyDoubleBase");
   EXPECT_FALSE(usedSpecializedInterfaceAccess);
   EXPECT_NE(nullptr, doubleBase);
@@ -164,7 +164,7 @@ TEST(SpecializedPluginPtr, Construction)
   // plugin was specialized for it. Also make sure that the specialized access
   // is being used.
   usedSpecializedInterfaceAccess = false;
-  SomeInterface *someInterface = plugin.GetInterface<SomeInterface>();
+  SomeInterface *someInterface = plugin->GetInterface<SomeInterface>();
   EXPECT_TRUE(usedSpecializedInterfaceAccess);
   EXPECT_EQ(nullptr, someInterface);
 }
@@ -172,7 +172,7 @@ TEST(SpecializedPluginPtr, Construction)
 template <typename PluginPtrType1, typename PluginPtrType2>
 void TestSetAndMapUsage(
     const ignition::common::PluginLoader &loader,
-    const ignition::common::TemplatePluginPtr &plugin)
+    const ignition::common::PluginPtr &plugin)
 {
   PluginPtrType1 plugin1 = plugin;
   PluginPtrType2 plugin2 = plugin1;
@@ -185,22 +185,22 @@ void TestSetAndMapUsage(
   EXPECT_TRUE(plugin2 == plugin1);
   EXPECT_FALSE(plugin2 != plugin1);
 
-  std::set<ignition::common::TemplatePluginPtr> orderedSet;
+  std::set<ignition::common::PluginPtr> orderedSet;
   EXPECT_TRUE(orderedSet.insert(plugin1).second);
   EXPECT_FALSE(orderedSet.insert(plugin1).second);
   EXPECT_FALSE(orderedSet.insert(plugin2).second);
 
-  std::unordered_set<ignition::common::TemplatePluginPtr> unorderedSet;
+  std::unordered_set<ignition::common::PluginPtr> unorderedSet;
   EXPECT_TRUE(unorderedSet.insert(plugin1).second);
   EXPECT_FALSE(unorderedSet.insert(plugin1).second);
   EXPECT_FALSE(unorderedSet.insert(plugin2).second);
 
-  std::map<ignition::common::TemplatePluginPtr, std::string> orderedMap;
+  std::map<ignition::common::PluginPtr, std::string> orderedMap;
   EXPECT_TRUE(orderedMap.insert(std::make_pair(plugin1, "some string")).second);
   EXPECT_FALSE(orderedMap.insert(std::make_pair(plugin1, "a string")).second);
   EXPECT_FALSE(orderedMap.insert(std::make_pair(plugin2, "chars")).second);
 
-  std::unordered_map<ignition::common::TemplatePluginPtr, std::string> unorderedMap;
+  std::unordered_map<ignition::common::PluginPtr, std::string> unorderedMap;
   EXPECT_TRUE(unorderedMap.insert(std::make_pair(plugin1, "strings")).second);
   EXPECT_FALSE(unorderedMap.insert(std::make_pair(plugin1, "letters")).second);
   EXPECT_FALSE(unorderedMap.insert(std::make_pair(plugin2, "")).second);
@@ -235,8 +235,8 @@ using AnotherSpecializedPluginPtr =
 
 TEST(PluginPtr, CopyMoveSemantics)
 {
-  ignition::common::TemplatePluginPtr plugin;
-  EXPECT_FALSE(plugin.IsValid());
+  ignition::common::PluginPtr plugin;
+  EXPECT_FALSE(!plugin.IsEmpty());
 
   std::string projectPath(PROJECT_BINARY_PATH);
 
@@ -249,11 +249,11 @@ TEST(PluginPtr, CopyMoveSemantics)
   pl.LoadLibrary(path);
 
   plugin = pl.Instantiate("test::util::DummySinglePlugin");
-  EXPECT_TRUE(plugin.IsValid());
+  EXPECT_TRUE(!plugin.IsEmpty());
 
-  ignition::common::TemplatePluginPtr otherPlugin =
+  ignition::common::PluginPtr otherPlugin =
       pl.Instantiate("test::util::DummySinglePlugin");
-  EXPECT_TRUE(otherPlugin.IsValid());
+  EXPECT_TRUE(!otherPlugin.IsEmpty());
 
   EXPECT_TRUE(plugin != otherPlugin);
   EXPECT_FALSE(plugin == otherPlugin);
@@ -264,14 +264,14 @@ TEST(PluginPtr, CopyMoveSemantics)
 
   igndbg << "Testing sets and maps with PluginPtr and PluginPtr\n";
   TestSetAndMapUsage<
-      ignition::common::TemplatePluginPtr,
-      ignition::common::TemplatePluginPtr>(
+      ignition::common::PluginPtr,
+      ignition::common::PluginPtr>(
         pl, plugin);
 
   igndbg << "Testing sets and maps with PluginPtr and "
          << "SomeSpecializedPluginPtr\n";
   TestSetAndMapUsage<
-      ignition::common::TemplatePluginPtr,
+      ignition::common::PluginPtr,
       SomeSpecializedPluginPtr>(
         pl, plugin);
 

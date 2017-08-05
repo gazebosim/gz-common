@@ -35,6 +35,7 @@ set (headers
   Skeleton.hh
   SkeletonAnimation.hh
   SkeletonNode.hh
+  SpecializedPlugin.hh
   SpecializedPluginPtr.hh
   StringUtils.hh
   SubMesh.hh
@@ -56,7 +57,7 @@ set (headers
   detail/PluginPtr.hh
   detail/PluginLoader.hh
   detail/PluginMacros.hh
-  detail/SpecializedPluginPtr.hh
+  detail/SpecializedPlugin.hh
   detail/SpecializedPluginPtrMacros.hh
   detail/SuppressWarning.hh
   detail/TemplateHelpers.hh
