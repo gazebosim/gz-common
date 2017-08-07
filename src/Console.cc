@@ -125,11 +125,21 @@ int Logger::Buffer::sync()
   {
     if (this->type == Logger::STDOUT)
     {
-     std::cout << "\033[1;" << this->color << "m" << this->str() << "\033[0m";
+      std::string outstr = this->str();
+      const char lastchar = this->str()[this->str().size() - 1];
+      if (lastchar == '\n')
+      {
+        outstr.pop_back();
+      }
+      std::cout << "\033[1;" << this->color << "m" << outstr << "\033[0m";
+      if (lastchar == '\n')
+      {
+        std::cout << std::endl;
+      }
     }
     else
     {
-     std::cerr << "\033[1;" << this->color << "m" << this->str() << "\033[0m";
+      std::cerr << "\033[1;" << this->color << "m" << this->str() << "\033[0m";
     }
   }
 
