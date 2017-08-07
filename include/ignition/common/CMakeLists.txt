@@ -26,10 +26,10 @@ set (headers
   NodeTransform.hh
   OBJLoader.hh
   Plugin.hh
-  PluginPtr.hh
   PluginInfo.hh
   PluginLoader.hh
   PluginMacros.hh
+  PluginPtr.hh
   SemanticVersion.hh
   SingletonT.hh
   Skeleton.hh
@@ -54,11 +54,10 @@ set (headers
   WorkerPool.hh
 
   detail/Plugin.hh
-  detail/PluginPtr.hh
   detail/PluginLoader.hh
   detail/PluginMacros.hh
+  detail/PluginPtr.hh
   detail/SpecializedPlugin.hh
-  detail/SpecializedPluginPtrMacros.hh
   detail/SuppressWarning.hh
   detail/TemplateHelpers.hh
 )
