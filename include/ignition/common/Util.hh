@@ -23,6 +23,7 @@
 #include <future>
 #include <vector>
 #include <ignition/common/System.hh>
+#include <ignition/common/Filesystem.hh>
 
 /////////////////////////////////////////////////
 // Defines
@@ -158,72 +159,6 @@ namespace ignition
     /// \return True if the variable was found or false otherwise.
     bool IGNITION_COMMON_VISIBLE env(
         const std::string &_name, std::string &_value);
-
-    /// \brief Check if the given path is a directory.
-    /// \param[in] _path Path to a directory.
-    /// \return True if _path is a directory.
-    bool IGNITION_COMMON_VISIBLE isDirectory(const std::string &_path);
-
-    /// \brief Check if the given path is a file.
-    /// \param[in] _path Path to a file.
-    /// \return True if _path is a file.
-    bool IGNITION_COMMON_VISIBLE isFile(const std::string &_path);
-
-    /// \brief Returns true if _path is a file or directory
-    /// \param[in] _path Path to check.
-    /// \return true if _path is a file or directory
-    bool IGNITION_COMMON_VISIBLE exists(const std::string &_path);
-
-    /// \brief Get the absolute path of a provided path.
-    /// \param[in] _path Relative or absolute path.
-    /// \return Absolute path
-    std::string IGNITION_COMMON_VISIBLE absPath(const std::string &_path);
-
-    /// \brief Join two strings together to form a path
-    /// \param[in] _path1 the left portion of the path
-    /// \param[in] _path2 the right portion of the path
-    /// \return Joined path
-    std::string IGNITION_COMMON_VISIBLE joinPaths(const std::string &_path1,
-                                                  const std::string &_path2);
-
-    /// \brief Copy a file.
-    /// \param[in] _existingFilename Path to an existing file.
-    /// \param[in] _newFilename Path of the new file.
-    /// \return True on success.
-    bool IGNITION_COMMON_VISIBLE copyFile(const std::string &_existingFilename,
-                  const std::string &_newFilename);
-
-    /// \brief Move a file.
-    /// \param[in] _existingFilename Full path to an existing file.
-    /// \param[in] _newFilename Full path of the new file.
-    /// \return True on success.
-    bool IGNITION_COMMON_VISIBLE moveFile(const std::string &_existingFilename,
-                  const std::string &_newFilename);
-
-    /// \brief Get the current working directory
-    /// \return Name of the current directory
-    std::string IGNITION_COMMON_VISIBLE cwd();
-
-    /// \brief Remove a directory.
-    /// \param[in] _path Path to a directory.
-    /// \return True if _path is a directory and was removed.
-    bool IGNITION_COMMON_VISIBLE removeDirectory(const std::string &_path);
-
-    /// \brief Remove a directory or file.
-    /// \param[in] _path Path to a directory or file.
-    /// \return True if _path was removed.
-    bool IGNITION_COMMON_VISIBLE removeDirectoryOrFile(
-        const std::string &_path);
-
-    /// \brief Remove a directory or file.
-    /// \param[in] _path Path to a directory or file.
-    /// \return True if _path was removed.
-    bool IGNITION_COMMON_VISIBLE removeAll(const std::string &_path);
-
-    /// \brief Create directories for the given path
-    /// \param[in] _path Path to create directories from
-    /// \return true on success
-    bool IGNITION_COMMON_VISIBLE createDirectories(const std::string &_path);
 
     /// \brief Get a UUID
     /// \return A UUID string

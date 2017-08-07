@@ -11,6 +11,7 @@ set (headers
   Dem.hh
   EnumIface.hh
   Event.hh
+  Filesystem.hh
   HeightmapData.hh
   KeyEvent.hh
   KeyFrame.hh
