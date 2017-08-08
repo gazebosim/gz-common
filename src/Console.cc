@@ -116,31 +116,26 @@ Logger::Buffer::~Buffer()
 /////////////////////////////////////////////////
 int Logger::Buffer::sync()
 {
+  std::string outstr = this->str();
+
   // Log messages to disk
-  Console::log << this->str();
+  Console::log << outstr;
   Console::log.flush();
 
   // Output to terminal
-  if (Console::Verbosity() >= this->verbosity)
+  if (Console::Verbosity() >= this->verbosity && !outstr.empty())
   {
-    if (this->type == Logger::STDOUT)
-    {
-      std::string outstr = this->str();
-      const char lastchar = this->str()[this->str().size() - 1];
-      if (lastchar == '\n')
-      {
-        outstr.pop_back();
-      }
-      std::cout << "\033[1;" << this->color << "m" << outstr << "\033[0m";
-      if (lastchar == '\n')
-      {
-        std::cout << std::endl;
-      }
-    }
-    else
-    {
-      std::cerr << "\033[1;" << this->color << "m" << this->str() << "\033[0m";
-    }
+    bool lastNewLine = outstr.back() == '\n';
+    std::ostream *outStream =
+      this->type == Logger::STDOUT ? &std::cout : &std::cerr;
+
+    if (lastNewLine)
+      outstr.pop_back();
+
+    (*outStream) << "\033[1;" << this->color << "m" << outstr << "\033[0m";
+
+    if (lastNewLine)
+      (*outStream) << std::endl;
   }
 
   this->str("");
