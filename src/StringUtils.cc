@@ -14,7 +14,9 @@
  * limitations under the License.
  *
  */
+
 #include "ignition/common/StringUtils.hh"
+#include <cmath>
 
 namespace ignition
 {
