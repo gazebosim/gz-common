@@ -74,7 +74,7 @@ TEST(Console_TEST, NoInitAndLog)
 TEST(Console_TEST, InitAndLog)
 {
   // Create a unique directory path
-  std::string path = ignition::common::uuid();
+  std::string path = IGN_TMP_DIR + ignition::common::uuid();
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -103,7 +103,7 @@ TEST(Console_TEST, InitAndLog)
 TEST(Console_TEST, LogSlashN)
 {
   // Create a unique directory path
-  std::string path = ignition::common::uuid();
+  std::string path = IGN_TMP_DIR + ignition::common::uuid();
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -133,7 +133,7 @@ TEST(Console_TEST, LogSlashN)
 TEST(Console_TEST, LogStdEndl)
 {
   // Create a unique directory path
-  std::string path = ignition::common::uuid();
+  std::string path = IGN_TMP_DIR + ignition::common::uuid();
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -163,7 +163,7 @@ TEST(Console_TEST, LogStdEndl)
 TEST(Console_TEST, ColorWarnSlashN)
 {
   // Create a unique directory path
-  std::string path = ignition::common::uuid();
+  std::string path = IGN_TMP_DIR + ignition::common::uuid();
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -193,7 +193,7 @@ TEST(Console_TEST, ColorWarnSlashN)
 TEST(Console_TEST, ColorWarnStdEndl)
 {
   // Create a unique directory path
-  std::string path = ignition::common::uuid();
+  std::string path = IGN_TMP_DIR + ignition::common::uuid();
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -223,7 +223,7 @@ TEST(Console_TEST, ColorWarnStdEndl)
 TEST(Console_TEST, ColorDbgSlashN)
 {
   // Create a unique directory path
-  std::string path = ignition::common::uuid();
+  std::string path = IGN_TMP_DIR + ignition::common::uuid();
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -253,7 +253,7 @@ TEST(Console_TEST, ColorDbgSlashN)
 TEST(Console_TEST, ColorDbgStdEndl)
 {
   // Create a unique directory path
-  std::string path = ignition::common::uuid();
+  std::string path = IGN_TMP_DIR + ignition::common::uuid();
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -283,7 +283,7 @@ TEST(Console_TEST, ColorDbgStdEndl)
 TEST(Console_TEST, ColorMsgSlashN)
 {
   // Create a unique directory path
-  std::string path = ignition::common::uuid();
+  std::string path = IGN_TMP_DIR + ignition::common::uuid();
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -313,7 +313,7 @@ TEST(Console_TEST, ColorMsgSlashN)
 TEST(Console_TEST, ColorMsgStdEndl)
 {
   // Create a unique directory path
-  std::string path = ignition::common::uuid();
+  std::string path = IGN_TMP_DIR + ignition::common::uuid();
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -343,7 +343,7 @@ TEST(Console_TEST, ColorMsgStdEndl)
 TEST(Console_TEST, ColorErrSlashN)
 {
   // Create a unique directory path
-  std::string path = ignition::common::uuid();
+  std::string path = IGN_TMP_DIR + ignition::common::uuid();
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -373,7 +373,7 @@ TEST(Console_TEST, ColorErrSlashN)
 TEST(Console_TEST, ColorErrStdEndl)
 {
   // Create a unique directory path
-  std::string path = ignition::common::uuid();
+  std::string path = IGN_TMP_DIR + ignition::common::uuid();
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -403,7 +403,7 @@ TEST(Console_TEST, ColorErrStdEndl)
 TEST(Console_TEST, ColorMsg)
 {
   // Create a unique directory path
-  std::string path = ignition::common::uuid();
+  std::string path = IGN_TMP_DIR + ignition::common::uuid();
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -425,7 +425,7 @@ TEST(Console_TEST, ColorMsg)
 TEST(Console_TEST, ColorErr)
 {
   // Create a unique directory path
-  std::string path = ignition::common::uuid();
+  std::string path = IGN_TMP_DIR + ignition::common::uuid();
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -463,7 +463,7 @@ TEST(Console_TEST, Prefix)
   ignition::common::Console::SetVerbosity(4);
 
   // Path to log file
-  std::string path = ignition::common::uuid();
+  std::string path = IGN_TMP_DIR + ignition::common::uuid();
   ignLogInit(path, "test.log");
   std::string logPath = path + "/test.log";
 
@@ -499,7 +499,7 @@ TEST(Console_TEST, Prefix)
 TEST(Console_TEST, LogDirectory)
 {
   // Create a unique directory path
-  std::string path = ignition::common::uuid();
+  std::string path = IGN_TMP_DIR + ignition::common::uuid();
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -512,6 +512,16 @@ TEST(Console_TEST, LogDirectory)
   absPath = absPath + "/" + path;
 
   EXPECT_EQ(logDir, absPath);
+}
+
+/////////////////////////////////////////////////
+/// \brief Clear out all the directories we produced during this test.
+/// This isn't a test so much as a courtesy to users and developers.
+TEST(Console_TEST, ConsoleTestRemoval)
+{
+  std::string absPath;
+  ignition::common::env(IGN_HOMEDIR, absPath);
+  EXPECT_TRUE(ignition::common::removeAll(absPath + "/" + IGN_TMP_DIR));
 }
 
 /////////////////////////////////////////////////

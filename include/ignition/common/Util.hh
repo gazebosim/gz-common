@@ -34,6 +34,8 @@
 # define IGN_HOMEDIR "HOME"
 #endif
 
+#define IGN_TMP_DIR "tmp-ign/"
+
 /// \brief Seconds in one nano second.
 #define IGN_NANO_TO_SEC 0.0000000001
 

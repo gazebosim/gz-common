@@ -39,12 +39,6 @@ namespace ignition
         std::string logPath;
         ASSERT_TRUE(ignition::common::env(IGN_HOMEDIR, logPath));
 
-        // We need to create the log directory if needed.
-        logPath = logPath + "/.ignition/test_logs";
-
-        if (!ignition::common::exists(logPath))
-          ignition::common::createDirectories(logPath);
-
         const ::testing::TestInfo *const testInfo =
           ::testing::UnitTest::GetInstance()->current_test_info();
 
@@ -53,7 +47,7 @@ namespace ignition
         this->logFilename = testCaseName + "_" + testName + ".log";
 
         // Initialize Console
-        ignLogInit("test_logs", this->logFilename);
+        ignLogInit(IGN_TMP_DIR + std::string("test_logs"), this->logFilename);
         ignition::common::Console::SetVerbosity(4);
 
         // Read the full path to the log directory.
@@ -90,6 +84,13 @@ namespace ignition
         }
 #endif
         return loggedString;
+      }
+
+      public: virtual ~AutoLogFixture()
+      {
+        std::string absPath;
+        ignition::common::env(IGN_HOMEDIR, absPath);
+        ignition::common::removeAll(absPath + "/" + IGN_TMP_DIR);
       }
 
       /// \brief String with the full path of the logfile
