@@ -61,11 +61,11 @@ TEST(PluginLoader, LoadExistingLibrary)
 
   ignition::common::PluginPtr firstPlugin =
       pl.Instantiate("test::util::DummySinglePlugin");
-  EXPECT_TRUE(!firstPlugin.IsEmpty());
+  EXPECT_FALSE(firstPlugin.IsEmpty());
 
   ignition::common::PluginPtr secondPlugin =
       pl.Instantiate("test::util::DummyMultiPlugin");
-  EXPECT_TRUE(!secondPlugin.IsEmpty());
+  EXPECT_FALSE(secondPlugin.IsEmpty());
 
   // Check that the DummyNameBase interface exists and that it returns the
   // correct value.
@@ -122,7 +122,7 @@ TEST(SpecializedPluginPtr, Construction)
 
   SomeSpecializedPluginPtr plugin(
         pl.Instantiate("::test::util::DummyMultiPlugin"));
-  EXPECT_TRUE(!plugin.IsEmpty());
+  EXPECT_FALSE(plugin.IsEmpty());
 
   // Make sure the specialized interface is available, that it is accessed using
   // the specialized access, and that it returns the expected value.
@@ -237,7 +237,7 @@ using AnotherSpecializedPluginPtr =
 TEST(PluginPtr, CopyMoveSemantics)
 {
   ignition::common::PluginPtr plugin;
-  EXPECT_FALSE(!plugin.IsEmpty());
+  EXPECT_TRUE(plugin.IsEmpty());
 
   std::string projectPath(PROJECT_BINARY_PATH);
 
@@ -250,11 +250,11 @@ TEST(PluginPtr, CopyMoveSemantics)
   pl.LoadLibrary(path);
 
   plugin = pl.Instantiate("test::util::DummySinglePlugin");
-  EXPECT_TRUE(!plugin.IsEmpty());
+  EXPECT_FALSE(plugin.IsEmpty());
 
   ignition::common::PluginPtr otherPlugin =
       pl.Instantiate("test::util::DummySinglePlugin");
-  EXPECT_TRUE(!otherPlugin.IsEmpty());
+  EXPECT_FALSE(otherPlugin.IsEmpty());
 
   EXPECT_TRUE(plugin != otherPlugin);
   EXPECT_FALSE(plugin == otherPlugin);
