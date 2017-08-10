@@ -15,8 +15,8 @@
  *
  */
 
-#include "ignition/common/StringUtils.hh"
 #include <cmath>
+#include "ignition/common/StringUtils.hh"
 
 namespace ignition
 {

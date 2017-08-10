@@ -94,7 +94,7 @@
   #define DETAIL_IGN_COMMON_FINISH_WARNING_SUPPRESSION(warning_token)
 
 
-#endif // Checking compiler type
+#endif
 
 
 #define DETAIL_IGN_COMMON_BEGIN_WARNING_SUPPRESSION(warning_token) \
