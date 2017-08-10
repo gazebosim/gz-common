@@ -120,7 +120,8 @@ TEST(SpecializedPluginPtr, Construction)
   ignition::common::PluginLoader pl;
   pl.LoadLibrary(path);
 
-  SomeSpecializedPluginPtr plugin(pl.Instantiate("::test::util::DummyMultiPlugin"));
+  SomeSpecializedPluginPtr plugin(
+        pl.Instantiate("::test::util::DummyMultiPlugin"));
   EXPECT_TRUE(!plugin.IsEmpty());
 
   // Make sure the specialized interface is available, that it is accessed using

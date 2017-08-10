@@ -45,15 +45,15 @@
 ///
 /// The warning_token should indicate whichever type of warning you want to
 /// suppress. The available tokens are listed at the bottom of this file.
-#define IGN_COMMON_BEGIN_WARNING_SUPPRESSION( warning_token ) \
-  DETAIL_IGN_COMMON_BEGIN_WARNING_SUPPRESSION( warning_token )
+#define IGN_COMMON_BEGIN_WARNING_SUPPRESSION(warning_token) \
+  DETAIL_IGN_COMMON_BEGIN_WARNING_SUPPRESSION(warning_token)
 
 
 /// \brief Use this macro to finish suppressing a specific type of warning
 /// within a specific block of code. This macro must be preceded by a call to
 /// IGN_COMMON_BEGIN_WARNING_SUPPRESSION(~).
-#define IGN_COMMON_FINISH_WARNING_SUPPRESSION( warning_token ) \
-  DETAIL_IGN_COMMON_FINISH_WARNING_SUPPRESSION( warning_token )
+#define IGN_COMMON_FINISH_WARNING_SUPPRESSION(warning_token) \
+  DETAIL_IGN_COMMON_FINISH_WARNING_SUPPRESSION(warning_token)
 
 
 // ---- List of available tokens ----
@@ -70,4 +70,4 @@
 // TODO: Add more warning tokens as they become relevant. Do not add tokens to
 // suppress unless it is necessary.
 
-#endif // IGNITION_COMMON_SUPPRESSWARNING_HH_
+#endif

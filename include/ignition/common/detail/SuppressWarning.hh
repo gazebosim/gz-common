@@ -39,7 +39,7 @@
     _Pragma(DETAIL_IGN_COMMON_WARN_SUP_HELPER_2(w))
 
 
-  #define DETAIL_IGN_COMMON_FINISH_WARNING_SUPPRESSION( warning_token ) \
+  #define DETAIL_IGN_COMMON_FINISH_WARNING_SUPPRESSION(warning_token) \
     _Pragma("GCC diagnostic pop")
 
 
@@ -58,7 +58,7 @@
     _Pragma(DETAIL_IGN_COMMON_WARN_SUP_HELPER_2(w))
 
 
-  #define DETAIL_IGN_COMMON_FINISH_WARNING_SUPPRESSION( warning_token ) \
+  #define DETAIL_IGN_COMMON_FINISH_WARNING_SUPPRESSION(warning_token) \
     _Pragma("clang diagnostic pop")
 
 
@@ -77,7 +77,7 @@
     _Pragma(DETAIL_IGN_COMMON_WARN_SUP_HELPER(w))
 
 
-  #define DETAIL_IGN_COMMON_FINISH_WARNING_SUPPRESSION( warning_token ) \
+  #define DETAIL_IGN_COMMON_FINISH_WARNING_SUPPRESSION(warning_token) \
     _Pragma("warning(pop)")
 
 
@@ -91,13 +91,13 @@
   #define DETAIL_IGN_COMMON_WARN_SUP_HELPER(w)
 
 
-  #define DETAIL_IGN_COMMON_FINISH_WARNING_SUPPRESSION( warning_token )
+  #define DETAIL_IGN_COMMON_FINISH_WARNING_SUPPRESSION(warning_token)
 
 
 #endif // Checking compiler type
 
 
-#define DETAIL_IGN_COMMON_BEGIN_WARNING_SUPPRESSION( warning_token ) \
+#define DETAIL_IGN_COMMON_BEGIN_WARNING_SUPPRESSION(warning_token) \
   DETAIL_IGN_COMMON_BEGIN_WARN_SUP_PUSH \
   DETAIL_IGN_COMMON_WARN_SUP_HELPER(warning_token)
 
@@ -123,4 +123,4 @@
 #endif
 
 
-#endif // IGNITION_COMMON_DETAIL_SUPPRESSWARNING_HH_
+#endif
