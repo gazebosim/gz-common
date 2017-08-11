@@ -51,10 +51,14 @@
   extern "C" DETAIL_IGN_PLUGIN_VISIBLE const \
   std::size_t IGNCOMMONSinglePluginInfoSize = \
     sizeof(ignition::common::PluginInfo); \
+  extern "C" DETAIL_IGN_PLUGIN_VISIBLE const \
+  std::size_t IGNCOMMONPluginInfoAlignment = \
+    alignof(ignition::common::PluginInfo); \
   \
   extern "C" DETAIL_IGN_PLUGIN_VISIBLE const \
   int IGNCOMMONPluginAPIVersion = \
-    ignition::common::PLUGIN_API_VERSION;
+    ignition::common::PLUGIN_API_VERSION; \
+
 
 
 #define DETAIL_IGN_COMMON_BEGIN_ADDING_PLUGINS \
