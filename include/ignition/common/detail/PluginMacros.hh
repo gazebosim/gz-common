@@ -49,7 +49,7 @@
 /// \brief Register the PluginInfo meta data
 #define DETAIL_IGN_COMMON_REGISTER_PLUGININFO_META_DATA\
   extern "C" DETAIL_IGN_PLUGIN_VISIBLE const \
-  std::size_t IGNCOMMONSinglePluginInfoSize = \
+  std::size_t IGNCOMMONPluginInfoSize = \
     sizeof(ignition::common::PluginInfo); \
   extern "C" DETAIL_IGN_PLUGIN_VISIBLE const \
   std::size_t IGNCOMMONPluginInfoAlignment = \
