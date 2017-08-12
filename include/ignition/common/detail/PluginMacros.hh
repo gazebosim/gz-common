@@ -44,7 +44,7 @@
 #define DETAIL_IGN_COMMON_SPECIALIZE_INTERFACE(interfaceName)\
   static_assert(std::is_same<interfaceName, ::interfaceName>::value, \
       #interfaceName " must be fully qualified like ::ns::MyClass");\
-  static constexpr const char* InterfaceName = #interfaceName;
+  static constexpr const char* IGNCOMMONInterfaceName = #interfaceName;
 
 /// \brief Register the PluginInfo meta data
 #define DETAIL_IGN_COMMON_REGISTER_PLUGININFO_META_DATA\

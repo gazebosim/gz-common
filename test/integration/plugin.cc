@@ -99,7 +99,7 @@ TEST(PluginLoader, LoadExistingLibrary)
 
 class SomeInterface
 {
-  public: static constexpr const char* InterfaceName = "SomeInterface";
+  public: IGN_COMMON_SPECIALIZE_INTERFACE(SomeInterface);
 };
 
 using SomeSpecializedPluginPtr =
