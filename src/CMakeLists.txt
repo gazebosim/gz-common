@@ -84,6 +84,7 @@ set (gtest_sources
   SubMesh_TEST.cc
   SVGLoader_TEST.cc
   SystemPaths_TEST.cc
+  TemplateHelpers_TEST.cc
   Time_TEST.cc
   URI_TEST.cc
   Util_TEST.cc
