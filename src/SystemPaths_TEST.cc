@@ -46,6 +46,7 @@ class SystemPathsFixture : public ::testing::Test
   public: std::string backupPluginPath;
 };
 
+/////////////////////////////////////////////////
 TEST_F(SystemPathsFixture, SystemPaths)
 {
   common::SystemPaths paths;
@@ -131,10 +132,55 @@ TEST_F(SystemPathsFixture, findFile)
   fout << "asdf";
   fout.close();
 
+  // LocateLocalFile
   common::SystemPaths sp;
   EXPECT_EQ(file1, sp.LocateLocalFile("test_f1", {dir1, dir2}));
   EXPECT_EQ(file2, sp.LocateLocalFile("test_f2", {dir1, dir2}));
   EXPECT_EQ(std::string(), sp.LocateLocalFile("test_f3", {dir1, dir2}));
+
+  // FindFile
+  EXPECT_EQ(std::string(), sp.FindFile("no_such_file"));
+}
+
+//////////////////////////////////////////////////
+TEST_F(SystemPathsFixture, NormalizeDirectoryPath)
+{
+  EXPECT_EQ(ignition::common::SystemPaths::NormalizeDirectoryPath("a/b/c/"),
+                                                                  "a/b/c/");
+  EXPECT_EQ(ignition::common::SystemPaths::NormalizeDirectoryPath("a/b/c"),
+                                                                  "a/b/c/");
+  EXPECT_EQ(ignition::common::SystemPaths::NormalizeDirectoryPath("/a/b/c/"),
+                                                                  "/a/b/c/");
+  EXPECT_EQ(ignition::common::SystemPaths::NormalizeDirectoryPath("/a/b/c"),
+                                                                  "/a/b/c/");
+  EXPECT_EQ(ignition::common::SystemPaths::NormalizeDirectoryPath("a\\b\\c"),
+                                                                  "a/b/c/");
+  EXPECT_EQ(ignition::common::SystemPaths::NormalizeDirectoryPath("a\\b\\c\\"),
+                                                                  "a/b/c/");
+}
+
+//////////////////////////////////////////////////
+TEST_F(SystemPathsFixture, PathsFromEnv)
+{
+  putenv(const_cast<char*>(
+    "IGN_PLUGIN_PATH=/tmp/plugin:/test/plugin/now/:/tmp/plugin"));
+
+  auto paths = ignition::common::SystemPaths::PathsFromEnv("IGN_PLUGIN_PATH");
+
+  EXPECT_EQ(paths.size(), 2u);
+
+  unsigned int count = 0;
+  for (auto const &path : paths)
+  {
+    if (count == 0)
+      EXPECT_EQ(path, "/tmp/plugin/");
+    if (count == 1)
+      EXPECT_EQ(path, "/test/plugin/now/");
+    if (count == 2)
+      FAIL();
+
+    ++count;
+  }
 }
 
 /////////////////////////////////////////////////
