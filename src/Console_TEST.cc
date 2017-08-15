@@ -18,7 +18,6 @@
 #include <gtest/gtest.h>
 #include <stdlib.h>
 
-#include "test/util.hh"
 #include "ignition/common/Time.hh"
 #include "ignition/common/Console.hh"
 #include "ignition/common/Util.hh"
@@ -29,6 +28,7 @@
 const int g_messageRepeat = 4;
 
 class Console_TEST : public ::testing::Test {
+  /// \brief Clear out all the directories we produced during this test.
   public: virtual ~Console_TEST()
   {
     std::string absPath;
