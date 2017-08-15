@@ -22,6 +22,8 @@
 #include <ignition/common/Console.hh>
 #include <ignition/common/Util.hh>
 
+#define IGN_TMP_DIR "tmp-ign/"
+
 namespace ignition
 {
   namespace testing

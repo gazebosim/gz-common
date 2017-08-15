@@ -22,6 +22,8 @@
 #include "ignition/common/Console.hh"
 #include "ignition/common/Util.hh"
 
+#include "test/util.hh"
+
 #ifndef _WIN32
 const int g_messageRepeat = 4;
 
