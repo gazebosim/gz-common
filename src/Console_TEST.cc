@@ -18,6 +18,7 @@
 #include <gtest/gtest.h>
 #include <stdlib.h>
 
+#include "test/util.hh"
 #include "ignition/common/Time.hh"
 #include "ignition/common/Console.hh"
 #include "ignition/common/Util.hh"
@@ -25,7 +26,17 @@
 #ifndef _WIN32
 const int g_messageRepeat = 4;
 
-class Console_TEST {};
+class Console_TEST : public ::testing::Test {
+  public: virtual ~Console_TEST()
+  {
+    std::string absPath;
+    ignition::common::env(IGN_HOMEDIR, absPath);
+    absPath += "/" + std::string(IGN_TMP_DIR);
+
+    if (ignition::common::isDirectory(absPath))
+      EXPECT_TRUE(ignition::common::removeAll(absPath));
+  }
+};
 
 std::string GetLogContent(const std::string &_filename)
 {
@@ -50,7 +61,7 @@ std::string GetLogContent(const std::string &_filename)
 
 /////////////////////////////////////////////////
 /// \brief Test Console::Init and Console::Log
-TEST(Console_TEST, NoInitAndLog)
+TEST_F(Console_TEST, NoInitAndLog)
 {
   // Log the string
   std::string logString = "this is a test";
@@ -71,7 +82,7 @@ TEST(Console_TEST, NoInitAndLog)
 
 /////////////////////////////////////////////////
 /// \brief Test Console::Init and Console::Log
-TEST(Console_TEST, InitAndLog)
+TEST_F(Console_TEST, InitAndLog)
 {
   // Create a unique directory path
   std::string path = IGN_TMP_DIR + ignition::common::uuid();
@@ -100,7 +111,7 @@ TEST(Console_TEST, InitAndLog)
 
 //////////////////////////////////////////////////
 /// \brief Test Console::Log with \n characters
-TEST(Console_TEST, LogSlashN)
+TEST_F(Console_TEST, LogSlashN)
 {
   // Create a unique directory path
   std::string path = IGN_TMP_DIR + ignition::common::uuid();
@@ -130,7 +141,7 @@ TEST(Console_TEST, LogSlashN)
 
 //////////////////////////////////////////////////
 /// \brief Test Console::Log with std::endl
-TEST(Console_TEST, LogStdEndl)
+TEST_F(Console_TEST, LogStdEndl)
 {
   // Create a unique directory path
   std::string path = IGN_TMP_DIR + ignition::common::uuid();
@@ -160,7 +171,7 @@ TEST(Console_TEST, LogStdEndl)
 
 //////////////////////////////////////////////////
 /// \brief Test Console::ColorWarn with \n characters
-TEST(Console_TEST, ColorWarnSlashN)
+TEST_F(Console_TEST, ColorWarnSlashN)
 {
   // Create a unique directory path
   std::string path = IGN_TMP_DIR + ignition::common::uuid();
@@ -190,7 +201,7 @@ TEST(Console_TEST, ColorWarnSlashN)
 
 //////////////////////////////////////////////////
 /// \brief Test Console::ColorWarn with std::endl
-TEST(Console_TEST, ColorWarnStdEndl)
+TEST_F(Console_TEST, ColorWarnStdEndl)
 {
   // Create a unique directory path
   std::string path = IGN_TMP_DIR + ignition::common::uuid();
@@ -220,7 +231,7 @@ TEST(Console_TEST, ColorWarnStdEndl)
 
 //////////////////////////////////////////////////
 /// \brief Test Console::ColorDbg with \n characters
-TEST(Console_TEST, ColorDbgSlashN)
+TEST_F(Console_TEST, ColorDbgSlashN)
 {
   // Create a unique directory path
   std::string path = IGN_TMP_DIR + ignition::common::uuid();
@@ -250,7 +261,7 @@ TEST(Console_TEST, ColorDbgSlashN)
 
 //////////////////////////////////////////////////
 /// \brief Test Console::ColorDbg with std::endl
-TEST(Console_TEST, ColorDbgStdEndl)
+TEST_F(Console_TEST, ColorDbgStdEndl)
 {
   // Create a unique directory path
   std::string path = IGN_TMP_DIR + ignition::common::uuid();
@@ -280,7 +291,7 @@ TEST(Console_TEST, ColorDbgStdEndl)
 
 //////////////////////////////////////////////////
 /// \brief Test Console::ColorMsg with \n characters
-TEST(Console_TEST, ColorMsgSlashN)
+TEST_F(Console_TEST, ColorMsgSlashN)
 {
   // Create a unique directory path
   std::string path = IGN_TMP_DIR + ignition::common::uuid();
@@ -310,7 +321,7 @@ TEST(Console_TEST, ColorMsgSlashN)
 
 //////////////////////////////////////////////////
 /// \brief Test Console::ColorMsg with std::endl
-TEST(Console_TEST, ColorMsgStdEndl)
+TEST_F(Console_TEST, ColorMsgStdEndl)
 {
   // Create a unique directory path
   std::string path = IGN_TMP_DIR + ignition::common::uuid();
@@ -340,7 +351,7 @@ TEST(Console_TEST, ColorMsgStdEndl)
 
 //////////////////////////////////////////////////
 /// \brief Test Console::ColorErr with \n characters
-TEST(Console_TEST, ColorErrSlashN)
+TEST_F(Console_TEST, ColorErrSlashN)
 {
   // Create a unique directory path
   std::string path = IGN_TMP_DIR + ignition::common::uuid();
@@ -370,7 +381,7 @@ TEST(Console_TEST, ColorErrSlashN)
 
 //////////////////////////////////////////////////
 /// \brief Test Console::ColorErr with std::endl
-TEST(Console_TEST, ColorErrStdEndl)
+TEST_F(Console_TEST, ColorErrStdEndl)
 {
   // Create a unique directory path
   std::string path = IGN_TMP_DIR + ignition::common::uuid();
@@ -400,7 +411,7 @@ TEST(Console_TEST, ColorErrStdEndl)
 
 /////////////////////////////////////////////////
 /// \brief Test Console::ColorMsg
-TEST(Console_TEST, ColorMsg)
+TEST_F(Console_TEST, ColorMsg)
 {
   // Create a unique directory path
   std::string path = IGN_TMP_DIR + ignition::common::uuid();
@@ -422,7 +433,7 @@ TEST(Console_TEST, ColorMsg)
 
 /////////////////////////////////////////////////
 /// \brief Test Console::ColorErr
-TEST(Console_TEST, ColorErr)
+TEST_F(Console_TEST, ColorErr)
 {
   // Create a unique directory path
   std::string path = IGN_TMP_DIR + ignition::common::uuid();
@@ -444,7 +455,7 @@ TEST(Console_TEST, ColorErr)
 
 /////////////////////////////////////////////////
 /// \brief Test Console::Verbosity
-TEST(Console_TEST, Verbosity)
+TEST_F(Console_TEST, Verbosity)
 {
   EXPECT_EQ(ignition::common::Console::Verbosity(), 1);
 
@@ -457,7 +468,7 @@ TEST(Console_TEST, Verbosity)
 
 /////////////////////////////////////////////////
 /// \brief Test Console::Prefix
-TEST(Console_TEST, Prefix)
+TEST_F(Console_TEST, Prefix)
 {
   // Max verbosity
   ignition::common::Console::SetVerbosity(4);
@@ -496,7 +507,7 @@ TEST(Console_TEST, Prefix)
 
 /////////////////////////////////////////////////
 /// \brief Test Console::LogDirectory
-TEST(Console_TEST, LogDirectory)
+TEST_F(Console_TEST, LogDirectory)
 {
   // Create a unique directory path
   std::string path = IGN_TMP_DIR + ignition::common::uuid();
@@ -512,16 +523,6 @@ TEST(Console_TEST, LogDirectory)
   absPath = absPath + "/" + path;
 
   EXPECT_EQ(logDir, absPath);
-}
-
-/////////////////////////////////////////////////
-/// \brief Clear out all the directories we produced during this test.
-/// This isn't a test so much as a courtesy to users and developers.
-TEST(Console_TEST, ConsoleTestRemoval)
-{
-  std::string absPath;
-  ignition::common::env(IGN_HOMEDIR, absPath);
-  EXPECT_TRUE(ignition::common::removeAll(absPath + "/" + IGN_TMP_DIR));
 }
 
 /////////////////////////////////////////////////
