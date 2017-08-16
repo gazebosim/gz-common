@@ -19,6 +19,7 @@
 #include <list>
 #include <utility>
 #include <cmath>
+#include <cctype>
 
 #include "tinyxml2.h"
 

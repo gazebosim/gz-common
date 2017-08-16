@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <fstream>
 #include <sstream>
+#include <cctype>
 
 #ifndef _WIN32
 #include <dirent.h>

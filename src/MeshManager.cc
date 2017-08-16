@@ -18,6 +18,7 @@
 #include <sys/stat.h>
 #include <string>
 #include <map>
+#include <cctype>
 
 #ifndef _WIN32
   #include "ignition/common/GTSMeshUtils.hh"
