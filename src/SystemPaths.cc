@@ -21,6 +21,7 @@
 #include <fstream>
 #include <sstream>
 #include <cctype>
+#include <locale>
 
 #ifndef _WIN32
 #include <dirent.h>
