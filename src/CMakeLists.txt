@@ -109,7 +109,7 @@ target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
   ${IGNITION-MATH_LIBRARIES}
   ${tinyxml2_LIBRARIES}
   ${uuid_LIBRARIES}
-  )
+  ${CMAKE_DL_LIBS})
 
 if(NOT WIN32)
   target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
