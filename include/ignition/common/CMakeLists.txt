@@ -53,6 +53,9 @@ set (headers
   Uuid.hh
   WorkerPool.hh
 
+)
+
+set (detail_headers
   detail/Plugin.hh
   detail/PluginLoader.hh
   detail/PluginMacros.hh
@@ -87,3 +90,4 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/ign_auto_headers.hh.in
 
 ign_install_includes("${INCLUDE_INSTALL_DIR_POSTFIX}/ignition" ${CMAKE_CURRENT_BINARY_DIR}/${IGN_PROJECT_NAME}.hh)
 ign_install_includes("${INCLUDE_INSTALL_DIR_POSTFIX}/ignition/${IGN_PROJECT_NAME}" ${headers})
+ign_install_includes("${INCLUDE_INSTALL_DIR_POSTFIX}/ignition/${IGN_PROJECT_NAME}/detail" ${detail_headers})
