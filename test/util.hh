@@ -49,7 +49,10 @@ namespace ignition
         this->logFilename = testCaseName + "_" + testName + ".log";
 
         // Initialize Console
-        ignLogInit(IGN_TMP_DIR + std::string("test_logs"), this->logFilename);
+        ignLogInit(ignition::common::joinPaths(
+                     IGN_TMP_DIR, std::string("test_logs")),
+                   this->logFilename);
+
         ignition::common::Console::SetVerbosity(4);
 
         // Read the full path to the log directory.
@@ -92,7 +95,8 @@ namespace ignition
       {
         std::string absPath;
         ignition::common::env(IGN_HOMEDIR, absPath);
-        ignition::common::removeAll(absPath + "/" + IGN_TMP_DIR);
+        ignition::common::removeAll(
+              ignition::common::joinPaths(absPath, IGN_TMP_DIR));
       }
 
       /// \brief String with the full path of the logfile
