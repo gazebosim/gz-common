@@ -109,7 +109,7 @@ target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
   ${IGNITION-MATH_LIBRARIES}
   ${tinyxml2_LIBRARIES}
   ${uuid_LIBRARIES}
-  ${CMAKE_DL_LIBS})
+  ${libdl_library})
 
 if(NOT WIN32)
   target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
@@ -152,6 +152,8 @@ endif()
 target_include_directories(${PROJECT_LIBRARY_TARGET_NAME}
   PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR_FULL}>)
+
+target_include_directories(${PROJECT_LIBRARY_TARGET_NAME} PRIVATE ${libdl_include_dir})
 
 ign_install_library(${PROJECT_LIBRARY_TARGET_NAME} ${PROJECT_EXPORT_NAME})
 
