@@ -1515,6 +1515,7 @@ MaterialPtr ColladaLoaderPrivate::LoadMaterial(const std::string &_name)
       this->LoadColorOrTexture(lambertXml, "ambient", mat);
       this->LoadColorOrTexture(lambertXml, "emission", mat);
       this->LoadColorOrTexture(lambertXml, "diffuse", mat);
+      // order matters: transparency needs to be loaded before transparent
       if (lambertXml->FirstChildElement("transparency"))
       {
         mat->SetTransparency(
@@ -1527,6 +1528,11 @@ MaterialPtr ColladaLoaderPrivate::LoadMaterial(const std::string &_name)
             lambertXml->FirstChildElement("transparent");
         this->LoadTransparent(transXml, mat);
       }
+      else
+      {
+        // no <transparent> tag, revert to zero transparency
+        mat->SetTransparency(0.0);
+      }
     }
     else if (phongXml)
     {
@@ -1538,6 +1544,7 @@ MaterialPtr ColladaLoaderPrivate::LoadMaterial(const std::string &_name)
         mat->SetShininess(
             this->LoadFloat(phongXml->FirstChildElement("shininess")));
 
+      // order matters: transparency needs to be loaded before transparent
       if (phongXml->FirstChildElement("transparency"))
         mat->SetTransparency(
             this->LoadFloat(phongXml->FirstChildElement("transparency")));
@@ -1546,6 +1553,11 @@ MaterialPtr ColladaLoaderPrivate::LoadMaterial(const std::string &_name)
         tinyxml2::XMLElement *transXml =
             phongXml->FirstChildElement("transparent");
         this->LoadTransparent(transXml, mat);
+      }
+      else
+      {
+        // no <transparent> tag, revert to zero transparency
+        mat->SetTransparency(0.0);
       }
     }
     else if (blinnXml)
@@ -1561,11 +1573,18 @@ MaterialPtr ColladaLoaderPrivate::LoadMaterial(const std::string &_name)
       if (blinnXml->FirstChildElement("transparency"))
         mat->SetTransparency(
             this->LoadFloat(blinnXml->FirstChildElement("transparency")));
+
+      // order matters: transparency needs to be loaded before transparent
       if (blinnXml->FirstChildElement("transparent"))
       {
         tinyxml2::XMLElement *transXml =
             blinnXml->FirstChildElement("transparent");
         this->LoadTransparent(transXml, mat);
+      }
+      else
+      {
+        // no <transparent> tag, revert to zero transparency
+        mat->SetTransparency(0.0);
       }
     }
   }
@@ -2295,7 +2314,8 @@ void ColladaLoaderPrivate::LoadTransparent(tinyxml2::XMLElement *_elem,
   const char *opaqueCStr = _elem->Attribute("opaque");
   if (!opaqueCStr)
   {
-    // ignerr << "No Opaque set\n";
+    // no opaque mode, revert transparency to 0.0
+    _mat->SetTransparency(0.0);
     return;
   }
 
@@ -2318,19 +2338,62 @@ void ColladaLoaderPrivate::LoadTransparent(tinyxml2::XMLElement *_elem,
     std::istringstream stream(colorStr);
     stream >> color;
 
+    // src is the texel value and dst is the existing pixel value
     double srcFactor = 0;
     double dstFactor = 0;
 
+    // Calculate alpha based on opaque mode.
+    // Equations are extracted from collada spec
+    // Make sure to update the final transparency value
+    // final mat transparency = 1 - srcFactor = dstFactor
     if (opaqueStr == "RGB_ZERO")
     {
-      // FIXME: should all channels be modulated independently?
-      srcFactor = color.R() * _mat->Transparency();
-      dstFactor = 1.0 - color.R() * _mat->Transparency();
+      // Lunimance based on ISO/CIE color standards ITU-R BT.709-4
+      float luminance = 0.212671 * color.R() +
+                        0.715160 * color.G() +
+                        0.072169 * color.B();
+      // result.a = fb.a * (luminance(transparent.rgb) * transparency) + mat.a *
+      // (1.0f - luminance(transparent.rgb) * transparency)
+      // where fb corresponds to the framebuffer (existing pixel) and
+      // mat corresponds to material before transparency (texel)
+      dstFactor = luminance * _mat->Transparency();
+      srcFactor = 1.0 - luminance * _mat->Transparency();
+      _mat->SetTransparency(dstFactor);
+    }
+    else if (opaqueStr == "RGB_ONE")
+    {
+      // Lunimance based on ISO/CIE color standards ITU-R BT.709-4
+      float luminance = 0.212671 * color.R() +
+                        0.715160 * color.G() +
+                        0.072169 * color.B();
+
+      // result.a = fb.a * (1.0f - luminance(transparent.rgb) * transparency) +
+      // mat.a * (luminance(transparent.rgb) * transparency)
+      // where fb corresponds to the framebuffer (existing pixel) and
+      // mat corresponds to material before transparency (texel)
+      dstFactor = 1.0 - luminance * _mat->Transparency();
+      srcFactor = luminance * _mat->Transparency();
+      _mat->SetTransparency(dstFactor);
     }
     else if (opaqueStr == "A_ONE")
     {
-      srcFactor = 1.0 - color.A() * _mat->Transparency();
+      // result.a = fb.a * (1.0f - transparent.a * transparency) + mat.a *
+      // (transparent.a * transparency)
+      // where fb corresponds to the framebuffer (existing pixel) and
+      // mat corresponds to material before transparency (texel)
+      dstFactor = 1.0 - color.A() * _mat->Transparency();
+      srcFactor = color.A() * _mat->Transparency();
+      _mat->SetTransparency(dstFactor);
+    }
+    else if (opaqueStr == "A_ZERO")
+    {
+      // result.a = fb.a * (transparent.a * transparency) + mat.a *
+      // (1.0f - transparent.a * transparency)
+      // where fb corresponds to the framebuffer (existing pixel) and
+      // mat corresponds to material before transparency (texel)
       dstFactor = color.A() * _mat->Transparency();
+      srcFactor = 1.0 - color.A() * _mat->Transparency();
+      _mat->SetTransparency(dstFactor);
     }
 
     _mat->SetBlendFactors(srcFactor, dstFactor);
