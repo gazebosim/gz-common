@@ -50,7 +50,8 @@ namespace ignition
       /// \param[in] _start Starting enum value.
       /// \param[in] _end Ending enum value.
       /// \param[in] _names Name of each enum value.
-      public: EnumIface(T _start, T _end, std::vector<std::string> _names)
+      public: EnumIface(T _start, T _end,
+          const std::vector<std::string> &_names)
               : names(_names)
       {
         this->range[0] = _start;
