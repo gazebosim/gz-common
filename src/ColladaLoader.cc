@@ -2352,7 +2352,7 @@ void ColladaLoaderPrivate::LoadTransparent(tinyxml2::XMLElement *_elem,
       float luminance = 0.212671 * color.R() +
                         0.715160 * color.G() +
                         0.072169 * color.B();
-      // result.a = fb.a * (lumiance(transparent.rgb) * transparency) + mat.a *
+      // result.a = fb.a * (luminance(transparent.rgb) * transparency) + mat.a *
       // (1.0f - luminance(transparent.rgb) * transparency)
       // where fb corresponds to the framebuffer (existing pixel) and
       // mat corresponds to material before transparency (texel)
@@ -2367,7 +2367,7 @@ void ColladaLoaderPrivate::LoadTransparent(tinyxml2::XMLElement *_elem,
                         0.715160 * color.G() +
                         0.072169 * color.B();
 
-      // result.a = fb.a * (1.0f - lumiance(transparent.rgb) * transparency) +
+      // result.a = fb.a * (1.0f - luminance(transparent.rgb) * transparency) +
       // mat.a * (luminance(transparent.rgb) * transparency)
       // where fb corresponds to the framebuffer (existing pixel) and
       // mat corresponds to material before transparency (texel)
