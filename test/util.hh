@@ -19,8 +19,9 @@
 
 #include <gtest/gtest.h>
 #include <string>
-#include <ignition/common/Console.hh>
-#include <ignition/common/Util.hh>
+#include "ignition/common/Console.hh"
+#include "ignition/common/Filesystem.hh"
+#include "ignition/common/Util.hh"
 
 #define IGN_TMP_DIR "tmp-ign/"
 
@@ -91,6 +92,7 @@ namespace ignition
         return loggedString;
       }
 
+      /// \brief Default destructor.
       public: virtual ~AutoLogFixture()
       {
         std::string absPath;
