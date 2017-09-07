@@ -304,12 +304,6 @@ namespace ignition
                  this->sec += this->nsec / this->nsInSec;
                  this->nsec = this->nsec % this->nsInSec;
                }
-#ifdef _WIN32
-// Disable warning C4251 which is triggered by
-// std::unique_ptr
-#pragma warning(push)
-#pragma warning(disable: 4251)
-#endif
 
       /// \brief Constant multiplier to convert from nanoseconds to seconds.
       private: static const int32_t nsInSec;
@@ -319,9 +313,6 @@ namespace ignition
       private: static const int32_t nsInMs;
 
       private: static struct timespec clockResolution;
-#ifdef _WIN32
-#pragma warning(pop)
-#endif
     };
   }
 }
