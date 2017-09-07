@@ -145,10 +145,10 @@ TEST_F(SystemPathsFixture, findFile)
 
   // LocateLocalFile
   common::SystemPaths sp;
-  EXPECT_EQ(ignition::common::sanitizedPath(file1), 
+  EXPECT_EQ(ignition::common::sanitizedPath(file1),
             sp.LocateLocalFile("test_f1", {dir1, dir2}));
 
-  EXPECT_EQ(ignition::common::sanitizedPath(file2), 
+  EXPECT_EQ(ignition::common::sanitizedPath(file2),
             sp.LocateLocalFile("test_f2", {dir1, dir2}));
 
   EXPECT_EQ(std::string(), sp.LocateLocalFile("test_f3", {dir1, dir2}));
