@@ -18,12 +18,26 @@ if (NOT freeimage_FOUND)
   else (NOT freeimage_INCLUDE_DIRS)
     # Check the FreeImage header for the right version
     set (testFreeImageSource ${CMAKE_CURRENT_BINARY_DIR}/CMakeTmp/test_freeimage.cc)
+    set (freeimage_test_output "")
+    set (freeimage_compile_output "")
     file (WRITE ${testFreeImageSource} 
       "#include <FreeImage.h>\nint main () { if (FREEIMAGE_MAJOR_VERSION >= ${FREEIMAGE_MAJOR_VERSION} && FREEIMAGE_MINOR_VERSION >= ${FREEIMAGE_MINOR_VERSION}) return 1; else return 0;} \n")
-    try_run(FREEIMAGE_RUNS FREEIMAGE_COMPILES ${CMAKE_CURRENT_BINARY_DIR} 
-                ${testFreeImageSource})
+
+    try_run(FREEIMAGE_RUNS
+            FREEIMAGE_COMPILES
+            ${CMAKE_CURRENT_BINARY_DIR}
+            ${testFreeImageSource}
+            CMAKE_FLAGS -DINCLUDE_DIRECTORIES=${freeimage_INCLUDE_DIRS}
+            RUN_OUTPUT_VARIABLE freeimage_test_output
+            COMPILE_OUTPUT_VARIABLE freeimage_compile_output)
+
+    if (NOT FREEIMAGE_COMPILES)
+      BUILD_ERROR("FreeImage test failed to compile - This may indicate a build system bug")
+      return()
+    endif (NOT FREEIMAGE_COMPILES)
+
     if (NOT FREEIMAGE_RUNS)
-      BUILD_ERROR("Invalid FreeImage Version. Requires ${FREEIMAGE_VERSION}")
+      BUILD_ERROR("Invalid FreeImage Version. Requires ${FREEIMAGE_MAJOR_VERSION}.${FREEIMAGE_MINOR_VERSION}")
     else (NOT FREEIMAGE_RUNS)
        message (STATUS "  Looking for FreeImage.h - found")
     endif (NOT FREEIMAGE_RUNS)

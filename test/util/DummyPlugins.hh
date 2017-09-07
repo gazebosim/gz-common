@@ -29,13 +29,13 @@ namespace test
 namespace util
 {
 
-class IGNITION_COMMON_VISIBLE DummyPluginBase
+class DummyPluginBase
 {
   public: virtual std::string MyNameIs() = 0;
 };
 
 
-class DummyPlugin : DummyPluginBase
+class DummyPlugin : public DummyPluginBase
 {
   public: virtual std::string MyNameIs();
 };

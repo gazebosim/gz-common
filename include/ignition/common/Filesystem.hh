@@ -60,14 +60,32 @@ namespace ignition
     /// \return true on success
     bool IGNITION_COMMON_VISIBLE createDirectories(const std::string &_path);
 
-    // The below is C++ variadic template magic to allow an append
-    // method that takes 1-n number of arguments to append together.
-
     /// \brief Append the preferred path separator character for this platform
     ///        onto the passed-in string.
     /// \param[in] _s  The path to start with.
     /// \return The original path with the platform path separator appended.
     std::string IGNITION_COMMON_VISIBLE const separator(std::string const &_s);
+
+    /// \brief Replace forward-slashes '/' with the preferred directory separator 
+    /// of the current operating system. On Windows, this will turn forward-slashes
+    /// into backslashes. If forward-slash is the preferred separator of the
+    /// current operating system, this will do nothing.
+    ///
+    /// Note that this will NOT convert backslashes (or any other separator)
+    /// into forward slashes, even on operating systems that use forward-slashes
+    /// as separators.
+    void IGNITION_COMMON_VISIBLE accommodatePath(std::string &_path);
+
+    /// \brief Returns a copy of _path which has been passed through accommodatePath.
+    std::string IGNITION_COMMON_VISIBLE accommodatedPath(const std::string &_path);
+
+    /// \brief Replace the preferred directory separator of the current operating 
+    /// system with a forward-slash '/'. On Windows, this will turn backslashes
+    /// into forward-slashes.
+    void IGNITION_COMMON_VISIBLE sanitizePath(std::string &_path);
+
+    /// \brief Returns a copy of _path which has been passed through sanitizePath.
+    std::string IGNITION_COMMON_VISIBLE sanitizedPath(const std::string &_path);
 
     /// \brief Get the absolute path of a provided path.
     /// \param[in] _path Relative or absolute path.
@@ -86,6 +104,9 @@ namespace ignition
     {
       return _path;
     }
+
+    // The below is C++ variadic template magic to allow a joinPaths
+    // method that takes 1-n number of arguments to append together.
 
     /// \brief Append one or more additional path elements to the first
     ///        passed in argument.
@@ -114,31 +135,41 @@ namespace ignition
     /// \param[in] _newFilename Path of the new file.
     /// \return True on success.
     bool IGNITION_COMMON_VISIBLE copyFile(const std::string &_existingFilename,
-                                          const std::string &_newFilename);
+                                          const std::string &_newFilename,
+                                          const bool _printWarnings = true);
 
     /// \brief Move a file.
     /// \param[in] _existingFilename Full path to an existing file.
     /// \param[in] _newFilename Full path of the new file.
     /// \return True on success.
     bool IGNITION_COMMON_VISIBLE moveFile(const std::string &_existingFilename,
-                                          const std::string &_newFilename);
+                                          const std::string &_newFilename,
+                                          const bool _printWarnings = true);
 
     /// \brief Remove an empty directory
     /// \remarks the directory must be empty to be removed
     /// \param[in] _path Path to a directory.
     /// \return True if _path is a directory and was removed.
-    bool IGNITION_COMMON_VISIBLE removeDirectory(const std::string &_path);
+    bool IGNITION_COMMON_VISIBLE removeDirectory(const std::string &_path,
+                                                 const bool _printWarnings = true);
+
+    /// \brief Remove a file. When _printWarnings is true, warnings will be 
+    /// printed out if the file cannot be removed.
+    bool IGNITION_COMMON_VISIBLE removeFile(const std::string &_path, 
+                                            const bool _printWarnings = true);
 
     /// \brief Remove a directory or file.
     /// \param[in] _path Path to a directory or file.
     /// \return True if _path was removed.
     bool IGNITION_COMMON_VISIBLE removeDirectoryOrFile(
-        const std::string &_path);
+        const std::string &_path,
+        const bool _printWarnings = true);
 
     /// \brief Remove a directory or file.
     /// \param[in] _path Path to a directory or file.
     /// \return True if _path was removed.
-    bool IGNITION_COMMON_VISIBLE removeAll(const std::string &_path);
+    bool IGNITION_COMMON_VISIBLE removeAll(const std::string &_path,
+                                           const bool _printWarnings = true);
 
     /// \internal
     class DirIterPrivate;

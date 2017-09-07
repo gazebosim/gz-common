@@ -18,42 +18,38 @@ macro (ign_build_tests)
 
     add_executable(${BINARY_NAME} ${GTEST_SOURCE_file})
 
-    add_dependencies(${BINARY_NAME}
-      ${PROJECT_LIBRARY_TARGET_NAME}
-      gtest gtest_main
-      )
-
-    if (UNIX)
-      target_link_libraries(${BINARY_NAME}
-         libgtest_main.a
-         libgtest.a
-         pthread
-         ${PROJECT_NAME_LOWER}
-	 ${IGNITION-MATH_LIBRARIES})
-    elseif(WIN32)
-      target_link_libraries(${BINARY_NAME}
-         gtest.lib
-         gtest_main.lib
-         ${PROJECT_NAME_LOWER}.lib
-         ${IGNITION-MATH_LIBRARIES})
-
-      # Copy in ignition-math library
-      add_custom_command(TARGET ${BINARY_NAME}
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${IGNITION-MATH_LIBRARY_DIRS}/${IGNITION-MATH_LIBRARIES}.dll"
-        $<TARGET_FILE_DIR:${BINARY_NAME}> VERBATIM)
-
-      # Copy in ignition-common library
-      add_custom_command(TARGET ${BINARY_NAME}
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${CMAKE_BINARY_DIR}/src/${PROJECT_NAME}.dll"
-        $<TARGET_FILE_DIR:${BINARY_NAME}> VERBATIM)
-    else()
-       message(FATAL_ERROR "Unsupported platform")
-    endif()
-
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
-	--gtest_output=xml:${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
+             --gtest_output=xml:${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
+
+    target_link_libraries(${BINARY_NAME}
+        gtest
+        gtest_main
+        ${PROJECT_NAME_LOWER}.lib
+        ${PROJECT_NAME_LOWER}
+        ${IGNITION-MATH_LIBRARIES})
+
+     if(WIN32)
+       # If we have not installed our project's library yet, then it will not be visible
+       # to the test when we attempt to run it. Therefore, we place a copy of our project's 
+       # library into the directory that contains the test executable. We do not need to do
+       # this for any of the test's other dependencies, because the fact that they were found
+       # by the build system means they are installed and will be visible when the test is run.
+
+       # Get the full file path to the original dll for this project
+       set(dll_original "$<TARGET_FILE:${PROJECT_LIBRARY_TARGET_NAME}>")
+
+       # Get the full file path for where we need to paste the dll for this project
+       set(dll_target "$<TARGET_FILE_DIR:${BINARY_NAME}>/$<TARGET_FILE_NAME:${PROJECT_LIBRARY_TARGET_NAME}>")
+       
+       # Add the copy_if_different command as a custom command that is tied the target
+       # of this test.
+       add_custom_command(
+         TARGET ${BINARY_NAME}
+         COMMAND ${CMAKE_COMMAND}
+         ARGS -E copy_if_different ${dll_original} ${dll_target}
+         VERBATIM)
+
+     endif(WIN32)
 
     set_tests_properties(${BINARY_NAME} PROPERTIES TIMEOUT 240)
 

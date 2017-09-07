@@ -139,6 +139,10 @@ namespace ignition
       public: static std::list<std::string> PathsFromEnv(
                 const std::string &_env);
 
+      /// \brief Get the delimiter that the current operating system
+      /// uses to separate different paths from each other.
+      public: static const char Delimiter();
+
 #ifdef _WIN32
 // Disable warning C4251
 #pragma warning(push)

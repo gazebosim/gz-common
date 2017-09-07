@@ -38,6 +38,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #ifndef _WIN32
 #include <dirent.h>
@@ -481,6 +482,40 @@ namespace ignition
     const std::string separator(const std::string &_p)
     {
       return _p + preferred_separator;
+    }
+
+    //////////////////////////////////////////////////
+    void accommodatePath(std::string &_path)
+    {
+      if ('/' == preferred_separator)
+        return;
+
+      std::replace(_path.begin(), _path.end(), '/', preferred_separator);
+    }
+
+    //////////////////////////////////////////////////
+    std::string accommodatedPath(const std::string &_path)
+    {
+      std::string copy = _path;
+      accommodatePath(copy);
+      return copy;
+    }
+
+    //////////////////////////////////////////////////
+    void sanitizePath(std::string &_path)
+    {
+      if ('/' == preferred_separator)
+        return;
+
+      std::replace(_path.begin(), _path.end(), preferred_separator, '/');
+    }
+
+    //////////////////////////////////////////////////
+    std::string sanitizedPath(const std::string &_path)
+    {
+      std::string copy = _path;
+      sanitizePath(copy);
+      return copy;
     }
 
     //////////////////////////////////////////////////

@@ -35,6 +35,11 @@ set (FREEIMAGE_MINOR_VERSION 9
   CACHE INTERNAL "FreeImage minor version requirement" FORCE)
 set (MIN_FREEIMAGE_VERSION ${FREEIMAGE_MAJOR_VERSION}.${FREEIMAGE_MINOR_VERSION}.0 CACHE INTERNAL "FreeImage version requirement" FORCE)
 
+if (WIN32)
+  set(BUILD_SYMLINK_TESTS_ON_WINDOWS false CACHE BOOL
+      "Creating symlinks requires special permissions on Windows, so those tests are disabled by default")
+endif ()
+
 ########################################
 # Package Creation:
 include (${project_cmake_dir}/cpack.cmake)

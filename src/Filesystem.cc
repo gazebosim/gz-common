@@ -64,6 +64,23 @@ namespace igncmn = ignition::common;
 using namespace ignition;
 using namespace igncmn;
 
+#ifdef _WIN32
+static void PrintWindowsSystemWarning(const std::string &_flavorText)
+{
+  // Based on example code by Microsoft: "Retrieving the Last-Error Code"
+  LPVOID lpMsgBuf;
+  DWORD dw = GetLastError();
+
+  FormatMessage(
+    FORMAT_MESSAGE_ALLOCATE_BUFFER |
+    FORMAT_MESSAGE_FROM_SYSTEM |
+    FORMAT_MESSAGE_IGNORE_INSERTS,
+    NULL, dw, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+    (LPTSTR)&lpMsgBuf, 0, NULL);
+
+  ignwarn << _flavorText << static_cast<LPCTSTR>(lpMsgBuf) << "\n";
+}
+#endif
 
 /////////////////////////////////////////////////
 bool ignition::common::isFile(const std::string &_path)
@@ -73,36 +90,72 @@ bool ignition::common::isFile(const std::string &_path)
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::removeDirectory(const std::string &_path)
+bool ignition::common::removeDirectory(const std::string &_path,
+                                       const bool _printWarnings)
 {
+  bool removed = false;
   if (ignition::common::isDirectory(_path))
   {
 #ifdef _WIN32
-    return RemoveDirectory(_path.c_str());
+    removed = RemoveDirectory(_path.c_str());
+    if (!removed && _printWarnings)
+    {
+      PrintWindowsSystemWarning("Failed to remove directory [" + _path + "]: ");
+    }
 #else
-    return rmdir(_path.c_str()) == 0;
+    removed = (rmdir(_path.c_str()) == 0);
+    if (!removed && _printWarnings)
+    {
+      ignwarn << "Failed to remove directory [" + _path + "]: "
+              << std::strerror(errno) << "\n";
+    }
 #endif
   }
+  else if (_printWarnings)
+  {
+    ignwarn << "The path [" << _path << "] does not refer to a directory\n";
+  }
 
-  return false;
+  return removed;
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::removeDirectoryOrFile(const std::string &_path)
+bool ignition::common::removeFile(const std::string &_path,
+                                  const bool _printWarnings)
+{
+  const bool removed = (std::remove(_path.c_str()) == 0);
+  if (!removed && _printWarnings)
+  {
+    ignwarn << "Failed to remove file [" << _path << "]: "
+            << std::strerror(errno) << "\n";
+  }
+
+  return removed;
+}
+
+/////////////////////////////////////////////////
+bool ignition::common::removeDirectoryOrFile(const std::string &_path,
+                                             const bool _printWarnings)
 {
   if (ignition::common::isDirectory(_path))
   {
-    return ignition::common::removeDirectory(_path);
+    return ignition::common::removeDirectory(_path, _printWarnings);
   }
   else if (ignition::common::isFile(_path))
   {
-    return std::remove(_path.c_str()) == 0;
+    return ignition::common::removeFile(_path, _printWarnings);
+  }
+  else if (_printWarnings)
+  {
+    ignwarn << "The path [" << _path << "] does not refer to a "
+            << "directory nor to a file\n";
   }
   return false;
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::removeAll(const std::string &_path)
+bool ignition::common::removeAll(const std::string &_path,
+                                 const bool _printWarnings)
 {
   if (ignition::common::isDirectory(_path))
   {
@@ -116,21 +169,33 @@ bool ignition::common::removeAll(const std::string &_path)
         if (!std::strcmp(p->d_name, ".") || !std::strcmp(p->d_name, ".."))
           continue;
 
-        ignition::common::removeAll(_path + "/" + p->d_name);
+        ignition::common::removeAll(_path + "/" + p->d_name, _printWarnings);
       }
     }
     closedir(dir);
   }
 
-  return ignition::common::removeDirectoryOrFile(_path);
+  return ignition::common::removeDirectoryOrFile(_path, _printWarnings);
 }
 
 /////////////////////////////////////////////////
 bool ignition::common::moveFile(const std::string &_existingFilename,
-                                const std::string &_newFilename)
+                                const std::string &_newFilename,
+                                const bool _printWarnings)
 {
-  return copyFile(_existingFilename, _newFilename) &&
-         std::remove(_existingFilename.c_str()) == 0;
+  if (!copyFile(_existingFilename, _newFilename, _printWarnings))
+    return false;
+
+  if (removeFile(_existingFilename, _printWarnings))
+    return true;
+
+  // The original file could not be removed, which means we are not
+  // able to "move" it (we can only copy it, apparently). Since this 
+  // function is meant to move files, and we have failed to move the 
+  // file, we should remove the copy that we made earlier.
+  removeFile(_newFilename, _printWarnings);
+
+  return false;
 }
 
 /////////////////////////////////////////////////
@@ -172,7 +237,8 @@ std::string ignition::common::joinPaths(const std::string &_path1,
 
 /////////////////////////////////////////////////
 bool ignition::common::copyFile(const std::string &_existingFilename,
-                                const std::string &_newFilename)
+                                const std::string &_newFilename,
+                                const bool _printWarnings)
 {
   std::string absExistingFilename =
     ignition::common::absPath(_existingFilename);
@@ -182,7 +248,15 @@ bool ignition::common::copyFile(const std::string &_existingFilename,
     return false;
 
 #ifdef _WIN32
-  return CopyFile(absExistingFilename.c_str(), absNewFilename.c_str(), false);
+  const bool copied = CopyFile(absExistingFilename.c_str(), absNewFilename.c_str(), false);
+  if (!copied && _printWarnings)
+  {
+    PrintWindowsSystemWarning(
+      "Failed to copy file [" + absExistingFilename
+      + "] to [" + absNewFilename + "]: ");
+  }
+
+  return copied;
 #elif defined(__APPLE__)
   bool result = false;
   std::ifstream in(absExistingFilename.c_str(), std::ifstream::binary);
@@ -196,12 +270,25 @@ bool ignition::common::copyFile(const std::string &_existingFilename,
       out << in.rdbuf();
       result = ignition::common::isFile(absNewFilename);
     }
+    else if (_printWarnings)
+    {
+      ignwarn << "Failed to create file [" << absNewFilename << "]: "
+              << std::strerror(errno) << "\n";
+    }
     out.close();
+  }
+  else if (_printWarnings)
+  {
+    ignwarn << "Failed to open file [" << absExistingFilename << "]: "
+            << std::strerror(errno) << "\n";
   }
   in.close();
 
+
+
   return result;
 #else
+  // TODO(MXG): See if the implementation for __APPLE__ can work here too
   int readFd = 0;
   int writeFd = 0;
   struct stat statBuf;

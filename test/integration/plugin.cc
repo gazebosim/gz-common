@@ -19,19 +19,23 @@
 #include <iostream>
 #include "ignition/common/PluginLoader.hh"
 #include "ignition/common/SystemPaths.hh"
+#include "ignition/common/Filesystem.hh"
 
 #include "test_config.h"
+#include "DummyPluginsPath.h"
 #include "util/DummyPlugins.hh"
 
 /////////////////////////////////////////////////
 TEST(PluginLoader, LoadExistingLibrary)
 {
-  std::string projectPath(PROJECT_BINARY_PATH);
+  std::string dummyPath = 
+    ignition::common::accommodatedPath(IGN_DUMMY_PLUGIN_PATH);
 
   ignition::common::SystemPaths sp;
-  sp.AddPluginPaths(projectPath + "/test/util");
+  sp.AddPluginPaths(dummyPath);
+
   std::string path = sp.FindSharedLibrary("IGNDummyPlugins");
-  ASSERT_LT(0u, path.size());
+  ASSERT_NE("", path);
 
   ignition::common::PluginLoader pm;
 

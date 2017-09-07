@@ -1,1 +1,16 @@
 add_library(IGNDummyPlugins SHARED DummyPlugins.cc)
+
+# Create a variable for the name of the header which will contain the dummy plugin path.
+# This variable gets put in the cache so that it is available at generation time.
+set(IGN_DUMMY_PLUGIN_PATH_HEADER "DummyPluginsPath.h" CACHE STRING "Name of DummyPlugin header" FORCE)
+
+set(header_text "#define IGN_DUMMY_PLUGIN_PATH \"$<TARGET_FILE_DIR:IGNDummyPlugins>\"")
+
+# Pipe the header text into a header that will be placed in the project binary directory.
+# We need to use this approach instead of the usual configure_file, because we required a
+# generator expression in order to locate the IGNDummyPlugins library on Windows. Generator
+# expressions can only be evaluated during generation (as opposed to during configuration),
+# so we must use add_custom_command in order to produce this header.
+add_custom_command(TARGET IGNDummyPlugins
+    COMMAND echo
+    ARGS "${header_text}" > ${PROJECT_BINARY_DIR}/${IGN_DUMMY_PLUGIN_PATH_HEADER})
