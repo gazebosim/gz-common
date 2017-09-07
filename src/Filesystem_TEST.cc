@@ -205,7 +205,7 @@ bool create_new_file_hardlink(const std::string &_hardlink,
 
 #endif
 
-#include <fstream>
+#include <fstream> // NOLINT
 #include "ignition/common/Filesystem.hh"
 
 namespace igncmn = ignition::common;
