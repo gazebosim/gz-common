@@ -74,28 +74,28 @@ bool ignition::common::isFile(const std::string &_path)
 
 /////////////////////////////////////////////////
 bool ignition::common::removeDirectory(const std::string &_path,
-                                       const bool _printWarnings)
+                                       const FilesystemWarningOp _warningOp)
 {
   bool removed = false;
   if (ignition::common::isDirectory(_path))
   {
 #ifdef _WIN32
     removed = RemoveDirectory(_path.c_str());
-    if (!removed && _printWarnings)
+    if (!removed && FSWO_LOG_WARNINGS == _warningOp)
     {
       ignition::common::PrintWindowsSystemWarning(
             "Failed to remove directory [" + _path + "]");
     }
 #else
     removed = (rmdir(_path.c_str()) == 0);
-    if (!removed && _printWarnings)
+    if (!removed && FSWO_LOG_WARNINGS == _warningOp)
     {
       ignwarn << "Failed to remove directory [" + _path + "]: "
               << std::strerror(errno) << "\n";
     }
 #endif
   }
-  else if (_printWarnings)
+  else if (_warningOp)
   {
     ignwarn << "The path [" << _path << "] does not refer to a directory\n";
   }
@@ -104,13 +104,13 @@ bool ignition::common::removeDirectory(const std::string &_path,
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::removeFile(const std::string &_path,
-                                  const bool _printWarnings)
+bool ignition::common::removeFile(const std::string &_existingFilename,
+                                  const FilesystemWarningOp _warningOp)
 {
-  const bool removed = (std::remove(_path.c_str()) == 0);
-  if (!removed && _printWarnings)
+  const bool removed = (std::remove(_existingFilename.c_str()) == 0);
+  if (!removed && FSWO_LOG_WARNINGS == _warningOp)
   {
-    ignwarn << "Failed to remove file [" << _path << "]: "
+    ignwarn << "Failed to remove file [" << _existingFilename << "]: "
             << std::strerror(errno) << "\n";
   }
 
@@ -118,18 +118,19 @@ bool ignition::common::removeFile(const std::string &_path,
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::removeDirectoryOrFile(const std::string &_path,
-                                             const bool _printWarnings)
+bool ignition::common::removeDirectoryOrFile(
+    const std::string &_path,
+    const FilesystemWarningOp _warningOp)
 {
   if (ignition::common::isDirectory(_path))
   {
-    return ignition::common::removeDirectory(_path, _printWarnings);
+    return ignition::common::removeDirectory(_path, _warningOp);
   }
   else if (ignition::common::isFile(_path))
   {
-    return ignition::common::removeFile(_path, _printWarnings);
+    return ignition::common::removeFile(_path, _warningOp);
   }
-  else if (_printWarnings)
+  else if (FSWO_LOG_WARNINGS == _warningOp)
   {
     ignwarn << "The path [" << _path << "] does not refer to a "
             << "directory nor to a file\n";
@@ -139,7 +140,7 @@ bool ignition::common::removeDirectoryOrFile(const std::string &_path,
 
 /////////////////////////////////////////////////
 bool ignition::common::removeAll(const std::string &_path,
-                                 const bool _printWarnings)
+                                 const FilesystemWarningOp _warningOp)
 {
   if (ignition::common::isDirectory(_path))
   {
@@ -153,31 +154,31 @@ bool ignition::common::removeAll(const std::string &_path,
         if (!std::strcmp(p->d_name, ".") || !std::strcmp(p->d_name, ".."))
           continue;
 
-        ignition::common::removeAll(_path + "/" + p->d_name, _printWarnings);
+        ignition::common::removeAll(_path + "/" + p->d_name, _warningOp);
       }
     }
     closedir(dir);
   }
 
-  return ignition::common::removeDirectoryOrFile(_path, _printWarnings);
+  return ignition::common::removeDirectoryOrFile(_path, _warningOp);
 }
 
 /////////////////////////////////////////////////
 bool ignition::common::moveFile(const std::string &_existingFilename,
                                 const std::string &_newFilename,
-                                const bool _printWarnings)
+                                const FilesystemWarningOp _warningOp)
 {
-  if (!copyFile(_existingFilename, _newFilename, _printWarnings))
+  if (!copyFile(_existingFilename, _newFilename, _warningOp))
     return false;
 
-  if (removeFile(_existingFilename, _printWarnings))
+  if (removeFile(_existingFilename, _warningOp))
     return true;
 
   // The original file could not be removed, which means we are not
   // able to "move" it (we can only copy it, apparently). Since this
   // function is meant to move files, and we have failed to move the
   // file, we should remove the copy that we made earlier.
-  removeFile(_newFilename, _printWarnings);
+  removeFile(_newFilename, _warningOp);
 
   return false;
 }
@@ -222,7 +223,7 @@ std::string ignition::common::joinPaths(const std::string &_path1,
 /////////////////////////////////////////////////
 bool ignition::common::copyFile(const std::string &_existingFilename,
                                 const std::string &_newFilename,
-                                const bool _printWarnings)
+                                const FilesystemWarningOp _warningOp)
 {
   std::string absExistingFilename =
     ignition::common::absPath(_existingFilename);
@@ -235,7 +236,7 @@ bool ignition::common::copyFile(const std::string &_existingFilename,
   const bool copied = CopyFile(absExistingFilename.c_str(),
                                absNewFilename.c_str(), false);
 
-  if (!copied && _printWarnings)
+  if (!copied && FSWO_LOG_WARNINGS == _warningOp)
   {
     ignition::common::PrintWindowsSystemWarning(
       "Failed to copy file [" + absExistingFilename
@@ -256,14 +257,14 @@ bool ignition::common::copyFile(const std::string &_existingFilename,
       out << in.rdbuf();
       result = ignition::common::isFile(absNewFilename);
     }
-    else if (_printWarnings)
+    else if (FSWO_LOG_WARNINGS == _warningOp)
     {
       ignwarn << "Failed to create file [" << absNewFilename << "]: "
               << std::strerror(errno) << "\n";
     }
     out.close();
   }
-  else if (_printWarnings)
+  else if (FSWO_LOG_WARNINGS == _warningOp)
   {
     ignwarn << "Failed to open file [" << absExistingFilename << "]: "
             << std::strerror(errno) << "\n";

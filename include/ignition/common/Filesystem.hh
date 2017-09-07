@@ -34,6 +34,20 @@ namespace ignition
 {
   namespace common
   {
+    /// \brief Options for how to handle errors that occur in functions that
+    /// manipulate the filesystem.
+    enum FilesystemWarningOp
+    {
+      /// \brief Errors that occur during filesystem manipulation should be
+      /// logged as warnings using ignwarn. (Recommended)
+      FSWO_LOG_WARNINGS = 0,
+
+      /// \brief Errors that occur during filesystem manipulation should not be
+      /// logged. The user will be responsible for checking the system's error
+      /// flags.
+      FSWO_SUPPRESS_WARNINGS
+    };
+
     /// \brief Determine whether the given path exists on the filesystem.
     /// \param[in] _path  The path to check for existence
     /// \return True if the path exists on the filesystem, false otherwise.
@@ -138,48 +152,55 @@ namespace ignition
     /// \brief Copy a file.
     /// \param[in] _existingFilename Path to an existing file.
     /// \param[in] _newFilename Path of the new file.
+    /// \param[in] _warningOp Log or suppress warnings that may occur.
     /// \return True on success.
     bool IGNITION_COMMON_VISIBLE copyFile(
         const std::string &_existingFilename,
         const std::string &_newFilename,
-        const bool _printWarnings = true);
+        const FilesystemWarningOp _warningOp = FSWO_LOG_WARNINGS);
 
     /// \brief Move a file.
     /// \param[in] _existingFilename Full path to an existing file.
     /// \param[in] _newFilename Full path of the new file.
+    /// \param[in] _warningOp Log or suppress warnings that may occur.
     /// \return True on success.
     bool IGNITION_COMMON_VISIBLE moveFile(
         const std::string &_existingFilename,
         const std::string &_newFilename,
-        const bool _printWarnings = true);
+        const FilesystemWarningOp _warningOp = FSWO_LOG_WARNINGS);
 
     /// \brief Remove an empty directory
     /// \remarks the directory must be empty to be removed
     /// \param[in] _path Path to a directory.
+    /// \param[in] _warningOp Log or suppress warnings that may occur.
     /// \return True if _path is a directory and was removed.
     bool IGNITION_COMMON_VISIBLE removeDirectory(
         const std::string &_path,
-        const bool _printWarnings = true);
+        const FilesystemWarningOp _warningOp = FSWO_LOG_WARNINGS);
 
-    /// \brief Remove a file. When _printWarnings is true, warnings will be
-    /// printed out if the file cannot be removed.
+    /// \brief Remove a file.
+    /// \param[in] _existingFilename Full path to an existing file.
+    /// \param[in] _warningOp Log or suppress warnings that may occur.
+    /// \return True on success.
     bool IGNITION_COMMON_VISIBLE removeFile(
-        const std::string &_path,
-        const bool _printWarnings = true);
+        const std::string &_existingFilename,
+        const FilesystemWarningOp _warningOp = FSWO_LOG_WARNINGS);
 
     /// \brief Remove a directory or file.
     /// \param[in] _path Path to a directory or file.
+    /// \param[in] _warningOp Log or suppress warnings that may occur.
     /// \return True if _path was removed.
     bool IGNITION_COMMON_VISIBLE removeDirectoryOrFile(
         const std::string &_path,
-        const bool _printWarnings = true);
+        const FilesystemWarningOp _warningOp = FSWO_LOG_WARNINGS);
 
     /// \brief Remove a directory or file.
     /// \param[in] _path Path to a directory or file.
+    /// \param[in] _warningOp Log or suppress warnings that may occur.
     /// \return True if _path was removed.
     bool IGNITION_COMMON_VISIBLE removeAll(
         const std::string &_path,
-        const bool _printWarnings = true);
+        const FilesystemWarningOp _warningOp = FSWO_LOG_WARNINGS);
 
     /// \internal
     class DirIterPrivate;
