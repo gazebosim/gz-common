@@ -11,8 +11,17 @@ set(header_text "#define IGN_DUMMY_PLUGIN_PATH \"$<TARGET_FILE_DIR:IGNDummyPlugi
 # generator expression in order to locate the IGNDummyPlugins library on Windows. Generator
 # expressions can only be evaluated during generation (as opposed to during configuration),
 # so we must use add_custom_command in order to produce this header.
-add_custom_command(TARGET IGNDummyPlugins
-    PRE_BUILD
-    COMMAND echo
-    ARGS "${header_text}" > ${PROJECT_BINARY_DIR}/${IGN_DUMMY_PLUGIN_PATH_HEADER}
-    VERBATIM)
+if(WIN32)
+  # Including VERBATIM causes the wrong behavior on Windows, so we leave it out of the 
+  # custom command when compiling on Windows.
+  add_custom_command(TARGET IGNDummyPlugins
+        PRE_BUILD
+        COMMAND echo
+        ARGS "${header_text}" > ${PROJECT_BINARY_DIR}/${IGN_DUMMY_PLUGIN_PATH_HEADER})
+else()
+  add_custom_command(TARGET IGNDummyPlugins
+      PRE_BUILD
+      COMMAND echo
+      ARGS "${header_text}" > ${PROJECT_BINARY_DIR}/${IGN_DUMMY_PLUGIN_PATH_HEADER}
+      VERBATIM)
+endif()
