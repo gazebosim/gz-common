@@ -28,7 +28,7 @@
 /////////////////////////////////////////////////
 TEST(PluginLoader, LoadExistingLibrary)
 {
-  std::string dummyPath = 
+  std::string dummyPath =
     ignition::common::accommodatedPath(IGN_DUMMY_PLUGIN_PATH);
 
   ignition::common::SystemPaths sp;

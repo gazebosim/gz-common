@@ -32,7 +32,7 @@ std::string customPrefix;
 FileLogger ignition::common::Console::log("");
 
 #ifdef _WIN32
-  // These are Windows-based color codes 
+  // These are Windows-based color codes
   // (yellow is not enumerated by Windows)
   const int red = FOREGROUND_RED | FOREGROUND_INTENSITY;
   const int yellow = 0x006 | FOREGROUND_INTENSITY;
@@ -153,14 +153,17 @@ int Logger::Buffer::sync()
 #else
   if (Console::Verbosity() >= this->verbosity && !outstr.empty())
   {
-    HANDLE hConsole = GetStdHandle(this->type == Logger::STDOUT ? STD_OUTPUT_HANDLE : STD_ERROR_HANDLE);
+    HANDLE hConsole = GetStdHandle(
+          this->type == Logger::STDOUT ? STD_OUTPUT_HANDLE : STD_ERROR_HANDLE);
 
     CONSOLE_SCREEN_BUFFER_INFO originalBufferInfo;
     GetConsoleScreenBufferInfo(hConsole, &originalBufferInfo);
 
     SetConsoleTextAttribute(hConsole, this->color);
 
-    std::ostream &outStream = this->type == Logger::STDOUT ? std::cout : std::cerr;
+    std::ostream &outStream =
+        this->type == Logger::STDOUT ? std::cout : std::cerr;
+
     outStream << outstr;
 
     SetConsoleTextAttribute(hConsole, originalBufferInfo.wAttributes);

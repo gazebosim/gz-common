@@ -33,13 +33,15 @@
     int64_t tv_nsec;
   };
 #else
+
   #include <time.h>
 #endif
 
 #else
   #include <unistd.h>
   #include <sys/time.h>
-  #include <time.h>
+
+  #include <time.h> // NOLINT (false positive for multiple includes)
 #endif
 
 

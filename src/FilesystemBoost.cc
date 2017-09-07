@@ -487,6 +487,7 @@ namespace ignition
     //////////////////////////////////////////////////
     void accommodatePath(std::string &_path)
     {
+      // cppcheck-suppress knownConditionTrueFalse
       if ('/' == preferred_separator)
         return;
 
@@ -504,6 +505,7 @@ namespace ignition
     //////////////////////////////////////////////////
     void sanitizePath(std::string &_path)
     {
+      // cppcheck-suppress knownConditionTrueFalse
       if ('/' == preferred_separator)
         return;
 

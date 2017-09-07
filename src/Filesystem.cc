@@ -190,8 +190,8 @@ bool ignition::common::moveFile(const std::string &_existingFilename,
     return true;
 
   // The original file could not be removed, which means we are not
-  // able to "move" it (we can only copy it, apparently). Since this 
-  // function is meant to move files, and we have failed to move the 
+  // able to "move" it (we can only copy it, apparently). Since this
+  // function is meant to move files, and we have failed to move the
   // file, we should remove the copy that we made earlier.
   removeFile(_newFilename, _printWarnings);
 
@@ -248,7 +248,9 @@ bool ignition::common::copyFile(const std::string &_existingFilename,
     return false;
 
 #ifdef _WIN32
-  const bool copied = CopyFile(absExistingFilename.c_str(), absNewFilename.c_str(), false);
+  const bool copied = CopyFile(absExistingFilename.c_str(),
+                               absNewFilename.c_str(), false);
+
   if (!copied && _printWarnings)
   {
     PrintWindowsSystemWarning(
@@ -257,7 +259,6 @@ bool ignition::common::copyFile(const std::string &_existingFilename,
   }
 
   return copied;
-//#elif defined(__APPLE__)
 #else
   bool result = false;
   std::ifstream in(absExistingFilename.c_str(), std::ifstream::binary);

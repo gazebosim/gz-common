@@ -106,9 +106,9 @@ bool create_new_file_hardlink(const std::string &_hardlink,
 #include <cstdint>
 
 #ifdef BUILD_SYMLINK_TESTS_ON_WINDOWS
- // The symlink tests require special permissions to work on Windows,
- // so they will be disabled by default. For more information, see:
- // https://bitbucket.org/ignitionrobotics/ign-common/issues/21
+// The symlink tests require special permissions to work on Windows,
+// so they will be disabled by default. For more information, see:
+// https://bitbucket.org/ignitionrobotics/ign-common/issues/21
 #define BUILD_SYMLINK_TESTS
 #endif
 
@@ -182,7 +182,9 @@ bool create_new_empty_file(const std::string &_filename)
 bool create_new_file_symlink(const std::string &_symlink,
                              const std::string &_target)
 {
-  const bool linked = ::CreateSymbolicLinkA(_symlink.c_str(), _target.c_str(), 0);
+  const bool linked = ::CreateSymbolicLinkA(
+        _symlink.c_str(), _target.c_str(), 0);
+
   if (!linked)
   {
     PrintWindowsSystemWarning("Failed to create file symlink from [" + _target
@@ -200,8 +202,9 @@ bool create_new_dir_symlink(const std::string &_symlink,
                                             SYMBOLIC_LINK_FLAG_DIRECTORY);
   if (!linked)
   {
-    PrintWindowsSystemWarning("Failed to create directory symlink from [" + _target
-                              + "] to [" + _symlink + "]: ");
+    PrintWindowsSystemWarning(
+          "Failed to create directory symlink from [" + _target
+          + "] to [" + _symlink + "]: ");
   }
 
   return linked;
@@ -251,14 +254,14 @@ TEST(Util_TEST, fileOps)
   std::string test2InContent((std::istreambuf_iterator<char>(test2In)),
                              (std::istreambuf_iterator<char>()));
   // We must close the file stream for test2.tmp, or else Windows
-  // will refuse to remove the file from the filesystem in the 
+  // will refuse to remove the file from the filesystem in the
   // upcoming test.
   test2In.close();
 
   EXPECT_EQ(testInContent, test2InContent);
 
   EXPECT_TRUE(common::moveFile("test2.tmp", "test3.tmp"));
-  
+
   EXPECT_FALSE(common::exists("test2.tmp"));
   EXPECT_TRUE(common::exists("test3.tmp"));
 
