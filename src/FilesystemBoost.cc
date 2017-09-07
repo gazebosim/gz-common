@@ -485,7 +485,7 @@ namespace ignition
     }
 
     //////////////////////////////////////////////////
-    void accommodatePath(std::string &_path)
+    void changeFromUnixPath(std::string &_path)
     {
       // cppcheck-suppress knownConditionTrueFalse
       if ('/' == preferred_separator)
@@ -495,15 +495,15 @@ namespace ignition
     }
 
     //////////////////////////////////////////////////
-    std::string accommodatedPath(const std::string &_path)
+    std::string copyFromUnixPath(const std::string &_path)
     {
       std::string copy = _path;
-      accommodatePath(copy);
+      changeFromUnixPath(copy);
       return copy;
     }
 
     //////////////////////////////////////////////////
-    void sanitizePath(std::string &_path)
+    void changeToUnixPath(std::string &_path)
     {
       // cppcheck-suppress knownConditionTrueFalse
       if ('/' == preferred_separator)
@@ -513,10 +513,10 @@ namespace ignition
     }
 
     //////////////////////////////////////////////////
-    std::string sanitizedPath(const std::string &_path)
+    std::string copyToUnixPath(const std::string &_path)
     {
       std::string copy = _path;
-      sanitizePath(copy);
+      changeToUnixPath(copy);
       return copy;
     }
 

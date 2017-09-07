@@ -74,21 +74,22 @@ namespace ignition
     /// Note that this will NOT convert backslashes (or any other separator)
     /// into forward slashes, even on operating systems that use forward-slashes
     /// as separators.
-    void IGNITION_COMMON_VISIBLE accommodatePath(std::string &_path);
+    void IGNITION_COMMON_VISIBLE changeFromUnixPath(std::string &_path);
 
     /// \brief Returns a copy of _path which has been passed through
-    /// accommodatePath.
-    std::string IGNITION_COMMON_VISIBLE accommodatedPath(
+    /// changeFromUnixPath.
+    std::string IGNITION_COMMON_VISIBLE copyFromUnixPath(
         const std::string &_path);
 
     /// \brief Replace the preferred directory separator of the current
     /// operating system with a forward-slash '/'. On Windows, this will turn
     /// backslashes into forward-slashes.
-    void IGNITION_COMMON_VISIBLE sanitizePath(std::string &_path);
+    void IGNITION_COMMON_VISIBLE changeToUnixPath(std::string &_path);
 
     /// \brief Returns a copy of _path which has been passed through
-    /// sanitizePath.
-    std::string IGNITION_COMMON_VISIBLE sanitizedPath(const std::string &_path);
+    /// changeToUnixPath.
+    std::string IGNITION_COMMON_VISIBLE copyToUnixPath(
+        const std::string &_path);
 
     /// \brief Get the absolute path of a provided path.
     /// \param[in] _path Relative or absolute path.

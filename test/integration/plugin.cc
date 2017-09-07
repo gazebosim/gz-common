@@ -29,7 +29,7 @@
 TEST(PluginLoader, LoadExistingLibrary)
 {
   std::string dummyPath =
-    ignition::common::accommodatedPath(IGN_DUMMY_PLUGIN_PATH);
+    ignition::common::copyFromUnixPath(IGN_DUMMY_PLUGIN_PATH);
 
   ignition::common::SystemPaths sp;
   sp.AddPluginPaths(dummyPath);

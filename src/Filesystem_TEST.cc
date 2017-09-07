@@ -125,7 +125,7 @@ static void PrintWindowsSystemWarning(const std::string &_flavorText)
     NULL, dw, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
     (LPTSTR)&lpMsgBuf, 0, NULL);
 
-  std::cerr << _flavorText << static_cast<LPCTSTR>(lpMsgBuf) << "\n";
+  ignerr << _flavorText << static_cast<LPCTSTR>(lpMsgBuf) << "\n";
 }
 
 /////////////////////////////////////////////////
