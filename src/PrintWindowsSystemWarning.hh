@@ -23,6 +23,7 @@
 #include <windows.h>
 #include <winnt.h>
 #include <cstdint>
+#include <ignition/common/Console.hh>
 
 namespace ignition
 {
