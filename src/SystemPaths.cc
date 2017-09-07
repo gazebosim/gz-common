@@ -393,7 +393,7 @@ std::list<std::string> SystemPaths::PathsFromEnv(const std::string &_env)
 }
 
 /////////////////////////////////////////////////
-const char SystemPaths::Delimiter()
+char SystemPaths::Delimiter()
 {
 #ifdef _WIN32
   return ';';

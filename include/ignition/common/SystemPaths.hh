@@ -141,7 +141,7 @@ namespace ignition
 
       /// \brief Get the delimiter that the current operating system
       /// uses to separate different paths from each other.
-      public: static const char Delimiter();
+      public: static char Delimiter();
 
 #ifdef _WIN32
 // Disable warning C4251

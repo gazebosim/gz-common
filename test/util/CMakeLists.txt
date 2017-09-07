@@ -12,5 +12,7 @@ set(header_text "#define IGN_DUMMY_PLUGIN_PATH \"$<TARGET_FILE_DIR:IGNDummyPlugi
 # expressions can only be evaluated during generation (as opposed to during configuration),
 # so we must use add_custom_command in order to produce this header.
 add_custom_command(TARGET IGNDummyPlugins
+    PRE_BUILD
     COMMAND echo
-    ARGS "${header_text}" > ${PROJECT_BINARY_DIR}/${IGN_DUMMY_PLUGIN_PATH_HEADER})
+    ARGS "${header_text}" > ${PROJECT_BINARY_DIR}/${IGN_DUMMY_PLUGIN_PATH_HEADER}
+    VERBATIM)

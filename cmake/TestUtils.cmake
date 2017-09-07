@@ -24,9 +24,12 @@ macro (ign_build_tests)
     target_link_libraries(${BINARY_NAME}
         gtest
         gtest_main
-        ${PROJECT_NAME_LOWER}.lib
         ${PROJECT_NAME_LOWER}
         ${IGNITION-MATH_LIBRARIES})
+
+     if(UNIX)
+       target_link_libraries(${BINARY_NAME} pthread)
+     endif(UNIX)
 
      if(WIN32)
        # If we have not installed our project's library yet, then it will not be visible

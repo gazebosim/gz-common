@@ -257,7 +257,8 @@ bool ignition::common::copyFile(const std::string &_existingFilename,
   }
 
   return copied;
-#elif defined(__APPLE__)
+//#elif defined(__APPLE__)
+#else
   bool result = false;
   std::ifstream in(absExistingFilename.c_str(), std::ifstream::binary);
 
@@ -284,40 +285,7 @@ bool ignition::common::copyFile(const std::string &_existingFilename,
   }
   in.close();
 
-
-
   return result;
-#else
-  // TODO(MXG): See if the implementation for __APPLE__ can work here too
-  int readFd = 0;
-  int writeFd = 0;
-  struct stat statBuf;
-  off_t offset = 0;
-
-  // Open the input file.
-  readFd = open(absExistingFilename.c_str(), O_RDONLY);
-  if (readFd < 0)
-    return false;
-
-  // Stat the input file to obtain its size.
-  fstat(readFd, &statBuf);
-
-  // Open the output file for writing, with the same permissions as the
-  // source file.
-  writeFd = open(absNewFilename.c_str(), O_WRONLY | O_CREAT, statBuf.st_mode);
-
-  while (offset >= 0 && offset < statBuf.st_size)
-  {
-    // Send the bytes from one file to the other.
-    ssize_t written = sendfile(writeFd, readFd, &offset, statBuf.st_size);
-    if (written < 0)
-      break;
-  }
-
-  close(readFd);
-  close(writeFd);
-
-  return offset == statBuf.st_size;
 #endif
 }
 
