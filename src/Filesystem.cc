@@ -46,6 +46,7 @@
 #else
 #include <io.h>
 #include "ignition/common/win_dirent.h"
+#include "PrintWindowsSystemWarning.hh"
 #endif
 
 #include "ignition/common/Filesystem.hh"
@@ -63,24 +64,6 @@
 namespace igncmn = ignition::common;
 using namespace ignition;
 using namespace igncmn;
-
-#ifdef _WIN32
-static void PrintWindowsSystemWarning(const std::string &_flavorText)
-{
-  // Based on example code by Microsoft: "Retrieving the Last-Error Code"
-  LPVOID lpMsgBuf;
-  DWORD dw = GetLastError();
-
-  FormatMessage(
-    FORMAT_MESSAGE_ALLOCATE_BUFFER |
-    FORMAT_MESSAGE_FROM_SYSTEM |
-    FORMAT_MESSAGE_IGNORE_INSERTS,
-    NULL, dw, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-    (LPTSTR)&lpMsgBuf, 0, NULL);
-
-  ignwarn << _flavorText << static_cast<LPCTSTR>(lpMsgBuf) << "\n";
-}
-#endif
 
 /////////////////////////////////////////////////
 bool ignition::common::isFile(const std::string &_path)
@@ -100,7 +83,8 @@ bool ignition::common::removeDirectory(const std::string &_path,
     removed = RemoveDirectory(_path.c_str());
     if (!removed && _printWarnings)
     {
-      PrintWindowsSystemWarning("Failed to remove directory [" + _path + "]: ");
+      ignition::common::PrintWindowsSystemWarning(
+            "Failed to remove directory [" + _path + "]");
     }
 #else
     removed = (rmdir(_path.c_str()) == 0);
@@ -253,9 +237,9 @@ bool ignition::common::copyFile(const std::string &_existingFilename,
 
   if (!copied && _printWarnings)
   {
-    PrintWindowsSystemWarning(
+    ignition::common::PrintWindowsSystemWarning(
       "Failed to copy file [" + absExistingFilename
-      + "] to [" + absNewFilename + "]: ");
+      + "] to [" + absNewFilename + "]");
   }
 
   return copied;

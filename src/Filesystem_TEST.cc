@@ -104,6 +104,7 @@ bool create_new_file_hardlink(const std::string &_hardlink,
 #include <windows.h>
 #include <winnt.h>
 #include <cstdint>
+#include "PrintWindowsSystemWarning.hh"
 
 #ifdef BUILD_SYMLINK_TESTS_ON_WINDOWS
 // The symlink tests require special permissions to work on Windows,
@@ -111,22 +112,6 @@ bool create_new_file_hardlink(const std::string &_hardlink,
 // https://bitbucket.org/ignitionrobotics/ign-common/issues/21
 #define BUILD_SYMLINK_TESTS
 #endif
-
-static void PrintWindowsSystemWarning(const std::string &_flavorText)
-{
-  // Based on example code by Microsoft "Retrieving the Last-Error Code"
-  LPVOID lpMsgBuf;
-  DWORD dw = GetLastError();
-
-  FormatMessage(
-    FORMAT_MESSAGE_ALLOCATE_BUFFER |
-    FORMAT_MESSAGE_FROM_SYSTEM |
-    FORMAT_MESSAGE_IGNORE_INSERTS,
-    NULL, dw, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-    (LPTSTR)&lpMsgBuf, 0, NULL);
-
-  ignerr << _flavorText << static_cast<LPCTSTR>(lpMsgBuf) << "\n";
-}
 
 /////////////////////////////////////////////////
 bool create_and_switch_to_temp_dir(std::string &_new_temp_path)
@@ -187,8 +172,9 @@ bool create_new_file_symlink(const std::string &_symlink,
 
   if (!linked)
   {
-    PrintWindowsSystemWarning("Failed to create file symlink from [" + _target
-                              + "] to [" + _symlink + "]: ");
+    ignition::common::PrintWindowsSystemWarning(
+          "Failed to create file symlink from [" + _target
+          + "] to [" + _symlink + "]");
   }
 
   return linked;
@@ -202,9 +188,9 @@ bool create_new_dir_symlink(const std::string &_symlink,
                                             SYMBOLIC_LINK_FLAG_DIRECTORY);
   if (!linked)
   {
-    PrintWindowsSystemWarning(
+    ignition::common::PrintWindowsSystemWarning(
           "Failed to create directory symlink from [" + _target
-          + "] to [" + _symlink + "]: ");
+          + "] to [" + _symlink + "]");
   }
 
   return linked;
