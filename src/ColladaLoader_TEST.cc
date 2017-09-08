@@ -125,7 +125,7 @@ TEST_F(ColladaLoader, LoadZeroCount)
 }
 
 /////////////////////////////////////////////////
-TEST_F(ColladaLoader, Specular)
+TEST_F(ColladaLoader, Material)
 {
   common::ColladaLoader loader;
   common::Mesh *mesh = loader.Load(
@@ -134,11 +134,24 @@ TEST_F(ColladaLoader, Specular)
 
   EXPECT_EQ(mesh->MaterialCount(), 1u);
 
-  const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
-  ASSERT_TRUE(mat != NULL);
+  common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+  ASSERT_TRUE(mat != nullptr);
 
   // Make sure we read the specular value
-  EXPECT_EQ(mat->Specular(), math::Color(0.5, 0.5, 0.5, 1.0));
+  EXPECT_EQ(math::Color(0.0, 0.0, 0.0, 1.0), mat->Ambient());
+  EXPECT_EQ(math::Color(0.64, 0.64, 0.64, 1.0), mat->Diffuse());
+  EXPECT_EQ(math::Color(0.5, 0.5, 0.5, 1.0), mat->Specular());
+  EXPECT_EQ(math::Color(0.0, 0.0, 0.0, 1.0), mat->Emissive());
+  EXPECT_DOUBLE_EQ(50.0, mat->Shininess());
+  // transparent: opaque="A_ONE", color=[1 1 1 1]
+  // transparency: 1.0
+  // resulting transparency value = (1 - color.a * transparency)
+  EXPECT_DOUBLE_EQ(0.0, mat->Transparency());
+  double srcFactor = -1;
+  double dstFactor = -1;
+  mat->BlendFactors(srcFactor, dstFactor);
+  EXPECT_DOUBLE_EQ(1.0, srcFactor);
+  EXPECT_DOUBLE_EQ(0.0, dstFactor);
 }
 
 /////////////////////////////////////////////////

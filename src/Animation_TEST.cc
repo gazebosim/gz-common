@@ -104,7 +104,6 @@ TEST_F(AnimationTest, NumericAnimation)
   EXPECT_DOUBLE_EQ(12, interpolatedKey.Value());
 }
 
-
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
