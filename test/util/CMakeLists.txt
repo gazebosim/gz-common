@@ -2,7 +2,7 @@ add_library(IGNDummyPlugins SHARED DummyPlugins.cc)
 
 # Create a variable for the name of the header which will contain the dummy plugin path.
 # This variable gets put in the cache so that it is available at generation time.
-set(IGN_DUMMY_PLUGIN_PATH_HEADER "DummyPluginsPath.h" CACHE STRING "Name of DummyPlugin header" FORCE)
+set(IGN_DUMMY_PLUGIN_PATH_HEADER "DummyPluginsPath.h" CACHE INTERNAL "Name of header which contains DummyPlugin library path")
 
 set(header_text "#define IGN_DUMMY_PLUGIN_PATH \"$<TARGET_FILE_DIR:IGNDummyPlugins>\"")
 

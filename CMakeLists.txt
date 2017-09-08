@@ -223,7 +223,7 @@ endif()
 # OS Specific initialization
 if (UNIX)
   ign_setup_unix()
-else (WIN32)
+elseif (MSVC)
   ign_setup_windows()
 endif()
 

@@ -101,21 +101,45 @@ endmacro()
 
 #################################################
 macro (ign_setup_windows)
-  # Using static linking in Windows by default
-  set(BUILD_SHARED_LIBS FALSE)
-  add_definitions(-DBUILDING_STATIC_LIBS -DWIN32_LEAN_AND_MEAN)
+
+  # Reduce overhead by ignoring unnecessary Windows headers
+  add_definitions(-DWIN32_LEAN_AND_MEAN)
+
+  # Use the dynamically loaded run-time library in Windows by default
+  set(BUILD_SHARED_LIBS TRUE)
+  set(IGN_RUNTIME_LIBRARY "/MD" CACHE STRING "Visual Studio Runtime Library Flag")
+  set_property(CACHE IGN_RUNTIME_LIBRARY PROPERTY STRINGS /MD /MT)
+  option(IGN_MSVC_DEFAULT_OPTIONS "Build project with default Visual Studio options" OFF)
 
   # Don't pull in the Windows min/max macros
   add_definitions(-DNOMINMAX)
 
-  # And we want exceptions
-  add_definitions("/EHsc")
-
   if (MSVC AND CMAKE_SIZEOF_VOID_P EQUAL 8)
-    # Not need if proper cmake gnerator (-G "...Win64") is passed to cmake
-    # Enable as a second measure to workaround over bug
+    # Not needed if a proper cmake generator (-G "...Win64") is passed 
+    # to cmake. Enable as a second measure to work around bug
     # http://www.cmake.org/Bug/print_bug_page.php?bug_id=11240
     set(CMAKE_SHARED_LINKER_FLAGS "/machine:x64")
+  endif()
+  
+  if(NOT IGN_MSVC_DEFAULT_OPTIONS)
+
+    # Zi: Produce complete debug information
+    # Gy: Prevent errors caused by multiply-defined symbols
+    # W3: Warning level 3: Production-quality warnings. 
+    #     TODO: Recommend Wall in the future.
+    #     Note: MSVC /Wall generates tons of warnings on gtest code.
+    # EHsc: Use standard-compliant exception handling
+    set(MSVC_COMMON_FLAGS "/Zi /Gy /W3 /EHsc")
+
+    # GL: Enable Whole Program Optimization
+    set(MSVC_RELEASE_FLAGS "/GL")
+
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${IGN_RUNTIME_LIBRARY}d ${MSVC_COMMON_FLAGS}")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${IGN_RUNTIME_LIBRARY} ${MSVC_COMMON_FLAGS} ${MSVC_RELEASE_FLAGS}")
+    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} ${IGN_RUNTIME_LIBRARY}d ${MSVC_COMMON_FLAGS} ${MSVC_RELEASE_FLAGS}")
+    
+    # TODO: What flags should be set for PROFILE and COVERAGE build types?
+
   endif()
 
 endmacro()
