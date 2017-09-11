@@ -21,6 +21,8 @@
 #include <ignition/common/SubMesh.hh>
 #include <ignition/common/Console.hh>
 #include <ignition/common/ColladaExporter.hh>
+#include <ignition/common/Filesystem.hh>
+#include <ignition/common/Console.hh>
 
 #include "tinyxml2.h"
 
@@ -30,6 +32,35 @@
 
 using namespace ignition;
 using namespace common;
+
+static void LogTinyXml2DocumentError(
+  const std::string &_flavorText,
+  const tinyxml2::XMLDocument &_doc)
+{
+  std::string warning = _flavorText + " | tinyxml2 error id (";
+  if (_doc.Error())
+  {
+    warning += std::to_string(_doc.ErrorID()) + "): ";
+
+    const char * error1 = _doc.GetErrorStr1();
+    const char * error2 = _doc.GetErrorStr2();
+
+    if (error1)
+      warning += "str1=" + std::string(error1);
+
+    if (error1 && error2)
+      warning += ", ";
+
+    if (error2)
+      warning += "str2=" + std::string(error2);
+  }
+  else
+  {
+    warning += "none)";
+  }
+
+  ignwarn << warning << "\n";
+}
 
 /// Private data for the ColladaExporter class
 class ignition::common::ColladaExporterPrivate
@@ -122,10 +153,11 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
   this->dataPtr->exportTextures = _exportTextures;
 
   // File name and path
-  unsigned int beginFilename = _filename.rfind("/")+1;
+  const std::string unix_filename = copyToUnixPath(_filename);
+  unsigned int beginFilename = unix_filename.rfind("/")+1;
 
-  this->dataPtr->path = _filename.substr(0, beginFilename);
-  this->dataPtr->filename = _filename.substr(beginFilename);
+  this->dataPtr->path = unix_filename.substr(0, beginFilename);
+  this->dataPtr->filename = unix_filename.substr(beginFilename);
 
   if (this->dataPtr->materialCount != 0 &&
       this->dataPtr->materialCount != this->dataPtr->subMeshCount)
@@ -196,16 +228,34 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
   // Save file
   if (this->dataPtr->exportTextures)
   {
-    createDirectories(
-        this->dataPtr->path + this->dataPtr->filename + "/meshes/");
-    xmlDoc.SaveFile((this->dataPtr->path + this->dataPtr->filename +
-        std::string("/meshes/") + this->dataPtr->filename +
-        std::string(".dae")).c_str());
+    const std::string directory = ignition::common::joinPaths(
+      this->dataPtr->path, this->dataPtr->filename, "meshes");
+
+    createDirectories(directory);
+
+    const std::string finalFilename = ignition::common::joinPaths(
+      this->dataPtr->path, this->dataPtr->filename, "meshes",
+      this->dataPtr->filename + ".dae");
+
+    const tinyxml2::XMLError error = xmlDoc.SaveFile(finalFilename.c_str());
+    if (tinyxml2::XML_SUCCESS != error)
+    {
+      LogTinyXml2DocumentError(
+        "Could not save colloda file with textures to [" + finalFilename
+        + "]", xmlDoc);
+    }
   }
   else
   {
-    xmlDoc.SaveFile((this->dataPtr->path + this->dataPtr->filename +
-        std::string(".dae")).c_str());
+    const std::string finalFilename = ignition::common::joinPaths(
+      this->dataPtr->path, this->dataPtr->filename + std::string(".dae"));
+
+    const tinyxml2::XMLError error = xmlDoc.SaveFile(finalFilename.c_str());
+    if (tinyxml2::XML_SUCCESS != error)
+    {
+      LogTinyXml2DocumentError(
+        "Could not save collada file to [" + finalFilename + "]", xmlDoc);
+    }
   }
 }
 

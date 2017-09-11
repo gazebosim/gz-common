@@ -36,7 +36,7 @@ set (FREEIMAGE_MINOR_VERSION 9
 set (MIN_FREEIMAGE_VERSION ${FREEIMAGE_MAJOR_VERSION}.${FREEIMAGE_MINOR_VERSION}.0 CACHE INTERNAL "FreeImage version requirement" FORCE)
 
 if (WIN32)
-  set(BUILD_SYMLINK_TESTS_ON_WINDOWS false CACHE BOOL
+  set(IGN_BUILD_SYMLINK_TESTS_ON_WINDOWS false CACHE BOOL
       "Creating symlinks requires special permissions on Windows, so those tests are disabled by default")
 endif ()
 
@@ -155,7 +155,7 @@ MESSAGE(STATUS "Checking ignition build type")
 # Set the default build type
 if (NOT CMAKE_BUILD_TYPE)
     set (CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING
-        "Choose the type of build, options are: Debug Release RelWithDebInfo Profile Check" FORCE)
+        "Choose the type of build, options are: Debug Release RelWithDebInfo Profile Check")
 endif (NOT CMAKE_BUILD_TYPE)
 # TODO: still convert to uppercase to keep backwards compatibility with
 # uppercase old supported and deprecated modes
@@ -201,12 +201,9 @@ if(NOT DEFINED USE_UPSTREAM_CFLAGS OR USE_UPSTREAM_CFLAGS)
   include(${project_cmake_dir}/DefaultCFlags.cmake)
 endif()
 
-# Check if warning options are avaliable for the compiler and return WARNING_CXX_FLAGS variable
-# MSVC generates tons of warnings on gtest code.
-# Recommended to use /W4 instead of /Wall
-if (MSVC)
-  set(WARN_LEVEL "/W2")
-else()
+# Check if warning options are avaliable for the compiler 
+# and return WARNING_CXX_FLAGS variable
+if (NOT MSVC)
   set(WARN_LEVEL "-Wall")
 endif()
 

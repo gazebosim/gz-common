@@ -101,21 +101,68 @@ endmacro()
 
 #################################################
 macro (ign_setup_windows)
-  # Using static linking in Windows by default
-  set(BUILD_SHARED_LIBS FALSE)
-  add_definitions(-DBUILDING_STATIC_LIBS -DWIN32_LEAN_AND_MEAN)
+
+  # Reduce overhead by ignoring unnecessary Windows headers
+  add_definitions(-DWIN32_LEAN_AND_MEAN)
+
+  # Use the dynamically loaded run-time library in Windows by default
+  set(BUILD_SHARED_LIBS TRUE)
+  set(IGN_RUNTIME_LIBRARY "/MD" CACHE STRING "Visual Studio Runtime Library Flag")
+  set_property(CACHE IGN_RUNTIME_LIBRARY PROPERTY STRINGS /MD /MT)
+  option(IGN_MSVC_DEFAULT_OPTIONS "(Not Recommended) Build project with default Visual Studio options" OFF)
 
   # Don't pull in the Windows min/max macros
   add_definitions(-DNOMINMAX)
 
-  # And we want exceptions
-  add_definitions("/EHsc")
-
   if (MSVC AND CMAKE_SIZEOF_VOID_P EQUAL 8)
-    # Not need if proper cmake gnerator (-G "...Win64") is passed to cmake
-    # Enable as a second measure to workaround over bug
+    # Not needed if a proper cmake generator (-G "...Win64") is passed 
+    # to cmake. Enable as a second measure to work around bug
     # http://www.cmake.org/Bug/print_bug_page.php?bug_id=11240
     set(CMAKE_SHARED_LINKER_FLAGS "/machine:x64")
+  endif()
+  
+  if(NOT IGN_MSVC_DEFAULT_OPTIONS)
+
+    # Gy: Prevent errors caused by multiply-defined symbols
+    # W3: Warning level 3: Production-quality warnings. 
+    #     TODO: Recommend Wall in the future.
+    #     Note: MSVC /Wall generates tons of warnings on gtest code.
+    # EHsc: Use standard-compliant exception handling
+    set(MSVC_MINIMAL_FLAGS "/Gy /W3 /EHsc")
+
+    option(IGN_MSVC_MULTIPROCESS_BUILD "Use multiple processes to build the ignition library" ON)
+    if(IGN_MSVC_MULTIPROCESS_BUILD)
+      # MP: Build using multiple processes (the number is set
+      #     automatically based on number of threads available).
+      set(MSVC_MINIMAL_FLAGS "${MSVC_MINIMAL_FLAGS} /MP")
+    endif()
+
+    # Zi: Produce complete debug information
+    # Note: We provide Zi to ordinary release mode because it does not impact
+    # performance and can be helpful for debugging.
+    set(MSVC_DEBUG_FLAGS "${MSVC_MINIMAL_FLAGS} /Zi")
+
+    # GL: Enable Whole Program Optimization
+    set(MSVC_RELEASE_FLAGS "${MSVC_DEBUG_FLAGS} /GL")
+
+    # cmake automatically provides /Zi /Ob0 /Od /RTC1
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${IGN_RUNTIME_LIBRARY}d ${MSVC_DEBUG_FLAGS}")
+
+    # cmake automatically provides /O2 /Ob2 /DNDEBUG
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${IGN_RUNTIME_LIBRARY} ${MSVC_RELEASE_FLAGS}")
+
+    # cmake automatically provides /Zi /O2 /Ob1 /DNDEBUG
+    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} ${IGN_RUNTIME_LIBRARY}d ${MSVC_RELEASE_FLAGS}")
+    
+    # cmake automatically provides /O1 /Ob1 /DNDEBUG
+    set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} ${IGN_RUNTIME_LIBRARY} ${MSVC_MINIMAL_FLAGS}")
+    
+    # TODO: What flags should be set for PROFILE and COVERAGE build types?
+
+  else()
+    # We always want this flag to be specified to get
+    # standard-compliant exception handling.
+    add_definitions("/EHsc")
   endif()
 
 endmacro()
