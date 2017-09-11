@@ -106,7 +106,7 @@ bool create_new_file_hardlink(const std::string &_hardlink,
 #include <cstdint>
 #include "PrintWindowsSystemWarning.hh"
 
-#ifdef BUILD_SYMLINK_TESTS_ON_WINDOWS
+#ifdef IGN_BUILD_SYMLINK_TESTS_ON_WINDOWS
 // The symlink tests require special permissions to work on Windows,
 // so they will be disabled by default. For more information, see:
 // https://bitbucket.org/ignitionrobotics/ign-common/issues/21
