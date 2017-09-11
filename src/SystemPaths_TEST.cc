@@ -20,7 +20,7 @@
 #include <gtest/gtest.h>
 #include <string>
 #include <vector>
-#include <stdio.h>
+#include <cstdio>
 
 #include "ignition/common/Util.hh"
 #include "ignition/common/SystemPaths.hh"
