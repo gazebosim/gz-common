@@ -27,3 +27,6 @@ pipelines:
           # Tests
           - make test
           - make install
+          # Coverage
+          - make coverage
+          - bash <(curl -s https://codecov.io/bash)
