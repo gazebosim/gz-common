@@ -25,6 +25,10 @@
 #include "ignition/common/Util.hh"
 #include "ignition/common/SystemPaths.hh"
 
+#ifdef _WIN32
+  #define snprintf _snprintf
+#endif
+
 using namespace ignition;
 
 class SystemPathsFixture : public ::testing::Test
