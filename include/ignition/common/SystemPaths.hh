@@ -31,7 +31,6 @@
 #include <list>
 #include <memory>
 #include <string>
-#include <type_traits>
 #include <vector>
 
 #include <ignition/common/System.hh>
@@ -66,7 +65,7 @@ namespace ignition
       /// \brief Find a file or path using a URI
       /// \param[in] _uri the uniform resource identifier
       /// \return Returns full path name to file
-      public: std::string FindFileURI(const std::string &_uri);
+      public: std::string FindFileURI(const std::string &_uri) const;
 
       /// \brief Set the plugin path environment variable to use
       /// \param [in] _env name of the environment variable
@@ -78,19 +77,7 @@ namespace ignition
       /// directory.
       /// \return Returns full path name to file
       public: std::string FindFile(const std::string &_filename,
-                                   bool _searchLocalPath = true);
-
-      /// \brief look for a file in a set of search paths (not recursive)
-      /// \description This method checks if a file exists in given directories.
-      ///              It does so by joining each path with the filename and
-      ///              checking if the file exists. If the file exists in
-      ///              multiple paths the first one is found.
-      /// \param[in] _filename Name of the file to find
-      /// \param[in] _paths paths to look for the file
-      /// \return Returns a path that will work from the current directory
-      //          or an empty string if the file was not found
-      public: std::string LocateLocalFile(const std::string &_filename,
-                                   const std::vector<std::string> &_paths);
+                                   const bool _searchLocalPath = true) const;
 
       /// \brief Find a shared library by name in the plugin paths
       ///
@@ -125,6 +112,18 @@ namespace ignition
       /// \param[in] _cb The callback function.
       public: void SetFindFileURICallback(
                   std::function<std::string (const std::string &)> _cb);
+
+      /// \brief look for a file in a set of search paths (not recursive)
+      /// \description This method checks if a file exists in given directories.
+      ///              It does so by joining each path with the filename and
+      ///              checking if the file exists. If the file exists in
+      ///              multiple paths the first one is found.
+      /// \param[in] _filename Name of the file to find
+      /// \param[in] _paths paths to look for the file
+      /// \return Returns a path that will work from the current directory
+      //          or an empty string if the file was not found
+      public: static std::string LocateLocalFile(const std::string &_filename,
+                                  const std::vector<std::string> &_paths);
 
       /// \brief Format the directory path to use "/" as a separator with "/"
       /// at the end.
