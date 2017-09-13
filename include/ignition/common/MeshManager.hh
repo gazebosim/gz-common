@@ -22,7 +22,6 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include <mutex>
 
 #include <ignition/math/Plane.hh>
 #include <ignition/math/Matrix3.hh>
@@ -39,11 +38,9 @@ namespace ignition
 {
   namespace common
   {
-    class ColladaLoader;
-    class ColladaExporter;
-    class STLLoader;
     class Mesh;
     class SubMesh;
+    class MeshManagerPrivate;
 
     /// \class MeshManager MeshManager.hh ignition/common/MeshManager.hh
     /// \brief Maintains and manages all meshes
@@ -260,30 +257,8 @@ namespace ignition
                       const ignition::math::Vector2d &_p,
                       const double _tol);
 
-#ifdef _WIN32
-// Disable warning C4251
-#pragma warning(push)
-#pragma warning(disable: 4251)
-#endif
-      /// \brief 3D mesh loader for COLLADA files
-      private: ColladaLoader *colladaLoader;
-
-      /// \brief 3D mesh exporter for COLLADA files
-      private: ColladaExporter *colladaExporter;
-
-      /// \brief 3D mesh loader for STL files
-      private: STLLoader *stlLoader;
-
-      /// \brief Dictionary of meshes, indexed by name
-      private: std::map<std::string, Mesh*> meshes;
-
-      /// \brief supported file extensions for meshes
-      private: std::vector<std::string> fileExtensions;
-
-      private: std::mutex mutex;
-#ifdef _WIN32
-#pragma warning(pop)
-#endif
+      /// \brief Pointer to private data
+      private: std::unique_ptr<MeshManagerPrivate> dataPtr;
 
       /// \brief Singleton implementation
       private: friend class SingletonT<MeshManager>;
