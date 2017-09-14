@@ -2,11 +2,11 @@
 #
 # For finding and loading @PKG_NAME@ from your project, type:
 #
-# find_package(@PROJECT_NAME_LOWER@@PROJECT_MAJOR_VERSION@)
+# find_package(@PROJECT_NAME_LOWER@@PROJECT_VERSION_MAJOR@)
 #
 # It defines the following variables:
 #
-#  @PROJECT_NAME_LOWER@@PROJECT_MAJOR_VERSION@_FOUND       - System has @PKG_NAME@.
+#  @PROJECT_NAME_LOWER@@PROJECT_VERSION_MAJOR@_FOUND       - System has @PKG_NAME@.
 #  @PKG_NAME@_INCLUDE_DIRS - include directories for @PKG_NAME@ and its dependencies.
 #  @PKG_NAME@_LIBRARY_DIRS - Paths in which the linker should search for libraries.
 #  @PKG_NAME@_LIBRARIES    - Libraries to link against.
@@ -39,8 +39,6 @@ endif()
 
 # Compatibility
 set(@PKG_NAME@_LIBRARIES @PROJECT_LIBRARY_TARGET_NAME@)
-set(@PKG_NAME@_INCLUDE_DIRS "@PACKAGE_INCLUDE_INSTALL_DIR_FULL@")
-set(@PKG_NAME@_LIBRARY_DIRS "@PACKAGE_LIB_INSTALL_DIR@")
-set(@PKG_NAME@_LDFLAGS      "-L@PACKAGE_LIB_INSTALL_DIR@")
-
-find_package(ignition-math3 REQUIRED)
+set(@PKG_NAME@_INCLUDE_DIRS "@PACKAGE_IGN_INCLUDE_INSTALL_DIR_FULL@")
+set(@PKG_NAME@_LIBRARY_DIRS "@PACKAGE_IGN_LIB_INSTALL_DIR@")
+set(@PKG_NAME@_LDFLAGS      "-L@PACKAGE_IGN_LIB_INSTALL_DIR@")

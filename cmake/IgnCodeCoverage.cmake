@@ -6,13 +6,15 @@
 # - Added support for Clang.
 # - Some additional usage instructions.
 #
+# 2017-09-13
+# - Tweaked instructions for ignition libraries
+# - Tweaked function name to avoid name collisions
+#
 # USAGE:
-# 1. Copy this file into your cmake modules path.
+# 1. Add the following line to your CMakeLists.txt:
+#      INCLUDE(IgnCodeCoverage)
 #
-# 2. Add the following line to your CMakeLists.txt:
-#      INCLUDE(CodeCoverage)
-#
-# 3. Set compiler flags to turn off optimization and enable coverage: 
+# 2. Set compiler flags to turn off optimization and enable coverage:
 #    SET(CMAKE_CXX_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
 #	 SET(CMAKE_C_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
 #  
@@ -89,7 +91,7 @@ ENDIF() # NOT CMAKE_BUILD_TYPE STREQUAL "Debug"
 #                       HTML report is generated in _outputname/index.html
 # Optional fourth parameter is passed as arguments to _testrunner
 #   Pass them in list form, e.g.: "-j;2" for -j 2
-FUNCTION(SETUP_TARGET_FOR_COVERAGE _targetname _testrunner _outputname)
+FUNCTION(IGN_SETUP_TARGET_FOR_COVERAGE _targetname _testrunner _outputname)
 
 	IF(NOT LCOV_PATH)
 		MESSAGE(FATAL_ERROR "lcov not found! Aborting...")

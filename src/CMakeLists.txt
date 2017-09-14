@@ -1,6 +1,6 @@
-include (${project_cmake_dir}/Utils.cmake)
+include(IgnUtils)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
-                    ${tinyxml2_INCLUDE_DIRS})
+                    ${TINYXML2_INCLUDE_DIRS})
 
 set (sources
   Animation.cc
@@ -107,20 +107,34 @@ endif()
 ign_add_library(${PROJECT_LIBRARY_TARGET_NAME} ${sources})
 target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
   ${IGNITION-MATH_LIBRARIES}
-  ${tinyxml2_LIBRARIES}
-  ${uuid_LIBRARIES}
-  ${libdl_library})
+  ${TINYXML2_LIBRARIES}
+  ${UUID_LIBRARIES}
+  ${DL_LIBRARIES})
 
-if(NOT WIN32)
-  target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
-    ${freeimage_LIBRARIES}
-    ${gts_LIBRARIES}
-    ${libavcodec_LIBRARIES}
-    ${libavformat_LIBRARIES}
-    ${libavutil_LIBRARIES}
-    ${libavdevice_LIBRARIES}
-    ${libswscale_LIBRARIES}
+if(NOT MSVC)
+
+  target_include_directories(${PROJECT_LIBRARY_TARGET_NAME}
+    PRIVATE
+    ${GTS_INCLUDE_DIRS}
+    ${UUID_INCLUDE_DIRS}
+    ${SWSCALE_INCLUDE_DIRS}
+    ${AVDEVICE_INCLUDE_DIRS}
   )
+
+  target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
+    ${FreeImage_LIBRARIES}
+    ${GTS_LIBRARIES}
+    ${AVCODEC_LIBRARIES}
+    ${AVFORMAT_LIBRARIES}
+    ${AVUTIL_LIBRARIES}
+    ${AVDEVICE_LIBRARIES}
+    ${SWSCALE_LIBRARIES}
+  )
+
+  target_compile_options(${PROJECT_LIBRARY_TARGET_NAME}
+    PRIVATE
+    ${GTS_CFLAGS})
+
 endif()
 
 if (UNIX AND NOT APPLE)
@@ -151,9 +165,9 @@ endif()
 
 target_include_directories(${PROJECT_LIBRARY_TARGET_NAME}
   PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR_FULL}>)
+  $<INSTALL_INTERFACE:${IGN_INCLUDE_INSTALL_DIR_FULL}>)
 
-target_include_directories(${PROJECT_LIBRARY_TARGET_NAME} PRIVATE ${libdl_include_dir})
+target_include_directories(${PROJECT_LIBRARY_TARGET_NAME} PRIVATE ${DL_INCLUDE_DIRS})
 
 ign_install_library(${PROJECT_LIBRARY_TARGET_NAME} ${PROJECT_EXPORT_NAME})
 
