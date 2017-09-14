@@ -17,12 +17,13 @@ pipelines:
             libavcodec-dev libavdevice-dev libavformat-dev libavutil-dev
             libfreeimage-dev libgts-dev libswscale-dev libtinyxml2-dev
             libignition-math3-dev
+            lcov curl mercurial
           # Code checker
           - sh tools/code_check.sh
           # Build
           - mkdir build
           - cd build
-          - cmake ..
+          - cmake .. -DCMAKE_BUILD_TYPE=coverage
           - make
           # Tests
           - make test
