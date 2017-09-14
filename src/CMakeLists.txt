@@ -1,6 +1,10 @@
-include(IgnUtils)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}
-                    ${TINYXML2_INCLUDE_DIRS})
+include_directories(
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  # Used to make test headers visible to the unit tests
+  ${PROJECT_SOURCE_DIR}
+  # Used to make test_config.h visible to the unit tests
+  ${PROJECT_BINARY_DIR}
+  ${TINYXML2_INCLUDE_DIRS})
 
 set (sources
   Animation.cc

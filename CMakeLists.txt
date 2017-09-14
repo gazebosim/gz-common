@@ -13,7 +13,6 @@ include(IgnCMake)
 #============================================================================
 ign_configure_project(common 0 4 0)
 
-
 #============================================================================
 # Set project-specific options
 #============================================================================
@@ -23,8 +22,8 @@ ign_configure_project(common 0 4 0)
 if(WIN32)
   option(
     IGN_BUILD_SYMLINK_TESTS_ON_WINDOWS
-    "Creating symlinks requires special permissions on Windows, so those tests "
-    "are disabled by default" false)
+    "Creating symlinks requires special permissions on Windows, so those tests are disabled by default"
+    false)
 endif()
 
 #--------------------------------------

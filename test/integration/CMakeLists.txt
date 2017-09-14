@@ -1,5 +1,8 @@
 set(TEST_TYPE "INTEGRATION")
 
+# This is to make test_config.h visible
+include_directories("${CMAKE_BINARY_DIR}")
+
 set(tests
   plugin.cc
 )
