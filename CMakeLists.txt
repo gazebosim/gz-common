@@ -44,23 +44,14 @@ endif()
 message (STATUS "\n\n-- ====== Finding 3rd Party Packages ======")
 
 #--------------------------------------
-# Find Freeimage
-ign_find_package(FreeImage VERSION 3.9 REQUIRED)
-#find_package(FreeImage 3.9)
-#if(FreeImage_FOUND)
-#  message (STATUS "Looking for FreeImage - found")
-#  include_directories(${FreeImage_INCLUDE_DIRS})
-#else()
-#  message (STATUS "Looking for FreeImage - not found")
-#endif()
-
-#--------------------------------------
 # Find ignition-math
 ign_find_package(ignition-math3 REQUIRED)
 include_directories(${IGNITION-MATH_INCLUDE_DIRS})
 
-#include(FindFreeImage)
-find_package(FreeImage 3.9)
+#--------------------------------------
+# Find Freeimage
+ign_find_package(FreeImage VERSION 3.9 REQUIRED)
+
 #--------------------------------------
 # Find Tinyxml2
 if(USE_EXTERNAL_TINYXML2)
