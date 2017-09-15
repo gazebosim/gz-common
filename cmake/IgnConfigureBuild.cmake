@@ -116,6 +116,12 @@ macro(ign_configure_build)
 
 
     #--------------------------------------
+    # Clear the test results directory
+    execute_process(COMMAND cmake -E remove_directory ${CMAKE_BINARY_DIR}/test_results)
+    execute_process(COMMAND cmake -E make_directory ${CMAKE_BINARY_DIR}/test_results)
+
+
+    #--------------------------------------
     # Add all the source code directories
     set(TEST_TYPE "UNIT")
     add_subdirectory(src)

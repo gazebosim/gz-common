@@ -13,6 +13,7 @@ include(IgnCMake)
 #============================================================================
 ign_configure_project(common 0 4 0)
 
+
 #============================================================================
 # Set project-specific options
 #============================================================================
@@ -94,7 +95,11 @@ if(NOT MSVC)
 
   #------------------------------------
   # Find avcodec
-  find_package(AVCODEC REQUIRED PRETTY libavcodec)
+  ign_find_package(AVCODEC REQUIRED PRETTY libavcodec)
+
+  #------------------------------------
+  # Find avutil
+  ign_find_package(AVUTIL REQUIRED PRETTY libavutil)
 
 endif()
 

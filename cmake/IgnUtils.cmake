@@ -1,40 +1,10 @@
-################################################################################
-#ign_append_to_cached_string(_string _cacheDesc [items...])
-# Appends items to a cached list.
-macro(ign_append_to_cached_string _string _cacheDesc)
-  foreach(newItem ${ARGN})
-    set(${_string} "${${_string}} ${newItem}" CACHE INTERNAL ${_cacheDesc} FORCE)
-  endforeach(newItem ${ARGN})
-  #string(STRIP ${${_string}} ${_string})
-endmacro(ign_append_to_cached_string)
-
-################################################################################
-# ign_append_to_cached_list (_list _cacheDesc [items...]
-# Appends items to a cached list.
-macro(ign_append_to_cached_list _list _cacheDesc)
-  set(tempList ${${_list}})
-  foreach(newItem ${ARGN})
-    list(APPEND tempList ${newItem})
-  endforeach(newItem ${newItem})
-  set(${_list} ${tempList} CACHE INTERNAL ${_cacheDesc} FORCE)
-endmacro(ign_append_to_cached_list)
-
-#################################################
-# Macro to turn a list into a string (why doesn't CMake have this built-in?)
-macro(list_to_string _string _list)
-    set(${_string})
-    foreach(_item ${_list})
-      set(${_string} "${${_string}} ${_item}")
-    endforeach(_item)
-    #string(STRIP ${${_string}} ${_string})
-endmacro(list_to_string)
 
 #################################################
 # ign_find_package(<PACKAGE_NAME> [REQUIRED] [QUIET]
-#                  [VERSION ver]
-#                  [EXTRA_ARGS args]
-#                  [PRETTY name]
-#                  [PURPOSE "explanation for this dependency"])
+#                  [VERSION <ver>]
+#                  [EXTRA_ARGS <args>]
+#                  [PRETTY <name>]
+#                  [PURPOSE <"explanation for this dependency">])
 #
 # This is a wrapper for the standard cmake find_package which behaves according
 # to the conventions of the ignition library. In particular, we do not quit
@@ -65,18 +35,6 @@ macro(ign_find_package PACKAGE_NAME)
   set(options REQUIRED QUIET)
   set(oneValueArgs VERSION PRETTY PURPOSE EXTRA_ARGS)
   set(multiValueArgs) # We are not using multiValueArgs yet
-
-  #------------------------------------
-  # We need this to be a macro instead of a function so that the variables which
-  # get set by find_package will make their way to the invoker, but this has the
-  # unfortunate side effect that variables which get created for the optional
-  # arguments will persist between invokations of this macro that occur in the
-  # same scope. Therefore, we will manually unset those optional variables here
-  # to keep make sure they don't pollute anything. If anyone has a better
-  # solution for this, please share.
-  foreach(arg ${options} ${oneValueArgs} ${multiValueArgs})
-    unset(ign_find_package_${arg})
-  endforeach()
 
   #------------------------------------
   # Parse the arguments
@@ -127,8 +85,205 @@ macro(ign_find_package PACKAGE_NAME)
     endif()
   endif()
 
-
 endmacro()
+
+#################################################
+# Macro to turn a list into a string (why doesn't CMake have this built-in?)
+macro(ign_list_to_string _string _list)
+    set(${_string})
+    foreach(_item ${_list})
+      set(${_string} "${${_string}} ${_item}")
+    endforeach(_item)
+    #string(STRIP ${${_string}} ${_string})
+endmacro()
+
+#################################################
+# ign_get_sources_and_unittests(<lib_srcs> <tests>)
+#
+# From the current directory, grab all the files ending in "*.cc" and sort them
+# into library source files <lib_srcs> and unittest source files <tests>. Remove
+# their paths to make them suitable for passing into ign_add_[library/tests].
+function(ign_get_libsources_and_unittests lib_sources_var tests_var)
+
+  # GLOB all the source files
+  file(GLOB source_files "*.cc")
+  list(SORT source_files)
+
+  # GLOB all the unit tests
+  file(GLOB test_files "*_TEST.cc")
+  list(SORT test_files)
+
+  # Initialize these lists
+  set(tests)
+  set(sources)
+
+  # Remove the unit tests from the list of source files
+  foreach(test_file ${test_files})
+
+    list(REMOVE_ITEM source_files ${test_file})
+
+    # Remove the path from the unit test and append to the list of tests.
+    get_filename_component(test ${test_file} NAME)
+    list(APPEND tests ${test})
+
+  endforeach()
+
+  foreach(source_file ${source_files})
+
+    # Remove the path from the library source file and append it to the list of
+    # library source files.
+    get_filename_component(source ${source_file} NAME)
+    list(APPEND sources ${source})
+
+  endforeach()
+
+  # Return the lists that have been created.
+  set(${lib_sources_var} ${sources} PARENT_SCOPE)
+  set(${tests_var} ${tests} PARENT_SCOPE)
+
+endfunction()
+
+#################################################
+# ign_get_sources(<sources>)
+#
+# From the current directory, grab all the source files and place them into
+# <sources>. Remove their paths to make them suitable for passing into
+# ign_add_[library/tests].
+function(ign_get_sources sources_var)
+
+  # GLOB all the source files
+  file(GLOB source_files "*.cc")
+  list(SORT source_files)
+
+  # Initialize this list
+  set(sources)
+
+  foreach(source_file ${source_files})
+
+    # Remove the path from the source file and append it the list of soures
+    get_filename_component(source ${source_file} NAME)
+    list(APPEND sources ${source})
+
+  endforeach()
+
+  # Return the list that has been created
+  set(${sources_var} ${sources} PARENT_SCOPE)
+
+endfunction()
+
+#################################################
+# ign_install_all_headers(
+#   [ADDITIONAL_DIRS <dirs>]
+#   [EXCLUDE <excluded_headers>])
+#
+# From the current directory, install all header files, including files from the
+# "detail" subdirectory. You can optionally specify additional directories
+# (besides detail) to also install. You may also specify header files to
+# exclude from the installation. This will accept all files ending in *.h and
+# *.hh. You may append an additional suffix (like .old or .backup) to prevent
+# a file from being included here.
+#
+# This will also run configure_file on ign_auto_headers.hh.in and config.hh.in
+# and install both of them.
+function(ign_install_all_headers)
+
+  #------------------------------------
+  # Define the expected arguments
+  set(options) # We are not using options yet
+  set(oneValueArgs) # We are not using oneValueArgs yet
+  set(multiValueArgs ADDITIONAL_DIRS EXCLUDE)
+
+  #------------------------------------
+  # Parse the arguments
+  cmake_parse_arguments(ign_install_all_headers "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+  #------------------------------------
+  # Build list of directories
+  set(dir_list "." "detail" ${ign_install_all_headers_ADDITIONAL_DIRS})
+
+  #------------------------------------
+  # Grab the excluded files
+  set(excluded ${ign_install_all_headers_EXCLUDE})
+
+  #------------------------------------
+  # Initialize the string of all headers
+  set(ign_headers)
+
+  #------------------------------------
+  # Install all the non-excluded headers
+  foreach(dir ${dir_list})
+
+    # GLOB all the header files in dir
+    file(GLOB header_files "${dir}/*.h" "${dir}/*.hh")
+    list(SORT header_files)
+
+    # Replace full paths with relative paths
+    set(headers)
+    foreach(header_file ${header_files})
+
+      get_filename_component(header ${header_file} NAME)
+      if("." STREQUAL ${dir})
+        list(APPEND headers ${header})
+      else()
+        list(APPEND headers ${dir}/${header})
+      endif()
+
+    endforeach()
+
+    # Remove the excluded headers
+    foreach(exclude ${excluded})
+      list(REMOVE_ITEM headers ${exclude})
+    endforeach()
+
+    # Add each header, prefixed by its directory, to the auto headers variable
+    foreach(header ${headers})
+      set(ign_headers "${ign_headers}#include <ignition/${IGN_DESIGNATION}/${header}>\n")
+    endforeach()
+
+    if("." STREQUAL ${dir})
+      set(destination "${IGN_INCLUDE_INSTALL_DIR_FULL}/ignition/${IGN_DESINATION}")
+    else()
+      set(destination "${IGN_INCLUDE_INSTALL_DIR_FULL}/ignition/${IGN_DESINATION}/${dir}")
+    endif()
+
+    install(
+      FILES ${headers}
+      DESTINATION ${destination}
+      COMPONENT headers)
+
+  endforeach()
+
+  # Define the install directory for the meta headers
+  set(meta_header_install_dir ${IGN_INCLUDE_INSTALL_DIR_FULL}/ignition/${IGN_DESIGNATION})
+
+  # Define the input/output of the configuration for the "master" header
+  set(master_header_in ${IGNITION_CMAKE_DIR}/ign_auto_headers.hh.in)
+  set(master_header_out ${CMAKE_CURRENT_BINARY_DIR}/${IGN_DESIGNATION}.hh)
+
+  # Generate the "master" header that includes all of the headers
+  configure_file(${master_header_in} ${master_header_out})
+
+  # Install the "master" header
+  install(
+    FILES ${master_header_out}
+    DESTINATION ${meta_header_install_dir}
+    COMPONENT headers)
+
+  # Define the input/output of the configuration for the "config" header
+  set(config_header_in ${CMAKE_CURRENT_SOURCE_DIR}/config.hh.in)
+  set(config_header_out ${CMAKE_CURRENT_BINARY_DIR}/config.hh)
+
+  # Generate the "config" header that describes our project configuration
+  configure_file(${config_header_in} ${config_header_out})
+
+  # Install the "config" header
+  install(
+    FILES ${config_header_out}
+    DESTINATION ${meta_header_install_dir}
+    COMPONENT headers)
+
+endfunction()
+
 
 #################################################
 # ign_build_error macro
