@@ -1,11 +1,11 @@
-include_directories (
+include_directories(
   ${PROJECT_SOURCE_DIR}/test/gtest/include
   ${PROJECT_SOURCE_DIR}/test/gtest
   ${PROJECT_SOURCE_DIR}/test
 )
 
 if(NOT MSVC)
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 endif()
 
 # Build gtest
@@ -23,4 +23,4 @@ add_subdirectory(regression)
 add_subdirectory(util)
 add_subdirectory(static_assertions)
 
-configure_file (test_config.h.in ${PROJECT_BINARY_DIR}/test_config.h)
+configure_file(test_config.h.in ${PROJECT_BINARY_DIR}/test_config.h)

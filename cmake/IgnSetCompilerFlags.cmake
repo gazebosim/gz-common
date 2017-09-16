@@ -235,7 +235,7 @@ endmacro()
 macro(ign_set_sse_flags)
 
   message(STATUS "\n-- Searching for host SSE information")
-  include(FindSSE)
+  include(IgnCheckSSE)
 
   if(SSE2_FOUND)
     add_compile_options(-msse -msse2)

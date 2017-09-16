@@ -231,7 +231,7 @@ endfunction()
 function(ign_create_cmake_package)
 
   # Set configuration arguments
-  set(PKG_NAME ${PROJECT_NAME_NO_VERSION_UPPER})
+  set(PKG_NAME ${PROJECT_NAME_UPPER})
   set(ign_config_input "${IGNITION_CMAKE_DIR}/ignition-config.cmake.in")
   set(ign_config_output "${PROJECT_NAME_LOWER}-config.cmake")
   set(ign_version_output "${PROJECT_NAME_LOWER}-config-version.cmake")
@@ -255,19 +255,40 @@ function(ign_create_cmake_package)
     COMPATIBILITY SameMajorVersion)
 
   # Install the configuration files to the configuration installation directory
-  install(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/${ign_config_output}
-    ${CMAKE_CURRENT_BINARY_DIR}/${ign_version_output}
-    DESTINATION ${ign_config_install_dir} COMPONENT cmake)
+  install(
+    FILES
+      ${CMAKE_CURRENT_BINARY_DIR}/${ign_config_output}
+      ${CMAKE_CURRENT_BINARY_DIR}/${ign_version_output}
+    DESTINATION ${ign_config_install_dir}
+    COMPONENT cmake)
 
   # Create *-targets.cmake file for build directory
-  export(EXPORT ${PROJECT_EXPORT_NAME}
-         FILE ${CMAKE_BINARY_DIR}/${ign_targets_output})
+  export(
+    EXPORT ${PROJECT_EXPORT_NAME}
+    FILE ${CMAKE_BINARY_DIR}/${ign_targets_output}
+    # We add a namespace that ends with a :: to the name of the exported target.
+    # This is so consumers of the project can call
+    #     find_package(ignition-<project>)
+    #     target_link_libraries(consumer_project ignition-<project>::ignition-<project>)
+    # and cmake will understand that the consumer is asking to link the imported
+    # target "ignition-<project>" to their "consumer_project" rather than asking
+    # to link a library named "ignition-<project>". In other words, when
+    # target_link_libraries is given a name that contains double-colons (::) it
+    # will never mistake it for a library name, and it will throw an error if
+    # it cannot find a target with the given name.
+    #
+    # The advantage of linking against a target rather than a library is that
+    # you will automatically link against all the dependencies of that target.
+    # This also helps us create find-config files that are relocatable.
+    NAMESPACE ${PROJECT_EXPORT_NAME}::)
 
   # Install *-targets.cmake file
-  install(EXPORT ${PROJECT_EXPORT_NAME}
-          DESTINATION ${ign_config_install_dir}
-          FILE ${cmake_targets_file})
+  install(
+    EXPORT ${PROJECT_EXPORT_NAME}
+    DESTINATION ${ign_config_install_dir}
+    FILE ${ign_targets_output}
+    # See explanation above for NAMESPACE
+    NAMESPACE ${PROJECT_EXPORT_NAME}::)
 
 endfunction()
 

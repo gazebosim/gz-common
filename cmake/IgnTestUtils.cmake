@@ -56,9 +56,9 @@ macro(ign_build_tests)
         add_definitions(-DUSE_LOW_MEMORY_TESTS=1)
       endif(USE_LOW_MEMORY_TESTS)
 
-      if(BINARY_NAME STREQUAL "UNIT_ColladaExporter_TEST")
-        list (APPEND GTEST_SOURCE_file ${CMAKE_SOURCE_DIR}/src/tinyxml2/tinyxml2.cpp)
-      endif()
+#      if(BINARY_NAME STREQUAL "UNIT_ColladaExporter_TEST")
+#        list (APPEND GTEST_SOURCE_file ${CMAKE_SOURCE_DIR}/src/tinyxml2/tinyxml2.cpp)
+#      endif()
 
       add_executable(${BINARY_NAME} ${GTEST_SOURCE_file})
 

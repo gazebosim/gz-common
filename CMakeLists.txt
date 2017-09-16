@@ -41,12 +41,12 @@ endif()
 #============================================================================
 # Search for project-specific dependencies
 #============================================================================
-message (STATUS "\n\n-- ====== Finding 3rd Party Packages ======")
+message(STATUS "\n\n-- ====== Finding 3rd Party Packages ======")
 
 #--------------------------------------
 # Find ignition-math
-ign_find_package(ignition-math3 REQUIRED)
-include_directories(${IGNITION-MATH_INCLUDE_DIRS})
+set(IGN_MATH_VER 3)
+ign_find_package(ignition-math${IGN_MATH_VER} REQUIRED)
 
 #--------------------------------------
 # Find Freeimage
@@ -55,13 +55,10 @@ ign_find_package(FreeImage VERSION 3.9 REQUIRED)
 #--------------------------------------
 # Find Tinyxml2
 if(USE_EXTERNAL_TINYXML2)
-  ign_find_package(TINYXML2 REQUIRED PRETTY tinxyml2)
+  ign_find_package(TINYXML2 REQUIRED PRETTY tinyxml2)
 else()
   # Needed in WIN32 since in UNIX the flag is added in the code installed
-  message (STATUS "Skipping search for tinyxml2")
-  set(TINYXML2_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/src/tinyxml2")
-  set(TINYXML2_LIBRARIES "")
-  set(TINYXML2_LIBRARY_DIRS "")
+  message(STATUS "Skipping search for tinyxml2 and using an internal version")
 endif()
 
 #--------------------------------------
@@ -103,7 +100,7 @@ if(NOT MSVC)
 
 endif()
 
-message (STATUS "-------------------------------------------\n")
+message(STATUS "-------------------------------------------\n")
 
 
 #============================================================================

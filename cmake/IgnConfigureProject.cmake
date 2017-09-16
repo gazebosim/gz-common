@@ -71,6 +71,11 @@ macro(ign_configure_project designation major_version minor_version patch_number
   ign_create_docs()
 
   #============================================================================
+  # Collect compiler features for C++11. Creates a variable called
+  #   CXX_11_COMPILE_FEATURES
+  ign_collect_compile_features()
+
+  #============================================================================
   # Initialize build errors/warnings
   # NOTE: We no longer use CACHE for these variables because it was set to
   # "INTERNAL", making it unnecessary to cache them. As long as this macro is
@@ -79,6 +84,87 @@ macro(ign_configure_project designation major_version minor_version patch_number
   # from the top-level scope, then it is being used incorrectly.
   set(build_errors "")
   set(build_warnings "")
+
+
+  #============================================================================
+  # Initialize the list of <PROJECT_NAME>-config.cmake dependencies
+  set(PROJECT_CONFIG_DEPENDENCIES)
+
+endmacro()
+
+#################################################
+# Collect the compiler features
+macro(ign_collect_compile_features)
+  # It's unfortunate that CMake does not provide this automatically
+
+  set(CXX_PROPOSED_COMPILE_FEATURES
+    cxx_uniform_initialization
+  )
+
+  set(CXX_1z_COMPILE_FEATURES
+    cxx_aggregate_default_initializers
+  )
+
+  set(CXX_14_COMPILE_FEATURES
+    cxx_attribute_deprecated
+    cxx_binary_literals
+    cxx_contextual_conversions
+    cxx_decltype_auto
+    cxx_digit_separators
+    cxx_generic_lambdas
+    cxx_lambda_init_captures
+    cxx_relaxed_constexpr
+    cxx_return_type_deduction
+    cxx_variable_templates
+  )
+
+  set(CXX_11_COMPILE_FEATURES
+    cxx_alias_templates
+    cxx_alignas
+    cxx_alignof
+    cxx_attributes
+    cxx_auto_type
+    cxx_constexpr
+    cxx_decltype_incomplete_return_types
+    cxx_decltype
+    cxx_default_function_template_args
+    cxx_defaulted_functions
+    cxx_defaulted_move_initializers
+    cxx_delegating_constructors
+    cxx_deleted_functions
+    cxx_enum_forward_declarations
+    cxx_explicit_conversions
+    cxx_extended_friend_declarations
+    cxx_extern_templates
+    cxx_final
+    cxx_func_identifier
+    cxx_generalized_initializers
+    cxx_inheriting_constructors
+    cxx_inline_namespaces
+    cxx_lambdas
+    cxx_local_type_template_args
+    cxx_long_long_type
+    cxx_noexcept
+    cxx_nonstatic_member_init
+    cxx_nullptr
+    cxx_override
+    cxx_range_for
+    cxx_raw_string_literals
+    cxx_reference_qualified_functions
+    cxx_right_angle_brackets
+    cxx_rvalue_references
+    cxx_sizeof_member
+    cxx_static_assert
+    cxx_strong_enums
+    cxx_thread_local
+    cxx_trailing_return_types
+    cxx_unicode_literals
+    cxx_unrestricted_unions
+    cxx_user_literals
+    cxx_variadic_macros
+    cxx_variadic_templates
+    cxx_template_template_parameters
+  )
 
 endmacro()
 
