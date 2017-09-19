@@ -144,7 +144,10 @@ const Mesh *MeshManager::Load(const std::string &_filename)
     else if (extension == "obj")
       loader = &this->dataPtr->objLoader;
     else
+    {
       ignerr << "Unsupported mesh format for file[" << _filename << "]\n";
+      return nullptr;
+    }
 
     // This mutex prevents two threads from loading the same mesh at the
     // same time.

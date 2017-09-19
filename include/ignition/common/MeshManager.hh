@@ -38,6 +38,7 @@ namespace ignition
 {
   namespace common
   {
+    /// \brief forward declaration
     class Mesh;
     class SubMesh;
     class MeshManagerPrivate;
