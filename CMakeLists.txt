@@ -3,10 +3,7 @@ cmake_minimum_required(VERSION 3.5.1 FATAL_ERROR)
 #============================================================================
 # Find ignition-cmake
 #============================================================================
-set(IGNITION_CMAKE_DIR "${CMAKE_CURRENT_LIST_DIR}/cmake/")
-list(APPEND CMAKE_MODULE_PATH "${IGNITION_CMAKE_DIR}")
-
-include(IgnCMake)
+find_package(ignition-cmake0 REQUIRED)
 
 #============================================================================
 # Set up the project
