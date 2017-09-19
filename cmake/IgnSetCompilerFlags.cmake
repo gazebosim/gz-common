@@ -20,7 +20,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+#
 #################################################
 # Set up compiler flags
 macro(ign_set_compiler_flags)
@@ -325,14 +325,11 @@ macro(ign_setup_msvc)
     set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_MINSIZEREL} ${IGN_RUNTIME_LIBRARY} ${MSVC_MINIMAL_FLAGS}")
     set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} ${IGN_RUNTIME_LIBRARY} ${MSVC_MINIMAL_FLAGS}")
 
-    # Default flags should match RelWithDebInfo
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_RELWITHDEBINFO}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
-
+    # NOTE: Leave CMAKE_C_FLAGS and CMAKE_CXX_FLAGS blank, because
+    # those will be appended to all build configurations.
 
     # TODO: What flags should be set for PROFILE and COVERAGE build types?
     #       Is it even possible to generate those build types on Windows?
-
 
   endif()
 
