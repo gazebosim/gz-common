@@ -223,9 +223,8 @@ macro(ign_setup_gcc_or_clang)
   set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} ${CUSTOM_ALL_FLAGS} ${CUSTOM_CXX_COVERAGE_FLAGS}")
 
 
-  # Default flags should match RelWithDebInfo
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_RELWITHDEBINFO}")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
+  # NOTE: Leave CMAKE_C_FLAGS and CMAKE_CXX_FLAGS blank, because those will
+  # be appended to all build configurations.
 
 endmacro()
 
