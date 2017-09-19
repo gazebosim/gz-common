@@ -20,9 +20,9 @@
 #       the standard pkg_check_modules, which provides an option called
 #       IMPORTED_TARGET that will create the imported targets the way we do here
 #
-macro(ign_pkg_check_modules)
+macro(ign_pkg_check_modules package)
 
-  ign_pkg_check_modules(${ARGN})
+  ign_pkg_check_modules_quiet(${package} ${ARGN})
 
   include(FindPackageHandleStandardArgs)
   find_package_handle_standard_args(
@@ -36,15 +36,7 @@ macro(ign_pkg_check_modules_quiet package)
   find_package(PkgConfig QUIET)
   pkg_check_modules(${package} ${ARGN})
 
-  if(${package}_FOUND)
-
-    message(STATUS "ign_pkg_check_modules found ${package}")
-
-  endif()
-
   if(${package}_FOUND AND NOT TARGET ${package}::${package})
-
-    message(STATUS "Creating imported target for ${package}")
 
     # For some reason, pkg_check_modules does not provide complete paths to the
     # libraries it returns, even though find_package is conventionally supposed

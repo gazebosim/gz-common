@@ -105,11 +105,8 @@ macro(ign_setup_packages)
   set(IGN_INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}")
   set(IGN_INCLUDE_INSTALL_DIR_POSTFIX "ignition/${IGN_DESIGNATION}${PROJECT_VERSION_MAJOR}")
   set(IGN_INCLUDE_INSTALL_DIR_FULL    "${IGN_INCLUDE_INSTALL_DIR}/${IGN_INCLUDE_INSTALL_DIR_POSTFIX}")
-  set(IGN_LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR} CACHE STRING "Library install directory, relative to CMAKE_INSTALL_PREFIX")
-  set(IGN_BIN_INSTALL_DIR ${CMAKE_INSTALL_BINDIR} CACHE STRING "Executable install directory, relative to CMAKE_INSTALL_PREFIX")
-
-  message(STATUS "IGN_LIB_INSTALL_DIR_FULL:${IGN_LIB_INSTALL_DIR_FULL}")
-  message(STATUS "IGN_BIN_INSTALL_DIR_FULL:${IGN_BIN_INSTALL_DIR_FULL}")
+  set(IGN_LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR})
+  set(IGN_BIN_INSTALL_DIR ${CMAKE_INSTALL_BINDIR})
 
   #============================================================================
   # Handle the user's RPATH setting
@@ -213,16 +210,11 @@ function(ign_create_pkgconfigs)
     set(version ${PROJECT_VERSION_MAJOR})
   endif()
 
-  message(STATUS "Pkgconfig directory: ${pkgconfig_dir}")
-  message(STATUS "List of pkgconfig files:${pkgconfig_files}")
-
   foreach(pkgconfig_file ${pkgconfig_files})
     # Get each filename
     get_filename_component(name ${pkgconfig_file} NAME_WE)
 
     set(${name}_configured_file "${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${name}${version}.pc")
-
-    message(STATUS "Configure pkgconfig: ${pkgconfig_file}")
 
     # Configure each file
     configure_file(${pkgconfig_file} ${${name}_configured_file} @ONLY)

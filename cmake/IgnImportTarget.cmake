@@ -51,57 +51,25 @@ macro(ign_import_target package)
   # against the variable package_LIBRARIES with the old-fashioned
   # target_link_libraries(mytarget ${package_LIBRARIES}
   add_library(${target_name} IMPORTED SHARED)
-  
-
-  get_target_property(target_imp_loc ${target_name} IMPORTED_LOCATION)
-  message(STATUS "Initial ${target_name}-IMPORTED_LOCATION:${target_imp_loc}")
-  
-  get_target_property(target_int_link_libs ${target_name} INTERFACE_LINK_LIBRARIES)
-  message(STATUS "Initial ${target_name}-INTERFACE_LINK_LIBRARIES:${target_int_link_libs}")
-  
-  get_target_property(target_imp_link_dep_libs ${target_name} IMPORTED_LINK_DEPENDENT_LIBRARIES)
-  message(STATUS "Initial ${target_name}-IMPORTED_LINK_DEPENDENT_LIBRARIES:${target_imp_link_dep_libs}")
 
   if(${package}_LIBRARIES)
     _ign_sort_libraries(${target_name} ${${package}_LIBRARIES})
   endif()
 
-  message(STATUS "${package}_LIBRARIES:${${package}_LIBRARIES}")
   if(${package}_LIBRARIES)
     set_target_properties(${target_name} PROPERTIES
       INTERFACE_LINK_LIBRARIES "${${package}_LIBRARIES}")
   endif()
 
-  message(STATUS "${package}_INCLUDE_DIRS:${${package}_INCLUDE_DIRS}")
   foreach(${package}_inc ${${package}_INCLUDE_DIRS})
     set_target_properties(${target_name} PROPERTIES
       INTERFACE_INCLUDE_DIRECTORIES "${${package}_inc}")
   endforeach()
 
-  message(STATUS "${package}_CFLAGS:${${package}_CFLAGS}")
   if(${package}_CFLAGS)
     set_target_properties(${target_name} PROPERTIES
       INTERFACE_COMPILE_OPTIONS "${${package}_CFLAGS}")
   endif()
-
-  get_target_property(target_imp_loc ${target_name} IMPORTED_LOCATION)
-  message(STATUS "${target_name}-IMPORTED_LOCATION:${target_imp_loc}")
-  
-  get_target_property(target_int_link_libs ${target_name} INTERFACE_LINK_LIBRARIES)
-  message(STATUS "${target_name}-INTERFACE_LINK_LIBRARIES:${target_int_link_libs}")
-  
-  get_target_property(target_link_int_libs ${target_name} LINK_INTERFACE_LIBRARIES)
-  message(STATUS "${target_name}-LINK_INTERFACE_LIBRARIES:${target_int_link_libs}")
-  
-  get_target_property(ill ${target_name} INTERFACE_LINK_LIBRARIES)
-  set_target_properties(${target_name}
-    PROPERTIES IMPORTED_LINK_DEPENDENT_LIBRARIES ${ill})
-  
-  get_target_property(target_imp_link_dep_libs ${target_name} IMPORTED_LINK_DEPENDENT_LIBRARIES)
-  message(STATUS "${target_name}-IMPORTED_LINK_DEPENDENT_LIBRARIES:${target_imp_link_dep_libs}")
-
-  get_target_property(target_imported_implib ${target_name} IMPORTED_IMPLIB)
-  message(STATUS "${target_name}-IMPORTED_IMPLIB:${target_imported_implib}")
 
   # What about linker flags? Is there no target property for that?
 
@@ -138,8 +106,6 @@ function(_ign_sort_libraries target_name first_lib)
     set_target_properties(${target_name} PROPERTIES
       IMPORTED_LOCATION "${first_lib}")
   endif()
-
-  message(STATUS "${target_name} extra libs:${ARGN}")
 
   foreach(extra_lib ${ARGN})
     set_target_properties(${target_name} PROPERTIES

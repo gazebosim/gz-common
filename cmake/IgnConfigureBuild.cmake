@@ -51,6 +51,10 @@ macro(ign_configure_build)
     endif()
   endif()
 
+  #--------------------------------------
+  # Examine the build type. If we do not recognize the type, we will generate
+  # an error, so this must come before the error handling.
+  ign_parse_build_type()
 
   #============================================================================
   # Print warnings and errors
@@ -93,12 +97,6 @@ macro(ign_configure_build)
     # Set up the compiler flags
     ign_set_compiler_flags()
 
-
-    #--------------------------------------
-    # Examine the build type
-    ign_parse_build_type()
-
-
     #--------------------------------------
     # We want to include both the include directory from the source tree and
     # also the include directory that's generated in the build folder,
@@ -140,15 +138,13 @@ endmacro()
 macro(ign_parse_build_type)
 
   #============================================================================
-  # Set the default build type to RelWithDebInfo
-  # NOTE: We do not need to check if CMAKE_BUILD_TYPE is set first, because we
-  # are not using the "FORCE" option. Therefore, if it is already set in the
-  # CACHE (i.e. by the user), then this command will be ignored.
-  set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING
-    "Choose the type of build. Options are: Debug Release RelWithDebInfo MinSizeRel Profile Check")
+  # If a build type is not specified, set it to RelWithDebInfo by default
+  if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "RelWithDebInfo")
+  endif()
 
   # Convert to uppercase in order to support arbitrary capitalization
-  string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UPPERCASE)
+  string(TOUPPER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE_UPPERCASE)
 
   #============================================================================
   # Set variables based on the build type
@@ -173,7 +169,7 @@ macro(ign_parse_build_type)
   elseif("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "PROFILE")
     set(BUILD_TYPE_PROFILE TRUE)
   else()
-    ign_build_error("CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} unknown. Valid options are: Debug Release RelWithDebInfo MinSizeRel Profile Check")
+    ign_build_error("CMAKE_BUILD_TYPE [${CMAKE_BUILD_TYPE}] unknown. Valid options are: Debug Release RelWithDebInfo MinSizeRel Profile Check")
   endif()
 
 endmacro()

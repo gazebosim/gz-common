@@ -33,6 +33,9 @@ macro(ign_build_tests)
     cmake_parse_arguments(ign_build_tests "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
     if(NOT ign_build_tests_TYPE)
+      # If you have encountered this error, you are probably migrating to the
+      # new ignition-cmake system. Be sure to also provide a SOURCES argument
+      # when calling ign_build_tests.
       message(FATAL_ERROR "Developer error: You must specify a TYPE for your tests!")
     endif()
 

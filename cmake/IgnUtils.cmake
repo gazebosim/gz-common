@@ -130,8 +130,11 @@ macro(ign_find_package PACKAGE_NAME)
   # Call find_package with the provided arguments
   find_package(${PACKAGE_NAME} ${${PACKAGE_NAME}_find_package_args})
   if(${PACKAGE_NAME}_FOUND)
+
     message(STATUS "Looking for ${${PACKAGE_NAME}_pretty} - found\n")
+
   else()
+
     message(STATUS "Looking for ${${PACKAGE_NAME}_pretty} - not found\n")
 
     #------------------------------------
@@ -221,8 +224,6 @@ macro(ign_find_package PACKAGE_NAME)
 
       # Append the entry as a string onto whichever type we selected
       set(${${PACKAGE_NAME}_pkgconfig_type} "${${${PACKAGE_NAME}_pkgconfig_type}} ${${PACKAGE_NAME}_pkgconfig_entry}")
-
-      message(STATUS "Appending ${PACKAGE_NAME} entry to ${${PACKAGE_NAME}_pkgconfig_type}")
 
     endif()
   endif()
@@ -514,8 +515,6 @@ macro(ign_install_library)
     PROPERTIES
       SOVERSION ${PROJECT_VERSION_MAJOR}
       VERSION ${PROJECT_VERSION_FULL})
-
-  message(STATUS "IGN_LIB_INSTALL_DIR_FULL:${IGN_LIB_INSTALL_DIR_FULL}")
 
   install(
     TARGETS ${PROJECT_LIBRARY_TARGET_NAME}
