@@ -21,11 +21,13 @@ include(IgnPkgConfig)
 # Use pkg_check_modules to start
 find_package(PkgConfig)
 if(PKG_CONFIG_FOUND)
-  pkg_check_modules(TINYXML2 tinyxml2)
+  ign_pkg_check_modules(TINYXML2 tinyxml2)
 endif()
 
 # If that failed, then fall back to manual detection (necessary for MacOS)
 if(NOT TINYXML2_FOUND)
+
+  message(STATUS "Attempting manual search for tinyxml2")
 
     find_path(TINYXML2_INCLUDE_DIRS tinyxml2.h ${TINYXML2_INCLUDE_DIRS} ENV CPATH)
     find_library(TINYXML2_LIBRARIES NAMES tinyxml2)
@@ -41,15 +43,15 @@ if(NOT TINYXML2_FOUND)
       set(TINYXML2_FOUND false)
     endif()
 
-    if (NOT TINYXML2_LIBRARY_DIRS)
-      message (STATUS "Looking for tinyxml2 library dirs - not found")
-      set(TINYXML2_FOUND false)
-    endif()
+#    if (NOT TINYXML2_LIBRARY_DIRS)
+#      message (STATUS "Looking for tinyxml2 library dirs - not found")
+#      set(TINYXML2_FOUND false)
+#    endif()
 
-endif()
+  if(TINYXML2_FOUND)
+    ign_create_imported_target(TINYXML2)
+  endif()
 
-if(TINYXML2_FOUND)
-  ign_create_imported_target(TINYXML2)
 endif()
 
 include(FindPackageHandleStandardArgs)

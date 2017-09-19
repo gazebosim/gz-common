@@ -88,7 +88,19 @@ macro(ign_configure_project designation major_version minor_version patch_number
 
   #============================================================================
   # Initialize the list of <PROJECT_NAME>-config.cmake dependencies
-  set(PROJECT_CONFIG_DEPENDENCIES)
+  set(PROJECT_CMAKE_DEPENDENCIES)
+
+  # Initialize the list of <PROJECT_NAME>.pc Requires
+  set(PROJECT_PKGCONFIG_REQUIRES)
+
+  # Initialize the list of <PROJECT_NAME>.pc Requires.private
+  set(PROJECT_PKCONFIG_REQUIRES_PRIVATE)
+
+  # Initialize the list of <PROJECT_NAME>.pc Libs
+  set(PROJECT_PKGCONFIG_LIBS)
+
+  # Initialize the list of <PROJECT_NAME>.pc Libs.private
+  set(PROJECT_PKGCONFIG_LIBS_PRIVATE)
 
 endmacro()
 

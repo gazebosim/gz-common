@@ -12,6 +12,11 @@
 #  @PKG_NAME@_LIBRARIES    - Libraries to link against.
 #  @PKG_NAME@_CXX_FLAGS    - Compiler flags for compiling C++ sources.
 #  @PKG_NAME@_LDFLAGS      - Linker flags.
+#
+# Additionally, it will create an imported target named @PROJECT_EXPORT_NAME@::@PROJECT_EXPORT_NAME@.
+# You can link your library against that target using target_link_library(~),
+# and all the variables mentioned above will automatically be pulled into your
+# target.
 
 
 
@@ -28,11 +33,6 @@ if(NOT TARGET @PROJECT_LIBRARY_TARGET_NAME@)
   include("${CMAKE_CURRENT_LIST_DIR}/@ign_targets_output@")
 endif()
 
-list(APPEND @PKG_NAME@_CXX_FLAGS -std=c++11)
-if("${CMAKE_CXX_COMPILER_ID} " MATCHES "Clang ")
-  set(@PKG_NAME@_CXX_FLAGS "${@PKG_NAME@_CXX_FLAGS} -stdlib=libc++")
-endif()
-
 # On windows we produce .dll libraries with no prefix
 if(WIN32)
  set(CMAKE_FIND_LIBRARY_PREFIXES "")
@@ -46,6 +46,6 @@ set(@PKG_NAME@_LIBRARY_DIRS "@PACKAGE_IGN_LIB_INSTALL_DIR@")
 set(@PKG_NAME@_LDFLAGS      "-L@PACKAGE_IGN_LIB_INSTALL_DIR@")
 
 include(CMakeFindDependencyMacro)
-foreach(dependency @PROJECT_CONFIG_DEPENDENCIES@)
+foreach(dependency @PROJECT_CMAKE_DEPENDENCIES@)
   find_dependency(${dependency})
 endforeach()

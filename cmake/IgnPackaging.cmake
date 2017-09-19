@@ -165,8 +165,8 @@ endmacro()
 # Create a package. Optionally specify some additional arguments.
 # ign_create_pkgconfigs([DIRECTORY dir] [SOURCES name1 name2 ...] [VERSION ver])
 # Default values if the arguments are not specified:
-#   DIRECTORY: "${CMAKE_SOURCE_DIR}/pkgconfig"
-#   SOURCES: All source files in DIRECTORY
+#   DIRECTORY: "${IGNITION_CMAKE_DIR}/pkgconfig"
+#   SOURCES: All *.in source files in DIRECTORY
 #   VERSION: ${PROJECT_VERSION_MAJOR}
 #
 # NOTE: When providing file names for SOURCES, do NOT include the *.in prefix.
@@ -174,16 +174,18 @@ endmacro()
 #       by one of the other argument options).
 function(ign_create_pkgconfigs)
 
+  #--------------------------------------
   # Parse the optional arguments given to the function
   set(multiValueArgs DIRECTORY SOURCES VERSION)
   cmake_parse_arguments(ign_create_pkgconfigs "" "" "${multiValueArgs}" ${ARGN})
 
+  #--------------------------------------
   # Use the user-specified directory if one was provided. Otherwise, use the
   # pkgconfig directory inside of the root directory of the build system.
   if(ign_create_pkgconfigs_DIRECTORY)
     set(pkgconfig_dir "${ign_create_pkgconfigs_DIRECTORY}")
   else()
-    set(pkgconfig_dir "${CMAKE_SOURCE_DIR}/pkgconfig")
+    set(pkgconfig_dir "${IGNITION_CMAKE_DIR}/pkgconfig")
   endif()
 
   if(ign_create_pkgconfigs_SOURCES)
@@ -199,6 +201,7 @@ function(ign_create_pkgconfigs)
     file(GLOB pkgconfig_files "${pkgconfig_dir}/*.in")
   endif()
 
+  #--------------------------------------
   # Get the user-provided version number, or else use the project's major
   # version number
   if(ign_create_pkgconfigs_VERSION)
@@ -207,11 +210,16 @@ function(ign_create_pkgconfigs)
     set(version ${PROJECT_VERSION_MAJOR})
   endif()
 
+  message(STATUS "Pkgconfig directory: ${pkgconfig_dir}")
+  message(STATUS "List of pkgconfig files:${pkgconfig_files}")
+
   foreach(pkgconfig_file ${pkgconfig_files})
     # Get each filename
     get_filename_component(name ${pkgconfig_file} NAME_WE)
 
     set(${name}_configured_file "${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${name}${version}.pc")
+
+    message(STATUS "Configure pkgconfig: ${pkgconfig_file}")
 
     # Configure each file
     configure_file(${pkgconfig_file} ${${name}_configured_file} @ONLY)

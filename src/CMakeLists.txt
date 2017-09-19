@@ -40,15 +40,17 @@ ign_add_library(${PROJECT_LIBRARY_TARGET_NAME} ${sources})
 
 # Link the libraries that we always need
 target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
-  ignition-math3::ignition-math3
-  FreeImage::FreeImage
-  DL::DL)
+  PUBLIC
+    ignition-math3::ignition-math3
+  PRIVATE
+    FreeImage::FreeImage
+    DL::DL)
 
 if(USE_EXTERNAL_TINYXML2)
   # If we are using an external copy of tinyxml2, add its imported target
   target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
-#    TINYXML2::TINYXML2)
-    ${TINYXML2_LIBRARIES})
+    PRIVATE
+      TINYXML2::TINYXML2)
 else()
   # Otherwise, add its source directory to our target's PRIVATE include
   # directories. We do not want this to be visible to consumers of
@@ -64,10 +66,6 @@ endif()
 ign_target_interface_include_directories(${PROJECT_LIBRARY_TARGET_NAME}
   ignition-math3::ignition-math3)
 
-# Tell the compiler that we want all of the C++11 features
-target_compile_features(
-  ${PROJECT_LIBRARY_TARGET_NAME} PUBLIC ${CXX_11_COMPILE_FEATURES})
-
 # This generator expression is necessary for multi-configuration generators,
 # such as MSVC on Windows, and also to ensure that our target exports the
 # headers correctly
@@ -82,17 +80,15 @@ if(NOT WIN32)
 
   # Link the libraries that we don't expect to find on Windows
   target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
-    ${UUID_LIBRARIES}
-#    UUID::UUID
-    GTS::GTS
-    ${GTS_LIBRARIES}
-#    SWSCALE::SWSCALE
-    ${SWSCALE_LIBRARIES}
-#    ${AVDEVICE_LIBRARIES}
-    AVDEVICE::AVDEVICE
-    ${AVFORMAT_LIBRARIES}
-    ${AVCODEC_LIBRARIES}
-    ${AVUTIL_LIBRARIES})
+    PUBLIC
+      UUID::UUID
+      SWSCALE::SWSCALE
+      AVDEVICE::AVDEVICE
+      AVFORMAT::AVFORMAT
+      AVCODEC::AVCODEC
+      AVUTIL::AVUTIL
+    PRIVATE
+      GTS::GTS)
 
   # Include the interface directories that we don't expect to find on Windows.
   # Note that GTS is not included here, because its headers are only used
@@ -145,12 +141,18 @@ ign_build_tests(
   TYPE UNIT
   SOURCES ${gtest_sources}
   INCLUDE_DIRS
+    # Used to make internal source file headers visible to the unit tests
     ${CMAKE_CURRENT_SOURCE_DIR}
-    # Used to make test headers visible to the unit tests
+    # Used to make test-directory headers visible to the unit tests
     ${PROJECT_SOURCE_DIR}
     # Used to make test_config.h visible to the unit tests
-    ${PROJECT_BINARY_DIR}
-)
+    ${PROJECT_BINARY_DIR})
+
+if(USE_EXTERNAL_TINYXML2)
+  # The collada exporter test uses tinyxml2, so we must link it if we're using
+  # and external copy.
+  target_link_libraries(UNIT_ColladaExporter_TEST TINYXML2::TINYXML2)
+endif()
 
 # Produce warning on Windows if the user has decided to turn on the symlink
 # tests. In order for those tests to work, they will need to run the tests in

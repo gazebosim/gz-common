@@ -42,7 +42,8 @@ if(NOT DL_FOUND)
   endif()
 
   if(DL_FOUND)
-    ign_create_imported_target(DL)
+    include(IgnImportTarget)
+    ign_import_target(DL)
   endif()
 
 endif()

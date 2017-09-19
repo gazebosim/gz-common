@@ -1,9 +1,12 @@
 
 #################################################
-# ign_find_package(<PACKAGE_NAME> [REQUIRED] [EXACT] [QUIET] [PRIVATE]
+# ign_find_package(<PACKAGE_NAME> [REQUIRED] [EXACT] [QUIET] [PRIVATE] [BUILD_ONLY] [PKGCONFIG_IGNORE]
 #                  [VERSION <ver>]
 #                  [EXTRA_ARGS <args>]
 #                  [PRETTY <name>]
+#                  [PKGCONFIG <pkgconfig_name>]
+#                  [PKGCONFIG_LIB <lib_name>]
+#                  [PKGCONFIG_VER_COMPARISON <|>|=|<=|>=]
 #                  [PURPOSE <"explanation for this dependency">])
 #
 # This is a wrapper for the standard cmake find_package which behaves according
@@ -13,7 +16,15 @@
 # configuration process. Descriptions of the function arguments are as follows:
 #
 # <PACKAGE_NAME>: The name of the package as it would normally be passed to
-#                 find_package(~)
+#                 find_package(~). Note if your package corresponds to a
+#                 find-module named FindABC.cmake, then <PACKAGE_NAME> must be
+#                 ABC, with the case matching. If the find-module is named
+#                 FindAbc.cmake, then <PACKAGE_NAME> must be Abc. This will not
+#                 necessarily match the library's actual name, nor will it
+#                 necessarily match the name used by pkgconfig, so there are
+#                 additional arguments (i.e. PRETTY, PKGCONFIG) to specify
+#                 alternative names for this package that can be used depending
+#                 on the context.
 #
 # [REQUIRED]: Optional. If provided, this will trigger an ignition build_error.
 #             If not provided, this will trigger an ignition build_warning.
@@ -26,10 +37,20 @@
 #          find_package(~) command. This function will still print its normal
 #          output.
 #
-# [PRIVATE]: Not recommended. This package will not be added to the list of
-#            package dependencies that must be found by
-#            <PROJECT_NAME>-config.cmake. Only use this if you are certain of
-#            what you are doing.
+# [PRIVATE]: Optional. Use this to indicate that consumers of the project do not
+#            need to link against this package, but it must be present on the
+#            system, because our project must link against it.
+#
+# [BUILD_ONLY]: Optional. Use this to indicate that the project only needs this
+#               package while building, and it does not need to be available to
+#               the consumer of this project at all. Normally this should only
+#               apply to a header-only library whose headers are included
+#               exclusively in the source files and not included in any public
+#               (i.e. installed) project headers.
+#
+# [PKGCONFIG_IGNORE]: Discouraged. If this option is provided, this package will
+#                     not be added to the project's pkgconfig file in any way.
+#                     This should only be used in very rare circumstances.
 #
 # [VERSION]: Optional. Follow this argument with the major[.minor[.patch[.tweak]]]
 #            version that you need for this package.
@@ -40,6 +61,28 @@
 #           <PACKAGE_NAME> when printing messages, warnings, or errors to the
 #           terminal.
 #
+# [PKGCONFIG]: Optional. If provided, the string that follows will be used to
+#              specify a "required" package for pkgconfig. If not provided, then
+#              <PACKAGE_NAME> will be used instead.
+#
+# [PKGCONFIG_LIB]: Optional. Use this to indicate that the package should be
+#                  considered a "library" by pkgconfig. This is used for
+#                  libraries which do not come with *.pc metadata, such as
+#                  system libraries, libdl, or librt. Generally you should leave
+#                  this out, because most packages will be considered "modules"
+#                  by pkgconfig, which is how we will treat this package by
+#                  default. The string which follows this argument will be used
+#                  as the library name, and the string that follows a PKGCONFIG
+#                  argument will be ignored, so the PKGCONFIG argument can be
+#                  left out when using this argument.
+#
+# [PKGCONFIG_VER_COMPARISON]: Optional. If provided, pkgconfig will be told how
+#                             the available version of this package must compare
+#                             to the specified version. Acceptable values are
+#                             =, <, >, <=, >=. Default will be =. If no version
+#                             is provided using VERSION, then this will be left
+#                             out, whether or not it is provided.
+#
 # [PURPOSE]: Optional. If provided, the string that follows will be appended to
 #            the build_warning or build_error that this function produces when
 #            the package could not be found.
@@ -48,8 +91,8 @@ macro(ign_find_package PACKAGE_NAME)
 
   #------------------------------------
   # Define the expected arguments
-  set(options REQUIRED QUIET PRIVATE EXACT)
-  set(oneValueArgs VERSION PRETTY PURPOSE EXTRA_ARGS)
+  set(options REQUIRED EXACT QUIET PRIVATE BUILD_ONLY)
+  set(oneValueArgs VERSION PRETTY PURPOSE EXTRA_ARGS PKGCONFIG PKGCONFIG_LIB PKGCONFIG_VER_COMPARISON)
   set(multiValueArgs) # We are not using multiValueArgs yet
 
   #------------------------------------
@@ -111,7 +154,7 @@ macro(ign_find_package PACKAGE_NAME)
   #------------------------------------
   # Add this package to the list of dependencies that will be inserted into the
   # find-config file, unless the invoker specifies that it should not be added
-  if(NOT ign_find_package_PRIVATE)
+  if(NOT ign_find_package_BUILD_ONLY)
 
     # Set up the arguments we want to pass to the find_dependency invokation for
     # our ignition project. We always need to pass the name of the dependency.
@@ -127,8 +170,59 @@ macro(ign_find_package PACKAGE_NAME)
       ign_string_append(${PACKAGE_NAME}_dependency_args EXACT)
     endif()
 
-    list(APPEND PROJECT_CONFIG_DEPENDENCIES "${${PACKAGE_NAME}_dependency_args}")
+    list(APPEND PROJECT_CMAKE_DEPENDENCIES "${${PACKAGE_NAME}_dependency_args}")
 
+    #------------------------------------
+    # Add this library or project to its relevant pkgconfig entry, unless we
+    # have been explicitly instructed to ignore it.
+    if(NOT ign_find_package_PKGCONFIG_IGNORE)
+      # Create the string that will be used as this library or package's entry
+      # in the pkgconfig file.
+      if(ign_find_package_PKGCONFIG_LIB)
+        # Libraries must be prepended with -l
+        set(${PACKAGE_NAME}_pkgconfig_entry "-l${ign_find_package_PKGCONFIG_LIB}")
+      elseif(ign_find_package_PKGCONFIG)
+        # Modules (a.k.a. packages) can just be provided with the name
+        set(${PACKAGE_NAME}_pkgconfig_entry "${ign_find_package_PKGCONFIG}")
+      else()
+        set(${PACKAGE_NAME}_pkgconfig_entry "${PACKAGE_NAME}")
+      endif()
+
+      # Add the version requirements to the entry.
+      if(ign_find_package_VERSION)
+        # Note, specifying the version is not supported for library dependencies.
+        # It is only supported for packages, a.k.a. modules.
+        if(NOT ign_find_package_PKGCONFIG_LIB)
+          set(comparison "=")
+          if(ign_find_package_PKGCONFIG_VER_COMPARISON)
+            set(comparison ${ign_find_package_PKGCONFIG_VER_COMPARISON})
+          endif()
+          set(${PACKAGE_NAME}_pkgconfig_entry "${${PACKAGE_NAME}_pkgconfig_entry} ${comparison} ${ign_find_package_VERSION}")
+        endif()
+      endif()
+
+      #------------------------------------
+      # Figure out what type of entry this should be for pkgconfig
+      set(${PACKAGE_NAME}_pkgconfig_type)
+      if(ign_find_package_PKGCONFIG_LIB)
+        # If we have a "library", use PROJECT_PKGCONFIG_LIB
+        set(${PACKAGE_NAME}_pkgconfig_type PROJECT_PKGCONFIG_LIBS)
+      else()
+        # If we have a "module", use PROJECT_PKGCONFIG_REQUIRES
+        set(${PACKAGE_NAME}_pkgconfig_type PROJECT_PKGCONFIG_REQUIRES)
+      endif()
+
+      if(ign_find_package_PRIVATE)
+        # If this is a private library or module, add the _PRIVATE suffix
+        set(${PACKAGE_NAME}_pkgconfig_type ${${PACKAGE_NAME}_pkgconfig_type}_PRIVATE)
+      endif()
+
+      # Append the entry as a string onto whichever type we selected
+      set(${${PACKAGE_NAME}_pkgconfig_type} "${${${PACKAGE_NAME}_pkgconfig_type}} ${${PACKAGE_NAME}_pkgconfig_entry}")
+
+      message(STATUS "Appending ${PACKAGE_NAME} entry to ${${PACKAGE_NAME}_pkgconfig_type}")
+
+    endif()
   endif()
 
 endmacro()

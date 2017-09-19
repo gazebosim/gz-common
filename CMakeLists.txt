@@ -50,12 +50,17 @@ ign_find_package(ignition-math${IGN_MATH_VER} REQUIRED)
 
 #--------------------------------------
 # Find Freeimage
-ign_find_package(FreeImage VERSION 3.9 REQUIRED)
+ign_find_package(
+  FreeImage VERSION 3.9 REQUIRED PRIVATE
+  PKGCONFIG_VER_COMPARISON >=)
 
 #--------------------------------------
 # Find Tinyxml2
 if(USE_EXTERNAL_TINYXML2)
-  ign_find_package(TINYXML2 REQUIRED PRETTY tinyxml2)
+  ign_find_package(
+    TINYXML2 REQUIRED PRIVATE
+    PRETTY tinyxml2
+    PKGCONFIG tinyxml2)
 else()
   # Needed in WIN32 since in UNIX the flag is added in the code installed
   message(STATUS "Skipping search for tinyxml2 and using an internal version")
@@ -63,7 +68,10 @@ endif()
 
 #--------------------------------------
 # Find libdl
-ign_find_package(DL REQUIRED PURPOSE "Required for plugins")
+ign_find_package(
+  DL REQUIRED PRIVATE PRETTY libdl
+  PKGCONFIG_LIB dl
+  PURPOSE "Required for plugins")
 
 #--------------------------------------
 # Find dependencies that we ignore for Visual Studio
@@ -71,32 +79,44 @@ if(NOT MSVC)
 
   #------------------------------------
   # Find uuid
-  ign_find_package(UUID REQUIRED PRETTY uuid)
+  ign_find_package(UUID REQUIRED PRETTY uuid PKGCONFIG uuid)
 
   #------------------------------------
   # Find GNU Triangulation Surface Library
-  ign_find_package(GTS REQUIRED PRETTY gts
-                   PURPOSE "GNU Triangulation Surface library")
+  ign_find_package(
+    GTS REQUIRED PRETTY gts PKGCONFIG gts
+    PURPOSE "GNU Triangulation Surface library")
 
   #------------------------------------
   # Find libswscale
-  ign_find_package(SWSCALE REQUIRED PRETTY libswscale)
+  ign_find_package(
+    SWSCALE REQUIRED PRETTY libswscale
+    PKGCONFIG libswscale)
 
   #------------------------------------
   # Find avdevice
-  ign_find_package(AVDEVICE VERSION 56.4.100 REQUIRED PRETTY libavdevice)
+  ign_find_package(
+    AVDEVICE VERSION 56.4.100 REQUIRED PRETTY libavdevice
+    PKGCONFIG libavdevice
+    PKGCONFIG_VER_COMPARISON >=)
 
   #------------------------------------
   # Find avformat
-  ign_find_package(AVFORMAT REQUIRED PRETTY libavformat)
+  ign_find_package(
+    AVFORMAT REQUIRED PRETTY libavformat
+    PKGCONFIG libavformat)
 
   #------------------------------------
   # Find avcodec
-  ign_find_package(AVCODEC REQUIRED PRETTY libavcodec)
+  ign_find_package(
+    AVCODEC REQUIRED PRETTY libavcodec
+    PKGCONFIG libavcodec)
 
   #------------------------------------
   # Find avutil
-  ign_find_package(AVUTIL REQUIRED PRETTY libavutil)
+  ign_find_package(
+    AVUTIL REQUIRED PRETTY libavutil
+    PKGCONFIG libavutil)
 
 endif()
 

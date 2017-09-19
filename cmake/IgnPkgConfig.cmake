@@ -25,7 +25,15 @@ macro(ign_pkg_check_modules package)
   find_package(PkgConfig)
   pkg_check_modules(${package} ${ARGN})
 
-  if(${package}_FOUND AND NOT TARGET ${package})
+  if(${package}_FOUND)
+
+    message(STATUS "ign_pkg_check_modules found ${package}")
+
+  endif()
+
+  if(${package}_FOUND AND NOT TARGET ${package}::${package})
+
+    message(STATUS "Creating imported target for ${package}")
 
     # For some reason, pkg_check_modules does not provide complete paths to the
     # libraries it returns, even though find_package is conventionally supposed
@@ -41,7 +49,8 @@ macro(ign_pkg_check_modules package)
       "${${package}_LIBRARIES}"
       "${${package}_LIBRARY_DIRS}")
 
-    ign_create_imported_target(${package})
+    include(IgnImportTarget)
+    ign_import_target(${package})
 
   endif()
 
@@ -68,54 +77,5 @@ function(_ign_pkgconfig_find_libraries output_var package library_names library_
   endforeach()
 
   set(${output_var} ${library_paths} PARENT_SCOPE)
-
-endfunction()
-
-macro(ign_create_imported_target package)
-
-  # Link against this "imported" target by saying
-  # target_link_libraries(mytarget package::package), instead of linking
-  # against the variable package_LIBRARIES with the old-fashioned
-  # target_link_libraries(mytarget ${package_LIBRARIES}
-  add_library(${package}::${package} IMPORTED SHARED)
-
-  message(STATUS "${package}_LIBRARIES:${${package}_LIBRARIES}")
-  if(${package}_LIBRARIES)
-    _ign_sort_libraries(${package} ${${package}_LIBRARIES})
-  endif()
-
-  message(STATUS "${package}_INCLUDE_DIRS:${${package}_INCLUDE_DIRS}")
-  foreach(${package}_inc ${${package}_INCLUDE_DIRS})
-    set_target_properties(${package}::${package} PROPERTIES
-      INTERFACE_INCLUDE_DIRECTORIES "${${package}_inc}")
-  endforeach()
-
-  message(STATUS "${package}_CFLAGS:${${package}_CFLAGS}")
-  if(${package}_CFLAGS)
-    set_target_properties(${package}::${package} PROPERTIES
-      INTERFACE_COMPILE_OPTIONS "${${package}_CFLAGS}")
-  endif()
-
-  # What about linker flags? Is there no target property for that?
-
-endmacro()
-
-# This is an awkward hack to give the package both an IMPORTED_LOCATION and
-# a set of INTERFACE_LIBRARIES in the event that PkgConfig returns multiple
-# libraries for this package. It seems that IMPORTED_LOCATION cannot support
-# specifying multiple libraries, so if we have multiple libraries, we need to
-# pass them into LINK_INTERFACE_LIBRARIES. However, if IMPORTED_LOCATION is
-# missing from the target, the dependencies do not get configured correctly by
-# the generator expressions, and the build system will try to link to a nonsense
-# garbage file.
-function(_ign_sort_libraries package first_lib)
-
-  set_target_properties(${package}::${package} PROPERTIES
-    IMPORTED_LOCATION "${first_lib}")
-
-  foreach(extra_lib ${ARGN})
-    set_target_properties(${package}::${package} PROPERTIES
-      LINK_INTERFACE_LIBRARIES "${extra_lib}")
-  endforeach()
 
 endfunction()

@@ -73,9 +73,10 @@ if(NOT FreeImage_FOUND)
     message(STATUS "Missing: Unable to find libfreeimage")
   endif(FreeImage_LIBRARIES)
 
-endif()
+  if(FreeImage_FOUND)
+    # Create the imported target for FreeImage if we found it
+    include(IgnImportTarget)
+    ign_import_target(FreeImage)
+  endif()
 
-if(FreeImage_FOUND)
-  # Create the imported target for FreeImage if we found it
-  ign_create_imported_target(FreeImage)
 endif()
