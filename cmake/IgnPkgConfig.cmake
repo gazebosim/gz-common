@@ -20,9 +20,20 @@
 #       the standard pkg_check_modules, which provides an option called
 #       IMPORTED_TARGET that will create the imported targets the way we do here
 #
-macro(ign_pkg_check_modules package)
+macro(ign_pkg_check_modules)
 
-  find_package(PkgConfig)
+  ign_pkg_check_modules(${ARGN})
+
+  include(FindPackageHandleStandardArgs)
+  find_package_handle_standard_args(
+    ${package}
+    REQUIRED_VARS ${package}_FOUND)
+
+endmacro()
+
+macro(ign_pkg_check_modules_quiet package)
+
+  find_package(PkgConfig QUIET)
   pkg_check_modules(${package} ${ARGN})
 
   if(${package}_FOUND)
@@ -53,11 +64,6 @@ macro(ign_pkg_check_modules package)
     ign_import_target(${package})
 
   endif()
-
-  include(FindPackageHandleStandardArgs)
-  find_package_handle_standard_args(
-    ${package}
-    REQUIRED_VARS ${package}_FOUND)
 
 endmacro()
 

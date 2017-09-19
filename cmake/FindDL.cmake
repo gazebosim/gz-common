@@ -16,7 +16,7 @@
 ########################################
 # Find libdl
 include(IgnPkgConfig)
-ign_pkg_check_modules(DL dl)
+ign_pkg_check_modules_quiet(DL dl)
 
 if(NOT DL_FOUND)
 

@@ -51,11 +51,22 @@ macro(ign_import_target package)
   # against the variable package_LIBRARIES with the old-fashioned
   # target_link_libraries(mytarget ${package_LIBRARIES}
   add_library(${target_name} IMPORTED SHARED)
+  
+
+  get_target_property(target_imp_loc ${target_name} IMPORTED_LOCATION)
+  message(STATUS "Initial ${target_name}-IMPORTED_LOCATION:${target_imp_loc}")
+  
+  get_target_property(target_int_link_libs ${target_name} INTERFACE_LINK_LIBRARIES)
+  message(STATUS "Initial ${target_name}-INTERFACE_LINK_LIBRARIES:${target_int_link_libs}")
+  
+  get_target_property(target_imp_link_dep_libs ${target_name} IMPORTED_LINK_DEPENDENT_LIBRARIES)
+  message(STATUS "Initial ${target_name}-IMPORTED_LINK_DEPENDENT_LIBRARIES:${target_imp_link_dep_libs}")
 
   if(${package}_LIBRARIES)
     _ign_sort_libraries(${target_name} ${${package}_LIBRARIES})
   endif()
 
+  message(STATUS "${package}_LIBRARIES:${${package}_LIBRARIES}")
   if(${package}_LIBRARIES)
     set_target_properties(${target_name} PROPERTIES
       INTERFACE_LINK_LIBRARIES "${${package}_LIBRARIES}")
@@ -73,6 +84,25 @@ macro(ign_import_target package)
       INTERFACE_COMPILE_OPTIONS "${${package}_CFLAGS}")
   endif()
 
+  get_target_property(target_imp_loc ${target_name} IMPORTED_LOCATION)
+  message(STATUS "${target_name}-IMPORTED_LOCATION:${target_imp_loc}")
+  
+  get_target_property(target_int_link_libs ${target_name} INTERFACE_LINK_LIBRARIES)
+  message(STATUS "${target_name}-INTERFACE_LINK_LIBRARIES:${target_int_link_libs}")
+  
+  get_target_property(target_link_int_libs ${target_name} LINK_INTERFACE_LIBRARIES)
+  message(STATUS "${target_name}-LINK_INTERFACE_LIBRARIES:${target_int_link_libs}")
+  
+  get_target_property(ill ${target_name} INTERFACE_LINK_LIBRARIES)
+  set_target_properties(${target_name}
+    PROPERTIES IMPORTED_LINK_DEPENDENT_LIBRARIES ${ill})
+  
+  get_target_property(target_imp_link_dep_libs ${target_name} IMPORTED_LINK_DEPENDENT_LIBRARIES)
+  message(STATUS "${target_name}-IMPORTED_LINK_DEPENDENT_LIBRARIES:${target_imp_link_dep_libs}")
+
+  get_target_property(target_imported_implib ${target_name} IMPORTED_IMPLIB)
+  message(STATUS "${target_name}-IMPORTED_IMPLIB:${target_imported_implib}")
+
   # What about linker flags? Is there no target property for that?
 
 endmacro()
@@ -85,14 +115,41 @@ endmacro()
 # missing from the target, the dependencies do not get configured correctly by
 # the generator expressions, and the build system will try to link to a nonsense
 # garbage file.
+#
+# TODO: Figure out if there is a better way to fill in the various library
+# properties of an imported target.
 function(_ign_sort_libraries target_name first_lib)
 
-  set_target_properties(${target_name} PROPERTIES
-    IMPORTED_LOCATION "${first_lib}")
+  if(MSVC)
+    # Note: For MSVC, we only care about the "import library" which is the 
+    # library ending in *.lib. The linker only needs to be told where the
+    # *.lib library is. The dynamic library (*.dll) only needs to be visible
+    # to the program at run-time, not at compile or link time. Furthermore,
+    # find_library on Windows only looks for *.lib files, so we expect that
+    # results of the form package_LIBRARIES will contain *.lib files when
+    # running on Windows. IMPORTED_IMPLIB is the target property that 
+    # indicates the "import library" of an "imported target", so that is
+    # the property that will fill in first and foremost.
+    #
+    # TODO: How does MinGW handle libraries?
+    set_target_properties(${target_name} PROPERTIES
+      IMPORTED_IMPLIB "${first_lib}")
+  else()
+    set_target_properties(${target_name} PROPERTIES
+      IMPORTED_LOCATION "${first_lib}")
+  endif()
+
+  message(STATUS "${target_name} extra libs:${ARGN}")
 
   foreach(extra_lib ${ARGN})
     set_target_properties(${target_name} PROPERTIES
       INTERFACE_LINK_LIBRARIES "${extra_lib}")
   endforeach()
+
+  get_target_property(ill ${target_name} INTERFACE_LINK_LIBRARIES)
+  set_target_properties(${target_name} 
+    PROPERTIES IMPORTED_LINK_INTERFACE_LIBRARIES ${ill})
+  set_target_properties(${target_name}
+    PROPERTIES IMPORTED_LINK_DEPENDENT_LIBRARIES ${ill})
 
 endfunction()

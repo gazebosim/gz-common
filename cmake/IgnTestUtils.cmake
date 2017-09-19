@@ -68,14 +68,14 @@ macro(ign_build_tests)
       target_link_libraries(${BINARY_NAME}
         gtest
         gtest_main
-        ${PROJECT_NAME_LOWER}
+        ${PROJECT_LIBRARY_TARGET_NAME}
         ${ign_build_tests_LIB_DEPS})
 
       target_include_directories(${BINARY_NAME}
         PRIVATE
-        ${PROJECT_SOURCE_DIR}
-        ${PROJECT_BINARY_DIR}
-        ${ign_build_tests_INCLUDE_DIRS})
+          ${PROJECT_SOURCE_DIR}
+          ${PROJECT_BINARY_DIR}
+          ${ign_build_tests_INCLUDE_DIRS})
 
       if(UNIX)
         target_link_libraries(${BINARY_NAME} pthread)

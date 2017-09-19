@@ -304,9 +304,7 @@ macro(ign_setup_msvc)
     set(MSVC_DEBUG_FLAGS "${MSVC_MINIMAL_FLAGS} /Zi")
 
     # GL: Enable Whole Program Optimization
-    # LTCG: Tell the linker to work with the compiler to perform whole-program
-    #       optimization
-    set(MSVC_RELEASE_FLAGS "${MSVC_DEBUG_FLAGS} /GL /LTCG")
+    set(MSVC_RELEASE_FLAGS "${MSVC_DEBUG_FLAGS} /GL")
 
     # UNDEBUG: Undefine NDEBUG so that assertions can be triggered
     set(MSVC_RELWITHDEBINFO_FLAGS "${MSVC_RELEASE_FLAGS} /UNDEBUG")
