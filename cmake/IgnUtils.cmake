@@ -68,13 +68,13 @@
 # [PKGCONFIG_LIB]: Optional. Use this to indicate that the package should be
 #                  considered a "library" by pkgconfig. This is used for
 #                  libraries which do not come with *.pc metadata, such as
-#                  system libraries, libdl, or librt. Generally you should leave
-#                  this out, because most packages will be considered "modules"
-#                  by pkgconfig, which is how we will treat this package by
-#                  default. The string which follows this argument will be used
-#                  as the library name, and the string that follows a PKGCONFIG
-#                  argument will be ignored, so the PKGCONFIG argument can be
-#                  left out when using this argument.
+#                  system libraries, libm, libdl, or librt. Generally you should
+#                  leave this out, because most packages will be considered
+#                  "modules" by pkgconfig, which is how we will treat the
+#                  package by default. The string which follows this argument
+#                  will be used as the library name, and the string that follows
+#                  a PKGCONFIG argument will be ignored, so the PKGCONFIG
+#                  argument can be left out when using this argument.
 #
 # [PKGCONFIG_VER_COMPARISON]: Optional. If provided, pkgconfig will be told how
 #                             the available version of this package must compare
@@ -153,8 +153,10 @@ macro(ign_find_package PACKAGE_NAME)
 
   #------------------------------------
   # Add this package to the list of dependencies that will be inserted into the
-  # find-config file, unless the invoker specifies that it should not be added
-  if(NOT ign_find_package_BUILD_ONLY)
+  # find-config file, unless the invoker specifies that it should not be added.
+  # Also, add this package or library as an entry to the pkgconfig file that we
+  # will produce for our project.
+  if(ign_find_package_REQUIRED AND NOT ign_find_package_BUILD_ONLY)
 
     # Set up the arguments we want to pass to the find_dependency invokation for
     # our ignition project. We always need to pass the name of the dependency.
@@ -379,9 +381,11 @@ function(ign_install_all_headers)
     endforeach()
 
     # Remove the excluded headers
-    foreach(exclude ${excluded})
-      list(REMOVE_ITEM headers ${exclude})
-    endforeach()
+    if(headers)
+      foreach(exclude ${excluded})
+        list(REMOVE_ITEM headers ${exclude})
+      endforeach()
+    endif()
 
     # Add each header, prefixed by its directory, to the auto headers variable
     foreach(header ${headers})
