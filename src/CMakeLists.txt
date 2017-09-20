@@ -1,4 +1,7 @@
 
+# Turn on C++11 support for the library
+set(CMAKE_CXX_STANDARD 11)
+
 # Collect source files into the "sources" variable and unit test files into the
 # "gtest_sources" variable
 ign_get_libsources_and_unittests(sources gtest_sources)
@@ -67,15 +70,6 @@ endif()
 ign_target_interface_include_directories(${PROJECT_LIBRARY_TARGET_NAME}
   ignition-math3::ignition-math3)
 
-# This generator expression is necessary for multi-configuration generators,
-# such as MSVC on Windows, and also to ensure that our target exports the
-# headers correctly
-target_include_directories(${PROJECT_LIBRARY_TARGET_NAME}
-  # This is the public ignition/common headers directory
-  PUBLIC $<INSTALL_INTERFACE:${IGN_INCLUDE_INSTALL_DIR_FULL}>
-  # This is the build directory version of the headers
-  PRIVATE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>)
-
 # Handle non-Windows configuration settings
 if(NOT WIN32)
 
@@ -129,9 +123,6 @@ if(UNIX AND NOT APPLE)
   endif()
 
 endif()
-
-# Turn on C++11 support for the library
-set_property(TARGET ${PROJECT_LIBRARY_TARGET_NAME} PROPERTY CXX_STANDARD 11)
 
 # Create installation instructions for the library target. This must be called
 # in the same scope that the target is created.
