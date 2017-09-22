@@ -20,7 +20,7 @@
 
 #include <ignition/math/Matrix4.hh>
 #include <ignition/math/Vector3.hh>
-#include <ignition/common/System.hh>
+#include <ignition/common/Export.h>
 #include <ignition/common/Util.hh>
 
 namespace ignition

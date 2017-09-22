@@ -24,7 +24,7 @@
 #include <ignition/math/Vector2.hh>
 
 #include <ignition/common/Types.hh>
-#include <ignition/common/System.hh>
+#include <ignition/common/Export.h>
 
 namespace ignition
 {

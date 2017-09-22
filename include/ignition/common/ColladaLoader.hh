@@ -18,7 +18,7 @@
 #define IGNITION_COMMON_COLLADALOADER_HH_
 
 #include <string>
-#include <ignition/common/System.hh>
+#include <ignition/common/Export.h>
 #include <ignition/common/MeshLoader.hh>
 
 namespace ignition

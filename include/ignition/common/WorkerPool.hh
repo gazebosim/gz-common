@@ -21,7 +21,7 @@
 #include <functional>
 #include <memory>
 
-#include <ignition/common/System.hh>
+#include <ignition/common/Export.h>
 #include <ignition/common/Time.hh>
 
 namespace ignition
