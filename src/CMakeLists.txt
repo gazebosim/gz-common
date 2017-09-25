@@ -45,7 +45,7 @@ ign_add_library(${PROJECT_LIBRARY_TARGET_NAME} ${sources})
 # Link the libraries that we always need
 target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
   PUBLIC
-    ignition-math3::ignition-math3
+    ignition-math${IGN_MATH_VER}::ignition-math${IGN_MATH_VER}
   PRIVATE
     FreeImage::FreeImage
     DL::DL)
@@ -68,7 +68,7 @@ endif()
 # headers are only included in the source code, and do not need to be visible
 # to projects that depend on ignition-common.
 ign_target_interface_include_directories(${PROJECT_LIBRARY_TARGET_NAME}
-  ignition-math3::ignition-math3)
+  ignition-math${IGN_MATH_VER}::ignition-math${IGN_MATH_VER})
 
 # Handle non-Windows configuration settings
 if(NOT WIN32)
