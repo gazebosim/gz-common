@@ -19,7 +19,7 @@
 
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Quaternion.hh>
-#include <ignition/common/Export.h>
+#include <ignition/common/Export.hh>
 
 namespace ignition
 {

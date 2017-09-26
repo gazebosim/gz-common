@@ -18,7 +18,7 @@
 #define IGNITION_COMMON_TIMER_HH_
 
 #include <ignition/common/Time.hh>
-#include <ignition/common/Export.h>
+#include <ignition/common/Export.hh>
 
 namespace ignition
 {

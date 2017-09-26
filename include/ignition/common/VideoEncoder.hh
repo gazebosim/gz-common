@@ -20,7 +20,7 @@
 #include <chrono>
 #include <string>
 #include <memory>
-#include <ignition/common/Export.h>
+#include <ignition/common/Export.hh>
 
 // Default bitrate (0) indicates that a bitrate should be calculated when
 // Start is called.

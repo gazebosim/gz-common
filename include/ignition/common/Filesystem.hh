@@ -21,7 +21,7 @@
 #include <memory>
 #include <string>
 
-#include <ignition/common/Export.h>
+#include <ignition/common/Export.hh>
 
 #ifdef _WIN32
 // Disable warning C4251 which is triggered by

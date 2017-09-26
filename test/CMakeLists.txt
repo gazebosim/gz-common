@@ -15,8 +15,6 @@ target_link_libraries(gtest_main gtest)
 set(GTEST_LIBRARY "${PROJECT_BINARY_DIR}/test/libgtest.a")
 set(GTEST_MAIN_LIBRARY "${PROJECT_BINARY_DIR}/test/libgtest_main.a")
 
-include_directories(${GTEST_INCLUDE_DIRS})
-
 add_subdirectory(integration)
 add_subdirectory(performance)
 add_subdirectory(regression)

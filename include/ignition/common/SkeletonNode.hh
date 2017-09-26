@@ -22,7 +22,7 @@
 #include <vector>
 
 #include <ignition/common/NodeTransform.hh>
-#include <ignition/common/Export.h>
+#include <ignition/common/Export.hh>
 
 namespace ignition
 {

@@ -24,7 +24,7 @@
 
 #include <ignition/math/Matrix4.hh>
 #include <ignition/common/SkeletonNode.hh>
-#include <ignition/common/Export.h>
+#include <ignition/common/Export.hh>
 
 namespace ignition
 {

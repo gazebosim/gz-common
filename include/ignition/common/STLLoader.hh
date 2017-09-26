@@ -21,7 +21,7 @@
 #include <string>
 
 #include "ignition/common/MeshLoader.hh"
-#include "ignition/common/Export.h"
+#include "ignition/common/Export.hh"
 
 #define LINE_MAX_LEN 256
 #define COR3_MAX 200000

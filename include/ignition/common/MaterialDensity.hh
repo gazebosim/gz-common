@@ -21,7 +21,7 @@
 #include <map>
 #include <tuple>
 #include <ignition/math/Helpers.hh>
-#include "ignition/common/Export.h"
+#include "ignition/common/Export.hh"
 
 namespace ignition
 {

@@ -21,7 +21,7 @@
 #include <vector>
 #include <algorithm>
 #include <ignition/common/Util.hh>
-#include <ignition/common/Export.h>
+#include <ignition/common/Export.hh>
 
 namespace ignition
 {

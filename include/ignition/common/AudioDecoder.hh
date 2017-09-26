@@ -20,7 +20,7 @@
 #include <stdint.h>
 #include <string>
 #include <memory>
-#include <ignition/common/Export.h>
+#include <ignition/common/Export.hh>
 
 namespace ignition
 {

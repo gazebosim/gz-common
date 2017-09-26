@@ -19,7 +19,7 @@
 
 #include <string>
 #include <memory>
-#include <ignition/common/Export.h>
+#include <ignition/common/Export.hh>
 
 struct AVFormatContext;
 struct AVCodecContext;

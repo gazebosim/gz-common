@@ -19,7 +19,7 @@
 
 #include <memory>
 #include <ignition/math/Vector2.hh>
-#include "ignition/common/Export.h"
+#include "ignition/common/Export.hh"
 
 namespace ignition
 {

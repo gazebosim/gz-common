@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include <ignition/common/Export.h>
+#include <ignition/common/Export.hh>
 
 namespace ignition
 {

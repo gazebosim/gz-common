@@ -20,7 +20,7 @@
 #include <string>
 #include <vector>
 
-#include <ignition/common/Export.h>
+#include <ignition/common/Export.hh>
 
 namespace ignition
 {
