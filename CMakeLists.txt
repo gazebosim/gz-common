@@ -38,7 +38,7 @@ endif()
 #============================================================================
 # Search for project-specific dependencies
 #============================================================================
-message(STATUS "\n\n-- ====== Finding 3rd Party Packages ======")
+message(STATUS "\n\n-- ====== Finding Dependencies ======")
 
 #--------------------------------------
 # Find ignition-math
