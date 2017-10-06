@@ -12,6 +12,8 @@ set (sources
   Console.cc
   Dem.cc
   Event.cc
+  Filesystem.cc
+  FilesystemBoost.cc
   KeyEvent.cc
   KeyFrame.cc
   Material.cc
@@ -70,6 +72,7 @@ set (gtest_sources
   Dem_TEST.cc
   EnumIface_TEST.cc
   Event_TEST.cc
+  Filesystem_TEST.cc
   KeyEvent_TEST.cc
   Material_TEST.cc
   MaterialDensity_TEST.cc

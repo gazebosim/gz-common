@@ -53,10 +53,10 @@ class ignition::common::MaterialPrivate
   public: math::Color emissive;
 
   /// \brief transparency value in the range 0 to 1
-  public: double transparency;
+  public: double transparency = 0.0;
 
   /// \brief shininess value (0 to 1)
-  public: double shininess;
+  public: double shininess = 0.0;
 
   /// \brief point size
   public: double pointSize;
@@ -71,10 +71,10 @@ class ignition::common::MaterialPrivate
   public: static unsigned int counter;
 
   /// \brief flag to perform depth buffer write
-  public: bool depthWrite;
+  public: bool depthWrite = true;
 
   /// \brief flag to indicate if lighting is enabled for this material.
-  public: bool lighting;
+  public: bool lighting = true;
 
   /// \brief source blend factor
   public: double srcBlendFactor;
@@ -93,12 +93,9 @@ Material::Material()
     std::to_string(this->dataPtr->counter++);
   this->dataPtr->blendMode = REPLACE;
   this->dataPtr->shadeMode = GOURAUD;
-  this->dataPtr->transparency = 0;
-  this->dataPtr->shininess = 0;
   this->dataPtr->ambient.Set(0.4f, 0.4f, 0.4f, 1.0f);
   this->dataPtr->diffuse.Set(0.5f, 0.5f, 0.5f, 1.0f);
   this->dataPtr->specular.Set(0, 0, 0, 1);
-  this->dataPtr->lighting = false;
   this->dataPtr->dstBlendFactor = this->dataPtr->srcBlendFactor = 1.0;
 }
 
@@ -110,11 +107,8 @@ Material::Material(const math::Color &_clr)
     std::to_string(this->dataPtr->counter++);
   this->dataPtr->blendMode = REPLACE;
   this->dataPtr->shadeMode = GOURAUD;
-  this->dataPtr->transparency = 0;
-  this->dataPtr->shininess = 0;
   this->dataPtr->ambient = _clr;
   this->dataPtr->diffuse = _clr;
-  this->dataPtr->lighting = false;
 }
 
 //////////////////////////////////////////////////
@@ -174,7 +168,6 @@ math::Color Material::Ambient() const
 void Material::SetDiffuse(const math::Color &_clr)
 {
   this->dataPtr->diffuse = _clr;
-  this->dataPtr->lighting = true;
 }
 
 //////////////////////////////////////////////////
@@ -187,7 +180,6 @@ math::Color Material::Diffuse() const
 void Material::SetSpecular(const math::Color &_clr)
 {
   this->dataPtr->specular = _clr;
-  this->dataPtr->lighting = true;
 }
 
 //////////////////////////////////////////////////
@@ -213,7 +205,6 @@ void Material::SetTransparency(double _t)
 {
   this->dataPtr->transparency = std::min(_t, 1.0);
   this->dataPtr->transparency = std::max(this->dataPtr->transparency, 0.0);
-  this->dataPtr->lighting = true;
 }
 
 //////////////////////////////////////////////////
@@ -226,7 +217,6 @@ double Material::Transparency() const
 void Material::SetShininess(double _s)
 {
   this->dataPtr->shininess = _s;
-  this->dataPtr->lighting = true;
 }
 
 //////////////////////////////////////////////////
@@ -243,7 +233,7 @@ void Material::SetBlendFactors(double _srcFactor, double _dstFactor)
 }
 
 //////////////////////////////////////////////////
-void Material::BlendFactors(double &_srcFactor, double &_dstFactor)
+void Material::BlendFactors(double &_srcFactor, double &_dstFactor) const
 {
   _srcFactor = this->dataPtr->srcBlendFactor;
   _dstFactor = this->dataPtr->dstBlendFactor;

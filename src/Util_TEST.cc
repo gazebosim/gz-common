@@ -18,7 +18,6 @@
 #include <stdlib.h>
 #include <gtest/gtest.h>
 #include <string>
-#include <sstream>
 
 #include <ignition/common/Util.hh>
 #include "test/util.hh"
@@ -100,73 +99,6 @@ TEST(Util_TEST, split)
   EXPECT_EQ(tokens.at(0), "//abc/def");
   EXPECT_EQ(tokens.at(1), "123");
   EXPECT_EQ(tokens.at(2), "567///");
-}
-
-/////////////////////////////////////////////////
-/// \brief Test file operations
-TEST(Util_TEST, fileOps)
-{
-  EXPECT_FALSE(common::cwd().empty());
-  EXPECT_TRUE(common::exists(common::cwd()));
-  EXPECT_TRUE(common::isDirectory(common::cwd()));
-
-  EXPECT_TRUE(common::isFile(__FILE__));
-  EXPECT_FALSE(common::isDirectory(__FILE__));
-
-  std::ofstream tmpOut("test.tmp");
-  tmpOut << "Output" << std::endl;
-  tmpOut.close();
-
-  EXPECT_TRUE(common::copyFile("test.tmp", "test2.tmp"));
-  EXPECT_TRUE(common::exists("test.tmp"));
-  EXPECT_TRUE(common::exists("test2.tmp"));
-
-  std::ifstream testIn("test.tmp");
-  std::string testInContent((std::istreambuf_iterator<char>(testIn)),
-                            (std::istreambuf_iterator<char>()));
-
-  std::ifstream test2In("test2.tmp");
-  std::string test2InContent((std::istreambuf_iterator<char>(test2In)),
-                             (std::istreambuf_iterator<char>()));
-
-
-  EXPECT_EQ(testInContent, test2InContent);
-
-  EXPECT_TRUE(common::moveFile("test2.tmp", "test3.tmp"));
-  EXPECT_FALSE(common::exists("test2.tmp"));
-  EXPECT_TRUE(common::exists("test3.tmp"));
-
-  std::ifstream test3In("test3.tmp");
-  std::string test3InContent((std::istreambuf_iterator<char>(test3In)),
-                             (std::istreambuf_iterator<char>()));
-
-  EXPECT_EQ(testInContent, test3InContent);
-
-  EXPECT_FALSE(common::copyFile("test3.tmp", "test3.tmp"));
-  EXPECT_FALSE(common::copyFile("test3.tmp", "./test3.tmp"));
-
-  std::remove("test.tmp");
-
-  // This file shouldn't exist, but we'll try to remove just in case the
-  // test failed.
-  std::remove("test2.tmp");
-
-  std::remove("test3.tmp");
-}
-
-/////////////////////////////////////////////////
-/// \brief Test file operations
-TEST(Util_TEST, moreFileOps)
-{
-  EXPECT_FALSE(common::copyFile("__wrong__.tmp", "test2.tmp"));
-  EXPECT_TRUE(!common::exists("test2.tmp"));
-  EXPECT_FALSE(common::copyFile("test.tmp", "__wrong_dir__/__wrong__.tmp"));
-  EXPECT_TRUE(!common::exists("__wrong_dir__"));
-
-  EXPECT_FALSE(common::moveFile("__wrong__.tmp", "test3.tmp"));
-  EXPECT_TRUE(!common::exists("test3.tmp"));
-  EXPECT_FALSE(common::moveFile("test2.tmp", "__wrong_dir__/__wrong__.tmp"));
-  EXPECT_TRUE(!common::exists("__wrong_dir__"));
 }
 
 /////////////////////////////////////////////////

@@ -17,6 +17,7 @@
 #ifndef IGNITION_COMMON_MOVINGWINDOWFILTER_HH_
 #define IGNITION_COMMON_MOVINGWINDOWFILTER_HH_
 
+#include <memory>
 #include <vector>
 
 #include <ignition/common/Time.hh>
@@ -99,7 +100,7 @@ namespace ignition
                      MovingWindowFilterPrivate<T> &_d);
 
       /// \brief Data pointer.
-      protected: MovingWindowFilterPrivate<T> *dataPtr;
+      protected: std::unique_ptr<MovingWindowFilterPrivate<T>> dataPtr;
     };
 
     //////////////////////////////////////////////////
@@ -115,8 +116,6 @@ namespace ignition
     MovingWindowFilter<T>::~MovingWindowFilter()
     {
       this->dataPtr->valHistory.clear();
-      delete this->dataPtr;
-      this->dataPtr = nullptr;
     }
 
     //////////////////////////////////////////////////
