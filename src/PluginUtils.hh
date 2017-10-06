@@ -13,15 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 
-#include "ignition/common/PluginMacros.hh"
+#ifndef IGNITION_COMMON_PLUGINUTILS_HH_
+#define IGNITION_COMMON_PLUGINUTILS_HH_
 
-class A
+#include <string>
+#include "ignition/common/StringUtils.hh"
+
+namespace ignition
 {
-  float test1;
-  double test2;
-};
+  namespace common
+  {
+    /// \brief format the name to start with "::"
+    inline std::string NormalizeName(const std::string &_name)
+    {
+      std::string name = _name;
+      if (!StartsWith(_name, "::"))
+      {
+        name = std::string("::") + _name;
+      }
+      return name;
+    }
+  }
+}
 
 
-IGN_COMMON_REGISTER_SINGLE_PLUGIN(A, A)
+#endif

@@ -22,22 +22,63 @@
 #include <string>
 
 #include <ignition/common/System.hh>
-
+#include <ignition/common/PluginMacros.hh>
 
 namespace test
 {
 namespace util
 {
 
-class IGNITION_COMMON_VISIBLE DummyPluginBase
+class IGNITION_COMMON_VISIBLE DummyNameBase
 {
   public: virtual std::string MyNameIs() = 0;
 };
 
 
-class DummyPlugin : DummyPluginBase
+class DummySinglePlugin : public DummyNameBase
 {
-  public: virtual std::string MyNameIs();
+  public: virtual std::string MyNameIs() override;
+};
+
+
+class IGNITION_COMMON_VISIBLE DummyDoubleBase
+{
+  public: virtual double MyDoubleValueIs() = 0;
+};
+
+class DummyIntBase
+{
+  public: virtual int MyIntegerValueIs() = 0;
+  IGN_COMMON_SPECIALIZE_INTERFACE(test::util::DummyIntBase)
+};
+
+class DummySetterBase
+{
+  public: virtual void SetName(const std::string &_name) = 0;
+  public: virtual void SetDoubleValue(const double _val) = 0;
+  public: virtual void SetIntegerValue(const int _val) = 0;
+  IGN_COMMON_SPECIALIZE_INTERFACE(test::util::DummySetterBase)
+};
+
+class DummyMultiPlugin
+    : public DummyNameBase,
+      public DummyDoubleBase,
+      public DummyIntBase,
+      public DummySetterBase
+{
+  public: virtual std::string MyNameIs() override;
+  public: virtual double MyDoubleValueIs() override;
+  public: virtual int MyIntegerValueIs() override;
+
+  public: virtual void SetName(const std::string &_name) override;
+  public: virtual void SetDoubleValue(const double _val) override;
+  public: virtual void SetIntegerValue(const int _val) override;
+
+  public: DummyMultiPlugin();
+
+  private: std::string name;
+  private: double val;
+  private: int intVal;
 };
 
 }

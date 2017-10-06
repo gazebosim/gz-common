@@ -19,6 +19,7 @@
 #include <iostream>
 #include "ignition/common/PluginLoader.hh"
 #include "ignition/common/SystemPaths.hh"
+#include "ignition/common/Plugin.hh"
 
 #include "test_config.h"
 #include "util/DummyPlugins.hh"
@@ -31,21 +32,58 @@ TEST(PluginLoader, LoadExistingLibrary)
   ignition::common::SystemPaths sp;
   sp.AddPluginPaths(projectPath + "/test/util");
   std::string path = sp.FindSharedLibrary("IGNDummyPlugins");
-  ASSERT_LT(0u, path.size());
+  ASSERT_FALSE(path.empty());
 
-  ignition::common::PluginLoader pm;
+  ignition::common::PluginLoader pl;
 
-  EXPECT_EQ("::test::util::DummyPlugin", pm.LoadLibrary(path));
+  // Make sure the expected plugins were loaded.
+  std::unordered_set<std::string> pluginNames = pl.LoadLibrary(path);
+  EXPECT_EQ(1u, pluginNames.count("::test::util::DummySinglePlugin"));
+  EXPECT_EQ(1u, pluginNames.count("::test::util::DummyMultiPlugin"));
 
-  std::cout << pm.PrettyStr();
+  std::cout << pl.PrettyStr();
 
-  ASSERT_EQ(1u, pm.InterfacesImplemented().size());
-  EXPECT_EQ("::test::util::DummyPluginBase", pm.InterfacesImplemented()[0]);
-  ASSERT_EQ(1u, pm.PluginsImplementing("::test::util::DummyPluginBase").size());
-  std::unique_ptr<test::util::DummyPluginBase> plugin =
-    pm.Instantiate<test::util::DummyPluginBase>("test::util::DummyPlugin");
-  ASSERT_NE(nullptr, plugin.get());
-  EXPECT_EQ(std::string("DummyPlugin"), plugin->MyNameIs());
+  // Make sure the expected interfaces were loaded.
+  EXPECT_EQ(4u, pl.InterfacesImplemented().size());
+  EXPECT_EQ(1u, pl.InterfacesImplemented()
+            .count("::test::util::DummyNameBase"));
+  EXPECT_EQ(2u, pl.PluginsImplementing("::test::util::DummyNameBase").size());
+  EXPECT_EQ(1u, pl.PluginsImplementing("::test::util::DummyDoubleBase").size());
+
+
+  ignition::common::PluginPtr firstPlugin =
+      pl.Instantiate("test::util::DummySinglePlugin");
+
+  ignition::common::PluginPtr secondPlugin =
+      pl.Instantiate("test::util::DummyMultiPlugin");
+
+  // Check that the DummyNameBase interface exists and that it returns the
+  // correct value.
+  test::util::DummyNameBase* nameBase =
+      firstPlugin->GetInterface<test::util::DummyNameBase>(
+        "test::util::DummyNameBase");
+  ASSERT_NE(nullptr, nameBase);
+  EXPECT_EQ(std::string("DummySinglePlugin"), nameBase->MyNameIs());
+
+  // Check that DummyDoubleBase does not exist for this plugin
+  test::util::DummyDoubleBase* doubleBase =
+      firstPlugin->GetInterface<test::util::DummyDoubleBase>(
+        "test::util::DummyDoubleBase");
+  EXPECT_EQ(nullptr, doubleBase);
+
+  // Check that DummyDoubleBase does exist for this function and that it returns
+  // the correct value.
+  doubleBase = secondPlugin->GetInterface<test::util::DummyDoubleBase>(
+        "test::util::DummyDoubleBase");
+  ASSERT_NE(nullptr, doubleBase);
+  EXPECT_NEAR(3.14159, doubleBase->MyDoubleValueIs(), 1e-8);
+
+  // Check that the DummyNameBase interface exists for this plugin and that it
+  // returns the correct value.
+  nameBase = secondPlugin->GetInterface<test::util::DummyNameBase>(
+        "test::util::DummyNameBase");
+  ASSERT_NE(nullptr, nameBase);
+  EXPECT_EQ(std::string("DummyMultiPlugin"), nameBase->MyNameIs());
 }
 
 /////////////////////////////////////////////////

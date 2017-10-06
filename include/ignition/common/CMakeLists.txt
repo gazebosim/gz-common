@@ -26,6 +26,7 @@ set (headers
   NodeAnimation.hh
   NodeTransform.hh
   OBJLoader.hh
+  Plugin.hh
   PluginInfo.hh
   PluginLoader.hh
   PluginMacros.hh
@@ -47,6 +48,10 @@ set (headers
   URI.hh
   Uuid.hh
   WorkerPool.hh
+
+  detail/Plugin.hh
+  detail/PluginMacros.hh
+  detail/SuppressWarning.hh
 )
 
 # FIXME: Some classes fail to build on Windows
