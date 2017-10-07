@@ -135,6 +135,20 @@ TEST(EndsWith, AtBeginning)
 }
 
 /////////////////////////////////////////////////
+TEST(EndsWith, PluralCast)
+{
+  EXPECT_EQ("cows", common::PluralCast("cow", 0));
+  EXPECT_EQ("cow",  common::PluralCast("cow", 1));
+  EXPECT_EQ("cows", common::PluralCast("cow", 2));
+  EXPECT_EQ("cows", common::PluralCast("cow", 4));
+
+  EXPECT_EQ("cacti",  common::PluralCast("cactus", "cacti", 0));
+  EXPECT_EQ("cactus", common::PluralCast("cactus", "cacti", 1));
+  EXPECT_EQ("cacti",  common::PluralCast("cactus", "cacti", 2));
+  EXPECT_EQ("cacti",  common::PluralCast("cactus", "cacti", 4));
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
