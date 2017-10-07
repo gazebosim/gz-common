@@ -82,6 +82,7 @@ set (gtest_sources
   MovingWindowFilter_TEST.cc
   OBJLoader_TEST.cc
   PluginLoader_TEST.cc
+  PluginUtils_TEST.cc
   SemanticVersion_TEST.cc
   StringUtils_TEST.cc
   SubMesh_TEST.cc
