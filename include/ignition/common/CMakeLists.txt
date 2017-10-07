@@ -37,6 +37,7 @@ set (headers
   SkeletonNode.hh
   StringUtils.hh
   SubMesh.hh
+  SuppressWarning.hh
   System.hh
   SystemPaths.hh
   STLLoader.hh
