@@ -209,7 +209,7 @@ void Sha1::Byte(std::array<unsigned int, 5> &_hash, const unsigned char _byte)
 bool Sha1::Digest(void const *_buffer, std::size_t _byteCount,
     std::array<unsigned int, 5> &_hash)
 {
-  _hash = {0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0};
+  _hash = {{0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0}};
 
   auto start = static_cast<unsigned char const*>(_buffer);
   auto end = static_cast<unsigned char const*>(start + _byteCount);

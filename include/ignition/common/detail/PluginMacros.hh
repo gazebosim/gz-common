@@ -41,35 +41,33 @@
   #endif
 #endif
 
-#define DETAIL_IGN_COMMON_SPECIALIZE_INTERFACE(interfaceName)\
+#define DETAIL_IGN_COMMON_SPECIALIZE_INTERFACE(interfaceName) \
   static_assert(std::is_same<interfaceName, ::interfaceName>::value, \
-      #interfaceName " must be fully qualified like ::ns::MyClass");\
+      #interfaceName " must be fully qualified like ::ns::MyClass"); \
   static constexpr const char* IGNCOMMONInterfaceName = #interfaceName;
 
 /// \brief Register the PluginInfo meta data
-#define DETAIL_IGN_COMMON_REGISTER_PLUGININFO_META_DATA\
-  extern "C" DETAIL_IGN_PLUGIN_VISIBLE const \
-  std::size_t IGNCOMMONPluginInfoSize = \
-    sizeof(ignition::common::PluginInfo); \
-  extern "C" DETAIL_IGN_PLUGIN_VISIBLE const \
-  std::size_t IGNCOMMONPluginInfoAlignment = \
-    alignof(ignition::common::PluginInfo); \
-  \
-  extern "C" DETAIL_IGN_PLUGIN_VISIBLE const \
-  int IGNCOMMONPluginAPIVersion = \
-    ignition::common::PLUGIN_API_VERSION; \
-
+#define DETAIL_IGN_COMMON_REGISTER_PLUGININFO_META_DATA \
+  extern "C" { \
+    std::size_t DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONPluginInfoSize = \
+      sizeof(ignition::common::PluginInfo); \
+    \
+    std::size_t DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONPluginInfoAlignment = \
+      alignof(ignition::common::PluginInfo); \
+    \
+    int DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONPluginAPIVersion = \
+      ignition::common::PLUGIN_API_VERSION; \
+  }
 
 
 #define DETAIL_IGN_COMMON_BEGIN_ADDING_PLUGINS \
   DETAIL_IGN_COMMON_REGISTER_PLUGININFO_META_DATA \
-IGN_COMMON_BEGIN_WARNING_SUPPRESSION(IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR)\
+IGN_COMMON_BEGIN_WARNING_SUPPRESSION(IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR) \
   struct IGN_macro_must_be_used_in_global_namespace;\
   static_assert(std::is_same < IGN_macro_must_be_used_in_global_namespace, \
       ::IGN_macro_must_be_used_in_global_namespace>::value, \
       "Macro for registering plugins must be used in global namespace"); \
-  extern "C" DETAIL_IGN_PLUGIN_VISIBLE \
-  std::size_t IGNCOMMONMultiPluginInfo( \
+  extern "C" std::size_t DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONMultiPluginInfo( \
       void *_outputInfo, const std::size_t _pluginId, const std::size_t _size) \
   { \
     if (_size != sizeof(ignition::common::PluginInfo)) \
@@ -101,14 +99,9 @@ IGN_COMMON_BEGIN_WARNING_SUPPRESSION(IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR)\
     if (insertion) \
     { \
       ++pluginCount; \
-      if (_pluginId == pluginCount-1) \
+      if (_pluginId == pluginCount - 1) \
       { \
         plugin->name = #pluginName; \
-        plugin->interfaces.insert(std::make_pair( \
-            #interface , [=](void* v_ptr) { \
-                pluginName * d_ptr = static_cast< pluginName *>(v_ptr); \
-                return static_cast< interface *>(d_ptr); \
-            })); \
         plugin->factory = []() { \
           return static_cast<void*>(new pluginName()); \
         }; \
@@ -117,10 +110,11 @@ IGN_COMMON_BEGIN_WARNING_SUPPRESSION(IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR)\
         }; \
       } \
     } \
-    else if ( #pluginName == plugin->name ) \
+  \
+    if ( #pluginName == plugin->name ) \
     { \
       plugin->interfaces.insert(std::make_pair( \
-          #interface , [&](void* v_ptr) { \
+          #interface , [=](void* v_ptr) { \
               pluginName * d_ptr = static_cast< pluginName *>(v_ptr); \
               return static_cast< interface *>(d_ptr); \
           })); \
