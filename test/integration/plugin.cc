@@ -21,8 +21,33 @@
 #include "ignition/common/SystemPaths.hh"
 #include "ignition/common/Plugin.hh"
 
+#include "ignition/common/config.hh"
 #include "test_config.h"
 #include "util/DummyPlugins.hh"
+
+/////////////////////////////////////////////////
+TEST(PluginLoader, LoadNonLibrary)
+{
+  std::string projectPath(PROJECT_BINARY_PATH);
+  ignition::common::PluginLoader pm;
+  EXPECT_TRUE(pm.LoadLibrary(projectPath + "/test_config.h").empty());
+}
+
+/////////////////////////////////////////////////
+TEST(PluginLoader, LoadNonPluginLibrary)
+{
+  std::string projectPath(PROJECT_BINARY_PATH);
+  std::string libraryName("ignition-common");
+  libraryName += std::to_string(IGNITION_COMMON_MAJOR_VERSION);
+
+  ignition::common::SystemPaths sp;
+  sp.AddPluginPaths(projectPath + "/src");
+  std::string path = sp.FindSharedLibrary(libraryName);
+  ASSERT_FALSE(path.empty());
+
+  ignition::common::PluginLoader pm;
+  EXPECT_TRUE(pm.LoadLibrary(path).empty());
+}
 
 /////////////////////////////////////////////////
 TEST(PluginLoader, LoadExistingLibrary)
