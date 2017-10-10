@@ -139,16 +139,17 @@ int Logger::Buffer::sync()
   if (Console::Verbosity() >= this->verbosity && !outstr.empty())
   {
     bool lastNewLine = outstr.back() == '\n';
-    std::ostream *outStream =
-      this->type == Logger::STDOUT ? &std::cout : &std::cerr;
+    FILE *outstream = this->type == Logger::STDOUT ? stdout : stderr;
 
     if (lastNewLine)
       outstr.pop_back();
 
-    (*outStream) << "\033[1;" << this->color << "m" << outstr << "\033[0m";
-
+    std::stringstream ss;
+    ss << "\033[1;" << this->color << "m" << outstr << "\033[0m";
     if (lastNewLine)
-      (*outStream) << std::endl;
+      ss << std::endl;
+
+    fprintf(outstream, "%s", ss.str().c_str());
   }
 #else
   if (Console::Verbosity() >= this->verbosity && !outstr.empty())
