@@ -17,7 +17,7 @@ pipelines:
             libavcodec-dev libavdevice-dev libavformat-dev libavutil-dev
             libfreeimage-dev libgts-dev libswscale-dev libtinyxml2-dev
             libignition-math3-dev
-            lcov curl mercurial
+            lcov curl mercurial cppcheck
           # Code checker
           - sh tools/code_check.sh
           # Build
