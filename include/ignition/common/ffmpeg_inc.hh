@@ -67,6 +67,18 @@ namespace ignition
     // cppcheck-suppress constStatement
     IGNITION_COMMON_VISIBLE
     void AVPacketUnref(AVPacket *_packet);
+
+    /// \brief Helper function to avoid deprecation warnings
+    /// from av_codec_decode_video2.
+    /// \param[in] __codecCtx Codec context.
+    /// \param[out] _frame AVFrame in which decoded video frame is stored.
+    /// \param[out] _gotFrame Zero if no frame could be decompressed,
+    /// otherwise nonzero.
+    /// \param[in] _packet AVPacket structure that stores compressed data.
+    // cppcheck-suppress constStatement
+    IGNITION_COMMON_VISIBLE
+    int AVCodecDecode(AVCodecContext *_codecCtx,
+        AVFrame *_frame, int *_gotFrame, AVPacket *_packet);
   }
 }
 

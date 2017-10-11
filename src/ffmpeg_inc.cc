@@ -47,3 +47,41 @@ void common::AVPacketUnref(AVPacket *_packet)
   av_free_packet(_packet);
 #endif
 }
+
+//////////////////////////////////////////////////
+int common::AVCodecDecode(AVCodecContext *_codecCtx,
+    AVFrame *_frame, int *_gotFrame, AVPacket *_packet)
+{
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 48, 101)
+  // from https://blogs.gentoo.org/lu_zero/2016/03/29/new-avcodec-api/
+  int ret;
+
+  *_gotFrame = 0;
+
+  if (_packet)
+  {
+    ret = avcodec_send_packet(_codecCtx, _packet);
+    if (ret < 0)
+      return ret == AVERROR_EOF ? 0 : ret;
+  }
+
+  ret = avcodec_receive_frame(_codecCtx, _frame);
+  if (ret < 0 && ret != AVERROR(EAGAIN) && ret != AVERROR_EOF)
+    return ret;
+  if (ret >= 0)
+    *_gotFrame = 1;
+
+  return 0;
+#else
+  // this was deprecated in ffmpeg version 3.1
+  // github.com/FFmpeg/FFmpeg/commit/7fc329e2dd6226dfecaa4a1d7adf353bf2773726
+# ifndef _WIN32
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+# endif
+  return avcodec_decode_video2(_codecCtx, _frame, _gotFrame, _packet);
+# ifndef _WIN32
+#  pragma GCC diagnostic pop
+# endif
+#endif
+}

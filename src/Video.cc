@@ -204,7 +204,7 @@ bool Video::NextFrame(unsigned char **_buffer)
     while (tmpPacket.size > 0)
     {
       // sending data to libavcodec
-      int processedLength = avcodec_decode_video2(this->dataPtr->codecCtx,
+      int processedLength = AVCodecDecode(this->dataPtr->codecCtx,
           this->dataPtr->avFrame, &frameAvailable, &tmpPacket);
 
       if (processedLength < 0)
