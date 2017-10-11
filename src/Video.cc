@@ -104,7 +104,7 @@ bool Video::Load(const std::string &_filename)
   for (unsigned int i = 0; i < this->dataPtr->formatCtx->nb_streams; ++i)
   {
     if (this->dataPtr->formatCtx->streams[i]->
-    // codec parameter deprecated in ffmped version 3.1
+    // codec parameter deprecated in ffmpeg version 3.1
     // github.com/FFmpeg/FFmpeg/commit/9200514ad8717c
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 48, 101)
             codecpar->
@@ -124,17 +124,45 @@ bool Video::Load(const std::string &_filename)
     return false;
   }
 
-  // Get a pointer to the codec context for the video stream
-  this->dataPtr->codecCtx = this->dataPtr->formatCtx->streams[
-    this->dataPtr->videoStream]->codec;
-
   // Find the decoder for the video stream
-  codec = avcodec_find_decoder(this->dataPtr->codecCtx->codec_id);
+  auto stream = this->dataPtr->formatCtx->streams[this->dataPtr->videoStream];
+  codec = avcodec_find_decoder(stream->
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 48, 101)
+                                       codecpar->
+#else
+                                       codec->
+#endif
+                                              codec_id);
   if (codec == nullptr)
   {
     ignerr << "Codec not found\n";
     return false;
   }
+
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 48, 101)
+  // AVCodecContext is not included in an AVStream as of ffmpeg 3.1
+  // allocate a codec context based on updated example
+  // github.com/FFmpeg/FFmpeg/commit/bba6a03b2816d805d44bce4f9701a71f7d3f8dad
+  this->dataPtr->codecCtx = avcodec_alloc_context3(codec);
+  if (!this->dataPtr->codecCtx)
+  {
+    ignerr << "Failed to allocate the codec context" << std::endl;
+    return false;
+  }
+
+  // Copy codec parameters from input stream to output codec context
+  if (avcodec_parameters_to_context(this->dataPtr->codecCtx,
+                                    stream->codecpar) < 0)
+  {
+    ignerr << "Failed to copy codec parameters to decoder context"
+           << std::endl;
+    return false;
+  }
+#else
+  // Get a pointer to the codec context for the video stream
+  this->dataPtr->codecCtx = this->dataPtr->formatCtx->streams[
+    this->dataPtr->videoStream]->codec;
+#endif
 
   // Inform the codec that we can handle truncated bitstreams -- i.e.,
   // bitstreams where frame boundaries can fall in the middle of packets
