@@ -103,8 +103,15 @@ bool Video::Load(const std::string &_filename)
   // Find the first video stream
   for (unsigned int i = 0; i < this->dataPtr->formatCtx->nb_streams; ++i)
   {
-    if (this->dataPtr->formatCtx->streams[i]->codec->codec_type ==
-        AVMEDIA_TYPE_VIDEO)
+    if (this->dataPtr->formatCtx->streams[i]->
+    // codec parameter deprecated in ffmped version 3.1
+    // github.com/FFmpeg/FFmpeg/commit/9200514ad8717c
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 48, 101)
+            codecpar->
+#else
+            codec->
+#endif
+            codec_type == AVMEDIA_TYPE_VIDEO)
     {
       this->dataPtr->videoStream = static_cast<int>(i);
       break;
