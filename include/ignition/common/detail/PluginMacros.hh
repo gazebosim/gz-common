@@ -63,8 +63,8 @@
 #define DETAIL_IGN_COMMON_BEGIN_ADDING_PLUGINS \
   DETAIL_IGN_COMMON_REGISTER_PLUGININFO_META_DATA \
 IGN_COMMON_BEGIN_WARNING_SUPPRESSION(IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR) \
-  /* This struct attempts to make sure that the macro is being called from a */ \
-  /* global namespace */ \
+  /* This struct attempts to make sure that the macro is being called from */ \
+  /* a global namespace */ \
   struct IGN_macro_must_be_used_in_global_namespace; \
   static_assert(std::is_same < IGN_macro_must_be_used_in_global_namespace, \
       ::IGN_macro_must_be_used_in_global_namespace>::value, \
@@ -100,8 +100,7 @@ IGN_COMMON_BEGIN_WARNING_SUPPRESSION(IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR) \
 
 
 #define DETAIL_IGN_COMMON_ADD_PLUGIN(pluginName, interface) \
-  /* cppcheck-suppress */ \
-  /* Attempt to ensure that the user is providing fully-qualified class names*/ \
+  /* Attempt to ensure that the user provides fully-qualified class names*/ \
   static_assert(std::is_same<pluginName, ::pluginName>::value, \
       #pluginName " must be fully qualified like ::ns::MyClass"); \
   static_assert(std::is_same<interface, ::interface>::value, \
