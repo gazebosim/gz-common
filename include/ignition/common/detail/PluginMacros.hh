@@ -82,7 +82,10 @@ IGN_COMMON_BEGIN_WARNING_SUPPRESSION(IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR) \
   /* ensure that this function agrees with the PluginLoader about the size */ \
   /* of a PluginInfo object. */ \
   \
-  /* \return The number of plugins after _pluginId remaining in this library*/\
+  /* \return The number of plugins from _pluginId onward that are remaining */ \
+  /* in this library. The expression */ \
+  /* (IGNCOMMONMultiPluginInfo(info, id, size) > 0) will evaluate as true */ \
+  /* if `info` has been filled with useful plugin information. */ \
   extern "C" std::size_t DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONMultiPluginInfo( \
       void *_outputInfo, const std::size_t _pluginId, const std::size_t _size) \
   { \
