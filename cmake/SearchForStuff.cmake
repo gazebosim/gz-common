@@ -7,12 +7,16 @@ include (${project_cmake_dir}/FindFreeimage.cmake)
 
 ########################################
 # Find ignition math
-set(IGNITION-MATH_REQUIRED_MAJOR_VERSION 3)
+set(IGNITION-MATH_REQUIRED_MAJOR_VERSION 4)
 if (NOT DEFINED IGNITION-MATH_LIBRARY_DIRS AND NOT DEFINED IGNITION-MATH_INCLUDE_DIRS AND NOT DEFINED IGNITION-MATH_LIBRARIES)
   find_package(ignition-math${IGNITION-MATH_REQUIRED_MAJOR_VERSION} QUIET)
   if (NOT ignition-math${IGNITION-MATH_REQUIRED_MAJOR_VERSION}_FOUND)
     message(STATUS "Looking for ignition-math${IGNITION-MATH_REQUIRED_MAJOR_VERSION}-config.cmake - not found")
-    BUILD_ERROR ("Missing: Ignition math${IGNITION-MATH_REQUIRED_MAJOR_VERSION} library.")
+    find_package(ignition-math3 QUIET)
+    if (NOT ignition-math3_FOUND)
+      message(STATUS "Looking for ignition-math3-config.cmake - not found")
+      BUILD_ERROR ("Missing: Ignition math${IGNITION-MATH_REQUIRED_MAJOR_VERSION} or Ignition math3 library.")
+    endif()
   else()
     message(STATUS "Looking for ignition-math${IGNITION-MATH_REQUIRED_MAJOR_VERSION}-config.cmake - found")
   endif()
