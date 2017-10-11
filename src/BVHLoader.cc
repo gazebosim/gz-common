@@ -282,5 +282,5 @@ std::unique_ptr<Skeleton> BVHLoader::Load(const std::string &_filename,
   skeleton->AddAnimation(animation);
 
   file.close();
-  return std::move(skeleton);
+  return skeleton;
 }
