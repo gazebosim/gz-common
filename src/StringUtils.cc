@@ -59,17 +59,17 @@ namespace ignition
     }
 
     //////////////////////////////////////////////////
-    std::string PluralCast(const std::string &_baseWord, const int _N)
+    std::string PluralCast(const std::string &_baseWord, const int _n)
     {
-      return PluralCast(_baseWord, _baseWord+"s", _N);
+      return PluralCast(_baseWord, _baseWord+"s", _n);
     }
 
     //////////////////////////////////////////////////
     std::string PluralCast(const std::string &_singular,
                            const std::string &_plural,
-                           const int _N)
+                           const int _n)
     {
-      return std::abs(_N) == 1? _singular : _plural;
+      return std::abs(_n) == 1? _singular : _plural;
     }
   }
 }

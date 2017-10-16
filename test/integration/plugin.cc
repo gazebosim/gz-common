@@ -62,10 +62,18 @@ TEST(PluginLoader, LoadExistingLibrary)
   ignition::common::PluginPtr firstPlugin =
       pl.Instantiate("test::util::DummySinglePlugin");
   EXPECT_FALSE(firstPlugin.IsEmpty());
+  EXPECT_TRUE(firstPlugin->HasInterface("test::util::DummyNameBase"));
+  EXPECT_FALSE(firstPlugin->HasInterface("test::util::DummyDoubleBase"));
+  EXPECT_FALSE(firstPlugin->HasInterface("test::util::DummyIntBase"));
+  EXPECT_FALSE(firstPlugin->HasInterface("test::util::DummySetterBase"));
 
   ignition::common::PluginPtr secondPlugin =
       pl.Instantiate("test::util::DummyMultiPlugin");
   EXPECT_FALSE(secondPlugin.IsEmpty());
+  EXPECT_TRUE(secondPlugin->HasInterface("test::util::DummyNameBase"));
+  EXPECT_TRUE(secondPlugin->HasInterface("test::util::DummyDoubleBase"));
+  EXPECT_TRUE(secondPlugin->HasInterface("test::util::DummyIntBase"));
+  EXPECT_TRUE(secondPlugin->HasInterface("test::util::DummySetterBase"));
 
   // Check that the DummyNameBase interface exists and that it returns the
   // correct value.
