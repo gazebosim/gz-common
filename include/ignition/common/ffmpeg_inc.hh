@@ -70,7 +70,7 @@ namespace ignition
 
     /// \brief Helper function to avoid deprecation warnings
     /// from av_codec_decode_video2.
-    /// \param[in] __codecCtx Codec context.
+    /// \param[in] _codecCtx Codec context.
     /// \param[out] _frame AVFrame in which decoded video frame is stored.
     /// \param[out] _gotFrame Zero if no frame could be decompressed,
     /// otherwise nonzero.
