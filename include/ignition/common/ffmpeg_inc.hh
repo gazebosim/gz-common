@@ -75,6 +75,8 @@ namespace ignition
     /// \param[out] _gotFrame Zero if no frame could be decompressed,
     /// otherwise nonzero.
     /// \param[in] _packet AVPacket structure that stores compressed data.
+    /// \return On error a negative value is returned, otherwise
+    /// the number of bytes used or zero if no frame could be decompressed.
     // cppcheck-suppress constStatement
     IGNITION_COMMON_VISIBLE
     int AVCodecDecode(AVCodecContext *_codecCtx,
