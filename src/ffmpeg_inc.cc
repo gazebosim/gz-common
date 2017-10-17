@@ -62,14 +62,20 @@ int common::AVCodecDecode(AVCodecContext *_codecCtx,
   {
     ret = avcodec_send_packet(_codecCtx, _packet);
     if (ret < 0)
+    {
       return ret == AVERROR_EOF ? 0 : ret;
+    }
   }
 
   ret = avcodec_receive_frame(_codecCtx, _frame);
   if (ret < 0 && ret != AVERROR(EAGAIN) && ret != AVERROR_EOF)
+  {
     return ret;
+  }
   if (ret >= 0)
+  {
     *_gotFrame = 1;
+  }
 
   return 0;
 #else
