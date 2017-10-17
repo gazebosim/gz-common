@@ -103,15 +103,15 @@ bool Video::Load(const std::string &_filename)
   // Find the first video stream
   for (unsigned int i = 0; i < this->dataPtr->formatCtx->nb_streams; ++i)
   {
-    if (this->dataPtr->formatCtx->streams[i]->
+    enum AVMediaType codec_type;
     // codec parameter deprecated in ffmpeg version 3.1
     // github.com/FFmpeg/FFmpeg/commit/9200514ad8717c
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 48, 101)
-            codecpar->
+    codec_type = this->dataPtr->formatCtx->streams[i]->codecpar->codec_type;
 #else
-            codec->
+    codec_type = this->dataPtr->formatCtx->streams[i]->codec->codec_type;
 #endif
-            codec_type == AVMEDIA_TYPE_VIDEO)
+    if (codec_type == AVMEDIA_TYPE_VIDEO)
     {
       this->dataPtr->videoStream = static_cast<int>(i);
       break;
@@ -126,13 +126,11 @@ bool Video::Load(const std::string &_filename)
 
   // Find the decoder for the video stream
   auto stream = this->dataPtr->formatCtx->streams[this->dataPtr->videoStream];
-  codec = avcodec_find_decoder(stream->
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 48, 101)
-                                       codecpar->
+  codec = avcodec_find_decoder(stream->codecpar->codec_id);
 #else
-                                       codec->
+  codec = avcodec_find_decoder(stream->codec->codec_id);
 #endif
-                                              codec_id);
   if (codec == nullptr)
   {
     ignerr << "Codec not found\n";
