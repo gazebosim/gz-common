@@ -38,7 +38,6 @@ namespace ignition
 
       /// \brief Copy constructor.
       /// \param[in] _path Another URIPath.
-      // cppcheck-suppress noExplicitConstructor
       public: URIPath(const URIPath &_path);
 
       /// \brief Construct a URIPath object from a string.
@@ -197,7 +196,6 @@ namespace ignition
 
       /// \brief Copy constructor
       /// \param[in] _uri Another URI.
-      // cppcheck-suppress noExplicitConstructor
       public: URI(const URI &_uri);
 
       /// \brief Destructor.
