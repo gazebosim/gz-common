@@ -16,6 +16,8 @@ if (NOT DEFINED IGNITION-MATH_LIBRARY_DIRS AND NOT DEFINED IGNITION-MATH_INCLUDE
     if (NOT ignition-math3_FOUND)
       message(STATUS "Looking for ignition-math3-config.cmake - not found")
       BUILD_ERROR ("Missing: Ignition math${IGNITION-MATH_REQUIRED_MAJOR_VERSION} or Ignition math3 library.")
+    else()
+      set(IGNITION-MATH_REQUIRED_MAJOR_VERSION 3)
     endif()
   else()
     message(STATUS "Looking for ignition-math${IGNITION-MATH_REQUIRED_MAJOR_VERSION}-config.cmake - found")
