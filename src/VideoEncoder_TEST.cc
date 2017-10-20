@@ -40,16 +40,16 @@ TEST_F(VideoEncoderTest, StartStop)
 
   video.Stop();
   EXPECT_FALSE(video.IsEncoding());
-  EXPECT_FALSE(common::exists(common::cwd() + "/TMP_RECORDING.ogv"));
+  EXPECT_FALSE(common::exists(common::cwd() + "/TMP_RECORDING.mpg"));
 
-  video.Start("ogv", "", 1024, 768);
+  video.Start("mpg", "", 1024, 768);
   EXPECT_TRUE(video.IsEncoding());
-  EXPECT_STREQ(video.Format().c_str(), "ogv");
-  EXPECT_TRUE(common::exists(common::cwd() + "/TMP_RECORDING.ogv"));
+  EXPECT_STREQ(video.Format().c_str(), "mpg");
+  EXPECT_TRUE(common::exists(common::cwd() + "/TMP_RECORDING.mpg"));
 
   video.Start("mp4", "", 1024, 768);
   EXPECT_TRUE(video.IsEncoding());
-  EXPECT_STREQ(video.Format().c_str(), "ogv");
+  EXPECT_STREQ(video.Format().c_str(), "mpg");
 
   video.Stop();
   EXPECT_FALSE(video.IsEncoding());
@@ -62,7 +62,7 @@ TEST_F(VideoEncoderTest, Exists)
   EXPECT_FALSE(video.IsEncoding());
   EXPECT_STREQ(video.Format().c_str(), VIDEO_ENCODER_FORMAT_DEFAULT);
 
-  EXPECT_FALSE(common::exists(common::cwd() + "/TMP_RECORDING.ogv"));
+  EXPECT_FALSE(common::exists(common::cwd() + "/TMP_RECORDING.mpg"));
   EXPECT_FALSE(common::exists(common::cwd() + "/TMP_RECORDING.mp4"));
 
   video.Start();
