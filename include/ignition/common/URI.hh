@@ -38,13 +38,11 @@ namespace ignition
 
       /// \brief Copy constructor.
       /// \param[in] _path Another URIPath.
-      // cppcheck-suppress noExplicitConstructor
       public: URIPath(const URIPath &_path);
 
       /// \brief Construct a URIPath object from a string.
       /// \param[in] _str A string.
-      // cppcheck-suppress noExplicitConstructor
-      public: URIPath(const std::string &_str);
+      public: explicit URIPath(const std::string &_str);
 
       /// \brief Destructor
       public: virtual ~URIPath();
@@ -122,8 +120,7 @@ namespace ignition
 
       /// \brief Construct a URIQuery object from a string.
       /// \param[in] _str A string.
-      // cppcheck-suppress noExplicitConstructor
-      public: URIQuery(const std::string &_str);
+      public: explicit URIQuery(const std::string &_str);
 
       /// \brief Copy constructor
       /// \param[in] _query Another query component
@@ -192,12 +189,10 @@ namespace ignition
 
       /// \brief Construct a URI object from a string.
       /// \param[in] _str A string.
-      // cppcheck-suppress noExplicitConstructor
-      public: URI(const std::string &_str);
+      public: explicit URI(const std::string &_str);
 
       /// \brief Copy constructor
       /// \param[in] _uri Another URI.
-      // cppcheck-suppress noExplicitConstructor
       public: URI(const URI &_uri);
 
       /// \brief Destructor.
