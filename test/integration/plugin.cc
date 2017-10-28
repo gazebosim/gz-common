@@ -339,6 +339,21 @@ TEST(PluginPtr, as_shared_ptr)
   ignition::common::PluginLoader pl;
   pl.LoadLibrary(path);
 
+  // as_shared_pointer without specialization
+  {
+    ignition::common::PluginPtr plugin =
+      pl.Instantiate("test::util::DummyMultiPlugin");
+
+    std::shared_ptr<test::util::DummyIntBase> int_ptr =
+      plugin->as_shared_ptr<test::util::DummyIntBase>();
+    EXPECT_TRUE(int_ptr.get());
+    EXPECT_EQ(5, int_ptr->MyIntegerValueIs());
+
+    std::shared_ptr<SomeInterface> some_ptr =
+      plugin->as_shared_ptr<SomeInterface>();
+    EXPECT_FALSE(some_ptr.get());
+  }
+
   std::shared_ptr<test::util::DummyIntBase> int_ptr =
       pl.Instantiate("test::util::DummyMultiPlugin")->
         as_shared_ptr<test::util::DummyIntBase>(
