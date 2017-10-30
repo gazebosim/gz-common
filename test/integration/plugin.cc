@@ -20,6 +20,8 @@
 // specialized plugin interfaces.
 #define IGNITION_UNITTEST_SPECIALIZED_PLUGIN_ACCESS
 
+#include <string>
+#include <vector>
 #include <gtest/gtest.h>
 #include <iostream>
 #include "ignition/common/PluginLoader.hh"
@@ -31,6 +33,31 @@
 #include "test_config.h"
 #include "util/DummyPlugins.hh"
 
+/////////////////////////////////////////////////
+TEST(PluginLoader, LoadBadPlugins)
+{
+  std::string projectPath(PROJECT_BINARY_PATH);
+
+  ignition::common::SystemPaths sp;
+  sp.AddPluginPaths(projectPath + "/test/util");
+  std::vector<std::string> libraryNames = {
+    "IGNBadPluginAPIVersionOld",
+    "IGNBadPluginAPIVersionNew",
+    "IGNBadPluginAlign",
+    "IGNBadPluginSize"};
+  for (auto const & libraryName : libraryNames)
+  {
+    std::string path = sp.FindSharedLibrary(libraryName);
+    ASSERT_FALSE(path.empty());
+
+    ignition::common::PluginLoader pl;
+
+    // Make sure the expected plugins were loaded.
+    ignition::common::Console::SetVerbosity(2);
+    std::unordered_set<std::string> pluginNames = pl.LoadLibrary(path);
+    EXPECT_TRUE(pluginNames.empty());
+  }
+}
 
 /////////////////////////////////////////////////
 TEST(PluginLoader, LoadExistingLibrary)

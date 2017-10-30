@@ -31,7 +31,6 @@ set (headers
   PluginLoader.hh
   PluginMacros.hh
   PluginPtr.hh
-  SemanticVersion.hh
   SingletonT.hh
   Skeleton.hh
   SkeletonAnimation.hh
