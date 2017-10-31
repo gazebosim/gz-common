@@ -10,7 +10,9 @@ ign_build_tests(
   TYPE INTEGRATION
   SOURCES ${tests})
 
-# We add this dependency to make sure that DummyPlugins gets generated
-# before INTEGRATION_plugin so that its auto-generated header is available.
-# We do not want to link INTEGRATION_plugin to the DummyPlugins library.
-add_dependencies(INTEGRATION_plugin IGNDummyPlugins)
+if(TARGET INTEGRATION_plugin)
+  # We add this dependency to make sure that DummyPlugins gets generated
+  # before INTEGRATION_plugin so that its auto-generated header is available.
+  # We do not want to link INTEGRATION_plugin to the DummyPlugins library.
+  add_dependencies(INTEGRATION_plugin IGNDummyPlugins)
+endif()

@@ -140,19 +140,21 @@ ign_build_tests(
     # Used to make test_config.h visible to the unit tests
     ${PROJECT_BINARY_DIR})
 
-if(USE_EXTERNAL_TINYXML2)
-  # The collada exporter test uses tinyxml2, so we must link it if we're using
-  # and external copy.
-  target_link_libraries(UNIT_ColladaExporter_TEST TINYXML2::TINYXML2)
-else()
-  # If we are using the internal copy of tinyxml2, then the collada exporter
-  # test needs to be pointed to the internal tinyxml2 include directory.
-  target_include_directories(UNIT_ColladaExporter_TEST PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tinyxml2)
-  # We also need to add this as a source file to the collada exporter test's
-  # target, because we do not export the tinyxml2 symbols that get generated
-  # in the ignition-common library. Therefore, the collada exporter test
-  # cannot link to those symbols and must generate its own.
-  target_sources(UNIT_ColladaExporter_TEST PRIVATE tinyxml2/tinyxml2.cpp)
+if(TARGET UNIT_ColladaExporter_TEST)
+  if(USE_EXTERNAL_TINYXML2)
+    # The collada exporter test uses tinyxml2, so we must link it if we're using
+    # and external copy.
+    target_link_libraries(UNIT_ColladaExporter_TEST TINYXML2::TINYXML2)
+  else()
+    # If we are using the internal copy of tinyxml2, then the collada exporter
+    # test needs to be pointed to the internal tinyxml2 include directory.
+    target_include_directories(UNIT_ColladaExporter_TEST PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tinyxml2)
+    # We also need to add this as a source file to the collada exporter test's
+    # target, because we do not export the tinyxml2 symbols that get generated
+    # in the ignition-common library. Therefore, the collada exporter test
+    # cannot link to those symbols and must generate its own.
+    target_sources(UNIT_ColladaExporter_TEST PRIVATE tinyxml2/tinyxml2.cpp)
+  endif()
 endif()
 
 # Produce warning on Windows if the user has decided to turn on the symlink
