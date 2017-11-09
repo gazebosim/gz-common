@@ -6,7 +6,7 @@
 :: Install dependencies
 call %win_lib% :download_unzip_install FreeImage-vc15-x64-release-debug.zip
 call %win_lib% :download_unzip_install dlfcn-win32-vc15-x64-release-debug.zip
-call %win_lib% :install_ign_project ign-math CMakeRefactor-default-WindowsUpdate-Oct2017
+call %win_lib% :install_ign_project ign-math ign-math4
 
 :: Set configuration variables
 @set build_type=Release
