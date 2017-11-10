@@ -883,9 +883,9 @@ bool SVGLoader::Parse(const std::string &_filename,
     std::string err2 = str2 ? str2 : "n/a";
 
     ignerr << "Failed to load file " <<  _filename << std::endl
-           << "XML Error Name: " << doc.ErrorName() << "\n"
-           << "XML Error Info 1: " << err1 << "\n"
-           << "XML Error Info 2: " << err2 << "\n";
+           << "XML error type " << doc.ErrorName() << "\n"
+           << "XML error info 1 " << err1 << "\n"
+           << "XML error info 2 " << err2 << "\n";
     return false;
   }
 
