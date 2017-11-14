@@ -66,7 +66,7 @@
 
 
   #define DETAIL_IGN_COMMON_BEGIN_WARN_SUP_PUSH \
-    _Pragma("warning(push)")
+    __pragma("warning(push)")
 
 
   #define DETAIL_IGN_COMMON_WARN_SUP_HELPER_2(w) \
@@ -74,11 +74,11 @@
 
 
   #define DETAIL_IGN_COMMON_WARN_SUP_HELPER(w) \
-    _Pragma(DETAIL_IGN_COMMON_WARN_SUP_HELPER_2(w))
+    __pragma(DETAIL_IGN_COMMON_WARN_SUP_HELPER_2(w))
 
 
   #define DETAIL_IGN_COMMON_FINISH_WARNING_SUPPRESSION(warning_token) \
-    _Pragma("warning(pop)")
+    __pragma("warning(pop)")
 
 
 #else

@@ -31,10 +31,8 @@
 /////////////////////////////////////////////////
 TEST(PluginLoader, LoadBadPlugins)
 {
-  std::string projectPath(PROJECT_BINARY_PATH);
-
   ignition::common::SystemPaths sp;
-  sp.AddPluginPaths(projectPath + "/test/util");
+  sp.AddPluginPaths(IGN_DUMMY_PLUGIN_PATH);
   std::vector<std::string> libraryNames = {
     "IGNBadPluginAPIVersionOld",
     "IGNBadPluginAPIVersionNew",
@@ -57,10 +55,8 @@ TEST(PluginLoader, LoadBadPlugins)
 /////////////////////////////////////////////////
 TEST(PluginLoader, LoadExistingLibrary)
 {
-  std::string projectPath(PROJECT_BINARY_PATH);
-
   ignition::common::SystemPaths sp;
-  sp.AddPluginPaths(projectPath + "/test/util");
+  sp.AddPluginPaths(IGN_DUMMY_PLUGIN_PATH);
   std::string path = sp.FindSharedLibrary("IGNDummyPlugins");
   ASSERT_FALSE(path.empty());
 
