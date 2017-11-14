@@ -20,7 +20,7 @@
 #include <memory>
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Angle.hh>
-#include <ignition/common/System.hh>
+#include <ignition/common/Export.hh>
 
 #ifdef HAVE_GDAL
 # include <string>

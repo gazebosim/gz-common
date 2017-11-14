@@ -19,6 +19,7 @@
 #include <string>
 #include <mutex>
 #include <map>
+#include <cctype>
 
 #ifndef _WIN32
   #include "ignition/common/GTSMeshUtils.hh"

@@ -33,7 +33,7 @@
 #include <string>
 #include <vector>
 
-#include <ignition/common/System.hh>
+#include <ignition/common/Export.hh>
 
 namespace ignition
 {
@@ -137,6 +137,10 @@ namespace ignition
       /// \return A list of paths listed by the environment variable.
       public: static std::list<std::string> PathsFromEnv(
                 const std::string &_env);
+
+      /// \brief Get the delimiter that the current operating system
+      /// uses to separate different paths from each other.
+      public: static char Delimiter();
 
 #ifdef _WIN32
 // Disable warning C4251

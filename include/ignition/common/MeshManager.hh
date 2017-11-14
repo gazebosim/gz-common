@@ -32,7 +32,7 @@
 
 #include "ignition/common/SingletonT.hh"
 #include "ignition/common/Types.hh"
-#include "ignition/common/System.hh"
+#include "ignition/common/Export.hh"
 
 namespace ignition
 {

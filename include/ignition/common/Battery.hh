@@ -21,7 +21,7 @@
 #include <string>
 #include <functional>
 #include <memory>
-#include <ignition/common/System.hh>
+#include <ignition/common/Export.hh>
 #include <ignition/common/Types.hh>
 #include <ignition/common/Util.hh>
 

@@ -21,7 +21,7 @@
 
 #include <string>
 
-#include <ignition/common/System.hh>
+#include <ignition/common/Export.hh>
 #include <ignition/common/PluginMacros.hh>
 
 namespace test

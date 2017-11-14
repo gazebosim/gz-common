@@ -25,6 +25,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+// The symlink tests should always work on UNIX systems
+#define BUILD_SYMLINK_TESTS
+
 /////////////////////////////////////////////////
 bool create_and_switch_to_temp_dir(std::string &_new_temp_path)
 {
@@ -101,6 +104,14 @@ bool create_new_file_hardlink(const std::string &_hardlink,
 #include <windows.h>
 #include <winnt.h>
 #include <cstdint>
+#include "PrintWindowsSystemWarning.hh"
+
+#ifdef IGN_BUILD_SYMLINK_TESTS_ON_WINDOWS
+// The symlink tests require special permissions to work on Windows,
+// so they will be disabled by default. For more information, see:
+// https://bitbucket.org/ignitionrobotics/ign-common/issues/21
+#define BUILD_SYMLINK_TESTS
+#endif
 
 /////////////////////////////////////////////////
 bool create_and_switch_to_temp_dir(std::string &_new_temp_path)
@@ -156,15 +167,33 @@ bool create_new_empty_file(const std::string &_filename)
 bool create_new_file_symlink(const std::string &_symlink,
                              const std::string &_target)
 {
-  return ::CreateSymbolicLinkA(_symlink.c_str(), _target.c_str(), 0) == TRUE;
+  const bool linked = ::CreateSymbolicLinkA(
+        _symlink.c_str(), _target.c_str(), 0);
+
+  if (!linked)
+  {
+    ignition::common::PrintWindowsSystemWarning(
+          "Failed to create file symlink from [" + _target
+          + "] to [" + _symlink + "]");
+  }
+
+  return linked;
 }
 
 /////////////////////////////////////////////////
 bool create_new_dir_symlink(const std::string &_symlink,
                             const std::string &_target)
 {
-  return ::CreateSymbolicLinkA(_symlink.c_str(), _target.c_str(),
-                               SYMBOLIC_LINK_FLAG_DIRECTORY) == TRUE;
+  const bool linked = ::CreateSymbolicLinkA(_symlink.c_str(), _target.c_str(),
+                                            SYMBOLIC_LINK_FLAG_DIRECTORY);
+  if (!linked)
+  {
+    ignition::common::PrintWindowsSystemWarning(
+          "Failed to create directory symlink from [" + _target
+          + "] to [" + _symlink + "]");
+  }
+
+  return linked;
 }
 
 /////////////////////////////////////////////////
@@ -176,7 +205,7 @@ bool create_new_file_hardlink(const std::string &_hardlink,
 
 #endif
 
-#include <fstream>
+#include <fstream> // NOLINT
 #include "ignition/common/Filesystem.hh"
 
 namespace igncmn = ignition::common;
@@ -210,16 +239,25 @@ TEST(Util_TEST, fileOps)
   std::ifstream test2In("test2.tmp");
   std::string test2InContent((std::istreambuf_iterator<char>(test2In)),
                              (std::istreambuf_iterator<char>()));
+  // We must close the file stream for test2.tmp, or else Windows
+  // will refuse to remove the file from the filesystem in the
+  // upcoming test.
+  test2In.close();
 
   EXPECT_EQ(testInContent, test2InContent);
 
   EXPECT_TRUE(common::moveFile("test2.tmp", "test3.tmp"));
+
   EXPECT_FALSE(common::exists("test2.tmp"));
   EXPECT_TRUE(common::exists("test3.tmp"));
 
   std::ifstream test3In("test3.tmp");
   std::string test3InContent((std::istreambuf_iterator<char>(test3In)),
                              (std::istreambuf_iterator<char>()));
+  // We must close this file stream for test3.tmp or else Windows
+  // wil lrefuse to remove the file from the filesystem in the
+  // upcoming test.
+  test3In.close();
 
   EXPECT_EQ(testInContent, test3InContent);
 
@@ -233,6 +271,7 @@ TEST(Util_TEST, fileOps)
   std::remove("test2.tmp");
 
   std::remove("test3.tmp");
+  EXPECT_FALSE(common::exists("test3.tmp"));
 }
 
 /////////////////////////////////////////////////
@@ -268,6 +307,10 @@ TEST(Filesystem, exists)
   EXPECT_FALSE(isDirectory("newfile"));
 }
 
+// The symlink tests require special permissions to work on Windows,
+// so they will be disabled by default. For more information, see:
+// https://bitbucket.org/ignitionrobotics/ign-common/issues/21
+#ifdef BUILD_SYMLINK_TESTS
 /////////////////////////////////////////////////
 TEST(Filesystem, symlink_exists)
 {
@@ -303,6 +346,7 @@ TEST(Filesystem, symlink_exists)
   ASSERT_TRUE(create_new_file_hardlink("hardlink-file", "newfile"));
   EXPECT_TRUE(exists("hardlink-file"));
 }
+#endif
 
 /////////////////////////////////////////////////
 TEST(Filesystem, cwd)
@@ -388,11 +432,13 @@ TEST(Filesystem, directory_iterator)
   ASSERT_TRUE(create_and_switch_to_temp_dir(new_temp_dir));
   ASSERT_TRUE(create_new_empty_file("newfile"));
   ASSERT_TRUE(createDirectory("newdir"));
+#ifdef BUILD_SYMLINK_TESTS
   ASSERT_TRUE(create_new_file_symlink("symlink-file", "newfile"));
   ASSERT_TRUE(create_new_file_symlink("symlink-file-broken", "nonexistent"));
   ASSERT_TRUE(create_new_dir_symlink("symlink-dir", "newdir"));
   ASSERT_TRUE(create_new_dir_symlink("symlink-dir-broken", "nonexistent-dir"));
   ASSERT_TRUE(create_new_file_hardlink("hardlink-file", "newfile"));
+#endif
 
   std::set<std::string> found_items;
 
@@ -404,11 +450,13 @@ TEST(Filesystem, directory_iterator)
 
   EXPECT_FALSE(found_items.find("newfile") == found_items.end());
   EXPECT_FALSE(found_items.find("newdir") == found_items.end());
+#ifdef BUILD_SYMLINK_TESTS
   EXPECT_FALSE(found_items.find("symlink-file") == found_items.end());
   EXPECT_FALSE(found_items.find("symlink-file-broken") == found_items.end());
   EXPECT_FALSE(found_items.find("symlink-dir") == found_items.end());
   EXPECT_FALSE(found_items.find("symlink-dir-broken") == found_items.end());
   EXPECT_FALSE(found_items.find("hardlink-file") == found_items.end());
+#endif
 
   found_items.clear();
   for (DirIter dirIter(""); dirIter != endIter; ++dirIter)
