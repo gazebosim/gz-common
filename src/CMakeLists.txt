@@ -47,8 +47,7 @@ target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
   PUBLIC
     ignition-math${IGN_MATH_VER}::ignition-math${IGN_MATH_VER}
   PRIVATE
-    FreeImage::FreeImage
-    DL::DL)
+    ${DL_TARGET})
 
 if(USE_EXTERNAL_TINYXML2)
   # If we are using an external copy of tinyxml2, add its imported target
@@ -83,6 +82,7 @@ if(NOT WIN32)
       AVCODEC::AVCODEC
       AVUTIL::AVUTIL
     PRIVATE
+      FreeImage::FreeImage
       GTS::GTS)
 
   # Include the interface directories that we don't expect to find on Windows.
