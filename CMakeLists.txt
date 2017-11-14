@@ -46,10 +46,6 @@ set(IGN_MATH_VER 4)
 ign_find_package(ignition-math${IGN_MATH_VER} REQUIRED)
 
 #--------------------------------------
-# Find Freeimage
-ign_find_package(FreeImage VERSION 3.9 REQUIRED PRIVATE)
-
-#--------------------------------------
 # Find Tinyxml2
 if(USE_EXTERNAL_TINYXML2)
   ign_find_package(TINYXML2 REQUIRED PRIVATE PRETTY tinyxml2)
@@ -66,6 +62,10 @@ ign_find_package(
 #--------------------------------------
 # Find dependencies that we ignore for Visual Studio
 if(NOT MSVC)
+
+  #--------------------------------------
+  # Find Freeimage
+  ign_find_package(FreeImage VERSION 3.9 REQUIRED PRIVATE)
 
   #------------------------------------
   # Find uuid
