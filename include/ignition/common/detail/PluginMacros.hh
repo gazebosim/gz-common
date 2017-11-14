@@ -87,7 +87,10 @@ IGN_COMMON_BEGIN_WARNING_SUPPRESSION(IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR) \
   /* (IGNCOMMONMultiPluginInfo(info, id, size) > 0) will evaluate as true */ \
   /* if `info` has been filled with useful plugin information. */ \
   extern "C" std::size_t DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONMultiPluginInfo( \
-      void *_outputInfo, const std::size_t _pluginId, const std::size_t _size) \
+      void * const _outputInfo, \
+      const void * const _stringAllocatorPtr, \
+      const std::size_t _pluginId, \
+      const std::size_t _size) \
   { \
     if (_size != sizeof(ignition::common::PluginInfo)) \
     { \
@@ -96,6 +99,8 @@ IGN_COMMON_BEGIN_WARNING_SUPPRESSION(IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR) \
     std::unordered_set<std::string> visitedPlugins; \
     ignition::common::PluginInfo *plugin = \
         static_cast<ignition::common::PluginInfo*>(_outputInfo); \
+    const std::allocator<char> &stringAllocator = \
+        *static_cast<const std::allocator<char>*>(_stringAllocatorPtr); \
     plugin->name.clear();
 
 
@@ -129,7 +134,7 @@ IGN_COMMON_BEGIN_WARNING_SUPPRESSION(IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR) \
       { \
         /* If the visitedPlugins has reached the requested _pluginId, fill */ \
         /* in the PluginInfo output parameter. */ \
-        plugin->name = #pluginName; \
+        plugin->name = std::string( #pluginName, stringAllocator ); \
         plugin->factory = []() { \
           return static_cast<void*>(new pluginName()); \
         }; \
