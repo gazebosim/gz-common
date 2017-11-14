@@ -46,7 +46,7 @@ TEST(PluginLoader, LoadExistingLibrary)
   ASSERT_EQ(1u, pm.InterfacesImplemented().size());
   EXPECT_EQ("::test::util::DummyPluginBase", pm.InterfacesImplemented()[0]);
   ASSERT_EQ(1u, pm.PluginsImplementing("::test::util::DummyPluginBase").size());
-  
+
   std::unique_ptr<test::util::DummyPluginBase> plugin =
     pm.Instantiate<test::util::DummyPluginBase>("test::util::DummyPlugin");
   ASSERT_NE(nullptr, plugin.get());
