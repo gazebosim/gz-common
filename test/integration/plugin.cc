@@ -97,27 +97,27 @@ TEST(PluginLoader, LoadExistingLibrary)
   // Check that the DummyNameBase interface exists and that it returns the
   // correct value.
   test::util::DummyNameBase* nameBase =
-      firstPlugin->GetInterface<test::util::DummyNameBase>(
+      firstPlugin->QueryInterface<test::util::DummyNameBase>(
         "test::util::DummyNameBase");
   ASSERT_NE(nullptr, nameBase);
   EXPECT_EQ(std::string("DummySinglePlugin"), nameBase->MyNameIs());
 
   // Check that DummyDoubleBase does not exist for this plugin
   test::util::DummyDoubleBase* doubleBase =
-      firstPlugin->GetInterface<test::util::DummyDoubleBase>(
+      firstPlugin->QueryInterface<test::util::DummyDoubleBase>(
         "test::util::DummyDoubleBase");
   EXPECT_EQ(nullptr, doubleBase);
 
   // Check that DummyDoubleBase does exist for this function and that it returns
   // the correct value.
-  doubleBase = secondPlugin->GetInterface<test::util::DummyDoubleBase>(
+  doubleBase = secondPlugin->QueryInterface<test::util::DummyDoubleBase>(
         "test::util::DummyDoubleBase");
   ASSERT_NE(nullptr, doubleBase);
   EXPECT_NEAR(3.14159, doubleBase->MyDoubleValueIs(), 1e-8);
 
   // Check that the DummyNameBase interface exists for this plugin and that it
   // returns the correct value.
-  nameBase = secondPlugin->GetInterface<test::util::DummyNameBase>(
+  nameBase = secondPlugin->QueryInterface<test::util::DummyNameBase>(
         "test::util::DummyNameBase");
   ASSERT_NE(nullptr, nameBase);
   EXPECT_EQ(std::string("DummyMultiPlugin"), nameBase->MyNameIs());
