@@ -20,6 +20,7 @@
 #define IGNITION_COMMON_TEST_UTIL_DUMMY_PLUGINS_HH_
 
 #include <string>
+#include <memory>
 
 #include <ignition/common/Export.hh>
 #include <ignition/common/PluginMacros.hh>
@@ -29,26 +30,26 @@ namespace test
 namespace util
 {
 
-class IGNITION_COMMON_VISIBLE DummyNameBase
+class DummyNameBase
 {
-  public: virtual std::string MyNameIs() = 0;
+  public: virtual std::string MyNameIs() const = 0;
 };
 
 
 class DummySinglePlugin : public DummyNameBase
 {
-  public: virtual std::string MyNameIs() override;
+  public: virtual std::string MyNameIs() const override;
 };
 
 
-class IGNITION_COMMON_VISIBLE DummyDoubleBase
+class DummyDoubleBase
 {
-  public: virtual double MyDoubleValueIs() = 0;
+  public: virtual double MyDoubleValueIs() const = 0;
 };
 
 class DummyIntBase
 {
-  public: virtual int MyIntegerValueIs() = 0;
+  public: virtual int MyIntegerValueIs() const = 0;
   IGN_COMMON_SPECIALIZE_INTERFACE(test::util::DummyIntBase)
 };
 
@@ -60,15 +61,29 @@ class DummySetterBase
   IGN_COMMON_SPECIALIZE_INTERFACE(test::util::DummySetterBase)
 };
 
+struct SomeObject
+{
+  int someInt;
+  double someDouble;
+};
+
+class DummyGetSomeObjectBase
+{
+  public: virtual std::unique_ptr<SomeObject> GetSomeObject() const = 0;
+  IGN_COMMON_SPECIALIZE_INTERFACE(test::util::DummyGetSomeObjectBase)
+};
+
 class DummyMultiPlugin
     : public DummyNameBase,
       public DummyDoubleBase,
       public DummyIntBase,
-      public DummySetterBase
+      public DummySetterBase,
+      public DummyGetSomeObjectBase
 {
-  public: virtual std::string MyNameIs() override;
-  public: virtual double MyDoubleValueIs() override;
-  public: virtual int MyIntegerValueIs() override;
+  public: virtual std::string MyNameIs() const override;
+  public: virtual double MyDoubleValueIs() const override;
+  public: virtual int MyIntegerValueIs() const override;
+  public: virtual std::unique_ptr<SomeObject> GetSomeObject() const override;
 
   public: virtual void SetName(const std::string &_name) override;
   public: virtual void SetDoubleValue(const double _val) override;
