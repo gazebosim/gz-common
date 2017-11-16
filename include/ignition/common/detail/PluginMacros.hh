@@ -87,8 +87,7 @@ IGN_COMMON_BEGIN_WARNING_SUPPRESSION(IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR) \
   /* (IGNCOMMONMultiPluginInfo(info, id, size) > 0) will evaluate as true */ \
   /* if `info` has been filled with useful plugin information. */ \
   extern "C" std::size_t DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONMultiPluginInfo( \
-      void * const _outputInfo, \
-      const void * const _stringAllocatorPtr, \
+      void * * const _outputInfo, \
       const std::size_t _pluginId, \
       const std::size_t _size) \
   { \
@@ -97,11 +96,17 @@ IGN_COMMON_BEGIN_WARNING_SUPPRESSION(IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR) \
       return 0u; \
     } \
     std::unordered_set<std::string> visitedPlugins; \
-    ignition::common::PluginInfo *plugin = \
-        static_cast<ignition::common::PluginInfo*>(_outputInfo); \
-    const std::allocator<char> &stringAllocator = \
-        *static_cast<const std::allocator<char>*>(_stringAllocatorPtr); \
-    plugin->name.clear();
+    ignition::common::PluginInfo * * const ptrToPlugin = \
+          reinterpret_cast<ignition::common::PluginInfo * * const>(_outputInfo); \
+    if (! (*ptrToPlugin) ) \
+    { \
+       *ptrToPlugin = new ignition::common::PluginInfo; \
+    } \
+    ignition::common::PluginInfo *plugin = *ptrToPlugin; \
+    plugin->name.clear(); \
+    plugin->interfaces.clear(); \
+    plugin->factory = nullptr; \
+    plugin->deleter = nullptr;
 
 
 #define DETAIL_IGN_COMMON_ADD_PLUGIN(pluginName, interface) \
@@ -134,7 +139,7 @@ IGN_COMMON_BEGIN_WARNING_SUPPRESSION(IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR) \
       { \
         /* If the visitedPlugins has reached the requested _pluginId, fill */ \
         /* in the PluginInfo output parameter. */ \
-        plugin->name = std::string( #pluginName, stringAllocator ); \
+        plugin->name = #pluginName; \
         plugin->factory = []() { \
           return static_cast<void*>(new pluginName()); \
         }; \
@@ -158,8 +163,12 @@ IGN_COMMON_BEGIN_WARNING_SUPPRESSION(IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR) \
 
 
 #define DETAIL_IGN_COMMON_FINISH_ADDING_PLUGINS \
-    if (_pluginId > visitedPlugins.size()) \
+    if (_pluginId >= visitedPlugins.size()) \
+    { \
+      if (plugin) \
+        delete plugin; \
       return 0u; \
+    } \
     return visitedPlugins.size() - _pluginId; \
   } \
 IGN_COMMON_FINISH_WARNING_SUPPRESSION(IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR)

@@ -70,7 +70,7 @@ TEST(PluginLoader, LoadExistingLibrary)
   std::cout << pl.PrettyStr();
 
   // Make sure the expected interfaces were loaded.
-  EXPECT_EQ(4u, pl.InterfacesImplemented().size());
+  EXPECT_EQ(5u, pl.InterfacesImplemented().size());
   EXPECT_EQ(1u, pl.InterfacesImplemented()
             .count("::test::util::DummyNameBase"));
   EXPECT_EQ(2u, pl.PluginsImplementing("::test::util::DummyNameBase").size());
@@ -118,6 +118,17 @@ TEST(PluginLoader, LoadExistingLibrary)
         "test::util::DummyNameBase");
   ASSERT_NE(nullptr, nameBase);
   EXPECT_EQ(std::string("DummyMultiPlugin"), nameBase->MyNameIs());
+
+  test::util::DummyGetSomeObjectBase *objectBase =
+    secondPlugin->GetInterface<test::util::DummyGetSomeObjectBase>();
+  ASSERT_NE(nullptr, objectBase);
+  
+  std::unique_ptr<test::util::SomeObject> object =
+    objectBase->GetSomeObject();
+  EXPECT_EQ(secondPlugin->GetInterface<test::util::DummyIntBase>()
+                ->MyIntegerValueIs(),
+            object->someInt);
+  EXPECT_NEAR(doubleBase->MyDoubleValueIs(), object->someDouble, 1e-8);
 }
 
 /////////////////////////////////////////////////
