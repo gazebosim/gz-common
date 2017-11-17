@@ -129,12 +129,12 @@ TEST(PluginLoader, LoadExistingLibrary)
   EXPECT_EQ(std::string("DummyMultiPlugin"), nameBase->MyNameIs());
 
   test::util::DummyGetSomeObjectBase *objectBase =
-    secondPlugin->GetInterface<test::util::DummyGetSomeObjectBase>();
+    secondPlugin->QueryInterface<test::util::DummyGetSomeObjectBase>();
   ASSERT_NE(nullptr, objectBase);
 
   std::unique_ptr<test::util::SomeObject> object =
     objectBase->GetSomeObject();
-  EXPECT_EQ(secondPlugin->GetInterface<test::util::DummyIntBase>()
+  EXPECT_EQ(secondPlugin->QueryInterface<test::util::DummyIntBase>()
                 ->MyIntegerValueIs(),
             object->someInt);
   EXPECT_NEAR(doubleBase->MyDoubleValueIs(), object->someDouble, 1e-8);
