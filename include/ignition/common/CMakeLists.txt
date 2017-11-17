@@ -26,6 +26,7 @@ set (headers
   NodeAnimation.hh
   NodeTransform.hh
   OBJLoader.hh
+  Plugin.hh
   PluginInfo.hh
   PluginLoader.hh
   PluginMacros.hh
@@ -35,6 +36,7 @@ set (headers
   SkeletonNode.hh
   StringUtils.hh
   SubMesh.hh
+  SuppressWarning.hh
   System.hh
   SystemPaths.hh
   STLLoader.hh
@@ -46,6 +48,12 @@ set (headers
   URI.hh
   Uuid.hh
   WorkerPool.hh
+)
+
+set (detail_headers
+  detail/Plugin.hh
+  detail/PluginMacros.hh
+  detail/SuppressWarning.hh
 )
 
 # FIXME: Some classes fail to build on Windows
@@ -73,3 +81,4 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/ign_auto_headers.hh.in
 
 ign_install_includes("${INCLUDE_INSTALL_DIR_POSTFIX}/ignition" ${CMAKE_CURRENT_BINARY_DIR}/${IGN_PROJECT_NAME}.hh)
 ign_install_includes("${INCLUDE_INSTALL_DIR_POSTFIX}/ignition/${IGN_PROJECT_NAME}" ${headers})
+ign_install_includes("${INCLUDE_INSTALL_DIR_POSTFIX}/ignition/${IGN_PROJECT_NAME}/detail" ${detail_headers})

@@ -25,6 +25,7 @@ set (sources
   NodeAnimation.cc
   NodeTransform.cc
   OBJLoader.cc
+  Plugin.cc
   PluginLoader.cc
   Skeleton.cc
   SkeletonAnimation.cc
@@ -80,6 +81,7 @@ set (gtest_sources
   MovingWindowFilter_TEST.cc
   OBJLoader_TEST.cc
   PluginLoader_TEST.cc
+  PluginUtils_TEST.cc
   StringUtils_TEST.cc
   SubMesh_TEST.cc
   SVGLoader_TEST.cc
