@@ -17,11 +17,20 @@
 
 #include "ignition/common/PluginMacros.hh"
 
-class A
+extern "C" {
+  std::size_t DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONPluginInfoSize =
+    sizeof(ignition::common::PluginInfo);
+
+  std::size_t DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONPluginInfoAlignment =
+    1 + alignof(ignition::common::PluginInfo);
+
+  int DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONPluginAPIVersion =
+    ignition::common::PLUGIN_API_VERSION;
+}
+
+extern "C" std::size_t DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONMultiPluginInfo(
+    void *, const std::size_t, const std::size_t)
 {
-  float test1;
-  double test2;
-};
+  return 0u;
+}
 
-
-IGN_COMMON_REGISTER_SINGLE_PLUGIN(A, A)

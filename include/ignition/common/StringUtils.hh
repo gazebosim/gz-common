@@ -46,6 +46,27 @@ namespace ignition
     /// \returns  true if _s1 ends with _s2
     bool IGNITION_COMMON_VISIBLE EndsWith(const std::string &_s1,
         const std::string &_s2);
+
+    /// \brief Choose whether to use a singular or plural version of a noun
+    /// based on the value of an integer quantity. This version will simply add
+    /// an 's' character to _baseWord in the event that std::abs(_n) != 1,
+    /// otherwise it returns _baseWord.
+    /// \param[in] _baseWord the singular version of the word to return
+    /// \param[in] _n the quantity that _baseWord is describing
+    /// \return _baseWord if std::abs(_n)==1, otherwise return _baseWords
+    std::string IGNITION_COMMON_VISIBLE PluralCast(
+        const std::string &_baseWord, const int _n);
+
+    /// \brief A version of PluralCast that works for irregular nouns. If
+    /// std::abs(_n)==1 then _singular is returned; otherwise _plural will be
+    /// returned.
+    /// \param[in] _singular the return value when std::abs(_n) == 1
+    /// \param[in] _plural the return value when std::abs(_n) != 1
+    /// \return _singular if std::abs(_n)==1, otherwise return _plural
+    std::string IGNITION_COMMON_VISIBLE PluralCast(
+        const std::string &_singular,
+        const std::string &_plural,
+        const int _n);
   }
 }
 

@@ -1,3 +1,7 @@
+add_library(IGNBadPluginAlign         SHARED BadPluginAlign.cc)
+add_library(IGNBadPluginAPIVersionNew SHARED BadPluginAPIVersionNew.cc)
+add_library(IGNBadPluginAPIVersionOld SHARED BadPluginAPIVersionOld.cc)
+add_library(IGNBadPluginSize          SHARED BadPluginSize.cc)
 add_library(IGNDummyPlugins SHARED DummyPlugins.cc)
 
 # Create a variable for the name of the header which will contain the dummy plugin path.
