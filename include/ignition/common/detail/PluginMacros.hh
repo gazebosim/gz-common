@@ -97,8 +97,8 @@ IGN_COMMON_BEGIN_WARNING_SUPPRESSION(IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR) \
     } \
     std::unordered_set<std::string> visitedPlugins; \
     ignition::common::PluginInfo * * const ptrToPlugin = \
-          reinterpret_cast<ignition::common::PluginInfo * * const>(_outputInfo); \
-    if (! (*ptrToPlugin) ) \
+        reinterpret_cast<ignition::common::PluginInfo * * const>(_outputInfo); \
+    if ( !(*ptrToPlugin) ) \
     { \
        *ptrToPlugin = new ignition::common::PluginInfo; \
     } \

@@ -84,7 +84,7 @@ TEST(PluginLoader, LoadExistingLibrary)
             .count("::test::util::DummyNameBase"));
   EXPECT_EQ(2u, pl.PluginsImplementing("::test::util::DummyNameBase").size());
   EXPECT_EQ(1u, pl.PluginsImplementing("::test::util::DummyDoubleBase").size());
-  
+
 
   ignition::common::PluginPtr firstPlugin =
       pl.Instantiate("test::util::DummySinglePlugin");
@@ -131,7 +131,7 @@ TEST(PluginLoader, LoadExistingLibrary)
   test::util::DummyGetSomeObjectBase *objectBase =
     secondPlugin->GetInterface<test::util::DummyGetSomeObjectBase>();
   ASSERT_NE(nullptr, objectBase);
-  
+
   std::unique_ptr<test::util::SomeObject> object =
     objectBase->GetSomeObject();
   EXPECT_EQ(secondPlugin->GetInterface<test::util::DummyIntBase>()
