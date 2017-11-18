@@ -27,12 +27,13 @@
 #include <ignition/math/Matrix3.hh>
 #include <ignition/math/Matrix4.hh>
 #include <ignition/math/Vector2.hh>
-#include "ignition/math/Vector3.hh"
-#include "ignition/math/Pose3.hh"
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Pose3.hh>
 
-#include "ignition/common/SingletonT.hh"
-#include "ignition/common/Types.hh"
-#include "ignition/common/Export.hh"
+#include <ignition/common/SingletonT.hh>
+#include <ignition/common/Types.hh>
+#include <ignition/common/Export.hh>
+#include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
 {

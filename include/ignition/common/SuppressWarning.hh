@@ -50,7 +50,11 @@
   DETAIL_IGN_COMMON_WARN_IGNORE__DELETE_NON_VIRTUAL_DESTRUCTOR
 
 
-/// \brief Compilers
+/// \brief Microsoft Visual Studio does not automatically export the interface
+/// information for member variables that belong to interface classes of a DLL.
+/// Instead it issues this warning. When the member variable is private, we
+/// choose to suppress the warning instead of needlessly adding the class
+/// information to the DLL interface.
 #define IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING \
   DETAIL_IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
 
