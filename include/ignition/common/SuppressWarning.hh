@@ -61,7 +61,7 @@
 
 /// \brief Use this macro to finish suppressing a specific type of warning
 /// within a specific block of code. This macro must be preceded by a call to
-/// IGN_COMMON_WARN_IGNORE__XXXXX (see options below for XXXXX).
+/// IGN_COMMON_WARN_IGNORE__XXXXX (see options above for XXXXX).
 #define IGN_COMMON_WARN_RESTORE(warning) \
   DETAIL_IGN_COMMON_WARN_RESTORE(warning)
 
