@@ -66,19 +66,15 @@
 
 
   #define DETAIL_IGN_COMMON_BEGIN_WARN_SUP_PUSH \
-    __pragma("warning(push)")
-
-
-  #define DETAIL_IGN_COMMON_WARN_SUP_HELPER_2(w) \
-    DETAIL_IGN_COMMON_STRINGIFY(warning(disable: w))
+    __pragma(warning(push))
 
 
   #define DETAIL_IGN_COMMON_WARN_SUP_HELPER(w) \
-    __pragma(DETAIL_IGN_COMMON_WARN_SUP_HELPER_2(w))
+    __pragma(warning(disable: w))
 
 
   #define DETAIL_IGN_COMMON_FINISH_WARNING_SUPPRESSION(warning_token) \
-    __pragma("warning(pop)")
+    __pragma(warning(pop))
 
 
 #else
@@ -112,7 +108,7 @@
 
 #elif defined _MSC_VER
 
-  #define DETAIL_IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR "4265"
+  #define DETAIL_IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR 4265
 
 
 #else
