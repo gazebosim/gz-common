@@ -45,9 +45,11 @@ namespace ignition
       /// \return Pointer to a new Mesh
       public: virtual Mesh *Load(const std::string &_filename);
 
+      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<OBJLoaderPrivate> dataPtr;
+      IGN_COMMON_WARN_RESTORE(DLL_INTERFACE_MISSING)
     };
   }
 }

@@ -23,6 +23,7 @@
 
 #include <ignition/common/Export.hh>
 #include <ignition/common/Time.hh>
+#include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
 {
@@ -55,8 +56,10 @@ namespace ignition
       //           the WorkerPool is destructed before all work is completed
       public: bool WaitForResults(const Time &_timeout = Time::Zero);
 
+      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief private implementation pointer
       private: std::unique_ptr<WorkerPoolPrivate> dataPtr;
+      IGN_COMMON_WARN_RESTORE(DLL_INTERFACE_MISSING)
     };
   }
 }
