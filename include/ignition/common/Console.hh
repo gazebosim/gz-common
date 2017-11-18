@@ -24,6 +24,7 @@
 
 #include <ignition/common/Util.hh>
 #include <ignition/common/Export.hh>
+#include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
 {

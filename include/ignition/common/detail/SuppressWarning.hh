@@ -39,7 +39,7 @@
     _Pragma(DETAIL_IGN_COMMON_WARN_SUP_HELPER_2(w))
 
 
-  #define DETAIL_IGN_COMMON_FINISH_WARNING_SUPPRESSION(warning_token) \
+  #define DETAIL_IGN_COMMON_WARN_RESTORE(warning_token) \
     _Pragma("GCC diagnostic pop")
 
 
@@ -58,7 +58,7 @@
     _Pragma(DETAIL_IGN_COMMON_WARN_SUP_HELPER_2(w))
 
 
-  #define DETAIL_IGN_COMMON_FINISH_WARNING_SUPPRESSION(warning_token) \
+  #define DETAIL_IGN_COMMON_WARN_RESTORE(warning_token) \
     _Pragma("clang diagnostic pop")
 
 
@@ -73,7 +73,7 @@
     __pragma(warning(disable: w))
 
 
-  #define DETAIL_IGN_COMMON_FINISH_WARNING_SUPPRESSION(warning_token) \
+  #define DETAIL_IGN_COMMON_WARN_RESTORE(warning_token) \
     __pragma(warning(pop))
 
 
@@ -87,7 +87,7 @@
   #define DETAIL_IGN_COMMON_WARN_SUP_HELPER(w)
 
 
-  #define DETAIL_IGN_COMMON_FINISH_WARNING_SUPPRESSION(warning_token)
+  #define DETAIL_IGN_COMMON_WARN_RESTORE(warning_token)
 
 
 #endif
@@ -102,18 +102,30 @@
 // Warning Tokens
 #if defined __GNUC__ || defined __clang__
 
-  #define DETAIL_IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR \
-    "-Wdelete-non-virtual-dtor"
+  #define DETAIL_IGN_COMMON_WARN_IGNORE__DELETE_NON_VIRTUAL_DESTRUCTOR \
+    DETAIL_IGN_COMMON_BEGIN_WARNING_SUPPRESSION("-Wdelete-non-virtual-dtor")
+
+
+  // There is no analogous warning for this in GCC or Clang
+  #define DETAIL_IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
 
 
 #elif defined _MSC_VER
 
-  #define DETAIL_IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR 4265
+  #define DETAIL_IGN_COMMON_WARN_IGNORE__DELETE_NON_VIRTUAL_DESTRUCTOR \
+    DETAIL_IGN_COMMON_BEGIN_WARNING_SUPPRESSION(4265)
+
+
+  #define DETAIL_IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING \
+    DETAIL_IGN_COMMON_BEGIN_WARNING_SUPPRESSION(4251)
 
 
 #else
 
-  #define DETAIL_IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR
+  #define DETAIL_IGN_COMMON_WARN_IGNORE__DELETE_NON_VIRTUAL_DESTRUCTOR
+
+
+  #define DETAIL_IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
 
 
 #endif

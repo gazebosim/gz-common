@@ -31,32 +31,14 @@
  * Usage example:
  *
  * SomeClass* ptr = CreatePtr();
- * IGN_COMMON_BEGIN_WARNING_SUPPRESSION( IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR )
+ * IGN_COMMON_WARN_IGNORE__DELETE_NON_VIRTUAL_DESTRUCTOR
  * delete ptr;
- * IGN_COMMON_FINISH_WARNING_SUPPRESSION( IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR )
+ * IGN_COMMON_WARN_RESTORE(DELETE_NON_VIRTUAL_DESTRUCTOR)
  *
  */
 
 
-/// \brief Use this macro to suppress a specific type of warning within a
-/// specific block of code. Call this macro at the start of the block which
-/// should be suppressed, and then call IGN_COMMON_FINISH_WARNING_SUPPRESSION(~)
-/// at the end.
-///
-/// The warning_token should indicate whichever type of warning you want to
-/// suppress. The available tokens are listed at the bottom of this file.
-#define IGN_COMMON_BEGIN_WARNING_SUPPRESSION(warning_token) \
-  DETAIL_IGN_COMMON_BEGIN_WARNING_SUPPRESSION(warning_token)
-
-
-/// \brief Use this macro to finish suppressing a specific type of warning
-/// within a specific block of code. This macro must be preceded by a call to
-/// IGN_COMMON_BEGIN_WARNING_SUPPRESSION(~).
-#define IGN_COMMON_FINISH_WARNING_SUPPRESSION(warning_token) \
-  DETAIL_IGN_COMMON_FINISH_WARNING_SUPPRESSION(warning_token)
-
-
-// ---- List of available tokens ----
+// ---- List of available suppressions ----
 
 /// \brief Compilers might warn about deleting a pointer to a class that has
 /// virtual functions without a virtual destructor or a `final` declaration,
@@ -64,10 +46,23 @@
 /// We want to suppress this warning when we know for certain (via the design
 /// of our implementation) that the pointer is definitely not pointing to a more
 /// derived type.
-#define IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR \
-  DETAIL_IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR
+#define IGN_COMMON_WARN_IGNORE__DELETE_NON_VIRTUAL_DESTRUCTOR \
+  DETAIL_IGN_COMMON_WARN_IGNORE__DELETE_NON_VIRTUAL_DESTRUCTOR
+
+
+/// \brief Compilers
+#define IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING \
+  DETAIL_IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
+
 
 // TODO: Add more warning tokens as they become relevant. Do not add tokens to
 // suppress unless it is necessary.
+
+
+/// \brief Use this macro to finish suppressing a specific type of warning
+/// within a specific block of code. This macro must be preceded by a call to
+/// IGN_COMMON_WARN_IGNORE__XXXXX (see options below for XXXXX).
+#define IGN_COMMON_WARN_RESTORE(warning) \
+  DETAIL_IGN_COMMON_WARN_RESTORE(warning)
 
 #endif
