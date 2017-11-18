@@ -163,7 +163,7 @@ TEST(SpecializedPluginPtr, Construction)
   // the specialized access, and that it returns the expected value.
   usedSpecializedInterfaceAccess = false;
   test::util::DummyIntBase *fooBase =
-      plugin->GetInterface<test::util::DummyIntBase>();
+      plugin->QueryInterface<test::util::DummyIntBase>();
   EXPECT_TRUE(usedSpecializedInterfaceAccess);
   EXPECT_NE(nullptr, fooBase);
   EXPECT_EQ(5, fooBase->MyIntegerValueIs());
@@ -172,7 +172,7 @@ TEST(SpecializedPluginPtr, Construction)
   // using the specialized access.
   usedSpecializedInterfaceAccess = false;
   test::util::DummySetterBase *setterBase =
-      plugin->GetInterface<test::util::DummySetterBase>();
+      plugin->QueryInterface<test::util::DummySetterBase>();
   EXPECT_TRUE(usedSpecializedInterfaceAccess);
   EXPECT_NE(nullptr, setterBase);
 
@@ -185,7 +185,7 @@ TEST(SpecializedPluginPtr, Construction)
   // the specialized access, and that it returns the expected value.
   usedSpecializedInterfaceAccess = false;
   test::util::DummyDoubleBase *doubleBase =
-      plugin->GetInterface<test::util::DummyDoubleBase>(
+      plugin->QueryInterface<test::util::DummyDoubleBase>(
         "test::util::DummyDoubleBase");
   EXPECT_FALSE(usedSpecializedInterfaceAccess);
   EXPECT_NE(nullptr, doubleBase);
@@ -200,7 +200,7 @@ TEST(SpecializedPluginPtr, Construction)
   // plugin was specialized for it. Also make sure that the specialized access
   // is being used.
   usedSpecializedInterfaceAccess = false;
-  SomeInterface *someInterface = plugin->GetInterface<SomeInterface>();
+  SomeInterface *someInterface = plugin->QueryInterface<SomeInterface>();
   EXPECT_TRUE(usedSpecializedInterfaceAccess);
   EXPECT_EQ(nullptr, someInterface);
 }
@@ -354,7 +354,7 @@ void CheckSomeValues(
   EXPECT_EQ(std::string("Changed using shared_ptr"), getName->MyNameIs());
 }
 
-TEST(PluginPtr, as_shared_ptr)
+TEST(PluginPtr, QueryInterfaceSharedPtr)
 {
   std::string projectPath(PROJECT_BINARY_PATH);
 
@@ -372,18 +372,18 @@ TEST(PluginPtr, as_shared_ptr)
       pl.Instantiate("test::util::DummyMultiPlugin");
 
     std::shared_ptr<test::util::DummyIntBase> int_ptr =
-      plugin->as_shared_ptr<test::util::DummyIntBase>();
+      plugin->QueryInterfaceSharedPtr<test::util::DummyIntBase>();
     EXPECT_TRUE(int_ptr.get());
     EXPECT_EQ(5, int_ptr->MyIntegerValueIs());
 
     std::shared_ptr<SomeInterface> some_ptr =
-      plugin->as_shared_ptr<SomeInterface>();
+      plugin->QueryInterfaceSharedPtr<SomeInterface>();
     EXPECT_FALSE(some_ptr.get());
   }
 
   std::shared_ptr<test::util::DummyIntBase> int_ptr =
       pl.Instantiate("test::util::DummyMultiPlugin")->
-        as_shared_ptr<test::util::DummyIntBase>(
+        QueryInterfaceSharedPtr<test::util::DummyIntBase>(
           "test::util::DummyIntBase");
   EXPECT_TRUE(int_ptr.get());
   EXPECT_EQ(5, int_ptr->MyIntegerValueIs());
@@ -394,29 +394,29 @@ TEST(PluginPtr, as_shared_ptr)
 
   usedSpecializedInterfaceAccess = false;
   std::shared_ptr<test::util::DummySetterBase> setter =
-      plugin->as_shared_ptr<test::util::DummySetterBase>();
+      plugin->QueryInterfaceSharedPtr<test::util::DummySetterBase>();
   EXPECT_TRUE(usedSpecializedInterfaceAccess);
   ASSERT_TRUE(setter.get());
 
   usedSpecializedInterfaceAccess = false;
   std::shared_ptr<SomeInterface> someInterface =
-      plugin->as_shared_ptr<SomeInterface>();
+      plugin->QueryInterfaceSharedPtr<SomeInterface>();
   EXPECT_TRUE(usedSpecializedInterfaceAccess);
   EXPECT_FALSE(someInterface.get());
 
   usedSpecializedInterfaceAccess = false;
   std::shared_ptr<test::util::DummyIntBase> getInt =
-      plugin->as_shared_ptr<test::util::DummyIntBase>();
+      plugin->QueryInterfaceSharedPtr<test::util::DummyIntBase>();
   EXPECT_TRUE(usedSpecializedInterfaceAccess);
   ASSERT_TRUE(getInt.get());
 
   std::shared_ptr<test::util::DummyDoubleBase> getDouble =
-      plugin->as_shared_ptr<test::util::DummyDoubleBase>(
+      plugin->QueryInterfaceSharedPtr<test::util::DummyDoubleBase>(
         "test::util::DummyDoubleBase");
   ASSERT_TRUE(getDouble.get());
 
   std::shared_ptr<test::util::DummyNameBase> getName =
-      plugin->as_shared_ptr<test::util::DummyNameBase>(
+      plugin->QueryInterfaceSharedPtr<test::util::DummyNameBase>(
         "test::util::DummyNameBase");
   ASSERT_TRUE(getName.get());
 
