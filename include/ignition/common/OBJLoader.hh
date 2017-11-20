@@ -50,7 +50,7 @@ namespace ignition
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<OBJLoaderPrivate> dataPtr;
-      IGN_COMMON_WARN_RESTORE(DLL_INTERFACE_MISSING)
+      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
     };
   }
 }

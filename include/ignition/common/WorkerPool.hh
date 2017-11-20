@@ -59,7 +59,7 @@ namespace ignition
       IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief private implementation pointer
       private: std::unique_ptr<WorkerPoolPrivate> dataPtr;
-      IGN_COMMON_WARN_RESTORE(DLL_INTERFACE_MISSING)
+      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
     };
   }
 }

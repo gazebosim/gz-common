@@ -33,7 +33,7 @@
  * SomeClass* ptr = CreatePtr();
  * IGN_COMMON_WARN_IGNORE__DELETE_NON_VIRTUAL_DESTRUCTOR
  * delete ptr;
- * IGN_COMMON_WARN_RESTORE(DELETE_NON_VIRTUAL_DESTRUCTOR)
+ * IGN_COMMON_WARN_RESUME__DELETE_NON_VIRTUAL_DESTRUCTOR
  *
  */
 
@@ -49,6 +49,9 @@
 #define IGN_COMMON_WARN_IGNORE__DELETE_NON_VIRTUAL_DESTRUCTOR \
   DETAIL_IGN_COMMON_WARN_IGNORE__DELETE_NON_VIRTUAL_DESTRUCTOR
 
+#define IGN_COMMON_WARN_RESUME__DELETE_NON_VIRTUAL_DESTRUCTOR \
+  DETAIL_IGN_COMMON_WARN_RESUME__DELETE_NON_VIRTUAL_DESTRUCTOR
+
 
 /// \brief Microsoft Visual Studio does not automatically export the interface
 /// information for member variables that belong to interface classes of a DLL.
@@ -58,15 +61,11 @@
 #define IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING \
   DETAIL_IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
 
+#define IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING \
+  DETAIL_IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+
 
 // TODO: Add more warning tokens as they become relevant. Do not add tokens to
 // suppress unless it is necessary.
-
-
-/// \brief Use this macro to finish suppressing a specific type of warning
-/// within a specific block of code. This macro must be preceded by a call to
-/// IGN_COMMON_WARN_IGNORE__XXXXX (see options above for XXXXX).
-#define IGN_COMMON_WARN_RESTORE(warning) \
-  DETAIL_IGN_COMMON_WARN_RESTORE(warning)
 
 #endif
