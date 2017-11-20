@@ -27,7 +27,6 @@
 
 #if defined __clang__
 
-
   #define DETAIL_IGN_COMMON_BEGIN_WARN_SUP_PUSH \
     _Pragma("clang diagnostic push")
 
@@ -42,6 +41,7 @@
 
   #define DETAIL_IGN_COMMON_WARN_RESUME \
     _Pragma("clang diagnostic pop")
+
 
 #elif defined __GNUC__
 
