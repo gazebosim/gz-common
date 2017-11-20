@@ -22,13 +22,7 @@
 #include <string>
 
 #include <ignition/common/Export.hh>
-
-#ifdef _WIN32
-// Disable warning C4251 which is triggered by
-// std::unique_ptr
-#pragma warning(push)
-#pragma warning(disable: 4251)
-#endif
+#include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
 {
@@ -242,14 +236,12 @@ namespace ignition
       /// \brief Close an open directory handle.
       private: void CloseHandle();
 
+      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Private data.
       private: std::unique_ptr<DirIterPrivate> dataPtr;
+      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
     };
   }
 }
-
-#ifdef _WIN32
-#pragma warning(pop)
-#endif
 
 #endif

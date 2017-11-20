@@ -22,6 +22,7 @@
 #include <functional>
 #include <memory>
 #include <ignition/common/Export.hh>
+#include <ignition/common/SuppressWarning.hh>
 #include <ignition/common/Types.hh>
 #include <ignition/common/Util.hh>
 
@@ -134,17 +135,11 @@ namespace ignition
       /// \return New battery voltage.
       private: double UpdateDefault(Battery *_battery);
 
-#ifdef _WIN32
-// Disable warning C4251
-#pragma warning(push)
-#pragma warning(disable: 4251)
-#endif
+      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \internal
       /// \brief Private data pointer.
       private: std::unique_ptr<BatteryPrivate> dataPtr;
-#ifdef _WIN32
-#pragma warning(pop)
-#endif
+      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
     };
   }
 }

@@ -25,6 +25,7 @@
 
 #include <ignition/common/Types.hh>
 #include <ignition/common/Export.hh>
+#include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
 {
@@ -187,17 +188,10 @@ namespace ignition
       /// \param[in] _vec Amount to translate vertices.
       public: void Translate(const ignition::math::Vector3d &_vec);
 
-#ifdef _WIN32
-// Disable warning C4251 which is triggered by
-// std::unique_ptr
-#pragma warning(push)
-#pragma warning(disable: 4251)
-#endif
+      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Private data pointer.
       private: std::unique_ptr<MeshPrivate> dataPtr;
-#ifdef _WIN32
-#pragma warning(pop)
-#endif
+      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
     };
   }
 }

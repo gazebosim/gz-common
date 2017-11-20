@@ -22,6 +22,7 @@
 
 #include <ignition/common/MeshExporter.hh>
 #include <ignition/common/Export.hh>
+#include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
 {
@@ -46,17 +47,11 @@ namespace ignition
       public: virtual void Export(const Mesh *_mesh,
           const std::string &_filename, bool _exportTextures = false);
 
-#ifdef _WIN32
-// Disable warning C4251
-#pragma warning(push)
-#pragma warning(disable: 4251)
-#endif
+      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<ColladaExporterPrivate> dataPtr;
-#ifdef _WIN32
-#pragma warning(pop)
-#endif
+      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
     };
   }
 }

@@ -19,7 +19,9 @@
 
 #include <memory>
 #include <string>
+
 #include <ignition/common/Export.hh>
+#include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
 {
@@ -99,17 +101,11 @@ namespace ignition
       /// \return True if the string could be parsed as a URIPath.
       public: bool Parse(const std::string &_str);
 
-#ifdef _WIN32
-// Disable warning C4251
-#pragma warning(push)
-#pragma warning(disable: 4251)
-#endif
+      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<URIPathPrivate> dataPtr;
-#ifdef _WIN32
-#pragma warning(pop)
-#endif
+      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
     };
 
     /// \brief The query component of a URI
@@ -168,17 +164,11 @@ namespace ignition
       /// \return True if the string can be parsed as a URIQuery.
       public: bool Parse(const std::string &_string);
 
-#ifdef _WIN32
-// Disable warning C4251
-#pragma warning(push)
-#pragma warning(disable: 4251)
-#endif
+      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<URIQueryPrivate> dataPtr;
-#ifdef _WIN32
-#pragma warning(pop)
-#endif
+      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
     };
 
     /// \brief A complete URI
@@ -256,17 +246,11 @@ namespace ignition
       /// \return True if the string can be parsed as a URI.
       public: bool Parse(const std::string &_str);
 
-#ifdef _WIN32
-// Disable warning C4251
-#pragma warning(push)
-#pragma warning(disable: 4251)
-#endif
+      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<URIPrivate> dataPtr;
-#ifdef _WIN32
-#pragma warning(pop)
-#endif
+      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
     };
   }
 }

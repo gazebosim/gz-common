@@ -34,6 +34,7 @@
 #include <vector>
 
 #include <ignition/common/Export.hh>
+#include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
 {
@@ -142,16 +143,10 @@ namespace ignition
       /// uses to separate different paths from each other.
       public: static char Delimiter();
 
-#ifdef _WIN32
-// Disable warning C4251
-#pragma warning(push)
-#pragma warning(disable: 4251)
-#endif
+      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Private data pointer
       private: std::unique_ptr<SystemPathsPrivate> dataPtr;
-#ifdef _WIN32
-#pragma warning(pop)
-#endif
+      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
     };
   }
 }

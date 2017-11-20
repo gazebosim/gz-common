@@ -20,7 +20,9 @@
 #include <memory>
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Angle.hh>
+
 #include <ignition/common/Export.hh>
+#include <ignition/common/SuppressWarning.hh>
 
 #ifdef HAVE_GDAL
 # include <string>
@@ -129,17 +131,11 @@ namespace ignition
       /// \return 0 when the operation succeeds to open a file.
       private: int LoadData();
 
-#ifdef _WIN32
-// Disable warning C4251
-#pragma warning(push)
-#pragma warning(disable: 4251)
-#endif
+      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// internal
       /// \brief Pointer to the private data.
       private: std::unique_ptr<DemPrivate> dataPtr;
-#ifdef _WIN32
-#pragma warning(pop)
-#endif
+      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
     };
   }
 }
