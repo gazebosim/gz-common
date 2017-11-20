@@ -45,12 +45,10 @@
 
 #elif defined __GNUC__
 
-  // NOTE: clang will define both __clang__ and __GNUC__, but on OSX it does not
-  // seem to accept the GCC diagnostic pragmas that are defined here (even
-  // though clang does seem to accept these pragmas on Ubuntu). Therefore, we
-  // check for the __clang__ macro before checking the __GNUC__ macro, because
-  // otherwise we might inadvertently call GCC pragmas in a version of clang
-  // that does not support them.
+  // NOTE: clang will define both __clang__ and __GNUC__, and it seems that
+  // clang will gladly accept GCC pragmas. Even so, if we want the pragmas to
+  // target the "correct" compiler, we should check if __clang__ is defined
+  // before checking whether __GNUC__ is defined.
 
   #define DETAIL_IGN_COMMON_BEGIN_WARN_SUP_PUSH \
     _Pragma("GCC diagnostic push")
