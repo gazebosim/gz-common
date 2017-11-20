@@ -24,26 +24,8 @@
 /* cppcheck-suppress */
 
 // BEGIN / FINISH Macros
-#if defined __GNUC__
 
-
-  #define DETAIL_IGN_COMMON_BEGIN_WARN_SUP_PUSH \
-    _Pragma("GCC diagnostic push")
-
-
-  #define DETAIL_IGN_COMMON_WARN_SUP_HELPER_2(w) \
-    DETAIL_IGN_COMMON_STRINGIFY(GCC diagnostic ignored w)
-
-
-  #define DETAIL_IGN_COMMON_WARN_SUP_HELPER(w) \
-    _Pragma(DETAIL_IGN_COMMON_WARN_SUP_HELPER_2(w))
-
-
-  #define DETAIL_IGN_COMMON_WARN_RESUME \
-    _Pragma("GCC diagnostic pop")
-
-
-#elif defined __clang__
+#if defined __clang__
 
 
   #define DETAIL_IGN_COMMON_BEGIN_WARN_SUP_PUSH \
@@ -60,6 +42,30 @@
 
   #define DETAIL_IGN_COMMON_WARN_RESUME \
     _Pragma("clang diagnostic pop")
+
+#elif defined __GNUC__
+
+  // NOTE: clang will define both __clang__ and __GNUC__, but on OSX it does not
+  // seem to accept the GCC diagnostic pragmas that are defined here (even
+  // though clang does seem to accept these pragmas on Ubuntu). Therefore, we
+  // check for the __clang__ macro before checking the __GNUC__ macro, because
+  // otherwise we might inadvertently call GCC pragmas in a version of clang
+  // that does not support them.
+
+  #define DETAIL_IGN_COMMON_BEGIN_WARN_SUP_PUSH \
+    _Pragma("GCC diagnostic push")
+
+
+  #define DETAIL_IGN_COMMON_WARN_SUP_HELPER_2(w) \
+    DETAIL_IGN_COMMON_STRINGIFY(GCC diagnostic ignored w)
+
+
+  #define DETAIL_IGN_COMMON_WARN_SUP_HELPER(w) \
+    _Pragma(DETAIL_IGN_COMMON_WARN_SUP_HELPER_2(w))
+
+
+  #define DETAIL_IGN_COMMON_WARN_RESUME \
+    _Pragma("GCC diagnostic pop")
 
 
 #elif defined _MSC_VER
@@ -132,6 +138,9 @@
 
 
 #else
+
+  // If the compiler is unknown, we simply leave these macros blank to avoid
+  // compilation errors.
 
   #define DETAIL_IGN_COMMON_WARN_IGNORE__DELETE_NON_VIRTUAL_DESTRUCTOR
   #define DETAIL_IGN_COMMON_WARN_RESUME__DELETE_NON_VIRTUAL_DESTRUCTOR

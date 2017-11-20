@@ -19,7 +19,7 @@
 #ifndef IGNITION_COMMON_SUPPRESSWARNING_HH_
 #define IGNITION_COMMON_SUPPRESSWARNING_HH_
 
-#include "detail/SuppressWarning.hh"
+#include <ignition/common/detail/SuppressWarning.hh>
 
 // This header contains cross-platform macros for suppressing warnings. Please
 // only use these macros responsibly when you are certain that the compiler is
@@ -37,6 +37,9 @@
  *
  */
 
+// Be sure to call the IGN_COMMON_WARN_RESUME__XXXXX macro at the end of the
+// block of code where the warning suppression is needed. Otherwise, you might
+// inadvertently suppress legitimate warnings.
 
 // ---- List of available suppressions ----
 
@@ -65,7 +68,7 @@
   DETAIL_IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
 
 
-// TODO: Add more warning tokens as they become relevant. Do not add tokens to
-// suppress unless it is necessary.
+// TODO: Add more warning types as they become relevant. Do not add warning
+// types to suppress unless they are genuinely necessary.
 
 #endif
