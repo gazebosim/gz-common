@@ -8,7 +8,8 @@ find_package(ignition-cmake0 REQUIRED)
 #============================================================================
 # Set up the project
 #============================================================================
-ign_configure_project(common 0.4.0)
+project(ignition-common0 VERSION 0.4.0)
+ign_configure_project()
 
 
 #============================================================================
