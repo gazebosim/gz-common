@@ -50,7 +50,6 @@ ign_find_package(ignition-math${IGN_MATH_VER} REQUIRED)
 if(USE_EXTERNAL_TINYXML2)
   ign_find_package(TINYXML2 REQUIRED PRIVATE PRETTY tinyxml2)
 else()
-  # Needed in WIN32 since in UNIX the flag is added in the code installed
   message(STATUS "Skipping search for tinyxml2 and using an internal version\n")
 endif()
 
