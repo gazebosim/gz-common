@@ -134,10 +134,10 @@ int Logger::Buffer::sync()
   Console::log << outstr;
   Console::log.flush();
 
-#ifndef _WIN32
   // Output to terminal
   if (Console::Verbosity() >= this->verbosity && !outstr.empty())
   {
+#ifndef _WIN32
     bool lastNewLine = outstr.back() == '\n';
     FILE *outstream = this->type == Logger::STDOUT ? stdout : stderr;
 
@@ -150,10 +150,7 @@ int Logger::Buffer::sync()
       ss << std::endl;
 
     fprintf(outstream, "%s", ss.str().c_str());
-  }
 #else
-  if (Console::Verbosity() >= this->verbosity && !outstr.empty())
-  {
     HANDLE hConsole = GetStdHandle(
           this->type == Logger::STDOUT ? STD_OUTPUT_HANDLE : STD_ERROR_HANDLE);
 
@@ -168,8 +165,8 @@ int Logger::Buffer::sync()
     outStream << outstr;
 
     SetConsoleTextAttribute(hConsole, originalBufferInfo.wAttributes);
-  }
 #endif
+  }
 
   this->str("");
   return 0;
