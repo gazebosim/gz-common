@@ -82,20 +82,35 @@ namespace ignition
     /// Note that this will NOT convert backslashes (or any other separator)
     /// into forward slashes, even on operating systems that use forward-slashes
     /// as separators.
+    ///
+    /// \param[out] _path This string will be directly modified by replacing its
+    /// forward-slashes with the preferred directory separator of the current
+    /// operating system.
     void IGNITION_COMMON_VISIBLE changeFromUnixPath(std::string &_path);
 
     /// \brief Returns a copy of _path which has been passed through
     /// changeFromUnixPath.
+    ///
+    /// \param[in] _path The path to start with
+    /// \return A modified path that uses the preferred directory separator of
+    /// the current operating system.
     std::string IGNITION_COMMON_VISIBLE copyFromUnixPath(
         const std::string &_path);
 
     /// \brief Replace the preferred directory separator of the current
     /// operating system with a forward-slash '/'. On Windows, this will turn
     /// backslashes into forward-slashes.
+    ///
+    /// \param[out] _path This string will be directly modified to use forward
+    /// slashes to separate its directory names.
     void IGNITION_COMMON_VISIBLE changeToUnixPath(std::string &_path);
 
     /// \brief Returns a copy of _path which has been passed through
     /// changeToUnixPath.
+    ///
+    /// \param[in] _path The path to start with
+    /// \return A modified path that uses forward slashes to separate directory
+    /// names.
     std::string IGNITION_COMMON_VISIBLE copyToUnixPath(
         const std::string &_path);
 
