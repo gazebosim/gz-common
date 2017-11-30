@@ -20,9 +20,14 @@
 #include <gtest/gtest.h>
 #include <string>
 #include <vector>
+#include <cstdio>
 
 #include "ignition/common/Util.hh"
 #include "ignition/common/SystemPaths.hh"
+
+#ifdef _WIN32
+  #define snprintf _snprintf
+#endif
 
 using namespace ignition;
 
@@ -50,7 +55,17 @@ class SystemPathsFixture : public ::testing::Test
 TEST_F(SystemPathsFixture, SystemPaths)
 {
   common::SystemPaths paths;
-  putenv(const_cast<char*>("IGN_PLUGIN_PATH=/tmp/plugin:/test/plugin/now"));
+  std::string env_str("IGN_PLUGIN_PATH=/tmp/plugin");
+  env_str += ignition::common::SystemPaths::Delimiter();
+  env_str += "/test/plugin/now";
+
+  // The char* passed to putenv will continue to be stored after the lifetime
+  // of this function, so we should not pass it a pointer which has an automatic
+  // lifetime.
+  static char env[1024];
+  snprintf(env, sizeof(env), "%s", env_str.c_str());
+  putenv(env);
+
   const std::list<std::string> pathList3 = paths.PluginPaths();
   EXPECT_EQ(static_cast<unsigned int>(2), pathList3.size());
   EXPECT_STREQ("/tmp/plugin/", pathList3.front().c_str());
@@ -134,8 +149,12 @@ TEST_F(SystemPathsFixture, findFile)
 
   // LocateLocalFile
   common::SystemPaths sp;
-  EXPECT_EQ(file1, sp.LocateLocalFile("test_f1", {dir1, dir2}));
-  EXPECT_EQ(file2, sp.LocateLocalFile("test_f2", {dir1, dir2}));
+  EXPECT_EQ(ignition::common::copyToUnixPath(file1),
+            sp.LocateLocalFile("test_f1", {dir1, dir2}));
+
+  EXPECT_EQ(ignition::common::copyToUnixPath(file2),
+            sp.LocateLocalFile("test_f2", {dir1, dir2}));
+
   EXPECT_EQ(std::string(), sp.LocateLocalFile("test_f3", {dir1, dir2}));
 
   // FindFile
@@ -162,8 +181,18 @@ TEST_F(SystemPathsFixture, NormalizeDirectoryPath)
 //////////////////////////////////////////////////
 TEST_F(SystemPathsFixture, PathsFromEnv)
 {
-  putenv(const_cast<char*>(
-    "IGN_PLUGIN_PATH=/tmp/plugin:/test/plugin/now/:/tmp/plugin"));
+  std::string env_str = "IGN_PLUGIN_PATH=/tmp/plugin";
+  env_str += ignition::common::SystemPaths::Delimiter();
+  env_str += "/test/plugin/now/";
+  env_str += ignition::common::SystemPaths::Delimiter();
+  env_str += "/tmp/plugin";
+
+  // The char* passed to putenv will continue to be stored after the lifetime
+  // of this function, so we should not pass it a pointer which has an automatic
+  // lifetime.
+  static char env[1024];
+  snprintf(env, sizeof(env), "%s", env_str.c_str());
+  putenv(env);
 
   auto paths = ignition::common::SystemPaths::PathsFromEnv("IGN_PLUGIN_PATH");
 

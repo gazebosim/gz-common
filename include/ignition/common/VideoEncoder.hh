@@ -20,7 +20,9 @@
 #include <chrono>
 #include <string>
 #include <memory>
-#include <ignition/common/System.hh>
+
+#include <ignition/common/Export.hh>
+#include <ignition/common/SuppressWarning.hh>
 
 // Default bitrate (0) indicates that a bitrate should be calculated when
 // Start is called.
@@ -118,9 +120,11 @@ namespace ignition
       /// memory. This will also delete any temporary files.
       public: void Reset();
 
+      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \internal
       /// \brief Private data pointer
       private: std::unique_ptr<VideoEncoderPrivate> dataPtr;
+      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
     };
   }
 }

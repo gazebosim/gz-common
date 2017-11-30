@@ -20,18 +20,28 @@
 #include <iomanip>
 
 #ifdef _WIN32
+
   #include <Windows.h>
   #include <Winsock2.h>
   #include <cstdint>
+// As of MSVS2015 (which contains MSVC++ ver 19), timespec is provided in time.h
+// _MSC_VER contains the the version of VC++ multiplied by 100.
+#if defined(_MSC_VER) && _MSC_VER < 1900
   struct timespec
   {
     int64_t tv_sec;
     int64_t tv_nsec;
   };
 #else
+
+  #include <time.h>
+#endif
+
+#else
   #include <unistd.h>
   #include <sys/time.h>
-  #include <time.h>
+
+  #include <time.h> // NOLINT (false positive for multiple includes)
 #endif
 
 

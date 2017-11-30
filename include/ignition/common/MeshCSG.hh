@@ -19,7 +19,7 @@
 
 #include <ignition/math/Pose3.hh>
 
-#include <ignition/common/System.hh>
+#include <ignition/common/Export.hh>
 
 struct _GtsSurface;
 typedef _GtsSurface GtsSurface;
