@@ -64,7 +64,7 @@ if(NOT MSVC)
 
   #--------------------------------------
   # Find Freeimage
-  ign_find_package(FreeImage VERSION 3.9 REQUIRED PRIVATE)
+  ign_find_package(FreeImage VERSION 3.9 REQUIRED PRIVATE PKGCONFIG_IGNORE)
 
   #------------------------------------
   # Find uuid
