@@ -13,7 +13,7 @@ find_package(ignition-cmake0 REQUIRED)
 #============================================================================
 # Configure the project
 #============================================================================
-ign_configure_project()
+ign_configure_project(VERSION_SUFFIX pre1)
 
 
 #============================================================================
@@ -55,7 +55,6 @@ ign_find_package(ignition-math${IGN_MATH_VER} REQUIRED)
 if(USE_EXTERNAL_TINYXML2)
   ign_find_package(TINYXML2 REQUIRED PRIVATE PRETTY tinyxml2)
 else()
-  # Needed in WIN32 since in UNIX the flag is added in the code installed
   message(STATUS "Skipping search for tinyxml2 and using an internal version\n")
 endif()
 
@@ -70,7 +69,7 @@ if(NOT MSVC)
 
   #--------------------------------------
   # Find Freeimage
-  ign_find_package(FreeImage VERSION 3.9 REQUIRED PRIVATE)
+  ign_find_package(FreeImage VERSION 3.9 REQUIRED PRIVATE PKGCONFIG_IGNORE)
 
   #------------------------------------
   # Find uuid

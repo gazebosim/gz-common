@@ -255,7 +255,7 @@ TEST(Util_TEST, fileOps)
   std::string test3InContent((std::istreambuf_iterator<char>(test3In)),
                              (std::istreambuf_iterator<char>()));
   // We must close this file stream for test3.tmp or else Windows
-  // wil lrefuse to remove the file from the filesystem in the
+  // will refuse to remove the file from the filesystem in the
   // upcoming test.
   test3In.close();
 
