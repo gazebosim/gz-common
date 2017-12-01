@@ -20,7 +20,9 @@
 #include <stdint.h>
 #include <string>
 #include <memory>
-#include <ignition/common/System.hh>
+
+#include <ignition/common/Export.hh>
+#include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
 {
@@ -63,8 +65,10 @@ namespace ignition
       /// \brief Free audio object, close files, streams.
       private: void Cleanup();
 
+      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Private data pointer
       private: std::unique_ptr<AudioDecoderPrivate> data;
+      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
     };
   }
 }

@@ -139,7 +139,7 @@ TEST_F(ColladaLoader, Material)
 
   // Make sure we read the specular value
   EXPECT_EQ(math::Color(0.0, 0.0, 0.0, 1.0), mat->Ambient());
-  EXPECT_EQ(math::Color(0.64, 0.64, 0.64, 1.0), mat->Diffuse());
+  EXPECT_EQ(math::Color(0.64f, 0.64f, 0.64f, 1.0f), mat->Diffuse());
   EXPECT_EQ(math::Color(0.5, 0.5, 0.5, 1.0), mat->Specular());
   EXPECT_EQ(math::Color(0.0, 0.0, 0.0, 1.0), mat->Emissive());
   EXPECT_DOUBLE_EQ(50.0, mat->Shininess());

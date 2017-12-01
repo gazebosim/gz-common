@@ -18,7 +18,7 @@
 #define IGNITION_COMMON_MESHEXPORTER_HH_
 
 #include <string>
-#include <ignition/common/System.hh>
+#include <ignition/common/Export.hh>
 
 namespace ignition
 {
