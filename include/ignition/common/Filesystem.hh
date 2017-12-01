@@ -21,19 +21,27 @@
 #include <memory>
 #include <string>
 
-#include <ignition/common/System.hh>
-
-#ifdef _WIN32
-// Disable warning C4251 which is triggered by
-// std::unique_ptr
-#pragma warning(push)
-#pragma warning(disable: 4251)
-#endif
+#include <ignition/common/Export.hh>
+#include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
 {
   namespace common
   {
+    /// \brief Options for how to handle errors that occur in functions that
+    /// manipulate the filesystem.
+    enum FilesystemWarningOp
+    {
+      /// \brief Errors that occur during filesystem manipulation should be
+      /// logged as warnings using ignwarn. (Recommended)
+      FSWO_LOG_WARNINGS = 0,
+
+      /// \brief Errors that occur during filesystem manipulation should not be
+      /// logged. The user will be responsible for checking the system's error
+      /// flags.
+      FSWO_SUPPRESS_WARNINGS
+    };
+
     /// \brief Determine whether the given path exists on the filesystem.
     /// \param[in] _path  The path to check for existence
     /// \return True if the path exists on the filesystem, false otherwise.
@@ -60,14 +68,51 @@ namespace ignition
     /// \return true on success
     bool IGNITION_COMMON_VISIBLE createDirectories(const std::string &_path);
 
-    // The below is C++ variadic template magic to allow an append
-    // method that takes 1-n number of arguments to append together.
-
     /// \brief Append the preferred path separator character for this platform
     ///        onto the passed-in string.
     /// \param[in] _s  The path to start with.
     /// \return The original path with the platform path separator appended.
     std::string IGNITION_COMMON_VISIBLE const separator(std::string const &_s);
+
+    /// \brief Replace forward-slashes '/' with the preferred directory
+    /// separator of the current operating system. On Windows, this will turn
+    /// forward-slashes into backslashes. If forward-slash is the preferred
+    /// separator of the current operating system, this will do nothing.
+    ///
+    /// Note that this will NOT convert backslashes (or any other separator)
+    /// into forward slashes, even on operating systems that use forward-slashes
+    /// as separators.
+    ///
+    /// \param[out] _path This string will be directly modified by replacing its
+    /// forward-slashes with the preferred directory separator of the current
+    /// operating system.
+    void IGNITION_COMMON_VISIBLE changeFromUnixPath(std::string &_path);
+
+    /// \brief Returns a copy of _path which has been passed through
+    /// changeFromUnixPath.
+    ///
+    /// \param[in] _path The path to start with
+    /// \return A modified path that uses the preferred directory separator of
+    /// the current operating system.
+    std::string IGNITION_COMMON_VISIBLE copyFromUnixPath(
+        const std::string &_path);
+
+    /// \brief Replace the preferred directory separator of the current
+    /// operating system with a forward-slash '/'. On Windows, this will turn
+    /// backslashes into forward-slashes.
+    ///
+    /// \param[out] _path This string will be directly modified to use forward
+    /// slashes to separate its directory names.
+    void IGNITION_COMMON_VISIBLE changeToUnixPath(std::string &_path);
+
+    /// \brief Returns a copy of _path which has been passed through
+    /// changeToUnixPath.
+    ///
+    /// \param[in] _path The path to start with
+    /// \return A modified path that uses forward slashes to separate directory
+    /// names.
+    std::string IGNITION_COMMON_VISIBLE copyToUnixPath(
+        const std::string &_path);
 
     /// \brief Get the absolute path of a provided path.
     /// \param[in] _path Relative or absolute path.
@@ -86,6 +131,9 @@ namespace ignition
     {
       return _path;
     }
+
+    // The below is C++ variadic template magic to allow a joinPaths
+    // method that takes 1-n number of arguments to append together.
 
     /// \brief Append one or more additional path elements to the first
     ///        passed in argument.
@@ -107,38 +155,61 @@ namespace ignition
     /// \brief Given a path, get just the basename portion.
     /// \param[in] _path  The full path.
     /// \return A new string with just the basename portion of the path.
-    std::string IGNITION_COMMON_VISIBLE basename(const std::string &_path);
+    std::string IGNITION_COMMON_VISIBLE basename(
+        const std::string &_path);
 
     /// \brief Copy a file.
     /// \param[in] _existingFilename Path to an existing file.
     /// \param[in] _newFilename Path of the new file.
+    /// \param[in] _warningOp Log or suppress warnings that may occur.
     /// \return True on success.
-    bool IGNITION_COMMON_VISIBLE copyFile(const std::string &_existingFilename,
-                                          const std::string &_newFilename);
+    bool IGNITION_COMMON_VISIBLE copyFile(
+        const std::string &_existingFilename,
+        const std::string &_newFilename,
+        const FilesystemWarningOp _warningOp = FSWO_LOG_WARNINGS);
 
     /// \brief Move a file.
     /// \param[in] _existingFilename Full path to an existing file.
     /// \param[in] _newFilename Full path of the new file.
+    /// \param[in] _warningOp Log or suppress warnings that may occur.
     /// \return True on success.
-    bool IGNITION_COMMON_VISIBLE moveFile(const std::string &_existingFilename,
-                                          const std::string &_newFilename);
+    bool IGNITION_COMMON_VISIBLE moveFile(
+        const std::string &_existingFilename,
+        const std::string &_newFilename,
+        const FilesystemWarningOp _warningOp = FSWO_LOG_WARNINGS);
 
     /// \brief Remove an empty directory
     /// \remarks the directory must be empty to be removed
     /// \param[in] _path Path to a directory.
+    /// \param[in] _warningOp Log or suppress warnings that may occur.
     /// \return True if _path is a directory and was removed.
-    bool IGNITION_COMMON_VISIBLE removeDirectory(const std::string &_path);
+    bool IGNITION_COMMON_VISIBLE removeDirectory(
+        const std::string &_path,
+        const FilesystemWarningOp _warningOp = FSWO_LOG_WARNINGS);
+
+    /// \brief Remove a file.
+    /// \param[in] _existingFilename Full path to an existing file.
+    /// \param[in] _warningOp Log or suppress warnings that may occur.
+    /// \return True on success.
+    bool IGNITION_COMMON_VISIBLE removeFile(
+        const std::string &_existingFilename,
+        const FilesystemWarningOp _warningOp = FSWO_LOG_WARNINGS);
 
     /// \brief Remove a directory or file.
     /// \param[in] _path Path to a directory or file.
+    /// \param[in] _warningOp Log or suppress warnings that may occur.
     /// \return True if _path was removed.
     bool IGNITION_COMMON_VISIBLE removeDirectoryOrFile(
-        const std::string &_path);
+        const std::string &_path,
+        const FilesystemWarningOp _warningOp = FSWO_LOG_WARNINGS);
 
     /// \brief Remove a directory or file.
     /// \param[in] _path Path to a directory or file.
+    /// \param[in] _warningOp Log or suppress warnings that may occur.
     /// \return True if _path was removed.
-    bool IGNITION_COMMON_VISIBLE removeAll(const std::string &_path);
+    bool IGNITION_COMMON_VISIBLE removeAll(
+        const std::string &_path,
+        const FilesystemWarningOp _warningOp = FSWO_LOG_WARNINGS);
 
     /// \internal
     class DirIterPrivate;
@@ -180,14 +251,12 @@ namespace ignition
       /// \brief Close an open directory handle.
       private: void CloseHandle();
 
+      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Private data.
       private: std::unique_ptr<DirIterPrivate> dataPtr;
+      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
     };
   }
 }
-
-#ifdef _WIN32
-#pragma warning(pop)
-#endif
 
 #endif

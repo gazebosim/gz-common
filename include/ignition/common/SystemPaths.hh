@@ -33,7 +33,8 @@
 #include <string>
 #include <vector>
 
-#include <ignition/common/System.hh>
+#include <ignition/common/Export.hh>
+#include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
 {
@@ -138,16 +139,14 @@ namespace ignition
       public: static std::list<std::string> PathsFromEnv(
                 const std::string &_env);
 
-#ifdef _WIN32
-// Disable warning C4251
-#pragma warning(push)
-#pragma warning(disable: 4251)
-#endif
+      /// \brief Get the delimiter that the current operating system
+      /// uses to separate different paths from each other.
+      public: static char Delimiter();
+
+      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Private data pointer
       private: std::unique_ptr<SystemPathsPrivate> dataPtr;
-#ifdef _WIN32
-#pragma warning(pop)
-#endif
+      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
     };
   }
 }

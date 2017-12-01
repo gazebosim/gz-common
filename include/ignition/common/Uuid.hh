@@ -20,7 +20,7 @@
 #include <iostream>
 #include <string>
 
-#include <ignition/common/System.hh>
+#include <ignition/common/Export.hh>
 
 #ifdef _WIN32
   #include <Rpc.h>

@@ -1,3 +1,10 @@
+/* THIS HEADER WAS AUTOMATICALLY GENERATED 
+ * AND SHOULD NOT BE DIRECTLY MODIFIED.
+ *
+ * See test/test_config.h.in in the ignition-common
+ * repo for the original source of this header.
+*/
+
 #define PROJECT_BINARY_PATH "${PROJECT_BINARY_DIR}"
 #define PROJECT_SOURCE_PATH "${PROJECT_SOURCE_DIR}"
 #define TEST_PATH "${PROJECT_SOURCE_DIR}/test"

@@ -24,27 +24,8 @@
 /* cppcheck-suppress */
 
 // BEGIN / FINISH Macros
-#if defined __GNUC__
 
-
-  #define DETAIL_IGN_COMMON_BEGIN_WARN_SUP_PUSH \
-    _Pragma("GCC diagnostic push")
-
-
-  #define DETAIL_IGN_COMMON_WARN_SUP_HELPER_2(w) \
-    DETAIL_IGN_COMMON_STRINGIFY(GCC diagnostic ignored w)
-
-
-  #define DETAIL_IGN_COMMON_WARN_SUP_HELPER(w) \
-    _Pragma(DETAIL_IGN_COMMON_WARN_SUP_HELPER_2(w))
-
-
-  #define DETAIL_IGN_COMMON_FINISH_WARNING_SUPPRESSION(warning_token) \
-    _Pragma("GCC diagnostic pop")
-
-
-#elif defined __clang__
-
+#if defined __clang__
 
   #define DETAIL_IGN_COMMON_BEGIN_WARN_SUP_PUSH \
     _Pragma("clang diagnostic push")
@@ -58,27 +39,46 @@
     _Pragma(DETAIL_IGN_COMMON_WARN_SUP_HELPER_2(w))
 
 
-  #define DETAIL_IGN_COMMON_FINISH_WARNING_SUPPRESSION(warning_token) \
+  #define DETAIL_IGN_COMMON_WARN_RESUME \
     _Pragma("clang diagnostic pop")
 
 
-#elif defined _MSC_VER
+#elif defined __GNUC__
 
+  // NOTE: clang will define both __clang__ and __GNUC__, and it seems that
+  // clang will gladly accept GCC pragmas. Even so, if we want the pragmas to
+  // target the "correct" compiler, we should check if __clang__ is defined
+  // before checking whether __GNUC__ is defined.
 
   #define DETAIL_IGN_COMMON_BEGIN_WARN_SUP_PUSH \
-    _Pragma("warning(push)")
+    _Pragma("GCC diagnostic push")
 
 
   #define DETAIL_IGN_COMMON_WARN_SUP_HELPER_2(w) \
-    DETAIL_IGN_COMMON_STRINGIFY(warning(disable: w))
+    DETAIL_IGN_COMMON_STRINGIFY(GCC diagnostic ignored w)
 
 
   #define DETAIL_IGN_COMMON_WARN_SUP_HELPER(w) \
     _Pragma(DETAIL_IGN_COMMON_WARN_SUP_HELPER_2(w))
 
 
-  #define DETAIL_IGN_COMMON_FINISH_WARNING_SUPPRESSION(warning_token) \
-    _Pragma("warning(pop)")
+  #define DETAIL_IGN_COMMON_WARN_RESUME \
+    _Pragma("GCC diagnostic pop")
+
+
+#elif defined _MSC_VER
+
+
+  #define DETAIL_IGN_COMMON_BEGIN_WARN_SUP_PUSH \
+    __pragma(warning(push))
+
+
+  #define DETAIL_IGN_COMMON_WARN_SUP_HELPER(w) \
+    __pragma(warning(disable: w))
+
+
+  #define DETAIL_IGN_COMMON_WARN_RESUME \
+    __pragma(warning(pop))
 
 
 #else
@@ -91,7 +91,7 @@
   #define DETAIL_IGN_COMMON_WARN_SUP_HELPER(w)
 
 
-  #define DETAIL_IGN_COMMON_FINISH_WARNING_SUPPRESSION(warning_token)
+  #define DETAIL_IGN_COMMON_WARN_RESUME
 
 
 #endif
@@ -106,18 +106,46 @@
 // Warning Tokens
 #if defined __GNUC__ || defined __clang__
 
-  #define DETAIL_IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR \
-    "-Wdelete-non-virtual-dtor"
+  #define DETAIL_IGN_COMMON_WARN_IGNORE__DELETE_NON_VIRTUAL_DESTRUCTOR \
+    DETAIL_IGN_COMMON_BEGIN_WARNING_SUPPRESSION("-Wdelete-non-virtual-dtor")
+
+  #define DETAIL_IGN_COMMON_WARN_RESUME__DELETE_NON_VIRTUAL_DESTRUCTOR \
+    DETAIL_IGN_COMMON_WARN_RESUME
+
+
+  // There is no analogous warning for this in GCC or Clang so we just make
+  // blank macros for this warning type.
+  #define DETAIL_IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
+  #define DETAIL_IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
 
 
 #elif defined _MSC_VER
 
-  #define DETAIL_IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR "4265"
+  #define DETAIL_IGN_COMMON_WARN_IGNORE__DELETE_NON_VIRTUAL_DESTRUCTOR \
+    DETAIL_IGN_COMMON_BEGIN_WARNING_SUPPRESSION(4265)
+
+  #define DETAIL_IGN_COMMON_WARN_RESUME__DELETE_NON_VIRTUAL_DESTRUCTOR \
+    DETAIL_IGN_COMMON_WARN_RESUME
+
+
+  #define DETAIL_IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING \
+    DETAIL_IGN_COMMON_BEGIN_WARNING_SUPPRESSION(4251)
+
+  #define DETAIL_IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING \
+    DETAIL_IGN_COMMON_WARN_RESUME
 
 
 #else
 
-  #define DETAIL_IGN_COMMON_DELETE_NON_VIRTUAL_DESTRUCTOR
+  // If the compiler is unknown, we simply leave these macros blank to avoid
+  // compilation errors.
+
+  #define DETAIL_IGN_COMMON_WARN_IGNORE__DELETE_NON_VIRTUAL_DESTRUCTOR
+  #define DETAIL_IGN_COMMON_WARN_RESUME__DELETE_NON_VIRTUAL_DESTRUCTOR
+
+
+  #define DETAIL_IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
+  #define DETAIL_IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
 
 
 #endif
