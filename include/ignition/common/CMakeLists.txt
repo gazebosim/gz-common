@@ -11,7 +11,8 @@ if(WIN32)
     VideoEncoder.hh
   )
 else()
-  set(exclude_headers)
+  set(exclude_headers
+    win_dirent.h)
 endif()
 
 ign_install_all_headers(EXCLUDE ${exclude_headers})
