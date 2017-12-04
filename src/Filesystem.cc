@@ -45,7 +45,7 @@
 #include <ignition/common/ffmpeg_inc.hh>
 #else
 #include <io.h>
-#include "ignition/common/win_dirent.h"
+#include "win_dirent.h"
 #include "PrintWindowsSystemWarning.hh"
 #endif
 
