@@ -22,6 +22,7 @@
 #include <ignition/common/Console.hh>
 #include <ignition/common/ColladaExporter.hh>
 #include <ignition/common/Filesystem.hh>
+#include <ignition/common/config.hh>
 
 #include "tinyxml2.h"
 
@@ -41,8 +42,13 @@ static void LogTinyXml2DocumentError(
   {
     warning += std::to_string(_doc.ErrorID()) + "): ";
 
+#ifdef TINYXML2_MAJOR_VERSION_GE_6
+    const char * error1 = _doc.ErrorStr();
+    const char * error2 = nullptr;
+#else
     const char * error1 = _doc.GetErrorStr1();
     const char * error2 = _doc.GetErrorStr2();
+#endif
 
     if (error1)
       warning += "str1=" + std::string(error1);

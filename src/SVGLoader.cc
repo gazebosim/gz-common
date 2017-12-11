@@ -25,6 +25,7 @@
 
 #include "ignition/common/Console.hh"
 #include "ignition/common/Util.hh"
+#include "ignition/common/config.hh"
 
 #include "ignition/common/SVGLoader.hh"
 
@@ -877,8 +878,13 @@ bool SVGLoader::Parse(const std::string &_filename,
   tinyxml2::XMLDocument doc;
   if (doc.LoadFile(_filename.c_str()) != tinyxml2::XML_SUCCESS)
   {
+#ifdef TINYXML2_MAJOR_VERSION_GE_6
+    const char *str1 = doc.ErrorStr();
+    const char *str2 = nullptr;
+#else
     const char *str1 = doc.GetErrorStr1();
     const char *str2 = doc.GetErrorStr2();
+#endif
     std::string err1 = str1 ? str1 : "n/a";
     std::string err2 = str2 ? str2 : "n/a";
 

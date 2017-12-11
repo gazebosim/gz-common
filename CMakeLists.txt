@@ -57,6 +57,10 @@ if(USE_EXTERNAL_TINYXML2)
 else()
   message(STATUS "Skipping search for tinyxml2 and using an internal version\n")
 endif()
+if (NOT TINYXML2_VERSION VERSION_LESS "6.0.0")
+  message(STATUS "TINYXML2_VERSION ${TINYXML2_VERSION}")
+  set(TINYXML2_MAJOR_VERSION_GE_6 True)
+endif()
 
 #--------------------------------------
 # Find libdl
