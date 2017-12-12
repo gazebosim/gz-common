@@ -62,6 +62,14 @@ else()
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tinyxml2)
 endif()
 
+# define of tinxml2 major version >= 6
+# https://bitbucket.org/ignitionrobotics/ign-common/issues/28
+if (NOT TINYXML2_VERSION VERSION_LESS "6.0.0")
+  message(STATUS "TINYXML2_VERSION ${TINYXML2_VERSION} >= 6.0.0")
+  target_compile_definitions(${PROJECT_LIBRARY_TARGET_NAME}
+    PRIVATE "TINYXML2_MAJOR_VERSION_GE_6")
+endif()
+
 # Include the interface directories that we always need.
 # Note that FreeImage, DL, and TINYXML2 are not included here, because their
 # headers are only included in the source code, and do not need to be visible
