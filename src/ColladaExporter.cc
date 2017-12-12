@@ -22,7 +22,6 @@
 #include <ignition/common/Console.hh>
 #include <ignition/common/ColladaExporter.hh>
 #include <ignition/common/Filesystem.hh>
-#include <ignition/common/config.hh>
 
 #include "tinyxml2.h"
 

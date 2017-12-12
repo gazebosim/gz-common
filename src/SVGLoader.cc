@@ -25,7 +25,6 @@
 
 #include "ignition/common/Console.hh"
 #include "ignition/common/Util.hh"
-#include "ignition/common/config.hh"
 
 #include "ignition/common/SVGLoader.hh"
 
