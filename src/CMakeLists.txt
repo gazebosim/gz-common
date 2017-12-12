@@ -67,7 +67,7 @@ endif()
 if (NOT TINYXML2_VERSION VERSION_LESS "6.0.0")
   message(STATUS "TINYXML2_VERSION ${TINYXML2_VERSION} >= 6.0.0")
   target_compile_definitions(${PROJECT_LIBRARY_TARGET_NAME}
-    PRIVATE "-DTINYXML2_MAJOR_VERSION_GE_6")
+    PRIVATE "TINYXML2_MAJOR_VERSION_GE_6")
 endif()
 
 # Include the interface directories that we always need.
