@@ -10,8 +10,6 @@ if(WIN32)
     Video.hh
     VideoEncoder.hh
   )
-else()
-  set(exclude_headers)
 endif()
 
 ign_install_all_headers(EXCLUDE ${exclude_headers})

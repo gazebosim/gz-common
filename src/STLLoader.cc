@@ -191,7 +191,7 @@ bool STLLoader::ReadBinary(FILE *_filein, Mesh *_mesh)
 
   // 80 byte Header.
   for (i = 0; i < 80; ++i)
-    static_cast<char>(fgetc(_filein));
+    fgetc(_filein);
 
   // Number of faces.
   face_num = this->LongIntRead(_filein);
