@@ -127,9 +127,8 @@ endif()
 # define of tinxml2 major version >= 6
 # https://bitbucket.org/ignitionrobotics/ign-common/issues/28
 if(TINYXML2_MAJOR_VERSION_GE_6)
-    set_target_properties(${PROJECT_LIBRARY_TARGET_NAME}
-      PROPERTIES COMPILE_FLAGS
-      "${current_property} -DTINYXML2_MAJOR_VERSION_GE_6")
+    target_compile_definitions(${PROJECT_LIBRARY_TARGET_NAME}
+      PRIVATE "-DTINYXML2_MAJOR_VERSION_GE_6")
 endif()
 
 # Create installation instructions for the library target. This must be called
