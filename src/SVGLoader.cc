@@ -19,6 +19,7 @@
 #include <list>
 #include <utility>
 #include <cmath>
+#include <cctype>
 
 #include "tinyxml2.h"
 
@@ -876,15 +877,20 @@ bool SVGLoader::Parse(const std::string &_filename,
   tinyxml2::XMLDocument doc;
   if (doc.LoadFile(_filename.c_str()) != tinyxml2::XML_SUCCESS)
   {
+#ifdef TINYXML2_MAJOR_VERSION_GE_6
+    const char *str1 = doc.ErrorStr();
+    const char *str2 = nullptr;
+#else
     const char *str1 = doc.GetErrorStr1();
     const char *str2 = doc.GetErrorStr2();
+#endif
     std::string err1 = str1 ? str1 : "n/a";
     std::string err2 = str2 ? str2 : "n/a";
 
     ignerr << "Failed to load file " <<  _filename << std::endl
-           << "XML Error Name: " << doc.ErrorName() << "\n"
-           << "XML Error Info 1: " << err1 << "\n"
-           << "XML Error Info 2: " << err2 << "\n";
+           << "XML error type " << doc.ErrorName() << "\n"
+           << "XML error info 1 " << err1 << "\n"
+           << "XML error info 2 " << err2 << "\n";
     return false;
   }
 

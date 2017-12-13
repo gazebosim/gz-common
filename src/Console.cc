@@ -20,6 +20,10 @@
 #include <ignition/common/Console.hh>
 #include <ignition/common/config.hh>
 
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
 using namespace ignition;
 using namespace common;
 
@@ -27,17 +31,25 @@ std::string customPrefix;
 
 FileLogger ignition::common::Console::log("");
 
-// 31 == Red
-Logger Console::err("[Err] ", 31, Logger::STDERR, 1);
+#ifdef _WIN32
+  // These are Windows-based color codes
+  // (yellow is not enumerated by Windows)
+  const int red = FOREGROUND_RED | FOREGROUND_INTENSITY;
+  const int yellow = 0x006 | FOREGROUND_INTENSITY;
+  const int green = FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+  const int blue = FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+#else
+  // These are ANSI-based color codes
+  const int red = 31;
+  const int yellow = 33;
+  const int green = 32;
+  const int blue = 36;
+#endif
 
-// 33 == yellow
-Logger Console::warn("[Wrn] ", 33, Logger::STDERR, 2);
-
-// 32 == green
-Logger Console::msg("[Msg] ", 32, Logger::STDOUT, 3);
-
-// 36 ==  blue
-Logger Console::dbg("[Dbg] ", 36, Logger::STDOUT, 4);
+Logger Console::err("[Err] ", red, Logger::STDERR, 1);
+Logger Console::warn("[Wrn] ", yellow, Logger::STDERR, 2);
+Logger Console::msg("[Msg] ", green, Logger::STDOUT, 3);
+Logger Console::dbg("[Dbg] ", blue, Logger::STDOUT, 4);
 
 int Console::verbosity = 1;
 
@@ -125,17 +137,35 @@ int Logger::Buffer::sync()
   // Output to terminal
   if (Console::Verbosity() >= this->verbosity && !outstr.empty())
   {
+#ifndef _WIN32
     bool lastNewLine = outstr.back() == '\n';
-    std::ostream *outStream =
-      this->type == Logger::STDOUT ? &std::cout : &std::cerr;
+    FILE *outstream = this->type == Logger::STDOUT ? stdout : stderr;
 
     if (lastNewLine)
       outstr.pop_back();
 
-    (*outStream) << "\033[1;" << this->color << "m" << outstr << "\033[0m";
-
+    std::stringstream ss;
+    ss << "\033[1;" << this->color << "m" << outstr << "\033[0m";
     if (lastNewLine)
-      (*outStream) << std::endl;
+      ss << std::endl;
+
+    fprintf(outstream, "%s", ss.str().c_str());
+#else
+    HANDLE hConsole = GetStdHandle(
+          this->type == Logger::STDOUT ? STD_OUTPUT_HANDLE : STD_ERROR_HANDLE);
+
+    CONSOLE_SCREEN_BUFFER_INFO originalBufferInfo;
+    GetConsoleScreenBufferInfo(hConsole, &originalBufferInfo);
+
+    SetConsoleTextAttribute(hConsole, this->color);
+
+    std::ostream &outStream =
+        this->type == Logger::STDOUT ? std::cout : std::cerr;
+
+    outStream << outstr;
+
+    SetConsoleTextAttribute(hConsole, originalBufferInfo.wAttributes);
+#endif
   }
 
   this->str("");

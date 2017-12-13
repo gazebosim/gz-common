@@ -38,6 +38,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #ifndef _WIN32
 #include <dirent.h>
@@ -478,6 +479,42 @@ namespace ignition
     const std::string separator(const std::string &_p)
     {
       return _p + preferred_separator;
+    }
+
+    //////////////////////////////////////////////////
+    void changeFromUnixPath(std::string &_path)
+    {
+      // cppcheck-suppress knownConditionTrueFalse
+      if ('/' == preferred_separator)
+        return;
+
+      std::replace(_path.begin(), _path.end(), '/', preferred_separator);
+    }
+
+    //////////////////////////////////////////////////
+    std::string copyFromUnixPath(const std::string &_path)
+    {
+      std::string copy = _path;
+      changeFromUnixPath(copy);
+      return copy;
+    }
+
+    //////////////////////////////////////////////////
+    void changeToUnixPath(std::string &_path)
+    {
+      // cppcheck-suppress knownConditionTrueFalse
+      if ('/' == preferred_separator)
+        return;
+
+      std::replace(_path.begin(), _path.end(), preferred_separator, '/');
+    }
+
+    //////////////////////////////////////////////////
+    std::string copyToUnixPath(const std::string &_path)
+    {
+      std::string copy = _path;
+      changeToUnixPath(copy);
+      return copy;
     }
 
     //////////////////////////////////////////////////

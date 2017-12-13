@@ -23,7 +23,8 @@
 #include <string>
 
 #include <ignition/common/Util.hh>
-#include <ignition/common/System.hh>
+#include <ignition/common/Export.hh>
+#include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
 {
@@ -47,7 +48,8 @@ namespace ignition
     /// \brief Initialize log file with filename given by _str.
     /// If called twice, it will close currently in use and open a new
     /// log file.
-    /// \param[in] _dir Name of directory in which to store the log file.
+    /// \param[in] _dir Name of directory in which to store the log file. Note
+    /// that _dir must be relative to your home directory.
     /// \param[in] _file Name of log file for ignlog messages.
     #define ignLogInit(_dir, _file)\
         ignition::common::Console::log.Init(_dir, _file)
@@ -112,9 +114,11 @@ namespace ignition
                    public: std::ofstream *stream;
                  };
 
+      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Stores the full path of the directory where all the log files
       /// are stored.
       private: std::string logDirectory;
+      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
 
       /// \brief True if initialized.
       private: bool initialized;
@@ -188,8 +192,10 @@ namespace ignition
                    public: int verbosity;
                  };
 
+      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Prefix to use when logging to file.
       private: std::string prefix;
+      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
     };
 
     /// \class Console Console.hh common/common.hh

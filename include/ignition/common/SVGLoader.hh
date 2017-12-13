@@ -25,6 +25,7 @@
 #include <ignition/math/Matrix3.hh>
 
 #include <ignition/common/Console.hh>
+#include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
 {
@@ -92,8 +93,7 @@ namespace ignition
       /// \param[in] _samples The number of points for cubic spline segments
       /// Samples must be greater than zero. A value of one will be used if
       /// _samples is set to zero.
-      // cppcheck-suppress noExplicitConstructor
-      public: SVGLoader(const unsigned int _samples);
+      public: explicit SVGLoader(const unsigned int _samples);
 
       /// \brief destructor
       public: ~SVGLoader();
@@ -122,17 +122,11 @@ namespace ignition
       public: void DumpPaths(const std::vector<SVGPath> &_paths,
                              std::ostream &_out) const;
 
-#ifdef _WIN32
-// Disable warning C4251
-#pragma warning(push)
-#pragma warning(disable: 4251)
-#endif
+      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \internal
       /// \brief Pointer to private data
       private: std::unique_ptr<SVGLoaderPrivate> dataPtr;
-#ifdef _WIN32
-#pragma warning(pop)
-#endif
+      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
     };
   }
 }

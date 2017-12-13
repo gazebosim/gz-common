@@ -21,8 +21,9 @@
 #include <string>
 #include <memory>
 
-#include "ignition/common/MeshLoader.hh"
-#include "ignition/common/System.hh"
+#include <ignition/common/MeshLoader.hh>
+#include <ignition/common/Export.hh>
+#include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
 {
@@ -45,9 +46,11 @@ namespace ignition
       /// \return Pointer to a new Mesh
       public: virtual Mesh *Load(const std::string &_filename);
 
+      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<OBJLoaderPrivate> dataPtr;
+      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
     };
   }
 }
