@@ -169,8 +169,8 @@ namespace ignition
     {
       while (true)
       {
-        struct dirent *entry = nullptr;
-        entry = readdir(reinterpret_cast<DIR*>(this->dataPtr->handle));
+        struct dirent *entry =
+          readdir(reinterpret_cast<DIR*>(this->dataPtr->handle)); // NOLINT
         if (!entry)
         {
           this->dataPtr->end = true;
