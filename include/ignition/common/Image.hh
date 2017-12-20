@@ -21,7 +21,7 @@
 #include <string>
 #include <ignition/math/Color.hh>
 #include <ignition/common/Export.hh>
-#include "SuppressWarning.hh"
+#include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
 {
