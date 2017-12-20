@@ -142,7 +142,7 @@ void Skeleton::Scale(const double _scale)
     SkeletonNode *node = iter->second;
     math::Matrix4d trans = node->Transform();
     math::Vector3d pos = trans.Translation();
-    trans.Translate(pos * _scale);
+    trans.SetTranslation(pos * _scale);
     node->SetTransform(trans, false);
   }
 

@@ -93,7 +93,7 @@ std::unique_ptr<Skeleton> BVHLoader::Load(const std::string &_filename,
               math::parseFloat(words[2]) * _scale,
               math::parseFloat(words[3]) * _scale);
           math::Matrix4d transform(math::Matrix4d::Identity);
-          transform.Translate(offset);
+          transform.SetTranslation(offset);
           node->SetTransform(transform);
         }
         else
@@ -266,7 +266,7 @@ std::unique_ptr<Skeleton> BVHLoader::Load(const std::string &_filename,
         mats.pop_back();
       }
       math::Matrix4d pos(math::Matrix4d::Identity);
-      pos.Translate(translation);
+      pos.SetTranslation(translation);
       transform = pos * transform;
       animation->AddKeyFrame(node->Name(), time, transform);
     }
