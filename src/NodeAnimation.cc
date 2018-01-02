@@ -76,7 +76,7 @@ void NodeAnimation::AddKeyFrame(const double _time,
 void NodeAnimation::AddKeyFrame(const double _time, const math::Pose3d &_pose)
 {
   math::Matrix4d mat(_pose.Rot());
-  mat.Translate(_pose.Pos());
+  mat.SetTranslation(_pose.Pos());
 
   this->AddKeyFrame(_time, mat);
 }
@@ -181,7 +181,7 @@ math::Matrix4d NodeAnimation::FrameAt(double _time, bool _loop) const
   math::Quaterniond rot = math::Quaterniond::Slerp(t, prevRot, nextRot, true);
 
   math::Matrix4d trans(rot);
-  trans.Translate(pos);
+  trans.SetTranslation(pos);
 
   return trans;
 }
@@ -195,7 +195,7 @@ void NodeAnimation::Scale(const double _scale)
   {
     math::Matrix4d *mat = &iter->second;
     math::Vector3d pos = mat->Translation();
-    mat->Translate(pos * _scale);
+    mat->SetTranslation(pos * _scale);
   }
 }
 

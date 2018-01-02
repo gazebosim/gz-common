@@ -551,7 +551,7 @@ ignition::math::Matrix4d ColladaLoaderPrivate::LoadNodeTransform(
       std::istringstream stream(transStr);
       stream >> translate;
       // translate *= this->meter;
-      transform.Translate(translate);
+      transform.SetTranslation(translate);
     }
 
     tinyxml2::XMLElement *rotateXml = _elem->FirstChildElement("rotate");
@@ -993,7 +993,7 @@ void ColladaLoaderPrivate::SetSkeletonNodeTransform(tinyxml2::XMLElement *_elem,
       std::istringstream stream(transStr);
       stream >> translate;
       // translate *= this->meter;
-      transform.Translate(translate);
+      transform.SetTranslation(translate);
 
       NodeTransform nt(transform);
       if (_elem->FirstChildElement("translate")->Attribute("sid"))
@@ -1263,7 +1263,7 @@ void ColladaLoaderPrivate::LoadNormals(const std::string &_id,
   }
 
   ignition::math::Matrix4d rotMat = _transform;
-  rotMat.Translate(ignition::math::Vector3d::Zero);
+  rotMat.SetTranslation(ignition::math::Vector3d::Zero);
 
   tinyxml2::XMLElement *normalsXml = this->ElementId("source", _id);
   if (!normalsXml)

@@ -356,7 +356,7 @@ void MeshManager::CreatePlane(const std::string &_name,
 
   rot = rot3;
 
-  xlate.Translate(_normal * -_d);
+  xlate.SetTranslation(_normal * -_d);
   xform = xlate * rot;
 
   ignition::math::Vector3d vec;
