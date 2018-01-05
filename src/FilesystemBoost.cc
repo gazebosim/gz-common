@@ -38,6 +38,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #ifndef _WIN32
 #include <dirent.h>
@@ -166,24 +167,21 @@ namespace ignition
     //////////////////////////////////////////////////
     void DirIter::Next()
     {
-      struct dirent entry;
-      struct dirent *result;
-
       while (true)
       {
-        if (readdir_r(reinterpret_cast<DIR*>(this->dataPtr->handle), &entry,
-                      &result) != 0
-            || result == nullptr)
+        struct dirent *entry =
+          readdir(reinterpret_cast<DIR*>(this->dataPtr->handle)); // NOLINT
+        if (!entry)
         {
           this->dataPtr->end = true;
           this->dataPtr->current = "";
           break;
         }
 
-        if ((strcmp(entry.d_name, ".") != 0)
-            && (strcmp(entry.d_name, "..") != 0))
+        if ((strcmp(entry->d_name, ".") != 0)
+            && (strcmp(entry->d_name, "..") != 0))
         {
-          this->dataPtr->current = std::string(entry.d_name);
+          this->dataPtr->current = std::string(entry->d_name);
           break;
         }
       }
@@ -481,6 +479,42 @@ namespace ignition
     const std::string separator(const std::string &_p)
     {
       return _p + preferred_separator;
+    }
+
+    //////////////////////////////////////////////////
+    void changeFromUnixPath(std::string &_path)
+    {
+      // cppcheck-suppress knownConditionTrueFalse
+      if ('/' == preferred_separator)
+        return;
+
+      std::replace(_path.begin(), _path.end(), '/', preferred_separator);
+    }
+
+    //////////////////////////////////////////////////
+    std::string copyFromUnixPath(const std::string &_path)
+    {
+      std::string copy = _path;
+      changeFromUnixPath(copy);
+      return copy;
+    }
+
+    //////////////////////////////////////////////////
+    void changeToUnixPath(std::string &_path)
+    {
+      // cppcheck-suppress knownConditionTrueFalse
+      if ('/' == preferred_separator)
+        return;
+
+      std::replace(_path.begin(), _path.end(), preferred_separator, '/');
+    }
+
+    //////////////////////////////////////////////////
+    std::string copyToUnixPath(const std::string &_path)
+    {
+      std::string copy = _path;
+      changeToUnixPath(copy);
+      return copy;
     }
 
     //////////////////////////////////////////////////

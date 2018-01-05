@@ -27,12 +27,13 @@
 #include <ignition/math/Matrix3.hh>
 #include <ignition/math/Matrix4.hh>
 #include <ignition/math/Vector2.hh>
-#include "ignition/math/Vector3.hh"
-#include "ignition/math/Pose3.hh"
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Pose3.hh>
 
-#include "ignition/common/SingletonT.hh"
-#include "ignition/common/Types.hh"
-#include "ignition/common/System.hh"
+#include <ignition/common/SingletonT.hh>
+#include <ignition/common/Types.hh>
+#include <ignition/common/Export.hh>
+#include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
 {
@@ -258,8 +259,10 @@ namespace ignition
                       const ignition::math::Vector2d &_p,
                       const double _tol);
 
+      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Pointer to private data
       private: std::unique_ptr<MeshManagerPrivate> dataPtr;
+      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
 
       /// \brief Singleton implementation
       private: friend class SingletonT<MeshManager>;
