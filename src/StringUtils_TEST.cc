@@ -135,6 +135,30 @@ TEST(EndsWith, AtBeginning)
 }
 
 /////////////////////////////////////////////////
+TEST(EndsWith, PluralCast)
+{
+  EXPECT_EQ("cows", common::PluralCast("cow", 0));
+  EXPECT_EQ("cow",  common::PluralCast("cow", 1));
+  EXPECT_EQ("cows", common::PluralCast("cow", 2));
+  EXPECT_EQ("cows", common::PluralCast("cow", 4));
+
+  EXPECT_EQ("cacti",  common::PluralCast("cactus", "cacti", 0));
+  EXPECT_EQ("cactus", common::PluralCast("cactus", "cacti", 1));
+  EXPECT_EQ("cacti",  common::PluralCast("cactus", "cacti", 2));
+  EXPECT_EQ("cacti",  common::PluralCast("cactus", "cacti", 4));
+
+  EXPECT_EQ("bear", common::PluralCast("bear", -1));
+  EXPECT_EQ("bears", common::PluralCast("bear", -2));
+  EXPECT_EQ("bears", common::PluralCast("bear", -3));
+  EXPECT_EQ("bears", common::PluralCast("bear", -4));
+
+  EXPECT_EQ("ox", common::PluralCast("ox", "oxen", -1));
+  EXPECT_EQ("oxen", common::PluralCast("ox", "oxen", -2));
+  EXPECT_EQ("oxen", common::PluralCast("ox", "oxen", -3));
+  EXPECT_EQ("oxen", common::PluralCast("ox", "oxen", -4));
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

@@ -16,8 +16,9 @@ pipelines:
             cmake pkg-config python ruby-ronn uuid-dev
             libavcodec-dev libavdevice-dev libavformat-dev libavutil-dev
             libfreeimage-dev libgts-dev libswscale-dev libtinyxml2-dev
-            libignition-math3-dev
-            lcov curl mercurial
+            libignition-cmake-dev
+            libignition-math4-dev
+            lcov curl mercurial cppcheck
           # Code checker
           - sh tools/code_check.sh
           # Build
@@ -31,3 +32,9 @@ pipelines:
           # Coverage
           - make coverage
           - bash <(curl -s https://codecov.io/bash)
+          # Examples
+          - cd ../examples
+          - mkdir build
+          - cd build
+          - cmake ..
+          - make

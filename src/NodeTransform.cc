@@ -154,7 +154,7 @@ void NodeTransform::RecalculateMatrix()
   {
     if (this->data->type == TRANSLATE)
     {
-      this->data->transform.Translate(math::Vector3d(this->data->source[0],
+      this->data->transform.SetTranslation(math::Vector3d(this->data->source[0],
             this->data->source[1], this->data->source[2]));
     }
     else

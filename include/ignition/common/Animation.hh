@@ -19,16 +19,14 @@
 
 #include <string>
 #include <vector>
-#include <ignition/common/System.hh>
+
+#include <ignition/math/Spline.hh>
+#include <ignition/math/RotationSpline.hh>
+
+#include <ignition/common/Export.hh>
 
 namespace ignition
 {
-  namespace math
-  {
-    class Spline;
-    class RotationSpline;
-  }
-
   namespace common
   {
     class KeyFrame;

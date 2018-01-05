@@ -20,8 +20,10 @@
 #include <iostream>
 #include <memory>
 #include <string>
+
 #include <ignition/math/Color.hh>
 #include <ignition/common/EnumIface.hh>
+#include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
 {
@@ -92,8 +94,7 @@ namespace ignition
 
       /// \brief Create a material with a default color
       /// \param[in] _clr Color of the material
-      // cppcheck-suppress noExplicitConstructor
-      public: Material(const math::Color &_clr);
+      public: explicit Material(const math::Color &_clr);
 
       /// \brief Get the name of the material
       /// \return The name of the material
@@ -241,17 +242,10 @@ namespace ignition
                 return _out;
               }
 
-#ifdef _WIN32
-// Disable warning C4251 which is triggered by
-// std::unique_ptr
-#pragma warning(push)
-#pragma warning(disable: 4251)
-#endif
+      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief destination blend factor
       private: std::unique_ptr<MaterialPrivate> dataPtr;
-#ifdef _WIN32
-#pragma warning(pop)
-#endif
+      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
     };
   }
 }

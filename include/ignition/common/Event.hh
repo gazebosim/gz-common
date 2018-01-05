@@ -26,7 +26,7 @@
 
 #include <ignition/common/config.hh>
 #include <ignition/common/Types.hh>
-#include <ignition/common/System.hh>
+#include <ignition/common/Export.hh>
 
 namespace ignition
 {

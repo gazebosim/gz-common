@@ -17,15 +17,17 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <algorithm>
+#include <cctype>
 #include <functional>
 #include <list>
+#include <locale>
 #include <string>
 #include <vector>
 
 #ifndef _WIN32
 #include <dirent.h>
 #else
-#include "ignition/common/win_dirent.h"
+#include "win_dirent.h"
 #endif
 
 #include "ignition/common/Console.hh"
@@ -328,12 +330,7 @@ void SystemPaths::AddPluginPaths(const std::string &_path)
 {
   if (_path.size())
   {
-#ifdef _WIN32
-    char delim = ';';
-#else
-    char delim = ':';
-#endif
-    std::vector<std::string> paths = Split(_path, delim);
+    std::vector<std::string> paths = Split(_path, Delimiter());
     for (auto const &path : paths)
     {
       std::string normalPath = NormalizeDirectoryPath(path);
@@ -384,13 +381,7 @@ std::list<std::string> SystemPaths::PathsFromEnv(const std::string &_env)
   if (envPathsStr.empty())
     return paths;
 
-#ifdef _WIN32
-  char delim = ';';
-#else
-  char delim = ':';
-#endif
-
-  auto ps = ignition::common::Split(envPathsStr, delim);
+  auto ps = ignition::common::Split(envPathsStr, Delimiter());
   for (auto const &path : ps)
   {
     std::string normalPath = NormalizeDirectoryPath(path);
@@ -398,4 +389,14 @@ std::list<std::string> SystemPaths::PathsFromEnv(const std::string &_env)
   }
 
   return paths;
+}
+
+/////////////////////////////////////////////////
+char SystemPaths::Delimiter()
+{
+#ifdef _WIN32
+  return ';';
+#else
+  return ':';
+#endif
 }

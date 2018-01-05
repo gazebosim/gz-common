@@ -14,6 +14,8 @@
  * limitations under the License.
  *
  */
+
+#include <cstdlib>
 #include "ignition/common/StringUtils.hh"
 
 namespace ignition
@@ -54,6 +56,20 @@ namespace ignition
         return 0 == _s1.compare(_s1.size() - _s2.size(), _s2.size(), _s2);
       }
       return false;
+    }
+
+    //////////////////////////////////////////////////
+    std::string PluralCast(const std::string &_baseWord, const int _n)
+    {
+      return PluralCast(_baseWord, _baseWord+"s", _n);
+    }
+
+    //////////////////////////////////////////////////
+    std::string PluralCast(const std::string &_singular,
+                           const std::string &_plural,
+                           const int _n)
+    {
+      return std::abs(_n) == 1? _singular : _plural;
     }
   }
 }

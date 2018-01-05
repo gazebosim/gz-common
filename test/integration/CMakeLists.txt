@@ -1,11 +1,18 @@
-set(TEST_TYPE "INTEGRATION")
+# This is to make test_config.h visible
+include_directories("${CMAKE_BINARY_DIR}")
 
-set(tests
-  plugin.cc
-)
+ign_get_sources(tests)
 
-include_directories(.)
+# FIXME the mesh test does not work
+list(REMOVE_ITEM tests mesh.cc)
 
-link_directories(${PROJECT_BINARY_DIR}/test)
+ign_build_tests(
+  TYPE INTEGRATION
+  SOURCES ${tests})
 
-ign_build_tests(${tests})
+if(TARGET INTEGRATION_plugin)
+  # We add this dependency to make sure that DummyPlugins gets generated
+  # before INTEGRATION_plugin so that its auto-generated header is available.
+  # We do not want to link INTEGRATION_plugin to the DummyPlugins library.
+  add_dependencies(INTEGRATION_plugin IGNDummyPlugins)
+endif()
