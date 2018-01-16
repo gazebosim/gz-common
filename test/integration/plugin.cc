@@ -16,7 +16,7 @@
 */
 
 // Defining this macro before including ignition/common/SpecializedPluginPtr.hh
-// allows us to test that the low-cost routines are being used to access the
+// allows us to test that the high-speed routines are being used to access the
 // specialized plugin interfaces.
 #define IGNITION_UNITTEST_SPECIALIZED_PLUGIN_ACCESS
 
