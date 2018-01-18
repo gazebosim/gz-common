@@ -15,6 +15,7 @@
  *
 */
 #include <gtest/gtest.h>
+#include <string>
 #include <ignition/common/Base64.hh>
 
 #include "test_config.h"
@@ -30,6 +31,24 @@ TEST_F(Base64, Encode)
   std::string str = "123abc";
   std::string result;
   common::Base64::Encode(str.c_str(), str.size(), result);
+}
+
+/////////////////////////////////////////////////
+TEST_F(Base64, EncodeDecode)
+{
+  const std::string original = "-_- face";
+  std::string encoded;
+  common::Base64::Encode(original.c_str(), original.size(), encoded);
+  EXPECT_NE(original, encoded);
+  std::cerr << encoded << std::endl;
+  for (unsigned char c : encoded)
+  {
+    if (c == '=')
+      break;
+
+    EXPECT_TRUE(isalnum(c) || (c == '+') || (c == '/')) << c;
+  }
+  EXPECT_EQ(original, common::Base64::Decode(encoded));
 }
 
 /////////////////////////////////////////////////
