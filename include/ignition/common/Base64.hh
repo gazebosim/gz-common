@@ -26,7 +26,7 @@ namespace ignition
   {
     class IGNITION_COMMON_VISIBLE Base64
     {
-      /// \brief Encode a binary string into base 64, terminated with '='.
+      /// \brief Encode a binary string into base 64, padded with '='.
       /// \param[in] _bytesToEncode String of bytes to encode.
       /// \param[in] _len Length of _bytesToEncode.
       /// \param[out] _result Based64 string is appended to this string.
