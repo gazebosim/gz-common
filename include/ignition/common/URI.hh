@@ -172,6 +172,7 @@ namespace ignition
     };
 
     /// \brief A complete URI
+    // cppcheck-suppress class_X_Y
     class IGNITION_COMMON_VISIBLE URI
     {
       /// \brief Default constructor
