@@ -144,10 +144,8 @@ TEST_F(MeshTest, Mesh)
   EXPECT_NE(submesh.lock()->TexCoord(0), uv0);
 
   // fill array
-  double *vertices = NULL;
-  int *indices = NULL;
-  vertices = new double[3];
-  indices = new int[1];
+  double *vertices = new double[3];
+  int *indices = new int[1];
   mesh->FillArrays(&vertices, &indices);
   EXPECT_TRUE(math::equal(vertices[0], submesh.lock()->Vertex(0).X()));
   EXPECT_TRUE(math::equal(vertices[1], submesh.lock()->Vertex(0).Y()));
