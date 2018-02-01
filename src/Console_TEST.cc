@@ -37,7 +37,9 @@ class Console_TEST : public ::testing::Test {
     absPath = ignition::common::joinPaths(absPath, std::string(IGN_TMP_DIR));
 
     if (ignition::common::isDirectory(absPath))
+    {
       EXPECT_TRUE(ignition::common::removeAll(absPath));
+    }
   }
 };
 
