@@ -130,7 +130,6 @@ GtsSurface *GTSMeshUtils::DelaunayTriangulation(
   GSList *l, *verticesList = nullptr;
 
   GtsSurface *surface;
-  verticesList = nullptr;
 
   for (const auto &vertex : _vertices)
   {

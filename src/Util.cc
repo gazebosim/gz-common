@@ -286,8 +286,8 @@ bool Sha1::Digest(void const *_buffer, std::size_t _byteCount,
 /////////////////////////////////////////////////
 void ignition::common::load()
 {
-  static bool first = true;
 #ifndef _WIN32
+  static bool first = true;
   if (first)
   {
     first = false;
