@@ -153,7 +153,6 @@ Time Time::Sleep(const common::Time &_time)
   if (_time >= clockResolution)
   {
     struct timespec interval;
-    struct timespec remainder;
     interval.tv_sec = _time.sec;
     interval.tv_nsec = _time.nsec;
 
@@ -172,13 +171,7 @@ Time Time::Sleep(const common::Time &_time)
       return result;
     }
 
-#ifdef __MACH__
-    if (nanosleep(&interval, &remainder) == -1)
-    {
-      result.sec = remainder.tv_sec;
-      result.nsec = remainder.tv_nsec;
-    }
-#elif defined(_WIN32)
+#ifdef _WIN32
     // Borrowed from roscpp_core/rostime/src/time.cpp
     HANDLE timer = NULL;
     LARGE_INTEGER sleepTime;
@@ -209,11 +202,20 @@ Time Time::Sleep(const common::Time &_time)
     result.sec = 0;
     result.nsec = 0;
 #else
+    struct timespec remainder;
+# ifdef __MACH__
+    if (nanosleep(&interval, &remainder) == -1)
+    {
+      result.sec = remainder.tv_sec;
+      result.nsec = remainder.tv_nsec;
+    }
+# else
     if (clock_nanosleep(CLOCK_REALTIME, 0, &interval, &remainder) == -1)
     {
       result.sec = remainder.tv_sec;
       result.nsec = remainder.tv_nsec;
     }
+# endif
 #endif
   }
   else

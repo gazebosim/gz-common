@@ -105,7 +105,6 @@ namespace ignition
 
     //////////////////////////////////////////////////
     template<typename T>
-    // cppcheck-suppress uninitMemberVar
     MovingWindowFilter<T>::MovingWindowFilter()
     : dataPtr(new MovingWindowFilterPrivate<T>())
     {
