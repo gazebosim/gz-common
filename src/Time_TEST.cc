@@ -54,13 +54,13 @@ TEST(TimeTest, Time)
 
   time.Set(2, 4000);
   time /= common::Time(2, 2);
-  EXPECT_TRUE(time == common::Time(1, 200));
-  EXPECT_FALSE(time != common::Time(1, 200));
+  EXPECT_TRUE(time == common::Time(1, 1999));
+  EXPECT_FALSE(time != common::Time(1, 1999));
 
   time += common::Time(0, 1);
 
-  EXPECT_EQ(time, 1.0 + 201*1e-9);
-  EXPECT_FALSE(time != 1.0 + 201*1e-9);
+  EXPECT_EQ(time, 1.0 + 2000*1e-9);
+  EXPECT_FALSE(time != 1.0 + 2000*1e-9);
   EXPECT_TRUE(time < 2.0);
   EXPECT_TRUE(time > 0.1);
   EXPECT_TRUE(time >= 0.1);
@@ -71,7 +71,7 @@ TEST(TimeTest, Time)
 
   time.Set(1, 1000);
   time = common::Time(1, 1000) / common::Time(2, 2);
-  EXPECT_TRUE(time == common::Time(0, 500000050));
+  EXPECT_TRUE(time == common::Time(0, 500000499));
 
   double sec = 1.0 + 1e-9;
   double msec = sec * 1e3;
@@ -80,6 +80,7 @@ TEST(TimeTest, Time)
   EXPECT_DOUBLE_EQ(nsec, IGN_SEC_TO_NANO * sec);
   EXPECT_DOUBLE_EQ(nsec, IGN_MS_TO_NANO * msec);
   EXPECT_DOUBLE_EQ(nsec, IGN_US_TO_NANO * usec);
+  EXPECT_DOUBLE_EQ(1.0, 1e9 * IGN_NANO_TO_SEC);
 }
 
 /////////////////////////////////////////////////
@@ -176,6 +177,22 @@ TEST(TimeTest, String)
   // Large time
   time = common::Time(1234567890, 123456789);
   EXPECT_EQ(time.FormattedString(), "14288 23:31:30.123");
+}
+
+/////////////////////////////////////////////////
+TEST(TimeTest, Double)
+{
+  common::Time time(1, 9e8);
+  EXPECT_DOUBLE_EQ(1.9, time.Double());
+
+  time.Set(1, -9e8);
+  EXPECT_DOUBLE_EQ(0.10000000000000001, time.Double());
+
+  time.Set(-1, 9e8);
+  EXPECT_DOUBLE_EQ(-0.10000000000000001, time.Double());
+
+  time.Set(-1, -9e8);
+  EXPECT_DOUBLE_EQ(-1.8999999999999999, time.Double());
 }
 
 /////////////////////////////////////////////////

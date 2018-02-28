@@ -35,16 +35,16 @@
 #endif
 
 /// \brief Seconds in one nano second.
-#define IGN_NANO_TO_SEC 0.0000000001
+#define IGN_NANO_TO_SEC 1e-9
 
 /// \brief Nano seconds in one second.
-#define IGN_SEC_TO_NANO 1000000000
+#define IGN_SEC_TO_NANO 1e9
 
 /// \brief Nano seconds in one millisecond.
-#define IGN_MS_TO_NANO 1000000
+#define IGN_MS_TO_NANO 1e6
 
 /// \brief Nano seconds in one microsecond.
-#define IGN_US_TO_NANO 1000
+#define IGN_US_TO_NANO 1e3
 
 /// \brief Speed of light.
 #define IGN_SPEED_OF_LIGHT = 299792458.0
