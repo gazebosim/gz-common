@@ -182,32 +182,32 @@ TEST(TimeTest, String)
 /////////////////////////////////////////////////
 TEST(TimeTest, Double)
 {
-  common::Time time(1, 9e8);
+  common::Time time(1, 900000000);
   EXPECT_DOUBLE_EQ(1.9, time.Double());
 
-  time.Set(1, -9e8);
+  time.Set(1, -900000000);
   EXPECT_DOUBLE_EQ(0.10000000000000001, time.Double());
 
-  time.Set(-1, 9e8);
+  time.Set(-1, 900000000);
   EXPECT_DOUBLE_EQ(-0.10000000000000001, time.Double());
 
-  time.Set(-1, -9e8);
+  time.Set(-1, -900000000);
   EXPECT_DOUBLE_EQ(-1.8999999999999999, time.Double());
 }
 
 /////////////////////////////////////////////////
 TEST(TimeTest, Float)
 {
-  common::Time time(1, 9e8);
+  common::Time time(1, 900000000);
   EXPECT_FLOAT_EQ(1.9f, time.Float());
 
-  time.Set(1, -9e8);
+  time.Set(1, -900000000);
   EXPECT_FLOAT_EQ(0.10000000000000001f, time.Float());
 
-  time.Set(-1, 9e8);
+  time.Set(-1, 900000000);
   EXPECT_FLOAT_EQ(-0.10000000000000001f, time.Float());
 
-  time.Set(-1, -9e8);
+  time.Set(-1, -900000000);
   EXPECT_FLOAT_EQ(-1.8999999999999999f, time.Float());
 }
 

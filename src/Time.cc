@@ -110,8 +110,9 @@ const Time &Time::SystemTime()
   auto duration = IGN_SYSTEM_TIME().time_since_epoch();
   wallTime.sec = std::chrono::duration_cast<std::chrono::seconds>(
       duration).count();
-  wallTime.nsec = std::chrono::duration_cast<std::chrono::nanoseconds>(
-      duration).count() - wallTime.sec * IGN_SEC_TO_NANO;
+  wallTime.nsec = static_cast<uint32_t>(
+    std::chrono::duration_cast<std::chrono::nanoseconds>(
+      duration).count() - wallTime.sec * IGN_SEC_TO_NANO);
 
   return wallTime;
 }
