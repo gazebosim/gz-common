@@ -186,13 +186,13 @@ TEST(TimeTest, Double)
   EXPECT_DOUBLE_EQ(1.9, time.Double());
 
   time.Set(1, -900000000);
-  EXPECT_DOUBLE_EQ(0.10000000000000001, time.Double());
+  EXPECT_DOUBLE_EQ(0.100000000, time.Double());
 
   time.Set(-1, 900000000);
-  EXPECT_DOUBLE_EQ(-0.10000000000000001, time.Double());
+  EXPECT_DOUBLE_EQ(-0.100000000, time.Double());
 
   time.Set(-1, -900000000);
-  EXPECT_DOUBLE_EQ(-1.8999999999999999, time.Double());
+  EXPECT_DOUBLE_EQ(-1.900000000, time.Double());
 }
 
 /////////////////////////////////////////////////
@@ -202,13 +202,13 @@ TEST(TimeTest, Float)
   EXPECT_FLOAT_EQ(1.9f, time.Float());
 
   time.Set(1, -900000000);
-  EXPECT_FLOAT_EQ(0.10000000000000001f, time.Float());
+  EXPECT_FLOAT_EQ(0.100000000f, time.Float());
 
   time.Set(-1, 900000000);
-  EXPECT_FLOAT_EQ(-0.10000000000000001f, time.Float());
+  EXPECT_FLOAT_EQ(-0.100000000f, time.Float());
 
   time.Set(-1, -900000000);
-  EXPECT_FLOAT_EQ(-1.8999999999999999f, time.Float());
+  EXPECT_FLOAT_EQ(-1.900000000f, time.Float());
 }
 
 /////////////////////////////////////////////////
