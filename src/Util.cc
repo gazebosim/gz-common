@@ -31,6 +31,7 @@
 #include <cstring>
 #include <cctype>
 
+#include <ignition/common/av/Util.hh>
 #include <ignition/common/config.hh>
 #include <ignition/common/SystemPaths.hh>
 #include <ignition/common/Util.hh>
