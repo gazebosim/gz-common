@@ -21,7 +21,6 @@
 #include <vector>
 
 #include <ignition/common/Time.hh>
-#include <ignition/common/Types.hh>
 #include <ignition/math/Helpers.hh>
 
 namespace ignition
