@@ -25,8 +25,8 @@
 #include <mutex>
 
 #include <ignition/common/config.hh>
-#include <ignition/common/Types.hh>
 #include <ignition/common/Export.hh>
+#include <ignition/common/events/Types.hh>
 
 namespace ignition
 {
