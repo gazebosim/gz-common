@@ -20,7 +20,7 @@
 #include <chrono>
 #include <string>
 #include <memory>
-   
+
 #include <ignition/common/Export.hh>
 #include <ignition/common/SuppressWarning.hh>
 
