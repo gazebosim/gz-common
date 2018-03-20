@@ -23,7 +23,6 @@
 #include <memory>
 #include <ignition/common/Export.hh>
 #include <ignition/common/SuppressWarning.hh>
-#include <ignition/common/Types.hh>
 #include <ignition/common/Util.hh>
 
 namespace ignition
