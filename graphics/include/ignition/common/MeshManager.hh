@@ -30,8 +30,8 @@
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Pose3.hh>
 
+#include <ignition/common/graphics/Types.hh>
 #include <ignition/common/SingletonT.hh>
-#include <ignition/common/Types.hh>
 #include <ignition/common/Export.hh>
 #include <ignition/common/SuppressWarning.hh>
 

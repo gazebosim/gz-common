@@ -108,13 +108,14 @@ message(STATUS "-------------------------------------------\n")
 # Temporary cmake hacks to facilitate moving source code
 #============================================================================
 if(NOT MSVC)
-  set(component_list "av" "events")
+  set(component_list "av" "events" "graphics")
   foreach (component_name ${component_list})
     include_directories(${PROJECT_SOURCE_DIR}/${component_name}/include)
     set(dir_list "." "detail" "${component_name}")
     foreach(dir ${dir_list})
       file(GLOB header_files
         "${component_name}/include/ignition/common/${dir}/*.hh")
+      list(SORT header_files)
       install(
         FILES ${header_files}
         DESTINATION "${IGN_INCLUDE_INSTALL_DIR_FULL}/ignition/${IGN_DESIGNATION}/${dir}"

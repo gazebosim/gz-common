@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Open Source Robotics Foundation
+ * Copyright (C) 2018 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_TYPES_HH_
-#define IGNITION_COMMON_TYPES_HH_
+
+#ifndef IGNITION_COMMON_GRAPHICS_TYPES_HH_
+#define IGNITION_COMMON_GRAPHICS_TYPES_HH_
 
 #include <memory>
 
-/// \brief Forward declarations for the common classes
+// This header contains forward declarations for some graphics types
 namespace ignition
 {
   namespace common
