@@ -20,9 +20,6 @@
 #include <memory>
 #include <vector>
 
-#include <ignition/common/Time.hh>
-#include <ignition/math/Helpers.hh>
-
 namespace ignition
 {
   namespace common
