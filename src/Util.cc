@@ -285,9 +285,9 @@ bool Sha1::Digest(void const *_buffer, std::size_t _byteCount,
 }
 
 /////////////////////////////////////////////////
+#ifndef _WIN32
 void ignition::common::load()
 {
-#ifndef _WIN32
   static bool first = true;
   if (first)
   {
@@ -302,8 +302,8 @@ void ignition::common::load()
     // Set the log callback function.
     av_log_set_callback(logCallback);
   }
-#endif
 }
+#endif
 
 /////////////////////////////////////////////////
 std::string ignition::common::systemTimeISO()
