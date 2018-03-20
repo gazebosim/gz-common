@@ -31,7 +31,6 @@
 #include <cstring>
 #include <cctype>
 
-#include <ignition/common/av/Util.hh>
 #include <ignition/common/config.hh>
 #include <ignition/common/SystemPaths.hh>
 #include <ignition/common/Util.hh>
@@ -42,6 +41,7 @@
 #include <dirent.h>
 #include <limits.h>
 #include <climits>
+#include <ignition/common/av/Util.hh>
 #include <ignition/common/ffmpeg_inc.hh>
 #else
 #include <io.h>
