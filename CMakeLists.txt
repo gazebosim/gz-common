@@ -113,6 +113,18 @@ if(NOT MSVC)
 else()
   set(component_list "events" "graphics")
 endif()
+set(excluded_sources)
+if(WIN32)
+  set(excluded_sources
+    AudioDecoder.cc
+    ffmpeg_inc.cc
+    GTSMeshUtils.cc
+    Image.cc
+    ImageHeightmap.cc
+    MeshCSG.cc
+    Video.cc
+    VideoEncoder.cc)
+endif()
 foreach (component_name ${component_list})
   include_directories(${PROJECT_SOURCE_DIR}/${component_name}/include)
   set(dir_list "." "detail" "${component_name}")
@@ -132,7 +144,12 @@ foreach (component_name ${component_list})
     list(REMOVE_ITEM component_sources ${component_test_file})
   endforeach()
   foreach (component_file ${component_sources})
-    list(APPEND extra_sources ${component_file})
+    get_filename_component(relative_file ${component_file} NAME)
+    if(NOT ${relative_file} IN_LIST excluded_sources)
+      list(APPEND extra_sources ${component_file})
+    else()
+      message(STATUS "skipping ${component_file}")
+    endif()
   endforeach()
 endforeach()
 
