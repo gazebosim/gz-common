@@ -47,7 +47,7 @@ then
 else
   CHECK_DIRS="./src ./include ./test/integration ./test/regression ./test/performance"\
 " ./av/include ./events/include ./graphics/include "\
-" ./events/src "
+" ./av/src     ./events/src     ./graphics/src "
   EXCLUDE_DIRS="./src/tinyxml2"
   if [ $CPPCHECK_LT_161 -eq 1 ]; then
     # cppcheck is older than 1.57, so don't check header files (issue #907)
