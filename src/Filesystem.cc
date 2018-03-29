@@ -42,7 +42,6 @@
 #include <dirent.h>
 #include <limits.h>
 #include <climits>
-#include <ignition/common/ffmpeg_inc.hh>
 #else
 #include <io.h>
 #include "win_dirent.h"
