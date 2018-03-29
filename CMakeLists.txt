@@ -46,7 +46,7 @@ message(STATUS "\n\n-- ====== Finding Dependencies ======")
 
 #--------------------------------------
 # Find ignition-math
-set(IGN_MATH_VER 4)
+set(IGN_MATH_VER 5)
 ign_find_package(ignition-math${IGN_MATH_VER} REQUIRED_BY graphics events)
 
 #--------------------------------------
