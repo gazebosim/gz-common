@@ -59,7 +59,7 @@ else()
   # Otherwise, add its source directory to our target's PRIVATE include
   # directories. We do not want this to be visible to consumers of
   # ignition-common.
-  target_include_directories(${PROJECT_LIBRARY_TARGET_NAME}
+  target_include_directories(${graphics_target}
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tinyxml2)
 
   if(TARGET UNIT_ColladaExporter_TEST)
@@ -75,4 +75,12 @@ else()
 
   endif()
 
+endif()
+
+# define of tinxml2 major version >= 6
+# https://bitbucket.org/ignitionrobotics/ign-common/issues/28
+if (NOT TINYXML2_VERSION VERSION_LESS "6.0.0")
+  message(STATUS "TINYXML2_VERSION ${TINYXML2_VERSION} >= 6.0.0")
+  target_compile_definitions(${graphics_target}
+    PRIVATE "TINYXML2_MAJOR_VERSION_GE_6")
 endif()
