@@ -68,8 +68,8 @@ void logCallback(void *_ptr, int _level, const char *_fmt, va_list _args)
 /////////////////////////////////////////////////
 void ignition::common::load()
 {
-  static bool first = true;
 #ifndef _WIN32
+  static bool first = true;
   if (first)
   {
     first = false;
