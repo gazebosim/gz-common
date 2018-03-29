@@ -8,7 +8,7 @@ project(ignition-common2 VERSION 2.0.0)
 #============================================================================
 # Find ignition-cmake
 #============================================================================
-find_package(ignition-cmake0 REQUIRED)
+find_package(ignition-cmake1 REQUIRED)
 
 #============================================================================
 # Configure the project
@@ -47,12 +47,14 @@ message(STATUS "\n\n-- ====== Finding Dependencies ======")
 #--------------------------------------
 # Find ignition-math
 set(IGN_MATH_VER 4)
-ign_find_package(ignition-math${IGN_MATH_VER} REQUIRED)
+ign_find_package(ignition-math${IGN_MATH_VER} REQUIRED_BY graphics events)
 
 #--------------------------------------
 # Find Tinyxml2
 if(USE_EXTERNAL_TINYXML2)
-  ign_find_package(TINYXML2 REQUIRED PRIVATE PRETTY tinyxml2)
+  ign_find_package(TINYXML2 PRETTY tinyxml2
+    REQUIRED_BY graphics
+    PRIVATE_FOR graphics)
 else()
   message(STATUS "Skipping search for tinyxml2 and using an internal version\n")
 endif()
@@ -68,7 +70,9 @@ if(NOT MSVC)
 
   #--------------------------------------
   # Find Freeimage
-  ign_find_package(FreeImage VERSION 3.9 REQUIRED PRIVATE PKGCONFIG_IGNORE)
+  ign_find_package(FreeImage VERSION 3.9
+    REQUIRED_BY graphics
+    PRIVATE_FOR graphics)
 
   #------------------------------------
   # Find uuid
@@ -77,27 +81,34 @@ if(NOT MSVC)
   #------------------------------------
   # Find GNU Triangulation Surface Library
   ign_find_package(
-    GTS REQUIRED PRETTY gts PURPOSE "GNU Triangulation Surface library")
+    GTS PRETTY gts PURPOSE "GNU Triangulation Surface library"
+    REQUIRED_BY graphics
+    PRIVATE_FOR graphics)
 
   #------------------------------------
   # Find libswscale
-  ign_find_package(SWSCALE REQUIRED PRETTY libswscale)
+  ign_find_package(SWSCALE REQUIRED_BY av PRETTY libswscale)
 
   #------------------------------------
   # Find avdevice
-  ign_find_package(AVDEVICE VERSION 56.4.100 REQUIRED PRETTY libavdevice)
+  ign_find_package(AVDEVICE VERSION 56.4.100 REQUIRED_BY av PRETTY libavdevice)
 
   #------------------------------------
   # Find avformat
-  ign_find_package(AVFORMAT REQUIRED PRETTY libavformat)
+  ign_find_package(AVFORMAT REQUIRED_BY av PRETTY libavformat)
 
   #------------------------------------
   # Find avcodec
-  ign_find_package(AVCODEC REQUIRED PRETTY libavcodec)
+  ign_find_package(AVCODEC REQUIRED_BY av PRETTY libavcodec)
 
   #------------------------------------
   # Find avutil
-  ign_find_package(AVUTIL REQUIRED PRETTY libavutil)
+  ign_find_package(AVUTIL REQUIRED_BY av PRETTY libavutil)
+
+else()
+
+  # We always skip the av component if we are compiling on Windows
+  set(SKIP_av true)
 
 endif()
 
@@ -105,58 +116,10 @@ message(STATUS "-------------------------------------------\n")
 
 
 #============================================================================
-# Temporary cmake hacks to facilitate moving source code
-#============================================================================
-set(extra_sources)
-if(NOT MSVC)
-  set(component_list "av" "events" "graphics")
-else()
-  set(component_list "events" "graphics")
-endif()
-set(excluded_sources)
-if(WIN32)
-  set(excluded_sources
-    AudioDecoder.cc
-    ffmpeg_inc.cc
-    GTSMeshUtils.cc
-    Image.cc
-    ImageHeightmap.cc
-    MeshCSG.cc
-    Video.cc
-    VideoEncoder.cc)
-endif()
-foreach (component_name ${component_list})
-  include_directories(${PROJECT_SOURCE_DIR}/${component_name}/include)
-  set(dir_list "." "detail" "${component_name}")
-  foreach(dir ${dir_list})
-    file(GLOB header_files
-      "${component_name}/include/ignition/common/${dir}/*.hh")
-    list(SORT header_files)
-    install(
-      FILES ${header_files}
-      DESTINATION "${IGN_INCLUDE_INSTALL_DIR_FULL}/ignition/${IGN_DESIGNATION}/${dir}"
-      COMPONENT headers)
-  endforeach()
-  # source files
-  file(GLOB component_sources "${component_name}/src/*.cc")
-  file(GLOB component_test_sources "${component_name}/src/*_TEST.cc")
-  foreach (component_test_file ${component_test_sources})
-    list(REMOVE_ITEM component_sources ${component_test_file})
-  endforeach()
-  foreach (component_file ${component_sources})
-    get_filename_component(relative_file ${component_file} NAME)
-    if(NOT ${relative_file} IN_LIST excluded_sources)
-      list(APPEND extra_sources ${component_file})
-    else()
-      message(STATUS "skipping ${component_file}")
-    endif()
-  endforeach()
-endforeach()
-
-#============================================================================
 # Configure the build
 #============================================================================
-ign_configure_build(QUIT_IF_BUILD_ERRORS)
+ign_configure_build(QUIT_IF_BUILD_ERRORS
+  COMPONENTS av events graphics)
 
 
 #============================================================================
