@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <cmath>
 #include <limits>
 #include "ignition/common/EnumIface.hh"
 #include "ignition/common/MaterialDensity.hh"
