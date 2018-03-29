@@ -22,6 +22,11 @@ if(NOT WIN32)
 
 endif()
 
+# don't build MovingWindowFilter_TEST if we don't have ignition-math
+if(NOT ignition-math${IGN_MATH_VER}_FOUND)
+  list(REMOVE_ITEM gtest_sources MovingWindowFilter_TEST.cc)
+endif()
+
 # Build the unit tests
 ign_build_tests(
   TYPE UNIT
@@ -33,6 +38,11 @@ ign_build_tests(
     ${PROJECT_SOURCE_DIR}
     # Used to make test_config.h visible to the unit tests
     ${PROJECT_BINARY_DIR})
+
+if(TARGET UNIT_MovingWindowFilter_TEST)
+  target_include_directories(UNIT_MovingWindowFilter_TEST PRIVATE
+    ${ignition-math${IGN_MATH_VER}_INCLUDE_DIRS})
+endif()
 
 if(TARGET UNIT_PluginLoader_TEST)
   target_compile_definitions(UNIT_PluginLoader_TEST PRIVATE
