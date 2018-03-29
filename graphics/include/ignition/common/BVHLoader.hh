@@ -21,7 +21,7 @@
 #include <string>
 
 #include <ignition/math/Pose3.hh>
-#include <ignition/common/Export.hh>
+#include <ignition/common/graphics/Export.hh>
 
 namespace ignition
 {
@@ -31,7 +31,7 @@ namespace ignition
 
     /// \class BVHLoader BVHLoader.hh ignition/common/BVHLoader.hh
     /// \brief Handles loading BVH animation files
-    class IGNITION_COMMON_VISIBLE BVHLoader
+    class IGNITION_COMMON_GRAPHICS_VISIBLE BVHLoader
     {
       /// \brief Constructor
       public: BVHLoader();

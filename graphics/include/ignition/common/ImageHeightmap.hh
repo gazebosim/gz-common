@@ -21,6 +21,7 @@
 #include <vector>
 #include <ignition/math/Vector3.hh>
 
+#include <ignition/common/graphics/Export.hh>
 #include <ignition/common/HeightmapData.hh>
 #include <ignition/common/Image.hh>
 
@@ -29,7 +30,7 @@ namespace ignition
   namespace common
   {
     /// \brief Encapsulates an image that will be interpreted as a heightmap.
-    class IGNITION_COMMON_VISIBLE ImageHeightmap
+    class IGNITION_COMMON_GRAPHICS_VISIBLE ImageHeightmap
       : public ignition::common::HeightmapData
     {
       /// \brief Constructor

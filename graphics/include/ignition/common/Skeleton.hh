@@ -24,7 +24,7 @@
 
 #include <ignition/math/Matrix4.hh>
 #include <ignition/common/SkeletonNode.hh>
-#include <ignition/common/Export.hh>
+#include <ignition/common/graphics/Export.hh>
 
 namespace ignition
 {
@@ -36,7 +36,7 @@ namespace ignition
 
     /// \class Skeleton Skeleton.hh ignition/common/Skeleton.hh
     /// \brief A skeleton, usually used for animation purposes.
-    class IGNITION_COMMON_VISIBLE Skeleton
+    class IGNITION_COMMON_GRAPHICS_VISIBLE Skeleton
     {
       /// \brief Constructor
       public: Skeleton();

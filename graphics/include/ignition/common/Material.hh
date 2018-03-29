@@ -22,6 +22,7 @@
 #include <string>
 
 #include <ignition/math/Color.hh>
+#include <ignition/common/graphics/Export.hh>
 #include <ignition/common/EnumIface.hh>
 #include <ignition/common/SuppressWarning.hh>
 
@@ -33,7 +34,7 @@ namespace ignition
     class MaterialPrivate;
 
     /// \brief Encapsulates description of a material
-    class IGNITION_COMMON_VISIBLE Material
+    class IGNITION_COMMON_GRAPHICS_VISIBLE Material
     {
       /// \def Shade modes
       /// \brief Enumeration of shade mode types

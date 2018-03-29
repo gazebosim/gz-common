@@ -21,7 +21,7 @@
 #include <string>
 
 #include <ignition/common/MeshExporter.hh>
-#include <ignition/common/Export.hh>
+#include <ignition/common/graphics/Export.hh>
 #include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
@@ -31,7 +31,7 @@ namespace ignition
     class ColladaExporterPrivate;
 
     /// \brief Class used to export Collada mesh files
-    class IGNITION_COMMON_VISIBLE ColladaExporter : public MeshExporter
+    class IGNITION_COMMON_GRAPHICS_VISIBLE ColladaExporter : public MeshExporter
     {
       /// \brief Constructor
       public: ColladaExporter();

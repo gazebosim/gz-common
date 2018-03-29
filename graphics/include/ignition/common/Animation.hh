@@ -23,7 +23,7 @@
 #include <ignition/math/Spline.hh>
 #include <ignition/math/RotationSpline.hh>
 
-#include <ignition/common/Export.hh>
+#include <ignition/common/graphics/Export.hh>
 
 namespace ignition
 {
@@ -36,7 +36,7 @@ namespace ignition
     /// \class Animation Animation.hh ignition/common/Animation.hh
     /// \brief Manages an animation, which is a collection of keyframes and
     /// the ability to interpolate between the keyframes
-    class IGNITION_COMMON_VISIBLE Animation
+    class IGNITION_COMMON_GRAPHICS_VISIBLE Animation
     {
       /// \brief Constructor
       /// \param[in] _name Name of the animation, should be unique
@@ -121,7 +121,7 @@ namespace ignition
     };
 
     /// \brief A pose animation.
-    class IGNITION_COMMON_VISIBLE PoseAnimation : public Animation
+    class IGNITION_COMMON_GRAPHICS_VISIBLE PoseAnimation : public Animation
     {
       /// \brief Constructor
       /// \param[in] _name String name of the animation. This should be unique.
@@ -159,7 +159,7 @@ namespace ignition
     };
 
     /// \brief A numeric animation.
-    class IGNITION_COMMON_VISIBLE NumericAnimation : public Animation
+    class IGNITION_COMMON_GRAPHICS_VISIBLE NumericAnimation : public Animation
     {
       /// \brief Constructor
       /// \param[in] _name String name of the animation. This should be unique.

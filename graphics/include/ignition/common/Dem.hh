@@ -21,7 +21,7 @@
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Angle.hh>
 
-#include <ignition/common/Export.hh>
+#include <ignition/common/graphics/Export.hh>
 #include <ignition/common/SuppressWarning.hh>
 
 #ifdef HAVE_GDAL
@@ -38,7 +38,7 @@ namespace ignition
 
     /// \class DEM DEM.hh common/common.hh
     /// \brief Encapsulates a DEM (Digital Elevation Model) file.
-    class IGNITION_COMMON_VISIBLE Dem : public HeightmapData
+    class IGNITION_COMMON_GRAPHICS_VISIBLE Dem : public HeightmapData
     {
       /// \brief Constructor.
       public: Dem();

@@ -24,6 +24,7 @@
 #include <ignition/math/Vector2.hh>
 #include <ignition/math/Matrix3.hh>
 
+#include <ignition/common/graphics/Export.hh>
 #include <ignition/common/Console.hh>
 #include <ignition/common/SuppressWarning.hh>
 
@@ -35,7 +36,7 @@ namespace ignition
     class SVGLoaderPrivate;
 
     /// \brief SVG command data structure
-    class IGNITION_COMMON_VISIBLE SVGCommand
+    class IGNITION_COMMON_GRAPHICS_VISIBLE SVGCommand
     {
       /// \brief Constructor
       public: SVGCommand() : cmd(' ') {}
@@ -59,7 +60,7 @@ namespace ignition
     };
 
     /// \brief An SVG path element data structure
-    struct IGNITION_COMMON_VISIBLE SVGPath
+    struct IGNITION_COMMON_GRAPHICS_VISIBLE SVGPath
     {
 #ifdef _WIN32
 // Disable warning C4251
@@ -87,7 +88,7 @@ namespace ignition
     };
 
     /// \brief A loader for SVG files
-    class IGNITION_COMMON_VISIBLE SVGLoader
+    class IGNITION_COMMON_GRAPHICS_VISIBLE SVGLoader
     {
       /// \brief Constructor
       /// \param[in] _samples The number of points for cubic spline segments
