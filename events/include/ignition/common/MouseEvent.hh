@@ -20,7 +20,7 @@
 #include <memory>
 #include <ignition/math/Vector2.hh>
 
-#include <ignition/common/Export.hh>
+#include <ignition/common/events/Export.hh>
 #include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
@@ -32,7 +32,7 @@ namespace ignition
 
     /// \class MouseEvent MouseEvent.hh ignition/common/MouseEvent.hh
     /// \brief Generic description of a mouse event.
-    class IGNITION_COMMON_VISIBLE MouseEvent
+    class IGNITION_COMMON_EVENTS_VISIBLE MouseEvent
     {
       /// \brief Standard mouse buttons enumeration.
       public: enum MouseButton
