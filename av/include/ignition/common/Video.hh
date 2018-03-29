@@ -20,7 +20,7 @@
 #include <string>
 #include <memory>
 
-#include <ignition/common/Export.hh>
+#include <ignition/common/av/Export.hh>
 #include <ignition/common/SuppressWarning.hh>
 
 struct AVFormatContext;
@@ -37,7 +37,7 @@ namespace ignition
     class VideoPrivate;
 
     /// \brief Handle video encoding and decoding using libavcodec
-    class IGNITION_COMMON_VISIBLE Video
+    class IGNITION_COMMON_AV_VISIBLE Video
     {
       /// \brief Constructor
       public: Video();

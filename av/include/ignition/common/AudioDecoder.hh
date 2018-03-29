@@ -21,7 +21,7 @@
 #include <string>
 #include <memory>
 
-#include <ignition/common/Export.hh>
+#include <ignition/common/av/Export.hh>
 #include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
@@ -33,7 +33,7 @@ namespace ignition
 
     /// \class AudioDecoder AudioDecoder.hh ignition/common/common.hh
     /// \brief An audio decoder based on FFMPEG.
-    class IGNITION_COMMON_VISIBLE AudioDecoder
+    class IGNITION_COMMON_AV_VISIBLE AudioDecoder
     {
       /// \brief Constructor.
       public: AudioDecoder();
