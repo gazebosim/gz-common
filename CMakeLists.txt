@@ -46,8 +46,8 @@ message(STATUS "\n\n-- ====== Finding Dependencies ======")
 
 #--------------------------------------
 # Find ignition-math
+ign_find_package(ignition-math5 REQUIRED_BY graphics events)
 set(IGN_MATH_VER 5)
-ign_find_package(ignition-math${IGN_MATH_VER} REQUIRED_BY graphics events)
 
 #--------------------------------------
 # Find Tinyxml2
