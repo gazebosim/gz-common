@@ -153,10 +153,11 @@ bool URIPath::Valid() const
 /////////////////////////////////////////////////
 bool URIPath::Valid(const std::string &_str)
 {
-  size_t slashCount = std::count(_str.begin(), _str.end(), '/');
-  if ((_str.empty()) ||
-      (slashCount == _str.size()) ||
-      (_str.find_first_of(" ?=&") != std::string::npos))
+  auto str = trimmed(_str);
+  size_t slashCount = std::count(str.begin(), str.end(), '/');
+  if ((str.empty()) ||
+      (slashCount == str.size()) ||
+      (str.find_first_of("?=&") != std::string::npos))
   {
     return false;
   }
@@ -258,17 +259,18 @@ bool URIQuery::Valid() const
 /////////////////////////////////////////////////
 bool URIQuery::Valid(const std::string &_str)
 {
-  if (_str.empty())
+  auto str = trimmed(_str);
+  if (str.empty())
     return true;
 
-  if ((std::count(_str.begin(), _str.end(), '?') != 1u) ||
-      (_str.find("?") != 0u) ||
-      (_str.find_first_of(" ") != std::string::npos))
+  if ((std::count(str.begin(), str.end(), '?') != 1u) ||
+      (str.find("?") != 0u) ||
+      (str.find_first_of(" ") != std::string::npos))
   {
     return false;
   }
 
-  for (auto const &query : common::split(_str.substr(1), "&"))
+  for (auto const &query : common::split(str.substr(1), "&"))
   {
     if (common::split(query, "=").size() != 2u)
       return false;
@@ -402,9 +404,10 @@ bool URI::Valid() const
 /////////////////////////////////////////////////
 bool URI::Valid(const std::string &_str)
 {
+  auto str = trimmed(_str);
   // Validate scheme.
-  auto schemeDelimPos = _str.find(kSchemeDelim);
-  if ((_str.empty()) ||
+  auto schemeDelimPos = str.find(kSchemeDelim);
+  if ((str.empty()) ||
       (schemeDelimPos == std::string::npos) ||
       (schemeDelimPos == 0u))
   {
@@ -412,17 +415,17 @@ bool URI::Valid(const std::string &_str)
   }
 
   auto from = schemeDelimPos + kSchemeDelim.size();
-  std::string localPath = _str.substr(from);
+  std::string localPath = str.substr(from);
   std::string localQuery;
 
-  auto to = _str.find("?", from);
+  auto to = str.find("?", from);
   if (to != std::string::npos)
   {
     // Update path.
-    localPath = _str.substr(from, to - from);
+    localPath = str.substr(from, to - from);
 
     // Update the query.
-    localQuery = _str.substr(to);
+    localQuery = str.substr(to);
   }
 
   // Validate the path and query.
