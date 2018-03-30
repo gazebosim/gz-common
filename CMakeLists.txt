@@ -65,14 +65,20 @@ ign_find_package(
   DL REQUIRED PRIVATE PRETTY libdl PURPOSE "Required for plugins")
 
 #--------------------------------------
+# Find dependencies that we ignore for Visual Studio
+if(NOT MSVC)
+
+  #------------------------------------
+  # Find uuid
+  ign_find_package(UUID REQUIRED PRETTY uuid)
+
+endif()
+
+#------------------------------------
 # Find Freeimage
 ign_find_package(FreeImage VERSION 3.9
   REQUIRED_BY graphics
   PRIVATE_FOR graphics)
-
-#------------------------------------
-# Find uuid
-ign_find_package(UUID REQUIRED PRETTY uuid)
 
 #------------------------------------
 # Find GNU Triangulation Surface Library
