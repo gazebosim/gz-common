@@ -485,6 +485,7 @@ namespace ignition
     void changeFromUnixPath(std::string &_path)
     {
       // cppcheck-suppress knownConditionTrueFalse
+      // cppcheck-suppress unmatchedSuppression
       if ('/' == preferred_separator)
         return;
 
@@ -503,6 +504,7 @@ namespace ignition
     void changeToUnixPath(std::string &_path)
     {
       // cppcheck-suppress knownConditionTrueFalse
+      // cppcheck-suppress unmatchedSuppression
       if ('/' == preferred_separator)
         return;
 

@@ -72,7 +72,9 @@ if [ $CPPCHECK_LT_161 -eq 0 ]; then
   CPPCHECK_BASE="$CPPCHECK_BASE --language=c++"
 fi
 CPPCHECK_INCLUDES="-I . -I ./include -I $builddir -I test"
-CPPCHECK_RULES="-DIGNITION_COMMON_VISIBLE=1"
+CPPCHECK_RULES="-UPATH_MAX -UFREEIMAGE_COLORORDER "\
+" -US_IROTH -US_IXOTH -US_IRGRP -U_XOPEN_PATH_MAX "\
+"--max-configs=50"
 CPPCHECK_CMD1A="-j 4 --enable=style,performance,portability,information"
 CPPCHECK_CMD1B="$CPPCHECK_RULES $CPPCHECK_FILES"
 CPPCHECK_CMD1="$CPPCHECK_CMD1A $CPPCHECK_CMD1B"
@@ -85,10 +87,10 @@ CPPCHECK_CMD3="-j 4 --enable=missingInclude $CPPCHECK_FILES $CPPCHECK_INCLUDES"
 
 if [ $xmlout -eq 1 ]; then
   # Performance, style, portability, and information
-  ($CPPCHECK_BASE --xml $CPPCHECK_CMD1) 2> $xmldir/cppcheck.xml
+  ($CPPCHECK_BASE --xml --xml-version=2 $CPPCHECK_CMD1) 2> $xmldir/cppcheck.xml
 
   # Check the configuration
-  ($CPPCHECK_BASE --xml $CPPCHECK_CMD3) 2> $xmldir/cppcheck-configuration.xml
+  ($CPPCHECK_BASE --xml --xml-version=2 $CPPCHECK_CMD3) 2> $xmldir/cppcheck-configuration.xml
 elif [ $QUICK_CHECK -eq 1 ]; then
   for f in $CHECK_FILES; do
     prefix=`basename $f | sed -e 's@\..*$@@'`

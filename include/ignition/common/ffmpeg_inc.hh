@@ -53,18 +53,15 @@ namespace ignition
   namespace common
   {
     /// \brief Helper function to avoid deprecation warnings.
-    // cppcheck-suppress constStatement
     IGNITION_COMMON_VISIBLE
     AVFrame *AVFrameAlloc(void);
 
     /// \brief Helper function to avoid deprecation warnings.
-    // cppcheck-suppress constStatement
     IGNITION_COMMON_VISIBLE
     void AVFrameUnref(AVFrame *_frame);
 
     /// \brief Helper function to avoid deprecation warnings.
     /// \param[in] _packet AVPacket structure that stores compressed data
-    // cppcheck-suppress constStatement
     IGNITION_COMMON_VISIBLE
     void AVPacketUnref(AVPacket *_packet);
 
@@ -77,7 +74,6 @@ namespace ignition
     /// \param[in] _packet AVPacket structure that stores compressed data.
     /// \return On error a negative value is returned, otherwise
     /// the number of bytes used or zero if no frame could be decompressed.
-    // cppcheck-suppress constStatement
     IGNITION_COMMON_VISIBLE
     int AVCodecDecode(AVCodecContext *_codecCtx,
         AVFrame *_frame, int *_gotFrame, AVPacket *_packet);
