@@ -53,6 +53,15 @@ TEST(URITEST, URIPath)
 }
 
 /////////////////////////////////////////////////
+TEST(URITEST, URIPathCoverageExtra)
+{
+  // getting full destructor coverage
+  URIPath *p = new URIPath;
+  EXPECT_TRUE(p != NULL);
+  delete p;
+}
+
+/////////////////////////////////////////////////
 TEST(URITEST, URIPathString)
 {
   URIPath path;
@@ -122,9 +131,21 @@ TEST(URITEST, URIQuery)
 }
 
 /////////////////////////////////////////////////
+TEST(URITEST, URIQueryCoverageExtra)
+{
+  // getting full destructor coverage
+  URIQuery *p = new URIQuery;
+  EXPECT_TRUE(p != NULL);
+  delete p;
+}
+
+/////////////////////////////////////////////////
 TEST(URITEST, URIQueryString)
 {
   URIQuery query;
+  EXPECT_TRUE(query.Valid());
+
+  // test static Valid function
   EXPECT_FALSE(URIQuery::Valid("??"));
   EXPECT_FALSE(URIQuery::Valid("invalid?"));
   EXPECT_FALSE(URIQuery::Valid("?invalid?"));
@@ -145,10 +166,16 @@ TEST(URITEST, URIQueryString)
   EXPECT_FALSE(query.Parse("?key"));
   EXPECT_FALSE(query.Parse("?key="));
   EXPECT_FALSE(query.Parse("?=value"));
+  // these invalid queries failed to parse and
+  // didn't update the query.
+  // it should still be valid
+  EXPECT_TRUE(query.Valid());
 
   EXPECT_TRUE(query.Parse(""));
   EXPECT_TRUE(query.Parse("?key=value"));
   EXPECT_TRUE(query.Parse("?key=value&key2=value2"));
+  // it should still be valid
+  EXPECT_TRUE(query.Valid());
 
   EXPECT_NO_THROW(URIQuery("??"));
   EXPECT_NO_THROW(URIQuery("invalid?"));
@@ -171,6 +198,7 @@ TEST(URITEST, Scheme)
 
   uri.SetScheme("data");
   EXPECT_EQ(uri.Str(), "data://");
+  EXPECT_EQ("data", uri.Scheme());
 }
 
 /////////////////////////////////////////////////
