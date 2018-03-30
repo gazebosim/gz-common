@@ -65,52 +65,42 @@ ign_find_package(
   DL REQUIRED PRIVATE PRETTY libdl PURPOSE "Required for plugins")
 
 #--------------------------------------
-# Find dependencies that we ignore for Visual Studio
-if(NOT MSVC)
+# Find Freeimage
+ign_find_package(FreeImage VERSION 3.9
+  REQUIRED_BY graphics
+  PRIVATE_FOR graphics)
 
-  #--------------------------------------
-  # Find Freeimage
-  ign_find_package(FreeImage VERSION 3.9
-    REQUIRED_BY graphics
-    PRIVATE_FOR graphics)
+#------------------------------------
+# Find uuid
+ign_find_package(UUID REQUIRED PRETTY uuid)
 
-  #------------------------------------
-  # Find uuid
-  ign_find_package(UUID REQUIRED PRETTY uuid)
+#------------------------------------
+# Find GNU Triangulation Surface Library
+ign_find_package(
+  GTS PRETTY gts PURPOSE "GNU Triangulation Surface library"
+  REQUIRED_BY graphics
+  PRIVATE_FOR graphics)
 
-  #------------------------------------
-  # Find GNU Triangulation Surface Library
-  ign_find_package(
-    GTS PRETTY gts PURPOSE "GNU Triangulation Surface library"
-    REQUIRED_BY graphics
-    PRIVATE_FOR graphics)
+#------------------------------------
+# Find libswscale
+ign_find_package(SWSCALE REQUIRED_BY av PRETTY libswscale)
 
-  #------------------------------------
-  # Find libswscale
-  ign_find_package(SWSCALE REQUIRED_BY av PRETTY libswscale)
+#------------------------------------
+# Find avdevice
+ign_find_package(AVDEVICE VERSION 56.4.100 REQUIRED_BY av PRETTY libavdevice)
 
-  #------------------------------------
-  # Find avdevice
-  ign_find_package(AVDEVICE VERSION 56.4.100 REQUIRED_BY av PRETTY libavdevice)
+#------------------------------------
+# Find avformat
+ign_find_package(AVFORMAT REQUIRED_BY av PRETTY libavformat)
 
-  #------------------------------------
-  # Find avformat
-  ign_find_package(AVFORMAT REQUIRED_BY av PRETTY libavformat)
+#------------------------------------
+# Find avcodec
+ign_find_package(AVCODEC REQUIRED_BY av PRETTY libavcodec)
 
-  #------------------------------------
-  # Find avcodec
-  ign_find_package(AVCODEC REQUIRED_BY av PRETTY libavcodec)
+#------------------------------------
+# Find avutil
+ign_find_package(AVUTIL REQUIRED_BY av PRETTY libavutil)
 
-  #------------------------------------
-  # Find avutil
-  ign_find_package(AVUTIL REQUIRED_BY av PRETTY libavutil)
-
-else()
-
-  # We always skip the av component if we are compiling on Windows
-  set(SKIP_av true)
-
-endif()
 
 message(STATUS "-------------------------------------------\n")
 
