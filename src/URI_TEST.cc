@@ -57,7 +57,7 @@ TEST(URITEST, URIPathCoverageExtra)
 {
   // getting full destructor coverage
   URIPath *p = new URIPath;
-  EXPECT_TRUE(p != NULL);
+  ASSERT_NE(nullptr, p);
   delete p;
 }
 
@@ -135,7 +135,7 @@ TEST(URITEST, URIQueryCoverageExtra)
 {
   // getting full destructor coverage
   URIQuery *p = new URIQuery;
-  EXPECT_TRUE(p != NULL);
+  ASSERT_NE(nullptr, p);
   delete p;
 }
 
@@ -289,6 +289,9 @@ TEST(URITEST, URIString)
   EXPECT_TRUE(URI::Valid("scheme://part1?key=value"));
   EXPECT_TRUE(URI::Valid("scheme://part1/part2?k1=v1&k2=v2"));
   EXPECT_TRUE(URI::Valid("scheme://part 1/part 2?k1=v1&k2=v2"));
+  EXPECT_TRUE(URI::Valid("scheme://part1 /part2 ?k1=v1&k2=v2"));
+  EXPECT_TRUE(URI::Valid("scheme://part  1  /part  2  ?k1=v1&k2=v2"));
+  EXPECT_TRUE(URI::Valid("scheme with space://part 1/part 2?k1=v1&k2=v2"));
 
   EXPECT_FALSE(uri.Parse(""));
   EXPECT_FALSE(uri.Parse("scheme"));
