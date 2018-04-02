@@ -1,23 +1,6 @@
 
 ign_get_libsources_and_unittests(sources gtest_sources)
 
-if(WIN32)
-
-  # FIXME: Some classes fail to build on Windows
-  list(REMOVE_ITEM sources
-    GTSMeshUtils.cc
-    Image.cc
-    ImageHeightmap.cc
-    MeshCSG.cc)
-
-  # FIXME: Some tests cannot build on Windows
-  list(REMOVE_ITEM gtest_sources
-    GTSMeshUtils_TEST.cc
-    Image_TEST.cc
-    ImageHeightmap_TEST.cc)
-
-endif()
-
 
 if(NOT USE_EXTERNAL_TINYXML2)
   # If we are using our internal copy of tinyxml2, then add its
