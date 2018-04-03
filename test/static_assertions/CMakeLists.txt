@@ -1,4 +1,6 @@
 set(static_assert_tests
+  plugin_bad_const_assignment
+  plugin_bad_const_construct
   plugin_no_base_class
   # TODO Fix FQN name check
   # plugin_not_fully_qualified_class
@@ -26,6 +28,12 @@ if (UNIX)
 
   # Tests pass if the output contains the expected error
 
+  set_tests_properties(STATIC_ASSERT_plugin_bad_const_assignment PROPERTIES
+    PASS_REGULAR_EXPRESSION "The requested PluginPtr cast would discard const qualifiers")
+
+  set_tests_properties(STATIC_ASSERT_plugin_bad_const_construct PROPERTIES
+    PASS_REGULAR_EXPRESSION "The requested PluginPtr cast would discard const qualifiers")
+
   set_tests_properties(STATIC_ASSERT_plugin_no_base_class PROPERTIES
     PASS_REGULAR_EXPRESSION "is not a base class of")
 
@@ -34,5 +42,4 @@ if (UNIX)
 
   set_tests_properties(STATIC_ASSERT_plugin_wrong_base_class PROPERTIES
     PASS_REGULAR_EXPRESSION "is not a base class of")
-
 endif()

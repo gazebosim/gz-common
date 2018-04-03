@@ -36,9 +36,9 @@ namespace ignition
       /// logged as warnings using ignwarn. (Recommended)
       FSWO_LOG_WARNINGS = 0,
 
-      /// \brief Errors that occur during filesystem manipulation should not be
-      /// logged. The user will be responsible for checking the system's error
-      /// flags.
+      /// \brief Errors that occur during filesystem manipulation should
+      /// not be logged. The user will be responsible for checking the
+      /// system's error flags.
       FSWO_SUPPRESS_WARNINGS
     };
 
@@ -72,7 +72,8 @@ namespace ignition
     ///        onto the passed-in string.
     /// \param[in] _s  The path to start with.
     /// \return The original path with the platform path separator appended.
-    std::string IGNITION_COMMON_VISIBLE const separator(std::string const &_s);
+    std::string IGNITION_COMMON_VISIBLE const separator(
+        std::string const &_s);
 
     /// \brief Replace forward-slashes '/' with the preferred directory
     /// separator of the current operating system. On Windows, this will turn
@@ -80,10 +81,11 @@ namespace ignition
     /// separator of the current operating system, this will do nothing.
     ///
     /// Note that this will NOT convert backslashes (or any other separator)
-    /// into forward slashes, even on operating systems that use forward-slashes
-    /// as separators.
+    /// into forward slashes, even on operating systems that use
+    /// forward-slashes as separators.
     ///
-    /// \param[out] _path This string will be directly modified by replacing its
+    /// \param[out] _path This string will be directly modified by
+    /// replacing its
     /// forward-slashes with the preferred directory separator of the current
     /// operating system.
     void IGNITION_COMMON_VISIBLE changeFromUnixPath(std::string &_path);
@@ -109,8 +111,8 @@ namespace ignition
     /// changeToUnixPath.
     ///
     /// \param[in] _path The path to start with
-    /// \return A modified path that uses forward slashes to separate directory
-    /// names.
+    /// \return A modified path that uses forward slashes to separate
+    /// directory names.
     std::string IGNITION_COMMON_VISIBLE copyToUnixPath(
         const std::string &_path);
 
@@ -226,12 +228,13 @@ namespace ignition
       public: DirIter();
 
       /// \brief Dereference operator; returns current directory record.
-      /// \return A string representing the entire path of the directory record.
+      /// \return A string representing the entire path of the directory
+      /// record.
       public: std::string operator*() const;
 
       /// \brief Pre-increment operator; moves to next directory record.
       /// \return This iterator.
-      public: const DirIter& operator++();
+      public: const DirIter &operator++();
 
       /// \brief Comparison operator to see if this iterator is at the
       ///        same point as another iterator.
