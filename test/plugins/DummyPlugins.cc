@@ -16,7 +16,7 @@
 */
 
 #include "ignition/common/PluginMacros.hh"
-#include "util/DummyPlugins.hh"
+#include "DummyPlugins.hh"
 
 
 namespace test
