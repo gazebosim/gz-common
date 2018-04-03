@@ -37,15 +37,15 @@ int main(int argc, char **argv)
   common::EventT<void ()> evt;
   common::ConnectionPtr conn = evt.Connect(std::bind(&callback));
 
-  std::cout << "Before callback: g_callback = " << g_callback << std::endl;
+  std::cout << "  Before event: g_callback = " << g_callback << std::endl;
   evt();
-  std::cout << "   One callback: g_callback = " << g_callback << std::endl;
+  std::cout << "     One event: g_callback = " << g_callback << std::endl;
 
   evt();
   evt();
   evt();
 
-  std::cout << " Four callbacks: g_callback = " << g_callback << std::endl;
+  std::cout << "   Four events: g_callback = " << g_callback << std::endl;
 
   std::cout << "Reset callback connection" << std::endl;
 
@@ -55,5 +55,5 @@ int main(int argc, char **argv)
   evt();
   evt();
 
-  std::cout << " More callbacks: g_callback = " << g_callback << std::endl;
+  std::cout << "   More events: g_callback = " << g_callback << std::endl;
 }
