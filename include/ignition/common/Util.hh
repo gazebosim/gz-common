@@ -35,7 +35,7 @@
 #endif
 
 /// \brief Seconds in one nano second.
-#define IGN_NANO_TO_SEC 0.0000000001
+#define IGN_NANO_TO_SEC 1e-9
 
 /// \brief Nano seconds in one second.
 #define IGN_SEC_TO_NANO 1000000000

@@ -30,16 +30,16 @@ namespace ignition
 {
   namespace common
   {
-    /// \brief Output an error message, if the verbose level is >= 0
+    /// \brief Output an error message, if the verbose level is >= 1
     #define ignerr (ignition::common::Console::err(__FILE__, __LINE__))
 
-    /// \brief Output a warning message, if the verbose level is >= 1
+    /// \brief Output a warning message, if the verbose level is >= 2
     #define ignwarn (ignition::common::Console::warn(__FILE__, __LINE__))
 
-    /// \brief Output a message, if the verbose level is >= 2
+    /// \brief Output a message, if the verbose level is >= 3
     #define ignmsg (ignition::common::Console::msg())
 
-    /// \brief Output a debug message, if the verbose level is >= 3
+    /// \brief Output a debug message, if the verbose level is >= 4
     #define igndbg (ignition::common::Console::dbg(__FILE__, __LINE__))
 
     /// \brief Output a message to a log file, regardless of verbosity level
