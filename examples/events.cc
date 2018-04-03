@@ -55,5 +55,6 @@ int main(int argc, char **argv)
   evt();
   evt();
 
-  std::cout << "   More events: g_callback = " << g_callback << std::endl;
+  std::cout << "More events but no more callbacks: g_callback = "
+            << g_callback << std::endl;
 }
