@@ -27,7 +27,7 @@
 
 #include "tinyxml2.h"
 
-#include "ignition/common/Types.hh"
+#include "ignition/common/graphics/Types.hh"
 #include "ignition/common/Console.hh"
 #include "ignition/common/Material.hh"
 #include "ignition/common/SubMesh.hh"

@@ -105,6 +105,28 @@ message(STATUS "-------------------------------------------\n")
 
 
 #============================================================================
+# Temporary cmake hacks to facilitate moving source code
+#============================================================================
+if(NOT MSVC)
+  set(component_list "av" "events" "graphics")
+else()
+  set(component_list "events" "graphics")
+endif()
+foreach (component_name ${component_list})
+  include_directories(${PROJECT_SOURCE_DIR}/${component_name}/include)
+  set(dir_list "." "detail" "${component_name}")
+  foreach(dir ${dir_list})
+    file(GLOB header_files
+      "${component_name}/include/ignition/common/${dir}/*.hh")
+    list(SORT header_files)
+    install(
+      FILES ${header_files}
+      DESTINATION "${IGN_INCLUDE_INSTALL_DIR_FULL}/ignition/${IGN_DESIGNATION}/${dir}"
+      COMPONENT headers)
+  endforeach()
+endforeach()
+
+#============================================================================
 # Configure the build
 #============================================================================
 ign_configure_build(QUIT_IF_BUILD_ERRORS)

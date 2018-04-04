@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Open Source Robotics Foundation
+ * Copyright (C) 2018 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,41 +14,22 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_TYPES_HH_
-#define IGNITION_COMMON_TYPES_HH_
+
+#ifndef IGNITION_COMMON_EVENTS_TYPES_HH_
+#define IGNITION_COMMON_EVENTS_TYPES_HH_
 
 #include <memory>
 
-/// \brief Forward declarations for the common classes
+// This header contains forward declarations for some event types
 namespace ignition
 {
   namespace common
   {
     class Connection;
-    class Material;
-    class Mesh;
-    class Skeleton;
-    class SubMesh;
 
     /// \def ConnectionPtr
     /// \brief Shared pointer to a Connection object
     using ConnectionPtr = std::shared_ptr<Connection>;
-
-    /// \def MaterialPtr
-    /// \brief Shared pointer to a Material object
-    using MaterialPtr = std::shared_ptr<Material>;
-
-    /// \def MeshPtr
-    /// \brief Standrd shared pointer to a Mesh object
-    using MeshPtr = std::shared_ptr<Mesh>;
-
-    /// \def SubMeshPtr
-    /// \brief Shared pointer to a SubMesh object
-    using SubMeshPtr = std::shared_ptr<SubMesh>;
-
-    /// \def SkeletonPtr
-    /// \brief Shared pointer to a Skeleton object
-    using SkeletonPtr = std::shared_ptr<Skeleton>;
   }
 }
 

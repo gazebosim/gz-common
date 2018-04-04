@@ -45,7 +45,8 @@ then
   CPPLINT_FILES="$CHECK_FILES"
   QUICK_TMP=`mktemp -t asdfXXXXXXXXXX`
 else
-  CHECK_DIRS="./src ./include ./test/integration ./test/regression ./test/performance"
+  CHECK_DIRS="./src ./include ./test/integration ./test/regression ./test/performance"\
+" ./av/include ./events/include ./graphics/include "
   EXCLUDE_DIRS="./src/tinyxml2"
   if [ $CPPCHECK_LT_161 -eq 1 ]; then
     # cppcheck is older than 1.57, so don't check header files (issue #907)
@@ -71,7 +72,8 @@ if [ $CPPCHECK_LT_161 -eq 0 ]; then
   # use --language argument if 1.57 or greater (issue #907)
   CPPCHECK_BASE="$CPPCHECK_BASE --language=c++"
 fi
-CPPCHECK_INCLUDES="-I . -I ./include -I $builddir -I test"
+CPPCHECK_INCLUDES="-I . -I ./include -I $builddir -I test"\
+" -I ./av/include -I ./events/include -I ./graphics/include "
 CPPCHECK_RULES="-UPATH_MAX -UFREEIMAGE_COLORORDER "\
 " -US_IROTH -US_IXOTH -US_IRGRP -U_XOPEN_PATH_MAX "\
 "--max-configs=50"

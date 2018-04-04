@@ -22,6 +22,7 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 
+#include <ignition/common/av/Util.hh>
 #include "ignition/common/ffmpeg_inc.hh"
 #include "ignition/common/Console.hh"
 #include "ignition/common/VideoEncoder.hh"

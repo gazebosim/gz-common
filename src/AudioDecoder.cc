@@ -15,6 +15,7 @@
 *
 */
 
+#include <ignition/common/av/Util.hh>
 #include <ignition/common/ffmpeg_inc.hh>
 #include <ignition/common/AudioDecoder.hh>
 #include <ignition/common/Console.hh>
