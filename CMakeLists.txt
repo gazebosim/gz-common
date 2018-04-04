@@ -107,6 +107,7 @@ message(STATUS "-------------------------------------------\n")
 #============================================================================
 # Temporary cmake hacks to facilitate moving source code
 #============================================================================
+set(extra_sources)
 if(NOT MSVC)
   set(component_list "av" "events" "graphics")
 else()
@@ -123,6 +124,15 @@ foreach (component_name ${component_list})
       FILES ${header_files}
       DESTINATION "${IGN_INCLUDE_INSTALL_DIR_FULL}/ignition/${IGN_DESIGNATION}/${dir}"
       COMPONENT headers)
+  endforeach()
+  # source files
+  file(GLOB component_sources "${component_name}/src/*.cc")
+  file(GLOB component_test_sources "${component_name}/src/*_TEST.cc")
+  foreach (component_test_file ${component_test_sources})
+    list(REMOVE_ITEM component_sources ${component_test_file})
+  endforeach()
+  foreach (component_file ${component_sources})
+    list(APPEND extra_sources ${component_file})
   endforeach()
 endforeach()
 

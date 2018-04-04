@@ -40,7 +40,7 @@ if(NOT USE_EXTERNAL_TINYXML2)
 endif()
 
 # Create the library target
-ign_add_library(${PROJECT_LIBRARY_TARGET_NAME} ${sources})
+ign_add_library(${PROJECT_LIBRARY_TARGET_NAME} ${sources} ${extra_sources})
 
 # Link the libraries that we always need
 target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
