@@ -20,7 +20,7 @@
 #include <memory>
 #include <string>
 
-#include <ignition/common/Export.hh>
+#include <ignition/common/events/Export.hh>
 #include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
@@ -32,7 +32,7 @@ namespace ignition
 
     /// \class KeyEvent KeyEvent.hh ignition/common/KeyEvent.hh
     /// \brief Generic description of a keyboard event.
-    class IGNITION_COMMON_VISIBLE KeyEvent
+    class IGNITION_COMMON_EVENTS_VISIBLE KeyEvent
     {
       /// \brief Key event types enumeration.
       public: enum EventType {NO_EVENT, PRESS, RELEASE};

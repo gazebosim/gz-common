@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include <ignition/common/Export.hh>
+#include <ignition/common/graphics/Export.hh>
 
 namespace ignition
 {
@@ -29,7 +29,7 @@ namespace ignition
 
     /// \class MeshLoader MeshLoader.hh ignition/common/MeshLoader.hh
     /// \brief Base class for loading meshes
-    class IGNITION_COMMON_VISIBLE MeshLoader
+    class IGNITION_COMMON_GRAPHICS_VISIBLE MeshLoader
     {
       /// \brief Constructor
       public: MeshLoader() = default;

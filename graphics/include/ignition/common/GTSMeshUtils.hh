@@ -21,7 +21,7 @@
 #include <vector>
 
 #include <ignition/math/Vector2.hh>
-#include <ignition/common/Export.hh>
+#include <ignition/common/graphics/Export.hh>
 
 
 struct _GtsSurface;
@@ -35,7 +35,7 @@ namespace ignition
 
     /// \class GTSMeshUtils GTSMeshUtils.hh ignition/common/GTSMeshUtils.hh
     /// \brief Creates GTS utilities for meshes
-    class IGNITION_COMMON_VISIBLE GTSMeshUtils
+    class IGNITION_COMMON_GRAPHICS_VISIBLE GTSMeshUtils
     {
       /// \brief Perform delaunay triangulation on input vertices.
       /// \param[in] _vertices A list of all vertices

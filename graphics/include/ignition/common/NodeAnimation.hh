@@ -23,7 +23,7 @@
 #include <ignition/math/Matrix4.hh>
 #include <ignition/math/Pose3.hh>
 
-#include <ignition/common/Export.hh>
+#include <ignition/common/graphics/Export.hh>
 
 namespace ignition
 {
@@ -33,7 +33,7 @@ namespace ignition
 
     /// \class NodeAnimation NodeAnimation.hh ignition/common/NodeAnimation.hh
     /// \brief Node animation
-    class IGNITION_COMMON_VISIBLE NodeAnimation
+    class IGNITION_COMMON_GRAPHICS_VISIBLE NodeAnimation
     {
       /// \brief constructor
       /// \param[in] _name the name of the node

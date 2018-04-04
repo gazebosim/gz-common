@@ -24,7 +24,7 @@
 #include <ignition/math/Vector2.hh>
 
 #include <ignition/common/graphics/Types.hh>
-#include <ignition/common/Export.hh>
+#include <ignition/common/graphics/Export.hh>
 #include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
@@ -37,7 +37,7 @@ namespace ignition
 
     /// \class Mesh Mesh.hh ignition/common/Mesh.hh
     /// \brief A 3D mesh
-    class IGNITION_COMMON_VISIBLE Mesh
+    class IGNITION_COMMON_GRAPHICS_VISIBLE Mesh
     {
       /// \brief Constructor
       public: Mesh();

@@ -19,7 +19,7 @@
 
 #include <ignition/math/Pose3.hh>
 
-#include <ignition/common/Export.hh>
+#include <ignition/common/graphics/Export.hh>
 
 struct _GtsSurface;
 typedef _GtsSurface GtsSurface;
@@ -34,7 +34,7 @@ namespace ignition
 
     /// \class MeshCSG MeshCSG.hh ignition/common/MeshCSG.hh
     /// \brief Creates CSG meshes
-    class IGNITION_COMMON_VISIBLE MeshCSG
+    class IGNITION_COMMON_GRAPHICS_VISIBLE MeshCSG
     {
       /// \brief An enumeration of the boolean operations
       public: enum BooleanOperation {UNION, INTERSECTION, DIFFERENCE};

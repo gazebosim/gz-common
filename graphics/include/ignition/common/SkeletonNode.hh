@@ -22,7 +22,7 @@
 #include <vector>
 
 #include <ignition/common/NodeTransform.hh>
-#include <ignition/common/Export.hh>
+#include <ignition/common/graphics/Export.hh>
 
 namespace ignition
 {
@@ -33,7 +33,7 @@ namespace ignition
 
     /// \class SkeletonNode Skeleton.hh ignition/common/SkeletonNode.hh
     /// \brief A skeleton node
-    class IGNITION_COMMON_VISIBLE SkeletonNode
+    class IGNITION_COMMON_GRAPHICS_VISIBLE SkeletonNode
     {
       /// \brief enumeration of node types
       public: enum SkeletonNodeType {NODE, JOINT};

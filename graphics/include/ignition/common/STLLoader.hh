@@ -21,7 +21,7 @@
 #include <string>
 
 #include "ignition/common/MeshLoader.hh"
-#include "ignition/common/Export.hh"
+#include "ignition/common/graphics/Export.hh"
 
 #define LINE_MAX_LEN 256
 #define COR3_MAX 200000
@@ -34,7 +34,7 @@ namespace ignition
   {
     /// \class STLLoader STLLoader.hh ignition/common/STLLoader.hh
     /// \brief Class used to load STL mesh files
-    class IGNITION_COMMON_VISIBLE STLLoader : public MeshLoader
+    class IGNITION_COMMON_GRAPHICS_VISIBLE STLLoader : public MeshLoader
     {
       /// \brief Constructor
       public: STLLoader();

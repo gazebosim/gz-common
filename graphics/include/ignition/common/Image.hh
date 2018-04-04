@@ -20,7 +20,7 @@
 #include <memory>
 #include <string>
 #include <ignition/math/Color.hh>
-#include <ignition/common/Export.hh>
+#include <ignition/common/graphics/Export.hh>
 #include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
@@ -57,7 +57,7 @@ namespace ignition
 
     /// \class Image Image.hh ignition/common/common.hh
     /// \brief Encapsulates an image
-    class IGNITION_COMMON_VISIBLE Image
+    class IGNITION_COMMON_GRAPHICS_VISIBLE Image
     {
       /// \brief Pixel formats enumeration
       public: enum PixelFormatType

@@ -18,7 +18,7 @@
 #define IGNITION_COMMON_COLLADALOADER_HH_
 
 #include <string>
-#include <ignition/common/Export.hh>
+#include <ignition/common/graphics/Export.hh>
 #include <ignition/common/MeshLoader.hh>
 
 namespace ignition
@@ -30,7 +30,7 @@ namespace ignition
 
     /// \class ColladaLoader ColladaLoader.hh ignition/common/ColladaLoader.hh
     /// \brief Class used to load Collada mesh files
-    class IGNITION_COMMON_VISIBLE ColladaLoader : public MeshLoader
+    class IGNITION_COMMON_GRAPHICS_VISIBLE ColladaLoader : public MeshLoader
     {
       /// \brief Constructor
       public: ColladaLoader();

@@ -18,7 +18,7 @@
 #define IGNITION_COMMON_MESHEXPORTER_HH_
 
 #include <string>
-#include <ignition/common/Export.hh>
+#include <ignition/common/graphics/Export.hh>
 
 namespace ignition
 {
@@ -27,7 +27,7 @@ namespace ignition
     class Mesh;
 
     /// \brief Base class for exporting meshes
-    class IGNITION_COMMON_VISIBLE MeshExporter
+    class IGNITION_COMMON_GRAPHICS_VISIBLE MeshExporter
     {
       /// \brief Constructor
       public: MeshExporter();

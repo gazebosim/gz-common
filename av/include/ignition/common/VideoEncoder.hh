@@ -21,7 +21,7 @@
 #include <string>
 #include <memory>
 
-#include <ignition/common/Export.hh>
+#include <ignition/common/av/Export.hh>
 #include <ignition/common/SuppressWarning.hh>
 
 // Default bitrate (0) indicates that a bitrate should be calculated when
@@ -41,7 +41,7 @@ namespace ignition
 
     /// \brief The VideoEncoder class supports encoding a series of images
     /// to a video format, and then writing the video to disk.
-    class IGNITION_COMMON_VISIBLE VideoEncoder
+    class IGNITION_COMMON_AV_VISIBLE VideoEncoder
     {
       /// \brief Constructor
       public: VideoEncoder();

@@ -32,7 +32,7 @@
 
 #include <ignition/common/graphics/Types.hh>
 #include <ignition/common/SingletonT.hh>
-#include <ignition/common/Export.hh>
+#include <ignition/common/graphics/Export.hh>
 #include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
@@ -46,7 +46,8 @@ namespace ignition
 
     /// \class MeshManager MeshManager.hh ignition/common/MeshManager.hh
     /// \brief Maintains and manages all meshes
-    class IGNITION_COMMON_VISIBLE MeshManager : public SingletonT<MeshManager>
+    class IGNITION_COMMON_GRAPHICS_VISIBLE MeshManager
+        : public SingletonT<MeshManager>
     {
       /// \brief Constructor
       private: MeshManager();

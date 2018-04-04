@@ -24,7 +24,7 @@
 #include <ignition/math/Vector2.hh>
 
 #include <ignition/common/graphics/Types.hh>
-#include <ignition/common/Export.hh>
+#include <ignition/common/graphics/Export.hh>
 #include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
@@ -36,7 +36,7 @@ namespace ignition
     class NodeAssignment;
 
     /// \brief A child mesh
-    class IGNITION_COMMON_VISIBLE SubMesh
+    class IGNITION_COMMON_GRAPHICS_VISIBLE SubMesh
     {
       /// \brief An enumeration of the geometric mesh primitives
       public: enum PrimitiveType
@@ -310,7 +310,7 @@ namespace ignition
 
     /// \brief Vertex to node weighted assignement for skeleton animation
     /// visualization
-    class IGNITION_COMMON_VISIBLE NodeAssignment
+    class IGNITION_COMMON_GRAPHICS_VISIBLE NodeAssignment
     {
       /// \brief Constructor.
       public: NodeAssignment();

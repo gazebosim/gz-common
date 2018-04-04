@@ -22,7 +22,7 @@
 #include <memory>
 
 #include <ignition/common/MeshLoader.hh>
-#include <ignition/common/Export.hh>
+#include <ignition/common/graphics/Export.hh>
 #include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
@@ -33,7 +33,7 @@ namespace ignition
     class OBJLoaderPrivate;
 
     /// \brief Class used to load obj mesh files
-    class IGNITION_COMMON_VISIBLE OBJLoader : public MeshLoader
+    class IGNITION_COMMON_GRAPHICS_VISIBLE OBJLoader : public MeshLoader
     {
       /// \brief Constructor
       public: OBJLoader();

@@ -24,7 +24,7 @@
 #include <ignition/math/Matrix4.hh>
 #include <ignition/math/Pose3.hh>
 
-#include <ignition/common/Export.hh>
+#include <ignition/common/graphics/Export.hh>
 
 namespace ignition
 {
@@ -36,7 +36,7 @@ namespace ignition
     /// \class SkeletonAnimation SkeletonAnimation.hh
     /// ignition/common/SkeletonAnimation.hh
     /// \brief Skeleton animation
-    class IGNITION_COMMON_VISIBLE SkeletonAnimation
+    class IGNITION_COMMON_GRAPHICS_VISIBLE SkeletonAnimation
     {
       /// \brief The Constructor
       /// \param[in] _name the name of the animation

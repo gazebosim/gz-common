@@ -19,14 +19,14 @@
 
 #include <vector>
 #include <ignition/math/Vector3.hh>
-#include <ignition/common/Export.hh>
+#include <ignition/common/graphics/Export.hh>
 
 namespace ignition
 {
   namespace common
   {
     /// \brief Encapsulates a generic heightmap data file.
-    class IGNITION_COMMON_VISIBLE HeightmapData
+    class IGNITION_COMMON_GRAPHICS_VISIBLE HeightmapData
     {
       /// \brief Destructor.
       public: virtual ~HeightmapData() = default;

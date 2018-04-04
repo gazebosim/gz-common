@@ -25,7 +25,7 @@
 #include <mutex>
 
 #include <ignition/common/config.hh>
-#include <ignition/common/Export.hh>
+#include <ignition/common/events/Export.hh>
 #include <ignition/common/events/Types.hh>
 
 namespace ignition
@@ -34,7 +34,7 @@ namespace ignition
   {
     /// \class Event Event.hh ignition/common/Event.hh
     /// \brief Base class for all events
-    class IGNITION_COMMON_VISIBLE Event
+    class IGNITION_COMMON_EVENTS_VISIBLE Event
     {
       /// \brief Constructor
       public: Event();
@@ -59,7 +59,7 @@ namespace ignition
     };
 
     /// \brief A class that encapsulates a connection.
-    class IGNITION_COMMON_VISIBLE Connection
+    class IGNITION_COMMON_EVENTS_VISIBLE Connection
     {
       /// \brief Constructor.
       /// \param[in] _e Event pointer to connect with.
