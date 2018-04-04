@@ -36,7 +36,7 @@ if(NOT USE_EXTERNAL_TINYXML2)
   # If we are using our internal copy of tinyxml2, then add its
   # source file.
   message(STATUS "Adding tinyxml2 source files")
-  list(APPEND sources ${CMAKE_CURRENT_SOURCE_DIR}/tinyxml2/tinyxml2.cpp)
+  list(APPEND sources ${CMAKE_SOURCE_DIR}/graphics/src/tinyxml2/tinyxml2.cpp)
 endif()
 
 # Create the library target
@@ -59,7 +59,7 @@ else()
   # directories. We do not want this to be visible to consumers of
   # ignition-common.
   target_include_directories(${PROJECT_LIBRARY_TARGET_NAME}
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tinyxml2)
+    PRIVATE ${CMAKE_SOURCE_DIR}/graphics/src/tinyxml2)
 endif()
 
 # define of tinxml2 major version >= 6
@@ -156,12 +156,12 @@ if(TARGET UNIT_ColladaExporter_TEST)
   else()
     # If we are using the internal copy of tinyxml2, then the collada exporter
     # test needs to be pointed to the internal tinyxml2 include directory.
-    target_include_directories(UNIT_ColladaExporter_TEST PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tinyxml2)
+    target_include_directories(UNIT_ColladaExporter_TEST PRIVATE ${CMAKE_SOURCE_DIR}/graphics/src/tinyxml2)
     # We also need to add this as a source file to the collada exporter test's
     # target, because we do not export the tinyxml2 symbols that get generated
     # in the ignition-common library. Therefore, the collada exporter test
     # cannot link to those symbols and must generate its own.
-    target_sources(UNIT_ColladaExporter_TEST PRIVATE tinyxml2/tinyxml2.cpp)
+    target_sources(UNIT_ColladaExporter_TEST PRIVATE ${CMAKE_SOURCE_DIR}/graphics/src/tinyxml2/tinyxml2.cpp)
   endif()
 endif()
 
