@@ -18,9 +18,9 @@
 #define IGNITION_COMMON_MATERIALDENSITY_HH_
 
 #include <string>
+#include <limits>
 #include <map>
 #include <tuple>
-#include <ignition/math/Helpers.hh>
 #include "ignition/common/Export.hh"
 
 namespace ignition
@@ -116,7 +116,7 @@ namespace ignition
       /// returned on error.
       public: static std::tuple<Type, double> Nearest(
                   const double _value,
-                  const double _epsilon = ignition::math::MAX_D);
+                  const double _epsilon = std::numeric_limits<double>::max());
 
       /// \brief Return the material with the closest density value within
       /// _epsilon, or MATERIAL_TYPE_END if not found.
@@ -125,7 +125,7 @@ namespace ignition
       /// and a material's density.
       /// \return The nearest material type. MATERIAL_TYPE_END on error.
       public: static Type NearestMaterial(const double _value,
-                  const double _epsilon = ignition::math::MAX_D);
+                  const double _epsilon = std::numeric_limits<double>::max());
 
 #ifdef _WIN32
 // Disable warning C4251

@@ -165,6 +165,11 @@ if(TARGET UNIT_ColladaExporter_TEST)
   endif()
 endif()
 
+if(TARGET UNIT_PluginLoader_TEST)
+  target_compile_definitions(UNIT_PluginLoader_TEST PRIVATE
+    "IGN_COMMON_LIB_PATH=\"$<TARGET_FILE_DIR:${PROJECT_LIBRARY_TARGET_NAME}>\"")
+endif()
+
 # Produce warning on Windows if the user has decided to turn on the symlink
 # tests. In order for those tests to work, they will need to run the tests in
 # administrative mode, or use some other workaround.
