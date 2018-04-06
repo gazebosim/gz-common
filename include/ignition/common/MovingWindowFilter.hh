@@ -20,10 +20,6 @@
 #include <memory>
 #include <vector>
 
-#include <ignition/common/Time.hh>
-#include <ignition/common/Types.hh>
-#include <ignition/math/Helpers.hh>
-
 namespace ignition
 {
   namespace common
@@ -105,7 +101,6 @@ namespace ignition
 
     //////////////////////////////////////////////////
     template<typename T>
-    // cppcheck-suppress uninitMemberVar
     MovingWindowFilter<T>::MovingWindowFilter()
     : dataPtr(new MovingWindowFilterPrivate<T>())
     {

@@ -23,11 +23,11 @@
 #include <unordered_map>
 
 #include "ignition/common/Console.hh"
+#include "ignition/common/PluginPtr.hh"
 #include "ignition/common/PluginInfo.hh"
 #include "ignition/common/PluginLoader.hh"
 #include "ignition/common/StringUtils.hh"
 #include "ignition/common/Util.hh"
-#include "ignition/common/Plugin.hh"
 
 #include "PluginUtils.hh"
 
@@ -185,9 +185,7 @@ namespace ignition
     PluginPtr PluginLoader::Instantiate(
         const std::string &_plugin) const
     {
-      PluginPtr instance = std::shared_ptr<Plugin>(new Plugin());
-      instance->PrivateSetPluginInstance(this->PrivateGetPluginInfo(_plugin));
-      return instance;
+      return PluginPtr(this->PrivateGetPluginInfo(_plugin));
     }
 
     /////////////////////////////////////////////////
@@ -200,7 +198,13 @@ namespace ignition
           this->dataPtr->plugins.find(plugin);
 
       if (this->dataPtr->plugins.end() == it)
+      {
+        ignerr << "Failed to get info for plugin ["
+               << plugin
+               << "] since it has not been loaded."
+               << std::endl;
         return nullptr;
+      }
 
       return &(it->second);
     }
@@ -239,11 +243,11 @@ namespace ignition
           || nullptr == multiInfoPtr || nullptr == alignPtr)
       {
         ignerr << "Library [" << _pathToLibrary
-               << "] doesn't have the right symbols: \n"
-               << " -- version symbol: " << versionPtr
-               << "\n -- size symbol: " << sizePtr
-               << "\n -- alignment symbol: " << alignPtr
-               << "\n -- info symbol: " << multiInfoPtr << "\n";
+               << "] doesn't have the right symbols:"
+               << "\n -- version symbol   -- " << versionPtr
+               << "\n -- size symbol      -- " << sizePtr
+               << "\n -- alignment symbol -- " << alignPtr
+               << "\n -- info symbol      -- " << multiInfoPtr << "\n";
 
         return loadedPlugins;
       }

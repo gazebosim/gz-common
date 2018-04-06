@@ -202,11 +202,17 @@ TEST_F(SystemPathsFixture, PathsFromEnv)
   for (auto const &path : paths)
   {
     if (count == 0)
+    {
       EXPECT_EQ(path, "/tmp/plugin/");
+    }
     if (count == 1)
+    {
       EXPECT_EQ(path, "/test/plugin/now/");
+    }
     if (count == 2)
+    {
       FAIL();
+    }
 
     ++count;
   }

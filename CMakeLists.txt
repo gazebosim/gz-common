@@ -3,18 +3,17 @@ cmake_minimum_required(VERSION 3.5.1 FATAL_ERROR)
 #============================================================================
 # Initialize the project
 #============================================================================
-project(ignition-common0 VERSION 0.5.0)
+project(ignition-common2 VERSION 2.0.0)
 
 #============================================================================
 # Find ignition-cmake
 #============================================================================
-find_package(ignition-cmake0 REQUIRED)
+find_package(ignition-cmake1 REQUIRED)
 
 #============================================================================
 # Configure the project
 #============================================================================
-ign_configure_project(VERSION_SUFFIX pre4)
-
+ign_configure_project()
 
 #============================================================================
 # Set project-specific options
@@ -47,13 +46,15 @@ message(STATUS "\n\n-- ====== Finding Dependencies ======")
 
 #--------------------------------------
 # Find ignition-math
-set(IGN_MATH_VER 4)
-ign_find_package(ignition-math${IGN_MATH_VER} REQUIRED)
+ign_find_package(ignition-math5 REQUIRED_BY graphics events)
+set(IGN_MATH_VER 5)
 
 #--------------------------------------
 # Find Tinyxml2
 if(USE_EXTERNAL_TINYXML2)
-  ign_find_package(TINYXML2 REQUIRED PRIVATE PRETTY tinyxml2)
+  ign_find_package(TINYXML2 PRETTY tinyxml2
+    REQUIRED_BY graphics
+    PRIVATE_FOR graphics)
 else()
   message(STATUS "Skipping search for tinyxml2 and using an internal version\n")
 endif()
@@ -67,40 +68,45 @@ ign_find_package(
 # Find dependencies that we ignore for Visual Studio
 if(NOT MSVC)
 
-  #--------------------------------------
-  # Find Freeimage
-  ign_find_package(FreeImage VERSION 3.9 REQUIRED PRIVATE PKGCONFIG_IGNORE)
-
   #------------------------------------
   # Find uuid
   ign_find_package(UUID REQUIRED PRETTY uuid)
 
-  #------------------------------------
-  # Find GNU Triangulation Surface Library
-  ign_find_package(
-    GTS REQUIRED PRETTY gts PURPOSE "GNU Triangulation Surface library")
-
-  #------------------------------------
-  # Find libswscale
-  ign_find_package(SWSCALE REQUIRED PRETTY libswscale)
-
-  #------------------------------------
-  # Find avdevice
-  ign_find_package(AVDEVICE VERSION 56.4.100 REQUIRED PRETTY libavdevice)
-
-  #------------------------------------
-  # Find avformat
-  ign_find_package(AVFORMAT REQUIRED PRETTY libavformat)
-
-  #------------------------------------
-  # Find avcodec
-  ign_find_package(AVCODEC REQUIRED PRETTY libavcodec)
-
-  #------------------------------------
-  # Find avutil
-  ign_find_package(AVUTIL REQUIRED PRETTY libavutil)
-
 endif()
+
+#------------------------------------
+# Find Freeimage
+ign_find_package(FreeImage VERSION 3.9
+  REQUIRED_BY graphics
+  PRIVATE_FOR graphics)
+
+#------------------------------------
+# Find GNU Triangulation Surface Library
+ign_find_package(
+  GTS PRETTY gts PURPOSE "GNU Triangulation Surface library"
+  REQUIRED_BY graphics
+  PRIVATE_FOR graphics)
+
+#------------------------------------
+# Find libswscale
+ign_find_package(SWSCALE REQUIRED_BY av PRETTY libswscale)
+
+#------------------------------------
+# Find avdevice
+ign_find_package(AVDEVICE VERSION 56.4.100 REQUIRED_BY av PRETTY libavdevice)
+
+#------------------------------------
+# Find avformat
+ign_find_package(AVFORMAT REQUIRED_BY av PRETTY libavformat)
+
+#------------------------------------
+# Find avcodec
+ign_find_package(AVCODEC REQUIRED_BY av PRETTY libavcodec)
+
+#------------------------------------
+# Find avutil
+ign_find_package(AVUTIL REQUIRED_BY av PRETTY libavutil)
+
 
 message(STATUS "-------------------------------------------\n")
 
@@ -108,7 +114,8 @@ message(STATUS "-------------------------------------------\n")
 #============================================================================
 # Configure the build
 #============================================================================
-ign_configure_build(QUIT_IF_BUILD_ERRORS)
+ign_configure_build(QUIT_IF_BUILD_ERRORS
+  COMPONENTS av events graphics)
 
 
 #============================================================================

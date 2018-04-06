@@ -35,13 +35,11 @@
 #include <ignition/common/SystemPaths.hh>
 #include <ignition/common/Util.hh>
 #include <ignition/common/Uuid.hh>
-#include <ignition/common/Console.hh>
 
 #ifndef _WIN32
 #include <dirent.h>
 #include <limits.h>
 #include <climits>
-#include <ignition/common/ffmpeg_inc.hh>
 #else
 #include <io.h>
 #include "win_dirent.h"
@@ -55,50 +53,6 @@
   const auto &ignstrtok = strtok_s;
 #else
   const auto &ignstrtok = strtok_r;
-#endif
-
-/////////////////////////////////////////////////
-// avcodec log callback. We use this to redirect message to gazebo's console
-// messages.
-#ifndef _WIN32
-void logCallback(void *_ptr, int _level, const char *_fmt, va_list _args)
-{
-  static char message[8192];
-
-  std::string msg = "ffmpeg ";
-
-  // Get the ffmpeg module.
-  if (_ptr)
-  {
-    AVClass *avc = *reinterpret_cast<AVClass**>(_ptr);
-    const char *module = avc->item_name(_ptr);
-    if (module)
-      msg += std::string("[") + module + "] ";
-  }
-
-  // Create the actual message
-  vsnprintf(message, sizeof(message), _fmt, _args);
-  msg += message;
-
-  // Output to the appropriate stream.
-  switch (_level)
-  {
-    case AV_LOG_DEBUG:
-      // There are a lot of debug messages. So we'll skip those.
-      break;
-    case AV_LOG_PANIC:
-    case AV_LOG_FATAL:
-    case AV_LOG_ERROR:
-      ignerr << msg << std::endl;
-      break;
-    case AV_LOG_WARNING:
-      ignwarn << msg << std::endl;
-      break;
-    default:
-      ignmsg << msg << std::endl;
-      break;
-  }
-}
 #endif
 
 static std::unique_ptr<ignition::common::SystemPaths> gSystemPaths(
@@ -281,27 +235,6 @@ bool Sha1::Digest(void const *_buffer, std::size_t _byteCount,
       static_cast<unsigned char>((this->bitCountLow) & 0xFF));
 
   return true;
-}
-
-/////////////////////////////////////////////////
-void ignition::common::load()
-{
-  static bool first = true;
-#ifndef _WIN32
-  if (first)
-  {
-    first = false;
-    avcodec_register_all();
-    av_register_all();
-
-#if defined(__linux__) && defined(HAVE_AVDEVICE)
-    avdevice_register_all();
-#endif
-
-    // Set the log callback function.
-    av_log_set_callback(logCallback);
-  }
-#endif
 }
 
 /////////////////////////////////////////////////

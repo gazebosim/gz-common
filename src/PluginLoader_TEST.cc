@@ -40,7 +40,7 @@ TEST(PluginLoader, LoadNonexistantLibrary)
 /////////////////////////////////////////////////
 TEST(PluginLoader, LoadNonLibrary)
 {
-  std::string projectPath(PROJECT_BINARY_PATH);
+  std::string projectPath(IGN_COMMON_LIB_PATH);
   ignition::common::PluginLoader pm;
   EXPECT_TRUE(pm.LoadLibrary(projectPath + "/test_config.h").empty());
 }
@@ -48,25 +48,25 @@ TEST(PluginLoader, LoadNonLibrary)
 /////////////////////////////////////////////////
 TEST(PluginLoader, LoadNonPluginLibrary)
 {
-  std::string projectPath(PROJECT_BINARY_PATH);
   std::string libraryName("ignition-common");
   libraryName += std::to_string(IGNITION_COMMON_MAJOR_VERSION);
 
-#ifndef _MSC_VER
-  // This test fails on MSVC because MSVC uses a multi-configuration
-  // generator-type build system. That makes it harder to predict
-  // where this library will be located after it is built. It may
-  // be in one of several possible directories, and we would have
-  // to jump through some hoops with generator expressions to make
-  // this test work. For now, we'll just skip it on Windows.
   ignition::common::SystemPaths sp;
-  sp.AddPluginPaths(projectPath + "/src");
+  sp.AddPluginPaths(IGN_COMMON_LIB_PATH);
   std::string path = sp.FindSharedLibrary(libraryName);
   ASSERT_FALSE(path.empty());
 
   ignition::common::PluginLoader pm;
   EXPECT_TRUE(pm.LoadLibrary(path).empty());
-#endif
+}
+
+/////////////////////////////////////////////////
+TEST(PluginLoader, InstantiateUnloadedPlugin)
+{
+  ignition::common::PluginLoader pm;
+  ignition::common::PluginPtr plugin =
+      pm.Instantiate("plugin::that::is::not::loaded");
+  EXPECT_FALSE(plugin);
 }
 
 /////////////////////////////////////////////////
