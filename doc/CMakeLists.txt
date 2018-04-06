@@ -1,5 +1,8 @@
 find_package(Doxygen)
 
+set(IGNITION_DOXYGEN_TAGFILES
+  "\"${IGNITION-MATH_DOXYGEN_TAGFILE} = ${IGNITION-MATH_API_URL}\"")
+
 if (DOXYGEN_FOUND)
   configure_file(${IGNITION_CMAKE_DOXYGEN_DIR}/api.in
                  ${CMAKE_BINARY_DIR}/api.dox @ONLY)
