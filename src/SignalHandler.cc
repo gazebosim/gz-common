@@ -21,6 +21,7 @@
 #include <signal.h> // NOLINT(*)
 #include <functional> // NOLINT(*)
 #include <map> // NOLINT(*)
+#include <mutex> // NOLINT(*)
 #include <vector> // NOLINT(*)
 #include "ignition/common/Console.hh" // NOLINT(*)
 
@@ -29,8 +30,10 @@ using namespace common;
 
 // A wrapper for the sigaction sa_handler.
 std::map<int, std::function<void(int)>> gOnSignalWrappers;
+std::mutex gWrapperMutex;
 void onSignal(int _value)
 {
+  std::lock_guard<std::mutex> lock(gWrapperMutex);
   // Send the signal to each wrapper
   for (std::pair<int, std::function<void(int)>> func : gOnSignalWrappers)
   {
@@ -60,6 +63,7 @@ SignalHandler::SignalHandler()
   : dataPtr(new SignalHandlerPrivate)
 {
   static int counter = 0;
+  std::lock_guard<std::mutex> lock(gWrapperMutex);
 
 #ifndef _WIN32
   // Only need to setup the system sighandler once.
@@ -101,6 +105,7 @@ SignalHandler::~SignalHandler()
 {
   if (this->dataPtr->wrapperIndex >= 0)
   {
+    std::lock_guard<std::mutex> lock(gWrapperMutex);
     gOnSignalWrappers.erase(
         gOnSignalWrappers.find(this->dataPtr->wrapperIndex));
   }

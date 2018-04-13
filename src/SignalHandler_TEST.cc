@@ -21,10 +21,14 @@
 #include <gtest/gtest.h> // NOLINT(*)
 #include <signal.h> // NOLINT(*)
 #include <condition_variable> // NOLINT(*)
+#include <map> // NOLINT(*)
 #include <mutex> // NOLINT(*)
 #include "ignition/common/Util.hh" // NOLINT(*)
 
 using namespace ignition;
+
+// Capture the gOnSignalWrappers map from SignalHandlers.cc
+extern std::map<int, std::function<void(int)>> gOnSignalWrappers;
 
 int gHandler1Sig = -1;
 int gHandler2Sig = -1;
@@ -40,7 +44,7 @@ void handler2Cb(int _sig)
 {
   gHandler2Sig = _sig;
 }
-
+/*
 /////////////////////////////////////////////////
 TEST(SignalHandler, Single)
 {
@@ -153,4 +157,100 @@ TEST(SignalHandler, Thread)
 
   EXPECT_EQ(SIGINT, gHandler1Sig);
   EXPECT_EQ(SIGINT, gHandler2Sig);
+}
+*/
+
+/////////////////////////////////////////////////
+TEST(SignalHandler, MultipleThreads)
+{
+  // Create a lock, which will allows us to wait for the thread to create
+  // its signal handler
+  std::mutex outerMutex;
+  std::unique_lock<std::mutex> outerLock(outerMutex);
+  std::condition_variable outerCv;
+
+  std::vector<std::thread*> threads;
+  std::vector<int> results;
+
+  // A lot of threads
+  int threadCount = 1000;
+
+  // Create all the threads.
+  for (int i = 0; i < threadCount; ++i)
+  {
+    // Create the thread. Inside the thread, a new signal handler is created.
+    std::thread *thread = new std::thread(
+        [&outerMutex, &outerCv, &results, threadCount] ()
+    {
+      common::SignalHandler handler;
+      EXPECT_TRUE(handler.Initialized());
+
+      int index = -1;
+      std::mutex localMutex;
+      std::condition_variable localCv;
+
+      // This signal handler will unblock the thread, allowing it to exit.
+      EXPECT_TRUE(handler.AddCallback(
+            [&results, &index, &localMutex, &localCv] (int _sig)
+      {
+        std::unique_lock<std::mutex> localLock(localMutex);
+        ASSERT_LT(index, static_cast<int>(results.size()));
+        results[index] = _sig;
+        localCv.notify_all();
+      }));
+
+      // Create a new index and result entry one-by-one
+      outerMutex.lock();
+      index = results.size();
+      EXPECT_LT(-1, index);
+      EXPECT_GT(threadCount, index);
+      results.push_back(0);
+
+      std::unique_lock<std::mutex> localLock(localMutex);
+      // Unblock the outer test when all the results have been created.
+      if (static_cast<int>(results.size()) >= threadCount)
+        outerCv.notify_all();
+
+      outerMutex.unlock();
+
+      // Wait for this thread's signal handler.
+      localCv.wait(localLock);
+    });
+
+    // Store the threads
+    threads.push_back(thread);
+  }
+
+  // Wait for all the threads to finish their creation process.
+  outerCv.wait(outerLock);
+
+  EXPECT_EQ(threadCount, static_cast<int>(results.size()));
+  EXPECT_EQ(threadCount, static_cast<int>(threads.size()));
+  EXPECT_EQ(threadCount, static_cast<int>(gOnSignalWrappers.size()));
+
+  // Check that all the indices in gOnSignalWrappers are increasing by one.
+  int index = 0;
+  for (std::pair<int, std::function<void(int)>> func : gOnSignalWrappers)
+  {
+    EXPECT_EQ(index, func.first);
+    ++index;
+  }
+
+  // Raise the signal and join the thread.
+  raise(SIGINT);
+
+  // Join all threads and cleanup
+  for (std::thread *thread : threads)
+  {
+    if (thread && thread->joinable())
+    {
+      thread->join();
+      delete thread;
+      thread = nullptr;
+    }
+  }
+
+  // Check the results
+  for (int i = 0; i < threadCount; ++i)
+    EXPECT_EQ(SIGINT, results[i]);
 }
