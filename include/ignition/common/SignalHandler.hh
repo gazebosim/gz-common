@@ -14,11 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_GAZEBO_SIGNALHANDLER_HH_
-#define IGNITION_GAZEBO_SIGNALHANDLER_HH_
+#ifndef IGNITION_COMMON_SIGNALHANDLER_HH_
+#define IGNITION_COMMON_SIGNALHANDLER_HH_
 
 #include <functional>
 #include <vector>
+
+#include <ignition/common/Export.hh>
 
 namespace ignition
 {
@@ -44,7 +46,7 @@ namespace ignition
     /// });
     /// ~~~
     ///
-    class SignalHandler
+    class IGNITION_COMMON_VISIBLE SignalHandler
     {
       /// \brief Constructor
       public: SignalHandler();
