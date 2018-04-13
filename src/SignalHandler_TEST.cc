@@ -15,12 +15,14 @@
  *
 */
 
-#include "ignition/common/SignalHandler.hh"
-#include <gtest/gtest.h>
-#include <signal.h>
-#include <condition_variable>
-#include <mutex>
-#include "ignition/common/Util.hh"
+// Suppressing cpplint.py because tools/cpplint.py is old. Remove the NOLINT
+// comments when upgrading to ign-cmake's "make codecheck"
+#include "ignition/common/SignalHandler.hh" // NOLINT(*)
+#include <gtest/gtest.h> // NOLINT(*)
+#include <signal.h> // NOLINT(*)
+#include <condition_variable> // NOLINT(*)
+#include <mutex> // NOLINT(*)
+#include "ignition/common/Util.hh" // NOLINT(*)
 
 using namespace ignition;
 
