@@ -114,21 +114,21 @@ namespace ignition
       /// \brief Delegate the function to the standard Plugin method
       /// \param[in] _type Empty object meant to guide the compiler to pick the
       /// desired implementation.
-      /// \return Pointer to the intergace
+      /// \return Pointer to the interface
       private: template <class Interface>
                Interface *PrivateQueryInterface(type<Interface> _type);
 
       /// \brief Use a high-speed accessor to provide this specialized interface
       /// \param[in] _type Empty object meant to guide the compiler to pick the
       /// desired implementation.
-      /// \return Pointer to the specialized intergace
+      /// \return Pointer to the specialized interface
       private: SpecInterface *PrivateQueryInterface(
           type<SpecInterface> _type);
 
       /// \brief Delegate the function to the standard Plugin method
       /// \param[in] _type Empty object meant to guide the compiler to pick the
       /// desired implementation.
-      /// \return Pointer to the specialized intergace
+      /// \return Pointer to the specialized interface
       private: template <class Interface>
                const Interface *PrivateQueryInterface(type<Interface> _type)
                const;
@@ -136,7 +136,7 @@ namespace ignition
       /// \brief Use a high-speed accessor to provide this specialized interface
       /// \param[in] _type Empty object meant to guide the compiler to pick the
       /// desired implementation.
-      /// \return Pointer to the specialized intergace
+      /// \return Pointer to the specialized interface
       private: const SpecInterface *PrivateQueryInterface(
                    type<SpecInterface> _type) const;
 
@@ -154,8 +154,8 @@ namespace ignition
       private: bool PrivateHasInterface(type<SpecInterface> _type) const;
 
       /// \brief Iterator that points to the entry of the specialized interface
-      private:
-          const Plugin::InterfaceMap::iterator privateSpecializedInterfaceIterator;
+      private: const Plugin::InterfaceMap::iterator
+               privateSpecializedInterfaceIterator;
 
       // Dev note (MXG): The privateSpecializedInterfaceIterator object must be
       // available to the user during their compile time, so it cannot be hidden

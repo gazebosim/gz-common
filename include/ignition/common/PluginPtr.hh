@@ -71,7 +71,7 @@ namespace ignition
       /// plugin instance held by _other. If this PluginPtr was holding an
       /// instance to another plugin, that instance will be deleted if no other
       /// PluginPtr is referencing it.
-      /// \param[in] _other Another PluginPtr object
+      /// \param[in] _other Pointer to plugin being moved.
       public: TemplatePluginPtr(TemplatePluginPtr &&_other);
 
       /// \brief Casting constructor. This PluginPtr will now point at the same
@@ -110,23 +110,23 @@ namespace ignition
       /// other PluginPtr is referencing it.
       /// \param[in] _other Another PluginPtr object.
       /// \return A reference to this object.
-      public: TemplatePluginPtr &operator=(TemplatePluginPtr &&_other);
+      public: TemplatePluginPtr &operator =(TemplatePluginPtr &&_other);
 
       /// \brief nullptr assignment operator. Same as calling Clear()
       /// \param[in] A nullptr object.
       /// \return A reference to this object.
-      public: TemplatePluginPtr &operator=(std::nullptr_t);
+      public: TemplatePluginPtr &operator =(std::nullptr_t);
 
       /// \brief Access the wrapper for the plugin instance and call one of its
       /// member functions.
       /// \return The ability to call a member function on the underlying Plugin
       /// object.
-      public: PluginType *operator->() const;
+      public: PluginType *operator ->() const;
 
       /// \brief Get a reference to the wrapper for the plugin instance that is
       /// being managed by this PluginPtr.
       /// \return A reference to the underlying Plugin object.
-      public: PluginType &operator*() const;
+      public: PluginType &operator *() const;
 
       /// \brief Comparison operator. Returns true if this Plugin is holding the
       /// same plugin instance as _other, otherwise returns false.
