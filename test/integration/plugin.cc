@@ -16,7 +16,7 @@
 */
 
 // Defining this macro before including ignition/common/SpecializedPluginPtr.hh
-// allows us to test that the low-cost routines are being used to access the
+// allows us to test that the high-speed routines are being used to access the
 // specialized plugin interfaces.
 #define IGNITION_UNITTEST_SPECIALIZED_PLUGIN_ACCESS
 
@@ -33,7 +33,7 @@
 
 #include "test_config.h"
 #include "DummyPluginsPath.h"
-#include "util/DummyPlugins.hh"
+#include "plugins/DummyPlugins.hh"
 
 /////////////////////////////////////////////////
 TEST(PluginLoader, LoadBadPlugins)
@@ -162,10 +162,8 @@ using SomeSpecializedPluginPtr =
 
 TEST(SpecializedPluginPtr, Construction)
 {
-  std::string projectPath(PROJECT_BINARY_PATH);
-
   ignition::common::SystemPaths sp;
-  sp.AddPluginPaths(projectPath + "/test/util");
+  sp.AddPluginPaths(IGN_DUMMY_PLUGIN_PATH);
   std::string path = sp.FindSharedLibrary("IGNDummyPlugins");
   ASSERT_FALSE(path.empty());
 
@@ -291,10 +289,8 @@ TEST(PluginPtr, CopyMoveSemantics)
   ignition::common::PluginPtr plugin;
   EXPECT_TRUE(plugin.IsEmpty());
 
-  std::string projectPath(PROJECT_BINARY_PATH);
-
   ignition::common::SystemPaths sp;
-  sp.AddPluginPaths(projectPath + "/test/util");
+  sp.AddPluginPaths(IGN_DUMMY_PLUGIN_PATH);
   std::string path = sp.FindSharedLibrary("IGNDummyPlugins");
   ASSERT_FALSE(path.empty());
 
@@ -373,10 +369,8 @@ void CheckSomeValues(
 
 TEST(PluginPtr, QueryInterfaceSharedPtr)
 {
-  std::string projectPath(PROJECT_BINARY_PATH);
-
   ignition::common::SystemPaths sp;
-  sp.AddPluginPaths(projectPath + "/test/util");
+  sp.AddPluginPaths(IGN_DUMMY_PLUGIN_PATH);
   std::string path = sp.FindSharedLibrary("IGNDummyPlugins");
   ASSERT_FALSE(path.empty());
 

@@ -14,7 +14,8 @@
  * limitations under the License.
  *
 */
-#include <ignition/math/Helpers.hh>
+#include <cmath>
+#include <limits>
 #include "ignition/common/EnumIface.hh"
 #include "ignition/common/MaterialDensity.hh"
 
@@ -91,7 +92,7 @@ double MaterialDensity::Density(const MaterialDensity::Type _material)
 std::tuple<MaterialDensity::Type, double> MaterialDensity::Nearest(
     const double _value, const double _epsilon)
 {
-  double min = ignition::math::MAX_D;
+  double min = std::numeric_limits<double>::max();
   std::tuple<MaterialDensity::Type, double> result
   {
     MaterialDensity::Type::END, -1.0

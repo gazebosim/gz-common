@@ -35,7 +35,7 @@
 #endif
 
 /// \brief Seconds in one nano second.
-#define IGN_NANO_TO_SEC 0.0000000001
+#define IGN_NANO_TO_SEC 1e-9
 
 /// \brief Nano seconds in one second.
 #define IGN_SEC_TO_NANO 1000000000
@@ -101,10 +101,6 @@ namespace ignition
 
     /// \brief A runtime error.
     typedef std::runtime_error exception;
-
-    /// \brief Load external libraries, such as libav. It is safe to call
-    /// this multiple times.
-    void load();
 
     /// \brief Get the wall time as an ISO string: YYYY-MM-DDTHH:MM:SS.NS
     /// \return The current wall time as an ISO string.
