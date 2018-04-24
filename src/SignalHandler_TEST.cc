@@ -27,11 +27,15 @@
 
 using namespace ignition;
 
+#ifndef _WIN32
 // Capture the gOnSignalWrappers map from SignalHandlers.cc
 extern std::map<int, std::function<void(int)>> gOnSignalWrappers;
+#endif
 
 int gHandler1Sig = -1;
 int gHandler2Sig = -1;
+int gHandler3Sig = -1;
+int gHandler4Sig = -1;
 
 /////////////////////////////////////////////////
 void handler1Cb(int _sig)
@@ -44,12 +48,26 @@ void handler2Cb(int _sig)
 {
   gHandler2Sig = _sig;
 }
-/*
+
+/////////////////////////////////////////////////
+void handler3Cb(int _sig)
+{
+  gHandler3Sig = _sig;
+}
+
+/////////////////////////////////////////////////
+void handler4Cb(int _sig)
+{
+  gHandler4Sig = _sig;
+}
+
 /////////////////////////////////////////////////
 TEST(SignalHandler, Single)
 {
   gHandler1Sig = -1;
   gHandler2Sig = -1;
+  gHandler3Sig = -1;
+  gHandler4Sig = -1;
 
   common::SignalHandler handler1;
   EXPECT_TRUE(handler1.AddCallback(handler1Cb));
@@ -62,6 +80,8 @@ TEST(SignalHandler, Multiple)
 {
   gHandler1Sig = -1;
   gHandler2Sig = -1;
+  gHandler3Sig = -1;
+  gHandler4Sig = -1;
 
   common::SignalHandler handler1;
   common::SignalHandler handler2;
@@ -69,13 +89,16 @@ TEST(SignalHandler, Multiple)
   EXPECT_TRUE(handler1.Initialized());
   EXPECT_TRUE(handler2.Initialized());
 
-  EXPECT_TRUE(handler1.AddCallback(handler1Cb));
-  EXPECT_TRUE(handler2.AddCallback(handler2Cb));
+  EXPECT_TRUE(handler1.AddCallback(handler3Cb));
+  EXPECT_TRUE(handler2.AddCallback(handler4Cb));
 
   raise(SIGINT);
 
-  EXPECT_EQ(SIGINT, gHandler1Sig);
-  EXPECT_EQ(SIGINT, gHandler2Sig);
+  EXPECT_EQ(-1, gHandler1Sig);
+  EXPECT_EQ(-1, gHandler2Sig);
+
+  EXPECT_EQ(SIGINT, gHandler3Sig);
+  EXPECT_EQ(SIGINT, gHandler4Sig);
 }
 
 
@@ -158,11 +181,13 @@ TEST(SignalHandler, Thread)
   EXPECT_EQ(SIGINT, gHandler1Sig);
   EXPECT_EQ(SIGINT, gHandler2Sig);
 }
-*/
 
 /////////////////////////////////////////////////
 TEST(SignalHandler, MultipleThreads)
 {
+  gHandler1Sig = -1;
+  gHandler2Sig = -1;
+
   // Create a lock, which will allows us to wait for the thread to create
   // its signal handler
   std::mutex outerMutex;
@@ -228,13 +253,15 @@ TEST(SignalHandler, MultipleThreads)
   EXPECT_EQ(threadCount, static_cast<int>(threads.size()));
   EXPECT_EQ(threadCount, static_cast<int>(gOnSignalWrappers.size()));
 
+#ifndef _WIN32
   // Check that all the indices in gOnSignalWrappers are increasing by one.
-  int index = 0;
+  int index = gOnSignalWrappers.begin()->first;
   for (std::pair<int, std::function<void(int)>> func : gOnSignalWrappers)
   {
     EXPECT_EQ(index, func.first);
     ++index;
   }
+#endif
 
   // Raise the signal and join the thread.
   raise(SIGINT);
