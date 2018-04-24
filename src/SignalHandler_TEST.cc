@@ -251,9 +251,10 @@ TEST(SignalHandler, MultipleThreads)
 
   EXPECT_EQ(threadCount, static_cast<int>(results.size()));
   EXPECT_EQ(threadCount, static_cast<int>(threads.size()));
-  EXPECT_EQ(threadCount, static_cast<int>(gOnSignalWrappers.size()));
 
 #ifndef _WIN32
+  EXPECT_EQ(threadCount, static_cast<int>(gOnSignalWrappers.size()));
+
   // Check that all the indices in gOnSignalWrappers are increasing by one.
   int index = gOnSignalWrappers.begin()->first;
   for (std::pair<int, std::function<void(int)>> func : gOnSignalWrappers)
