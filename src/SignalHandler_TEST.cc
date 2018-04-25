@@ -15,6 +15,7 @@
  *
 */
 
+#ifndef _WIN32
 // Suppressing cpplint.py because tools/cpplint.py is old. Remove the NOLINT
 // comments when upgrading to ign-cmake's "make codecheck"
 #include "ignition/common/SignalHandler.hh" // NOLINT(*)
@@ -27,10 +28,8 @@
 
 using namespace ignition;
 
-#ifndef _WIN32
 // Capture the gOnSignalWrappers map from SignalHandlers.cc
 extern std::map<int, std::function<void(int)>> gOnSignalWrappers;
-#endif
 
 int gHandler1Sig = -1;
 int gHandler2Sig = -1;
@@ -252,7 +251,6 @@ TEST(SignalHandler, MultipleThreads)
   EXPECT_EQ(threadCount, static_cast<int>(results.size()));
   EXPECT_EQ(threadCount, static_cast<int>(threads.size()));
 
-#ifndef _WIN32
   EXPECT_EQ(threadCount, static_cast<int>(gOnSignalWrappers.size()));
 
   // Check that all the indices in gOnSignalWrappers are increasing by one.
@@ -262,7 +260,6 @@ TEST(SignalHandler, MultipleThreads)
     EXPECT_EQ(index, func.first);
     ++index;
   }
-#endif
 
   // Raise the signal and join the thread.
   raise(SIGINT);
@@ -282,3 +279,4 @@ TEST(SignalHandler, MultipleThreads)
   for (int i = 0; i < threadCount; ++i)
     EXPECT_EQ(SIGINT, results[i]);
 }
+#endif
