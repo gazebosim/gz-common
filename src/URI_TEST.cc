@@ -31,14 +31,14 @@ TEST(URITEST, URIPath)
   EXPECT_EQ(path1.Str(), "part1");
   path1.PushBack("part2");
   EXPECT_EQ(path1.Str(), "part1/part2");
-  path1.PushFront("part0");
-  EXPECT_EQ(path1.Str(), "part0/part1/part2");
+  path1.PushFront("part 0");
+  EXPECT_EQ(path1.Str(), "part 0/part1/part2");
 
   path2 = path1 / "part3";
-  EXPECT_EQ(path2.Str(), "part0/part1/part2/part3");
+  EXPECT_EQ(path2.Str(), "part 0/part1/part2/part3");
 
   path1 /= "part3";
-  EXPECT_EQ(path1.Str(), "part0/part1/part2/part3");
+  EXPECT_EQ(path1.Str(), "part 0/part1/part2/part3");
 
   EXPECT_TRUE(path1 == path2);
 
@@ -50,6 +50,15 @@ TEST(URITEST, URIPath)
 
   URIPath path4(path3);
   EXPECT_TRUE(path4 == path3);
+}
+
+/////////////////////////////////////////////////
+TEST(URITEST, URIPathCoverageExtra)
+{
+  // getting full destructor coverage
+  URIPath *p = new URIPath;
+  ASSERT_NE(nullptr, p);
+  delete p;
 }
 
 /////////////////////////////////////////////////
@@ -67,6 +76,7 @@ TEST(URITEST, URIPathString)
   EXPECT_TRUE(URIPath::Valid("/part1/"));
   EXPECT_TRUE(URIPath::Valid("/part1/part2"));
   EXPECT_TRUE(URIPath::Valid("/part1/part2/"));
+  EXPECT_TRUE(URIPath::Valid("/part 1/part 2/"));
 
   EXPECT_FALSE(path.Parse(""));
   EXPECT_FALSE(path.Parse("//"));
@@ -79,6 +89,7 @@ TEST(URITEST, URIPathString)
   EXPECT_TRUE(path.Parse("/part1/"));
   EXPECT_TRUE(path.Parse("/part1/part2"));
   EXPECT_TRUE(path.Parse("/part1/part2/"));
+  EXPECT_TRUE(path.Parse("/part 1/part 2/"));
 
   EXPECT_NO_THROW(EXPECT_FALSE(URIPath("").Valid()));
   EXPECT_NO_THROW(EXPECT_FALSE(URIPath("//").Valid()));
@@ -91,7 +102,7 @@ TEST(URITEST, URIPathString)
   EXPECT_NO_THROW(URIPath("/part1"));
   EXPECT_NO_THROW(URIPath("/part1/"));
   EXPECT_NO_THROW(URIPath("/part1/part2"));
-  EXPECT_NO_THROW(URIPath("/part1/part2/"));
+  EXPECT_NO_THROW(URIPath("/part 1/part2/"));
 }
 
 /////////////////////////////////////////////////
@@ -120,9 +131,21 @@ TEST(URITEST, URIQuery)
 }
 
 /////////////////////////////////////////////////
+TEST(URITEST, URIQueryCoverageExtra)
+{
+  // getting full destructor coverage
+  URIQuery *p = new URIQuery;
+  ASSERT_NE(nullptr, p);
+  delete p;
+}
+
+/////////////////////////////////////////////////
 TEST(URITEST, URIQueryString)
 {
   URIQuery query;
+  EXPECT_TRUE(query.Valid());
+
+  // test static Valid function
   EXPECT_FALSE(URIQuery::Valid("??"));
   EXPECT_FALSE(URIQuery::Valid("invalid?"));
   EXPECT_FALSE(URIQuery::Valid("?invalid?"));
@@ -130,6 +153,7 @@ TEST(URITEST, URIQueryString)
   EXPECT_FALSE(URIQuery::Valid("?key"));
   EXPECT_FALSE(URIQuery::Valid("?key="));
   EXPECT_FALSE(URIQuery::Valid("?=value"));
+  EXPECT_FALSE(URIQuery::Valid("?key=value with space"));
 
   EXPECT_TRUE(URIQuery::Valid(""));
   EXPECT_TRUE(URIQuery::Valid("?key=value"));
@@ -142,10 +166,16 @@ TEST(URITEST, URIQueryString)
   EXPECT_FALSE(query.Parse("?key"));
   EXPECT_FALSE(query.Parse("?key="));
   EXPECT_FALSE(query.Parse("?=value"));
+  // these invalid queries failed to parse and
+  // didn't update the query.
+  // it should still be valid
+  EXPECT_TRUE(query.Valid());
 
   EXPECT_TRUE(query.Parse(""));
   EXPECT_TRUE(query.Parse("?key=value"));
   EXPECT_TRUE(query.Parse("?key=value&key2=value2"));
+  // it should still be valid
+  EXPECT_TRUE(query.Valid());
 
   EXPECT_NO_THROW(URIQuery("??"));
   EXPECT_NO_THROW(URIQuery("invalid?"));
@@ -168,6 +198,7 @@ TEST(URITEST, Scheme)
 
   uri.SetScheme("data");
   EXPECT_EQ(uri.Str(), "data://");
+  EXPECT_EQ("data", uri.Scheme());
 }
 
 /////////////////////////////////////////////////
@@ -252,10 +283,15 @@ TEST(URITEST, URIString)
   EXPECT_FALSE(URI::Valid("scheme://"));
   EXPECT_FALSE(URI::Valid("scheme://?key=value"));
   EXPECT_FALSE(URI::Valid("scheme://part1?keyvalue"));
+  EXPECT_FALSE(URI::Valid("scheme://part1?key value"));
   EXPECT_TRUE(URI::Valid("scheme://part1"));
   EXPECT_TRUE(URI::Valid("scheme://part1/part2"));
   EXPECT_TRUE(URI::Valid("scheme://part1?key=value"));
   EXPECT_TRUE(URI::Valid("scheme://part1/part2?k1=v1&k2=v2"));
+  EXPECT_TRUE(URI::Valid("scheme://part 1/part 2?k1=v1&k2=v2"));
+  EXPECT_TRUE(URI::Valid("scheme://part1 /part2 ?k1=v1&k2=v2"));
+  EXPECT_TRUE(URI::Valid("scheme://part  1  /part  2  ?k1=v1&k2=v2"));
+  EXPECT_TRUE(URI::Valid("scheme with space://part 1/part 2?k1=v1&k2=v2"));
 
   EXPECT_FALSE(uri.Parse(""));
   EXPECT_FALSE(uri.Parse("scheme"));
