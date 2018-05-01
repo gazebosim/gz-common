@@ -61,12 +61,18 @@ void handler4Cb(int _sig)
 }
 
 /////////////////////////////////////////////////
-TEST(SignalHandler, Single)
+void resetSignals()
 {
   gHandler1Sig = -1;
   gHandler2Sig = -1;
   gHandler3Sig = -1;
   gHandler4Sig = -1;
+}
+
+/////////////////////////////////////////////////
+TEST(SignalHandler, Single)
+{
+  resetSignals();
 
   common::SignalHandler handler1;
   EXPECT_TRUE(handler1.AddCallback(handler1Cb));
@@ -77,10 +83,7 @@ TEST(SignalHandler, Single)
 /////////////////////////////////////////////////
 TEST(SignalHandler, Multiple)
 {
-  gHandler1Sig = -1;
-  gHandler2Sig = -1;
-  gHandler3Sig = -1;
-  gHandler4Sig = -1;
+  resetSignals();
 
   common::SignalHandler handler1;
   common::SignalHandler handler2;
@@ -104,8 +107,7 @@ TEST(SignalHandler, Multiple)
 /////////////////////////////////////////////////
 TEST(SignalHandler, InitFailure)
 {
-  gHandler1Sig = -1;
-  gHandler2Sig = -1;
+  resetSignals();
 
   class NotInitializedSignalHandler : public common::SignalHandler
   {
@@ -130,13 +132,12 @@ TEST(SignalHandler, InitFailure)
 /////////////////////////////////////////////////
 TEST(SignalHandler, Thread)
 {
-  gHandler1Sig = -1;
-  gHandler2Sig = -1;
+  resetSignals();
 
   std::mutex mutex;
   std::condition_variable cv;
 
-  // Create a lock, which will allows us to wait for the thread to create
+  // Create a lock, which will allow us to wait for the thread to create
   // its signal handler
   std::unique_lock<std::mutex> outerLock(mutex);
 
@@ -184,10 +185,9 @@ TEST(SignalHandler, Thread)
 /////////////////////////////////////////////////
 TEST(SignalHandler, MultipleThreads)
 {
-  gHandler1Sig = -1;
-  gHandler2Sig = -1;
+  resetSignals();
 
-  // Create a lock, which will allows us to wait for the thread to create
+  // Create a lock, which will allow us to wait for the thread to create
   // its signal handler
   std::mutex outerMutex;
   std::unique_lock<std::mutex> outerLock(outerMutex);
