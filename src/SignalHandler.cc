@@ -20,8 +20,10 @@
 #include "ignition/common/SignalHandler.hh" // NOLINT(*)
 #include <signal.h> // NOLINT(*)
 #include <functional> // NOLINT(*)
+#include <iostream> // NOLINT(*)
 #include <map> // NOLINT(*)
 #include <mutex> // NOLINT(*)
+#include <utility> // NOLINT(*)
 #include <vector> // NOLINT(*)
 #include "ignition/common/Console.hh" // NOLINT(*)
 
@@ -31,6 +33,10 @@ using namespace common;
 // A wrapper for the sigaction sa_handler.
 std::map<int, std::function<void(int)>> gOnSignalWrappers;
 std::mutex gWrapperMutex;
+
+/////////////////////////////////////////////////
+/// \brief Callback to execute when a signal is received.
+/// \param[in] _value Signal number.
 void onSignal(int _value)
 {
   std::lock_guard<std::mutex> lock(gWrapperMutex);

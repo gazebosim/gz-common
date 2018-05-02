@@ -18,7 +18,6 @@
 #define IGNITION_COMMON_SIGNALHANDLER_HH_
 
 #include <functional>
-#include <vector>
 
 #include <ignition/common/Export.hh>
 
