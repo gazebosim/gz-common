@@ -112,12 +112,8 @@ SignalHandler::SignalHandler()
 /////////////////////////////////////////////////
 SignalHandler::~SignalHandler()
 {
-  if (this->dataPtr->wrapperIndex >= 0)
-  {
-    std::lock_guard<std::mutex> lock(gWrapperMutex);
-    gOnSignalWrappers.erase(
-        gOnSignalWrappers.find(this->dataPtr->wrapperIndex));
-  }
+  std::lock_guard<std::mutex> lock(gWrapperMutex);
+  gOnSignalWrappers.erase(this->dataPtr->wrapperIndex);
   delete this->dataPtr;
   this->dataPtr = nullptr;
 }
