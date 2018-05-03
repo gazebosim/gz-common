@@ -57,8 +57,11 @@ class ignition::common::SignalHandlerPrivate
   /// \brief the callbacks to execute when a signal is received.
   public: std::vector<std::function<void(int)>> callbacks;
 
+  /// \brief Callback mutex.
+  public: std::mutex cbMutex;
+
   /// \brief True if signal handlers were successfully initialized.
-  public: bool initialized = false;
+  public: std::atomic<bool> initialized = {false};
 
   /// \brief Index in the global gOnSignalWrappers map.
   public: int wrapperIndex = -1;
@@ -134,11 +137,11 @@ void SignalHandler::SetInitialized(const bool _init)
 /////////////////////////////////////////////////
 bool SignalHandler::AddCallback(std::function<void(int)> _cb)
 {
-  bool result = false;
-  if (this->dataPtr->initialized)
+  bool result = this->dataPtr->initialized;
+  if (result)
   {
+    std::lock_guard<std::mutex> lock(this->dataPtr->cbMutex);
     this->dataPtr->callbacks.push_back(_cb);
-    result = true;
   }
   else
   {
@@ -151,6 +154,7 @@ bool SignalHandler::AddCallback(std::function<void(int)> _cb)
 //////////////////////////////////////////////////
 void SignalHandlerPrivate::OnSignal(int _sig)
 {
+  std::lock_guard<std::mutex> lock(this->cbMutex);
   igndbg << "Received signal[" << _sig << "].\n";
   for (std::function<void(int)> cb : this->callbacks)
     cb(_sig);
