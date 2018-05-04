@@ -23,7 +23,7 @@
 #include <condition_variable> // NOLINT(*)
 #include <map> // NOLINT(*)
 #include <mutex> // NOLINT(*)
-#include <thread>
+#include <thread> // NOLINT(*)
 #include "ignition/common/Util.hh" // NOLINT(*)
 
 using namespace ignition;
