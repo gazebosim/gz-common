@@ -15,12 +15,11 @@
  *
 */
 
-#ifndef _WIN32
 // Suppressing cpplint.py because tools/cpplint.py is old. Remove the NOLINT
 // comments when upgrading to ign-cmake's "make codecheck"
 #include "ignition/common/SignalHandler.hh" // NOLINT(*)
 #include <gtest/gtest.h> // NOLINT(*)
-#include <signal.h> // NOLINT(*)
+#include <csignal> // NOLINT(*)
 #include <condition_variable> // NOLINT(*)
 #include <map> // NOLINT(*)
 #include <mutex> // NOLINT(*)
@@ -76,7 +75,7 @@ TEST(SignalHandler, Single)
 
   common::SignalHandler handler1;
   EXPECT_TRUE(handler1.AddCallback(handler1Cb));
-  raise(SIGTERM);
+  std::raise(SIGTERM);
   EXPECT_EQ(SIGTERM, gHandler1Sig);
 }
 
@@ -94,7 +93,7 @@ TEST(SignalHandler, Multiple)
   EXPECT_TRUE(handler1.AddCallback(handler3Cb));
   EXPECT_TRUE(handler2.AddCallback(handler4Cb));
 
-  raise(SIGINT);
+  std::raise(SIGINT);
 
   EXPECT_EQ(-1, gHandler1Sig);
   EXPECT_EQ(-1, gHandler2Sig);
@@ -123,7 +122,7 @@ TEST(SignalHandler, InitFailure)
   EXPECT_FALSE(badSigHandler.Initialized());
   EXPECT_FALSE(badSigHandler.AddCallback(handler1Cb));
 
-  raise(SIGINT);
+  std::raise(SIGINT);
 
   EXPECT_EQ(-1, gHandler1Sig);
   EXPECT_EQ(-1, gHandler2Sig);
@@ -174,7 +173,7 @@ TEST(SignalHandler, Thread)
   cv.wait(outerLock);
 
   // Raise the signal and join the thread.
-  raise(SIGINT);
+  std::raise(SIGINT);
   outerLock.unlock();
   thread1.join();
 
@@ -262,7 +261,7 @@ TEST(SignalHandler, MultipleThreads)
   }
 
   // Raise the signal and join the thread.
-  raise(SIGINT);
+  std::raise(SIGINT);
 
   // Join all threads and cleanup
   for (std::thread *thread : threads)
@@ -279,4 +278,3 @@ TEST(SignalHandler, MultipleThreads)
   for (int i = 0; i < threadCount; ++i)
     EXPECT_EQ(SIGINT, results[i]);
 }
-#endif

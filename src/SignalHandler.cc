@@ -18,9 +18,8 @@
 // Suppressing cpplint.py because tools/cpplint.py is old. Remove the NOLINT
 // comments when upgrading to ign-cmake's "make codecheck"
 #include "ignition/common/SignalHandler.hh" // NOLINT(*)
-#include <signal.h> // NOLINT(*)
+#include <csignal> // NOLINT(*)
 #include <functional> // NOLINT(*)
-#include <iostream> // NOLINT(*)
 #include <map> // NOLINT(*)
 #include <mutex> // NOLINT(*)
 #include <utility> // NOLINT(*)
@@ -74,31 +73,19 @@ SignalHandler::SignalHandler()
   static int counter = 0;
   std::lock_guard<std::mutex> lock(gWrapperMutex);
 
-#ifndef _WIN32
-  // Only need to setup the system sighandler once.
-  if (counter == 0)
+  if (std::signal(SIGINT, onSignal) == SIG_ERR)
   {
-    /// \todo(nkoenig) Add a mock interface to test failure of signal
-    /// creation.
-    struct sigaction sigact;
-    sigact.sa_flags = 0;
-    sigact.sa_handler = onSignal;
-    if (sigemptyset(&sigact.sa_mask) != 0)
-      std::cerr << "sigemptyset failed while setting up for SIGINT\n";
-
-    if (sigaction(SIGINT, &sigact, nullptr))
-    {
-      ignerr << "Unable to catch SIGINT.\n"
-        << " Please visit http://community.gazebosim.org for help.\n";
-      return;
-    }
-    if (sigaction(SIGTERM, &sigact, nullptr))
-    {
-      ignerr << "Unable to catch SIGTERM.\n";
-      return;
-    }
+    ignerr << "Unable to catch SIGINT.\n"
+           << " Please visit http://community.gazebosim.org for help.\n";
+    return;
   }
-#endif
+
+  if (std::signal(SIGTERM, onSignal) == SIG_ERR)
+  {
+    ignerr << "Unable to catch SIGTERM.\n"
+           << " Please visit http://community.gazebosim.org for help.\n";
+    return;
+  }
 
   gOnSignalWrappers[counter] = std::bind(&SignalHandlerPrivate::OnSignal,
       this->dataPtr, std::placeholders::_1);
