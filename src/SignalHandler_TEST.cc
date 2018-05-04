@@ -23,6 +23,7 @@
 #include <condition_variable> // NOLINT(*)
 #include <map> // NOLINT(*)
 #include <mutex> // NOLINT(*)
+#include <thread> // NOLINT(*)
 #include "ignition/common/Util.hh" // NOLINT(*)
 
 using namespace ignition;
@@ -198,7 +199,11 @@ TEST(SignalHandler, MultipleThreads)
   std::vector<int> results;
 
   // A lot of threads
+#if _WIN64 || __amd64__
   int threadCount = 1000;
+#else
+  int threadCount = std::thread::hardware_concurrency();
+#endif
 
   // Create all the threads.
   for (int i = 0; i < threadCount; ++i)
