@@ -14,9 +14,10 @@
 1. Expand plugin functionality with PluginPtr and specializations
     * [Pull request 59](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/59)
 
+1. Added signal handler class
+    * [Pull request 115](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/115)
 
 ## Ignition Common 1.x.x (2018-XX-XX)
-
 
 
 ## Ignition Common 1.1.0 (2018-04-16)
@@ -33,4 +34,3 @@
 
 1. Fix nanosecond to second conversion
     * [Pull request 100](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/100)
-
