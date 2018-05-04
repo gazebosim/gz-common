@@ -1,5 +1,7 @@
-## Ignition Common 1.x.x (2018-XX-XX)
+## Ignition Common 2.x.x (2018-XX-XX)
 
+1. Added signal handler class
+    * [Pull request 115](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/115)
 
 
 ## Ignition Common 1.1.0 (2018-04-16)
@@ -16,4 +18,3 @@
 
 1. Fix nanosecond to second conversion
     * [Pull request 100](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/100)
-
