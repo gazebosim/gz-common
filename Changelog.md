@@ -1,7 +1,23 @@
-## Ignition Common 2.x.x (2018-XX-XX)
+## Ignition Common 2.x
+
+## Ignition Common 2.0.0 (2018-XX-XX)
+
+1. Use ignition-cmake1 and components for av, events, and graphics
+    * [Pull request 102](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/102)
+    * [Pull request 103](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/103)
+    * [Pull request 105](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/105)
+    * [Pull request 106](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/106)
+    * [Pull request 107](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/107)
+    * [Pull request 108](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/108)
+    * [Pull request 109](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/109)
+
+1. Expand plugin functionality with PluginPtr and specializations
+    * [Pull request 59](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/59)
 
 1. Added signal handler class
     * [Pull request 115](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/115)
+
+## Ignition Common 1.x.x (2018-XX-XX)
 
 
 ## Ignition Common 1.1.0 (2018-04-16)
