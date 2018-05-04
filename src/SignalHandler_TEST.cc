@@ -28,7 +28,9 @@
 using namespace ignition;
 
 // Capture the gOnSignalWrappers map from SignalHandlers.cc
+#ifndef _WIN32
 extern std::map<int, std::function<void(int)>> gOnSignalWrappers;
+#endif
 
 int gHandler1Sig = -1;
 int gHandler2Sig = -1;
@@ -250,6 +252,7 @@ TEST(SignalHandler, MultipleThreads)
   EXPECT_EQ(threadCount, static_cast<int>(results.size()));
   EXPECT_EQ(threadCount, static_cast<int>(threads.size()));
 
+#ifndef _WIN32
   EXPECT_EQ(threadCount, static_cast<int>(gOnSignalWrappers.size()));
 
   // Check that all the indices in gOnSignalWrappers are increasing by one.
@@ -259,6 +262,7 @@ TEST(SignalHandler, MultipleThreads)
     EXPECT_EQ(index, func.first);
     ++index;
   }
+#endif
 
   // Raise the signal and join the thread.
   std::raise(SIGINT);
