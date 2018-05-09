@@ -264,13 +264,14 @@ TEST(Util_TEST, fileOps)
   EXPECT_FALSE(common::copyFile("test3.tmp", "test3.tmp"));
   EXPECT_FALSE(common::copyFile("test3.tmp", "./test3.tmp"));
 
-  std::remove("test.tmp");
+  EXPECT_TRUE(common::removeFile("test.tmp"));
 
   // This file shouldn't exist, but we'll try to remove just in case the
   // test failed.
-  std::remove("test2.tmp");
+  EXPECT_FALSE(common::removeFile("test2.tmp"));
 
-  std::remove("test3.tmp");
+  EXPECT_TRUE(common::removeFile("test3.tmp"));
+
   EXPECT_FALSE(common::exists("test3.tmp"));
 }
 
@@ -329,6 +330,7 @@ TEST(Filesystem, symlink_exists)
   // Case 1
   ASSERT_TRUE(create_new_file_symlink("symlink-file", "newfile"));
   EXPECT_TRUE(exists("symlink-file"));
+  EXPECT_TRUE(removeFile("symlink-file"));
 
   // Case 2
   ASSERT_TRUE(create_new_file_symlink("symlink-file-broken", "nonexistent"));
@@ -337,6 +339,7 @@ TEST(Filesystem, symlink_exists)
   // Case 3
   ASSERT_TRUE(create_new_dir_symlink("symlink-dir", "newdir"));
   EXPECT_TRUE(exists("symlink-dir"));
+  EXPECT_TRUE(removeDirectory("symlink-dir"));
 
   // Case 4
   ASSERT_TRUE(create_new_dir_symlink("symlink-dir-broken", "nonexistent-dir"));
@@ -345,6 +348,7 @@ TEST(Filesystem, symlink_exists)
   // Case 5
   ASSERT_TRUE(create_new_file_hardlink("hardlink-file", "newfile"));
   EXPECT_TRUE(exists("hardlink-file"));
+  EXPECT_TRUE(removeFile("hardlink-file"));
 }
 #endif
 
