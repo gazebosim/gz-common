@@ -91,7 +91,7 @@ bool ignition::common::removeDirectory(const std::string &_path,
     if (!removed)
     {
       // A sym link would end up here
-      removed = (remove(_path.c_str()) == 0);
+      removed = (std::remove(_path.c_str()) == 0);
     }
 
     if (!removed && FSWO_LOG_WARNINGS == _warningOp)

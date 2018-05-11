@@ -264,7 +264,7 @@ TEST(Util_TEST, fileOps)
   EXPECT_FALSE(common::copyFile("test3.tmp", "test3.tmp"));
   EXPECT_FALSE(common::copyFile("test3.tmp", "./test3.tmp"));
 
-  EXPECT_TRUE(common::removeFile("test.tmp"));
+  common::removeFile("test.tmp");
 
   // This file shouldn't exist, but we'll try to remove just in case the
   // test failed.
