@@ -30,6 +30,7 @@ namespace ignition
     // Forward declare private data classes.
     class URIPathPrivate;
     class URIQueryPrivate;
+    class URIFragmentPrivate;
     class URIPrivate;
 
     /// \brief The path component of a URI
@@ -171,6 +172,66 @@ namespace ignition
       IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
     };
 
+    /// \brief The fragment component of a URI
+    class IGNITION_COMMON_VISIBLE URIFragment
+    {
+      /// \brief Constructor
+      public: URIFragment();
+
+      /// \brief Construct a URIFragment object from a string.
+      /// \param[in] _str A string.
+      public: explicit URIFragment(const std::string &_str);
+
+      /// \brief Copy constructor
+      /// \param[in] _fragment Another fragment component
+      public: URIFragment(const URIFragment &_fragment);
+
+      /// \brief Destructor
+      public: virtual ~URIFragment();
+
+      /// \brief Remove all values of the fragment
+      public: void Clear();
+
+      /// \brief Equal operator.
+      /// \param[in] _fragment another URIFragment.
+      /// \return Itself.
+      public: URIFragment &operator=(const URIFragment &_fragment);
+
+      /// \brief Equal operator.
+      /// \param[in] _fragment another URIFragment.
+      /// \return Itself.
+      public: URIFragment &operator=(const std::string &_fragment);
+
+      /// \brief Return true if the two fragments contain the same values.
+      /// \param[in] _fragment A URI fragment to compare.
+      /// return True if the fragments match.
+      public: bool operator==(const URIFragment &_fragment) const;
+
+      /// \brief Get the fragment as a string.
+      /// \return The fragment as a string.
+      public: std::string Str() const;
+
+      /// \brief Check if a string is a valid URI fragment.
+      /// \param[in] _str The string to check.
+      /// \return True if the string can be parsed as a URI fragment.
+      public: static bool Valid(const std::string &_str);
+
+      /// \brief Check if this is a valid URI fragment.
+      /// \return True if this can be parsed as a URI fragment.
+      public: bool Valid() const;
+
+      /// \brief Parse a string as URIFragment.
+      /// \param[in] _str A string.
+      /// \return True if the string can be parsed as a URIFragment.
+      public: bool Parse(const std::string &_string);
+
+      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<URIFragmentPrivate> dataPtr;
+      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+    };
+
     /// \brief A complete URI
     // cppcheck-suppress class_X_Y
     class IGNITION_COMMON_VISIBLE URI
@@ -222,6 +283,14 @@ namespace ignition
       /// \brief Get a const reference of the query component.
       /// \return A const reference of the query.
       public: const URIQuery &Query() const;
+
+      /// \brief Get a mutable version of the fragment component.
+      /// \return A reference to the fragment.
+      public: URIFragment &Fragment();
+
+      /// \brief Get a const reference of the fragment component.
+      /// \return A const reference of the fragment.
+      public: const URIFragment &Fragment() const;
 
       /// \brief Equal operator.
       /// \param[in] _uri Another URI.

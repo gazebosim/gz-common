@@ -31,14 +31,14 @@ TEST(URITEST, URIPath)
   EXPECT_EQ(path1.Str(), "part1");
   path1.PushBack("part2");
   EXPECT_EQ(path1.Str(), "part1/part2");
-  path1.PushFront("part 0");
-  EXPECT_EQ(path1.Str(), "part 0/part1/part2");
+  path1.PushFront("part%200");
+  EXPECT_EQ(path1.Str(), "part%200/part1/part2");
 
   path2 = path1 / "part3";
-  EXPECT_EQ(path2.Str(), "part 0/part1/part2/part3");
+  EXPECT_EQ(path2.Str(), "part%200/part1/part2/part3");
 
   path1 /= "part3";
-  EXPECT_EQ(path1.Str(), "part 0/part1/part2/part3");
+  EXPECT_EQ(path1.Str(), "part%200/part1/part2/part3");
 
   EXPECT_TRUE(path1 == path2);
 
@@ -71,12 +71,17 @@ TEST(URITEST, URIPathString)
   EXPECT_FALSE(URIPath::Valid("?invalid"));
   EXPECT_FALSE(URIPath::Valid("=invalid"));
   EXPECT_FALSE(URIPath::Valid("&invalid"));
+  EXPECT_FALSE(URIPath::Valid("invalid#"));
+  EXPECT_FALSE(URIPath::Valid("#invalid"));
   EXPECT_TRUE(URIPath::Valid("part1"));
+  EXPECT_TRUE(URIPath::Valid("/"));
   EXPECT_TRUE(URIPath::Valid("/part1"));
   EXPECT_TRUE(URIPath::Valid("/part1/"));
   EXPECT_TRUE(URIPath::Valid("/part1/part2"));
   EXPECT_TRUE(URIPath::Valid("/part1/part2/"));
-  EXPECT_TRUE(URIPath::Valid("/part 1/part 2/"));
+  EXPECT_FALSE(URIPath::Valid("/part 1/part 2/"));
+  EXPECT_TRUE(URIPath::Valid("/part+1/part+2"));
+  EXPECT_TRUE(URIPath::Valid("/part%201/part%202"));
 
   EXPECT_FALSE(path.Parse(""));
   EXPECT_FALSE(path.Parse("//"));
@@ -84,12 +89,17 @@ TEST(URITEST, URIPathString)
   EXPECT_FALSE(path.Parse("?invalid"));
   EXPECT_FALSE(path.Parse("=invalid"));
   EXPECT_FALSE(path.Parse("&invalid"));
+  EXPECT_FALSE(path.Parse("invalid#"));
+  EXPECT_FALSE(path.Parse("#invalid"));
   EXPECT_TRUE(path.Parse("part1"));
+  EXPECT_TRUE(path.Parse("/"));
   EXPECT_TRUE(path.Parse("/part1"));
   EXPECT_TRUE(path.Parse("/part1/"));
   EXPECT_TRUE(path.Parse("/part1/part2"));
   EXPECT_TRUE(path.Parse("/part1/part2/"));
-  EXPECT_TRUE(path.Parse("/part 1/part 2/"));
+  EXPECT_FALSE(path.Parse("/part 1/part 2/"));
+  EXPECT_TRUE(path.Parse("/part+1/part+2"));
+  EXPECT_TRUE(path.Parse("/part%201/part%202"));
 
   EXPECT_NO_THROW(EXPECT_FALSE(URIPath("").Valid()));
   EXPECT_NO_THROW(EXPECT_FALSE(URIPath("//").Valid()));
@@ -97,12 +107,17 @@ TEST(URITEST, URIPathString)
   EXPECT_NO_THROW(EXPECT_FALSE(URIPath("?invalid").Valid()));
   EXPECT_NO_THROW(EXPECT_FALSE(URIPath("=invalid").Valid()));
   EXPECT_NO_THROW(EXPECT_FALSE(URIPath("&invalid").Valid()));
+  EXPECT_NO_THROW(EXPECT_FALSE(URIPath("invalid#").Valid()));
+  EXPECT_NO_THROW(EXPECT_FALSE(URIPath("#invalid").Valid()));
 
+  EXPECT_NO_THROW(URIPath("/"));
   EXPECT_NO_THROW(URIPath("part1"));
   EXPECT_NO_THROW(URIPath("/part1"));
   EXPECT_NO_THROW(URIPath("/part1/"));
   EXPECT_NO_THROW(URIPath("/part1/part2"));
   EXPECT_NO_THROW(URIPath("/part 1/part2/"));
+  EXPECT_NO_THROW(URIPath("/part+1/part+2"));
+  EXPECT_NO_THROW(URIPath("/part%201/part%202"));
 }
 
 /////////////////////////////////////////////////
@@ -150,6 +165,8 @@ TEST(URITEST, URIQueryString)
   EXPECT_FALSE(URIQuery::Valid("invalid?"));
   EXPECT_FALSE(URIQuery::Valid("?invalid?"));
   EXPECT_FALSE(URIQuery::Valid("? invalid"));
+  EXPECT_FALSE(URIQuery::Valid("#invalid"));
+  EXPECT_FALSE(URIQuery::Valid("invalid#"));
   EXPECT_FALSE(URIQuery::Valid("?key"));
   EXPECT_FALSE(URIQuery::Valid("?key="));
   EXPECT_FALSE(URIQuery::Valid("?=value"));
@@ -163,6 +180,8 @@ TEST(URITEST, URIQueryString)
   EXPECT_FALSE(query.Parse("invalid?"));
   EXPECT_FALSE(query.Parse("?invalid?"));
   EXPECT_FALSE(query.Parse("? invalid"));
+  EXPECT_FALSE(query.Parse("#invalid"));
+  EXPECT_FALSE(query.Parse("invalid#"));
   EXPECT_FALSE(query.Parse("?key"));
   EXPECT_FALSE(query.Parse("?key="));
   EXPECT_FALSE(query.Parse("?=value"));
@@ -181,6 +200,8 @@ TEST(URITEST, URIQueryString)
   EXPECT_NO_THROW(URIQuery("invalid?"));
   EXPECT_NO_THROW(URIQuery("?invalid?"));
   EXPECT_NO_THROW(URIQuery("? invalid"));
+  EXPECT_NO_THROW(URIQuery("#invalid"));
+  EXPECT_NO_THROW(URIQuery("invalid#"));
   EXPECT_NO_THROW(URIQuery("?key"));
   EXPECT_NO_THROW(URIQuery("?key="));
   EXPECT_NO_THROW(URIQuery("?=value"));
@@ -188,6 +209,84 @@ TEST(URITEST, URIQueryString)
   EXPECT_NO_THROW(URIQuery(""));
   EXPECT_NO_THROW(URIQuery("?key=value"));
   EXPECT_NO_THROW(URIQuery("?key=value&key2=value2"));
+}
+
+/////////////////////////////////////////////////
+TEST(URITEST, URIFragment)
+{
+  URIFragment fragment1, fragment2, fragment3;
+  EXPECT_TRUE(fragment1.Str().empty());
+
+  fragment1 = "#f1";
+  EXPECT_EQ(fragment1.Str(), "#f1");
+  fragment1 = "#f2";
+  EXPECT_EQ(fragment1.Str(), "#f2");
+
+  fragment2 = fragment1;
+  EXPECT_EQ(fragment2.Str(), fragment1.Str());
+  EXPECT_TRUE(fragment2 == fragment1);
+
+  fragment3 = fragment1;
+  EXPECT_TRUE(fragment3 == fragment1);
+
+  fragment1.Clear();
+  EXPECT_TRUE(fragment1.Str().empty());
+
+  URIFragment fragment4(fragment2);
+  EXPECT_TRUE(fragment4 == fragment2);
+}
+
+/////////////////////////////////////////////////
+TEST(URITEST, URIFragmentCoverageExtra)
+{
+  // getting full destructor coverage
+  URIFragment *p = new URIFragment;
+  ASSERT_NE(nullptr, p);
+  delete p;
+}
+
+/////////////////////////////////////////////////
+TEST(URITEST, URIFragmentString)
+{
+  URIFragment fragment;
+  EXPECT_TRUE(fragment.Valid());
+
+  // test static Valid function
+  EXPECT_FALSE(URIFragment::Valid("##"));
+  EXPECT_FALSE(URIFragment::Valid("invalid#"));
+  EXPECT_FALSE(URIFragment::Valid("#invalid#"));
+  EXPECT_FALSE(URIFragment::Valid("# invalid"));
+  EXPECT_FALSE(URIFragment::Valid("#value with space"));
+
+  EXPECT_TRUE(URIFragment::Valid(""));
+  EXPECT_TRUE(URIFragment::Valid("#fragment"));
+  EXPECT_TRUE(URIFragment::Valid("#fragment/?!$&'()*+,;=:@%20fragment"));
+
+  EXPECT_FALSE(fragment.Parse("##"));
+  EXPECT_FALSE(fragment.Parse("invalid#"));
+  EXPECT_FALSE(fragment.Parse("#invalid#"));
+  EXPECT_FALSE(fragment.Parse("# invalid"));
+  EXPECT_FALSE(fragment.Parse("#value with space"));
+  // these invalid fragments failed to parse and
+  // didn't update the fragment.
+  // it should still be valid
+  EXPECT_TRUE(fragment.Valid());
+
+  EXPECT_TRUE(fragment.Parse(""));
+  EXPECT_TRUE(fragment.Parse("#fragment"));
+  EXPECT_TRUE(fragment.Parse("#fragment/?!$&'()*+,;=:@%20FRAGMENT"));
+  // it should still be valid
+  EXPECT_TRUE(fragment.Valid());
+
+  EXPECT_NO_THROW(URIFragment("##"));
+  EXPECT_NO_THROW(URIFragment("invalid#"));
+  EXPECT_NO_THROW(URIFragment("#invalid#"));
+  EXPECT_NO_THROW(URIFragment("# invalid"));
+  EXPECT_NO_THROW(URIFragment("#value with space"));
+
+  EXPECT_NO_THROW(URIFragment(""));
+  EXPECT_NO_THROW(URIFragment("#fragment"));
+  EXPECT_NO_THROW(URIFragment("#fragment/?!$&'()*+,;=:@%20fragment"));
 }
 
 /////////////////////////////////////////////////
@@ -212,6 +311,18 @@ TEST(URITEST, Path)
 
   uri.Path() /= "default";
   EXPECT_EQ(uri.Str(), "data://world/default");
+
+  uri.Parse("file:///var/run/test");
+  EXPECT_EQ(uri.Str(), "file:///var/run/test");
+
+  uri.Parse("file://var/run/test");
+  EXPECT_EQ(uri.Str(), "file://var/run/test");
+
+  uri.Parse("file://test+space");
+  EXPECT_EQ(uri.Str(), "file://test+space");
+
+  uri.Parse("file://test%20space");
+  EXPECT_EQ(uri.Str(), "file://test%20space");
 }
 
 /////////////////////////////////////////////////
@@ -275,6 +386,53 @@ TEST(URITEST, QueryCopy)
 }
 
 /////////////////////////////////////////////////
+TEST(URITEST, Fragment)
+{
+  URI uri;
+  uri.SetScheme("data");
+
+  uri.Fragment() = "#f";
+  EXPECT_EQ(uri.Str(), "data://#f");
+
+  uri.Path().PushFront("default");
+  EXPECT_EQ(uri.Str(), "data://default#f");
+
+  uri.Path().PushFront("world");
+  EXPECT_EQ(uri.Str(), "data://world/default#f");
+
+  URI uri2 = uri;
+
+  uri.Path().Clear();
+  EXPECT_EQ(uri.Str(), "data://#f");
+
+  uri.Fragment().Clear();
+  EXPECT_EQ(uri.Str(), "data://");
+
+  uri.Clear();
+  uri2.Clear();
+  EXPECT_EQ(uri, uri2);
+}
+
+/////////////////////////////////////////////////
+TEST(URITEST, FragmentCopy)
+{
+  URI uri;
+  uri.SetScheme("data");
+  uri.Fragment() = "#f";
+
+  auto uriTmp(uri);
+  uriTmp.Fragment() = "#g";
+  const auto uriCopy(uriTmp);
+  const auto fragmentCopy(uriCopy.Fragment());
+
+  EXPECT_NE(uri.Fragment().Str(), fragmentCopy.Str());
+  EXPECT_EQ(uri.Fragment().Str(), "#f");
+  EXPECT_EQ(uriTmp.Str(), "data://#g");
+  EXPECT_EQ(uriCopy.Str(), "data://#g");
+  EXPECT_EQ(fragmentCopy.Str(), "#g");
+}
+
+/////////////////////////////////////////////////
 TEST(URITEST, URIString)
 {
   URI uri;
@@ -288,10 +446,12 @@ TEST(URITEST, URIString)
   EXPECT_TRUE(URI::Valid("scheme://part1/part2"));
   EXPECT_TRUE(URI::Valid("scheme://part1?key=value"));
   EXPECT_TRUE(URI::Valid("scheme://part1/part2?k1=v1&k2=v2"));
-  EXPECT_TRUE(URI::Valid("scheme://part 1/part 2?k1=v1&k2=v2"));
-  EXPECT_TRUE(URI::Valid("scheme://part1 /part2 ?k1=v1&k2=v2"));
-  EXPECT_TRUE(URI::Valid("scheme://part  1  /part  2  ?k1=v1&k2=v2"));
-  EXPECT_TRUE(URI::Valid("scheme with space://part 1/part 2?k1=v1&k2=v2"));
+  EXPECT_FALSE(URI::Valid("scheme://part 1/part 2?k1=v1&k2=v2"));
+  EXPECT_TRUE(URI::Valid("scheme://part+1/part+2?k1=v1&k2=v2"));
+  EXPECT_TRUE(URI::Valid("scheme://part%201/part%202?k1=v1&k2=v2"));
+  EXPECT_FALSE(URI::Valid("scheme://part1 /part2 ?k1=v1&k2=v2"));
+  EXPECT_FALSE(URI::Valid("scheme://part  1  /part  2  ?k1=v1&k2=v2"));
+  EXPECT_FALSE(URI::Valid("scheme with space://part 1/part 2?k1=v1&k2=v2"));
 
   EXPECT_FALSE(uri.Parse(""));
   EXPECT_FALSE(uri.Parse("scheme"));
@@ -302,6 +462,8 @@ TEST(URITEST, URIString)
   EXPECT_TRUE(uri.Parse("scheme://part1/part2"));
   EXPECT_TRUE(uri.Parse("scheme://part1?key=value"));
   EXPECT_TRUE(uri.Parse("scheme://part1/part2?k1=v1&k2=v2"));
+  EXPECT_TRUE(uri.Parse("scheme://part+1/part+2?k1=v1&k2=v2"));
+  EXPECT_TRUE(uri.Parse("scheme://part%201/part%202?k1=v1&k2=v2"));
 
   EXPECT_NO_THROW(EXPECT_FALSE(URI("").Valid()));
   EXPECT_NO_THROW(EXPECT_FALSE(URI("scheme").Valid()));
@@ -313,6 +475,8 @@ TEST(URITEST, URIString)
   EXPECT_NO_THROW(URI("scheme://part1/part2"));
   EXPECT_NO_THROW(URI("scheme://part1?key=value"));
   EXPECT_NO_THROW(URI("scheme://part1/part2?k1=v1&k2=v2"));
+  EXPECT_NO_THROW(URI("scheme://part+1/part+2?k1=v1&k2=v2"));
+  EXPECT_NO_THROW(URI("scheme://part%201/part%202?k1=v1&k2=v2"));
 }
 
 /////////////////////////////////////////////////
