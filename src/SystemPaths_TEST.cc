@@ -41,6 +41,12 @@ class SystemPathsFixture : public ::testing::Test
         this->backupPluginPath += getenv("IGN_PLUGIN_PATH");
 
       putenv(const_cast<char*>("IGN_PLUGIN_PATH="));
+
+#ifdef _WIN32
+      this->filesystemRoot = "C:\\";
+#else
+      this->filesystemRoot = "/";
+#endif
     }
 
   public: virtual void TearDown()
@@ -49,6 +55,7 @@ class SystemPathsFixture : public ::testing::Test
     }
 
   public: std::string backupPluginPath;
+  public: std::string filesystemRoot;
 };
 
 /////////////////////////////////////////////////
@@ -128,15 +135,86 @@ TEST_F(SystemPathsFixture, SearchPathUsesForwardSlashes)
 }
 
 //////////////////////////////////////////////////
-TEST_F(SystemPathsFixture, findFile)
+TEST_F(SystemPathsFixture, FindFileURI)
 {
-  std::string dir1 = ignition::common::absPath("test_dir1");
-  std::string dir2 = ignition::common::absPath("test_dir2");
+  auto dir1 = ignition::common::absPath("test_dir1");
+  auto dir2 = ignition::common::absPath("test_dir2");
   ignition::common::createDirectories(dir1);
   ignition::common::createDirectories(dir2);
-  std::string file1 = ignition::common::absPath(
+  auto file1 = ignition::common::absPath(
       ignition::common::joinPaths(dir1, "test_f1"));
-  std::string file2 = ignition::common::absPath(
+  auto file2 = ignition::common::absPath(
+      ignition::common::joinPaths(dir2, "test_f2"));
+
+  std::ofstream fout;
+  fout.open(file1, std::ofstream::out);
+  fout << "asdf";
+  fout.close();
+  fout.open(file2, std::ofstream::out);
+  fout << "asdf";
+  fout.close();
+
+  common::SystemPaths sp;
+  auto filesystemRootUnix = ignition::common::copyToUnixPath(
+          this->filesystemRoot);
+
+  EXPECT_EQ("", sp.FindFileURI("file://no_such_file"));
+  EXPECT_EQ(file1, sp.FindFileURI("file://test_dir1/test_f1"));
+  EXPECT_EQ(file1, sp.FindFileURI("file://" +
+                                  ignition::common::copyToUnixPath(file1)));
+  EXPECT_EQ("", sp.FindFileURI("osrf://unknown.protocol"));
+  EXPECT_EQ("", sp.FindFileURI(this->filesystemRoot + "no_such_file"));
+  EXPECT_EQ("", sp.FindFileURI("file://" + filesystemRootUnix +
+                               "no_such_file"));
+  EXPECT_EQ("", sp.FindFileURI("not_an_uri"));
+
+#ifdef _WIN32
+  EXPECT_EQ(this->filesystemRoot + "Windows", 
+            sp.FindFileURI("file://" + filesystemRootUnix + "Windows"));
+  EXPECT_EQ("", sp.FindFileURI("file://" + this->filesystemRoot + "Windows"));
+#endif
+
+  auto robotCb = [dir1](const std::string &_s) {
+    return _s.find("robot://", 0) != std::string::npos ?
+           ignition::common::joinPaths(dir1, _s.substr(8)) : "";
+  };
+  auto osrfCb = [dir2](const ignition::common::URI &_uri) {
+    return _uri.Scheme() == "osrf" ?
+           ignition::common::joinPaths(dir2, _uri.Path().Str()) : "";
+  };
+  auto robot2Cb = [dir2](const ignition::common::URI &_uri) {
+    return _uri.Scheme() == "robot" ?
+           ignition::common::joinPaths(dir2, _uri.Path().Str()) : "";
+  };
+
+  EXPECT_EQ("", sp.FindFileURI("robot://test_f1"));
+  EXPECT_EQ("", sp.FindFileURI("osrf://test_f2"));
+
+  sp.SetFindFileURICallback(robotCb);
+  EXPECT_EQ(file1, sp.FindFileURI("robot://test_f1"));
+  EXPECT_EQ("", sp.FindFileURI("osrf://test_f2"));
+
+  sp.AddFindFileURICallback(osrfCb);
+  EXPECT_EQ(file1, sp.FindFileURI("robot://test_f1"));
+  EXPECT_EQ(file2, sp.FindFileURI("osrf://test_f2"));
+
+  // Test that th CB from SetFindFileURICallback is called first even when a
+  // second handler for the same protocol is available
+  sp.AddFindFileURICallback(robot2Cb);
+  EXPECT_EQ(file1, sp.FindFileURI("robot://test_f1"));
+  EXPECT_EQ(file2, sp.FindFileURI("osrf://test_f2"));
+}
+
+//////////////////////////////////////////////////
+TEST_F(SystemPathsFixture, FindFile)
+{
+  auto dir1 = ignition::common::absPath("test_dir1");
+  auto dir2 = ignition::common::absPath("test_dir2");
+  ignition::common::createDirectories(dir1);
+  ignition::common::createDirectories(dir2);
+  auto file1 = ignition::common::absPath(
+      ignition::common::joinPaths(dir1, "test_f1"));
+  auto file2 = ignition::common::absPath(
       ignition::common::joinPaths(dir2, "test_f2"));
 
   std::ofstream fout;
@@ -155,10 +233,63 @@ TEST_F(SystemPathsFixture, findFile)
   EXPECT_EQ(ignition::common::copyToUnixPath(file2),
             sp.LocateLocalFile("test_f2", {dir1, dir2}));
 
-  EXPECT_EQ(std::string(), sp.LocateLocalFile("test_f3", {dir1, dir2}));
+  EXPECT_EQ("", sp.LocateLocalFile("test_f3", {dir1, dir2}));
 
   // FindFile
-  EXPECT_EQ(std::string(), sp.FindFile("no_such_file"));
+  EXPECT_EQ("", sp.FindFile(this->filesystemRoot + "no_such_file"));
+  EXPECT_EQ("", sp.FindFile("no_such_file"));
+  EXPECT_EQ(file1, sp.FindFile(common::joinPaths("test_dir1", "test_f1")));
+  EXPECT_EQ(file1, sp.FindFile("file://test_dir1/test_f1"));
+
+  // Existing absolute paths
+#ifndef _WIN32
+  const auto tmpDir = "/tmp";
+  const auto homeDir = "/home";
+  const auto badDir = "/bad";
+#else
+  const auto tmpDir = "C:\\Windows";
+  const auto homeDir = "C:\\Users";
+  const auto badDir = "C:\\bad";
+#endif
+  {
+    EXPECT_EQ(tmpDir, sp.FindFile(tmpDir));
+    EXPECT_EQ(homeDir, sp.FindFile(homeDir));
+    EXPECT_EQ("", sp.FindFile(badDir));
+  }
+
+  // Custom callback
+  {
+    auto tmpCb = [tmpDir](const std::string &_s) {
+      return _s == "tmp" ? tmpDir : "";
+    };
+    auto homeCb = [homeDir](const std::string &_s) {
+      return _s == "home" ? homeDir : "";
+    };
+    auto badCb = [badDir](const std::string &_s) {
+      return _s == "bad" ? badDir : "";
+    };
+
+    sp.SetFindFileCallback(tmpCb);
+
+    EXPECT_EQ(tmpDir, sp.FindFile("tmp"));
+    EXPECT_EQ("", sp.FindFile("home"));
+    EXPECT_EQ("", sp.FindFile("bad"));
+    EXPECT_EQ("", sp.FindFile("banana"));
+
+    sp.AddFindFileCallback(homeCb);
+
+    EXPECT_EQ(tmpDir, sp.FindFile("tmp"));
+    EXPECT_EQ(homeDir, sp.FindFile("home"));
+    EXPECT_EQ("", sp.FindFile("bad"));
+    EXPECT_EQ("", sp.FindFile("banana"));
+
+    sp.AddFindFileCallback(badCb);
+
+    EXPECT_EQ(tmpDir, sp.FindFile("tmp"));
+    EXPECT_EQ(homeDir, sp.FindFile("home"));
+    EXPECT_EQ("", sp.FindFile("bad"));
+    EXPECT_EQ("", sp.FindFile("banana"));
+  }
 }
 
 //////////////////////////////////////////////////

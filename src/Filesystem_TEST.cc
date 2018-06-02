@@ -297,6 +297,10 @@ TEST(Filesystem, exists)
   ASSERT_TRUE(create_new_empty_file("newfile"));
   ASSERT_TRUE(createDirectory("fstestexists"));
 
+  const auto &relativeSubdir = joinPaths("fstestexists", "newfile2");
+  const auto &absoluteSubdir = joinPaths(new_temp_dir, relativeSubdir);
+  ASSERT_TRUE(create_new_empty_file(relativeSubdir));
+
   EXPECT_TRUE(exists("fstestexists"));
   EXPECT_TRUE(isDirectory("fstestexists"));
 
@@ -305,6 +309,16 @@ TEST(Filesystem, exists)
 
   EXPECT_TRUE(exists("newfile"));
   EXPECT_FALSE(isDirectory("newfile"));
+
+  // file in relative subdirectory
+  EXPECT_TRUE(exists(relativeSubdir));
+  EXPECT_TRUE(isFile(relativeSubdir));
+  EXPECT_FALSE(isDirectory(relativeSubdir));
+
+  // file in absolute subdirectory
+  EXPECT_TRUE(exists(absoluteSubdir));
+  EXPECT_TRUE(isFile(absoluteSubdir));
+  EXPECT_FALSE(isDirectory(absoluteSubdir));
 }
 
 // The symlink tests require special permissions to work on Windows,
