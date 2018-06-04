@@ -3,7 +3,7 @@
 # Only use spaces to indent your .yml configuration.
 # -----
 # You can specify a custom docker image from Docker Hub as your build environment.
-image: ubuntu:16.04
+image: ubuntu:bionic
 
 options:
   max-time: 10
@@ -12,9 +12,6 @@ pipelines:
   default:
     - step:
         script:
-          - echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable xenial main" > /etc/apt/sources.list.d/gazebo-stable.list
-          - echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-prerelease xenial main" > /etc/apt/sources.list.d/gazebo-prerelease.list
-          - apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys D2486D2DD83DB69272AFE98867170598AF249743
           - apt-get update
           - apt-get -y install
             cmake pkg-config python ruby-ronn uuid-dev
@@ -25,6 +22,22 @@ pipelines:
             lcov curl mercurial cppcheck
           # Code checker
           - sh tools/code_check.sh
+          # Ignition cmake
+          - hg clone http://bitbucket.org/ignitionrobotics/ign-cmake -b c++17
+          - cd ign-cmake
+          - mkdir build
+          - cd build
+          - cmake .. # -DENABLE_TESTS_COMPILATION=false
+          - make -j4 install
+          - cd ../..
+          # Ignition math
+          - hg clone http://bitbucket.org/ignitionrobotics/ign-math -b gcc8_c++17
+          - cd ign-math
+          - mkdir build
+          - cd build
+          - cmake .. # -DENABLE_TESTS_COMPILATION=false
+          - make -j4 install
+          - cd ../..
           # Build
           - mkdir build
           - cd build

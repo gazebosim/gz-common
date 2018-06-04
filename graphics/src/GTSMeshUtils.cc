@@ -26,7 +26,7 @@ using namespace ignition;
 using namespace common;
 
 //////////////////////////////////////////////////
-static void FillVertex(GtsPoint *_p, gpointer *_data)
+static int FillVertex(GtsPoint *_p, gpointer *_data)
 {
   // create a vertex from GTS_POINT and add it to the submesh
   SubMesh *subMesh = reinterpret_cast<SubMesh *>(_data[0]);
@@ -36,10 +36,12 @@ static void FillVertex(GtsPoint *_p, gpointer *_data)
   // submesh in the FillFace function.
   g_hash_table_insert(vIndex, _p,
       GUINT_TO_POINTER((*(reinterpret_cast<guint *>(_data[1])))++));
+
+  return 0;
 }
 
 //////////////////////////////////////////////////
-static void FillFace(GtsTriangle *_t, gpointer *_data)
+static int FillFace(GtsTriangle *_t, gpointer *_data)
 {
   SubMesh *subMesh = reinterpret_cast<SubMesh *>(_data[0]);
   GHashTable *vIndex = reinterpret_cast<GHashTable *>(_data[2]);
@@ -48,16 +50,18 @@ static void FillFace(GtsTriangle *_t, gpointer *_data)
   subMesh->AddIndex(GPOINTER_TO_UINT(g_hash_table_lookup(vIndex, v1)));
   subMesh->AddIndex(GPOINTER_TO_UINT(g_hash_table_lookup(vIndex, v3)));
   subMesh->AddIndex(GPOINTER_TO_UINT(g_hash_table_lookup(vIndex, v2)));
+  return 0;
 }
 
 //////////////////////////////////////////////////////////////////////////
-static void AddConstraint(GtsConstraint *_c, GtsSurface *_s)
+static int AddConstraint(GtsConstraint *_c, GtsSurface *_s)
 {
   gts_delaunay_add_constraint(_s, _c);
+  return 0;
 }
 
 //////////////////////////////////////////////////
-static void Intersection(GtsEdge *_c, gpointer *_data)
+static int Intersection(GtsEdge *_c, gpointer *_data)
 {
   double x = *reinterpret_cast<double *>(_data[0]);
   double y = *reinterpret_cast<double *>(_data[1]);
@@ -95,10 +99,12 @@ static void Intersection(GtsEdge *_c, gpointer *_data)
     if (s >= 0 && s <= 1 && t >= 0 && t <= 1)
       (*intersection)++;
   }
+
+  return 0;
 }
 
 //////////////////////////////////////////////////
-bool TriangleIsHole(GtsTriangle *_t, GtsFifo *_edgeList)
+int TriangleIsHole(GtsTriangle *_t, GtsFifo *_edgeList)
 {
   GtsEdge *e1, *e2, *e3;
   GtsVertex *v1, *v2, *v3;
@@ -117,9 +123,9 @@ bool TriangleIsHole(GtsTriangle *_t, GtsFifo *_edgeList)
   gts_fifo_foreach(_edgeList, (GtsFunc) Intersection, data);
 
   if (intersections % 2)
-    return false;
+    return 0;
   else
-    return true;
+    return 1;
 }
 
 //////////////////////////////////////////////////

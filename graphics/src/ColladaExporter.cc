@@ -282,7 +282,7 @@ void ColladaExporterPrivate::ExportGeometrySource(
     const ignition::common::SubMesh *_subMesh,
     tinyxml2::XMLElement *_meshXml, GeometryType _type, const char *_meshID)
 {
-  char sourceId[100], sourceArrayId[100];
+  char sourceId[100], sourceArrayId[107];
   std::ostringstream fillData;
   fillData.precision(8);
   fillData << std::fixed;
@@ -412,7 +412,7 @@ void ColladaExporterPrivate::ExportGeometries(
       this->ExportGeometrySource(subMesh.get(), meshXml, UVMAP, meshId);
     }
 
-    char attributeValue[100];
+    char attributeValue[111];
 
     tinyxml2::XMLElement *verticesXml =
       _libraryGeometriesXml->GetDocument()->NewElement("vertices");
@@ -750,7 +750,7 @@ void ColladaExporterPrivate::ExportVisualScenes(
 
   for (unsigned int i = 0; i < this->subMeshCount; ++i)
   {
-    char meshId[100], materialId[100], attributeValue[100];
+    char meshId[100], materialId[100], attributeValue[101];
     snprintf(meshId, sizeof(meshId), "mesh_%u", i);
     snprintf(materialId, sizeof(materialId), "material_%u", i);
 

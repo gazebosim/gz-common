@@ -1,14 +1,14 @@
-cmake_minimum_required(VERSION 3.5.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.10.2 FATAL_ERROR)
 
 #============================================================================
 # Initialize the project
 #============================================================================
-project(ignition-common2 VERSION 2.0.0)
+project(ignition-common3 VERSION 3.0.0)
 
 #============================================================================
 # Find ignition-cmake
 #============================================================================
-find_package(ignition-cmake1 REQUIRED)
+find_package(ignition-cmake2 REQUIRED)
 
 #============================================================================
 # Configure the project
@@ -46,8 +46,8 @@ message(STATUS "\n\n-- ====== Finding Dependencies ======")
 
 #--------------------------------------
 # Find ignition-math
-ign_find_package(ignition-math5 REQUIRED_BY graphics events)
-set(IGN_MATH_VER ${ignition-math5_VERSION_MAJOR})
+ign_find_package(ignition-math6 REQUIRED_BY graphics events)
+set(IGN_MATH_VER ${ignition-math6_VERSION_MAJOR})
 
 #--------------------------------------
 # Find Tinyxml2
