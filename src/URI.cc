@@ -139,11 +139,18 @@ const URIPath &URIPath::operator/=(const std::string &_part)
 /////////////////////////////////////////////////
 std::string URIPath::Str(const std::string &_delim) const
 {
-  std::string result;
+  std::string result(this->dataPtr->isAbsolute ? "/" : "");
+  bool firstPart = true;
   for (auto const &part : this->dataPtr->path)
   {
-    if (!result.empty() || this->dataPtr->isAbsolute)
+    if (firstPart)
+    {
+      firstPart = false;
+    }
+    else
+    {
       result += _delim;
+    }
     result += part;
   }
 

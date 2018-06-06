@@ -50,6 +50,12 @@ TEST(URITEST, URIPath)
 
   URIPath path4(path3);
   EXPECT_TRUE(path4 == path3);
+
+  URIPath path5("/absolute/path");
+  EXPECT_EQ(path5.Str(), "/absolute/path");
+
+  URIPath path6("/");
+  EXPECT_EQ(path6.Str(), "/");
 }
 
 /////////////////////////////////////////////////
