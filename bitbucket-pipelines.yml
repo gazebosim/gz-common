@@ -1,8 +1,3 @@
-# This is a sample build configuration for C++.
-# Check our guides at https://confluence.atlassian.com/x/VYk8Lw for more examples.
-# Only use spaces to indent your .yml configuration.
-# -----
-# You can specify a custom docker image from Docker Hub as your build environment.
 image: ubuntu:bionic
 
 options:
@@ -17,11 +12,18 @@ pipelines:
             cmake pkg-config python ruby-ronn uuid-dev
             libavcodec-dev libavdevice-dev libavformat-dev libavutil-dev
             libfreeimage-dev libgts-dev libswscale-dev libtinyxml2-dev
-            lcov curl mercurial cppcheck
-          # Code checker
-          - sh tools/code_check.sh
+            curl git mercurial cppcheck g++-8
+          - update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 800 --slave /usr/bin/g++ g++ /usr/bin/g++-8 --slave /usr/bin/gcov gcov /usr/bin/gcov-8
+          - gcc -v
+          - g++ -v
+          - gcov -v
+          # lcov
+          - git clone https://github.com/linux-test-project/lcov.git
+          - cd lcov
+          - make install
+          - cd ..
           # Ignition cmake
-          - hg clone http://bitbucket.org/ignitionrobotics/ign-cmake -b c++17
+          - hg clone http://bitbucket.org/ignitionrobotics/ign-cmake -b gz11
           - cd ign-cmake
           - mkdir build
           - cd build
@@ -29,7 +31,7 @@ pipelines:
           - make -j4 install
           - cd ../..
           # Ignition math
-          - hg clone http://bitbucket.org/ignitionrobotics/ign-math -b gcc8_c++17
+          - hg clone http://bitbucket.org/ignitionrobotics/ign-math -b gz11 
           - cd ign-math
           - mkdir build
           - cd build
@@ -47,6 +49,7 @@ pipelines:
           # Coverage
           - make coverage
           - bash <(curl -s https://codecov.io/bash)
+          - make codecheck
           # Examples
           - cd ../examples
           - mkdir build
