@@ -6,7 +6,7 @@
 image: ubuntu:bionic
 
 options:
-  max-time: 10
+  max-time: 20
 
 pipelines:
   default:
@@ -25,7 +25,7 @@ pipelines:
           - cd ign-cmake
           - mkdir build
           - cd build
-          - cmake .. # -DENABLE_TESTS_COMPILATION=false
+          - cmake .. -DBUILD_TESTING=OFF
           - make -j4 install
           - cd ../..
           # Ignition math
@@ -33,7 +33,7 @@ pipelines:
           - cd ign-math
           - mkdir build
           - cd build
-          - cmake .. # -DENABLE_TESTS_COMPILATION=false
+          - cmake .. -DBUILD_TESTING=OFF
           - make -j4 install
           - cd ../..
           # Build
