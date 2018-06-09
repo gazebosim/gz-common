@@ -197,7 +197,7 @@ namespace ignition
         const std::string &_existingFilename,
         const FilesystemWarningOp _warningOp = FSWO_LOG_WARNINGS);
 
-    /// \brief Remove a directory or file.
+    /// \brief Remove an empty directory or file.
     /// \param[in] _path Path to a directory or file.
     /// \param[in] _warningOp Log or suppress warnings that may occur.
     /// \return True if _path was removed.
@@ -205,7 +205,7 @@ namespace ignition
         const std::string &_path,
         const FilesystemWarningOp _warningOp = FSWO_LOG_WARNINGS);
 
-    /// \brief Remove a directory or file.
+    /// \brief Remove a file or a directory and all its contents.
     /// \param[in] _path Path to a directory or file.
     /// \param[in] _warningOp Log or suppress warnings that may occur.
     /// \return True if _path was removed.
