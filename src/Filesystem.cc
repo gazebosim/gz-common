@@ -87,6 +87,12 @@ bool ignition::common::removeDirectory(const std::string &_path,
     }
 #else
     removed = (rmdir(_path.c_str()) == 0);
+    if (!removed)
+    {
+      // A sym link would end up here
+      removed = (std::remove(_path.c_str()) == 0);
+    }
+
     if (!removed && FSWO_LOG_WARNINGS == _warningOp)
     {
       ignwarn << "Failed to remove directory [" + _path + "]: "

@@ -1,3 +1,10 @@
+## Ignition Common 3.x
+
+## Ignition Common 3.0.0 (2018-XX-XX)
+
+1. Use ign-cmake2 and support Ubuntu Bionic (18.04).
+    * [Pull request 131](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/131)
+
 ## Ignition Common 2.x
 
 ## Ignition Common 2.0.0 (2018-XX-XX)
@@ -18,6 +25,18 @@
     * [Pull request 115](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/115)
 
 ## Ignition Common 1.x.x (2018-XX-XX)
+
+
+## Ignition Common 1.1.1 (2018-05-23)
+
+1. Documentation upload improvements
+    * [Pull request 117](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/117)
+
+1. Fix build on homebrew with ffmpeg4
+    * [Pull request 119](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/119)
+
+1. Remove symbolic link directory
+    * [Pull request 124](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/124)
 
 
 ## Ignition Common 1.1.0 (2018-04-16)
