@@ -48,7 +48,6 @@ pipelines:
           - make install
           # Coverage
           - make coverage
-          - make codecheck
           # Use a special version of codecov for handling gcc8 output.
           - bash <(curl -s https://raw.githubusercontent.com/codecov/codecov-bash/4678d212cce2078bbaaf5027af0c0dafaad6a095/codecov) -X gcovout
           # Examples
@@ -57,3 +56,4 @@ pipelines:
           - cd build
           - cmake ..
           - make
+          - make codecheck
