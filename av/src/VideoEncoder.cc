@@ -14,13 +14,13 @@
  * limitations under the License.
  *
 */
-#include <mutex>
-#include <stdio.h>
-
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
+
+#include <mutex>
+#include <stdio.h>
 
 #include <ignition/common/av/Util.hh>
 #include "ignition/common/ffmpeg_inc.hh"

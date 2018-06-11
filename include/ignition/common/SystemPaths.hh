@@ -105,14 +105,14 @@ namespace ignition
       /// and empty string if the file was not found in the callback.
       /// \param[in] _cb The callback function.
       public: void SetFindFileCallback(
-                  std::function<std::string (const std::string &)> _cb);
+                  std::function<std::string(const std::string &)> _cb);
 
       /// \brief Set the callback to use when ignition can't find a file uri.
       /// The callback should return a complete path to the requested file, or
       /// and empty string if the file was not found in the callback.
       /// \param[in] _cb The callback function.
       public: void SetFindFileURICallback(
-                  std::function<std::string (const std::string &)> _cb);
+                  std::function<std::string(const std::string &)> _cb);
 
       /// \brief look for a file in a set of search paths (not recursive)
       /// \description This method checks if a file exists in given directories.
