@@ -206,7 +206,7 @@ void FileLogger::Init(const std::string &_directory,
   logPath = logPath + "/" + _directory;
 
   // Create the directory if it doesn't exist.
-  // \todo: Replace this with c++1y, when it is released.
+  // \todo(anyone): Replace this with c++1y, when it is released.
   if (!exists(logPath))
     createDirectories(logPath);
 
@@ -229,7 +229,7 @@ void FileLogger::Init(const std::string &_directory,
 
   this->initialized = true;
 
-  /// \todo Reimplement this.
+  /// \todo(anyone) Reimplement this.
   // Output the version of the project.
   // (*buf->stream) << PROJECT_VERSION_HEADER << std::endl;
 }

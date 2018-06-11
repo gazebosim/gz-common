@@ -148,7 +148,7 @@ std::string SystemPaths::FindSharedLibrary(const std::string &_libName)
   std::vector<std::string> searchNames =
     this->dataPtr->GenerateLibraryPaths(_libName);
 
-  // TODO return list of paths that match if more than one matches?
+  // TODO(anyone) return list of paths that match if more than one matches?
   for (auto const &possibleName : searchNames)
   {
     if (exists(possibleName))
