@@ -15,8 +15,9 @@
  *
 */
 
-#include <algorithm>
 #include <gtest/gtest.h>
+
+#include <algorithm>
 #include "ignition/common/PluginLoader.hh"
 #include "ignition/common/SystemPaths.hh"
 
