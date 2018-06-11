@@ -43,20 +43,22 @@ static void LogTinyXml2DocumentError(
 
 #ifdef TINYXML2_MAJOR_VERSION_GE_6
     const char * error1 = _doc.ErrorStr();
-    const char * error2 = nullptr;
 #else
     const char * error1 = _doc.GetErrorStr1();
-    const char * error2 = _doc.GetErrorStr2();
 #endif
 
     if (error1)
       warning += "str1=" + std::string(error1);
+
+#ifndef TINYXML2_MAJOR_VERSION_GE_6
+    const char * error2 = _doc.GetErrorStr2();
 
     if (error1 && error2)
       warning += ", ";
 
     if (error2)
       warning += "str2=" + std::string(error2);
+#endif
   }
   else
   {

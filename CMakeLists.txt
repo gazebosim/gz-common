@@ -122,3 +122,12 @@ ign_configure_build(QUIT_IF_BUILD_ERRORS
 # Create package information
 #============================================================================
 ign_create_packages()
+
+
+#============================================================================
+# Create documentation
+#============================================================================
+ign_create_docs(
+  TAGFILES
+    "${IGNITION-MATH_DOXYGEN_TAGFILE} = ${IGNITION-MATH_API_URL}"
+  )
