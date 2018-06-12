@@ -193,6 +193,7 @@ std::string ignition::common::absPath(const std::string &_path)
 {
   std::string result;
 
+  // cppcheck-suppress ConfigurationNotChecked
   char path[IGN_PATH_MAX] = "";
 #ifdef _WIN32
   if (GetFullPathName(_path.c_str(), IGN_PATH_MAX, &path[0], nullptr) != 0)
@@ -293,6 +294,7 @@ bool ignition::common::createDirectories(const std::string &_path)
 #ifdef _WIN32
       _mkdir(dir.c_str());
 #else
+      // cppcheck-suppress ConfigurationNotChecked
       mkdir(dir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 #endif
     }
