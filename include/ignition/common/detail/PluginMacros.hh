@@ -134,9 +134,9 @@ IGN_COMMON_WARN_IGNORE__DELETE_NON_VIRTUAL_DESTRUCTOR \
   /* with each other. */\
   { \
     const bool insertion = visitedPlugins.insert(#pluginName).second; \
-    if (insertion) \
+    if (insertion) /* NOLINT(*) */ \
     { \
-      if (_pluginId == visitedPlugins.size() - 1) \
+      if (_pluginId == visitedPlugins.size() - 1) /* NOLINT(*) */ \
       { \
         /* If the visitedPlugins has reached the requested _pluginId, fill */ \
         /* in the PluginInfo output parameter. */ \
@@ -150,7 +150,7 @@ IGN_COMMON_WARN_IGNORE__DELETE_NON_VIRTUAL_DESTRUCTOR \
       } \
     } \
   \
-    if ( #pluginName == plugin->name ) \
+    if ( #pluginName == plugin->name ) /* NOLINT(*) */ \
     { \
       /* If the name of the desired plugin matches this call to the macro, */ \
       /* add a map entry for the interface specified by this macro. */ \
@@ -164,7 +164,7 @@ IGN_COMMON_WARN_IGNORE__DELETE_NON_VIRTUAL_DESTRUCTOR \
 
 
 #define DETAIL_IGN_COMMON_FINISH_ADDING_PLUGINS \
-    if (_pluginId >= visitedPlugins.size()) \
+    if (_pluginId >= visitedPlugins.size()) /* NOLINT(*) */ \
     { \
       if (plugin) \
         delete plugin; \
