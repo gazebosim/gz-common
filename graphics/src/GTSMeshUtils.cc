@@ -14,8 +14,9 @@
  * limitations under the License.
  *
  */
-#include <vector>
 #include <gts.h>
+
+#include <vector>
 
 #include <ignition/common/Mesh.hh>
 #include <ignition/common/SubMesh.hh>

@@ -23,6 +23,7 @@
 #include <typeinfo>
 #include <type_traits>
 #include <unordered_set>
+#include <utility>
 #include "ignition/common/PluginInfo.hh"
 #include "ignition/common/SuppressWarning.hh"
 
