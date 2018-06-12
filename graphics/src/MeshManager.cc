@@ -853,7 +853,7 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
       vert.Y() = radius * cosf(seg * deltaSegAngle);
       vert.X() = radius * sinf(seg * deltaSegAngle);
 
-      // TODO: Don't think these normals are correct.
+      // TODO(anyone): Don't think these normals are correct.
       norm = vert;
       norm.Z() = 0;
       norm.Normalize();
@@ -977,7 +977,7 @@ void MeshManager::CreateCone(const std::string &name, float radius,
       vert.Y() = ringRadius * cosf(seg * deltaSegAngle);
       vert.X() = ringRadius * sinf(seg * deltaSegAngle);
 
-      // TODO: Don't think these normals are correct.
+      // TODO(anyone): Don't think these normals are correct.
       norm = vert;
       norm.Normalize();
 
@@ -1086,7 +1086,7 @@ void MeshManager::CreateTube(const std::string &_name, float _innerRadius,
       vert.Y() = radius * cosf(seg * deltaSegAngle);
       vert.X() = radius * sinf(seg * deltaSegAngle);
 
-      // TODO: Don't think these normals are correct.
+      // TODO(anyone): Don't think these normals are correct.
       norm = vert;
       norm.Normalize();
 
@@ -1155,7 +1155,7 @@ void MeshManager::CreateTube(const std::string &_name, float _innerRadius,
       vert.Y() = radius * cosf(seg * deltaSegAngle);
       vert.X() = radius * sinf(seg * deltaSegAngle);
 
-      // TODO: Don't think these normals are correct.
+      // TODO(anyone): Don't think these normals are correct.
       norm = vert;
       norm.Normalize();
 
