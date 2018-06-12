@@ -16,6 +16,7 @@
 */
 
 #include <algorithm>
+#include <cstring>
 #include <list>
 #include <map>
 #include <string>
@@ -26,7 +27,7 @@
 using namespace ignition;
 using namespace common;
 
-static const std::string kSchemeDelim = "://";
+static const char kSchemeDelim[] = "://";
 
 /// \brief URIPath private data.
 class ignition::common::URIPathPrivate
@@ -414,7 +415,7 @@ bool URI::Valid(const std::string &_str)
     return false;
   }
 
-  auto from = schemeDelimPos + kSchemeDelim.size();
+  auto from = schemeDelimPos + std::strlen(kSchemeDelim);
   std::string localPath = str.substr(from);
   std::string localQuery;
 
@@ -439,7 +440,7 @@ bool URI::Parse(const std::string &_str)
     return false;
 
   auto schemeDelimPos = _str.find(kSchemeDelim);
-  auto from = schemeDelimPos + kSchemeDelim.size();
+  auto from = schemeDelimPos + std::strlen(kSchemeDelim);
   std::string localScheme = _str.substr(0, schemeDelimPos);
   std::string localPath = _str.substr(from);
   std::string localQuery;

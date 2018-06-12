@@ -254,6 +254,9 @@ namespace ignition
 
       /// \brief The level of verbosity, the default level is 1.
       private: static int verbosity;
+
+      /// \brief A custom prefix. See SetPrefix().
+      private: static std::string customPrefix;
     };
   }
 }

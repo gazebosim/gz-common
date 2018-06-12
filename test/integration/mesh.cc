@@ -32,7 +32,7 @@ using namespace ignition;
 
 class MeshTest : public ignition::testing::AutoLogFixture { };
 
-std::string asciiSTLBox =
+char asciiSTLBox[] =
 "solid MYSOLID\n" +
 "  facet normal  0.0   0.0  -1.0\n" +
 "    outer loop\n" +
