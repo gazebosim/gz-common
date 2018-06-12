@@ -221,7 +221,7 @@ std::string ignition::common::absPath(const std::string &_path)
 std::string ignition::common::joinPaths(const std::string &_path1,
                                         const std::string &_path2)
 {
-  // todo #ifdef _WIN32 use PathCchCombine()
+  // todo(anyone) #ifdef _WIN32 use PathCchCombine()
   return separator(_path1) + _path2;
 }
 
