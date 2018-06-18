@@ -47,11 +47,6 @@
 using namespace ignition;
 using namespace common;
 
-static const std::string base64CharsOld =
-"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-"abcdefghijklmnopqrstuvwxyz"
-"0123456789+/";
-
 static const char base64Chars[] =
 "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 "abcdefghijklmnopqrstuvwxyz"

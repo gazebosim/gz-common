@@ -50,7 +50,7 @@ Logger Console::msg("[Msg] ", green, Logger::STDOUT, 3);
 Logger Console::dbg("[Dbg] ", blue, Logger::STDOUT, 4);
 
 int Console::verbosity = 1;
-std::string Console::customPrefix = "";
+std::string Console::customPrefix = ""; // NOLINT(*)
 
 //////////////////////////////////////////////////
 void Console::SetVerbosity(const int _level)
