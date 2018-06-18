@@ -15,8 +15,9 @@
  *
  */
 
-#include <algorithm>
 #include <dlfcn.h>
+
+#include <algorithm>
 #include <functional>
 #include <locale>
 #include <sstream>

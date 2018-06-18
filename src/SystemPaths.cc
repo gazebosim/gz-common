@@ -98,6 +98,7 @@ SystemPaths::SystemPaths()
 #ifdef _WIN32
     mkdir(fullPath.c_str());
 #else
+    // cppcheck-suppress ConfigurationNotChecked
     mkdir(fullPath.c_str(), S_IRWXU | S_IRGRP | S_IROTH);
 #endif
   }
@@ -148,7 +149,7 @@ std::string SystemPaths::FindSharedLibrary(const std::string &_libName)
   std::vector<std::string> searchNames =
     this->dataPtr->GenerateLibraryPaths(_libName);
 
-  // TODO return list of paths that match if more than one matches?
+  // TODO(anyone) return list of paths that match if more than one matches?
   for (auto const &possibleName : searchNames)
   {
     if (exists(possibleName))

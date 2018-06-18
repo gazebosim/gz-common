@@ -14,12 +14,11 @@
  * limitations under the License.
  *
 */
+#include <gtest/gtest.h>
 
 #include <chrono>
 #include <iomanip>
 #include <cmath>
-
-#include <gtest/gtest.h>
 
 #include "ignition/common/PluginLoader.hh"
 #include "ignition/common/SystemPaths.hh"

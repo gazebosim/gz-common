@@ -49,7 +49,7 @@ namespace ignition
       /// \brief Load a DEM file.
       /// \param[in] _filename the path to the terrain file.
       /// \return 0 when the operation succeeds to open a file.
-      public: int Load(const std::string &_filename="");
+      public: int Load(const std::string &_filename = "");
 
       /// \brief Get the elevation of a terrain's point in meters.
       /// \param[in] _x X coordinate of the terrain.

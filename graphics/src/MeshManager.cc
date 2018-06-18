@@ -46,26 +46,26 @@ class ignition::common::MeshManagerPrivate
 #pragma warning(push)
 #pragma warning(disable: 4251)
 #endif
-    /// \brief 3D mesh loader for COLLADA files
-    public: ColladaLoader colladaLoader;
+  /// \brief 3D mesh loader for COLLADA files
+  public: ColladaLoader colladaLoader;
 
-    /// \brief 3D mesh exporter for COLLADA files
-    public: ColladaExporter colladaExporter;
+  /// \brief 3D mesh exporter for COLLADA files
+  public: ColladaExporter colladaExporter;
 
-    /// \brief 3D mesh loader for STL files
-    public: STLLoader stlLoader;
+  /// \brief 3D mesh loader for STL files
+  public: STLLoader stlLoader;
 
-    /// \brief 3D mesh loader for OBJ files
-    public: OBJLoader objLoader;
+  /// \brief 3D mesh loader for OBJ files
+  public: OBJLoader objLoader;
 
-    /// \brief Dictionary of meshes, indexed by name
-    public: std::map<std::string, Mesh*> meshes;
+  /// \brief Dictionary of meshes, indexed by name
+  public: std::map<std::string, Mesh*> meshes;
 
-    /// \brief supported file extensions for meshes
-    public: std::vector<std::string> fileExtensions;
+  /// \brief supported file extensions for meshes
+  public: std::vector<std::string> fileExtensions;
 
-    /// \brief Mutex to protect the mesh map
-    public: std::mutex mutex;
+  /// \brief Mutex to protect the mesh map
+  public: std::mutex mutex;
 #ifdef _WIN32
 #pragma warning(pop)
 #endif
@@ -853,7 +853,7 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
       vert.Y() = radius * cosf(seg * deltaSegAngle);
       vert.X() = radius * sinf(seg * deltaSegAngle);
 
-      // TODO: Don't think these normals are correct.
+      // TODO(anyone): Don't think these normals are correct.
       norm = vert;
       norm.Z() = 0;
       norm.Normalize();
@@ -977,7 +977,7 @@ void MeshManager::CreateCone(const std::string &name, float radius,
       vert.Y() = ringRadius * cosf(seg * deltaSegAngle);
       vert.X() = ringRadius * sinf(seg * deltaSegAngle);
 
-      // TODO: Don't think these normals are correct.
+      // TODO(anyone): Don't think these normals are correct.
       norm = vert;
       norm.Normalize();
 
@@ -1086,7 +1086,7 @@ void MeshManager::CreateTube(const std::string &_name, float _innerRadius,
       vert.Y() = radius * cosf(seg * deltaSegAngle);
       vert.X() = radius * sinf(seg * deltaSegAngle);
 
-      // TODO: Don't think these normals are correct.
+      // TODO(anyone): Don't think these normals are correct.
       norm = vert;
       norm.Normalize();
 
@@ -1155,7 +1155,7 @@ void MeshManager::CreateTube(const std::string &_name, float _innerRadius,
       vert.Y() = radius * cosf(seg * deltaSegAngle);
       vert.X() = radius * sinf(seg * deltaSegAngle);
 
-      // TODO: Don't think these normals are correct.
+      // TODO(anyone): Don't think these normals are correct.
       norm = vert;
       norm.Normalize();
 
