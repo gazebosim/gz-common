@@ -47,6 +47,7 @@ namespace ignition
 
     //////////////////////////////////////////////////
     template <typename PluginType>
+    // cppcheck-suppress *
     template <typename OtherPluginType>
     TemplatePluginPtr<PluginType>::TemplatePluginPtr(
         const TemplatePluginPtr<OtherPluginType> &_other)

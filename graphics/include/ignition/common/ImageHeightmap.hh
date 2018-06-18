@@ -40,7 +40,7 @@ namespace ignition
       /// \brief Load an image file as a heightmap.
       /// \param[in] _filename the path to the image file.
       /// \return True when the operation succeeds to open a file.
-      public: int Load(const std::string &_filename="");
+      public: int Load(const std::string &_filename = "");
 
       // Documentation inherited.
       public: void FillHeightMap(int _subSampling, unsigned int _vertSize,

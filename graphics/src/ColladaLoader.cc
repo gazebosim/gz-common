@@ -2319,7 +2319,7 @@ void ColladaLoaderPrivate::LoadTransparent(tinyxml2::XMLElement *_elem,
     return;
   }
 
-  // TODO: Handle transparent textures
+  // TODO(anyone): Handle transparent textures
   // https://www.khronos.org/files/collada_spec_1_5.pdf
   // Determining Transparency (Opacity) section:
   // opaque modes: RGB_ZERO, RGB_ONE, A_ONE

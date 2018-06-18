@@ -98,6 +98,7 @@ SystemPaths::SystemPaths()
 #ifdef _WIN32
     mkdir(fullPath.c_str());
 #else
+    // cppcheck-suppress ConfigurationNotChecked
     mkdir(fullPath.c_str(), S_IRWXU | S_IRGRP | S_IROTH);
 #endif
   }

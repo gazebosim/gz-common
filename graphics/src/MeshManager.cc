@@ -46,26 +46,26 @@ class ignition::common::MeshManagerPrivate
 #pragma warning(push)
 #pragma warning(disable: 4251)
 #endif
-    /// \brief 3D mesh loader for COLLADA files
-    public: ColladaLoader colladaLoader;
+  /// \brief 3D mesh loader for COLLADA files
+  public: ColladaLoader colladaLoader;
 
-    /// \brief 3D mesh exporter for COLLADA files
-    public: ColladaExporter colladaExporter;
+  /// \brief 3D mesh exporter for COLLADA files
+  public: ColladaExporter colladaExporter;
 
-    /// \brief 3D mesh loader for STL files
-    public: STLLoader stlLoader;
+  /// \brief 3D mesh loader for STL files
+  public: STLLoader stlLoader;
 
-    /// \brief 3D mesh loader for OBJ files
-    public: OBJLoader objLoader;
+  /// \brief 3D mesh loader for OBJ files
+  public: OBJLoader objLoader;
 
-    /// \brief Dictionary of meshes, indexed by name
-    public: std::map<std::string, Mesh*> meshes;
+  /// \brief Dictionary of meshes, indexed by name
+  public: std::map<std::string, Mesh*> meshes;
 
-    /// \brief supported file extensions for meshes
-    public: std::vector<std::string> fileExtensions;
+  /// \brief supported file extensions for meshes
+  public: std::vector<std::string> fileExtensions;
 
-    /// \brief Mutex to protect the mesh map
-    public: std::mutex mutex;
+  /// \brief Mutex to protect the mesh map
+  public: std::mutex mutex;
 #ifdef _WIN32
 #pragma warning(pop)
 #endif

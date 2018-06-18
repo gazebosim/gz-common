@@ -87,7 +87,7 @@ Mesh *OBJLoader::Load(const std::string &_filename)
   Mesh *mesh = new Mesh();
   mesh->SetPath(path);
 
-  for (auto const s: shapes)
+  for (auto const s : shapes)
   {
     // obj mesh assigns a material id to each 'face' but ignition assigns a
     // single material to each 'submesh'. The strategy here is to identify
