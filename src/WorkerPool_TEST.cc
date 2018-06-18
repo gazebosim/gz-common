@@ -15,8 +15,9 @@
  *
 */
 
-#include <atomic>
 #include <gtest/gtest.h>
+
+#include <atomic>
 
 #include "ignition/common/Console.hh"
 #include "ignition/common/WorkerPool.hh"

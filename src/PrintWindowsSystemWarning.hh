@@ -19,9 +19,9 @@
 #define IGNITION_COMMON_PRINTWINDOWSSYSTEMWARNING_HH_
 
 #ifdef _WIN32
-#include <string>
 #include <windows.h>
 #include <winnt.h>
+#include <string>
 #include <cstdint>
 #include <ignition/common/Console.hh>
 

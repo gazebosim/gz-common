@@ -68,7 +68,8 @@
   DETAIL_IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
 
 
-// TODO: Add more warning types as they become relevant. Do not add warning
+// TODO(anyone): Add more warning types as they become relevant.
+// Do not add warning
 // types to suppress unless they are genuinely necessary.
 
 #endif

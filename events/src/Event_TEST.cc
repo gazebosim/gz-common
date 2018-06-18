@@ -15,8 +15,9 @@
  *
 */
 
-#include <functional>
 #include <gtest/gtest.h>
+
+#include <functional>
 #include <ignition/common/Event.hh>
 #include "test/util.hh"
 

@@ -20,6 +20,7 @@
 #define IGNITION_COMMON_DETAIL_SPECIALIZEDPLUGIN_HH_
 
 #include "ignition/common/SpecializedPlugin.hh"
+#include <memory>
 
 // This preprocessor token should only be used by the unittest that is
 // responsible for checking that the specialized routines are being used to
@@ -35,6 +36,7 @@ namespace ignition
   {
     /////////////////////////////////////////////////
     template <class SpecInterface>
+    // cppcheck-suppress *
     template <class Interface>
     Interface *SpecializedPlugin<SpecInterface>::QueryInterface()
     {
@@ -222,7 +224,7 @@ namespace ignition
         /// Plugin type.
         #define DETAIL_IGN_COMMON_COMPOSEPLUGIN_DISPATCH( \
                       ReturnType, Function, Suffix, CastTo, Args) \
-          public: \
+          public: /* NOLINT(*) */ \
           template <class T> \
           ReturnType Function Suffix \
           { \

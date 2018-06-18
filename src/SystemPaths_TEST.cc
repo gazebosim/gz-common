@@ -14,10 +14,11 @@
  * limitations under the License.
  *
 */
+#include <gtest/gtest.h>
+
 #include <algorithm>
 #include <cstring>
 #include <fstream>
-#include <gtest/gtest.h>
 #include <string>
 #include <vector>
 #include <cstdio>

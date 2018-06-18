@@ -383,7 +383,7 @@ namespace ignition
         this->Cleanup();
 
         this->SetSignaled(true);
-        for (const auto &iter: this->connections)
+        for (const auto &iter : this->connections)
         {
           if (iter.second->on)
             iter.second->callback(_p1, _p2, _p3, _p4, _p5, _p6);

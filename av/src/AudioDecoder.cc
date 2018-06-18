@@ -215,7 +215,7 @@ bool AudioDecoder::SetFile(const std::string &_filename)
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-    if (this->data->formatCtx->streams[i]->codec->codec_type ==
+    if (this->data->formatCtx->streams[i]->codec->codec_type == // NOLINT(*)
         AVMEDIA_TYPE_AUDIO)
 #ifndef _WIN32
 # pragma GCC diagnostic pop
