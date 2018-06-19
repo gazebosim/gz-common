@@ -255,8 +255,10 @@ namespace ignition
       /// \brief The level of verbosity, the default level is 1.
       private: static int verbosity;
 
+      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief A custom prefix. See SetPrefix().
       private: static std::string customPrefix;
+      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
     };
   }
 }
