@@ -138,6 +138,10 @@ TEST(WorkerPool, ThingsRunInParallel)
   // the timing test is flaky on windows and mac
   EXPECT_TRUE(result);
 #endif
+  if (!result)
+  {
+    igndbg << "WaitForResults failed" << std::endl;
+  }
   EXPECT_EQ(2, sentinel);
 }
 
