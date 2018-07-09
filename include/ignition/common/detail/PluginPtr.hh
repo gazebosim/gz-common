@@ -47,7 +47,8 @@ namespace ignition
 
     //////////////////////////////////////////////////
     template <typename PluginType>
-    // cppcheck-suppress *
+    // the following is a false positive with cppcheck 1.82 fixed in 1.83
+    // cppcheck-suppress syntaxError
     template <typename OtherPluginType>
     TemplatePluginPtr<PluginType>::TemplatePluginPtr(
         const TemplatePluginPtr<OtherPluginType> &_other)

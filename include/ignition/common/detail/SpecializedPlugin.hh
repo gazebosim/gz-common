@@ -36,7 +36,8 @@ namespace ignition
   {
     /////////////////////////////////////////////////
     template <class SpecInterface>
-    // cppcheck-suppress *
+    // the following is a false positive with cppcheck 1.82 fixed in 1.83
+    // cppcheck-suppress syntaxError
     template <class Interface>
     Interface *SpecializedPlugin<SpecInterface>::QueryInterface()
     {
