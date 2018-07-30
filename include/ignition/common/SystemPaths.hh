@@ -111,14 +111,16 @@ namespace ignition
       /// The callback should return a complete path to the requested file, or
       /// and empty string if the file was not found in the callback.
       /// \param[in] _cb The callback function.
-      public: void SetFindFileCallback(
+      /// \deprecated Use AddFindFileCallback instead
+      public: void IGN_DEPRECATED(3) SetFindFileCallback(
                   std::function<std::string(const std::string &)> _cb);
 
       /// \brief Add a callback to use when FindFile() can't find a file.
       /// The callback should return a full local path to the requested file, or
       /// and empty string if the file was not found in the callback.
       /// Callbacks will be called in the order they were added until a path is
-      /// found.
+      /// found (if a callback is set using SetFindFileCallback(), that one is
+      /// called first).
       /// \param[in] _cb The callback function, which takes a file path or URI
       /// and returns the full local path.
       public: void AddFindFileCallback(
@@ -128,7 +130,8 @@ namespace ignition
       /// The callback should return a full local path to the requested file, or
       /// and empty string if the file was not found in the callback.
       /// Callbacks will be called in the order they were added until a path is
-      /// found.
+      /// found (if a callback is set using SetFindFileURICallback(), that one
+      /// is called first).
       /// \param[in] _cb The callback function, which takes a file path or URI
       /// and returns the full local path.
       public: void AddFindFileURICallback(
@@ -138,7 +141,8 @@ namespace ignition
       /// The callback should return a complete path to the requested file, or
       /// and empty string if the file was not found in the callback.
       /// \param[in] _cb The callback function.
-      public: void SetFindFileURICallback(
+      /// \deprecated Use AddFindFileURICallback instead
+      public: void IGN_DEPRECATED(3) SetFindFileURICallback(
                   std::function<std::string(const std::string &)> _cb);
 
       /// \brief look for a file in a set of search paths (not recursive)

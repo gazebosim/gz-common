@@ -248,7 +248,7 @@ std::string SystemPaths::FindFileURI(const std::string &_uri) const
   return this->FindFileURI(uri);
 }
 
-
+//////////////////////////////////////////////////
 std::string SystemPaths::FindFileURI(const ignition::common::URI &_uri) const
 {
   std::string prefix = _uri.Scheme();
