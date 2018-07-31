@@ -18,6 +18,7 @@
 #include <sys/types.h>
 #include <algorithm>
 #include <cctype>
+#include <cstring>
 #include <functional>
 #include <list>
 #include <locale>
@@ -244,6 +245,14 @@ std::string SystemPaths::FindFileURI(const std::string &_uri) const
     return this->FindFile(_uri);
   }
 
+  // TODO: Special handling of absolute file:// URIs is needed until the URI 
+  //       class is fixed to support absolute URIs
+  if (common::StartsWith(_uri, "file:///"))
+  {
+    const auto filename = _uri.substr(std::strlen("file://"));
+    return this->FindFile(ignition::common::copyFromUnixPath(filename));
+  }
+
   const auto uri = ignition::common::URI(_uri);
   return this->FindFileURI(uri);
 }
@@ -298,36 +307,44 @@ std::string SystemPaths::FindFile(const std::string &_filename,
                                   const bool _searchLocalPath) const
 {
   std::string path;
+  std::string filename = _filename;
 
-  if (_filename.empty())
+  if (filename.empty())
     return path;
 
-  // Handle as URI
-  if (ignition::common::URI::Valid(_filename))
+  // TODO: Special handling of absolute file:// URIs is needed until the URI
+  //       class is fixed to support absolute URIs
+  if (common::StartsWith(filename, "file:///"))
   {
-    path = this->FindFileURI(ignition::common::URI(_filename));
+    filename = filename.substr(std::strlen("file://"));
+  }
+
+  // Handle as URI
+  if (ignition::common::URI::Valid(filename))
+  {
+    path = this->FindFileURI(ignition::common::URI(filename));
   }
   // Handle as local absolute path
-  else if (_filename[0] == '/')
+  else if (filename[0] == '/')
   {
-    path = _filename;
+    path = filename;
   }
   // Try appending to local paths
   else
   {
-    auto cwdPath = joinPaths(cwd(), _filename);
+    auto cwdPath = joinPaths(cwd(), filename);
     if (_searchLocalPath && exists(cwdPath))
     {
       path = cwdPath;
     }
-    else if ((_filename[0] == '/' || _filename[0] == '.' || _searchLocalPath)
-             && exists(_filename))
+    else if ((filename[0] == '/' || filename[0] == '.' || _searchLocalPath)
+             && exists(filename))
     {
-      path = _filename;
+      path = filename;
     }
     else if (this->dataPtr->findFileCB)
     {
-      path = this->dataPtr->findFileCB(_filename);
+      path = this->dataPtr->findFileCB(filename);
     }
   }
 
@@ -336,7 +353,7 @@ std::string SystemPaths::FindFile(const std::string &_filename,
   {
     for (const auto &cb : this->dataPtr->findFileCbs)
     {
-      path = cb(_filename);
+      path = cb(filename);
       if (!path.empty())
         break;
     }

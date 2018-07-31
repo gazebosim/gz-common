@@ -160,9 +160,8 @@ TEST_F(SystemPathsFixture, FindFileURI)
 
   EXPECT_EQ("", sp.FindFileURI("file://no_such_file"));
   EXPECT_EQ(file1, sp.FindFileURI("file://test_dir1/test_f1"));
-  //TODO: requires fixes in URI class for determining absolute paths
-  //EXPECT_EQ(file1, sp.FindFileURI("file://" +
-  //                                ignition::common::copyToUnixPath(file1)));
+  EXPECT_EQ(file1, sp.FindFileURI("file://" +
+                                  ignition::common::copyToUnixPath(file1)));
   EXPECT_EQ("", sp.FindFileURI("osrf://unknown.protocol"));
   EXPECT_EQ("", sp.FindFileURI(this->filesystemRoot + "no_such_file"));
   EXPECT_EQ("", sp.FindFileURI("file://" + filesystemRootUnix +
@@ -194,7 +193,16 @@ TEST_F(SystemPathsFixture, FindFileURI)
   EXPECT_EQ("", sp.FindFileURI("robot://test_f1"));
   EXPECT_EQ("", sp.FindFileURI("osrf://test_f2"));
 
+  // We still want to test the deprecated function until it is removed.
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   sp.SetFindFileURICallback(robotCb);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
+
   EXPECT_EQ(file1, sp.FindFileURI("robot://test_f1"));
   EXPECT_EQ("", sp.FindFileURI("osrf://test_f2"));
 
@@ -273,7 +281,15 @@ TEST_F(SystemPathsFixture, FindFile)
       return _s == "bad" ? badDir : "";
     };
 
+    // We still want to test the deprecated function until it is removed.
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     sp.SetFindFileCallback(tmpCb);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 
     EXPECT_EQ(tmpDir, sp.FindFile("tmp"));
     EXPECT_EQ("", sp.FindFile("home"));

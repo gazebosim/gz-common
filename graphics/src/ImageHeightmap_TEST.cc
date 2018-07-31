@@ -49,8 +49,7 @@ TEST_F(DemTest, NotImage)
 TEST_F(ImageHeightmapTest, BasicAPI)
 {
   common::ImageHeightmap img;
-  // std::string path("file://"); //TODO: requires fixes in URI class for determining absolute paths
-  std::string path("");
+  std::string path("file://");
 
   path += std::string(TEST_PATH) + "/data/heightmap_bowl.png";
   std::cout << "PATH[" << path << "]\n";
@@ -66,8 +65,7 @@ TEST_F(ImageHeightmapTest, BasicAPI)
 TEST_F(ImageHeightmapTest, FillHeightmap)
 {
   common::ImageHeightmap img;
-  // std::string path("file://"); //TODO: requires fixes in URI class for determining absolute paths
-  std::string path("");
+  std::string path("file://");
 
   path += std::string(TEST_PATH) + "/data/heightmap_bowl.png";
   EXPECT_EQ(0, img.Load(path));
