@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#include <algorithm>
 #include <cstring>
+#include <algorithm>
 #include <fstream>
 #include <gtest/gtest.h>
 #include <string>
@@ -169,7 +169,7 @@ TEST_F(SystemPathsFixture, FindFileURI)
   EXPECT_EQ("", sp.FindFileURI("not_an_uri"));
 
 #ifdef _WIN32
-  EXPECT_EQ(this->filesystemRoot + "Windows", 
+  EXPECT_EQ(this->filesystemRoot + "Windows",
             sp.FindFileURI("file://" + filesystemRootUnix + "Windows"));
   // TODO: This test should not work, because 'file://C:\\Windows' is not a
   // valid URI. However, until the URI class is upgraded to resolve this as

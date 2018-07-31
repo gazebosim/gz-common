@@ -245,7 +245,7 @@ std::string SystemPaths::FindFileURI(const std::string &_uri) const
     return this->FindFile(_uri);
   }
 
-  // TODO: Special handling of absolute file:// URIs is needed until the URI 
+  // TODO: Special handling of absolute file:// URIs is needed until the URI
   //       class is fixed to support absolute URIs
   if (common::StartsWith(_uri, "file:///"))
   {
