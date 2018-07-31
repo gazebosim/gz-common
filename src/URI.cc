@@ -35,7 +35,7 @@ class ignition::common::URIPathPrivate
   public: std::list<std::string> path;
 
   /// \brief Whether the path is absolute (starts with slash) or not.
-  public: bool isAbsolute;
+  public: bool isAbsolute{false};
 
   /// \brief A helper method to determine if the given string represents
   ///        an absolute path starting segment or not.
@@ -202,7 +202,10 @@ bool URIPath::Valid(const std::string &_str)
                                    "%"
                                    "-._~"
                                    "!$&'()*+,;="
-                                   "[]";
+                                   "[] "; // TODO: the space should not be
+                                          // there, but leaving it out breaks
+                                          // other stuff, e.g. ign-fuel-tools
+                                          // now have URIs with unencoded spaces
   if (str.find_first_not_of(allowedChars) != std::string::npos)
     return false;
 

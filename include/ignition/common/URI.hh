@@ -83,7 +83,7 @@ namespace ignition
       /// \return The path as a string, with each path part separated by _delim.
       public: std::string Str(const std::string &_delim = "/") const;
 
-      /// \brief Equal operator.
+      /// \brief Assignment operator.
       /// \param[in] _path Another URIPath.
       /// \return Itself.
       public: URIPath &operator=(const URIPath &_path);
@@ -135,7 +135,7 @@ namespace ignition
       public: void Insert(const std::string &_key,
                           const std::string &_value);
 
-      /// \brief Equal operator.
+      /// \brief Assignment operator.
       /// \param[in] _query another URIQuery.
       /// \return Itself.
       public: URIQuery &operator=(const URIQuery &_query);
@@ -192,12 +192,12 @@ namespace ignition
       /// \brief Remove all values of the fragment
       public: void Clear();
 
-      /// \brief Equal operator.
+      /// \brief Assignment operator.
       /// \param[in] _fragment another URIFragment.
       /// \return Itself.
       public: URIFragment &operator=(const URIFragment &_fragment);
 
-      /// \brief Equal operator.
+      /// \brief Assignment operator.
       /// \param[in] _fragment another URIFragment.
       /// \return Itself.
       public: URIFragment &operator=(const std::string &_fragment);
@@ -292,7 +292,7 @@ namespace ignition
       /// \return A const reference of the fragment.
       public: const URIFragment &Fragment() const;
 
-      /// \brief Equal operator.
+      /// \brief Assignment operator.
       /// \param[in] _uri Another URI.
       /// \return Itself.
       public: URI &operator=(const URI &_uri);
