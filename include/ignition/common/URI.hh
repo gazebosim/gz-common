@@ -53,13 +53,31 @@ namespace ignition
       /// \brief Remove all parts of the path
       public: void Clear();
 
+      /// \brief Returns whether the path is absolute or not.
+      public: bool IsAbsolute() const;
+
+      /// \brief Set whether the path is to be treated absolute or not.
+      /// \param[in] _absolute Whether the path is to be treated absolute or
+      ///                      not.
+      public: void SetAbsolute(bool _absolute = true);
+
+      /// \brief Set the path to be relative.
+      public: void SetRelative();
+
       /// \brief Push a new part onto the front of this path.
       /// \param[in] _part Path part to push
+      /// Empty _part is ignored. If _part starts with /, the path is set to
+      /// absolute (though calling SetAbsolute() is the preferred method). All
+      /// forward slashes inside the string are URI-encoded to %2F.
       public: void PushFront(const std::string &_part);
 
       /// \brief Push a new part onto the back of this path.
       /// \param[in] _part Path part to push
       /// \sa operator/
+      /// Empty _part is ignored. If _part starts with / and the path is empty,
+      /// the path is set to absolute (though calling SetAbsolute() is the
+      /// preferred method). All forward slashes inside the string are
+      /// URI-encoded to %2F.
       public: void PushBack(const std::string &_part);
 
       /// \brief Compound assignment operator.

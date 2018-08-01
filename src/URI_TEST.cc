@@ -64,6 +64,71 @@ TEST(URITEST, URIPath)
 
   URIPath path6("/");
   EXPECT_EQ(path6.Str(), "/");
+
+  URIPath path7;
+  path7.PushFront("/abs");
+  EXPECT_EQ(path7.Str(), "/abs");
+
+  path7.PushFront("/abs2");
+  EXPECT_EQ(path7.Str(), "/abs2/abs");
+
+  path7.PushFront("abs3");
+  EXPECT_EQ(path7.Str(), "/abs3/abs2/abs");
+
+  path7.PushFront("");
+  EXPECT_EQ(path7.Str(), "/abs3/abs2/abs");
+
+  path7.PushFront("/");
+  EXPECT_EQ(path7.Str(), "/abs3/abs2/abs");
+
+  path7.SetRelative();
+  EXPECT_EQ(path7.Str(), "abs3/abs2/abs");
+
+  path7.PushFront("/");
+  EXPECT_EQ(path7.Str(), "/abs3/abs2/abs");
+
+  path7.SetRelative();
+  path7.SetAbsolute();
+  EXPECT_EQ(path7.Str(), "/abs3/abs2/abs");
+
+  path7.SetAbsolute(false);
+  path7.PushFront("/abs4");
+  EXPECT_EQ(path7.Str(), "/abs4/abs3/abs2/abs");
+
+  path7.PushFront("abs6/abs5");
+  EXPECT_EQ(path7.Str(), "/abs6%2Fabs5/abs4/abs3/abs2/abs");
+
+  URIPath path8;
+  path8.PushBack("/abs");
+  EXPECT_EQ(path8.Str(), "/abs");
+
+  path8.PushBack("/abs2");
+  EXPECT_EQ(path8.Str(), "/abs/%2Fabs2");
+
+  path8.PushBack("abs3");
+  EXPECT_EQ(path8.Str(), "/abs/%2Fabs2/abs3");
+
+  path8.PushBack("");
+  EXPECT_EQ(path8.Str(), "/abs/%2Fabs2/abs3");
+
+  path8.PushBack("/");
+  EXPECT_EQ(path8.Str(), "/abs/%2Fabs2/abs3/%2F");
+
+  path8.SetRelative();
+  EXPECT_EQ(path8.Str(), "abs/%2Fabs2/abs3/%2F");
+
+  path8.PushBack("/");
+  EXPECT_EQ(path8.Str(), "abs/%2Fabs2/abs3/%2F/%2F");
+
+  path8.SetAbsolute();
+  path8.PushBack("abs4");
+  EXPECT_EQ(path8.Str(), "/abs/%2Fabs2/abs3/%2F/%2F/abs4");
+
+  path8.PushBack("abs5/abs6");
+  EXPECT_EQ(path8.Str(), "/abs/%2Fabs2/abs3/%2F/%2F/abs4/abs5%2Fabs6");
+
+  URIPath path9 = path8;
+  EXPECT_EQ(path9.Str(), path8.Str());
 }
 
 /////////////////////////////////////////////////
@@ -81,6 +146,8 @@ TEST(URITEST, URIPathString)
   URIPath path;
   EXPECT_FALSE(URIPath::Valid(""));
   EXPECT_FALSE(URIPath::Valid("//"));
+  EXPECT_FALSE(URIPath::Valid("a//b"));
+  EXPECT_FALSE(URIPath::Valid("/a//b"));
   EXPECT_FALSE(URIPath::Valid(" "));
   EXPECT_FALSE(URIPath::Valid("?invalid"));
   EXPECT_FALSE(URIPath::Valid("=invalid"));
@@ -102,6 +169,8 @@ TEST(URITEST, URIPathString)
 
   EXPECT_FALSE(path.Parse(""));
   EXPECT_FALSE(path.Parse("//"));
+  EXPECT_FALSE(path.Parse("a//b"));
+  EXPECT_FALSE(path.Parse("/a//b"));
   EXPECT_FALSE(path.Parse(" "));
   EXPECT_FALSE(path.Parse("?invalid"));
   EXPECT_FALSE(path.Parse("=invalid"));
@@ -123,6 +192,8 @@ TEST(URITEST, URIPathString)
 
   EXPECT_NO_THROW(EXPECT_FALSE(URIPath("").Valid()));
   EXPECT_NO_THROW(EXPECT_FALSE(URIPath("//").Valid()));
+  EXPECT_NO_THROW(EXPECT_FALSE(URIPath("a//b").Valid()));
+  EXPECT_NO_THROW(EXPECT_FALSE(URIPath("/a//b").Valid()));
   EXPECT_NO_THROW(EXPECT_FALSE(URIPath(" ").Valid()));
   EXPECT_NO_THROW(EXPECT_FALSE(URIPath("?invalid").Valid()));
   EXPECT_NO_THROW(EXPECT_FALSE(URIPath("=invalid").Valid()));

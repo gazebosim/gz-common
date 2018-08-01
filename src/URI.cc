@@ -41,8 +41,7 @@ class ignition::common::URIPathPrivate
   ///        an absolute path starting segment or not.
   public: bool IsStringAbsolute(const std::string &_path)
   {
-    return (_path.compare(0, 1, "/") == 0 ||
-           (_path.length() > 0 && _path.compare(1, 3, ":\\") == 0));
+    return _path.length() > 0 && _path[0] == '/';
   }
 };
 
@@ -106,19 +105,82 @@ URIPath::URIPath(const URIPath &_path)
 }
 
 /////////////////////////////////////////////////
+bool URIPath::IsAbsolute() const
+{
+  return this->dataPtr->isAbsolute;
+}
+
+/////////////////////////////////////////////////
+void URIPath::SetAbsolute(bool _absolute)
+{
+  this->dataPtr->isAbsolute = _absolute;
+}
+
+/////////////////////////////////////////////////
+void URIPath::SetRelative()
+{
+  this->SetAbsolute(false);
+}
+
+/////////////////////////////////////////////////
 void URIPath::PushFront(const std::string &_part)
 {
-  this->dataPtr->path.push_front(_part);
-  this->dataPtr->isAbsolute = this->dataPtr->IsStringAbsolute(_part);
+  if (_part.empty())
+  {
+    ignwarn << "Adding empty path segment to URI " << this->Str()
+            << " has no effect." << std::endl;
+    return;
+  }
+
+  auto part = _part;
+  if (_part[0] == '/')
+  {
+    ignwarn << "Instead of pushing a string starting with slash, call "
+               "SetAbsolute() instead." << std::endl;
+    part = _part.substr(1);
+    this->SetAbsolute();
+  }
+
+  if (part.find('/') != std::string::npos)
+  {
+    // TODO: Once URI encoding is implemented, all invalid characters should be
+    // encoded, not just slashes.
+    ignwarn << "Unencoded slashes in URI part, encoding them." << std::endl;
+    part = common::replaceAll(part, "/", "%2F");
+  }
+
+  if (!part.empty())
+    this->dataPtr->path.push_front(part);
 }
 
 /////////////////////////////////////////////////
 void URIPath::PushBack(const std::string &_part)
 {
-  this->dataPtr->path.push_back(_part);
+  if (_part.empty())
+  {
+    ignwarn << "Adding empty path segment to URI " << this->Str()
+            << " has no effect." << std::endl;
+    return;
+  }
 
-  if (this->dataPtr->path.size() == 1)
-    this->dataPtr->isAbsolute = this->dataPtr->IsStringAbsolute(_part);
+  auto part = _part;
+  if (this->dataPtr->path.size() == 0 && _part[0] == '/')
+  {
+    ignwarn << "Instead of pushing a string starting with slash, call "
+               "SetAbsolute() instead." << std::endl;
+    part = _part.substr(1);
+    this->SetAbsolute();
+  }
+
+  if (part.find('/') != std::string::npos)
+  {
+    // TODO: Once URI encoding is implemented, all invalid characters should be
+    // encoded, not just slashes.
+    ignwarn << "Unencoded slashes in URI part, encoding them." << std::endl;
+    part = common::replaceAll(part, "/", "%2F");
+  }
+
+  this->dataPtr->path.push_back(part);
 }
 
 /////////////////////////////////////////////////
@@ -132,7 +194,7 @@ const URIPath URIPath::operator/(const std::string &_part) const
 /////////////////////////////////////////////////
 const URIPath &URIPath::operator/=(const std::string &_part)
 {
-  this->dataPtr->path.push_back(_part);
+  this->PushBack(_part);
   return *this;
 }
 
@@ -161,6 +223,7 @@ std::string URIPath::Str(const std::string &_delim) const
 URIPath &URIPath::operator=(const URIPath &_path)
 {
   this->dataPtr->path = _path.dataPtr->path;
+  this->dataPtr->isAbsolute = _path.dataPtr->isAbsolute;
   return *this;
 }
 
@@ -168,6 +231,7 @@ URIPath &URIPath::operator=(const URIPath &_path)
 void URIPath::Clear()
 {
   this->dataPtr->path.clear();
+  this->dataPtr->isAbsolute = false;
 }
 
 /////////////////////////////////////////////////
@@ -219,6 +283,10 @@ bool URIPath::Valid(const std::string &_str)
                                         "[/";
   if (str.substr(0, 1).find_first_not_of(allowedCharsFirst) !=
       std::string::npos)
+    return false;
+
+  // Two consecutive slashes are not valid
+  if (str.find("//") != std::string::npos)
     return false;
 
   return true;
@@ -414,7 +482,8 @@ URIFragment &URIFragment::operator=(const URIFragment &_fragment)
 }
 
 /////////////////////////////////////////////////
-URIFragment &URIFragment::operator=(const std::string &_fragment) {
+URIFragment &URIFragment::operator=(const std::string &_fragment)
+{
   this->Parse(_fragment);
   return *this;
 }
