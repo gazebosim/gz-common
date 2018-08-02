@@ -26,32 +26,38 @@ TEST(URITEST, URIPath)
 {
   URIPath path1, path2, path3;
   EXPECT_TRUE(path1.Str().empty());
+  EXPECT_FALSE(path1.IsAbsolute());
 
   path1.PushFront("part1");
   EXPECT_EQ(path1.Str(), "part1");
   path1.PushBack("part2");
   EXPECT_EQ(path1.Str(), "part1/part2");
+  EXPECT_FALSE(path1.IsAbsolute());
 
   path1.PushFront("part 0");
   EXPECT_EQ(path1.Str(), "part 0/part1/part2");
   // TODO: switch to the following once URI class is upgraded
   // path1.PushFront("part%200");
   // EXPECT_EQ(path1.Str(), "part%200/part1/part2");
+  EXPECT_FALSE(path1.IsAbsolute());
 
   path2 = path1 / "part3";
   EXPECT_EQ(path2.Str(), "part 0/part1/part2/part3");
   // TODO: switch to the following once URI class is upgraded
   // EXPECT_EQ(path2.Str(), "part%200/part1/part2/part3");
+  EXPECT_FALSE(path2.IsAbsolute());
 
   path1 /= "part3";
   EXPECT_EQ(path1.Str(), "part 0/part1/part2/part3");
   // TODO: switch to the following once URI class is upgraded
   // EXPECT_EQ(path1.Str(), "part%200/part1/part2/part3");
+  EXPECT_FALSE(path1.IsAbsolute());
 
   EXPECT_TRUE(path1 == path2);
 
   path3 = path1;
   EXPECT_TRUE(path3 == path1);
+  EXPECT_FALSE(path3.IsAbsolute());
 
   path1.Clear();
   EXPECT_TRUE(path1.Str().empty());
@@ -61,74 +67,96 @@ TEST(URITEST, URIPath)
 
   URIPath path5("/absolute/path");
   EXPECT_EQ(path5.Str(), "/absolute/path");
+  EXPECT_TRUE(path5.IsAbsolute());
 
   URIPath path6("/");
   EXPECT_EQ(path6.Str(), "/");
+  EXPECT_TRUE(path6.IsAbsolute());
 
   URIPath path7;
   path7.PushFront("/abs");
   EXPECT_EQ(path7.Str(), "/abs");
+  EXPECT_TRUE(path7.IsAbsolute());
 
   path7.PushFront("/abs2");
   EXPECT_EQ(path7.Str(), "/abs2/abs");
+  EXPECT_TRUE(path7.IsAbsolute());
 
   path7.PushFront("abs3");
   EXPECT_EQ(path7.Str(), "/abs3/abs2/abs");
+  EXPECT_TRUE(path7.IsAbsolute());
 
   path7.PushFront("");
   EXPECT_EQ(path7.Str(), "/abs3/abs2/abs");
+  EXPECT_TRUE(path7.IsAbsolute());
 
   path7.PushFront("/");
   EXPECT_EQ(path7.Str(), "/abs3/abs2/abs");
+  EXPECT_TRUE(path7.IsAbsolute());
 
   path7.SetRelative();
   EXPECT_EQ(path7.Str(), "abs3/abs2/abs");
+  EXPECT_FALSE(path7.IsAbsolute());
 
   path7.PushFront("/");
   EXPECT_EQ(path7.Str(), "/abs3/abs2/abs");
+  EXPECT_TRUE(path7.IsAbsolute());
 
   path7.SetRelative();
   path7.SetAbsolute();
   EXPECT_EQ(path7.Str(), "/abs3/abs2/abs");
+  EXPECT_TRUE(path7.IsAbsolute());
 
   path7.SetAbsolute(false);
   path7.PushFront("/abs4");
   EXPECT_EQ(path7.Str(), "/abs4/abs3/abs2/abs");
+  EXPECT_TRUE(path7.IsAbsolute());
 
   path7.PushFront("abs6/abs5");
   EXPECT_EQ(path7.Str(), "/abs6%2Fabs5/abs4/abs3/abs2/abs");
+  EXPECT_TRUE(path7.IsAbsolute());
 
   URIPath path8;
   path8.PushBack("/abs");
   EXPECT_EQ(path8.Str(), "/abs");
+  EXPECT_TRUE(path8.IsAbsolute());
 
   path8.PushBack("/abs2");
   EXPECT_EQ(path8.Str(), "/abs/%2Fabs2");
+  EXPECT_TRUE(path8.IsAbsolute());
 
   path8.PushBack("abs3");
   EXPECT_EQ(path8.Str(), "/abs/%2Fabs2/abs3");
+  EXPECT_TRUE(path8.IsAbsolute());
 
   path8.PushBack("");
   EXPECT_EQ(path8.Str(), "/abs/%2Fabs2/abs3");
+  EXPECT_TRUE(path8.IsAbsolute());
 
   path8.PushBack("/");
   EXPECT_EQ(path8.Str(), "/abs/%2Fabs2/abs3/%2F");
+  EXPECT_TRUE(path8.IsAbsolute());
 
   path8.SetRelative();
   EXPECT_EQ(path8.Str(), "abs/%2Fabs2/abs3/%2F");
+  EXPECT_FALSE(path8.IsAbsolute());
 
   path8.PushBack("/");
   EXPECT_EQ(path8.Str(), "abs/%2Fabs2/abs3/%2F/%2F");
+  EXPECT_FALSE(path8.IsAbsolute());
 
   path8.SetAbsolute();
   path8.PushBack("abs4");
   EXPECT_EQ(path8.Str(), "/abs/%2Fabs2/abs3/%2F/%2F/abs4");
+  EXPECT_TRUE(path8.IsAbsolute());
 
   path8.PushBack("abs5/abs6");
   EXPECT_EQ(path8.Str(), "/abs/%2Fabs2/abs3/%2F/%2F/abs4/abs5%2Fabs6");
+  EXPECT_TRUE(path8.IsAbsolute());
 
   URIPath path9 = path8;
   EXPECT_EQ(path9.Str(), path8.Str());
+  EXPECT_TRUE(path9.IsAbsolute());
 }
 
 /////////////////////////////////////////////////
@@ -412,15 +440,19 @@ TEST(URITEST, Path)
 
   uri.Parse("file:///var/run/test");
   EXPECT_EQ(uri.Str(), "file:///var/run/test");
+  EXPECT_TRUE(uri.Path().IsAbsolute());
 
   uri.Parse("file://var/run/test");
   EXPECT_EQ(uri.Str(), "file://var/run/test");
+  EXPECT_FALSE(uri.Path().IsAbsolute());
 
   uri.Parse("file://test+space");
   EXPECT_EQ(uri.Str(), "file://test+space");
+  EXPECT_FALSE(uri.Path().IsAbsolute());
 
   uri.Parse("file://test%20space");
   EXPECT_EQ(uri.Str(), "file://test%20space");
+  EXPECT_FALSE(uri.Path().IsAbsolute());
 }
 
 /////////////////////////////////////////////////
