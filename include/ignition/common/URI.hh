@@ -54,6 +54,7 @@ namespace ignition
       public: void Clear();
 
       /// \brief Returns whether the path is absolute or not.
+      /// \return Whether the path is absolute or not.
       public: bool IsAbsolute() const;
 
       /// \brief Set whether the path is to be treated absolute or not.

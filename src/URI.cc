@@ -111,7 +111,7 @@ bool URIPath::IsAbsolute() const
 }
 
 /////////////////////////////////////////////////
-void URIPath::SetAbsolute(bool _absolute)
+void URIPath::SetAbsolute(const bool _absolute)
 {
   this->dataPtr->isAbsolute = _absolute;
 }
