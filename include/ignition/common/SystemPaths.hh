@@ -35,6 +35,7 @@
 
 #include <ignition/common/Export.hh>
 #include <ignition/common/SuppressWarning.hh>
+#include <ignition/common/URI.hh>
 
 namespace ignition
 {
@@ -67,6 +68,12 @@ namespace ignition
       /// \param[in] _uri the uniform resource identifier
       /// \return Returns full path name to file
       public: std::string FindFileURI(const std::string &_uri) const;
+
+      /// \brief Find a file or path using a URI
+      /// \param[in] _uri the uniform resource identifier
+      /// \return Returns full path name to file or an empty string if URI
+      /// couldn't be found.
+      public: std::string FindFileURI(const ignition::common::URI &_uri) const;
 
       /// \brief Set the plugin path environment variable to use
       /// \param [in] _env name of the environment variable
@@ -104,15 +111,39 @@ namespace ignition
       /// The callback should return a complete path to the requested file, or
       /// and empty string if the file was not found in the callback.
       /// \param[in] _cb The callback function.
-      public: void SetFindFileCallback(
-                  std::function<std::string (const std::string &)> _cb);
+      /// \deprecated Use AddFindFileCallback instead
+      public: void IGN_DEPRECATED(3) SetFindFileCallback(
+                  std::function<std::string(const std::string &)> _cb);
+
+      /// \brief Add a callback to use when FindFile() can't find a file.
+      /// The callback should return a full local path to the requested file, or
+      /// and empty string if the file was not found in the callback.
+      /// Callbacks will be called in the order they were added until a path is
+      /// found (if a callback is set using SetFindFileCallback(), that one is
+      /// called first).
+      /// \param[in] _cb The callback function, which takes a file path or URI
+      /// and returns the full local path.
+      public: void AddFindFileCallback(
+                  std::function<std::string(const std::string &)> _cb);
+
+      /// \brief Add a callback to use when FindFileURI() can't find a file.
+      /// The callback should return a full local path to the requested file, or
+      /// and empty string if the file was not found in the callback.
+      /// Callbacks will be called in the order they were added until a path is
+      /// found (if a callback is set using SetFindFileURICallback(), that one
+      /// is called first).
+      /// \param[in] _cb The callback function, which takes a file path or URI
+      /// and returns the full local path.
+      public: void AddFindFileURICallback(
+          std::function<std::string(const ignition::common::URI &)> _cb);
 
       /// \brief Set the callback to use when ignition can't find a file uri.
       /// The callback should return a complete path to the requested file, or
       /// and empty string if the file was not found in the callback.
       /// \param[in] _cb The callback function.
-      public: void SetFindFileURICallback(
-                  std::function<std::string (const std::string &)> _cb);
+      /// \deprecated Use AddFindFileURICallback instead
+      public: void IGN_DEPRECATED(3) SetFindFileURICallback(
+                  std::function<std::string(const std::string &)> _cb);
 
       /// \brief look for a file in a set of search paths (not recursive)
       /// \description This method checks if a file exists in given directories.
