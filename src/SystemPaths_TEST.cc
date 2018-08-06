@@ -174,18 +174,22 @@ TEST_F(SystemPathsFixture, FindFileURI)
   // TODO: This test should not work, because 'file://C:\\Windows' is not a
   // valid URI. However, until the URI class is upgraded to resolve this as
   // invalid URI, this test has to be commented out.
-  //EXPECT_EQ("", sp.FindFileURI("file://" + this->filesystemRoot + "Windows"));
+  // EXPECT_EQ("",
+  //     sp.FindFileURI("file://" + this->filesystemRoot + "Windows"));
 #endif
 
-  auto robotCb = [dir1](const std::string &_s) {
+  auto robotCb = [dir1](const std::string &_s)
+  {
     return _s.find("robot://", 0) != std::string::npos ?
            ignition::common::joinPaths(dir1, _s.substr(8)) : "";
   };
-  auto osrfCb = [dir2](const ignition::common::URI &_uri) {
+  auto osrfCb = [dir2](const ignition::common::URI &_uri)
+  {
     return _uri.Scheme() == "osrf" ?
            ignition::common::joinPaths(dir2, _uri.Path().Str()) : "";
   };
-  auto robot2Cb = [dir2](const ignition::common::URI &_uri) {
+  auto robot2Cb = [dir2](const ignition::common::URI &_uri)
+  {
     return _uri.Scheme() == "robot" ?
            ignition::common::joinPaths(dir2, _uri.Path().Str()) : "";
   };
@@ -271,13 +275,16 @@ TEST_F(SystemPathsFixture, FindFile)
 
   // Custom callback
   {
-    auto tmpCb = [tmpDir](const std::string &_s) {
+    auto tmpCb = [tmpDir](const std::string &_s)
+    {
       return _s == "tmp" ? tmpDir : "";
     };
-    auto homeCb = [homeDir](const std::string &_s) {
+    auto homeCb = [homeDir](const std::string &_s)
+    {
       return _s == "home" ? homeDir : "";
     };
-    auto badCb = [badDir](const std::string &_s) {
+    auto badCb = [badDir](const std::string &_s)
+    {
       return _s == "bad" ? badDir : "";
     };
 

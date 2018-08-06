@@ -61,11 +61,11 @@ class ignition::common::SystemPathsPrivate
   public: std::function<std::string(const std::string &)> findFileURICB;
 
   /// \brief Callbacks to be called in order in case a file can't be found.
-  public: std::vector<std::function<std::string(
+  public: std::vector <std::function <std::string(
               const std::string &)> > findFileCbs;
 
   /// \brief Callbacks to be called in order in case a file can't be found.
-  public: std::vector<std::function<std::string(
+  public: std::vector <std::function <std::string(
               const ignition::common::URI &)> > findFileURICbs;
 
   /// \brief generates paths to try searching for the named library
