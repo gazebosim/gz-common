@@ -472,6 +472,28 @@ TEST(Filesystem, directory_iterator)
 }
 
 /////////////////////////////////////////////////
+TEST(Filesystem, createDirectories)
+{
+  std::string new_temp_dir;
+  ASSERT_TRUE(create_and_switch_to_temp_dir(new_temp_dir));
+
+  // test creating directories using relative path
+  std::string rel_dir = separator("rel_dir") + "subdir";
+  ASSERT_TRUE(createDirectories(rel_dir));
+  EXPECT_TRUE(exists(rel_dir));
+  EXPECT_TRUE(isDirectory(rel_dir));
+
+  // test creating directories using abs path
+  std::string path = cwd();
+  EXPECT_EQ(path, new_temp_dir);
+
+  std::string abs_dir = separator(cwd()) + separator("abs_dir") + "subdir";
+  ASSERT_TRUE(createDirectories(abs_dir));
+  EXPECT_TRUE(exists(abs_dir));
+  EXPECT_TRUE(isDirectory(abs_dir));
+}
+
+/////////////////////////////////////////////////
 /// Main
 int main(int argc, char **argv)
 {
