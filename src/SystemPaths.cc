@@ -18,6 +18,7 @@
 #include <sys/types.h>
 #include <algorithm>
 #include <cctype>
+#include <cstring>
 #include <functional>
 #include <list>
 #include <locale>
@@ -54,10 +55,18 @@ class ignition::common::SystemPathsPrivate
   public: std::string logPath;
 
   /// \brief Find file callback.
-  public: std::function<std::string (const std::string &)> findFileCB;
+  public: std::function<std::string(const std::string &)> findFileCB;
 
   /// \brief Find file URI callback.
-  public: std::function<std::string (const std::string &)> findFileURICB;
+  public: std::function<std::string(const std::string &)> findFileURICB;
+
+  /// \brief Callbacks to be called in order in case a file can't be found.
+  public: std::vector <std::function <std::string(
+              const std::string &)> > findFileCbs;
+
+  /// \brief Callbacks to be called in order in case a file can't be found.
+  public: std::vector <std::function <std::string(
+              const ignition::common::URI &)> > findFileURICbs;
 
   /// \brief generates paths to try searching for the named library
   public: std::vector<std::string> GenerateLibraryPaths(
@@ -230,23 +239,67 @@ std::vector<std::string> SystemPathsPrivate::GenerateLibraryPaths(
 //////////////////////////////////////////////////
 std::string SystemPaths::FindFileURI(const std::string &_uri) const
 {
-  int index = _uri.find("://");
-  std::string prefix = _uri.substr(0, index);
-  std::string suffix = _uri.substr(index + 3, _uri.size() - index - 3);
+  if (!ignition::common::URI::Valid(_uri))
+  {
+    ignerr << "The passed value [" << _uri << "] is not a valid URI, "
+              "trying as a file" << std::endl;
+    return this->FindFile(_uri);
+  }
+
+  // TODO(anyone): Special handling of absolute file:
+  // URIs is needed until the URI
+  // class is fixed to support absolute URIs
+  if (common::StartsWith(_uri, "file:///"))
+  {
+    const auto filename = _uri.substr(std::strlen("file://"));
+    return this->FindFile(ignition::common::copyFromUnixPath(filename));
+  }
+
+  const auto uri = ignition::common::URI(_uri);
+  return this->FindFileURI(uri);
+}
+
+//////////////////////////////////////////////////
+std::string SystemPaths::FindFileURI(const ignition::common::URI &_uri) const
+{
+  std::string prefix = _uri.Scheme();
+  std::string suffix = _uri.Path().Str() + _uri.Query().Str();
   std::string filename;
 
-  if (prefix.empty() || prefix == "file")
+  if (prefix == "file")
   {
     // First try to find the file on the current system
-    filename = this->FindFile(suffix);
+    filename = this->FindFile(ignition::common::copyFromUnixPath(suffix));
   }
-  else
+  else if (this->dataPtr->findFileURICB)
   {
-    filename = this->dataPtr->findFileURICB(_uri);
+    filename = this->dataPtr->findFileURICB(_uri.Str());
+  }
+
+  // If still not found, try custom callbacks
+  if (filename.empty())
+  {
+    for (const auto &cb : this->dataPtr->findFileURICbs)
+    {
+      filename = cb(_uri);
+      if (!filename.empty())
+        break;
+    }
   }
 
   if (filename.empty())
-    ignerr << "Unable to find file with URI [" << _uri << "]\n";
+  {
+    ignerr << "Unable to find file with URI [" << _uri.Str() << "]" <<
+           std::endl;
+    return std::string();
+  }
+
+  if (!exists(filename))
+  {
+    ignerr << "URI [" << _uri.Str() << "] resolved to path [" << filename <<
+           "] but the path does not exist" << std::endl;
+    return std::string();
+  }
 
   return filename;
 }
@@ -256,47 +309,69 @@ std::string SystemPaths::FindFile(const std::string &_filename,
                                   const bool _searchLocalPath) const
 {
   std::string path;
+  std::string filename = _filename;
 
-  if (_filename.empty())
+  if (filename.empty())
     return path;
 
-  if (_filename.find("://") != std::string::npos)
+  // TODO(anyone): Special handling of absolute file:
+  // URIs is needed until the URI
+  // class is fixed to support absolute URIs
+  if (common::StartsWith(filename, "file:///"))
   {
-    path = this->FindFileURI(_filename);
+    filename = filename.substr(std::strlen("file://"));
   }
-  else if (_filename[0] == '/')
+
+  // Handle as URI
+  if (ignition::common::URI::Valid(filename))
   {
-    path = _filename;
+    path = this->FindFileURI(ignition::common::URI(filename));
   }
+  // Handle as local absolute path
+  else if (filename[0] == '/')
+  {
+    path = filename;
+  }
+  // Try appending to local paths
   else
   {
-    bool found = false;
-
-    path = cwd() + "/" + _filename;
-
-    if (_searchLocalPath && exists(path))
+    auto cwdPath = joinPaths(cwd(), filename);
+    if (_searchLocalPath && exists(cwdPath))
     {
-      found = true;
+      path = cwdPath;
     }
-    else if ((_filename[0] == '/' || _filename[0] == '.' || _searchLocalPath)
-             && exists(_filename))
+    else if ((filename[0] == '/' || filename[0] == '.' || _searchLocalPath)
+             && exists(filename))
     {
-      path = _filename;
-      found = true;
+      path = filename;
     }
     else if (this->dataPtr->findFileCB)
     {
-      path = this->dataPtr->findFileCB(_filename);
-      found = !path.empty();
+      path = this->dataPtr->findFileCB(filename);
     }
+  }
 
-    if (!found)
-      return std::string();
+  // If still not found, try custom callbacks
+  if (path.empty())
+  {
+    for (const auto &cb : this->dataPtr->findFileCbs)
+    {
+      path = cb(filename);
+      if (!path.empty())
+        break;
+    }
+  }
+
+  if (path.empty())
+  {
+    ignerr << "Could not resolve file [" << _filename << "]" << std::endl;
+    return std::string();
   }
 
   if (!exists(path))
   {
-    ignerr << "File or path does not exist[" << path << "]\n";
+    ignerr << "File [" << _filename << "] resolved to path [" << path <<
+              "] but the path does not exist" << std::endl;
     return std::string();
   }
 
@@ -358,16 +433,30 @@ void SystemPaths::AddSearchPathSuffix(const std::string &_suffix)
 
 /////////////////////////////////////////////////
 void SystemPaths::SetFindFileCallback(
-    std::function<std::string (const std::string &)> _cb)
+    std::function<std::string(const std::string &)> _cb)
 {
   this->dataPtr->findFileCB = _cb;
 }
 
 /////////////////////////////////////////////////
 void SystemPaths::SetFindFileURICallback(
-    std::function<std::string (const std::string &)> _cb)
+    std::function<std::string(const std::string &)> _cb)
 {
   this->dataPtr->findFileURICB = _cb;
+}
+
+/////////////////////////////////////////////////
+void SystemPaths::AddFindFileCallback(
+    std::function<std::string(const std::string &)> _cb)
+{
+  this->dataPtr->findFileCbs.push_back(_cb);
+}
+
+/////////////////////////////////////////////////
+void SystemPaths::AddFindFileURICallback(
+    std::function<std::string(const ignition::common::URI &)> _cb)
+{
+  this->dataPtr->findFileURICbs.push_back(_cb);
 }
 
 /////////////////////////////////////////////////

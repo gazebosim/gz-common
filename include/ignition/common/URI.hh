@@ -30,6 +30,7 @@ namespace ignition
     // Forward declare private data classes.
     class URIPathPrivate;
     class URIQueryPrivate;
+    class URIFragmentPrivate;
     class URIPrivate;
 
     /// \brief The path component of a URI
@@ -52,13 +53,32 @@ namespace ignition
       /// \brief Remove all parts of the path
       public: void Clear();
 
+      /// \brief Returns whether the path is absolute or not.
+      /// \return Whether the path is absolute or not.
+      public: bool IsAbsolute() const;
+
+      /// \brief Set whether the path is to be treated absolute or not.
+      /// \param[in] _absolute Whether the path is to be treated absolute or
+      ///                      not.
+      public: void SetAbsolute(bool _absolute = true);
+
+      /// \brief Set the path to be relative.
+      public: void SetRelative();
+
       /// \brief Push a new part onto the front of this path.
       /// \param[in] _part Path part to push
+      /// Empty _part is ignored. If _part starts with /, the path is set to
+      /// absolute (though calling SetAbsolute() is the preferred method). All
+      /// forward slashes inside the string are URI-encoded to %2F.
       public: void PushFront(const std::string &_part);
 
       /// \brief Push a new part onto the back of this path.
       /// \param[in] _part Path part to push
       /// \sa operator/
+      /// Empty _part is ignored. If _part starts with / and the path is empty,
+      /// the path is set to absolute (though calling SetAbsolute() is the
+      /// preferred method). All forward slashes inside the string are
+      /// URI-encoded to %2F.
       public: void PushBack(const std::string &_part);
 
       /// \brief Compound assignment operator.
@@ -82,7 +102,7 @@ namespace ignition
       /// \return The path as a string, with each path part separated by _delim.
       public: std::string Str(const std::string &_delim = "/") const;
 
-      /// \brief Equal operator.
+      /// \brief Assignment operator.
       /// \param[in] _path Another URIPath.
       /// \return Itself.
       public: URIPath &operator=(const URIPath &_path);
@@ -134,7 +154,7 @@ namespace ignition
       public: void Insert(const std::string &_key,
                           const std::string &_value);
 
-      /// \brief Equal operator.
+      /// \brief Assignment operator.
       /// \param[in] _query another URIQuery.
       /// \return Itself.
       public: URIQuery &operator=(const URIQuery &_query);
@@ -168,6 +188,66 @@ namespace ignition
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<URIQueryPrivate> dataPtr;
+      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+    };
+
+    /// \brief The fragment component of a URI
+    class IGNITION_COMMON_VISIBLE URIFragment
+    {
+      /// \brief Constructor
+      public: URIFragment();
+
+      /// \brief Construct a URIFragment object from a string.
+      /// \param[in] _str A string.
+      public: explicit URIFragment(const std::string &_str);
+
+      /// \brief Copy constructor
+      /// \param[in] _fragment Another fragment component
+      public: URIFragment(const URIFragment &_fragment);
+
+      /// \brief Destructor
+      public: virtual ~URIFragment();
+
+      /// \brief Remove all values of the fragment
+      public: void Clear();
+
+      /// \brief Assignment operator.
+      /// \param[in] _fragment another URIFragment.
+      /// \return Itself.
+      public: URIFragment &operator=(const URIFragment &_fragment);
+
+      /// \brief Assignment operator.
+      /// \param[in] _fragment another URIFragment.
+      /// \return Itself.
+      public: URIFragment &operator=(const std::string &_fragment);
+
+      /// \brief Return true if the two fragments contain the same values.
+      /// \param[in] _fragment A URI fragment to compare.
+      /// return True if the fragments match.
+      public: bool operator==(const URIFragment &_fragment) const;
+
+      /// \brief Get the fragment as a string.
+      /// \return The fragment as a string.
+      public: std::string Str() const;
+
+      /// \brief Check if a string is a valid URI fragment.
+      /// \param[in] _str The string to check.
+      /// \return True if the string can be parsed as a URI fragment.
+      public: static bool Valid(const std::string &_str);
+
+      /// \brief Check if this is a valid URI fragment.
+      /// \return True if this can be parsed as a URI fragment.
+      public: bool Valid() const;
+
+      /// \brief Parse a string as URIFragment.
+      /// \param[in] _str A string.
+      /// \return True if the string can be parsed as a URIFragment.
+      public: bool Parse(const std::string &_string);
+
+      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<URIFragmentPrivate> dataPtr;
       IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
     };
 
@@ -223,7 +303,15 @@ namespace ignition
       /// \return A const reference of the query.
       public: const URIQuery &Query() const;
 
-      /// \brief Equal operator.
+      /// \brief Get a mutable version of the fragment component.
+      /// \return A reference to the fragment.
+      public: URIFragment &Fragment();
+
+      /// \brief Get a const reference of the fragment component.
+      /// \return A const reference of the fragment.
+      public: const URIFragment &Fragment() const;
+
+      /// \brief Assignment operator.
       /// \param[in] _uri Another URI.
       /// \return Itself.
       public: URI &operator=(const URI &_uri);

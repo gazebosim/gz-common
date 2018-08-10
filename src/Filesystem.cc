@@ -287,7 +287,7 @@ bool ignition::common::createDirectories(const std::string &_path)
   size_t index = 0;
   while (index < _path.size())
   {
-    size_t end = _path.find('/', index+1);
+    size_t end = _path.find(separator(""), index+1);
     std::string dir = _path.substr(0, end);
     if (!exists(dir))
     {
