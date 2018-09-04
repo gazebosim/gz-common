@@ -32,8 +32,12 @@ namespace ignition
     /// \brief info needed to perform work
     class WorkOrder
     {
+      /// \brief Default constructor
       public: WorkOrder() = default;
 
+      /// \brief Constructor used by std::deque::emplace.
+      /// \param[in] _work Work function.
+      /// \param[in] _cb Callback function.
       public: WorkOrder(const std::function<void()> &_work,
                  const std::function<void()> _cb)
         : work(_work), callback(_cb) {}
@@ -122,7 +126,7 @@ WorkerPool::WorkerPool(const unsigned int _minThreadCount)
   : dataPtr(new WorkerPoolPrivate)
 {
   unsigned int numWorkers = std::max(std::thread::hardware_concurrency(),
-      _minThreadCount);
+      std::max(_minThreadCount, 1u));
 
   // create worker threads
   for (unsigned int w = 0; w < numWorkers; ++w)
