@@ -35,8 +35,11 @@ namespace ignition
     /// \brief A pool of worker threads that do stuff in parallel
     class IGNITION_COMMON_VISIBLE WorkerPool
     {
-      /// \brief creates worker threads
-      public: WorkerPool();
+      /// \brief Creates worker threads. The number of worker threads is
+      /// determined by max(std::thread::hardware_concurrency, _minThreadCount).
+      /// \param[in] _minThreadCount The minimum number of threads to
+      /// create in the pool.
+      public: WorkerPool(const unsigned int _minThreadCount = 1u);
 
       /// \brief closes worker threads
       public: ~WorkerPool();

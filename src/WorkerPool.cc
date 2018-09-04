@@ -30,13 +30,19 @@ namespace ignition
   namespace common
   {
     /// \brief info needed to perform work
-    struct WorkOrder
+    class WorkOrder
     {
+      public: WorkOrder() = default;
+
+      public: WorkOrder(const std::function<void()> &_work,
+                 const std::function<void()> _cb)
+        : work(_work), callback(_cb) {}
+
       /// \brief method that does the work
-      std::function<void()> work = std::function<void()>();
+      public: std::function<void()> work = std::function<void()>();
 
       /// \brief callback to invoke after working
-      std::function<void()> callback = std::function<void()>();
+      public: std::function<void()> callback = std::function<void()>();
     };
 
     /// \brief Private implementation
@@ -83,9 +89,8 @@ void WorkerPoolPrivate::Worker()
 
       // Wait for a work order
       while (!this->done && this->workOrders.empty())
-      {
         this->signalNewWork.wait(queueLock);
-      }
+
       // Destructor may have signaled to shutdown workers
       if (this->done)
         break;
@@ -106,15 +111,18 @@ void WorkerPoolPrivate::Worker()
     {
       std::unique_lock<std::mutex> queueLock(this->queueMtx);
       --(this->activeOrders);
+      if (this->workOrders.empty() && this->activeOrders <= 0)
+        this->signalWorkDone.notify_all();
     }
-    this->signalWorkDone.notify_all();
   }
 }
 
 //////////////////////////////////////////////////
-WorkerPool::WorkerPool() : dataPtr(new WorkerPoolPrivate)
+WorkerPool::WorkerPool(const unsigned int _minThreadCount)
+  : dataPtr(new WorkerPoolPrivate)
 {
-  unsigned int numWorkers = std::max(std::thread::hardware_concurrency(), 1u);
+  unsigned int numWorkers = std::max(std::thread::hardware_concurrency(),
+      _minThreadCount);
 
   // create worker threads
   for (unsigned int w = 0; w < numWorkers; ++w)
@@ -144,16 +152,10 @@ WorkerPool::~WorkerPool()
 }
 
 //////////////////////////////////////////////////
-void WorkerPool::AddWork(std::function<void()> _work,
-    std::function<void()> _cb)
+void WorkerPool::AddWork(std::function<void()> _work, std::function<void()> _cb)
 {
-  WorkOrder order;
-  order.work = _work;
-  order.callback = _cb;
-  {
-    std::unique_lock<std::mutex> queueLock(this->dataPtr->queueMtx);
-    this->dataPtr->workOrders.push(std::move(order));
-  }
+  std::unique_lock<std::mutex> queueLock(this->dataPtr->queueMtx);
+  this->dataPtr->workOrders.emplace(_work, _cb);
   this->dataPtr->signalNewWork.notify_one();
 }
 
@@ -164,34 +166,27 @@ bool WorkerPool::WaitForResults(const Time &_timeout)
   std::unique_lock<std::mutex> queueLock(this->dataPtr->queueMtx);
 
   // Lambda to keep logic in one place for both cases
-  const auto &done = this->dataPtr->done;
-  const auto &workOrders = this->dataPtr->workOrders;
-  const auto &activeOrders = this->dataPtr->activeOrders;
-  std::function<bool()> haveResults =
-    [&done, &workOrders, &activeOrders] () -> bool
-      {
-        return done || (workOrders.empty() && !activeOrders);
-      };
-
-  if (Time::Zero == _timeout)
-  {
-    // Loop for spurious wakeups
-    while (!haveResults())
+  std::function<bool()> haveResults = [this] () -> bool
     {
-      if (Time::Zero == _timeout)
-      {
-        // Wait forever
-        this->dataPtr->signalWorkDone.wait(queueLock);
-      }
+      return this->dataPtr->done ||
+        (this->dataPtr->workOrders.empty() && !this->dataPtr->activeOrders);
+    };
+
+  if (!haveResults())
+  {
+    if (Time::Zero == _timeout)
+    {
+      // Wait forever
+      this->dataPtr->signalWorkDone.wait(queueLock);
+    }
+    else
+    {
+      // Wait for timeout
+      signaled = this->dataPtr->signalWorkDone.wait_for(queueLock,
+          std::chrono::seconds(_timeout.sec) +
+          std::chrono::nanoseconds(_timeout.nsec),
+          haveResults);
     }
   }
-  else
-  {
-    // Wait for timeout
-    signaled = this->dataPtr->signalWorkDone.wait_for(queueLock,
-        std::chrono::seconds(_timeout.sec) +
-        std::chrono::nanoseconds(_timeout.nsec),
-        haveResults);
-  }
-  return signaled && !done;
+  return signaled && !this->dataPtr->done;
 }
