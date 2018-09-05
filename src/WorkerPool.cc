@@ -39,7 +39,7 @@ namespace ignition
       /// \param[in] _work Work function.
       /// \param[in] _cb Callback function.
       public: WorkOrder(const std::function<void()> &_work,
-                 const std::function<void()> _cb)
+                 const std::function<void()> &_cb)
         : work(_work), callback(_cb) {}
 
       /// \brief method that does the work

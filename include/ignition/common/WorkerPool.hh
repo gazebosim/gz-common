@@ -39,7 +39,7 @@ namespace ignition
       /// determined by max(std::thread::hardware_concurrency, _minThreadCount).
       /// \param[in] _minThreadCount The minimum number of threads to
       /// create in the pool. A value of zero is converted to a value of 1.
-      public: WorkerPool(const unsigned int _minThreadCount = 1u);
+      public: explicit WorkerPool(const unsigned int _minThreadCount = 1u);
 
       /// \brief closes worker threads
       public: ~WorkerPool();
