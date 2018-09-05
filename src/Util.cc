@@ -22,14 +22,15 @@
 #include <sys/sendfile.h>
 #endif
 
-#include <iomanip>
 #include <array>
 #include <algorithm>
-#include <sstream>
-#include <fstream>
 #include <cstdlib>
 #include <cstring>
 #include <cctype>
+#include <fstream>
+#include <functional>
+#include <iomanip>
+#include <sstream>
 
 #include <ignition/common/config.hh>
 #include <ignition/common/SystemPaths.hh>
