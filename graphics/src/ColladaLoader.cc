@@ -648,7 +648,7 @@ void ColladaLoaderPrivate::LoadController(tinyxml2::XMLElement *_contrXml,
 
   std::string jointsStr = jointsXml->FirstChildElement("Name_array")->GetText();
 
-  std::vector<std::string> joints = split(jointsStr, " ");
+  std::vector<std::string> joints = split(jointsStr, " \r\n");
 
   tinyxml2::XMLElement *invBMXml = this->ElementId("source", invBindMatURL);
 
@@ -660,7 +660,7 @@ void ColladaLoaderPrivate::LoadController(tinyxml2::XMLElement *_contrXml,
 
   std::string posesStr = invBMXml->FirstChildElement("float_array")->GetText();
 
-  std::vector<std::string> strs = split(posesStr, " ");
+  std::vector<std::string> strs = split(posesStr, " \r\n");
 
   for (unsigned int i = 0; i < joints.size(); ++i)
   {
@@ -717,7 +717,7 @@ void ColladaLoaderPrivate::LoadController(tinyxml2::XMLElement *_contrXml,
   tinyxml2::XMLElement *weightsXml = this->ElementId("source", weightsURL);
 
   std::string wString = weightsXml->FirstChildElement("float_array")->GetText();
-  std::vector<std::string> wStrs = split(wString, " ");
+  std::vector<std::string> wStrs = split(wString, " \r\n");
 
   std::vector<float> weights;
   for (unsigned int i = 0; i < wStrs.size(); ++i)
@@ -725,8 +725,8 @@ void ColladaLoaderPrivate::LoadController(tinyxml2::XMLElement *_contrXml,
 
   std::string cString = vertWeightsXml->FirstChildElement("vcount")->GetText();
   std::string vString = vertWeightsXml->FirstChildElement("v")->GetText();
-  std::vector<std::string> vCountStrs = split(cString, " ");
-  std::vector<std::string> vStrs = split(vString, " ");
+  std::vector<std::string> vCountStrs = split(cString, " \r\n");
+  std::vector<std::string> vStrs = split(vString, " \r\n");
 
   std::vector<unsigned int> vCount;
   std::vector<unsigned int> v;
@@ -860,7 +860,7 @@ void ColladaLoaderPrivate::LoadAnimationSet(tinyxml2::XMLElement *_xml,
       tinyxml2::XMLElement *timeArray =
           frameTimesXml->FirstChildElement("float_array");
       std::string timeStr = timeArray->GetText();
-      std::vector<std::string> timeStrs = split(timeStr, " ");
+      std::vector<std::string> timeStrs = split(timeStr, " \r\n");
 
       std::vector<double> times;
       for (unsigned int i = 0; i < timeStrs.size(); ++i)
@@ -869,7 +869,7 @@ void ColladaLoaderPrivate::LoadAnimationSet(tinyxml2::XMLElement *_xml,
       tinyxml2::XMLElement *output =
           frameTransXml->FirstChildElement("float_array");
       std::string outputStr = output->GetText();
-      std::vector<std::string> outputStrs = split(outputStr, " ");
+      std::vector<std::string> outputStrs = split(outputStr, " \r\n");
 
       std::vector<double> values;
       for (unsigned int i = 0; i < outputStrs.size(); ++i)
@@ -1226,7 +1226,7 @@ void ColladaLoaderPrivate::LoadPositions(const std::string &_id,
       unsigned int, Vector3Hash> unique;
 
   std::vector<std::string>::iterator iter, end;
-  std::vector<std::string> strs = split(valueStr, " ");
+  std::vector<std::string> strs = split(valueStr, " \r\n");
 
   end = strs.end();
   for (iter = strs.begin(); iter != end; iter += 3)
@@ -1458,7 +1458,7 @@ void ColladaLoaderPrivate::LoadTexCoords(const std::string &_id,
 
   // Read the raw texture values, and split them on spaces.
   std::string valueStr = floatArrayXml->GetText();
-  std::vector<std::string> values = split(valueStr, " ");
+  std::vector<std::string> values = split(valueStr, " \r\n");
 
   // Read in all the texture coordinates.
   for (int i = 0; i < totCount; i += stride)
@@ -1781,7 +1781,7 @@ void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
   //   e.g. if vcount = 4, break into triangle 1: [0,1,2], triangle 2: [0,2,3]
   tinyxml2::XMLElement *vcountXml = _polylistXml->FirstChildElement("vcount");
   std::string vcountStr = vcountXml->GetText();
-  std::vector<std::string> vcountStrs = split(vcountStr, " ");
+  std::vector<std::string> vcountStrs = split(vcountStr, " \r\n");
   std::vector<int> vcounts;
   for (unsigned int j = 0; j < vcountStrs.size(); ++j)
     vcounts.push_back(math::parseInt(vcountStrs[j]));
@@ -1796,7 +1796,7 @@ void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
   unsigned int *values = new unsigned int[inputSize];
   memset(values, 0, inputSize);
 
-  std::vector<std::string> strs = split(pStr, " ");
+  std::vector<std::string> strs = split(pStr, " \r\n");
   std::vector<std::string>::iterator strs_iter = strs.begin();
   for (unsigned int l = 0; l < vcounts.size(); ++l)
   {
@@ -2028,7 +2028,10 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
   bool hasNormals = false;
   bool hasTexcoords = false;
   unsigned int offsetSize = 0;
-  std::map<const unsigned int, int> inputs;
+
+  // read input elements. A vector of int is used because there can be
+  // multiple TEXCOORD inputs.
+  std::map<const unsigned int, std::set<int>> inputs;
 
   // look up table of position/normal/texcoord duplicate indices
   std::map<unsigned int, unsigned int> texDupMap;
@@ -2047,32 +2050,34 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
           positionDupMap, normalDupMap);
       if (norms.size() > count)
         combinedVertNorms = true;
-      inputs[VERTEX] = ignition::math::parseInt(offset);
+      inputs[VERTEX].insert(ignition::math::parseInt(offset));
       hasVertices = true;
     }
     else if (semantic == "NORMAL")
     {
       this->LoadNormals(source, _transform, norms, normalDupMap);
       combinedVertNorms = false;
-      inputs[NORMAL] = ignition::math::parseInt(offset);
+      inputs[NORMAL].insert(ignition::math::parseInt(offset));
       hasNormals = true;
     }
     else if (semantic == "TEXCOORD" && !hasTexcoords)
     {
       // we currently only support one set of UVs
       this->LoadTexCoords(source, texcoords, texDupMap);
-      inputs[TEXCOORD] = ignition::math::parseInt(offset);
+      inputs[TEXCOORD].insert(ignition::math::parseInt(offset));
       hasTexcoords = true;
     }
     else
     {
-      inputs[otherSemantics++] = ignition::math::parseInt(offset);
+      inputs[otherSemantics++].insert(ignition::math::parseInt(offset));
       ignwarn << "Triangle input semantic: '" << semantic << "' is currently"
           << " not supported" << std::endl;
     }
     trianglesInputXml = trianglesInputXml->NextSiblingElement("input");
-    offsetSize++;
   }
+
+  for (const auto &input : inputs)
+    offsetSize += input.second.size();
 
   tinyxml2::XMLElement *pXml = _trianglesXml->FirstChildElement("p");
   if (!pXml || !pXml->GetText())
@@ -2118,7 +2123,7 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
   std::map<unsigned int, std::vector<GeometryIndices> > vertexIndexMap;
 
   unsigned int *values = new unsigned int[offsetSize];
-  std::vector<std::string> strs = split(pStr, " ");
+  std::vector<std::string> strs = split(pStr, " \r\n");
 
   for (unsigned int j = 0; j < strs.size(); j += offsetSize)
   {
@@ -2134,7 +2139,7 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
     {
       // Get the vertex position index value. If the position is a duplicate
       // then reset the index to the first instance of the duplicated position
-      daeVertIndex = values[inputs[VERTEX]];
+      daeVertIndex = values[*inputs[VERTEX].begin()];
       if (positionDupMap.find(daeVertIndex) != positionDupMap.end())
         daeVertIndex = positionDupMap[daeVertIndex];
 
@@ -2161,7 +2166,7 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
             // Get the vertex normal index value. If the normal is a duplicate
             // then reset the index to the first instance of the duplicated
             // position
-            unsigned int remappedNormalIndex = values[inputs[NORMAL]];
+            unsigned int remappedNormalIndex = values[*inputs[NORMAL].begin()];
             if (normalDupMap.find(remappedNormalIndex) != normalDupMap.end())
               remappedNormalIndex = normalDupMap[remappedNormalIndex];
 
@@ -2173,7 +2178,8 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
             // Get the vertex texcoord index value. If the texcoord is a
             // duplicate then reset the index to the first instance of the
             // duplicated texcoord
-            unsigned int remappedTexcoordIndex = values[inputs[TEXCOORD]];
+            unsigned int remappedTexcoordIndex =
+                values[*inputs[TEXCOORD].begin()];
             if (texDupMap.find(remappedTexcoordIndex) != texDupMap.end())
               remappedTexcoordIndex = texDupMap[remappedTexcoordIndex];
 
@@ -2227,7 +2233,7 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
       }
       if (hasNormals)
       {
-        unsigned int inputRemappedNormalIndex = values[inputs[NORMAL]];
+        unsigned int inputRemappedNormalIndex = values[*inputs[NORMAL].begin()];
         if (normalDupMap.find(inputRemappedNormalIndex) != normalDupMap.end())
           inputRemappedNormalIndex = normalDupMap[inputRemappedNormalIndex];
         subMesh->AddNormal(norms[inputRemappedNormalIndex]);
@@ -2235,7 +2241,8 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
       }
       if (hasTexcoords)
       {
-        unsigned int inputRemappedTexcoordIndex = values[inputs[TEXCOORD]];
+        unsigned int inputRemappedTexcoordIndex =
+            values[*inputs[TEXCOORD].begin()];
         if (texDupMap.find(inputRemappedTexcoordIndex) != texDupMap.end())
           inputRemappedTexcoordIndex = texDupMap[inputRemappedTexcoordIndex];
         subMesh->AddTexCoord(texcoords[inputRemappedTexcoordIndex].X(),
