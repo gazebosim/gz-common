@@ -1,3 +1,4 @@
+# Avoid to install the win_dirent header when not in windows
 if(WIN32)
   ign_install_all_headers()
 else()
