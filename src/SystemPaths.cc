@@ -28,7 +28,7 @@
 #ifndef _WIN32
 #include <dirent.h>
 #else
-#include "ignition/common/win_dirent.h"
+#include "win_dirent.h"
 #endif
 
 #include "ignition/common/Console.hh"

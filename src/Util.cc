@@ -43,7 +43,7 @@
 #include <climits>
 #else
 #include <io.h>
-#include <ignition/common/win_dirent.h>
+#include "win_dirent.h"
 #endif
 
 
