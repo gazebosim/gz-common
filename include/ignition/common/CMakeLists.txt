@@ -1,5 +1,2 @@
-if(WIN32)
-  ign_install_all_headers()
-else()
-  ign_install_all_headers(EXCLUDE_FILES "win_dirent.h")
-endif()
+
+ign_install_all_headers()
