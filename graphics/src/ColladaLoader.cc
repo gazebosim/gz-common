@@ -301,8 +301,7 @@ void hash_combine(std::size_t &_seed, const double &_v)
 }
 
 /////////////////////////////////////////////////
-struct Vector3Hash : std::unary_function<const ignition::math::Vector3d,
-  std::size_t>
+struct Vector3Hash
 {
   std::size_t operator()(const ignition::math::Vector3d &_v) const
   {
@@ -315,8 +314,7 @@ struct Vector3Hash : std::unary_function<const ignition::math::Vector3d,
 };
 
 /////////////////////////////////////////////////
-struct Vector2dHash : std::unary_function<const ignition::math::Vector2d,
-  std::size_t>
+struct Vector2dHash
 {
   std::size_t operator()(const ignition::math::Vector2d &_v) const
   {
