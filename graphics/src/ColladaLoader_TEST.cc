@@ -155,6 +155,24 @@ TEST_F(ColladaLoader, Material)
 }
 
 /////////////////////////////////////////////////
+TEST_F(ColladaLoader, TexCoordSets)
+{
+  common::ColladaLoader loader;
+  // This triangle mesh has multiple uv sets and vertices separated by
+  // line breaks
+  common::Mesh *mesh = loader.Load(std::string(PROJECT_SOURCE_PATH) +
+      "/test/data/multiple_texture_coordinates_triangle.dae");
+  ASSERT_TRUE(mesh);
+
+  EXPECT_EQ(3u, mesh->VertexCount());
+  EXPECT_EQ(3u, mesh->NormalCount());
+  EXPECT_EQ(3u, mesh->IndexCount());
+  EXPECT_EQ(3u, mesh->TexCoordCount());
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->MaterialCount());
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
