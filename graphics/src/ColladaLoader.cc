@@ -1223,8 +1223,15 @@ void ColladaLoaderPrivate::LoadPositions(const std::string &_id,
   std::unordered_map<ignition::math::Vector3d,
       unsigned int, Vector3Hash> unique;
 
+  std::cerr << " =========== valueStr " << std::endl;
+  std::cerr << valueStr << std::endl;
+  std::cerr << " ===========  " << std::endl;
+
   std::vector<std::string>::iterator iter, end;
   std::vector<std::string> strs = split(valueStr, " \r\n");
+  std::cerr << " strs size " << strs.size() << std::endl;
+  for (auto i = 0; i < strs.size(); ++i) std::cerr << strs[i] << " ";
+  std::cerr << std::endl;
 
   end = strs.end();
   for (iter = strs.begin(); iter != end; iter += 3)
