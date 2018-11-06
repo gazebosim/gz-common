@@ -1225,7 +1225,6 @@ void ColladaLoaderPrivate::LoadPositions(const std::string &_id,
 
   std::vector<std::string>::iterator iter, end;
   std::vector<std::string> strs = split(valueStr, " \r\n");
-
   end = strs.end();
   for (iter = strs.begin(); iter != end; iter += 3)
   {
@@ -2058,7 +2057,7 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
       inputs[NORMAL].insert(ignition::math::parseInt(offset));
       hasNormals = true;
     }
-    else if (semantic == "TEXCOORD" && !hasTexcoords)
+    else if (semantic == "TEXCOORD")
     {
       // we currently only support one set of UVs
       this->LoadTexCoords(source, texcoords, texDupMap);

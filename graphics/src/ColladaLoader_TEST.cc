@@ -170,6 +170,19 @@ TEST_F(ColladaLoader, TexCoordSets)
   EXPECT_EQ(3u, mesh->TexCoordCount());
   EXPECT_EQ(1u, mesh->SubMeshCount());
   EXPECT_EQ(0u, mesh->MaterialCount());
+
+  auto sm = mesh->SubMeshByIndex(0u);
+  auto subMesh = sm.lock();
+  EXPECT_NE(nullptr, subMesh);
+  EXPECT_EQ(math::Vector3d(0, 0, 0), subMesh->Vertex(0u));
+  EXPECT_EQ(math::Vector3d(10, 0, 0), subMesh->Vertex(1u));
+  EXPECT_EQ(math::Vector3d(10, 10, 0), subMesh->Vertex(2u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), subMesh->Normal(0u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), subMesh->Normal(1u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), subMesh->Normal(2u));
+  EXPECT_EQ(math::Vector2d(0, 1), subMesh->TexCoord(0u));
+  EXPECT_EQ(math::Vector2d(0, 1), subMesh->TexCoord(1u));
+  EXPECT_EQ(math::Vector2d(0, 1), subMesh->TexCoord(2u));
 }
 
 /////////////////////////////////////////////////

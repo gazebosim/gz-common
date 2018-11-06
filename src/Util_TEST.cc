@@ -99,6 +99,12 @@ TEST(Util_TEST, split)
   EXPECT_EQ(tokens.at(0), "//abc/def");
   EXPECT_EQ(tokens.at(1), "123");
   EXPECT_EQ(tokens.at(2), "567///");
+
+  tokens = common::split("12\r\n34\r\n56", "\r\n");
+  ASSERT_EQ(tokens.size(), 3u);
+  EXPECT_EQ(tokens.at(0), "12");
+  EXPECT_EQ(tokens.at(1), "34");
+  EXPECT_EQ(tokens.at(2), "56");
 }
 
 /////////////////////////////////////////////////
