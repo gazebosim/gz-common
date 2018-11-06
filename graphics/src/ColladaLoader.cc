@@ -1223,13 +1223,13 @@ void ColladaLoaderPrivate::LoadPositions(const std::string &_id,
   std::unordered_map<ignition::math::Vector3d,
       unsigned int, Vector3Hash> unique;
 
-  std::cerr << " =========== valueStr " << std::endl;
+  std::cerr << " =========== pos valueStr " << std::endl;
   std::cerr << valueStr << std::endl;
   std::cerr << " ===========  " << std::endl;
 
   std::vector<std::string>::iterator iter, end;
   std::vector<std::string> strs = split(valueStr, " \r\n");
-  std::cerr << " strs size " << strs.size() << std::endl;
+  std::cerr << " pos strs size " << strs.size() << std::endl;
   for (auto i = 0; i < strs.size(); ++i) std::cerr << strs[i] << " ";
   std::cerr << std::endl;
 
@@ -1312,6 +1312,10 @@ void ColladaLoaderPrivate::LoadNormals(const std::string &_id,
       unsigned int, Vector3Hash> unique;
 
   std::string valueStr = floatArrayXml->GetText();
+  std::cerr << " =========== normal valueStr " << std::endl;
+  std::cerr << valueStr << std::endl;
+  std::cerr << " ===========  " << std::endl;
+
   std::istringstream iss(valueStr);
   do
   {
@@ -1464,6 +1468,12 @@ void ColladaLoaderPrivate::LoadTexCoords(const std::string &_id,
   // Read the raw texture values, and split them on spaces.
   std::string valueStr = floatArrayXml->GetText();
   std::vector<std::string> values = split(valueStr, " \r\n");
+
+  std::cerr << " =========== uv valueStr " << std::endl;
+  std::cerr << valueStr << std::endl;
+  std::cerr << " ===========  " << std::endl;
+  std::cerr << " uv strs size " << values.size() << std::endl;
+
 
   // Read in all the texture coordinates.
   for (int i = 0; i < totCount; i += stride)
@@ -2065,7 +2075,7 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
       inputs[NORMAL].insert(ignition::math::parseInt(offset));
       hasNormals = true;
     }
-    else if (semantic == "TEXCOORD" && !hasTexcoords)
+    else if (semantic == "TEXCOORD")
     {
       // we currently only support one set of UVs
       this->LoadTexCoords(source, texcoords, texDupMap);
@@ -2129,11 +2139,17 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
 
   unsigned int *values = new unsigned int[offsetSize];
   std::vector<std::string> strs = split(pStr, " \r\n");
+    std::cerr << "  -----  p strs size " << strs.size() << std::endl; ;
 
   for (unsigned int j = 0; j < strs.size(); j += offsetSize)
   {
+    std::cerr << "  -----  offset values " << std::endl; ;
     for (unsigned int i = 0; i < offsetSize; ++i)
+    {
       values[i] = ignition::math::parseInt(strs[j+i]);
+      std::cerr << values[i] << " " ;
+    }
+    std::cerr << "  -----  done offset values " << std::endl; ;
 
     unsigned int daeVertIndex = 0;
     bool addIndex = !hasVertices;

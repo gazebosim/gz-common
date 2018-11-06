@@ -17,7 +17,7 @@
         <source id="triangle-mesh-positions">
           <float_array id="triangle-mesh-positions-array" count="9">
 0 0 0
-0 0 0
+10 0 0
 10 10 0
           </float_array>
           <technique_common>
