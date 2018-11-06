@@ -100,7 +100,6 @@ TEST(Util_TEST, split)
   EXPECT_EQ(tokens.at(1), "123");
   EXPECT_EQ(tokens.at(2), "567///");
 
-  std::string str = "12\r\n34\r\n56";
   tokens = common::split("12\r\n34\r\n56", "\r\n");
   ASSERT_EQ(tokens.size(), 3u);
   EXPECT_EQ(tokens.at(0), "12");
