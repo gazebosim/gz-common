@@ -1,6 +1,12 @@
 ## Ignition Common 1.x.x (2018-XX-XX)
 
 
+## Ignition Common 1.X.X (20XX-XX-XX)
+
+1. Time::Sleep: use CLOCK_MONOTONIC on Linux
+    * [Pull request 159](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/159)
+
+
 ## Ignition Common 1.1.1 (2018-05-23)
 
 1. Documentation upload improvements
