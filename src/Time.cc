@@ -210,7 +210,7 @@ Time Time::Sleep(const common::Time &_time)
       result.nsec = remainder.tv_nsec;
     }
 # else
-    if (clock_nanosleep(CLOCK_REALTIME, 0, &interval, &remainder) == -1)
+    if (clock_nanosleep(CLOCK_MONOTONIC, 0, &interval, &remainder) == -1)
     {
       result.sec = remainder.tv_sec;
       result.nsec = remainder.tv_nsec;
