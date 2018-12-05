@@ -89,6 +89,7 @@ necessary prerequisites followed by building from source.
 ### Prerequisites
 
 Ignition Common requires:
+
   * [Ignition CMake](https://ignitionrobotics.org/libs/cmake)
   * [Ignition Math](https://ignitionrobotics.org/libs/math).
 
@@ -98,6 +99,7 @@ The Graphics component requires:
   * [GTS](http://gts.sourceforge.net/).
 
 The AV component requires:
+
   * [libswscale](https://www.ffmpeg.org/libswscale.html)
   * [libavdevice](https://www.ffmpeg.org/libavdevice.html)
   * [libavformat](https://www.ffmpeg.org/libavformat.html)
