@@ -1932,7 +1932,9 @@ bool LoadObj(attrib_t *attrib, std::vector<shape_t> *shapes,
         if (!end_line_bit) {
           line_cache.idx0 = idx;
         } else {
+          #if !defined(_WIN32) && !defined(__clang__)
           #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+          #endif
           line_cache.idx1 = idx;
           lineGroup.push_back(line_cache.idx0);
           lineGroup.push_back(line_cache.idx1);
