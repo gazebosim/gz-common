@@ -76,7 +76,7 @@ Mesh *OBJLoader::Load(const std::string &_filename)
 
   if (!warn.empty())
   {
-    ignwarn << err << std::endl;
+    ignwarn << warn << std::endl;
   }
 
   if (!err.empty())
