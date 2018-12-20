@@ -199,8 +199,8 @@ Refer to the following table for information about important directories and fil
 |    +-- regression          Regression tests.
 +-- tutorials                Tutorials, written in markdown.
 +-- Changelog.md             Changelog.
-+-- Migration.md             Migration guide.
 +-- CMakeLists.txt           CMake build script.
++-- Migration.md             Migration guide.
 ```
 # Contributing
 
