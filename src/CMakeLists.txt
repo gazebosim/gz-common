@@ -10,7 +10,7 @@ ign_create_core_library(
 
 # Link the libraries that we always need
 target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
-  PRIVATE ${DL_TARGET})
+  PRIVATE ${DL_TARGET} ${Remotery_LIBRARIES})
 
 # Handle non-Windows configuration settings
 if(NOT WIN32)

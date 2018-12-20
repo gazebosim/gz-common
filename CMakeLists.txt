@@ -65,6 +65,10 @@ ign_find_package(
   DL REQUIRED PRIVATE PRETTY libdl PURPOSE "Required for plugins")
 
 #--------------------------------------
+# Find Remotery
+find_package(Remotery REQUIRED)
+
+#--------------------------------------
 # Find dependencies that we ignore for Visual Studio
 if(NOT MSVC)
 
