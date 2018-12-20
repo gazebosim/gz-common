@@ -1,6 +1,6 @@
 # Ignition Common : AV, Graphics, Events, and much more.
 
-**Maintainer:** nate AT openrobotics DOT org 
+**Maintainer:** nate AT openrobotics DOT org
 
 [![Bitbucket open issues](https://img.shields.io/bitbucket/issues-raw/ignitionrobotics/ign-common.svg)](https://bitbucket.org/ignitionrobotics/ign-common/issues)
 [![Bitbucket open pull requests](https://img.shields.io/bitbucket/pr-raw/ignitionrobotics/ign-common.svg)](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests)
@@ -9,9 +9,9 @@
 
 Build | Status
 -- | --
-Test coverage | [![codecov](https://codecov.io/bb/ignitionrobotics/ign-common/branch/default/graph/badge.svg)](https://codecov.io/bb/ignitionrobotics/ign-common)  
-Ubuntu Bionic | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-default-bionic-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-default-bionic-amd64)  
-Homebrew      | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-default-homebrew-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-default-homebrew-amd64)  
+Test coverage | [![codecov](https://codecov.io/bb/ignitionrobotics/ign-common/branch/default/graph/badge.svg)](https://codecov.io/bb/ignitionrobotics/ign-common)
+Ubuntu Bionic | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-default-bionic-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-default-bionic-amd64)
+Homebrew      | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-default-homebrew-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-default-homebrew-amd64)
 Windows       | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-default-windows7-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-default-windows7-amd64)
 
 Ignition Common, a component of [Ignition
@@ -33,7 +33,7 @@ encoding/decoding to thread pools.
 * [Source Install](#markdown-header-source-install)
 
     * [Prerequisites](#markdown-header-prerequisites)
-  
+
     * [Building from Source](#markdown-header-building-from-source)
 
 [Usage](#markdown-header-usage)
@@ -84,7 +84,7 @@ which version you need.
 ## Source Install
 
 Source installation can be performed in UNIX systems by first installing the
-necessary prerequisites followed by building from source. 
+necessary prerequisites followed by building from source.
 
 ### Prerequisites
 
@@ -199,6 +199,7 @@ Refer to the following table for information about important directories and fil
 |    +-- regression          Regression tests.
 +-- tutorials                Tutorials, written in markdown.
 +-- Changelog.md             Changelog.
++-- Migration.md             Migration guide.
 +-- CMakeLists.txt           CMake build script.
 ```
 # Contributing
