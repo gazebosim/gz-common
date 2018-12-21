@@ -71,7 +71,7 @@ const int32_t Time::nsInMs = 1000000;
 Time::Time()
   : sec(0), nsec(0)
 {
-  #ifdef __MACH__
+#ifdef __MACH__
   clockResolution.tv_sec = 1 / sysconf(_SC_CLK_TCK);
 #elif defined(_WIN32)
   LARGE_INTEGER freq;
