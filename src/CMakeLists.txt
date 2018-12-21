@@ -12,6 +12,11 @@ ign_create_core_library(
 target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
   PRIVATE ${DL_TARGET} ${Remotery_LIBRARIES})
 
+if(${IGNITION_ENABLE_PROFILER})
+  target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
+    PRIVATE ${Remotery_LIBRARIES})
+endif()
+
 # Handle non-Windows configuration settings
 if(NOT WIN32)
 

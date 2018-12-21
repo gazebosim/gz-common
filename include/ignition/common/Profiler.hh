@@ -23,6 +23,7 @@
 
 #include <ignition/common/Export.hh>
 #include <ignition/common/SingletonT.hh>
+#include <ignition/common/config.hh>
 
 namespace ignition
 {
@@ -40,6 +41,8 @@ namespace ignition
     /// In general, users should should directly interface with this class,
     /// but instead use the profiling macros, which can be enabled/disabled
     /// at compile time, which eliminates any performance impact of the profiler.
+    ///
+    /// Profiler is enabled by setting IGNITION_ENABLE_PROFILER at compile time.
     class IGNITION_COMMON_VISIBLE Profiler: public virtual SingletonT<Profiler>
     {
       /// \brief Constructor
@@ -102,6 +105,7 @@ namespace ignition
   }
 }
 
+#ifdef IGNITION_ENABLE_PROFILER
 /// \brief Set name of profiled thread
 #define IGN_PROFILE_THREAD_NAME(name) ignition::common::Profiler::Instance()->SetThreadName(name);
 /// \brief Log profiling text, if supported by implementation
@@ -117,5 +121,15 @@ static uint32_t __hash##line = 0; \
 ignition::common::ScopedProfile __profile##line(name, &__hash##line);
 /// \brief Scoped profiling sample. Sample will stop at end of scope.
 #define IGN_PROFILE(name)             IGN_PROFILE_L(name, __LINE__);
+
+#else
+
+#define IGN_PROFILE_THREAD_NAME(name) ((void) name)
+#define IGN_PROFILE_LOG_TEXT(name)    ((void) name)
+#define IGN_PROFILE_BEGIN(name)       ((void) name)
+#define IGN_PROFILE_END()             ((void) 0)
+#define IGN_PROFILE_L(name, line)     ((void) name)
+#define IGN_PROFILE(name)             ((void) name)
+#endif
 
 #endif  // IGNITION_COMMON_PROFILER_HH_

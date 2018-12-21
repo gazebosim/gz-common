@@ -20,6 +20,8 @@
 #include "ignition/common/Console.hh"
 #include "ignition/common/Util.hh"
 
+#ifdef IGNITION_ENABLE_PROFILER
+
 using namespace ignition;
 using namespace common;
 
@@ -67,6 +69,11 @@ RemoteryProfilerImpl::RemoteryProfilerImpl()
     this->settings->msSleepBetweenServerUpdates = 10;
   }
 
+  this->settings->input_handler_context = this;
+  this->settings->input_handler = [](const char* _text, void* _context) {
+    static_cast<RemoteryProfilerImpl*>(_context)->HandleInput(_text);
+  };
+
   rmtError error;
   error = rmt_CreateGlobalInstance(&this->rmt);
 
@@ -105,3 +112,11 @@ void RemoteryProfilerImpl::EndSample()
 {
   rmt_EndCPUSample();
 }
+
+//////////////////////////////////////////////////
+void RemoteryProfilerImpl::HandleInput(const char* _text)
+{
+  (void) _text;
+}
+
+#endif  // IGNITION_ENABLE_PROFILER

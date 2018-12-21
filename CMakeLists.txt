@@ -68,6 +68,10 @@ ign_find_package(
 # Find Remotery
 find_package(Remotery REQUIRED)
 
+if(${Remotery_FOUND})
+  set(IGNITION_ENABLE_PROFILER 1)
+endif()
+
 #--------------------------------------
 # Find dependencies that we ignore for Visual Studio
 if(NOT MSVC)

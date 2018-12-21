@@ -16,15 +16,22 @@
  */
 #include "ignition/common/Profiler.hh" // NOLINT(*)
 
+#include "ProfilerImpl.hh"
+
+#ifdef IGNITION_ENABLE_PROFILER
 #include "RemoteryProfilerImpl.hh"
+#endif
 
 using namespace ignition;
 using namespace common;
 
 //////////////////////////////////////////////////
 Profiler::Profiler():
-  impl(new RemoteryProfilerImpl())
+  impl(nullptr)
 {
+#ifdef IGNITION_ENABLE_PROFILER
+  impl = new RemoteryProfilerImpl();
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -37,24 +44,27 @@ Profiler::~Profiler()
 //////////////////////////////////////////////////
 void Profiler::SetThreadName(const char * _name)
 {
-  this->impl->SetThreadName(_name);
+  if (this->impl)
+    this->impl->SetThreadName(_name);
 }
 
 //////////////////////////////////////////////////
 void Profiler::LogText(const char * _text)
 {
-  this->impl->LogText(_text);
+  if (this->impl)
+    this->impl->LogText(_text);
 }
 
 //////////////////////////////////////////////////
 void Profiler::BeginSample(const char * _name, uint32_t* _hash)
 {
-  this->impl->BeginSample(_name, _hash);
+  if (this->impl)
+    this->impl->BeginSample(_name, _hash);
 }
 
 //////////////////////////////////////////////////
 void Profiler::EndSample()
 {
-  this->impl->EndSample();
+  if (this->impl)
+    this->impl->EndSample();
 }
-

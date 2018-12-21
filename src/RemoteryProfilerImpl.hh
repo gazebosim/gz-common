@@ -25,6 +25,8 @@
 #include "RemoteryConfig.h"
 #include "Remotery.h"
 
+#ifdef IGNITION_ENABLE_PROFILER
+
 namespace ignition
 {
   namespace common
@@ -36,6 +38,14 @@ namespace ignition
     ///
     /// Remotery will start and open a web socket that will allow users to view
     /// live profiling information via the web browser.
+    ///
+    /// The Remotery profiler can additionally be configured via environment
+    /// variables at runtime.
+    ///
+    /// * RMT_PORT: Port to listen for incoming connections on.
+    /// * RMT_QUEUE_SIZE: Size of the internal message queues
+    /// * RMT_MSGS_PER_UPDATE: Upper limit on number of messages consumed per loop
+    /// * RMT_SLEEP_BETWEEN_UPDATES: Controls profile server update rate.
     class RemoteryProfilerImpl: public ProfilerImpl
     {
       /// \brief Constructor.
@@ -65,6 +75,9 @@ namespace ignition
       /// \brief End a profiling sample.
       public: void EndSample() final;
 
+      /// \brief Handle input coming from Remotery web console.
+      public: void HandleInput(const char* _text);
+
       /// \brief Remotery settings.
       private: rmtSettings* settings;
 
@@ -74,5 +87,5 @@ namespace ignition
   }
 }
 
+#endif  // IGNITION_ENABLE_PROFILER
 #endif  // IGNITION_COMMON_PROFILERIMPL_HH_
-
