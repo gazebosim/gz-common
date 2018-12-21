@@ -71,6 +71,20 @@ const int32_t Time::nsInMs = 1000000;
 Time::Time()
   : sec(0), nsec(0)
 {
+  #ifdef __MACH__
+  clockResolution.tv_sec = 1 / sysconf(_SC_CLK_TCK);
+#elif defined(_WIN32)
+  LARGE_INTEGER freq;
+  QueryPerformanceFrequency(&freq);
+  double period = 1.0/freq.QuadPart;
+  clockResolution.tv_sec = static_cast<int64_t>(floor(period));
+  clockResolution.tv_nsec =
+    static_cast<int64_t>((period - floor(period)) * nsInSec);
+#else
+  // get clock resolution, skip sleep if resolution is larger then
+  // requested sleep time
+  clock_getres(CLOCK_REALTIME, &clockResolution);
+#endif
 }
 
 /////////////////////////////////////////////////
