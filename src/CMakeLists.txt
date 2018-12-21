@@ -10,9 +10,9 @@ ign_create_core_library(
 
 # Link the libraries that we always need
 target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
-  PRIVATE ${DL_TARGET} ${Remotery_LIBRARIES})
+  PRIVATE ${DL_TARGET})
 
-if(${IGNITION_ENABLE_PROFILER})
+if(${IGN_PROFILER_REMOTERY})
   target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
     PRIVATE ${Remotery_LIBRARIES})
 endif()
@@ -52,6 +52,11 @@ endif()
 if(TARGET UNIT_PluginLoader_TEST)
   target_compile_definitions(UNIT_PluginLoader_TEST PRIVATE
     "IGN_COMMON_LIB_PATH=\"$<TARGET_FILE_DIR:${PROJECT_LIBRARY_TARGET_NAME}>\"")
+endif()
+
+if(TARGET UNIT_Profiler_TEST)
+  target_compile_definitions(UNIT_Profiler_TEST PRIVATE
+    "IGN_ENABLE_PROFILER=1")
 endif()
 
 # Produce warning on Windows if the user has decided to turn on the symlink

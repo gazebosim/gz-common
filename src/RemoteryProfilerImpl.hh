@@ -25,8 +25,6 @@
 #include "RemoteryConfig.h"
 #include "Remotery.h"
 
-#ifdef IGNITION_ENABLE_PROFILER
-
 namespace ignition
 {
   namespace common
@@ -87,5 +85,4 @@ namespace ignition
   }
 }
 
-#endif  // IGNITION_ENABLE_PROFILER
 #endif  // IGNITION_COMMON_PROFILERIMPL_HH_

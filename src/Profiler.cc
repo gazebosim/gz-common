@@ -18,9 +18,9 @@
 
 #include "ProfilerImpl.hh"
 
-#ifdef IGNITION_ENABLE_PROFILER
+#ifdef IGN_PROFILER_REMOTERY
 #include "RemoteryProfilerImpl.hh"
-#endif
+#endif  // IGN_PROFILER_REMOTERY
 
 using namespace ignition;
 using namespace common;
@@ -29,15 +29,16 @@ using namespace common;
 Profiler::Profiler():
   impl(nullptr)
 {
-#ifdef IGNITION_ENABLE_PROFILER
+#ifdef IGN_PROFILER_REMOTERY
   impl = new RemoteryProfilerImpl();
-#endif
+#endif  // IGN_PROFILER_REMOTERY
 }
 
 //////////////////////////////////////////////////
 Profiler::~Profiler()
 {
-  delete this->impl;
+  if (this->impl)
+    delete this->impl;
   this->impl = nullptr;
 }
 

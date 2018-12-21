@@ -65,11 +65,10 @@ ign_find_package(
   DL REQUIRED PRIVATE PRETTY libdl PURPOSE "Required for plugins")
 
 #--------------------------------------
-# Find Remotery
-find_package(Remotery REQUIRED)
-
+# Optionally find Remotery
+find_package(Remotery)
 if(${Remotery_FOUND})
-  set(IGNITION_ENABLE_PROFILER 1)
+  set(IGN_PROFILER_REMOTERY 1)
 endif()
 
 #--------------------------------------

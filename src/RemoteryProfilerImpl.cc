@@ -15,12 +15,12 @@
  *
  */
 
-#include "RemoteryProfilerImpl.hh"
+#include "ignition/common/config.hh"
+#ifdef IGN_PROFILER_REMOTERY
 
+#include "RemoteryProfilerImpl.hh"
 #include "ignition/common/Console.hh"
 #include "ignition/common/Util.hh"
-
-#ifdef IGNITION_ENABLE_PROFILER
 
 using namespace ignition;
 using namespace common;
@@ -119,4 +119,4 @@ void RemoteryProfilerImpl::HandleInput(const char* _text)
   (void) _text;
 }
 
-#endif  // IGNITION_ENABLE_PROFILER
+#endif  // IGN_PROFILER_REMOTERY
