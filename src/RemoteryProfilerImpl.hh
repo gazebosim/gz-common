@@ -29,16 +29,46 @@ namespace ignition
 {
   namespace common
   {
+    /// \brief Remotery profiler implementation
+    ///
+    /// Used to provide Remotery (https://github.com/Celtoys/Remotery) profiler
+    /// implementation.
+    ///
+    /// Remotery will start and open a web socket that will allow users to view
+    /// live profiling information via the web browser.
     class RemoteryProfilerImpl: public ProfilerImpl
     {
+      /// \brief Constructor.
       public: RemoteryProfilerImpl();
+
+      /// \brief Destructor.
       public: ~RemoteryProfilerImpl() final;
-      public: void SetThreadName(const std::string& name) final;
-      public: void LogText(const std::string& text) final;
-      public: void BeginSample(const std::string& name) final;
+
+      /// \brief Set the name of the current thread
+      /// \param[in] _name Name to set
+      public: void SetThreadName(const char * _name) final;
+
+      /// \brief Log text to profiler output.
+      /// Will appear in the Remotery console.
+      /// \param[in] _text Text to log.
+      public: void LogText(const char * _text) final;
+
+      /// \brief Begin a named profiling sample.
+      /// Begins a CPU profiler sample with a given name. Can optionally take
+      /// a hash parameter to be cached between executions of `BeginSample`, so
+      /// that hashes don't need to be recomputed by the underlying implementation.
+      /// \param[in] _name Name of the sample
+      /// \param[in,out] _hash An optional hash value that can be cached
+      ///   between executions.
+      public: void BeginSample(const char * _name, uint32_t* _hash) final;
+
+      /// \brief End a profiling sample.
       public: void EndSample() final;
 
+      /// \brief Remotery settings.
       private: rmtSettings* settings;
+
+      /// \brief Remotery instance.
       private: Remotery* rmt;
     };
   }

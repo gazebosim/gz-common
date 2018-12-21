@@ -30,32 +30,70 @@ namespace ignition
   {
     class ProfilerImpl;
 
+    /// \brief Used to perform application-wide performance profiling
+    ///
+    /// This class provides the necessary infrastructure for recording profiling
+    /// information of an application while it is running. The actual profiler
+    /// implementation can be choosen at runtime, and is invoked through a
+    /// series of macros found below.
+    ///
+    /// In general, users should should directly interface with this class,
+    /// but instead use the profiling macros, which can be enabled/disabled
+    /// at compile time, which eliminates any performance impact of the profiler.
     class IGNITION_COMMON_VISIBLE Profiler: public virtual SingletonT<Profiler>
     {
+      /// \brief Constructor
       protected: Profiler();
 
+      /// \brief Destructor
       protected: ~Profiler();
 
-      public: void SetThreadName(const std::string& name);
+      /// \brief Set the name of the current thread
+      /// \param[in] _name Name to set
+      public: void SetThreadName(const char * _name);
 
-      public: void LogText(const std::string& text);
+      /// \brief Log text to profiler output (if supported)
+      /// If the underlying profiler implementation supports additional
+      /// log messages, this can be used to send.
+      ///
+      /// Currently, the Remotery implentation supports this functionality.
+      /// \param[in] _text Text to log.
+      public: void LogText(const char * _text);
 
-      public: void BeginSample(const std::string& name);
+      /// \brief Begin a named profiling sample.
+      /// Begins a CPU profiler sample with a given name. Can optionally take
+      /// a hash parameter to be cached between executions of `BeginSample`, so
+      /// that hashes don't need to be recomputed by the underlying implementation.
+      /// \param[in] _name Name of the sample
+      /// \param[in,out] _hash An optional hash value that can be cached
+      ///   between executions.
+      public: void BeginSample(const char * _name, uint32_t* _hash=nullptr);
 
+      /// \brief End a profiling sample.
       public: void EndSample();
 
+      /// \brief Pointer to the profiler implementation
       private: ProfilerImpl* impl;
 
+      /// \brief Needed for SingletonT.
       private: friend class SingletonT<Profiler>;
     };
 
-    class ScopedProfile
+    /// \brief Used to provide C++ RAII-style profiling sample.
+    /// The sample will start on the construction of the `ScopedProfile` object
+    /// and stop when the object leaves scope.
+    class IGNITION_COMMON_VISIBLE ScopedProfile
     {
-      public: ScopedProfile(const std::string& name)
+      /// \brief Constructor. Starts profile sample.
+      /// \param[in] _name Name of the sample
+      /// \param[in,out] _hash An optional hash value that can be cached
+      ///   between executions.
+      public: ScopedProfile(const char * _name, uint32_t* _hash)
       {
-        Profiler::Instance()->BeginSample(name);
+        Profiler::Instance()->BeginSample(_name, _hash);
       }
 
+      /// \brief Destructor. Stops profile sample.
       public: ~ScopedProfile()
       {
         Profiler::Instance()->EndSample();
@@ -64,14 +102,20 @@ namespace ignition
   }
 }
 
+/// \brief Set name of profiled thread
+#define IGN_PROFILE_THREAD_NAME(name) ignition::common::Profiler::Instance()->SetThreadName(name);
+/// \brief Log profiling text, if supported by implementation
+#define IGN_PROFILE_LOG_TEXT(name)    ignition::common::Profiler::Instance()->LogText(name);
+/// \brief Being profiling sample
+#define IGN_PROFILE_BEGIN(name)       ignition::common::Profiler::Instance()->BeginSample(name)
+/// \brief End profiling sample
+#define IGN_PROFILE_END()             ignition::common::Profiler::Instance()->EndSample()
 
-#define IGN_PROFILE_THREAD_NAME(name) Profiler::Instance()->SetThreadName(name);
-#define IGN_PROFILE_LOG_TEXT(name)    Profiler::Instance()->LogText(name);
-#define IGN_PROFILE_BEGIN(name)       Profiler::Instance()->BeginSample(name)
-#define IGN_PROFILE_END()             Profiler::Instance()->EndSample()
-
-#define IGN_PROFILE_LL(name, line)    ScopedProfile _profile##line(name);
-#define IGN_PROFILE_L(name, line)     IGN_PROFILE_LL(name, line);
+/// \brief Convenience wrapper for scoped profiling sample. Use IGN_PROFILE
+#define IGN_PROFILE_L(name, line) \
+static uint32_t __hash##line = 0; \
+ignition::common::ScopedProfile __profile##line(name, &__hash##line);
+/// \brief Scoped profiling sample. Sample will stop at end of scope.
 #define IGN_PROFILE(name)             IGN_PROFILE_L(name, __LINE__);
 
 #endif  // IGNITION_COMMON_PROFILER_HH_

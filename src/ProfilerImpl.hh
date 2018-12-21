@@ -24,13 +24,35 @@ namespace ignition
 {
   namespace common
   {
+    /// \brief Interface to be implemented by profiler implementations.
     class ProfilerImpl
     {
+      /// \brief Constructor.
       public: ProfilerImpl() = default;
+
+      /// \brief Destructor.
       public: virtual ~ProfilerImpl() = default;
-      public: virtual void SetThreadName(const std::string& name) = 0;
-      public: virtual void LogText(const std::string& text) = 0;
-      public: virtual void BeginSample(const std::string& name) = 0;
+
+      /// \brief Set the name of the current thread
+      /// \param[in] _name Name to set
+      public: virtual void SetThreadName(const char * _name) = 0;
+
+      /// \brief Log text to profiler output (if supported)
+      /// If the underlying profiler implementation supports additional
+      /// log messages, this can be used to send.
+      /// \param[in] _text Text to log.
+      public: virtual void LogText(const char * _text) = 0;
+
+      /// \brief Begin a named profiling sample.
+      /// Begins a CPU profiler sample with a given name. Can optionally take
+      /// a hash parameter to be cached between executions of `BeginSample`, so
+      /// that hashes don't need to be recomputed by the underlying implementation.
+      /// \param[in] _name Name of the sample
+      /// \param[in,out] _hash An optional hash value that can be cached
+      ///   between executions.
+      public: virtual void BeginSample(const char * _name, uint32_t* _hash) = 0;
+
+      /// \brief End a profiling sample.
       public: virtual void EndSample() = 0;
     };
   }
