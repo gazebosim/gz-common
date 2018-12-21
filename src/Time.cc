@@ -83,7 +83,7 @@ Time::Time()
 #else
   // get clock resolution, skip sleep if resolution is larger then
   // requested sleep time
-  clock_getres(CLOCK_REALTIME, &clockResolution);
+  clock_getres(CLOCK_MONOTONIC, &clockResolution);
 #endif
 }
 
