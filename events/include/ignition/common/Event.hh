@@ -92,11 +92,14 @@ namespace ignition
 #endif
 
       /// \brief Friend class.
-      public: template<typename T> friend class EventT;
+      public: template<typename T, typename N> friend class EventT;
     };
 
     /// \brief A class for event processing.
-    template<typename T>
+    /// \tparam T function event callback function signature
+    /// \tparam N optional additional type to disambiguate events with same
+    ///   function signature
+    template<typename T, typename N = void>
     class EventT : public Event
     {
       public: using CallbackT = std::function<T>;
@@ -184,23 +187,23 @@ namespace ignition
     };
 
     /// \brief Constructor.
-    template<typename T>
-    EventT<T>::EventT()
+    template<typename T, typename N>
+    EventT<T, N>::EventT()
     : Event()
     {
     }
 
     /// \brief Destructor. Deletes all the associated connections.
-    template<typename T>
-    EventT<T>::~EventT()
+    template<typename T, typename N>
+    EventT<T, N>::~EventT()
     {
       this->connections.clear();
     }
 
     /// \brief Adds a connection.
     /// \param[in] _subscriber the subscriber to connect.
-    template<typename T>
-    ConnectionPtr EventT<T>::Connect(const std::function<T> &_subscriber)
+    template<typename T, typename N>
+    ConnectionPtr EventT<T, N>::Connect(const std::function<T> &_subscriber)
     {
       int index = 0;
       if (!this->connections.empty())
@@ -214,16 +217,16 @@ namespace ignition
 
     /// \brief Get the number of connections.
     /// \return Number of connections.
-    template<typename T>
-    unsigned int EventT<T>::ConnectionCount() const
+    template<typename T, typename N>
+    unsigned int EventT<T, N>::ConnectionCount() const
     {
       return this->connections.size();
     }
 
     /// \brief Removes a connection.
     /// \param[in] _id the connection index.
-    template<typename T>
-    void EventT<T>::Disconnect(int _id)
+    template<typename T, typename N>
+    void EventT<T, N>::Disconnect(int _id)
     {
       // Find the connection
       auto const &it = this->connections.find(_id);
@@ -236,8 +239,8 @@ namespace ignition
     }
 
     /////////////////////////////////////////////
-    template<typename T>
-    void EventT<T>::Cleanup()
+    template<typename T, typename N>
+    void EventT<T, N>::Cleanup()
     {
       std::lock_guard<std::mutex> lock(this->mutex);
       // Remove all queue connections.

@@ -259,6 +259,29 @@ TEST_F(EventTest, EventWithTenParams)
   EXPECT_EQ(count, 55);
 }
 
+TEST_F(EventTest, typeid_test)
+{
+  using Event1 = common::EventT<void(int)>;
+  using Event2 = common::EventT<void(int)>;
+
+  // Type aliases don't change the `typeid` value.
+  EXPECT_EQ(typeid(Event1).hash_code(), typeid(Event2).hash_code());
+  EXPECT_EQ(typeid(Event1).name(), typeid(Event2).name());
+
+  // To have multiple events of the same type, use the second arg
+  using Event3 = common::EventT<void(int), struct _Event3>;
+  using Event4 = common::EventT<void(int), struct _Event4>;
+
+  EXPECT_NE(typeid(Event3).hash_code(), typeid(Event4).hash_code());
+  EXPECT_NE(typeid(Event3).name(), typeid(Event4).name());
+
+  // These should also not be the same as the previous.
+  EXPECT_NE(typeid(Event3).hash_code(), typeid(Event1).hash_code());
+  EXPECT_NE(typeid(Event3).hash_code(), typeid(Event2).hash_code());
+  EXPECT_NE(typeid(Event3).name(), typeid(Event1).name());
+  EXPECT_NE(typeid(Event3).name(), typeid(Event2).name());
+}
+
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
