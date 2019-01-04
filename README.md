@@ -1,89 +1,221 @@
-# Ignition Common
+# Ignition Common : AV, Graphics, Events, and much more.
 
-** Ignition Common classes and functions for robot applications.**
+**Maintainer:** nate AT openrobotics DOT org
 
-Ignition Common is a component in the ignition framework, a set
-of libraries designed to rapidly develop robot applications.
+[![Bitbucket open issues](https://img.shields.io/bitbucket/issues-raw/ignitionrobotics/ign-common.svg)](https://bitbucket.org/ignitionrobotics/ign-common/issues)
+[![Bitbucket open pull requests](https://img.shields.io/bitbucket/pr-raw/ignitionrobotics/ign-common.svg)](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests)
+[![Discourse topics](https://img.shields.io/discourse/https/community.gazebosim.org/topics.svg)](https://community.gazebosim.org)
+[![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
-[http://ignitionrobotics.org](http://ignitionrobotics.org)
+Build | Status
+-- | --
+Test coverage | [![codecov](https://codecov.io/bb/ignitionrobotics/ign-common/branch/default/graph/badge.svg)](https://codecov.io/bb/ignitionrobotics/ign-common)
+Ubuntu Bionic | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-default-bionic-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-default-bionic-amd64)
+Homebrew      | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-default-homebrew-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-default-homebrew-amd64)
+Windows       | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-default-windows7-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-default-windows7-amd64)
 
-Test coverage:
+Ignition Common, a component of [Ignition
+Robotics](https://ignitionrobotics.org), provides a set of libraries that
+cover many different use cases. An audio-visual library supports
+processing audio and video files, a graphics library can load a variety 3D
+mesh file formats into a generic in-memory representation, and the core
+library of Ignition Common contains functionality that spans Base64
+encoding/decoding to thread pools.
 
-[![codecov](https://codecov.io/bb/ignitionrobotics/ign-common/branch/master/graph/badge.svg)](https://codecov.io/bb/ignitionrobotics/ign-common)
+# Table of Contents
 
-## Installation
+[Features](#markdown-header-features)
 
-Standard installation can be performed in UNIX systems using the following
-steps:
+[Install](#markdown-header-install)
 
-    mkdir build/
-    cd build/
-    cmake ..
+* [Binary Install](#markdown-header-binary-install)
+
+* [Source Install](#markdown-header-source-install)
+
+    * [Prerequisites](#markdown-header-prerequisites)
+
+    * [Building from Source](#markdown-header-building-from-source)
+
+[Usage](#markdown-header-usage)
+
+[Documentation](#markdown-header-documentation)
+
+[Testing](#markdown-header-testing)
+
+[Folder Structure](#markdown-header-folder-structure)
+
+[Code of Conduct](#markdown-header-code-of-conduct)
+
+[Contributing](#markdown-header-code-of-contributing)
+
+[Versioning](#markdown-header-versioning)
+
+[License](#markdown-header-license)
+
+# Features
+
+Some of the many capabilities contained in Ignition Common are:
+
+* **AV**: FFMpeg based audio decoder, and video encoder and decoder.
+* **Core**: Base64 encoding and decoding, battery model, console logging,
+  cross-platform filesystem interface, URI processing, and a thread pool.
+* **Events**: Mouse and keyboard events, and a high-performance signal and
+callback system.
+* **Graphics**: Collada, SVG, STL, OBJ, and DEM loaders. In-memory mesh,
+  image, and material representations. Animation processing and BVH loader.
+
+# Install
+
+We recommend following the [Binary Install](#markdown-header-binary-install) instructions to get up and running as quickly and painlessly as possible.
+
+The [Source Install](#markdown-header-source-install) instructions should be used if you need the very latest software improvements, you need to modify the code, or you plan to make a contribution.
+
+## Binary Install
+
+On Ubuntu systems, `apt-get` can be used to install `ignition-common`:
+
+```
+sudo apt install libignition-common<#>-dev
+```
+
+Be sure to replace `<#>` with a number value, such as 2 or 3, depending on
+which version you need.
+
+## Source Install
+
+Source installation can be performed in UNIX systems by first installing the
+necessary prerequisites followed by building from source.
+
+### Prerequisites
+
+Ignition Common requires:
+
+  * [Ignition CMake](https://ignitionrobotics.org/libs/cmake)
+  * [Ignition Math](https://ignitionrobotics.org/libs/math).
+
+The Graphics component requires:
+
+  * [FreeImage](http://freeimage.sourceforge.net/)
+  * [GTS](http://gts.sourceforge.net/).
+
+The AV component requires:
+
+  * [libswscale](https://www.ffmpeg.org/libswscale.html)
+  * [libavdevice](https://www.ffmpeg.org/libavdevice.html)
+  * [libavformat](https://www.ffmpeg.org/libavformat.html)
+  * [libavcodec](https://www.ffmpeg.org/libavcodec.html)
+  * [libavutil](https://www.ffmpeg.org/libavutil.html)
+
+### Building from source
+
+1. Clone the repository
+
+    ```
+    hg clone https://bitbucket.org/ignitionrobotics/ign-common
+    ```
+
+2. Install the [Prerequisites](#markdown-header-prerequisites).
+
+3. Configure and build
+
+    ```
+    cd ign-common; mkdir build;cd build; cmake ..;  make
+    ```
+
+4. Optionally, install Ignition Common
+
+    ```
     sudo make install
+    ```
 
-## Uninstallation
+# Usage
 
-To uninstall the software installed with the previous steps:
+Please refer to the [examples directory](https://bitbucket.org/ignitionrobotics/ign-common/raw/default/examples/?at=default).
 
-    cd build/
-    sudo make uninstall
+# Documentation
 
-## Test
+API and tutorials can be found at [https://ignitionrobotics.org/libs/common](https://ignitionrobotics.org/libs/common).
 
-Run tests as follows:
+You can also generate the documentation from a clone of this repository by following these steps.
 
+1. You will need Doxygen. On Ubuntu Doxygen can be installed using
+
+    ```
+    sudo apt-get install doxygen
+    ```
+
+2. Clone the repository
+
+    ```
+    hg clone https://bitbucket.org/ignitionrobotics/ign-common
+    ```
+
+3. Configure and build the documentation.
+
+    ```
+    cd ign-common; mkdir build; cd build; cmake ../; make doc
+    ```
+
+4. View the documentation by running the following command from the build directory.
+
+    ```
+    firefox doxygen/html/index.html
+    ```
+
+# Testing
+
+Follow these steps to run tests and static code analysis in your clone of this repository.
+
+1. Follow the [source install instruction](#markdown-header-source-install).
+
+2. Run tests.
+
+    ```
     make test
+    ```
 
-> Tests are automatically built. To disable them, run `cmake` as follows:
+3. Static code checker.
 
-      cmake .. -DENABLE_TESTS_COMPILATION=false
+    ```
+    make codecheck
+    ```
 
-### Test coverage
+# Folder Structure
 
-To run test coverage:
-
-1. Install LCOV
-
-        sudo apt-get install lcov
-
-1. Build with coverage
-
-        cd build/
-        cmake .. -DCMAKE_BUILD_TYPE=coverage
-        make
-
-1. Run tests
-
-        make test
-
-1. Generate coverage
-
-        make coverage
-
-1. View results
-
-        firefox coverage/index.html
-
-## Create Documentation & Release
-
-1. Build documentation
+Refer to the following table for information about important directories and files in this repository.
 
 ```
-cd build
-make doc
++-- av                       Header and source files for the AV component.
++-- events                   Header and source files for the Event component.
++-- examples                 Example programs.
++-- graphics                 Header and source files for the Graphics component.
++-- include/ignition/common  Header files for the core component.
++-- src                      Core source files and unit tests.
++-- test
+|    +-- integration         Integration tests.
+|    +-- performance         Performance tests.
+|    +-- plugins             Plugin tests.
+|    +-- static_assertions   Plugin static assertion tests.
+|    +-- regression          Regression tests.
++-- tutorials                Tutorials, written in markdown.
++-- Changelog.md             Changelog.
++-- CMakeLists.txt           CMake build script.
++-- Migration.md             Migration guide.
 ```
+# Contributing
 
-1. Upload documentation to ignitionrobotics.org.
+Please see
+[CONTRIBUTING.md](https://bitbucket.org/ignitionrobotics/ign-gazebo/src/406665896aa40bb42f14cf61d48b3d94f2fc5dd8/CONTRIBUTING.md?at=default&fileviewer=file-view-default).
 
-```
-cd build
-sh upload.sh
-```
+# Code of Conduct
 
-1. If you're creating a new release, then tell ignitionrobotics.org about
-   the new version. For example:
+Please see
+[CODE_OF_CONDUCT.md](https://bitbucket.org/ignitionrobotics/ign-gazebo/src/406665896aa40bb42f14cf61d48b3d94f2fc5dd8/CODE_OF_CONDUCT.md?at=default&fileviewer=file-view-default).
 
-```
-curl -k -X POST -d '{"libName":"common", "version":"1.0.0", "releaseDate":"2017-10-09T12:10:13+02:00","password":"secret"}' https://api.ignitionrobotics.org/1.0/versions
-```
+# Versioning
 
+This library uses [Semantic Versioning](https://semver.org/). Additionally, this library is part of the [Ignition Robotics project](https://ignitionrobotics.org) which periodically releases a versioned set of compatible and complimentary libraries. See the [Ignition Robotics website](https://ignitionrobotics.org) for version and release information.
+
+# License
+
+This library is licensed under [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0). See also the [LICENSE](https://bitbucket.org/ignitionrobotics/ign-common/src/default/LICENSE) file.
