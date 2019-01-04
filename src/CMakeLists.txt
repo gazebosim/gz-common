@@ -49,11 +49,6 @@ if(TARGET UNIT_PluginLoader_TEST)
     "IGN_COMMON_LIB_PATH=\"$<TARGET_FILE_DIR:${PROJECT_LIBRARY_TARGET_NAME}>\"")
 endif()
 
-if(TARGET UNIT_Profiler_TEST)
-  target_compile_definitions(UNIT_Profiler_TEST PRIVATE
-    "IGN_ENABLE_PROFILER=1")
-endif()
-
 # Produce warning on Windows if the user has decided to turn on the symlink
 # tests. In order for those tests to work, they will need to run the tests in
 # administrative mode, or use some other workaround.
