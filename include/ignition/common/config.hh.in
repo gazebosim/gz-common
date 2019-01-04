@@ -11,4 +11,3 @@
 #define IGNITION_COMMON_VERSION_HEADER "Ignition common, version ${PROJECT_VERSION_FULL}\nCopyright (C) 2017 Open Source Robotics Foundation.\nReleased under the Apache 2.0 License.\n\n"
 
 #cmakedefine HAVE_AVDEVICE
-#cmakedefine IGN_PROFILER_REMOTERY

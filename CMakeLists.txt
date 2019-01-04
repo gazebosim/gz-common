@@ -65,13 +65,6 @@ ign_find_package(
   DL REQUIRED PRIVATE PRETTY libdl PURPOSE "Required for plugins")
 
 #--------------------------------------
-# Optionally find Remotery
-find_package(Remotery)
-if(${Remotery_FOUND})
-  set(IGN_PROFILER_REMOTERY 1)
-endif()
-
-#--------------------------------------
 # Find dependencies that we ignore for Visual Studio
 if(NOT MSVC)
 
@@ -125,7 +118,7 @@ configure_file("${PROJECT_SOURCE_DIR}/cppcheck.suppress.in"
                ${PROJECT_BINARY_DIR}/cppcheck.suppress)
 
 ign_configure_build(QUIT_IF_BUILD_ERRORS
-  COMPONENTS av events graphics)
+  COMPONENTS av events graphics profiler)
 
 #============================================================================
 # Create package information
