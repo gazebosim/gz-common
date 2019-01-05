@@ -10,6 +10,7 @@ if(APPLE)
     ${Remotery_SRC}
     ./Remotery/lib/RemoteryMetal.mm
   )
+  find_library(FOUNDATION Foundation)
 endif()
 
 set(RMT_ENABLED 1)
@@ -48,6 +49,10 @@ target_include_directories(${profiler_target} PRIVATE
 
 if (UNIX)
   target_link_libraries(${profiler_target} PUBLIC pthread)
+endif()
+
+if(APPLE)
+  target_link_libraries(${profiler_target} PUBLIC ${FOUNDATION})
 endif()
 
 ign_build_tests(TYPE UNIT SOURCES ${gtest_sources}
