@@ -21,7 +21,7 @@
 #include <memory>
 #include <string>
 
-#include <ignition/common/Export.hh>
+#include <ignition/common/profiler/Export.hh>
 #include <ignition/common/SingletonT.hh>
 #include <ignition/common/config.hh>
 
@@ -43,7 +43,8 @@ namespace ignition
     /// at compile time, which eliminates any performance impact of profiling.
     ///
     /// Profiler is enabled by setting IGN_ENABLE_PROFILER at compile time.
-    class IGNITION_COMMON_VISIBLE Profiler: public virtual SingletonT<Profiler>
+    class IGNITION_COMMON_PROFILER_VISIBLE Profiler
+        : public virtual SingletonT<Profiler>
     {
       /// \brief Constructor
       protected: Profiler();
@@ -85,7 +86,7 @@ namespace ignition
     /// \brief Used to provide C++ RAII-style profiling sample.
     /// The sample will start on the construction of the `ScopedProfile` object
     /// and stop when the object leaves scope.
-    class IGNITION_COMMON_VISIBLE ScopedProfile
+    class IGNITION_COMMON_PROFILER_VISIBLE ScopedProfile
     {
       /// \brief Constructor. Starts profile sample.
       /// \param[in] _name Name of the sample
