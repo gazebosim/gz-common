@@ -62,7 +62,8 @@ RemoteryProfilerImpl::RemoteryProfilerImpl()
   std::string sleep_between_updates;
   if (env("RMT_SLEEP_BETWEEN_UPDATES", sleep_between_updates))
   {
-    this->settings->msSleepBetweenServerUpdates = std::stoul(sleep_between_updates);
+    this->settings->msSleepBetweenServerUpdates =
+        std::stoul(sleep_between_updates);
   }
   else
   {
@@ -77,7 +78,7 @@ RemoteryProfilerImpl::RemoteryProfilerImpl()
   rmtError error;
   error = rmt_CreateGlobalInstance(&this->rmt);
 
-  if(RMT_ERROR_NONE != error)
+  if (RMT_ERROR_NONE != error)
   {
     ignerr << "Error launching Remotery: " << error;
   }

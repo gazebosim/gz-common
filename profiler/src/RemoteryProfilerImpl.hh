@@ -20,10 +20,10 @@
 
 #include "ProfilerImpl.hh"
 
-#include <string>
-
 #include "RemoteryConfig.h"
 #include "Remotery.h"
+
+#include <string>
 
 namespace ignition
 {
@@ -42,7 +42,7 @@ namespace ignition
     ///
     /// * RMT_PORT: Port to listen for incoming connections on.
     /// * RMT_QUEUE_SIZE: Size of the internal message queues
-    /// * RMT_MSGS_PER_UPDATE: Upper limit on number of messages consumed per loop
+    /// * RMT_MSGS_PER_UPDATE: Upper limit on messages consumed per loop
     /// * RMT_SLEEP_BETWEEN_UPDATES: Controls profile server update rate.
     class RemoteryProfilerImpl: public ProfilerImpl
     {
@@ -64,7 +64,7 @@ namespace ignition
       /// \brief Begin a named profiling sample.
       /// Begins a CPU profiler sample with a given name. Can optionally take
       /// a hash parameter to be cached between executions of `BeginSample`, so
-      /// that hashes don't need to be recomputed by the underlying implementation.
+      /// that hashes don't need to be recomputed.
       /// \param[in] _name Name of the sample
       /// \param[in,out] _hash An optional hash value that can be cached
       ///   between executions.

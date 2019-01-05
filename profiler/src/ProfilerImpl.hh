@@ -46,7 +46,7 @@ namespace ignition
       /// \brief Begin a named profiling sample.
       /// Begins a CPU profiler sample with a given name. Can optionally take
       /// a hash parameter to be cached between executions of `BeginSample`, so
-      /// that hashes don't need to be recomputed by the underlying implementation.
+      /// that hashes don't need to be recomputed.
       /// \param[in] _name Name of the sample
       /// \param[in,out] _hash An optional hash value that can be cached
       ///   between executions.

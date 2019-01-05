@@ -48,12 +48,12 @@ void c_function() {
 /////////////////////////////////////////////////
 TEST(Profiler, Profiler)
 {
-
   std::atomic<bool> running {true};
 
   auto thread_fcn = [&running](const std::string& name){
     IGN_PROFILE_THREAD_NAME(name.c_str());
-    while(running) {
+    while (running)
+    {
       IGN_PROFILE("Loop");
       c_function();
     }

@@ -40,7 +40,7 @@ namespace ignition
     ///
     /// In general, users should should directly interface with this class,
     /// but instead use the profiling macros, which can be enabled/disabled
-    /// at compile time, which eliminates any performance impact of the profiler.
+    /// at compile time, which eliminates any performance impact of profiling.
     ///
     /// Profiler is enabled by setting IGN_ENABLE_PROFILER at compile time.
     class IGNITION_COMMON_VISIBLE Profiler: public virtual SingletonT<Profiler>
@@ -66,11 +66,11 @@ namespace ignition
       /// \brief Begin a named profiling sample.
       /// Begins a CPU profiler sample with a given name. Can optionally take
       /// a hash parameter to be cached between executions of `BeginSample`, so
-      /// that hashes don't need to be recomputed by the underlying implementation.
+      /// that hashes don't need to be recomputed.
       /// \param[in] _name Name of the sample
       /// \param[in,out] _hash An optional hash value that can be cached
       ///   between executions.
-      public: void BeginSample(const char * _name, uint32_t* _hash=nullptr);
+      public: void BeginSample(const char * _name, uint32_t* _hash = nullptr);
 
       /// \brief End a profiling sample.
       public: void EndSample();
@@ -107,13 +107,17 @@ namespace ignition
 
 #ifdef IGN_ENABLE_PROFILER
 /// \brief Set name of profiled thread
-#define IGN_PROFILE_THREAD_NAME(name) ignition::common::Profiler::Instance()->SetThreadName(name);
+#define IGN_PROFILE_THREAD_NAME(name) \
+    ignition::common::Profiler::Instance()->SetThreadName(name);
 /// \brief Log profiling text, if supported by implementation
-#define IGN_PROFILE_LOG_TEXT(name)    ignition::common::Profiler::Instance()->LogText(name);
+#define IGN_PROFILE_LOG_TEXT(name) \
+    ignition::common::Profiler::Instance()->LogText(name);
 /// \brief Being profiling sample
-#define IGN_PROFILE_BEGIN(name)       ignition::common::Profiler::Instance()->BeginSample(name)
+#define IGN_PROFILE_BEGIN(name) \
+    ignition::common::Profiler::Instance()->BeginSample(name)
 /// \brief End profiling sample
-#define IGN_PROFILE_END()             ignition::common::Profiler::Instance()->EndSample()
+#define IGN_PROFILE_END() \
+    ignition::common::Profiler::Instance()->EndSample()
 
 /// \brief Convenience wrapper for scoped profiling sample. Use IGN_PROFILE
 #define IGN_PROFILE_L(name, line) \
