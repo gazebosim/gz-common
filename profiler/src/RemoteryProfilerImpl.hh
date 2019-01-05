@@ -18,12 +18,12 @@
 #ifndef IGNITION_COMMON_REMOTERYPROFILERIMPL_HH_
 #define IGNITION_COMMON_REMOTERYPROFILERIMPL_HH_
 
-#include "ProfilerImpl.hh"
-
 #include "RemoteryConfig.h"
 #include "Remotery.h"
 
 #include <string>
+
+#include "ProfilerImpl.hh"
 
 namespace ignition
 {
