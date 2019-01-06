@@ -150,6 +150,9 @@ static rmtBool g_SettingsInitialized = RMT_FALSE;
     #include <cuda.h>
 #endif
 
+#ifndef _WIN32
+    #pragma GCC diagnostic ignored "-Wswitch-default"
+#endif
 
 
 static rmtU8 minU8(rmtU8 a, rmtU8 b)
