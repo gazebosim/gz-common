@@ -80,7 +80,9 @@ ign_build_tests(TYPE UNIT SOURCES ${PROFILER_TESTS}
   LIB_DEPS ${profiler_target}
   TEST_LIST profiler_tests)
 
-target_compile_definitions(UNIT_Profiler_Remotery_TEST PUBLIC "IGN_PROFILER_ENABLE=1")
+if(TARGET UNIT_Profiler_Remotery_TEST)
+  target_compile_definitions(UNIT_Profiler_Remotery_TEST PUBLIC "IGN_PROFILER_ENABLE=1")
+endif()
 
 install(DIRECTORY Remotery/vis/
         DESTINATION ${IGN_DATA_INSTALL_DIR}/profiler_vis)
