@@ -63,3 +63,5 @@ foreach(profiler_test ${profiler_tests})
   target_compile_definitions(${profiler_test} PUBLIC "IGN_ENABLE_PROFILER=1")
 endforeach()
 
+install(DIRECTORY Remotery/vis/
+        DESTINATION ${IGN_DATA_INSTALL_DIR}/profiler_vis)
