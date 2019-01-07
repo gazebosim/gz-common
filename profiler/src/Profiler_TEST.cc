@@ -26,19 +26,25 @@
 using namespace ignition;
 using namespace common;
 
-void a_function() {
+/////////////////////////////////////////////////
+void a_function()
+{
   IGN_PROFILE("a_function");
   common::Time::Sleep(common::Time(0, 100));
 }
 
-void b_function() {
+/////////////////////////////////////////////////
+void b_function()
+{
   IGN_PROFILE("b_function");
   a_function();
   a_function();
   a_function();
 }
 
-void c_function() {
+/////////////////////////////////////////////////
+void c_function()
+{
   IGN_PROFILE("c_function");
   b_function();
   b_function();
@@ -48,10 +54,10 @@ void c_function() {
 /////////////////////////////////////////////////
 TEST(Profiler, Profiler)
 {
-  std::atomic<bool> running {true};
+  std::atomic<bool> running{true};
 
-  auto thread_fcn = [&running](const std::string& name){
-    IGN_PROFILE_THREAD_NAME(name.c_str());
+  auto thread_fcn = [&running](const std::string &_name){
+    IGN_PROFILE_THREAD_NAME(_name.c_str());
     while (running)
     {
       IGN_PROFILE("Loop");
@@ -66,7 +72,8 @@ TEST(Profiler, Profiler)
   auto t5 = std::thread(thread_fcn, "thread5");
 
   IGN_PROFILE_THREAD_NAME("main thread");
-  for (size_t ii = 0; ii < 100; ++ii) {
+  for (size_t ii = 0; ii < 100; ++ii)
+  {
     IGN_PROFILE("Loop");
     common::Time::Sleep(common::Time(1, 0));
     IGN_PROFILE_LOG_TEXT("Loop");

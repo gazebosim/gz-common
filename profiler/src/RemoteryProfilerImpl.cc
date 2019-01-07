@@ -71,8 +71,8 @@ RemoteryProfilerImpl::RemoteryProfilerImpl()
   }
 
   this->settings->input_handler_context = this;
-  this->settings->input_handler = [](const char* _text, void* _context) {
-    static_cast<RemoteryProfilerImpl*>(_context)->HandleInput(_text);
+  this->settings->input_handler = [](const char *_text, void *_context) {
+    static_cast<RemoteryProfilerImpl *>(_context)->HandleInput(_text);
   };
 
   rmtError error;
@@ -80,30 +80,30 @@ RemoteryProfilerImpl::RemoteryProfilerImpl()
 
   if (RMT_ERROR_NONE != error)
   {
-    ignerr << "Error launching Remotery: " << error;
+    ignerr << "Error launching Remotery: " << error << std::endl;
   }
 }
 
 //////////////////////////////////////////////////
 RemoteryProfilerImpl::~RemoteryProfilerImpl()
 {
-  rmt_DestroyGlobalInstance(rmt);
+  rmt_DestroyGlobalInstance(this->rmt);
 }
 
 //////////////////////////////////////////////////
-void RemoteryProfilerImpl::SetThreadName(const char * _name)
+void RemoteryProfilerImpl::SetThreadName(const char *_name)
 {
   rmt_SetCurrentThreadName(_name);
 }
 
 //////////////////////////////////////////////////
-void RemoteryProfilerImpl::LogText(const char * _text)
+void RemoteryProfilerImpl::LogText(const char *_text)
 {
   rmt_LogText(_text);
 }
 
 //////////////////////////////////////////////////
-void RemoteryProfilerImpl::BeginSample(const char * _name, uint32_t* _hash)
+void RemoteryProfilerImpl::BeginSample(const char *_name, uint32_t *_hash)
 {
   _rmt_BeginCPUSample(_name, RMTSF_None, _hash);
 }
@@ -115,7 +115,7 @@ void RemoteryProfilerImpl::EndSample()
 }
 
 //////////////////////////////////////////////////
-void RemoteryProfilerImpl::HandleInput(const char* _text)
+void RemoteryProfilerImpl::HandleInput(const char *_text)
 {
   (void) _text;
 }

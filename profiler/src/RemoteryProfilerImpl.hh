@@ -21,8 +21,6 @@
 #include "RemoteryConfig.h"
 #include "Remotery.h"
 
-#include <string>
-
 #include "ProfilerImpl.hh"
 
 namespace ignition
@@ -54,12 +52,12 @@ namespace ignition
 
       /// \brief Set the name of the current thread
       /// \param[in] _name Name to set
-      public: void SetThreadName(const char * _name) final;
+      public: void SetThreadName(const char *_name) final;
 
       /// \brief Log text to profiler output.
       /// Will appear in the Remotery console.
       /// \param[in] _text Text to log.
-      public: void LogText(const char * _text) final;
+      public: void LogText(const char *_text) final;
 
       /// \brief Begin a named profiling sample.
       /// Begins a CPU profiler sample with a given name. Can optionally take
@@ -68,19 +66,20 @@ namespace ignition
       /// \param[in] _name Name of the sample
       /// \param[in,out] _hash An optional hash value that can be cached
       ///   between executions.
-      public: void BeginSample(const char * _name, uint32_t* _hash) final;
+      public: void BeginSample(const char *_name, uint32_t *_hash) final;
 
       /// \brief End a profiling sample.
       public: void EndSample() final;
 
       /// \brief Handle input coming from Remotery web console.
-      public: void HandleInput(const char* _text);
+      /// \param[in] _text Incoming input.
+      public: void HandleInput(const char *_text);
 
       /// \brief Remotery settings.
-      private: rmtSettings* settings;
+      private: rmtSettings *settings;
 
       /// \brief Remotery instance.
-      private: Remotery* rmt;
+      private: Remotery *rmt;
     };
   }
 }

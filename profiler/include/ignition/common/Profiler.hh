@@ -38,7 +38,7 @@ namespace ignition
     /// implementation can be choosen at runtime, and is invoked through a
     /// series of macros found below.
     ///
-    /// In general, users should should directly interface with this class,
+    /// In general, users shouldn't directly interface with this class,
     /// but instead use the profiling macros, which can be enabled/disabled
     /// at compile time, which eliminates any performance impact of profiling.
     ///
@@ -54,7 +54,7 @@ namespace ignition
 
       /// \brief Set the name of the current thread
       /// \param[in] _name Name to set
-      public: void SetThreadName(const char * _name);
+      public: void SetThreadName(const char *_name);
 
       /// \brief Log text to profiler output (if supported)
       /// If the underlying profiler implementation supports additional
@@ -62,7 +62,7 @@ namespace ignition
       ///
       /// Currently, the Remotery implentation supports this functionality.
       /// \param[in] _text Text to log.
-      public: void LogText(const char * _text);
+      public: void LogText(const char *_text);
 
       /// \brief Begin a named profiling sample.
       /// Begins a CPU profiler sample with a given name. Can optionally take
@@ -71,13 +71,13 @@ namespace ignition
       /// \param[in] _name Name of the sample
       /// \param[in,out] _hash An optional hash value that can be cached
       ///   between executions.
-      public: void BeginSample(const char * _name, uint32_t* _hash = nullptr);
+      public: void BeginSample(const char *_name, uint32_t *_hash = nullptr);
 
       /// \brief End a profiling sample.
       public: void EndSample();
 
       /// \brief Pointer to the profiler implementation
-      private: ProfilerImpl* impl;
+      private: ProfilerImpl *impl;
 
       /// \brief Needed for SingletonT.
       private: friend class SingletonT<Profiler>;
@@ -92,7 +92,7 @@ namespace ignition
       /// \param[in] _name Name of the sample
       /// \param[in,out] _hash An optional hash value that can be cached
       ///   between executions.
-      public: ScopedProfile(const char * _name, uint32_t* _hash)
+      public: ScopedProfile(const char *_name, uint32_t *_hash)
       {
         Profiler::Instance()->BeginSample(_name, _hash);
       }
