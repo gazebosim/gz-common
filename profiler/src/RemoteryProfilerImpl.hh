@@ -18,6 +18,8 @@
 #ifndef IGNITION_COMMON_REMOTERYPROFILERIMPL_HH_
 #define IGNITION_COMMON_REMOTERYPROFILERIMPL_HH_
 
+#include <string>
+
 #include "RemoteryConfig.h"
 #include "Remotery.h"
 

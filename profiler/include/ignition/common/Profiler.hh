@@ -158,7 +158,8 @@ ignition::common::ScopedProfile __profile##line(name, &__hash##line);
 #define IGN_PROFILE(name)             ((void) name)
 #endif  // IGN_PROFILER_ENABLE
 
-/// \brief Macro to determine if the profiler is enabled and has an implementation.
-#define IGN_PROFILER_VALID IGN_PROFILER_ENABLE && ignition::common::Profiler::Instance()->Valid()
+/// \brief Macro to determine if profiler is enabled and has an implementation.
+#define IGN_PROFILER_VALID \
+    IGN_PROFILER_ENABLE && ignition::common::Profiler::Instance()->Valid()
 
 #endif  // IGNITION_COMMON_PROFILER_HH_

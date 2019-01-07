@@ -36,11 +36,12 @@ Profiler::Profiler():
 
   if (this->impl == nullptr)
   {
-    ignwarn << "No profiler implementation detected, profiling will be disabled";
+    ignwarn << "No profiler implementation detected, profiling is disabled"
+            << std::endl;
   }
   else
   {
-    igndbg << "Ignition profiling with: " << impl->Name();
+    igndbg << "Ignition profiling with: " << impl->Name() << std::endl;
   }
 }
 
