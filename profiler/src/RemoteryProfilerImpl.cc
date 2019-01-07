@@ -16,7 +16,6 @@
  */
 
 #include "ignition/common/config.hh"
-#ifdef IGN_PROFILER_REMOTERY
 
 #include "RemoteryProfilerImpl.hh"
 #include "ignition/common/Console.hh"
@@ -91,6 +90,12 @@ RemoteryProfilerImpl::~RemoteryProfilerImpl()
 }
 
 //////////////////////////////////////////////////
+std::string RemoteryProfilerImpl::Name() const
+{
+  return "ign_profiler_remotery";
+}
+
+//////////////////////////////////////////////////
 void RemoteryProfilerImpl::SetThreadName(const char *_name)
 {
   rmt_SetCurrentThreadName(_name);
@@ -119,5 +124,3 @@ void RemoteryProfilerImpl::HandleInput(const char *_text)
 {
   (void) _text;
 }
-
-#endif  // IGN_PROFILER_REMOTERY

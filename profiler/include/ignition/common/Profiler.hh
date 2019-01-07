@@ -43,6 +43,16 @@ namespace ignition
     /// at compile time, which eliminates any performance impact of profiling.
     ///
     /// Profiler is enabled by setting IGN_ENABLE_PROFILER at compile time.
+    ///
+    /// The profiler header also exports several convenience macros to make
+    /// adding inspection points easier.
+    ///
+    /// * IGN_PROFILE_THREAD_NAME - Set the name of the current profiled thread.
+    /// * IGN_PROFILE_LOG_TEXT - Log text to the profiler console (if supported)
+    /// * IGN_PROFILE_BEGIN - Begin a named profile sample
+    /// * IGN_PROFILE_END - End a named profile sample
+    /// * IGN_PROFILE - RAII-style profile sample. The sample will end at the
+    ///     end of the current scope.
     class IGNITION_COMMON_PROFILER_VISIBLE Profiler
         : public virtual SingletonT<Profiler>
     {
@@ -76,6 +86,12 @@ namespace ignition
       /// \brief End a profiling sample.
       public: void EndSample();
 
+      /// \brief Get the underlying profiler implentation name
+      public: std::string ImplementationName() const;
+
+      /// \brief Detect if profiler is enabled and has an implementation
+      public: bool Valid() const;
+
       /// \brief Pointer to the profiler implementation
       private: ProfilerImpl *impl;
 
@@ -106,7 +122,12 @@ namespace ignition
   }
 }
 
-#ifdef IGN_ENABLE_PROFILER
+#ifndef IGN_PROFILER_ENABLE
+/// Always set this variable to some value
+#define IGN_PROFILER_ENABLE 0
+#endif
+
+#if IGN_PROFILER_ENABLE
 /// \brief Set name of profiled thread
 #define IGN_PROFILE_THREAD_NAME(name) \
     ignition::common::Profiler::Instance()->SetThreadName(name);
@@ -135,6 +156,9 @@ ignition::common::ScopedProfile __profile##line(name, &__hash##line);
 #define IGN_PROFILE_END()             ((void) 0)
 #define IGN_PROFILE_L(name, line)     ((void) name)
 #define IGN_PROFILE(name)             ((void) name)
-#endif
+#endif  // IGN_PROFILER_ENABLE
+
+/// \brief Macro to determine if the profiler is enabled and has an implementation.
+#define IGN_PROFILER_VALID IGN_PROFILER_ENABLE && ignition::common::Profiler::Instance()->Valid()
 
 #endif  // IGNITION_COMMON_PROFILER_HH_

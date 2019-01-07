@@ -15,6 +15,7 @@
  *
  */
 #include "ignition/common/Profiler.hh" // NOLINT(*)
+#include "ignition/common/Console.hh"
 
 #include "ProfilerImpl.hh"
 
@@ -32,6 +33,15 @@ Profiler::Profiler():
 #ifdef IGN_PROFILER_REMOTERY
   impl = new RemoteryProfilerImpl();
 #endif  // IGN_PROFILER_REMOTERY
+
+  if (this->impl == nullptr)
+  {
+    ignwarn << "No profiler implementation detected, profiling will be disabled";
+  }
+  else
+  {
+    igndbg << "Ignition profiling with: " << impl->Name();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -68,4 +78,20 @@ void Profiler::EndSample()
 {
   if (this->impl)
     this->impl->EndSample();
+}
+
+//////////////////////////////////////////////////
+std::string Profiler::ImplementationName() const
+{
+  if (this->impl)
+    return this->impl->Name();
+  else
+    return "disabled";
+}
+
+
+//////////////////////////////////////////////////
+bool Profiler::Valid() const
+{
+  return this->impl != nullptr;
 }

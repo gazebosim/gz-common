@@ -50,6 +50,9 @@ namespace ignition
       /// \brief Destructor.
       public: ~RemoteryProfilerImpl() final;
 
+      /// \brief Retrieve profiler name.
+      public: std::string Name() const final;
+
       /// \brief Set the name of the current thread
       /// \param[in] _name Name to set
       public: void SetThreadName(const char *_name) final;

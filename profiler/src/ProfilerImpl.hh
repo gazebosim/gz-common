@@ -33,6 +33,9 @@ namespace ignition
       /// \brief Destructor.
       public: virtual ~ProfilerImpl() = default;
 
+      /// \brief Retrieve profiler name.
+      public: virtual std::string Name() const = 0;
+
       /// \brief Set the name of the current thread
       /// \param[in] _name Name to set
       public: virtual void SetThreadName(const char *_name) = 0;
