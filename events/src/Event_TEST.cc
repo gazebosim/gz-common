@@ -269,8 +269,8 @@ TEST_F(EventTest, typeid_test)
   EXPECT_EQ(typeid(Event1).name(), typeid(Event2).name());
 
   // To have multiple events of the same type, use the second arg
-  using Event3 = common::EventT<void(int), struct _Event3>;
-  using Event4 = common::EventT<void(int), struct _Event4>;
+  using Event3 = common::EventT<void(int), struct Event3Tag>;
+  using Event4 = common::EventT<void(int), struct Event4Tag>;
 
   EXPECT_NE(typeid(Event3).hash_code(), typeid(Event4).hash_code());
   EXPECT_NE(typeid(Event3).name(), typeid(Event4).name());
