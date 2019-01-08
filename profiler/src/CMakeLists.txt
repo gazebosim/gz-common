@@ -81,8 +81,20 @@ ign_build_tests(TYPE UNIT SOURCES ${PROFILER_TESTS}
   TEST_LIST profiler_tests)
 
 if(TARGET UNIT_Profiler_Remotery_TEST)
-  target_compile_definitions(UNIT_Profiler_Remotery_TEST PUBLIC "IGN_PROFILER_ENABLE=1")
+  target_compile_definitions(UNIT_Profiler_Remotery_TEST
+    PUBLIC "IGN_PROFILER_ENABLE=1")
 endif()
 
-install(DIRECTORY Remotery/vis/
-        DESTINATION ${IGN_DATA_INSTALL_DIR}/profiler_vis)
+if(IGN_PROFILER_REMOTERY)
+  set(IGN_PROFILER_VIS_PATH ${IGN_DATA_INSTALL_DIR}/profiler_vis)
+
+  configure_file(Remotery/ign_remotery_vis.in
+    ${CMAKE_CURRENT_BINARY_DIR}/ign_remotery_vis)
+
+  install(PROGRAMS
+    ${CMAKE_CURRENT_BINARY_DIR}/ign_remotery_vis
+    DESTINATION bin)
+
+  install(DIRECTORY Remotery/vis/
+          DESTINATION ${IGN_DATA_INSTALL_DIR}/profiler_vis)
+endif()
