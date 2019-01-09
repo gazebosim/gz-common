@@ -1,4 +1,5 @@
 codecov:
   branch: default
 ignore:
-  - "profiler/src/Remotery"
+  - "profiler/src/Remotery/lib"
+  - "profiler/src/Remotery/vis"
