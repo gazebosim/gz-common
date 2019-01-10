@@ -101,8 +101,6 @@ open /usr/share/ignition/ignition-common3/profiler_vis/index.html
 
 If you are successful, you should see the profiler output in a browser.
 
-[//]: # "TODO: Screenshot of remotery window"
-
 ## Using the Profiler
 
 The profiler is used through a series of macros.
@@ -138,12 +136,6 @@ Additionally, each thread can be given a name for easy reference in the UI:
   IGN_PROFILE_THREAD_NAME("physics");
   IGN_PROFILE_THREAD_NAME("gui");
 ```
-
-## Interpreting the Remotery output
-
-[//]: # "TODO: Screenshot of remotery sample window"
-
-[//]: # "TODO: Screenshot of remotery timeline window"
 
 ## Configuring the Profiler
 
