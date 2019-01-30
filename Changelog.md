@@ -6,8 +6,7 @@
     * [Pull request 131](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/131)
 
 1. Added hash64 function.
-    * [Pull request 132](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/132)
-
+    * [Pull request 170](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/170)
 
 ## Ignition Common 2.x
 
