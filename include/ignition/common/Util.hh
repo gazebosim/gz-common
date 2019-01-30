@@ -34,6 +34,12 @@
 # define IGN_HOMEDIR "HOME"
 #endif
 
+#if defined(_MSC_VER)
+# define BIG_CONSTANT(x) (x)
+#else
+# define BIG_CONSTANT(x) (x##LLU)
+#endif
+
 /// \brief Seconds in one nano second.
 #define IGN_NANO_TO_SEC 1e-9
 
@@ -148,6 +154,13 @@ namespace ignition
     /// \sa sha1(const T &_buffer)
     std::string IGNITION_COMMON_VISIBLE sha1(
         void const *_buffer, std::size_t _byteCount);
+
+    /// \brief MurmurHash2 algorithm, 64-bit versions, by Austin Appleby.
+    /// The same caveats as 32-bit MurmurHash2 apply here - beware of
+    /// alignment and endian-ness issues if used across multiple platforms.
+    /// 64-bit hash for 64-bit platforms
+    /// \ref https://github.com/aappleby/smhasher/blob/master/src/MurmurHash2.cpp
+    uint64_t hash64(const std::string &_input, uint64_t _seed = 0);
 
     /// \brief Find the environment variable '_name' and return its value.
     /// \param[in] _name Name of the environment variable.

@@ -68,6 +68,35 @@ TEST(Util_TEST, SHA1)
 }
 
 /////////////////////////////////////////////////
+/// \brief Test Util::hash64
+TEST(Util_TEST, Hash64)
+{
+  // Do not forget to update 'precomputedHash' if you modify the string input.
+  uint64_t precomputedHash;
+  uint64_t computedHash;
+  std::string s;
+
+  // Compute the hash64 of a string.
+  s = "Look at this. It’s worthless — ten dollars from a vendor in the street. "
+      "But I take it, I bury it in the sand for a thousand years, it becomes "
+      "priceless. Like the Ark.";
+  computedHash = common::hash64(s);
+  precomputedHash = 10992298837217494943U;
+  EXPECT_EQ(precomputedHash, computedHash);
+
+  // The result should be different if we use another seed.
+  uint64_t seed = 6;
+  uint64_t otherComputedHash = common::hash64(s, seed);
+  EXPECT_NE(precomputedHash, otherComputedHash);
+
+  // Compute the hash64 of an empty string
+  s = "";
+  computedHash = common::hash64(s);
+  precomputedHash = 0;
+  EXPECT_EQ(precomputedHash, computedHash);
+}
+
+/////////////////////////////////////////////////
 /// \brief Test the string tokenizer split() function.
 TEST(Util_TEST, split)
 {
