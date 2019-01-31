@@ -25,22 +25,30 @@ pipelines:
           - git checkout 04335632c371b5066e722298c9f8c6f11b210201
           - make install
           - cd ..
-          # Ignition cmake
-          - hg clone http://bitbucket.org/ignitionrobotics/ign-cmake -b gz11
-          - cd ign-cmake
-          - mkdir build
-          - cd build
-          - cmake .. -DBUILD_TESTING=OFF
-          - make -j4 install
-          - cd ../..
-          # Ignition math
-          - hg clone http://bitbucket.org/ignitionrobotics/ign-math -b gz11
-          - cd ign-math
-          - mkdir build
-          - cd build
-          - cmake .. -DBUILD_TESTING=OFF
-          - make -j4 install
-          - cd ../..
+
+          # Ignition dependencies
+          - echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable bionic main" > /etc/apt/sources.list.d/gazebo-stable.list
+          - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys D2486D2DD83DB69272AFE98867170598AF249743
+          - apt-get update
+          - apt-get -y install
+            libignition-cmake2-dev
+            libignition-math6-dev
+          # Ignition cmake (uncomment to build from a specific branch)
+          # - hg clone http://bitbucket.org/ignitionrobotics/ign-cmake -b gz11
+          # - cd ign-cmake
+          # - mkdir build
+          # - cd build
+          # - cmake .. -DBUILD_TESTING=OFF
+          # - make -j4 install
+          # - cd ../..
+          # Ignition math (uncomment to build from a specific branch)
+          # - hg clone http://bitbucket.org/ignitionrobotics/ign-math -b gz11
+          # - cd ign-math
+          # - mkdir build
+          # - cd build
+          # - cmake .. -DBUILD_TESTING=OFF
+          # - make -j4 install
+          # - cd ../..
           # Build
           - mkdir build
           - cd build
