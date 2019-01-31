@@ -156,56 +156,25 @@ namespace ignition
     std::string IGNITION_COMMON_VISIBLE sha1(
         void const *_buffer, std::size_t _byteCount);
 
-    /// \brief MurmurHash2 algorithm, 64-bit versions, by Austin Appleby.
-    /// The same caveats as 32-bit MurmurHash2 apply here - beware of
-    /// alignment and endian-ness issues if used across multiple platforms.
-    /// 64-bit hash for 64-bit platforms
-    /// \ref https://github.com/aappleby/smhasher/blob/master/src/MurmurHash2.cpp
-    constexpr uint64_t IGNITION_COMMON_VISIBLE hash64(
-        std::string_view _input, uint64_t _seed = 0)
+    /// \brief fnv1a algorithm for 64-bit platforms.
+    /// \param[in] _key The input string.
+    /// \return A 64-bit unsigned hash value.
+    /// \ref https://notes.underscorediscovery.com/constexpr-fnv1a/
+    constexpr uint64_t IGNITION_COMMON_VISIBLE hash64(std::string_view _key)
     {
-      auto key = _input.data();
-      auto len = strlen(key);
-      const uint64_t m = BIG_CONSTANT(0xc6a4a7935bd1e995);
-      const int r = 47;
+      const char *data = _key.data();
+      const auto len = strlen(data);
+      const uint64_t prime = 0x100000001b3;
+      uint64_t hash = 0xcbf29ce484222325;
 
-      uint64_t h = _seed ^ (len * m);
-
-      const uint64_t *data = (const uint64_t*)key;
-      const uint64_t *end = data + (len / 8);
-
-      while (data != end)
+      for (auto i = 0u; i < len; ++i)
       {
-        uint64_t k = *data++;
-
-        k *= m;
-        k ^= k >> r;
-        k *= m;
-
-        h ^= k;
-        h *= m;
+        uint8_t value = data[i];
+        hash = hash ^ value;
+        hash *= prime;
       }
 
-      const unsigned char *data2 = (const unsigned char*)data;
-
-      switch (len & 7)
-      {
-        case 7: h ^= uint64_t(data2[6]) << 48;__attribute__((fallthrough));
-        case 6: h ^= uint64_t(data2[5]) << 40;__attribute__((fallthrough));
-        case 5: h ^= uint64_t(data2[4]) << 32;__attribute__((fallthrough));
-        case 4: h ^= uint64_t(data2[3]) << 24;__attribute__((fallthrough));
-        case 3: h ^= uint64_t(data2[2]) << 16;__attribute__((fallthrough));
-        case 2: h ^= uint64_t(data2[1]) << 8;__attribute__((fallthrough));
-        case 1: h ^= uint64_t(data2[0]);
-                h *= m;__attribute__((fallthrough));
-        default: break;
-      };
-
-      h ^= h >> r;
-      h *= m;
-      h ^= h >> r;
-
-      return h;
+      return hash;
     }
 
     /// \brief Find the environment variable '_name' and return its value.
