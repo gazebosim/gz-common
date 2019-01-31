@@ -22,7 +22,6 @@
 #include <memory>
 #include <string>
 #include <future>
-#include <string_view>
 #include <vector>
 #include <ignition/common/Export.hh>
 #include <ignition/common/Filesystem.hh>
