@@ -163,7 +163,7 @@ namespace ignition
     constexpr uint64_t IGNITION_COMMON_VISIBLE hash64(std::string_view _key)
     {
       const char *data = _key.data();
-      const auto len = strlen(data);
+      const auto len = _key.size();
       const uint64_t prime = 0x100000001b3;
       uint64_t hash = 0xcbf29ce484222325;
 
