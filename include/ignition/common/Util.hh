@@ -160,7 +160,8 @@ namespace ignition
     /// alignment and endian-ness issues if used across multiple platforms.
     /// 64-bit hash for 64-bit platforms
     /// \ref https://github.com/aappleby/smhasher/blob/master/src/MurmurHash2.cpp
-    uint64_t hash64(const std::string &_input, uint64_t _seed = 0);
+    uint64_t IGNITION_COMMON_VISIBLE hash64(
+        const std::string &_input, uint64_t _seed = 0);
 
     /// \brief Find the environment variable '_name' and return its value.
     /// \param[in] _name Name of the environment variable.
