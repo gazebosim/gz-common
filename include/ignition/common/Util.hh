@@ -18,9 +18,11 @@
 #define IGNITION_COMMON_UTIL_HH_
 
 #include <cassert>
+#include <cstring>
 #include <memory>
 #include <string>
 #include <future>
+#include <string_view>
 #include <vector>
 #include <ignition/common/Export.hh>
 #include <ignition/common/Filesystem.hh>
@@ -160,8 +162,59 @@ namespace ignition
     /// alignment and endian-ness issues if used across multiple platforms.
     /// 64-bit hash for 64-bit platforms
     /// \ref https://github.com/aappleby/smhasher/blob/master/src/MurmurHash2.cpp
-    uint64_t IGNITION_COMMON_VISIBLE hash64(
-        const std::string &_input, uint64_t _seed = 0);
+    constexpr uint64_t IGNITION_COMMON_VISIBLE hash64(
+        std::string_view _input, uint64_t _seed = 0)
+    {
+      auto key = _input.data();
+      auto len = strlen(key);
+      const uint64_t m = BIG_CONSTANT(0xc6a4a7935bd1e995);
+      const int r = 47;
+
+      uint64_t h = _seed ^ (len * m);
+
+      const uint64_t *data = (const uint64_t*)key;
+      const uint64_t *end = data + (len / 8);
+
+      while (data != end)
+      {
+        uint64_t k = *data++;
+
+        k *= m;
+        k ^= k >> r;
+        k *= m;
+
+        h ^= k;
+        h *= m;
+      }
+
+      const unsigned char *data2 = (const unsigned char*)data;
+
+      switch (len & 7)
+      {
+        case 7: h ^= uint64_t(data2[6]) << 48;
+                break;
+        case 6: h ^= uint64_t(data2[5]) << 40;
+                break;
+        case 5: h ^= uint64_t(data2[4]) << 32;
+                break;
+        case 4: h ^= uint64_t(data2[3]) << 24;
+                break;
+        case 3: h ^= uint64_t(data2[2]) << 16;
+                break;
+        case 2: h ^= uint64_t(data2[1]) << 8;
+                break;
+        case 1: h ^= uint64_t(data2[0]);
+                h *= m;
+                break;
+        default: break;
+      };
+
+      h ^= h >> r;
+      h *= m;
+      h ^= h >> r;
+
+      return h;
+    }
 
     /// \brief Find the environment variable '_name' and return its value.
     /// \param[in] _name Name of the environment variable.
