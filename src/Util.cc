@@ -366,14 +366,14 @@ std::vector<std::string> ignition::common::split(const std::string &_str,
 void ignition::common::ltrim(std::string &_s)
 {
   _s.erase(_s.begin(), std::find_if(_s.begin(), _s.end(),
-        std::not1(std::ptr_fun<int, int>(std::isspace))));
+        [](int c) {return !std::isspace(c);}));
 }
 
 /////////////////////////////////////////////////
 void ignition::common::rtrim(std::string &_s)
 {
   _s.erase(std::find_if(_s.rbegin(), _s.rend(),
-        std::not1(std::ptr_fun<int, int>(std::isspace))).base(),
+        [](int c) {return !std::isspace(c);}).base(),
       _s.end());
 }
 
