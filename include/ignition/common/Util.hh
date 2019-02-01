@@ -18,7 +18,6 @@
 #define IGNITION_COMMON_UTIL_HH_
 
 #include <cassert>
-#include <cstring>
 #include <memory>
 #include <string>
 #include <future>
@@ -33,12 +32,6 @@
 # define IGN_HOMEDIR "HOMEPATH"
 #else
 # define IGN_HOMEDIR "HOME"
-#endif
-
-#if defined(_MSC_VER)
-# define BIG_CONSTANT(x) (x)
-#else
-# define BIG_CONSTANT(x) (x##LLU)
 #endif
 
 /// \brief Seconds in one nano second.
@@ -156,6 +149,10 @@ namespace ignition
     std::string IGNITION_COMMON_VISIBLE sha1(
         void const *_buffer, std::size_t _byteCount);
 
+    #ifdef _MSC_VER
+      #pragma warning(disable:4307)
+    #endif
+
     /// \brief fnv1a algorithm for 64-bit platforms.
     /// \param[in] _key The input string.
     /// \return A 64-bit unsigned hash value.
@@ -176,6 +173,10 @@ namespace ignition
 
       return hash;
     }
+
+    #ifdef _MSC_VER
+      #pragma warning(pop)
+    #endif
 
     /// \brief Find the environment variable '_name' and return its value.
     /// \param[in] _name Name of the environment variable.

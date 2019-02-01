@@ -75,8 +75,8 @@ TEST(Util_TEST, Hash64)
   {
     constexpr auto computedHash = common::hash64(
       "Look at this. It’s worthless — ten dollars from a vendor in the street. "
-        "But I take it, I bury it in the sand for a thousand years, it becomes "
-        "priceless. Like the Ark.");
+      "But I take it, I bury it in the sand for a thousand years, it becomes "
+      "priceless. Like the Ark.");
     uint64_t precomputedHash = 5217348260923471204U;
     EXPECT_EQ(precomputedHash, computedHash);
   }
