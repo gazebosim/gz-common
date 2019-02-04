@@ -45,8 +45,14 @@ class ignition::common::SystemPathsPrivate
   /// \brief Name of the environment variable to check for plugin paths
   public: std::string pluginPathEnv = "IGN_PLUGIN_PATH";
 
+  /// \brief Name of the environment variable to check for file paths
+  public: std::string filePathEnv = "IGN_FILE_PATH";
+
   /// \brief Paths to plugins
   public: std::list<std::string> pluginPaths;
+
+  /// \brief Paths to files
+  public: std::list<std::string> filePaths;
 
   /// \brief Suffix paths
   public: std::list<std::string> suffixPaths;
@@ -115,6 +121,9 @@ SystemPaths::SystemPaths()
     closedir(dir);
 
   this->dataPtr->logPath = fullPath;
+  // Populate this->dataPtr->filePaths with values from the default
+  // environment variable.
+  this->SetFilePathEnv(this->dataPtr->filePathEnv);
 }
 
 /////////////////////////////////////////////////
@@ -170,6 +179,46 @@ std::string SystemPaths::FindSharedLibrary(const std::string &_libName)
   return pathToLibrary;
 }
 
+/////////////////////////////////////////////////
+void SystemPaths::SetFilePathEnv(const std::string &_env)
+{
+  this->dataPtr->filePathEnv = _env;
+  if (!this->dataPtr->filePathEnv.empty())
+  {
+    this->ClearFilePaths();
+    std::string result;
+    if (env(this->dataPtr->filePathEnv, result))
+    {
+      this->AddFilePaths(result);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+const std::list<std::string> &SystemPaths::FilePaths()
+{
+  return this->dataPtr->filePaths;
+}
+
+/////////////////////////////////////////////////
+void SystemPaths::ClearFilePaths()
+{
+  this->dataPtr->filePaths.clear();
+}
+
+/////////////////////////////////////////////////
+void SystemPaths::AddFilePaths(const std::string &_path)
+{
+  if (_path.size())
+  {
+    std::vector<std::string> paths = Split(_path, Delimiter());
+    for (auto const &path : paths)
+    {
+      std::string normalPath = NormalizeDirectoryPath(path);
+      insertUnique(normalPath, this->dataPtr->filePaths);
+    }
+  }
+}
 /////////////////////////////////////////////////
 std::string SystemPaths::NormalizeDirectoryPath(const std::string &_path)
 {
@@ -348,6 +397,19 @@ std::string SystemPaths::FindFile(const std::string &_filename,
     else if (this->dataPtr->findFileCB)
     {
       path = this->dataPtr->findFileCB(filename);
+    }
+  }
+
+  // Look in custom paths.
+  if (path.empty())
+  {
+    for (const std::string &filePath : this->dataPtr->filePaths)
+    {
+      if (exists(joinPaths(filePath, filename)))
+      {
+        path = joinPaths(filePath, filename);
+        break;
+      }
     }
   }
 

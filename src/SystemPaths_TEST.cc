@@ -43,6 +43,13 @@ class SystemPathsFixture : public ::testing::Test
 
       putenv(const_cast<char*>("IGN_PLUGIN_PATH="));
 
+      this->backupFilePath = "IGN_FILE_PATH=";
+
+      if (getenv("IGN_FILE_PATH"))
+        this->backupFilePath += getenv("IGN_FILE_PATH");
+
+      putenv(const_cast<char*>("IGN_FILE_PATH="));
+
 #ifdef _WIN32
       this->filesystemRoot = "C:\\";
 #else
@@ -53,9 +60,11 @@ class SystemPathsFixture : public ::testing::Test
   public: virtual void TearDown()
     {
       putenv(const_cast<char*>(this->backupPluginPath.c_str()));
+      putenv(const_cast<char*>(this->backupFilePath.c_str()));
     }
 
   public: std::string backupPluginPath;
+  public: std::string backupFilePath;
   public: std::string filesystemRoot;
 };
 
@@ -82,6 +91,31 @@ TEST_F(SystemPathsFixture, SystemPaths)
   paths.ClearPluginPaths();
 
   EXPECT_EQ(static_cast<unsigned int>(2), paths.PluginPaths().size());
+}
+
+/////////////////////////////////////////////////
+TEST_F(SystemPathsFixture, FileSystemPaths)
+{
+  std::string env_str("IGN_FILE_PATH=/tmp/file");
+  env_str += ignition::common::SystemPaths::Delimiter();
+  env_str += "/test/file/now";
+
+  // The char* passed to putenv will continue to be stored after the lifetime
+  // of this function, so we should not pass it a pointer which has an automatic
+  // lifetime.
+  static char env[1024];
+  snprintf(env, sizeof(env), "%s", env_str.c_str());
+  putenv(env);
+
+  common::SystemPaths paths;
+  const std::list<std::string> pathList3 = paths.FilePaths();
+  EXPECT_EQ(static_cast<unsigned int>(2), pathList3.size());
+  EXPECT_STREQ("/tmp/file/", pathList3.front().c_str());
+  EXPECT_STREQ("/test/file/now/", pathList3.back().c_str());
+
+  paths.ClearFilePaths();
+
+  EXPECT_EQ(static_cast<unsigned int>(0), paths.FilePaths().size());
 }
 
 /////////////////////////////////////////////////
