@@ -95,9 +95,14 @@ namespace ignition
       /// \return Time as a float in seconds
       public: float Float() const;
 
-      /// \brief Sleep for the specified time
+      /// \brief Sleep for the specified time.
       /// \param[in] _time Sleep time
-      /// \return Time actually slept
+      /// \return On OSX and Linux the return value is the time slept,
+      /// as reported by `nanosleep` for OSX and `clock_nanosleep` for Linux.
+      /// The return value does not include time spent before and after the
+      /// actual call to the system's sleep function.
+      ///
+      /// On Windows the return value is always common::Time::Zero.
       public: static Time Sleep(const common::Time &_time);
 
       /// \brief Get the time as a string formatted as "DD hh:mm:ss.mmm", with
