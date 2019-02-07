@@ -217,9 +217,9 @@ Time Time::Sleep(const common::Time &_time)
       result.sec = remainder.tv_sec;
       result.nsec = remainder.tv_nsec;
     }
+# endif
     // Compute the time actually slept.
     result = _time - result;
-# endif
 #endif
   }
   else
