@@ -103,6 +103,27 @@ namespace ignition
       /// \brief clear out SystemPaths#pluginPaths
       public: void ClearPluginPaths();
 
+      /// \brief Set the file path environment variable to use, and clears
+      /// any previously file paths. The default
+      /// environment variable is IGN_FILE_PATH. The
+      /// environment variable should be a set of colon (semicolon on windows)
+      /// delimited paths. These paths will be used with the FindFile function.
+      /// \param [in] _env name of the environment variable
+      public: void SetFilePathEnv(const std::string &_env);
+
+      /// \brief Get the file paths
+      /// \return a list of paths
+      public: const std::list<std::string> &FilePaths();
+
+      /// \brief Add colon (semicolon on windows) delimited paths to find
+      /// files. These paths will be used with the FindFile function.
+      /// \param[in] _path A colon (semicolon on windows) delimited
+      /// string of paths.
+      public: void AddFilePaths(const std::string &_path);
+
+      /// \brief clear out SystemPaths#filePaths
+      public: void ClearFilePaths();
+
       /// \brief add _suffix to the list of path search suffixes
       /// \param[in] _suffix The suffix to add
       public: void AddSearchPathSuffix(const std::string &_suffix);
