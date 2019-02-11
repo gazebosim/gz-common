@@ -1,3 +1,13 @@
+## Ignition Common 3.x
+
+## Ignition Common 3.0.0 (2018-XX-XX)
+
+1. Use ign-cmake2 and support Ubuntu Bionic (18.04).
+    * [Pull request 131](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/131)
+
+1. Added hash64 function.
+    * [Pull request 170](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/170)
+
 ## Ignition Common 2.x
 
 ## Ignition Common 2.0.0 (2018-XX-XX)

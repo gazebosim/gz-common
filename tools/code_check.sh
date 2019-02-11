@@ -73,14 +73,14 @@ CPPCHECK_BASE="cppcheck -q --inline-suppr --suppressions-list=$SUPPRESS"\
 " --suppress=unmatchedSuppression:include/ignition/common/detail/SpecializedPlugin.hh"
 if [ $CPPCHECK_LT_161 -eq 0 ]; then
   # use --language argument if 1.57 or greater (issue #907)
-  CPPCHECK_BASE="$CPPCHECK_BASE --language=c++"
+  CPPCHECK_BASE="$CPPCHECK_BASE --language=c++ --std=c++14 --force"
 fi
 CPPCHECK_INCLUDES="-I . -I ./include -I $builddir -I test"\
 " -I ./av/include -I ./events/include -I ./graphics/include "
 CPPCHECK_RULES="-UPATH_MAX -UFREEIMAGE_COLORORDER "\
 " -US_IROTH -US_IXOTH -US_IRGRP -U_XOPEN_PATH_MAX "\
 "--max-configs=50"
-CPPCHECK_CMD1A="-j 4 --enable=style,performance,portability,information"
+CPPCHECK_CMD1A="-j 4 --enable=style,performance,portability"
 CPPCHECK_CMD1B="$CPPCHECK_RULES $CPPCHECK_FILES"
 CPPCHECK_CMD1="$CPPCHECK_CMD1A $CPPCHECK_CMD1B"
 CPPCHECK_CMD2="--enable=unusedFunction $CPPCHECK_FILES"
@@ -125,7 +125,7 @@ elif [ $QUICK_CHECK -eq 1 ]; then
     # Undo changes to suppression file
     sed -i -e "s@$tmp2@$f@" $SUPPRESS
 
-    python $hg_root/tools/cpplint.py $tmp2 2>&1 \
+    python $hg_root/tools/cpplint.py --extensions=cc,hh $tmp2 2>&1 \
       | sed -e "s@$tmp2@$f@g" -e "s@$tmp2base@$prefix@g" \
       | grep -v 'Total errors found: 0'
 
@@ -142,8 +142,8 @@ fi
 
 # cpplint
 if [ $xmlout -eq 1 ]; then
-  (echo $CPPLINT_FILES | xargs python tools/cpplint.py 2>&1) \
+  (echo $CPPLINT_FILES | xargs python tools/cpplint.py --extensions=cc,hh 2>&1) \
     | python tools/cpplint_to_cppcheckxml.py 2> $xmldir/cpplint.xml
 elif [ $QUICK_CHECK -eq 0 ]; then
-  echo $CPPLINT_FILES | xargs python tools/cpplint.py 2>&1
+  echo $CPPLINT_FILES | xargs python tools/cpplint.py  --extensions=cc,hh 2>&1
 fi

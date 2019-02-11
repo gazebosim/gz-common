@@ -212,6 +212,14 @@ TEST(TimeTest, Float)
 }
 
 /////////////////////////////////////////////////
+TEST(TimeTest, Sleep)
+{
+  common::Time sleepTime(1, 900000000);
+  common::Time result = common::Time::Sleep(sleepTime);
+  EXPECT_EQ(sleepTime, result);
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

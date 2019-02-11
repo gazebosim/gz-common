@@ -243,6 +243,7 @@ void ImagePrivate::DataImpl(unsigned char **_data, unsigned int &_count,
       scanWidth, FreeImage_GetBPP(_img), redmask, greenmask, bluemask, true);
 
 #ifdef FREEIMAGE_COLORORDER
+  // cppcheck-suppress ConfigurationNotChecked
   if (FREEIMAGE_COLORORDER != FREEIMAGE_COLORORDER_RGB)
   {
 #else
@@ -317,6 +318,7 @@ math::Color Image::Pixel(unsigned int _x, unsigned int _y) const
     }
 
 #ifdef FREEIMAGE_COLORORDER
+    // cppcheck-suppress ConfigurationNotChecked
     if (FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_RGB)
       clr.Set(firgb.rgbRed, firgb.rgbGreen, firgb.rgbBlue);
     else

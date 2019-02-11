@@ -149,6 +149,35 @@ namespace ignition
     std::string IGNITION_COMMON_VISIBLE sha1(
         void const *_buffer, std::size_t _byteCount);
 
+    #ifdef _MSC_VER
+      #pragma warning(disable:4307)
+    #endif
+
+    /// \brief fnv1a algorithm for 64-bit platforms.
+    /// \param[in] _key The input string.
+    /// \return A 64-bit unsigned hash value.
+    /// \ref https://notes.underscorediscovery.com/constexpr-fnv1a/
+    constexpr uint64_t IGNITION_COMMON_VISIBLE hash64(std::string_view _key)
+    {
+      const char *data = _key.data();
+      const auto len = _key.size();
+      const uint64_t prime = 0x100000001b3;
+      uint64_t hash = 0xcbf29ce484222325;
+
+      for (auto i = 0u; i < len; ++i)
+      {
+        uint8_t value = data[i];
+        hash = hash ^ value;
+        hash *= prime;
+      }
+
+      return hash;
+    }
+
+    #ifdef _MSC_VER
+      #pragma warning(pop)
+    #endif
+
     /// \brief Find the environment variable '_name' and return its value.
     /// \param[in] _name Name of the environment variable.
     /// \param[out] _value Value if the variable was found.

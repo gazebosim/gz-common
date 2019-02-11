@@ -155,6 +155,37 @@ TEST_F(ColladaLoader, Material)
 }
 
 /////////////////////////////////////////////////
+TEST_F(ColladaLoader, TexCoordSets)
+{
+  common::ColladaLoader loader;
+  // This triangle mesh has multiple uv sets and vertices separated by
+  // line breaks
+  common::Mesh *mesh = loader.Load(std::string(PROJECT_SOURCE_PATH) +
+      "/test/data/multiple_texture_coordinates_triangle.dae");
+  ASSERT_TRUE(mesh);
+
+  EXPECT_EQ(3u, mesh->VertexCount());
+  EXPECT_EQ(3u, mesh->NormalCount());
+  EXPECT_EQ(3u, mesh->IndexCount());
+  EXPECT_EQ(3u, mesh->TexCoordCount());
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->MaterialCount());
+
+  auto sm = mesh->SubMeshByIndex(0u);
+  auto subMesh = sm.lock();
+  EXPECT_NE(nullptr, subMesh);
+  EXPECT_EQ(math::Vector3d(0, 0, 0), subMesh->Vertex(0u));
+  EXPECT_EQ(math::Vector3d(10, 0, 0), subMesh->Vertex(1u));
+  EXPECT_EQ(math::Vector3d(10, 10, 0), subMesh->Vertex(2u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), subMesh->Normal(0u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), subMesh->Normal(1u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), subMesh->Normal(2u));
+  EXPECT_EQ(math::Vector2d(0, 1), subMesh->TexCoord(0u));
+  EXPECT_EQ(math::Vector2d(0, 1), subMesh->TexCoord(1u));
+  EXPECT_EQ(math::Vector2d(0, 1), subMesh->TexCoord(2u));
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

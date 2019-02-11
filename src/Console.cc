@@ -27,8 +27,6 @@
 using namespace ignition;
 using namespace common;
 
-std::string customPrefix;
-
 FileLogger ignition::common::Console::log("");
 
 #ifdef _WIN32
@@ -52,6 +50,7 @@ Logger Console::msg("[Msg] ", green, Logger::STDOUT, 3);
 Logger Console::dbg("[Dbg] ", blue, Logger::STDOUT, 4);
 
 int Console::verbosity = 1;
+std::string Console::customPrefix = ""; // NOLINT(*)
 
 //////////////////////////////////////////////////
 void Console::SetVerbosity(const int _level)
@@ -88,7 +87,6 @@ Logger::Logger(const std::string &_prefix, const int _color,
 /////////////////////////////////////////////////
 Logger::~Logger()
 {
-  delete this->rdbuf();
 }
 
 /////////////////////////////////////////////////
@@ -184,7 +182,16 @@ FileLogger::FileLogger(const std::string &_filename)
 /////////////////////////////////////////////////
 FileLogger::~FileLogger()
 {
-  delete this->rdbuf();
+  if (this->initialized && this->rdbuf())
+  {
+    FileLogger::Buffer *buf = static_cast<FileLogger::Buffer*>(
+        this->rdbuf());
+    if (buf->stream)
+    {
+      delete buf->stream;
+      buf->stream = nullptr;
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -206,7 +213,7 @@ void FileLogger::Init(const std::string &_directory,
   logPath = logPath + "/" + _directory;
 
   // Create the directory if it doesn't exist.
-  // \todo: Replace this with c++1y, when it is released.
+  // \todo(anyone): Replace this with c++1y, when it is released.
   if (!exists(logPath))
     createDirectories(logPath);
 
@@ -215,7 +222,10 @@ void FileLogger::Init(const std::string &_directory,
   // Check if the Init method has been already called, and if so
   // remove current buffer.
   if (buf->stream)
+  {
     delete buf->stream;
+    buf->stream = nullptr;
+  }
 
   buf->stream = new std::ofstream(logPath.c_str(), std::ios::out);
   if (!buf->stream->is_open())
@@ -229,7 +239,7 @@ void FileLogger::Init(const std::string &_directory,
 
   this->initialized = true;
 
-  /// \todo Reimplement this.
+  /// \todo(anyone) Reimplement this.
   // Output the version of the project.
   // (*buf->stream) << PROJECT_VERSION_HEADER << std::endl;
 }

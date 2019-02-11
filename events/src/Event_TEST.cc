@@ -15,8 +15,9 @@
  *
 */
 
-#include <functional>
 #include <gtest/gtest.h>
+
+#include <functional>
 #include <ignition/common/Event.hh>
 #include "test/util.hh"
 
@@ -206,6 +207,79 @@ TEST_F(EventTest, ManyChanges)
 
   EXPECT_EQ(g_callback, 3);
   EXPECT_EQ(g_callback1, 2);
+}
+
+TEST_F(EventTest, EventWithOneParam)
+{
+  int count = 0;
+
+  auto fcn = [&count](int increment1){
+    count += increment1;
+  };
+
+  common::EventT<void(int)> evt;
+  common::ConnectionPtr conn = evt.Connect(fcn);
+
+  evt(10);
+  EXPECT_EQ(count, 10);
+}
+
+TEST_F(EventTest, EventWithTwoParams)
+{
+  int count = 0;
+  std::string test;
+
+  auto fcn = [&count, &test](std::string str, int increment){
+    test = str;
+    count += increment;
+  };
+
+  common::EventT<void(std::string, int)> evt;
+  common::ConnectionPtr conn = evt.Connect(fcn);
+
+  evt("test", 10);
+  EXPECT_EQ(count, 10);
+  EXPECT_EQ(test, "test");
+}
+
+TEST_F(EventTest, EventWithTenParams)
+{
+  int count = 0;
+
+  auto fcn = [&count](int i1, int i2, int i3, int i4, int i5,
+                      int i6, int i7, int i8, int i9, int i10){
+    count += i1 + i2 + i3 + i4 + i5 + i6 + i7 + i8 + i9 + i10;
+  };
+
+  common::EventT<void(int, int, int, int, int,
+                      int, int, int, int, int)> evt;
+  common::ConnectionPtr conn = evt.Connect(fcn);
+
+  evt(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+  EXPECT_EQ(count, 55);
+}
+
+TEST_F(EventTest, typeid_test)
+{
+  using Event1 = common::EventT<void(int)>;
+  using Event2 = common::EventT<void(int)>;
+
+  // Type aliases don't change the `typeid` value.
+  EXPECT_EQ(typeid(Event1).hash_code(), typeid(Event2).hash_code());
+  EXPECT_EQ(typeid(Event1).name(), typeid(Event2).name());
+
+  // To have multiple events of the same type, use the second arg
+  using Event3 = common::EventT<void(int), struct Event3Tag>;
+  using Event4 = common::EventT<void(int), struct Event4Tag>;
+
+  EXPECT_NE(typeid(Event3).hash_code(), typeid(Event4).hash_code());
+  EXPECT_NE(typeid(Event3).name(), typeid(Event4).name());
+
+  // These should also not be the same as the previous.
+  EXPECT_NE(typeid(Event3).hash_code(), typeid(Event1).hash_code());
+  EXPECT_NE(typeid(Event3).hash_code(), typeid(Event2).hash_code());
+  EXPECT_NE(typeid(Event3).name(), typeid(Event1).name());
+  EXPECT_NE(typeid(Event3).name(), typeid(Event2).name());
 }
 
 /////////////////////////////////////////////////

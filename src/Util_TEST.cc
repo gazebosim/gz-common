@@ -68,6 +68,28 @@ TEST(Util_TEST, SHA1)
 }
 
 /////////////////////////////////////////////////
+/// \brief Test Util::hash64
+TEST(Util_TEST, Hash64)
+{
+  // Do not forget to update 'precomputedHash' if you modify the string input.
+  {
+    constexpr auto computedHash = common::hash64(
+      "Look at this. It’s worthless — ten dollars from a vendor in the street. "
+      "But I take it, I bury it in the sand for a thousand years, it becomes "
+      "priceless. Like the Ark.");
+    uint64_t precomputedHash = 5217348260923471204U;
+    EXPECT_EQ(precomputedHash, computedHash);
+  }
+
+  // Compute the hash64 of an empty string.
+  {
+    constexpr auto computedHash = common::hash64("");
+    uint64_t precomputedHash = 14695981039346656037U;
+    EXPECT_EQ(precomputedHash, computedHash);
+  }
+}
+
+/////////////////////////////////////////////////
 /// \brief Test the string tokenizer split() function.
 TEST(Util_TEST, split)
 {
@@ -99,6 +121,12 @@ TEST(Util_TEST, split)
   EXPECT_EQ(tokens.at(0), "//abc/def");
   EXPECT_EQ(tokens.at(1), "123");
   EXPECT_EQ(tokens.at(2), "567///");
+
+  tokens = common::split("12\r\n34\r\n56", "\r\n");
+  ASSERT_EQ(tokens.size(), 3u);
+  EXPECT_EQ(tokens.at(0), "12");
+  EXPECT_EQ(tokens.at(1), "34");
+  EXPECT_EQ(tokens.at(2), "56");
 }
 
 /////////////////////////////////////////////////

@@ -15,8 +15,9 @@
  *
  */
 
-#include <string>
 #include <gts.h>
+
+#include <string>
 
 #include "ignition/common/Console.hh"
 #include "ignition/common/Mesh.hh"
@@ -106,7 +107,7 @@ void MeshCSG::MergeVertices(GPtrArray * _vertices, double _epsilon)
 }
 
 //////////////////////////////////////////////////
-static void FillVertex(GtsPoint *_p, gpointer *_data)
+static int FillVertex(GtsPoint *_p, gpointer *_data)
 {
   // create a vertex from GTS_POINT and add it to the submesh
   SubMesh *subMesh = reinterpret_cast<SubMesh *>(_data[0]);
@@ -116,10 +117,11 @@ static void FillVertex(GtsPoint *_p, gpointer *_data)
   // submesh in the FillFace function.
   g_hash_table_insert(vIndex, _p,
       GUINT_TO_POINTER((*(reinterpret_cast<guint *>(_data[1])))++));
+  return 0;
 }
 
 //////////////////////////////////////////////////
-static void FillFace(GtsTriangle *_t, gpointer *_data)
+static int FillFace(GtsTriangle *_t, gpointer *_data)
 {
   SubMesh *subMesh = reinterpret_cast<SubMesh *>(_data[0]);
   GHashTable* vIndex = reinterpret_cast<GHashTable *>(_data[2]);
@@ -130,6 +132,14 @@ static void FillFace(GtsTriangle *_t, gpointer *_data)
   subMesh->AddIndex(GPOINTER_TO_UINT(g_hash_table_lookup(vIndex, v1)));
   subMesh->AddIndex(GPOINTER_TO_UINT(g_hash_table_lookup(vIndex, v2)));
   subMesh->AddIndex(GPOINTER_TO_UINT(g_hash_table_lookup(vIndex, v3)));
+  return 0;
+}
+
+//////////////////////////////////////////////////////////////////////////
+static int TriangleRevert(GtsTriangle *_t, void *)
+{
+  gts_triangle_revert(_t);
+  return 0;
 }
 
 //////////////////////////////////////////////////
@@ -228,8 +238,8 @@ Mesh *MeshCSG::CreateBoolean(const Mesh *_m1, const Mesh *_m2, int _operation,
   {
     gts_surface_inter_boolean(si, s3, GTS_1_OUT_2);
     gts_surface_inter_boolean(si, s3, GTS_2_IN_1);
-    gts_surface_foreach_face(si->s2, (GtsFunc) gts_triangle_revert, nullptr);
-    gts_surface_foreach_face(s2, (GtsFunc) gts_triangle_revert, nullptr);
+    gts_surface_foreach_face(si->s2, (GtsFunc) TriangleRevert, nullptr);
+    gts_surface_foreach_face(s2, (GtsFunc) TriangleRevert, nullptr);
   }
 
 //  FILE *output = fopen("output.gts", "w");

@@ -218,18 +218,22 @@ Time Time::Sleep(const common::Time &_time)
 #else
     struct timespec remainder;
 # ifdef __MACH__
-    if (nanosleep(&interval, &remainder) == -1)
+    if (nanosleep(&interval, &remainder) == EINTR)
     {
+      // Get the time remaining (time unslept)
       result.sec = remainder.tv_sec;
       result.nsec = remainder.tv_nsec;
     }
 # else
-    if (clock_nanosleep(CLOCK_MONOTONIC, 0, &interval, &remainder) == -1)
+    if (clock_nanosleep(CLOCK_MONOTONIC, 0, &interval, &remainder) == EINTR)
     {
+      // Get the time remaining (time unslept)
       result.sec = remainder.tv_sec;
       result.nsec = remainder.tv_nsec;
     }
 # endif
+    // Compute the time actually slept.
+    result = _time - result;
 #endif
   }
   else

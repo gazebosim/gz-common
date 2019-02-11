@@ -40,11 +40,14 @@
    René Nyffenegger rene.nyffenegger@adp-gmbh.ch
 */
 #include "ignition/common/Base64.hh"
+#include <algorithm>
+#include <cstring>
+#include <iostream>
 
 using namespace ignition;
 using namespace common;
 
-static const std::string base64Chars =
+static const char base64Chars[] =
 "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 "abcdefghijklmnopqrstuvwxyz"
 "0123456789+/";
@@ -119,7 +122,13 @@ std::string Base64::Decode(const std::string &_encodedString)
     if (i == 4)
     {
       for (i = 0; i < 4; ++i)
-        charArray4[i] = base64Chars.find(charArray4[i]);
+      {
+        const char *match = std::find(base64Chars,
+            base64Chars + std::strlen(base64Chars),
+            static_cast<char>(charArray4[i]));
+
+        charArray4[i] = match - base64Chars;
+      }
 
       charArray3[0] = (charArray4[0] << 2) +
         ((charArray4[1] & 0x30) >> 4);
@@ -135,11 +144,17 @@ std::string Base64::Decode(const std::string &_encodedString)
 
   if (i)
   {
-    for (int j = i; j <4; ++j)
+    for (int j = i; j < 4; ++j)
       charArray4[j] = 0;
 
-    for (int j = 0; j <4; ++j)
-      charArray4[j] = base64Chars.find(charArray4[j]);
+    for (int j = 0; j < 4; ++j)
+    {
+      const char *match = std::find(base64Chars,
+          base64Chars + std::strlen(base64Chars),
+          static_cast<char>(charArray4[j]));
+
+      charArray4[j] = match - base64Chars;
+    }
 
     charArray3[0] = (charArray4[0] << 2) + ((charArray4[1] & 0x30) >> 4);
     charArray3[1] = ((charArray4[1] & 0xf) << 4) +

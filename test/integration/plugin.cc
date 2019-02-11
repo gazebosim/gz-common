@@ -20,9 +20,10 @@
 // specialized plugin interfaces.
 #define IGNITION_UNITTEST_SPECIALIZED_PLUGIN_ACCESS
 
+#include <gtest/gtest.h>
+
 #include <string>
 #include <vector>
-#include <gtest/gtest.h>
 #include <iostream>
 #include "ignition/common/Console.hh"
 #include "ignition/common/Filesystem.hh"
