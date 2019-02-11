@@ -335,60 +335,6 @@ std::string ignition::common::sha1(void const *_buffer, std::size_t _byteCount)
   return stream.str();
 }
 
-//////////////////////////////////////////////////
-uint64_t ignition::common::hash64(const std::string &_input, uint64_t _seed)
-{
-  auto key = _input.data();
-  auto len = strlen(key);
-  const uint64_t m = BIG_CONSTANT(0xc6a4a7935bd1e995);
-  const int r = 47;
-
-  uint64_t h = _seed ^ (len * m);
-
-  const uint64_t *data = (const uint64_t*)key;
-  const uint64_t *end = data + (len / 8);
-
-  while (data != end)
-  {
-    uint64_t k = *data++;
-
-    k *= m;
-    k ^= k >> r;
-    k *= m;
-
-    h ^= k;
-    h *= m;
-  }
-
-  const unsigned char *data2 = (const unsigned char*)data;
-
-  switch (len & 7)
-  {
-    case 7: h ^= uint64_t(data2[6]) << 48;
-            break;
-    case 6: h ^= uint64_t(data2[5]) << 40;
-            break;
-    case 5: h ^= uint64_t(data2[4]) << 32;
-            break;
-    case 4: h ^= uint64_t(data2[3]) << 24;
-            break;
-    case 3: h ^= uint64_t(data2[2]) << 16;
-            break;
-    case 2: h ^= uint64_t(data2[1]) << 8;
-            break;
-    case 1: h ^= uint64_t(data2[0]);
-            h *= m;
-            break;
-    default: break;
-  };
-
-  h ^= h >> r;
-  h *= m;
-  h ^= h >> r;
-
-  return h;
-}
-
 /////////////////////////////////////////////////
 std::string ignition::common::uuid()
 {
@@ -420,14 +366,14 @@ std::vector<std::string> ignition::common::split(const std::string &_str,
 void ignition::common::ltrim(std::string &_s)
 {
   _s.erase(_s.begin(), std::find_if(_s.begin(), _s.end(),
-        std::not1(std::ptr_fun<int, int>(std::isspace))));
+        [](int c) {return !std::isspace(c);}));
 }
 
 /////////////////////////////////////////////////
 void ignition::common::rtrim(std::string &_s)
 {
   _s.erase(std::find_if(_s.rbegin(), _s.rend(),
-        std::not1(std::ptr_fun<int, int>(std::isspace))).base(),
+        [](int c) {return !std::isspace(c);}).base(),
       _s.end());
 }
 

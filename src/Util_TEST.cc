@@ -72,28 +72,21 @@ TEST(Util_TEST, SHA1)
 TEST(Util_TEST, Hash64)
 {
   // Do not forget to update 'precomputedHash' if you modify the string input.
-  uint64_t precomputedHash;
-  uint64_t computedHash;
-  std::string s;
-
-  // Compute the hash64 of a string.
-  s = "Look at this. It’s worthless — ten dollars from a vendor in the street. "
+  {
+    constexpr auto computedHash = common::hash64(
+      "Look at this. It’s worthless — ten dollars from a vendor in the street. "
       "But I take it, I bury it in the sand for a thousand years, it becomes "
-      "priceless. Like the Ark.";
-  computedHash = common::hash64(s);
-  precomputedHash = 10992298837217494943U;
-  EXPECT_EQ(precomputedHash, computedHash);
+      "priceless. Like the Ark.");
+    uint64_t precomputedHash = 5217348260923471204U;
+    EXPECT_EQ(precomputedHash, computedHash);
+  }
 
-  // The result should be different if we use another seed.
-  uint64_t seed = 6;
-  uint64_t otherComputedHash = common::hash64(s, seed);
-  EXPECT_NE(precomputedHash, otherComputedHash);
-
-  // Compute the hash64 of an empty string
-  s = "";
-  computedHash = common::hash64(s);
-  precomputedHash = 0;
-  EXPECT_EQ(precomputedHash, computedHash);
+  // Compute the hash64 of an empty string.
+  {
+    constexpr auto computedHash = common::hash64("");
+    uint64_t precomputedHash = 14695981039346656037U;
+    EXPECT_EQ(precomputedHash, computedHash);
+  }
 }
 
 /////////////////////////////////////////////////
