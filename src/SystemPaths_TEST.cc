@@ -116,6 +116,24 @@ TEST_F(SystemPathsFixture, FileSystemPaths)
   paths.ClearFilePaths();
 
   EXPECT_EQ(static_cast<unsigned int>(0), paths.FilePaths().size());
+
+  std::string dir1 = "test_dir1";
+  ignition::common::createDirectories(dir1);
+  std::string file1 = ignition::common::joinPaths(dir1, "test_f1");
+  std::ofstream fout;
+  fout.open(file1, std::ofstream::out);
+  fout << "asdf";
+  fout.close();
+
+  EXPECT_EQ("", paths.FindFile("no_such_file"));
+  EXPECT_EQ("", paths.FindFile("test_f1"));
+  env_str += ignition::common::SystemPaths::Delimiter();
+  env_str += "test_dir1";
+
+  snprintf(env, sizeof(env), "%s", env_str.c_str());
+  putenv(env);
+  paths.SetFilePathEnv("IGN_FILE_PATH");
+  EXPECT_EQ(file1, paths.FindFile("test_f1")) << paths.FindFile("test_f1");
 }
 
 /////////////////////////////////////////////////

@@ -408,6 +408,7 @@ std::string SystemPaths::FindFile(const std::string &_filename,
       if (exists(joinPaths(filePath, filename)))
       {
         path = joinPaths(filePath, filename);
+        ignition::common::replaceAll(path, path, "//", "/");
         break;
       }
     }
