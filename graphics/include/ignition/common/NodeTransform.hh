@@ -38,6 +38,10 @@ namespace ignition
       /// \param[in] _type the type of transform
       public: explicit NodeTransform(const NodeTransformType _type = MATRIX);
 
+      /// \brief Copy constructor
+      /// \param[in] _other NodeTransform to copy
+      public: NodeTransform(const NodeTransform &_other);
+
       /// \brief Constructor
       /// \param[in] _mat the matrix
       /// \param[in] _sid identifier
@@ -113,7 +117,7 @@ namespace ignition
       public: math::Matrix4d operator*(const math::Matrix4d &_m) const;
 
       /// \brief Data pointer
-      private: NodeTransformPrivate *data;
+      private: std::unique_ptr<NodeTransformPrivate> data;
     };
   }
 }

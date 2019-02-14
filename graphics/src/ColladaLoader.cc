@@ -98,13 +98,16 @@ namespace ignition
       public: std::map<std::string, std::map<unsigned int, unsigned int> >
           texcoordDuplicateMap;
 
+      /// \brief Current scene being parsed
+      public: tinyxml2::XMLElement *currentScene = nullptr;
+
       /// \brief Load a controller instance
       /// \param[in] _contrXml Pointer to the control XML instance
       /// \param[in] _skelXml Pointer the skeleton xml instance
       /// \param[in] _transform A tranform to apply
       /// \param[in,out] _mesh The mesh being loaded
       public: void LoadController(tinyxml2::XMLElement *_contrXml,
-                                   tinyxml2::XMLElement *_skelXml,
+                                   std::vector<tinyxml2::XMLElement*> _skelXmls,
                                    const ignition::math::Matrix4d &_transform,
                                    Mesh *_mesh);
 
@@ -273,6 +276,18 @@ namespace ignition
       /// \param[out] _mat Material to hold the transparent properties
       public: void LoadTransparent(tinyxml2::XMLElement *_elem,
                                     MaterialPtr _mat);
+
+      /// \brief Merges a new root node to the skeleton
+      /// \details This will do 1 of the things:
+      ///     1: If `_mergeNode` is already part of the skeleton, do nothing
+      ///     2: If the skeleton's root is a descendent of `_mergeNode`, sets
+      ///         the new root node as `_mergeNode`
+      ///     3: If the skeleton and `_mergeNode` is unrelated, creates a new
+      ///         dummy root and adds both of them as childrens.
+      /// \param[in] _skeleton skeleton to merge
+      /// \param[in] _mergeNode new root node to merge
+      public: void MergeSkeleton(SkeletonPtr _skeleton,
+          SkeletonNode *_mergeNode);
     };
 
     /// \brief Helper data structure for loading collada geometries.
@@ -391,6 +406,8 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
   // This will make the model the correct size.
   mesh->Scale(ignition::math::Vector3d(
       this->dataPtr->meter, this->dataPtr->meter, this->dataPtr->meter));
+  if (mesh->HasSkeleton())
+    mesh->MeshSkeleton()->Scale(this->dataPtr->meter);
 
   return mesh;
 }
@@ -403,6 +420,7 @@ void ColladaLoaderPrivate::LoadScene(Mesh *_mesh)
       sceneXml->FirstChildElement("instance_visual_scene")->Attribute("url");
 
   tinyxml2::XMLElement *visSceneXml = this->ElementId("visual_scene", sceneURL);
+  this->currentScene = visSceneXml;
 
   if (!visSceneXml)
   {
@@ -493,11 +511,6 @@ void ColladaLoaderPrivate::LoadNode(tinyxml2::XMLElement *_elem, Mesh *_mesh,
     std::string contrURL = instContrXml->Attribute("url");
     tinyxml2::XMLElement *contrXml = this->ElementId("controller", contrURL);
 
-    tinyxml2::XMLElement *instSkelXml =
-        instContrXml->FirstChildElement("skeleton");
-    std::string rootURL = instSkelXml->GetText();
-    tinyxml2::XMLElement *rootNodeXml = this->ElementId("node", rootURL);
-
     this->materialMap.clear();
     tinyxml2::XMLElement *bindMatXml, *techniqueXml, *matXml;
     bindMatXml = instContrXml->FirstChildElement("bind_material");
@@ -517,7 +530,27 @@ void ColladaLoaderPrivate::LoadNode(tinyxml2::XMLElement *_elem, Mesh *_mesh,
       bindMatXml = bindMatXml->NextSiblingElement("bind_material");
     }
 
-    this->LoadController(contrXml, rootNodeXml, transform, _mesh);
+    std::vector<tinyxml2::XMLElement*> rootNodeXmls;
+    for (tinyxml2::XMLElement *skelXml =
+        instContrXml->FirstChildElement("skeleton"); skelXml;
+        skelXml = skelXml->NextSiblingElement("skeleton"))
+    {
+      std::string rootURL = skelXml->GetText();
+      rootNodeXmls.emplace_back(this->ElementId(currentScene,
+          "node", rootURL));
+    }
+    // no skeleton tag present, assume whole scene is a skeleton
+    if (rootNodeXmls.empty())
+    {
+      for (tinyxml2::XMLElement *child =
+          this->currentScene->FirstChildElement();
+          child; child = child->NextSiblingElement())
+      {
+        rootNodeXmls.emplace_back(child);
+      }
+    }
+
+    this->LoadController(contrXml, rootNodeXmls, transform, _mesh);
     instContrXml = instContrXml->NextSiblingElement("instance_controller");
   }
 }
@@ -590,18 +623,10 @@ ignition::math::Matrix4d ColladaLoaderPrivate::LoadNodeTransform(
 
 /////////////////////////////////////////////////
 void ColladaLoaderPrivate::LoadController(tinyxml2::XMLElement *_contrXml,
-    tinyxml2::XMLElement *_skelXml, const ignition::math::Matrix4d &_transform,
+    std::vector<tinyxml2::XMLElement*> _skelXmls,
+    const ignition::math::Matrix4d &_transform,
     Mesh *_mesh)
 {
-  SkeletonPtr skeleton(new Skeleton(this->LoadSkeletonNodes(_skelXml, NULL)));
-  _mesh->SetSkeleton(skeleton);
-
-  tinyxml2::XMLElement *rootXml = _contrXml->GetDocument()->RootElement();
-
-  if (rootXml->FirstChildElement("library_animations"))
-    this->LoadAnimations(rootXml->FirstChildElement("library_animations"),
-        skeleton);
-
   tinyxml2::XMLElement *skinXml = _contrXml->FirstChildElement("skin");
   std::string geomURL = skinXml->Attribute("source");
 
@@ -616,8 +641,6 @@ void ColladaLoaderPrivate::LoadController(tinyxml2::XMLElement *_contrXml,
                 values[4], values[5], values[6], values[7],
                 values[8], values[9], values[10], values[11],
                 values[12], values[13], values[14], values[15]);
-
-  skeleton->SetBindShapeTransform(bindTrans);
 
   tinyxml2::XMLElement *jointsXml = skinXml->FirstChildElement("joints");
   std::string jointsURL, invBindMatURL;
@@ -646,7 +669,32 @@ void ColladaLoaderPrivate::LoadController(tinyxml2::XMLElement *_contrXml,
 
   std::string jointsStr = jointsXml->FirstChildElement("Name_array")->GetText();
 
-  std::vector<std::string> joints = split(jointsStr, " \r\n");
+  std::vector<std::string> joints = split(jointsStr, " \t\r\n");
+
+  // Load the skeleton
+  SkeletonPtr skeleton = nullptr;
+  if (_mesh->HasSkeleton())
+    skeleton = _mesh->MeshSkeleton();
+  for (tinyxml2::XMLElement *rootNodeXml : _skelXmls)
+  {
+    SkeletonNode *rootSkelNode =
+        this->LoadSkeletonNodes(rootNodeXml, nullptr);
+    if (skeleton)
+      this->MergeSkeleton(skeleton, rootSkelNode);
+    else
+    {
+      skeleton = SkeletonPtr(new Skeleton(rootSkelNode));
+      _mesh->SetSkeleton(skeleton);
+    }
+  }
+  skeleton->SetBindShapeTransform(bindTrans);
+
+  tinyxml2::XMLElement *rootXml = _contrXml->GetDocument()->RootElement();
+  if (rootXml->FirstChildElement("library_animations"))
+  {
+    this->LoadAnimations(rootXml->FirstChildElement("library_animations"),
+        skeleton);
+  }
 
   tinyxml2::XMLElement *invBMXml = this->ElementId("source", invBindMatURL);
 
@@ -658,7 +706,7 @@ void ColladaLoaderPrivate::LoadController(tinyxml2::XMLElement *_contrXml,
 
   std::string posesStr = invBMXml->FirstChildElement("float_array")->GetText();
 
-  std::vector<std::string> strs = split(posesStr, " \r\n");
+  std::vector<std::string> strs = split(posesStr, " \t\r\n");
 
   for (unsigned int i = 0; i < joints.size(); ++i)
   {
@@ -682,6 +730,7 @@ void ColladaLoaderPrivate::LoadController(tinyxml2::XMLElement *_contrXml,
             ignition::math::parseFloat(strs[id + 15]));
 
     skeleton->NodeByName(joints[i])->SetInverseBindTransform(mat);
+    skeleton->NodeByName(joints[i])->SetModelTransform(mat.Inverse(), false);
   }
 
   tinyxml2::XMLElement *vertWeightsXml =
@@ -715,7 +764,7 @@ void ColladaLoaderPrivate::LoadController(tinyxml2::XMLElement *_contrXml,
   tinyxml2::XMLElement *weightsXml = this->ElementId("source", weightsURL);
 
   std::string wString = weightsXml->FirstChildElement("float_array")->GetText();
-  std::vector<std::string> wStrs = split(wString, " \r\n");
+  std::vector<std::string> wStrs = split(wString, " \t\r\n");
 
   std::vector<float> weights;
   for (unsigned int i = 0; i < wStrs.size(); ++i)
@@ -723,8 +772,8 @@ void ColladaLoaderPrivate::LoadController(tinyxml2::XMLElement *_contrXml,
 
   std::string cString = vertWeightsXml->FirstChildElement("vcount")->GetText();
   std::string vString = vertWeightsXml->FirstChildElement("v")->GetText();
-  std::vector<std::string> vCountStrs = split(cString, " \r\n");
-  std::vector<std::string> vStrs = split(vString, " \r\n");
+  std::vector<std::string> vCountStrs = split(cString, " \t\r\n");
+  std::vector<std::string> vStrs = split(vString, " \t\r\n");
 
   std::vector<unsigned int> vCount;
   std::vector<unsigned int> v;
@@ -762,7 +811,7 @@ void ColladaLoaderPrivate::LoadAnimations(tinyxml2::XMLElement *_xml,
     while (childXml)
     {
       this->LoadAnimationSet(childXml, _skel);
-      childXml->NextSiblingElement("animation");
+      childXml = childXml->NextSiblingElement("animation");
     }
   }
   else
@@ -858,7 +907,7 @@ void ColladaLoaderPrivate::LoadAnimationSet(tinyxml2::XMLElement *_xml,
       tinyxml2::XMLElement *timeArray =
           frameTimesXml->FirstChildElement("float_array");
       std::string timeStr = timeArray->GetText();
-      std::vector<std::string> timeStrs = split(timeStr, " \r\n");
+      std::vector<std::string> timeStrs = split(timeStr, " \t\r\n");
 
       std::vector<double> times;
       for (unsigned int i = 0; i < timeStrs.size(); ++i)
@@ -867,7 +916,7 @@ void ColladaLoaderPrivate::LoadAnimationSet(tinyxml2::XMLElement *_xml,
       tinyxml2::XMLElement *output =
           frameTransXml->FirstChildElement("float_array");
       std::string outputStr = output->GetText();
-      std::vector<std::string> outputStrs = split(outputStr, " \r\n");
+      std::vector<std::string> outputStrs = split(outputStr, " \t\r\n");
 
       std::vector<double> values;
       for (unsigned int i = 0; i < outputStrs.size(); ++i)
@@ -880,13 +929,36 @@ void ColladaLoaderPrivate::LoadAnimationSet(tinyxml2::XMLElement *_xml,
       unsigned int stride =
         ignition::math::parseInt(accessor->Attribute("stride"));
 
+      SkeletonNode *targetNode = _skel->NodeById(targetBone);
+      if (targetNode == nullptr)
+      {
+        tinyxml2::XMLElement *targetNodeXml =
+            this->ElementId("node", targetBone);
+        if (targetNodeXml == nullptr)
+        {
+          ignerr << "Failed to load animation, '" << targetBone << "' not found"
+              << std::endl;
+          return;
+        }
+        targetNode = this->LoadSkeletonNodes(targetNodeXml, nullptr);
+        this->MergeSkeleton(_skel, targetNode);
+      }
+
+      // In COLLOADA, `target` is specified to be the `id` of a node, however
+      // the nodes are identified by `name` in this loader. Here, we resolve
+      // `targetBone` to the node's `name` to prevent missing animations.
+      std::string targetBoneName = targetNode->Name();
       for (unsigned int i = 0; i < times.size(); ++i)
       {
-        if (animation[targetBone].find(times[i]) == animation[targetBone].end())
-          animation[targetBone][times[i]] =
+        if (animation[targetBoneName].find(times[i]) ==
+            animation[targetBoneName].end())
+        {
+          animation[targetBoneName][times[i]] =
                       _skel->NodeById(targetBone)->Transforms();
+        }
 
-        std::vector<NodeTransform> *frame = &animation[targetBone][times[i]];
+        std::vector<NodeTransform> *frame =
+            &animation[targetBoneName][times[i]];
 
         for (unsigned int j = 0; j < (*frame).size(); ++j)
         {
@@ -994,7 +1066,8 @@ void ColladaLoaderPrivate::SetSkeletonNodeTransform(tinyxml2::XMLElement *_elem,
       transform.SetTranslation(translate);
 
       NodeTransform nt(transform);
-      if (_elem->FirstChildElement("translate")->Attribute("sid"))
+      tinyxml2::XMLElement *matrix = _elem->FirstChildElement("matrix");
+      if (matrix && matrix->Attribute("sid"))
         nt.SetSID(_elem->FirstChildElement("translate")->Attribute("sid"));
       nt.SetType(NodeTransformType::TRANSLATE);
       nt.SetSourceValues(translate);
@@ -1039,7 +1112,8 @@ void ColladaLoaderPrivate::SetSkeletonNodeTransform(tinyxml2::XMLElement *_elem,
       scaleMat.Scale(scale);
 
       NodeTransform nt(scaleMat);
-      if (_elem->FirstChildElement("matrix")->Attribute("sid"))
+      tinyxml2::XMLElement *matrix = _elem->FirstChildElement("matrix");
+      if (matrix && matrix->Attribute("sid"))
         nt.SetSID(_elem->FirstChildElement("matrix")->Attribute("sid"));
       nt.SetType(NodeTransformType::SCALE);
       nt.SetSourceValues(scale);
@@ -1224,7 +1298,7 @@ void ColladaLoaderPrivate::LoadPositions(const std::string &_id,
       unsigned int, Vector3Hash> unique;
 
   std::vector<std::string>::iterator iter, end;
-  std::vector<std::string> strs = split(valueStr, " \r\n");
+  std::vector<std::string> strs = split(valueStr, " \t\r\n");
   end = strs.end();
   for (iter = strs.begin(); iter != end; iter += 3)
   {
@@ -1455,7 +1529,7 @@ void ColladaLoaderPrivate::LoadTexCoords(const std::string &_id,
 
   // Read the raw texture values, and split them on spaces.
   std::string valueStr = floatArrayXml->GetText();
-  std::vector<std::string> values = split(valueStr, " \r\n");
+  std::vector<std::string> values = split(valueStr, " \t\r\n");
 
   // Read in all the texture coordinates.
   for (int i = 0; i < totCount; i += stride)
@@ -1778,7 +1852,7 @@ void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
   //   e.g. if vcount = 4, break into triangle 1: [0,1,2], triangle 2: [0,2,3]
   tinyxml2::XMLElement *vcountXml = _polylistXml->FirstChildElement("vcount");
   std::string vcountStr = vcountXml->GetText();
-  std::vector<std::string> vcountStrs = split(vcountStr, " \r\n");
+  std::vector<std::string> vcountStrs = split(vcountStr, " \t\r\n");
   std::vector<int> vcounts;
   for (unsigned int j = 0; j < vcountStrs.size(); ++j)
     vcounts.push_back(math::parseInt(vcountStrs[j]));
@@ -1793,7 +1867,7 @@ void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
   unsigned int *values = new unsigned int[inputSize];
   memset(values, 0, inputSize);
 
-  std::vector<std::string> strs = split(pStr, " \r\n");
+  std::vector<std::string> strs = split(pStr, " \t\r\n");
   std::vector<std::string>::iterator strs_iter = strs.begin();
   for (unsigned int l = 0; l < vcounts.size(); ++l)
   {
@@ -2120,7 +2194,7 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
   std::map<unsigned int, std::vector<GeometryIndices> > vertexIndexMap;
 
   unsigned int *values = new unsigned int[offsetSize];
-  std::vector<std::string> strs = split(pStr, " \r\n");
+  std::vector<std::string> strs = split(pStr, " \t\r\n");
 
   for (unsigned int j = 0; j < strs.size(); j += offsetSize)
   {
@@ -2327,7 +2401,12 @@ void ColladaLoaderPrivate::LoadTransparent(tinyxml2::XMLElement *_elem,
   // https://www.khronos.org/files/collada_spec_1_5.pdf
   // Determining Transparency (Opacity) section:
   // opaque modes: RGB_ZERO, RGB_ONE, A_ONE
-  if (_elem->FirstChildElement("color"))
+  if (_elem->FirstChildElement("texture"))
+  {
+    ignwarn << "texture based transparency not supported" << std::endl;
+    _mat->SetTransparency(0.0);
+  }
+  else if (_elem->FirstChildElement("color"))
   {
     const char *colorCStr = _elem->FirstChildElement("color")->GetText();
     if (!colorCStr)
@@ -2402,4 +2481,40 @@ void ColladaLoaderPrivate::LoadTransparent(tinyxml2::XMLElement *_elem,
 
     _mat->SetBlendFactors(srcFactor, dstFactor);
   }
+}
+
+/////////////////////////////////////////////////
+void ColladaLoaderPrivate::MergeSkeleton(SkeletonPtr _skeleton,
+    SkeletonNode *_mergeNode)
+{
+  if (_skeleton->NodeById(_mergeNode->Id()))
+    return;
+
+  SkeletonNode *currentRoot = _skeleton->RootNode();
+  if (currentRoot->Id() == _mergeNode->Id())
+    return;
+
+  if (_mergeNode->ChildById(currentRoot->Id()))
+  {
+    _skeleton->RootNode(_mergeNode);
+    return;
+  }
+
+  SkeletonNode *dummyRoot = nullptr;
+  if (currentRoot->Id() == "dummy-root")
+    dummyRoot = currentRoot;
+  else
+  {
+    dummyRoot =
+        new SkeletonNode(nullptr, "dummy-root", "dummy-root");
+  }
+  if (dummyRoot != currentRoot)
+  {
+    dummyRoot->AddChild(currentRoot);
+    currentRoot->SetParent(dummyRoot);
+  }
+  dummyRoot->AddChild(_mergeNode);
+  _mergeNode->SetParent(dummyRoot);
+  dummyRoot->SetTransform(math::Matrix4d::Identity);
+  _skeleton->RootNode(dummyRoot);
 }
