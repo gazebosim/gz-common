@@ -28,6 +28,8 @@ release will remove the deprecated code.
 1. Depends on **ignition-cmake2**
     + Ignition-common now depends on ignition-cmake2.
 
+1. Requires c++17.
+
 ## Ignition Common 1.X to 2.X
 
 ### Modifications
