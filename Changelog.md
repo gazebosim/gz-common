@@ -37,6 +37,9 @@
     * [Pull request 175](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/175)
     * [Issue 44](https://bitbucket.org/ignitionrobotics/ign-common/issue/44)
 
+1. NodeTransform: use unique_ptr for private data, add copy constructor/assignment
+    * [Pull request 181](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/181)
+
 ## Ignition Common 2.x
 
 ## Ignition Common 2.x.x (2018-XX-XX)
