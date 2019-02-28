@@ -42,6 +42,10 @@ namespace ignition
       /// \param[in] _other NodeTransform to copy
       public: NodeTransform(const NodeTransform &_other);
 
+      /// \brief Copy assignment
+      /// \param[in] _ther NodeTransform to copy
+      public: NodeTransform &operator=(const NodeTransform &_other);
+
       /// \brief Constructor
       /// \param[in] _mat the matrix
       /// \param[in] _sid identifier

@@ -62,10 +62,14 @@ NodeTransform::NodeTransform(const NodeTransform &_other)
 }
 
 //////////////////////////////////////////////////
-NodeTransform::~NodeTransform()
+NodeTransform &NodeTransform::operator=(const NodeTransform &_other)
 {
-  // do nothing
+  this->data.reset(new NodeTransformPrivate(*_other.data));
+  return *this;
 }
+
+//////////////////////////////////////////////////
+NodeTransform::~NodeTransform() = default;
 
 //////////////////////////////////////////////////
 void NodeTransform::Set(const math::Matrix4d &_mat)
