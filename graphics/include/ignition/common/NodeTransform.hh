@@ -16,6 +16,7 @@
 */
 #ifndef IGNITION_COMMON_NODE_TRANSFORM_HH_
 #define IGNITION_COMMON_NODE_TRANSFORM_HH_
+#include <memory>
 #include <string>
 
 #include <ignition/math/Matrix4.hh>
@@ -120,8 +121,10 @@ namespace ignition
       /// \return transform matrix multiplied by _m
       public: math::Matrix4d operator*(const math::Matrix4d &_m) const;
 
+      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Data pointer
       private: std::unique_ptr<NodeTransformPrivate> data;
+      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
     };
   }
 }

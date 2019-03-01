@@ -1,16 +1,50 @@
 ## Ignition Common 3.x
 
+## Ignition Common 3.x.x (2018-XX-XX)
+
 ## Ignition Common 3.0.0 (2018-XX-XX)
 
 1. Use ign-cmake2 and support Ubuntu Bionic (18.04).
     * [Pull request 131](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/131)
 
-1. Added hash64 function.
+1. WorkerPool: allow user to set minimum number of worker threads.
+    * [Pull request 151](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/151)
+
+1. ColladaLoader fixes: setting multiple texcoord's, check for line breaks when using `split`
+    * [Pull request 152](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/152)
+    * [Pull request 157](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/157)
+
+1. Event: replace `operator()` and `Signal()` explicit templates with variadic templates and perfect forwarding.
+    * [Pull request 156](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/156)
+
+1. Event: use second template argument to disambiguate events with matching signatures.
+    * [Pull request 164](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/164)
+    * [Pull request 166](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/166)
+
+1. Add profiler using Remotery.
+    * [Pull request 162](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/162)
+    * [Pull request 169](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/169)
+
+1. Added hash64 function for converting `std::string` to `uint64_t` as `constexpr`.
     * [Pull request 170](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/170)
+    * [Pull request 171](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/171)
+    * [Pull request 172](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/172)
+
+1. SystemPaths: search paths in `IGN_FILE_PATH` environment variable when finding files
+    * [Pull request 175](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/175)
+
+1. `Time::Sleep`: return amount of time actually slept
+    * [Pull request 175](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/175)
+    * [Issue 44](https://bitbucket.org/ignitionrobotics/ign-common/issue/44)
+
+1. NodeTransform: use unique_ptr for private data, add copy constructor/assignment
+    * [Pull request 181](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/181)
 
 ## Ignition Common 2.x
 
-## Ignition Common 2.0.0 (2018-XX-XX)
+## Ignition Common 2.x.x (2018-XX-XX)
+
+## Ignition Common 2.0.0 (2018-02-11)
 
 1. Use ignition-cmake1 and components for av, events, and graphics
     * [Pull request 102](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/102)
@@ -26,6 +60,9 @@
 
 1. Added signal handler class
     * [Pull request 115](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/115)
+
+1. Update tinyobjloader to version that supports triangulating meshes with concave polygons.
+    * [Pull request 160](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/160)
 
 ## Ignition Common 1.x.x (2018-XX-XX)
 
