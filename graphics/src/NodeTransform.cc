@@ -55,11 +55,21 @@ NodeTransform::NodeTransform(const math::Matrix4d &_mat,
 }
 
 //////////////////////////////////////////////////
-NodeTransform::~NodeTransform()
+NodeTransform::NodeTransform(const NodeTransform &_other)
+    : data(new NodeTransformPrivate(*_other.data))
 {
-  delete this->data;
-  this->data = NULL;
+  // do nothing
 }
+
+//////////////////////////////////////////////////
+NodeTransform &NodeTransform::operator=(const NodeTransform &_other)
+{
+  this->data.reset(new NodeTransformPrivate(*_other.data));
+  return *this;
+}
+
+//////////////////////////////////////////////////
+NodeTransform::~NodeTransform() = default;
 
 //////////////////////////////////////////////////
 void NodeTransform::Set(const math::Matrix4d &_mat)
