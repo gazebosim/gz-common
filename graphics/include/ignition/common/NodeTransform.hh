@@ -16,6 +16,7 @@
 */
 #ifndef IGNITION_COMMON_NODE_TRANSFORM_HH_
 #define IGNITION_COMMON_NODE_TRANSFORM_HH_
+#include <memory>
 #include <string>
 
 #include <ignition/math/Matrix4.hh>
@@ -37,6 +38,14 @@ namespace ignition
       /// \brief Constructor
       /// \param[in] _type the type of transform
       public: explicit NodeTransform(const NodeTransformType _type = MATRIX);
+
+      /// \brief Copy constructor
+      /// \param[in] _other NodeTransform to copy
+      public: NodeTransform(const NodeTransform &_other);
+
+      /// \brief Copy assignment
+      /// \param[in] _ther NodeTransform to copy
+      public: NodeTransform &operator=(const NodeTransform &_other);
 
       /// \brief Constructor
       /// \param[in] _mat the matrix
@@ -112,8 +121,10 @@ namespace ignition
       /// \return transform matrix multiplied by _m
       public: math::Matrix4d operator*(const math::Matrix4d &_m) const;
 
+      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Data pointer
-      private: NodeTransformPrivate *data;
+      private: std::unique_ptr<NodeTransformPrivate> data;
+      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
     };
   }
 }
