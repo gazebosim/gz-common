@@ -55,6 +55,10 @@ namespace ignition
       /// \param[in] _voltage Initial voltage of the battery
       public: Battery(const std::string &_name, const double _voltage);
 
+      /// \brief Copy constructor
+      /// \param[in] _battery Battery to copy.
+      public: Battery(const Battery &_battery);
+
       /// \brief Destructor.
       public: virtual ~Battery();
 

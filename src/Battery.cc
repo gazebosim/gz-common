@@ -64,6 +64,27 @@ Battery::Battery(const std::string &_name, const double _voltage)
 }
 
 /////////////////////////////////////////////////
+Battery::Battery(const Battery &_battery)
+  : dataPtr(new BatteryPrivate)
+{
+  this->dataPtr->initVoltage = _battery.dataPtr->initVoltage;
+  this->dataPtr->realVoltage = _battery.dataPtr->realVoltage;
+
+  this->dataPtr->powerLoads.clear();
+  for (auto& load : _battery.dataPtr->powerLoads)
+  {
+    this->dataPtr->powerLoads.insert(std::pair<uint32_t, double>(
+      load.first, load.second));
+  }
+
+  this->dataPtr->powerLoadCounter = _battery.dataPtr->powerLoadCounter;
+  this->dataPtr->updateFunc = _battery.dataPtr->updateFunc;
+
+  this->dataPtr->name = _battery.dataPtr->name;
+  // Mutex neither copyable nor movable.
+}
+
+/////////////////////////////////////////////////
 Battery::~Battery()
 {
 }
