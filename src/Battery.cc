@@ -15,6 +15,8 @@
  *
 */
 
+#include <math.h>
+
 #include <ignition/common/Console.hh>
 #include <ignition/common/Battery.hh>
 
@@ -90,6 +92,16 @@ Battery::~Battery()
 }
 
 /////////////////////////////////////////////////
+bool Battery::operator==(const Battery &_battery) const
+{
+  if (_battery.Name() == this->Name() &&
+    fabs(_battery.InitVoltage() - this->InitVoltage()) < 1e-6)
+    return true;
+  else
+    return false;
+}
+
+/////////////////////////////////////////////////
 void Battery::Init()
 {
   this->ResetVoltage();
@@ -100,6 +112,12 @@ void Battery::Init()
 void Battery::ResetVoltage()
 {
   this->dataPtr->realVoltage = std::max(0.0, this->dataPtr->initVoltage);
+}
+
+//////////////////////////////////////////////////
+double Battery::InitVoltage() const
+{
+  return this->dataPtr->initVoltage;
 }
 
 //////////////////////////////////////////////////

@@ -62,6 +62,11 @@ namespace ignition
       /// \brief Destructor.
       public: virtual ~Battery();
 
+      /// \brief Equal to operator
+      /// \param[in] _battery the battery to compare to
+      /// \return true if names are the same, false otherwise
+      public: bool operator==(const Battery &_battery) const;
+
       /// \brief Initialize.
       public: virtual void Init();
 
@@ -69,6 +74,10 @@ namespace ignition
       /// The initial value might have been loaded from an sdf element.
       /// \sa Load
       public: virtual void ResetVoltage();
+
+      /// \brief Return the initial voltage.
+      /// \return The initial voltage.
+      public: virtual double InitVoltage() const;
 
       /// \brief Set the initial voltage
       /// \param[in] _voltage Initial voltage.
@@ -143,6 +152,10 @@ namespace ignition
       private: std::unique_ptr<BatteryPrivate> dataPtr;
       IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
     };
+
+    /// \def ElementPtr
+    /// \brief Shared pointer to an SDF Element
+    typedef std::shared_ptr<Battery> BatteryPtr;
   }
 }
 #endif
