@@ -133,6 +133,11 @@ namespace ignition
       public: void SetUpdateFunc(
                   std::function<double (Battery *)> _updateFunc);
 
+      /// \brief Reset function to update voltage, upon destruction of current
+      /// callback function.
+      /// \sa UpdateDefault
+      public: void ResetUpdateFunc();
+
       /// \brief Update the battery. This will in turn trigger the function
       /// set using the SetUpdateFunc function.
       /// \sa SetUpdateFunc.

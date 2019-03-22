@@ -234,3 +234,10 @@ void Battery::SetUpdateFunc(
 {
   this->dataPtr->updateFunc = _updateFunc;
 }
+
+/////////////////////////////////////////////////
+void Battery::ResetUpdateFunc()
+{
+  this->SetUpdateFunc(std::bind(&Battery::UpdateDefault, this,
+        std::placeholders::_1));
+}
