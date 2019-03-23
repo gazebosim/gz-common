@@ -64,7 +64,8 @@ namespace ignition
 
       /// \brief Equal to operator
       /// \param[in] _battery the battery to compare to
-      /// \return true if names are the same, false otherwise
+      /// \return true if names and initial voltages are the same, false
+      /// otherwise
       public: bool operator==(const Battery &_battery) const;
 
       /// \brief Initialize.
