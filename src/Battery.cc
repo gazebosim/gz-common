@@ -15,7 +15,7 @@
  *
 */
 
-#include <math.h>
+#include <cmath>
 
 #include <ignition/common/Console.hh>
 #include <ignition/common/Battery.hh>
@@ -87,6 +87,27 @@ Battery::Battery(const Battery &_battery)
 }
 
 /////////////////////////////////////////////////
+Battery &Battery::operator=(const Battery &_battery)
+{
+  this->dataPtr->initVoltage = _battery.dataPtr->initVoltage;
+  this->dataPtr->realVoltage = _battery.dataPtr->realVoltage;
+
+  this->dataPtr->powerLoads.clear();
+  for (auto& load : _battery.dataPtr->powerLoads)
+  {
+    this->dataPtr->powerLoads.insert(std::pair<uint32_t, double>(
+      load.first, load.second));
+  }
+
+  this->dataPtr->powerLoadCounter = _battery.dataPtr->powerLoadCounter;
+  this->dataPtr->updateFunc = _battery.dataPtr->updateFunc;
+
+  this->dataPtr->name = _battery.dataPtr->name;
+  // Mutex neither copyable nor movable.
+  return *this;
+}
+
+/////////////////////////////////////////////////
 Battery::~Battery()
 {
 }
@@ -95,7 +116,7 @@ Battery::~Battery()
 bool Battery::operator==(const Battery &_battery) const
 {
   if (_battery.Name() == this->Name() &&
-    fabs(_battery.InitVoltage() - this->InitVoltage()) < 1e-6)
+    abs(_battery.InitVoltage() - this->InitVoltage()) < 1e-6)
     return true;
   else
     return false;

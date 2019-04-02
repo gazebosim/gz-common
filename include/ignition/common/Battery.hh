@@ -59,6 +59,11 @@ namespace ignition
       /// \param[in] _battery Battery to copy.
       public: Battery(const Battery &_battery);
 
+      /// \brief Assignment operator
+      /// \param[in] _battery The new battery
+      /// \return a reference to this instance
+      public: Battery &operator=(const Battery &_battery);
+
       /// \brief Destructor.
       public: virtual ~Battery();
 
@@ -78,7 +83,7 @@ namespace ignition
 
       /// \brief Return the initial voltage.
       /// \return The initial voltage.
-      public: virtual double InitVoltage() const;
+      public: double InitVoltage() const;
 
       /// \brief Set the initial voltage
       /// \param[in] _voltage Initial voltage.
