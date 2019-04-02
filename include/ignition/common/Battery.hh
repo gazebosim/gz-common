@@ -164,8 +164,8 @@ namespace ignition
       IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
     };
 
-    /// \def ElementPtr
-    /// \brief Shared pointer to an SDF Element
+    /// \def BatteryPtr
+    /// \brief Shared pointer to a battery
     typedef std::shared_ptr<Battery> BatteryPtr;
   }
 }
