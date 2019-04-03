@@ -405,9 +405,9 @@ std::string SystemPaths::FindFile(const std::string &_filename,
   {
     for (const std::string &filePath : this->dataPtr->filePaths)
     {
-      if (exists(joinPaths(filePath, filename)))
+      if (exists(NormalizeDirectoryPath(filePath) + filename))
       {
-        path = joinPaths(filePath, filename);
+        path = NormalizeDirectoryPath(filePath) + filename;
         ignition::common::replaceAll(path, path, "//", "/");
         break;
       }
