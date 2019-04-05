@@ -26,11 +26,43 @@ class BatteryTest : public ignition::testing::AutoLogFixture { };
 TEST_F(BatteryTest, Construction)
 {
   // Create the battery
-  std::unique_ptr<common::Battery> battery(new common::Battery());
-  EXPECT_TRUE(battery != nullptr);
+  std::unique_ptr<common::Battery> battery1(new common::Battery());
+  EXPECT_TRUE(battery1 != nullptr);
+  EXPECT_DOUBLE_EQ(battery1->Voltage(), 0.0);
+  EXPECT_EQ(battery1->PowerLoads().size(), 0u);
+}
 
-  EXPECT_DOUBLE_EQ(battery->Voltage(), 0.0);
-  EXPECT_EQ(battery->PowerLoads().size(), 0u);
+/////////////////////////////////////////////////
+TEST_F(BatteryTest, CopyConstructor)
+{
+  std::unique_ptr<common::Battery> battery(new common::Battery("battery1",
+    12.0));
+
+  std::unique_ptr<common::Battery> batteryCopied(new common::Battery(*battery));
+  EXPECT_EQ(batteryCopied->Name(), "battery1");
+  EXPECT_DOUBLE_EQ(batteryCopied->InitVoltage(), 12.0);
+}
+
+/////////////////////////////////////////////////
+TEST_F(BatteryTest, EquivalenceOperator)
+{
+  std::unique_ptr<common::Battery> battery(new common::Battery("battery1",
+    12.0));
+  std::unique_ptr<common::Battery> batteryCopied(new common::Battery(*battery));
+
+  EXPECT_TRUE((*battery) == (*batteryCopied));
+}
+
+/////////////////////////////////////////////////
+TEST_F(BatteryTest, AssignmentOperator)
+{
+  std::unique_ptr<common::Battery> battery(new common::Battery("battery1",
+    12.0));
+
+  common::Battery batteryAssigned;
+  batteryAssigned = *battery;
+  EXPECT_EQ(batteryAssigned.Name(), "battery1");
+  EXPECT_DOUBLE_EQ(batteryAssigned.InitVoltage(), 12.0);
 }
 
 /////////////////////////////////////////////////
@@ -40,11 +72,14 @@ TEST_F(BatteryTest, AddConsumer)
   std::unique_ptr<common::Battery> battery(new common::Battery());
   EXPECT_TRUE(battery != nullptr);
 
+  // Invalid consumer ID
+  EXPECT_FALSE(battery->SetPowerLoad(10, 5.0));
+
   uint32_t consumerId = battery->AddConsumer();
   EXPECT_EQ(consumerId, 0u);
   EXPECT_EQ(battery->PowerLoads().size(), 1u);
 
-  battery->SetPowerLoad(consumerId, 5.0);
+  EXPECT_TRUE(battery->SetPowerLoad(consumerId, 5.0));
 
   double powerLoad = 0;
   EXPECT_TRUE(battery->PowerLoad(consumerId, powerLoad));
@@ -182,6 +217,15 @@ TEST_F(BatteryTest, SetUpdateFunc)
     battery->Update();
 
   EXPECT_DOUBLE_EQ(battery->Voltage(), initVoltage + N * fixture.step);
+
+  // Reset update function to default, and expect unchanged voltage
+  double origVolt = battery->Voltage();
+  battery->ResetUpdateFunc();
+
+  for (int i = 0; i < N; ++i)
+    battery->Update();
+
+  EXPECT_DOUBLE_EQ(battery->Voltage(), origVolt);
 }
 
 int main(int argc, char **argv)
