@@ -116,7 +116,7 @@ Battery::~Battery()
 bool Battery::operator==(const Battery &_battery) const
 {
   if (_battery.Name() == this->Name() &&
-    abs(_battery.InitVoltage() - this->InitVoltage()) < 1e-6)
+    std::abs(_battery.InitVoltage() - this->InitVoltage()) < 1e-6)
     return true;
   else
     return false;
