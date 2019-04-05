@@ -28,6 +28,7 @@ TEST_F(BatteryTest, Construction)
   // Create the battery
   std::unique_ptr<common::Battery> battery(new common::Battery());
   EXPECT_TRUE(battery != nullptr);
+
   EXPECT_DOUBLE_EQ(battery->Voltage(), 0.0);
   EXPECT_EQ(battery->PowerLoads().size(), 0u);
 }
