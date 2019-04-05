@@ -250,20 +250,6 @@ TEST_F(BatteryTest, SetUpdateFunc)
     battery->Update();
 
   EXPECT_DOUBLE_EQ(battery->Voltage(), origVolt);
-
-  // Destroy battery
-  common::Battery * batteryDestroyed = new common::Battery();
-  batteryDestroyed->ResetUpdateFunc();
-
-  for (int i = 0; i < N; ++i)
-  {
-    if (batteryDestroyed)
-    {
-      batteryDestroyed->Update();
-      delete batteryDestroyed;
-      batteryDestroyed = nullptr;
-    }
-  }
 }
 
 int main(int argc, char **argv)
