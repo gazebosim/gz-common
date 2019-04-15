@@ -213,6 +213,22 @@ namespace ignition
         const std::string &_path,
         const FilesystemWarningOp _warningOp = FSWO_LOG_WARNINGS);
 
+    /// \brief Generates a path for a file which doesn't collide with existing
+    /// files, by appending numbers to it (i.e. (0), (1), ...)
+    /// \param[in] _pathAndName Full absolute path and file name up to the
+    /// file extension.
+    /// \param[in] _extension File extension, such as "ddf".
+    /// \return Full path with name and extension, which doesn't collide with
+    /// existing files
+    std::string IGNITION_COMMON_VISIBLE uniqueFilePath(
+        const std::string &_pathAndName, const std::string &_extension);
+
+    /// \brief Unique directory path to not overwrite existing directory
+    /// \param[in] _pathAndName Full absolute path
+    /// \return Full path which doesn't collide with existing files
+    std::string IGNITION_COMMON_VISIBLE uniqueDirectoryPath(
+        const std::string &_dir);
+
     /// \internal
     class DirIterPrivate;
 
