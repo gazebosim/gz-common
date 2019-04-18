@@ -304,3 +304,34 @@ bool ignition::common::createDirectories(const std::string &_path)
   return true;
 }
 
+//////////////////////////////////////////////////
+std::string ignition::common::uniqueFilePath(const std::string &_pathAndName,
+  const std::string &_extension)
+{
+  std::string result = _pathAndName + "." + _extension;
+  int count = 1;
+
+  // Check if file exists and change name accordingly
+  while (common::exists(result.c_str()))
+  {
+    result = _pathAndName + "(" + std::to_string(count++) + ").";
+    result += _extension;
+  }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
+std::string ignition::common::uniqueDirectoryPath(const std::string &_dir)
+{
+  std::string result = _dir;
+  int count = 1;
+
+  // Check if file exists and change name accordingly
+  while (common::exists(result.c_str()))
+  {
+    result = _dir + "(" + std::to_string(count++) + ")";
+  }
+
+  return result;
+}
