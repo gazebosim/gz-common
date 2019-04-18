@@ -51,15 +51,18 @@ TEST_F(BatteryTest, EqualToOperator)
     12.0));
   std::unique_ptr<common::Battery> batteryCopied(new common::Battery(*battery));
   EXPECT_TRUE((*battery) == (*batteryCopied));
+  EXPECT_FALSE((*battery) != (*batteryCopied));
 
   // Difference in name
   batteryCopied->SetName("battery2");
   EXPECT_FALSE((*battery) == (*batteryCopied));
+  EXPECT_TRUE((*battery) != (*batteryCopied));
 
   // Difference in initial voltage
   batteryCopied->SetName(battery->Name());
   batteryCopied->SetInitVoltage(battery->InitVoltage() + 1.0);
   EXPECT_FALSE((*battery) == (*batteryCopied));
+  EXPECT_TRUE((*battery) != (*batteryCopied));
 }
 
 /////////////////////////////////////////////////

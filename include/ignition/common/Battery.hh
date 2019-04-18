@@ -73,6 +73,12 @@ namespace ignition
       /// otherwise
       public: bool operator==(const Battery &_battery) const;
 
+      /// \brief Inequality operator
+      /// \param[in] _battery the battery to compare to
+      /// \return true if names or initial voltages are not the same, false
+      /// otherwise
+      public: bool operator!=(const Battery &_battery) const;
+
       /// \brief Initialize.
       public: virtual void Init();
 

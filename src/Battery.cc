@@ -123,6 +123,12 @@ bool Battery::operator==(const Battery &_battery) const
 }
 
 /////////////////////////////////////////////////
+bool Battery::operator!=(const Battery &_battery) const
+{
+  return !(*this == _battery);
+}
+
+/////////////////////////////////////////////////
 void Battery::Init()
 {
   this->ResetVoltage();
