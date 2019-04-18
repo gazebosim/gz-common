@@ -544,10 +544,10 @@ TEST(Filesystem, uniquePaths)
   EXPECT_EQ(fileExistingRt2, newFile + "(2).txt");
 
   // Cleanup
-  EXPECT_TRUE(removeFile(newFileWithExt));
-  EXPECT_TRUE(removeFile(fileExistingRt));
-  EXPECT_TRUE(removeDirectory(dir));
-  EXPECT_TRUE(removeDirectory(dirExistingRt));
+  EXPECT_TRUE(removeFile(newFileWithExt)) << newFileWithExt;
+  EXPECT_TRUE(removeFile(fileExistingRt)) << fileExistingRt;
+  EXPECT_TRUE(removeDirectory(dir)) << dir;
+  EXPECT_TRUE(removeDirectory(dirExistingRt)) << dirExistingRt;
 }
 
 /////////////////////////////////////////////////
