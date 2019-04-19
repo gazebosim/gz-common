@@ -216,7 +216,12 @@ TEST(TimeTest, Sleep)
 {
   common::Time sleepTime(1, 900000000);
   common::Time result = common::Time::Sleep(sleepTime);
+#ifdef _WIN32
+  // Sleep always returns (0 0) on Windows
+  EXPECT_EQ(common::Time::Zero, result);
+#else
   EXPECT_EQ(sleepTime, result);
+#endif
 }
 
 /////////////////////////////////////////////////
