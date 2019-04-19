@@ -5,6 +5,9 @@
 1. Profiler: give hint on osx to find frameworks so it doesn't find them inside Xcode
     * [Pull request 189](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/189)
 
+1. Fix windows tests: SystemPathsFixture.FileSystemPaths and TimeTest.Sleep
+    * [Pull request 188](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/188)
+
 1. Consolidate Console::log streams to reduce colored log size
     * [Pull request 185](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/185)
     * [Issue 47](https://bitbucket.org/ignitionrobotics/ign-common/issue/47)
