@@ -15,6 +15,8 @@
  *
 */
 
+#include <cmath>
+
 #include <ignition/common/Console.hh>
 #include <ignition/common/Battery.hh>
 
@@ -64,8 +66,66 @@ Battery::Battery(const std::string &_name, const double _voltage)
 }
 
 /////////////////////////////////////////////////
+Battery::Battery(const Battery &_battery)
+  : dataPtr(new BatteryPrivate)
+{
+  this->dataPtr->initVoltage = _battery.dataPtr->initVoltage;
+  this->dataPtr->realVoltage = _battery.dataPtr->realVoltage;
+
+  this->dataPtr->powerLoads.clear();
+  for (auto& load : _battery.dataPtr->powerLoads)
+  {
+    this->dataPtr->powerLoads.insert(std::pair<uint32_t, double>(
+      load.first, load.second));
+  }
+
+  this->dataPtr->powerLoadCounter = _battery.dataPtr->powerLoadCounter;
+  this->dataPtr->updateFunc = _battery.dataPtr->updateFunc;
+
+  this->dataPtr->name = _battery.dataPtr->name;
+  // Mutex neither copyable nor movable.
+}
+
+/////////////////////////////////////////////////
+Battery &Battery::operator=(const Battery &_battery)
+{
+  this->dataPtr->initVoltage = _battery.dataPtr->initVoltage;
+  this->dataPtr->realVoltage = _battery.dataPtr->realVoltage;
+
+  this->dataPtr->powerLoads.clear();
+  for (auto& load : _battery.dataPtr->powerLoads)
+  {
+    this->dataPtr->powerLoads.insert(std::pair<uint32_t, double>(
+      load.first, load.second));
+  }
+
+  this->dataPtr->powerLoadCounter = _battery.dataPtr->powerLoadCounter;
+  this->dataPtr->updateFunc = _battery.dataPtr->updateFunc;
+
+  this->dataPtr->name = _battery.dataPtr->name;
+  // Mutex neither copyable nor movable.
+  return *this;
+}
+
+/////////////////////////////////////////////////
 Battery::~Battery()
 {
+}
+
+/////////////////////////////////////////////////
+bool Battery::operator==(const Battery &_battery) const
+{
+  if (_battery.Name() == this->Name() &&
+    std::abs(_battery.InitVoltage() - this->InitVoltage()) < 1e-6)
+    return true;
+  else
+    return false;
+}
+
+/////////////////////////////////////////////////
+bool Battery::operator!=(const Battery &_battery) const
+{
+  return !(*this == _battery);
 }
 
 /////////////////////////////////////////////////
@@ -79,6 +139,12 @@ void Battery::Init()
 void Battery::ResetVoltage()
 {
   this->dataPtr->realVoltage = std::max(0.0, this->dataPtr->initVoltage);
+}
+
+//////////////////////////////////////////////////
+double Battery::InitVoltage() const
+{
+  return this->dataPtr->initVoltage;
 }
 
 //////////////////////////////////////////////////
@@ -194,4 +260,11 @@ void Battery::SetUpdateFunc(
     std::function<double (Battery *)> _updateFunc)
 {
   this->dataPtr->updateFunc = _updateFunc;
+}
+
+/////////////////////////////////////////////////
+void Battery::ResetUpdateFunc()
+{
+  this->SetUpdateFunc(std::bind(&Battery::UpdateDefault, this,
+        std::placeholders::_1));
 }

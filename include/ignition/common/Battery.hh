@@ -55,8 +55,29 @@ namespace ignition
       /// \param[in] _voltage Initial voltage of the battery
       public: Battery(const std::string &_name, const double _voltage);
 
+      /// \brief Copy constructor
+      /// \param[in] _battery Battery to copy.
+      public: Battery(const Battery &_battery);
+
+      /// \brief Assignment operator
+      /// \param[in] _battery The new battery
+      /// \return a reference to this instance
+      public: Battery &operator=(const Battery &_battery);
+
       /// \brief Destructor.
       public: virtual ~Battery();
+
+      /// \brief Equal to operator
+      /// \param[in] _battery the battery to compare to
+      /// \return true if names and initial voltages are the same, false
+      /// otherwise
+      public: bool operator==(const Battery &_battery) const;
+
+      /// \brief Inequality operator
+      /// \param[in] _battery the battery to compare to
+      /// \return true if names or initial voltages are not the same, false
+      /// otherwise
+      public: bool operator!=(const Battery &_battery) const;
 
       /// \brief Initialize.
       public: virtual void Init();
@@ -65,6 +86,10 @@ namespace ignition
       /// The initial value might have been loaded from an sdf element.
       /// \sa Load
       public: virtual void ResetVoltage();
+
+      /// \brief Return the initial voltage.
+      /// \return The initial voltage.
+      public: double InitVoltage() const;
 
       /// \brief Set the initial voltage
       /// \param[in] _voltage Initial voltage.
@@ -120,6 +145,11 @@ namespace ignition
       public: void SetUpdateFunc(
                   std::function<double (Battery *)> _updateFunc);
 
+      /// \brief Reset function to update voltage, upon destruction of current
+      /// callback function.
+      /// \sa UpdateDefault
+      public: void ResetUpdateFunc();
+
       /// \brief Update the battery. This will in turn trigger the function
       /// set using the SetUpdateFunc function.
       /// \sa SetUpdateFunc.
@@ -139,6 +169,10 @@ namespace ignition
       private: std::unique_ptr<BatteryPrivate> dataPtr;
       IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
     };
+
+    /// \def BatteryPtr
+    /// \brief Shared pointer to a battery
+    typedef std::shared_ptr<Battery> BatteryPtr;
   }
 }
 #endif
