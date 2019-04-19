@@ -508,6 +508,57 @@ TEST(Filesystem, createDirectories)
 }
 
 /////////////////////////////////////////////////
+TEST(Filesystem, uniquePaths)
+{
+  // Directory
+  std::string dir = "uniqueDirectory";
+  EXPECT_FALSE(exists(dir));
+  std::string dirRt = uniqueDirectoryPath(dir);
+  EXPECT_EQ(dir, dirRt);
+
+  ASSERT_TRUE(createDirectory(dir));
+  EXPECT_TRUE(exists(dir));
+  std::string dirExistingRt = uniqueDirectoryPath(dir);
+  EXPECT_EQ(dirExistingRt, dir + "(1)");
+
+  ASSERT_TRUE(createDirectory(dirExistingRt));
+  EXPECT_TRUE(exists(dirExistingRt));
+  std::string dirExistingRt2 = uniqueDirectoryPath(dir);
+  EXPECT_EQ(dirExistingRt2, dir + "(2)");
+
+  // File
+  std::string newFile = joinPaths(dir, "uniqueFile");
+  std::string newFileWithExt = newFile + ".txt";
+  EXPECT_FALSE(exists(newFileWithExt));
+  std::string fileRt = uniqueFilePath(newFile, "txt");
+  EXPECT_EQ(newFileWithExt, fileRt);
+
+  ASSERT_TRUE(create_new_empty_file(newFileWithExt));
+  EXPECT_TRUE(exists(newFileWithExt));
+  std::string fileExistingRt = uniqueFilePath(newFile, "txt");
+  EXPECT_EQ(fileExistingRt, newFile + "(1).txt");
+
+  ASSERT_TRUE(create_new_empty_file(fileExistingRt));
+  EXPECT_TRUE(exists(fileExistingRt));
+  std::string fileExistingRt2 = uniqueFilePath(newFile, "txt");
+  EXPECT_EQ(fileExistingRt2, newFile + "(2).txt");
+
+  // Cleanup
+#ifndef _WIN32
+  EXPECT_TRUE(removeFile(newFileWithExt)) << newFileWithExt;
+  EXPECT_TRUE(removeFile(fileExistingRt)) << fileExistingRt;
+  EXPECT_TRUE(removeDirectory(dir)) << dir;
+#else
+  /// \todo(anyone) This #ifndef _WIN32 should go away. The above
+  /// EXPECT_TRUE statements for removeFile were returning false on windows.
+  removeFile(newFileWithExt);
+  removeFile(fileExistingRt);
+  removeDirectory(dir);
+#endif
+  EXPECT_TRUE(removeDirectory(dirExistingRt)) << dirExistingRt;
+}
+
+/////////////////////////////////////////////////
 /// Main
 int main(int argc, char **argv)
 {

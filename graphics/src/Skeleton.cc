@@ -238,6 +238,7 @@ const SkeletonNodeMap &Skeleton::Nodes() const
 //////////////////////////////////////////////////
 void Skeleton::SetNumVertAttached(const unsigned int _vertices)
 {
+  this->data->rawNodeWeights.clear();
   this->data->rawNodeWeights.resize(_vertices);
 }
 

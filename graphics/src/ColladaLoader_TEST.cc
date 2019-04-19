@@ -21,6 +21,8 @@
 #include "ignition/common/SubMesh.hh"
 #include "ignition/common/Material.hh"
 #include "ignition/common/ColladaLoader.hh"
+#include "ignition/common/Skeleton.hh"
+#include "ignition/common/SkeletonAnimation.hh"
 #include "test/util.hh"
 
 using namespace ignition;
@@ -183,6 +185,119 @@ TEST_F(ColladaLoader, TexCoordSets)
   EXPECT_EQ(math::Vector2d(0, 1), subMesh->TexCoord(0u));
   EXPECT_EQ(math::Vector2d(0, 1), subMesh->TexCoord(1u));
   EXPECT_EQ(math::Vector2d(0, 1), subMesh->TexCoord(2u));
+}
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadBoxWithAnimationOutsideSkeleton)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      std::string(PROJECT_SOURCE_PATH) +
+      "/test/data/box_with_animation_outside_skeleton.dae");
+
+  EXPECT_EQ(36u, mesh->IndexCount());
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(1u, mesh->MaterialCount());
+  EXPECT_LT(0u, mesh->TexCoordCount());
+  common::SkeletonPtr skeleton = mesh->MeshSkeleton();
+  ASSERT_EQ(1u, skeleton->AnimationCount());
+  common::SkeletonAnimation *anim = skeleton->Animation(0);
+  EXPECT_EQ(1u, anim->NodeCount());
+  EXPECT_TRUE(anim->HasNode("Armature"));
+  auto poseStart = anim->PoseAt(0.04166662);
+  math::Matrix4d expectedTrans = math::Matrix4d(
+      1, 0, 0, 1,
+      0, 1, 0, -1,
+      0, 0, 1, 0,
+      0, 0, 0, 1);
+  EXPECT_EQ(expectedTrans, poseStart.at("Armature"));
+  auto poseEnd = anim->PoseAt(1.666667);
+  expectedTrans = math::Matrix4d(
+        1, 0, 0, 2,
+        0, 1, 0, -1,
+        0, 0, 1, 0,
+        0, 0, 0, 1);
+  EXPECT_EQ(expectedTrans, poseEnd.at("Armature"));
+}
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadBoxInstControllerWithoutSkeleton)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      std::string(PROJECT_SOURCE_PATH) +
+      "/test/data/box_inst_controller_without_skeleton.dae");
+
+  EXPECT_EQ(36u, mesh->IndexCount());
+  EXPECT_EQ(35u, mesh->VertexCount());
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(1u, mesh->MaterialCount());
+  EXPECT_EQ(35u, mesh->TexCoordCount());
+  common::SkeletonPtr skeleton = mesh->MeshSkeleton();
+  EXPECT_LT(0u, skeleton->NodeCount());
+  EXPECT_NE(nullptr, skeleton->NodeById("Armature_Bone"));
+}
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadBoxMultipleInstControllers)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      std::string(PROJECT_SOURCE_PATH) +
+      "/test/data/box_multiple_inst_controllers.dae");
+
+  EXPECT_EQ(72u, mesh->IndexCount());
+  EXPECT_EQ(70u, mesh->VertexCount());
+  EXPECT_EQ(2u, mesh->SubMeshCount());
+  EXPECT_EQ(1u, mesh->MaterialCount());
+  EXPECT_EQ(70u, mesh->TexCoordCount());
+
+  std::shared_ptr<common::SubMesh> submesh = mesh->SubMeshByIndex(0).lock();
+  std::shared_ptr<common::SubMesh> submesh2 = mesh->SubMeshByIndex(1).lock();
+  EXPECT_EQ(36u, submesh->IndexCount());
+  EXPECT_EQ(36u, submesh2->IndexCount());
+  EXPECT_EQ(35u, submesh->VertexCount());
+  EXPECT_EQ(35u, submesh2->VertexCount());
+  EXPECT_EQ(35u, submesh->TexCoordCount());
+  EXPECT_EQ(35u, submesh2->TexCoordCount());
+
+  common::SkeletonPtr skeleton = mesh->MeshSkeleton();
+  EXPECT_NE(nullptr, skeleton->NodeById("Armature_Bone"));
+  EXPECT_NE(nullptr, skeleton->NodeById("Armature_Bone2"));
+}
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadBoxNestedAnimation)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      std::string(PROJECT_SOURCE_PATH) +
+      "/test/data/box_nested_animation.dae");
+
+  EXPECT_EQ(36u, mesh->IndexCount());
+  EXPECT_EQ(35u, mesh->VertexCount());
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(1u, mesh->MaterialCount());
+  EXPECT_EQ(35u, mesh->TexCoordCount());
+  common::SkeletonPtr skeleton = mesh->MeshSkeleton();
+  ASSERT_EQ(1u, mesh->MeshSkeleton()->AnimationCount());
+  common::SkeletonAnimation *anim = skeleton->Animation(0);
+  EXPECT_EQ(1u, anim->NodeCount());
+  EXPECT_TRUE(anim->HasNode("Bone"));
+  auto poseStart = anim->PoseAt(0);
+  math::Matrix4d expectedTrans = math::Matrix4d(
+      1, 0, 0, 1,
+      0, 1, 0, -1,
+      0, 0, 1, 0,
+      0, 0, 0, 1);
+  EXPECT_EQ(expectedTrans, poseStart.at("Bone"));
+  auto poseEnd = anim->PoseAt(1.666667);
+  expectedTrans = math::Matrix4d(
+        1, 0, 0, 2,
+        0, 1, 0, -1,
+        0, 0, 1, 0,
+        0, 0, 0, 1);
+  EXPECT_EQ(expectedTrans, poseEnd.at("Bone"));
 }
 
 /////////////////////////////////////////////////
