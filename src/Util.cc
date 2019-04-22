@@ -409,7 +409,8 @@ std::string ignition::common::trimmed(std::string _s)
 std::string ignition::common::lowercase(const std::string &_in)
 {
   std::string out = _in;
-  std::transform(out.begin(), out.end(), out.begin(), ::tolower);
+  for (size_t i = 0; i < out.size(); ++i)
+    out[i] = std::tolower(out[i], std::locale());
   return out;
 }
 
