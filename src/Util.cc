@@ -30,6 +30,7 @@
 #include <fstream>
 #include <functional>
 #include <iomanip>
+#include <locale>
 #include <sstream>
 
 #include <ignition/common/config.hh>
