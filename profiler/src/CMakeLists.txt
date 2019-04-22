@@ -23,7 +23,9 @@ if(IGN_PROFILER_REMOTERY)
       ${Remotery_SRC}
       ./Remotery/lib/RemoteryMetal.mm
     )
-    find_library(FOUNDATION Foundation)
+    find_library(FOUNDATION Foundation
+      HINTS /System/Library/Frameworks
+    )
   endif()
 
   set(RMT_ENABLED 1)
