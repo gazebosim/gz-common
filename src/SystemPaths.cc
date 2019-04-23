@@ -237,9 +237,7 @@ std::string SystemPaths::NormalizeDirectoryPath(const std::string &_path)
 std::vector<std::string> SystemPathsPrivate::GenerateLibraryPaths(
     const std::string &_libName) const
 {
-  std::string lowercaseLibName = _libName;
-  for (size_t i = 0; i < _libName.size(); ++i)
-    lowercaseLibName[i] = std::tolower(_libName[i], std::locale());
+  std::string lowercaseLibName = lowercase(_libName);
   // test for possible prefixes or extensions on the library name
   bool hasLib = StartsWith(_libName, "lib");
   bool hasDotSo = EndsWith(lowercaseLibName, ".so");
