@@ -104,9 +104,11 @@ Logger &Logger::operator()(const std::string &_file, int _line)
   int index = _file.find_last_of("/") + 1;
 
   Console::log << "(" << IGN_SYSTEM_TIME_NS() << ") ";
-  (*this) << Console::Prefix() << this->prefix
+  std::stringstream prefixString;
+  prefixString << Console::Prefix() << this->prefix
     << "[" << _file.substr(index , _file.size() - index) << ":"
     << _line << "] ";
+  (*this) << prefixString.str();
 
   return (*this);
 }
