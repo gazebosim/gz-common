@@ -1,3 +1,11 @@
+## Ignition Common 4.x
+
+## Ignition Common 4.x.x (2019-XX-XX)
+
+1. Corrected `BAYER_RGGR8` to `BAYER_BGGR8` in `PixelFormatName` and
+   `PixelFormatType` located in `graphics/include/ignition/common/Image.hh`.
+    * [Pull request 191](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/191)
+
 ## Ignition Common 3.x
 
 ## Ignition Common 3.x.x (2018-XX-XX)
