@@ -1,6 +1,8 @@
 ## Ignition Common 3.x
 
-## Ignition Common 3.x.x (2018-XX-XX)
+## Ignition Common 3.x.x (2019-XX-XX)
+
+## Ignition Common 3.1.0 (2019-XX-XX)
 
 1. Image::PixelFormatType: append `BAYER_BGGR8` instead of replacing `BAYER_RGGR8`
     * [Pull request 192](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/192)
@@ -15,7 +17,7 @@
     * [Pull request 185](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/185)
     * [Issue 47](https://bitbucket.org/ignitionrobotics/ign-common/issue/47)
 
-## Ignition Common 3.0.0 (2018-XX-XX)
+## Ignition Common 3.0.0 (2019-02-28)
 
 1. Use ign-cmake2 and support Ubuntu Bionic (18.04).
     * [Pull request 131](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/131)
