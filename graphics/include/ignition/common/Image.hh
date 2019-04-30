@@ -52,7 +52,8 @@ namespace ignition
       "BAYER_RGGB8",
       "BAYER_RGGR8",
       "BAYER_GBRG8",
-      "BAYER_GRBG8"
+      "BAYER_GRBG8",
+      "BAYER_BGGR8"
     };
 
     /// \class Image Image.hh ignition/common/common.hh
@@ -81,7 +82,8 @@ namespace ignition
                 BAYER_RGGR8,
                 BAYER_GBRG8,
                 BAYER_GRBG8,
-                PIXEL_FORMAT_COUNT
+                PIXEL_FORMAT_COUNT,
+                BAYER_BGGR8
               };
 
 
