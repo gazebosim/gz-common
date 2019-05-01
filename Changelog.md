@@ -8,7 +8,15 @@
 
 ## Ignition Common 3.x
 
-## Ignition Common 3.x.x (2018-XX-XX)
+## Ignition Common 3.x.x (2019-XX-XX)
+
+## Ignition Common 3.1.0 (2019-XX-XX)
+
+1. Image::PixelFormatType: append `BAYER_BGGR8` instead of replacing `BAYER_RGGR8`
+    * [Pull request 192](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/192)
+
+1. Use `std::tolower` with locale in lowercase helper function
+    * [Pull request 190](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/190)
 
 1. Profiler: give hint on osx to find frameworks so it doesn't find them inside Xcode
     * [Pull request 189](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/189)
@@ -16,11 +24,21 @@
 1. Fix windows tests: SystemPathsFixture.FileSystemPaths and TimeTest.Sleep
     * [Pull request 188](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/188)
 
+1. Filesystem functions to create unique paths
+    * [Pull request 187](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/187)
+
+1. Battery additions for LinearBatteryPlugin port to ign-gazebo
+    * [Pull request 186](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/186)
+
 1. Consolidate Console::log streams to reduce colored log size
     * [Pull request 185](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/185)
     * [Issue 47](https://bitbucket.org/ignitionrobotics/ign-common/issue/47)
 
-## Ignition Common 3.0.0 (2018-XX-XX)
+1. Fix ColladaLoader to support mixamo models and fix skeleton animation loading
+    * [Pull request 179](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/179)
+    * [osrf/gazebo pull request 3071](https://bitbucket.org/osrf/gazebo/pull-requests/3071)
+
+## Ignition Common 3.0.0 (2019-02-28)
 
 1. Use ign-cmake2 and support Ubuntu Bionic (18.04).
     * [Pull request 131](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/131)
