@@ -5,6 +5,13 @@ Deprecated code produces compile-time warnings. These warning serve as
 notification to users that their code should be upgraded. The next major
 release will remove the deprecated code.
 
+## Ignition Common 3.X to 4.X
+
+### Modifications
+
+1. Corrected `BAYER_RGGR8` to `BAYER_BGGR8` in `PixelFormatName` and
+   `PixelFormatType` located in `graphics/include/ignition/common/Image.hh`.
+
 ## Ignition Common 2.X to 3.X
 
 ### Additions
