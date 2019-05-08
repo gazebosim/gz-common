@@ -1930,6 +1930,9 @@ bool LoadObj(attrib_t *attrib, std::vector<shape_t> *shapes,
         token += n;
 
         if (!end_line_bit) {
+          #if !defined(_WIN32) && !defined(__clang__)
+          #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+          #endif
           line_cache.idx0 = idx;
         } else {
           #if !defined(_WIN32) && !defined(__clang__)
