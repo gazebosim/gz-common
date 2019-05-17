@@ -2,7 +2,7 @@
 
 ## Ignition Common 3.x.x (2019-XX-XX)
 
-## Ignition Common 3.1.0 (2019-XX-XX)
+## Ignition Common 3.1.0 (2019-05-17)
 
 1. Image::PixelFormatType: append `BAYER_BGGR8` instead of replacing `BAYER_RGGR8`
     * [Pull request 192](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/192)
