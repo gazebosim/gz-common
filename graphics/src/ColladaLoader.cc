@@ -408,6 +408,7 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
       this->dataPtr->meter, this->dataPtr->meter, this->dataPtr->meter));
   if (mesh->HasSkeleton())
     mesh->MeshSkeleton()->Scale(this->dataPtr->meter);
+
   return mesh;
 }
 
