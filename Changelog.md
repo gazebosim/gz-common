@@ -2,6 +2,9 @@
 
 ## Ignition Common 3.x.x (2019-XX-XX)
 
+1. Port ColladaLoader fix: use default value of 1 for stride parameter when unset.
+    * [Pull request 196](https://bitbucket.org/osrf/gazebo/pull-request/196)
+
 ## Ignition Common 3.1.0 (2019-05-17)
 
 1. Image::PixelFormatType: append `BAYER_BGGR8` instead of replacing `BAYER_RGGR8`
