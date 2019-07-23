@@ -184,6 +184,7 @@ RemoteryProfilerImpl::RemoteryProfilerImpl()
     static_cast<RemoteryProfilerImpl *>(_context)->HandleInput(_text);
   };
 
+  igndbg << "Staring ign-common profiler impl: Remotery (port: " << this->settings->port << ")" << std::endl;
   rmtError error;
   error = rmt_CreateGlobalInstance(&this->rmt);
 
@@ -223,7 +224,7 @@ void RemoteryProfilerImpl::LogText(const char *_text)
 //////////////////////////////////////////////////
 void RemoteryProfilerImpl::BeginSample(const char *_name, uint32_t *_hash)
 {
-  _rmt_BeginCPUSample(_name, RMTSF_None, _hash);
+  _rmt_BeginCPUSample(_name, RMTSF_Aggregate, _hash);
 }
 
 //////////////////////////////////////////////////
