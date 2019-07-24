@@ -140,9 +140,10 @@ namespace ignition
       /// \param[in] _bvhFile the bvh file to load animation from
       /// \param[in] _scale the scale of the animation
       /// \return True if the BVH animation is compatible with skeleton
-      public: bool AddBVHAnimation(const std::string &_bvhFile, double _scale);
+      public: bool AddBvhAnimation(const std::string &_bvhFile, double _scale);
 
-      /// \brief Finding the skin node name that corresponds to the given animation node name.
+      /// \brief Finding the skin node name that corresponds to
+      /// the given animation node name.
       /// \param[in] _animNodeName the given animation node name
       /// \return The corresponding skin node name in the skeleton
       public: std::string NodeNameAnimToSkin(const std::string &_animNodeName);
@@ -151,13 +152,13 @@ namespace ignition
       /// the animation skeleton to skin skeleton
       /// \param[in] _animNodeName the animation node name
       /// \return The transformation to align translation
-      public: ignition::math::Matrix4d AlignTranslation(const std::string &_animNodeName);
+      public: math::Matrix4d AlignTranslation(const std::string &_animNodeName);
 
       /// \brief Get the transformation to align rotation from
       /// the animation skeleton to skin skeleton
       /// \param[in] _animNodeName the animation node name
       /// \return The transformation to align rotation
-      public: ignition::math::Matrix4d AlignRotation(const std::string &_animNodeName);
+      public: math::Matrix4d AlignRotation(const std::string &_animNodeName);
 
       /// \brief Initializes the hande numbers for each node in the map
       /// using breadth first traversal
