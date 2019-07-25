@@ -540,6 +540,14 @@ TEST(Filesystem, copyDirectories)
   EXPECT_TRUE(exists(temp_dir_copy));
   EXPECT_TRUE(isDirectory(temp_dir_copy));
 
+  // Copy recursively
+  std::string subdir = joinPaths(new_temp_dir, "subdir");
+  ASSERT_TRUE(createDirectories(subdir));
+  std::string rec_dir_copy = "recDirCopied";
+  ASSERT_TRUE(copyDirectory(subdir, rec_dir_copy));
+  EXPECT_TRUE(exists(rec_dir_copy));
+  EXPECT_TRUE(isDirectory(rec_dir_copy));
+
   // Non-existent source directory
   EXPECT_TRUE(removeAll(new_temp_dir));
   ASSERT_FALSE(copyDirectory(new_temp_dir, temp_dir_copy));
