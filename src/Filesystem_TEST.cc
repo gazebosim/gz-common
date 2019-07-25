@@ -392,6 +392,18 @@ TEST(Filesystem, append)
 }
 
 /////////////////////////////////////////////////
+TEST(Filesystem, parentPath)
+{
+  std::string child = "/path/to/a/child";
+  std::string parent = parentPath(child);
+  EXPECT_EQ(child, absPath(joinPaths(parent, "child")));
+
+  std::string child_with_slash = "/path/to/a/child/";
+  parent = parentPath(child);
+  EXPECT_EQ(child, absPath(joinPaths(parent, "child")));
+}
+
+/////////////////////////////////////////////////
 TEST(Filesystem, cwd_error)
 {
   // This test intentionally creates a directory, switches to it, removes
@@ -505,6 +517,35 @@ TEST(Filesystem, createDirectories)
   ASSERT_TRUE(createDirectories(abs_dir));
   EXPECT_TRUE(exists(abs_dir));
   EXPECT_TRUE(isDirectory(abs_dir));
+}
+
+/////////////////////////////////////////////////
+TEST(Filesystem, copyDirectories)
+{
+  //std::string new_temp_dir;
+  //ASSERT_TRUE(create_and_switch_to_temp_dir(new_temp_dir));
+
+  // Create a directory
+  std::string new_temp_dir = "dirToBeCopied";
+  EXPECT_FALSE(exists(new_temp_dir));
+  ASSERT_TRUE(createDirectories(new_temp_dir));
+  EXPECT_TRUE(exists(new_temp_dir));
+  EXPECT_TRUE(isDirectory(new_temp_dir));
+
+  // Copy to a directory
+  std::string temp_dir_copy = "dirCopied";
+  ASSERT_TRUE(copyDirectory(new_temp_dir, temp_dir_copy));
+  EXPECT_TRUE(exists(temp_dir_copy));
+  EXPECT_TRUE(isDirectory(temp_dir_copy));
+
+  // Copy to an existing directory - should overwrite
+  ASSERT_TRUE(copyDirectory(new_temp_dir, temp_dir_copy));
+  EXPECT_TRUE(exists(temp_dir_copy));
+  EXPECT_TRUE(isDirectory(temp_dir_copy));
+
+  // Non-existent source directory
+  EXPECT_TRUE(removeAll(new_temp_dir));
+  ASSERT_FALSE(copyDirectory(new_temp_dir, temp_dir_copy));
 }
 
 /////////////////////////////////////////////////

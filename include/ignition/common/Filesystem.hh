@@ -160,7 +160,8 @@ namespace ignition
     std::string IGNITION_COMMON_VISIBLE basename(
         const std::string &_path);
 
-    /// \brief Given a path, get just its parent path portion.
+    /// \brief Given a path, get just its parent path portion, without
+    /// separator at the end.
     /// \param[in] _path  Path of which to find parent path
     /// \return A new string with just the parent path of the path.
     std::string IGNITION_COMMON_VISIBLE parentPath(
