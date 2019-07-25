@@ -396,11 +396,16 @@ TEST(Filesystem, parentPath)
 {
   std::string child = "/path/to/a/child";
   std::string parent = parentPath(child);
-  EXPECT_EQ(child, absPath(joinPaths(parent, "child")));
+  // Expect no separator at the end
+  EXPECT_EQ('a', *parent.rbegin());
+  // Expect parent string to match beginning of child string
+  EXPECT_EQ(parent, child.substr(0, parent.size()));
+  // join "a" with "child" and expect to match end of child string
+  EXPECT_EQ(separator("a") + "child", child.substr(parent.size()-1));
 
   std::string child_with_slash = "/path/to/a/child/";
-  parent = parentPath(child_with_slash);
-  EXPECT_EQ(child, absPath(joinPaths(parent, "child")));
+  std::string parent2 = parentPath(child_with_slash);
+  EXPECT_EQ(parent, parent2);
 }
 
 /////////////////////////////////////////////////
