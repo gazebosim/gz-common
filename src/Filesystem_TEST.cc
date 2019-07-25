@@ -399,7 +399,7 @@ TEST(Filesystem, parentPath)
   EXPECT_EQ(child, absPath(joinPaths(parent, "child")));
 
   std::string child_with_slash = "/path/to/a/child/";
-  parent = parentPath(child);
+  parent = parentPath(child_with_slash);
   EXPECT_EQ(child, absPath(joinPaths(parent, "child")));
 }
 
@@ -522,9 +522,6 @@ TEST(Filesystem, createDirectories)
 /////////////////////////////////////////////////
 TEST(Filesystem, copyDirectories)
 {
-  //std::string new_temp_dir;
-  //ASSERT_TRUE(create_and_switch_to_temp_dir(new_temp_dir));
-
   // Create a directory
   std::string new_temp_dir = "dirToBeCopied";
   EXPECT_FALSE(exists(new_temp_dir));
