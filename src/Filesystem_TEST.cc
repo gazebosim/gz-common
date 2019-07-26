@@ -549,7 +549,7 @@ TEST(Filesystem, copyDirectories)
   std::string subdir = joinPaths(new_temp_dir, "subdir");
   ASSERT_TRUE(createDirectories(subdir));
   std::string rec_dir_copy = "recDirCopied";
-  ASSERT_TRUE(copyDirectory(subdir, rec_dir_copy));
+  ASSERT_TRUE(copyDirectory(new_temp_dir, rec_dir_copy));
   EXPECT_TRUE(exists(rec_dir_copy));
   EXPECT_TRUE(isDirectory(rec_dir_copy));
 
