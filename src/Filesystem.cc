@@ -317,7 +317,7 @@ bool ignition::common::copyDirectory(const std::string &_existingDirname,
     removeAll(_newDirname, _warningOp);
   }
   // Create the destination directory
-  if (!createDirectories(_newDirname))
+  if (!createDirectory(_newDirname))
   {
     if (FSWO_LOG_WARNINGS == _warningOp)
     {

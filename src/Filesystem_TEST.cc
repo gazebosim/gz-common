@@ -538,6 +538,12 @@ TEST(Filesystem, copyDirectories)
   // Copy to a directory
   std::string temp_dir_copy = "dirCopied";
   EXPECT_FALSE(exists(temp_dir_copy));
+
+  EXPECT_TRUE(createDirectory(temp_dir_copy));
+  EXPECT_TRUE(removeDirectory(temp_dir_copy));
+  EXPECT_TRUE(createDirectories(temp_dir_copy));
+  EXPECT_TRUE(removeAll(temp_dir_copy));
+
   ASSERT_TRUE(copyDirectory(new_temp_dir, temp_dir_copy));
   EXPECT_TRUE(exists(temp_dir_copy));
   EXPECT_TRUE(isDirectory(temp_dir_copy));
