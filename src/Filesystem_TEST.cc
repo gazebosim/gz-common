@@ -394,7 +394,7 @@ TEST(Filesystem, append)
 /////////////////////////////////////////////////
 TEST(Filesystem, parentPath)
 {
-  std::string child = "/path/to/a/child";
+  std::string child = joinPaths("path", "to", "a", "child");
   std::string parent = parentPath(child);
   // Expect no separator at the end
   EXPECT_EQ('a', *parent.rbegin());
@@ -403,7 +403,8 @@ TEST(Filesystem, parentPath)
   // join "a" with "child" and expect to match end of child string
   EXPECT_EQ(separator("a") + "child", child.substr(parent.size()-1));
 
-  std::string child_with_slash = "/path/to/a/child/";
+  std::string child_with_slash = joinPaths("path", "to", "a", "child");
+  child_with_slash = separator(child_with_slash);
   std::string parent2 = parentPath(child_with_slash);
   EXPECT_EQ(parent, parent2);
 }
@@ -536,6 +537,7 @@ TEST(Filesystem, copyDirectories)
 
   // Copy to a directory
   std::string temp_dir_copy = "dirCopied";
+  EXPECT_FALSE(exists(temp_dir_copy));
   ASSERT_TRUE(copyDirectory(new_temp_dir, temp_dir_copy));
   EXPECT_TRUE(exists(temp_dir_copy));
   EXPECT_TRUE(isDirectory(temp_dir_copy));
