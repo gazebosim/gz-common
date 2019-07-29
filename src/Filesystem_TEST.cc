@@ -553,6 +553,12 @@ TEST(Filesystem, copyDirectories)
   EXPECT_TRUE(exists(temp_dir_copy));
   EXPECT_TRUE(isDirectory(temp_dir_copy));
 
+  // Copy to a directory with non-existent intermediate paths
+  std::string interm_dir_copy = joinPaths("dirInterm", "dirCopied");
+  ASSERT_TRUE(copyDirectory(new_temp_dir, interm_dir_copy));
+  EXPECT_TRUE(exists(interm_dir_copy));
+  EXPECT_TRUE(isDirectory(interm_dir_copy));
+
   // Copy recursively
   std::string subdir = joinPaths(new_temp_dir, "subdir");
   ASSERT_TRUE(createDirectories(subdir));
