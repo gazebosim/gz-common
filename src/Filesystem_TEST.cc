@@ -559,9 +559,12 @@ TEST(Filesystem, copyDirectories)
   EXPECT_TRUE(exists(interm_dir_copy));
   EXPECT_TRUE(isDirectory(interm_dir_copy));
 
-  // Copy recursively
+  // Copy recursively a directory with a directory and a file in it
   std::string subdir = joinPaths(new_temp_dir, "subdir");
-  ASSERT_TRUE(createDirectories(subdir));
+  EXPECT_TRUE(createDirectories(subdir));
+  std::string subfile = joinPaths(subdir, "newfile");
+  EXPECT_TRUE(create_new_empty_file(subfile));
+  EXPECT_TRUE(exists(subfile));
   std::string rec_dir_copy = "recDirCopied";
   ASSERT_TRUE(copyDirectory(new_temp_dir, rec_dir_copy));
   EXPECT_TRUE(exists(rec_dir_copy));

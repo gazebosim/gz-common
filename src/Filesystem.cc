@@ -316,8 +316,11 @@ bool ignition::common::copyDirectory(const std::string &_existingDirname,
   {
     if (!removeAll(_newDirname, _warningOp))
     {
-      ignwarn << "Unable to remove existing destination directory ["
-              << _newDirname << "]\n";
+      if (FSWO_LOG_WARNINGS == _warningOp)
+      {
+        ignwarn << "Unable to remove existing destination directory ["
+                << _newDirname << "]\n";
+      }
       return false;
     }
   }
@@ -342,8 +345,11 @@ bool ignition::common::copyDirectory(const std::string &_existingDirname,
       if (!copyDirectory(current, joinPaths(_newDirname, basename(current)),
          _warningOp))
       {
-        ignwarn << "Unable to copy directory to ["
-                << joinPaths(_newDirname, basename(current)) << "]\n";
+        if (FSWO_LOG_WARNINGS == _warningOp)
+        {
+          ignwarn << "Unable to copy directory to ["
+                  << joinPaths(_newDirname, basename(current)) << "]\n";
+        }
         return false;
       }
     }
