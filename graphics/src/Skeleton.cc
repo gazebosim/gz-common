@@ -316,6 +316,10 @@ SkeletonAnimation *Skeleton::Animation(const unsigned int _i) const
 //////////////////////////////////////////////////
 void Skeleton::AddAnimation(SkeletonAnimation *_anim)
 {
+  if (this->data->anims.size() > 0)
+  {
+    this->data->anims.clear();
+  }
   this->data->anims.push_back(_anim);
 }
 
