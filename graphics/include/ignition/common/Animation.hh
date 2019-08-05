@@ -17,9 +17,11 @@
 #ifndef IGNITION_COMMON_ANIMATION_HH_
 #define IGNITION_COMMON_ANIMATION_HH_
 
+#include <map>
 #include <string>
 #include <vector>
 
+#include <ignition/math/Pose3.hh>
 #include <ignition/math/Spline.hh>
 #include <ignition/math/RotationSpline.hh>
 
@@ -180,6 +182,100 @@ namespace ignition
       /// \param[out] _kf NumericKeyFrame reference to hold the
       /// interpolated result
       public: void InterpolatedKeyFrame(NumericKeyFrame &_kf) const;
+    };
+
+    /// \brief Information about a trajectory for an animation (e.g., Actor)
+    /// This contains the keyframe information. 
+    class IGNITION_COMMON_GRAPHICS_VISIBLE TrajectoryInfo
+    {
+      /// \brief Constructor
+      public: TrajectoryInfo();
+
+      /// \brief Return the id of the trajectory
+      /// \return Id of the trajectory
+      public: unsigned int Id() const;
+
+      /// \brief Set the id of the trajectory
+      /// \param[in] _id Id for the trajectory
+      public: void SetId(unsigned int _id);
+
+      /// \brief Return the animation index
+      /// \return Index of the associated animation
+      public: unsigned int AnimIndex() const;
+
+      /// \brief Set the animation index
+      /// \param[in] _index Animation index (auto-generated according to the type)
+      public: void SetAnimIndex(unsigned int _index);
+
+      /// \brief Return the duration of the trajectory
+      /// \return Duration of the animation in seconds
+      public: double Duration() const;
+
+      /// \brief Set the duration of the trajectory
+      /// \param[in] _duration Trajectory duration
+      public: void SetDuration(double _duration);
+
+      /// \brief Return the duration of the animation
+      /// \param[in] _time Time at which to create the keyframe
+      /// \return Duration of the animation in seconds
+      public: double DistanceSoFar(double _time) const;
+
+      /// \brief Return the start time of the trajectory
+      /// \return Start time of the trajectory in seconds
+      public: double StartTime() const;
+
+      /// \brief Set the start time of the trajectory
+      /// \param[in] _startTime Trajectory start time in seconds
+      public: void SetStartTime(double _startTime);
+
+      /// \brief Return the end time of the trajectory
+      /// \return End time of the trajectory in seconds
+      public: double EndTime() const;
+
+      /// \brief Set the end time of the trajectory
+      /// \param[in] _endTime Trajectory end time in seconds
+      public: void SetEndTime(double _endTime);
+
+      /// \brief Return the trajectory is translated
+      /// \return True if the trajectory is translated
+      public: bool Translated() const;
+
+      /// \brief Set whether the trajectory is translated
+      /// \param[in] _translated True if the trajectory is translated
+      public: void SetTranslated(bool _translated);
+
+      /// \brief Return the waypoints in the trajectory
+      /// \return Waypoints represented in pose animation format
+      public: common::PoseAnimation *Waypoints() const;
+
+      /// \brief Load all waypoints in the trajectory
+      /// \param[in] _waypoints Waypoints in time-pose pairs
+      public: void AddWaypoints(std::map<double, math::Pose3d> _waypoints);
+
+      /// \brief ID of the trajectory
+      protected: unsigned int id;
+
+      /// \brief Type of trajectory. If it matches the name a skeleton
+      /// animation, they will be played together
+      protected: unsigned int animIndex;
+
+      /// \brief Duration of this keyframe in seconds
+      protected: double duration;
+
+      /// \brief Start time of this keyframe within the trajectory, in seconds.
+      protected: double startTime;
+
+      /// \brief End time of this keyframe within the trajectory, in seconds.
+      protected: double endTime;
+
+      /// \brief True if the trajectory is translated.
+      protected: bool translated;
+
+      /// \brief Waypoints in pose animation format
+      protected: common::PoseAnimation *waypoints;
+      
+      /// \brief Segment distance
+      protected: std::map<double, double> segDistance;
     };
   }
 }

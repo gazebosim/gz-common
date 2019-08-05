@@ -17,6 +17,7 @@
 #include <algorithm>
 
 #include <ignition/math/Spline.hh>
+#include <ignition/math/Vector2.hh>
 #include <ignition/math/RotationSpline.hh>
 #include <ignition/common/Console.hh>
 #include <ignition/common/KeyFrame.hh>
@@ -311,4 +312,165 @@ void NumericAnimation::InterpolatedKeyFrame(NumericKeyFrame &_kf) const
     double diff = k2->Value() - k1->Value();
     _kf.Value(k1->Value() + diff * t);
   }
+}
+
+/////////////////////////////////////////////////
+TrajectoryInfo::TrajectoryInfo()
+  : id(0), animIndex(0), duration(0.0), startTime(0.0), endTime(0.0),
+  translated(false), waypoints(nullptr)
+{
+}
+
+/////////////////////////////////////////////////
+unsigned int TrajectoryInfo::Id() const
+{
+  return this->id;
+}
+
+/////////////////////////////////////////////////
+void TrajectoryInfo::SetId(unsigned int _id)
+{
+  this->id = _id;
+}
+
+/////////////////////////////////////////////////
+unsigned int TrajectoryInfo::AnimIndex() const
+{
+  return this->animIndex;
+}
+
+/////////////////////////////////////////////////
+void TrajectoryInfo::SetAnimIndex(unsigned int _index)
+{
+  this->animIndex = _index;
+}
+
+/////////////////////////////////////////////////
+double TrajectoryInfo::Duration() const
+{
+  return this->duration;
+}
+
+/////////////////////////////////////////////////
+void TrajectoryInfo::SetDuration(double _duration)
+{
+  this->duration = _duration;
+}
+
+/////////////////////////////////////////////////
+double TrajectoryInfo::DistanceSoFar(double _time) const
+{
+  double distance = 0.0;
+  auto pIter = this->segDistance.begin();
+  double prevTime = 0.0;
+  while (_time > pIter->first)
+  {
+    distance += pIter->second;
+    prevTime = pIter->first;
+    pIter++;
+  }
+  // difference is less than 0.001s
+  if (std::abs(pIter->first - _time ) < 0.01)
+  {
+    return distance;
+  }
+  // if waypoints remain at the same point
+  if (std::abs(pIter->second) < 0.1)
+  {
+    return distance;
+  }
+  // add big difference
+  distance += (_time - prevTime) / (pIter->first - prevTime) 
+                    * pIter->second;
+  return distance;
+}
+
+/////////////////////////////////////////////////
+double TrajectoryInfo::StartTime() const
+{
+  return this->startTime;
+}
+
+/////////////////////////////////////////////////
+void TrajectoryInfo::SetStartTime(double _startTime)
+{
+  this->startTime = _startTime;
+}
+
+/////////////////////////////////////////////////
+double TrajectoryInfo::EndTime() const
+{
+  return this->endTime;
+}
+
+/////////////////////////////////////////////////
+void TrajectoryInfo::SetEndTime(double _endTime)
+{
+  this->endTime = _endTime;
+}
+
+/////////////////////////////////////////////////
+bool TrajectoryInfo::Translated() const
+{
+  return this->translated;
+}
+
+/////////////////////////////////////////////////
+void TrajectoryInfo::SetTranslated(bool _translated)
+{
+  this->translated = _translated;
+}
+
+/////////////////////////////////////////////////
+common::PoseAnimation *TrajectoryInfo::Waypoints() const
+{
+  return this->waypoints;
+}
+
+/////////////////////////////////////////////////
+void TrajectoryInfo::AddWaypoints(std::map<double, math::Pose3d> _waypoints)
+{
+  auto first = _waypoints.begin();
+  auto last = _waypoints.rbegin();
+  this->startTime = first->first;
+  this->endTime = last->first;
+
+  std::stringstream animName; 
+  animName << this->AnimIndex() << "_" << this->Id();
+  common::PoseAnimation *anim = new common::PoseAnimation(
+        animName.str(), last->first, false);
+
+  math::Vector3d prevPose;
+  double firstTime = 0.0; 
+  for (auto pIter = _waypoints.begin(); pIter != _waypoints.end(); ++pIter)
+  {
+    common::PoseKeyFrame *key;
+    if (pIter == _waypoints.begin())
+    {
+      if (!math::equal(pIter->first, 0.0))
+      {
+        key = anim->CreateKeyFrame(0.0);
+      }
+      else
+      {
+        key = anim->CreateKeyFrame(pIter->first);
+      }
+      firstTime = pIter->first;
+      prevPose = pIter->second.Pos();
+    }
+    else
+    {
+      key = anim->CreateKeyFrame(pIter->first);
+      math::Vector2d p1(prevPose.X(), prevPose.Y());
+      math::Vector2d p2(pIter->second.Pos().X(), pIter->second.Pos().Y());
+      this->segDistance[pIter->first - firstTime] = p1.Distance(p2);
+      prevPose = pIter->second.Pos();
+    }
+    key->Translation(pIter->second.Pos());
+    key->Rotation(pIter->second.Rot());
+  }
+
+  this->waypoints = anim;
+  this->translated = true;
+  this->duration = last->first - first->first;
 }

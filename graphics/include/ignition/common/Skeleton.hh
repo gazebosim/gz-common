@@ -144,21 +144,27 @@ namespace ignition
 
       /// \brief Finding the skin node name that corresponds to
       /// the given animation node name.
+      /// \param[in] _index the animation index
       /// \param[in] _animNodeName the given animation node name
       /// \return The corresponding skin node name in the skeleton
-      public: std::string NodeNameAnimToSkin(const std::string &_animNodeName);
+      public: std::string NodeNameAnimToSkin(unsigned int _index, 
+                  const std::string &_animNodeName);
 
       /// \brief Get the transformation to align translation from
       /// the animation skeleton to skin skeleton
+      /// \param[in] _index the animation index
       /// \param[in] _animNodeName the animation node name
       /// \return The transformation to align translation
-      public: math::Matrix4d AlignTranslation(const std::string &_animNodeName);
+      public: math::Matrix4d AlignTranslation(unsigned int _index,
+                  const std::string &_animNodeName);
 
       /// \brief Get the transformation to align rotation from
       /// the animation skeleton to skin skeleton
+      /// \param[in] _index the animation index
       /// \param[in] _animNodeName the animation node name
       /// \return The transformation to align rotation
-      public: math::Matrix4d AlignRotation(const std::string &_animNodeName);
+      public: math::Matrix4d AlignRotation(unsigned int _index,
+                  const std::string &_animNodeName);
 
       /// \brief Initializes the hande numbers for each node in the map
       /// using breadth first traversal
