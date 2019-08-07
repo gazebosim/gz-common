@@ -246,6 +246,12 @@ std::string ignition::common::systemTimeISO()
 }
 
 /////////////////////////////////////////////////
+std::string ignition::common::systemTimeIso()
+{
+  return timeToIso(IGN_SYSTEM_TIME());
+}
+
+/////////////////////////////////////////////////
 std::string ignition::common::timeToIso(
     const std::chrono::time_point<std::chrono::system_clock> &_time)
 {
