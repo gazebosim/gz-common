@@ -22,6 +22,7 @@
 #include <string>
 #include <future>
 #include <vector>
+#include <chrono>
 #include <ignition/common/Export.hh>
 #include <ignition/common/Filesystem.hh>
 
@@ -105,6 +106,13 @@ namespace ignition
     /// \brief Get the wall time as an ISO string: YYYY-MM-DDTHH:MM:SS.NS
     /// \return The current wall time as an ISO string.
     std::string IGNITION_COMMON_VISIBLE systemTimeISO();
+
+    /// \brief Converts a time point to an ISO string: YYYY-MM-DDTHH:MM:SS.NS
+    /// \param[in] _time A time point, such as one created by
+    /// IGN_SYSTEM_TIME().
+    /// \return The current wall time as an ISO string.
+    std::string IGNITION_COMMON_VISIBLE timeToIso(
+        const std::chrono::time_point<std::chrono::system_clock> &_time);
 
     /// \brief Get the log path
     /// \return the log path
