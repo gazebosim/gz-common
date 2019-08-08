@@ -2,6 +2,9 @@
 
 ## Ignition Common 3.x.x (2019-XX-XX)
 
+1. Allow ignLogInit to use an absolute path. Added a timeToIso that converts a given time to an ISO string. Some console timestamps were using `IGN_SYSTEM_TIME_NS()` and others `ignition::common::systemTimeISO()`. Switched all to use `ignition::common::systemTimeISO()`.
+    * [Pull request 203](https://bitbucket.org/osrf/gazebo/pull-request/203)
+
 1. Port ColladaLoader fix: use default value of 1 for stride parameter when unset.
     * [Pull request 196](https://bitbucket.org/osrf/gazebo/pull-request/196)
 
