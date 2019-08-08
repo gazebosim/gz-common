@@ -185,7 +185,7 @@ namespace ignition
     };
 
     /// \brief Information about a trajectory for an animation (e.g., Actor)
-    /// This contains the keyframe information. 
+    /// This contains the keyframe information.
     class IGNITION_COMMON_GRAPHICS_VISIBLE TrajectoryInfo
     {
       /// \brief Constructor
@@ -204,7 +204,8 @@ namespace ignition
       public: unsigned int AnimIndex() const;
 
       /// \brief Set the animation index
-      /// \param[in] _index Animation index (auto-generated according to the type)
+      /// \param[in] _index Animation index
+      /// (auto-generated according to the type)
       public: void SetAnimIndex(unsigned int _index);
 
       /// \brief Return the duration of the trajectory
@@ -273,7 +274,7 @@ namespace ignition
 
       /// \brief Waypoints in pose animation format
       protected: common::PoseAnimation *waypoints;
-      
+
       /// \brief Segment distance
       protected: std::map<double, double> segDistance;
     };

@@ -147,7 +147,7 @@ namespace ignition
       /// \param[in] _index the animation index
       /// \param[in] _animNodeName the given animation node name
       /// \return The corresponding skin node name in the skeleton
-      public: std::string NodeNameAnimToSkin(unsigned int _index, 
+      public: std::string NodeNameAnimToSkin(unsigned int _index,
                   const std::string &_animNodeName);
 
       /// \brief Get the transformation to align translation from

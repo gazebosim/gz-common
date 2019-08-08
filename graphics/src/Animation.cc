@@ -369,7 +369,7 @@ double TrajectoryInfo::DistanceSoFar(double _time) const
     prevTime = pIter->first;
     pIter++;
   }
-  // difference is less than 0.01s
+  // difference is less than 0.001s
   if (std::abs(pIter->first - _time ) < 0.01)
   {
     return distance;
@@ -380,7 +380,7 @@ double TrajectoryInfo::DistanceSoFar(double _time) const
     return distance;
   }
   // add big difference
-  distance += (_time - prevTime) / (pIter->first - prevTime) 
+  distance += (_time - prevTime) / (pIter->first - prevTime)
                     * pIter->second;
   return distance;
 }
@@ -435,13 +435,13 @@ void TrajectoryInfo::AddWaypoints(std::map<double, math::Pose3d> _waypoints)
   this->startTime = first->first;
   this->endTime = last->first;
 
-  std::stringstream animName; 
+  std::stringstream animName;
   animName << this->AnimIndex() << "_" << this->Id();
   common::PoseAnimation *anim = new common::PoseAnimation(
         animName.str(), last->first, false);
 
   math::Vector3d prevPose;
-  double firstTime = 0.0; 
+  double firstTime = 0.0;
   for (auto pIter = _waypoints.begin(); pIter != _waypoints.end(); ++pIter)
   {
     common::PoseKeyFrame *key;
