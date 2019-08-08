@@ -1,6 +1,6 @@
 ## Ignition Common 3.x
 
-## Ignition Common 3.x.x (2019-XX-XX)
+## Ignition Common 3.2.0 (2019-08-07)
 
 1. Allow ignLogInit to use an absolute path. Added a timeToIso that converts a given time to an ISO string. Some console timestamps were using `IGN_SYSTEM_TIME_NS()` and others `ignition::common::systemTimeISO()`. Switched all to use `ignition::common::systemTimeISO()`.
     * [Pull request 203](https://bitbucket.org/osrf/gazebo/pull-request/203)
