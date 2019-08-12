@@ -358,8 +358,11 @@ bool ignition::common::copyDirectory(const std::string &_existingDirname,
       if (!copyFile(current, joinPaths(_newDirname, basename(current)),
         _warningOp))
       {
-        ignwarn << "Unable to copy file to ["
-                << joinPaths(_newDirname, basename(current)) << "]\n";
+        if (FSWO_LOG_WARNINGS == _warningOp)
+        {
+          ignwarn << "Unable to copy file to ["
+                  << joinPaths(_newDirname, basename(current)) << "]\n";
+        }
         return false;
       }
     }
