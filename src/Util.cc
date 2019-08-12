@@ -242,9 +242,22 @@ bool Sha1::Digest(void const *_buffer, std::size_t _byteCount,
 /////////////////////////////////////////////////
 std::string ignition::common::systemTimeISO()
 {
+  return timeToIso(IGN_SYSTEM_TIME());
+}
+
+/////////////////////////////////////////////////
+std::string ignition::common::systemTimeIso()
+{
+  return timeToIso(IGN_SYSTEM_TIME());
+}
+
+/////////////////////////////////////////////////
+std::string ignition::common::timeToIso(
+    const std::chrono::time_point<std::chrono::system_clock> &_time)
+{
   char isoStr[25];
 
-  auto epoch = IGN_SYSTEM_TIME().time_since_epoch();
+  auto epoch = _time.time_since_epoch();
   auto sec = std::chrono::duration_cast<std::chrono::seconds>(epoch).count();
   auto nano = std::chrono::duration_cast<std::chrono::nanoseconds>(
       epoch).count() - sec * IGN_SEC_TO_NANO;

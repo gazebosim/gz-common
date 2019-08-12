@@ -49,7 +49,8 @@ namespace ignition
     /// If called twice, it will close currently in use and open a new
     /// log file.
     /// \param[in] _dir Name of directory in which to store the log file. Note
-    /// that _dir must be relative to your home directory.
+    /// that if _dir does not start with a forward slash (/), then _dir will
+    /// be relative to your home directory.
     /// \param[in] _file Name of log file for ignlog messages.
     #define ignLogInit(_dir, _file)\
         ignition::common::Console::log.Init(_dir, _file)

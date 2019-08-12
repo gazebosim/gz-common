@@ -92,7 +92,7 @@ Logger::~Logger()
 /////////////////////////////////////////////////
 Logger &Logger::operator()()
 {
-  Console::log << "(" << ignition::common::systemTimeISO() << ") ";
+  Console::log << "(" << ignition::common::systemTimeIso() << ") ";
   (*this) << Console::Prefix() << this->prefix;
 
   return (*this);
@@ -103,7 +103,7 @@ Logger &Logger::operator()(const std::string &_file, int _line)
 {
   int index = _file.find_last_of("/") + 1;
 
-  Console::log << "(" << IGN_SYSTEM_TIME_NS() << ") ";
+  Console::log << "(" << ignition::common::systemTimeIso() << ") ";
   std::stringstream prefixString;
   prefixString << Console::Prefix() << this->prefix
     << "[" << _file.substr(index , _file.size() - index) << ":"
@@ -202,17 +202,23 @@ void FileLogger::Init(const std::string &_directory,
 {
   std::string logPath;
 
-  if (!env(IGN_HOMEDIR, logPath))
+  if (_directory.empty() || _directory[0] != '/')
   {
-    ignerr << "Missing HOME environment variable."
-           << "No log file will be generated.";
-    return;
+    if (!env(IGN_HOMEDIR, logPath))
+    {
+      ignerr << "Missing HOME environment variable."
+        << "No log file will be generated.";
+      return;
+    }
+    logPath = logPath + "/" + _directory;
+  }
+  else
+  {
+    logPath = _directory;
   }
 
   FileLogger::Buffer *buf = static_cast<FileLogger::Buffer*>(
       this->rdbuf());
-
-  logPath = logPath + "/" + _directory;
 
   // Create the directory if it doesn't exist.
   // \todo(anyone): Replace this with c++1y, when it is released.
@@ -252,7 +258,7 @@ FileLogger &FileLogger::operator()()
   if (!this->initialized)
     this->Init(".ignition", "auto_default.log");
 
-  (*this) << "(" << IGN_SYSTEM_TIME_NS() << ") ";
+  (*this) << "(" << ignition::common::systemTimeIso() << ") ";
   return (*this);
 }
 
@@ -263,7 +269,7 @@ FileLogger &FileLogger::operator()(const std::string &_file, int _line)
     this->Init(".ignition", "auto_default.log");
 
   int index = _file.find_last_of("/") + 1;
-  (*this) << "(" << IGN_SYSTEM_TIME_NS() << ") ["
+  (*this) << "(" << ignition::common::systemTimeIso() << ") ["
     << _file.substr(index , _file.size() - index) << ":" << _line << "]";
 
   return (*this);
