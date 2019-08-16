@@ -260,13 +260,13 @@ namespace ignition
       /// animation, they will be played together
       protected: unsigned int animIndex;
 
-      /// \brief Duration of this keyframe in seconds
+      /// \brief Duration of the trajectory in seconds
       protected: double duration;
 
-      /// \brief Start time of this keyframe within the trajectory, in seconds.
+      /// \brief Start time of the trajectory, in seconds.
       protected: double startTime;
 
-      /// \brief End time of this keyframe within the trajectory, in seconds.
+      /// \brief End time of the trajectory, in seconds.
       protected: double endTime;
 
       /// \brief True if the trajectory is translated.
