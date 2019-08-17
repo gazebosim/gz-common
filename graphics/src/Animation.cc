@@ -369,7 +369,7 @@ double TrajectoryInfo::DistanceSoFar(double _time) const
     prevTime = pIter->first;
     pIter++;
   }
-  // difference is less than 0.001s
+  // difference is less than 0.01s
   if (std::abs(pIter->first - _time ) < 0.01)
   {
     return distance;
