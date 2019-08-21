@@ -106,37 +106,58 @@ TEST_F(AnimationTest, NumericAnimation)
 /////////////////////////////////////////////////
 TEST_F(AnimationTest, TrajectoryInfo)
 {
+  using namespace std::chrono_literals;
+  using TP = std::chrono::steady_clock::time_point;
+
   common::TrajectoryInfo trajInfo;
 
   trajInfo.SetId(0);
-  EXPECT_EQ(0, trajInfo.Id());
+  EXPECT_EQ(0u, trajInfo.Id());
 
   trajInfo.SetAnimIndex(0);
-  EXPECT_EQ(0, trajInfo.AnimIndex());
+  EXPECT_EQ(0u, trajInfo.AnimIndex());
 
-  trajInfo.SetDuration(5.5);
-  EXPECT_DOUBLE_EQ(5.5, trajInfo.Duration());
+  auto startTime = TP(3s);
+  trajInfo.SetStartTime(startTime);
+  EXPECT_EQ(startTime, trajInfo.StartTime());
 
-  trajInfo.SetStartTime(0.5);
-  EXPECT_DOUBLE_EQ(0.5, trajInfo.StartTime());
+  auto endTime = TP(5s);
+  trajInfo.SetEndTime(endTime);
+  EXPECT_EQ(endTime, trajInfo.EndTime());
 
-  trajInfo.SetEndTime(6.0);
-  EXPECT_DOUBLE_EQ(6.0, trajInfo.EndTime());
+  // Duration is calculated from start and end times
+  EXPECT_EQ(2s, trajInfo.Duration());
 
   trajInfo.SetTranslated(true);
   EXPECT_TRUE(trajInfo.Translated());
 
   EXPECT_EQ(nullptr, trajInfo.Waypoints());
 
-  std::map<double, math::Pose3d> waypoints;
-  waypoints[0.0] = math::Pose3d::Zero;
-  waypoints[5.0] = math::Pose3d::Zero;
+  std::map<TP, math::Pose3d> waypoints;
+  // duration from start == 0
+  waypoints[TP(100ms)] = math::Pose3d::Zero;
+  // duration from start == 100ms
+  waypoints[TP(200ms)] = math::Pose3d(1, 0, 0, 0, 0, 0);
+  // duration from start == 150ms
+  waypoints[TP(250ms)] = math::Pose3d(2, 0, 0, 0, 0, 0);
+  // duration from start == 200ms
+  waypoints[TP(300ms)] = math::Pose3d(4, 0, 0, 0, 0, 0);
 
-  trajInfo.AddWaypoints(waypoints);
+  trajInfo.SetWaypoints(waypoints);
   EXPECT_NE(nullptr, trajInfo.Waypoints());
 
-  EXPECT_DOUBLE_EQ(0.0, trajInfo.DistanceSoFar(1.0));
-  EXPECT_DOUBLE_EQ(0.0, trajInfo.DistanceSoFar(5.0));
+  // Start and end times updated from new waypoints
+  EXPECT_EQ(TP(100ms), trajInfo.StartTime());
+  EXPECT_EQ(TP(300ms), trajInfo.EndTime());
+  EXPECT_EQ(200ms, trajInfo.Duration());
+
+  EXPECT_DOUBLE_EQ(0.0, trajInfo.DistanceSoFar(0ms));
+  EXPECT_DOUBLE_EQ(0.5, trajInfo.DistanceSoFar(50ms));
+  EXPECT_DOUBLE_EQ(1.0, trajInfo.DistanceSoFar(100ms));
+  EXPECT_DOUBLE_EQ(2.0, trajInfo.DistanceSoFar(150ms));
+  EXPECT_DOUBLE_EQ(3.0, trajInfo.DistanceSoFar(175ms));
+  EXPECT_DOUBLE_EQ(4.0, trajInfo.DistanceSoFar(200ms));
+  EXPECT_DOUBLE_EQ(4.0, trajInfo.DistanceSoFar(500ms));
 }
 
 /////////////////////////////////////////////////
