@@ -45,7 +45,6 @@ TEST_F(AnimationTest, PoseAnimation)
     EXPECT_DOUBLE_EQ(1.0, anim.Time());
   }
 
-
   common::PoseAnimation anim("pose_test", 5.0, false);
   common::PoseKeyFrame *key = anim.CreateKeyFrame(0.0);
 
@@ -102,6 +101,42 @@ TEST_F(AnimationTest, NumericAnimation)
   common::NumericKeyFrame interpolatedKey(0);
   anim.InterpolatedKeyFrame(interpolatedKey);
   EXPECT_DOUBLE_EQ(12, interpolatedKey.Value());
+}
+
+/////////////////////////////////////////////////
+TEST_F(AnimationTest, TrajectoryInfo)
+{
+  common::TrajectoryInfo trajInfo;
+
+  trajInfo.SetId(0);
+  EXPECT_EQ(0, trajInfo.Id());
+
+  trajInfo.SetAnimIndex(0);
+  EXPECT_EQ(0, trajInfo.AnimIndex());
+
+  trajInfo.SetDuration(5.5);
+  EXPECT_DOUBLE_EQ(5.5, trajInfo.Duration());
+
+  trajInfo.SetStartTime(0.5);
+  EXPECT_DOUBLE_EQ(0.5, trajInfo.StartTime());
+
+  trajInfo.SetEndTime(6.0);
+  EXPECT_DOUBLE_EQ(6.0, trajInfo.EndTime());
+
+  trajInfo.SetTranslated(true);
+  EXPECT_TRUE(trajInfo.Translated());
+
+  EXPECT_EQ(nullptr, trajInfo.Waypoints());
+
+  std::map<double, math::Pose3d> waypoints;
+  waypoints[0.0] = math::Pose3d::Zero;
+  waypoints[5.0] = math::Pose3d::Zero;
+
+  trajInfo.AddWaypoints(waypoints);
+  EXPECT_NE(nullptr, trajInfo.Waypoints());
+
+  EXPECT_DOUBLE_EQ(0.0, trajInfo.DistanceSoFar(1.0));
+  EXPECT_DOUBLE_EQ(0.0, trajInfo.DistanceSoFar(5.0));
 }
 
 /////////////////////////////////////////////////
