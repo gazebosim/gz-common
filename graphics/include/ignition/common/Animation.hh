@@ -217,11 +217,6 @@ namespace ignition
       /// \return Duration of the animation.
       public: std::chrono::steady_clock::duration Duration() const;
 
-      /// \brief Set the duration of the trajectory.
-      /// \param[in] _duration Trajectory duration.
-      public: void SetDuration(
-          const std::chrono::steady_clock::duration &_duration);
-
       /// \brief Get the distance covered by the trajectory by a given time.
       /// \param[in] _time Time from trajectory start to check the distance.
       /// \return Distance in meters covered by the trajectory.
