@@ -316,8 +316,8 @@ void NumericAnimation::InterpolatedKeyFrame(NumericKeyFrame &_kf) const
 
 /////////////////////////////////////////////////
 TrajectoryInfo::TrajectoryInfo()
-  : id(0), animIndex(0), duration(0.0), startTime(0.0), endTime(0.0),
-  translated(false), waypoints(nullptr)
+  : id(0), animIndex(0), duration(0), startTime(0),
+  endTime(0), translated(false), waypoints(nullptr)
 {
 }
 
@@ -348,13 +348,14 @@ void TrajectoryInfo::SetAnimIndex(unsigned int _index)
 /////////////////////////////////////////////////
 double TrajectoryInfo::Duration() const
 {
-  return this->duration;
+  return std::chrono::duration_cast<std::chrono::milliseconds>(
+            this->duration).count() / 1000.0;
 }
 
 /////////////////////////////////////////////////
 void TrajectoryInfo::SetDuration(double _duration)
 {
-  this->duration = _duration;
+  this->duration = std::chrono::milliseconds(static_cast<int>(_duration*1000));
 }
 
 /////////////////////////////////////////////////
@@ -388,25 +389,28 @@ double TrajectoryInfo::DistanceSoFar(double _time) const
 /////////////////////////////////////////////////
 double TrajectoryInfo::StartTime() const
 {
-  return this->startTime;
+  return std::chrono::duration_cast<std::chrono::milliseconds>(
+            this->startTime).count() / 1000.0;
 }
 
 /////////////////////////////////////////////////
 void TrajectoryInfo::SetStartTime(double _startTime)
 {
-  this->startTime = _startTime;
+  this->startTime = std::chrono::milliseconds(
+                  static_cast<int>(_startTime * 1000));
 }
 
 /////////////////////////////////////////////////
 double TrajectoryInfo::EndTime() const
 {
-  return this->endTime;
+  return std::chrono::duration_cast<std::chrono::milliseconds>(
+            this->endTime).count() / 1000.0;
 }
 
 /////////////////////////////////////////////////
 void TrajectoryInfo::SetEndTime(double _endTime)
 {
-  this->endTime = _endTime;
+  this->endTime = std::chrono::milliseconds(static_cast<int>(_endTime * 1000));
 }
 
 /////////////////////////////////////////////////
@@ -432,8 +436,8 @@ void TrajectoryInfo::AddWaypoints(std::map<double, math::Pose3d> _waypoints)
 {
   auto first = _waypoints.begin();
   auto last = _waypoints.rbegin();
-  this->startTime = first->first;
-  this->endTime = last->first;
+  this->SetStartTime(first->first);
+  this->SetEndTime(last->first);
 
   std::stringstream animName;
   animName << this->AnimIndex() << "_" << this->Id();
@@ -472,5 +476,5 @@ void TrajectoryInfo::AddWaypoints(std::map<double, math::Pose3d> _waypoints)
 
   this->waypoints = anim;
   this->translated = true;
-  this->duration = last->first - first->first;
+  this->SetDuration(last->first - first->first);
 }

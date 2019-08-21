@@ -261,13 +261,13 @@ namespace ignition
       protected: unsigned int animIndex;
 
       /// \brief Duration of the trajectory in seconds
-      protected: double duration;
+      protected: std::chrono::steady_clock::duration duration;
 
       /// \brief Start time of the trajectory, in seconds.
-      protected: double startTime;
+      protected: std::chrono::steady_clock::duration startTime;
 
       /// \brief End time of the trajectory, in seconds.
-      protected: double endTime;
+      protected: std::chrono::steady_clock::duration endTime;
 
       /// \brief True if the trajectory is translated.
       protected: bool translated;
