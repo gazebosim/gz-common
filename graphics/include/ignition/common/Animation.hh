@@ -18,6 +18,7 @@
 #define IGNITION_COMMON_ANIMATION_HH_
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -34,6 +35,7 @@ namespace ignition
     class KeyFrame;
     class PoseKeyFrame;
     class NumericKeyFrame;
+    class TrajectoryInfoPrivate;
 
     /// \class Animation Animation.hh ignition/common/Animation.hh
     /// \brief Manages an animation, which is a collection of keyframes and
@@ -191,6 +193,26 @@ namespace ignition
       /// \brief Constructor
       public: TrajectoryInfo();
 
+      /// \brief Copy constructor
+      /// \param[in] _trajInfo TrajectoryInfo to copy.
+      public: TrajectoryInfo(const TrajectoryInfo &_trajInfo);
+
+      /// \brief Move constructor
+      /// \param[in] _trajInfo TrajectoryInfo to move.
+      public: TrajectoryInfo(TrajectoryInfo &&_trajInfo) noexcept;
+
+      /// \brief Destructor
+      public: ~TrajectoryInfo();
+
+      /// \brief Assignment operator.
+      /// \param[in] _trajInfo The TrajectoryInfo to set values from.
+      /// \return *this
+      public: TrajectoryInfo &operator=(const TrajectoryInfo &_trajInfo);
+
+      /// \brief Copy TrajectoryInfo from a TrajectoryInfo instance.
+      /// \param[in] _trajInfo The TrajectoryInfo to set values from.
+      public: void CopyFrom(const TrajectoryInfo &_trajInfo);
+
       /// \brief Return the id of the trajectory
       /// \return Id of the trajectory
       public: unsigned int Id() const;
@@ -208,34 +230,33 @@ namespace ignition
       /// (auto-generated according to the type)
       public: void SetAnimIndex(unsigned int _index);
 
-      /// \brief Return the duration of the trajectory
-      /// \return Duration of the animation in seconds
-      public: double Duration() const;
+      /// \brief Return the duration of the trajectory.
+      /// \return Duration of the animation.
+      public: std::chrono::steady_clock::duration Duration() const;
 
-      /// \brief Set the duration of the trajectory
-      /// \param[in] _duration Trajectory duration
-      public: void SetDuration(double _duration);
+      /// \brief Get the distance covered by the trajectory by a given time.
+      /// \param[in] _time Time from trajectory start to check the distance.
+      /// \return Distance in meters covered by the trajectory.
+      public: double DistanceSoFar(
+          const std::chrono::steady_clock::duration &_time) const;
 
-      /// \brief Return the duration of the animation
-      /// \param[in] _time Time at which to create the keyframe
-      /// \return Duration of the animation in seconds
-      public: double DistanceSoFar(double _time) const;
+      /// \brief Return the start time of the trajectory.
+      /// \return Start time of the trajectory.
+      public: std::chrono::steady_clock::time_point StartTime() const;
 
-      /// \brief Return the start time of the trajectory
-      /// \return Start time of the trajectory in seconds
-      public: double StartTime() const;
-
-      /// \brief Set the start time of the trajectory
-      /// \param[in] _startTime Trajectory start time in seconds
-      public: void SetStartTime(double _startTime);
+      /// \brief Set the start time of the trajectory.
+      /// \param[in] _startTime Trajectory start time.
+      public: void SetStartTime(
+          const std::chrono::steady_clock::time_point &_startTime);
 
       /// \brief Return the end time of the trajectory
       /// \return End time of the trajectory in seconds
-      public: double EndTime() const;
+      public: std::chrono::steady_clock::time_point EndTime() const;
 
-      /// \brief Set the end time of the trajectory
-      /// \param[in] _endTime Trajectory end time in seconds
-      public: void SetEndTime(double _endTime);
+      /// \brief Set the end time of the trajectory.
+      /// \param[in] _endTime Trajectory end time.
+      public: void SetEndTime(
+          const std::chrono::steady_clock::time_point &_endTime);
 
       /// \brief Return the trajectory is translated
       /// \return True if the trajectory is translated
@@ -250,33 +271,14 @@ namespace ignition
       public: common::PoseAnimation *Waypoints() const;
 
       /// \brief Load all waypoints in the trajectory
-      /// \param[in] _waypoints Waypoints in time-pose pairs
-      public: void AddWaypoints(std::map<double, math::Pose3d> _waypoints);
+      /// \param[in] _waypoints Map of waypoints, where the key is the absolute
+      /// time of the waypoint and the value is the pose.
+      public: void SetWaypoints(
+          std::map<std::chrono::steady_clock::time_point, math::Pose3d>
+           _waypoints);
 
-      /// \brief ID of the trajectory
-      protected: unsigned int id;
-
-      /// \brief Type of trajectory. If it matches the name a skeleton
-      /// animation, they will be played together
-      protected: unsigned int animIndex;
-
-      /// \brief Duration of the trajectory in seconds
-      protected: std::chrono::steady_clock::duration duration;
-
-      /// \brief Start time of the trajectory, in seconds.
-      protected: std::chrono::steady_clock::duration startTime;
-
-      /// \brief End time of the trajectory, in seconds.
-      protected: std::chrono::steady_clock::duration endTime;
-
-      /// \brief True if the trajectory is translated.
-      protected: bool translated;
-
-      /// \brief Waypoints in pose animation format
-      protected: common::PoseAnimation *waypoints;
-
-      /// \brief Segment distance
-      protected: std::map<double, double> segDistance;
+      /// \brief Private data pointer.
+      private: TrajectoryInfoPrivate *dataPtr;
     };
   }
 }
