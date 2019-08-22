@@ -38,15 +38,6 @@ namespace
   };
 }
 
-/// \brief Get a duration as seconds.
-/// \param[in] _duration Chrono duration.
-/// \return Duration in seconds, as double.
-double seconds(const std::chrono::steady_clock::duration &_duration)
-{
-  auto [sec, nsec] = math::durationToSecNsec(_duration);
-  return sec + nsec / 1000000000.0;
-}
-
 /////////////////////////////////////////////////
 class ignition::common::TrajectoryInfoPrivate
 {
@@ -374,10 +365,8 @@ void TrajectoryInfo::CopyFrom(const TrajectoryInfo &_trajInfo)
 {
   this->dataPtr->id = _trajInfo.dataPtr->id;
   this->dataPtr->animIndex = _trajInfo.dataPtr->animIndex;
-  this->dataPtr->startTime = std::chrono::steady_clock::time_point(
-                                _trajInfo.dataPtr->startTime);
-  this->dataPtr->endTime = std::chrono::steady_clock::time_point(
-                                _trajInfo.dataPtr->endTime);
+  this->dataPtr->startTime = _trajInfo.dataPtr->startTime;
+  this->dataPtr->endTime = _trajInfo.dataPtr->endTime;
   this->dataPtr->translated = _trajInfo.dataPtr->translated;
   this->dataPtr->waypoints = _trajInfo.dataPtr->waypoints;
   this->dataPtr->segDistance = _trajInfo.dataPtr->segDistance;
@@ -513,13 +502,14 @@ void TrajectoryInfo::SetWaypoints(
 
   std::stringstream animName;
   animName << this->AnimIndex() << "_" << this->Id();
-  common::PoseAnimation *anim = new common::PoseAnimation(
-                animName.str(), seconds(this->Duration()), false);
+  common::PoseAnimation *anim = new common::PoseAnimation(animName.str(),
+      std::chrono::duration<double>(this->Duration()).count(), false);
 
   auto prevPose = first->second.Pos();
   for (auto pIter = _waypoints.begin(); pIter != _waypoints.end(); ++pIter)
   {
-    auto key = anim->CreateKeyFrame(seconds(pIter->first - this->StartTime()));
+    auto key = anim->CreateKeyFrame(
+      std::chrono::duration<double>(pIter->first - this->StartTime()).count());
 
     math::Vector2d p1(prevPose.X(), prevPose.Y());
     math::Vector2d p2(pIter->second.Pos().X(), pIter->second.Pos().Y());

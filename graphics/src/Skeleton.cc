@@ -327,6 +327,8 @@ bool Skeleton::AddBvhAnimation(const std::string &_bvhFile, double _scale)
 {
   BVHLoader loader;
   auto skel = loader.Load(_bvhFile, _scale);
+  if (nullptr == skel)
+    return false;
 
   bool compatible = true;
 
@@ -337,7 +339,7 @@ bool Skeleton::AddBvhAnimation(const std::string &_bvhFile, double _scale)
   }
   else
   {
-    for (unsigned int i =- 0; i < this->NodeCount(); ++i)
+    for (unsigned int i = 0; i < this->NodeCount(); ++i)
     {
       SkeletonNode *skinNode = this->NodeByHandle(i);
       SkeletonNode *animNode = skel->NodeByHandle(i);
