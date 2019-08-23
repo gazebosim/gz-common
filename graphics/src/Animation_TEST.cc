@@ -160,7 +160,6 @@ TEST_F(AnimationTest, TrajectoryInfo)
   EXPECT_DOUBLE_EQ(4.0, trajInfo.DistanceSoFar(500ms));
 
   waypoints.clear();
-  std::cout << waypoints.size() << std::endl;
   // duration from start == 0
   waypoints[TP(200ms)] = math::Pose3d(1, 0, 0, 0, 0, 0);
   // duration from start == 2000ms

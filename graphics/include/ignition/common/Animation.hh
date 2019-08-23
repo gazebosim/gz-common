@@ -18,7 +18,6 @@
 #define IGNITION_COMMON_ANIMATION_HH_
 
 #include <map>
-#include <memory>
 #include <string>
 #include <vector>
 
@@ -258,7 +257,7 @@ namespace ignition
       public: void SetEndTime(
           const std::chrono::steady_clock::time_point &_endTime);
 
-      /// \brief Return the trajectory is translated
+      /// \brief Return whether the trajectory is translated
       /// \return True if the trajectory is translated
       public: bool Translated() const;
 
@@ -278,7 +277,7 @@ namespace ignition
            _waypoints);
 
       /// \brief Private data pointer.
-      private: TrajectoryInfoPrivate *dataPtr;
+      private: TrajectoryInfoPrivate *dataPtr{nullptr};
     };
   }
 }
