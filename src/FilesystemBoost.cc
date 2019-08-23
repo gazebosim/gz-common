@@ -437,7 +437,7 @@ namespace ignition
       dirpath += (dirpath.empty()
                   || (dirpath[dirpath.size()-1] != '\\'
                       && dirpath[dirpath.size()-1] != '/'
-                      && dirpath[dirpath.size()-1] != ':'))? "\\" : "";
+                      && dirpath[dirpath.size()-1] != ':'))? "\\*" : "*";
 
       WIN32_FIND_DATAA data;
       if ((this->dataPtr->handle = ::FindFirstFileA(dirpath.c_str(), &data))

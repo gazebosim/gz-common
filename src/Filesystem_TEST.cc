@@ -511,6 +511,14 @@ TEST_F(FilesystemTest, directory_iterator)
   }
 
   EXPECT_EQ(found_items.size(), 0UL);
+
+  found_items.clear();
+  for (DirIter dirIter("newDir"); dirIter != endIter; ++dirIter)
+  {
+    found_items.insert(basename(*dirIter));
+  }
+
+  EXPECT_EQ(found_items.size(), 0UL);
 }
 
 /////////////////////////////////////////////////
