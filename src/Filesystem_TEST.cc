@@ -528,56 +528,67 @@ TEST(Filesystem, createDirectories)
 /////////////////////////////////////////////////
 TEST(Filesystem, copyDirectories)
 {
-  // Create a directory
-  std::string new_temp_dir = "dirToBeCopied";
-  EXPECT_FALSE(exists(new_temp_dir));
-  ASSERT_TRUE(createDirectories(new_temp_dir));
-  EXPECT_TRUE(exists(new_temp_dir));
-  EXPECT_TRUE(isDirectory(new_temp_dir));
+  std::string newTempDir;
+  ASSERT_TRUE(create_and_switch_to_temp_dir(newTempDir));
+
+  // Create an empty directory
+  std::string dirToBeCopied = "dirToBeCopied";
+  EXPECT_FALSE(exists(dirToBeCopied));
+  EXPECT_TRUE(createDirectories(dirToBeCopied));
+  EXPECT_TRUE(exists(dirToBeCopied));
+  EXPECT_TRUE(isDirectory(dirToBeCopied));
 
   // Copy to a directory
-  std::string temp_dir_copy = "dirCopied";
-  EXPECT_FALSE(exists(temp_dir_copy));
+  std::string dirCopied = "dirCopied";
+  EXPECT_FALSE(exists(dirCopied));
 
-  EXPECT_TRUE(createDirectory(temp_dir_copy));
-  EXPECT_TRUE(removeDirectory(temp_dir_copy));
-  EXPECT_TRUE(createDirectories(temp_dir_copy));
-  EXPECT_TRUE(removeAll(temp_dir_copy));
-
-  ASSERT_TRUE(copyDirectory(new_temp_dir, temp_dir_copy));
-  EXPECT_TRUE(exists(temp_dir_copy));
-  EXPECT_TRUE(isDirectory(temp_dir_copy));
+  EXPECT_TRUE(copyDirectory(dirToBeCopied, dirCopied));
+  EXPECT_TRUE(exists(dirCopied));
+  EXPECT_TRUE(isDirectory(dirCopied));
 
   // Copy to an existing directory - should overwrite
-  ASSERT_TRUE(copyDirectory(new_temp_dir, temp_dir_copy));
-  EXPECT_TRUE(exists(temp_dir_copy));
-  EXPECT_TRUE(isDirectory(temp_dir_copy));
+  EXPECT_TRUE(copyDirectory(dirToBeCopied, dirCopied));
+  EXPECT_TRUE(exists(dirCopied));
+  EXPECT_TRUE(isDirectory(dirCopied));
 
   // Copy to a directory with non-existent intermediate paths
-  std::string interm_dir_copy = joinPaths("dirInterm", "dirCopied");
-  ASSERT_TRUE(copyDirectory(new_temp_dir, interm_dir_copy));
-  EXPECT_TRUE(exists(interm_dir_copy));
-  EXPECT_TRUE(isDirectory(interm_dir_copy));
+  std::string intermDirCopy = joinPaths("dirInterm", "dirCopied");
+  EXPECT_FALSE(exists(intermDirCopy));
+
+  EXPECT_TRUE(copyDirectory(dirToBeCopied, intermDirCopy));
+  EXPECT_TRUE(exists(intermDirCopy));
+  EXPECT_TRUE(isDirectory(intermDirCopy));
 
   // Copy recursively a directory with a directory and a file in it
-  std::string subdir = joinPaths(new_temp_dir, "subdir");
-  EXPECT_TRUE(createDirectories(subdir));
-  std::string subfile = joinPaths(subdir, "newfile");
-  EXPECT_TRUE(create_new_empty_file(subfile));
-  EXPECT_TRUE(exists(subfile));
-  std::string rec_dir_copy = "recDirCopied";
-  ASSERT_TRUE(copyDirectory(new_temp_dir, rec_dir_copy));
-  EXPECT_TRUE(exists(rec_dir_copy));
-  EXPECT_TRUE(isDirectory(rec_dir_copy));
+  std::string subDir = joinPaths(dirToBeCopied, "subDir");
+  EXPECT_FALSE(exists(subDir));
+  EXPECT_TRUE(createDirectories(subDir));
+  EXPECT_TRUE(exists(subDir));
+
+  std::string subFile = joinPaths(subDir, "newfile");
+  EXPECT_FALSE(exists(subFile));
+  EXPECT_TRUE(create_new_empty_file(subFile));
+  EXPECT_TRUE(exists(subFile));
+
+  std::string recDirCopied = "recDirCopied";
+  EXPECT_TRUE(copyDirectory(dirToBeCopied, recDirCopied));
+  EXPECT_TRUE(exists(recDirCopied));
+  EXPECT_TRUE(isDirectory(recDirCopied));
 
   // Non-existent source directory
-  EXPECT_TRUE(removeAll(new_temp_dir));
-  ASSERT_FALSE(copyDirectory(new_temp_dir, temp_dir_copy));
+  EXPECT_TRUE(removeAll(dirToBeCopied));
+  EXPECT_FALSE(copyDirectory(dirToBeCopied, dirCopied));
+
+  // Cleanup
+  EXPECT_TRUE(removeAll(newTempDir));
 }
 
 /////////////////////////////////////////////////
 TEST(Filesystem, uniquePaths)
 {
+  std::string newTempDir;
+  ASSERT_TRUE(create_and_switch_to_temp_dir(newTempDir));
+
   // Directory
   std::string dir = "uniqueDirectory";
   EXPECT_FALSE(exists(dir));
@@ -624,6 +635,8 @@ TEST(Filesystem, uniquePaths)
   removeDirectory(dir);
 #endif
   EXPECT_TRUE(removeDirectory(dirExistingRt)) << dirExistingRt;
+
+  EXPECT_TRUE(removeAll(newTempDir));
 }
 
 /////////////////////////////////////////////////
