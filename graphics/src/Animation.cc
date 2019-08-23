@@ -17,6 +17,7 @@
 #include <algorithm>
 
 #include <ignition/math/Spline.hh>
+#include <ignition/math/Vector2.hh>
 #include <ignition/math/RotationSpline.hh>
 #include <ignition/common/Console.hh>
 #include <ignition/common/KeyFrame.hh>
@@ -37,6 +38,34 @@ namespace
   };
 }
 
+/////////////////////////////////////////////////
+class ignition::common::TrajectoryInfoPrivate
+{
+  /// \brief ID of the trajectory
+  public: unsigned int id{0};
+
+  /// \brief Type of trajectory. If it matches the name a skeleton
+  /// animation, they will be played together
+  public: unsigned int animIndex{0};
+
+  /// \brief Start time of the trajectory.
+  public: std::chrono::steady_clock::time_point startTime;
+
+  /// \brief End time of the trajectory.
+  public: std::chrono::steady_clock::time_point endTime;
+
+  /// \brief True if the trajectory is translated.
+  public: bool translated{false};
+
+  /// \brief Waypoints in pose animation format.
+  /// Times within the animation should be considered durations counted
+  /// from start time.
+  public: common::PoseAnimation *waypoints{nullptr};
+
+  /// \brief Distance on the XY plane covered by each segment. The key is the
+  /// duration from start time, the value is the distance in meters.
+  public: std::map<std::chrono::steady_clock::duration, double> segDistance;
+};
 
 /////////////////////////////////////////////////
 Animation::Animation(const std::string &_name, const double _length,
@@ -311,4 +340,188 @@ void NumericAnimation::InterpolatedKeyFrame(NumericKeyFrame &_kf) const
     double diff = k2->Value() - k1->Value();
     _kf.Value(k1->Value() + diff * t);
   }
+}
+
+/////////////////////////////////////////////////
+TrajectoryInfo::TrajectoryInfo()
+  : dataPtr(new TrajectoryInfoPrivate)
+{
+}
+
+/////////////////////////////////////////////////
+TrajectoryInfo::TrajectoryInfo(TrajectoryInfo &&_trajInfo) noexcept
+{
+  this->dataPtr = _trajInfo.dataPtr;
+  _trajInfo.dataPtr = nullptr;
+}
+
+/////////////////////////////////////////////////
+TrajectoryInfo::~TrajectoryInfo()
+{
+}
+
+//////////////////////////////////////////////////
+void TrajectoryInfo::CopyFrom(const TrajectoryInfo &_trajInfo)
+{
+  this->dataPtr->id = _trajInfo.dataPtr->id;
+  this->dataPtr->animIndex = _trajInfo.dataPtr->animIndex;
+  this->dataPtr->startTime = _trajInfo.dataPtr->startTime;
+  this->dataPtr->endTime = _trajInfo.dataPtr->endTime;
+  this->dataPtr->translated = _trajInfo.dataPtr->translated;
+  this->dataPtr->waypoints = _trajInfo.dataPtr->waypoints;
+  this->dataPtr->segDistance = _trajInfo.dataPtr->segDistance;
+}
+
+//////////////////////////////////////////////////
+TrajectoryInfo::TrajectoryInfo(const TrajectoryInfo &_trajInfo)
+  : dataPtr(new TrajectoryInfoPrivate)
+{
+  this->CopyFrom(_trajInfo);
+}
+
+//////////////////////////////////////////////////
+TrajectoryInfo &TrajectoryInfo::operator=(const TrajectoryInfo &_trajInfo)
+{
+  this->CopyFrom(_trajInfo);
+  return *this;
+}
+
+/////////////////////////////////////////////////
+unsigned int TrajectoryInfo::Id() const
+{
+  return this->dataPtr->id;
+}
+
+/////////////////////////////////////////////////
+void TrajectoryInfo::SetId(unsigned int _id)
+{
+  this->dataPtr->id = _id;
+}
+
+/////////////////////////////////////////////////
+unsigned int TrajectoryInfo::AnimIndex() const
+{
+  return this->dataPtr->animIndex;
+}
+
+/////////////////////////////////////////////////
+void TrajectoryInfo::SetAnimIndex(unsigned int _index)
+{
+  this->dataPtr->animIndex = _index;
+}
+
+/////////////////////////////////////////////////
+std::chrono::steady_clock::duration TrajectoryInfo::Duration() const
+{
+  return this->dataPtr->endTime - this->dataPtr->startTime;
+}
+
+/////////////////////////////////////////////////
+double TrajectoryInfo::DistanceSoFar(
+    const std::chrono::steady_clock::duration &_time) const
+{
+  double distance = 0.0;
+
+  // Sum all completed segments
+  auto segment = this->dataPtr->segDistance.begin();
+  auto prevSegment = segment;
+  for (; segment != this->dataPtr->segDistance.end() && segment->first <= _time;
+      prevSegment = segment, ++segment)
+  {
+    distance += segment->second;
+  }
+
+  if (segment == this->dataPtr->segDistance.end())
+    return distance;
+
+  // Add difference
+  if (_time - prevSegment->first > std::chrono::steady_clock::duration())
+  {
+    distance += static_cast<double>((_time - prevSegment->first).count()) /
+        static_cast<double>((segment->first - prevSegment->first).count()) *
+        segment->second;
+  }
+  return distance;
+}
+
+/////////////////////////////////////////////////
+std::chrono::steady_clock::time_point TrajectoryInfo::StartTime() const
+{
+  return this->dataPtr->startTime;
+}
+
+/////////////////////////////////////////////////
+void TrajectoryInfo::SetStartTime(
+    const std::chrono::steady_clock::time_point &_startTime)
+{
+  this->dataPtr->startTime = _startTime;
+}
+
+/////////////////////////////////////////////////
+std::chrono::steady_clock::time_point TrajectoryInfo::EndTime() const
+{
+  return this->dataPtr->endTime;
+}
+
+/////////////////////////////////////////////////
+void TrajectoryInfo::SetEndTime(
+    const std::chrono::steady_clock::time_point &_endTime)
+{
+  this->dataPtr->endTime = _endTime;
+}
+
+/////////////////////////////////////////////////
+bool TrajectoryInfo::Translated() const
+{
+  return this->dataPtr->translated;
+}
+
+/////////////////////////////////////////////////
+void TrajectoryInfo::SetTranslated(bool _translated)
+{
+  this->dataPtr->translated = _translated;
+}
+
+/////////////////////////////////////////////////
+common::PoseAnimation *TrajectoryInfo::Waypoints() const
+{
+  return this->dataPtr->waypoints;
+}
+
+/////////////////////////////////////////////////
+void TrajectoryInfo::SetWaypoints(
+    std::map<std::chrono::steady_clock::time_point, math::Pose3d> _waypoints)
+{
+  this->dataPtr->segDistance.clear();
+
+  auto first = _waypoints.begin();
+  auto last = _waypoints.rbegin();
+
+  this->SetStartTime(first->first);
+  this->SetEndTime(last->first);
+
+  std::stringstream animName;
+  animName << this->AnimIndex() << "_" << this->Id();
+  common::PoseAnimation *anim = new common::PoseAnimation(animName.str(),
+      std::chrono::duration<double>(this->Duration()).count(), false);
+
+  auto prevPose = first->second.Pos();
+  for (auto pIter = _waypoints.begin(); pIter != _waypoints.end(); ++pIter)
+  {
+    auto key = anim->CreateKeyFrame(
+      std::chrono::duration<double>(pIter->first - this->StartTime()).count());
+
+    math::Vector2d p1(prevPose.X(), prevPose.Y());
+    math::Vector2d p2(pIter->second.Pos().X(), pIter->second.Pos().Y());
+    this->dataPtr->segDistance[pIter->first - this->StartTime()] =
+        p1.Distance(p2);
+
+    key->Translation(pIter->second.Pos());
+    key->Rotation(pIter->second.Rot());
+
+    prevPose = pIter->second.Pos();
+  }
+
+  this->dataPtr->waypoints = anim;
+  this->dataPtr->translated = true;
 }

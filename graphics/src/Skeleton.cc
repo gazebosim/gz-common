@@ -17,6 +17,7 @@
 #include <list>
 #include <ignition/common/SkeletonAnimation.hh>
 #include <ignition/common/Skeleton.hh>
+#include <ignition/common/BVHLoader.hh>
 
 using namespace ignition;
 using namespace common;
@@ -41,13 +42,32 @@ class ignition::common::SkeletonPrivate
 
   /// \brief the array of animations
   public: std::vector<SkeletonAnimation*> anims;
+
+  /// \brief Animation node to skin node map
+  /// * Map holding:
+  ///     * Skeleton node names from animation
+  ///     * Skeleton node names from skin
+  /// \sa skelAnimation
+  public: std::vector<std::map<std::string, std::string>> mapAnimSkin;
+
+  /// \brief Translation alignment from animation to skin
+  /// * Map holding:
+  ///     * Skeleton node names from animation
+  ///     * Transformations to translate
+  public: std::vector<std::map<std::string, math::Matrix4d>> alignTranslate;
+
+  /// \brief Rotation alignment from animation to skin
+  /// * Map holding:
+  ///     * Skeleton node names from animation
+  ///     * Transformations to rotate
+  public: std::vector<std::map<std::string, math::Matrix4d>> alignRotate;
 };
 
 //////////////////////////////////////////////////
 Skeleton::Skeleton()
   : data(new SkeletonPrivate)
 {
-  this->data->root = NULL;
+  this->data->root = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -296,5 +316,180 @@ SkeletonAnimation *Skeleton::Animation(const unsigned int _i) const
 //////////////////////////////////////////////////
 void Skeleton::AddAnimation(SkeletonAnimation *_anim)
 {
+  this->data->mapAnimSkin.push_back(std::map<std::string, std::string>());
+  this->data->alignTranslate.push_back(std::map<std::string, math::Matrix4d>());
+  this->data->alignRotate.push_back(std::map<std::string, math::Matrix4d>());
   this->data->anims.push_back(_anim);
+}
+
+//////////////////////////////////////////////////
+bool Skeleton::AddBvhAnimation(const std::string &_bvhFile, double _scale)
+{
+  BVHLoader loader;
+  auto skel = loader.Load(_bvhFile, _scale);
+  if (nullptr == skel)
+    return false;
+
+  bool compatible = true;
+
+  std::map<std::string, std::string> skelMap;
+  if (this->NodeCount() != skel->NodeCount())
+  {
+    compatible = false;
+  }
+  else
+  {
+    for (unsigned int i = 0; i < this->NodeCount(); ++i)
+    {
+      SkeletonNode *skinNode = this->NodeByHandle(i);
+      SkeletonNode *animNode = skel->NodeByHandle(i);
+      if (skinNode->ChildCount() != animNode->ChildCount())
+      {
+        compatible = false;
+        break;
+      }
+      else
+      {
+        skelMap[animNode->Name()] = skinNode->Name();
+      }
+    }
+  }
+
+  if (!compatible)
+  {
+    return false;
+  }
+
+  // align frames
+  std::map<std::string, math::Matrix4d> translations;
+  std::map<std::string, math::Matrix4d> rotations;
+
+  for (unsigned int i = 0; i < skel->NodeCount(); ++i)
+  {
+    SkeletonNode *animNode = skel->NodeByHandle(i);
+    SkeletonNode *skinNode = this->NodeByHandle(i);
+
+    if (animNode->Parent() != nullptr)
+    {
+      if (animNode->Parent()->ChildCount() > 1
+              && skinNode->Transform().Translation() ==
+              math::Vector3d::Zero)
+      {
+        translations[animNode->Name()] = math::Matrix4d::Identity;
+      }
+    }
+
+    if (animNode->ChildCount() == 0)
+    {
+      continue;
+    }
+
+    if (this->RootNode()->Name() == skelMap[animNode->Name()])
+    {
+      translations[animNode->Name()] = math::Matrix4d(
+        this->RootNode()->Transform().Rotation());
+      math::Matrix4d tmp(translations[animNode->Name()]);
+      tmp.SetTranslation(animNode->Transform().Translation());
+      animNode->SetTransform(tmp, true);
+    }
+
+    if (animNode->ChildCount() > 1)
+    {
+      continue;
+    }
+
+    math::Vector3d relativeBVH(
+          animNode->Child(0)->ModelTransform().Translation()
+              - animNode->ModelTransform().Translation());
+
+    math::Vector3d relativeSkin(
+          skinNode->Child(0)->ModelTransform().Translation()
+              - skinNode->ModelTransform().Translation());
+
+    if (relativeBVH == math::Vector3d::Zero ||
+            relativeSkin == math::Vector3d::Zero)
+    {
+      continue;
+    }
+
+    math::Vector3d n(relativeBVH.Cross(relativeSkin));
+    double theta = asin(n.Length() /
+          (relativeSkin.Length() * relativeBVH.Length()));
+
+    translations[animNode->Child(0)->Name()] =
+        math::Matrix4d(skinNode->ModelTransform().Rotation()).Inverse()
+        * math::Matrix4d(math::Quaterniond(n.Normalize(), theta))
+        * math::Matrix4d(animNode->ModelTransform().Rotation());
+    math::Matrix4d tmp(animNode->ModelTransform().Rotation());
+    tmp = tmp.Inverse()
+        * math::Matrix4d(math::Quaterniond(n.Normalize(), theta))
+        * math::Matrix4d(animNode->ModelTransform().Rotation());
+    tmp.SetTranslation(animNode->Transform().Translation());
+    animNode->SetTransform(tmp, true);
+  }
+
+  for (unsigned int i = 0; i < skel->NodeCount(); ++i)
+  {
+    SkeletonNode *animNode = skel->NodeByHandle(i);
+    SkeletonNode *skinNode = this->NodeByHandle(i);
+
+    if (skelMap[animNode->Name()] == this->RootNode()->Name())
+    {
+      rotations[animNode->Name()] = math::Matrix4d::Identity;
+      continue;
+    }
+
+    if (translations[animNode->Name()] == math::Matrix4d::Zero)
+    {
+        translations[animNode->Name()] = math::Matrix4d::Identity;
+    }
+
+    rotations[animNode->Name()] =
+          math::Matrix4d(animNode->Transform().Rotation()).Inverse()
+          * translations[animNode->Name()].Inverse()
+          * math::Matrix4d(skinNode->Transform().Rotation());
+  }
+
+  this->data->anims.push_back(skel->Animation(0u));
+  this->data->mapAnimSkin.push_back(skelMap);
+  this->data->alignTranslate.push_back(translations);
+  this->data->alignRotate.push_back(rotations);
+
+  return true;
+}
+
+//////////////////////////////////////////////////
+std::string Skeleton::NodeNameAnimToSkin(unsigned int _index,
+      const std::string &_animNodeName)
+{
+  if (this->data->mapAnimSkin[_index].find(_animNodeName)
+        != this->data->mapAnimSkin[_index].end())
+  {
+    return this->data->mapAnimSkin[_index][_animNodeName];
+  }
+  return _animNodeName;
+}
+
+//////////////////////////////////////////////////
+math::Matrix4d Skeleton::AlignTranslation(unsigned int _index,
+      const std::string &_animNodeName)
+{
+  if (this->data->alignTranslate[_index].find(_animNodeName)
+        != this->data->alignTranslate[_index].end())
+  {
+    return this->data->alignTranslate[_index][_animNodeName];
+  }
+  return math::Matrix4d::Identity;
+}
+
+//////////////////////////////////////////////////
+math::Matrix4d Skeleton::AlignRotation(unsigned int _index,
+      const std::string &_animNodeName)
+{
+  if (this->data->alignRotate[_index].find(_animNodeName)
+        != this->data->alignRotate[_index].end())
+  {
+    return this->data->alignRotate[_index][_animNodeName];
+  }
+  return math::Matrix4d::Identity;
 }

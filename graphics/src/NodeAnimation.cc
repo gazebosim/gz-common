@@ -163,7 +163,7 @@ math::Matrix4d NodeAnimation::FrameAt(double _time, bool _loop) const
 
   double t = (time - prevKey) / (nextKey - prevKey);
 
-  if (t >= 0.0 && t <= 1.0)
+  if (t < 0.0 || t > 1.0)
   {
     ignerr << "Invalid time range\n";
     return math::Matrix4d();
