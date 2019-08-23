@@ -2199,13 +2199,13 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
   // indices, used for identifying vertices that can be shared.
   std::map<unsigned int, std::vector<GeometryIndices> > vertexIndexMap;
 
-  unsigned int *values = new unsigned int[offsetSize];
+  std::vector<unsigned int> values(offsetSize);
   std::vector<std::string> strs = split(pStr, " \t\r\n");
 
   for (unsigned int j = 0; j < strs.size(); j += offsetSize)
   {
     for (unsigned int i = 0; i < offsetSize; ++i)
-      values[i] = ignition::math::parseInt(strs[j+i]);
+      values.at(i) = ignition::math::parseInt(strs[j+i]);
 
     unsigned int daeVertIndex = 0;
     bool addIndex = !hasVertices;
@@ -2216,7 +2216,7 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
     {
       // Get the vertex position index value. If the position is a duplicate
       // then reset the index to the first instance of the duplicated position
-      daeVertIndex = values[*inputs[VERTEX].begin()];
+      daeVertIndex = values.at(*inputs[VERTEX].begin());
       if (positionDupMap.find(daeVertIndex) != positionDupMap.end())
         daeVertIndex = positionDupMap[daeVertIndex];
 
@@ -2243,7 +2243,7 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
             // Get the vertex normal index value. If the normal is a duplicate
             // then reset the index to the first instance of the duplicated
             // position
-            unsigned int remappedNormalIndex = values[*inputs[NORMAL].begin()];
+            unsigned int remappedNormalIndex = values.at(*inputs[NORMAL].begin());
             if (normalDupMap.find(remappedNormalIndex) != normalDupMap.end())
               remappedNormalIndex = normalDupMap[remappedNormalIndex];
 
@@ -2256,7 +2256,7 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
             // duplicate then reset the index to the first instance of the
             // duplicated texcoord
             unsigned int remappedTexcoordIndex =
-                values[*inputs[TEXCOORD].begin()];
+                values.at(*inputs[TEXCOORD].begin());
             if (texDupMap.find(remappedTexcoordIndex) != texDupMap.end())
               remappedTexcoordIndex = texDupMap[remappedTexcoordIndex];
 
@@ -2295,10 +2295,10 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
         {
           SkeletonPtr skel = _mesh->MeshSkeleton();
           for (unsigned int i = 0;
-              i < skel->VertNodeWeightCount(values[daeVertIndex]); ++i)
+              i < skel->VertNodeWeightCount(daeVertIndex); ++i)
           {
             std::pair<std::string, double> node_weight =
-              skel->VertNodeWeight(values[daeVertIndex], i);
+              skel->VertNodeWeight(daeVertIndex, i);
             SkeletonNode *node =
                 _mesh->MeshSkeleton()->NodeByName(node_weight.first);
             subMesh->AddNodeAssignment(subMesh->VertexCount()-1,
@@ -2310,7 +2310,7 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
       }
       if (hasNormals)
       {
-        unsigned int inputRemappedNormalIndex = values[*inputs[NORMAL].begin()];
+        unsigned int inputRemappedNormalIndex = values.at(*inputs[NORMAL].begin());
         if (normalDupMap.find(inputRemappedNormalIndex) != normalDupMap.end())
           inputRemappedNormalIndex = normalDupMap[inputRemappedNormalIndex];
         subMesh->AddNormal(norms[inputRemappedNormalIndex]);
@@ -2319,7 +2319,7 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
       if (hasTexcoords)
       {
         unsigned int inputRemappedTexcoordIndex =
-            values[*inputs[TEXCOORD].begin()];
+            values.at(*inputs[TEXCOORD].begin());
         if (texDupMap.find(inputRemappedTexcoordIndex) != texDupMap.end())
           inputRemappedTexcoordIndex = texDupMap[inputRemappedTexcoordIndex];
         subMesh->AddTexCoord(texcoords[inputRemappedTexcoordIndex].X(),
@@ -2337,7 +2337,6 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
     }
   }
 
-  delete [] values;
   _mesh->AddSubMesh(std::move(subMesh));
 }
 
