@@ -494,14 +494,16 @@ TEST_F(FilesystemTest, directory_iterator)
     found_items.insert(basename(*dirIter));
   }
 
-  EXPECT_FALSE(found_items.find("newfile") == found_items.end());
-  EXPECT_FALSE(found_items.find("newdir") == found_items.end());
+  EXPECT_EQ(found_items.find("."), found_items.end());
+  EXPECT_EQ(found_items.find(".."), found_items.end());
+  EXPECT_NE(found_items.find("newfile"), found_items.end());
+  EXPECT_NE(found_items.find("newdir"), found_items.end());
 #ifdef BUILD_SYMLINK_TESTS
-  EXPECT_FALSE(found_items.find("symlink-file") == found_items.end());
-  EXPECT_FALSE(found_items.find("symlink-file-broken") == found_items.end());
-  EXPECT_FALSE(found_items.find("symlink-dir") == found_items.end());
-  EXPECT_FALSE(found_items.find("symlink-dir-broken") == found_items.end());
-  EXPECT_FALSE(found_items.find("hardlink-file") == found_items.end());
+  EXPECT_NE(found_items.find("symlink-file"), found_items.end());
+  EXPECT_NE(found_items.find("symlink-file-broken"), found_items.end());
+  EXPECT_NE(found_items.find("symlink-dir"), found_items.end());
+  EXPECT_NE(found_items.find("symlink-dir-broken"), found_items.end());
+  EXPECT_NE(found_items.find("hardlink-file"), found_items.end());
 #endif
 
   found_items.clear();

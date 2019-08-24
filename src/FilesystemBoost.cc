@@ -440,8 +440,18 @@ namespace ignition
                       && dirpath[dirpath.size()-1] != ':'))? "\\*" : "*";
 
       WIN32_FIND_DATAA data;
-      if ((this->dataPtr->handle = ::FindFirstFileA(dirpath.c_str(), &data))
-          == INVALID_HANDLE_VALUE)
+      this->dataPtr->handle = ::FindFirstFileA(dirpath.c_str(), &data);
+
+      // Keep iterating until we hit the end, or get a value other than "." and
+      // ".."
+      while (this->dataPtr->handle != INVALID_HANDLE_VALUE &&
+             (std::string(data.cFileName) == "." ||
+              std::string(data.cFileName) == ".."))
+      {
+        this->dataPtr->handle = ::FindFirstFileA(dirpath.c_str(), &data);
+      }
+
+      if (this->dataPtr->handle == INVALID_HANDLE_VALUE)
       {
         this->dataPtr->handle = nullptr;  // signal eof
         this->dataPtr->end = true;
