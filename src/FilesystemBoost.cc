@@ -55,6 +55,7 @@
 #include <winnt.h>
 #endif
 
+#include "ignition/common/Console.hh"
 #include "ignition/common/Filesystem.hh"
 
 namespace ignition
@@ -441,16 +442,20 @@ namespace ignition
 
       WIN32_FIND_DATAA data;
       data.cFileName[0] = 0;
+igndbg << "DirIter" << std::endl;
       // Skip "." and ".."
       while (data.cFileName[0] == 0 ||
              std::string(data.cFileName) == "." ||
              std::string(data.cFileName) == "..")
       {
+igndbg << "DirIter  " << std::string(data.cFileName) << std::endl;
         this->dataPtr->handle = ::FindFirstFileA(dirpath.c_str(), &data);
+igndbg << "DirIter  " << std::string(data.cFileName) << std::endl;
 
         // Hit the end
         if (this->dataPtr->handle == INVALID_HANDLE_VALUE)
         {
+igndbg << "DirIter  INVALID" << std::endl;
           this->dataPtr->handle = nullptr;  // signal eof
           this->dataPtr->end = true;
           return;
