@@ -440,8 +440,9 @@ namespace ignition
                       && dirpath[dirpath.size()-1] != ':'))? "\\*" : "*";
 
       WIN32_FIND_DATAA data;
+      data.cFileName[0] = 0;
       // Skip "." and ".."
-      while (std::string(data.cFileName) == "" ||
+      while (data.cFileName[0] == 0 ||
              std::string(data.cFileName) == "." ||
              std::string(data.cFileName) == "..")
       {
