@@ -441,43 +441,46 @@ namespace ignition
                       && dirpath[dirpath.size()-1] != ':'))? "\\*" : "*";
 
       WIN32_FIND_DATAA data;
-      data.cFileName[0] = 0;
-igndbg << "DirIter" << std::endl;
-      // Skip "." and ".."
-      while (data.cFileName[0] == 0 ||
-             std::string(data.cFileName) == "." ||
-             std::string(data.cFileName) == "..")
-      {
-igndbg << "DirIter  " << std::string(data.cFileName) << std::endl;
-        this->dataPtr->handle = ::FindFirstFileA(dirpath.c_str(), &data);
-igndbg << "DirIter  " << std::string(data.cFileName) << std::endl;
+      this->dataPtr->handle = ::FindFirstFileA(dirpath.c_str(), &data);
 
-        // Hit the end
-        if (this->dataPtr->handle == INVALID_HANDLE_VALUE)
-        {
-igndbg << "DirIter  INVALID" << std::endl;
-          this->dataPtr->handle = nullptr;  // signal eof
-          this->dataPtr->end = true;
-          return;
-        }
+      // Signal EOF
+      if (this->dataPtr->handle == INVALID_HANDLE_VALUE)
+      {
+        this->dataPtr->handle = nullptr;
+        this->dataPtr->end = true;
+        return;
       }
 
       this->dataPtr->current = std::string(data.cFileName);
+
+      // Skip "." and ".."
+      while (this->dataPtr->current == "." ||
+             this->dataPtr->current == "..")
+      {
+        this->Next();
+      }
     }
 
     //////////////////////////////////////////////////
     void DirIter::Next()
     {
       WIN32_FIND_DATAA data;
-      if (::FindNextFileA(this->dataPtr->handle, &data) == 0)  // fails
+      data.cFileName[0] = 0;
+      while(data.cFileName[0] == 0 ||
+            std::string(data.cFileName) == "." ||
+            std::string(data.cFileName) == "..")
       {
-        this->dataPtr->end = true;
-        this->dataPtr->current = "";
+        auto found = ::FindNextFileA(this->dataPtr->handle, &data);
+        // Signal EOF
+        if (!found)
+        {
+          this->dataPtr->end = true;
+          this->dataPtr->current = "";
+          return;
+        }
       }
-      else
-      {
-        this->dataPtr->current = std::string(data.cFileName);
-      }
+
+      this->dataPtr->current = std::string(data.cFileName);
     }
 
     //////////////////////////////////////////////////
