@@ -160,6 +160,13 @@ namespace ignition
     std::string IGNITION_COMMON_VISIBLE basename(
         const std::string &_path);
 
+    /// \brief Given a path, get just its parent path portion, without
+    /// separator at the end.
+    /// \param[in] _path  Path of which to find parent path
+    /// \return A new string with just the parent path of the path.
+    std::string IGNITION_COMMON_VISIBLE parentPath(
+        const std::string &_path);
+
     /// \brief Copy a file.
     /// \param[in] _existingFilename Path to an existing file.
     /// \param[in] _newFilename Path of the new file.
@@ -168,6 +175,15 @@ namespace ignition
     bool IGNITION_COMMON_VISIBLE copyFile(
         const std::string &_existingFilename,
         const std::string &_newFilename,
+        const FilesystemWarningOp _warningOp = FSWO_LOG_WARNINGS);
+
+    /// \brief Copy a directory, overwrite the destination directory if exists.
+    /// \param[in] _source Path to an existing directory to copy from.
+    /// \param[in] _destination Path to the destination directory.
+    /// \return True on success.
+    bool IGNITION_COMMON_VISIBLE copyDirectory(
+        const std::string &_existingDirname,
+        const std::string &_newDirname,
         const FilesystemWarningOp _warningOp = FSWO_LOG_WARNINGS);
 
     /// \brief Move a file.

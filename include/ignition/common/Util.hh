@@ -125,7 +125,7 @@ namespace ignition
     /// \return the log path
     std::string IGNITION_COMMON_VISIBLE logPath();
 
-    /// \brief add path sufix to common::SystemPaths
+    /// \brief add path suffix to common::SystemPaths
     /// \param[in] _suffix The suffix to add.
     void IGNITION_COMMON_VISIBLE addSearchPathSuffix(
         const std::string &_suffix);

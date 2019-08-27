@@ -30,6 +30,11 @@ class GTSMeshUtils : public ignition::testing::AutoLogFixture { };
 /////////////////////////////////////////////////
 TEST_F(GTSMeshUtils, DelaunayTriangulation)
 {
+  #ifdef _WIN32
+  std::cerr << "Skipping test on windows due to issue #50" << std::endl;
+  return;
+  #endif
+
   // test triangulation of a path with two subpaths:
   // a smaller square inside a bigger square.
   // The smaller square should be treated as a hole inside the bigger square.

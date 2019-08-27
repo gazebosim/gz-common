@@ -2,7 +2,10 @@
 
 ## Ignition Common 3.X.X
 
-## Ignition Common 3.3.0 (2019-08-23)
+## Ignition Common 3.3.0 (2019-08-27)
+
+1. skip GTSMeshUtils test on Windows due to issue #50
+    * [Pull request 205](https://bitbucket.org/osrf/gazebo/pull-request/205)
 
 1. Add bvh animation support for skeleton and TrajectoryInfo
     * [Pull request 197](https://bitbucket.org/osrf/gazebo/pull-request/197)
