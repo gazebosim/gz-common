@@ -466,7 +466,7 @@ namespace ignition
     {
       WIN32_FIND_DATAA data;
       data.cFileName[0] = 0;
-      while(data.cFileName[0] == 0 ||
+      while (data.cFileName[0] == 0 ||
             std::string(data.cFileName) == "." ||
             std::string(data.cFileName) == "..")
       {
