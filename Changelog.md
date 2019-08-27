@@ -13,6 +13,9 @@
 1. ColladaLoader: fix wrong node weights caused by buffer overflow bug
     * [Pull request 201](https://bitbucket.org/osrf/gazebo/pull-request/201)
 
+1. Filesystem copy directory and parentpath
+    * [Pull request 200](https://bitbucket.org/osrf/gazebo/pull-request/200)
+
 ## Ignition Common 3.2.0 (2019-08-07)
 
 1. Allow ignLogInit to use an absolute path. Added a timeToIso that converts a given time to an ISO string. Some console timestamps were using `IGN_SYSTEM_TIME_NS()` and others `ignition::common::systemTimeISO()`. Switched all to use `ignition::common::systemTimeISO()`.
