@@ -160,6 +160,10 @@ const std::list<std::string> &SystemPaths::PluginPaths()
 /////////////////////////////////////////////////
 std::string SystemPaths::FindSharedLibrary(const std::string &_libName)
 {
+  // Short circuit if the given library name is an absolute path to a file.
+  if (exists(_libName))
+    return _libName;
+
   // Trigger loading paths from env
   this->PluginPaths();
 
