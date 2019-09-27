@@ -55,6 +55,7 @@
 #include <winnt.h>
 #endif
 
+#include "ignition/common/Console.hh"
 #include "ignition/common/Filesystem.hh"
 
 namespace ignition
@@ -440,15 +441,23 @@ namespace ignition
                       && dirpath[dirpath.size()-1] != ':'))? "\\*" : "*";
 
       WIN32_FIND_DATAA data;
-      if ((this->dataPtr->handle = ::FindFirstFileA(dirpath.c_str(), &data))
-          == INVALID_HANDLE_VALUE)
+      this->dataPtr->handle = ::FindFirstFileA(dirpath.c_str(), &data);
+
+      // Signal EOF
+      if (this->dataPtr->handle == INVALID_HANDLE_VALUE)
       {
-        this->dataPtr->handle = nullptr;  // signal eof
+        this->dataPtr->handle = nullptr;
         this->dataPtr->end = true;
+        return;
       }
-      else
+
+      this->dataPtr->current = std::string(data.cFileName);
+
+      // Skip "." and ".."
+      while (this->dataPtr->current == "." ||
+             this->dataPtr->current == "..")
       {
-        this->dataPtr->current = std::string(data.cFileName);
+        this->Next();
       }
     }
 
@@ -456,15 +465,22 @@ namespace ignition
     void DirIter::Next()
     {
       WIN32_FIND_DATAA data;
-      if (::FindNextFileA(this->dataPtr->handle, &data) == 0)  // fails
+      data.cFileName[0] = 0;
+      while (data.cFileName[0] == 0 ||
+            std::string(data.cFileName) == "." ||
+            std::string(data.cFileName) == "..")
       {
-        this->dataPtr->end = true;
-        this->dataPtr->current = "";
+        auto found = ::FindNextFileA(this->dataPtr->handle, &data);
+        // Signal EOF
+        if (!found)
+        {
+          this->dataPtr->end = true;
+          this->dataPtr->current = "";
+          return;
+        }
       }
-      else
-      {
-        this->dataPtr->current = std::string(data.cFileName);
-      }
+
+      this->dataPtr->current = std::string(data.cFileName);
     }
 
     //////////////////////////////////////////////////

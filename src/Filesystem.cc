@@ -227,6 +227,21 @@ std::string ignition::common::joinPaths(const std::string &_path1,
 }
 
 /////////////////////////////////////////////////
+std::string ignition::common::parentPath(const std::string &_path)
+{
+  std::string result;
+
+  size_t last_sep = _path.find_last_of(separator(""));
+  // If slash is the last character, find its parent directory
+  if (last_sep == _path.length() - 1)
+    last_sep = _path.substr(0, last_sep).find_last_of(separator(""));
+
+  result = _path.substr(0, last_sep);
+
+  return result;
+}
+
+/////////////////////////////////////////////////
 bool ignition::common::copyFile(const std::string &_existingFilename,
                                 const std::string &_newFilename,
                                 const FilesystemWarningOp _warningOp)
@@ -282,6 +297,80 @@ bool ignition::common::copyFile(const std::string &_existingFilename,
 }
 
 /////////////////////////////////////////////////
+bool ignition::common::copyDirectory(const std::string &_existingDirname,
+                                     const std::string &_newDirname,
+                                     const FilesystemWarningOp _warningOp)
+{
+  // Check whether source directory exists
+  if (!exists(_existingDirname) || !isDirectory(_existingDirname))
+  {
+    if (FSWO_LOG_WARNINGS == _warningOp)
+    {
+      ignwarn << "Source directory [" << _existingDirname
+              << "] does not exist or is not a directory" << std::endl;
+    }
+    return false;
+  }
+
+  if (exists(_newDirname))
+  {
+    if (!removeAll(_newDirname, _warningOp))
+    {
+      if (FSWO_LOG_WARNINGS == _warningOp)
+      {
+        ignwarn << "Unable to remove existing destination directory ["
+                << _newDirname << "]\n";
+      }
+      return false;
+    }
+  }
+  // Create the destination directory
+  if (!createDirectories(_newDirname))
+  {
+    if (FSWO_LOG_WARNINGS == _warningOp)
+    {
+      ignwarn << "Unable to create the destination directory ["
+              << _newDirname << "], please check the permission\n";
+    }
+    return false;
+  }
+
+  // Start copy from source to destination directory
+  for (DirIter file(_existingDirname); file != DirIter(); ++file)
+  {
+    std::string current(*file);
+    if (isDirectory(current))
+    {
+      // Copy recursively
+      if (!copyDirectory(current, joinPaths(_newDirname, basename(current)),
+         _warningOp))
+      {
+        if (FSWO_LOG_WARNINGS == _warningOp)
+        {
+          ignwarn << "Unable to copy directory to ["
+                  << joinPaths(_newDirname, basename(current)) << "]\n";
+        }
+        return false;
+      }
+    }
+    else
+    {
+      if (!copyFile(current, joinPaths(_newDirname, basename(current)),
+        _warningOp))
+      {
+        if (FSWO_LOG_WARNINGS == _warningOp)
+        {
+          ignwarn << "Unable to copy file to ["
+                  << joinPaths(_newDirname, basename(current)) << "]\n";
+        }
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+/////////////////////////////////////////////////
 bool ignition::common::createDirectories(const std::string &_path)
 {
   size_t index = 0;
@@ -312,7 +401,7 @@ std::string ignition::common::uniqueFilePath(const std::string &_pathAndName,
   int count = 1;
 
   // Check if file exists and change name accordingly
-  while (common::exists(result.c_str()))
+  while (exists(result.c_str()))
   {
     result = _pathAndName + "(" + std::to_string(count++) + ").";
     result += _extension;
@@ -328,7 +417,7 @@ std::string ignition::common::uniqueDirectoryPath(const std::string &_dir)
   int count = 1;
 
   // Check if file exists and change name accordingly
-  while (common::exists(result.c_str()))
+  while (exists(result.c_str()))
   {
     result = _dir + "(" + std::to_string(count++) + ")";
   }

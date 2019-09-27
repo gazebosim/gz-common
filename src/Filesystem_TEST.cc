@@ -206,15 +206,25 @@ bool create_new_file_hardlink(const std::string &_hardlink,
 #endif
 
 #include <fstream> // NOLINT
+#include "ignition/common/Console.hh"
 #include "ignition/common/Filesystem.hh"
 
-namespace igncmn = ignition::common;
 using namespace ignition;
-using namespace igncmn;
+using namespace common;
+
+/// \brief Test Filesystem
+class FilesystemTest : public ::testing::Test
+{
+  // Documentation inherited
+  protected: void SetUp() override
+  {
+    Console::SetVerbosity(4);
+  }
+};
 
 /////////////////////////////////////////////////
 /// \brief Test file operations
-TEST(Util_TEST, fileOps)
+TEST_F(FilesystemTest, fileOps)
 {
   EXPECT_FALSE(common::cwd().empty());
   EXPECT_TRUE(common::exists(common::cwd()));
@@ -277,7 +287,7 @@ TEST(Util_TEST, fileOps)
 
 /////////////////////////////////////////////////
 /// \brief Test file operations
-TEST(Util_TEST, moreFileOps)
+TEST_F(FilesystemTest, moreFileOps)
 {
   EXPECT_FALSE(common::copyFile("__wrong__.tmp", "test2.tmp"));
   EXPECT_TRUE(!common::exists("test2.tmp"));
@@ -291,7 +301,7 @@ TEST(Util_TEST, moreFileOps)
 }
 
 /////////////////////////////////////////////////
-TEST(Filesystem, exists)
+TEST_F(FilesystemTest, exists)
 {
   std::string new_temp_dir;
   ASSERT_TRUE(create_and_switch_to_temp_dir(new_temp_dir));
@@ -327,7 +337,7 @@ TEST(Filesystem, exists)
 // https://bitbucket.org/ignitionrobotics/ign-common/issues/21
 #ifdef BUILD_SYMLINK_TESTS
 /////////////////////////////////////////////////
-TEST(Filesystem, symlink_exists)
+TEST_F(FilesystemTest, symlink_exists)
 {
   // There are 5 cases we want to test for links (Unix doesn't allow hard links
   // to directories or to non-existent files):
@@ -367,7 +377,7 @@ TEST(Filesystem, symlink_exists)
 #endif
 
 /////////////////////////////////////////////////
-TEST(Filesystem, cwd)
+TEST_F(FilesystemTest, cwd)
 {
   std::string new_temp_dir;
   ASSERT_TRUE(create_and_switch_to_temp_dir(new_temp_dir));
@@ -377,7 +387,7 @@ TEST(Filesystem, cwd)
 }
 
 /////////////////////////////////////////////////
-TEST(Filesystem, append)
+TEST_F(FilesystemTest, append)
 {
   std::string path = "tmp";
   path = joinPaths(path, "hello");
@@ -392,7 +402,25 @@ TEST(Filesystem, append)
 }
 
 /////////////////////////////////////////////////
-TEST(Filesystem, cwd_error)
+TEST_F(FilesystemTest, parentPath)
+{
+  std::string child = joinPaths("path", "to", "a", "child");
+  std::string parent = parentPath(child);
+  // Expect no separator at the end
+  EXPECT_EQ('a', *parent.rbegin());
+  // Expect parent string to match beginning of child string
+  EXPECT_EQ(parent, child.substr(0, parent.size()));
+  // join "a" with "child" and expect to match end of child string
+  EXPECT_EQ(separator("a") + "child", child.substr(parent.size()-1));
+
+  std::string child_with_slash = joinPaths("path", "to", "a", "child");
+  child_with_slash = separator(child_with_slash);
+  std::string parent2 = parentPath(child_with_slash);
+  EXPECT_EQ(parent, parent2);
+}
+
+/////////////////////////////////////////////////
+TEST_F(FilesystemTest, cwd_error)
 {
   // This test intentionally creates a directory, switches to it, removes
   // the directory, and then tries to call cwd() on it to cause
@@ -409,7 +437,7 @@ TEST(Filesystem, cwd_error)
 }
 
 /////////////////////////////////////////////////
-TEST(Filesystem, basename)
+TEST_F(FilesystemTest, basename)
 {
   std::string absolute = joinPaths("", "home", "bob", "foo");
   EXPECT_EQ(basename(absolute), "foo");
@@ -444,7 +472,7 @@ TEST(Filesystem, basename)
 }
 
 /////////////////////////////////////////////////
-TEST(Filesystem, directory_iterator)
+TEST_F(FilesystemTest, directory_iterator)
 {
   std::string new_temp_dir;
   ASSERT_TRUE(create_and_switch_to_temp_dir(new_temp_dir));
@@ -466,14 +494,16 @@ TEST(Filesystem, directory_iterator)
     found_items.insert(basename(*dirIter));
   }
 
-  EXPECT_FALSE(found_items.find("newfile") == found_items.end());
-  EXPECT_FALSE(found_items.find("newdir") == found_items.end());
+  EXPECT_EQ(found_items.find("."), found_items.end());
+  EXPECT_EQ(found_items.find(".."), found_items.end());
+  EXPECT_NE(found_items.find("newfile"), found_items.end());
+  EXPECT_NE(found_items.find("newdir"), found_items.end());
 #ifdef BUILD_SYMLINK_TESTS
-  EXPECT_FALSE(found_items.find("symlink-file") == found_items.end());
-  EXPECT_FALSE(found_items.find("symlink-file-broken") == found_items.end());
-  EXPECT_FALSE(found_items.find("symlink-dir") == found_items.end());
-  EXPECT_FALSE(found_items.find("symlink-dir-broken") == found_items.end());
-  EXPECT_FALSE(found_items.find("hardlink-file") == found_items.end());
+  EXPECT_NE(found_items.find("symlink-file"), found_items.end());
+  EXPECT_NE(found_items.find("symlink-file-broken"), found_items.end());
+  EXPECT_NE(found_items.find("symlink-dir"), found_items.end());
+  EXPECT_NE(found_items.find("symlink-dir-broken"), found_items.end());
+  EXPECT_NE(found_items.find("hardlink-file"), found_items.end());
 #endif
 
   found_items.clear();
@@ -483,10 +513,18 @@ TEST(Filesystem, directory_iterator)
   }
 
   EXPECT_EQ(found_items.size(), 0UL);
+
+  found_items.clear();
+  for (DirIter dirIter("newDir"); dirIter != endIter; ++dirIter)
+  {
+    found_items.insert(basename(*dirIter));
+  }
+
+  EXPECT_EQ(found_items.size(), 0UL);
 }
 
 /////////////////////////////////////////////////
-TEST(Filesystem, createDirectories)
+TEST_F(FilesystemTest, createDirectories)
 {
   std::string new_temp_dir;
   ASSERT_TRUE(create_and_switch_to_temp_dir(new_temp_dir));
@@ -508,8 +546,72 @@ TEST(Filesystem, createDirectories)
 }
 
 /////////////////////////////////////////////////
-TEST(Filesystem, uniquePaths)
+TEST_F(FilesystemTest, copyDirectories)
 {
+  std::string newTempDir;
+  ASSERT_TRUE(create_and_switch_to_temp_dir(newTempDir));
+
+  // Create an empty directory
+  std::string dirToBeCopied = "dir_to_be_copied";
+  EXPECT_FALSE(exists(dirToBeCopied));
+  EXPECT_TRUE(createDirectories(dirToBeCopied));
+  EXPECT_TRUE(exists(dirToBeCopied));
+  EXPECT_TRUE(isDirectory(dirToBeCopied));
+
+  // Copy to a directory
+  std::string dirCopied = "dir_copied";
+  EXPECT_FALSE(exists(dirCopied));
+
+  EXPECT_TRUE(copyDirectory(dirToBeCopied, dirCopied)) << dirToBeCopied <<
+      " -> " << dirCopied;
+  EXPECT_TRUE(exists(dirCopied));
+  EXPECT_TRUE(isDirectory(dirCopied));
+
+  // Copy to an existing directory - should overwrite
+  EXPECT_TRUE(copyDirectory(dirToBeCopied, dirCopied));
+  EXPECT_TRUE(exists(dirCopied));
+  EXPECT_TRUE(isDirectory(dirCopied));
+
+  // Copy to a directory with non-existent intermediate paths
+  std::string intermDirCopy = joinPaths("dir_interm", "dir_copied");
+  EXPECT_FALSE(exists(intermDirCopy));
+
+  EXPECT_TRUE(copyDirectory(dirToBeCopied, intermDirCopy));
+  EXPECT_TRUE(exists(intermDirCopy));
+  EXPECT_TRUE(isDirectory(intermDirCopy));
+
+  // Copy recursively a directory with a directory and a file in it
+  std::string subDir = joinPaths(dirToBeCopied, "sub_dir");
+  EXPECT_FALSE(exists(subDir));
+  EXPECT_TRUE(createDirectories(subDir));
+  EXPECT_TRUE(exists(subDir));
+
+  std::string subFile = joinPaths(subDir, "sub_file");
+  EXPECT_FALSE(exists(subFile));
+  EXPECT_TRUE(create_new_empty_file(subFile));
+  EXPECT_TRUE(exists(subFile));
+
+  std::string recDirCopied = "rec_dir_copied";
+  EXPECT_TRUE(copyDirectory(dirToBeCopied, recDirCopied));
+  EXPECT_TRUE(exists(recDirCopied));
+  EXPECT_TRUE(isDirectory(recDirCopied));
+
+  // Non-existent source directory
+  EXPECT_FALSE(copyDirectory("fake_dir", dirCopied));
+
+  // Cleanup
+  /// \todo(anyone) Fix removing files on windows
+#ifndef _WIN32
+  EXPECT_TRUE(removeAll(newTempDir));
+#endif
+}
+
+/////////////////////////////////////////////////
+TEST_F(FilesystemTest, uniquePaths)
+{
+  std::string newTempDir;
+  ASSERT_TRUE(create_and_switch_to_temp_dir(newTempDir));
+
   // Directory
   std::string dir = "uniqueDirectory";
   EXPECT_FALSE(exists(dir));

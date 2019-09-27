@@ -22,6 +22,7 @@
 #include <string>
 #include <future>
 #include <vector>
+#include <chrono>
 #include <ignition/common/Export.hh>
 #include <ignition/common/Filesystem.hh>
 
@@ -102,15 +103,29 @@ namespace ignition
     /// \brief A runtime error.
     typedef std::runtime_error exception;
 
+    /// \brief Please use systemTimeIso() as this function will be deprecated
+    /// in Ignition Common 4.
+    /// Get the wall time as an ISO string: YYYY-MM-DDTHH:MM:SS.NS
+    /// \return The current wall time as an ISO string.
+    /// \sa systemTimeIso();
+    std::string IGNITION_COMMON_VISIBLE systemTimeISO();
+
     /// \brief Get the wall time as an ISO string: YYYY-MM-DDTHH:MM:SS.NS
     /// \return The current wall time as an ISO string.
-    std::string IGNITION_COMMON_VISIBLE systemTimeISO();
+    std::string IGNITION_COMMON_VISIBLE systemTimeIso();
+
+    /// \brief Converts a time point to an ISO string: YYYY-MM-DDTHH:MM:SS.NS
+    /// \param[in] _time A time point, such as one created by
+    /// IGN_SYSTEM_TIME().
+    /// \return An ISO string that represents the given _time.
+    std::string IGNITION_COMMON_VISIBLE timeToIso(
+        const std::chrono::time_point<std::chrono::system_clock> &_time);
 
     /// \brief Get the log path
     /// \return the log path
     std::string IGNITION_COMMON_VISIBLE logPath();
 
-    /// \brief add path sufix to common::SystemPaths
+    /// \brief add path suffix to common::SystemPaths
     /// \param[in] _suffix The suffix to add.
     void IGNITION_COMMON_VISIBLE addSearchPathSuffix(
         const std::string &_suffix);
