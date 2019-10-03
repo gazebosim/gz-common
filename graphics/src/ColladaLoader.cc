@@ -500,6 +500,8 @@ void ColladaLoaderPrivate::LoadNode(tinyxml2::XMLElement *_elem, Mesh *_mesh,
       bindMatXml = bindMatXml->NextSiblingElement("bind_material");
     }
 
+    if (_mesh->HasSkeleton())
+      _mesh->MeshSkeleton()->SetNumVertAttached(0);
     this->LoadGeometry(geomXml, transform, _mesh);
     instGeomXml = instGeomXml->NextSiblingElement("instance_geometry");
   }
