@@ -153,13 +153,13 @@ math::Matrix4d NodeAnimation::FrameAt(double _time, bool _loop) const
 
   std::map<double, math::Matrix4d>::const_iterator it2 = it1--;
 
-  if (it1 == this->data->keyFrames.begin() || math::equal(it1->first, time))
-    return it1->second;
+  if (math::equal(it2->first, time))
+    return it2->second;
 
   double nextKey = it2->first;
   math::Matrix4d nextTrans = it2->second;
   double prevKey = it1->first;
-  math::Matrix4d prevTrans = it2->second;
+  math::Matrix4d prevTrans = it1->second;
 
   double t = (time - prevKey) / (nextKey - prevKey);
 

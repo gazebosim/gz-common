@@ -123,6 +123,12 @@ namespace ignition
       public: void LoadAnimationSet(tinyxml2::XMLElement *_xml,
                                      SkeletonPtr _skel);
 
+      /// \brief Load a single skeleton node
+      /// \param[in] _xml Pointer to the XML instance
+      /// \param[in,out] _xml Pointer to the Skeleton node parent
+      public: SkeletonNode *LoadSingleSkeletonNode(tinyxml2::XMLElement *_xml,
+                                              SkeletonNode *_parent);
+
       /// \brief Load skeleton nodes
       /// \param[in] _xml Pointer to the XML instance
       /// \param[in,out] _parent Pointer to the Skeleton node parent
@@ -288,6 +294,15 @@ namespace ignition
       /// \param[in] _mergeNode new root node to merge
       public: void MergeSkeleton(SkeletonPtr _skeleton,
           SkeletonNode *_mergeNode);
+
+      /// \brief Apply the the inv bind transform to the skeleton pose.
+      /// \remarks have to set the model transforms starting from the root in
+      /// breadth first order. Because setting the model transform also updates
+      /// the transform based on the parent's inv model transform. Setting the
+      /// child before the parent results in the child's transform being
+      /// calculated from the "old" parent model transform.
+      /// \param[in] _skeleton the skeleton to work on
+      public: void ApplyInvBindTransform(SkeletonPtr _skeleton);
     };
 
     /// \brief Helper data structure for loading collada geometries.
@@ -402,6 +417,9 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
   mesh->SetPath(this->dataPtr->path);
 
   this->dataPtr->LoadScene(mesh);
+
+  if (mesh->HasSkeleton())
+    this->dataPtr->ApplyInvBindTransform(mesh->MeshSkeleton());
 
   // This will make the model the correct size.
   mesh->Scale(ignition::math::Vector3d(
@@ -732,7 +750,6 @@ void ColladaLoaderPrivate::LoadController(tinyxml2::XMLElement *_contrXml,
             ignition::math::parseFloat(strs[id + 15]));
 
     skeleton->NodeByName(joints[i])->SetInverseBindTransform(mat);
-    skeleton->NodeByName(joints[i])->SetModelTransform(mat.Inverse(), false);
   }
 
   tinyxml2::XMLElement *vertWeightsXml =
@@ -1013,23 +1030,35 @@ void ColladaLoaderPrivate::LoadAnimationSet(tinyxml2::XMLElement *_xml,
 }
 
 /////////////////////////////////////////////////
-SkeletonNode *ColladaLoaderPrivate::LoadSkeletonNodes(
+SkeletonNode* ColladaLoaderPrivate::LoadSingleSkeletonNode(
     tinyxml2::XMLElement *_xml, SkeletonNode *_parent)
 {
   std::string name;
   if (_xml->Attribute("sid"))
     name = _xml->Attribute("sid");
-  else
+  else if (_xml->Attribute("name"))
     name = _xml->Attribute("name");
+  else
+    name = _xml->Attribute("id");
 
   SkeletonNode* node = new SkeletonNode(_parent, name, _xml->Attribute("id"));
 
-  if (std::string(_xml->Attribute("type")) == std::string("NODE"))
+  if (!_xml->Attribute("type")
+      || std::string(_xml->Attribute("type")) == "NODE")
+  {
     node->SetType(SkeletonNode::NODE);
+  }
 
+  return node;
+}
+
+/////////////////////////////////////////////////
+SkeletonNode *ColladaLoaderPrivate::LoadSkeletonNodes(
+    tinyxml2::XMLElement *_xml, SkeletonNode *_parent)
+{
+  auto node = this->LoadSingleSkeletonNode(_xml, _parent);
   this->SetSkeletonNodeTransform(_xml, node);
-
-  tinyxml2::XMLElement *childXml = _xml->FirstChildElement("node");
+  auto childXml = _xml->FirstChildElement("node");
   while (childXml)
   {
     this->LoadSkeletonNodes(childXml, node);
@@ -1706,6 +1735,30 @@ void ColladaLoaderPrivate::LoadColorOrTexture(tinyxml2::XMLElement *_elem,
   }
   else if (typeElem->FirstChildElement("texture"))
   {
+    if (_type == "ambient")
+    {
+      ignwarn << "ambient texture not supported" << std::endl;
+      return;
+    }
+    if (_type == "emission")
+    {
+      ignwarn << "emission texture not supported" << std::endl;
+      return;
+    }
+    if (_type == "specular")
+    {
+      ignwarn << "specular texture not supported" << std::endl;
+      return;
+    }
+
+    // rendering pipeline doesn't respect the blend mode, here we set
+    // the diffuse to full white as a workaround.
+    if (_type == "diffuse"
+        && _mat->Blend() == Material::BlendMode::REPLACE)
+    {
+      _mat->SetDiffuse(math::Color(1, 1, 1, 1));
+    }
+
     _mat->SetLighting(true);
     tinyxml2::XMLElement *imageXml = NULL;
     std::string textureName =
@@ -2015,7 +2068,7 @@ void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
             input.vertexIndex = daeVertIndex;
             input.mappedIndex = newVertIndex;
           }
-          if (!inputs[VERTEX].empty())
+          if (!inputs[NORMAL].empty())
           {
             unsigned int inputRemappedNormalIndex =
               values[*inputs[NORMAL].begin()];
@@ -2526,4 +2579,21 @@ void ColladaLoaderPrivate::MergeSkeleton(SkeletonPtr _skeleton,
   _mergeNode->SetParent(dummyRoot);
   dummyRoot->SetTransform(math::Matrix4d::Identity);
   _skeleton->RootNode(dummyRoot);
+}
+
+/////////////////////////////////////////////////
+void ColladaLoaderPrivate::ApplyInvBindTransform(SkeletonPtr _skeleton)
+{
+  std::list<SkeletonNode *> queue;
+  queue.push_back(_skeleton->RootNode());
+
+  while (!queue.empty())
+  {
+    SkeletonNode *node = queue.front();
+    if (node->HasInvBindTransform())
+      node->SetModelTransform(node->InverseBindTransform().Inverse(), false);
+    for (unsigned int i = 0; i < node->ChildCount(); i++)
+      queue.push_back(node->Child(i));
+    queue.pop_front();
+  }
 }
