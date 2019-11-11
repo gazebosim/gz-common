@@ -125,7 +125,7 @@ namespace ignition
 
       /// \brief Load a single skeleton node
       /// \param[in] _xml Pointer to the XML instance
-      /// \param[in,out] _xml Pointer to the Skeleton node parent
+      /// \param[in,out] _parent Pointer to the Skeleton node parent
       public: SkeletonNode *LoadSingleSkeletonNode(tinyxml2::XMLElement *_xml,
                                               SkeletonNode *_parent);
 
