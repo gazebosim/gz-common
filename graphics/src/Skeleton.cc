@@ -35,13 +35,13 @@ class ignition::common::SkeletonPrivate
   public: SkeletonNodeMap nodes;
 
   /// \brief the bind pose skeletal transform
-  public: math::Matrix4d bindShapeTransform;
+  public: math::Matrix4d bindShapeTransform{math::Matrix4d::Identity};
 
   /// \brief the node weight table
   public: RawNodeWeights rawNodeWeights;
 
   /// \brief the array of animations
-  public: std::vector<SkeletonAnimation*> anims;
+  public: std::vector<SkeletonAnimation *> anims;
 
   /// \brief Animation node to skin node map
   /// * Map holding:

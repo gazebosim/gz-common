@@ -159,6 +159,12 @@ namespace ignition
       /// \return the transform
       public: math::Matrix4d InverseBindTransform() const;
 
+      /// \brief Returns true if the node has inv bind transform.
+      /// \detail to keep ABI compatibility, it checks if the inv bind transform
+      /// is the default value of zero.
+      /// \return true if the node has inv bind transform
+      public: bool HasInvBindTransform() const;
+
       /// \brief Retrieve the model transform
       /// \return the transform
       public: math::Matrix4d ModelTransform() const;
