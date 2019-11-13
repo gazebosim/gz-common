@@ -1030,7 +1030,7 @@ void ColladaLoaderPrivate::LoadAnimationSet(tinyxml2::XMLElement *_xml,
 }
 
 /////////////////////////////////////////////////
-SkeletonNode* ColladaLoaderPrivate::LoadSingleSkeletonNode(
+SkeletonNode *ColladaLoaderPrivate::LoadSingleSkeletonNode(
     tinyxml2::XMLElement *_xml, SkeletonNode *_parent)
 {
   std::string name;
