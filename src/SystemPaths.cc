@@ -327,6 +327,21 @@ std::string SystemPaths::FindFileURI(const ignition::common::URI &_uri) const
     filename = this->dataPtr->findFileURICB(_uri.Str());
   }
 
+  // Look in custom paths.
+  // Tries the suffix against all paths, regardless of the scheme
+  if (filename.empty())
+  {
+    for (const std::string &filePath : this->dataPtr->filePaths)
+    {
+      if (exists(NormalizeDirectoryPath(filePath) + suffix))
+      {
+        filename = NormalizeDirectoryPath(filePath) + suffix;
+        ignition::common::replaceAll(filename, filename, "//", "/");
+        break;
+      }
+    }
+  }
+
   // If still not found, try custom callbacks
   if (filename.empty())
   {
