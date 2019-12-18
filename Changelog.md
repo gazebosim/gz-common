@@ -2,6 +2,9 @@
 
 ## Ignition Common 3.X.X
 
+1. Fix `Image::ConvertPixelFormat` for `BAYER_BGGR8`
+    * [Pull request 211](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/211)
+
 ## Ignition Common 3.3.0 (2019-08-27)
 
 1. skip GTSMeshUtils test on Windows due to issue #50
