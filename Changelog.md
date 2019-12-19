@@ -3,13 +3,13 @@
 ## Ignition Common 3.X.X
 
 1. Port Skeleton fixes from gazebo.
-    * [Pull request 206](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/206)
+    * [Pull request 209](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/209)
 
 1. Port gazebo9 fix for ColladaLoader with multiple geometries
     * [Pull request 208](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/208)
 
 1. `SystemPaths::FindSharedLibrary`: return input if its is an absolute path to a file
-    * [Pull request 209](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/209)
+    * [Pull request 206](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/206)
 
 1. Fix `Image::ConvertPixelFormat` for `BAYER_BGGR8`
     * [Pull request 211](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/211)
