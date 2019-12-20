@@ -552,7 +552,7 @@ bool URIPath::Valid(const std::string &_str)
                                         ":"
                                         "%"
                                         // "-._~"  // is in RFC, weird
-                                        "+"// "!$&'()*,;=" // is in RFC, weird
+                                        "+"  // "!$&'()*,;=" // is in RFC, weird
                                         "[/";
   if (str.substr(0, 1).find_first_not_of(allowedCharsFirst) !=
       std::string::npos)

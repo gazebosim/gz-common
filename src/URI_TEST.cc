@@ -656,7 +656,8 @@ TEST(URITEST, WikipediaTests)
   // The following tests were pulled from:
   // https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Examples
 
-  EXPECT_TRUE(uri.Parse("https://john.doe@www.example.com:123/forum/questions/?tag=networking&order=newest#top"));
+  EXPECT_TRUE(uri.Parse("https://john.doe@www.example.com:123/forum/questions"
+        "/?tag=networking&order=newest#top"));
   EXPECT_EQ("https", uri.Scheme());
   EXPECT_EQ("john.doe", uri.Authority().UserInfo());
   EXPECT_EQ("www.example.com", uri.Authority().Host());
