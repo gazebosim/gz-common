@@ -12,16 +12,19 @@ release will remove the deprecated code.
 1. Corrected `BAYER_RGGR8` to `BAYER_BGGR8` in `PixelFormatName` and
    `PixelFormatType` located in `graphics/include/ignition/common/Image.hh`.
 
-1. URI parsing has updated to follow the specification more closely.
+1. URI parsing has updated to follow the specification more closely. Changes
+   include:
     * An empty URI Path is valid.
-    * Double forward slashes (//) are valid in a URI Path.
-    * A URI Query does not require the `key=value` format. For example
-    a valid query can be "?aquery" and even "?aquery?".
+    * Double forward slashes, `//`, are valid in a URI Path.
+    * A URI Query does not require a `key=value` format. For example
+    a valid query can be "?aquery", "?aquery?", and `??`.
     * A URI authority is optional. If present, then a URI authority begins
     with two forward slashes and immediately follows the URI scheme. A host
     must be present if an authority is present. All this means the following
     is invalid, `file:///abs/path/to/file`. The proper form is
-    `file:/abs/path/to/file`.
+    `file:/abs/path/to/file`. `file://` has been deprecated in Ignition
+    Common 4. Starting in Ignition Common 5 `file://` will require a 
+    valid authority.
 
 ## Ignition Common 2.X to 3.X
 
