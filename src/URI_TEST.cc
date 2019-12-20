@@ -223,7 +223,10 @@ TEST(URITEST, URIPathString)
   EXPECT_NO_THROW(EXPECT_TRUE(URIPath("a//b").Valid()));
   EXPECT_NO_THROW(EXPECT_TRUE(URIPath("/a//b").Valid()));
   EXPECT_NO_THROW(EXPECT_TRUE(URIPath(" ").Valid()));
-  EXPECT_NO_THROW(EXPECT_FALSE(URIPath("?invalid").Valid()));
+
+  // The following are valid because setting a URIPath to an invalid string
+  // results in the path being empty, which in turn is a valid path.
+  EXPECT_NO_THROW(EXPECT_TRUE(URIPath("?invalid").Valid()));
   EXPECT_NO_THROW(EXPECT_TRUE(URIPath("=invalid").Valid()));
   EXPECT_NO_THROW(EXPECT_TRUE(URIPath("&invalid").Valid()));
   EXPECT_NO_THROW(EXPECT_TRUE(URIPath("invalid#").Valid()));
@@ -444,10 +447,26 @@ TEST(URITEST, Path)
   EXPECT_EQ(uri.Str(), "file:/var/run/test");
   EXPECT_TRUE(uri.Path().IsAbsolute());
 
+  // The following seven lines are valid for Ignition Common 5. See
+  // the deprecation note in URI::Parse(const std::string).
+  // uri.Parse("file://var/run/test");
+  // EXPECT_EQ(uri.Str(), "file://var/run/test");
+  // EXPECT_EQ(uri.Path().Str(), "/run/test");
+  // EXPECT_TRUE(uri.Path().IsAbsolute());
+  // EXPECT_TRUE(uri.Parse("file://test%20space"));
+  // EXPECT_EQ(uri.Authority().Str(), "//test%20space");
+  // EXPECT_TRUE(uri.Path().Str().empty());
+
+  // The following seven lines are valid for Ignition Common 4, and should
+  // be removed in Ignition Common 5. See the deprecation note in
+  // URI::Parse(const std::string).
   uri.Parse("file://var/run/test");
-  EXPECT_EQ(uri.Str(), "file://var/run/test");
-  EXPECT_EQ(uri.Path().Str(), "/run/test");
-  EXPECT_TRUE(uri.Path().IsAbsolute());
+  EXPECT_EQ(uri.Str(), "file:var/run/test");
+  EXPECT_EQ(uri.Path().Str(), "var/run/test");
+  EXPECT_FALSE(uri.Path().IsAbsolute());
+  EXPECT_TRUE(uri.Parse("file://test%20space"));
+  EXPECT_EQ(uri.Authority().Str(), "");
+  EXPECT_EQ("test%20space", uri.Path().Str());
 
   uri.Parse("file:/var/run/test");
   EXPECT_EQ(uri.Str(), "file:/var/run/test");
@@ -461,9 +480,6 @@ TEST(URITEST, Path)
   EXPECT_EQ(uri.Path().Str(), "/test+space");
   EXPECT_TRUE(uri.Path().IsAbsolute());
 
-  EXPECT_TRUE(uri.Parse("file://test%20space"));
-  EXPECT_EQ(uri.Authority().Str(), "//test%20space");
-  EXPECT_TRUE(uri.Path().Str().empty());
 
   EXPECT_TRUE(uri.Parse("file:/test%20space"));
   EXPECT_EQ(uri.Str(), "file:/test%20space");

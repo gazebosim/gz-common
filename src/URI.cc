@@ -1062,10 +1062,24 @@ bool URI::Parse(const std::string &_str)
   size_t authDelimPos = str.find(kAuthDelim);
   if (authDelimPos != std::string::npos && authDelimPos == 0)
   {
-    size_t authEndPos = str.find_first_of("/?#",
-        authDelimPos + std::strlen(kAuthDelim));
-    localAuthority = str.substr(authDelimPos, authEndPos);
-    str.erase(0, authEndPos);
+    if (localScheme == "file")
+    {
+      // Deprecated. file:// is deprecated in Ignition Common 4. Remove
+      // this part of this `if` statement and leave just the contents of the
+      // `else` clause.
+      ignwarn << "`file://<path>` is deprecated. The double forward slash "
+        << "following a scheme (`file:` in this case) indicates the presense "
+        << "of a URI authority. `file://` should be replaced with just "
+        << "`file:` when referring to system path.\n";
+      str.erase(0, 2);
+    }
+    else
+    {
+      size_t authEndPos = str.find_first_of("/?#",
+          authDelimPos + std::strlen(kAuthDelim));
+      localAuthority = str.substr(authDelimPos, authEndPos);
+      str.erase(0, authEndPos);
+    }
   }
 
   // Get the path information
