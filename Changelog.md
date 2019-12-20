@@ -8,7 +8,41 @@
 
 ## Ignition Common 3.x
 
-## Ignition Common 3.x.x (2019-XX-XX)
+## Ignition Common 3.X.X
+
+1. Port Skeleton fixes from gazebo.
+    * [Pull request 209](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/209)
+
+1. Port gazebo9 fix for ColladaLoader with multiple geometries
+    * [Pull request 208](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/208)
+
+1. `SystemPaths::FindSharedLibrary`: return input if its is an absolute path to a file
+    * [Pull request 206](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/206)
+
+1. Fix `Image::ConvertPixelFormat` for `BAYER_BGGR8`
+    * [Pull request 211](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/211)
+
+## Ignition Common 3.3.0 (2019-08-27)
+
+1. skip GTSMeshUtils test on Windows due to issue #50
+    * [Pull request 205](https://bitbucket.org/osrf/gazebo/pull-request/205)
+
+1. Add bvh animation support for skeleton and TrajectoryInfo
+    * [Pull request 197](https://bitbucket.org/osrf/gazebo/pull-request/197)
+
+1. ColladaLoader: fix wrong node weights caused by buffer overflow bug
+    * [Pull request 201](https://bitbucket.org/osrf/gazebo/pull-request/201)
+
+1. Filesystem copy directory and parentpath
+    * [Pull request 200](https://bitbucket.org/osrf/gazebo/pull-request/200)
+
+## Ignition Common 3.2.0 (2019-08-07)
+
+1. Allow ignLogInit to use an absolute path. Added a timeToIso that converts a given time to an ISO string. Some console timestamps were using `IGN_SYSTEM_TIME_NS()` and others `ignition::common::systemTimeISO()`. Switched all to use `ignition::common::systemTimeISO()`.
+    * [Pull request 203](https://bitbucket.org/osrf/gazebo/pull-request/203)
+
+1. Port ColladaLoader fix: use default value of 1 for stride parameter when unset.
+    * [Pull request 196](https://bitbucket.org/osrf/gazebo/pull-request/196)
 
 ## Ignition Common 3.1.0 (2019-05-17)
 

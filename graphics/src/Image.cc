@@ -460,6 +460,12 @@ Image::PixelFormatType Image::ConvertPixelFormat(const std::string &_format)
   else if (_format == "R8G8B8" || _format == "RGB_INT8")
     return RGB_INT8;
 
+  // Handle BAYER_BGGR8 since it is after PIXEL_FORMAT_COUNT in the enum
+  if (_format == "BAYER_BGGR8")
+  {
+    return BAYER_BGGR8;
+  }
+
   for (unsigned int i = 0; i < PIXEL_FORMAT_COUNT; ++i)
     if (PixelFormatNames[i] == _format)
       return static_cast<PixelFormatType>(i);

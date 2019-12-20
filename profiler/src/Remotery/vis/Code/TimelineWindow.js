@@ -65,12 +65,12 @@ TimelineWindow = (function()
 		// Resize window
 		var top = top_window.Position[1] + top_window.Size[1] + 10;
 		this.Window.SetPosition(10, top);
-		this.Window.SetSize(width - 2 * 10, 200);
+		this.Window.SetSize(width - 2 * 10, height);
 
 		// Resize controls
 		var parent_size = this.Window.Size;
 		this.TimelineContainer.SetPosition(BORDER, 10);
-		this.TimelineContainer.SetSize(parent_size[0] - 2 * BORDER, 160);
+		this.TimelineContainer.SetSize(parent_size[0] - 2 * BORDER, height);
 
 		// Resize rows
 		var row_width = RowWidth(this);
