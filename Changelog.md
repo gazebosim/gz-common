@@ -1,5 +1,11 @@
 ## Ignition Common 4.x
 
+## Ignition Common 4.x.x (2019-XX-XX)
+
+1. Corrected `BAYER_RGGR8` to `BAYER_BGGR8` in `PixelFormatName` and
+   `PixelFormatType` located in `graphics/include/ignition/common/Image.hh`.
+    * [Pull request 191](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/191)
+
 1. Added URI Authority parsing to the URI class. Authority information can
    be found [here](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Generic_syntax). This update also caused some formally valid syntax to become invalid, and some formally invalid syntax to become valid. See the migration guide.
     * [Pull request xxx](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/xxx)
