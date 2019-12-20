@@ -18,6 +18,7 @@
 #define IGNITION_COMMON_URI_HH_
 
 #include <memory>
+#include <optional>
 #include <string>
 
 #include <ignition/common/Export.hh>
