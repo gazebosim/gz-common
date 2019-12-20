@@ -223,7 +223,7 @@ TEST(URITEST, URIPathString)
   EXPECT_NO_THROW(EXPECT_TRUE(URIPath("a//b").Valid()));
   EXPECT_NO_THROW(EXPECT_TRUE(URIPath("/a//b").Valid()));
   EXPECT_NO_THROW(EXPECT_TRUE(URIPath(" ").Valid()));
-  EXPECT_NO_THROW(EXPECT_TRUE(URIPath("?invalid").Valid()));
+  EXPECT_NO_THROW(EXPECT_FALSE(URIPath("?invalid").Valid()));
   EXPECT_NO_THROW(EXPECT_TRUE(URIPath("=invalid").Valid()));
   EXPECT_NO_THROW(EXPECT_TRUE(URIPath("&invalid").Valid()));
   EXPECT_NO_THROW(EXPECT_TRUE(URIPath("invalid#").Valid()));
