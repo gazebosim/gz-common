@@ -37,6 +37,20 @@ namespace ignition
     /// A URI authority contains userinfo, host, and port data. The format
     /// of a URI authority is `//userinfo@host:port`. The `userinfo` and
     /// `port` components are optional.
+    ///
+    /// A URI Authority requires the existence of host information,
+    /// except when a Scheme is `file`.  When a scheme is `file`, then the
+    /// following are considered valid URIs and equivalent:
+    ///
+    ///   * file:/abs/path
+    ///   * file:///abs/path
+    ///
+    /// Keep in mind that a URI path must start with a forward slash when an
+    /// authority, as indicated by two forward slashes, is present. This
+    /// means relative file paths cannot be specified with an empty
+    /// authority. For example, `file://abs/path` will result in a host
+    /// value of `abs` and the URI path will be `/path`. You can specify
+    /// a relative path using `file:abs/path`.
     class IGNITION_COMMON_VISIBLE URIAuthority
     {
       /// \brief Constructor
@@ -73,6 +87,16 @@ namespace ignition
       /// \param[in] _host The host.
       public: void SetHost(const std::string &_host) const;
 
+      /// \brief True if an empty host is considered valid.
+      /// \return True if an empty host is valid.
+      public: bool EmptyHostValid() const;
+
+      /// \brief Set whether an empty host is considered valid.
+      /// This should only be set to true if the corresponding URIScheme
+      /// is "file".
+      /// \param[in] _valid True if an empty host is valid.
+      public: void SetEmptyHostValid(bool _valid) const;
+
       /// \brief Get the port.
       /// \return The port number, which is optional.
       public: std::optional<int> Port() const;
@@ -96,8 +120,12 @@ namespace ignition
 
       /// \brief Return true if the string is a valid path.
       /// \param[in] _str String to check.
+      /// \param[in] _emptyHostValid Set this to true if an empty host is
+      /// valid. This should only be set to true if the corresponding URIScheme
+      /// is "file".
       /// \return True if _str is a valid URI path.
-      public: static bool Valid(const std::string &_str);
+      public: static bool Valid(const std::string &_str,
+                  bool _emptyHostValid = false);
 
       /// \brief Return true if this is a valid authority.
       /// \return True if this is a valid URI authority.
@@ -105,8 +133,12 @@ namespace ignition
 
       /// \brief Parse a string as URIAuthority.
       /// \param[in] _str A string.
+      /// \param[in] _emptyHostValid Set this to true if an empty host is
+      /// valid. This should only be set to true if the corresponding URIScheme
+      /// is "file".
       /// \return True if the string could be parsed as a URIAuthority.
-      public: bool Parse(const std::string &_str);
+      public: bool Parse(const std::string &_str,
+                  bool _emptyHostValid = false);
 
       IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \internal

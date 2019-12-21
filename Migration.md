@@ -20,11 +20,7 @@ release will remove the deprecated code.
     a valid query can be "?aquery", "?aquery?", and `??`.
     * A URI authority is optional. If present, then a URI authority begins
     with two forward slashes and immediately follows the URI scheme. A host
-    must be present if an authority is present. All this means the following
-    is invalid, `file:///abs/path/to/file`. The proper form is
-    `file:/abs/path/to/file`. `file://` has been deprecated in Ignition
-    Common 4. Starting in Ignition Common 5 `file://` will require a 
-    valid authority.
+    must be present if an authority is present and the scheme != 'file'.
 
 ## Ignition Common 2.X to 3.X
 

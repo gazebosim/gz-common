@@ -41,6 +41,13 @@ class ignition::common::URIAuthorityPrivate
 
   /// \brief The port.
   public: std::optional<int> port;
+
+  /// \brief Set this to true if an empty host is valid. This should only be
+  /// set to true if the corresponding URIScheme is "file".
+  public: bool emptyHostValid = false;
+
+  /// \brief True if the host was set to empty.
+  public: bool hasEmptyHost = false;
 };
 
 /// \brief URIPath private data.
@@ -131,6 +138,8 @@ void URIAuthority::Clear()
   this->dataPtr->userInfo.clear();
   this->dataPtr->host.clear();
   this->dataPtr->port.reset();
+  this->dataPtr->emptyHostValid = false;
+  this->dataPtr->hasEmptyHost = false;
 }
 
 //////////////////////////////////////////////////
@@ -174,13 +183,15 @@ bool URIAuthority::operator==(const URIAuthority &_auth) const
 {
   return this->dataPtr->userInfo == _auth.UserInfo() &&
          this->dataPtr->host == _auth.Host() &&
-         this->dataPtr->port == _auth.Port();
+         this->dataPtr->port == _auth.Port() &&
+         this->dataPtr->emptyHostValid == _auth.EmptyHostValid();
 }
 
 //////////////////////////////////////////////////
 std::string URIAuthority::Str() const
 {
-  if (!this->dataPtr->host.empty())
+  if (!this->dataPtr->host.empty() ||
+      (this->dataPtr->emptyHostValid && this->dataPtr->hasEmptyHost))
   {
     std::string result = "//";
     result += this->dataPtr->userInfo.empty() ? "" :
@@ -200,6 +211,9 @@ URIAuthority &URIAuthority::operator=(const URIAuthority &_auth)
   this->dataPtr->userInfo = _auth.UserInfo();
   this->dataPtr->host = _auth.Host();
   this->dataPtr->port = _auth.Port();
+  this->dataPtr->emptyHostValid = _auth.EmptyHostValid();
+  this->dataPtr->hasEmptyHost = _auth.dataPtr->hasEmptyHost;
+
   return *this;
 }
 
@@ -210,7 +224,7 @@ bool URIAuthority::Valid() const
 }
 
 //////////////////////////////////////////////////
-bool URIAuthority::Valid(const std::string &_str)
+bool URIAuthority::Valid(const std::string &_str, bool _emptyHostValid)
 {
   auto str = trimmed(_str);
   if (str.empty())
@@ -266,7 +280,7 @@ bool URIAuthority::Valid(const std::string &_str)
     host = str.substr(userInfoIndex);
 
   // The host can't be empty.
-  if (host.empty())
+  if (host.empty() && !_emptyHostValid)
     return false;
 
   // IP-literal  = "[" IPV6address "]
@@ -297,15 +311,32 @@ bool URIAuthority::Valid(const std::string &_str)
 }
 
 //////////////////////////////////////////////////
-bool URIAuthority::Parse(const std::string &_str)
+bool URIAuthority::EmptyHostValid() const
 {
-  if (!this->Valid(_str))
+  return this->dataPtr->emptyHostValid;
+}
+
+//////////////////////////////////////////////////
+void URIAuthority::SetEmptyHostValid(bool _valid) const
+{
+  this->dataPtr->emptyHostValid = _valid;
+}
+
+//////////////////////////////////////////////////
+bool URIAuthority::Parse(const std::string &_str, bool _emptyHostValid)
+{
+  if (!this->Valid(_str, _emptyHostValid))
     return false;
 
   this->Clear();
 
-  if (_str.empty())
+  this->dataPtr->emptyHostValid = _emptyHostValid;
+
+  if (_str.empty() || _str == "//")
+  {
+    this->dataPtr->hasEmptyHost = true;
     return true;
+  }
 
   auto userInfoIndex = _str.find("@");
   if (userInfoIndex != std::string::npos)
@@ -972,8 +1003,10 @@ bool URI::Valid() const
 bool URI::Valid(const std::string &_str)
 {
   auto str = trimmed(_str);
+
   // Validate scheme.
-  auto schemeDelimPos = str.find(kSchemeDelim);
+  size_t schemeDelimPos = str.find(kSchemeDelim);
+
   if ((str.empty()) ||
       (schemeDelimPos == std::string::npos) ||
       (schemeDelimPos == 0u))
@@ -981,60 +1014,70 @@ bool URI::Valid(const std::string &_str)
     return false;
   }
 
-  auto authDelimPos = str.find(kAuthDelim);
-  auto pathStart = authDelimPos != std::string::npos ?
-    str.find("/", authDelimPos + std::strlen(kAuthDelim)) :
-    str.find("/");
-
+  std::string localScheme;
   std::string localAuthority;
-  if (authDelimPos != std::string::npos && authDelimPos == schemeDelimPos+1)
-  {
-    if (pathStart != std::string::npos)
-      localAuthority = str.substr(authDelimPos, pathStart - authDelimPos);
-    else
-    {
-      auto to = str.find('?', authDelimPos);
-      if (to != std::string::npos)
-        localAuthority = str.substr(authDelimPos, to - authDelimPos);
-      else
-      {
-        to = str.find('#', authDelimPos);
-        if (to != std::string::npos)
-          localAuthority = str.substr(authDelimPos, to - authDelimPos);
-        else
-          localAuthority = str.substr(authDelimPos);
-      }
-    }
-  }
-
-  std::string localPath = pathStart != std::string::npos ?
-    str.substr(pathStart) : "";
+  std::string localPath;
   std::string localQuery;
   std::string localFragment;
 
-  auto to = str.find('?', pathStart);
-  if (to != std::string::npos)
-  {
-    // Update path.
-    localPath = str.substr(pathStart, to - pathStart);
+  localScheme = str.substr(0, schemeDelimPos);
+  str.erase(0, schemeDelimPos + std::strlen(kSchemeDelim));
 
-    // Update the query.
-    localQuery = str.substr(to);
+  bool emptyHostValid = false;
+  if (localScheme == "file")
+    emptyHostValid = true;
+
+  bool authorityPresent = false;
+
+  // Get the authority delimiter position, if one is present
+  size_t authDelimPos = str.find(kAuthDelim);
+  if (authDelimPos != std::string::npos && authDelimPos == 0)
+  {
+    authorityPresent = true;
+    size_t authEndPos = str.find_first_of("/?#",
+        authDelimPos + std::strlen(kAuthDelim));
+
+    if (localScheme != "file" && authEndPos == authDelimPos+2)
+    {
+      ignerr << "A host is manadatory when using a scheme other than file\n";
+      return false;
+    }
+    else
+    {
+      localAuthority = str.substr(authDelimPos, authEndPos);
+      str.erase(0, authEndPos);
+    }
   }
 
-  auto to2 = str.find('#', to);
-  if (to2 != std::string::npos)
-  {
-    // Update query.
-    localQuery = str.substr(to, to2 - to);
+  // Get the path information
+  size_t pathEndPos = str.find_first_of("?#");
+  localPath = str.substr(0, pathEndPos);
+  str.erase(0, pathEndPos);
 
-    // Update the fragment.
-    localFragment = str.substr(to2);
+  size_t queryStartPos = str.find("?");
+  if (queryStartPos != std::string::npos)
+  {
+    size_t queryEndPos = str.find("#");
+    // Get the query.
+    localQuery = str.substr(0, queryEndPos);
+    str.erase(0, queryEndPos);
+  }
+
+  size_t fragStartPos = str.find("#");
+  if (fragStartPos != std::string::npos)
+  {
+    // Get the query.
+    localFragment = str;
+  }
+
+  if (!emptyHostValid || authorityPresent)
+  {
+    if (!URIAuthority::Valid(localAuthority, emptyHostValid))
+      return false;
   }
 
   // Validate the path and query.
-  return URIAuthority::Valid(localAuthority) &&
-         URIPath::Valid(localPath) &&
+  return URIPath::Valid(localPath) &&
          URIQuery::Valid(localQuery) &&
          URIFragment::Valid(localFragment);
 }
@@ -1058,25 +1101,27 @@ bool URI::Parse(const std::string &_str)
   localScheme = str.substr(0, schemeDelimPos);
   str.erase(0, schemeDelimPos + std::strlen(kSchemeDelim));
 
+  bool emptyHostValid = false;
+  if (localScheme == "file")
+    emptyHostValid = true;
+
+  bool authorityPresent = false;
+
   // Get the authority delimiter position, if one is present
   size_t authDelimPos = str.find(kAuthDelim);
   if (authDelimPos != std::string::npos && authDelimPos == 0)
   {
-    if (localScheme == "file")
+    authorityPresent = true;
+    size_t authEndPos = str.find_first_of("/?#",
+        authDelimPos + std::strlen(kAuthDelim));
+
+    if (localScheme != "file" && authEndPos == authDelimPos+2)
     {
-      // Deprecated. file:// is deprecated in Ignition Common 4. Remove
-      // this part of this `if` statement and leave just the contents of the
-      // `else` clause.
-      ignwarn << "`file://<path>` is deprecated. The double forward slash "
-        << "following a scheme (`file:` in this case) indicates the presense "
-        << "of a URI authority. `file://` should be replaced with just "
-        << "`file:` when referring to system path.\n";
-      str.erase(0, 2);
+      ignerr << "A host is manadatory when using a scheme other than file\n";
+      return false;
     }
     else
     {
-      size_t authEndPos = str.find_first_of("/?#",
-          authDelimPos + std::strlen(kAuthDelim));
       localAuthority = str.substr(authDelimPos, authEndPos);
       str.erase(0, authEndPos);
     }
@@ -1106,8 +1151,13 @@ bool URI::Parse(const std::string &_str)
   this->Clear();
   this->SetScheme(localScheme);
 
-  return this->dataPtr->authority.Parse(localAuthority) &&
-         this->dataPtr->path.Parse(localPath) &&
+  if (!emptyHostValid || authorityPresent)
+  {
+    if (!this->dataPtr->authority.Parse(localAuthority, emptyHostValid))
+      return false;
+  }
+
+  return this->dataPtr->path.Parse(localPath) &&
          this->dataPtr->query.Parse(localQuery) &&
          this->dataPtr->fragment.Parse(localFragment);
 }

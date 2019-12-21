@@ -214,7 +214,6 @@ TEST_F(SystemPathsFixture, FindFileURI)
 
   EXPECT_EQ("", sp.FindFileURI("file://no_such_file"));
   EXPECT_EQ(file1, sp.FindFileURI("file:test_dir1/test_f1"));
-  EXPECT_EQ(file1, sp.FindFileURI("file://test_dir1/test_f1"));
   EXPECT_EQ(file1, sp.FindFileURI("file://" +
                                   ignition::common::copyToUnixPath(file1)));
   EXPECT_EQ("", sp.FindFileURI("osrf://unknown.protocol"));
@@ -311,7 +310,7 @@ TEST_F(SystemPathsFixture, FindFile)
   EXPECT_EQ("", sp.FindFile(this->filesystemRoot + "no_such_file"));
   EXPECT_EQ("", sp.FindFile("no_such_file"));
   EXPECT_EQ(file1, sp.FindFile(common::joinPaths("test_dir1", "test_f1")));
-  EXPECT_EQ(file1, sp.FindFile("file://test_dir1/test_f1"));
+  EXPECT_EQ(file1, sp.FindFile("file:test_dir1/test_f1"));
 
   // Existing absolute paths
 #ifndef _WIN32

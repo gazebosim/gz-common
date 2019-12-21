@@ -441,32 +441,24 @@ TEST(URITEST, Path)
   uri.Path() /= "default";
   EXPECT_EQ(uri.Str(), "data:world/default");
 
-  EXPECT_FALSE(uri.Parse("file:///var/run/test"));
+  EXPECT_TRUE(uri.Parse("file:///var/run/test"));
 
   EXPECT_TRUE(uri.Parse("file:/var/run/test"));
   EXPECT_EQ(uri.Str(), "file:/var/run/test");
   EXPECT_TRUE(uri.Path().IsAbsolute());
 
-  // The following seven lines are valid for Ignition Common 5. See
-  // the deprecation note in URI::Parse(const std::string).
-  // uri.Parse("file://var/run/test");
-  // EXPECT_EQ(uri.Str(), "file://var/run/test");
-  // EXPECT_EQ(uri.Path().Str(), "/run/test");
-  // EXPECT_TRUE(uri.Path().IsAbsolute());
-  // EXPECT_TRUE(uri.Parse("file://test%20space"));
-  // EXPECT_EQ(uri.Authority().Str(), "//test%20space");
-  // EXPECT_TRUE(uri.Path().Str().empty());
-
-  // The following seven lines are valid for Ignition Common 4, and should
-  // be removed in Ignition Common 5. See the deprecation note in
-  // URI::Parse(const std::string).
-  uri.Parse("file://var/run/test");
-  EXPECT_EQ(uri.Str(), "file:var/run/test");
-  EXPECT_EQ(uri.Path().Str(), "var/run/test");
-  EXPECT_FALSE(uri.Path().IsAbsolute());
+  EXPECT_TRUE(uri.Parse("file://var/run/test"));
+  EXPECT_EQ(uri.Str(), "file://var/run/test");
+  EXPECT_EQ(uri.Path().Str(), "/run/test");
+  EXPECT_TRUE(uri.Path().IsAbsolute());
   EXPECT_TRUE(uri.Parse("file://test%20space"));
-  EXPECT_EQ(uri.Authority().Str(), "");
-  EXPECT_EQ("test%20space", uri.Path().Str());
+  EXPECT_EQ(uri.Authority().Str(), "//test%20space");
+  EXPECT_TRUE(uri.Path().Str().empty());
+
+  EXPECT_TRUE(uri.Parse("file:///abs/path/test"));
+  EXPECT_EQ(uri.Str(), "file:///abs/path/test");
+  EXPECT_EQ(uri.Path().Str(), "/abs/path/test");
+  EXPECT_TRUE(uri.Path().IsAbsolute());
 
   uri.Parse("file:/var/run/test");
   EXPECT_EQ(uri.Str(), "file:/var/run/test");
@@ -603,7 +595,7 @@ TEST(URITEST, URIString)
   EXPECT_FALSE(URI::Valid("scheme://"));
   EXPECT_FALSE(URI::Valid("scheme://?key=value"));
   EXPECT_TRUE(URI::Valid("scheme://part1?keyvalue"));
-  EXPECT_TRUE(URI::Valid("scheme://part1?key value"));
+  EXPECT_FALSE(URI::Valid("scheme://part1?key value"));
   EXPECT_TRUE(URI::Valid("scheme://part1"));
   EXPECT_TRUE(URI::Valid("scheme://part1/part2"));
   EXPECT_TRUE(URI::Valid("scheme://part1?key=value"));
@@ -742,6 +734,23 @@ TEST(URITEST, URIAuthority)
   auth2 = auth;
   EXPECT_TRUE(auth == auth2);
   EXPECT_TRUE(auth2.Valid());
+}
+
+TEST(URITEST, File)
+{
+  URI uri;
+  EXPECT_TRUE(uri.Parse("file:relative/path"));
+  EXPECT_EQ("relative/path", uri.Path().Str());
+  EXPECT_FALSE(uri.Authority().EmptyHostValid());
+
+  EXPECT_TRUE(uri.Parse("file:/abs/path"));
+  EXPECT_EQ("/abs/path", uri.Path().Str());
+  EXPECT_FALSE(uri.Authority().EmptyHostValid());
+
+  // Empty host is valid for file: scheme
+  EXPECT_TRUE(uri.Parse("file:///abs/path"));
+  EXPECT_EQ("/abs/path", uri.Path().Str());
+  EXPECT_TRUE(uri.Authority().EmptyHostValid());
 }
 
 /////////////////////////////////////////////////
