@@ -25,6 +25,7 @@ using namespace ignition;
 
 class ImageTest : public ignition::testing::AutoLogFixture { };
 
+/////////////////////////////////////////////////
 TEST_F(ImageTest, Image)
 {
   common::Image img;
@@ -53,6 +54,54 @@ TEST_F(ImageTest, Image)
 
   img.SetFromData(data, img.Width(), img.Height(),
                   common::Image::RGB_INT8);
+}
+
+/////////////////////////////////////////////////
+TEST_F(ImageTest, ConvertPixelFormat)
+{
+  using Image = ignition::common::Image;
+  EXPECT_EQ(Image::PixelFormatType::UNKNOWN_PIXEL_FORMAT,
+         Image::ConvertPixelFormat("fake"));
+  EXPECT_EQ(Image::PixelFormatType::UNKNOWN_PIXEL_FORMAT,
+         Image::ConvertPixelFormat("unknown"));
+  EXPECT_EQ(Image::PixelFormatType::UNKNOWN_PIXEL_FORMAT,
+         Image::ConvertPixelFormat("UNKNOWN_PIXEL_FORMAT"));
+  EXPECT_EQ(Image::PixelFormatType::L_INT8,
+         Image::ConvertPixelFormat("L_INT8"));
+  EXPECT_EQ(Image::PixelFormatType::L_INT16,
+         Image::ConvertPixelFormat("L_INT16"));
+  EXPECT_EQ(Image::PixelFormatType::RGB_INT8,
+         Image::ConvertPixelFormat("RGB_INT8"));
+  EXPECT_EQ(Image::PixelFormatType::RGBA_INT8,
+         Image::ConvertPixelFormat("RGBA_INT8"));
+  EXPECT_EQ(Image::PixelFormatType::RGB_INT16,
+         Image::ConvertPixelFormat("RGB_INT16"));
+  EXPECT_EQ(Image::PixelFormatType::RGB_INT32,
+         Image::ConvertPixelFormat("RGB_INT32"));
+  EXPECT_EQ(Image::PixelFormatType::BGR_INT8,
+         Image::ConvertPixelFormat("BGR_INT8"));
+  EXPECT_EQ(Image::PixelFormatType::BGRA_INT8,
+         Image::ConvertPixelFormat("BGRA_INT8"));
+  EXPECT_EQ(Image::PixelFormatType::BGR_INT16,
+         Image::ConvertPixelFormat("BGR_INT16"));
+  EXPECT_EQ(Image::PixelFormatType::BGR_INT32,
+         Image::ConvertPixelFormat("BGR_INT32"));
+  EXPECT_EQ(Image::PixelFormatType::R_FLOAT16,
+         Image::ConvertPixelFormat("R_FLOAT16"));
+  EXPECT_EQ(Image::PixelFormatType::R_FLOAT32,
+         Image::ConvertPixelFormat("R_FLOAT32"));
+  EXPECT_EQ(Image::PixelFormatType::RGB_FLOAT16,
+         Image::ConvertPixelFormat("RGB_FLOAT16"));
+  EXPECT_EQ(Image::PixelFormatType::RGB_FLOAT32,
+         Image::ConvertPixelFormat("RGB_FLOAT32"));
+  EXPECT_EQ(Image::PixelFormatType::BAYER_RGGB8,
+         Image::ConvertPixelFormat("BAYER_RGGB8"));
+  EXPECT_EQ(Image::PixelFormatType::BAYER_GBRG8,
+         Image::ConvertPixelFormat("BAYER_GBRG8"));
+  EXPECT_EQ(Image::PixelFormatType::BAYER_GRBG8,
+         Image::ConvertPixelFormat("BAYER_GRBG8"));
+  EXPECT_EQ(Image::PixelFormatType::BAYER_BGGR8,
+         Image::ConvertPixelFormat("BAYER_BGGR8"));
 }
 
 

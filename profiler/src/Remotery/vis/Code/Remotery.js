@@ -328,7 +328,7 @@ Remotery = (function()
         var h = window.innerHeight;
         self.Console.WindowResized(w, h);
         self.TitleWindow.WindowResized(w, h);
-        self.TimelineWindow.WindowResized(w, h, self.TitleWindow.Window);
+        self.TimelineWindow.WindowResized(w, 600, self.TitleWindow.Window);
         for (var i in self.SampleWindows)
             self.SampleWindows[i].WindowResized(self.TimelineWindow.Window, self.Console.Window);
     }

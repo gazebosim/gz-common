@@ -136,6 +136,36 @@ namespace ignition
       /// \param[in] _anim the animation to add
       public: void AddAnimation(SkeletonAnimation *_anim);
 
+      /// \brief Add an animation from BVH file.
+      /// \param[in] _bvhFile the bvh file to load animation from
+      /// \param[in] _scale the scale of the animation
+      /// \return True if the BVH animation is compatible with skeleton
+      public: bool AddBvhAnimation(const std::string &_bvhFile, double _scale);
+
+      /// \brief Finding the skin node name that corresponds to
+      /// the given animation node name.
+      /// \param[in] _index the animation index
+      /// \param[in] _animNodeName the given animation node name
+      /// \return The corresponding skin node name in the skeleton
+      public: std::string NodeNameAnimToSkin(unsigned int _index,
+                  const std::string &_animNodeName);
+
+      /// \brief Get the transformation to align translation from
+      /// the animation skeleton to skin skeleton
+      /// \param[in] _index the animation index
+      /// \param[in] _animNodeName the animation node name
+      /// \return The transformation to align translation
+      public: math::Matrix4d AlignTranslation(unsigned int _index,
+                  const std::string &_animNodeName);
+
+      /// \brief Get the transformation to align rotation from
+      /// the animation skeleton to skin skeleton
+      /// \param[in] _index the animation index
+      /// \param[in] _animNodeName the animation node name
+      /// \return The transformation to align rotation
+      public: math::Matrix4d AlignRotation(unsigned int _index,
+                  const std::string &_animNodeName);
+
       /// \brief Initializes the hande numbers for each node in the map
       /// using breadth first traversal
       private: void BuildNodeMap();

@@ -17,9 +17,11 @@
 #ifndef IGNITION_COMMON_ANIMATION_HH_
 #define IGNITION_COMMON_ANIMATION_HH_
 
+#include <map>
 #include <string>
 #include <vector>
 
+#include <ignition/math/Pose3.hh>
 #include <ignition/math/Spline.hh>
 #include <ignition/math/RotationSpline.hh>
 
@@ -32,6 +34,7 @@ namespace ignition
     class KeyFrame;
     class PoseKeyFrame;
     class NumericKeyFrame;
+    class TrajectoryInfoPrivate;
 
     /// \class Animation Animation.hh ignition/common/Animation.hh
     /// \brief Manages an animation, which is a collection of keyframes and
@@ -180,6 +183,101 @@ namespace ignition
       /// \param[out] _kf NumericKeyFrame reference to hold the
       /// interpolated result
       public: void InterpolatedKeyFrame(NumericKeyFrame &_kf) const;
+    };
+
+    /// \brief Information about a trajectory for an animation (e.g., Actor)
+    /// This contains the keyframe information.
+    class IGNITION_COMMON_GRAPHICS_VISIBLE TrajectoryInfo
+    {
+      /// \brief Constructor
+      public: TrajectoryInfo();
+
+      /// \brief Copy constructor
+      /// \param[in] _trajInfo TrajectoryInfo to copy.
+      public: TrajectoryInfo(const TrajectoryInfo &_trajInfo);
+
+      /// \brief Move constructor
+      /// \param[in] _trajInfo TrajectoryInfo to move.
+      public: TrajectoryInfo(TrajectoryInfo &&_trajInfo) noexcept;
+
+      /// \brief Destructor
+      public: ~TrajectoryInfo();
+
+      /// \brief Assignment operator.
+      /// \param[in] _trajInfo The TrajectoryInfo to set values from.
+      /// \return *this
+      public: TrajectoryInfo &operator=(const TrajectoryInfo &_trajInfo);
+
+      /// \brief Copy TrajectoryInfo from a TrajectoryInfo instance.
+      /// \param[in] _trajInfo The TrajectoryInfo to set values from.
+      public: void CopyFrom(const TrajectoryInfo &_trajInfo);
+
+      /// \brief Return the id of the trajectory
+      /// \return Id of the trajectory
+      public: unsigned int Id() const;
+
+      /// \brief Set the id of the trajectory
+      /// \param[in] _id Id for the trajectory
+      public: void SetId(unsigned int _id);
+
+      /// \brief Return the animation index
+      /// \return Index of the associated animation
+      public: unsigned int AnimIndex() const;
+
+      /// \brief Set the animation index
+      /// \param[in] _index Animation index
+      /// (auto-generated according to the type)
+      public: void SetAnimIndex(unsigned int _index);
+
+      /// \brief Return the duration of the trajectory.
+      /// \return Duration of the animation.
+      public: std::chrono::steady_clock::duration Duration() const;
+
+      /// \brief Get the distance covered by the trajectory by a given time.
+      /// \param[in] _time Time from trajectory start to check the distance.
+      /// \return Distance in meters covered by the trajectory.
+      public: double DistanceSoFar(
+          const std::chrono::steady_clock::duration &_time) const;
+
+      /// \brief Return the start time of the trajectory.
+      /// \return Start time of the trajectory.
+      public: std::chrono::steady_clock::time_point StartTime() const;
+
+      /// \brief Set the start time of the trajectory.
+      /// \param[in] _startTime Trajectory start time.
+      public: void SetStartTime(
+          const std::chrono::steady_clock::time_point &_startTime);
+
+      /// \brief Return the end time of the trajectory
+      /// \return End time of the trajectory in seconds
+      public: std::chrono::steady_clock::time_point EndTime() const;
+
+      /// \brief Set the end time of the trajectory.
+      /// \param[in] _endTime Trajectory end time.
+      public: void SetEndTime(
+          const std::chrono::steady_clock::time_point &_endTime);
+
+      /// \brief Return whether the trajectory is translated
+      /// \return True if the trajectory is translated
+      public: bool Translated() const;
+
+      /// \brief Set whether the trajectory is translated
+      /// \param[in] _translated True if the trajectory is translated
+      public: void SetTranslated(bool _translated);
+
+      /// \brief Return the waypoints in the trajectory
+      /// \return Waypoints represented in pose animation format
+      public: common::PoseAnimation *Waypoints() const;
+
+      /// \brief Load all waypoints in the trajectory
+      /// \param[in] _waypoints Map of waypoints, where the key is the absolute
+      /// time of the waypoint and the value is the pose.
+      public: void SetWaypoints(
+          std::map<std::chrono::steady_clock::time_point, math::Pose3d>
+           _waypoints);
+
+      /// \brief Private data pointer.
+      private: TrajectoryInfoPrivate *dataPtr{nullptr};
     };
   }
 }

@@ -319,6 +319,12 @@ math::Matrix4d SkeletonNode::InverseBindTransform() const
 }
 
 //////////////////////////////////////////////////
+bool SkeletonNode::HasInvBindTransform() const
+{
+  return this->data->invBindTransform != math::Matrix4d::Zero;
+}
+
+//////////////////////////////////////////////////
 std::vector<NodeTransform> SkeletonNode::RawTransforms() const
 {
   return this->data->rawTransforms;
