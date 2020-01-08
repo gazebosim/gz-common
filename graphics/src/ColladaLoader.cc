@@ -2581,7 +2581,8 @@ void ColladaLoaderPrivate::MergeSkeleton(SkeletonPtr _skeleton,
     if (mergeNodeContainsRoot)
     {
       _skeleton->RootNode(_mergeNode);
-      delete dummyRoot;
+      // TODO since we are replacing the whole tree delete the old one
+      delete currentRoot;
       return;
     }
     dummyRoot = currentRoot;
