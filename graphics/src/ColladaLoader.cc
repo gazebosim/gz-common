@@ -290,6 +290,8 @@ namespace ignition
       ///         the new root node as `_mergeNode`
       ///     3: If the skeleton and `_mergeNode` is unrelated, creates a new
       ///         dummy root and adds both of them as childrens.
+      //      4: If a dummy root already exists but the merge node contains 
+      //          all its children, set the merge node as the new root.
       /// \param[in] _skeleton skeleton to merge
       /// \param[in] _mergeNode new root node to merge
       public: void MergeSkeleton(SkeletonPtr _skeleton,
@@ -2564,7 +2566,26 @@ void ColladaLoaderPrivate::MergeSkeleton(SkeletonPtr _skeleton,
 
   SkeletonNode *dummyRoot = nullptr;
   if (currentRoot->Id() == "dummy-root")
+  {
+    // Check if the node that will be merged contains the dummy-root
+    // if it is replace dummyRoot
+    bool mergeNodeContainsRoot = true;
+    for (unsigned int i=0; i<currentRoot->ChildCount(); ++i)
+    {
+      if (_mergeNode->ChildById(currentRoot->Child(i)->Id()) == NULL)
+      {
+        mergeNodeContainsRoot = false;
+        break;
+      }
+    } 
+    if (mergeNodeContainsRoot)
+    {
+      _skeleton->RootNode(_mergeNode);
+      delete dummyRoot;
+      return;
+    }
     dummyRoot = currentRoot;
+  }
   else
   {
     dummyRoot =
