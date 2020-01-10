@@ -1603,9 +1603,9 @@ void LoadMtl(std::map<std::string, int> *material_map,
       // without a matching Kd value.
       if (!has_kd)
       {
-        material.diffuse[0] = 0.6;
-        material.diffuse[1] = 0.6;
-        material.diffuse[2] = 0.6;
+        material.diffuse[0] = 0.625;
+        material.diffuse[1] = 0.625;
+        material.diffuse[2] = 0.625;
       }
 
       continue;
