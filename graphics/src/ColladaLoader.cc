@@ -2572,7 +2572,7 @@ void ColladaLoaderPrivate::MergeSkeleton(SkeletonPtr _skeleton,
     bool mergeNodeContainsRoot = true;
     for (unsigned int i=0; i < currentRoot->ChildCount(); ++i)
     {
-      if (_mergeNode->ChildById(currentRoot->Child(i)->Id()) == NULL)
+      if (_mergeNode->ChildById(currentRoot->Child(i)->Id()) == nullptr)
       {
         mergeNodeContainsRoot = false;
         break;
