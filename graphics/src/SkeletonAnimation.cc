@@ -139,6 +139,12 @@ std::map<std::string, math::Matrix4d> SkeletonAnimation::PoseAtX(
 {
   std::map<std::string, NodeAnimation*>::const_iterator nodeAnim =
       this->data->animations.find(_node);
+  if (nodeAnim == this->data->animations.end())
+  {
+    ignerr << "Can't find animation named [" << _node << "]" << std::endl;
+    return {};
+  }
+
   math::Matrix4d lastPos = nodeAnim->second->KeyFrame(
       nodeAnim->second->FrameCount() - 1).second;
 
