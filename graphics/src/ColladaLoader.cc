@@ -645,26 +645,50 @@ ignition::math::Matrix4d ColladaLoaderPrivate::LoadNodeTransform(
 
 /////////////////////////////////////////////////
 void ColladaLoaderPrivate::LoadController(tinyxml2::XMLElement *_contrXml,
-    std::vector<tinyxml2::XMLElement*> _skelXmls,
+    std::vector<tinyxml2::XMLElement *> _skelXmls,
     const ignition::math::Matrix4d &_transform,
     Mesh *_mesh)
 {
+  if (nullptr == _contrXml)
+  {
+    ignerr << "Can't load null controller element." << std::endl;
+    return;
+  }
+
   tinyxml2::XMLElement *skinXml = _contrXml->FirstChildElement("skin");
+  if (nullptr == skinXml)
+  {
+    ignerr << "Failed to find skin element" << std::endl;
+    return;
+  }
+
   std::string geomURL = skinXml->Attribute("source");
 
-  ignition::math::Matrix4d bindTrans;
-  std::string matrixStr =
-        skinXml->FirstChildElement("bind_shape_matrix")->GetText();
+  auto shapeMat = skinXml->FirstChildElement("bind_shape_matrix");
+  if (nullptr == shapeMat || nullptr == shapeMat->GetText())
+  {
+    ignerr << "Missing <bind_shape_matrix>" << std::endl;
+    return;
+  }
+  std::string matrixStr = shapeMat->GetText();
   std::istringstream iss(matrixStr);
   std::vector<double> values(16);
   for (unsigned int i = 0; i < 16; ++i)
     iss >> values[i];
+
+  ignition::math::Matrix4d bindTrans;
   bindTrans.Set(values[0], values[1], values[2], values[3],
                 values[4], values[5], values[6], values[7],
                 values[8], values[9], values[10], values[11],
                 values[12], values[13], values[14], values[15]);
 
   tinyxml2::XMLElement *jointsXml = skinXml->FirstChildElement("joints");
+  if (nullptr == jointsXml)
+  {
+    ignerr << "Failed to find <joints> element" << std::endl;
+    return;
+  }
+
   std::string jointsURL, invBindMatURL;
   tinyxml2::XMLElement *inputXml = jointsXml->FirstChildElement("input");
   while (inputXml)
@@ -673,23 +697,39 @@ void ColladaLoaderPrivate::LoadController(tinyxml2::XMLElement *_contrXml,
     std::string source = inputXml->Attribute("source");
     if (semantic == "JOINT")
       jointsURL = source;
-    else
-    {
-      if (semantic == "INV_BIND_MATRIX")
-        invBindMatURL = source;
-    }
+    else if (semantic == "INV_BIND_MATRIX")
+      invBindMatURL = source;
+
     inputXml = inputXml->NextSiblingElement("input");
+  }
+
+  if (jointsURL.empty())
+  {
+    ignwarn << "Missing semantic='JOINT' input source" << std::endl;
+  }
+
+  if (invBindMatURL.empty())
+  {
+    ignwarn << "Missing semantic='INV__BIND_MATRIX' input source" << std::endl;
   }
 
   jointsXml = this->ElementId("source", jointsURL);
 
   if (!jointsXml)
   {
-    ignerr << "Could not find node[" << jointsURL << "]. "
-        << "Faild to parse skinning information in Collada file." << std::endl;
+    ignerr << "Could not find node [" << jointsURL << "]. "
+        << "Failed to parse skinning information in Collada file." << std::endl;
+    return;
   }
 
-  std::string jointsStr = jointsXml->FirstChildElement("Name_array")->GetText();
+  auto nameArray = jointsXml->FirstChildElement("Name_array");
+  if (nullptr == nameArray)
+  {
+    ignerr << "Missing <Name_array>" << std::endl;
+    return;
+  }
+
+  std::string jointsStr = nameArray->GetText();
 
   std::vector<std::string> joints = split(jointsStr, " \t\r\n");
 
@@ -697,22 +737,28 @@ void ColladaLoaderPrivate::LoadController(tinyxml2::XMLElement *_contrXml,
   SkeletonPtr skeleton = nullptr;
   if (_mesh->HasSkeleton())
     skeleton = _mesh->MeshSkeleton();
+
   for (tinyxml2::XMLElement *rootNodeXml : _skelXmls)
   {
     SkeletonNode *rootSkelNode =
         this->LoadSkeletonNodes(rootNodeXml, nullptr);
-    if (skeleton)
-      this->MergeSkeleton(skeleton, rootSkelNode);
-    else
+    if (nullptr == skeleton)
     {
       skeleton = SkeletonPtr(new Skeleton(rootSkelNode));
       _mesh->SetSkeleton(skeleton);
     }
+    else if (nullptr != rootSkelNode)
+      this->MergeSkeleton(skeleton, rootSkelNode);
+  }
+  if (nullptr == skeleton)
+  {
+    ignerr << "Failed to create skeleton." << std::endl;
+    return;
   }
   skeleton->SetBindShapeTransform(bindTrans);
 
   tinyxml2::XMLElement *rootXml = _contrXml->GetDocument()->RootElement();
-  if (rootXml->FirstChildElement("library_animations"))
+  if (rootXml && rootXml->FirstChildElement("library_animations"))
   {
     this->LoadAnimations(rootXml->FirstChildElement("library_animations"),
         skeleton);
@@ -720,10 +766,11 @@ void ColladaLoaderPrivate::LoadController(tinyxml2::XMLElement *_contrXml,
 
   tinyxml2::XMLElement *invBMXml = this->ElementId("source", invBindMatURL);
 
-  if (!invBMXml)
+  if (nullptr == invBMXml)
   {
     ignerr << "Could not find node[" << invBindMatURL << "]. "
         << "Faild to parse skinning information in Collada file." << std::endl;
+    return;
   }
 
   std::string posesStr = invBMXml->FirstChildElement("float_array")->GetText();
@@ -732,6 +779,13 @@ void ColladaLoaderPrivate::LoadController(tinyxml2::XMLElement *_contrXml,
 
   for (unsigned int i = 0; i < joints.size(); ++i)
   {
+    auto node = skeleton->NodeByName(joints[i]);
+    if (nullptr == node)
+    {
+      ignerr << "Node [" << joints[i] << "] is null." << std::endl;
+      continue;
+    }
+
     unsigned int id = i * 16;
     ignition::math::Matrix4d mat;
     mat.Set(ignition::math::parseFloat(strs[id +  0]),
@@ -751,11 +805,16 @@ void ColladaLoaderPrivate::LoadController(tinyxml2::XMLElement *_contrXml,
             ignition::math::parseFloat(strs[id + 14]),
             ignition::math::parseFloat(strs[id + 15]));
 
-    skeleton->NodeByName(joints[i])->SetInverseBindTransform(mat);
+    node->SetInverseBindTransform(mat);
   }
 
   tinyxml2::XMLElement *vertWeightsXml =
       skinXml->FirstChildElement("vertex_weights");
+  if (nullptr == vertWeightsXml)
+  {
+    ignerr << "Failed to find vertex_weights" << std::endl;
+    return;
+  }
 
   inputXml = vertWeightsXml->FirstChildElement("input");
   unsigned int jOffset = 0;
@@ -963,12 +1022,17 @@ void ColladaLoaderPrivate::LoadAnimationSet(tinyxml2::XMLElement *_xml,
             this->ElementId("node", targetBone);
         if (targetNodeXml == nullptr)
         {
-          ignerr << "Failed to load animation, '" << targetBone << "' not found"
+          ignerr << "Failed to load animation, [" << targetBone << "] not found"
               << std::endl;
-          return;
+          continue;
         }
         targetNode = this->LoadSkeletonNodes(targetNodeXml, nullptr);
         this->MergeSkeleton(_skel, targetNode);
+      }
+      if (targetNode == nullptr)
+      {
+        ignerr << "Failed to load bone [" << targetBone << "]." << std::endl;
+        continue;
       }
 
       // In COLLOADA, `target` is specified to be the `id` of a node, however
@@ -980,8 +1044,16 @@ void ColladaLoaderPrivate::LoadAnimationSet(tinyxml2::XMLElement *_xml,
         if (animation[targetBoneName].find(times[i]) ==
             animation[targetBoneName].end())
         {
-          animation[targetBoneName][times[i]] =
-                      _skel->NodeById(targetBone)->Transforms();
+          auto bone = _skel->NodeById(targetBone);
+          if (nullptr != bone)
+          {
+            animation[targetBoneName][times[i]] = bone->Transforms();
+          }
+          else
+          {
+            ignerr << "Failed to find node with ID [" << targetBone << "]"
+                   << std::endl;
+          }
         }
 
         std::vector<NodeTransform> *frame =
@@ -1035,13 +1107,24 @@ void ColladaLoaderPrivate::LoadAnimationSet(tinyxml2::XMLElement *_xml,
 SkeletonNode *ColladaLoaderPrivate::LoadSingleSkeletonNode(
     tinyxml2::XMLElement *_xml, SkeletonNode *_parent)
 {
+  if (nullptr == _xml)
+  {
+    ignerr << "Can't load single skeleton node from null XML." << std::endl;
+    return nullptr;
+  }
+
   std::string name;
   if (_xml->Attribute("sid"))
     name = _xml->Attribute("sid");
   else if (_xml->Attribute("name"))
     name = _xml->Attribute("name");
-  else
+  else if (_xml->Attribute("id"))
     name = _xml->Attribute("id");
+  else
+  {
+    ignerr << "Failed to create skeleton node without a name." << std::endl;
+    return nullptr;
+  }
 
   SkeletonNode* node = new SkeletonNode(_parent, name, _xml->Attribute("id"));
 
@@ -1058,8 +1141,29 @@ SkeletonNode *ColladaLoaderPrivate::LoadSingleSkeletonNode(
 SkeletonNode *ColladaLoaderPrivate::LoadSkeletonNodes(
     tinyxml2::XMLElement *_xml, SkeletonNode *_parent)
 {
+  if (nullptr == _xml)
+  {
+    ignerr << "Can't load skeleton nodes from null XML element." << std::endl;
+    return nullptr;
+  }
+
+  // Skip extras
+  if (std::string(_xml->Value()) == "extra")
+  {
+    ignwarn << "Skipping [extra] element." << std::endl;
+    return nullptr;
+  }
+
+  if (std::string(_xml->Value()) != "node")
+  {
+    ignwarn << "Failed to load element [" << _xml->Value()
+            << "] as skeleton node." << std::endl;
+    return nullptr;
+  }
+
   auto node = this->LoadSingleSkeletonNode(_xml, _parent);
   this->SetSkeletonNodeTransform(_xml, node);
+
   auto childXml = _xml->FirstChildElement("node");
   while (childXml)
   {
@@ -1073,6 +1177,18 @@ SkeletonNode *ColladaLoaderPrivate::LoadSkeletonNodes(
 void ColladaLoaderPrivate::SetSkeletonNodeTransform(tinyxml2::XMLElement *_elem,
       SkeletonNode *_node)
 {
+  if (nullptr == _elem)
+  {
+    ignerr << "Can't set transform from null XML." << std::endl;
+    return;
+  }
+
+  if (nullptr == _node)
+  {
+    ignerr << "Can't set transform to null skeleton node." << std::endl;
+    return;
+  }
+
   ignition::math::Matrix4d transform(ignition::math::Matrix4d::Identity);
 
   if (_elem->FirstChildElement("matrix"))
@@ -2364,6 +2480,12 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
               skel->VertNodeWeight(daeVertIndex, i);
             SkeletonNode *node =
                 _mesh->MeshSkeleton()->NodeByName(node_weight.first);
+            if (nullptr == node)
+            {
+              ignerr << "Failed to find skeleton node named ["
+                     << node_weight.first << "]" << std::endl;
+              continue;
+            }
             subMesh->AddNodeAssignment(subMesh->VertexCount()-1,
                             node->Handle(), node_weight.second);
           }
@@ -2555,8 +2677,26 @@ void ColladaLoaderPrivate::LoadTransparent(tinyxml2::XMLElement *_elem,
 void ColladaLoaderPrivate::MergeSkeleton(SkeletonPtr _skeleton,
     SkeletonNode *_mergeNode)
 {
+  if (nullptr == _skeleton)
+  {
+    ignerr << "Fail to merge null skeleton." << std::endl;
+    return;
+  }
+
+  if (nullptr == _mergeNode)
+  {
+    ignerr << "Fail to merge null skeleton node." << std::endl;
+    return;
+  }
+
   if (_skeleton->NodeById(_mergeNode->Id()))
     return;
+
+  if (nullptr == _skeleton->RootNode())
+  {
+    ignerr << "Skeleton missing root node." << std::endl;
+    return;
+  }
 
   SkeletonNode *currentRoot = _skeleton->RootNode();
   if (currentRoot->Id() == _mergeNode->Id())
@@ -2616,10 +2756,13 @@ void ColladaLoaderPrivate::ApplyInvBindTransform(SkeletonPtr _skeleton)
   while (!queue.empty())
   {
     SkeletonNode *node = queue.front();
+    queue.pop_front();
+    if (nullptr == node)
+      continue;
+
     if (node->HasInvBindTransform())
       node->SetModelTransform(node->InverseBindTransform().Inverse(), false);
     for (unsigned int i = 0; i < node->ChildCount(); i++)
       queue.push_back(node->Child(i));
-    queue.pop_front();
   }
 }
