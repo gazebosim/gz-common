@@ -421,6 +421,12 @@ TEST_F(SubMeshTest, Volume)
   EXPECT_DOUBLE_EQ(1.0, boxSub.Volume());
   boxSub.SetPrimitiveType(common::SubMesh::LINES);
   EXPECT_DOUBLE_EQ(0.0, boxSub.Volume());
+
+  // Test adding another index, which would make the submesh invalid.
+  boxSub.SetPrimitiveType(common::SubMesh::TRIANGLES);
+  EXPECT_DOUBLE_EQ(1.0, boxSub.Volume());
+  boxSub.AddIndex(1);
+  EXPECT_DOUBLE_EQ(0.0, boxSub.Volume());
 }
 
 /////////////////////////////////////////////////
