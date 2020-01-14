@@ -1362,6 +1362,7 @@ void LoadMtl(std::map<std::string, int> *material_map,
   // Issue 43. `d` wins against `Tr` since `Tr` is not in the MTL specification.
   bool has_d = false;
   bool has_tr = false;
+  bool has_kd = false;
 
   std::stringstream warn_ss;
 
@@ -1444,6 +1445,7 @@ void LoadMtl(std::map<std::string, int> *material_map,
       material.diffuse[0] = r;
       material.diffuse[1] = g;
       material.diffuse[2] = b;
+      has_kd = true;
       continue;
     }
 
@@ -1596,6 +1598,16 @@ void LoadMtl(std::map<std::string, int> *material_map,
       token += 7;
       ParseTextureNameAndOption(&(material.diffuse_texname),
                                 &(material.diffuse_texopt), token);
+
+      // Set a decent diffuse default value if a diffuse texture is specified
+      // without a matching Kd value.
+      if (!has_kd)
+      {
+        material.diffuse[0] = 0.6;
+        material.diffuse[1] = 0.6;
+        material.diffuse[2] = 0.6;
+      }
+
       continue;
     }
 
