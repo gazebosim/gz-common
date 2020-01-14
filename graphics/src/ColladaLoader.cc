@@ -2568,7 +2568,7 @@ void ColladaLoaderPrivate::MergeSkeleton(SkeletonPtr _skeleton,
   if (currentRoot->Id() == "dummy-root")
   {
     // Check if the node that will be merged contains the dummy-root
-    // if it is replace dummyRoot
+    // if so, replace dummyRoot
     bool mergeNodeContainsRoot = true;
     for (unsigned int i=0; i < currentRoot->ChildCount(); ++i)
     {
