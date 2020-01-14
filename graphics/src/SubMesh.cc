@@ -565,6 +565,40 @@ std::string SubMesh::Name() const
 }
 
 //////////////////////////////////////////////////
+double SubMesh::Volume() const
+{
+  double volume = 0.0;
+  if (this->dataPtr->primitiveType == SubMesh::TRIANGLES)
+  {
+    if (this->dataPtr->indices.size() % 3 == 0)
+    {
+      for (unsigned int idx = 0; idx < this->dataPtr->indices.size(); idx += 3)
+      {
+        ignition::math::Vector3d v1 =
+          this->dataPtr->vertices[this->dataPtr->indices[idx]];
+        ignition::math::Vector3d v2 =
+          this->dataPtr->vertices[this->dataPtr->indices[idx+1]];
+        ignition::math::Vector3d v3 =
+          this->dataPtr->vertices[this->dataPtr->indices[idx+2]];
+
+        volume += std::abs(v1.Cross(v2).Dot(v3) / 6.0);
+      }
+    }
+    else
+    {
+      ignerr << "The number of indices is not a multiple of three.\n";
+    }
+  }
+  else
+  {
+    ignerr << "Volume calculation can only be accomplished on a triangulated "
+      << " mesh.\n";
+  }
+
+  return volume;
+}
+
+//////////////////////////////////////////////////
 NodeAssignment::NodeAssignment()
   : vertexIndex(0), nodeIndex(0), weight(0.0)
 {
