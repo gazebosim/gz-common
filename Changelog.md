@@ -2,6 +2,10 @@
 
 ## Ignition Common 3.X.X
 
+1. `tiny_obj_loader`: set better diffuse value when `map_kD` is present and `Kd` is not specified.
+    * [Pull request 216](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/216)
+    * [Pull request 217](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/217)
+
 1. ColladaLoader: load files with actors with multiple skeletons
     * [Pull request 215](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/215)
 
