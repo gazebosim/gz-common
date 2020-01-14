@@ -410,7 +410,6 @@ TEST_F(SubMeshTest, Volume)
     ASSERT_TRUE(otherCylinder != nullptr);
     EXPECT_NEAR(IGN_PI * std::pow(2.5, 2) * 12, otherCylinder->Volume(),
         1e-2);
-
   }
 
   // Test another Primitive Type, which should result in a zero volume
