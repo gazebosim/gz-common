@@ -2461,13 +2461,12 @@ void ColladaLoaderPrivate::LoadTransparent(tinyxml2::XMLElement *_elem,
     return;
   }
 
-  // TODO(anyone): Handle transparent textures
   // https://www.khronos.org/files/collada_spec_1_5.pdf
   // Determining Transparency (Opacity) section:
   // opaque modes: RGB_ZERO, RGB_ONE, A_ONE
   if (_elem->FirstChildElement("texture"))
   {
-    ignwarn << "texture based transparency not supported" << std::endl;
+    _mat->SetAlphaFromTexture(true);
     _mat->SetTransparency(0.0);
   }
   else if (_elem->FirstChildElement("color"))
