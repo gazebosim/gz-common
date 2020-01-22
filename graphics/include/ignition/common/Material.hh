@@ -162,7 +162,7 @@ namespace ignition
       /// \param[in] _alpha Set the alpha threshold value
       /// \param[in] _twoSided Enable two sided rendering
       public: void SetAlphaFromTexture(bool _enabled,
-                  double _alpha=0.5, bool _twoSided=true);
+                  double _alpha = 0.5, bool _twoSided = true);
 
       /// \brief Get the enable alpha from textures
       /// \return The enable alpha value
