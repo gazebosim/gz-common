@@ -302,6 +302,18 @@ namespace ignition
       /// \param[in] _vec Amount to translate vertices.
       public: void Translate(const ignition::math::Vector3d &_vec);
 
+      /// \brief Compute the volume of this submesh. The primitive type
+      /// must be TRIANGLES.
+      ///
+      /// This function utilizes the mesh volume formula from
+      /// "Efficient feature extraction for 2d/3d objects in mesh
+      /// representation" by Cha Zhang and Tsuhan Chen. Link:
+      /// http://chenlab.ece.cornell.edu/Publication/Cha/icip01_Cha.pdf.
+      /// The formula does not check for a closed (water tight) mesh.
+      ///
+      /// \return The submesh's volume. The volume can be zero if
+      /// the primitive type is not TRIANGLES, or there are no triangles.
+      public: double Volume() const;
 
       IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Private data pointer.

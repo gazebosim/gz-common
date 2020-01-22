@@ -410,3 +410,14 @@ void Mesh::AABB(ignition::math::Vector3d &_center,
   _center.Y(0.5 * (_minXYZ.Y() + _maxXYZ.Y()));
   _center.Z(0.5 * (_minXYZ.Z() + _maxXYZ.Z()));
 }
+
+//////////////////////////////////////////////////
+double Mesh::Volume() const
+{
+  double volume = 0.0;
+
+  for (const std::shared_ptr<SubMesh> &submesh : this->dataPtr->submeshes)
+    volume += submesh->Volume();
+
+  return volume;
+}
