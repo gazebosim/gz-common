@@ -21,6 +21,9 @@
 1. ColladaLoader: load files with actors with multiple skeletons
     * [BitBucket pull request 215](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/215)
 
+1. Compute volume of mesh shapes with `Mesh::Volume` and `SubMesh::Volume`.
+    * [Pull request 214](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/214)
+
 1. Port Skeleton fixes from gazebo.
     * [BitBucket pull request 209](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/209)
 
