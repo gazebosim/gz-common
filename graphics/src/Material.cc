@@ -56,7 +56,7 @@ class ignition::common::MaterialPrivate
   public: double transparency = 0.0;
 
   // \brief Enable texture based alpha rendering
-  public: bool alphaEnabled = false;
+  public: bool textureAlphaEnabled = false;
 
   // \brief Cutoff value for alpha, values below threshold will not be rendered
   public: double alphaThreshold = 0.5;
@@ -226,15 +226,15 @@ double Material::Transparency() const
 void Material::SetAlphaFromTexture(bool _enabled, double _alpha,
                                    bool _twoSided)
 {
-  this->dataPtr->alphaEnabled = _enabled;
+  this->dataPtr->textureAlphaEnabled = _enabled;
   this->dataPtr->alphaThreshold = _alpha;
   this->dataPtr->twoSidedEnabled = _twoSided;
 }
 
 //////////////////////////////////////////////////
-bool Material::AlphaEnabled() const
+bool Material::TextureAlphaEnabled() const
 {
-  return this->dataPtr->alphaEnabled;
+  return this->dataPtr->textureAlphaEnabled;
 }
 
 //////////////////////////////////////////////////
