@@ -2,6 +2,9 @@
 
 ## Ignition Common 3.X.X
 
+1. Add support for alpha based texture transparency.
+    * [Pull request 221](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/221)
+
 1. `tiny_obj_loader`: set better diffuse value when `map_kD` is present and `Kd` is not specified.
     * [Pull request 216](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/216)
     * [Pull request 217](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/217)
