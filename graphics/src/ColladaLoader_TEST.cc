@@ -204,6 +204,7 @@ TEST_F(ColladaLoader, LoadBoxWithAnimationOutsideSkeleton)
   common::SkeletonAnimation *anim = skeleton->Animation(0);
   EXPECT_EQ(1u, anim->NodeCount());
   EXPECT_TRUE(anim->HasNode("Armature"));
+  EXPECT_NE(nullptr, anim->NodeAnimationByName("Armature"));
   auto poseStart = anim->PoseAt(0.04166662);
   math::Matrix4d expectedTrans = math::Matrix4d(
       1, 0, 0, 1,
@@ -284,6 +285,7 @@ TEST_F(ColladaLoader, LoadBoxNestedAnimation)
   common::SkeletonAnimation *anim = skeleton->Animation(0);
   EXPECT_EQ(1u, anim->NodeCount());
   EXPECT_TRUE(anim->HasNode("Bone"));
+  EXPECT_NE(nullptr, anim->NodeAnimationByName("Bone"));
   auto poseStart = anim->PoseAt(0);
   math::Matrix4d expectedTrans = math::Matrix4d(
       1, 0, 0, 1,
