@@ -69,6 +69,16 @@ unsigned int SkeletonAnimation::NodeCount() const
 }
 
 //////////////////////////////////////////////////
+NodeAnimation *SkeletonAnimation::NodeAnimationByName(
+    const std::string &_node) const
+{
+  auto it = this->data->animations.find(_node);
+  if (it != this->data->animations.end())
+    return it->second;
+  return nullptr;
+}
+
+//////////////////////////////////////////////////
 bool SkeletonAnimation::HasNode(const std::string &_node) const
 {
   return (this->data->animations.find(_node) != this->data->animations.end());

@@ -14,6 +14,9 @@
 
 ## Ignition Common 3.X.X
 
+1. Add function to get NodeAnimation
+    * [Pull request 223](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/223)
+
 1. Add support for alpha based texture transparency.
     * [Pull request 221](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/221)
 
