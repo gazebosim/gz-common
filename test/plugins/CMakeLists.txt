@@ -8,7 +8,11 @@ add_library(IGNDummyPlugins SHARED DummyPlugins.cc)
 # This variable gets put in the cache so that it is available at generation time.
 set(IGN_DUMMY_PLUGIN_PATH_HEADER "DummyPluginsPath.h" CACHE INTERNAL "Name of header which contains DummyPlugin library path")
 
-get_target_property(IGNDummyPluginsLocation IGNDummyPlugins RUNTIME_OUTPUT_DIRECTORY)
+if(WIN32)
+  get_target_property(IGNDummyPluginsLocation IGNDummyPlugins RUNTIME_OUTPUT_DIRECTORY)
+else()
+  get_target_property(IGNDummyPluginsLocation IGNDummyPlugins LIBRARY_OUTPUT_DIRECTORY)
+endif()
 set(header_text "#define IGN_DUMMY_PLUGIN_PATH \"${IGNDummyPluginsLocation}\"")
 
 # Pipe the header text into a header that will be placed in the project binary directory.
