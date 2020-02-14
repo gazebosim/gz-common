@@ -52,6 +52,11 @@ TEST_F(MaterialTest, Material)
   mat.SetTransparency(0.2);
   EXPECT_DOUBLE_EQ(0.2, mat.Transparency());
 
+  mat.SetAlphaFromTexture(true, 0.3, false);
+  EXPECT_EQ(mat.TextureAlphaEnabled(), true);
+  EXPECT_DOUBLE_EQ(mat.AlphaThreshold(), 0.3);
+  EXPECT_EQ(mat.TwoSidedEnabled(), false);
+
   mat.SetShininess(0.2);
   EXPECT_DOUBLE_EQ(0.2, mat.Shininess());
 

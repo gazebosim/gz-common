@@ -204,6 +204,9 @@ TEST_F(ColladaLoader, LoadBoxWithAnimationOutsideSkeleton)
   common::SkeletonAnimation *anim = skeleton->Animation(0);
   EXPECT_EQ(1u, anim->NodeCount());
   EXPECT_TRUE(anim->HasNode("Armature"));
+  auto nodeAnimation = anim->NodeAnimationByName("Armature");
+  EXPECT_NE(nullptr, nodeAnimation);
+  EXPECT_EQ("Armature", nodeAnimation->Name());
   auto poseStart = anim->PoseAt(0.04166662);
   math::Matrix4d expectedTrans = math::Matrix4d(
       1, 0, 0, 1,
@@ -284,6 +287,9 @@ TEST_F(ColladaLoader, LoadBoxNestedAnimation)
   common::SkeletonAnimation *anim = skeleton->Animation(0);
   EXPECT_EQ(1u, anim->NodeCount());
   EXPECT_TRUE(anim->HasNode("Bone"));
+  auto nodeAnimation = anim->NodeAnimationByName("Bone");
+  EXPECT_NE(nullptr, nodeAnimation);
+  EXPECT_EQ("Bone", nodeAnimation->Name());
   auto poseStart = anim->PoseAt(0);
   math::Matrix4d expectedTrans = math::Matrix4d(
       1, 0, 0, 1,
@@ -332,6 +338,19 @@ TEST_F(ColladaLoader, LoadBoxWithMultipleGeoms)
   ASSERT_EQ(2u, mesh->SubMeshCount());
   EXPECT_EQ(24u, mesh->SubMeshByIndex(0).lock()->NodeAssignmentsCount());
   EXPECT_EQ(0u, mesh->SubMeshByIndex(1).lock()->NodeAssignmentsCount());
+}
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, MergeBoxWithDoubleSkeleton)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(std::string(PROJECT_SOURCE_PATH) +
+     "/test/data/box_with_double_skeleton.dae");
+  EXPECT_TRUE(mesh->HasSkeleton());
+  auto skeleton_ptr = mesh->MeshSkeleton();
+  // The two skeletons have been joined and their root is the
+  // animation root, called Armature
+  EXPECT_EQ(skeleton_ptr->RootNode()->Name(), std::string("Armature"));
 }
 
 /////////////////////////////////////////////////

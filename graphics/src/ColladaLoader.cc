@@ -290,6 +290,8 @@ namespace ignition
       ///         the new root node as `_mergeNode`
       ///     3: If the skeleton and `_mergeNode` is unrelated, creates a new
       ///         dummy root and adds both of them as childrens.
+      //      4: If a dummy root already exists but the merge node contains
+      //          all its children, set the merge node as the new root.
       /// \param[in] _skeleton skeleton to merge
       /// \param[in] _mergeNode new root node to merge
       public: void MergeSkeleton(SkeletonPtr _skeleton,
@@ -2459,13 +2461,12 @@ void ColladaLoaderPrivate::LoadTransparent(tinyxml2::XMLElement *_elem,
     return;
   }
 
-  // TODO(anyone): Handle transparent textures
   // https://www.khronos.org/files/collada_spec_1_5.pdf
   // Determining Transparency (Opacity) section:
   // opaque modes: RGB_ZERO, RGB_ONE, A_ONE
   if (_elem->FirstChildElement("texture"))
   {
-    ignwarn << "texture based transparency not supported" << std::endl;
+    _mat->SetAlphaFromTexture(true);
     _mat->SetTransparency(0.0);
   }
   else if (_elem->FirstChildElement("color"))
@@ -2564,7 +2565,27 @@ void ColladaLoaderPrivate::MergeSkeleton(SkeletonPtr _skeleton,
 
   SkeletonNode *dummyRoot = nullptr;
   if (currentRoot->Id() == "dummy-root")
+  {
+    // Check if the node that will be merged contains the dummy-root
+    // if so, replace dummyRoot
+    bool mergeNodeContainsRoot = true;
+    for (unsigned int i=0; i < currentRoot->ChildCount(); ++i)
+    {
+      if (_mergeNode->ChildById(currentRoot->Child(i)->Id()) == nullptr)
+      {
+        mergeNodeContainsRoot = false;
+        break;
+      }
+    }
+    if (mergeNodeContainsRoot)
+    {
+      _skeleton->RootNode(_mergeNode);
+      // TODO(anyone) since we are replacing the whole tree delete the old one
+      delete currentRoot;
+      return;
+    }
     dummyRoot = currentRoot;
+  }
   else
   {
     dummyRoot =

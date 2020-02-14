@@ -2,6 +2,34 @@
 
 ## Ignition Common 3.X.X
 
+1. Add function to get NodeAnimation
+    * [Pull request 223](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/223)
+
+1. Add support for alpha based texture transparency.
+    * [Pull request 221](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/221)
+
+1. `tiny_obj_loader`: set better diffuse value when `map_kD` is present and `Kd` is not specified.
+    * [Pull request 216](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/216)
+    * [Pull request 217](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/217)
+
+1. ColladaLoader: load files with actors with multiple skeletons
+    * [Pull request 215](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/215)
+
+1. Compute volume of mesh shapes with `Mesh::Volume` and `SubMesh::Volume`.
+    * [Pull request 214](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/214)
+
+1. Port Skeleton fixes from gazebo.
+    * [Pull request 209](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/209)
+
+1. Port gazebo9 fix for ColladaLoader with multiple geometries
+    * [Pull request 208](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/208)
+
+1. `SystemPaths::FindSharedLibrary`: return input if its is an absolute path to a file
+    * [Pull request 206](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/206)
+
+1. Fix `Image::ConvertPixelFormat` for `BAYER_BGGR8`
+    * [Pull request 211](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/211)
+
 ## Ignition Common 3.3.0 (2019-08-27)
 
 1. skip GTSMeshUtils test on Windows due to issue #50

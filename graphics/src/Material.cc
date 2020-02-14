@@ -55,6 +55,15 @@ class ignition::common::MaterialPrivate
   /// \brief transparency value in the range 0 to 1
   public: double transparency = 0.0;
 
+  // \brief Enable texture based alpha rendering
+  public: bool textureAlphaEnabled = false;
+
+  // \brief Cutoff value for alpha, values below threshold will not be rendered
+  public: double alphaThreshold = 0.5;
+
+  // \brief Enables two sided rendering
+  public: bool twoSidedEnabled = false;
+
   /// \brief shininess value (0 to 1)
   public: double shininess = 0.0;
 
@@ -211,6 +220,33 @@ void Material::SetTransparency(double _t)
 double Material::Transparency() const
 {
   return this->dataPtr->transparency;
+}
+
+//////////////////////////////////////////////////
+void Material::SetAlphaFromTexture(bool _enabled, double _alpha,
+                                   bool _twoSided)
+{
+  this->dataPtr->textureAlphaEnabled = _enabled;
+  this->dataPtr->alphaThreshold = _alpha;
+  this->dataPtr->twoSidedEnabled = _twoSided;
+}
+
+//////////////////////////////////////////////////
+bool Material::TextureAlphaEnabled() const
+{
+  return this->dataPtr->textureAlphaEnabled;
+}
+
+//////////////////////////////////////////////////
+double Material::AlphaThreshold() const
+{
+  return this->dataPtr->alphaThreshold;
+}
+
+//////////////////////////////////////////////////
+bool Material::TwoSidedEnabled() const
+{
+  return this->dataPtr->twoSidedEnabled;
 }
 
 //////////////////////////////////////////////////
