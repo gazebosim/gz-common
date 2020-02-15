@@ -310,6 +310,13 @@ std::string ignition::common::findFilePath(const std::string &_file)
 }
 
 /////////////////////////////////////////////////
+void ignition::common::addFindFileURICallback(
+    std::function<std::string(const ignition::common::URI &)> _cb)
+{
+  gSystemPaths->AddFindFileURICallback(_cb);
+}
+
+/////////////////////////////////////////////////
 bool ignition::common::env(const std::string &_name, std::string &_value)
 {
   std::string v;
