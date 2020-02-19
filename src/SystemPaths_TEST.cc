@@ -284,12 +284,17 @@ TEST_F(SystemPathsFixture, FindFileURI)
   EXPECT_EQ(file2, sp.FindFileURI("osrf://test_f2"));
 
   // URI + env var
-  setenv("IGN_FILE_PATH", dir1.c_str(), true);
+  static char env[1024];
+  snprintf(env, sizeof(env), "%s", ("IGN_FILE_PATH=" + dir1).c_str());
+  putenv(env);
+
   sp.SetFilePathEnv("IGN_FILE_PATH");
   EXPECT_EQ(file1, sp.FindFileURI("anything://test_f1"));
   EXPECT_NE(file2, sp.FindFileURI("anything://test_f2"));
 
-  setenv("IGN_FILE_PATH", dir2.c_str(), true);
+  snprintf(env, sizeof(env), "%s", ("IGN_FILE_PATH=" + dir2).c_str());
+  putenv(env);
+
   sp.SetFilePathEnv("IGN_FILE_PATH");
   EXPECT_NE(file1, sp.FindFileURI("anything://test_f1"));
   EXPECT_EQ(file2, sp.FindFileURI("anything://test_f2"));
