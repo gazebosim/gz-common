@@ -25,6 +25,7 @@
 #include <chrono>
 #include <ignition/common/Export.hh>
 #include <ignition/common/Filesystem.hh>
+#include <ignition/common/URI.hh>
 
 /////////////////////////////////////////////////
 // Defines
@@ -147,6 +148,17 @@ namespace ignition
     /// \param[in] _file the file name to look for.
     /// \return The path containing the file.
     std::string IGNITION_COMMON_VISIBLE findFilePath(const std::string &_file);
+
+    /// \brief Add a callback to use when findFile() can't find a file that is
+    /// a valid URI.
+    /// The callback should return a full local path to the requested file, or
+    /// and empty string if the file was not found in the callback.
+    /// Callbacks will be called in the order they were added until a path is
+    /// found.
+    /// \param[in] _cb The callback function, which takes a file path or URI
+    /// and returns the full local path.
+    void IGNITION_COMMON_VISIBLE addFindFileURICallback(
+        std::function<std::string(const URI &)> _cb);
 
     /// \brief Compute the SHA1 hash of an array of bytes.
     /// \param[in] _buffer Input sequence. The permitted data types for this
