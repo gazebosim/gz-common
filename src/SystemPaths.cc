@@ -333,9 +333,10 @@ std::string SystemPaths::FindFileURI(const ignition::common::URI &_uri) const
   {
     for (const std::string &filePath : this->dataPtr->filePaths)
     {
-      if (exists(NormalizeDirectoryPath(filePath) + suffix))
+      auto withSuffix = NormalizeDirectoryPath(filePath) + suffix;
+      if (exists(withSuffix))
       {
-        filename = NormalizeDirectoryPath(filePath) + suffix;
+        filename = withSuffix;
         ignition::common::replaceAll(filename, filename, "//", "/");
         break;
       }

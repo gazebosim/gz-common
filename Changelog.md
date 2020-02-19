@@ -2,6 +2,9 @@
 
 ## Ignition Common 3.X.X
 
+1. Custom paths for file URIs (env var + URI)
+    * [Pull request 210](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/210)
+
 1. Add function to get NodeAnimation
     * [Pull request 223](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/223)
 
