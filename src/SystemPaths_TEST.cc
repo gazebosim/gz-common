@@ -126,8 +126,8 @@ TEST_F(SystemPathsFixture, FileSystemPaths)
 
   std::string dir1 = "test_dir1";
   ignition::common::createDirectories(dir1);
-  std::string file1 =
-      ignition::common::SystemPaths::NormalizeDirectoryPath(dir1) + "test_f1";
+  auto file1 = ignition::common::copyFromUnixPath(
+      ignition::common::joinPaths(dir1, "test_f1"));
   std::ofstream fout;
   fout.open(file1, std::ofstream::out);
   fout << "asdf";

@@ -196,13 +196,18 @@ TEST(Util_TEST, findFile)
   EXPECT_EQ(file1, ignition::common::findFile("file://test_dir1/test_f1"));
 
   // Custom callback
-  auto fileCb = [](const ignition::common::URI &)
+#ifndef _WIN32
+  const auto tmpDir = "/tmp";
+#else
+  const auto tmpDir = "C:\\Windows";
+#endif
+  auto fileCb = [&tmpDir](const ignition::common::URI &)
   {
-    return "/tmp";
+    return tmpDir;
   };
 
   ignition::common::addFindFileURICallback(fileCb);
-  EXPECT_EQ("/tmp", ignition::common::findFile("model://banana"));
+  EXPECT_EQ(tmpDir, ignition::common::findFile("model://banana"));
 }
 
 /////////////////////////////////////////////////
