@@ -334,11 +334,10 @@ std::string SystemPaths::FindFileURI(const ignition::common::URI &_uri) const
   {
     for (const std::string &filePath : this->dataPtr->filePaths)
     {
-      auto withSuffix = filePath + suffix;
+      auto withSuffix = NormalizeDirectoryPath(filePath) + suffix;
       if (exists(withSuffix))
       {
-        filename = withSuffix;
-        ignition::common::replaceAll(filename, filename, "//", "/");
+        filename = ignition::common::copyFromUnixPath(withSuffix);
         break;
       }
     }
@@ -424,10 +423,10 @@ std::string SystemPaths::FindFile(const std::string &_filename,
   {
     for (const std::string &filePath : this->dataPtr->filePaths)
     {
-      if (exists(NormalizeDirectoryPath(filePath) + filename))
+      auto withSuffix = NormalizeDirectoryPath(filePath) + filename;
+      if (exists(withSuffix))
       {
-        path = NormalizeDirectoryPath(filePath) + filename;
-        ignition::common::replaceAll(path, path, "//", "/");
+        path = ignition::common::copyFromUnixPath(withSuffix);
         break;
       }
     }
