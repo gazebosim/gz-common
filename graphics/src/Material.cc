@@ -352,7 +352,7 @@ std::string Material::ShadeStr() const
 //////////////////////////////////////////////////
 void Material::SetPbrMaterial(const Pbr &_pbr)
 {
-  this->dataPtr->pbr.reset(new Pbr(_pbr));
+  this->dataPtr->pbr = std::make_unique<Pbr>(_pbr);
 }
 
 //////////////////////////////////////////////////
