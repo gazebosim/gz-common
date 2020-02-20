@@ -422,10 +422,10 @@ std::string SystemPaths::FindFile(const std::string &_filename,
   {
     for (const std::string &filePath : this->dataPtr->filePaths)
     {
-      if (exists(NormalizeDirectoryPath(filePath) + filename))
+      auto withSuffix = NormalizeDirectoryPath(filePath) + filename;
+      if (exists(withSuffix))
       {
-        path = NormalizeDirectoryPath(filePath) + filename;
-        ignition::common::replaceAll(path, path, "//", "/");
+        path = ignition::common::copyFromUnixPath(withSuffix);
         break;
       }
     }
