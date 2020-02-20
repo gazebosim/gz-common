@@ -34,6 +34,7 @@ using namespace ignition;
 
 class SystemPathsFixture : public ::testing::Test
 {
+  // Documentation inherited
   public: virtual void SetUp()
     {
       this->backupPluginPath = "IGN_PLUGIN_PATH=";
@@ -57,14 +58,20 @@ class SystemPathsFixture : public ::testing::Test
 #endif
     }
 
+  // Documentation inherited
   public: virtual void TearDown()
     {
       putenv(const_cast<char*>(this->backupPluginPath.c_str()));
       putenv(const_cast<char*>(this->backupFilePath.c_str()));
     }
 
+  /// \brief Backup of plugin paths to be restored after the test
   public: std::string backupPluginPath;
+
+  /// \brief Backup of file paths to be restored after the test
   public: std::string backupFilePath;
+
+  /// \brief Root of filesystem according to each platform
   public: std::string filesystemRoot;
 };
 
@@ -119,8 +126,8 @@ TEST_F(SystemPathsFixture, FileSystemPaths)
 
   std::string dir1 = "test_dir1";
   ignition::common::createDirectories(dir1);
-  std::string file1 =
-      ignition::common::SystemPaths::NormalizeDirectoryPath(dir1) + "test_f1";
+  auto file1 = ignition::common::copyFromUnixPath(
+      ignition::common::joinPaths(dir1, "test_f1"));
   std::ofstream fout;
   fout.open(file1, std::ofstream::out);
   fout << "asdf";
@@ -135,6 +142,7 @@ TEST_F(SystemPathsFixture, FileSystemPaths)
   putenv(env);
   paths.SetFilePathEnv("IGN_FILE_PATH");
   EXPECT_EQ(file1, paths.FindFile("test_f1")) << paths.FindFile("test_f1");
+  EXPECT_EQ(file1, paths.FindFile("model://test_f1"));
 }
 
 /////////////////////////////////////////////////
@@ -274,6 +282,22 @@ TEST_F(SystemPathsFixture, FindFileURI)
   sp.AddFindFileURICallback(robot2Cb);
   EXPECT_EQ(file1, sp.FindFileURI("robot://test_f1"));
   EXPECT_EQ(file2, sp.FindFileURI("osrf://test_f2"));
+
+  // URI + env var
+  static char env[1024];
+  snprintf(env, sizeof(env), "%s", ("IGN_FILE_PATH=" + dir1).c_str());
+  putenv(env);
+
+  sp.SetFilePathEnv("IGN_FILE_PATH");
+  EXPECT_EQ(file1, sp.FindFileURI("anything://test_f1"));
+  EXPECT_NE(file2, sp.FindFileURI("anything://test_f2"));
+
+  snprintf(env, sizeof(env), "%s", ("IGN_FILE_PATH=" + dir2).c_str());
+  putenv(env);
+
+  sp.SetFilePathEnv("IGN_FILE_PATH");
+  EXPECT_NE(file1, sp.FindFileURI("anything://test_f1"));
+  EXPECT_EQ(file2, sp.FindFileURI("anything://test_f2"));
 }
 
 //////////////////////////////////////////////////

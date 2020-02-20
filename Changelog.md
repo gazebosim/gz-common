@@ -5,6 +5,9 @@
 1. Add Pbr Material class
     * [Pull request xxx](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/xxx)
 
+1. Custom paths for file URIs (env var + URI)
+    * [Pull request 210](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/210)
+
 1. Add function to get NodeAnimation
     * [Pull request 223](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/223)
 
@@ -32,6 +35,9 @@
 
 1. Fix `Image::ConvertPixelFormat` for `BAYER_BGGR8`
     * [Pull request 211](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/211)
+
+1. Support custom callbacks to find files on global interface
+    * [Pull request 226](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/226)
 
 ## Ignition Common 3.3.0 (2019-08-27)
 
