@@ -2,8 +2,8 @@
 
 ## Ignition Common 3.X.X
 
-1. Add Pbr Material class
-    * [Pull request xxx](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/xxx)
+1. Add PBR material class
+    * [Pull request 227](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/227)
 
 1. Custom paths for file URIs (env var + URI)
     * [Pull request 210](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/210)
