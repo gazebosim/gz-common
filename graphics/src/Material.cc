@@ -90,6 +90,9 @@ class ignition::common::MaterialPrivate
 
   /// \brief destination blend factor
   public: double dstBlendFactor;
+
+  /// \brief Physically Based Rendering (PBR) properties
+  public: std::unique_ptr<Pbr> pbr;
 };
 
 unsigned int MaterialPrivate::counter = 0;
@@ -346,3 +349,14 @@ std::string Material::ShadeStr() const
   return shadeModeIface.Str(this->Shade());
 }
 
+//////////////////////////////////////////////////
+void Material::SetPbrMaterial(const Pbr &_pbr)
+{
+  this->dataPtr->pbr.reset(new Pbr(_pbr));
+}
+
+//////////////////////////////////////////////////
+Pbr *Material::PbrMaterial() const
+{
+  return this->dataPtr->pbr.get();
+}

@@ -2,6 +2,9 @@
 
 ## Ignition Common 3.X.X
 
+1. Add Pbr Material class
+    * [Pull request xxx](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/xxx)
+
 1. Add function to get NodeAnimation
     * [Pull request 223](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/223)
 

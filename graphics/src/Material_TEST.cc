@@ -17,6 +17,7 @@
 #include <gtest/gtest.h>
 
 #include "ignition/common/Material.hh"
+#include "ignition/common/Pbr.hh"
 #include "test/util.hh"
 
 using namespace ignition;
@@ -80,6 +81,12 @@ TEST_F(MaterialTest, Material)
 
   mat.SetLighting(true);
   EXPECT_TRUE(mat.Lighting());
+
+  common::Pbr pbr;
+  EXPECT_EQ(nullptr, mat.PbrMaterial());
+  mat.SetPbrMaterial(pbr);
+  EXPECT_NE(nullptr, mat.PbrMaterial());
+  EXPECT_EQ(pbr, *mat.PbrMaterial());
 }
 
 /////////////////////////////////////////////////
