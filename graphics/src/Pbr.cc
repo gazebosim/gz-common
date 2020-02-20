@@ -228,7 +228,7 @@ double Pbr::Metalness() const
 }
 
 //////////////////////////////////////////////////
-void Pbr::SetMetalness(const double _metalness)
+void Pbr::SetMetalness(double _metalness)
 {
   this->dataPtr->metalness = _metalness;
 }
@@ -240,7 +240,7 @@ double Pbr::Roughness() const
 }
 
 //////////////////////////////////////////////////
-void Pbr::SetRoughness(const double _roughness)
+void Pbr::SetRoughness(double _roughness)
 {
   this->dataPtr->roughness = _roughness;
 }
@@ -270,7 +270,7 @@ void Pbr::SetGlossinessMap(const std::string &_map)
 }
 
 //////////////////////////////////////////////////
-void Pbr::SetGlossiness(const double _glossiness)
+void Pbr::SetGlossiness(double _glossiness)
 {
   this->dataPtr->glossiness = _glossiness;
 }

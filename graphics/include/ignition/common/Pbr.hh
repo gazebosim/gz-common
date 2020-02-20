@@ -172,7 +172,7 @@ namespace common
 
     /// \brief Set the metalness value of the material for metal workflow.
     /// \param[in] _value Metalness value.
-    public: void SetMetalness(const double _value);
+    public: void SetMetalness(double _value);
 
     /// \brief Get the roughness value of the material for metal workflow
     /// \return roughness value of the material
@@ -180,7 +180,7 @@ namespace common
 
     /// \brief Set the roughness value of the material for metal workflow.
     /// \param[in] _value Roughness value.
-    public: void SetRoughness(const double _value);
+    public: void SetRoughness(double _value);
 
     /// \brief Get the glossiness map filename for specular workflow. This will
     /// be an empty string if a glossiness map has not been set.
@@ -198,7 +198,7 @@ namespace common
 
     /// \brief Set the glossiness value of the material for specular workflow.
     /// \param[in] _value Glossiness value.
-    public: void SetGlossiness(const double _value);
+    public: void SetGlossiness(double _value);
 
     /// \brief Get the specular map filename for specular workflow. This will
     /// be an empty string if a specular map has not been set.
