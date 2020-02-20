@@ -348,6 +348,41 @@ TEST_F(ColladaLoader, MergeBoxWithDoubleSkeleton)
 }
 
 /////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadCylinderAnimatedFrom3dsMax)
+{
+  // TODO(anyone) This test shows that the mesh loads without crashing, but the
+  // mesh animation looks deformed when loaded. That still needs to be
+  // addressed.
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      std::string(PROJECT_SOURCE_PATH) +
+      "/test/data/cylinder_animated_from_3ds_max.dae");
+
+  EXPECT_EQ("unknown", mesh->Name());
+  EXPECT_EQ(202u, mesh->VertexCount());
+  EXPECT_EQ(202u, mesh->NormalCount());
+  EXPECT_EQ(852u, mesh->IndexCount());
+  EXPECT_LT(0u, mesh->TexCoordCount());
+  EXPECT_EQ(0u, mesh->MaterialCount());
+
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  auto subMesh = mesh->SubMeshByIndex(0);
+  ASSERT_NE(nullptr, subMesh.lock());
+  EXPECT_EQ("Cylinder01", subMesh.lock()->Name());
+
+  EXPECT_TRUE(mesh->HasSkeleton());
+  auto skeleton = mesh->MeshSkeleton();
+  ASSERT_NE(nullptr, skeleton);
+  ASSERT_EQ(1u, skeleton->AnimationCount());
+
+  auto anim = skeleton->Animation(0);
+  ASSERT_NE(nullptr, anim);
+  EXPECT_EQ("Bone02", anim->Name());
+  EXPECT_EQ(1u, anim->NodeCount());
+  EXPECT_TRUE(anim->HasNode("Bone02"));
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
