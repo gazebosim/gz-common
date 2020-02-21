@@ -2,6 +2,8 @@
 
 ## Ignition Common 3.X.X
 
+## Ignition Common 3.4.0 (2019-02-20)
+
 1. Add PBR material class
     * [Pull request 227](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/227)
 
@@ -10,6 +12,9 @@
 
 1. Add function to get NodeAnimation
     * [Pull request 223](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/223)
+
+1. Handle unexpected COLLADA more gracefully
+    * [Pull request 218](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/218)
 
 1. Add support for alpha based texture transparency.
     * [Pull request 221](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/221)
