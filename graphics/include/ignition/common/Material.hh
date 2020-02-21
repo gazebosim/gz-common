@@ -24,6 +24,7 @@
 #include <ignition/math/Color.hh>
 #include <ignition/common/graphics/Export.hh>
 #include <ignition/common/EnumIface.hh>
+#include <ignition/common/Pbr.hh>
 #include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
@@ -240,6 +241,14 @@ namespace ignition
       /// \brief Get lighting enabled
       /// \return the lighting enabled state
       public: bool Lighting() const;
+
+      /// \brief Set the Physically Based Rendering (PBR) material
+      /// \return The PBR material to set to.
+      public: void SetPbrMaterial(const Pbr &_pbr);
+
+      /// \brief Get the Physically Based Rendering (PBR) material
+      /// \return Pointer to the PBR material. Null if it does not exist.
+      public: Pbr *PbrMaterial() const;
 
       /// \brief Stream insertion operator
       /// param[in] _out the output stream to extract from
