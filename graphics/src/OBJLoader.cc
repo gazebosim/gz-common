@@ -93,7 +93,7 @@ Mesh *OBJLoader::Load(const std::string &_filename)
   Mesh *mesh = new Mesh();
   mesh->SetPath(path);
 
-  for (auto const s : shapes)
+  for (auto const &s : shapes)
   {
     // obj mesh assigns a material id to each 'face' but ignition assigns a
     // single material to each 'submesh'. The strategy here is to identify
@@ -110,29 +110,32 @@ Mesh *OBJLoader::Load(const std::string &_filename)
         subMeshMatId[id] = subMesh.get();
 
         Material *mat = nullptr;
-        auto m = materials[id];
-        if (materialIds.find(m.name) != materialIds.end())
+        if (id >= 0 && static_cast<size_t>(id) < materials.size())
         {
-          mat = materialIds[m.name];
-        }
-        else
-        {
-          // Create new material and pass it to mesh who will take ownership of
-          // the object
-          mat = new Material();
-          mat->SetAmbient(
-              math::Color(m.ambient[0], m.ambient[1], m.ambient[2]));
-          mat->SetDiffuse(
-              math::Color(m.diffuse[0], m.diffuse[1], m.diffuse[2]));
-          mat->SetSpecular(
-              math::Color(m.specular[0], m.specular[1], m.specular[2]));
-          mat->SetEmissive(
-              math::Color(m.emission[0], m.emission[1], m.emission[2]));
-          mat->SetShininess(m.shininess);
-          mat->SetTransparency(1.0 - m.dissolve);
-          if (!m.diffuse_texname.empty())
-            mat->SetTextureImage(m.diffuse_texname, path.c_str());
-          materialIds[m.name] = mat;
+          auto m = materials[id];
+          if (materialIds.find(m.name) != materialIds.end())
+          {
+            mat = materialIds[m.name];
+          }
+          else
+          {
+            // Create new material and pass it to mesh who will take ownership of
+            // the object
+            mat = new Material();
+            mat->SetAmbient(
+                math::Color(m.ambient[0], m.ambient[1], m.ambient[2]));
+            mat->SetDiffuse(
+                math::Color(m.diffuse[0], m.diffuse[1], m.diffuse[2]));
+            mat->SetSpecular(
+                math::Color(m.specular[0], m.specular[1], m.specular[2]));
+            mat->SetEmissive(
+                math::Color(m.emission[0], m.emission[1], m.emission[2]));
+            mat->SetShininess(m.shininess);
+            mat->SetTransparency(1.0 - m.dissolve);
+            if (!m.diffuse_texname.empty())
+              mat->SetTextureImage(m.diffuse_texname, path.c_str());
+            materialIds[m.name] = mat;
+          }
         }
         int matIndex = mesh->IndexOfMaterial(mat);
         if (matIndex < 0)
