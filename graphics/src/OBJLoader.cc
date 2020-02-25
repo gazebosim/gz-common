@@ -119,8 +119,8 @@ Mesh *OBJLoader::Load(const std::string &_filename)
           }
           else
           {
-            // Create new material and pass it to mesh who will take ownership of
-            // the object
+            // Create new material and pass it to mesh who will take ownership
+            // of the object
             mat = new Material();
             mat->SetAmbient(
                 math::Color(m.ambient[0], m.ambient[1], m.ambient[2]));

@@ -65,12 +65,11 @@ TEST_F(OBJLoaderTest, LoadObjBox)
 TEST_F(OBJLoaderTest, InvalidMaterial)
 {
   ignition::common::OBJLoader objLoader;
-  ignition::common::Mesh *mesh = nullptr;
 
   std::string meshFilename = std::string(PROJECT_SOURCE_PATH) +
     "/test/data/invalid_material.obj";
 
-  mesh = objLoader.Load(meshFilename);
+  ignition::common::Mesh *mesh = objLoader.Load(meshFilename);
   EXPECT_TRUE(mesh != nullptr);
 }
 
