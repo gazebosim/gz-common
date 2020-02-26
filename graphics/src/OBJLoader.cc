@@ -112,7 +112,7 @@ Mesh *OBJLoader::Load(const std::string &_filename)
         Material *mat = nullptr;
         if (id >= 0 && static_cast<size_t>(id) < materials.size())
         {
-          auto m = materials[id];
+          auto &m = materials[id];
           if (materialIds.find(m.name) != materialIds.end())
           {
             mat = materialIds[m.name];
@@ -136,11 +136,16 @@ Mesh *OBJLoader::Load(const std::string &_filename)
               mat->SetTextureImage(m.diffuse_texname, path.c_str());
             materialIds[m.name] = mat;
           }
+          int matIndex = mesh->IndexOfMaterial(mat);
+          if (matIndex < 0)
+            matIndex = mesh->AddMaterial(MaterialPtr(mat));
+          subMesh->SetMaterialIndex(matIndex);
         }
-        int matIndex = mesh->IndexOfMaterial(mat);
-        if (matIndex < 0)
-          matIndex = mesh->AddMaterial(MaterialPtr(mat));
-        subMesh->SetMaterialIndex(matIndex);
+        else
+        {
+          ignwarn << "Missing material for shape[" << s.name << "] "
+              << "in OBJ file[" << _filename << "]" << std::endl;
+        }
         mesh->AddSubMesh(std::move(subMesh));
       }
     }
