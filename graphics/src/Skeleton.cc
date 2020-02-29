@@ -15,6 +15,7 @@
  *
  */
 #include <list>
+#include <ignition/common/Console.hh>
 #include <ignition/common/SkeletonAnimation.hh>
 #include <ignition/common/Skeleton.hh>
 #include <ignition/common/BVHLoader.hh>
@@ -155,6 +156,12 @@ unsigned int Skeleton::JointCount() const
 //////////////////////////////////////////////////
 void Skeleton::Scale(const double _scale)
 {
+  if (nullptr == this->data->root)
+  {
+    ignerr << "Failed to scale skeleton, null root." << std::endl;
+    return;
+  }
+
   //  scale skeleton structure
   for (SkeletonNodeMap::iterator iter = this->data->nodes.begin();
        iter != this->data->nodes.end(); ++iter)
@@ -177,7 +184,7 @@ void Skeleton::Scale(const double _scale)
 //////////////////////////////////////////////////
 void Skeleton::BuildNodeMap()
 {
-  std::list<SkeletonNode*> toVisit;
+  std::list<SkeletonNode *> toVisit;
   toVisit.push_front(this->data->root);
 
   unsigned int handle = 0;
@@ -186,6 +193,9 @@ void Skeleton::BuildNodeMap()
   {
     SkeletonNode *node = toVisit.front();
     toVisit.pop_front();
+
+    if (nullptr == node)
+      continue;
 
     for (int i = (node->ChildCount() - 1); i >= 0; --i)
       toVisit.push_front(node->Child(i));
