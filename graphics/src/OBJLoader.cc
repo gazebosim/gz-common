@@ -133,11 +133,6 @@ Mesh *OBJLoader::Load(const std::string &_filename)
           if (!m.diffuse_texname.empty())
             mat->SetTextureImage(m.diffuse_texname, path.c_str());
           materialIds[m.name] = mat;
-
-          // set default PBR material properties
-          common::Pbr pbr;
-          pbr.SetMetalness(0.0);
-          mat->SetPbrMaterial(pbr);
         }
         int matIndex = mesh->IndexOfMaterial(mat);
         if (matIndex < 0)
