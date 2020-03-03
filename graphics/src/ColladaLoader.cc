@@ -1823,11 +1823,6 @@ MaterialPtr ColladaLoaderPrivate::LoadMaterial(const std::string &_name)
   if (cgXml)
     ignerr << "profile_CG unsupported\n";
 
-  // set default PBR material properties
-  common::Pbr pbr;
-  pbr.SetMetalness(0.0);
-  mat->SetPbrMaterial(pbr);
-
   this->materialIds[_name] = mat;
 
   return mat;
