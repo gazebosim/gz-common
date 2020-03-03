@@ -2,6 +2,9 @@
 
 ## Ignition Common 3.X.X
 
+1. Update PBR metalness default value to 0.0
+    * [Pull request 231](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/231)
+
 ## Ignition Common 3.4.0 (2019-02-20)
 
 1. Add PBR material class
