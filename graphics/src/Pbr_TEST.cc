@@ -33,7 +33,7 @@ TEST(Pbr, BasicAPI)
   EXPECT_EQ(std::string(), pbr.MetalnessMap());
   EXPECT_EQ(std::string(), pbr.EmissiveMap());
   EXPECT_DOUBLE_EQ(0.5, pbr.Roughness());
-  EXPECT_DOUBLE_EQ(0.5, pbr.Metalness());
+  EXPECT_DOUBLE_EQ(0.0, pbr.Metalness());
   EXPECT_EQ(std::string(), pbr.SpecularMap());
   EXPECT_EQ(std::string(), pbr.GlossinessMap());
   EXPECT_DOUBLE_EQ(0.0, pbr.Glossiness());
@@ -109,7 +109,7 @@ TEST(Pbr, MoveCopy)
     EXPECT_EQ(std::string(), pbr2.RoughnessMap());
     EXPECT_EQ(std::string(), pbr2.MetalnessMap());
     EXPECT_DOUBLE_EQ(0.5, pbr2.Roughness());
-    EXPECT_DOUBLE_EQ(0.5, pbr2.Metalness());
+    EXPECT_DOUBLE_EQ(0.0, pbr2.Metalness());
   }
 
   // move

@@ -54,7 +54,7 @@ class ignition::common::PbrPrivate
   public: double roughness = 0.5;
 
   /// \brief Metalness value (metal workflow only)
-  public: double metalness = 0.5;
+  public: double metalness = 0.0;
 
   /// \brief Specular map (specular workflow only)
   public: std::string specularMap = "";

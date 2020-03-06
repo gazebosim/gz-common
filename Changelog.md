@@ -2,6 +2,9 @@
 
 ## Ignition Common 3.X.X
 
+1. Update PBR metalness default value to 0.0
+    * [Pull request 231](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/231)
+
 1. Fix crash when loading OBJ meshes with invalid materials
     * [Pull request 230](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/230)
 
