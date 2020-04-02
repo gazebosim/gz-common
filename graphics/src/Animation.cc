@@ -15,6 +15,7 @@
  *
 */
 #include <algorithm>
+#include <unordered_map>
 
 #include <ignition/math/Spline.hh>
 #include <ignition/math/Vector2.hh>
@@ -36,6 +37,42 @@ namespace
       return _kf->Time() < _kf2->Time();
     }
   };
+}
+
+/////////////////////////////////////////////////
+class ignition::common::AnimationPrivate
+{
+  /// \brief true if the animation is interpolated in x
+  public: bool interpolateX;
+};
+
+// TODO(luca) Make Animation class follow PIMPL and remove global static map
+/////////////////////////////////////////////////
+typedef std::unordered_map<Animation *, AnimationPrivate *> AnimationPrivateMap;
+static AnimationPrivateMap animationPrivateMap;
+
+/////////////////////////////////////////////////
+static AnimationPrivate* AnimationDataPtr(Animation* animation)
+{
+  auto mapIt = animationPrivateMap.find(animation);
+  if (mapIt == animationPrivateMap.end())
+  {
+    // Create the map entry
+    animationPrivateMap[animation] = new AnimationPrivate;
+  }
+  return animationPrivateMap[animation];
+}
+
+/////////////////////////////////////////////////
+static void DeleteAnimationDataPtr(Animation *animation)
+{
+  // Delete the data pointer class and erase the hash map entry
+  auto mapIt = animationPrivateMap.find(animation);
+  if (mapIt != animationPrivateMap.end())
+  {
+    delete mapIt->second;
+    animationPrivateMap.erase(mapIt);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -69,16 +106,18 @@ class ignition::common::TrajectoryInfoPrivate
 
 /////////////////////////////////////////////////
 Animation::Animation(const std::string &_name, const double _length,
-    const bool _loop)
+    const bool _loop, const bool _interpolateX)
 : name(_name), length(_length), loop(_loop)
 {
   this->timePos = 0;
   this->build = false;
+  AnimationDataPtr(this)->interpolateX = _interpolateX;
 }
 
 /////////////////////////////////////////////////
 Animation::~Animation()
 {
+  DeleteAnimationDataPtr(this);
 }
 
 /////////////////////////////////////////////////
@@ -125,6 +164,18 @@ void Animation::AddTime(const double _time)
 double Animation::Time() const
 {
   return this->timePos;
+}
+
+/////////////////////////////////////////////////
+bool Animation::InterpolateX() const
+{
+  return AnimationDataPtr(const_cast<Animation *>(this))->interpolateX;
+}
+
+/////////////////////////////////////////////////
+void Animation::SetInterpolateX(const bool _interpolateX)
+{
+  AnimationDataPtr(this)->interpolateX = _interpolateX;
 }
 
 /////////////////////////////////////////////////
@@ -199,9 +250,9 @@ double Animation::KeyFramesAtTime(double _time, common::KeyFrame **_kf1,
 }
 
 /////////////////////////////////////////////////
-PoseAnimation::PoseAnimation(const std::string &_name,
-    const double _length, const bool _loop)
-: Animation(_name, _length, _loop)
+PoseAnimation::PoseAnimation(const std::string &_name, const double _length,
+    const bool _loop, const bool _interpolateX)
+: Animation(_name, _length, _loop, _interpolateX)
 {
   this->positionSpline = NULL;
   this->rotationSpline = NULL;

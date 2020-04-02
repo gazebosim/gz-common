@@ -34,6 +34,7 @@ namespace ignition
     class KeyFrame;
     class PoseKeyFrame;
     class NumericKeyFrame;
+    class AnimationPrivate;
     class TrajectoryInfoPrivate;
 
     /// \class Animation Animation.hh ignition/common/Animation.hh
@@ -45,8 +46,10 @@ namespace ignition
       /// \param[in] _name Name of the animation, should be unique
       /// \param[in] _length Duration of the animation in seconds
       /// \param[in] _loop Set to true if the animation should repeat
-      public: Animation(const std::string &_name,
-                  const double _length, const bool _loop);
+      /// \param[in] _interpolateX Set to true if the animation speed should
+      /// be interpolated depending on displacement in the X direction
+      public: Animation(const std::string &_name, const double _length,
+                  const bool _loop, const bool _interpolateX = false);
 
       /// \brief Destructor
       public: virtual ~Animation();
@@ -70,6 +73,14 @@ namespace ignition
       /// \brief Return the current time position
       /// \return The time position in seconds
       public: double Time() const;
+
+      /// \brief Return the interpolateX value
+      /// \return The interpolateX value
+      public: bool InterpolateX() const;
+
+      /// \brief Set the interpolateX value
+      /// \param[in] _interpolateX The interpolateX value
+      public: void SetInterpolateX(const bool _interpolateX);
 
       /// \brief Return the number of key frames in the animation
       /// \return The number of keyframes
@@ -130,8 +141,10 @@ namespace ignition
       /// \param[in] _name String name of the animation. This should be unique.
       /// \param[in] _length Length of the animation in seconds
       /// \param[in] _loop True == loop the animation
-      public: PoseAnimation(const std::string &_name,
-                            const double _length, const bool _loop);
+      /// \param[in] _interpolateX Set to true if the animation speed should
+      /// be interpolated depending on displacement in the X direction
+      public: PoseAnimation(const std::string &_name, const double _length,
+                  const bool _loop, const bool _interpolateX = false);
 
       /// \brief Destructor
       public: virtual ~PoseAnimation();
