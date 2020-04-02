@@ -2,6 +2,9 @@
 
 ## Ignition Common 3.X.X
 
+1. Add interpolate\_x property to actor animations
+    * [Pull request 232](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/232)
+
 1. Update PBR metalness default value to 0.0
     * [Pull request 231](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/231)
 
