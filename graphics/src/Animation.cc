@@ -52,22 +52,22 @@ typedef std::unordered_map<Animation *, AnimationPrivate *> AnimationPrivateMap;
 static AnimationPrivateMap animationPrivateMap;
 
 /////////////////////////////////////////////////
-static AnimationPrivate* AnimationDataPtr(Animation* animation)
+static AnimationPrivate* AnimationDataPtr(Animation *_animation)
 {
-  auto mapIt = animationPrivateMap.find(animation);
+  auto mapIt = animationPrivateMap.find(_animation);
   if (mapIt == animationPrivateMap.end())
   {
     // Create the map entry
-    animationPrivateMap[animation] = new AnimationPrivate;
+    animationPrivateMap[_animation] = new AnimationPrivate;
   }
-  return animationPrivateMap[animation];
+  return animationPrivateMap[_animation];
 }
 
 /////////////////////////////////////////////////
-static void DeleteAnimationDataPtr(Animation *animation)
+static void DeleteAnimationDataPtr(Animation *_animation)
 {
   // Delete the data pointer class and erase the hash map entry
-  auto mapIt = animationPrivateMap.find(animation);
+  auto mapIt = animationPrivateMap.find(_animation);
   if (mapIt != animationPrivateMap.end())
   {
     delete mapIt->second;
