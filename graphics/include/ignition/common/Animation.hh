@@ -46,10 +46,8 @@ namespace ignition
       /// \param[in] _name Name of the animation, should be unique
       /// \param[in] _length Duration of the animation in seconds
       /// \param[in] _loop Set to true if the animation should repeat
-      /// \param[in] _interpolateX Set to true if the animation speed should
-      /// be interpolated depending on displacement in the X direction
-      public: Animation(const std::string &_name, const double _length,
-                  const bool _loop, const bool _interpolateX = false);
+      public: Animation(const std::string &_name,
+                  const double _length, const bool _loop);
 
       /// \brief Destructor
       public: virtual ~Animation();
@@ -141,10 +139,8 @@ namespace ignition
       /// \param[in] _name String name of the animation. This should be unique.
       /// \param[in] _length Length of the animation in seconds
       /// \param[in] _loop True == loop the animation
-      /// \param[in] _interpolateX Set to true if the animation speed should
-      /// be interpolated depending on displacement in the X direction
-      public: PoseAnimation(const std::string &_name, const double _length,
-                  const bool _loop, const bool _interpolateX = false);
+      public: PoseAnimation(const std::string &_name,
+                  const double _length, const bool _loop);
 
       /// \brief Destructor
       public: virtual ~PoseAnimation();

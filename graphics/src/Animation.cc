@@ -43,7 +43,7 @@ namespace
 class ignition::common::AnimationPrivate
 {
   /// \brief true if the animation is interpolated in x
-  public: bool interpolateX;
+  public: bool interpolateX = false;
 };
 
 // TODO(luca) Make Animation class follow PIMPL and remove global static map
@@ -106,12 +106,11 @@ class ignition::common::TrajectoryInfoPrivate
 
 /////////////////////////////////////////////////
 Animation::Animation(const std::string &_name, const double _length,
-    const bool _loop, const bool _interpolateX)
+    const bool _loop)
 : name(_name), length(_length), loop(_loop)
 {
   this->timePos = 0;
   this->build = false;
-  AnimationDataPtr(this)->interpolateX = _interpolateX;
 }
 
 /////////////////////////////////////////////////
@@ -251,8 +250,8 @@ double Animation::KeyFramesAtTime(double _time, common::KeyFrame **_kf1,
 
 /////////////////////////////////////////////////
 PoseAnimation::PoseAnimation(const std::string &_name, const double _length,
-    const bool _loop, const bool _interpolateX)
-: Animation(_name, _length, _loop, _interpolateX)
+    const bool _loop)
+: Animation(_name, _length, _loop)
 {
   this->positionSpline = NULL;
   this->rotationSpline = NULL;
