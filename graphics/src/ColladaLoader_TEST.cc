@@ -335,6 +335,19 @@ TEST_F(ColladaLoader, LoadBoxWithMultipleGeoms)
 }
 
 /////////////////////////////////////////////////
+TEST_F(ColladaLoader, MergeBoxWithDoubleSkeleton)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(std::string(PROJECT_SOURCE_PATH) +
+     "/test/data/box_with_double_skeleton.dae");
+  EXPECT_TRUE(mesh->HasSkeleton());
+  auto skeleton_ptr = mesh->MeshSkeleton();
+  // The two skeletons have been joined and their root is the
+  // animation root, called Armature
+  EXPECT_EQ(skeleton_ptr->RootNode()->Name(), std::string("Armature"));
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

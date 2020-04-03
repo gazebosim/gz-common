@@ -21,6 +21,7 @@
 #include "ignition/math/Vector3.hh"
 #include "ignition/common/Mesh.hh"
 #include "ignition/common/SubMesh.hh"
+#include "ignition/common/MeshManager.hh"
 #include "test/util.hh"
 
 using namespace ignition;
@@ -343,6 +344,88 @@ TEST_F(SubMeshTest, SubMesh)
     EXPECT_EQ(nodeCopy.nodeIndex, 0u);
     EXPECT_DOUBLE_EQ(nodeCopy.weight, 0.5f);
   }
+}
+
+/////////////////////////////////////////////////
+TEST_F(SubMeshTest, Volume)
+{
+  // Box mesh tests
+  {
+    common::MeshManager::Instance()->CreateBox("unit_box",
+        ignition::math::Vector3d::One, ignition::math::Vector2d::One);
+
+    const common::Mesh *unitBox =
+      common::MeshManager::Instance()->MeshByName("unit_box");
+    ASSERT_TRUE(unitBox != nullptr);
+    EXPECT_DOUBLE_EQ(1.0, unitBox->Volume());
+
+    common::MeshManager::Instance()->CreateBox("other_box",
+        ignition::math::Vector3d(2, 3, 4), ignition::math::Vector2d::One);
+    const common::Mesh *otherBox =
+      common::MeshManager::Instance()->MeshByName("other_box");
+    ASSERT_TRUE(otherBox != nullptr);
+    EXPECT_DOUBLE_EQ(24.0, otherBox->Volume());
+  }
+
+  // Sphere mesh tests
+  {
+    common::MeshManager::Instance()->CreateSphere("unit_sphere", 0.5, 10, 10);
+
+    const common::Mesh *unitSphere =
+      common::MeshManager::Instance()->MeshByName("unit_sphere");
+    ASSERT_TRUE(unitSphere != nullptr);
+    EXPECT_NEAR(4.0/3.0 * IGN_PI * std::pow(0.5, 3), unitSphere->Volume(),
+        1e-2);
+
+    // A larger sphere needs to have higher resolution in order to get the
+    // volume close to (4/3) * Pi * r^3.
+    common::MeshManager::Instance()->CreateSphere("other_sphere",
+        2.5, 500, 500);
+
+    const common::Mesh *otherSphere =
+      common::MeshManager::Instance()->MeshByName("other_sphere");
+    ASSERT_TRUE(otherSphere != nullptr);
+    EXPECT_NEAR(4.0/3.0 * IGN_PI * std::pow(2.5, 3), otherSphere->Volume(),
+        1e-2);
+  }
+
+  // Cylinder mesh tests
+  {
+    common::MeshManager::Instance()->CreateCylinder("unit_cylinder",
+        0.5, 1, 10, 10);
+
+    const common::Mesh *unitCylinder =
+      common::MeshManager::Instance()->MeshByName("unit_cylinder");
+    ASSERT_TRUE(unitCylinder != nullptr);
+    EXPECT_NEAR(IGN_PI * std::pow(0.5, 2) * 1.0, unitCylinder->Volume(),
+        1e-2);
+
+    // A larger cylinder needs to have higher resolution in order to get the
+    // volume close to Pi * r^2 * h.
+    common::MeshManager::Instance()->CreateCylinder("other_cylinder",
+        2.5, 12, 500, 500);
+
+    const common::Mesh *otherCylinder =
+      common::MeshManager::Instance()->MeshByName("other_cylinder");
+    ASSERT_TRUE(otherCylinder != nullptr);
+    EXPECT_NEAR(IGN_PI * std::pow(2.5, 2) * 12, otherCylinder->Volume(),
+        1e-2);
+  }
+
+  // Test another Primitive Type, which should result in a zero volume
+  const common::Mesh *boxMesh =
+    common::MeshManager::Instance()->MeshByName("unit_box");
+  common::SubMesh boxSub(*(boxMesh->SubMeshByIndex(0).lock().get()));
+  EXPECT_EQ(24u, boxSub.VertexCount());
+  EXPECT_DOUBLE_EQ(1.0, boxSub.Volume());
+  boxSub.SetPrimitiveType(common::SubMesh::LINES);
+  EXPECT_DOUBLE_EQ(0.0, boxSub.Volume());
+
+  // Test adding another index, which would make the submesh invalid.
+  boxSub.SetPrimitiveType(common::SubMesh::TRIANGLES);
+  EXPECT_DOUBLE_EQ(1.0, boxSub.Volume());
+  boxSub.AddIndex(1);
+  EXPECT_DOUBLE_EQ(0.0, boxSub.Volume());
 }
 
 /////////////////////////////////////////////////
