@@ -369,7 +369,14 @@ bool URIAuthority::Parse(const std::string &_str, bool _emptyHostValid)
   if (portIndex != std::string::npos)
   {
     std::string portStr = _str.substr(portIndex + 1);
-    this->dataPtr->port.emplace(std::stoi(portStr));
+    try
+    {
+      this->dataPtr->port.emplace(std::stoi(portStr));
+    }
+    catch (...)
+    {
+      // Do nothing. The port number was invalid.
+    }
   }
 
   return true;
