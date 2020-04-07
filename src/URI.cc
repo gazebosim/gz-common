@@ -1122,7 +1122,14 @@ bool URI::Parse(const std::string &_str)
     size_t authEndPos = str.find_first_of("/?#",
         authDelimPos + std::strlen(kAuthDelim));
 
-    if (localScheme != "file" && authEndPos == authDelimPos+2)
+    // This could be a windows file path of the form file://D:/path/to/file
+    // In this case, the authority is not present.
+    if (str[authEndPos-1] == ':' && str[authEndPos] == '/')
+    {
+      str.erase(0, std::strlen(kAuthDelim));
+      authorityPresent = false;
+    }
+    else if (localScheme != "file" && authEndPos == authDelimPos+2)
     {
       ignerr << "A host is manadatory when using a scheme other than file\n";
       return false;

@@ -753,6 +753,15 @@ TEST(URITEST, File)
   EXPECT_TRUE(uri.Authority().EmptyHostValid());
 }
 
+//////////////////////////////////////////////////
+TEST(URITEST, WinPath)
+{
+  const auto uri = ignition::common::URI("file://D:/my/test/dir/world.sdf");
+  EXPECT_EQ("file", uri.Scheme());
+  EXPECT_TRUE(uri.Authority().Str().empty());
+  EXPECT_EQ("file:D:/my/test/dir/world.sdf", uri.Str());
+}
+
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
