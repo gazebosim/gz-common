@@ -307,6 +307,7 @@ std::string SystemPaths::FindFileURI(const std::string &_uri) const
   }
 
   const auto uri = ignition::common::URI(_uri);
+  std::cout << "Debug URI[" << uri.Str() << "]\n";
   return this->FindFileURI(uri);
 }
 

@@ -213,7 +213,7 @@ TEST_F(SystemPathsFixture, FindFileURI)
           this->filesystemRoot);
 
   EXPECT_EQ("", sp.FindFileURI("file://no_such_file"));
-  EXPECT_EQ(file1, sp.FindFileURI("file://test_dir1/test_f1"));
+  EXPECT_EQ(file1, sp.FindFileURI("file:test_dir1/test_f1"));
   EXPECT_EQ(file1, sp.FindFileURI("file://" +
                                   ignition::common::copyToUnixPath(file1)));
   EXPECT_EQ("", sp.FindFileURI("osrf://unknown.protocol"));
@@ -267,13 +267,13 @@ TEST_F(SystemPathsFixture, FindFileURI)
 
   sp.AddFindFileURICallback(osrfCb);
   EXPECT_EQ(file1, sp.FindFileURI("robot://test_f1"));
-  EXPECT_EQ(file2, sp.FindFileURI("osrf://test_f2"));
+  EXPECT_EQ(file2, sp.FindFileURI("osrf:test_f2"));
 
   // Test that th CB from SetFindFileURICallback is called first even when a
   // second handler for the same protocol is available
   sp.AddFindFileURICallback(robot2Cb);
   EXPECT_EQ(file1, sp.FindFileURI("robot://test_f1"));
-  EXPECT_EQ(file2, sp.FindFileURI("osrf://test_f2"));
+  EXPECT_EQ(file2, sp.FindFileURI("osrf:test_f2"));
 }
 
 //////////////////////////////////////////////////
@@ -310,7 +310,7 @@ TEST_F(SystemPathsFixture, FindFile)
   EXPECT_EQ("", sp.FindFile(this->filesystemRoot + "no_such_file"));
   EXPECT_EQ("", sp.FindFile("no_such_file"));
   EXPECT_EQ(file1, sp.FindFile(common::joinPaths("test_dir1", "test_f1")));
-  EXPECT_EQ(file1, sp.FindFile("file://test_dir1/test_f1"));
+  EXPECT_EQ(file1, sp.FindFile("file:test_dir1/test_f1"));
 
   // Existing absolute paths
 #ifndef _WIN32
