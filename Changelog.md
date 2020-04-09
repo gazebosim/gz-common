@@ -14,6 +14,8 @@
 
 ## Ignition Common 3.X.X
 
+## Ignition Common 3.5.0 (2020-04-09)
+
 1. Add interpolate\_x property to actor animations
     * [Pull request 232](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/232)
 
@@ -23,7 +25,7 @@
 1. Fix crash when loading OBJ meshes with invalid materials
     * [Pull request 230](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/230)
 
-## Ignition Common 3.4.0 (2019-02-20)
+## Ignition Common 3.4.0 (2020-02-20)
 
 1. Add PBR material class
     * [Pull request 227](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/227)
