@@ -2,7 +2,7 @@
 
 ## Ignition Common 3.X.X
 
-## Ignition Common 3.5.0
+## Ignition Common 3.5.0 (2020-04-09)
 
 1. Add interpolate\_x property to actor animations
     * [Pull request 232](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/232)
