@@ -109,7 +109,7 @@ bool create_new_file_hardlink(const std::string &_hardlink,
 #ifdef IGN_BUILD_SYMLINK_TESTS_ON_WINDOWS
 // The symlink tests require special permissions to work on Windows,
 // so they will be disabled by default. For more information, see:
-// https://bitbucket.org/ignitionrobotics/ign-common/issues/21
+// https://github.com/ignitionrobotics/ign-common/issues/21
 #define BUILD_SYMLINK_TESTS
 #endif
 
@@ -334,7 +334,7 @@ TEST_F(FilesystemTest, exists)
 
 // The symlink tests require special permissions to work on Windows,
 // so they will be disabled by default. For more information, see:
-// https://bitbucket.org/ignitionrobotics/ign-common/issues/21
+// https://github.com/ignitionrobotics/ign-common/issues/21
 #ifdef BUILD_SYMLINK_TESTS
 /////////////////////////////////////////////////
 TEST_F(FilesystemTest, symlink_exists)

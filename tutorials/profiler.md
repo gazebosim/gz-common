@@ -21,7 +21,7 @@ In order to use the profiler, inspection points must be added to the source code
 and the application or library must be linked to the `ignition-common::profiler`
 component.
 
-To start, download the [profiler.cc](https://bitbucket.org/ignitionrobotics/ign-common/raw/default/example/profiler.cc) example.
+To start, download the [profiler.cc](https://github.com/ignitionrobotics/ign-common/raw/master/examples/profiler.cc) example.
 
 The relevant corresponding C++ would be as follows:
 

@@ -34,7 +34,7 @@ pipelines:
             libignition-cmake2-dev
             libignition-math6-dev
           # Ignition cmake (uncomment to build from a specific branch)
-          # - hg clone http://bitbucket.org/ignitionrobotics/ign-cmake -b gz11
+          # - git clone http://github.com/ignitionrobotics/ign-cmake -b gz11
           # - cd ign-cmake
           # - mkdir build
           # - cd build
@@ -42,7 +42,7 @@ pipelines:
           # - make -j4 install
           # - cd ../..
           # Ignition math (uncomment to build from a specific branch)
-          # - hg clone http://bitbucket.org/ignitionrobotics/ign-math -b gz11
+          # - git clone http://github.com/ignitionrobotics/ign-math -b gz11
           # - cd ign-math
           # - mkdir build
           # - cd build
