@@ -18,7 +18,7 @@ pipelines:
             libfreeimage-dev libgts-dev libswscale-dev libtinyxml2-dev
             libignition-cmake-dev
             libignition-math4-dev
-            lcov curl mercurial cppcheck
+            lcov curl git cppcheck
           # Code checker
           - sh tools/code_check.sh
           # Build

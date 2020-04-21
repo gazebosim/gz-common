@@ -63,7 +63,7 @@ else()
 endif()
 
 # define of tinxml2 major version >= 6
-# https://bitbucket.org/ignitionrobotics/ign-common/issues/28
+# https://github.com/ignitionrobotics/ign-common/issues/28
 if (NOT TINYXML2_VERSION VERSION_LESS "6.0.0")
   message(STATUS "TINYXML2_VERSION ${TINYXML2_VERSION} >= 6.0.0")
   target_compile_definitions(${PROJECT_LIBRARY_TARGET_NAME}
@@ -174,7 +174,7 @@ if(WIN32)
     message(STATUS "You have opted to enable symlink tests on a Windows platform.")
     message(STATUS "The test UNIT_Filesystem_TEST will require elevated privileges")
     message(STATUS "in order to succeed. For more information, see the issue")
-    message(STATUS "https://bitbucket.org/ignitionrobotics/ign-common/issues/21")
+    message(STATUS "https://github.com/ignitionrobotics/ign-common/issues/21")
     message(STATUS "")
     target_compile_definitions(UNIT_Filesystem_TEST PRIVATE IGN_BUILD_SYMLINK_TESTS_ON_WINDOWS)
   endif()
