@@ -8,74 +8,74 @@
     * [BitBucket pull request 232](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/232)
 
 1. Update PBR metalness default value to 0.0
-    * [BitBucket pull request 231](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-request/231)
+    * [BitBucket pull request 231](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/231)
 
 1. Fix crash when loading OBJ meshes with invalid materials
-    * [BitBucket pull request 230](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-request/230)
+    * [BitBucket pull request 230](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/230)
 
 ## Ignition Common 3.4.0 (2020-02-20)
 
 1. Add PBR material class
-    * [BitBucket pull request 227](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-request/227)
+    * [BitBucket pull request 227](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/227)
 
 1. Custom paths for file URIs (env var + URI)
-    * [BitBucket pull request 210](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-request/210)
+    * [BitBucket pull request 210](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/210)
 
 1. Add function to get NodeAnimation
-    * [BitBucket pull request 223](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-request/223)
+    * [BitBucket pull request 223](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/223)
 
 1. Handle unexpected COLLADA more gracefully
-    * [BitBucket pull request 218](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-request/218)
+    * [BitBucket pull request 218](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/218)
 
 1. Add support for alpha based texture transparency.
-    * [BitBucket pull request 221](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-request/221)
+    * [BitBucket pull request 221](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/221)
 
 1. `tiny_obj_loader`: set better diffuse value when `map_kD` is present and `Kd` is not specified.
-    * [BitBucket pull request 216](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-request/216)
-    * [BitBucket pull request 217](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-request/217)
+    * [BitBucket pull request 216](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/216)
+    * [BitBucket pull request 217](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/217)
 
 1. ColladaLoader: load files with actors with multiple skeletons
-    * [BitBucket pull request 215](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-request/215)
+    * [BitBucket pull request 215](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/215)
 
 1. Compute volume of mesh shapes with `Mesh::Volume` and `SubMesh::Volume`.
     * [BitBucket pull request 214](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/214)
 
 1. Port Skeleton fixes from gazebo.
-    * [BitBucket pull request 209](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-request/209)
+    * [BitBucket pull request 209](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/209)
 
 1. Port gazebo9 fix for ColladaLoader with multiple geometries
-    * [BitBucket pull request 208](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-request/208)
+    * [BitBucket pull request 208](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/208)
 
 1. `SystemPaths::FindSharedLibrary`: return input if its is an absolute path to a file
-    * [BitBucket pull request 206](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-request/206)
+    * [BitBucket pull request 206](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/206)
 
 1. Fix `Image::ConvertPixelFormat` for `BAYER_BGGR8`
     * [BitBucket pull request 211](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/211)
 
 1. Support custom callbacks to find files on global interface
-    * [BitBucket pull request 226](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-request/226)
+    * [BitBucket pull request 226](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/226)
 
 ## Ignition Common 3.3.0 (2019-08-27)
 
 1. skip GTSMeshUtils test on Windows due to issue #50
-    * [BitBucket pull request 205](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-request/205)
+    * [BitBucket pull request 205](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/205)
 
 1. Add bvh animation support for skeleton and TrajectoryInfo
-    * [BitBucket pull request 197](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-request/197)
+    * [BitBucket pull request 197](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/197)
 
 1. ColladaLoader: fix wrong node weights caused by buffer overflow bug
-    * [BitBucket pull request 201](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-request/201)
+    * [BitBucket pull request 201](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/201)
 
 1. Filesystem copy directory and parentpath
-    * [BitBucket pull request 200](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-request/200)
+    * [BitBucket pull request 200](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/200)
 
 ## Ignition Common 3.2.0 (2019-08-07)
 
 1. Allow ignLogInit to use an absolute path. Added a timeToIso that converts a given time to an ISO string. Some console timestamps were using `IGN_SYSTEM_TIME_NS()` and others `ignition::common::systemTimeISO()`. Switched all to use `ignition::common::systemTimeISO()`.
-    * [BitBucket pull request 203](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-request/203)
+    * [BitBucket pull request 203](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/203)
 
 1. Port ColladaLoader fix: use default value of 1 for stride parameter when unset.
-    * [BitBucket pull request 196](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-request/196)
+    * [BitBucket pull request 196](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/196)
 
 ## Ignition Common 3.1.0 (2019-05-17)
 
