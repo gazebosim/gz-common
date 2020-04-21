@@ -12,7 +12,7 @@ pipelines:
             cmake pkg-config python ruby-ronn uuid-dev
             libavcodec-dev libavdevice-dev libavformat-dev libavutil-dev
             libfreeimage-dev libgts-dev libswscale-dev libtinyxml2-dev
-            curl git mercurial cppcheck g++-8
+            curl git cppcheck g++-8
           - update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 800 --slave /usr/bin/g++ g++ /usr/bin/g++-8 --slave /usr/bin/gcov gcov /usr/bin/gcov-8
           - gcc -v
           - g++ -v
