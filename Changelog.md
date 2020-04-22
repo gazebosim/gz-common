@@ -58,24 +58,24 @@
 ## Ignition Common 3.3.0 (2019-08-27)
 
 1. skip GTSMeshUtils test on Windows due to issue #50
-    * [BitBucket pull request 205](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/205)
+    * [BitBucket pull request 205](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/205)
 
 1. Add bvh animation support for skeleton and TrajectoryInfo
-    * [BitBucket pull request 197](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/197)
+    * [BitBucket pull request 197](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/197)
 
 1. ColladaLoader: fix wrong node weights caused by buffer overflow bug
-    * [BitBucket pull request 201](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/201)
+    * [BitBucket pull request 201](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/201)
 
 1. Filesystem copy directory and parentpath
-    * [BitBucket pull request 200](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/200)
+    * [BitBucket pull request 200](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/200)
 
 ## Ignition Common 3.2.0 (2019-08-07)
 
 1. Allow ignLogInit to use an absolute path. Added a timeToIso that converts a given time to an ISO string. Some console timestamps were using `IGN_SYSTEM_TIME_NS()` and others `ignition::common::systemTimeISO()`. Switched all to use `ignition::common::systemTimeISO()`.
-    * [BitBucket pull request 203](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/203)
+    * [BitBucket pull request 203](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/203/page/1)
 
 1. Port ColladaLoader fix: use default value of 1 for stride parameter when unset.
-    * [BitBucket pull request 196](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/196)
+    * [BitBucket pull request 196](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/196)
 
 ## Ignition Common 3.1.0 (2019-05-17)
 
@@ -103,7 +103,7 @@
 
 1. Fix ColladaLoader to support mixamo models and fix skeleton animation loading
     * [BitBucket pull request 179](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/179)
-    * [osrf/gazebo pull request 3071](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/3071)
+    * [BitBucket osrf/gazebo pull request 3071](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/3071)
 
 ## Ignition Common 3.0.0 (2019-02-28)
 
