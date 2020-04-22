@@ -137,7 +137,7 @@
     * [BitBucket pull request 175](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/175)
 
 1. `Time::Sleep`: return amount of time actually slept
-    * [BitBucket pull request 175](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/175)
+    * [BitBucket pull request 175](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/176)
     * [Issue 44](https://github.com/ignitionrobotics/ign-common/issues/44)
 
 1. NodeTransform: use unique_ptr for private data, add copy constructor/assignment
