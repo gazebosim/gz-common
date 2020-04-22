@@ -17,30 +17,30 @@
 ## Ignition Common 3.5.0 (2020-04-09)
 
 1. Add interpolate\_x property to actor animations
-    * [Pull request 232](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/232)
+    * [BitBucket pull request 232](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/232)
 
 1. Update PBR metalness default value to 0.0
-    * [Pull request 231](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/231)
+    * [BitBucket pull request 231](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/231)
 
 1. Fix crash when loading OBJ meshes with invalid materials
-    * [Pull request 230](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/230)
+    * [BitBucket pull request 230](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/230)
 
 ## Ignition Common 3.4.0 (2020-02-20)
 
 1. Add PBR material class
-    * [Pull request 227](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/227)
+    * [BitBucket pull request 227](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/227)
 
 1. Custom paths for file URIs (env var + URI)
-    * [Pull request 210](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/210)
+    * [BitBucket pull request 210](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/210)
 
 1. Add function to get NodeAnimation
-    * [Pull request 223](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/223)
+    * [BitBucket pull request 223](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/223)
 
 1. Handle unexpected COLLADA more gracefully
-    * [Pull request 218](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/218)
+    * [BitBucket pull request 218](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/218)
 
 1. Add support for alpha based texture transparency.
-    * [Pull request 221](https://bitbucket.org/ignitionrobotics/ign-common/pull-request/221)
+    * [BitBucket pull request 221](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/221)
 
 1. `tiny_obj_loader`: set better diffuse value when `map_kD` is present and `Kd` is not specified.
     * [BitBucket pull request 216](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/216)
@@ -50,7 +50,7 @@
     * [BitBucket pull request 215](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/215)
 
 1. Compute volume of mesh shapes with `Mesh::Volume` and `SubMesh::Volume`.
-    * [Pull request 214](https://bitbucket.org/ignitionrobotics/ign-common/pull-requests/214)
+    * [BitBucket pull request 214](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/214)
 
 1. Port Skeleton fixes from gazebo.
     * [BitBucket pull request 209](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/209)
@@ -63,6 +63,9 @@
 
 1. Fix `Image::ConvertPixelFormat` for `BAYER_BGGR8`
     * [BitBucket pull request 211](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/211)
+
+1. Support custom callbacks to find files on global interface
+    * [BitBucket pull request 226](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/226)
 
 ## Ignition Common 3.3.0 (2019-08-27)
 
