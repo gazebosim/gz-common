@@ -9,7 +9,7 @@ of libraries designed to rapidly develop robot applications.
 
 Test coverage:
 
-[![codecov](https://codecov.io/bb/ignitionrobotics/ign-common/branch/master/graph/badge.svg)](https://codecov.io/bb/ignitionrobotics/ign-common)
+[![codecov](https://codecov.io/gh/ignitionrobotics/ign-common/branch/master/graph/badge.svg)](https://codecov.io/gh/ignitionrobotics/ign-common)
 
 ## Installation
 
