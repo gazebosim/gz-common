@@ -19,7 +19,7 @@
 
 #include <functional>
 #include <ignition/common/Event.hh>
-#include "test/util.hh"
+#include "test_util.hh"
 
 using namespace ignition;
 

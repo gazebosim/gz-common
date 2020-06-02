@@ -1,0 +1,102 @@
+load(
+    "//ign_bazel:generate_include_header.bzl",
+    "generate_include_header",
+)
+load(
+    "//ign_bazel:generate_file.bzl",
+    "generate_file",
+)
+
+public_headers_no_gen = [
+    #"include/ignition/common/AudioDecoder.hh",
+    "include/ignition/common/ffmpeg_inc.hh",
+    "include/ignition/common/Video.hh",
+    "include/ignition/common/VideoEncoder.hh",
+    "include/ignition/common/av/Util.hh",
+]
+
+sources = [
+    #"src/AudioDecoder.cc",
+    "src/ffmpeg_inc.cc",
+    "src/Util.cc",
+    "src/Video.cc",
+    "src/VideoEncoder.cc",
+]
+
+test_sources = [
+    #"src/AudioDecoder_TEST.cc",
+    #"src/VideoEncoder_TEST.cc",
+]
+
+generate_file(
+    name = "include/ignition/common/av/Export.hh",
+    content = """
+#pragma once
+// IGN_DEPRECATED is defined by all ignition libraries, but the version below
+// is a simplified version.  When mixing the regular ignition libraries and
+// the drake compiled ignition libraries, the compiler throws a warning about
+// the macro being multiply defined.  We undefine it before redefining it here
+// to work around that issue.  Note that the IGNITION_MATH_VISIBLE macro
+// shouldn't be defined multiple times, but we undefine it just in case.
+#ifdef IGNITION_COMMON_AV_VISIBLE
+#undef IGNITION_COMMON_AV_VISIBLE
+#endif
+#define IGNITION_COMMON_AV_VISIBLE __attribute__ ((visibility("default")))
+#ifdef IGN_DEPRECATED
+#undef IGN_DEPRECATED
+#endif
+#define IGN_DEPRECATED(version) __attribute__ ((__deprecated__))
+    """,
+    visibility = ["//visibility:private"],
+)
+
+generate_include_header(
+    name = "eventshh_genrule",
+    out = "include/ignition/common/av.hh",
+    hdrs = public_headers_no_gen + [
+        "include/ignition/common/av/Export.hh",
+    ],
+)
+
+public_headers = public_headers_no_gen + [
+    "include/ignition/common/av/Export.hh",
+    "include/ignition/common/av.hh",
+]
+
+cc_binary(
+    name = "libign_common-av.so",
+    srcs = sources + public_headers,
+    includes = ["include"],
+    linkopts = ["-Wl,-soname,libign_common-av.so", "-lswscale"],
+    linkshared = True,
+    visibility = [],
+    deps = [
+        "//ign_common:ign_common",
+    ],
+)
+
+cc_library(
+    name = "av",
+    srcs = ["libign_common-av.so"],
+    hdrs = public_headers,
+    includes = ["include"],
+    visibility = ["//visibility:public"],
+    linkstatic = True,
+    alwayslink = 1,
+    deps = [],
+)
+
+[cc_test(
+    name = src.replace("/", "_").replace(".cc", "").replace("src_", ""),
+    srcs = [src],
+    deps = [
+        "//ign_common",
+        "//ign_common/av",
+        "//ign_common/test:test_utils",
+        "@gtest//:gtest",
+        "@gtest//:gtest_main",
+    ]
+) for src in test_sources]
+
+
+
