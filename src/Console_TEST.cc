@@ -23,7 +23,7 @@
 #include "ignition/common/Time.hh"
 #include "ignition/common/Util.hh"
 
-#include "test/util.hh"
+#include "test_util.hh"
 
 #ifndef _WIN32
 const int g_messageRepeat = 4;

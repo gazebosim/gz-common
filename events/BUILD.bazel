@@ -1,0 +1,98 @@
+load(
+    "//ign_bazel:generate_include_header.bzl",
+    "generate_include_header",
+)
+load(
+    "//ign_bazel:generate_file.bzl",
+    "generate_file",
+)
+
+public_headers_no_gen = [
+    "include/ignition/common/Event.hh",
+    "include/ignition/common/KeyEvent.hh",
+    "include/ignition/common/MouseEvent.hh",
+    "include/ignition/common/events/Types.hh",
+]
+
+sources = [
+    "src/Event.cc",
+    "src/KeyEvent.cc",
+    "src/MouseEvent.cc",
+]
+
+test_sources = [
+    #"src/Event_TEST.cc",
+    "src/KeyEvent_TEST.cc",
+    #"src/MouseEvent_TEST.cc",
+]
+
+generate_file(
+    name = "include/ignition/common/events/Export.hh",
+    content = """
+#pragma once
+// IGN_DEPRECATED is defined by all ignition libraries, but the version below
+// is a simplified version.  When mixing the regular ignition libraries and
+// the drake compiled ignition libraries, the compiler throws a warning about
+// the macro being multiply defined.  We undefine it before redefining it here
+// to work around that issue.  Note that the IGNITION_MATH_VISIBLE macro
+// shouldn't be defined multiple times, but we undefine it just in case.
+#ifdef IGNITION_COMMON_EVENTS_VISIBLE
+#undef IGNITION_COMMON_EVENTS_VISIBLE
+#endif
+#define IGNITION_COMMON_EVENTS_VISIBLE __attribute__ ((visibility("default")))
+#ifdef IGN_DEPRECATED
+#undef IGN_DEPRECATED
+#endif
+#define IGN_DEPRECATED(version) __attribute__ ((__deprecated__))
+    """,
+    visibility = ["//visibility:private"],
+)
+
+generate_include_header(
+    name = "eventshh_genrule",
+    out = "include/ignition/common/events.hh",
+    hdrs = public_headers_no_gen + [
+        "include/ignition/common/events/Export.hh",
+    ],
+)
+
+public_headers = public_headers_no_gen + [
+    "include/ignition/common/events/Export.hh",
+    "include/ignition/common/events.hh",
+]
+
+cc_binary(
+    name = "libign_common-events.so",
+    srcs = sources + public_headers,
+    includes = ["include"],
+    linkopts = ["-Wl,-soname,libign_common-events.so"],
+    linkshared = True,
+    visibility = [],
+    deps = [
+        "//ign_math",
+        "//ign_common",
+    ],
+)
+
+cc_library(
+    name = "events",
+    srcs = ["libign_common-events.so"],
+    hdrs = public_headers,
+    includes = ["include"],
+    visibility = ["//visibility:public"],
+)
+
+[cc_test(
+    name = src.replace("/", "_").replace(".cc", "").replace("src_", ""),
+    srcs = [src],
+    deps = [
+        "//ign_math",
+        "//ign_common",
+        "//ign_common/events",
+        "//ign_common/test:test_utils",
+        "@gtest//:gtest",
+        "@gtest//:gtest_main",
+    ]
+) for src in test_sources]
+
+
