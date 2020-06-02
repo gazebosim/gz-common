@@ -25,6 +25,10 @@
 
 #include "tinyxml2.h"
 
+#if TINYXML2_MAJOR_VERSION >= 6
+  #define TINYXML2_MAJOR_VERSION_GE_6
+#endif
+
 #ifdef _WIN32
   #define snprintf _snprintf
 #endif

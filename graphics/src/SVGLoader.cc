@@ -23,6 +23,10 @@
 
 #include "tinyxml2.h"
 
+#if TINYXML2_MAJOR_VERSION >= 6
+  #define TINYXML2_MAJOR_VERSION_GE_6
+#endif
+
 #include "ignition/common/Console.hh"
 #include "ignition/common/Util.hh"
 

@@ -235,12 +235,12 @@ TEST_F(FilesystemTest, fileOps)
   EXPECT_TRUE(common::isDirectory(common::cwd()));
   EXPECT_FALSE(common::isFile(common::cwd()));
 
-  EXPECT_TRUE(common::isFile(__FILE__));
-  EXPECT_FALSE(common::isDirectory(__FILE__));
-
   std::ofstream tmpOut("test.tmp");
   tmpOut << "Output" << std::endl;
   tmpOut.close();
+
+  EXPECT_TRUE(common::isFile("test.tmp"));
+  EXPECT_FALSE(common::isDirectory("test.tmp"));
 
   EXPECT_TRUE(common::copyFile("test.tmp", "test2.tmp"));
   EXPECT_TRUE(common::exists("test.tmp"));
