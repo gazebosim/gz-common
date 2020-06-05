@@ -14,6 +14,9 @@
 
 ## Ignition Common 3.X.X
 
+1. Fix ColladaLoader loading <transparent> tag when <transparency> does not exist
+    * [Pull request 68](https://github.com/ignitionrobotics/ign-common/pull/68)
+
 ## Ignition Common 3.5.0 (2020-04-09)
 
 1. Add interpolate\_x property to actor animations

@@ -154,6 +154,31 @@ TEST_F(ColladaLoader, Material)
   mat->BlendFactors(srcFactor, dstFactor);
   EXPECT_DOUBLE_EQ(1.0, srcFactor);
   EXPECT_DOUBLE_EQ(0.0, dstFactor);
+
+  common::Mesh *meshOpaque = loader.Load(
+      std::string(PROJECT_SOURCE_PATH) + "/test/data/box_opaque.dae");
+  ASSERT_TRUE(meshOpaque);
+
+  EXPECT_EQ(meshOpaque->MaterialCount(), 1u);
+
+  common::MaterialPtr matOpaque = meshOpaque->MaterialByIndex(0u);
+  ASSERT_TRUE(matOpaque != nullptr);
+
+  // Make sure we read the specular value
+  EXPECT_EQ(math::Color(0.0, 0.0, 0.0, 1.0), matOpaque->Ambient());
+  EXPECT_EQ(math::Color(0.64f, 0.64f, 0.64f, 1.0f), matOpaque->Diffuse());
+  EXPECT_EQ(math::Color(0.5, 0.5, 0.5, 1.0), matOpaque->Specular());
+  EXPECT_EQ(math::Color(0.0, 0.0, 0.0, 1.0), matOpaque->Emissive());
+  EXPECT_DOUBLE_EQ(50.0, matOpaque->Shininess());
+  // transparent: opaque="A_ONE", color=[1 1 1 1]
+  // transparency: not specified, defaults to 1.0
+  // resulting transparency value = (1 - color.a * transparency)
+  EXPECT_DOUBLE_EQ(0.0, matOpaque->Transparency());
+  srcFactor = -1;
+  dstFactor = -1;
+  matOpaque->BlendFactors(srcFactor, dstFactor);
+  EXPECT_DOUBLE_EQ(1.0, srcFactor);
+  EXPECT_DOUBLE_EQ(0.0, dstFactor);
 }
 
 /////////////////////////////////////////////////
