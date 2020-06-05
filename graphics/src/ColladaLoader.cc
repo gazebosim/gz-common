@@ -2610,6 +2610,15 @@ void ColladaLoaderPrivate::LoadTransparent(tinyxml2::XMLElement *_elem,
     double srcFactor = 0;
     double dstFactor = 0;
 
+    // If <transparency> tag exists, _mat->Transparency() should be set to
+    // that value already. Otherwise, use default value of 1.0 as per
+    // collada spec
+    double transparency = 1.0;
+    auto transparencyNode =
+        _elem->Parent()->FirstChildElement("transparency");
+    if (transparencyNode)
+      transparency = _mat->Transparency();
+
     // Calculate alpha based on opaque mode.
     // Equations are extracted from collada spec
     // Make sure to update the final transparency value
@@ -2624,8 +2633,8 @@ void ColladaLoaderPrivate::LoadTransparent(tinyxml2::XMLElement *_elem,
       // (1.0f - luminance(transparent.rgb) * transparency)
       // where fb corresponds to the framebuffer (existing pixel) and
       // mat corresponds to material before transparency (texel)
-      dstFactor = luminance * _mat->Transparency();
-      srcFactor = 1.0 - luminance * _mat->Transparency();
+      dstFactor = luminance * transparency;
+      srcFactor = 1.0 - luminance * transparency;
       _mat->SetTransparency(dstFactor);
     }
     else if (opaqueStr == "RGB_ONE")
@@ -2639,8 +2648,8 @@ void ColladaLoaderPrivate::LoadTransparent(tinyxml2::XMLElement *_elem,
       // mat.a * (luminance(transparent.rgb) * transparency)
       // where fb corresponds to the framebuffer (existing pixel) and
       // mat corresponds to material before transparency (texel)
-      dstFactor = 1.0 - luminance * _mat->Transparency();
-      srcFactor = luminance * _mat->Transparency();
+      dstFactor = 1.0 - luminance * transparency;
+      srcFactor = luminance * transparency;
       _mat->SetTransparency(dstFactor);
     }
     else if (opaqueStr == "A_ONE")
@@ -2649,8 +2658,8 @@ void ColladaLoaderPrivate::LoadTransparent(tinyxml2::XMLElement *_elem,
       // (transparent.a * transparency)
       // where fb corresponds to the framebuffer (existing pixel) and
       // mat corresponds to material before transparency (texel)
-      dstFactor = 1.0 - color.A() * _mat->Transparency();
-      srcFactor = color.A() * _mat->Transparency();
+      dstFactor = 1.0 - color.A() * transparency;
+      srcFactor = color.A() * transparency;
       _mat->SetTransparency(dstFactor);
     }
     else if (opaqueStr == "A_ZERO")
@@ -2659,8 +2668,8 @@ void ColladaLoaderPrivate::LoadTransparent(tinyxml2::XMLElement *_elem,
       // (1.0f - transparent.a * transparency)
       // where fb corresponds to the framebuffer (existing pixel) and
       // mat corresponds to material before transparency (texel)
-      dstFactor = color.A() * _mat->Transparency();
-      srcFactor = 1.0 - color.A() * _mat->Transparency();
+      dstFactor = color.A() * transparency;
+      srcFactor = 1.0 - color.A() * transparency;
       _mat->SetTransparency(dstFactor);
     }
 
