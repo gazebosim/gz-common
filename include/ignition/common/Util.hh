@@ -161,7 +161,7 @@ namespace ignition
     void IGNITION_COMMON_VISIBLE addFindFileURICallback(
         std::function<std::string(const URI &)> _cb);
 
-    /// \brief Get a pointer to the global system paths that's used by all
+    /// \brief Get a pointer to the global system paths that is used by all
     /// the findFile functions.
     /// Caller should not assume ownership.
     /// \return A mutable reference to the system paths object.

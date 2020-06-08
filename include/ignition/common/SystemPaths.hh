@@ -116,7 +116,7 @@ namespace ignition
       /// The environment variable contains a set of colon (semicolon on
       /// windows) delimited paths. These paths are used with the FindFile
       /// functions.
-      /// \retuen Name of the environment variable
+      /// \return Name of the environment variable
       /// \sa SetFilePathEnv
       public: std::string FilePathEnv() const;
 
