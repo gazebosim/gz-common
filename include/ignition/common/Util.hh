@@ -163,7 +163,9 @@ namespace ignition
 
     /// \brief Get a pointer to the global system paths that is used by all
     /// the findFile functions.
-    /// Caller should not assume ownership.
+    /// The returned instance has global shared state for a given process.
+    /// Care should be taken when manipulating global system paths
+    /// Caller should not assume ownership of the pointer.
     /// \return A mutable reference to the system paths object.
     common::SystemPaths IGNITION_COMMON_VISIBLE *systemPaths();
 
