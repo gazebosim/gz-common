@@ -25,6 +25,7 @@
 #include <chrono>
 #include <ignition/common/Export.hh>
 #include <ignition/common/Filesystem.hh>
+#include <ignition/common/SystemPaths.hh>
 #include <ignition/common/URI.hh>
 
 /////////////////////////////////////////////////
@@ -159,6 +160,14 @@ namespace ignition
     /// and returns the full local path.
     void IGNITION_COMMON_VISIBLE addFindFileURICallback(
         std::function<std::string(const URI &)> _cb);
+
+    /// \brief Get a pointer to the global system paths that is used by all
+    /// the findFile functions.
+    /// The returned instance has global shared state for a given process.
+    /// Care should be taken when manipulating global system paths
+    /// Caller should not assume ownership of the pointer.
+    /// \return A mutable reference to the system paths object.
+    common::SystemPaths IGNITION_COMMON_VISIBLE *systemPaths();
 
     /// \brief Compute the SHA1 hash of an array of bytes.
     /// \param[in] _buffer Input sequence. The permitted data types for this

@@ -115,6 +115,7 @@ TEST_F(SystemPathsFixture, FileSystemPaths)
   putenv(env);
 
   common::SystemPaths paths;
+  EXPECT_EQ("IGN_FILE_PATH", paths.FilePathEnv());
   const std::list<std::string> pathList3 = paths.FilePaths();
   EXPECT_EQ(static_cast<unsigned int>(2), pathList3.size());
   EXPECT_STREQ("/tmp/file/", pathList3.front().c_str());
@@ -289,13 +290,16 @@ TEST_F(SystemPathsFixture, FindFileURI)
   putenv(env);
 
   sp.SetFilePathEnv("IGN_FILE_PATH");
+  EXPECT_EQ("IGN_FILE_PATH", sp.FilePathEnv());
   EXPECT_EQ(file1, sp.FindFileURI("anything://test_f1"));
   EXPECT_NE(file2, sp.FindFileURI("anything://test_f2"));
 
-  snprintf(env, sizeof(env), "%s", ("IGN_FILE_PATH=" + dir2).c_str());
+  std::string newEnv{"IGN_NEW_FILE_PATH"};
+  snprintf(env, sizeof(env), "%s", (newEnv + "=" + dir2).c_str());
   putenv(env);
 
-  sp.SetFilePathEnv("IGN_FILE_PATH");
+  sp.SetFilePathEnv(newEnv);
+  EXPECT_EQ(newEnv, sp.FilePathEnv());
   EXPECT_NE(file1, sp.FindFileURI("anything://test_f1"));
   EXPECT_EQ(file2, sp.FindFileURI("anything://test_f2"));
 }

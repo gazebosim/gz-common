@@ -199,6 +199,12 @@ void SystemPaths::SetFilePathEnv(const std::string &_env)
 }
 
 /////////////////////////////////////////////////
+std::string SystemPaths::FilePathEnv() const
+{
+  return this->dataPtr->filePathEnv;
+}
+
+/////////////////////////////////////////////////
 const std::list<std::string> &SystemPaths::FilePaths()
 {
   return this->dataPtr->filePaths;
