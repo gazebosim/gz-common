@@ -2,6 +2,8 @@
 
 ## Ignition Common 3.X.X
 
+## Ignition Common 3.6.0 (2020-06-09)
+
 1. Refactor Image::MaxColor to reduce computation time
     * [Pull request 66](https://github.com/ignitionrobotics/ign-common/pull/66)
 
@@ -13,6 +15,9 @@
 
 1. Remove unused included headers
     * [Pull request 71](https://github.com/ignitionrobotics/ign-common/pull/71)
+
+1. More file path APIs
+    * [Pull request 70](https://github.com/ignitionrobotics/ign-common/pull/70)
 
 ## Ignition Common 3.5.0 (2020-04-09)
 
