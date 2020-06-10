@@ -383,15 +383,72 @@ math::Color Image::MaxColor() const
 
   maxClr.Set(0, 0, 0, 0);
 
-  for (y = 0; y < this->Height(); y++)
-  {
-    for (x = 0; x < this->Width(); x++)
-    {
-      clr = this->Pixel(x, y);
+  if (!this->Valid())
+    return clr;
 
-      if (clr.R() + clr.G() + clr.B() > maxClr.R() + maxClr.G() + maxClr.B())
+  FREE_IMAGE_COLOR_TYPE type = FreeImage_GetColorType(this->dataPtr->bitmap);
+
+  if (type == FIC_RGB || type == FIC_RGBALPHA)
+  {
+    RGBQUAD firgb;
+
+    for (y = 0; y < this->Height(); y++)
+    {
+      for (x = 0; x < this->Width(); x++)
       {
-        maxClr = clr;
+        clr.Set(0, 0, 0, 0);
+
+        if (FALSE ==
+              FreeImage_GetPixelColor(this->dataPtr->bitmap, x, y, &firgb))
+        {
+          ignerr << "Image: Coordinates out of range["
+            << x << " " << y << "] \n";
+          continue;
+        }
+
+#ifdef FREEIMAGE_COLORORDER
+        // cppcheck-suppress ConfigurationNotChecked
+        if (FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_RGB)
+          clr.Set(firgb.rgbRed, firgb.rgbGreen, firgb.rgbBlue);
+        else
+          clr.Set(firgb.rgbBlue, firgb.rgbGreen, firgb.rgbRed);
+#else
+#ifdef FREEIMAGE_BIGENDIAN
+        clr.Set(firgb.rgbRed, firgb.rgbGreen, firgb.rgbBlue);
+#else
+        clr.Set(firgb.rgbBlue, firgb.rgbGreen, firgb.rgbRed);
+#endif
+#endif
+        if (clr.R() + clr.G() + clr.B() > maxClr.R() + maxClr.G() + maxClr.B())
+        {
+          maxClr = clr;
+        }
+      }
+    }
+  }
+  else
+  {
+    BYTE byteValue;
+    for (y = 0; y < this->Height(); y++)
+    {
+      for (x = 0; x < this->Width(); x++)
+      {
+        clr.Set(0, 0, 0, 0);
+
+        if (FreeImage_GetPixelIndex(
+              this->dataPtr->bitmap, x, y, &byteValue) == FALSE)
+        {
+          ignerr << "Image: Coordinates out of range ["
+            << x << " " << y << "] \n";
+          continue;
+        }
+
+        clr.Set(byteValue, byteValue, byteValue);
+
+        if (clr.R() + clr.G() + clr.B() > maxClr.R() + maxClr.G() + maxClr.B())
+        {
+          maxClr = clr;
+        }
       }
     }
   }

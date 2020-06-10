@@ -2,8 +2,22 @@
 
 ## Ignition Common 3.X.X
 
+## Ignition Common 3.6.0 (2020-06-09)
+
+1. Refactor Image::MaxColor to reduce computation time
+    * [Pull request 66](https://github.com/ignitionrobotics/ign-common/pull/66)
+
+1. Update to gtest 1.10.0 with patch for gcc warnings
+    * [Pull request 67](https://github.com/ignitionrobotics/ign-common/pull/67)
+
 1. Fix ColladaLoader loading <transparent> tag when <transparency> does not exist
     * [Pull request 68](https://github.com/ignitionrobotics/ign-common/pull/68)
+
+1. Remove unused included headers
+    * [Pull request 71](https://github.com/ignitionrobotics/ign-common/pull/71)
+
+1. More file path APIs
+    * [Pull request 70](https://github.com/ignitionrobotics/ign-common/pull/70)
 
 ## Ignition Common 3.5.0 (2020-04-09)
 
