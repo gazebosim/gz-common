@@ -1,0 +1,163 @@
+load(
+    "//ign_bazel:generate_include_header.bzl",
+    "generate_include_header",
+)
+load(
+    "//ign_bazel:generate_file.bzl",
+    "generate_file",
+)
+
+public_headers_no_gen = [
+    "include/ignition/common/Animation.hh",
+    "include/ignition/common/BVHLoader.hh",
+    "include/ignition/common/ColladaExporter.hh",
+    "include/ignition/common/ColladaLoader.hh",
+    "include/ignition/common/Dem.hh",
+    "include/ignition/common/GTSMeshUtils.hh",
+    "include/ignition/common/HeightmapData.hh",
+    "include/ignition/common/ImageHeightmap.hh",
+    "include/ignition/common/Image.hh",
+    "include/ignition/common/KeyFrame.hh",
+    "include/ignition/common/Material.hh",
+    "include/ignition/common/MeshCSG.hh",
+    "include/ignition/common/MeshExporter.hh",
+    "include/ignition/common/Mesh.hh",
+    "include/ignition/common/MeshLoader.hh",
+    "include/ignition/common/MeshManager.hh",
+    "include/ignition/common/NodeAnimation.hh",
+    "include/ignition/common/NodeTransform.hh",
+    "include/ignition/common/OBJLoader.hh",
+    "include/ignition/common/Pbr.hh",
+    "include/ignition/common/SkeletonAnimation.hh",
+    "include/ignition/common/Skeleton.hh",
+    "include/ignition/common/SkeletonNode.hh",
+    "include/ignition/common/STLLoader.hh",
+    "include/ignition/common/SubMesh.hh",
+    "include/ignition/common/SVGLoader.hh",
+    "include/ignition/common/graphics/Types.hh",
+]
+
+sources = [
+    "src/Animation.cc",
+    "src/BVHLoader.cc",
+    "src/ColladaExporter.cc",
+    "src/ColladaLoader.cc",
+    "src/Dem.cc",
+    "src/GTSMeshUtils.cc",
+    "src/ImageHeightmap.cc",
+    "src/Image.cc",
+    "src/KeyFrame.cc",
+    "src/Material.cc",
+    "src/MeshCSG.cc",
+    "src/MeshExporter.cc",
+    "src/Mesh.cc",
+    "src/MeshManager.cc",
+    "src/NodeAnimation.cc",
+    "src/NodeTransform.cc",
+    "src/OBJLoader.cc",
+    "src/Pbr.cc",
+    "src/SkeletonAnimation.cc",
+    "src/Skeleton.cc",
+    "src/SkeletonNode.cc",
+    "src/STLLoader.cc",
+    "src/SubMesh.cc",
+    "src/SVGLoader.cc",
+]
+
+test_sources = [
+    "src/Animation_TEST.cc",
+    "src/ColladaExporter_TEST.cc",
+    "src/ColladaLoader_TEST.cc",
+    "src/Dem_TEST.cc",
+    "src/GTSMeshUtils_TEST.cc",
+    "src/ImageHeightmap_TEST.cc",
+    "src/Image_TEST.cc",
+    "src/Material_TEST.cc",
+    "src/MeshManager_TEST.cc",
+    "src/Mesh_TEST.cc",
+    "src/OBJLoader_TEST.cc",
+    "src/Pbr_TEST.cc",
+    "src/SubMesh_TEST.cc",
+    "src/SVGLoader_TEST.cc",
+]
+
+generate_file(
+    name = "include/ignition/common/graphics/Export.hh",
+    content = """
+#pragma once
+// IGN_DEPRECATED is defined by all ignition libraries, but the version below
+// is a simplified version.  When mixing the regular ignition libraries and
+// the drake compiled ignition libraries, the compiler throws a warning about
+// the macro being multiply defined.  We undefine it before redefining it here
+// to work around that issue.  Note that the IGNITION_COMMON_GRAPHICS_VISIBLE macro
+// shouldn't be defined multiple times, but we undefine it just in case.
+#ifdef IGNITION_COMMON_GRAPHICS_VISIBLE
+#undef IGNITION_COMMON_GRAPHICS_VISIBLE
+#endif
+#define IGNITION_COMMON_GRAPHICS_VISIBLE __attribute__ ((visibility("default")))
+#ifdef IGN_DEPRECATED
+#undef IGN_DEPRECATED
+#endif
+#define IGN_DEPRECATED(version) __attribute__ ((__deprecated__))
+    """,
+    visibility = ["//visibility:private"],
+)
+
+generate_include_header(
+    name = "graphics_hh_genrule",
+    out = "include/ignition/common/graphics.hh",
+    hdrs = public_headers_no_gen + [
+        "include/ignition/common/graphics/Export.hh",
+    ],
+)
+
+public_headers = public_headers_no_gen + [
+    "include/ignition/common/graphics/Export.hh",
+    "include/ignition/common/graphics.hh",
+    "src/tiny_obj_loader.h",
+]
+
+cc_binary(
+    name = "libign_common-graphics.so",
+    srcs = sources + public_headers,
+    includes = ["include"],
+    linkopts = ["-Wl,-soname,libign_common-graphics.so", "-lfreeimage"],
+    linkshared = True,
+    visibility = [],
+    copts = [
+        "-Iexternal/glib",
+        "-Iexternal/glibconfig",
+    ],
+    deps = [
+        "@glib//:headers",
+        "@glibconfig//:headers",
+        "//ign_common",
+        "//ign_common/graphics/src/tinyxml2:tinyxml2",
+        "//ign_math",
+    ],
+)
+
+cc_library(
+    name = "graphics",
+    srcs = ["libign_common-graphics.so"],
+    hdrs = public_headers,
+    includes = ["include"],
+    visibility = ["//visibility:public"],
+    linkstatic = True,
+    alwayslink = 1,
+    deps = [],
+)
+
+[cc_test(
+    name = src.replace("/", "_").replace(".cc", "").replace("src_", ""),
+    srcs = [src],
+    deps = [
+        "//ign_common",
+        "//ign_common/graphics",
+        "//ign_common/test:test_utils",
+        "//ign_common/graphics/src/tinyxml2:tinyxml2",
+        "//ign_math",
+        "@gtest//:gtest",
+        "@gtest//:gtest_main",
+    ]
+) for src in test_sources]

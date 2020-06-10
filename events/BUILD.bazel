@@ -94,5 +94,3 @@ cc_library(
         "@gtest//:gtest_main",
     ]
 ) for src in test_sources]
-
-

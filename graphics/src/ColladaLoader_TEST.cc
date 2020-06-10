@@ -23,7 +23,7 @@
 #include "ignition/common/ColladaLoader.hh"
 #include "ignition/common/Skeleton.hh"
 #include "ignition/common/SkeletonAnimation.hh"
-#include "test/util.hh"
+#include "test_util.hh"
 
 using namespace ignition;
 

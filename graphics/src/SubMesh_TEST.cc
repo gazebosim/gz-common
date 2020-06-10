@@ -22,7 +22,7 @@
 #include "ignition/common/Mesh.hh"
 #include "ignition/common/SubMesh.hh"
 #include "ignition/common/MeshManager.hh"
-#include "test/util.hh"
+#include "test_util.hh"
 
 using namespace ignition;
 

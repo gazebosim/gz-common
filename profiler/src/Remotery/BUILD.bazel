@@ -1,0 +1,23 @@
+sources = ["lib/Remotery.c"]
+
+headers = ["lib/Remotery.h"]
+
+cc_binary(
+    name = "libign_common-remotery.so",
+    srcs = sources + headers,
+    includes = ["lib"],
+    linkopts = ["-Wl,-soname,libign_common-remotery.so"],
+    linkshared = True,
+    visibility = [],
+)
+
+cc_library(
+    name = "remotery",
+    srcs = ["libign_common-remotery.so"],
+    hdrs = headers,
+    includes = ["lib"],
+    visibility = ["//visibility:public"],
+    linkstatic = True,
+    alwayslink = 1,
+    deps =[],
+)
