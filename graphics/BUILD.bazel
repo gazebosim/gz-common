@@ -121,7 +121,7 @@ cc_binary(
     name = "libign_common-graphics.so",
     srcs = sources + public_headers,
     includes = ["include"],
-    linkopts = ["-Wl,-soname,libign_common-graphics.so", "-lfreeimage"],
+    linkopts = ["-Wl,-soname,libign_common-graphics.so", "-lfreeimage", "-lgts"],
     linkshared = True,
     visibility = [],
     copts = [
@@ -143,8 +143,6 @@ cc_library(
     hdrs = public_headers,
     includes = ["include"],
     visibility = ["//visibility:public"],
-    linkstatic = True,
-    alwayslink = 1,
     deps = [],
 )
 
