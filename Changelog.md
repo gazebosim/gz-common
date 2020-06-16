@@ -3,7 +3,7 @@
 ## Ignition Common 3.X.X
 
 1. Fix hierarchical submesh processing in the ColladaLoader.
-    * [Pull Request 77](https://github.com/ignitionrobotics/ign-common/pull/77)
+    * [Pull Request 78](https://github.com/ignitionrobotics/ign-common/pull/78)
 
 ## Ignition Common 3.5.0 (2020-04-09)
 
