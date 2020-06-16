@@ -466,16 +466,16 @@ void ColladaLoaderPrivate::LoadNode(tinyxml2::XMLElement *_elem, Mesh *_mesh,
   ignition::math::Matrix4d transform = this->LoadNodeTransform(_elem);
   transform = _transform * transform;
 
-  if (_elem->Attribute("name"))
-  {
-    this->currentNodeName = _elem->Attribute("name");
-  }
-
   nodeXml = _elem->FirstChildElement("node");
   while (nodeXml)
   {
     this->LoadNode(nodeXml, _mesh, transform);
     nodeXml = nodeXml->NextSiblingElement("node");
+  }
+
+  if (_elem->Attribute("name"))
+  {
+    this->currentNodeName = _elem->Attribute("name");
   }
 
   if (_elem->FirstChildElement("instance_node"))

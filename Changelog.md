@@ -2,6 +2,9 @@
 
 ## Ignition Common 3.X.X
 
+1. Fix hierarchical submesh processing in the ColladaLoader.
+    * [Pull Request 78](https://github.com/ignitionrobotics/ign-common/pull/78)
+
 ## Ignition Common 3.6.0 (2020-06-09)
 
 1. Refactor Image::MaxColor to reduce computation time
