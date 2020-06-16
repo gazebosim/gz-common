@@ -14,9 +14,6 @@
  * limitations under the License.
  *
 */
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 
 #ifdef __linux__
 #include <sys/sendfile.h>
@@ -314,6 +311,12 @@ void ignition::common::addFindFileURICallback(
     std::function<std::string(const ignition::common::URI &)> _cb)
 {
   gSystemPaths->AddFindFileURICallback(_cb);
+}
+
+/////////////////////////////////////////////////
+ignition::common::SystemPaths *ignition::common::systemPaths()
+{
+  return gSystemPaths.get();
 }
 
 /////////////////////////////////////////////////

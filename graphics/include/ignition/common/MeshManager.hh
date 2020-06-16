@@ -57,7 +57,9 @@ namespace ignition
       /// Destroys the collada loader, the stl loader and all the meshes
       private: virtual ~MeshManager();
 
-      /// \brief Load a mesh from a file
+      /// \brief Load a mesh from a file.
+      /// The mesh will be searched on the global SystemPaths instance provided
+      /// by Util.hh.
       /// \param[in] _filename the path to the mesh
       /// \return a pointer to the created mesh
       public: const Mesh *Load(const std::string &_filename);
