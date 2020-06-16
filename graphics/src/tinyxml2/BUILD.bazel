@@ -1,0 +1,23 @@
+sources = ["tinyxml2.cpp"]
+
+headers = ["tinyxml2.h"]
+
+cc_binary(
+    name = "libign_common-tinyxml2.so",
+    srcs = sources + headers,
+    includes = ["."],
+    linkopts = ["-Wl,-soname,libign_common-tinyxml2.so"],
+    linkshared = True,
+    visibility = [],
+)
+
+cc_library(
+    name = "tinyxml2",
+    srcs = ["libign_common-tinyxml2.so"],
+    hdrs = headers,
+    includes = ["."],
+    visibility = ["//visibility:public"],
+    linkstatic = True,
+    alwayslink = 1,
+    deps =[],
+)

@@ -1,0 +1,124 @@
+load(
+    "//ign_bazel:cmake_configure_file.bzl",
+    "cmake_configure_file",
+)
+load(
+    "//ign_bazel:generate_include_header.bzl",
+    "generate_include_header",
+)
+load(
+    "//ign_bazel:generate_file.bzl",
+    "generate_file",
+)
+
+public_headers_no_gen = [
+    "include/ignition/common/Profiler.hh",
+]
+
+sources = [
+    "src/Profiler.cc",
+    "src/RemoteryProfilerImpl.cc",
+]
+
+test_sources = [
+    "src/Profiler_Disabled_TEST.cc",
+    "src/Profiler_Remotery_TEST.cc",
+]
+
+# Configuration for UNIX
+RMT_ENABLED = 1
+RMT_USE_TINYCRT = 0
+RMT_USE_CUDA = 0
+RMT_USE_D3D11 = 0
+RMT_USE_OPENGL = 1
+RMT_USE_METAL = 0
+
+cmake_configure_file(
+    name = "remotery_config",
+    src = "src/RemoteryConfig.h.in",
+    out = "include/RemoteryConfig.h",
+    cmakelists = ["CMakeLists.txt"],
+    defines = [
+        "RMT_ENABLED=%d" % (RMT_ENABLED),
+        "RMT_USE_TINYCRT=%d" % (RMT_USE_TINYCRT),
+        "RMT_USE_CUDA=%d" % (RMT_USE_CUDA),
+        "RMT_USE_D3D11=%d" % (RMT_USE_D3D11),
+        "RMT_USE_OPENGL=%d" % (RMT_USE_OPENGL),
+        "RMT_USE_METAL=%d" % (RMT_USE_METAL),
+    ],
+    visibility = ["//visibility:private"],
+)
+
+generate_file(
+    name = "include/ignition/common/profiler/Export.hh",
+    content = """
+#pragma once
+// IGN_DEPRECATED is defined by all ignition libraries, but the version below
+// is a simplified version.  When mixing the regular ignition libraries and
+// the drake compiled ignition libraries, the compiler throws a warning about
+// the macro being multiply defined.  We undefine it before redefining it here
+// to work around that issue.  Note that the IGNITION_PROFILER_GRAPHICS_VISIBLE macro
+// shouldn't be defined multiple times, but we undefine it just in case.
+#ifdef IGNITION_COMMON_PROFILER_VISIBLE
+#undef IGNITION_COMMON_PROFILER_VISIBLE
+#endif
+#define IGNITION_COMMON_PROFILER_VISIBLE __attribute__ ((visibility("default")))
+#ifdef IGN_DEPRECATED
+#undef IGN_DEPRECATED
+#endif
+#define IGN_DEPRECATED(version) __attribute__ ((__deprecated__))
+    """,
+    visibility = ["//visibility:private"],
+)
+
+generate_include_header(
+    name = "profiler_hh_genrule",
+    out = "include/ignition/common/profiler.hh",
+    hdrs = public_headers_no_gen + [
+        "include/ignition/common/profiler/Export.hh",
+        "include/RemoteryConfig.h",
+    ],
+)
+
+public_headers = public_headers_no_gen + [
+    "include/ignition/common/profiler/Export.hh",
+    "include/ignition/common/profiler.hh",
+    "src/ProfilerImpl.hh",
+    "src/RemoteryProfilerImpl.hh",
+    "include/RemoteryConfig.h",
+]
+
+cc_binary(
+    name = "libign_common-profiler.so",
+    srcs = sources + public_headers,
+    includes = ["include"],
+    linkopts = ["-Wl,-soname,libign_common-profiler.so"],
+    linkshared = True,
+    visibility = [],
+    deps = [
+        "//ign_common",
+        "//ign_common/profiler/src/Remotery:remotery",
+    ],
+)
+
+cc_library(
+    name = "profiler",
+    srcs = ["libign_common-profiler.so"],
+    hdrs = public_headers,
+    includes = ["include"],
+    visibility = ["//visibility:public"],
+    linkstatic = True,
+    alwayslink = 1,
+    deps = [],
+)
+
+[cc_test(
+    name = src.replace("/", "_").replace(".cc", "").replace("src_", ""),
+    srcs = [src],
+    deps = [
+        "//ign_common",
+        "//ign_common/profiler:profiler",
+        "@gtest//:gtest",
+        "@gtest//:gtest_main",
+    ]
+) for src in test_sources]

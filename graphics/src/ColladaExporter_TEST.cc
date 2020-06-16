@@ -22,7 +22,7 @@
 #include "ignition/common/SubMesh.hh"
 #include "ignition/common/ColladaLoader.hh"
 #include "ignition/common/ColladaExporter.hh"
-#include "test/util.hh"
+#include "test_util.hh"
 
 #ifdef _WIN32
   #define snprintf _snprintf
