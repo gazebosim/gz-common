@@ -2,6 +2,9 @@
 
 ## Ignition Common 3.X.X
 
+1. Fix hierarchical submesh processing in the ColladaLoader.
+    * [Pull Request 77](https://github.com/ignitionrobotics/ign-common/pull/77)
+
 ## Ignition Common 3.5.0 (2020-04-09)
 
 1. Add interpolate\_x property to actor animations
