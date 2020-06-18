@@ -84,10 +84,10 @@ public_headers = public_headers_no_gen + [
 ]
 
 cc_binary(
-    name = "libign_common-profiler.so",
+    name = "libignition-common3-profiler.so",
     srcs = sources + public_headers,
     includes = ["include"],
-    linkopts = ["-Wl,-soname,libign_common-profiler.so"],
+    linkopts = ["-Wl,-soname,libignition-common3-profiler.so"],
     linkshared = True,
     visibility = [],
     defines = [
@@ -102,13 +102,13 @@ cc_binary(
 
 cc_library(
     name = "profiler",
-    srcs = ["libign_common-profiler.so"],
+    srcs = ["libignition-common3-profiler.so"],
     hdrs = public_headers,
     includes = ["include"],
     visibility = ["//visibility:public"],
     linkstatic = True,
     alwayslink = 1,
-    deps = [":libign_common-profiler.so"],
+    deps = [":libignition-common3-profiler.so"],
 )
 
 

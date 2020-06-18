@@ -102,10 +102,10 @@ public_headers = public_headers_no_gen + [
 ]
 
 cc_binary(
-    name = "libign_common-graphics.so",
+    name = "libignition-common3-graphics.so",
     srcs = sources + public_headers,
     includes = ["include"],
-    linkopts = ["-Wl,-soname,libign_common-graphics.so", "-lfreeimage", "-lgts"],
+    linkopts = ["-Wl,-soname,libignition-common3-graphics.so", "-lfreeimage", "-lgts"],
     linkshared = True,
     visibility = [],
     copts = [
@@ -123,7 +123,7 @@ cc_binary(
 
 cc_library(
     name = "graphics",
-    srcs = ["libign_common-graphics.so"],
+    srcs = ["libignition-common3-graphics.so"],
     hdrs = public_headers,
     includes = ["include"],
     visibility = ["//visibility:public"],

@@ -64,10 +64,10 @@ public_headers = public_headers_no_gen + [
 ]
 
 cc_binary(
-    name = "libign_common-av.so",
+    name = "libignition-common3-av.so",
     srcs = sources + public_headers,
     includes = ["include"],
-    linkopts = ["-Wl,-soname,libign_common-av.so", "-lswscale"],
+    linkopts = ["-Wl,-soname,libignition-common3-av.so", "-lswscale"],
     linkshared = True,
     visibility = [],
     deps = [
@@ -77,7 +77,7 @@ cc_binary(
 
 cc_library(
     name = "av",
-    srcs = ["libign_common-av.so"],
+    srcs = ["libignition-common3-av.so"],
     hdrs = public_headers,
     includes = ["include"],
     visibility = ["//visibility:public"],
