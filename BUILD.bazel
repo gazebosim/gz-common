@@ -117,7 +117,7 @@ public_headers = public_headers_no_gen + [
 ]
 
 cc_binary(
-    name = "libign_common.so",
+    name = "libignition-common4.so",
     srcs = [
         "src/Base64.cc",
         "src/Battery.cc",
@@ -138,25 +138,25 @@ cc_binary(
         "src/WorkerPool.cc",
     ] + private_headers + public_headers,
     includes = ["include"],
-    linkopts = ["-Wl,-soname,libign_common.so", "-ldl", "-luuid"],
+    linkopts = ["-Wl,-soname,libignition-common4.so", "-ldl", "-luuid"],
     linkshared =  True,
     visibility = [],
 )
 
 cc_library(
     name = "ign_common",
-    srcs = ["libign_common.so"],
+    srcs = ["libignition-common4.so"],
     hdrs = public_headers,
     includes = ["include"],
     visibility = ["//visibility:public"],
 )
 
 test_srcs = [
-    #"src/Base64_TEST.cc",
+    "src/Base64_TEST.cc",
     "src/Console_TEST.cc",
-    #"src/Filesystem_TEST.cc",
-    #"src/MaterialDensity_TEST.cc",
-    #"src/PluginLoader_TEST.cc",
+    "src/Filesystem_TEST.cc",
+    "src/MaterialDensity_TEST.cc",
+    "src/PluginLoader_TEST.cc",
     "src/SignalHandler_TEST.cc",
     "src/StringUtils_TEST.cc",
     "src/SystemPaths_TEST.cc",

@@ -64,22 +64,6 @@ sources = [
     "src/SVGLoader.cc",
 ]
 
-test_sources = [
-    "src/Animation_TEST.cc",
-    "src/ColladaExporter_TEST.cc",
-    "src/ColladaLoader_TEST.cc",
-    "src/Dem_TEST.cc",
-    "src/GTSMeshUtils_TEST.cc",
-    "src/ImageHeightmap_TEST.cc",
-    "src/Image_TEST.cc",
-    "src/Material_TEST.cc",
-    "src/MeshManager_TEST.cc",
-    "src/Mesh_TEST.cc",
-    "src/OBJLoader_TEST.cc",
-    "src/Pbr_TEST.cc",
-    "src/SubMesh_TEST.cc",
-    "src/SVGLoader_TEST.cc",
-]
 
 generate_file(
     name = "include/ignition/common/graphics/Export.hh",
@@ -146,9 +130,27 @@ cc_library(
     deps = [],
 )
 
+test_sources = [
+    "src/Animation_TEST.cc",
+    "src/ColladaExporter_TEST.cc",
+    "src/ColladaLoader_TEST.cc",
+    "src/Dem_TEST.cc",
+    "src/GTSMeshUtils_TEST.cc",
+    "src/ImageHeightmap_TEST.cc",
+    "src/Image_TEST.cc",
+    "src/Material_TEST.cc",
+    "src/MeshManager_TEST.cc",
+    "src/Mesh_TEST.cc",
+    "src/OBJLoader_TEST.cc",
+    "src/Pbr_TEST.cc",
+    "src/SubMesh_TEST.cc",
+    "src/SVGLoader_TEST.cc",
+]
+
 [cc_test(
     name = src.replace("/", "_").replace(".cc", "").replace("src_", ""),
     srcs = [src],
+    data = ["//ign_common/test:data"],
     deps = [
         "//ign_common",
         "//ign_common/graphics",
@@ -159,3 +161,4 @@ cc_library(
         "@gtest//:gtest_main",
     ]
 ) for src in test_sources]
+

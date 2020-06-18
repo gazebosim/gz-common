@@ -28,10 +28,12 @@ class ImageTest : public ignition::testing::AutoLogFixture { };
 /////////////////////////////////////////////////
 TEST_F(ImageTest, Image)
 {
+  std::string dataDir;
+  ASSERT_TRUE(ignition::testing::TestDataPath(dataDir));
   common::Image img;
   EXPECT_EQ(-1, img.Load("/file/shouldn/never/exist.png"));
   std::string filename =  "file://";
-  filename += PROJECT_SOURCE_PATH;
+  filename += dataDir;
   filename += "/test/data/cordless_drill/materials/textures/cordless_drill.png";
   EXPECT_EQ(0, img.Load(filename));
   EXPECT_EQ(static_cast<unsigned int>(128), img.Width());
@@ -131,7 +133,9 @@ void ImagePerformanceTest::MaxColor(const std::string &_filePath,
                                     const unsigned int _height)
 {
   std::string fileName =  "file://";
-  fileName += PROJECT_SOURCE_PATH;
+  std::string dataDir;
+  ASSERT_TRUE(ignition::testing::TestDataPath(dataDir));
+  fileName += dataDir;
   fileName += "/";
   fileName += _filePath;
 
