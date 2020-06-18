@@ -21,9 +21,9 @@ sources = [
 ]
 
 test_sources = [
-    #"src/Event_TEST.cc",
+    "src/Event_TEST.cc",
     "src/KeyEvent_TEST.cc",
-    #"src/MouseEvent_TEST.cc",
+    "src/MouseEvent_TEST.cc",
 ]
 
 generate_file(
@@ -65,7 +65,7 @@ cc_binary(
     name = "libignition-common3-events.so",
     srcs = sources + public_headers,
     includes = ["include"],
-    linkopts = ["-Wl,-soname,libignition-common333-events.so"],
+    linkopts = ["-Wl,-soname,libignition-common3-events.so"],
     linkshared = True,
     visibility = [],
     deps = [

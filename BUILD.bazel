@@ -141,6 +141,7 @@ cc_binary(
     linkopts = ["-Wl,-soname,libignition-common4.so", "-ldl", "-luuid"],
     linkshared =  True,
     visibility = [],
+    deps = ["//ign_math"],
 )
 
 cc_library(
