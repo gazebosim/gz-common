@@ -48,7 +48,7 @@ class Console_TEST : public ::testing::Test {
   {
     if (ignition::common::isDirectory(this->logPath))
     {
-      //std::cout << this->logPath << std::endl;
+      EXPECT_TRUE(ignition::common::removeAll(this->logPath));
     }
   }
 
