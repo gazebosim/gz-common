@@ -148,6 +148,7 @@ cc_library(
     name = "ign_common",
     srcs = ["libignition-common4.so"],
     hdrs = public_headers,
+    deps = ["//ign_math"],
     includes = ["include"],
     visibility = ["//visibility:public"],
 )
@@ -173,7 +174,6 @@ test_srcs = [
     name = src.replace("/", "_").replace(".cc", "").replace("src_", ""),
     srcs = [src],
     deps = [
-        "//ign_math",
         "//ign_common",
         "//ign_common/test:test_utils",
         "@gtest//:gtest",
