@@ -3,8 +3,8 @@ load(
     "cmake_configure_file",
 )
 
-BINARY_DIR = "/tmp"
-SOURCE_DIR = "/tmp"
+BINARY_DIR = "./ign_common"
+SOURCE_DIR = "./ign_common"
 
 # Generates config.hh based on the version numbers in CMake code.
 cmake_configure_file(
@@ -26,3 +26,4 @@ cc_library(
     visibility = ["//visibility:public"],
 )
 
+exports_files(["data"])

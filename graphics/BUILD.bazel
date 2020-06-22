@@ -64,22 +64,6 @@ sources = [
     "src/SVGLoader.cc",
 ]
 
-test_sources = [
-    "src/Animation_TEST.cc",
-    "src/ColladaExporter_TEST.cc",
-    "src/ColladaLoader_TEST.cc",
-    "src/Dem_TEST.cc",
-    "src/GTSMeshUtils_TEST.cc",
-    "src/ImageHeightmap_TEST.cc",
-    "src/Image_TEST.cc",
-    "src/Material_TEST.cc",
-    "src/MeshManager_TEST.cc",
-    "src/Mesh_TEST.cc",
-    "src/OBJLoader_TEST.cc",
-    "src/Pbr_TEST.cc",
-    "src/SubMesh_TEST.cc",
-    "src/SVGLoader_TEST.cc",
-]
 
 generate_file(
     name = "include/ignition/common/graphics/Export.hh",
@@ -118,10 +102,10 @@ public_headers = public_headers_no_gen + [
 ]
 
 cc_binary(
-    name = "libign_common-graphics.so",
+    name = "libignition-common3-graphics.so",
     srcs = sources + public_headers,
     includes = ["include"],
-    linkopts = ["-Wl,-soname,libign_common-graphics.so", "-lfreeimage", "-lgts"],
+    linkopts = ["-Wl,-soname,libignition-common3-graphics.so", "-lfreeimage", "-lgts"],
     linkshared = True,
     visibility = [],
     copts = [
@@ -139,16 +123,34 @@ cc_binary(
 
 cc_library(
     name = "graphics",
-    srcs = ["libign_common-graphics.so"],
+    srcs = ["libignition-common3-graphics.so"],
     hdrs = public_headers,
     includes = ["include"],
     visibility = ["//visibility:public"],
     deps = [],
 )
 
+test_sources = [
+    "src/Animation_TEST.cc",
+    "src/ColladaExporter_TEST.cc",
+    "src/ColladaLoader_TEST.cc",
+    "src/Dem_TEST.cc",
+    "src/GTSMeshUtils_TEST.cc",
+    "src/ImageHeightmap_TEST.cc",
+    "src/Image_TEST.cc",
+    "src/Material_TEST.cc",
+    "src/MeshManager_TEST.cc",
+    "src/Mesh_TEST.cc",
+    "src/OBJLoader_TEST.cc",
+    "src/Pbr_TEST.cc",
+    "src/SubMesh_TEST.cc",
+    "src/SVGLoader_TEST.cc",
+]
+
 [cc_test(
     name = src.replace("/", "_").replace(".cc", "").replace("src_", ""),
     srcs = [src],
+    data = ["//ign_common/test:data"],
     deps = [
         "//ign_common",
         "//ign_common/graphics",
@@ -159,3 +161,4 @@ cc_library(
         "@gtest//:gtest_main",
     ]
 ) for src in test_sources]
+

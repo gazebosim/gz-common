@@ -21,9 +21,9 @@ sources = [
 ]
 
 test_sources = [
-    #"src/Event_TEST.cc",
+    "src/Event_TEST.cc",
     "src/KeyEvent_TEST.cc",
-    #"src/MouseEvent_TEST.cc",
+    "src/MouseEvent_TEST.cc",
 ]
 
 generate_file(
@@ -62,10 +62,10 @@ public_headers = public_headers_no_gen + [
 ]
 
 cc_binary(
-    name = "libign_common-events.so",
+    name = "libignition-common3-events.so",
     srcs = sources + public_headers,
     includes = ["include"],
-    linkopts = ["-Wl,-soname,libign_common-events.so"],
+    linkopts = ["-Wl,-soname,libignition-common3-events.so"],
     linkshared = True,
     visibility = [],
     deps = [
@@ -76,7 +76,7 @@ cc_binary(
 
 cc_library(
     name = "events",
-    srcs = ["libign_common-events.so"],
+    srcs = ["libignition-common3-events.so"],
     hdrs = public_headers,
     includes = ["include"],
     visibility = ["//visibility:public"],

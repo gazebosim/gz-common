@@ -23,12 +23,51 @@
 #include "ignition/common/Filesystem.hh"
 #include "ignition/common/Util.hh"
 
+#include "test_config.h"
+
 #define IGN_TMP_DIR "tmp-ign/"
 
 namespace ignition
 {
   namespace testing
   {
+    bool TestDataPath(std::string &_dataDir)
+    {
+      std::string dataDir;
+      if(ignition::common::env("TEST_SRCDIR", dataDir))
+      {
+        _dataDir = ignition::common::joinPaths(dataDir, "__main__/ign_common");
+        return true;
+      }
+      else
+      {
+        _dataDir = PROJECT_SOURCE_PATH;
+        return true;
+      }
+
+      return false;
+    }
+
+    bool TestTmpPath(std::string &_tmpDir)
+    {
+      std::string tmpDir;
+
+      if(ignition::common::env("TEST_UNDECLARED_OUTPUTS_DIR", tmpDir))
+      {
+        _tmpDir = tmpDir;
+        return true;
+      }
+
+      std::string homeDir;
+      if(ignition::common::env(IGN_HOMEDIR, homeDir))
+      {
+        _tmpDir = ignition::common::joinPaths(homeDir, IGN_TMP_DIR);
+        return true;
+      }
+
+      return false;
+    }
+
     /// \brief A utility class that stores test logs in ~/.ignition/test_logs.
     /// This functionality is needed to keep all the log information reported
     /// by ignition during continuous integration. Without this, debugging
@@ -39,8 +78,8 @@ namespace ignition
       protected: virtual void SetUp()
       {
 #ifndef _WIN32
-        std::string logPath;
-        ASSERT_TRUE(ignition::common::env(IGN_HOMEDIR, logPath));
+        ASSERT_TRUE(TestTmpPath(this->tmpDir));
+        std::string logPath = this->tmpDir;
 
         const ::testing::TestInfo *const testInfo =
           ::testing::UnitTest::GetInstance()->current_test_info();
@@ -51,7 +90,7 @@ namespace ignition
 
         // Initialize Console
         ignLogInit(ignition::common::joinPaths(
-                     IGN_TMP_DIR, std::string("test_logs")),
+                     logPath, std::string("test_logs")),
                    this->logFilename);
 
         ignition::common::Console::SetVerbosity(4);
@@ -95,11 +134,11 @@ namespace ignition
       /// \brief Default destructor.
       public: virtual ~AutoLogFixture()
       {
-        std::string absPath;
-        ignition::common::env(IGN_HOMEDIR, absPath);
-        ignition::common::removeAll(
-              ignition::common::joinPaths(absPath, IGN_TMP_DIR));
+        ignition::common::removeAll(this->tmpDir);
       }
+
+      /// \brief Root of the temporary directory
+      private: std::string tmpDir;
 
       /// \brief String with the full path of the logfile
       private: std::string logFilename;

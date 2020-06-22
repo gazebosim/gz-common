@@ -1,0 +1,11 @@
+pkg-config
+ruby-ronn
+uuid-dev
+libavcodec-dev
+libavdevice-dev
+libavformat-dev
+libavutil-dev
+libfreeimage-dev
+libgts-dev
+libswscale-dev
+libtinyxml2-dev

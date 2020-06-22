@@ -20,11 +20,6 @@ sources = [
     "src/RemoteryProfilerImpl.cc",
 ]
 
-test_sources = [
-    "src/Profiler_Disabled_TEST.cc",
-    "src/Profiler_Remotery_TEST.cc",
-]
-
 # Configuration for UNIX
 RMT_ENABLED = 1
 RMT_USE_TINYCRT = 0
@@ -89,12 +84,16 @@ public_headers = public_headers_no_gen + [
 ]
 
 cc_binary(
-    name = "libign_common-profiler.so",
+    name = "libignition-common3-profiler.so",
     srcs = sources + public_headers,
     includes = ["include"],
-    linkopts = ["-Wl,-soname,libign_common-profiler.so"],
+    linkopts = ["-Wl,-soname,libignition-common3-profiler.so"],
     linkshared = True,
     visibility = [],
+    defines = [
+        "IGN_PROFILER_ENABLE=1",
+        "IGN_PROFILER_REMOTERY=1"
+    ],
     deps = [
         "//ign_common",
         "//ign_common/profiler/src/Remotery:remotery",
@@ -103,22 +102,38 @@ cc_binary(
 
 cc_library(
     name = "profiler",
-    srcs = ["libign_common-profiler.so"],
+    srcs = ["libignition-common3-profiler.so"],
     hdrs = public_headers,
     includes = ["include"],
     visibility = ["//visibility:public"],
     linkstatic = True,
     alwayslink = 1,
-    deps = [],
+    deps = [":libignition-common3-profiler.so"],
 )
 
-[cc_test(
-    name = src.replace("/", "_").replace(".cc", "").replace("src_", ""),
-    srcs = [src],
+
+cc_test(
+    name = "Profiler_Disabled_TEST",
+    srcs = ["src/Profiler_Disabled_TEST.cc"],
+    defines = [
+        "IGN_PROFILER_ENABLE=0",
+        "IGN_PROFILER_REMOTERY=0",
+    ],
     deps = [
         "//ign_common",
         "//ign_common/profiler:profiler",
         "@gtest//:gtest",
         "@gtest//:gtest_main",
     ]
-) for src in test_sources]
+)
+
+cc_test(
+    name = "Profiler_Remotery_TEST",
+    srcs = ["src/Profiler_Remotery_TEST.cc"],
+    deps = [
+        "//ign_common",
+        "//ign_common/profiler:profiler",
+        "@gtest//:gtest",
+        "@gtest//:gtest_main",
+    ]
+)

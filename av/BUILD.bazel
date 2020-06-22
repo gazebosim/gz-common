@@ -25,7 +25,7 @@ sources = [
 
 test_sources = [
     #"src/AudioDecoder_TEST.cc",
-    #"src/VideoEncoder_TEST.cc",
+    "src/VideoEncoder_TEST.cc",
 ]
 
 generate_file(
@@ -64,10 +64,11 @@ public_headers = public_headers_no_gen + [
 ]
 
 cc_binary(
-    name = "libign_common-av.so",
+    name = "libignition-common3-av.so",
     srcs = sources + public_headers,
     includes = ["include"],
-    linkopts = ["-Wl,-soname,libign_common-av.so", "-lswscale"],
+    linkopts = ["-Wl,-soname,libignition-common3-av.so",
+                "-lswscale", "-lavdevice", "-lavformat", "-lavcodec"],
     linkshared = True,
     visibility = [],
     deps = [
@@ -77,13 +78,13 @@ cc_binary(
 
 cc_library(
     name = "av",
-    srcs = ["libign_common-av.so"],
+    srcs = ["libignition-common3-av.so"],
     hdrs = public_headers,
     includes = ["include"],
     visibility = ["//visibility:public"],
     linkstatic = True,
     alwayslink = 1,
-    deps = [],
+    deps = ["libignition-common3-av.so"],
 )
 
 [cc_test(

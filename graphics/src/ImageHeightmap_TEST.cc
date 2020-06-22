@@ -39,9 +39,10 @@ TEST_F(DemTest, MisingFile)
 TEST_F(DemTest, NotImage)
 {
   common::ImageHeightmap img;
-  std::string path = TEST_PATH;
+  std::string path;
+  ASSERT_TRUE(ignition::testing::TestDataPath(path));
 
-  path += "/data/dem_portrait.tif";
+  path += "/test/data/dem_portrait.tif";
   EXPECT_EQ(-1, img.Load(path));
 }
 
@@ -49,9 +50,10 @@ TEST_F(DemTest, NotImage)
 TEST_F(ImageHeightmapTest, BasicAPI)
 {
   common::ImageHeightmap img;
-  std::string path("file://");
-
-  path += std::string(TEST_PATH) + "/data/heightmap_bowl.png";
+  std::string path;
+  ASSERT_TRUE(ignition::testing::TestDataPath(path));
+  path = "file://" + path;
+  path += "/test/data/heightmap_bowl.png";
   std::cout << "PATH[" << path << "]\n";
   EXPECT_EQ(0, img.Load(path));
 
@@ -65,9 +67,10 @@ TEST_F(ImageHeightmapTest, BasicAPI)
 TEST_F(ImageHeightmapTest, FillHeightmap)
 {
   common::ImageHeightmap img;
-  std::string path("file://");
-
-  path += std::string(TEST_PATH) + "/data/heightmap_bowl.png";
+  std::string path;
+  ASSERT_TRUE(ignition::testing::TestDataPath(path));
+  path = "file://" + path;
+  path += "/test/data/heightmap_bowl.png";
   EXPECT_EQ(0, img.Load(path));
 
   // Use FillHeightMap() to retrieve a vector<float> after some transformations
