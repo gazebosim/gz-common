@@ -60,6 +60,7 @@ namespace ignition
 
       /// \brief Get the sample rate from the latest decoded file.
       /// \return Integer sample rate, such as 44100.
+      /// If no file is decoded, -1 is returned.
       public: int SampleRate();
 
       /// \brief Free audio object, close files, streams.

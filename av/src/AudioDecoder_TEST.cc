@@ -30,6 +30,9 @@ TEST(AudioDecoder, FileNotSet)
   unsigned int dataBufferSize;
   uint8_t *dataBuffer = NULL;
   EXPECT_FALSE(audio.Decode(&dataBuffer, &dataBufferSize));
+
+  EXPECT_EQ(audio.File(), "");
+  EXPECT_EQ(audio.SampleRate(), -1);
 }
 
 /////////////////////////////////////////////////
