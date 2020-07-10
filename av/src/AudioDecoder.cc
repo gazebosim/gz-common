@@ -172,7 +172,10 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
 /////////////////////////////////////////////////
 int AudioDecoder::SampleRate()
 {
-  return this->data->codecCtx->sample_rate;
+  if (this->data->codecCtx)
+    return this->data->codecCtx->sample_rate;
+
+  return -1;
 }
 
 /////////////////////////////////////////////////

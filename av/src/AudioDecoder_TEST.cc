@@ -30,6 +30,9 @@ TEST(AudioDecoder, FileNotSet)
   unsigned int dataBufferSize;
   uint8_t *dataBuffer = NULL;
   EXPECT_FALSE(audio.Decode(&dataBuffer, &dataBufferSize));
+
+  EXPECT_EQ(audio.File(), "");
+  EXPECT_EQ(audio.SampleRate(), -1);
 }
 
 /////////////////////////////////////////////////
@@ -59,7 +62,7 @@ TEST(AudioDecoder, DataBuffer)
 {
   common::AudioDecoder audio;
 
-  std::string path = PROJECT_SOURCE_PATH;
+  std::string path = TEST_PATH;
   path += "/data/cheer.wav";
   EXPECT_TRUE(audio.SetFile(path));
 
@@ -110,8 +113,8 @@ TEST(AudioDecoder, CheerFile)
     path = TEST_PATH;
     path += "/data/cheer.wav";
     EXPECT_TRUE(audio.SetFile(path));
-    EXPECT_EQ(audio.GetFile(), path);
-    EXPECT_EQ(audio.GetSampleRate(), 48000);
+    EXPECT_EQ(audio.File(), path);
+    EXPECT_EQ(audio.SampleRate(), 48000);
 
     audio.Decode(&dataBuffer, &dataBufferSize);
     EXPECT_EQ(dataBufferSize, 5428692u);
@@ -122,8 +125,8 @@ TEST(AudioDecoder, CheerFile)
     path = TEST_PATH;
     path += "/data/cheer.ogg";
     EXPECT_TRUE(audio.SetFile(path));
-    EXPECT_EQ(audio.GetFile(), path);
-    EXPECT_EQ(audio.GetSampleRate(), 44100);
+    EXPECT_EQ(audio.File(), path);
+    EXPECT_EQ(audio.SampleRate(), 44100);
 
     audio.Decode(&dataBuffer, &dataBufferSize);
     // In Ubuntu trusty the buffer size double for ogg decoding.
@@ -137,11 +140,17 @@ TEST(AudioDecoder, CheerFile)
     path = TEST_PATH;
     path += "/data/cheer.mp3";
     EXPECT_TRUE(audio.SetFile(path));
-    EXPECT_EQ(audio.GetFile(), path);
-    EXPECT_EQ(audio.GetSampleRate(), 44100);
+    EXPECT_EQ(audio.File(), path);
+    EXPECT_EQ(audio.SampleRate(), 44100);
 
     audio.Decode(&dataBuffer, &dataBufferSize);
-    EXPECT_EQ(dataBufferSize, 4995072u);
+
+    // later versions of ffmpeg produces a different buffer size probably due to
+    // underlying changes in the decoder. The size of the first decoded frame
+    // is much smaller than all other frames.
+    EXPECT_TRUE(dataBufferSize == 4995072u ||
+                dataBufferSize == 4987612u ||
+                dataBufferSize == 4987612u * 2);
   }
 }
 
