@@ -2,6 +2,8 @@
 
 set -x
 
+BUILD_DIR=`pwd`
+
 # Install
 make install
 
@@ -11,3 +13,5 @@ mkdir build
 cd build
 cmake ..
 make
+
+cd $BUILD_DIR
