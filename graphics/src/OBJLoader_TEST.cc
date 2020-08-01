@@ -61,6 +61,19 @@ TEST_F(OBJLoaderTest, LoadObjBox)
 }
 
 /////////////////////////////////////////////////
+// This tests opening an OBJ file that has an invalid material reference
+TEST_F(OBJLoaderTest, InvalidMaterial)
+{
+  ignition::common::OBJLoader objLoader;
+
+  std::string meshFilename = std::string(PROJECT_SOURCE_PATH) +
+    "/test/data/invalid_material.obj";
+
+  ignition::common::Mesh *mesh = objLoader.Load(meshFilename);
+  EXPECT_TRUE(mesh != nullptr);
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

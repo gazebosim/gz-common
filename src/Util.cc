@@ -14,9 +14,6 @@
  * limitations under the License.
  *
 */
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 
 #ifdef __linux__
 #include <sys/sendfile.h>
@@ -307,6 +304,19 @@ std::string ignition::common::findFilePath(const std::string &_file)
     int index = filepath.find_last_of("/");
     return filepath.substr(0, index);
   }
+}
+
+/////////////////////////////////////////////////
+void ignition::common::addFindFileURICallback(
+    std::function<std::string(const ignition::common::URI &)> _cb)
+{
+  gSystemPaths->AddFindFileURICallback(_cb);
+}
+
+/////////////////////////////////////////////////
+ignition::common::SystemPaths *ignition::common::systemPaths()
+{
+  return gSystemPaths.get();
 }
 
 /////////////////////////////////////////////////

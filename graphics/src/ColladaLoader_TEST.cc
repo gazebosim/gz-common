@@ -154,6 +154,31 @@ TEST_F(ColladaLoader, Material)
   mat->BlendFactors(srcFactor, dstFactor);
   EXPECT_DOUBLE_EQ(1.0, srcFactor);
   EXPECT_DOUBLE_EQ(0.0, dstFactor);
+
+  common::Mesh *meshOpaque = loader.Load(
+      std::string(PROJECT_SOURCE_PATH) + "/test/data/box_opaque.dae");
+  ASSERT_TRUE(meshOpaque);
+
+  EXPECT_EQ(meshOpaque->MaterialCount(), 1u);
+
+  common::MaterialPtr matOpaque = meshOpaque->MaterialByIndex(0u);
+  ASSERT_TRUE(matOpaque != nullptr);
+
+  // Make sure we read the specular value
+  EXPECT_EQ(math::Color(0.0, 0.0, 0.0, 1.0), matOpaque->Ambient());
+  EXPECT_EQ(math::Color(0.64f, 0.64f, 0.64f, 1.0f), matOpaque->Diffuse());
+  EXPECT_EQ(math::Color(0.5, 0.5, 0.5, 1.0), matOpaque->Specular());
+  EXPECT_EQ(math::Color(0.0, 0.0, 0.0, 1.0), matOpaque->Emissive());
+  EXPECT_DOUBLE_EQ(50.0, matOpaque->Shininess());
+  // transparent: opaque="A_ONE", color=[1 1 1 1]
+  // transparency: not specified, defaults to 1.0
+  // resulting transparency value = (1 - color.a * transparency)
+  EXPECT_DOUBLE_EQ(0.0, matOpaque->Transparency());
+  srcFactor = -1;
+  dstFactor = -1;
+  matOpaque->BlendFactors(srcFactor, dstFactor);
+  EXPECT_DOUBLE_EQ(1.0, srcFactor);
+  EXPECT_DOUBLE_EQ(0.0, dstFactor);
 }
 
 /////////////////////////////////////////////////
@@ -204,6 +229,9 @@ TEST_F(ColladaLoader, LoadBoxWithAnimationOutsideSkeleton)
   common::SkeletonAnimation *anim = skeleton->Animation(0);
   EXPECT_EQ(1u, anim->NodeCount());
   EXPECT_TRUE(anim->HasNode("Armature"));
+  auto nodeAnimation = anim->NodeAnimationByName("Armature");
+  EXPECT_NE(nullptr, nodeAnimation);
+  EXPECT_EQ("Armature", nodeAnimation->Name());
   auto poseStart = anim->PoseAt(0.04166662);
   math::Matrix4d expectedTrans = math::Matrix4d(
       1, 0, 0, 1,
@@ -284,6 +312,9 @@ TEST_F(ColladaLoader, LoadBoxNestedAnimation)
   common::SkeletonAnimation *anim = skeleton->Animation(0);
   EXPECT_EQ(1u, anim->NodeCount());
   EXPECT_TRUE(anim->HasNode("Bone"));
+  auto nodeAnimation = anim->NodeAnimationByName("Bone");
+  EXPECT_NE(nullptr, nodeAnimation);
+  EXPECT_EQ("Bone", nodeAnimation->Name());
   auto poseStart = anim->PoseAt(0);
   math::Matrix4d expectedTrans = math::Matrix4d(
       1, 0, 0, 1,
@@ -345,6 +376,41 @@ TEST_F(ColladaLoader, MergeBoxWithDoubleSkeleton)
   // The two skeletons have been joined and their root is the
   // animation root, called Armature
   EXPECT_EQ(skeleton_ptr->RootNode()->Name(), std::string("Armature"));
+}
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadCylinderAnimatedFrom3dsMax)
+{
+  // TODO(anyone) This test shows that the mesh loads without crashing, but the
+  // mesh animation looks deformed when loaded. That still needs to be
+  // addressed.
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      std::string(PROJECT_SOURCE_PATH) +
+      "/test/data/cylinder_animated_from_3ds_max.dae");
+
+  EXPECT_EQ("unknown", mesh->Name());
+  EXPECT_EQ(202u, mesh->VertexCount());
+  EXPECT_EQ(202u, mesh->NormalCount());
+  EXPECT_EQ(852u, mesh->IndexCount());
+  EXPECT_LT(0u, mesh->TexCoordCount());
+  EXPECT_EQ(0u, mesh->MaterialCount());
+
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  auto subMesh = mesh->SubMeshByIndex(0);
+  ASSERT_NE(nullptr, subMesh.lock());
+  EXPECT_EQ("Cylinder01", subMesh.lock()->Name());
+
+  EXPECT_TRUE(mesh->HasSkeleton());
+  auto skeleton = mesh->MeshSkeleton();
+  ASSERT_NE(nullptr, skeleton);
+  ASSERT_EQ(1u, skeleton->AnimationCount());
+
+  auto anim = skeleton->Animation(0);
+  ASSERT_NE(nullptr, anim);
+  EXPECT_EQ("Bone02", anim->Name());
+  EXPECT_EQ(1u, anim->NodeCount());
+  EXPECT_TRUE(anim->HasNode("Bone02"));
 }
 
 /////////////////////////////////////////////////

@@ -55,6 +55,15 @@ class ignition::common::MaterialPrivate
   /// \brief transparency value in the range 0 to 1
   public: double transparency = 0.0;
 
+  // \brief Enable texture based alpha rendering
+  public: bool textureAlphaEnabled = false;
+
+  // \brief Cutoff value for alpha, values below threshold will not be rendered
+  public: double alphaThreshold = 0.5;
+
+  // \brief Enables two sided rendering
+  public: bool twoSidedEnabled = false;
+
   /// \brief shininess value (0 to 1)
   public: double shininess = 0.0;
 
@@ -81,6 +90,9 @@ class ignition::common::MaterialPrivate
 
   /// \brief destination blend factor
   public: double dstBlendFactor;
+
+  /// \brief Physically Based Rendering (PBR) properties
+  public: std::unique_ptr<Pbr> pbr;
 };
 
 unsigned int MaterialPrivate::counter = 0;
@@ -214,6 +226,33 @@ double Material::Transparency() const
 }
 
 //////////////////////////////////////////////////
+void Material::SetAlphaFromTexture(bool _enabled, double _alpha,
+                                   bool _twoSided)
+{
+  this->dataPtr->textureAlphaEnabled = _enabled;
+  this->dataPtr->alphaThreshold = _alpha;
+  this->dataPtr->twoSidedEnabled = _twoSided;
+}
+
+//////////////////////////////////////////////////
+bool Material::TextureAlphaEnabled() const
+{
+  return this->dataPtr->textureAlphaEnabled;
+}
+
+//////////////////////////////////////////////////
+double Material::AlphaThreshold() const
+{
+  return this->dataPtr->alphaThreshold;
+}
+
+//////////////////////////////////////////////////
+bool Material::TwoSidedEnabled() const
+{
+  return this->dataPtr->twoSidedEnabled;
+}
+
+//////////////////////////////////////////////////
 void Material::SetShininess(double _s)
 {
   this->dataPtr->shininess = _s;
@@ -310,3 +349,14 @@ std::string Material::ShadeStr() const
   return shadeModeIface.Str(this->Shade());
 }
 
+//////////////////////////////////////////////////
+void Material::SetPbrMaterial(const Pbr &_pbr)
+{
+  this->dataPtr->pbr = std::make_unique<Pbr>(_pbr);
+}
+
+//////////////////////////////////////////////////
+Pbr *Material::PbrMaterial() const
+{
+  return this->dataPtr->pbr.get();
+}

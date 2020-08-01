@@ -1,0 +1,13 @@
+libavcodec-dev
+libavdevice-dev
+libavformat-dev
+libavutil-dev
+libfreeimage-dev
+libgts-dev
+libignition-cmake2-dev
+libignition-math6-dev
+libswscale-dev
+libtinyxml2-dev
+pkg-config
+ruby-ronn
+uuid-dev

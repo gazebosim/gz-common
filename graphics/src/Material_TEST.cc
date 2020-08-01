@@ -17,6 +17,7 @@
 #include <gtest/gtest.h>
 
 #include "ignition/common/Material.hh"
+#include "ignition/common/Pbr.hh"
 #include "test/util.hh"
 
 using namespace ignition;
@@ -52,6 +53,11 @@ TEST_F(MaterialTest, Material)
   mat.SetTransparency(0.2);
   EXPECT_DOUBLE_EQ(0.2, mat.Transparency());
 
+  mat.SetAlphaFromTexture(true, 0.3, false);
+  EXPECT_EQ(mat.TextureAlphaEnabled(), true);
+  EXPECT_DOUBLE_EQ(mat.AlphaThreshold(), 0.3);
+  EXPECT_EQ(mat.TwoSidedEnabled(), false);
+
   mat.SetShininess(0.2);
   EXPECT_DOUBLE_EQ(0.2, mat.Shininess());
 
@@ -75,6 +81,12 @@ TEST_F(MaterialTest, Material)
 
   mat.SetLighting(true);
   EXPECT_TRUE(mat.Lighting());
+
+  common::Pbr pbr;
+  EXPECT_EQ(nullptr, mat.PbrMaterial());
+  mat.SetPbrMaterial(pbr);
+  EXPECT_NE(nullptr, mat.PbrMaterial());
+  EXPECT_EQ(pbr, *mat.PbrMaterial());
 }
 
 /////////////////////////////////////////////////

@@ -85,7 +85,7 @@ ign_find_package(FreeImage VERSION 3.9
 ign_find_package(
   GTS PRETTY gts PURPOSE "GNU Triangulation Surface library"
   REQUIRED_BY graphics
-  PRIVATE_FOR graphics)
+  PRIVATE_FOR graphics)ConstructSdfNestedModel
 
 #------------------------------------
 # Find libswscale

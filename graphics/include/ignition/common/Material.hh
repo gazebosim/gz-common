@@ -24,6 +24,7 @@
 #include <ignition/math/Color.hh>
 #include <ignition/common/graphics/Export.hh>
 #include <ignition/common/EnumIface.hh>
+#include <ignition/common/Pbr.hh>
 #include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
@@ -157,6 +158,25 @@ namespace ignition
       /// \return The transparency percentage
       public: double Transparency() const;
 
+      /// \brief Set the material to use the alpha channel from the textures
+      /// \param[in] _enabled Enable alpha channel based rendering
+      /// \param[in] _alpha Set the alpha threshold value
+      /// \param[in] _twoSided Enable two sided rendering
+      public: void SetAlphaFromTexture(bool _enabled,
+                  double _alpha = 0.5, bool _twoSided = true);
+
+      /// \brief Get the enable alpha from textures
+      /// \return The enable alpha value
+      public: bool TextureAlphaEnabled() const;
+
+      /// \brief Get the alpha threshold
+      /// \return The alpha threshold value
+      public: double AlphaThreshold() const;
+
+      /// \brief Get the enable two sided rendering
+      /// \return The enable two sided rendering value
+      public: bool TwoSidedEnabled() const;
+
       /// \brief Set the shininess
       /// \param[in] _t The shininess value
       public: void SetShininess(double _t);
@@ -165,7 +185,7 @@ namespace ignition
       /// \return The shininess value
       public: double Shininess() const;
 
-      /// \brief Set the blende factors. Will be interpreted as:
+      /// \brief Set the blend factors. Will be interpreted as:
       ///        (texture * _srcFactor) + (scene_pixel * _dstFactor)
       /// \param[in] _srcFactor The source factor
       /// \param[in] _dstFactor The destination factor
@@ -221,6 +241,14 @@ namespace ignition
       /// \brief Get lighting enabled
       /// \return the lighting enabled state
       public: bool Lighting() const;
+
+      /// \brief Set the Physically Based Rendering (PBR) material
+      /// \return The PBR material to set to.
+      public: void SetPbrMaterial(const Pbr &_pbr);
+
+      /// \brief Get the Physically Based Rendering (PBR) material
+      /// \return Pointer to the PBR material. Null if it does not exist.
+      public: Pbr *PbrMaterial() const;
 
       /// \brief Stream insertion operator
       /// param[in] _out the output stream to extract from
