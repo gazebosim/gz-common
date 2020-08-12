@@ -30,7 +30,6 @@ The relevant corresponding C++ would be as follows:
 #include <ignition/common/Profiler.hh>
 
 ...
-
 void thread(const char *_thread_name)
 {
   // Sets the name of the thread to appear in the UI
@@ -73,6 +72,12 @@ cmake ..
 make profiler_example
 ```
 
+Or if you are building with ``colcon``, enable profiler by passing in ``cmake`` args.
+
+```{.sh}
+colcon build --merge-install --cmake-args -DENABLE_PROFILER=1
+```
+
 Then execute the example and the profiler visualization:
 
 From terminal 1:
@@ -99,7 +104,18 @@ xdg-open /usr/share/ignition/ignition-common3/profiler_vis/index.html
 open /usr/share/ignition/ignition-common3/profiler_vis/index.html
 ```
 
-If you are successful, you should see the profiler output in a browser.
+If you see ``connection error``, there are a couple of things to double check
+1. Is profiler enabled?
+2. Are you using the correct port number? Run ``ign gazebo -v 4``. The port number will be printed out if the profiler is indeed enabled. 
+
+    ```{.sh}
+    [Dbg] [RemoteryProfilerImpl.cc:187] Staring ign-common profiler impl: Remotery (port: 1500)
+    ```
+3. Are you running the program in a separate terminal? Profiler only establishes connection if there is a program runing and being actively profiled. 
+
+
+If you are successful, you should see the profiler output in a browser. Similar to this 
+![profiler viewer exmaple](imgs/profiler_tutorial_example.png)
 
 ## Using the Profiler
 
