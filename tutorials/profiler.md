@@ -117,11 +117,11 @@ If the profiler is run successfully, you should see output in a browser. Similar
 
 ![profiler viewer exmaple](imgs/profiler_tutorial_example.png)
 
-### TroubleShoot the web viewer
+### Troubleshoot the web viewer
 
 If you see ``connection error``, there are a couple of things to double check
 1. Was the profiler enabled when the project you're trying to run was compiled? Note that this isn't the case if you installed Ignition libraries from binaries, for example. You need to compile the project from source with the ENABLE_PROFILER variable set.
-2. Are you using the correct port number in the upper left corner ``Connection Addresss: ws://127.0.0.1:1500/rmt``? Run ``ign gazebo -v 4`` or ``echo $RMT_PORT`` to show the port number in use. The port number will be printed out if the profiler is enabled. 
+2. Are you using the correct port number in the upper left corner ``Connection Addresss: ws://127.0.0.1:1500/rmt``? Run ``ign gazebo -v 4`` to show the port number in use. The port number will be printed out if the profiler is enabled. 
 
     ```{.sh}
     [Dbg] [RemoteryProfilerImpl.cc:187] Staring ign-common profiler impl: Remotery (port: 1500)
