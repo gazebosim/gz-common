@@ -17,6 +17,8 @@ cmake on the targets or sources that you are interested in (described below).
 
 ## Enabling the Profiler
 
+### On custom example
+
 In order to use the profiler, inspection points must be added to the source code,
 and the application or library must be linked to the `ignition-common::profiler`
 component.
@@ -30,7 +32,6 @@ The relevant corresponding C++ would be as follows:
 #include <ignition/common/Profiler.hh>
 
 ...
-
 void thread(const char *_thread_name)
 {
   // Sets the name of the thread to appear in the UI
@@ -99,7 +100,39 @@ xdg-open /usr/share/ignition/ignition-common4/profiler_vis/index.html
 open /usr/share/ignition/ignition-common4/profiler_vis/index.html
 ```
 
-If you are successful, you should see the profiler output in a browser.
+### On Ignition library
+
+If you want to use profiler on any other ignition library, enable the profiler at compile time with ``ENABLE_PROFILER`` cmake argument.
+
+When compiling with ``CMake``:
+```{.sh}
+cmake .. -DENABLE_PROFILER=1
+```
+When compiling with ``colcon``:
+```{.sh}
+colcon build --cmake-args -DENABLE_PROFILER=1
+```
+
+If the profiler is run successfully, you should see output in a browser. Similar to this 
+
+![profiler viewer exmaple](imgs/profiler_tutorial_example.png)
+
+### Troubleshoot the web viewer
+
+If you see ``connection error``, there are a couple of things to double check
+1. Was the profiler enabled when the project you're trying to run was compiled? Note that this isn't the case if you installed Ignition libraries from binaries, for example. You need to compile the project from source with the ENABLE_PROFILER variable set.
+2. Are you using the correct port number in the upper left corner ``Connection Addresss: ws://127.0.0.1:1500/rmt``? Run ``ign gazebo -v 4`` to show the port number in use. The port number will be printed out if the profiler is enabled. 
+
+    ```{.sh}
+    [Dbg] [RemoteryProfilerImpl.cc:187] Staring ign-common profiler impl: Remotery (port: 1500)
+    ```
+3. Are you running the program in a separate terminal? Profiler only establishes connection if there is a program runing and being actively profiled.
+
+4. If you want to use a different port, configure the environment variable `RMT_PORT` by running the following in terminal, and update the web viewer port in your browser accordingly (see 2 above)
+    ```{.sh}
+    export RMT_PORT=1500
+    ```
+
 
 ## Using the Profiler
 
