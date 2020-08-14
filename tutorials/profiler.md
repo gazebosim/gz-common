@@ -115,7 +115,7 @@ colcon build --cmake-args -DENABLE_PROFILER=1
 
 If the profiler is run successfully, you should see output in a browser. Similar to this 
 
-![profiler viewer exmaple](imgs/profiler_tutorial_example.png)
+<img src="https://raw.githubusercontent.com/ignitionrobotics/ign-common/ign-common3/tutorials/imgs/profiler_tutorial_example.png">
 
 ### Troubleshoot the web viewer
 
