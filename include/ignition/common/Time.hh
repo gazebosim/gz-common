@@ -52,24 +52,24 @@ namespace ignition
       };
 
       /// \brief Constructors
-      public: Time();
+      public: IGN_DEPRECATED(3) Time();
 
       /// \brief Copy constructor
       /// \param[in] time Time to copy
-      public: Time(const Time &_time);
+      public: IGN_DEPRECATED(3) Time(const Time &_time);
 
       /// \brief Constructor
       /// \param[in] _tv Time to initialize to
-      public: explicit Time(const struct timespec &_tv);
+      public: explicit IGN_DEPRECATED(3) Time(const struct timespec &_tv);
 
       /// \brief Constructor
       /// \param[in] _sec Seconds
       /// \param[in] _nsec Nanoseconds
-      public: Time(int32_t _sec, int32_t _nsec);
+      public: IGN_DEPRECATED(3) Time(int32_t _sec, int32_t _nsec);
 
       /// \brief Constuctor
       /// \param[in] _time Time in double format sec.nsec
-      public: explicit Time(double _time);
+      public: explicit IGN_DEPRECATED(3) Time(double _time);
 
       /// \brief Destructor
       public: virtual ~Time();
