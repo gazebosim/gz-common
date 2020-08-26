@@ -76,7 +76,7 @@ namespace ignition
 
       /// \brief Get the wall time
       /// \return the current time
-      public: static const Time &SystemTime();
+      public: static const IGN_DEPRECATED(3) Time &SystemTime();
 
       /// \brief Set to sec and nsec
       /// \param[in] _sec Seconds
@@ -103,7 +103,7 @@ namespace ignition
       /// actual call to the system's sleep function.
       ///
       /// On Windows the return value is always common::Time::Zero.
-      public: static Time Sleep(const common::Time &_time);
+      public: static Time IGN_DEPRECATED(3) Sleep(const common::Time &_time);
 
       /// \brief Get the time as a string formatted as "DD hh:mm:ss.mmm", with
       /// the option to choose the start/end.
