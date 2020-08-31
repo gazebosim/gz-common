@@ -52,31 +52,31 @@ namespace ignition
       };
 
       /// \brief Constructors
-      public: IGN_DEPRECATED(3) Time();
+      public: IGN_DEPRECATED(4) Time();
 
       /// \brief Copy constructor
       /// \param[in] time Time to copy
-      public: IGN_DEPRECATED(3) Time(const Time &_time);
+      public: IGN_DEPRECATED(4) Time(const Time &_time);
 
       /// \brief Constructor
       /// \param[in] _tv Time to initialize to
-      public: explicit IGN_DEPRECATED(3) Time(const struct timespec &_tv);
+      public: explicit IGN_DEPRECATED(4) Time(const struct timespec &_tv);
 
       /// \brief Constructor
       /// \param[in] _sec Seconds
       /// \param[in] _nsec Nanoseconds
-      public: IGN_DEPRECATED(3) Time(int32_t _sec, int32_t _nsec);
+      public: IGN_DEPRECATED(4) Time(int32_t _sec, int32_t _nsec);
 
       /// \brief Constuctor
       /// \param[in] _time Time in double format sec.nsec
-      public: explicit IGN_DEPRECATED(3) Time(double _time);
+      public: explicit IGN_DEPRECATED(4) Time(double _time);
 
       /// \brief Destructor
       public: virtual ~Time();
 
       /// \brief Get the wall time
       /// \return the current time
-      public: static const IGN_DEPRECATED(3) Time &SystemTime();
+      public: static const IGN_DEPRECATED(4) Time &SystemTime();
 
       /// \brief Set to sec and nsec
       /// \param[in] _sec Seconds
@@ -103,7 +103,7 @@ namespace ignition
       /// actual call to the system's sleep function.
       ///
       /// On Windows the return value is always common::Time::Zero.
-      public: static Time IGN_DEPRECATED(3) Sleep(const common::Time &_time);
+      public: static Time IGN_DEPRECATED(4) Sleep(const common::Time &_time);
 
       /// \brief Get the time as a string formatted as "DD hh:mm:ss.mmm", with
       /// the option to choose the start/end.
