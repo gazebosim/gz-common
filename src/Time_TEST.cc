@@ -28,7 +28,7 @@ TEST(TimeTest, Time)
   common::Timer timer;
   timer.Start();
   IGN_SLEEP_MS(100);
-  EXPECT_TRUE(timer.Elapsed() > common::Time(0, 100000000));
+  EXPECT_TRUE(timer.Elapsed() > 0.1);
 
   common::Time time;
   time = common::Time::SystemTime();

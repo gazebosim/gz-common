@@ -20,11 +20,18 @@
 using namespace ignition;
 using namespace common;
 
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 //////////////////////////////////////////////////
 Timer::Timer()
   : running(false)
 {
 }
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 
 //////////////////////////////////////////////////
 Timer::~Timer()
@@ -34,14 +41,14 @@ Timer::~Timer()
 //////////////////////////////////////////////////
 void Timer::Start()
 {
-  this->start = Time::SystemTime();
+  this->start = std::chrono::steady_clock::now();
   this->running = true;
 }
 
 //////////////////////////////////////////////////
 void Timer::Stop()
 {
-  this->stop = Time::SystemTime();
+  this->stop = std::chrono::steady_clock::now();
   this->running = false;
 }
 
@@ -52,15 +59,18 @@ bool Timer::Running() const
 }
 
 //////////////////////////////////////////////////
-Time Timer::Elapsed() const
+double Timer::Elapsed() const
 {
   if (this->running)
   {
-    Time currentTime;
-    currentTime = Time::SystemTime();
-
-    return currentTime - this->start;
+    std::chrono::steady_clock::time_point currentTime;
+    currentTime = std::chrono::steady_clock::now();
+    std::chrono::duration<double> diff = currentTime - this->start;
+    return diff.count();
   }
   else
-    return this->stop - this->start;
+  {
+    std::chrono::duration<double> diff = this->stop - this->start;
+    return diff.count();
+  }
 }

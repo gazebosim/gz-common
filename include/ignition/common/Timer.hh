@@ -46,7 +46,7 @@ namespace ignition
 
       /// \brief Get the elapsed time
       /// \return The time
-      public: Time Elapsed() const;
+      public: double Elapsed() const;
 
       /// \brief Stream operator friendly
       public: friend std::ostream &operator<<(std::ostream &out,
@@ -57,10 +57,10 @@ namespace ignition
               }
 
       /// \brief The time of the last call to Start
-      private: Time start;
+      private: std::chrono::steady_clock::time_point start;
 
       /// \brief The time when Stop was called.
-      private: Time stop;
+      private: std::chrono::steady_clock::time_point stop;
 
       /// \brief True if the timer is running.
       private: bool running;
