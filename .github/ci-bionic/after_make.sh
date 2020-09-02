@@ -13,4 +13,4 @@ cmake ..
 make
 
 # return to the compilation place
-cd ../build
+cd ../../build
