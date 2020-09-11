@@ -408,6 +408,7 @@ TrajectoryInfo::TrajectoryInfo(TrajectoryInfo &&_trajInfo) noexcept
 /////////////////////////////////////////////////
 TrajectoryInfo::~TrajectoryInfo()
 {
+  delete this->dataPtr;
 }
 
 //////////////////////////////////////////////////
