@@ -20,18 +20,11 @@
 using namespace ignition;
 using namespace common;
 
-#ifndef _WIN32
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
 //////////////////////////////////////////////////
 Timer::Timer()
   : running(false)
 {
 }
-#ifndef _WIN32
-# pragma GCC diagnostic pop
-#endif
 
 //////////////////////////////////////////////////
 Timer::~Timer()
