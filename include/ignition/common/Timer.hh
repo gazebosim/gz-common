@@ -46,13 +46,17 @@ namespace ignition
 
       /// \brief Get the elapsed time
       /// \return The time
-      public: double Elapsed() const;
+      public: Time IGN_DEPRECATED(4) Elapsed() const;
+
+      /// \brief Get the elapsed time
+      /// \return The time
+      public: double ElapsedTime() const;
 
       /// \brief Stream operator friendly
       public: friend std::ostream &operator<<(std::ostream &out,
                                               const ignition::common::Timer &t)
               {
-                out << t.Elapsed();
+                out << t.ElapsedTime();
                 return out;
               }
 

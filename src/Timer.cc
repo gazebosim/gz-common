@@ -52,7 +52,37 @@ bool Timer::Running() const
 }
 
 //////////////////////////////////////////////////
-double Timer::Elapsed() const
+Time Timer::Elapsed() const
+{
+  if (this->running)
+  {
+    std::chrono::steady_clock::time_point currentTime;
+    currentTime = std::chrono::steady_clock::now();
+    std::chrono::duration<double> diff = currentTime - this->start;
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+    return Time(diff.count());
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
+  }
+  else{
+    std::chrono::duration<double> diff = this->stop - this->start;
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+    return Time(diff.count());
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
+  }
+}
+
+//////////////////////////////////////////////////
+double Timer::ElapsedTime() const
 {
   if (this->running)
   {

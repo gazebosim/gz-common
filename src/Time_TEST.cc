@@ -28,7 +28,7 @@ TEST(TimeTest, Time)
   common::Timer timer;
   timer.Start();
   IGN_SLEEP_MS(100);
-  EXPECT_TRUE(timer.Elapsed() > 0.1);
+  EXPECT_TRUE(timer.ElapsedTime() > 0.1);
 
 #ifndef _WIN32
 # pragma GCC diagnostic push
