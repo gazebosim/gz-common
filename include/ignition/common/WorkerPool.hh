@@ -67,7 +67,8 @@ namespace ignition
       /// \remarks The return value can be false even when waiting forever if
       //           the WorkerPool is destructed before all work is completed
       public: bool WaitForResults(
-        const std::chrono::steady_clock::duration &_timeout = std::chrono::steady_clock::duration::zero());
+        const std::chrono::steady_clock::duration &_timeout =
+          std::chrono::steady_clock::duration::zero());
 
       IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief private implementation pointer

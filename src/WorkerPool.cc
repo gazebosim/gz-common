@@ -196,7 +196,8 @@ bool WorkerPool::WaitForResults(const Time &_timeout)
 }
 
 //////////////////////////////////////////////////
-bool WorkerPool::WaitForResults(const std::chrono::steady_clock::duration &_timeout)
+bool WorkerPool::WaitForResults(
+  const std::chrono::steady_clock::duration &_timeout)
 {
   bool signaled = true;
   std::unique_lock<std::mutex> queueLock(this->dataPtr->queueMtx);

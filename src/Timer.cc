@@ -68,7 +68,8 @@ Time Timer::Elapsed() const
 # pragma GCC diagnostic pop
 #endif
   }
-  else{
+  else
+  {
     std::chrono::duration<double> diff = this->stop - this->start;
 #ifndef _WIN32
 # pragma GCC diagnostic push
