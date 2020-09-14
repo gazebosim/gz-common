@@ -194,3 +194,34 @@ bool WorkerPool::WaitForResults(const Time &_timeout)
   }
   return signaled && !this->dataPtr->done;
 }
+
+//////////////////////////////////////////////////
+bool WorkerPool::WaitForResults(const std::chrono::steady_clock::duration &_timeout)
+{
+  bool signaled = true;
+  std::unique_lock<std::mutex> queueLock(this->dataPtr->queueMtx);
+
+  // Lambda to keep logic in one place for both cases
+  std::function<bool()> haveResults = [this] () -> bool
+    {
+      return this->dataPtr->done ||
+        (this->dataPtr->workOrders.empty() && !this->dataPtr->activeOrders);
+    };
+
+  if (!haveResults())
+  {
+    if (std::chrono::steady_clock::duration::zero() == _timeout)
+    {
+      // Wait forever
+      this->dataPtr->signalWorkDone.wait(queueLock);
+    }
+    else
+    {
+      // Wait for timeout
+      signaled = this->dataPtr->signalWorkDone.wait_for(queueLock,
+          _timeout,
+          haveResults);
+    }
+  }
+  return signaled && !this->dataPtr->done;
+}

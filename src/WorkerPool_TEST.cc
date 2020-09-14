@@ -92,15 +92,7 @@ TEST(WorkerPool, WaitWithTimeout)
       {
         workSentinel = 5;
       });
-#ifndef _WIN32
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  Time time(5);
-#ifndef _WIN32
-# pragma GCC diagnostic pop
-#endif
-  EXPECT_TRUE(pool.WaitForResults(time));
+  EXPECT_TRUE(pool.WaitForResults(std::chrono::seconds(5)));
   EXPECT_EQ(5, workSentinel);
 }
 
@@ -112,15 +104,7 @@ TEST(WorkerPool, WaitWithTimeoutThatTimesOut)
       {
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
       });
-#ifndef _WIN32
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  Time time(0.0001);
-#ifndef _WIN32
-# pragma GCC diagnostic pop
-#endif
-  EXPECT_FALSE(pool.WaitForResults(time));
+  EXPECT_FALSE(pool.WaitForResults(std::chrono::nanoseconds(100000)));
 }
 
 //////////////////////////////////////////////////
@@ -147,15 +131,7 @@ TEST(WorkerPool, ThingsRunInParallel)
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
         ++sentinel;
       });
-#ifndef _WIN32
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  Time time(0.009);
-#ifndef _WIN32
-# pragma GCC diagnostic pop
-#endif
-  bool result = pool.WaitForResults(time);
+  bool result = pool.WaitForResults(std::chrono::milliseconds(9));
 #ifdef __linux__
   // the timing test is flaky on windows and mac
   EXPECT_TRUE(result);
