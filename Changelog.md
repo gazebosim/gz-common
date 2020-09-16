@@ -14,8 +14,27 @@
 
 ## Ignition Common 3.X.X
 
+## Ignition Common 3.6.1 (2020-09-16)
+
 1. Fix hierarchical submesh processing in the ColladaLoader.
     * [Pull Request 78](https://github.com/ignitionrobotics/ign-common/pull/78)
+
+1. Tutorial updates
+    * [Pull Request 86](https://github.com/ignitionrobotics/ign-common/pull/86)
+    * [Pull Request 87](https://github.com/ignitionrobotics/ign-common/pull/87)
+    * [Pull Request 92](https://github.com/ignitionrobotics/ign-common/pull/92)
+
+1. Fix the AudioDecoder class
+    * [Pull Request 81](https://github.com/ignitionrobotics/ign-common/pull/81)
+
+1. Fix actions CI
+    * [Pull Request 83](https://github.com/ignitionrobotics/ign-common/pull/83)
+
+1. Fix trajectory info memory leak
+    * [Pull Request 93](https://github.com/ignitionrobotics/ign-common/pull/93)
+
+1. Remove URI warning on constructor
+    * [Pull Request 94](https://github.com/ignitionrobotics/ign-common/pull/94)
 
 ## Ignition Common 3.6.0 (2020-06-09)
 
