@@ -83,18 +83,18 @@ Time Timer::Elapsed() const
 }
 
 //////////////////////////////////////////////////
-double Timer::ElapsedTime() const
+std::chrono::duration<double> Timer::ElapsedTime() const
 {
   if (this->running)
   {
     std::chrono::steady_clock::time_point currentTime;
     currentTime = std::chrono::steady_clock::now();
     std::chrono::duration<double> diff = currentTime - this->start;
-    return diff.count();
+    return diff;
   }
   else
   {
     std::chrono::duration<double> diff = this->stop - this->start;
-    return diff.count();
+    return diff;
   }
 }
