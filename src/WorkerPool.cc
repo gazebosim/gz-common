@@ -21,6 +21,7 @@
 #include <utility>
 
 #include "ignition/common/WorkerPool.hh"
+#include "ignition/math/Helpers.hh"
 
 namespace igncmn = ignition::common;
 using namespace igncmn;
@@ -166,33 +167,7 @@ void WorkerPool::AddWork(std::function<void()> _work, std::function<void()> _cb)
 //////////////////////////////////////////////////
 bool WorkerPool::WaitForResults(const Time &_timeout)
 {
-  bool signaled = true;
-  std::unique_lock<std::mutex> queueLock(this->dataPtr->queueMtx);
-
-  // Lambda to keep logic in one place for both cases
-  std::function<bool()> haveResults = [this] () -> bool
-    {
-      return this->dataPtr->done ||
-        (this->dataPtr->workOrders.empty() && !this->dataPtr->activeOrders);
-    };
-
-  if (!haveResults())
-  {
-    if (Time::Zero == _timeout)
-    {
-      // Wait forever
-      this->dataPtr->signalWorkDone.wait(queueLock);
-    }
-    else
-    {
-      // Wait for timeout
-      signaled = this->dataPtr->signalWorkDone.wait_for(queueLock,
-          std::chrono::seconds(_timeout.sec) +
-          std::chrono::nanoseconds(_timeout.nsec),
-          haveResults);
-    }
-  }
-  return signaled && !this->dataPtr->done;
+  return WaitForResults(math::secNsecToDuration(_timeout.sec, _timeout.nsec));
 }
 
 //////////////////////////////////////////////////
