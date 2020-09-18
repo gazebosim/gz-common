@@ -12,6 +12,11 @@ ign_create_core_library(
 target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
   PRIVATE ${DL_TARGET})
 
+# This is required by the WorkerPool::WaitForResults(const Time &_timeout)
+# TODO(anyone): IGN_DEPRECATED(4). Remove this part when the method is removed
+target_include_directories(${PROJECT_LIBRARY_TARGET_NAME} PRIVATE
+  ${ignition-math${IGN_MATH_VER}_INCLUDE_DIRS})
+
 # Handle non-Windows configuration settings
 if(NOT WIN32)
 

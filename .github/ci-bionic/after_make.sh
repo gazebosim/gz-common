@@ -11,3 +11,6 @@ mkdir build
 cd build
 cmake ..
 make
+
+# return to the compilation place
+cd ../../build
