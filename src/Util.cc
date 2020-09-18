@@ -320,9 +320,11 @@ ignition::common::SystemPaths *ignition::common::systemPaths()
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::env(const std::string &_name, std::string &_value)
+bool ignition::common::env(const std::string &_name, std::string &_value,
+                           bool _allowEmpty)
 {
   std::string v;
+  bool valid = false;
 #ifdef _WIN32
   const DWORD buffSize = 32767;
   static char buffer[buffSize];
@@ -330,12 +332,24 @@ bool ignition::common::env(const std::string &_name, std::string &_value)
   {
     v = buffer;
   }
+
+  if(!v.empty())
+    valid = true;
+
 #else
   const char *cvar = std::getenv(_name.c_str());
-  if (cvar)
+  if (cvar != nullptr)
+  {
     v = cvar;
+    valid = true;
+
+    if (v[0] == '\0' && !_allowEmpty)
+    {
+      valid = false;
+    } 
+  }
 #endif
-  if (!v.empty())
+  if (valid)
   {
     _value = v;
     return true;

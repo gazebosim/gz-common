@@ -173,6 +173,100 @@ TEST(Util_TEST, emptyENV)
 }
 
 /////////////////////////////////////////////////
+TEST(Util_TEST, env_set)
+{
+  const auto key = "IGN_ENV_SET";
+  ASSERT_EQ(0, setenv(key, "VALUE", true));
+
+  // Check set var 
+  {
+    std::string value;
+    EXPECT_TRUE(common::env(key, value));
+    EXPECT_FALSE(value.empty());
+    EXPECT_EQ("VALUE", value);
+  }
+
+  // Check set var with allowEmpty
+  {
+    std::string value;
+    EXPECT_TRUE(common::env(key, value, true));
+    EXPECT_FALSE(value.empty());
+    EXPECT_EQ("VALUE", value);
+  }
+
+  // Check set var without allowEmpty
+  {
+    std::string value;
+    EXPECT_TRUE(common::env(key, value, false));
+    EXPECT_FALSE(value.empty());
+    EXPECT_EQ("VALUE", value);
+  }
+
+  unsetenv(key);
+}
+
+/////////////////////////////////////////////////
+TEST(Util_TEST, env_unset)
+{
+  const auto key = "IGN_ENV_UNSET";
+  unsetenv(key);
+
+  // Check unset var (default)
+  {
+    std::string value;
+    EXPECT_FALSE(common::env(key, value));
+    EXPECT_TRUE(value.empty());
+  }
+
+  // Check unset var with allowEmpty
+  {
+    std::string value;
+    EXPECT_FALSE(common::env(key, value, true));
+    EXPECT_TRUE(value.empty());
+  }
+
+  // Check unset var without allowEmpty
+  {
+    std::string value;
+    EXPECT_FALSE(common::env(key, value, false));
+    EXPECT_TRUE(value.empty());
+  }
+  unsetenv(key);
+}
+
+/////////////////////////////////////////////////
+TEST(Util_TEST, env_set_empty)
+{
+  const auto key = "IGN_ENV_SET_EMPTY";
+
+  ASSERT_EQ(0, setenv(key, "", true));
+
+  // Check set empty var (default)
+  {
+    std::string value;
+    EXPECT_FALSE(common::env(key, value));
+    EXPECT_TRUE(value.empty());
+  }
+
+  // Check set empty var with allowEmpty
+#ifndef _WIN32
+  {
+    std::string value;
+    EXPECT_TRUE(common::env(key, value, true));
+    EXPECT_TRUE(value.empty());
+  }
+#endif
+
+  // Check set empty var without allowEmpty
+  {
+    std::string value;
+    EXPECT_FALSE(common::env(key, value, false));
+    EXPECT_TRUE(value.empty());
+  }
+  unsetenv(key);
+}
+
+/////////////////////////////////////////////////
 TEST(Util_TEST, findFile)
 {
   EXPECT_EQ("", ignition::common::findFile("no_such_file"));

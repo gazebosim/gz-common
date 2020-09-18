@@ -217,9 +217,12 @@ namespace ignition
     /// \brief Find the environment variable '_name' and return its value.
     /// \param[in] _name Name of the environment variable.
     /// \param[out] _value Value if the variable was found.
+    /// \param[in] _allowEmpty Allow set-but-empty variables.
+    ///           (Unsupported on Windows)
     /// \return True if the variable was found or false otherwise.
     bool IGNITION_COMMON_VISIBLE env(
-        const std::string &_name, std::string &_value);
+        const std::string &_name, std::string &_value,
+        bool _allowEmpty=false);
 
     /// \brief Get a UUID
     /// \return A UUID string
