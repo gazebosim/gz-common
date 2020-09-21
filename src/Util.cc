@@ -320,6 +320,12 @@ ignition::common::SystemPaths *ignition::common::systemPaths()
 }
 
 /////////////////////////////////////////////////
+bool ignition::common::env(const std::string &_name, std::string &_value)
+{
+  return env(_name, _value, false);
+}
+
+/////////////////////////////////////////////////
 bool ignition::common::env(const std::string &_name, std::string &_value,
                            bool _allowEmpty)
 {
