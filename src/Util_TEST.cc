@@ -173,7 +173,7 @@ TEST(Util_TEST, emptyENV)
 }
 
 /////////////////////////////////////////////////
-TEST(Util_TEST, env_set)
+TEST(Util_TEST, envSet)
 {
   const auto key = "IGN_ENV_SET";
   ASSERT_EQ(0, setenv(key, "VALUE", true));
@@ -206,7 +206,7 @@ TEST(Util_TEST, env_set)
 }
 
 /////////////////////////////////////////////////
-TEST(Util_TEST, env_unset)
+TEST(Util_TEST, envUnset)
 {
   const auto key = "IGN_ENV_UNSET";
   unsetenv(key);
@@ -235,7 +235,7 @@ TEST(Util_TEST, env_unset)
 }
 
 /////////////////////////////////////////////////
-TEST(Util_TEST, env_set_empty)
+TEST(Util_TEST, envSetEmpty)
 {
   const auto key = "IGN_ENV_SET_EMPTY";
 
