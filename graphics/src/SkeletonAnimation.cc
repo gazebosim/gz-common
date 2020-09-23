@@ -45,6 +45,8 @@ SkeletonAnimation::SkeletonAnimation(const std::string &_name)
 //////////////////////////////////////////////////
 SkeletonAnimation::~SkeletonAnimation()
 {
+  for (auto &it : this->data->animations)
+    delete it.second;
   this->data->animations.clear();
   delete this->data;
   this->data = NULL;
