@@ -176,9 +176,9 @@ TEST(Util_TEST, emptyENV)
 TEST(Util_TEST, envSet)
 {
   const auto key = "IGN_ENV_SET";
-  ASSERT_EQ(0, setenv(key, "VALUE", true));
+  ASSERT_TRUE(common::setenv(key, "VALUE"));
 
-  // Check set var 
+  // Check set var
   {
     std::string value;
     EXPECT_TRUE(common::env(key, value));
@@ -202,14 +202,14 @@ TEST(Util_TEST, envSet)
     EXPECT_EQ("VALUE", value);
   }
 
-  unsetenv(key);
+  common::unsetenv(key);
 }
 
 /////////////////////////////////////////////////
 TEST(Util_TEST, envUnset)
 {
   const auto key = "IGN_ENV_UNSET";
-  unsetenv(key);
+  common::unsetenv(key);
 
   // Check unset var (default)
   {
@@ -231,7 +231,7 @@ TEST(Util_TEST, envUnset)
     EXPECT_FALSE(common::env(key, value, false));
     EXPECT_TRUE(value.empty());
   }
-  unsetenv(key);
+  common::unsetenv(key);
 }
 
 /////////////////////////////////////////////////
@@ -239,7 +239,7 @@ TEST(Util_TEST, envSetEmpty)
 {
   const auto key = "IGN_ENV_SET_EMPTY";
 
-  ASSERT_EQ(0, setenv(key, "", true));
+  ASSERT_EQ(0, common::setenv(key, ""));
 
   // Check set empty var (default)
   {
@@ -248,9 +248,17 @@ TEST(Util_TEST, envSetEmpty)
     EXPECT_TRUE(value.empty());
   }
 
-  // Check set empty var with allowEmpty
-#ifndef _WIN32
+#ifdef _WIN32
   {
+    // This will warn on Windows, but return false
+    std::string value;
+    EXPECT_FALSE(common::env(key, value, true));
+    EXPECT_TRUE(value.empty());
+  }
+#else
+  {
+    // This will not warn and return true on Linux,
+    // as empty environment variables are allowed.
     std::string value;
     EXPECT_TRUE(common::env(key, value, true));
     EXPECT_TRUE(value.empty());
@@ -263,7 +271,7 @@ TEST(Util_TEST, envSetEmpty)
     EXPECT_FALSE(common::env(key, value, false));
     EXPECT_TRUE(value.empty());
   }
-  unsetenv(key);
+  common::unsetenv(key);
 }
 
 /////////////////////////////////////////////////

@@ -31,6 +31,7 @@
 #include <sstream>
 
 #include <ignition/common/config.hh>
+#include <ignition/common/Console.hh>
 #include <ignition/common/SystemPaths.hh>
 #include <ignition/common/Util.hh>
 #include <ignition/common/Uuid.hh>
@@ -339,8 +340,16 @@ bool ignition::common::env(const std::string &_name, std::string &_value,
     v = buffer;
   }
 
-  if(!v.empty())
+  if (!v.empty())
+  {
     valid = true;
+  }
+
+  if (_allowEmpty)
+  {
+    ignwarn << "Reading environment variable with _allowEmpty==true"
+            << " is unsupported on Windows.\n";
+  }
 
 #else
   const char *cvar = std::getenv(_name.c_str());
@@ -352,7 +361,7 @@ bool ignition::common::env(const std::string &_name, std::string &_value,
     if (v[0] == '\0' && !_allowEmpty)
     {
       valid = false;
-    } 
+    }
   }
 #endif
   if (valid)
@@ -361,6 +370,51 @@ bool ignition::common::env(const std::string &_name, std::string &_value,
     return true;
   }
   return false;
+}
+
+/////////////////////////////////////////////////
+bool ignition::common::setenv(const std::string &_name, std::string &_value)
+{
+#ifdef _WIN32
+  if (0 != _putenv_s(_name.c_str(), _value.c_str()))
+  {
+    ignwarn << "Failed to set environment variable: "
+            << "[" << _name << "]"
+            << strerror(errno) << std::endl;
+    return false;
+  }
+#else
+  if (0 != setenv(_name.c_str(), value.c_str(), true))
+  {
+    ignwarn << "Failed to set environment variable: "
+            << "[" << _name << "]"
+            << strerror(errno) << std::endl;
+    return false;
+  }
+#endif
+  return true;
+}
+/////////////////////////////////////////////////
+bool ignition::common::unsetenv(const std::string &_name)
+{
+#ifdef _WIN32
+  if (0 != _putenv_s(_name.c_str(), ""))
+  {
+    ignwarn << "Failed to unset environment variable: "
+            << "[" << _name << "]"
+            << strerror(errno) << std::endl;
+    return false;
+  }
+#else
+  if (0 != unset(_name))
+  {
+    ignwarn << "Failed to unset environment variable: "
+            << "[" << _name << "]"
+            << strerror(errno) << std::endl;
+    return false;
+  }
+#endif
+  return true;
 }
 
 /////////////////////////////////////////////////
