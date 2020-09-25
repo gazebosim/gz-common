@@ -202,14 +202,14 @@ TEST(Util_TEST, envSet)
     EXPECT_EQ("VALUE", value);
   }
 
-  common::unsetenv(key);
+  ASSERT_TRUE(common::unsetenv(key));
 }
 
 /////////////////////////////////////////////////
 TEST(Util_TEST, envUnset)
 {
   const auto key = "IGN_ENV_UNSET";
-  common::unsetenv(key);
+  ASSERT_TRUE(common::unsetenv(key));
 
   // Check unset var (default)
   {
@@ -231,7 +231,7 @@ TEST(Util_TEST, envUnset)
     EXPECT_FALSE(common::env(key, value, false));
     EXPECT_TRUE(value.empty());
   }
-  common::unsetenv(key);
+  ASSERT_TRUE(common::unsetenv(key));
 }
 
 /////////////////////////////////////////////////
@@ -239,7 +239,7 @@ TEST(Util_TEST, envSetEmpty)
 {
   const auto key = "IGN_ENV_SET_EMPTY";
 
-  ASSERT_EQ(0, common::setenv(key, ""));
+  ASSERT_TRUE(common::setenv(key, ""));
 
   // Check set empty var (default)
   {
@@ -271,7 +271,7 @@ TEST(Util_TEST, envSetEmpty)
     EXPECT_FALSE(common::env(key, value, false));
     EXPECT_TRUE(value.empty());
   }
-  common::unsetenv(key);
+  ASSERT_TRUE(common::unsetenv(key));
 }
 
 /////////////////////////////////////////////////

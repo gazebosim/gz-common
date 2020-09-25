@@ -373,7 +373,7 @@ bool ignition::common::env(const std::string &_name, std::string &_value,
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::setenv(const std::string &_name, std::string &_value)
+bool ignition::common::setenv(const std::string &_name, const std::string &_value)
 {
 #ifdef _WIN32
   if (0 != _putenv_s(_name.c_str(), _value.c_str()))
@@ -384,7 +384,7 @@ bool ignition::common::setenv(const std::string &_name, std::string &_value)
     return false;
   }
 #else
-  if (0 != setenv(_name.c_str(), value.c_str(), true))
+  if (0 != ::setenv(_name.c_str(), _value.c_str(), true))
   {
     ignwarn << "Failed to set environment variable: "
             << "[" << _name << "]"
@@ -406,7 +406,7 @@ bool ignition::common::unsetenv(const std::string &_name)
     return false;
   }
 #else
-  if (0 != unset(_name))
+  if (0 != ::unsetenv(_name.c_str()))
   {
     ignwarn << "Failed to unset environment variable: "
             << "[" << _name << "]"
