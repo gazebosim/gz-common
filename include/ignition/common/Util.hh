@@ -215,11 +215,40 @@ namespace ignition
     #endif
 
     /// \brief Find the environment variable '_name' and return its value.
+    ///
+    /// \TODO(mjcarroll): Deprecate and remove in tick-tock.
+    ///
     /// \param[in] _name Name of the environment variable.
     /// \param[out] _value Value if the variable was found.
     /// \return True if the variable was found or false otherwise.
     bool IGNITION_COMMON_VISIBLE env(
         const std::string &_name, std::string &_value);
+
+    /// \brief Find the environment variable '_name' and return its value.
+    /// \param[in] _name Name of the environment variable.
+    /// \param[out] _value Value if the variable was found.
+    /// \param[in] _allowEmpty Allow set-but-empty variables.
+    ///           (Unsupported on Windows)
+    /// \return True if the variable was found or false otherwise.
+    bool IGNITION_COMMON_VISIBLE env(
+        const std::string &_name, std::string &_value,
+        bool _allowEmpty);
+
+    /// \brief Set the environment variable '_name'.
+    ///
+    /// Note that on Windows setting an empty string (_value=="")
+    /// is the equivalent of unsetting the variable.
+    ///
+    /// \param[in] _name Name of the environment variable.
+    /// \param[in] _value Value of the variable to be set.
+    /// \return True if the variable was set or false otherwise.
+    bool IGNITION_COMMON_VISIBLE setenv(
+        const std::string &_name, const std::string &_value);
+
+    /// \brief Unset the environment variable '_name'.
+    /// \param[in] _name Name of the environment variable.
+    /// \return True if the variable was unset or false otherwise.
+    bool IGNITION_COMMON_VISIBLE unsetenv(const std::string &_name);
 
     /// \brief Get a UUID
     /// \return A UUID string
