@@ -112,7 +112,8 @@ class ignition::common::ColladaExporterPrivate
   /// \param[in] _libraryVisualScenesXml Pointer to the library visual
   /// scenes XML instance
   public: void ExportVisualScenes(
-              tinyxml2::XMLElement *_libraryVisualScenesXml);
+              tinyxml2::XMLElement *_libraryVisualScenesXml,
+              std::vector<math::Matrix4d> &_submeshToMatrix);
 
   /// \brief Export scene element
   /// \param[in] _sceneXml Pointer to the scene XML instance
@@ -152,6 +153,14 @@ ColladaExporter::~ColladaExporter()
 //////////////////////////////////////////////////
 void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
     bool _exportTextures)
+{
+  std::vector<math::Matrix4d> empty;
+  this->ColladaExporter::Export(_mesh, _filename, _exportTextures, empty);
+}
+
+//////////////////////////////////////////////////
+void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
+    bool _exportTextures, std::vector<math::Matrix4d> &_submeshToMatrix)
 {
   this->dataPtr->mesh = _mesh;
   this->dataPtr->materialCount = this->dataPtr->mesh->MaterialCount();
@@ -223,7 +232,7 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
   // Library visual scenes element
   tinyxml2::XMLElement *libraryVisualScenesXml =
       xmlDoc.NewElement("library_visual_scenes");
-  this->dataPtr->ExportVisualScenes(libraryVisualScenesXml);
+  this->dataPtr->ExportVisualScenes(libraryVisualScenesXml, _submeshToMatrix);
   colladaXml->LinkEndChild(libraryVisualScenesXml);
 
   // Scene element
@@ -736,7 +745,8 @@ void ColladaExporterPrivate::ExportEffects(
 
 //////////////////////////////////////////////////
 void ColladaExporterPrivate::ExportVisualScenes(
-    tinyxml2::XMLElement *_libraryVisualScenesXml)
+    tinyxml2::XMLElement *_libraryVisualScenesXml,
+    std::vector<math::Matrix4d> &_submeshToMatrix)
 {
   tinyxml2::XMLElement *visualSceneXml =
     _libraryVisualScenesXml->GetDocument()->NewElement("visual_scene");
@@ -744,17 +754,36 @@ void ColladaExporterPrivate::ExportVisualScenes(
   visualSceneXml->SetAttribute("name", "Scene");
   visualSceneXml->SetAttribute("id", "Scene");
 
-  tinyxml2::XMLElement *nodeXml =
-    _libraryVisualScenesXml->GetDocument()->NewElement("node");
-  visualSceneXml->LinkEndChild(nodeXml);
-  nodeXml->SetAttribute("name", "node");
-  nodeXml->SetAttribute("id", "node");
+  tinyxml2::XMLElement *nodeXml;
 
   for (unsigned int i = 0; i < this->subMeshCount; ++i)
   {
-    char meshId[100], materialId[100], attributeValue[101];
+    char meshId[100], materialId[100], attributeValue[101], nodeId[106];
+
     snprintf(meshId, sizeof(meshId), "mesh_%u", i);
+    snprintf(nodeId, sizeof(nodeId), "node_%u", i);
     snprintf(materialId, sizeof(materialId), "material_%u", i);
+
+    nodeXml =
+      _libraryVisualScenesXml->GetDocument()->NewElement("node");
+    visualSceneXml->LinkEndChild(nodeXml);
+
+    nodeXml->SetAttribute("name", nodeId);
+    nodeXml->SetAttribute("id", nodeId);
+
+    if(i < _submeshToMatrix.size()){
+      std::ostringstream fillData;
+      fillData.precision(8);
+      fillData << std::fixed;
+
+      fillData << _submeshToMatrix.at(i);
+
+      tinyxml2::XMLElement *matrixXml =
+        _libraryVisualScenesXml->GetDocument()->NewElement("matrix");
+      nodeXml->LinkEndChild(matrixXml);
+      matrixXml->LinkEndChild(_libraryVisualScenesXml->GetDocument()->NewText(
+            fillData.str().c_str()));
+    }
 
     tinyxml2::XMLElement *instanceGeometryXml =
       _libraryVisualScenesXml->GetDocument()->NewElement("instance_geometry");
