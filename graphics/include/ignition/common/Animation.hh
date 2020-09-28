@@ -123,7 +123,7 @@ namespace ignition
       protected: bool loop;
 
       /// \brief array of keyframe type alias
-      protected: typedef std::vector<common::KeyFrame*> KeyFrame_V;
+      protected: typedef std::vector<common::KeyFrame *> KeyFrame_V;
 
       /// \brief array of key frames
       protected: KeyFrame_V keyFrames;
