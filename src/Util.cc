@@ -327,7 +327,8 @@ bool ignition::common::env(const std::string &_name, std::string &_value)
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::env(const std::string &_name, std::string &_value,
+bool ignition::common::env(const std::string &_name,
+                           std::string &_value,
                            bool _allowEmpty)
 {
   std::string v;
@@ -373,7 +374,8 @@ bool ignition::common::env(const std::string &_name, std::string &_value,
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::setenv(const std::string &_name, const std::string &_value)
+bool ignition::common::setenv(const std::string &_name,
+                              const std::string &_value)
 {
 #ifdef _WIN32
   if (0 != _putenv_s(_name.c_str(), _value.c_str()))
