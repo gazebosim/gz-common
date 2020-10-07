@@ -145,6 +145,7 @@ void Material::SetTextureImage(const std::string &_tex,
                                const std::string &_resourcePath)
 {
   this->dataPtr->texImage = _resourcePath + "/" + _tex;
+
   // If the texture image doesn't exist then try the next most likely path.
   if (!exists(this->dataPtr->texImage))
   {
