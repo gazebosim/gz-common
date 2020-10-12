@@ -366,6 +366,32 @@ TEST_F(ColladaLoader, LoadBoxWithMultipleGeoms)
 }
 
 /////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadBoxWithHierarchicalNodes)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      std::string(PROJECT_SOURCE_PATH) +
+      "/test/data/box_with_hierarchical_nodes.dae");
+
+  ASSERT_EQ(5u, mesh->SubMeshCount());
+
+  // node by itself
+  EXPECT_EQ("StaticCube", mesh->SubMeshByIndex(0).lock()->Name());
+
+  // nested node with no name so it takes the parent's name instead
+  EXPECT_EQ("StaticCubeParent", mesh->SubMeshByIndex(1).lock()->Name());
+
+  // parent node containing child node with no name
+  EXPECT_EQ("StaticCubeParent", mesh->SubMeshByIndex(2).lock()->Name());
+
+  // nested node with name
+  EXPECT_EQ("StaticCubeNested", mesh->SubMeshByIndex(3).lock()->Name());
+
+  // Parent of nested node with name
+  EXPECT_EQ("StaticCubeParent2", mesh->SubMeshByIndex(4).lock()->Name());
+}
+
+/////////////////////////////////////////////////
 TEST_F(ColladaLoader, MergeBoxWithDoubleSkeleton)
 {
   common::ColladaLoader loader;
