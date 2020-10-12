@@ -498,7 +498,7 @@ void ColladaLoaderPrivate::LoadNode(tinyxml2::XMLElement *_elem, Mesh *_mesh,
     {
       // if none of the ancestor node has a name, then create a custom name
       static int nodeCounter = 0;
-      nodeName = "unnanmed_submesh_" + std::to_string(nodeCounter++);
+      nodeName = "unnamed_submesh_" + std::to_string(nodeCounter++);
     }
     this->currentNodeName = nodeName;
   }
