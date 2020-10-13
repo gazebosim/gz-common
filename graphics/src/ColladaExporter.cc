@@ -516,13 +516,12 @@ int ColladaExporterPrivate::ExportImages(
       tinyxml2::XMLElement *initFromXml =
         _libraryImagesXml->GetDocument()->NewElement("init_from");
       initFromXml->LinkEndChild(_libraryImagesXml->GetDocument()->NewText(
-        imageString.substr(imageString.find("meshes/")+7).c_str()));
+        ("../materials/textures" + imageString.substr(imageString.rfind("/"))).c_str() ));
       imageXml->LinkEndChild(initFromXml);
 
       if (this->exportTextures)
       {
         createDirectories(this->path + this->filename + "/materials/textures");
-
         std::ifstream  src(imageString.c_str(), std::ios::binary);
         std::ofstream  dst((this->path + this->filename +
             "/materials/textures" + imageString.substr(
@@ -681,7 +680,7 @@ void ColladaExporterPrivate::ExportEffects(
     {
       tinyxml2::XMLElement *textureXml =
         _libraryEffectsXml->GetDocument()->NewElement("texture");
-      snprintf(id, sizeof(id), "image_%u", i);
+      snprintf(id, sizeof(id), "image_%u_sampler", i);
       textureXml->SetAttribute("texture", id);
       textureXml->SetAttribute("texcoord", "UVSET0");
       diffuseXml->LinkEndChild(textureXml);
