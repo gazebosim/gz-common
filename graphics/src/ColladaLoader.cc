@@ -477,6 +477,31 @@ void ColladaLoaderPrivate::LoadNode(tinyxml2::XMLElement *_elem, Mesh *_mesh,
   {
     this->currentNodeName = _elem->Attribute("name");
   }
+  else
+  {
+    // if node does not have a name, then append the mesh in this node
+    // to the first ancestor node that has a name, i.e. this mesh becomes
+    // part of the parent / ancestor mesh
+    tinyxml2::XMLElement *parent =
+        dynamic_cast<tinyxml2::XMLElement *>(_elem->Parent());
+    std::string nodeName;
+    while (parent && std::string(parent->Value()) == "node")
+    {
+      const char *name = parent->Attribute("name");
+      if (name)
+      {
+        nodeName = name;
+        break;
+      }
+    }
+    if (nodeName.empty())
+    {
+      // if none of the ancestor node has a name, then create a custom name
+      static int nodeCounter = 0;
+      nodeName = "unnamed_submesh_" + std::to_string(nodeCounter++);
+    }
+    this->currentNodeName = nodeName;
+  }
 
   if (_elem->FirstChildElement("instance_node"))
   {
