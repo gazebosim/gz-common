@@ -76,6 +76,9 @@ class ignition::common::VideoEncoderPrivate
   /// \brief Previous time when the frame is added.
   public: std::chrono::steady_clock::time_point timePrev;
 
+  /// \brief Time when the first frame is added.
+  public: std::chrono::steady_clock::time_point timeStart;
+
   /// \brief Number of frames in the video
   public: uint64_t frameCount = 0;
 
@@ -505,8 +508,12 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
   auto dt = _timestamp - this->dataPtr->timePrev;
 
   // Skip frames that arrive faster than the video's fps
-  if (dt < std::chrono::duration<double>(1.0/this->dataPtr->fps))
+  double period = 1.0/this->dataPtr->fps;
+  if (dt < std::chrono::duration<double>(period))
     return false;
+
+  if (this->dataPtr->frameCount == 0u)
+    this->dataPtr->timeStart = _timestamp;
 
   this->dataPtr->timePrev = _timestamp;
 
@@ -575,7 +582,14 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
       this->dataPtr->avOutFrame->data,
       this->dataPtr->avOutFrame->linesize);
 
-  this->dataPtr->avOutFrame->pts = this->dataPtr->frameCount++;
+  // compute frame number based on timestamp of current image
+  auto timeSinceStart = std::chrono::duration_cast<std::chrono::milliseconds>(
+      _timestamp - this->dataPtr->timeStart);
+  double durationSec = timeSinceStart.count() / 1000.0;
+  uint64_t frameNumber = durationSec / period;
+
+  this->dataPtr->avOutFrame->pts = frameNumber;
+  this->dataPtr->frameCount++;
 
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 40, 101)
   int gotOutput = 0;
