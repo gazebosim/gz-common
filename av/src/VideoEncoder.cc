@@ -128,7 +128,8 @@ bool VideoEncoder::Start(const std::string &_format,
   // This will be true if Stop has been called, but not reset. We will reset
   // automatically to prevent any errors.
   if (this->dataPtr->formatCtx || this->dataPtr->avInFrame ||
-      this->dataPtr->avOutFrame || this->dataPtr->swsCtx)
+      this->dataPtr->avOutFrame || this->dataPtr->swsCtx ||
+      this->dataPtr->frameCount > 0u)
   {
     this->Reset();
   }
