@@ -588,98 +588,105 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
   double durationSec = timeSinceStart.count() / 1000.0;
   uint64_t frameNumber = durationSec / period;
 
-  this->dataPtr->avOutFrame->pts = frameNumber;
-  this->dataPtr->frameCount++;
+  uint64_t frameDiff = frameNumber + 1 - this->dataPtr->frameCount;
+
+  // make sure we have continuous pts (frame number) otherwise some decoders
+  // may not be happy. So encode more (duplicate) frames until the current frame
+  // number
+  for (uint64_t i = 0u; i < frameDiff; ++i)
+  {
+    this->dataPtr->avOutFrame->pts = this->dataPtr->frameCount++;
 
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 40, 101)
-  int gotOutput = 0;
-  AVPacket avPacket;
-  av_init_packet(&avPacket);
-  avPacket.data = nullptr;
-  avPacket.size = 0;
+    int gotOutput = 0;
+    AVPacket avPacket;
+    av_init_packet(&avPacket);
+    avPacket.data = nullptr;
+    avPacket.size = 0;
 
-  int ret = avcodec_encode_video2(this->dataPtr->codecCtx, &avPacket,
-      this->dataPtr->avOutFrame, &gotOutput);
+    int ret = avcodec_encode_video2(this->dataPtr->codecCtx, &avPacket,
+        this->dataPtr->avOutFrame, &gotOutput);
 
-  if (ret >= 0 && gotOutput == 1)
-  {
-    avPacket.stream_index = this->dataPtr->videoStream->index;
-
-    // Scale timestamp appropriately.
-    if (avPacket.pts != static_cast<int64_t>(AV_NOPTS_VALUE))
+    if (ret >= 0 && gotOutput == 1)
     {
-      avPacket.pts = av_rescale_q(avPacket.pts,
-          this->dataPtr->codecCtx->time_base,
-          this->dataPtr->videoStream->time_base);
-    }
-
-    if (avPacket.dts != static_cast<int64_t>(AV_NOPTS_VALUE))
-    {
-      avPacket.dts = av_rescale_q(
-          avPacket.dts,
-          this->dataPtr->codecCtx->time_base,
-          this->dataPtr->videoStream->time_base);
-    }
-
-    // Write frame to disk
-    ret = av_interleaved_write_frame(this->dataPtr->formatCtx, &avPacket);
-
-    if (ret < 0)
-    {
-      ignerr << "Error writing frame" << std::endl;
-      return false;
-    }
-  }
-
-  av_free_packet(&avPacket);
-
-// #else for libavcodec version check
-#else
-
-  AVPacket *avPacket = av_packet_alloc();
-  av_init_packet(avPacket);
-
-  avPacket->data = nullptr;
-  avPacket->size = 0;
-
-  int ret = avcodec_send_frame(this->dataPtr->codecCtx,
-                               this->dataPtr->avOutFrame);
-
-  // This loop will retrieve and write available packets
-  while (ret >= 0)
-  {
-    ret = avcodec_receive_packet(this->dataPtr->codecCtx, avPacket);
-
-    // Potential performance improvement: Queue the packets and write in
-    // a separate thread.
-    if (ret >= 0)
-    {
-      avPacket->stream_index = this->dataPtr->videoStream->index;
+      avPacket.stream_index = this->dataPtr->videoStream->index;
 
       // Scale timestamp appropriately.
-      if (avPacket->pts != static_cast<int64_t>(AV_NOPTS_VALUE))
+      if (avPacket.pts != static_cast<int64_t>(AV_NOPTS_VALUE))
       {
-        avPacket->pts = av_rescale_q(avPacket->pts,
+        avPacket.pts = av_rescale_q(avPacket.pts,
             this->dataPtr->codecCtx->time_base,
             this->dataPtr->videoStream->time_base);
       }
 
-      if (avPacket->dts != static_cast<int64_t>(AV_NOPTS_VALUE))
+      if (avPacket.dts != static_cast<int64_t>(AV_NOPTS_VALUE))
       {
-        avPacket->dts = av_rescale_q(
-            avPacket->dts,
+        avPacket.dts = av_rescale_q(
+            avPacket.dts,
             this->dataPtr->codecCtx->time_base,
             this->dataPtr->videoStream->time_base);
       }
 
       // Write frame to disk
-      if (av_interleaved_write_frame(this->dataPtr->formatCtx, avPacket) < 0)
-        ignerr << "Error writing frame" << std::endl;
-    }
-  }
+      ret = av_interleaved_write_frame(this->dataPtr->formatCtx, &avPacket);
 
-  av_packet_unref(avPacket);
+      if (ret < 0)
+      {
+        ignerr << "Error writing frame" << std::endl;
+        return false;
+      }
+    }
+
+    av_free_packet(&avPacket);
+
+    // #else for libavcodec version check
+#else
+
+    AVPacket *avPacket = av_packet_alloc();
+    av_init_packet(avPacket);
+
+    avPacket->data = nullptr;
+    avPacket->size = 0;
+
+    int ret = avcodec_send_frame(this->dataPtr->codecCtx,
+                                 this->dataPtr->avOutFrame);
+
+    // This loop will retrieve and write available packets
+    while (ret >= 0)
+    {
+      ret = avcodec_receive_packet(this->dataPtr->codecCtx, avPacket);
+
+      // Potential performance improvement: Queue the packets and write in
+      // a separate thread.
+      if (ret >= 0)
+      {
+        avPacket->stream_index = this->dataPtr->videoStream->index;
+
+        // Scale timestamp appropriately.
+        if (avPacket->pts != static_cast<int64_t>(AV_NOPTS_VALUE))
+        {
+          avPacket->pts = av_rescale_q(avPacket->pts,
+              this->dataPtr->codecCtx->time_base,
+              this->dataPtr->videoStream->time_base);
+        }
+
+        if (avPacket->dts != static_cast<int64_t>(AV_NOPTS_VALUE))
+        {
+          avPacket->dts = av_rescale_q(
+              avPacket->dts,
+              this->dataPtr->codecCtx->time_base,
+              this->dataPtr->videoStream->time_base);
+        }
+
+        // Write frame to disk
+        if (av_interleaved_write_frame(this->dataPtr->formatCtx, avPacket) < 0)
+          ignerr << "Error writing frame" << std::endl;
+      }
+    }
+
+    av_packet_unref(avPacket);
 #endif
+  }
   return true;
 }
 
