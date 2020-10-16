@@ -16,6 +16,7 @@
 
 #include <gtest/gtest.h>
 
+#include "test_config.h"
 #include "ignition/common/Material.hh"
 #include "ignition/common/Pbr.hh"
 #include "test/util.hh"
@@ -35,8 +36,15 @@ TEST_F(MaterialTest, Material)
   EXPECT_STREQ("texture_image", mat.TextureImage().c_str());
 
   mat.SetTextureImage("texture_image", "/path");
-  EXPECT_STREQ("/path/../materials/textures/texture_image",
-               mat.TextureImage().c_str());
+  std::string texturePath = common::joinPaths("/path", "..",
+      "materials", "textures", "texture_image");
+  EXPECT_STREQ(texturePath.c_str(), mat.TextureImage().c_str());
+
+  texturePath = common::joinPaths(std::string(PROJECT_SOURCE_PATH), "test",
+      "data", "box.dae");
+
+  mat.SetTextureImage(texturePath, "bad_path");
+  EXPECT_STREQ(texturePath.c_str(), mat.TextureImage().c_str());
 
   mat.SetAmbient(math::Color(0.1f, 0.2f, 0.3f, 0.4f));
   EXPECT_TRUE(mat.Ambient() == math::Color(0.1f, 0.2f, 0.3f, 0.4f));
