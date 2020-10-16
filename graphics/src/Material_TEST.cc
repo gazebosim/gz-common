@@ -35,8 +35,8 @@ TEST_F(MaterialTest, Material)
   mat.SetTextureImage("texture_image");
   EXPECT_STREQ("texture_image", mat.TextureImage().c_str());
 
-  mat.SetTextureImage("texture_image", "path");
-  std::string texturePath = common::joinPaths("path", "..",
+  mat.SetTextureImage("texture_image", "/path");
+  std::string texturePath = common::joinPaths("/path", "..",
       "materials", "textures", "texture_image");
   EXPECT_STREQ(texturePath.c_str(), mat.TextureImage().c_str());
 
