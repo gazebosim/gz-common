@@ -51,7 +51,7 @@ namespace ignition
 
       public: virtual void Export(const Mesh *_mesh,
           const std::string &_filename, bool _exportTextures,
-          std::vector<math::Matrix4d> &_submeshToMatrix);
+          const std::vector<math::Matrix4d> &_submeshToMatrix);
 
       IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \internal

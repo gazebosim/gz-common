@@ -113,7 +113,7 @@ class ignition::common::ColladaExporterPrivate
   /// scenes XML instance
   public: void ExportVisualScenes(
               tinyxml2::XMLElement *_libraryVisualScenesXml,
-              std::vector<math::Matrix4d> &_submeshToMatrix);
+              const std::vector<math::Matrix4d> &_submeshToMatrix);
 
   /// \brief Export scene element
   /// \param[in] _sceneXml Pointer to the scene XML instance
@@ -155,13 +155,23 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
     bool _exportTextures)
 {
   std::vector<math::Matrix4d> empty;
-  this->ColladaExporter::Export(_mesh, _filename, _exportTextures, empty);
+  this->Export(_mesh, _filename, _exportTextures, empty);
 }
 
 //////////////////////////////////////////////////
 void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
-    bool _exportTextures, std::vector<math::Matrix4d> &_submeshToMatrix)
+    bool _exportTextures, const std::vector<math::Matrix4d> &_submeshToMatrix)
 {
+
+  if ( _submeshToMatrix.size() > 0 &&
+    (_mesh->SubMeshCount() != _submeshToMatrix.size()) )
+  {
+    ignerr << "_submeshToMatrix.size() : " << _mesh->SubMeshCount()
+        << " , must be equal to SubMeshCount() : " << _mesh->SubMeshCount()
+        << std::endl;
+    return;
+  }
+
   this->dataPtr->mesh = _mesh;
   this->dataPtr->materialCount = this->dataPtr->mesh->MaterialCount();
   this->dataPtr->subMeshCount = this->dataPtr->mesh->SubMeshCount();
@@ -173,14 +183,6 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
 
   this->dataPtr->path = unix_filename.substr(0, beginFilename);
   this->dataPtr->filename = unix_filename.substr(beginFilename);
-
-  if (this->dataPtr->materialCount != 0 &&
-      this->dataPtr->materialCount != this->dataPtr->subMeshCount)
-  {
-    ignwarn << "Material count [" << this->dataPtr->materialCount <<
-        "] different from submesh count [" <<
-        this->dataPtr->subMeshCount << "]\n";
-  }
 
   // Collada file
   tinyxml2::XMLDocument xmlDoc;
@@ -399,9 +401,12 @@ void ColladaExporterPrivate::ExportGeometries(
 {
   for (unsigned int i = 0; i < this->subMeshCount; ++i)
   {
+
+    int materialIndex = this->mesh->SubMeshByIndex(i).lock()->MaterialIndex();
+
     char meshId[100], materialId[100];
     snprintf(meshId, sizeof(meshId), "mesh_%u", i);
-    snprintf(materialId, sizeof(materialId), "material_%u", i);
+    snprintf(materialId, sizeof(materialId), "material_%u", materialIndex);
 
     tinyxml2::XMLElement *geometryXml =
       _libraryGeometriesXml->GetDocument()->NewElement("geometry");
@@ -745,7 +750,7 @@ void ColladaExporterPrivate::ExportEffects(
 //////////////////////////////////////////////////
 void ColladaExporterPrivate::ExportVisualScenes(
     tinyxml2::XMLElement *_libraryVisualScenesXml,
-    std::vector<math::Matrix4d> &_submeshToMatrix)
+    const std::vector<math::Matrix4d> &_submeshToMatrix)
 {
   tinyxml2::XMLElement *visualSceneXml =
     _libraryVisualScenesXml->GetDocument()->NewElement("visual_scene");
@@ -761,7 +766,6 @@ void ColladaExporterPrivate::ExportVisualScenes(
 
     snprintf(meshId, sizeof(meshId), "mesh_%u", i);
     snprintf(nodeId, sizeof(nodeId), "node_%u", i);
-    snprintf(materialId, sizeof(materialId), "material_%u", i);
 
     nodeXml =
       _libraryVisualScenesXml->GetDocument()->NewElement("node");
@@ -790,11 +794,16 @@ void ColladaExporterPrivate::ExportVisualScenes(
     snprintf(attributeValue, sizeof(attributeValue), "#%s", meshId);
     instanceGeometryXml->SetAttribute("url", attributeValue);
 
-    const ignition::common::MaterialPtr material =
-      this->mesh->MaterialByIndex(i);
+    int materialIndex = this->mesh->SubMeshByIndex(i).lock()->MaterialIndex();
 
-    if (material)
+    if (materialIndex != -1 )
     {
+
+      const ignition::common::MaterialPtr material =
+        this->mesh->MaterialByIndex(materialIndex);
+
+      snprintf(materialId, sizeof(materialId), "material_%u", materialIndex);
+
       tinyxml2::XMLElement *bindMaterialXml =
         _libraryVisualScenesXml->GetDocument()->NewElement("bind_material");
       instanceGeometryXml->LinkEndChild(bindMaterialXml);
