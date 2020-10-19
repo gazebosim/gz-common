@@ -24,6 +24,7 @@
 #include <cstdio>
 
 #include "ignition/common/Util.hh"
+#include "ignition/common/StringUtils.hh"
 #include "ignition/common/SystemPaths.hh"
 
 #ifdef _WIN32
@@ -32,24 +33,19 @@
 
 using namespace ignition;
 
+const char kPluginPath[] = "IGN_PLUGIN_PATH";
+const char kFilePath[] = "IGN_FILE_PATH";
+
 class SystemPathsFixture : public ::testing::Test
 {
   // Documentation inherited
   public: virtual void SetUp()
     {
-      this->backupPluginPath = "IGN_PLUGIN_PATH=";
+      common::env(kPluginPath, this->backupPluginPath);
+      common::unsetenv(kPluginPath);
 
-      if (getenv("IGN_PLUGIN_PATH"))
-        this->backupPluginPath += getenv("IGN_PLUGIN_PATH");
-
-      putenv(const_cast<char*>("IGN_PLUGIN_PATH="));
-
-      this->backupFilePath = "IGN_FILE_PATH=";
-
-      if (getenv("IGN_FILE_PATH"))
-        this->backupFilePath += getenv("IGN_FILE_PATH");
-
-      putenv(const_cast<char*>("IGN_FILE_PATH="));
+      common::env(kFilePath, this->backupFilePath);
+      common::unsetenv(kFilePath);
 
 #ifdef _WIN32
       this->filesystemRoot = "C:\\";
@@ -61,8 +57,8 @@ class SystemPathsFixture : public ::testing::Test
   // Documentation inherited
   public: virtual void TearDown()
     {
-      putenv(const_cast<char*>(this->backupPluginPath.c_str()));
-      putenv(const_cast<char*>(this->backupFilePath.c_str()));
+      common::setenv(kPluginPath, this->backupPluginPath);
+      common::setenv(kFilePath, this->backupFilePath);
     }
 
   /// \brief Backup of plugin paths to be restored after the test
@@ -75,21 +71,18 @@ class SystemPathsFixture : public ::testing::Test
   public: std::string filesystemRoot;
 };
 
+std::string SystemPathsJoin(const std::vector<std::string> &_paths)
+{
+  return common::Join(_paths, common::SystemPaths::Delimiter());
+}
+
 /////////////////////////////////////////////////
 TEST_F(SystemPathsFixture, SystemPaths)
 {
+  common::setenv(kPluginPath,
+      SystemPathsJoin({"/tmp/plugin", "/test/plugin/now"}));
+
   common::SystemPaths paths;
-  std::string env_str("IGN_PLUGIN_PATH=/tmp/plugin");
-  env_str += ignition::common::SystemPaths::Delimiter();
-  env_str += "/test/plugin/now";
-
-  // The char* passed to putenv will continue to be stored after the lifetime
-  // of this function, so we should not pass it a pointer which has an automatic
-  // lifetime.
-  static char env[1024];
-  snprintf(env, sizeof(env), "%s", env_str.c_str());
-  putenv(env);
-
   const std::list<std::string> pathList3 = paths.PluginPaths();
   EXPECT_EQ(static_cast<unsigned int>(2), pathList3.size());
   EXPECT_STREQ("/tmp/plugin/", pathList3.front().c_str());
@@ -103,19 +96,12 @@ TEST_F(SystemPathsFixture, SystemPaths)
 /////////////////////////////////////////////////
 TEST_F(SystemPathsFixture, FileSystemPaths)
 {
-  std::string env_str("IGN_FILE_PATH=/tmp/file");
-  env_str += ignition::common::SystemPaths::Delimiter();
-  env_str += "/test/file/now";
-
-  // The char* passed to putenv will continue to be stored after the lifetime
-  // of this function, so we should not pass it a pointer which has an automatic
-  // lifetime.
-  static char env[1024];
-  snprintf(env, sizeof(env), "%s", env_str.c_str());
-  putenv(env);
+  std::vector<std::string> filePaths {"/tmp/file",
+                                      "/test/file/now"};
+  common::setenv(kFilePath, SystemPathsJoin(filePaths));
 
   common::SystemPaths paths;
-  EXPECT_EQ("IGN_FILE_PATH", paths.FilePathEnv());
+  EXPECT_EQ(kFilePath, paths.FilePathEnv());
   const std::list<std::string> pathList3 = paths.FilePaths();
   EXPECT_EQ(static_cast<unsigned int>(2), pathList3.size());
   EXPECT_STREQ("/tmp/file/", pathList3.front().c_str());
@@ -136,12 +122,10 @@ TEST_F(SystemPathsFixture, FileSystemPaths)
 
   EXPECT_EQ("", paths.FindFile("no_such_file"));
   EXPECT_EQ("", paths.FindFile("test_f1"));
-  env_str += ignition::common::SystemPaths::Delimiter();
-  env_str += "test_dir1";
 
-  snprintf(env, sizeof(env), "%s", env_str.c_str());
-  putenv(env);
-  paths.SetFilePathEnv("IGN_FILE_PATH");
+  filePaths.push_back("test_dir1");
+  common::setenv(kFilePath, SystemPathsJoin(filePaths));
+  paths.SetFilePathEnv(kFilePath);
   EXPECT_EQ(file1, paths.FindFile("test_f1")) << paths.FindFile("test_f1");
   EXPECT_EQ(file1, paths.FindFile("model://test_f1"));
 }
@@ -285,19 +269,14 @@ TEST_F(SystemPathsFixture, FindFileURI)
   EXPECT_EQ(file2, sp.FindFileURI("osrf://test_f2"));
 
   // URI + env var
-  static char env[1024];
-  snprintf(env, sizeof(env), "%s", ("IGN_FILE_PATH=" + dir1).c_str());
-  putenv(env);
-
-  sp.SetFilePathEnv("IGN_FILE_PATH");
-  EXPECT_EQ("IGN_FILE_PATH", sp.FilePathEnv());
+  common::setenv(kFilePath, dir1);
+  sp.SetFilePathEnv(kFilePath);
+  EXPECT_EQ(kFilePath, sp.FilePathEnv());
   EXPECT_EQ(file1, sp.FindFileURI("anything://test_f1"));
   EXPECT_NE(file2, sp.FindFileURI("anything://test_f2"));
 
   std::string newEnv{"IGN_NEW_FILE_PATH"};
-  snprintf(env, sizeof(env), "%s", (newEnv + "=" + dir2).c_str());
-  putenv(env);
-
+  common::setenv(newEnv, dir2);
   sp.SetFilePathEnv(newEnv);
   EXPECT_EQ(newEnv, sp.FilePathEnv());
   EXPECT_NE(file1, sp.FindFileURI("anything://test_f1"));
@@ -422,20 +401,10 @@ TEST_F(SystemPathsFixture, NormalizeDirectoryPath)
 //////////////////////////////////////////////////
 TEST_F(SystemPathsFixture, PathsFromEnv)
 {
-  std::string env_str = "IGN_PLUGIN_PATH=/tmp/plugin";
-  env_str += ignition::common::SystemPaths::Delimiter();
-  env_str += "/test/plugin/now/";
-  env_str += ignition::common::SystemPaths::Delimiter();
-  env_str += "/tmp/plugin";
+  common::setenv(kPluginPath,
+      SystemPathsJoin({"/tmp/plugin", "/test/plugin/now/", "/tmp/plugin"}));
 
-  // The char* passed to putenv will continue to be stored after the lifetime
-  // of this function, so we should not pass it a pointer which has an automatic
-  // lifetime.
-  static char env[1024];
-  snprintf(env, sizeof(env), "%s", env_str.c_str());
-  putenv(env);
-
-  auto paths = ignition::common::SystemPaths::PathsFromEnv("IGN_PLUGIN_PATH");
+  auto paths = ignition::common::SystemPaths::PathsFromEnv(kPluginPath);
 
   EXPECT_EQ(paths.size(), 2u);
 
