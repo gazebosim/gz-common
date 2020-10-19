@@ -144,16 +144,23 @@ void Material::SetTextureImage(const std::string &_tex)
 void Material::SetTextureImage(const std::string &_tex,
                                const std::string &_resourcePath)
 {
-  this->dataPtr->texImage = _resourcePath + "/" + _tex;
+  this->dataPtr->texImage = common::joinPaths(_resourcePath, _tex);
 
   // If the texture image doesn't exist then try the next most likely path.
   if (!exists(this->dataPtr->texImage))
   {
-    this->dataPtr->texImage = _resourcePath + "/../materials/textures/" + _tex;
+    // Try to resolve this texture image to a locally cached path in a
+    // separate directory
+    this->dataPtr->texImage = common::findFile(_tex);
     if (!exists(this->dataPtr->texImage))
     {
-      ignerr << "Unable to find texture[" << _tex << "] in path["
-            << _resourcePath << "]\n";
+      this->dataPtr->texImage = common::joinPaths(_resourcePath, "..",
+          "materials", "textures", _tex);
+      if (!exists(this->dataPtr->texImage))
+      {
+        ignerr << "Unable to find texture [" << _tex << "] as a locally"
+              " cached texture or in path ["<< _resourcePath << "]\n";
+      }
     }
   }
 }
