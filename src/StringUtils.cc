@@ -39,6 +39,30 @@ namespace ignition
     }
 
     //////////////////////////////////////////////////
+    std::string Join(const std::vector<std::string> &_orig,
+                     const std::string &_delim)
+    {
+      std::string ret = "";
+      for (size_t ii = 0; ii < _orig.size(); ++ii)
+      {
+        if (_orig[ii].empty())
+          continue;
+
+        ret += _orig[ii];
+        if (ii < _orig.size() - 1)
+        {
+          ret += _delim;
+        }
+      }
+      return ret;
+    }
+    //////////////////////////////////////////////////
+    std::string Join(const std::vector<std::string> &_orig, char _delim)
+    {
+      return Join(_orig, std::string(1, _delim));
+    }
+
+    //////////////////////////////////////////////////
     bool StartsWith(const std::string &_s1, const std::string &_s2)
     {
       if (_s1.size() >= _s2.size())
