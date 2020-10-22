@@ -14,6 +14,33 @@
 
 ## Ignition Common 3.X.X
 
+## Ignition Common 3.7.0 (2020-10-21)
+
+1. Miscellaneous Cleanups
+    * Feature: Join function for combining strings with a delimiter
+    * [Pull Request 107](https://github.com/ignitionrobotics/ign-common/pull/107)
+
+1. Improve fork experience
+    * [Pull Request 103](https://github.com/ignitionrobotics/ign-common/pull/103)
+
+1. Add Console example
+    * [Pull Request 106](https://github.com/ignitionrobotics/ign-common/pull/106)
+
+1. Support fuel URLs for textures
+    * [Pull Request 102](https://github.com/ignitionrobotics/ign-common/pull/102)
+    
+1. Fix loading dae file with hierarchical node that does not have a name
+    * [Pull Request 101](https://github.com/ignitionrobotics/ign-common/pull/101)
+    
+1. Fix more Animation memory leaks
+    * [Pull Request 98](https://github.com/ignitionrobotics/ign-common/pull/98)
+
+1. Fix env behavior to return true on empty vars
+    * Feature: Add setenv for setting environment variables
+    * Feature: Add unsetenv for clearing environment variables
+    * Feature: Add alternative env implementation that respects empty variables
+    * [Pull Request 97](https://github.com/ignitionrobotics/ign-common/pull/97)
+
 ## Ignition Common 3.6.1 (2020-09-16)
 
 1. Fix hierarchical submesh processing in the ColladaLoader.
