@@ -17,41 +17,47 @@
 
 #include "ignition/common/VideoEncoder.hh"
 #include "ignition/common/Video.hh"
-#include "ignition/common/ffmpeg_inc.hh"
 #include "test_config.h"
 #include "test/util.hh"
 
 using namespace ignition;
 using namespace common;
 
+const unsigned int kSize = 10;
+const unsigned char *kFrame = new unsigned char[kSize*kSize];
+const std::string kPath = common::cwd() + "/TMP_RECORDING.mp4";
+
+// set to 720ms because video duration missing additional 18 frames
+//    which may be due to how video encoding works
+const int kTol = 720;
+
+void durationTest(VideoEncoder &_vidEncoder, Video &_video,
+                  const int &_fps, const int &_seconds)
+{
+  _vidEncoder.Start("mp4", "", kSize, kSize, _fps, 0);
+
+  int frameCount = 0;
+  while (frameCount != _fps*_seconds)
+  {
+    if (_vidEncoder.AddFrame(kFrame, kSize, kSize))
+      ++frameCount;
+  }
+
+  _vidEncoder.Stop();
+  _video.Load(kPath);
+
+  EXPECT_NEAR(std::chrono::duration_cast<std::chrono::milliseconds>(_video.Duration()).count(),
+              _seconds*1000,
+              kTol);
+}
+
 TEST(EncoderTimingTest, Duration)
 {
   VideoEncoder vidEncoder;
-  vidEncoder.Start();
-
-  unsigned int size = 10;
-  unsigned char *frame = new unsigned char[size*size];
-
-  // int milliSec = (1.0/VIDEO_ENCODER_FPS_DEFAULT)*1000; // ms btwn frames
-  // for (int i = 0; i < VIDEO_ENCODER_FPS_DEFAULT; ++i)
-  // {
-  //   ASSERT_TRUE(vidEncoder.AddFrame(frame, size, size));
-  //   std::this_thread::sleep_for(std::chrono::milliseconds(milliSec));
-  // }
-
-  int frame_count = 0;
-  while (frame_count != VIDEO_ENCODER_FPS_DEFAULT)
-  {
-    if (vidEncoder.AddFrame(frame, size, size))
-      ++frame_count;
-  }
-
-  vidEncoder.Stop();
-
   Video video;
-  std::string path = common::cwd() + "/TMP_RECORDING.mp4";
-  video.Load(path);
 
-  EXPECT_EQ(video.Duration()*1.0/AV_TIME_BASE, 1.0);
-  // EXPECT_EQ(video.Duration(), AV_TIME_BASE);
+  durationTest(vidEncoder, video, 50, 1);
+  durationTest(vidEncoder, video, 30, 5);
+  durationTest(vidEncoder, video, 60, 10);
+  durationTest(vidEncoder, video, 25, 20);
 }

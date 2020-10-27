@@ -58,8 +58,9 @@ namespace ignition
       /// \return the height
       public: int Height() const;
 
-      // TODO: doc
-      public: int64_t Duration() const;
+      // \brief Get the duration of the video where 1000000 is AV_TIME_BASE fractional seconds
+      // \return the duration
+      public: std::chrono::duration<int64_t, std::ratio<1, 1000000>> Duration() const;
 
       /// \brief Get the next frame of the video.
       /// \param[out] _img Image in which the frame is stored
