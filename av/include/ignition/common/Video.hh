@@ -58,6 +58,9 @@ namespace ignition
       /// \return the height
       public: int Height() const;
 
+      // TODO: doc
+      public: int64_t Duration() const;
+
       /// \brief Get the next frame of the video.
       /// \param[out] _img Image in which the frame is stored
       /// \return  false on error
