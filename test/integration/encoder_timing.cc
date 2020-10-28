@@ -25,7 +25,6 @@ using namespace common;
 
 const unsigned int kSize = 10;
 const unsigned char *kFrame = new unsigned char[kSize*kSize];
-const std::string kPath = common::cwd() + "/TMP_RECORDING.mp4";
 
 // set to 720ms because video duration missing additional 18 frames
 //    which may be due to how video encoding works
@@ -44,9 +43,10 @@ void durationTest(VideoEncoder &_vidEncoder, Video &_video,
   }
 
   _vidEncoder.Stop();
-  _video.Load(kPath);
+  _video.Load(common::cwd() + "/TMP_RECORDING.mp4");
 
-  EXPECT_NEAR(std::chrono::duration_cast<std::chrono::milliseconds>(_video.Duration()).count(),
+  EXPECT_NEAR(std::chrono::duration_cast<std::chrono::milliseconds>(
+                _video.Duration()).count(),
               _seconds*1000,
               kTol);
 }
