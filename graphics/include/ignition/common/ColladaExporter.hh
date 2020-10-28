@@ -49,7 +49,7 @@ namespace ignition
       public: virtual void Export(const Mesh *_mesh,
           const std::string &_filename, bool _exportTextures = false);
 
-      public: virtual void Export(const Mesh *_mesh,
+      public: void Export(const Mesh *_mesh,
           const std::string &_filename, bool _exportTextures,
           const std::vector<math::Matrix4d> &_submeshToMatrix);
 
