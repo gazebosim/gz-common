@@ -400,7 +400,8 @@ void ColladaExporterPrivate::ExportGeometries(
 {
   for (unsigned int i = 0; i < this->subMeshCount; ++i)
   {
-    unsigned int materialIndex = this->mesh->SubMeshByIndex(i).lock()->MaterialIndex();
+    unsigned int materialIndex =
+      this->mesh->SubMeshByIndex(i).lock()->MaterialIndex();
 
     char meshId[100], materialId[100];
     snprintf(meshId, sizeof(meshId), "mesh_%u", i);
@@ -792,7 +793,8 @@ void ColladaExporterPrivate::ExportVisualScenes(
     snprintf(attributeValue, sizeof(attributeValue), "#%s", meshId);
     instanceGeometryXml->SetAttribute("url", attributeValue);
 
-    unsigned int materialIndex = this->mesh->SubMeshByIndex(i).lock()->MaterialIndex();
+    unsigned int materialIndex =
+      this->mesh->SubMeshByIndex(i).lock()->MaterialIndex();
 
     if (materialIndex != -1 )
     {
