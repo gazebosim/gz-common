@@ -18,10 +18,11 @@
 #include "tinyxml2.h"
 
 #include "test_config.h"
-#include "ignition/common/Mesh.hh"
-#include "ignition/common/SubMesh.hh"
 #include "ignition/common/ColladaLoader.hh"
 #include "ignition/common/ColladaExporter.hh"
+#include "ignition/common/Filesystem.hh"
+#include "ignition/common/Mesh.hh"
+#include "ignition/common/SubMesh.hh"
 #include "test/util.hh"
 
 #ifdef _WIN32
@@ -205,8 +206,8 @@ TEST_F(ColladaExporter, ExportMeshWithSubmeshes)
       boxFilenameIn);
 
   const common::Mesh *drillMesh = loader.Load(
-      std::string(PROJECT_SOURCE_PATH) +
-      "/test/data/cordless_drill/meshes/cordless_drill.dae");
+      common::joinPaths(PROJECT_SOURCE_PATH,
+      "/test/data/cordless_drill/meshes/cordless_drill.dae"));
 
   common::Mesh outMesh;
   std::weak_ptr<common::SubMesh> subm;
@@ -229,16 +230,17 @@ TEST_F(ColladaExporter, ExportMeshWithSubmeshes)
   matrix = math::Matrix4d(localPose);
   subMeshMatrix.push_back(matrix);
 
-  std::string pathOut = common::cwd();
-  common::createDirectories(pathOut + "/" + "tmp");
+  std::string pathOut = common::joinPaths(common::cwd(), "tmp");
+  common::createDirectories(pathOut);
 
   common::ColladaExporter exporter;
-  exporter.Export(&outMesh, pathOut + "/tmp/mesh_with_submeshes", true, subMeshMatrix);
+  exporter.Export(&outMesh,
+      common::joinPaths(pathOut, "mesh_with_submeshes"), true, subMeshMatrix);
 
   // Check .dae file
   tinyxml2::XMLDocument xmlDoc;
-  std::string filename = pathOut +
-     "/tmp/mesh_with_submeshes/meshes/mesh_with_submeshes.dae";
+  std::string filename = common::joinPaths(pathOut,
+     "mesh_with_submeshes/meshes/mesh_with_submeshes.dae");
 
   EXPECT_EQ(xmlDoc.LoadFile(filename.c_str()), tinyxml2::XML_SUCCESS);
 
@@ -290,8 +292,8 @@ TEST_F(ColladaExporter, ExportMeshWithSubmeshes)
    }
 
   // Reload mesh and compare
-  const common::Mesh *meshReloaded = loader.Load(pathOut +
-       "/tmp/mesh_with_submeshes/meshes/mesh_with_submeshes.dae");
+  const common::Mesh *meshReloaded = loader.Load(common::joinPaths(pathOut,
+       "mesh_with_submeshes/meshes/mesh_with_submeshes.dae"));
 
   EXPECT_EQ(outMesh.Name(), meshReloaded->Name());
   EXPECT_EQ(outMesh.SubMeshCount(), meshReloaded->SubMeshCount());
@@ -304,7 +306,7 @@ TEST_F(ColladaExporter, ExportMeshWithSubmeshes)
        meshReloaded->TexCoordCount());
 
   // Remove temp directory
-  common::removeAll(pathOut + "/tmp");
+  common::removeAll(pathOut);
 }
 
 /////////////////////////////////////////////////
