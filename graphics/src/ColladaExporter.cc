@@ -400,7 +400,7 @@ void ColladaExporterPrivate::ExportGeometries(
 {
   for (unsigned int i = 0; i < this->subMeshCount; ++i)
   {
-    int materialIndex = this->mesh->SubMeshByIndex(i).lock()->MaterialIndex();
+    unsigned int materialIndex = this->mesh->SubMeshByIndex(i).lock()->MaterialIndex();
 
     char meshId[100], materialId[100];
     snprintf(meshId, sizeof(meshId), "mesh_%u", i);
@@ -519,8 +519,8 @@ int ColladaExporterPrivate::ExportImages(
       tinyxml2::XMLElement *initFromXml =
         _libraryImagesXml->GetDocument()->NewElement("init_from");
       initFromXml->LinkEndChild(_libraryImagesXml->GetDocument()->NewText(
-        ("../materials/textures" + imageString.substr(imageString.rfind("/"))
-      ).c_str() ));
+        ("../materials/textures" + imageString.substr(
+          imageString.rfind("/"))).c_str()));
       imageXml->LinkEndChild(initFromXml);
 
       if (this->exportTextures)
@@ -757,16 +757,14 @@ void ColladaExporterPrivate::ExportVisualScenes(
   visualSceneXml->SetAttribute("name", "Scene");
   visualSceneXml->SetAttribute("id", "Scene");
 
-  tinyxml2::XMLElement *nodeXml;
-
   for (unsigned int i = 0; i < this->subMeshCount; ++i)
   {
-    char meshId[100], materialId[100], attributeValue[101], nodeId[106];
+    char meshId[100], attributeValue[101], nodeId[106];
 
     snprintf(meshId, sizeof(meshId), "mesh_%u", i);
     snprintf(nodeId, sizeof(nodeId), "node_%u", i);
 
-    nodeXml =
+    tinyxml2::XMLElement *nodeXml =
       _libraryVisualScenesXml->GetDocument()->NewElement("node");
     visualSceneXml->LinkEndChild(nodeXml);
 
@@ -794,10 +792,11 @@ void ColladaExporterPrivate::ExportVisualScenes(
     snprintf(attributeValue, sizeof(attributeValue), "#%s", meshId);
     instanceGeometryXml->SetAttribute("url", attributeValue);
 
-    int materialIndex = this->mesh->SubMeshByIndex(i).lock()->MaterialIndex();
+    unsigned int materialIndex = this->mesh->SubMeshByIndex(i).lock()->MaterialIndex();
 
     if (materialIndex != -1 )
     {
+      char materialId[100];
       const ignition::common::MaterialPtr material =
         this->mesh->MaterialByIndex(materialIndex);
 

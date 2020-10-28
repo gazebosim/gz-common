@@ -291,7 +291,7 @@ TEST_F(ColladaExporter, ExportMeshWithSubmeshes)
     EXPECT_EQ(matrixStr, fillData.str());
 
     nodeXml = nodeXml->NextSiblingElement("node");
- }
+  }
 
   // Reload mesh and compare
   const common::Mesh *meshReloaded = loader.Load(common::joinPaths(pathOut,
