@@ -291,7 +291,8 @@ int Video::Height() const
 }
 
 /////////////////////////////////////////////////
-Video::Length Video::Duration() const
+std::chrono::steady_clock::duration Video::Duration() const
 {
-  return Video::Length(this->dataPtr->formatCtx->duration);
+  return std::chrono::duration<int64_t, std::ratio<1, AV_TIME_BASE>>(
+      this->dataPtr->formatCtx->duration);
 }
