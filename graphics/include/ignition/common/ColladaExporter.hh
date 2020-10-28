@@ -19,6 +19,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <ignition/common/MeshExporter.hh>
 #include <ignition/common/graphics/Export.hh>

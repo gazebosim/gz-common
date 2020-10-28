@@ -162,7 +162,6 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
 void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
     bool _exportTextures, const std::vector<math::Matrix4d> &_submeshToMatrix)
 {
-
   if ( _submeshToMatrix.size() > 0 &&
     (_mesh->SubMeshCount() != _submeshToMatrix.size()) )
   {
@@ -401,7 +400,6 @@ void ColladaExporterPrivate::ExportGeometries(
 {
   for (unsigned int i = 0; i < this->subMeshCount; ++i)
   {
-
     int materialIndex = this->mesh->SubMeshByIndex(i).lock()->MaterialIndex();
 
     char meshId[100], materialId[100];
@@ -521,7 +519,8 @@ int ColladaExporterPrivate::ExportImages(
       tinyxml2::XMLElement *initFromXml =
         _libraryImagesXml->GetDocument()->NewElement("init_from");
       initFromXml->LinkEndChild(_libraryImagesXml->GetDocument()->NewText(
-        ("../materials/textures" + imageString.substr(imageString.rfind("/"))).c_str() ));
+        ("../materials/textures" + imageString.substr(imageString.rfind("/"))
+      ).c_str() ));
       imageXml->LinkEndChild(initFromXml);
 
       if (this->exportTextures)
@@ -774,7 +773,8 @@ void ColladaExporterPrivate::ExportVisualScenes(
     nodeXml->SetAttribute("name", nodeId);
     nodeXml->SetAttribute("id", nodeId);
 
-    if(i < _submeshToMatrix.size()){
+    if (i < _submeshToMatrix.size())
+    {
       std::ostringstream fillData;
       fillData.precision(8);
       fillData << std::fixed;
@@ -798,7 +798,6 @@ void ColladaExporterPrivate::ExportVisualScenes(
 
     if (materialIndex != -1 )
     {
-
       const ignition::common::MaterialPtr material =
         this->mesh->MaterialByIndex(materialIndex);
 

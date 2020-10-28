@@ -197,7 +197,6 @@ TEST_F(ColladaExporter, ExportCordlessDrill)
 /////////////////////////////////////////////////
 TEST_F(ColladaExporter, ExportMeshWithSubmeshes)
 {
-
   std::string boxFilenameIn = std::string(PROJECT_SOURCE_PATH) +
       "/test/data/box.dae";
 
@@ -214,7 +213,9 @@ TEST_F(ColladaExporter, ExportMeshWithSubmeshes)
   std::vector<math::Matrix4d> subMeshMatrix;
   math::Pose3d localPose = math::Pose3d::Zero;
 
-  int i = outMesh.AddMaterial(boxMesh->MaterialByIndex(boxMesh->SubMeshByIndex(0).lock()->MaterialIndex()));
+  int i = outMesh.AddMaterial(
+    boxMesh->MaterialByIndex(
+      boxMesh->SubMeshByIndex(0).lock()->MaterialIndex()));
   subm = outMesh.AddSubMesh(*boxMesh->SubMeshByIndex(0).lock().get());
   subm.lock()->SetMaterialIndex(i);
 
@@ -222,7 +223,9 @@ TEST_F(ColladaExporter, ExportMeshWithSubmeshes)
   math::Matrix4d matrix(localPose);
   subMeshMatrix.push_back(matrix);
 
-  i = outMesh.AddMaterial(drillMesh->MaterialByIndex(drillMesh->SubMeshByIndex(0).lock()->MaterialIndex()));
+  i = outMesh.AddMaterial(
+    drillMesh->MaterialByIndex(
+      drillMesh->SubMeshByIndex(0).lock()->MaterialIndex()));
   subm = outMesh.AddSubMesh(*drillMesh->SubMeshByIndex(0).lock().get());
   subm.lock()->SetMaterialIndex(i);
 
@@ -246,50 +249,49 @@ TEST_F(ColladaExporter, ExportMeshWithSubmeshes)
 
   ASSERT_TRUE(xmlDoc.FirstChildElement("COLLADA") != nullptr);
   ASSERT_TRUE(xmlDoc.FirstChildElement(
-         "COLLADA")->FirstChildElement("library_geometries") != nullptr);
+      "COLLADA")->FirstChildElement("library_geometries") != nullptr);
 
   tinyxml2::XMLElement *geometryXml = xmlDoc.FirstChildElement("COLLADA")
-       ->FirstChildElement("library_geometries")
-       ->FirstChildElement("geometry");
-   ASSERT_TRUE(geometryXml != nullptr);
+      ->FirstChildElement("library_geometries")
+      ->FirstChildElement("geometry");
+  ASSERT_TRUE(geometryXml != nullptr);
 
   for (unsigned int j = 0; j < outMesh.SubMeshCount(); ++j)
   {
-   unsigned int countMeshInt =
-     outMesh.SubMeshByIndex(j).lock()->VertexCount()*3;
-     char countMesh[100];
-     snprintf(countMesh, sizeof(countMesh), "%u", countMeshInt);
+    unsigned int countMeshInt =
+      outMesh.SubMeshByIndex(j).lock()->VertexCount()*3;
+    char countMesh[100];
+    snprintf(countMesh, sizeof(countMesh), "%u", countMeshInt);
 
-     const char *countDae = geometryXml
-         ->FirstChildElement("mesh")
-         ->FirstChildElement("source")
-         ->FirstChildElement("float_array")
-         ->Attribute("count");
+    const char *countDae = geometryXml
+       ->FirstChildElement("mesh")
+       ->FirstChildElement("source")
+       ->FirstChildElement("float_array")
+       ->Attribute("count");
 
-     EXPECT_STREQ(countDae, countMesh);
+    EXPECT_STREQ(countDae, countMesh);
 
-     geometryXml = geometryXml->NextSiblingElement("geometry");
+    geometryXml = geometryXml->NextSiblingElement("geometry");
   }
 
   tinyxml2::XMLElement *nodeXml = xmlDoc.FirstChildElement("COLLADA")
-       ->FirstChildElement("library_visual_scenes")
-       ->FirstChildElement("visual_scene")
-       ->FirstChildElement("node");
-   ASSERT_TRUE(nodeXml != nullptr);
+      ->FirstChildElement("library_visual_scenes")
+      ->FirstChildElement("visual_scene")
+      ->FirstChildElement("node");
+  ASSERT_TRUE(nodeXml != nullptr);
 
-   for (unsigned int j = 0; j < outMesh.SubMeshCount(); ++j)
-   {
-
-     std::ostringstream fillData;
-     fillData.precision(8);
-     fillData << std::fixed;
-     fillData << subMeshMatrix.at(j);
+  for (unsigned int j = 0; j < outMesh.SubMeshCount(); ++j)
+  {
+    std::ostringstream fillData;
+    fillData.precision(8);
+    fillData << std::fixed;
+    fillData << subMeshMatrix.at(j);
 
     std::string matrixStr = nodeXml->FirstChildElement("matrix")->GetText();
     EXPECT_EQ(matrixStr, fillData.str());
 
     nodeXml = nodeXml->NextSiblingElement("node");
-   }
+ }
 
   // Reload mesh and compare
   const common::Mesh *meshReloaded = loader.Load(common::joinPaths(pathOut,
@@ -298,12 +300,12 @@ TEST_F(ColladaExporter, ExportMeshWithSubmeshes)
   EXPECT_EQ(outMesh.Name(), meshReloaded->Name());
   EXPECT_EQ(outMesh.SubMeshCount(), meshReloaded->SubMeshCount());
   EXPECT_EQ(outMesh.MaterialCount(),
-       meshReloaded->MaterialCount());
+      meshReloaded->MaterialCount());
   EXPECT_EQ(outMesh.IndexCount(), meshReloaded->IndexCount());
   EXPECT_EQ(outMesh.VertexCount(), meshReloaded->VertexCount());
   EXPECT_EQ(outMesh.NormalCount(), meshReloaded->NormalCount());
   EXPECT_EQ(outMesh.TexCoordCount(),
-       meshReloaded->TexCoordCount());
+      meshReloaded->TexCoordCount());
 
   // Remove temp directory
   common::removeAll(pathOut);
