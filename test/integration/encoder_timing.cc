@@ -46,7 +46,7 @@ void durationTest(VideoEncoder &_vidEncoder, Video &_video,
   _video.Load(common::cwd() + "/TMP_RECORDING.mp4");
 
   EXPECT_NEAR(std::chrono::duration_cast<std::chrono::milliseconds>(
-                _video.Duration()).count(),
+              _video.Duration()).count(),
               _seconds*1000,
               kTol);
 }
@@ -57,7 +57,8 @@ TEST(EncoderTimingTest, Duration)
   Video video;
 
   durationTest(vidEncoder, video, 50, 1);
-  durationTest(vidEncoder, video, 30, 5);
-  durationTest(vidEncoder, video, 60, 10);
-  durationTest(vidEncoder, video, 25, 20);
+  durationTest(vidEncoder, video, 30, 2);
+  durationTest(vidEncoder, video, 25, 5);
+
+  delete [] kFrame;
 }
