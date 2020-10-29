@@ -18,6 +18,7 @@
 #include "ignition/common/Console.hh"
 #include "ignition/common/ffmpeg_inc.hh"
 #include "ignition/common/Video.hh"
+#include "ignition/common/av/Util.hh"
 
 using namespace ignition;
 using namespace common;
@@ -48,6 +49,8 @@ class ignition::common::VideoPrivate
 Video::Video()
 : dataPtr(new VideoPrivate)
 {
+  // Make sure libav is loaded.
+  ignition::common::load();
 }
 
 /////////////////////////////////////////////////

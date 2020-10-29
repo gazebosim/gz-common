@@ -71,6 +71,59 @@ TEST(StringUtils, SplitOneDelimiterAtEnd)
 }
 
 /////////////////////////////////////////////////
+TEST(Join, Simple)
+{
+  {
+    std::string delim = " ";
+    auto pieces = std::vector<std::string>{"Hello", "World"};
+    auto joined = common::Join(pieces, delim);
+    EXPECT_EQ("Hello World", joined);
+  }
+
+  {
+    std::string delim = "x";
+    auto pieces = std::vector<std::string>{"Hello", "World"};
+    auto joined = common::Join(pieces, delim);
+    EXPECT_EQ("HelloxWorld", joined);
+  }
+
+  {
+    std::string delim = "x";
+    auto pieces = std::vector<std::string>{
+      "foo", "bar", "baz", "bing"};
+    auto joined = common::Join(pieces, delim);
+    EXPECT_EQ("fooxbarxbazxbing", joined);
+  }
+}
+
+/////////////////////////////////////////////////
+TEST(Join, EmptyDelim)
+{
+  std::string delim = "";
+  auto pieces = std::vector<std::string>{"Hello", "World"};
+  auto joined = common::Join(pieces, delim);
+  EXPECT_EQ("HelloWorld", joined);
+}
+
+/////////////////////////////////////////////////
+TEST(Join, EmptyPart)
+{
+  std::string delim = " ";
+  auto pieces = std::vector<std::string>{"Hello", "", "World"};
+  auto joined = common::Join(pieces, delim);
+  EXPECT_EQ("Hello World", joined);
+}
+
+/////////////////////////////////////////////////
+TEST(Join, EmptyParts)
+{
+  std::string delim = "x";
+  auto pieces = std::vector<std::string>{};
+  auto joined = common::Join(pieces, delim);
+  EXPECT_EQ("", joined);
+}
+
+/////////////////////////////////////////////////
 TEST(StartsWith, NotInString)
 {
   std::string big = "Hello World!";
