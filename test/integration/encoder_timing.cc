@@ -28,7 +28,7 @@ const unsigned char *kFrame = new unsigned char[kSize*kSize];
 
 // set to 720ms because video duration missing additional 18 frames
 //    which may be due to how video encoding works
-const int kTol = 720;
+const std::chrono::milliseconds kTol(720);
 
 void durationTest(VideoEncoder &_vidEncoder, Video &_video,
                   const int &_fps, const int &_seconds)
@@ -43,12 +43,12 @@ void durationTest(VideoEncoder &_vidEncoder, Video &_video,
   }
 
   _vidEncoder.Stop();
-  _video.Load(common::cwd() + "/TMP_RECORDING.mp4");
+  _video.Load(common::joinPaths(common::cwd(), "/TMP_RECORDING.mp4"));
 
   EXPECT_NEAR(std::chrono::duration_cast<std::chrono::milliseconds>(
               _video.Duration()).count(),
               _seconds*1000,
-              kTol);
+              kTol.count());
 }
 
 TEST(EncoderTimingTest, Duration)
