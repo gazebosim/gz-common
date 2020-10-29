@@ -24,7 +24,7 @@ using namespace ignition;
 using namespace common;
 
 const unsigned int kSize = 10;
-const unsigned char *kFrame = new unsigned char[kSize*kSize];
+const std::array<unsigned char, kSize*kSize> kFrame = {};
 
 // set to 720ms because video duration missing additional 18 frames
 //    which may be due to how video encoding works
@@ -38,7 +38,7 @@ void durationTest(VideoEncoder &_vidEncoder, Video &_video,
   int frameCount = 0;
   while (frameCount != _fps*_seconds)
   {
-    if (_vidEncoder.AddFrame(kFrame, kSize, kSize))
+    if (_vidEncoder.AddFrame(kFrame.data(), kSize, kSize))
       ++frameCount;
   }
 
@@ -59,6 +59,4 @@ TEST(EncoderTimingTest, Duration)
   durationTest(vidEncoder, video, 50, 1);
   durationTest(vidEncoder, video, 30, 2);
   durationTest(vidEncoder, video, 25, 5);
-
-  delete [] kFrame;
 }
