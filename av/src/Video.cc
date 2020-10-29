@@ -289,3 +289,9 @@ int Video::Height() const
 {
   return this->dataPtr->codecCtx->height;
 }
+
+/////////////////////////////////////////////////
+Video::Length Video::Duration() const
+{
+  return Video::Length(this->dataPtr->formatCtx->duration);
+}

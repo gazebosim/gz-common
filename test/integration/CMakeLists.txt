@@ -8,7 +8,8 @@ list(REMOVE_ITEM tests mesh.cc)
 
 ign_build_tests(
   TYPE INTEGRATION
-  SOURCES ${tests})
+  SOURCES ${tests}
+  LIB_DEPS ${PROJECT_LIBRARY_TARGET_NAME}-av)
 
 if(TARGET INTEGRATION_plugin)
   # We add this dependency to make sure that DummyPlugins gets generated
