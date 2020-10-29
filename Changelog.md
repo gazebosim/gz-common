@@ -14,12 +14,109 @@
 
 ## Ignition Common 3.X.X
 
+## Ignition Common 3.7.0 (2020-10-21)
+
+1. Miscellaneous Cleanups
+    * Feature: Join function for combining strings with a delimiter
+    * [Pull Request 107](https://github.com/ignitionrobotics/ign-common/pull/107)
+
+1. Improve fork experience
+    * [Pull Request 103](https://github.com/ignitionrobotics/ign-common/pull/103)
+
+1. Add Console example
+    * [Pull Request 106](https://github.com/ignitionrobotics/ign-common/pull/106)
+
+1. Support fuel URLs for textures
+    * [Pull Request 102](https://github.com/ignitionrobotics/ign-common/pull/102)
+    
+1. Fix loading dae file with hierarchical node that does not have a name
+    * [Pull Request 101](https://github.com/ignitionrobotics/ign-common/pull/101)
+    
+1. Fix more Animation memory leaks
+    * [Pull Request 98](https://github.com/ignitionrobotics/ign-common/pull/98)
+
+1. Fix env behavior to return true on empty vars
+    * Feature: Add setenv for setting environment variables
+    * Feature: Add unsetenv for clearing environment variables
+    * Feature: Add alternative env implementation that respects empty variables
+    * [Pull Request 97](https://github.com/ignitionrobotics/ign-common/pull/97)
+
+## Ignition Common 3.6.1 (2020-09-16)
+
+1. Fix hierarchical submesh processing in the ColladaLoader.
+    * [Pull Request 78](https://github.com/ignitionrobotics/ign-common/pull/78)
+
+1. Tutorial updates
+    * [Pull Request 86](https://github.com/ignitionrobotics/ign-common/pull/86)
+    * [Pull Request 87](https://github.com/ignitionrobotics/ign-common/pull/87)
+    * [Pull Request 92](https://github.com/ignitionrobotics/ign-common/pull/92)
+
+1. Fix the AudioDecoder class
+    * [Pull Request 81](https://github.com/ignitionrobotics/ign-common/pull/81)
+
+1. Fix actions CI
+    * [Pull Request 83](https://github.com/ignitionrobotics/ign-common/pull/83)
+
+1. Fix trajectory info memory leak
+    * [Pull Request 93](https://github.com/ignitionrobotics/ign-common/pull/93)
+
+1. Remove URI warning on constructor
+    * [Pull Request 94](https://github.com/ignitionrobotics/ign-common/pull/94)
+
+## Ignition Common 3.6.0 (2020-06-09)
+
+1. Refactor Image::MaxColor to reduce computation time
+    * [Pull request 66](https://github.com/ignitionrobotics/ign-common/pull/66)
+
+1. Update to gtest 1.10.0 with patch for gcc warnings
+    * [Pull request 67](https://github.com/ignitionrobotics/ign-common/pull/67)
+
+1. Fix ColladaLoader loading <transparent> tag when <transparency> does not exist
+    * [Pull request 68](https://github.com/ignitionrobotics/ign-common/pull/68)
+
+1. Remove unused included headers
+    * [Pull request 71](https://github.com/ignitionrobotics/ign-common/pull/71)
+
+1. More file path APIs
+    * [Pull request 70](https://github.com/ignitionrobotics/ign-common/pull/70)
+
+## Ignition Common 3.5.0 (2020-04-09)
+
+1. Add interpolate\_x property to actor animations
+    * [BitBucket pull request 232](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/232)
+
+1. Update PBR metalness default value to 0.0
+    * [BitBucket pull request 231](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/231)
+
+1. Fix crash when loading OBJ meshes with invalid materials
+    * [BitBucket pull request 230](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/230)
+
+## Ignition Common 3.4.0 (2020-02-20)
+
+1. Add PBR material class
+    * [BitBucket pull request 227](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/227)
+
+1. Custom paths for file URIs (env var + URI)
+    * [BitBucket pull request 210](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/210)
+
+1. Add function to get NodeAnimation
+    * [BitBucket pull request 223](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/223)
+
+1. Handle unexpected COLLADA more gracefully
+    * [BitBucket pull request 218](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/218)
+
+1. Add support for alpha based texture transparency.
+    * [BitBucket pull request 221](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/221)
+
 1. `tiny_obj_loader`: set better diffuse value when `map_kD` is present and `Kd` is not specified.
     * [BitBucket pull request 216](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/216)
     * [BitBucket pull request 217](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/217)
 
 1. ColladaLoader: load files with actors with multiple skeletons
     * [BitBucket pull request 215](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/215)
+
+1. Compute volume of mesh shapes with `Mesh::Volume` and `SubMesh::Volume`.
+    * [BitBucket pull request 214](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/214)
 
 1. Port Skeleton fixes from gazebo.
     * [BitBucket pull request 209](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/209)
@@ -32,6 +129,9 @@
 
 1. Fix `Image::ConvertPixelFormat` for `BAYER_BGGR8`
     * [BitBucket pull request 211](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/211)
+
+1. Support custom callbacks to find files on global interface
+    * [BitBucket pull request 226](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/226)
 
 ## Ignition Common 3.3.0 (2019-08-27)
 

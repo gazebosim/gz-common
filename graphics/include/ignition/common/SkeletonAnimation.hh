@@ -24,6 +24,7 @@
 #include <ignition/math/Matrix4.hh>
 #include <ignition/math/Pose3.hh>
 
+#include <ignition/common/NodeAnimation.hh>
 #include <ignition/common/graphics/Export.hh>
 
 namespace ignition
@@ -57,6 +58,12 @@ namespace ignition
       /// \brief Returns the number of animation nodes
       /// \return the count
       public: unsigned int NodeCount() const;
+
+      /// \brief Returns the node animation for given node name
+      /// \param[in] _name Name of node
+      /// \return NodeAnimation object
+      public: NodeAnimation *NodeAnimationByName(const std::string &_name)
+          const;
 
       /// \brief Looks for a node with a specific name in the animations
       /// \param[in] _node the name of the node

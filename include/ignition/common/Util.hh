@@ -25,6 +25,8 @@
 #include <chrono>
 #include <ignition/common/Export.hh>
 #include <ignition/common/Filesystem.hh>
+#include <ignition/common/SystemPaths.hh>
+#include <ignition/common/URI.hh>
 
 /////////////////////////////////////////////////
 // Defines
@@ -148,6 +150,25 @@ namespace ignition
     /// \return The path containing the file.
     std::string IGNITION_COMMON_VISIBLE findFilePath(const std::string &_file);
 
+    /// \brief Add a callback to use when findFile() can't find a file that is
+    /// a valid URI.
+    /// The callback should return a full local path to the requested file, or
+    /// and empty string if the file was not found in the callback.
+    /// Callbacks will be called in the order they were added until a path is
+    /// found.
+    /// \param[in] _cb The callback function, which takes a file path or URI
+    /// and returns the full local path.
+    void IGNITION_COMMON_VISIBLE addFindFileURICallback(
+        std::function<std::string(const URI &)> _cb);
+
+    /// \brief Get a pointer to the global system paths that is used by all
+    /// the findFile functions.
+    /// The returned instance has global shared state for a given process.
+    /// Care should be taken when manipulating global system paths
+    /// Caller should not assume ownership of the pointer.
+    /// \return A mutable reference to the system paths object.
+    common::SystemPaths IGNITION_COMMON_VISIBLE *systemPaths();
+
     /// \brief Compute the SHA1 hash of an array of bytes.
     /// \param[in] _buffer Input sequence. The permitted data types for this
     /// function are std::string and any STL container.
@@ -194,11 +215,40 @@ namespace ignition
     #endif
 
     /// \brief Find the environment variable '_name' and return its value.
+    ///
+    /// \TODO(mjcarroll): Deprecate and remove in tick-tock.
+    ///
     /// \param[in] _name Name of the environment variable.
     /// \param[out] _value Value if the variable was found.
     /// \return True if the variable was found or false otherwise.
     bool IGNITION_COMMON_VISIBLE env(
         const std::string &_name, std::string &_value);
+
+    /// \brief Find the environment variable '_name' and return its value.
+    /// \param[in] _name Name of the environment variable.
+    /// \param[out] _value Value if the variable was found.
+    /// \param[in] _allowEmpty Allow set-but-empty variables.
+    ///           (Unsupported on Windows)
+    /// \return True if the variable was found or false otherwise.
+    bool IGNITION_COMMON_VISIBLE env(
+        const std::string &_name, std::string &_value,
+        bool _allowEmpty);
+
+    /// \brief Set the environment variable '_name'.
+    ///
+    /// Note that on Windows setting an empty string (_value=="")
+    /// is the equivalent of unsetting the variable.
+    ///
+    /// \param[in] _name Name of the environment variable.
+    /// \param[in] _value Value of the variable to be set.
+    /// \return True if the variable was set or false otherwise.
+    bool IGNITION_COMMON_VISIBLE setenv(
+        const std::string &_name, const std::string &_value);
+
+    /// \brief Unset the environment variable '_name'.
+    /// \param[in] _name Name of the environment variable.
+    /// \return True if the variable was unset or false otherwise.
+    bool IGNITION_COMMON_VISIBLE unsetenv(const std::string &_name);
 
     /// \brief Get a UUID
     /// \return A UUID string

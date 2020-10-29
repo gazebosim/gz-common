@@ -32,7 +32,7 @@ class ignition::common::SkeletonAnimationPrivate
   public: double length;
 
   /// \brief a dictionary of node animations
-  public: std::map<std::string, NodeAnimation*> animations;
+  public: std::map<std::string, std::shared_ptr<NodeAnimation>> animations;
 };
 
 //////////////////////////////////////////////////
@@ -69,6 +69,16 @@ unsigned int SkeletonAnimation::NodeCount() const
 }
 
 //////////////////////////////////////////////////
+NodeAnimation *SkeletonAnimation::NodeAnimationByName(
+    const std::string &_node) const
+{
+  auto it = this->data->animations.find(_node);
+  if (it != this->data->animations.end())
+    return it->second.get();
+  return nullptr;
+}
+
+//////////////////////////////////////////////////
 bool SkeletonAnimation::HasNode(const std::string &_node) const
 {
   return (this->data->animations.find(_node) != this->data->animations.end());
@@ -79,7 +89,7 @@ void SkeletonAnimation::AddKeyFrame(const std::string &_node,
     const double _time, const math::Matrix4d &_mat)
 {
   if (this->data->animations.find(_node) == this->data->animations.end())
-    this->data->animations[_node] = new NodeAnimation(_node);
+    this->data->animations[_node] = std::make_shared<NodeAnimation>(_node);
 
   if (_time > this->data->length)
     this->data->length = _time;
@@ -92,7 +102,7 @@ void SkeletonAnimation::AddKeyFrame(const std::string &_node,
       const double _time, const math::Pose3d &_pose)
 {
   if (this->data->animations.find(_node) == this->data->animations.end())
-    this->data->animations[_node] = new NodeAnimation(_node);
+    this->data->animations[_node] = std::make_shared<NodeAnimation>(_node);
 
   if (_time > this->data->length)
     this->data->length = _time;
@@ -123,9 +133,8 @@ std::map<std::string, math::Matrix4d> SkeletonAnimation::PoseAt(
   ///  prev and next keyframe for each node at each time step, but rather
   ///  doing it only once per time step.
   std::map<std::string, math::Matrix4d> pose;
-  for (std::map<std::string, NodeAnimation*>::const_iterator iter =
-          this->data->animations.begin();
-          iter != this->data->animations.end(); ++iter)
+  for (auto iter = this->data->animations.begin();
+      iter != this->data->animations.end(); ++iter)
   {
     pose[iter->first] = iter->second->FrameAt(_time, _loop);
   }
@@ -137,8 +146,13 @@ std::map<std::string, math::Matrix4d> SkeletonAnimation::PoseAt(
 std::map<std::string, math::Matrix4d> SkeletonAnimation::PoseAtX(
              const double _x, const std::string &_node, const bool _loop) const
 {
-  std::map<std::string, NodeAnimation*>::const_iterator nodeAnim =
-      this->data->animations.find(_node);
+  auto nodeAnim = this->data->animations.find(_node);
+  if (nodeAnim == this->data->animations.end())
+  {
+    ignerr << "Can't find animation named [" << _node << "]" << std::endl;
+    return {};
+  }
+
   math::Matrix4d lastPos = nodeAnim->second->KeyFrame(
       nodeAnim->second->FrameCount() - 1).second;
 
@@ -162,8 +176,7 @@ std::map<std::string, math::Matrix4d> SkeletonAnimation::PoseAtX(
 //////////////////////////////////////////////////
 void SkeletonAnimation::Scale(const double _scale)
 {
-  for (std::map<std::string, NodeAnimation*>::iterator iter =
-       this->data->animations.begin();
+  for (auto iter = this->data->animations.begin();
        iter != this->data->animations.end(); ++iter)
   {
     iter->second->Scale(_scale);

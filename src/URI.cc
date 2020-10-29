@@ -881,8 +881,7 @@ URI::URI()
 URI::URI(const std::string &_str)
   : URI()
 {
-  if (!this->Parse(_str))
-    ignwarn << "Unable to parse URI [" << _str << "]. Ignoring." << std::endl;
+  this->Parse(_str);
 }
 
 /////////////////////////////////////////////////

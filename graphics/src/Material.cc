@@ -55,6 +55,15 @@ class ignition::common::MaterialPrivate
   /// \brief transparency value in the range 0 to 1
   public: double transparency = 0.0;
 
+  // \brief Enable texture based alpha rendering
+  public: bool textureAlphaEnabled = false;
+
+  // \brief Cutoff value for alpha, values below threshold will not be rendered
+  public: double alphaThreshold = 0.5;
+
+  // \brief Enables two sided rendering
+  public: bool twoSidedEnabled = false;
+
   /// \brief shininess value (0 to 1)
   public: double shininess = 0.0;
 
@@ -81,6 +90,9 @@ class ignition::common::MaterialPrivate
 
   /// \brief destination blend factor
   public: double dstBlendFactor;
+
+  /// \brief Physically Based Rendering (PBR) properties
+  public: std::unique_ptr<Pbr> pbr;
 };
 
 unsigned int MaterialPrivate::counter = 0;
@@ -132,16 +144,23 @@ void Material::SetTextureImage(const std::string &_tex)
 void Material::SetTextureImage(const std::string &_tex,
                                const std::string &_resourcePath)
 {
-  this->dataPtr->texImage = _resourcePath + "/" + _tex;
+  this->dataPtr->texImage = common::joinPaths(_resourcePath, _tex);
 
   // If the texture image doesn't exist then try the next most likely path.
   if (!exists(this->dataPtr->texImage))
   {
-    this->dataPtr->texImage = _resourcePath + "/../materials/textures/" + _tex;
+    // Try to resolve this texture image to a locally cached path in a
+    // separate directory
+    this->dataPtr->texImage = common::findFile(_tex);
     if (!exists(this->dataPtr->texImage))
     {
-      ignerr << "Unable to find texture[" << _tex << "] in path["
-            << _resourcePath << "]\n";
+      this->dataPtr->texImage = common::joinPaths(_resourcePath, "..",
+          "materials", "textures", _tex);
+      if (!exists(this->dataPtr->texImage))
+      {
+        ignerr << "Unable to find texture [" << _tex << "] as a locally"
+              " cached texture or in path ["<< _resourcePath << "]\n";
+      }
     }
   }
 }
@@ -211,6 +230,33 @@ void Material::SetTransparency(double _t)
 double Material::Transparency() const
 {
   return this->dataPtr->transparency;
+}
+
+//////////////////////////////////////////////////
+void Material::SetAlphaFromTexture(bool _enabled, double _alpha,
+                                   bool _twoSided)
+{
+  this->dataPtr->textureAlphaEnabled = _enabled;
+  this->dataPtr->alphaThreshold = _alpha;
+  this->dataPtr->twoSidedEnabled = _twoSided;
+}
+
+//////////////////////////////////////////////////
+bool Material::TextureAlphaEnabled() const
+{
+  return this->dataPtr->textureAlphaEnabled;
+}
+
+//////////////////////////////////////////////////
+double Material::AlphaThreshold() const
+{
+  return this->dataPtr->alphaThreshold;
+}
+
+//////////////////////////////////////////////////
+bool Material::TwoSidedEnabled() const
+{
+  return this->dataPtr->twoSidedEnabled;
 }
 
 //////////////////////////////////////////////////
@@ -310,3 +356,14 @@ std::string Material::ShadeStr() const
   return shadeModeIface.Str(this->Shade());
 }
 
+//////////////////////////////////////////////////
+void Material::SetPbrMaterial(const Pbr &_pbr)
+{
+  this->dataPtr->pbr = std::make_unique<Pbr>(_pbr);
+}
+
+//////////////////////////////////////////////////
+Pbr *Material::PbrMaterial() const
+{
+  return this->dataPtr->pbr.get();
+}

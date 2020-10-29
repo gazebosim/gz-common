@@ -199,6 +199,12 @@ void SystemPaths::SetFilePathEnv(const std::string &_env)
 }
 
 /////////////////////////////////////////////////
+std::string SystemPaths::FilePathEnv() const
+{
+  return this->dataPtr->filePathEnv;
+}
+
+/////////////////////////////////////////////////
 const std::list<std::string> &SystemPaths::FilePaths()
 {
   return this->dataPtr->filePaths;
@@ -307,7 +313,6 @@ std::string SystemPaths::FindFileURI(const std::string &_uri) const
   }
 
   const auto uri = ignition::common::URI(_uri);
-  std::cout << "Debug URI[" << uri.Str() << "]\n";
   return this->FindFileURI(uri);
 }
 
@@ -326,6 +331,21 @@ std::string SystemPaths::FindFileURI(const ignition::common::URI &_uri) const
   else if (this->dataPtr->findFileURICB)
   {
     filename = this->dataPtr->findFileURICB(_uri.Str());
+  }
+
+  // Look in custom paths.
+  // Tries the suffix against all paths, regardless of the scheme
+  if (filename.empty())
+  {
+    for (const std::string &filePath : this->dataPtr->filePaths)
+    {
+      auto withSuffix = NormalizeDirectoryPath(filePath) + suffix;
+      if (exists(withSuffix))
+      {
+        filename = ignition::common::copyFromUnixPath(withSuffix);
+        break;
+      }
+    }
   }
 
   // If still not found, try custom callbacks
@@ -408,10 +428,10 @@ std::string SystemPaths::FindFile(const std::string &_filename,
   {
     for (const std::string &filePath : this->dataPtr->filePaths)
     {
-      if (exists(NormalizeDirectoryPath(filePath) + filename))
+      auto withSuffix = NormalizeDirectoryPath(filePath) + filename;
+      if (exists(withSuffix))
       {
-        path = NormalizeDirectoryPath(filePath) + filename;
-        ignition::common::replaceAll(path, path, "//", "/");
+        path = ignition::common::copyFromUnixPath(withSuffix);
         break;
       }
     }

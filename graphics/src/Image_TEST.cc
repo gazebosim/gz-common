@@ -104,6 +104,49 @@ TEST_F(ImageTest, ConvertPixelFormat)
          Image::ConvertPixelFormat("BAYER_BGGR8"));
 }
 
+using string_int2 = std::tuple<const char *, unsigned int, unsigned int>;
+
+class ImagePerformanceTest : public ImageTest,
+                             public ::testing::WithParamInterface<string_int2>
+{
+  /// \brief Loads an image specified by _filename and checks its max color.
+  /// \param[in] _filePath Relative path to the image file to check.
+  /// \param[in] _width Width of the image in pixels.
+  /// \param[in] _height Height of the image in pixels.
+  public: void MaxColor(const std::string &_filePath,
+                        const unsigned int _width,
+                        const unsigned int _height);
+};
+
+TEST_P(ImagePerformanceTest, MaxColorFlatHeightmap)
+{
+  MaxColor(std::get<0>(GetParam()), std::get<1>(GetParam()),
+           std::get<2>(GetParam()));
+}
+
+void ImagePerformanceTest::MaxColor(const std::string &_filePath,
+                                    const unsigned int _width,
+                                    const unsigned int _height)
+{
+  std::string fileName =  "file://";
+  fileName += PROJECT_SOURCE_PATH;
+  fileName += "/";
+  fileName += _filePath;
+
+  common::Image img;
+  EXPECT_EQ(0, img.Load(fileName));
+  EXPECT_EQ(_width, img.Width());
+  EXPECT_EQ(_height, img.Height());
+  EXPECT_EQ(ignition::math::Color(0., 0., 0., 0), img.MaxColor());
+  EXPECT_TRUE(img.Valid());
+}
+
+INSTANTIATE_TEST_SUITE_P(FlatHeightmaps, ImagePerformanceTest,
+  ::testing::Values(
+    std::make_tuple("test/data/heightmap_flat_129x129.png", 129u, 129u),
+    std::make_tuple("test/data/heightmap_flat_257x257.png", 257u, 257u),
+    std::make_tuple("test/data/heightmap_flat_513x513.png", 513u, 513u),
+    std::make_tuple("test/data/heightmap_flat_1025x1025.png", 1025u, 1025u)));
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

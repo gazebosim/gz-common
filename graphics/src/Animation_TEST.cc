@@ -45,6 +45,13 @@ TEST_F(AnimationTest, PoseAnimation)
     EXPECT_DOUBLE_EQ(1.0, anim.Time());
   }
 
+  {
+    common::PoseAnimation anim("interpolatex_test", 1.0, true);
+    EXPECT_FALSE(anim.InterpolateX());
+    anim.SetInterpolateX(true);
+    EXPECT_TRUE(anim.InterpolateX());
+  }
+
   common::PoseAnimation anim("pose_test", 5.0, false);
   common::PoseKeyFrame *key = anim.CreateKeyFrame(0.0);
 

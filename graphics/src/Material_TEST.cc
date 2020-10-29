@@ -16,7 +16,9 @@
 
 #include <gtest/gtest.h>
 
+#include "test_config.h"
 #include "ignition/common/Material.hh"
+#include "ignition/common/Pbr.hh"
 #include "test/util.hh"
 
 using namespace ignition;
@@ -34,8 +36,15 @@ TEST_F(MaterialTest, Material)
   EXPECT_STREQ("texture_image", mat.TextureImage().c_str());
 
   mat.SetTextureImage("texture_image", "/path");
-  EXPECT_STREQ("/path/../materials/textures/texture_image",
-               mat.TextureImage().c_str());
+  std::string texturePath = common::joinPaths("/path", "..",
+      "materials", "textures", "texture_image");
+  EXPECT_STREQ(texturePath.c_str(), mat.TextureImage().c_str());
+
+  texturePath = common::joinPaths(std::string(PROJECT_SOURCE_PATH), "test",
+      "data", "box.dae");
+
+  mat.SetTextureImage(texturePath, "bad_path");
+  EXPECT_STREQ(texturePath.c_str(), mat.TextureImage().c_str());
 
   mat.SetAmbient(math::Color(0.1f, 0.2f, 0.3f, 0.4f));
   EXPECT_TRUE(mat.Ambient() == math::Color(0.1f, 0.2f, 0.3f, 0.4f));
@@ -51,6 +60,11 @@ TEST_F(MaterialTest, Material)
 
   mat.SetTransparency(0.2);
   EXPECT_DOUBLE_EQ(0.2, mat.Transparency());
+
+  mat.SetAlphaFromTexture(true, 0.3, false);
+  EXPECT_EQ(mat.TextureAlphaEnabled(), true);
+  EXPECT_DOUBLE_EQ(mat.AlphaThreshold(), 0.3);
+  EXPECT_EQ(mat.TwoSidedEnabled(), false);
 
   mat.SetShininess(0.2);
   EXPECT_DOUBLE_EQ(0.2, mat.Shininess());
@@ -75,6 +89,12 @@ TEST_F(MaterialTest, Material)
 
   mat.SetLighting(true);
   EXPECT_TRUE(mat.Lighting());
+
+  common::Pbr pbr;
+  EXPECT_EQ(nullptr, mat.PbrMaterial());
+  mat.SetPbrMaterial(pbr);
+  EXPECT_NE(nullptr, mat.PbrMaterial());
+  EXPECT_EQ(pbr, *mat.PbrMaterial());
 }
 
 /////////////////////////////////////////////////

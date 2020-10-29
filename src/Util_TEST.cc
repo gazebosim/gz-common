@@ -173,6 +173,149 @@ TEST(Util_TEST, emptyENV)
 }
 
 /////////////////////////////////////////////////
+TEST(Util_TEST, envSet)
+{
+  const auto key = "IGN_ENV_SET";
+  ASSERT_TRUE(common::setenv(key, "VALUE"));
+
+  // Check set var
+  {
+    std::string value;
+    EXPECT_TRUE(common::env(key, value));
+    EXPECT_FALSE(value.empty());
+    EXPECT_EQ("VALUE", value);
+  }
+
+  // Check set var with allowEmpty
+  {
+    std::string value;
+    EXPECT_TRUE(common::env(key, value, true));
+    EXPECT_FALSE(value.empty());
+    EXPECT_EQ("VALUE", value);
+  }
+
+  // Check set var without allowEmpty
+  {
+    std::string value;
+    EXPECT_TRUE(common::env(key, value, false));
+    EXPECT_FALSE(value.empty());
+    EXPECT_EQ("VALUE", value);
+  }
+
+  ASSERT_TRUE(common::unsetenv(key));
+}
+
+/////////////////////////////////////////////////
+TEST(Util_TEST, envUnset)
+{
+  const auto key = "IGN_ENV_UNSET";
+  ASSERT_TRUE(common::unsetenv(key));
+
+  // Check unset var (default)
+  {
+    std::string value;
+    EXPECT_FALSE(common::env(key, value));
+    EXPECT_TRUE(value.empty());
+  }
+
+  // Check unset var with allowEmpty
+  {
+    std::string value;
+    EXPECT_FALSE(common::env(key, value, true));
+    EXPECT_TRUE(value.empty());
+  }
+
+  // Check unset var without allowEmpty
+  {
+    std::string value;
+    EXPECT_FALSE(common::env(key, value, false));
+    EXPECT_TRUE(value.empty());
+  }
+  ASSERT_TRUE(common::unsetenv(key));
+}
+
+/////////////////////////////////////////////////
+TEST(Util_TEST, envSetEmpty)
+{
+  const auto key = "IGN_ENV_SET_EMPTY";
+
+  ASSERT_TRUE(common::setenv(key, ""));
+  ASSERT_FALSE(common::setenv("", ""));
+
+  // Check set empty var (default)
+  {
+    std::string value;
+    EXPECT_FALSE(common::env(key, value));
+    EXPECT_TRUE(value.empty());
+  }
+
+#ifdef _WIN32
+  {
+    // This will warn on Windows, but return false
+    std::string value;
+    EXPECT_FALSE(common::env(key, value, true));
+    EXPECT_TRUE(value.empty());
+  }
+#else
+  {
+    // This will not warn and return true on Linux,
+    // as empty environment variables are allowed.
+    std::string value;
+    EXPECT_TRUE(common::env(key, value, true));
+    EXPECT_TRUE(value.empty());
+  }
+#endif
+
+  // Check set empty var without allowEmpty
+  {
+    std::string value;
+    EXPECT_FALSE(common::env(key, value, false));
+    EXPECT_TRUE(value.empty());
+  }
+  ASSERT_TRUE(common::unsetenv(key));
+}
+
+/////////////////////////////////////////////////
+TEST(Util_TEST, findFile)
+{
+  EXPECT_EQ("", ignition::common::findFile("no_such_file"));
+
+  // Create file to find
+  auto dir1 = ignition::common::absPath("test_dir1");
+  ignition::common::createDirectories(dir1);
+  auto file1 = ignition::common::absPath(
+      ignition::common::joinPaths(dir1, "test_f1"));
+
+  std::ofstream fout;
+  fout.open(file1, std::ofstream::out);
+  fout << "asdf";
+  fout.close();
+
+  // Relative path
+  auto systemPaths = ignition::common::systemPaths();
+  ASSERT_NE(nullptr, systemPaths);
+  EXPECT_EQ(file1, systemPaths->FindFile(common::joinPaths("test_dir1",
+      "test_f1"), true));
+
+  // Relative prefixed by file://
+  EXPECT_EQ(file1, ignition::common::findFile("file:test_dir1/test_f1"));
+
+  // Custom callback
+#ifndef _WIN32
+  const auto tmpDir = "/tmp";
+#else
+  const auto tmpDir = "C:\\Windows";
+#endif
+  auto fileCb = [&tmpDir](const ignition::common::URI &)
+  {
+    return tmpDir;
+  };
+
+  ignition::common::addFindFileURICallback(fileCb);
+  EXPECT_EQ(tmpDir, ignition::common::findFile("model://banana"));
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

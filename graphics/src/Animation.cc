@@ -15,6 +15,7 @@
  *
 */
 #include <algorithm>
+#include <unordered_map>
 
 #include <ignition/math/Spline.hh>
 #include <ignition/math/Vector2.hh>
@@ -39,6 +40,42 @@ namespace
 }
 
 /////////////////////////////////////////////////
+class ignition::common::AnimationPrivate
+{
+  /// \brief true if the animation is interpolated in x
+  public: bool interpolateX = false;
+};
+
+// TODO(luca) Make Animation class follow PIMPL and remove global static map
+/////////////////////////////////////////////////
+typedef std::unordered_map<Animation *, AnimationPrivate *> AnimationPrivateMap;
+static AnimationPrivateMap animationPrivateMap;
+
+/////////////////////////////////////////////////
+static AnimationPrivate* AnimationDataPtr(Animation *_animation)
+{
+  auto mapIt = animationPrivateMap.find(_animation);
+  if (mapIt == animationPrivateMap.end())
+  {
+    // Create the map entry
+    animationPrivateMap[_animation] = new AnimationPrivate;
+  }
+  return animationPrivateMap[_animation];
+}
+
+/////////////////////////////////////////////////
+static void DeleteAnimationDataPtr(Animation *_animation)
+{
+  // Delete the data pointer class and erase the hash map entry
+  auto mapIt = animationPrivateMap.find(_animation);
+  if (mapIt != animationPrivateMap.end())
+  {
+    delete mapIt->second;
+    animationPrivateMap.erase(mapIt);
+  }
+}
+
+/////////////////////////////////////////////////
 class ignition::common::TrajectoryInfoPrivate
 {
   /// \brief ID of the trajectory
@@ -60,7 +97,7 @@ class ignition::common::TrajectoryInfoPrivate
   /// \brief Waypoints in pose animation format.
   /// Times within the animation should be considered durations counted
   /// from start time.
-  public: common::PoseAnimation *waypoints{nullptr};
+  public: std::shared_ptr<common::PoseAnimation> waypoints;
 
   /// \brief Distance on the XY plane covered by each segment. The key is the
   /// duration from start time, the value is the distance in meters.
@@ -79,6 +116,7 @@ Animation::Animation(const std::string &_name, const double _length,
 /////////////////////////////////////////////////
 Animation::~Animation()
 {
+  DeleteAnimationDataPtr(this);
 }
 
 /////////////////////////////////////////////////
@@ -125,6 +163,18 @@ void Animation::AddTime(const double _time)
 double Animation::Time() const
 {
   return this->timePos;
+}
+
+/////////////////////////////////////////////////
+bool Animation::InterpolateX() const
+{
+  return AnimationDataPtr(const_cast<Animation *>(this))->interpolateX;
+}
+
+/////////////////////////////////////////////////
+void Animation::SetInterpolateX(const bool _interpolateX)
+{
+  AnimationDataPtr(this)->interpolateX = _interpolateX;
 }
 
 /////////////////////////////////////////////////
@@ -199,8 +249,8 @@ double Animation::KeyFramesAtTime(double _time, common::KeyFrame **_kf1,
 }
 
 /////////////////////////////////////////////////
-PoseAnimation::PoseAnimation(const std::string &_name,
-    const double _length, const bool _loop)
+PoseAnimation::PoseAnimation(const std::string &_name, const double _length,
+    const bool _loop)
 : Animation(_name, _length, _loop)
 {
   this->positionSpline = NULL;
@@ -212,6 +262,8 @@ PoseAnimation::~PoseAnimation()
 {
   delete this->positionSpline;
   delete this->rotationSpline;
+  for (auto kf : this->keyFrames)
+    delete kf;
 }
 
 /////////////////////////////////////////////////
@@ -358,6 +410,7 @@ TrajectoryInfo::TrajectoryInfo(TrajectoryInfo &&_trajInfo) noexcept
 /////////////////////////////////////////////////
 TrajectoryInfo::~TrajectoryInfo()
 {
+  delete this->dataPtr;
 }
 
 //////////////////////////////////////////////////
@@ -485,7 +538,7 @@ void TrajectoryInfo::SetTranslated(bool _translated)
 /////////////////////////////////////////////////
 common::PoseAnimation *TrajectoryInfo::Waypoints() const
 {
-  return this->dataPtr->waypoints;
+  return this->dataPtr->waypoints.get();
 }
 
 /////////////////////////////////////////////////
@@ -502,7 +555,8 @@ void TrajectoryInfo::SetWaypoints(
 
   std::stringstream animName;
   animName << this->AnimIndex() << "_" << this->Id();
-  common::PoseAnimation *anim = new common::PoseAnimation(animName.str(),
+  std::shared_ptr<common::PoseAnimation> anim =
+      std::make_shared<common::PoseAnimation>(animName.str(),
       std::chrono::duration<double>(this->Duration()).count(), false);
 
   auto prevPose = first->second.Pos();

@@ -33,6 +33,30 @@ namespace ignition
     std::vector<std::string> IGNITION_COMMON_VISIBLE Split(
         const std::string &_orig, char _delim);
 
+    /// \brief Join a sequence of strings with a delimiter
+    ///
+    /// Note that this will skip any empty entries in the vector,
+    /// and will also not prepend or append the delimiter to the
+    /// final output string
+    ///
+    /// \param[in] _orig The input sequence of strings
+    /// \param[in] _delim a string delimiter to join the string with
+    /// \returns a single string composed of strings joined with the delimiter
+    std::string IGNITION_COMMON_VISIBLE Join(
+        const std::vector<std::string> &_orig, const std::string &_delim);
+
+    /// \brief Join a sequence of strings with a delimiter
+    ///
+    /// Note that this will skip any empty entries in the vector,
+    /// and will also not prepend or append the delimiter to the
+    /// final output string
+    ///
+    /// \param[in] _orig The input sequence of strings
+    /// \param[in] _delim a character to join the string with
+    /// \returns a single string composed of strings joined with the delimiter
+    std::string IGNITION_COMMON_VISIBLE Join(
+        const std::vector<std::string> &_orig, char _delim);
+
     /// \brief return true if string starts with another string
     /// \param[in] _s1 the string to check
     /// \param[in] _s2 the possible prefix
