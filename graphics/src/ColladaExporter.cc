@@ -796,11 +796,12 @@ void ColladaExporterPrivate::ExportVisualScenes(
     unsigned int materialIndex =
       this->mesh->SubMeshByIndex(i).lock()->MaterialIndex();
 
-    if (materialIndex != -1 )
+    const ignition::common::MaterialPtr material =
+      this->mesh->MaterialByIndex(materialIndex);
+
+    if (material)
     {
       char materialId[100];
-      const ignition::common::MaterialPtr material =
-        this->mesh->MaterialByIndex(materialIndex);
 
       snprintf(materialId, sizeof(materialId), "material_%u", materialIndex);
 
