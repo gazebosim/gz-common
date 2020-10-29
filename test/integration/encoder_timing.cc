@@ -14,7 +14,7 @@
  *
 */
 #include <gtest/gtest.h>
-
+#include <array>
 #include "ignition/common/VideoEncoder.hh"
 #include "ignition/common/Video.hh"
 #include "test_config.h"
