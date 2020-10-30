@@ -238,8 +238,7 @@ bool Video::NextFrame(unsigned char **_buffer)
 
   if (packet.stream_index == this->dataPtr->videoStream)
   {
-    tmpPacket.data = packet.data;
-    tmpPacket.size = packet.size;
+    tmpPacket = packet;
 
     // Process all the data in the frame
     while (tmpPacket.size > 0)
