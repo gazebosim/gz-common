@@ -510,7 +510,8 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
 
   // Skip frames that arrive faster than the video's fps
   double period = 1.0/this->dataPtr->fps;
-  if (dt < std::chrono::duration<double>(period))
+  if (this->dataPtr->frameCount > 0u &&
+      dt < std::chrono::duration<double>(period))
     return false;
 
   if (this->dataPtr->frameCount == 0u)
