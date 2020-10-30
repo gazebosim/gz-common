@@ -43,6 +43,9 @@ class ignition::common::VideoPrivate
 
   /// \brief index of first video stream or -1
   public: int videoStream = -1;
+
+  /// \brief Pixel format of the output image. Has to be 24-bit RGB.
+  public: AVPixelFormat dstPixelFormat = AV_PIX_FMT_RGB24;
 };
 
 /////////////////////////////////////////////////
@@ -188,7 +191,7 @@ bool Video::Load(const std::string &_filename)
       this->dataPtr->codecCtx->pix_fmt,
       this->dataPtr->codecCtx->width,
       this->dataPtr->codecCtx->height,
-      AV_PIX_FMT_RGB24,
+      this->dataPtr->dstPixelFormat,
       SWS_BICUBIC, nullptr, nullptr, nullptr);
 
   if (this->dataPtr->swsCtx == nullptr)
@@ -198,13 +201,13 @@ bool Video::Load(const std::string &_filename)
   }
 
   this->dataPtr->avFrameDst = common::AVFrameAlloc();
-  this->dataPtr->avFrameDst->format = this->dataPtr->codecCtx->pix_fmt;
+  this->dataPtr->avFrameDst->format = this->dataPtr->dstPixelFormat;
   this->dataPtr->avFrameDst->width = this->dataPtr->codecCtx->width;
   this->dataPtr->avFrameDst->height = this->dataPtr->codecCtx->height;
   av_image_alloc(this->dataPtr->avFrameDst->data,
       this->dataPtr->avFrameDst->linesize,
       this->dataPtr->codecCtx->width, this->dataPtr->codecCtx->height,
-      this->dataPtr->codecCtx->pix_fmt, 1);
+      this->dataPtr->dstPixelFormat, 1);
 
   // DEBUG: Will save all the frames
   // Image img;
