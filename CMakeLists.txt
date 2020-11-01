@@ -33,9 +33,8 @@ endif()
 if(UNIX OR APPLE)
   option(USE_EXTERNAL_TINYXML2 "Use a system-installed version of tinyxml2" ON)
 elseif(WIN32)
-  # This is always false for Windows, so we can avoid trying to search for a
-  # system installation of tinyxml2.
-  set(USE_EXTERNAL_TINYXML2 false)
+  # For backward compatibility, this option on Windows by default is OFF
+  option(USE_EXTERNAL_TINYXML2 "Use a system-installed version of tinyxml2" OFF)
 endif()
 
 
