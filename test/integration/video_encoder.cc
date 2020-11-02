@@ -45,7 +45,7 @@ TEST(EncoderDecoderTest, DecodeEncodeDecode)
   const auto testVideoInPath = common::joinPaths(TEST_PATH, "data",
                                                  testVideoInName);
   const auto testVideoOutPath = common::joinPaths(common::cwd(),
-                                                  testVideoOutName);;
+                                                  testVideoOutName);
 
   Video decoder;
   decoder.Load(testVideoInPath);
