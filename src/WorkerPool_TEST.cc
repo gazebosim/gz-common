@@ -25,6 +25,11 @@
 namespace igncmn = ignition::common;
 using namespace igncmn;
 
+#ifdef __linux__
+static bool kIsLinux = true;
+#else
+static bool kIsLinux = false;
+#endif
 
 //////////////////////////////////////////////////
 TEST(WorkerPool, OneWorkNoCallback)
@@ -100,13 +105,18 @@ TEST(WorkerPool, WaitWithTimeout)
 //////////////////////////////////////////////////
 TEST(WorkerPool, WaitWithTimeoutThatTimesOut)
 {
-  WorkerPool pool;
-  pool.AddWork([] ()
-      {
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
-      });
-  Time time(0.0001);
-  EXPECT_FALSE(pool.WaitForResults(time));
+  // /TODO(anyone) Deflake this test
+  // ref: https://github.com/ignitionrobotics/ign-common/issues/52
+  if (kIsLinux)
+  {
+    WorkerPool pool;
+    pool.AddWork([] ()
+        {
+          std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        });
+    Time time(0.0001);
+    EXPECT_FALSE(pool.WaitForResults(time));
+  }
 }
 
 //////////////////////////////////////////////////
@@ -121,29 +131,32 @@ TEST(WorkerPool, ThingsRunInParallel)
     return;
   }
 
-  WorkerPool pool;
-  std::atomic<int> sentinel(0);
-  pool.AddWork([&sentinel] ()
-      {
-        ++sentinel;
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
-      });
-  pool.AddWork([&sentinel] ()
-      {
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
-        ++sentinel;
-      });
-  Time time(0.009);
-  bool result = pool.WaitForResults(time);
-#ifdef __linux__
-  // the timing test is flaky on windows and mac
-  EXPECT_TRUE(result);
-#endif
-  if (!result)
+  // /TODO(anyone) Deflake this test
+  // ref: https://github.com/ignitionrobotics/ign-common/issues/53
+  if (kIsLinux)
   {
-    igndbg << "WaitForResults failed" << std::endl;
+    WorkerPool pool;
+    std::atomic<int> sentinel(0);
+    pool.AddWork([&sentinel] ()
+        {
+          ++sentinel;
+          std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        });
+    pool.AddWork([&sentinel] ()
+        {
+          std::this_thread::sleep_for(std::chrono::milliseconds(5));
+          ++sentinel;
+        });
+    Time time(0.009);
+    bool result = pool.WaitForResults(time);
+    // the timing test is flaky on windows and mac
+    EXPECT_TRUE(result);
+    if (!result)
+    {
+      igndbg << "WaitForResults failed" << std::endl;
+    }
+    EXPECT_EQ(2, sentinel);
   }
-  EXPECT_EQ(2, sentinel);
 }
 
 //////////////////////////////////////////////////
