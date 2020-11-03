@@ -21,15 +21,10 @@
 
 #include "ignition/common/Console.hh"
 #include "ignition/common/WorkerPool.hh"
+#include "ignition/utilities/ExtraTestMacros.hh"
 
 namespace igncmn = ignition::common;
 using namespace igncmn;
-
-#ifdef __linux__
-static bool kIsLinux = true;
-#else
-static bool kIsLinux = false;
-#endif
 
 //////////////////////////////////////////////////
 TEST(WorkerPool, OneWorkNoCallback)
@@ -103,24 +98,23 @@ TEST(WorkerPool, WaitWithTimeout)
 }
 
 //////////////////////////////////////////////////
-TEST(WorkerPool, WaitWithTimeoutThatTimesOut)
+// /TODO(anyone) Deflake this test
+// ref: https://github.com/ignitionrobotics/ign-common/issues/52
+TEST(WorkerPool, IGN_UTILS_TEST_ENABLED_ONLY_ON_LINUX(WaitWithTimeoutThatTimesOut))
 {
-  // /TODO(anyone) Deflake this test
-  // ref: https://github.com/ignitionrobotics/ign-common/issues/52
-  if (kIsLinux)
-  {
-    WorkerPool pool;
-    pool.AddWork([] ()
-        {
-          std::this_thread::sleep_for(std::chrono::milliseconds(5));
-        });
-    Time time(0.0001);
-    EXPECT_FALSE(pool.WaitForResults(time));
-  }
+  WorkerPool pool;
+  pool.AddWork([] ()
+      {
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+      });
+  Time time(0.0001);
+  EXPECT_FALSE(pool.WaitForResults(time));
 }
 
 //////////////////////////////////////////////////
-TEST(WorkerPool, ThingsRunInParallel)
+// /TODO(anyone) Deflake this test
+// ref: https://github.com/ignitionrobotics/ign-common/issues/53
+TEST(WorkerPool, IGN_UTILS_TEST_ENABLED_ONLY_ON_LINUX(ThingsRunInParallel))
 {
   const unsigned int hc = std::thread::hardware_concurrency();
   if (2 > hc)
@@ -131,32 +125,27 @@ TEST(WorkerPool, ThingsRunInParallel)
     return;
   }
 
-  // /TODO(anyone) Deflake this test
-  // ref: https://github.com/ignitionrobotics/ign-common/issues/53
-  if (kIsLinux)
+  WorkerPool pool;
+  std::atomic<int> sentinel(0);
+  pool.AddWork([&sentinel] ()
+      {
+        ++sentinel;
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+      });
+  pool.AddWork([&sentinel] ()
+      {
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        ++sentinel;
+      });
+  Time time(0.009);
+  bool result = pool.WaitForResults(time);
+  // the timing test is flaky on windows and mac
+  EXPECT_TRUE(result);
+  if (!result)
   {
-    WorkerPool pool;
-    std::atomic<int> sentinel(0);
-    pool.AddWork([&sentinel] ()
-        {
-          ++sentinel;
-          std::this_thread::sleep_for(std::chrono::milliseconds(5));
-        });
-    pool.AddWork([&sentinel] ()
-        {
-          std::this_thread::sleep_for(std::chrono::milliseconds(5));
-          ++sentinel;
-        });
-    Time time(0.009);
-    bool result = pool.WaitForResults(time);
-    // the timing test is flaky on windows and mac
-    EXPECT_TRUE(result);
-    if (!result)
-    {
-      igndbg << "WaitForResults failed" << std::endl;
-    }
-    EXPECT_EQ(2, sentinel);
+    igndbg << "WaitForResults failed" << std::endl;
   }
+  EXPECT_EQ(2, sentinel);
 }
 
 //////////////////////////////////////////////////
