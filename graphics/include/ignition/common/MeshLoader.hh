@@ -17,6 +17,7 @@
 #ifndef IGNITION_COMMON_MESHLOADER_HH_
 #define IGNITION_COMMON_MESHLOADER_HH_
 
+#include <clocale>
 #include <string>
 
 #include <ignition/common/graphics/Export.hh>
@@ -32,7 +33,9 @@ namespace ignition
     class IGNITION_COMMON_GRAPHICS_VISIBLE MeshLoader
     {
       /// \brief Constructor
-      public: MeshLoader() = default;
+      public: MeshLoader() {
+        std::setlocale(LC_NUMERIC, "C");
+      }
 
       /// \brief Destructor
       public: virtual ~MeshLoader() = default;
