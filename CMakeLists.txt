@@ -8,7 +8,8 @@ project(ignition-common3 VERSION 3.7.0)
 #============================================================================
 # Find ignition-cmake
 #============================================================================
-find_package(ignition-cmake2 REQUIRED)
+find_package(ignition-cmake2 REQUIRED COMPONENTS utilities)
+set(IGN_CMAKE_VER ${ignition-cmake2_VERSION_MAJOR})
 
 #============================================================================
 # Configure the project
