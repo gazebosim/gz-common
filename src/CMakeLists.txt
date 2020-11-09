@@ -31,6 +31,8 @@ endif()
 ign_build_tests(
   TYPE UNIT
   SOURCES ${gtest_sources}
+  LIB_DEPS
+    ignition-cmake${IGN_CMAKE_VER}::utilities
   INCLUDE_DIRS
     # Used to make internal source file headers visible to the unit tests
     ${CMAKE_CURRENT_SOURCE_DIR}
