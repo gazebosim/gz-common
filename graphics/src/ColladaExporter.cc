@@ -520,8 +520,10 @@ int ColladaExporterPrivate::ExportImages(
       tinyxml2::XMLElement *initFromXml =
         _libraryImagesXml->GetDocument()->NewElement("init_from");
       const auto imageName = imageString.substr(imageString.rfind("/"));
-      const auto imagePath =  common::Join({"..", "materials", "textures", imageName}, "/");
-      initFromXml->LinkEndChild(_libraryImagesXml->GetDocument()->NewText(imagePath.c_str());
+      const auto imagePath =  common::Join({"..", "materials", "textures",
+        imageName}, "/");
+      initFromXml->LinkEndChild(_libraryImagesXml->GetDocument()->NewText(
+        imagePath.c_str());
       imageXml->LinkEndChild(initFromXml);
 
       if (this->exportTextures)
