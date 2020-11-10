@@ -29,6 +29,9 @@ void logCallback(void *_ptr, int _level, const char *_fmt, va_list _args)
 {
   static char message[8192];
 
+  if (_level > av_log_get_level())
+    return;
+
   std::string msg = "ffmpeg ";
 
   // Get the ffmpeg module.
