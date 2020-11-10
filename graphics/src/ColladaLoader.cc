@@ -316,8 +316,9 @@ namespace ignition
       /// \brief Index of a normal in the collada <p> element
       public: unsigned int normalIndex;
 
-      /// \brief Index of a texture coordinate in the collada <p> element
-      public: unsigned int texcoordIndex;
+      /// \brief A map of texture coordinate set index to index of a texture
+      /// coordinate in the collada <p> element
+      public: std::map<unsigned int, unsigned int> texcoordIndex;
 
       /// \brief Index of a vertex in the Gazebo mesh
       public: unsigned int mappedIndex;
@@ -1992,7 +1993,8 @@ void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
 
   std::vector<ignition::math::Vector3d> verts;
   std::vector<ignition::math::Vector3d> norms;
-  std::vector<ignition::math::Vector2d> texcoords;
+  std::map<unsigned int, std::vector<ignition::math::Vector2d>> texcoords;
+  std::map<unsigned int, unsigned int> texcoordsOffsetToSet;
 
   const unsigned int VERTEX = 0;
   const unsigned int NORMAL = 1;
@@ -2000,7 +2002,7 @@ void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
   unsigned int otherSemantics = TEXCOORD + 1;
 
   // look up table of position/normal/texcoord duplicate indices
-  std::map<unsigned int, unsigned int> texDupMap;
+  std::map<unsigned int, std::map<unsigned int, unsigned int>> texDupMap;
   std::map<unsigned int, unsigned int> normalDupMap;
   std::map<unsigned int, unsigned int> positionDupMap;
 
@@ -2034,8 +2036,14 @@ void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
     }
     else if (semantic == "TEXCOORD")
     {
-      this->LoadTexCoords(source, texcoords, texDupMap);
-      inputs[TEXCOORD].insert(ignition::math::parseInt(offset));
+      int offsetInt = ignition::math::parseInt(offset);
+      if (inputs[TEXCOORD].find(offsetInt) == inputs[TEXCOORD].end())
+      {
+        int set = ignition::math::parseInt(polylistInputXml->Attribute("set"));
+        this->LoadTexCoords(source, texcoords[set], texDupMap[set]);
+        inputs[TEXCOORD].insert(offsetInt);
+        texcoordsOffsetToSet[offsetInt] = set;
+      }
     }
     else
     {
@@ -2153,16 +2161,26 @@ void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
 
               if (!inputs[TEXCOORD].empty())
               {
-                // Get the vertex texcoord index value. If the texcoord is a
-                // duplicate then reset the index to the first instance of the
-                // duplicated texcoord
-                unsigned int remappedTexcoordIndex =
-                  values[*inputs[TEXCOORD].begin()];
-
-                if (texDupMap.find(remappedTexcoordIndex) != texDupMap.end())
-                  remappedTexcoordIndex = texDupMap[remappedTexcoordIndex];
-
-                texEqual = iv.texcoordIndex == remappedTexcoordIndex;
+                texEqual = true;
+                for (auto offset : inputs[TEXCOORD])
+                {
+                  int set = texcoordsOffsetToSet[offset];
+                  // Get the vertex texcoord index value. If the texcoord is a
+                  // duplicate then reset the index to the first instance of the
+                  // duplicated texcoord
+                  unsigned int remappedTexcoordIndex =
+                    values[offset];
+                  auto &texDupMapSet = texDupMap[set];
+                  auto texDupMapSetIt = texDupMapSet.find(
+                      remappedTexcoordIndex);
+                  if (texDupMapSetIt != texDupMapSet.end())
+                    remappedTexcoordIndex = texDupMapSetIt->second;
+                  if (iv.texcoordIndex[set] != remappedTexcoordIndex)
+                  {
+                    texEqual = false;
+                    break;
+                  }
+                }
               }
 
               // if the vertex has matching normal and texcoord index values
@@ -2228,17 +2246,25 @@ void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
 
           if (!inputs[TEXCOORD].empty())
           {
-            unsigned int inputRemappedTexcoordIndex =
-              values[*inputs[TEXCOORD].begin()];
-
-            if (texDupMap.find(inputRemappedTexcoordIndex) != texDupMap.end())
+            for (auto offset : inputs[TEXCOORD])
             {
-              inputRemappedTexcoordIndex =
-                  texDupMap[inputRemappedTexcoordIndex];
+              unsigned int inputRemappedTexcoordIndex =
+                // values[*inputs[TEXCOORD].begin()];
+                values[offset];
+
+              int set = texcoordsOffsetToSet[offset];
+
+              auto texDupMapSet = texDupMap[set];
+              auto texDupMapSetIt = texDupMapSet.find(
+                  inputRemappedTexcoordIndex);
+              if (texDupMapSetIt != texDupMapSet.end())
+                inputRemappedTexcoordIndex = texDupMapSetIt->second;
+              auto &texcoordsSet = texcoords[set];
+              subMesh->AddTexCoordBySet(
+                  texcoordsSet[inputRemappedTexcoordIndex].X(),
+                  texcoordsSet[inputRemappedTexcoordIndex].Y(), set);
+              input.texcoordIndex[set] = inputRemappedTexcoordIndex;
             }
-            subMesh->AddTexCoord(texcoords[inputRemappedTexcoordIndex].X(),
-                texcoords[inputRemappedTexcoordIndex].Y());
-            input.texcoordIndex = inputRemappedTexcoordIndex;
           }
 
           // add the new ignition submesh vertex index to the map
@@ -2293,7 +2319,8 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
 
   std::vector<ignition::math::Vector3d> verts;
   std::vector<ignition::math::Vector3d> norms;
-  std::vector<ignition::math::Vector2d> texcoords;
+  std::map<unsigned int, std::vector<ignition::math::Vector2d>> texcoords;
+  std::map<unsigned int, unsigned int> texcoordsOffsetToSet;
 
   const unsigned int VERTEX = 0;
   const unsigned int NORMAL = 1;
@@ -2309,7 +2336,7 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
   std::map<const unsigned int, std::set<int>> inputs;
 
   // look up table of position/normal/texcoord duplicate indices
-  std::map<unsigned int, unsigned int> texDupMap;
+  std::map<unsigned int, std::map<unsigned int, unsigned int>> texDupMap;
   std::map<unsigned int, unsigned int> normalDupMap;
   std::map<unsigned int, unsigned int> positionDupMap;
 
@@ -2337,9 +2364,15 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
     }
     else if (semantic == "TEXCOORD")
     {
-      // we currently only support one set of UVs
-      this->LoadTexCoords(source, texcoords, texDupMap);
-      inputs[TEXCOORD].insert(ignition::math::parseInt(offset));
+      int offsetInt = ignition::math::parseInt(offset);
+      if (inputs[TEXCOORD].find(offsetInt) == inputs[TEXCOORD].end())
+      {
+        unsigned int set = ignition::math::parseInt(
+            trianglesInputXml->Attribute("set"));
+        this->LoadTexCoords(source, texcoords[set], texDupMap[set]);
+        inputs[TEXCOORD].insert(offsetInt);
+        texcoordsOffsetToSet[offsetInt] = set;
+      }
       hasTexcoords = true;
     }
     else
@@ -2451,16 +2484,26 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
           }
           if (hasTexcoords)
           {
-            // Get the vertex texcoord index value. If the texcoord is a
-            // duplicate then reset the index to the first instance of the
-            // duplicated texcoord
-            unsigned int remappedTexcoordIndex =
-                values.at(*inputs[TEXCOORD].begin());
-            if (texDupMap.find(remappedTexcoordIndex) != texDupMap.end())
-              remappedTexcoordIndex = texDupMap[remappedTexcoordIndex];
+            texEqual = true;
+            for (auto offset : inputs[TEXCOORD])
+            {
+              // Get the vertex texcoord index value. If the texcoord is a
+              // duplicate then reset the index to the first instance of the
+              // duplicated texcoord
+              unsigned int remappedTexcoordIndex =
+                  values.at(offset);
+              int set = texcoordsOffsetToSet[offset];
+              auto texDupMapSet = texDupMap[set];
+              auto texDupMapSetIt = texDupMapSet.find(remappedTexcoordIndex);
+              if (texDupMapSetIt != texDupMapSet.end())
+                remappedTexcoordIndex = texDupMapSetIt->second;
 
-            if (iv.texcoordIndex == remappedTexcoordIndex)
-              texEqual = true;
+              if (iv.texcoordIndex[set] != remappedTexcoordIndex)
+              {
+                texEqual = false;
+                break;
+              }
+            }
           }
 
           // if the vertex has matching normal and texcoord index values then
@@ -2524,13 +2567,22 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
       }
       if (hasTexcoords)
       {
-        unsigned int inputRemappedTexcoordIndex =
-            values.at(*inputs[TEXCOORD].begin());
-        if (texDupMap.find(inputRemappedTexcoordIndex) != texDupMap.end())
-          inputRemappedTexcoordIndex = texDupMap[inputRemappedTexcoordIndex];
-        subMesh->AddTexCoord(texcoords[inputRemappedTexcoordIndex].X(),
-            texcoords[inputRemappedTexcoordIndex].Y());
-        input.texcoordIndex = inputRemappedTexcoordIndex;
+        for (auto offset : inputs[TEXCOORD])
+        {
+          unsigned int inputRemappedTexcoordIndex =
+              values.at(offset);
+
+          int set = texcoordsOffsetToSet[offset];
+          auto &texDupMapSet = texDupMap[set];
+          auto texDupMapSetIt = texDupMapSet.find(inputRemappedTexcoordIndex);
+          if (texDupMapSetIt != texDupMapSet.end())
+            inputRemappedTexcoordIndex = texDupMapSetIt->second;
+          auto &texcoordsSet = texcoords[set];
+          subMesh->AddTexCoordBySet(
+              texcoordsSet[inputRemappedTexcoordIndex].X(),
+              texcoordsSet[inputRemappedTexcoordIndex].Y(), set);
+          input.texcoordIndex[set] = inputRemappedTexcoordIndex;
+        }
       }
 
       // add the new ignition submesh vertex index to the map

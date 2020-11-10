@@ -124,6 +124,20 @@ namespace ignition
       /// \param[in] _uv The texture coordinate
       public: void AddTexCoord(const ignition::math::Vector2d &_uv);
 
+      /// \brief Add a texture coord to a texture coordinate set of the mesh
+      /// \param[in] _u Position along u
+      /// \param[in] _v Position along v
+      /// \param[in] _setIndex Texture coordinate set index
+      public: void AddTexCoordBySet(double _u, double _v,
+          unsigned int _setIndex);
+
+      /// \brief Add a texture coord to a texture coordinate set of the mesh
+      /// \param[in] _u Position along u
+      /// \param[in] _v Position along v
+      /// \param[in] _setIndex Texture coordinate set index
+      public: void AddTexCoordBySet(const ignition::math::Vector2d &_uv,
+          unsigned int _setIndex);
+
       /// \brief Add a vertex - skeleton node assignment
       /// \param[in] _vertex The vertex index
       /// \param[in] _node The node index
@@ -165,11 +179,30 @@ namespace ignition
       public: ignition::math::Vector2d TexCoord(
                   const unsigned int _index) const;
 
+      /// \brief Get a texture coordinate for a texture coordinate set
+      /// \param[in] _index the texture index
+      /// \return The texture coordinate or ignition::math::Vector2d::Zero
+      /// if index is out of bounds.
+      /// \param[in] _setIndex Texture coordinate set index
+      /// \sa bool HasTexCoordBySet(unsigned int _index, unsigned int _setIndex)
+      /// const
+      public: ignition::math::Vector2d TexCoordBySet(
+                  unsigned int _index,
+                  unsigned int _setIndex) const;
+
       /// \brief Set a texture coordinate
       /// \param[in] _index Index of the texture coordinate that will be set.
       /// \param[in] _uv The new texture coordinate
       public: void SetTexCoord(const unsigned int _index,
                                const ignition::math::Vector2d &_uv);
+
+      /// \brief Set a texture coordinate for a texture coordinate set
+      /// \param[in] _index Index of the texture coordinate that will be set.
+      /// \param[in] _uv The new texture coordinate
+      /// \param[in] _setIndex Texture coordinate set index
+      public: void SetTexCoordBySet(unsigned int _index,
+                               const ignition::math::Vector2d &_uv,
+                               unsigned int _setIdex);
 
       /// \brief Get an index value from the index array
       /// \param[in] _index Array index.
@@ -215,6 +248,12 @@ namespace ignition
       /// \return The number of texture coordinates.
       public: unsigned int TexCoordCount() const;
 
+      /// \brief Return the number of texture coordinates for a texture
+      /// coordinate set
+      /// \param[in] _setIndex Texture coordinate set index
+      /// \return The number of texture coordinates.
+      public: unsigned int TexCoordCountBySet(unsigned int _setIndex) const;
+
       /// \brief Get the number of vertex-skeleton node assignments
       /// \return The number of vertex-skeleton node assignments
       public: unsigned int NodeAssignmentsCount() const;
@@ -258,6 +297,15 @@ namespace ignition
       /// the given _index.
       public: bool HasTexCoord(const unsigned int _index) const;
 
+      /// \brief Return true if this submesh has the texture coordinate with
+      /// the given index in a texture coordinate set
+      /// \param[in] _index Texture coordinate index
+      /// \param[in] _setIndex Texture coordinate set index
+      /// \return Return true if this submesh has the texture coordinate with
+      /// the given _index.
+      public: bool HasTexCoordBySet(unsigned int _index, unsigned int _setIndex)
+          const;
+
       /// \brief Return true if this submesh has the node assignment with
       /// the given index
       /// \param[in] _index Node assignment index
@@ -283,6 +331,14 @@ namespace ignition
       /// \param[in] _center Center of the projection.
       public: void GenSphericalTexCoord(
                   const ignition::math::Vector3d &_center);
+
+      /// \brief Generate texture coordinates for a texture coordinate set
+      ///  using spherical projection from center
+      /// \param[in] _center Center of the projection.
+      /// \param[in] _setIndex Texture coordinate set index
+      public: void GenSphericalTexCoordBySet(
+                  const ignition::math::Vector3d &_center,
+                  unsigned int _setIndex);
 
       /// \brief Scale all vertices by _factor
       /// \param[in] _factor Scaling factor
