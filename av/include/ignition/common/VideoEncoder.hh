@@ -20,9 +20,12 @@
 #include <chrono>
 #include <string>
 #include <memory>
+#include <optional>
 
+#include <ignition/common/FlagSet.hh>
 #include <ignition/common/av/Export.hh>
 #include <ignition/common/SuppressWarning.hh>
+#include <ignition/common/HWVideo.hh>
 
 // Default bitrate (0) indicates that a bitrate should be calculated when
 // Start is called.
@@ -66,6 +69,26 @@ namespace ignition
       /// However, the "v4l2" _format must be accompanied with a video
       /// loopback device filename.
       /// \return True on success
+      /// \note This will automatically select a HW-accelerated encoder based
+      /// on the values of environment variables IGN_VIDEO_ALLOWED_ENCODERS,
+      /// IGN_VIDEO_ENCODER_DEVICE and IGN_VIDEO_ENCODER_USE_HW_SURFACE.
+      /// To completely avoid trying to set up HW accelerated encoding,
+      /// set IGN_VIDEO_ALLOWED_ENCODERS to value NONE or leave it empty or
+      /// unset.
+      /// The meaning of these variables is the following:
+      /// - IGN_VIDEO_ALLOWED_ENCODERS is a colon-separated list of values of
+      /// HWEncoderType enum, or ALL to allow all encoders. Default is NONE.
+      /// - IGN_VIDEO_ENCODER_DEVICE optionally specifies the HW device
+      /// to use for encoding (used only when a matching encoder is found
+      /// first). By default, an empty string is used, which means to use
+      /// whatever device is found to work first.
+      /// - IGN_VIDEO_USE_HW_SURFACE specifies whether the encoder should use
+      /// an explicit GPU buffer for video frames. Some codecs do this
+      /// implicitly, and then this setting has no meaning (setting it to 1 can
+      /// actually decrease performance). For codecs that need to set this
+      /// explicitly, this variable is checked for three values: 1, 0 and empty.
+      /// Empty value means that the implementation should guess whether
+      /// explicit GPU buffers are worth it or not.
       public: bool Start(
                 const std::string &_format = VIDEO_ENCODER_FORMAT_DEFAULT,
                 const std::string &_filename = "",
@@ -73,6 +96,40 @@ namespace ignition
                 const unsigned int _height = VIDEO_ENCODER_HEIGHT_DEFAULT,
                 const unsigned int _fps = VIDEO_ENCODER_FPS_DEFAULT,
                 const unsigned int _bitRate = VIDEO_ENCODER_BITRATE_DEFAULT);
+
+      /// \brief Start the encoder. This should be called once. Add new
+      /// frames to the video using the AddFrame function. Use SaveToFile
+      /// when the video is complete.
+      /// \param[in] _width Width in pixels of the output video.
+      /// \param[in] _height Height in pixels of the output video.
+      /// \param[in] _format String that represents the video type.
+      /// Supported types include: "avi", "ogv", mp4", "v4l2". If using
+      /// "v4l2", you must also specify a _filename.
+      /// \param[in] _bitRate Bit rate to encode the video. A value of zero
+      /// will cause this function to automatically compute a bitrate.
+      /// \param[in] _filename Name of the file that stores the video while it
+      /// is being created. This is a temporary file when recording to
+      /// disk, or a video4linux loopback device like /dev/video0 when
+      /// the _format is "v4l2". If blank, a default temporary file is used.
+      /// However, the "v4l2" _format must be accompanied with a video
+      /// loopback device filename.
+      /// \param[in] _allowedHwAccel Allowed HW acceleration frameworks to
+      /// probe (as a bitmask of values of HWAccelerationDevice enum).
+      /// Set to HWAccelerationDevice::NONE to force software encoding only.
+      /// \param[in] _hwAccelDevice If nonempty, specifies the HW device to use
+      /// for encoding. If empty, the framework search method will look for some
+      /// default devices.
+      /// \return True on success
+      public: bool Start(
+                const std::string &_format,
+                const std::string &_filename,
+                unsigned int _width,
+                unsigned int _height,
+                unsigned int _fps,
+                unsigned int _bitRate,
+                const FlagSet<HWEncoderType>& _allowedHwAccel,
+                const std::string& _hwAccelDevice = "",
+                std::optional<bool> _useHwSurface = {});
 
       /// \brief Stop the encoder. The SaveToFile function also calls this
       /// function.

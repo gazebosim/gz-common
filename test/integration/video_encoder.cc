@@ -15,6 +15,9 @@
 */
 #include <gtest/gtest.h>
 
+// needed on MacOS
+#include <cmath>
+
 #include "ignition/common/VideoEncoder.hh"
 #include "ignition/common/Video.hh"
 #include "test_config.h"

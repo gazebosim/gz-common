@@ -20,14 +20,21 @@
 
 #include <ignition/common/av/Util.hh>
 #include "ignition/common/ffmpeg_inc.hh"
-#include "ignition/common/Console.hh"
 #include "ignition/common/VideoEncoder.hh"
+#include "ignition/common/StringUtils.hh"
+#include "ignition/common/Console.hh"
+
+#ifdef IGN_COMMON_BUILD_HW_VIDEO
+#include "ignition/common/HWEncoder.hh"
+#endif
 
 using namespace ignition;
 using namespace common;
+using namespace std;
 
 // Private data class
-class ignition::common::VideoEncoderPrivate
+// hidden visibility specifier has to be explicitly set to silent a gcc warning
+class IGNITION_COMMON_AV_HIDDEN ignition::common::VideoEncoderPrivate
 {
   /// \brief Name of the file which stores the video while it is being
   ///        recorded.
@@ -84,7 +91,45 @@ class ignition::common::VideoEncoderPrivate
 
   /// \brief Mutex for thread safety.
   public: std::mutex mutex;
+
+#ifdef IGN_COMMON_BUILD_HW_VIDEO
+  /// \brief The HW encoder configuration (optional).
+  public: std::unique_ptr<HWEncoder> hwEncoder = nullptr;
+#endif
+
+  /// Find a suitable encoder for the given codec ID.
+  /// \param[in] _codecId ID of the codec we seek the encoder for.
+  /// \return The matched encoder (or nullptr on failure).
+  public: AVCodec* FindEncoder(AVCodecID _codecId);
+
+  /// \brief Get a pointer to the frame that contains the encoder input. This
+  /// mainly serves for uploading the frame to GPU buffer if HW acceleration is
+  /// used and HW surfaces are configured.
+  /// \param[in] _inFrame The input frame to be encoded (in CPU buffer).
+  /// \return Either _inFrame of a pointer to the GPU buffer containing the
+  /// uploaded frame.
+  public: AVFrame* GetFrameForEncoder(AVFrame* _inFrame);
 };
+
+/////////////////////////////////////////////////
+AVCodec* VideoEncoderPrivate::FindEncoder(AVCodecID _codecId)
+{
+#ifdef IGN_COMMON_BUILD_HW_VIDEO
+  if (this->hwEncoder)
+    return this->hwEncoder->FindEncoder(_codecId);
+#endif
+  return avcodec_find_encoder(_codecId);
+}
+
+/////////////////////////////////////////////////
+AVFrame* VideoEncoderPrivate::GetFrameForEncoder(AVFrame* _inFrame)
+{
+#ifdef IGN_COMMON_BUILD_HW_VIDEO
+  if (this->hwEncoder)
+    return this->hwEncoder->GetFrameForEncoder(_inFrame);
+#endif
+  return _inFrame;
+}
 
 /////////////////////////////////////////////////
 VideoEncoder::VideoEncoder()
@@ -119,6 +164,63 @@ bool VideoEncoder::Start(const std::string &_format,
                          const unsigned int _height,
                          const unsigned int _fps,
                          const unsigned int _bitRate)
+{
+  std::string allowedEncodersStr;
+  env("IGN_VIDEO_ALLOWED_ENCODERS", allowedEncodersStr);
+
+  FlagSet<HWEncoderType> allowedEncoders = HWEncoderType::NONE;
+  if (allowedEncodersStr == "ALL")
+  {
+    allowedEncoders = FlagSet<HWEncoderType>::ALL();
+  }
+  else if (!allowedEncodersStr.empty() && allowedEncodersStr != "NONE")
+  {
+    for (const auto& encoderStr : Split(allowedEncodersStr, ':'))
+    {
+      HWEncoderType encoder = HWEncoderType::NONE;
+      HWEncoderTypeParser.Set(encoder, encoderStr);
+      if (encoder != HWEncoderType::NONE)
+        allowedEncoders |= encoder;
+    }
+  }
+
+#ifndef IGN_COMMON_BUILD_HW_VIDEO
+  if (allowedEncoders != HWEncoderType::NONE)
+  {
+    ignwarn << "Hardware encoding with encoders " << allowedEncodersStr
+            << " was requested, but ignition-common is built without HW "
+            << "encoding support. A software encoder will be used instead."
+            << std::endl;
+  }
+#endif
+
+  std::string device;
+  env("IGN_VIDEO_ENCODER_DEVICE", device);
+
+  std::string hwSurfaceStr;
+  env("IGN_VIDEO_USE_HW_SURFACE", hwSurfaceStr);
+
+  std::optional<bool> useHwSurface;
+  if (!hwSurfaceStr.empty())
+  {
+    if (hwSurfaceStr == "0")
+      useHwSurface = false;
+    else
+      useHwSurface = true;
+  }
+
+  return this->Start(_format, _filename, _width, _height, _fps, _bitRate,
+                     allowedEncoders, device, useHwSurface);
+}
+
+/////////////////////////////////////////////////
+bool VideoEncoder::Start(
+  const std::string &_format, const std::string &_filename,
+  const unsigned int _width, const unsigned int _height,
+  const unsigned int _fps, const unsigned int _bitRate,
+  [[maybe_unused]] const FlagSet<HWEncoderType>& _allowedHwAccel,
+  [[maybe_unused]] const std::string& _hwAccelDevice,
+  [[maybe_unused]] std::optional<bool> _useHwSurface)
 {
   // Do not allow Start to be called more than once without Stop or Reset
   // being called first.
@@ -174,7 +276,7 @@ bool VideoEncoder::Start(const std::string &_format,
   this->dataPtr->frameCount = 0;
   this->dataPtr->filename = _filename;
 
-  // Create a default filenamae if the provided filename is empty.
+  // Create a default filename if the provided filename is empty.
   if (this->dataPtr->filename.empty())
   {
     if (this->dataPtr->format.compare("v4l2") == 0)
@@ -269,21 +371,29 @@ bool VideoEncoder::Start(const std::string &_format,
     return false;
   }
 
+#ifdef IGN_COMMON_BUILD_HW_VIDEO
+  // HW encoder needs to be created before the call to FindEncoder()
+  this->dataPtr->hwEncoder = std::make_unique<HWEncoder>(
+      _allowedHwAccel, _hwAccelDevice, _useHwSurface);
+#endif
+
   // find the video encoder
-  AVCodec *encoder = avcodec_find_encoder(
-      this->dataPtr->formatCtx->oformat->video_codec);
+  const auto codecId = this->dataPtr->formatCtx->oformat->video_codec;
+  auto* encoder = this->dataPtr->FindEncoder(codecId);
   if (!encoder)
   {
     ignerr << "Codec for["
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
           << this->dataPtr->formatCtx->oformat->name
 #else
-          << avcodec_get_name(this->dataPtr->formatCtx->oformat->video_codec)
+          << avcodec_get_name(codecId)
 #endif
           << "] not found. Video encoding is not started.\n";
     this->Reset();
     return false;
   }
+
+  ignmsg << "Using encoder " << encoder->name << std::endl;
 
   // Create a new video stream
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
@@ -349,8 +459,7 @@ bool VideoEncoder::Start(const std::string &_format,
   this->dataPtr->codecCtx->thread_count = 5;
 
   // Set the codec id
-  this->dataPtr->codecCtx->codec_id =
-    this->dataPtr->formatCtx->oformat->video_codec;
+  this->dataPtr->codecCtx->codec_id = codecId;
 
   if (this->dataPtr->codecCtx->codec_id == AV_CODEC_ID_MPEG1VIDEO)
   {
@@ -371,6 +480,14 @@ bool VideoEncoder::Start(const std::string &_format,
     av_opt_set(this->dataPtr->videoStream->priv_data, "preset", "slow", 0);
 #endif
   }
+
+  // we misuse this field a bit, as docs say it is unused in encoders
+  // here, it stores the input format of the encoder
+  this->dataPtr->codecCtx->sw_pix_fmt = this->dataPtr->codecCtx->pix_fmt;
+#ifdef IGN_COMMON_BUILD_HW_VIDEO
+  if (this->dataPtr->hwEncoder)
+    this->dataPtr->hwEncoder->ConfigHWAccel(this->dataPtr->codecCtx);
+#endif
 
   // Open the video context
   int ret = avcodec_open2(this->dataPtr->codecCtx, encoder, 0);
@@ -395,7 +512,8 @@ bool VideoEncoder::Start(const std::string &_format,
     return false;
   }
 
-  this->dataPtr->avOutFrame->format = this->dataPtr->codecCtx->pix_fmt;
+  // we misuse sw_pix_fmt a bit, as docs say it is unused in encoders
+  this->dataPtr->avOutFrame->format = this->dataPtr->codecCtx->sw_pix_fmt;
   this->dataPtr->avOutFrame->width = this->dataPtr->codecCtx->width;
   this->dataPtr->avOutFrame->height = this->dataPtr->codecCtx->height;
 
@@ -547,7 +665,8 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
         static_cast<AVPixelFormat>(this->dataPtr->avInFrame->format),
         this->dataPtr->codecCtx->width,
         this->dataPtr->codecCtx->height,
-        this->dataPtr->codecCtx->pix_fmt,
+        // we misuse this field a bit, as docs say it is unused in encoders
+        this->dataPtr->codecCtx->sw_pix_fmt,
         0, nullptr, nullptr, nullptr);
 
     if (this->dataPtr->swsCtx == nullptr)
@@ -568,6 +687,9 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
       this->dataPtr->avOutFrame->data,
       this->dataPtr->avOutFrame->linesize);
 
+  auto* frameToEncode = this->dataPtr->GetFrameForEncoder(
+    this->dataPtr->avOutFrame);
+
   // compute frame number based on timestamp of current image
   auto timeSinceStart = std::chrono::duration_cast<std::chrono::milliseconds>(
       _timestamp - this->dataPtr->timeStart);
@@ -581,7 +703,7 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
   // number
   for (uint64_t i = 0u; i < frameDiff; ++i)
   {
-    this->dataPtr->avOutFrame->pts = this->dataPtr->frameCount++;
+    frameToEncode->pts = this->dataPtr->frameCount++;
 
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 40, 101)
     int gotOutput = 0;
@@ -591,7 +713,7 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
     avPacket.size = 0;
 
     int ret = avcodec_encode_video2(this->dataPtr->codecCtx, &avPacket,
-        this->dataPtr->avOutFrame, &gotOutput);
+      frameToEncode, &gotOutput);
 
     if (ret >= 0 && gotOutput == 1)
     {
@@ -635,7 +757,7 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
     avPacket->size = 0;
 
     int ret = avcodec_send_frame(this->dataPtr->codecCtx,
-                                 this->dataPtr->avOutFrame);
+                                 frameToEncode);
 
     // This loop will retrieve and write available packets
     while (ret >= 0)
@@ -767,4 +889,8 @@ void VideoEncoder::Reset()
   this->dataPtr->format = VIDEO_ENCODER_FORMAT_DEFAULT;
   this->dataPtr->timePrev = std::chrono::steady_clock::time_point();
   this->dataPtr->timeStart = std::chrono::steady_clock::time_point();
+#ifdef IGN_COMMON_BUILD_HW_VIDEO
+  if (this->dataPtr->hwEncoder)
+    this->dataPtr->hwEncoder.reset();
+#endif
 }
