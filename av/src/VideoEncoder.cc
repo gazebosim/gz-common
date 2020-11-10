@@ -689,6 +689,9 @@ bool VideoEncoder::Stop()
     sws_freeContext(this->dataPtr->swsCtx);
   this->dataPtr->swsCtx = nullptr;
 
+  if (this->dataPtr->formatCtx && this->dataPtr->formatCtx->pb)
+    avio_closep(&this->dataPtr->formatCtx->pb);
+
   // This frees the context and all the streams
   if (this->dataPtr->formatCtx)
     avformat_free_context(this->dataPtr->formatCtx);
