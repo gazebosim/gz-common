@@ -6,7 +6,7 @@ ign_get_sources(tests)
 # FIXME the mesh test does not work
 list(REMOVE_ITEM tests mesh.cc)
 
-if (WIN32)
+if (${SKIP_av})
   list(REMOVE_ITEM tests encoder_timing.cc)
 endif()
 
