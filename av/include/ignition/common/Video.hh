@@ -68,8 +68,9 @@ namespace ignition
       public: Length Duration() const;
 
       /// \brief Get the next frame of the video.
-      /// \param[out] _img Image in which the frame is stored
-      /// \return  false on error
+      /// \param[out] _buffer Allocated buffer in which the frame is stored
+      ///                     (size has to be width * height * 3 bytes).
+      /// \return false on error or end of file
       public: bool NextFrame(unsigned char **_buffer);
 
       /// \brief free up open Video object, close files, streams
