@@ -376,11 +376,8 @@ bool VideoEncoder::Start(const std::string &_format,
   int ret = avcodec_open2(this->dataPtr->codecCtx, encoder, 0);
   if (ret < 0)
   {
-    char errBuff[AV_ERROR_MAX_STRING_SIZE];
-    av_strerror(ret, errBuff, AV_ERROR_MAX_STRING_SIZE);
-
-    ignerr << "Could not open video codec: " << errBuff
-          << "Video encoding is not started\n";
+    ignerr << "Could not open video codec: " << av_err2str_cpp(ret)
+          << ". Video encoding is not started\n";
     this->Reset();
     return false;
   }
@@ -410,8 +407,8 @@ bool VideoEncoder::Start(const std::string &_format,
                      this->dataPtr->codecCtx->height,
                      this->dataPtr->codecCtx->pix_fmt, 32) < 0)
   {
-    ignerr << "Could not allocate raw picture buffer."
-          << "Video encoding is not started\n";
+    ignerr << "Could not allocate raw picture buffer. "
+           << "Video encoding is not started\n";
     this->Reset();
     return false;
   }
@@ -427,11 +424,8 @@ bool VideoEncoder::Start(const std::string &_format,
 #endif
   if (ret < 0)
   {
-    char errBuff[AV_ERROR_MAX_STRING_SIZE];
-    av_strerror(ret, errBuff, AV_ERROR_MAX_STRING_SIZE);
-
-    ignerr << "Could not copy the stream parameters:" << errBuff
-          << "Video encoding not started\n";
+    ignerr << "Could not copy the stream parameters:" << av_err2str_cpp(ret)
+          << ". Video encoding not started\n";
     return false;
   }
 
@@ -449,11 +443,8 @@ bool VideoEncoder::Start(const std::string &_format,
 
     if (ret < 0)
     {
-      char errBuff[AV_ERROR_MAX_STRING_SIZE];
-      av_strerror(ret, errBuff, AV_ERROR_MAX_STRING_SIZE);
       ignerr << "Could not open '" << this->dataPtr->filename << "'. "
-            << errBuff
-            << "Video encoding is not started\n";
+            << av_err2str_cpp(ret) << ". Video encoding is not started\n";
       this->Reset();
       return false;
     }
@@ -463,10 +454,7 @@ bool VideoEncoder::Start(const std::string &_format,
   ret = avformat_write_header(this->dataPtr->formatCtx, nullptr);
   if (ret < 0)
   {
-    char errBuff[AV_ERROR_MAX_STRING_SIZE];
-    av_strerror(ret, errBuff, AV_ERROR_MAX_STRING_SIZE);
-
-    ignerr << "Error occured when opening output file: " << errBuff
+    ignerr << "Error occured when opening output file: " << av_err2str_cpp(ret)
           << ". Video encoding is not started\n";
     this->Reset();
     return false;
