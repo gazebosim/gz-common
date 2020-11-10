@@ -17,6 +17,8 @@
 #ifndef IGNITION_COMMON_FFMPEG_INC_HH_
 #define IGNITION_COMMON_FFMPEG_INC_HH_
 
+#include <string>
+
 #include <ignition/common/config.hh>
 
 #ifndef _WIN32
@@ -77,6 +79,14 @@ namespace ignition
     IGNITION_COMMON_AV_VISIBLE
     int AVCodecDecode(AVCodecContext *_codecCtx,
         AVFrame *_frame, int *_gotFrame, AVPacket *_packet);
+
+    // av_err2str only works in C99, this is a version that works in C++;
+    inline std::string av_err2str_cpp(int errnum)
+    {
+      char buf[AV_ERROR_MAX_STRING_SIZE];
+      // lavu 51.58.100
+      return av_make_error_string(buf, AV_ERROR_MAX_STRING_SIZE, errnum);
+    }
   }
 }
 
