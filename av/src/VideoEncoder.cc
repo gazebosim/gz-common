@@ -548,7 +548,7 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
         this->dataPtr->codecCtx->width,
         this->dataPtr->codecCtx->height,
         this->dataPtr->codecCtx->pix_fmt,
-        SWS_BICUBIC, nullptr, nullptr, nullptr);
+        0, nullptr, nullptr, nullptr);
 
     if (this->dataPtr->swsCtx == nullptr)
     {
