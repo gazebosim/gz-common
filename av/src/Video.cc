@@ -250,9 +250,10 @@ bool Video::NextFrame(unsigned char **_buffer)
       int processedLength = AVCodecDecode(this->dataPtr->codecCtx,
           this->dataPtr->avFrame, &frameAvailable, &tmpPacket);
 
-      if (processedLength < 0)
+      if (processedLength <= 0)
       {
-        ignerr << "Error while processing the data\n";
+        if (processedLength < 0)
+          ignerr << "Error while processing the data\n";
         break;
       }
 
@@ -280,7 +281,7 @@ bool Video::NextFrame(unsigned char **_buffer)
   }
   AVPacketUnref(&packet);
 
-  return true;
+  return frameAvailable != 0;
 }
 
 /////////////////////////////////////////////////
