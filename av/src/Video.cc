@@ -253,7 +253,11 @@ bool Video::NextFrame(unsigned char **_buffer)
       if (processedLength <= 0)
       {
         if (processedLength < 0)
-          ignerr << "Error while processing the data\n";
+          ignerr << "Error while processing the data: "
+                 << av_err2str_cpp(processedLength) << std::endl;
+        else
+          ignmsg << "No more data in packet." << std::endl;
+
         break;
       }
 
