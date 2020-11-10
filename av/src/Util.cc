@@ -24,7 +24,6 @@
 /////////////////////////////////////////////////
 // avcodec log callback. We use this to redirect message to gazebo's console
 // messages.
-#ifndef _WIN32
 void logCallback(void *_ptr, int _level, const char *_fmt, va_list _args)
 {
   static char message[8192];
@@ -66,12 +65,10 @@ void logCallback(void *_ptr, int _level, const char *_fmt, va_list _args)
       break;
   }
 }
-#endif
 
 /////////////////////////////////////////////////
 void ignition::common::load()
 {
-#ifndef _WIN32
   static bool first = true;
   if (first)
   {
@@ -88,5 +85,4 @@ void ignition::common::load()
     // Set the log callback function.
     av_log_set_callback(logCallback);
   }
-#endif
 }
