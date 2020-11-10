@@ -3,12 +3,13 @@ cmake_minimum_required(VERSION 3.10.2 FATAL_ERROR)
 #============================================================================
 # Initialize the project
 #============================================================================
-project(ignition-common3 VERSION 3.6.1)
+project(ignition-common3 VERSION 3.7.0)
 
 #============================================================================
 # Find ignition-cmake
 #============================================================================
-find_package(ignition-cmake2 REQUIRED)
+find_package(ignition-cmake2 REQUIRED COMPONENTS utilities)
+set(IGN_CMAKE_VER ${ignition-cmake2_VERSION_MAJOR})
 
 #============================================================================
 # Configure the project
@@ -33,9 +34,8 @@ endif()
 if(UNIX OR APPLE)
   option(USE_EXTERNAL_TINYXML2 "Use a system-installed version of tinyxml2" ON)
 elseif(WIN32)
-  # This is always false for Windows, so we can avoid trying to search for a
-  # system installation of tinyxml2.
-  set(USE_EXTERNAL_TINYXML2 false)
+  # For backward compatibility, this option on Windows by default is OFF
+  option(USE_EXTERNAL_TINYXML2 "Use a system-installed version of tinyxml2" OFF)
 endif()
 
 

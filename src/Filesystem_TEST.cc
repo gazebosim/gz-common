@@ -25,6 +25,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "ignition/common/Util.hh"
+
 // The symlink tests should always work on UNIX systems
 #define BUILD_SYMLINK_TESTS
 
@@ -32,12 +34,8 @@
 bool create_and_switch_to_temp_dir(std::string &_new_temp_path)
 {
   std::string tmppath;
-  const char *tmp = getenv("TMPDIR");
-  if (tmp)
-  {
-    tmppath = std::string(tmp);
-  }
-  else
+
+  if (!ignition::common::env("TMPDIR", tmppath))
   {
     tmppath = std::string("/tmp");
   }
