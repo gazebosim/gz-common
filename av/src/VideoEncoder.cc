@@ -399,13 +399,9 @@ bool VideoEncoder::Start(const std::string &_format,
   this->dataPtr->avOutFrame->width = this->dataPtr->codecCtx->width;
   this->dataPtr->avOutFrame->height = this->dataPtr->codecCtx->height;
 
-  // the image can be allocated by any means and av_image_alloc() is
-  // just the most convenient way if av_malloc() is to be used
-  if (av_image_alloc(this->dataPtr->avOutFrame->data,
-                     this->dataPtr->avOutFrame->linesize,
-                     this->dataPtr->codecCtx->width,
-                     this->dataPtr->codecCtx->height,
-                     this->dataPtr->codecCtx->pix_fmt, 32) < 0)
+  // av_image_alloc() could also allocate the image, but av_frame_get_buffer()
+  // allocates a refcounted buffer, which is easier to manage
+  if (av_frame_get_buffer(this->dataPtr->avOutFrame, 32) > 0)
   {
     ignerr << "Could not allocate raw picture buffer. "
            << "Video encoding is not started\n";
@@ -537,18 +533,18 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
           this->dataPtr->inHeight);
 #else
       this->dataPtr->avInFrame = av_frame_alloc();
+      this->dataPtr->avInFrame->width = this->dataPtr->inWidth;
+      this->dataPtr->avInFrame->height = this->dataPtr->inHeight;
+      this->dataPtr->avInFrame->format = AV_PIX_FMT_RGB24;
 
-      av_image_alloc(this->dataPtr->avInFrame->data,
-          this->dataPtr->avInFrame->linesize,
-          this->dataPtr->inWidth, this->dataPtr->inHeight,
-          AV_PIX_FMT_RGB24, 1);
+      av_frame_get_buffer(this->dataPtr->avInFrame, 1);
 #endif
     }
 
     this->dataPtr->swsCtx = sws_getContext(
         this->dataPtr->inWidth,
         this->dataPtr->inHeight,
-        AV_PIX_FMT_RGB24,
+        static_cast<AVPixelFormat>(this->dataPtr->avInFrame->format),
         this->dataPtr->codecCtx->width,
         this->dataPtr->codecCtx->height,
         this->dataPtr->codecCtx->pix_fmt,
