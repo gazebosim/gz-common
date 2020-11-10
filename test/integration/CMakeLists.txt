@@ -6,6 +6,10 @@ ign_get_sources(tests)
 # FIXME the mesh test does not work
 list(REMOVE_ITEM tests mesh.cc)
 
+if (${SKIP_av})
+  list(REMOVE_ITEM tests video_encoder.cc)
+endif()
+
 ign_build_tests(
   TYPE INTEGRATION
   SOURCES ${tests})
@@ -15,4 +19,8 @@ if(TARGET INTEGRATION_plugin)
   # before INTEGRATION_plugin so that its auto-generated header is available.
   # We do not want to link INTEGRATION_plugin to the DummyPlugins library.
   add_dependencies(INTEGRATION_plugin IGNDummyPlugins)
+endif()
+
+if(TARGET INTEGRATION_video_encoder)
+  target_link_libraries(INTEGRATION_video_encoder ${PROJECT_LIBRARY_TARGET_NAME}-av)
 endif()
