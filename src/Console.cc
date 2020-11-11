@@ -30,12 +30,11 @@ using namespace common;
 FileLogger ignition::common::Console::log("");
 
 #ifdef _WIN32
-  // These are Windows-based color codes
-  // (yellow is not enumerated by Windows)
-  const int red = FOREGROUND_RED | FOREGROUND_INTENSITY;
-  const int yellow = 0x006 | FOREGROUND_INTENSITY;
-  const int green = FOREGROUND_GREEN | FOREGROUND_INTENSITY;
-  const int blue = FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+  // docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences
+  const int red = 31;
+  const int yellow = 33;
+  const int green = 32;
+  const int blue = 36;
 #else
   // These are ANSI-based color codes
   const int red = 31;
@@ -151,20 +150,33 @@ int Logger::Buffer::sync()
 
     fprintf(outstream, "%s", ss.str().c_str());
 #else
-    HANDLE hConsole = GetStdHandle(
-          this->type == Logger::STDOUT ? STD_OUTPUT_HANDLE : STD_ERROR_HANDLE);
+    HANDLE hConsole = CreateFileW(
+      L"CONOUT$", GENERIC_WRITE|GENERIC_READ, 0, nullptr, OPEN_EXISTING,
+      FILE_ATTRIBUTE_NORMAL, nullptr);
 
-    CONSOLE_SCREEN_BUFFER_INFO originalBufferInfo;
-    GetConsoleScreenBufferInfo(hConsole, &originalBufferInfo);
-
-    SetConsoleTextAttribute(hConsole, this->color);
+    DWORD dwMode = 0;
+    bool vtProcessing = false;
+    if (GetConsoleMode(hConsole, &dwMode))
+    {
+      if ((dwMode & ENABLE_VIRTUAL_TERMINAL_PROCESSING) > 0)
+      {
+        vtProcessing = true;
+      }
+      else
+      {
+        dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+        if (SetConsoleMode(hConsole, dwMode))
+          vtProcessing = true;
+      }
+    }
 
     std::ostream &outStream =
         this->type == Logger::STDOUT ? std::cout : std::cerr;
 
-    outStream << outstr;
-
-    SetConsoleTextAttribute(hConsole, originalBufferInfo.wAttributes);
+    if (vtProcessing)
+      outStream << "\x1b[" << this->color << "m" << outstr << "\x1b[m";
+    else
+      outStream << outstr;
 #endif
   }
 
