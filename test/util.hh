@@ -39,8 +39,6 @@ namespace ignition
       protected: virtual void SetUp()
       {
 #ifndef _WIN32
-        std::string logPath;
-        ASSERT_TRUE(ignition::common::env(IGN_HOMEDIR, logPath));
 
         const ::testing::TestInfo *const testInfo =
           ::testing::UnitTest::GetInstance()->current_test_info();
@@ -70,7 +68,7 @@ namespace ignition
       }
 
       /// \brief Get a string with all the log content loaded from the disk.
-      /// \return A string will all the log content.
+      /// \return A string with all the log content.
       protected: std::string LogContent() const
       {
         std::string loggedString;

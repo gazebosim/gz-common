@@ -206,8 +206,8 @@ std::string ignition::common::absPath(const std::string &_path)
   else if (!_path.empty())
   {
     // If _path is an absolute path, then return _path.
-    // An absoluate path on Windows is a character followed by a colon and a
-    // forward-slash.
+    // An absolute path on Windows is a character followed by a colon and a
+    // backslash.
     if (_path.compare(0, 1, "/") == 0 || _path.compare(1, 3, ":\\") == 0)
       result = _path;
     // Otherwise return the current working directory with _path appended.

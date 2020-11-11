@@ -341,7 +341,7 @@ namespace ignition
     bool internal_check_path(const std::string &_path, DWORD &attr)
     {
       attr = ::GetFileAttributesA(_path.c_str());
-      if (attr == 0xFFFFFFFF)
+      if (attr == INVALID_FILE_ATTRIBUTES)
       {
         return process_status_failure();
       }

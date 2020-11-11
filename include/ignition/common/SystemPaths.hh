@@ -104,7 +104,7 @@ namespace ignition
       public: void ClearPluginPaths();
 
       /// \brief Set the file path environment variable to use, and clears
-      /// any previously file paths. The default
+      /// any previously set file paths. The default
       /// environment variable is IGN_FILE_PATH. The
       /// environment variable should be a set of colon (semicolon on windows)
       /// delimited paths. These paths will be used with the FindFile function.

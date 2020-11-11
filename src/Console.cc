@@ -186,8 +186,7 @@ FileLogger::~FileLogger()
 {
   if (this->initialized && this->rdbuf())
   {
-    FileLogger::Buffer *buf = static_cast<FileLogger::Buffer*>(
-        this->rdbuf());
+    auto *buf = dynamic_cast<FileLogger::Buffer*>(this->rdbuf());
     if (buf->stream)
     {
       delete buf->stream;
@@ -217,13 +216,10 @@ void FileLogger::Init(const std::string &_directory,
     logPath = _directory;
   }
 
-  FileLogger::Buffer *buf = static_cast<FileLogger::Buffer*>(
-      this->rdbuf());
+  auto* buf = dynamic_cast<FileLogger::Buffer*>(this->rdbuf());
 
   // Create the directory if it doesn't exist.
-  // \todo(anyone): Replace this with c++1y, when it is released.
-  if (!exists(logPath))
-    createDirectories(logPath);
+  createDirectories(logPath);
 
   logPath = joinPaths(logPath, _filename);
 

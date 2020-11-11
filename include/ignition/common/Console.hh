@@ -45,11 +45,11 @@ namespace ignition
     /// \brief Output a message to a log file, regardless of verbosity level
     #define ignlog (ignition::common::Console::log())
 
-    /// \brief Initialize log file with filename given by _str.
-    /// If called twice, it will close currently in use and open a new
+    /// \brief Initialize log file with filename given by _dir/_file.
+    /// If called twice, it will close the file currently in use and open a new
     /// log file.
     /// \param[in] _dir Name of directory in which to store the log file. Note
-    /// that if _dir does not start with a forward slash (/), then _dir will
+    /// that if _dir is not an absolute path, then _dir will
     /// be relative to your home directory.
     /// \param[in] _file Name of log file for ignlog messages.
     #define ignLogInit(_dir, _file)\
