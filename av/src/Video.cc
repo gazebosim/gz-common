@@ -212,10 +212,12 @@ bool Video::Load(const std::string &_filename)
   this->dataPtr->avFrameDst->format = this->dataPtr->dstPixelFormat;
   this->dataPtr->avFrameDst->width = this->dataPtr->codecCtx->width;
   this->dataPtr->avFrameDst->height = this->dataPtr->codecCtx->height;
-  av_image_alloc(this->dataPtr->avFrameDst->data,
-      this->dataPtr->avFrameDst->linesize,
-      this->dataPtr->codecCtx->width, this->dataPtr->codecCtx->height,
-      this->dataPtr->dstPixelFormat, 1);
+  int ret = av_frame_get_buffer(this->dataPtr->avFrameDst, 1);
+  ignerr << "RET" << ret << "xxxxxxxxxxxxxxxxxxxx" << std::endl;
+//  av_image_alloc(this->dataPtr->avFrameDst->data,
+//      this->dataPtr->avFrameDst->linesize,
+//      this->dataPtr->codecCtx->width, this->dataPtr->codecCtx->height,
+//      this->dataPtr->dstPixelFormat, 1);
 
   // DEBUG: Will save all the frames
   // Image img;
