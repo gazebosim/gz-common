@@ -201,7 +201,13 @@ void FileLogger::Init(const std::string &_directory,
 {
   std::string logPath;
 
-  if (_directory.empty() || _directory[0] != '/')
+  if (_directory.empty() ||
+#ifndef _WIN32
+    _directory[0] != '/'
+#else
+    _directory.length() < 2 || _directory[1] != ':'
+#endif
+    )
   {
     if (!env(IGN_HOMEDIR, logPath))
     {

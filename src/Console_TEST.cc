@@ -27,7 +27,6 @@
 
 namespace igncmn = ignition::common;
 
-#ifndef _WIN32
 const int g_messageRepeat = 4;
 
 class Console_TEST : public ::testing::Test {
@@ -554,4 +553,3 @@ int main(int argc, char **argv)
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
-#endif
