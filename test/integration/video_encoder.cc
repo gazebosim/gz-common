@@ -46,7 +46,7 @@ computeAverageIntensity(const size_t bufferSize, const unsigned char* buf)
 /////////////////////////////////////////////////
 TEST_F(EncoderDecoderTest, DecodeEncodeDecode)
 {
-  av_log_set_level(AV_LOG_ERROR);
+//  av_log_set_level(AV_LOG_ERROR);
 
   const unsigned int fps = 25u;
 
