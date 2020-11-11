@@ -116,9 +116,10 @@ namespace ignition
     std::string IGNITION_COMMON_VISIBLE copyToUnixPath(
         const std::string &_path);
 
-    /// \brief Get the absolute path of a provided path.
+    /// \brief Get the absolute path of a provided path. Relative paths are
+    /// resolved relative to the current working directory.
     /// \param[in] _path Relative or absolute path.
-    /// \return Absolute path
+    /// \return Absolute path (with platform-dependent directory separators).
     std::string IGNITION_COMMON_VISIBLE absPath(const std::string &_path);
 
     /// \brief Join two strings together to form a path

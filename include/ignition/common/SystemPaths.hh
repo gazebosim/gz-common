@@ -56,23 +56,27 @@ namespace ignition
       /// \brief Destructor
       public: virtual ~SystemPaths();
 
-      /// \brief Get the log path
+      /// \brief Get the log path. If IGN_LOG_PATH environment variable is set,
+      /// then this path is used. If not, the path is $HOME/.ignition, and in
+      /// case even HOME is not set, /tmp/ignition is used. If the directory
+      /// does not exist, it is created in the constructor of SystemPaths.
       /// \return the path
       public: std::string LogPath() const;
 
       /// \brief Get the plugin paths
-      /// \return a list of paths
+      /// \return a list of paths (with forward slashes as directory separators)
       public: const std::list<std::string> &PluginPaths();
 
       /// \brief Find a file or path using a URI
       /// \param[in] _uri the uniform resource identifier
-      /// \return Returns full path name to file
+      /// \return Returns full path name to file with platform-specific
+      /// directory separators, or an empty string if URI couldn't be found.
       public: std::string FindFileURI(const std::string &_uri) const;
 
       /// \brief Find a file or path using a URI
       /// \param[in] _uri the uniform resource identifier
-      /// \return Returns full path name to file or an empty string if URI
-      /// couldn't be found.
+      /// \return Returns full path name to file with platform-specific
+      /// directory separators, or an empty string if URI couldn't be found.
       public: std::string FindFileURI(const ignition::common::URI &_uri) const;
 
       /// \brief Set the plugin path environment variable to use
@@ -83,7 +87,8 @@ namespace ignition
       /// \param[in] _filename Name of the file to find.
       /// \param[in] _searchLocalPath True to search in the current working
       /// directory.
-      /// \return Returns full path name to file
+      /// \return Returns full path name to file with platform-specific
+      /// directory separators, or empty string on error.
       public: std::string FindFile(const std::string &_filename,
                                    const bool _searchLocalPath = true) const;
 
@@ -93,7 +98,8 @@ namespace ignition
       /// platforms. For example searching for "MyLibName" may try finding
       /// "MyLibName", "libMyLibName.so", "MyLibName.dll", etc...
       /// \param[in] _libName Name of shared libary to look for
-      /// \return path to file or empty string on error
+      /// \return Path to file with platform-specific directory separators,
+      /// or empty string on error.
       public: std::string FindSharedLibrary(const std::string &_libName);
 
       /// \brief Add colon (semicolon on windows) delimited paths to plugins
@@ -121,13 +127,14 @@ namespace ignition
       public: std::string FilePathEnv() const;
 
       /// \brief Get the file paths
-      /// \return a list of paths
+      /// \return a list of paths (with forward slashes as directory separators)
       public: const std::list<std::string> &FilePaths();
 
       /// \brief Add colon (semicolon on windows) delimited paths to find
       /// files. These paths will be used with the FindFile function.
       /// \param[in] _path A colon (semicolon on windows) delimited
-      /// string of paths.
+      /// string of paths. The path can have either forward slashes or platform-
+      /// specific directory separators, both are okay.
       public: void AddFilePaths(const std::string &_path);
 
       /// \brief clear out SystemPaths#filePaths
@@ -139,7 +146,8 @@ namespace ignition
 
       /// \brief Set the callback to use when ignition can't find a file.
       /// The callback should return a complete path to the requested file, or
-      /// and empty string if the file was not found in the callback.
+      /// and empty string if the file was not found in the callback. The path
+      /// should use platform-specific directory separators.
       /// \param[in] _cb The callback function.
       /// \deprecated Use AddFindFileCallback instead
       public: void IGN_DEPRECATED(3) SetFindFileCallback(
@@ -147,7 +155,8 @@ namespace ignition
 
       /// \brief Add a callback to use when FindFile() can't find a file.
       /// The callback should return a full local path to the requested file, or
-      /// and empty string if the file was not found in the callback.
+      /// and empty string if the file was not found in the callback. The path
+      /// should use platform-specific directory separators.
       /// Callbacks will be called in the order they were added until a path is
       /// found (if a callback is set using SetFindFileCallback(), that one is
       /// called first).
@@ -158,7 +167,8 @@ namespace ignition
 
       /// \brief Add a callback to use when FindFileURI() can't find a file.
       /// The callback should return a full local path to the requested file, or
-      /// and empty string if the file was not found in the callback.
+      /// and empty string if the file was not found in the callback. The path
+      /// should use platform-specific directory separators.
       /// Callbacks will be called in the order they were added until a path is
       /// found (if a callback is set using SetFindFileURICallback(), that one
       /// is called first).
@@ -169,7 +179,8 @@ namespace ignition
 
       /// \brief Set the callback to use when ignition can't find a file uri.
       /// The callback should return a complete path to the requested file, or
-      /// and empty string if the file was not found in the callback.
+      /// and empty string if the file was not found in the callback. The path
+      /// should use platform-specific directory separators.
       /// \param[in] _cb The callback function.
       /// \deprecated Use AddFindFileURICallback instead
       public: void IGN_DEPRECATED(3) SetFindFileURICallback(
@@ -183,7 +194,9 @@ namespace ignition
       /// \param[in] _filename Name of the file to find
       /// \param[in] _paths paths to look for the file
       /// \return Returns a path that will work from the current directory
-      //          or an empty string if the file was not found
+      ///         or an empty string if the file was not found. The returned
+      ///         path will be normalized, i.e. backslashes will be substituted
+      ///         with forward slashes.
       public: static std::string LocateLocalFile(const std::string &_filename,
                                   const std::vector<std::string> &_paths);
 

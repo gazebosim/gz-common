@@ -94,8 +94,8 @@ SystemPaths::SystemPaths()
 : dataPtr(new SystemPathsPrivate)
 {
   std::string home, path, fullPath;
-  if (!env("HOME", home))
-    home = "/tmp/gazebo";
+  if (!env(IGN_HOMEDIR, home))
+    home = "/tmp/ignition";
 
   if (!env("IGN_LOG_PATH", path))
   {
@@ -180,6 +180,8 @@ std::string SystemPaths::FindSharedLibrary(const std::string &_libName)
       break;
     }
   }
+
+  changeFromUnixPath(pathToLibrary);
   return pathToLibrary;
 }
 
@@ -303,15 +305,6 @@ std::string SystemPaths::FindFileURI(const std::string &_uri) const
     return this->FindFile(_uri);
   }
 
-  // TODO(anyone): Special handling of absolute file:
-  // URIs is needed until the URI
-  // class is fixed to support absolute URIs
-  if (common::StartsWith(_uri, "file:///"))
-  {
-    const auto filename = _uri.substr(std::strlen("file://"));
-    return this->FindFile(ignition::common::copyFromUnixPath(filename));
-  }
-
   const auto uri = ignition::common::URI(_uri);
   return this->FindFileURI(uri);
 }
@@ -386,14 +379,6 @@ std::string SystemPaths::FindFile(const std::string &_filename,
   if (filename.empty())
     return path;
 
-  // TODO(anyone): Special handling of absolute file:
-  // URIs is needed until the URI
-  // class is fixed to support absolute URIs
-  if (common::StartsWith(filename, "file:///"))
-  {
-    filename = filename.substr(std::strlen("file://"));
-  }
-
   // Handle as URI
   if (ignition::common::URI::Valid(filename))
   {
@@ -404,6 +389,13 @@ std::string SystemPaths::FindFile(const std::string &_filename,
   {
     path = filename;
   }
+#ifdef _WIN32
+  // Handle as Windows absolute path
+  else if (filename.length() >= 2 && filename[1] == ':')
+  {
+    path = filename;
+  }
+#endif // _WIN32
   // Try appending to local paths
   else
   {
@@ -412,8 +404,7 @@ std::string SystemPaths::FindFile(const std::string &_filename,
     {
       path = cwdPath;
     }
-    else if ((filename[0] == '/' || filename[0] == '.' || _searchLocalPath)
-             && exists(filename))
+    else if ((filename[0] == '.' || _searchLocalPath) && exists(filename))
     {
       path = filename;
     }
