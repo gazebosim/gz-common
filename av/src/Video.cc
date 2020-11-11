@@ -35,8 +35,11 @@ class ignition::common::VideoPrivate
   /// \brief audio video frame
   public: AVFrame *avFrame = nullptr;
 
-  /// \brief Destination audio video frame
+  /// \brief Destination audio video frame (32-byte aligned lines)
   public: AVFrame *avFrameDst = nullptr;
+
+  /// \brief Line sizes of an unaligned output frame
+  public: int dstLineSizes[4];
 
   /// \brief software scaling context
   public: SwsContext *swsCtx = nullptr;
@@ -192,7 +195,7 @@ bool Video::Load(const std::string &_filename)
       this->dataPtr->codecCtx->width,
       this->dataPtr->codecCtx->height,
       this->dataPtr->dstPixelFormat,
-      SWS_BICUBIC, nullptr, nullptr, nullptr);
+      0, nullptr, nullptr, nullptr);
 
   if (this->dataPtr->swsCtx == nullptr)
   {
@@ -200,14 +203,18 @@ bool Video::Load(const std::string &_filename)
     return false;
   }
 
+  // swscale needs 32-byte-aligned output frame on some systems
   this->dataPtr->avFrameDst = common::AVFrameAlloc();
   this->dataPtr->avFrameDst->format = this->dataPtr->dstPixelFormat;
   this->dataPtr->avFrameDst->width = this->dataPtr->codecCtx->width;
   this->dataPtr->avFrameDst->height = this->dataPtr->codecCtx->height;
-  av_image_alloc(this->dataPtr->avFrameDst->data,
-      this->dataPtr->avFrameDst->linesize,
-      this->dataPtr->codecCtx->width, this->dataPtr->codecCtx->height,
-      this->dataPtr->dstPixelFormat, 1);
+  av_frame_get_buffer(this->dataPtr->avFrameDst, 32);
+
+  // dstLineSizes are the line sizes of unaligned image frame (needed for
+  // copying data to the (unaligned) output buffer of the NextFrame() call)
+  av_image_fill_linesizes(this->dataPtr->dstLineSizes,
+                          this->dataPtr->dstPixelFormat,
+                          this->dataPtr->codecCtx->width);
 
   // DEBUG: Will save all the frames
   // Image img;
@@ -267,12 +274,19 @@ bool Video::NextFrame(unsigned char **_buffer)
             this->dataPtr->codecCtx->height, this->dataPtr->avFrameDst->data,
             this->dataPtr->avFrameDst->linesize);
 
-        memcpy(*_buffer, this->dataPtr->avFrameDst->data[0],
-            this->dataPtr->codecCtx->height *
-            (this->dataPtr->codecCtx->width*3));
+        // avFrameDst now contains data that are in RGB24, but have 32-byte aligned
+        // lines; dstLineSizes are the line sizes of unaligned RGB24 which we want
+        // in the output buffer
+        av_image_copy(_buffer,
+                      this->dataPtr->dstLineSizes,
+                      const_cast<const uint8_t **>(this->dataPtr->avFrameDst->data),
+                      this->dataPtr->avFrameDst->linesize,
+                      this->dataPtr->dstPixelFormat,
+                      this->dataPtr->codecCtx->width,
+                      this->dataPtr->codecCtx->height);
 
         // Debug:
-        // pgm_save(this->pic.data[0], this->pic.linesize[0],
+        // pgm_save(_buffer, this->dataPtr->dstLineSizes[0],
         // this->dataPtr->codecCtx->width,
         // this->dataPtr->codecCtx->height, buf);
       }
