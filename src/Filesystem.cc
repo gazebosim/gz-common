@@ -382,11 +382,16 @@ bool ignition::common::createDirectories(const std::string &_path)
     if (!exists(dir))
     {
 #ifdef _WIN32
-      _mkdir(dir.c_str());
+      if (_mkdir(dir.c_str()) != 0)
 #else
       // cppcheck-suppress ConfigurationNotChecked
-      mkdir(dir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+      if (mkdir(dir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != 0)
 #endif
+      {
+        ignerr << "Failed to create directory [" + dir + "]: "
+               << std::strerror(errno) << std::endl;
+        return false;
+      }
     }
     index = end;
   }
