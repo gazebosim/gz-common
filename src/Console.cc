@@ -210,7 +210,7 @@ void FileLogger::Init(const std::string &_directory,
         << "No log file will be generated.";
       return;
     }
-    logPath = logPath + "/" + _directory;
+    logPath = joinPaths(logPath, _directory);
   }
   else
   {
@@ -225,7 +225,7 @@ void FileLogger::Init(const std::string &_directory,
   if (!exists(logPath))
     createDirectories(logPath);
 
-  logPath = logPath + "/" + _filename;
+  logPath = joinPaths(logPath, _filename);
 
   // Check if the Init method has been already called, and if so
   // remove current buffer.
@@ -243,7 +243,7 @@ void FileLogger::Init(const std::string &_directory,
   if (isDirectory(logPath))
     this->logDirectory = logPath;
   else
-    this->logDirectory = logPath.substr(0, logPath.rfind('/'));
+    this->logDirectory = logPath.substr(0, logPath.rfind(separator("")));
 
   this->initialized = true;
 

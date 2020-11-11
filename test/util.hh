@@ -23,7 +23,7 @@
 #include "ignition/common/Filesystem.hh"
 #include "ignition/common/Util.hh"
 
-#define IGN_TMP_DIR "tmp-ign/"
+#define IGN_TMP_DIR "tmp-ign"
 
 namespace ignition
 {
@@ -65,11 +65,8 @@ namespace ignition
       /// \return The full log file path as a string.
       protected: std::string GetFullLogPath() const
       {
-#ifndef _WIN32
-        return this->logDirectory + "/" + this->logFilename;
-#else
-        return std::string();
-#endif
+        return ignition::common::joinPaths(
+          this->logDirectory, this->logFilename);
       }
 
       /// \brief Get a string with all the log content loaded from the disk.

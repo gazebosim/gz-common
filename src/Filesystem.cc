@@ -157,7 +157,8 @@ bool ignition::common::removeAll(const std::string &_path,
         if (!std::strcmp(p->d_name, ".") || !std::strcmp(p->d_name, ".."))
           continue;
 
-        ignition::common::removeAll(_path + "/" + p->d_name, _warningOp);
+        const auto removed = ignition::common::removeAll(
+          ignition::common::joinPaths(_path, p->d_name), _warningOp);
       }
     }
     closedir(dir);
@@ -208,7 +209,7 @@ std::string ignition::common::absPath(const std::string &_path)
       result = _path;
     // Otherwise return the current working directory with _path appended.
     else
-      result = ignition::common::cwd() + "/" + _path;
+      result = joinPaths(ignition::common::cwd(), _path);
   }
 
   ignition::common::replaceAll(result, result, "//", "/");

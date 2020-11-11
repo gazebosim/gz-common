@@ -100,7 +100,7 @@ SystemPaths::SystemPaths()
   if (!env("IGN_LOG_PATH", path))
   {
     if (home != "/tmp/ignition")
-      fullPath = home + "/.ignition";
+      fullPath = joinPaths(home, ".ignition");
     else
       fullPath = home;
   }
