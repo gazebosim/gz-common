@@ -49,18 +49,24 @@ class IGNITION_COMMON_AV_HIDDEN ignition::common::VideoEncoderPrivate
   /// \brief libav format I/O context
   public: AVFormatContext *formatCtx = nullptr;
 
-  /// \brief libav output video frame
+  /// \brief libav output video frame (aligned to 32 bytes)
   public: AVFrame *avOutFrame = nullptr;
 
-  /// \brief libav input image data
+  /// \brief libav input image data (aligned to 32 bytes)
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
   public: AVPicture *avInFrame = nullptr;
 #else
   public: AVFrame *avInFrame = nullptr;
 #endif
 
+  /// \brief Pixel format of the input frame. So far it is hardcoded.
+  public: AVPixelFormat inPixFormat = AV_PIX_FMT_RGB24;
+
   /// \brief Software scaling context
   public: SwsContext *swsCtx = nullptr;
+
+  /// \brief Line sizes of an unaligned input frame
+  public: int inputLineSizes[4];
 
   /// \brief True if the encoder is running
   public: bool encoding = false;
@@ -647,22 +653,26 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
       this->dataPtr->avInFrame = new AVPicture;
       avpicture_alloc(this->dataPtr->avInFrame,
-          AV_PIX_FMT_RGB24, this->dataPtr->inWidth,
+          this->dataPtr->inPixFormat, this->dataPtr->inWidth,
           this->dataPtr->inHeight);
 #else
       this->dataPtr->avInFrame = av_frame_alloc();
       this->dataPtr->avInFrame->width = this->dataPtr->inWidth;
       this->dataPtr->avInFrame->height = this->dataPtr->inHeight;
-      this->dataPtr->avInFrame->format = AV_PIX_FMT_RGB24;
+      this->dataPtr->avInFrame->format = this->dataPtr->inPixFormat;
 
-      av_frame_get_buffer(this->dataPtr->avInFrame, 1);
+      av_frame_get_buffer(this->dataPtr->avInFrame, 32);
 #endif
     }
+
+    av_image_fill_linesizes(this->dataPtr->inputLineSizes,
+                            this->dataPtr->inPixFormat,
+                            this->dataPtr->inWidth);
 
     this->dataPtr->swsCtx = sws_getContext(
         this->dataPtr->inWidth,
         this->dataPtr->inHeight,
-        static_cast<AVPixelFormat>(this->dataPtr->avInFrame->format),
+        this->dataPtr->inPixFormat,
         this->dataPtr->codecCtx->width,
         this->dataPtr->codecCtx->height,
         // we misuse this field a bit, as docs say it is unused in encoders
@@ -677,8 +687,13 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
   }
 
   // encode
-  memcpy(this->dataPtr->avInFrame->data[0], _frame,
-         this->dataPtr->inWidth * this->dataPtr->inHeight * 3);
+
+  // copy the unaligned input buffer to the 32-byte-aligned avInFrame
+  av_image_copy(
+      this->dataPtr->avInFrame->data, this->dataPtr->avInFrame->linesize,
+      &_frame, this->dataPtr->inputLineSizes,
+      this->dataPtr->inPixFormat,
+      this->dataPtr->inWidth, this->dataPtr->inHeight);
 
   sws_scale(this->dataPtr->swsCtx,
       this->dataPtr->avInFrame->data,
