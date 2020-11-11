@@ -95,7 +95,7 @@ TEST_F(EncoderDecoderTest, DecodeEncodeDecode)
   }
 
   EXPECT_EQ(numInFrames, 90u);
-  EXPECT_GE(numOutFrames, 89u);
+  EXPECT_EQ(numOutFrames, 90u);
 
   // check that the intensity got computed and that the image is not all black
   // or all white
@@ -121,8 +121,9 @@ TEST_F(EncoderDecoderTest, DecodeEncodeDecode)
       avgIntensity2 = computeAverageIntensity(bufferSize, buf);
   }
 
-  // output can differ by up to 1 sec
-  EXPECT_GT(numFrames2, numInFrames - fps);
+  // one frame is still being lost somewhere, but only one regardless of video
+  // length or fps
+  EXPECT_GE(numFrames2, 89u);
   // average color intensities should be pretty close
   EXPECT_NEAR(avgIntensity2, avgIntensity, 1.0);
 
