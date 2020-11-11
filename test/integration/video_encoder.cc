@@ -55,13 +55,17 @@ TEST_F(EncoderDecoderTest, DecodeEncodeDecode)
   const auto testVideoInPath = joinPaths(TEST_PATH, "data", testVideoInName);
   const auto testVideoOutPath = joinPaths(cwd(), testVideoOutName);
 
+  ignerr << "1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << std::endl;
+
   Video decoder;
   decoder.Load(testVideoInPath);
 
+  ignerr << "2xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << std::endl;
   VideoEncoder encoder;
   ASSERT_TRUE(encoder.Start("mp4", "",
                             decoder.Width(), decoder.Height(), fps));
 
+  ignerr << "3xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << std::endl;
   const size_t bufferSize = decoder.Width() * decoder.Height() * 3;
   auto* buf = new unsigned char[bufferSize];
   size_t numInFrames = 0;
@@ -71,13 +75,16 @@ TEST_F(EncoderDecoderTest, DecodeEncodeDecode)
   auto fps_start = Now();
   size_t fps_frames = 0;
 
+  ignerr << "4xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << std::endl;
   while (decoder.NextFrame(&buf))
   {
     TimePoint stamp { milliseconds(1000) / fps * numInFrames };
     numInFrames++;
 
+    ignerr << "numInFrames" << numInFrames << "xxxxxxxxxxxxxxxxx" << std::endl;
     if (encoder.AddFrame(buf, decoder.Width(), decoder.Height(), stamp))
       numOutFrames++;
+    ignerr << "numOutFrames" << numOutFrames << "xxxxxxxxxxxxxxxx" << std::endl;
 
     // compute average intensity of frame number 10
     if (numInFrames == 10)
@@ -93,6 +100,7 @@ TEST_F(EncoderDecoderTest, DecodeEncodeDecode)
     }
   }
 
+  ignerr << "5xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << std::endl;
   EXPECT_EQ(numInFrames, 90u);
   EXPECT_GE(numOutFrames, 89u);
 
@@ -103,10 +111,14 @@ TEST_F(EncoderDecoderTest, DecodeEncodeDecode)
   EXPECT_LT(avgIntensity, 255.0 - 1e-6);
 
   encoder.SaveToFile(testVideoOutPath);
+  ignerr << "6xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << std::endl;
   ASSERT_TRUE(common::exists(testVideoOutPath));
+  ignerr << "7xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << std::endl;
 
   Video decoder2;
   decoder2.Load(testVideoOutPath);
+
+  ignerr << "8xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << std::endl;
 
   ASSERT_EQ(decoder2.Width(), decoder.Width());
   ASSERT_EQ(decoder2.Height(), decoder.Height());
@@ -119,7 +131,7 @@ TEST_F(EncoderDecoderTest, DecodeEncodeDecode)
     if (numFrames2 == 10)
       avgIntensity2 = computeAverageIntensity(bufferSize, buf);
   }
-
+  ignerr << "9xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << std::endl;
   // output can differ by up to 1 sec
   EXPECT_GT(numFrames2, numInFrames - fps);
   // average color intensities should be pretty close
