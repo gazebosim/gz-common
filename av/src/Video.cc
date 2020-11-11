@@ -242,6 +242,7 @@ bool Video::NextFrame(unsigned char **_buffer)
   int frameAvailable = 0;
   int ret;
 
+  ignerr << "1xxxxxxxxxxxxxxxxx" << std::endl;
   while (frameAvailable == 0)
   {
     // this loop will always exit because each call to AVCodecDecode()
@@ -253,12 +254,16 @@ bool Video::NextFrame(unsigned char **_buffer)
     {
       av_init_packet(&packet);
 
+      ignerr << "2xxxxxxxxxxxxxxxxx" << std::endl;
+
       // read a frame from the input stream
       ret = av_read_frame(this->dataPtr->formatCtx, &packet);
+      ignerr << "3xxxxxxxxxxxxxxxxx" << std::endl;
       if (ret < 0)
       {
         if (ret == AVERROR_EOF)
         {
+          ignerr << "EOFxxxxxxxxxxxxxxxxx" << std::endl;
           // end of stream, enter draining mode
           avcodec_send_packet(this->dataPtr->codecCtx, nullptr);
           this->dataPtr->drainingMode = true;
@@ -272,21 +277,25 @@ bool Video::NextFrame(unsigned char **_buffer)
       }
       else if (packet.stream_index != this->dataPtr->videoStream)
       {
+        ignerr << "STREAMxxxxxxxxxxxxxxxxx" << std::endl;
         // packet belongs to a stream we're not interested in (e.g. audio)
         av_packet_unref(&packet);
         continue;
       }
     }
 
+    ignerr << "4xxxxxxxxxxxxxxxxx" << std::endl;
     // Process all the data in the frame
     ret = AVCodecDecode(
       this->dataPtr->codecCtx, this->dataPtr->avFrame, &frameAvailable,
       this->dataPtr->drainingMode ? nullptr : &packet);
-
+    ignerr << "5xxxxxxxxxxxxxxxxx" << std::endl;
     if (ret == AVERROR_EOF)
     {
+      ignerr << "5EOFxxxxxxxxxxxxxxxxx" << std::endl;
       if (!this->dataPtr->drainingMode)
         AVPacketUnref(&packet);
+      ignerr << "6xxxxxxxxxxxxxxxxx" << std::endl;
       return false;
     }
     else if (ret < 0)
@@ -297,11 +306,13 @@ bool Video::NextFrame(unsigned char **_buffer)
     }
     if (!this->dataPtr->drainingMode)
       AVPacketUnref(&packet);
+    ignerr << "7xxxxxxxxxxxxxxxxx" << std::endl;
   }
-
+  ignerr << "8xxxxxxxxxxxxxxxxx" << std::endl;
   // processing the image if available
   if (frameAvailable)
   {
+    ignerr << "9xxxxxxxxxxxxxxxxx" << std::endl;
     sws_scale(this->dataPtr->swsCtx,
               this->dataPtr->avFrame->data,
               this->dataPtr->avFrame->linesize,
@@ -309,11 +320,11 @@ bool Video::NextFrame(unsigned char **_buffer)
               this->dataPtr->codecCtx->height,
               this->dataPtr->avFrameDst->data,
               this->dataPtr->avFrameDst->linesize);
-
+    ignerr << "10xxxxxxxxxxxxxxxxx" << std::endl;
     memcpy(*_buffer, this->dataPtr->avFrameDst->data[0],
            this->dataPtr->codecCtx->height *
              (this->dataPtr->codecCtx->width * 3));
-
+    ignerr << "11xxxxxxxxxxxxxxxxx" << std::endl;
     // Debug:
     // pgm_save(this->pic.data[0], this->pic.linesize[0],
     // this->dataPtr->codecCtx->width,
@@ -321,7 +332,7 @@ bool Video::NextFrame(unsigned char **_buffer)
 
     return true;
   }
-
+  ignerr << "12xxxxxxxxxxxxxxxxx" << std::endl;
   return false;  // shouldn't ever get here, but just to be sure
 }
 
