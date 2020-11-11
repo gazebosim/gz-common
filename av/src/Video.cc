@@ -49,6 +49,14 @@ class ignition::common::VideoPrivate
 
   /// \brief Pixel format of the output image. Has to be 24-bit RGB.
   public: AVPixelFormat dstPixelFormat = AV_PIX_FMT_RGB24;
+
+  /// \brief When input data end, the decoder can still hold some decoded
+  /// frames. According to
+  /// https://www.ffmpeg.org/doxygen/3.4/group__lavc__encdec.html , end of
+  /// stream situations require flushing, i.e. setting the codec in draining
+  /// mode and reading what's left there. This variable tells whether we have
+  /// already entered the flushing mode.
+  public: bool drainingMode = false;
 };
 
 /////////////////////////////////////////////////
@@ -237,64 +245,98 @@ bool Video::Load(const std::string &_filename)
 /////////////////////////////////////////////////
 bool Video::NextFrame(unsigned char **_buffer)
 {
-  AVPacket packet, tmpPacket;
+  AVPacket packet;
   int frameAvailable = 0;
+  int ret;
 
-  av_init_packet(&packet);
-
-  // Read a frame.
-  if (av_read_frame(this->dataPtr->formatCtx, &packet) < 0)
-    return false;
-
-  if (packet.stream_index == this->dataPtr->videoStream)
+  while (frameAvailable == 0)
   {
-    tmpPacket = packet;
+    // this loop will always exit because each call to AVCodecDecode()
+    // reads from the input buffer and it has to either end at some time or
+    // return a valid frame
 
-    // Process all the data in the frame
-    while (tmpPacket.size > 0)
+    // in draining mode, we no longer read the input stream as it has ended
+    if (!this->dataPtr->drainingMode)
     {
-      // sending data to libavcodec
-      int processedLength = AVCodecDecode(this->dataPtr->codecCtx,
-          this->dataPtr->avFrame, &frameAvailable, &tmpPacket);
+      av_init_packet(&packet);
 
-      if (processedLength < 0)
+      // read a frame from the input stream
+      ret = av_read_frame(this->dataPtr->formatCtx, &packet);
+      if (ret < 0)
       {
-        ignerr << "Error while processing the data\n";
-        break;
+        if (ret == AVERROR_EOF)
+        {
+          // end of stream, enter draining mode
+          avcodec_send_packet(this->dataPtr->codecCtx, nullptr);
+          this->dataPtr->drainingMode = true;
+        }
+        else
+        {
+          ignerr << "Error reading packet: " << av_err2str_cpp(ret)
+                 << ". Stopped reading the file." << std::endl;
+          return false;
+        }
       }
-
-      tmpPacket.data = tmpPacket.data + processedLength;
-      tmpPacket.size = tmpPacket.size - processedLength;
-
-      // processing the image if available
-      if (frameAvailable)
+      else if (packet.stream_index != this->dataPtr->videoStream)
       {
-        sws_scale(this->dataPtr->swsCtx, this->dataPtr->avFrame->data,
-            this->dataPtr->avFrame->linesize, 0,
-            this->dataPtr->codecCtx->height, this->dataPtr->avFrameDst->data,
-            this->dataPtr->avFrameDst->linesize);
-
-        // avFrameDst now contains data that are in RGB24, but have 32-byte aligned
-        // lines; dstLineSizes are the line sizes of unaligned RGB24 which we want
-        // in the output buffer
-        av_image_copy(_buffer,
-                      this->dataPtr->dstLineSizes,
-                      const_cast<const uint8_t **>(this->dataPtr->avFrameDst->data),
-                      this->dataPtr->avFrameDst->linesize,
-                      this->dataPtr->dstPixelFormat,
-                      this->dataPtr->codecCtx->width,
-                      this->dataPtr->codecCtx->height);
-
-        // Debug:
-        // pgm_save(_buffer, this->dataPtr->dstLineSizes[0],
-        // this->dataPtr->codecCtx->width,
-        // this->dataPtr->codecCtx->height, buf);
+        // packet belongs to a stream we're not interested in (e.g. audio)
+        av_packet_unref(&packet);
+        continue;
       }
     }
-  }
-  AVPacketUnref(&packet);
 
-  return true;
+    // Process all the data in the frame
+    ret = AVCodecDecode(
+      this->dataPtr->codecCtx, this->dataPtr->avFrame, &frameAvailable,
+      this->dataPtr->drainingMode ? nullptr : &packet);
+
+    if (ret == AVERROR_EOF)
+    {
+      if (!this->dataPtr->drainingMode)
+        AVPacketUnref(&packet);
+      return false;
+    }
+    else if (ret < 0)
+    {
+      ignerr << "Error while processing packet data: "
+             << av_err2str_cpp(ret) << std::endl;
+      // continue processing data
+    }
+    if (!this->dataPtr->drainingMode)
+      AVPacketUnref(&packet);
+  }
+
+  // processing the image if available
+  if (frameAvailable)
+  {
+    sws_scale(this->dataPtr->swsCtx,
+              this->dataPtr->avFrame->data,
+              this->dataPtr->avFrame->linesize,
+              0,
+              this->dataPtr->codecCtx->height,
+              this->dataPtr->avFrameDst->data,
+              this->dataPtr->avFrameDst->linesize);
+
+    // avFrameDst now contains data that are in RGB24, but have 32-byte aligned
+    // lines; dstLineSizes are the line sizes of unaligned RGB24 which we want
+    // in the output buffer
+    av_image_copy(_buffer,
+                  this->dataPtr->dstLineSizes,
+                  const_cast<const uint8_t **>(this->dataPtr->avFrameDst->data),
+                  this->dataPtr->avFrameDst->linesize,
+                  this->dataPtr->dstPixelFormat,
+                  this->dataPtr->codecCtx->width,
+                  this->dataPtr->codecCtx->height);
+
+    // Debug:
+    // pgm_save(_buffer, this->dataPtr->dstLineSizes[0],
+    // this->dataPtr->codecCtx->width,
+    // this->dataPtr->codecCtx->height, buf);
+
+    return true;
+  }
+
+  return false;  // shouldn't ever get here, but just to be sure
 }
 
 /////////////////////////////////////////////////
