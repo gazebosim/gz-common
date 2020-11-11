@@ -41,9 +41,9 @@
 #include <limits.h>
 #include <climits>
 #else
+#include <shlwapi.h>
 #include <io.h>
 #include "win_dirent.h"
-#include <shlwapi.h>
 #include "PrintWindowsSystemWarning.hh"
 #endif
 
@@ -226,15 +226,15 @@ std::string ignition::common::joinPaths(const std::string &_path1,
 {
 #ifndef _WIN32
   return separator(_path1) + _path2;
-#else // _WIN32
+#else  // _WIN32
   // +1 for directory separator, +1 for the ending \0 character
   std::vector<CHAR> combined(_path1.length() + _path2.length() + 2);
-  // TODO (anyone) Switch to PathAllocCombine once switched to wide strings
+  // TODO(anyone): Switch to PathAllocCombine once switched to wide strings
   if (::PathCombineA(combined.data(), _path1.c_str(), _path2.c_str()) != NULL)
     return std::string(combined.data());
   else
     return separator(_path1) + _path2;
-#endif //_WIN32
+#endif  // _WIN32
 }
 
 /////////////////////////////////////////////////
@@ -393,11 +393,12 @@ bool ignition::common::createDirectories(const std::string &_path)
     {
 #ifdef _WIN32
       if (_mkdir(dir.c_str()) != 0)
+      {
 #else
       // cppcheck-suppress ConfigurationNotChecked
       if (mkdir(dir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != 0)
-#endif
       {
+#endif
         ignerr << "Failed to create directory [" + dir + "]: "
                << std::strerror(errno) << std::endl;
         return false;

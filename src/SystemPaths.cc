@@ -395,7 +395,7 @@ std::string SystemPaths::FindFile(const std::string &_filename,
   {
     path = filename;
   }
-#endif // _WIN32
+#endif  // _WIN32
   // Try appending to local paths
   else
   {
