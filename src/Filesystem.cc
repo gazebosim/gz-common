@@ -159,6 +159,8 @@ bool ignition::common::removeAll(const std::string &_path,
 
         const auto removed = ignition::common::removeAll(
           ignition::common::joinPaths(_path, p->d_name), _warningOp);
+        if (!removed)
+          return false;
       }
     }
     closedir(dir);
