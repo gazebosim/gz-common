@@ -46,7 +46,7 @@ computeAverageIntensity(const size_t bufferSize, const unsigned char* buf)
 /////////////////////////////////////////////////
 TEST_F(EncoderDecoderTest, DecodeEncodeDecode)
 {
-//  av_log_set_level(AV_LOG_ERROR);
+  av_log_set_level(AV_LOG_ERROR);
 
   const unsigned int fps = 25u;
 
@@ -71,13 +71,13 @@ TEST_F(EncoderDecoderTest, DecodeEncodeDecode)
   auto fps_start = Now();
   size_t fps_frames = 0;
 
-  decoder.NextFrame(&buf);
   while (decoder.NextFrame(&buf))
   {
     TimePoint stamp { milliseconds(1000) / fps * numInFrames };
+    numInFrames++;
+
     if (encoder.AddFrame(buf, decoder.Width(), decoder.Height(), stamp))
       numOutFrames++;
-    numInFrames++;
 
     // compute average intensity of frame number 10
     if (numInFrames == 10)
@@ -93,8 +93,8 @@ TEST_F(EncoderDecoderTest, DecodeEncodeDecode)
     }
   }
 
-  EXPECT_GE(numInFrames, 89u);
-  EXPECT_GE(numOutFrames, 88u);
+  EXPECT_EQ(numInFrames, 90u);
+  EXPECT_GE(numOutFrames, 89u);
 
   // check that the intensity got computed and that the image is not all black
   // or all white
