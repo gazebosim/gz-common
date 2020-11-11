@@ -95,6 +95,7 @@ namespace ignition
       /// \brief Default destructor.
       public: virtual ~AutoLogFixture()
       {
+        ignLogClose();
         std::string absPath;
         ignition::common::env(IGN_HOMEDIR, absPath);
         ignition::common::removeAll(

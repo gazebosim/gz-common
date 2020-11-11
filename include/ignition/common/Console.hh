@@ -55,6 +55,10 @@ namespace ignition
     #define ignLogInit(_dir, _file)\
         ignition::common::Console::log.Init(_dir, _file)
 
+    /// \brief Close the file used for logging.
+    #define ignLogClose()\
+        ignition::common::Console::log.Close()
+
     /// \brief Get the full path of the directory where the log files are stored
     /// \return Full path of the directory
     #define ignLogDirectory()\
@@ -77,6 +81,9 @@ namespace ignition
       /// \param[in] _filename Name of the log file to write output into.
       public: void Init(const std::string &_directory,
                         const std::string &_filename);
+
+      /// \brief Close the open file handles.
+      public: void Close();
 
       /// \brief Output a filename and line number, then return a reference
       /// to the logger.

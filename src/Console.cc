@@ -252,6 +252,17 @@ void FileLogger::Init(const std::string &_directory,
   // (*buf->stream) << PROJECT_VERSION_HEADER << std::endl;
 }
 
+void FileLogger::Close()
+{
+  auto* buf = dynamic_cast<FileLogger::Buffer*>(this->rdbuf());
+  if (buf && buf->stream && buf->stream->is_open())
+  {
+    buf->stream->close();
+    delete buf->stream;
+    buf->stream = nullptr;
+  }
+}
+
 /////////////////////////////////////////////////
 FileLogger &FileLogger::operator()()
 {

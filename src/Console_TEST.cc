@@ -38,6 +38,7 @@ class Console_TEST : public ::testing::Test {
 
     if (ignition::common::isDirectory(absPath))
     {
+      ignLogClose();
       EXPECT_TRUE(ignition::common::removeAll(absPath));
     }
   }
@@ -79,10 +80,11 @@ TEST_F(Console_TEST, NoInitAndLog)
   EXPECT_TRUE(GetLogContent(logPath).find(logString) != std::string::npos);
 
   // Cleanup
+  ignLogClose();
   std::string path;
   EXPECT_TRUE(ignition::common::env(IGN_HOMEDIR, path));
   path = ignition::common::joinPaths(path, logPath);
-  ignition::common::removeAll(path);
+  EXPECT_TRUE(ignition::common::removeAll(path));
 }
 
 /////////////////////////////////////////////////
@@ -111,7 +113,8 @@ TEST_F(Console_TEST, InitAndLog)
   EXPECT_TRUE(GetLogContent(logPath).find(logString) != std::string::npos);
 
   // Cleanup
-  ignition::common::removeAll(basePath);
+  ignLogClose();
+  EXPECT_TRUE(ignition::common::removeAll(basePath));
 }
 
 //////////////////////////////////////////////////
