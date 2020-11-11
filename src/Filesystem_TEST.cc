@@ -377,11 +377,16 @@ TEST_F(FilesystemTest, symlink_exists)
 /////////////////////////////////////////////////
 TEST_F(FilesystemTest, cwd)
 {
+  const auto origCwd = cwd();
+
   std::string new_temp_dir;
   ASSERT_TRUE(create_and_switch_to_temp_dir(new_temp_dir));
 
   std::string path = cwd();
   EXPECT_EQ(path, new_temp_dir);
+
+  EXPECT_TRUE(common::chdir(origCwd));
+  EXPECT_EQ(origCwd, cwd());
 }
 
 /////////////////////////////////////////////////
@@ -546,6 +551,7 @@ TEST_F(FilesystemTest, createDirectories)
 /////////////////////////////////////////////////
 TEST_F(FilesystemTest, copyDirectories)
 {
+  const auto origCwd = ignition::common::cwd();
   std::string newTempDir;
   ASSERT_TRUE(create_and_switch_to_temp_dir(newTempDir));
 
@@ -598,10 +604,8 @@ TEST_F(FilesystemTest, copyDirectories)
   EXPECT_FALSE(copyDirectory("fake_dir", dirCopied));
 
   // Cleanup
-  /// \todo(anyone) Fix removing files on windows
-#ifndef _WIN32
+  ignition::common::chdir(origCwd);
   EXPECT_TRUE(removeAll(newTempDir));
-#endif
 }
 
 /////////////////////////////////////////////////

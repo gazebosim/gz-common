@@ -154,6 +154,11 @@ namespace ignition
     /// \return Name of the current directory
     std::string IGNITION_COMMON_VISIBLE cwd();
 
+    /// \brief Change current working directory to _dir.
+    /// \param[in] _dir The directory to change to.
+    /// \return Whether the operation succeeded.
+    bool IGNITION_COMMON_VISIBLE chdir(const std::string& _dir);
+
     /// \brief Given a path, get just the basename portion.
     /// \param[in] _path  The full path.
     /// \return A new string with just the basename portion of the path.

@@ -145,6 +145,12 @@ namespace ignition
     }
 
     //////////////////////////////////////////////////
+    bool chdir(const std::string& _dir)
+    {
+      return ::chdir(_dir.c_str()) == 0;
+    }
+
+    //////////////////////////////////////////////////
     DirIter::DirIter(const std::string &_in) : dataPtr(new DirIterPrivate)
     {
       this->dataPtr->dirname = _in;
@@ -414,6 +420,11 @@ namespace ignition
       {
         return buf.data();
       }
+    }
+
+    bool chdir(const std::string& _dir)
+    {
+      return ::SetCurrentDirectoryA(_dir.c_str());
     }
 
     //////////////////////////////////////////////////
