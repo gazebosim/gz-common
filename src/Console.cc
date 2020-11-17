@@ -29,19 +29,14 @@ using namespace common;
 
 FileLogger ignition::common::Console::log("");
 
-#ifdef _WIN32
-  // docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences
-  const int red = 31;
-  const int yellow = 33;
-  const int green = 32;
-  const int blue = 36;
-#else
-  // These are ANSI-based color codes
-  const int red = 31;
-  const int yellow = 33;
-  const int green = 32;
-  const int blue = 36;
-#endif
+// On UNIX, these are ANSI-based color codes. On Windows, these are colors from
+// docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences .
+// They happen to overlap, but there might be differences if more colors are
+// added.
+const int red = 31;
+const int yellow = 33;
+const int green = 32;
+const int blue = 36;
 
 Logger Console::err("[Err] ", red, Logger::STDERR, 1);
 Logger Console::warn("[Wrn] ", yellow, Logger::STDERR, 2);
@@ -266,6 +261,7 @@ void FileLogger::Init(const std::string &_directory,
   // (*buf->stream) << PROJECT_VERSION_HEADER << std::endl;
 }
 
+/////////////////////////////////////////////////
 void FileLogger::Close()
 {
   auto* buf = dynamic_cast<FileLogger::Buffer*>(this->rdbuf());

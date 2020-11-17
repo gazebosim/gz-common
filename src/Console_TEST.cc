@@ -25,7 +25,7 @@
 
 #include "test/util.hh"
 
-namespace igncmn = ignition::common;
+using namespace ignition::common;
 
 const int g_messageRepeat = 4;
 
@@ -93,7 +93,7 @@ TEST_F(Console_TEST, NoInitAndLog)
 TEST_F(Console_TEST, InitAndLog)
 {
   // Create a unique directory path
-  std::string path = igncmn::joinPaths(IGN_TMP_DIR, ignition::common::uuid());
+  std::string path = joinPaths(IGN_TMP_DIR, ignition::common::uuid());
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -123,7 +123,7 @@ TEST_F(Console_TEST, InitAndLog)
 TEST_F(Console_TEST, LogSlashN)
 {
   // Create a unique directory path
-  std::string path = igncmn::joinPaths(IGN_TMP_DIR, ignition::common::uuid());
+  std::string path = joinPaths(IGN_TMP_DIR, ignition::common::uuid());
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -153,7 +153,7 @@ TEST_F(Console_TEST, LogSlashN)
 TEST_F(Console_TEST, LogStdEndl)
 {
   // Create a unique directory path
-  std::string path = igncmn::joinPaths(IGN_TMP_DIR, ignition::common::uuid());
+  std::string path = joinPaths(IGN_TMP_DIR, ignition::common::uuid());
 
   // Initialize logging
   ignLogInit(path, "test.log");

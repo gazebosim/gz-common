@@ -422,6 +422,7 @@ namespace ignition
       }
     }
 
+    /////////////////////////////////////////////////
     bool chdir(const std::string& _dir)
     {
       return ::SetCurrentDirectoryA(_dir.c_str());
