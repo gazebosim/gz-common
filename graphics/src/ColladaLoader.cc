@@ -2484,6 +2484,19 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
           }
           if (hasTexcoords)
           {
+            // Get the vertex texcoord index value. If the texcoord is a
+            // duplicate then reset the index to the first instance of the
+            // duplicated texcoord
+            // unsigned int offset = *inputs[TEXCOORD].begin();
+            // unsigned int remappedTexcoordIndex =
+            //     values.at(offset);
+            // int set = texcoordsOffsetToSet[offset];
+            // auto &texDupMapSet = texDupMap[set];
+            // auto texDupMapSetIt = texDupMapSet.find(remappedTexcoordIndex);
+            // if (texDupMapSetIt != texDupMapSet.end())
+            //   remappedTexcoordIndex = texDupMapSetIt->second;
+            // texEqual = iv.texcoordIndex[set] == remappedTexcoordIndex;
+
             texEqual = true;
             for (auto offset : inputs[TEXCOORD])
             {
@@ -2493,7 +2506,7 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
               unsigned int remappedTexcoordIndex =
                   values.at(offset);
               int set = texcoordsOffsetToSet[offset];
-              auto texDupMapSet = texDupMap[set];
+              auto &texDupMapSet = texDupMap[set];
               auto texDupMapSetIt = texDupMapSet.find(remappedTexcoordIndex);
               if (texDupMapSetIt != texDupMapSet.end())
                 remappedTexcoordIndex = texDupMapSetIt->second;
@@ -2504,6 +2517,7 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
                 break;
               }
             }
+
           }
 
           // if the vertex has matching normal and texcoord index values then
