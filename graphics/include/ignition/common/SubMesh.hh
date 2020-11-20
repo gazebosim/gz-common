@@ -254,6 +254,10 @@ namespace ignition
       /// \return The number of texture coordinates.
       public: unsigned int TexCoordCountBySet(unsigned int _setIndex) const;
 
+      /// \brief Return the number of texture coordinate sets
+      /// \return The number of texture coordinates sets.
+      public: unsigned int TexCoordSetCount() const;
+
       /// \brief Get the number of vertex-skeleton node assignments
       /// \return The number of vertex-skeleton node assignments
       public: unsigned int NodeAssignmentsCount() const;

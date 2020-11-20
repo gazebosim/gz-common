@@ -436,6 +436,12 @@ unsigned int SubMesh::TexCoordCountBySet(unsigned int _setIndex) const
 }
 
 //////////////////////////////////////////////////
+unsigned int SubMesh::TexCoordSetCount() const
+{
+  return this->dataPtr->texCoords.size();
+}
+
+//////////////////////////////////////////////////
 unsigned int SubMesh::NodeAssignmentsCount() const
 {
   return this->dataPtr->nodeAssignments.size();

@@ -230,6 +230,7 @@ TEST_F(ColladaLoader, TexCoordSets)
   EXPECT_FALSE(subMeshB->HasTexCoord(3u));
 
   // test texture coordinate set API
+  EXPECT_EQ(2u, subMeshB->TexCoordSetCount());
   EXPECT_EQ(3u, subMeshB->TexCoordCountBySet(0u));
   EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoordBySet(0u, 0u));
   EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoordBySet(1u, 0u));
