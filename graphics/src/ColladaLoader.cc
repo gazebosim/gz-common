@@ -2249,12 +2249,11 @@ void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
             for (auto offset : inputs[TEXCOORD])
             {
               unsigned int inputRemappedTexcoordIndex =
-                // values[*inputs[TEXCOORD].begin()];
                 values[offset];
 
               int set = texcoordsOffsetToSet[offset];
 
-              auto texDupMapSet = texDupMap[set];
+              auto &texDupMapSet = texDupMap[set];
               auto texDupMapSetIt = texDupMapSet.find(
                   inputRemappedTexcoordIndex);
               if (texDupMapSetIt != texDupMapSet.end())
