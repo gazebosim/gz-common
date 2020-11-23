@@ -32,7 +32,7 @@
 // Defines
 
 #ifdef _WIN32
-# define IGN_HOMEDIR "HOMEPATH"
+# define IGN_HOMEDIR "USERPROFILE"
 #else
 # define IGN_HOMEDIR "HOME"
 #endif
