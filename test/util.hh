@@ -23,7 +23,7 @@
 #include "ignition/common/Filesystem.hh"
 #include "ignition/common/Util.hh"
 
-#define IGN_TMP_DIR "tmp-ign/"
+#define IGN_TMP_DIR "tmp-ign"
 
 namespace ignition
 {
@@ -38,10 +38,6 @@ namespace ignition
       /// \brief Setup the test fixture. This gets called by gtest.
       protected: virtual void SetUp()
       {
-#ifndef _WIN32
-        std::string logPath;
-        ASSERT_TRUE(ignition::common::env(IGN_HOMEDIR, logPath));
-
         const ::testing::TestInfo *const testInfo =
           ::testing::UnitTest::GetInstance()->current_test_info();
 
@@ -58,26 +54,21 @@ namespace ignition
 
         // Read the full path to the log directory.
         this->logDirectory = ignLogDirectory();
-#endif
       }
 
       /// \brief Get a string with the full log file path.
       /// \return The full log file path as a string.
       protected: std::string GetFullLogPath() const
       {
-#ifndef _WIN32
-        return this->logDirectory + "/" + this->logFilename;
-#else
-        return std::string();
-#endif
+        return ignition::common::joinPaths(
+          this->logDirectory, this->logFilename);
       }
 
       /// \brief Get a string with all the log content loaded from the disk.
-      /// \return A string will all the log content.
+      /// \return A string with all the log content.
       protected: std::string LogContent() const
       {
         std::string loggedString;
-#ifndef _WIN32
         std::cout << "2 Log Path[" <<this->GetFullLogPath() << "]\n";
         // Open the log file, and read back the string
         std::ifstream ifs(this->GetFullLogPath().c_str(), std::ios::in);
@@ -88,13 +79,13 @@ namespace ignition
           std::getline(ifs, line);
           loggedString += line;
         }
-#endif
         return loggedString;
       }
 
       /// \brief Default destructor.
       public: virtual ~AutoLogFixture()
       {
+        ignLogClose();
         std::string absPath;
         ignition::common::env(IGN_HOMEDIR, absPath);
         ignition::common::removeAll(

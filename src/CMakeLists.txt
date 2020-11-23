@@ -12,14 +12,15 @@ ign_create_core_library(
 target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
   PRIVATE ${DL_TARGET})
 
-# Handle non-Windows configuration settings
+# Handle OS-dependent configuration settings
 if(NOT WIN32)
-
   # Link the libraries that we don't expect to find on Windows
   target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
     PUBLIC UUID::UUID
     pthread)
-
+else()
+  target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
+    PRIVATE shlwapi)
 endif()
 
 # don't build MovingWindowFilter_TEST if we don't have ignition-math
