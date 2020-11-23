@@ -30,6 +30,8 @@ release will remove the deprecated code.
 
 1. Requires c++17.
 
+1. (New in 3.8.0) On Windows, the value of C++ macro `IGN_HOMEDIR` changed from `HOMEPATH` to `USERPROFILE`. It is usually used to read the path to the user's home from environment. The old value pointed to a path relative to the (a) current drive letter as reported by `pwd`, not the system drive letter. The new value correctly points to an environment variable that contains the full absolute path to the user's profile. If the code did not use the macro in some unexpected way, the new behavior should work either the same or even better (it would work even when the current directory is on a non-system drive). If the code relied on this value to be relative to the current drive letter, it needs to be changed to use `HOMEPATH` directly.
+
 ## Ignition Common 1.X to 2.X
 
 ### Modifications
