@@ -2516,7 +2516,6 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
                 break;
               }
             }
-
           }
 
           // if the vertex has matching normal and texcoord index values then

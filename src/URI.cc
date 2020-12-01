@@ -42,7 +42,8 @@ class ignition::common::URIPathPrivate
   ///        an absolute path starting segment or not.
   public: bool IsStringAbsolute(const std::string &_path)
   {
-    return _path.length() > 0 && _path[0] == '/';
+    return (_path.length() > 0 && _path[0] == '/') ||
+           (_path.length() > 1 && _path[1] == ':');
   }
 };
 
@@ -114,6 +115,16 @@ bool URIPath::IsAbsolute() const
 /////////////////////////////////////////////////
 void URIPath::SetAbsolute(const bool _absolute)
 {
+  if (this->dataPtr->isAbsolute && !_absolute && !this->dataPtr->path.empty() &&
+      this->dataPtr->path.front().length() >= 2 &&
+      this->dataPtr->path.front()[1] == ':')
+  {
+    ignerr << "URIPath " << this->Str() << " cannot be set to represent a "
+              "relative path because it starts with a Windows drive "
+              "specifier." << std::endl;
+    return;
+  }
+
   this->dataPtr->isAbsolute = _absolute;
 }
 
@@ -139,6 +150,11 @@ void URIPath::PushFront(const std::string &_part)
     ignwarn << "Instead of pushing a string starting with slash, call "
                "SetAbsolute() instead." << std::endl;
     part = _part.substr(1);
+    this->SetAbsolute();
+  }
+  // Windows absolute path
+  else if (_part.length() >= 2 && _part[1] == ':')
+  {
     this->SetAbsolute();
   }
 
@@ -173,6 +189,11 @@ void URIPath::PushBack(const std::string &_part)
     part = _part.substr(1);
     this->SetAbsolute();
   }
+  // Windows absolute path
+  else if (this->dataPtr->path.empty() && _part.size() >= 2 && _part[1] == ':')
+  {
+    this->SetAbsolute();
+  }
 
   if (part.find('/') != std::string::npos)
   {
@@ -205,6 +226,13 @@ const URIPath &URIPath::operator/=(const std::string &_part)
 std::string URIPath::Str(const std::string &_delim) const
 {
   std::string result(this->dataPtr->isAbsolute ? "/" : "");
+  // if the first element is a windows drive specifier, do not prepend the slash
+  if (!this->dataPtr->path.empty() && this->dataPtr->path.front().size() >= 2 &&
+    this->dataPtr->path.front()[1] == ':')
+  {
+    result = "";
+  }
+
   bool firstPart = true;
   for (auto const &part : this->dataPtr->path)
   {

@@ -116,15 +116,17 @@ namespace ignition
     std::string IGNITION_COMMON_VISIBLE copyToUnixPath(
         const std::string &_path);
 
-    /// \brief Get the absolute path of a provided path.
+    /// \brief Get the absolute path of a provided path. Relative paths are
+    /// resolved relative to the current working directory.
     /// \param[in] _path Relative or absolute path.
-    /// \return Absolute path
+    /// \return Absolute path (with platform-dependent directory separators).
     std::string IGNITION_COMMON_VISIBLE absPath(const std::string &_path);
 
     /// \brief Join two strings together to form a path
     /// \param[in] _path1 the left portion of the path
     /// \param[in] _path2 the right portion of the path
-    /// \return Joined path
+    /// \return Joined path. The function can do simplifications such as
+    /// elimination of ../ (but is not guaranteed to do so).
     std::string IGNITION_COMMON_VISIBLE joinPaths(const std::string &_path1,
                                                   const std::string &_path2);
 
@@ -153,6 +155,11 @@ namespace ignition
     /// \brief Get the current working directory
     /// \return Name of the current directory
     std::string IGNITION_COMMON_VISIBLE cwd();
+
+    /// \brief Change current working directory to _dir.
+    /// \param[in] _dir The directory to change to.
+    /// \return Whether the operation succeeded.
+    bool IGNITION_COMMON_VISIBLE chdir(const std::string &_dir);
 
     /// \brief Given a path, get just the basename portion.
     /// \param[in] _path  The full path.

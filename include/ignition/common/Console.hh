@@ -45,15 +45,19 @@ namespace ignition
     /// \brief Output a message to a log file, regardless of verbosity level
     #define ignlog (ignition::common::Console::log())
 
-    /// \brief Initialize log file with filename given by _str.
-    /// If called twice, it will close currently in use and open a new
+    /// \brief Initialize log file with filename given by _dir/_file.
+    /// If called twice, it will close the file currently in use and open a new
     /// log file.
     /// \param[in] _dir Name of directory in which to store the log file. Note
-    /// that if _dir does not start with a forward slash (/), then _dir will
+    /// that if _dir is not an absolute path, then _dir will
     /// be relative to your home directory.
     /// \param[in] _file Name of log file for ignlog messages.
     #define ignLogInit(_dir, _file)\
         ignition::common::Console::log.Init(_dir, _file)
+
+    /// \brief Close the file used for logging.
+    #define ignLogClose()\
+        ignition::common::Console::log.Close()
 
     /// \brief Get the full path of the directory where the log files are stored
     /// \return Full path of the directory
@@ -77,6 +81,9 @@ namespace ignition
       /// \param[in] _filename Name of the log file to write output into.
       public: void Init(const std::string &_directory,
                         const std::string &_filename);
+
+      /// \brief Close the open file handles.
+      public: void Close();
 
       /// \brief Output a filename and line number, then return a reference
       /// to the logger.

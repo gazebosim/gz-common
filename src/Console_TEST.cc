@@ -25,7 +25,8 @@
 
 #include "test/util.hh"
 
-#ifndef _WIN32
+using namespace ignition::common;
+
 const int g_messageRepeat = 4;
 
 class Console_TEST : public ::testing::Test {
@@ -38,6 +39,7 @@ class Console_TEST : public ::testing::Test {
 
     if (ignition::common::isDirectory(absPath))
     {
+      ignLogClose();
       EXPECT_TRUE(ignition::common::removeAll(absPath));
     }
   }
@@ -79,10 +81,11 @@ TEST_F(Console_TEST, NoInitAndLog)
   EXPECT_TRUE(GetLogContent(logPath).find(logString) != std::string::npos);
 
   // Cleanup
+  ignLogClose();
   std::string path;
   EXPECT_TRUE(ignition::common::env(IGN_HOMEDIR, path));
   path = ignition::common::joinPaths(path, logPath);
-  ignition::common::removeAll(path);
+  EXPECT_TRUE(ignition::common::removeAll(path));
 }
 
 /////////////////////////////////////////////////
@@ -90,7 +93,7 @@ TEST_F(Console_TEST, NoInitAndLog)
 TEST_F(Console_TEST, InitAndLog)
 {
   // Create a unique directory path
-  std::string path = IGN_TMP_DIR + ignition::common::uuid();
+  std::string path = joinPaths(IGN_TMP_DIR, ignition::common::uuid());
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -111,7 +114,8 @@ TEST_F(Console_TEST, InitAndLog)
   EXPECT_TRUE(GetLogContent(logPath).find(logString) != std::string::npos);
 
   // Cleanup
-  ignition::common::removeAll(basePath);
+  ignLogClose();
+  EXPECT_TRUE(ignition::common::removeAll(basePath));
 }
 
 //////////////////////////////////////////////////
@@ -119,7 +123,7 @@ TEST_F(Console_TEST, InitAndLog)
 TEST_F(Console_TEST, LogSlashN)
 {
   // Create a unique directory path
-  std::string path = IGN_TMP_DIR + ignition::common::uuid();
+  std::string path = joinPaths(IGN_TMP_DIR, ignition::common::uuid());
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -149,7 +153,7 @@ TEST_F(Console_TEST, LogSlashN)
 TEST_F(Console_TEST, LogStdEndl)
 {
   // Create a unique directory path
-  std::string path = IGN_TMP_DIR + ignition::common::uuid();
+  std::string path = joinPaths(IGN_TMP_DIR, ignition::common::uuid());
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -549,4 +553,3 @@ int main(int argc, char **argv)
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
-#endif
