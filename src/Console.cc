@@ -29,20 +29,14 @@ using namespace common;
 
 FileLogger ignition::common::Console::log("");
 
-#ifdef _WIN32
-  // These are Windows-based color codes
-  // (yellow is not enumerated by Windows)
-  const int red = FOREGROUND_RED | FOREGROUND_INTENSITY;
-  const int yellow = 0x006 | FOREGROUND_INTENSITY;
-  const int green = FOREGROUND_GREEN | FOREGROUND_INTENSITY;
-  const int blue = FOREGROUND_BLUE | FOREGROUND_INTENSITY;
-#else
-  // These are ANSI-based color codes
-  const int red = 31;
-  const int yellow = 33;
-  const int green = 32;
-  const int blue = 36;
-#endif
+// On UNIX, these are ANSI-based color codes. On Windows, these are colors from
+// docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences .
+// They happen to overlap, but there might be differences if more colors are
+// added.
+const int red = 31;
+const int yellow = 33;
+const int green = 32;
+const int blue = 36;
 
 Logger Console::err("[Err] ", red, Logger::STDERR, 1);
 Logger Console::warn("[Wrn] ", yellow, Logger::STDERR, 2);
@@ -151,20 +145,33 @@ int Logger::Buffer::sync()
 
     fprintf(outstream, "%s", ss.str().c_str());
 #else
-    HANDLE hConsole = GetStdHandle(
-          this->type == Logger::STDOUT ? STD_OUTPUT_HANDLE : STD_ERROR_HANDLE);
+    HANDLE hConsole = CreateFileW(
+      L"CONOUT$", GENERIC_WRITE|GENERIC_READ, 0, nullptr, OPEN_EXISTING,
+      FILE_ATTRIBUTE_NORMAL, nullptr);
 
-    CONSOLE_SCREEN_BUFFER_INFO originalBufferInfo;
-    GetConsoleScreenBufferInfo(hConsole, &originalBufferInfo);
-
-    SetConsoleTextAttribute(hConsole, this->color);
+    DWORD dwMode = 0;
+    bool vtProcessing = false;
+    if (GetConsoleMode(hConsole, &dwMode))
+    {
+      if ((dwMode & ENABLE_VIRTUAL_TERMINAL_PROCESSING) > 0)
+      {
+        vtProcessing = true;
+      }
+      else
+      {
+        dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+        if (SetConsoleMode(hConsole, dwMode))
+          vtProcessing = true;
+      }
+    }
 
     std::ostream &outStream =
         this->type == Logger::STDOUT ? std::cout : std::cerr;
 
-    outStream << outstr;
-
-    SetConsoleTextAttribute(hConsole, originalBufferInfo.wAttributes);
+    if (vtProcessing)
+      outStream << "\x1b[" << this->color << "m" << outstr << "\x1b[m";
+    else
+      outStream << outstr;
 #endif
   }
 
@@ -186,8 +193,7 @@ FileLogger::~FileLogger()
 {
   if (this->initialized && this->rdbuf())
   {
-    FileLogger::Buffer *buf = static_cast<FileLogger::Buffer*>(
-        this->rdbuf());
+    auto *buf = dynamic_cast<FileLogger::Buffer*>(this->rdbuf());
     if (buf->stream)
     {
       delete buf->stream;
@@ -202,7 +208,13 @@ void FileLogger::Init(const std::string &_directory,
 {
   std::string logPath;
 
-  if (_directory.empty() || _directory[0] != '/')
+  if (_directory.empty() ||
+#ifndef _WIN32
+    _directory[0] != '/'
+#else
+    _directory.length() < 2 || _directory[1] != ':'
+#endif
+    )
   {
     if (!env(IGN_HOMEDIR, logPath))
     {
@@ -210,22 +222,19 @@ void FileLogger::Init(const std::string &_directory,
         << "No log file will be generated.";
       return;
     }
-    logPath = logPath + "/" + _directory;
+    logPath = joinPaths(logPath, _directory);
   }
   else
   {
     logPath = _directory;
   }
 
-  FileLogger::Buffer *buf = static_cast<FileLogger::Buffer*>(
-      this->rdbuf());
+  auto* buf = dynamic_cast<FileLogger::Buffer*>(this->rdbuf());
 
   // Create the directory if it doesn't exist.
-  // \todo(anyone): Replace this with c++1y, when it is released.
-  if (!exists(logPath))
-    createDirectories(logPath);
+  createDirectories(logPath);
 
-  logPath = logPath + "/" + _filename;
+  logPath = joinPaths(logPath, _filename);
 
   // Check if the Init method has been already called, and if so
   // remove current buffer.
@@ -243,13 +252,25 @@ void FileLogger::Init(const std::string &_directory,
   if (isDirectory(logPath))
     this->logDirectory = logPath;
   else
-    this->logDirectory = logPath.substr(0, logPath.rfind('/'));
+    this->logDirectory = logPath.substr(0, logPath.rfind(separator("")));
 
   this->initialized = true;
 
   /// \todo(anyone) Reimplement this.
   // Output the version of the project.
   // (*buf->stream) << PROJECT_VERSION_HEADER << std::endl;
+}
+
+/////////////////////////////////////////////////
+void FileLogger::Close()
+{
+  auto* buf = dynamic_cast<FileLogger::Buffer*>(this->rdbuf());
+  if (buf && buf->stream && buf->stream->is_open())
+  {
+    buf->stream->close();
+    delete buf->stream;
+    buf->stream = nullptr;
+  }
 }
 
 /////////////////////////////////////////////////

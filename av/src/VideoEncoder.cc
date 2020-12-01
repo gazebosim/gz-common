@@ -510,7 +510,8 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
 
   // Skip frames that arrive faster than the video's fps
   double period = 1.0/this->dataPtr->fps;
-  if (dt < std::chrono::duration<double>(period))
+  if (this->dataPtr->frameCount > 0u &&
+      dt < std::chrono::duration<double>(period))
     return false;
 
   if (this->dataPtr->frameCount == 0u)
@@ -777,4 +778,6 @@ void VideoEncoder::Reset()
   this->dataPtr->bitRate = VIDEO_ENCODER_BITRATE_DEFAULT;
   this->dataPtr->fps = VIDEO_ENCODER_FPS_DEFAULT;
   this->dataPtr->format = VIDEO_ENCODER_FORMAT_DEFAULT;
+  this->dataPtr->timePrev = std::chrono::steady_clock::time_point();
+  this->dataPtr->timeStart = std::chrono::steady_clock::time_point();
 }
