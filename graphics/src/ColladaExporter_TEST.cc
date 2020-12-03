@@ -32,25 +32,29 @@
 using namespace ignition;
 
 class ColladaExporter : public ignition::testing::AutoLogFixture {
+  /// \brief Setup the test fixture. This gets called by gtest.
+  public: void SetUp() override
+  {
+    // Call superclass to make sure that logging is initialized
+    this->ignition::testing::AutoLogFixture::SetUp();
+    this->pathData = common::joinPaths(PROJECT_SOURCE_PATH, "test", "data");
+    this->pathOut = common::joinPaths(common::cwd(), "tmp");
 
-/// \brief Setup the test fixture. This gets called by gtest.
-public: void SetUp() override
-{
-  this->ignition::testing::AutoLogFixture::SetUp();
-  this->pathData = common::joinPaths(PROJECT_SOURCE_PATH, "test", "data");
-  this->pathOut = common::joinPaths(common::cwd(), "tmp");
+    common::createDirectories(this->pathOut);
+  }
 
-  common::createDirectories(this->pathOut);
-}
+  /// \brief Tear down the test fixture. This gets called by gtest.
+  public: void TearDown() override
+  {
+    // Remove temp directory
+    common::removeAll(this->pathOut);
+  }
 
-public: void TearDown() override
-{
-  // Remove temp directory
-  common::removeAll(this->pathOut);
-}
+  /// \brief Path to project test data
+  public: std::string pathData;
 
-public: std::string pathData;
-public: std::string pathOut;
+  /// \brief Path to temporary output (removed during TearDown)
+  public: std::string pathOut;
 };
 
 /////////////////////////////////////////////////
@@ -126,7 +130,8 @@ TEST_F(ColladaExporter, ExportCordlessDrill)
 {
   const auto filenameIn = common::joinPaths(this->pathData,
       "cordless_drill", "meshes", "cordless_drill.dae");
-  const auto filenameOut = common::joinPaths(pathOut, "cordless_drill_exported");
+  const auto filenameOut = common::joinPaths(this->pathOut,
+      "cordless_drill_exported");
   const auto filenameOutExt = common::joinPaths(filenameOut,
       "meshes", "cordless_drill_exported.dae");
 
@@ -209,7 +214,8 @@ TEST_F(ColladaExporter, ExportMeshWithSubmeshes)
   const auto drillFilenameIn = common::joinPaths(this->pathData,
       "cordless_drill", "meshes", "cordless_drill.dae");
 
-  const auto filenameOut = common::joinPaths(pathOut, "mesh_with_submeshes");
+  const auto filenameOut = common::joinPaths(this->pathOut,
+      "mesh_with_submeshes");
   const auto filenameOutExt = common::joinPaths(filenameOut,
       "meshes", "mesh_with_submeshes.dae");
 
