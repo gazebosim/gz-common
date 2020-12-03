@@ -145,6 +145,12 @@ namespace ignition
     }
 
     //////////////////////////////////////////////////
+    bool chdir(const std::string& _dir)
+    {
+      return ::chdir(_dir.c_str()) == 0;
+    }
+
+    //////////////////////////////////////////////////
     DirIter::DirIter(const std::string &_in) : dataPtr(new DirIterPrivate)
     {
       this->dataPtr->dirname = _in;
@@ -335,7 +341,7 @@ namespace ignition
     bool internal_check_path(const std::string &_path, DWORD &attr)
     {
       attr = ::GetFileAttributesA(_path.c_str());
-      if (attr == 0xFFFFFFFF)
+      if (attr == INVALID_FILE_ATTRIBUTES)
       {
         return process_status_failure();
       }
@@ -414,6 +420,12 @@ namespace ignition
       {
         return buf.data();
       }
+    }
+
+    /////////////////////////////////////////////////
+    bool chdir(const std::string& _dir)
+    {
+      return ::SetCurrentDirectoryA(_dir.c_str());
     }
 
     //////////////////////////////////////////////////
