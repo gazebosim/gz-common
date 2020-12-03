@@ -31,21 +31,38 @@
 
 using namespace ignition;
 
-class ColladaExporter : public ignition::testing::AutoLogFixture { };
+class ColladaExporter : public ignition::testing::AutoLogFixture {
+
+/// \brief Setup the test fixture. This gets called by gtest.
+public: void SetUp() override
+{
+  this->ignition::testing::AutoLogFixture::SetUp();
+  this->pathData = common::joinPaths(PROJECT_SOURCE_PATH, "test", "data");
+  this->pathOut = common::joinPaths(common::cwd(), "tmp");
+
+  common::createDirectories(this->pathOut);
+}
+
+public: void TearDown() override
+{
+  // Remove temp directory
+  common::removeAll(this->pathOut);
+}
+
+public: std::string pathData;
+public: std::string pathOut;
+};
 
 /////////////////////////////////////////////////
 TEST_F(ColladaExporter, ExportBox)
 {
-  std::string filenameIn = std::string(PROJECT_SOURCE_PATH) +
-      "/test/data/box.dae";
+  const auto filenameIn = common::joinPaths(this->pathData, "box.dae");
+  const auto filenameOut = common::joinPaths(this->pathOut, "box_exported");
+  const auto filenameOutExt = filenameOut + ".dae";
 
-  std::string pathOut = common::cwd();
-  common::createDirectories(pathOut + "/" + "tmp");
-  std::string filenameOut = pathOut+ "/tmp/box_exported";
-
+  // Load original mesh
   common::ColladaLoader loader;
-  const common::Mesh *meshOriginal = loader.Load(
-      filenameIn);
+  const common::Mesh *meshOriginal = loader.Load(filenameIn);
 
   // Export with extension
   common::ColladaExporter exporter;
@@ -53,8 +70,7 @@ TEST_F(ColladaExporter, ExportBox)
 
   // Check .dae file
   tinyxml2::XMLDocument xmlDoc;
-  filenameOut = filenameOut + ".dae";
-  EXPECT_EQ(xmlDoc.LoadFile(filenameOut.c_str()), tinyxml2::XML_SUCCESS);
+  ASSERT_EQ(xmlDoc.LoadFile(filenameOutExt.c_str()), tinyxml2::XML_SUCCESS);
   ASSERT_TRUE(xmlDoc.FirstChildElement("COLLADA") != nullptr);
 
   const char *countDae = xmlDoc.FirstChildElement("COLLADA")
@@ -72,7 +88,7 @@ TEST_F(ColladaExporter, ExportBox)
   EXPECT_STREQ(countDae, countMesh);
 
   // Reload mesh and compare
-  const common::Mesh *meshReloaded = loader.Load(filenameOut);
+  const common::Mesh *meshReloaded = loader.Load(filenameOutExt);
 
   EXPECT_EQ(meshOriginal->Name(), meshReloaded->Name());
   EXPECT_EQ(meshOriginal->Max(), meshReloaded->Max());
@@ -103,32 +119,28 @@ TEST_F(ColladaExporter, ExportBox)
                 meshReloaded->SubMeshByIndex(i).lock()->TexCoord(j));
     }
   }
-
-  // Remove temp directory
-  common::removeAll(pathOut + "/tmp");
 }
 
 /////////////////////////////////////////////////
 TEST_F(ColladaExporter, ExportCordlessDrill)
 {
+  const auto filenameIn = common::joinPaths(this->pathData,
+      "cordless_drill", "meshes", "cordless_drill.dae");
+  const auto filenameOut = common::joinPaths(pathOut, "cordless_drill_exported");
+  const auto filenameOutExt = common::joinPaths(filenameOut,
+      "meshes", "cordless_drill_exported.dae");
+
+  // Load original mesh
   common::ColladaLoader loader;
-  const common::Mesh *meshOriginal = loader.Load(
-      std::string(PROJECT_SOURCE_PATH) +
-      "/test/data/cordless_drill/meshes/cordless_drill.dae");
+  const common::Mesh *meshOriginal = loader.Load(filenameIn);
 
-  std::string pathOut = common::cwd();
-  common::createDirectories(pathOut + "/" + "tmp");
-
+  // Export with extension
   common::ColladaExporter exporter;
-  exporter.Export(meshOriginal, pathOut + "/tmp/cordless_drill_exported", true);
+  exporter.Export(meshOriginal, filenameOut, true);
 
   // Check .dae file
   tinyxml2::XMLDocument xmlDoc;
-  std::string filename = pathOut +
-    "/tmp/cordless_drill_exported/meshes/cordless_drill_exported.dae";
-
-  EXPECT_EQ(xmlDoc.LoadFile(filename.c_str()), tinyxml2::XML_SUCCESS);
-
+  ASSERT_EQ(xmlDoc.LoadFile(filenameOutExt.c_str()), tinyxml2::XML_SUCCESS);
   ASSERT_TRUE(xmlDoc.FirstChildElement("COLLADA") != nullptr);
   ASSERT_TRUE(xmlDoc.FirstChildElement(
         "COLLADA")->FirstChildElement("library_geometries") != nullptr);
@@ -157,8 +169,7 @@ TEST_F(ColladaExporter, ExportCordlessDrill)
   }
 
   // Reload mesh and compare
-  const common::Mesh *meshReloaded = loader.Load(pathOut +
-      "/tmp/cordless_drill_exported/meshes/cordless_drill_exported.dae");
+  const common::Mesh *meshReloaded = loader.Load(filenameOutExt);
 
   EXPECT_EQ(meshOriginal->Name(), meshReloaded->Name());
   EXPECT_EQ(meshOriginal->Max(), meshReloaded->Max());
@@ -189,24 +200,22 @@ TEST_F(ColladaExporter, ExportCordlessDrill)
                 meshReloaded->SubMeshByIndex(i).lock()->TexCoord(j));
     }
   }
-
-  // Remove temp directory
-  common::removeAll(pathOut + "/tmp");
 }
 
 /////////////////////////////////////////////////
 TEST_F(ColladaExporter, ExportMeshWithSubmeshes)
 {
-  std::string boxFilenameIn = std::string(PROJECT_SOURCE_PATH) +
-      "/test/data/box.dae";
+  const auto boxFilenameIn = common::joinPaths(this->pathData, "box.dae");
+  const auto drillFilenameIn = common::joinPaths(this->pathData,
+      "cordless_drill", "meshes", "cordless_drill.dae");
+
+  const auto filenameOut = common::joinPaths(pathOut, "mesh_with_submeshes");
+  const auto filenameOutExt = common::joinPaths(filenameOut,
+      "meshes", "mesh_with_submeshes.dae");
 
   common::ColladaLoader loader;
-  const common::Mesh *boxMesh = loader.Load(
-      boxFilenameIn);
-
-  const common::Mesh *drillMesh = loader.Load(
-      common::joinPaths(PROJECT_SOURCE_PATH,
-      "/test/data/cordless_drill/meshes/cordless_drill.dae"));
+  const common::Mesh *boxMesh = loader.Load(boxFilenameIn);
+  const common::Mesh *drillMesh = loader.Load(drillFilenameIn);
 
   common::Mesh outMesh;
   std::weak_ptr<common::SubMesh> subm;
@@ -233,19 +242,13 @@ TEST_F(ColladaExporter, ExportMeshWithSubmeshes)
   matrix = math::Matrix4d(localPose);
   subMeshMatrix.push_back(matrix);
 
-  std::string pathOut = common::joinPaths(common::cwd(), "tmp");
-  common::createDirectories(pathOut);
-
+  // Export with extension
   common::ColladaExporter exporter;
-  exporter.Export(&outMesh,
-      common::joinPaths(pathOut, "mesh_with_submeshes"), true, subMeshMatrix);
+  exporter.Export(&outMesh, filenameOut, true, subMeshMatrix);
 
   // Check .dae file
   tinyxml2::XMLDocument xmlDoc;
-  std::string filename = common::joinPaths(pathOut,
-     "mesh_with_submeshes/meshes/mesh_with_submeshes.dae");
-
-  EXPECT_EQ(xmlDoc.LoadFile(filename.c_str()), tinyxml2::XML_SUCCESS);
+  ASSERT_EQ(xmlDoc.LoadFile(filenameOutExt.c_str()), tinyxml2::XML_SUCCESS);
 
   ASSERT_TRUE(xmlDoc.FirstChildElement("COLLADA") != nullptr);
   ASSERT_TRUE(xmlDoc.FirstChildElement(
@@ -294,8 +297,7 @@ TEST_F(ColladaExporter, ExportMeshWithSubmeshes)
   }
 
   // Reload mesh and compare
-  const common::Mesh *meshReloaded = loader.Load(common::joinPaths(pathOut,
-       "mesh_with_submeshes/meshes/mesh_with_submeshes.dae"));
+  const common::Mesh *meshReloaded = loader.Load(filenameOutExt);
 
   EXPECT_EQ(outMesh.Name(), meshReloaded->Name());
   EXPECT_EQ(outMesh.SubMeshCount(), meshReloaded->SubMeshCount());
@@ -306,9 +308,6 @@ TEST_F(ColladaExporter, ExportMeshWithSubmeshes)
   EXPECT_EQ(outMesh.NormalCount(), meshReloaded->NormalCount());
   EXPECT_EQ(outMesh.TexCoordCount(),
       meshReloaded->TexCoordCount());
-
-  // Remove temp directory
-  common::removeAll(pathOut);
 }
 
 /////////////////////////////////////////////////
