@@ -588,7 +588,7 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
   auto timeSinceStart = std::chrono::duration_cast<std::chrono::milliseconds>(
       _timestamp - this->dataPtr->timeStart);
   double durationSec = timeSinceStart.count() / 1000.0;
-  uint64_t frameNumber = durationSec / period;
+  uint64_t frameNumber = static_cast<uint64_t>(durationSec / period);
 
   uint64_t frameDiff = frameNumber + 1 - this->dataPtr->frameCount;
 
