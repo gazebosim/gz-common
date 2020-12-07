@@ -355,6 +355,8 @@ NumericAnimation::NumericAnimation(const std::string &_name,
 /////////////////////////////////////////////////
 NumericAnimation::~NumericAnimation()
 {
+  for (auto kf : this->keyFrames)
+    delete kf;
 }
 
 /////////////////////////////////////////////////

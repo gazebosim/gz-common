@@ -82,7 +82,10 @@ Skeleton::Skeleton(SkeletonNode *_root)
 //////////////////////////////////////////////////
 Skeleton::~Skeleton()
 {
-  delete this->data->root;
+  for (auto& kv : this->data->nodes)
+    delete kv.second;
+  for (auto& a : this->data->anims)
+    delete a;
   delete this->data;
   this->data = NULL;
 }
