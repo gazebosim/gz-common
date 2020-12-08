@@ -14,8 +14,10 @@
  * limitations under the License.
  *
  */
-#include <string>
+
 #include <algorithm>
+#include <map>
+#include <string>
 
 #include "ignition/math/Helpers.hh"
 
