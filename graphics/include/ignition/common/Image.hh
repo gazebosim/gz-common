@@ -109,6 +109,10 @@ namespace ignition
       /// \param[in] _filename The name of the saved image
       public: void SavePNG(const std::string &_filename);
 
+      /// \brief Save the image in PNG format
+      /// \param[in] _filename The name of the saved image
+      public: void SavePNGToBuffer(std::vector<unsigned char> &_buffer);
+
       /// \brief Set the image from raw data
       /// \param[in] _data Pointer to the raw image data
       /// \param[in] _width Width in pixels

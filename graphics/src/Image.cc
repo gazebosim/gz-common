@@ -138,6 +138,19 @@ void Image::SavePNG(const std::string &_filename)
 }
 
 //////////////////////////////////////////////////
+void Image::SavePNGToBuffer(std::vector<unsigned char>& buffer)
+{
+  FIMEMORY *hmem = FreeImage_OpenMemory();
+  FreeImage_SaveToMemory(FIF_PNG, this->dataPtr->bitmap, hmem);
+  unsigned char* mem_buffer = nullptr;
+  unsigned int size_in_bytes = 0;
+  FreeImage_AcquireMemory(hmem, &mem_buffer, &size_in_bytes);
+  buffer.resize(size_in_bytes);
+  std::memcpy(buffer.data(), mem_buffer, size_in_bytes);
+  FreeImage_CloseMemory(hmem);
+}
+
+//////////////////////////////////////////////////
 void Image::SetFromData(const unsigned char *_data,
     unsigned int _width,
     unsigned int _height,
