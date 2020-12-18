@@ -2002,7 +2002,8 @@ void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
   unsigned int otherSemantics = TEXCOORD + 1;
 
   // look up table of position/normal/texcoord duplicate indices
-  std::map<unsigned int, std::map<unsigned int, unsigned int>> texDupMap;
+  std::unordered_map<unsigned int, std::map<unsigned int, unsigned int>>
+      texDupMap;
   std::map<unsigned int, unsigned int> normalDupMap;
   std::map<unsigned int, unsigned int> positionDupMap;
 
@@ -2338,7 +2339,8 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
   std::map<const unsigned int, std::set<int>> inputs;
 
   // look up table of position/normal/texcoord duplicate indices
-  std::map<unsigned int, std::map<unsigned int, unsigned int>> texDupMap;
+  std::unordered_map<unsigned int, std::map<unsigned int, unsigned int>>
+      texDupMap;
   std::map<unsigned int, unsigned int> normalDupMap;
   std::map<unsigned int, unsigned int> positionDupMap;
 
