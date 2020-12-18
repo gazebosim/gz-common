@@ -16,6 +16,7 @@
 */
 
 #include <gtest/gtest.h>
+#include <memory>
 
 #include "test_config.h"
 #include "ignition/common/GTSMeshUtils.hh"
@@ -62,7 +63,7 @@ TEST_F(GTSMeshUtils, DelaunayTriangulation)
   edges.push_back(ignition::math::Vector2i(6, 7));
   edges.push_back(ignition::math::Vector2i(7, 4));
 
-  common::Mesh *mesh = new common::Mesh();
+  auto mesh = std::make_unique<common::Mesh>();
   mesh->SetName("extruded");
   common::SubMesh subMesh;
 
