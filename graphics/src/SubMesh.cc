@@ -253,7 +253,10 @@ bool SubMesh::HasTexCoord(const unsigned int _index) const
 bool SubMesh::HasTexCoordBySet(unsigned int _index,
     unsigned int _setIndex) const
 {
-  return _index < this->dataPtr->texCoords[_setIndex].size();
+  auto it = this->dataPtr->texCoords.find(_setIndex);
+  if (it == this->dataPtr->texCoords.end())
+    return false;
+  return _index < it->second.size();
 }
 
 //////////////////////////////////////////////////
@@ -291,13 +294,21 @@ ignition::math::Vector2d SubMesh::TexCoord(const unsigned int _index) const
 ignition::math::Vector2d SubMesh::TexCoordBySet(unsigned int _index,
     unsigned int _setIndex) const
 {
-  if (_index >= this->dataPtr->texCoords[_setIndex].size())
+  auto it = this->dataPtr->texCoords.find(_setIndex);
+  if (it == this->dataPtr->texCoords.end())
+  {
+    ignerr << "Texture coordinate set does not exist: " << _setIndex
+           << std::endl;
+    return math::Vector2d::Zero;
+  }
+
+  if (_index >= it->second.size())
   {
     ignerr << "Index too large" << std::endl;
     return math::Vector2d::Zero;
   }
 
-  return this->dataPtr->texCoords[_setIndex][_index];
+  return it->second[_index];
 }
 
 //////////////////////////////////////////////////
@@ -314,13 +325,21 @@ void SubMesh::SetTexCoord(const unsigned int _index,
 void SubMesh::SetTexCoordBySet(unsigned int _index,
     const ignition::math::Vector2d &_t, unsigned int _setIndex)
 {
-  if (_index >= this->dataPtr->texCoords[_setIndex].size())
+  auto it = this->dataPtr->texCoords.find(_setIndex);
+  if (it == this->dataPtr->texCoords.end())
+  {
+    ignerr << "Texture coordinate set does not exist: " << _setIndex
+           << std::endl;
+    return;
+  }
+
+  if (_index >= it->second.size())
   {
     ignerr << "Index too large" << std::endl;
     return;
   }
 
-  this->dataPtr->texCoords[_setIndex][_index] = _t;
+  it->second[_index] = _t;
 }
 
 //////////////////////////////////////////////////
@@ -434,6 +453,10 @@ unsigned int SubMesh::TexCoordCount() const
 //////////////////////////////////////////////////
 unsigned int SubMesh::TexCoordCountBySet(unsigned int _setIndex) const
 {
+  auto it = this->dataPtr->texCoords.find(_setIndex);
+  if (it == this->dataPtr->texCoords.end())
+    return 0u;
+
   return this->dataPtr->texCoords[_setIndex].size();
 }
 
