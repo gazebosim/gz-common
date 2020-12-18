@@ -202,6 +202,7 @@ GtsSurface *GTSMeshUtils::DelaunayTriangulation(
         edgeList);
 
   gts_fifo_destroy(edgeList);
+  g_slist_free(verticesList);
   return surface;
 }
 
