@@ -2002,7 +2002,8 @@ void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
   unsigned int otherSemantics = TEXCOORD + 1;
 
   // look up table of position/normal/texcoord duplicate indices
-  std::map<unsigned int, std::map<unsigned int, unsigned int>> texDupMap;
+  std::unordered_map<unsigned int, std::map<unsigned int, unsigned int>>
+      texDupMap;
   std::map<unsigned int, unsigned int> normalDupMap;
   std::map<unsigned int, unsigned int> positionDupMap;
 
@@ -2039,7 +2040,10 @@ void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
       int offsetInt = ignition::math::parseInt(offset);
       if (inputs[TEXCOORD].find(offsetInt) == inputs[TEXCOORD].end())
       {
-        int set = ignition::math::parseInt(polylistInputXml->Attribute("set"));
+        unsigned int set = 0u;
+        auto setStr = polylistInputXml->Attribute("set");
+        if (setStr)
+          set = ignition::math::parseInt(setStr);
         this->LoadTexCoords(source, texcoords[set], texDupMap[set]);
         inputs[TEXCOORD].insert(offsetInt);
         texcoordsOffsetToSet[offsetInt] = set;
@@ -2335,7 +2339,8 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
   std::map<const unsigned int, std::set<int>> inputs;
 
   // look up table of position/normal/texcoord duplicate indices
-  std::map<unsigned int, std::map<unsigned int, unsigned int>> texDupMap;
+  std::unordered_map<unsigned int, std::map<unsigned int, unsigned int>>
+      texDupMap;
   std::map<unsigned int, unsigned int> normalDupMap;
   std::map<unsigned int, unsigned int> positionDupMap;
 
@@ -2366,8 +2371,10 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
       int offsetInt = ignition::math::parseInt(offset);
       if (inputs[TEXCOORD].find(offsetInt) == inputs[TEXCOORD].end())
       {
-        unsigned int set = ignition::math::parseInt(
-            trianglesInputXml->Attribute("set"));
+        unsigned int set = 0u;
+        auto setStr = trianglesInputXml->Attribute("set");
+        if (setStr)
+          set = ignition::math::parseInt(setStr);
         this->LoadTexCoords(source, texcoords[set], texDupMap[set]);
         inputs[TEXCOORD].insert(offsetInt);
         texcoordsOffsetToSet[offsetInt] = set;
@@ -2483,19 +2490,6 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
           }
           if (hasTexcoords)
           {
-            // Get the vertex texcoord index value. If the texcoord is a
-            // duplicate then reset the index to the first instance of the
-            // duplicated texcoord
-            // unsigned int offset = *inputs[TEXCOORD].begin();
-            // unsigned int remappedTexcoordIndex =
-            //     values.at(offset);
-            // int set = texcoordsOffsetToSet[offset];
-            // auto &texDupMapSet = texDupMap[set];
-            // auto texDupMapSetIt = texDupMapSet.find(remappedTexcoordIndex);
-            // if (texDupMapSetIt != texDupMapSet.end())
-            //   remappedTexcoordIndex = texDupMapSetIt->second;
-            // texEqual = iv.texcoordIndex[set] == remappedTexcoordIndex;
-
             texEqual = true;
             for (auto offset : inputs[TEXCOORD])
             {

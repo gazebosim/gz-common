@@ -96,13 +96,13 @@ TEST(AudioDecoder, CheerFile)
   EXPECT_FALSE(audio.SetFile("_bad_audio_filename_.wav"));
 
   // Test no stream info
-  std::string path = TEST_PATH;
-  path += "/data/audio_bad_codec.grf";
+  auto path = common::joinPaths(TEST_PATH, "data", "audio_bad_codec.grf");
+  EXPECT_FALSE(common::exists(path));
   EXPECT_FALSE(audio.SetFile(path));
 
   // Test a valid file without an audio stream
-  path = TEST_PATH;
-  path += "/data/empty_audio.mp4";
+  path = common::joinPaths(TEST_PATH, "data", "empty_audio.mp4");
+  ASSERT_TRUE(common::exists(path));
   EXPECT_FALSE(audio.SetFile(path));
 
   unsigned int dataBufferSize;
@@ -110,8 +110,8 @@ TEST(AudioDecoder, CheerFile)
 
   // WAV
   {
-    path = TEST_PATH;
-    path += "/data/cheer.wav";
+    path = common::joinPaths(TEST_PATH, "data", "cheer.wav");
+    ASSERT_TRUE(common::exists(path));
     EXPECT_TRUE(audio.SetFile(path));
     EXPECT_EQ(audio.File(), path);
     EXPECT_EQ(audio.SampleRate(), 48000);
@@ -122,8 +122,8 @@ TEST(AudioDecoder, CheerFile)
 
   // OGG
   {
-    path = TEST_PATH;
-    path += "/data/cheer.ogg";
+    path = common::joinPaths(TEST_PATH, "data", "cheer.ogg");
+    ASSERT_TRUE(common::exists(path));
     EXPECT_TRUE(audio.SetFile(path));
     EXPECT_EQ(audio.File(), path);
     EXPECT_EQ(audio.SampleRate(), 44100);
@@ -137,8 +137,8 @@ TEST(AudioDecoder, CheerFile)
 
   // MP3
   {
-    path = TEST_PATH;
-    path += "/data/cheer.mp3";
+    path = common::joinPaths(TEST_PATH, "data", "cheer.mp3");
+    ASSERT_TRUE(common::exists(path));
     EXPECT_TRUE(audio.SetFile(path));
     EXPECT_EQ(audio.File(), path);
     EXPECT_EQ(audio.SampleRate(), 44100);

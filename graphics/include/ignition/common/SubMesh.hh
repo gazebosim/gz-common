@@ -115,13 +115,21 @@ namespace ignition
       /// \param[in] _z Position along z
       public: void AddNormal(const double _x, const double _y, const double _z);
 
-      /// \brief Add a texture coord to the mesh
+      /// \brief Add a texture coord to the mesh. If multiple texture
+      /// coordinate sets exist, this function adds it to the first texture
+      /// coordinate set in the submesh. If no previous texture coordinates
+      /// exist, it is added to set 0.
       /// \param[in] _u Position along u
       /// \param[in] _v Position along v
+      /// \sa AddTexCoordBySet
       public: void AddTexCoord(const double _u, const double _v);
 
-      /// \brief Add a texture coordinate to the mesh
+      /// \brief Add a texture coordinate to the mesh. If multiple texture
+      /// coordinate sets exist, this function adds it to the first texture
+      /// coordinate set in the submesh. If no previous texture coordinates
+      /// exist, it is added to set 0.
       /// \param[in] _uv The texture coordinate
+      /// \sa AddTexCoordBySet
       public: void AddTexCoord(const ignition::math::Vector2d &_uv);
 
       /// \brief Add a texture coord to a texture coordinate set of the mesh
@@ -190,9 +198,12 @@ namespace ignition
                   unsigned int _index,
                   unsigned int _setIndex) const;
 
-      /// \brief Set a texture coordinate
+      /// \brief Set a texture coordinate. If multiple texture
+      /// coordinate sets exist, this function sets the texture
+      /// coordinate in the first texture coordinate set in the submesh.
       /// \param[in] _index Index of the texture coordinate that will be set.
       /// \param[in] _uv The new texture coordinate
+      /// \sa SetTexCoordBySet
       public: void SetTexCoord(const unsigned int _index,
                                const ignition::math::Vector2d &_uv);
 
@@ -244,8 +255,13 @@ namespace ignition
       /// \return The number of indices.
       public: unsigned int IndexCount() const;
 
-      /// \brief Return the number of texture coordinates
+      /// \brief Return the number of texture coordinates. If multiple
+      /// texture coordinate sets exist, this function checks the first
+      /// texture coordinate set in the submesh, which by default is set 0,
+      /// unless AddTexCoordBySet is called with a different set index number
+      /// the first time a texture coordinate is added.
       /// \return The number of texture coordinates.
+      /// \sa TexCoordCountBySet
       public: unsigned int TexCoordCount() const;
 
       /// \brief Return the number of texture coordinates for a texture
@@ -295,10 +311,15 @@ namespace ignition
       public: bool HasNormal(const unsigned int _index) const;
 
       /// \brief Return true if this submesh has the texture coordinate with
-      /// the given index
+      /// the given index. If multiple texture coordinate sets exist, this
+      /// function checks the first texture coordinate set in the submesh,
+      /// which by default is set 0 unless AddTexCoordBySet is called with
+      /// a different set index number the first time a texture coordinate is
+      /// added.
       /// \param[in] _index Texture coordinate index
       /// \return Return true if this submesh has the texture coordinate with
       /// the given _index.
+      /// \sa HasTexCoordBySet
       public: bool HasTexCoord(const unsigned int _index) const;
 
       /// \brief Return true if this submesh has the texture coordinate with

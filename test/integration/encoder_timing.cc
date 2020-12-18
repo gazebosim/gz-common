@@ -45,10 +45,13 @@ void durationTest(VideoEncoder &_vidEncoder, Video &_video,
   _vidEncoder.Stop();
   _video.Load(common::joinPaths(common::cwd(), "/TMP_RECORDING.mp4"));
 
-  EXPECT_NEAR(std::chrono::duration_cast<std::chrono::milliseconds>(
-              _video.Duration()).count(),
-              _seconds*1000,
-              kTol.count());
+  auto length = std::chrono::duration_cast<std::chrono::milliseconds>(
+      _video.Duration()).count();
+
+  // Static cast to suppress Windows warning
+  EXPECT_NEAR(static_cast<double>(length),
+              static_cast<double>(_seconds*1000),
+              static_cast<double>(kTol.count()));
 }
 
 TEST(EncoderTimingTest, Duration)
