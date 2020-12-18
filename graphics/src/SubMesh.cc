@@ -245,7 +245,16 @@ bool SubMesh::HasTexCoord(const unsigned int _index) const
 {
   if (this->dataPtr->texCoords.empty())
     return false;
+
   unsigned firstSetIndex = this->dataPtr->texCoords.begin()->first;
+
+  if (this->dataPtr->texCoords.size() > 1u)
+  {
+    ignwarn << "Multiple texture coordinate sets exist in submesh: "
+            << this->dataPtr->name << ". Checking first set with index: "
+            << firstSetIndex << std::endl;
+  }
+
   return this->HasTexCoordBySet(_index, firstSetIndex);
 }
 
@@ -287,6 +296,14 @@ ignition::math::Vector2d SubMesh::TexCoord(const unsigned int _index) const
     return math::Vector2d::Zero;
   }
   unsigned firstSetIndex = this->dataPtr->texCoords.begin()->first;
+
+  if (this->dataPtr->texCoords.size() > 1u)
+  {
+    ignwarn << "Multiple texture coordinate sets exist in submesh: "
+            << this->dataPtr->name << ". Checking first set with index: "
+            << firstSetIndex << std::endl;
+  }
+
   return this->TexCoordBySet(_index, firstSetIndex);
 }
 
@@ -318,6 +335,14 @@ void SubMesh::SetTexCoord(const unsigned int _index,
   unsigned firstSetIndex = 0u;
   if (!this->dataPtr->texCoords.empty())
     firstSetIndex = this->dataPtr->texCoords.begin()->first;
+
+  if (this->dataPtr->texCoords.size() > 1u)
+  {
+    ignwarn << "Multiple texture coordinate sets exist in submesh: "
+            << this->dataPtr->name << ". Checking first set with index: "
+            << firstSetIndex << std::endl;
+  }
+
   this->SetTexCoordBySet(_index, _t, firstSetIndex);
 }
 
@@ -447,6 +472,14 @@ unsigned int SubMesh::TexCoordCount() const
   if (this->dataPtr->texCoords.empty())
     return 0u;
   unsigned firstSetIndex = this->dataPtr->texCoords.begin()->first;
+
+  if (this->dataPtr->texCoords.size() > 1u)
+  {
+    ignwarn << "Multiple texture coordinate sets exist in submesh: "
+            << this->dataPtr->name << ". Checking first set with index: "
+            << firstSetIndex << std::endl;
+  }
+
   return this->TexCoordCountBySet(firstSetIndex);
 }
 
