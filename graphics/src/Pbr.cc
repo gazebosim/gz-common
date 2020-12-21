@@ -50,6 +50,12 @@ class ignition::common::PbrPrivate
   /// \brief Emissive map
   public: std::string emissiveMap = "";
 
+  /// \brief Light map
+  public: std::string lightMap;
+
+  /// \brief Light map texture coordinate set
+  public: unsigned int lightMapUvSet = 0u;
+
   /// \brief Roughness value (metal workflow only)
   public: double roughness = 0.5;
 
@@ -291,6 +297,25 @@ std::string Pbr::EmissiveMap() const
 void Pbr::SetEmissiveMap(const std::string &_map)
 {
   this->dataPtr->emissiveMap = _map;
+}
+
+//////////////////////////////////////////////////
+std::string Pbr::LightMap() const
+{
+  return this->dataPtr->lightMap;
+}
+
+//////////////////////////////////////////////////
+void Pbr::SetLightMap(const std::string &_map, unsigned int _uvSet)
+{
+  this->dataPtr->lightMap = _map;
+  this->dataPtr->lightMapUvSet = _uvSet;
+}
+
+//////////////////////////////////////////////////
+unsigned int Pbr::LightMapTexCoordSet() const
+{
+  return this->dataPtr->lightMapUvSet;
 }
 
 //////////////////////////////////////////////////
