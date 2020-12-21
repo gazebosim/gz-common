@@ -2,9 +2,17 @@
 
 ## Ignition Common 3.X.X
 
+## Ignition Common 3.9.0 (2020-12-21)
+
+1. Support multiple texture coordinate sets
+    * [Pull Request 131](https://github.com/ignitionrobotics/ign-common/pull/131)
+
+1. Add Lightmap to material
+    * [Pull Request 132](https://github.com/ignitionrobotics/ign-common/pull/132)
+
 ## Ignition Common 3.8.0 (2020-12-08)
 
-1. Call ignition::common::load() from Video constructor 
+1. Call ignition::common::load() from Video constructor
     * [Pull Request 111](https://github.com/ignitionrobotics/ign-common/pull/111)
 
 1. Cleanup
@@ -40,10 +48,10 @@
 
 1. Support fuel URLs for textures
     * [Pull Request 102](https://github.com/ignitionrobotics/ign-common/pull/102)
-    
+
 1. Fix loading dae file with hierarchical node that does not have a name
     * [Pull Request 101](https://github.com/ignitionrobotics/ign-common/pull/101)
-    
+
 1. Fix more Animation memory leaks
     * [Pull Request 98](https://github.com/ignitionrobotics/ign-common/pull/98)
 
