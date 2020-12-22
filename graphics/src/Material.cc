@@ -64,6 +64,9 @@ class ignition::common::MaterialPrivate
   // \brief Enables two sided rendering
   public: bool twoSidedEnabled = false;
 
+  /// \brief render order value
+  public: int renderOrder = 0.0;
+
   /// \brief shininess value (0 to 1)
   public: double shininess = 0.0;
 
@@ -269,6 +272,18 @@ void Material::SetShininess(double _s)
 double Material::Shininess() const
 {
   return this->dataPtr->shininess;
+}
+
+//////////////////////////////////////////////////
+void Material::SetRenderOrder(float _renderOrder)
+{
+  this->dataPtr->renderOrder = _renderOrder;
+}
+
+//////////////////////////////////////////////////
+float Material::RenderOrder() const
+{
+  return this->dataPtr->renderOrder;
 }
 
 //////////////////////////////////////////////////
