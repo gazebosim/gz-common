@@ -28,8 +28,12 @@ TEST(TimeTest, Time)
   common::Timer timer;
   timer.Start();
   IGN_SLEEP_MS(100);
-  EXPECT_TRUE(timer.Elapsed() > common::Time(0, 100000000));
+  EXPECT_TRUE(timer.ElapsedTime().count() > 0.1);
 
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   common::Time time;
   time = common::Time::SystemTime();
   EXPECT_TRUE(common::Time::SystemTime() - time < common::Time(0, 1000000));
@@ -58,6 +62,9 @@ TEST(TimeTest, Time)
   EXPECT_FALSE(time != common::Time(1, 1999));
 
   time += common::Time(0, 1);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 
   EXPECT_EQ(time, 1.0 + 2000*1e-9);
   EXPECT_FALSE(time != 1.0 + 2000*1e-9);
@@ -66,12 +73,26 @@ TEST(TimeTest, Time)
   EXPECT_TRUE(time >= 0.1);
 
   time.Set(1, 1000);
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   time = common::Time(1, 1000) * common::Time(2, 2);
   EXPECT_TRUE(time == common::Time(2, 2000));
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 
   time.Set(1, 1000);
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   time = common::Time(1, 1000) / common::Time(2, 2);
   EXPECT_TRUE(time == common::Time(0, 500000499));
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 
   double sec = 1.0 + 1e-9;
   double msec = sec * 1e3;
@@ -86,6 +107,10 @@ TEST(TimeTest, Time)
 /////////////////////////////////////////////////
 TEST(TimeTest, String)
 {
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   common::Time time(0);
 
   // Several combinations
@@ -173,16 +198,29 @@ TEST(TimeTest, String)
   EXPECT_EQ(time.FormattedString(common::Time::FormatOption::MINUTES,
                                  common::Time::FormatOption::MINUTES),
                                  "4320");
-
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   // Large time
   time = common::Time(1234567890, 123456789);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
   EXPECT_EQ(time.FormattedString(), "14288 23:31:30.123");
 }
 
 /////////////////////////////////////////////////
 TEST(TimeTest, Double)
 {
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   common::Time time(1, 900000000);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
   EXPECT_DOUBLE_EQ(1.9, time.Double());
 
   time.Set(1, -900000000);
@@ -198,7 +236,14 @@ TEST(TimeTest, Double)
 /////////////////////////////////////////////////
 TEST(TimeTest, Float)
 {
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   common::Time time(1, 900000000);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
   EXPECT_FLOAT_EQ(1.9f, time.Float());
 
   time.Set(1, -900000000);
@@ -214,6 +259,10 @@ TEST(TimeTest, Float)
 /////////////////////////////////////////////////
 TEST(TimeTest, Sleep)
 {
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   common::Time sleepTime(1, 900000000);
   common::Time result = common::Time::Sleep(sleepTime);
 #ifdef _WIN32
@@ -221,6 +270,10 @@ TEST(TimeTest, Sleep)
   EXPECT_EQ(common::Time::Zero, result);
 #else
   EXPECT_EQ(sleepTime, result);
+#endif
+
+#ifndef _WIN32
+# pragma GCC diagnostic pop
 #endif
 }
 
