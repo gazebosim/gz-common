@@ -65,7 +65,7 @@ class ignition::common::MaterialPrivate
   public: bool twoSidedEnabled = false;
 
   /// \brief render order value
-  public: int renderOrder = 0.0;
+  public: float renderOrder = 0.0;
 
   /// \brief shininess value (0 to 1)
   public: double shininess = 0.0;
