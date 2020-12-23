@@ -27,17 +27,32 @@
 using namespace ignition;
 using namespace common;
 
-static const char kSchemeDelim[] = "://";
+static const char kSchemeDelim[] = ":";
+static const char kAuthDelim[] = "//";
+
+/// \brief URIAuthority private data.
+class ignition::common::URIAuthorityPrivate
+{
+  /// \brief The user information.
+  public: std::string userInfo;
+
+  /// \brief The host.
+  public: std::string host;
+
+  /// \brief The port.
+  public: std::optional<int> port;
+
+  /// \brief Set this to true if an empty host is valid. This should only be
+  /// set to true if the corresponding URIScheme is "file".
+  public: bool emptyHostValid = false;
+
+  /// \brief True if the host was set to empty.
+  public: bool hasEmptyHost = false;
+};
 
 /// \brief URIPath private data.
 class ignition::common::URIPathPrivate
 {
-  /// \brief The parts of the path.
-  public: std::list<std::string> path;
-
-  /// \brief Whether the path is absolute (starts with slash) or not.
-  public: bool isAbsolute = false;
-
   /// \brief A helper method to determine if the given string represents
   ///        an absolute path starting segment or not.
   public: bool IsStringAbsolute(const std::string &_path)
@@ -45,13 +60,22 @@ class ignition::common::URIPathPrivate
     return (_path.length() > 0 && _path[0] == '/') ||
            (_path.length() > 1 && _path[1] == ':');
   }
+
+  /// \brief The parts of the path.
+  public: std::list<std::string> path;
+
+  /// \brief Whether the path is absolute (starts with slash) or not.
+  public: bool isAbsolute = false;
+
+  /// \brief True if there is a trailing slash in the path.
+  public: bool trailingSlash = false;
 };
 
 /// \brief URIQuery private data.
 class ignition::common::URIQueryPrivate
 {
   /// \brief The key/value tuples that compose the query.
-  public: std::map<std::string, std::string> values;
+  public: std::vector<std::pair<std::string, std::string>> values;
 };
 
 /// \brief URIFragment private data.
@@ -67,6 +91,9 @@ class ignition::common::URIPrivate
   /// \brief The URI scheme.
   public: std::string scheme;
 
+  /// \brief Authority component.
+  public: URIAuthority authority;
+
   /// \brief Path component.
   public: URIPath path;
 
@@ -76,6 +103,285 @@ class ignition::common::URIPrivate
   /// \brief Fragment component.
   public: URIFragment fragment;
 };
+
+//////////////////////////////////////////////////
+URIAuthority::URIAuthority()
+: dataPtr(new URIAuthorityPrivate())
+{
+}
+
+//////////////////////////////////////////////////
+URIAuthority::URIAuthority(const URIAuthority &_authority)
+  : URIAuthority()
+{
+  *this = _authority;
+}
+
+//////////////////////////////////////////////////
+URIAuthority::URIAuthority(const std::string &_str)
+  : URIAuthority()
+{
+  if (!this->Parse(_str))
+  {
+    ignwarn << "Unable to parse URIAuthority [" << _str << "]. Ignoring."
+           << std::endl;
+  }
+}
+
+//////////////////////////////////////////////////
+URIAuthority::~URIAuthority()
+{
+}
+
+//////////////////////////////////////////////////
+void URIAuthority::Clear()
+{
+  this->dataPtr->userInfo.clear();
+  this->dataPtr->host.clear();
+  this->dataPtr->port.reset();
+  this->dataPtr->emptyHostValid = false;
+  this->dataPtr->hasEmptyHost = false;
+}
+
+//////////////////////////////////////////////////
+std::string URIAuthority::UserInfo() const
+{
+  return this->dataPtr->userInfo;
+}
+
+//////////////////////////////////////////////////
+void URIAuthority::SetUserInfo(const std::string &_userInfo) const
+{
+  this->dataPtr->userInfo = _userInfo;
+}
+
+//////////////////////////////////////////////////
+std::string URIAuthority::Host() const
+{
+  return this->dataPtr->host;
+}
+
+//////////////////////////////////////////////////
+void URIAuthority::SetHost(const std::string &_host) const
+{
+  this->dataPtr->host = _host;
+}
+
+//////////////////////////////////////////////////
+std::optional<int> URIAuthority::Port() const
+{
+  return this->dataPtr->port;
+}
+
+//////////////////////////////////////////////////
+void URIAuthority::SetPort(int _port) const
+{
+  this->dataPtr->port.emplace(_port);
+}
+
+//////////////////////////////////////////////////
+bool URIAuthority::operator==(const URIAuthority &_auth) const
+{
+  return this->dataPtr->userInfo == _auth.UserInfo() &&
+         this->dataPtr->host == _auth.Host() &&
+         this->dataPtr->port == _auth.Port() &&
+         this->dataPtr->emptyHostValid == _auth.EmptyHostValid();
+}
+
+//////////////////////////////////////////////////
+std::string URIAuthority::Str() const
+{
+  if (!this->dataPtr->host.empty() ||
+      (this->dataPtr->emptyHostValid && this->dataPtr->hasEmptyHost))
+  {
+    std::string result = "//";
+    result += this->dataPtr->userInfo.empty() ? "" :
+      this->dataPtr->userInfo + "@";
+    result += this->dataPtr->host;
+    result += this->dataPtr->port ?
+      ":" + std::to_string(*this->dataPtr->port) : "";
+    return result;
+  }
+
+  return "";
+}
+
+//////////////////////////////////////////////////
+URIAuthority &URIAuthority::operator=(const URIAuthority &_auth)
+{
+  this->dataPtr->userInfo = _auth.UserInfo();
+  this->dataPtr->host = _auth.Host();
+  this->dataPtr->port = _auth.Port();
+  this->dataPtr->emptyHostValid = _auth.EmptyHostValid();
+  this->dataPtr->hasEmptyHost = _auth.dataPtr->hasEmptyHost;
+
+  return *this;
+}
+
+//////////////////////////////////////////////////
+bool URIAuthority::Valid() const
+{
+  return URIAuthority::Valid(this->Str());
+}
+
+//////////////////////////////////////////////////
+bool URIAuthority::Valid(const std::string &_str, bool _emptyHostValid)
+{
+  auto str = trimmed(_str);
+  if (str.empty())
+    return true;
+
+  // The authority must start with two forward slashes
+  if (str.find("//") != 0)
+    return false;
+
+  auto userInfoIndex = str.find("@", 2);
+  if (userInfoIndex != std::string::npos)
+  {
+    // Allowed character for userinformation from RFC3986:
+    // unreserved    = ALPHA / DIGIT / "-" / "." / "_" / "~"
+    // pct-encoded   = "%" HEXDIG HEXDIG
+    // sub-delims    = "!" / "$" / "&" / "'" / "(" / ")"
+    //                 / "*" / "+" / "," / ";" / "="
+    const std::string allowedChars = "qwertzuiopasdfghjklyxcvbnm"
+                                     "QWERTZUIOPASDFGHJKLYXCVBNM"
+                                     "0123456789"
+                                     "-._~"
+                                     "%"
+                                     "!$&'()*+,;=";
+
+    std::string userInfo = str.substr(2, userInfoIndex - 2);
+    if (userInfo.find_first_not_of(allowedChars, 1) != std::string::npos)
+      return false;
+    userInfoIndex += 1;
+  }
+  else
+  {
+    userInfoIndex = 2;
+  }
+
+  auto ipv6StartIndex = str.find("[", userInfoIndex);
+  std::string host;
+  // Is this an IPV6 address?
+  if (ipv6StartIndex != std::string::npos)
+  {
+    auto ipv6EndIndex = str.find("]", ipv6StartIndex);
+    // IPV6 must be surrounded by square brackets [ ].
+    if (ipv6EndIndex == std::string::npos)
+      return false;
+    host = str.substr(ipv6StartIndex, ipv6EndIndex);
+  }
+  // Is a port specified?
+  else if (str.find(":", userInfoIndex) != std::string::npos)
+  {
+    host = str.substr(userInfoIndex,
+        str.find(":", userInfoIndex) - userInfoIndex);
+  }
+  else
+    host = str.substr(userInfoIndex);
+
+  // The host can't be empty.
+  if (host.empty() && !_emptyHostValid)
+    return false;
+
+  // IP-literal  = "[" IPV6address "]
+  // IPV4address = dec-octet "." dec-octet "." dec-octet "." dec-octet
+  // reg-name = *( unreserved / pct-encoded  )
+  //
+  // pct-encoded   =  "%" HEXDIG HEXDIG
+  // unreserved    = ALPHA / DIGIT / "-" / "." / "_" / "~"
+  const std::string hostAllowedChars = "qwertzuiopasdfghjklyxcvbnm"
+                                   "QWERTZUIOPASDFGHJKLYXCVBNM"
+                                   "0123456789"
+                                   "%"
+                                   "-._"
+                                   "[] :";
+  if (host.find_first_not_of(hostAllowedChars, 1) != std::string::npos)
+    return false;
+
+  auto portIndex = str.find(":", userInfoIndex + host.size());
+  if (portIndex != std::string::npos)
+  {
+    std::string portStr = str.substr(portIndex+1);
+    const std::string allowedChars = "0123456789";
+    if (portStr.find_first_not_of(allowedChars, 1) != std::string::npos)
+      return false;
+  }
+
+  return true;
+}
+
+//////////////////////////////////////////////////
+bool URIAuthority::EmptyHostValid() const
+{
+  return this->dataPtr->emptyHostValid;
+}
+
+//////////////////////////////////////////////////
+void URIAuthority::SetEmptyHostValid(bool _valid) const
+{
+  this->dataPtr->emptyHostValid = _valid;
+}
+
+//////////////////////////////////////////////////
+bool URIAuthority::Parse(const std::string &_str, bool _emptyHostValid)
+{
+  if (!this->Valid(_str, _emptyHostValid))
+    return false;
+
+  this->Clear();
+
+  this->dataPtr->emptyHostValid = _emptyHostValid;
+
+  if (_str.empty() || _str == "//")
+  {
+    this->dataPtr->hasEmptyHost = true;
+    return true;
+  }
+
+  auto userInfoIndex = _str.find("@");
+  if (userInfoIndex != std::string::npos)
+  {
+    this->dataPtr->userInfo = _str.substr(2, userInfoIndex - 2);
+    userInfoIndex += 1;
+  }
+  else
+  {
+    userInfoIndex = 2;
+  }
+
+  auto ipv6StartIndex = _str.find("[", userInfoIndex);
+  // Is this an IPV6 address?
+  if (ipv6StartIndex != std::string::npos)
+  {
+    auto ipv6EndIndex = _str.find("]", ipv6StartIndex);
+    this->dataPtr->host = _str.substr(ipv6StartIndex, ipv6EndIndex);
+  }
+  // Is a port specified?
+  else if (_str.find(":", userInfoIndex) != std::string::npos)
+  {
+    this->dataPtr->host = _str.substr(userInfoIndex,
+        _str.find(":", userInfoIndex) - userInfoIndex);
+  }
+  else
+    this->dataPtr->host = _str.substr(userInfoIndex);
+
+  auto portIndex = _str.find(":", userInfoIndex + this->dataPtr->host.size());
+  if (portIndex != std::string::npos)
+  {
+    std::string portStr = _str.substr(portIndex + 1);
+    try
+    {
+      this->dataPtr->port.emplace(std::stoi(portStr));
+    }
+    catch (...)
+    {
+      // Do nothing. The port number was invalid.
+    }
+  }
+
+  return true;
+}
 
 /////////////////////////////////////////////////
 URIPath::URIPath()
@@ -247,6 +553,9 @@ std::string URIPath::Str(const std::string &_delim) const
     result += part;
   }
 
+  if (this->dataPtr->trailingSlash)
+    result += "/";
+
   return result;
 }
 
@@ -282,12 +591,10 @@ bool URIPath::Valid() const
 bool URIPath::Valid(const std::string &_str)
 {
   auto str = trimmed(_str);
-  size_t slashCount = std::count(str.begin(), str.end(), '/');
-  if ((str.empty()) ||
-      (slashCount == str.size() && str.size() > 1))
-  {
+
+  // All spaces is not allowed.
+  if (str.empty() && !_str.empty())
     return false;
-  }
 
   // TODO(anyone): the space should not be
   // there, but leaving it out breaks
@@ -311,14 +618,10 @@ bool URIPath::Valid(const std::string &_str)
                                         ":"
                                         "%"
                                         // "-._~"  // is in RFC, weird
-                                        // "!$&'()*+,;=" // is in RFC, weird
+                                        "+"  // "!$&'()*,;=" // is in RFC, weird
                                         "[/";
   if (str.substr(0, 1).find_first_not_of(allowedCharsFirst) !=
       std::string::npos)
-    return false;
-
-  // Two consecutive slashes are not valid
-  if (str.find("//") != std::string::npos)
     return false;
 
   return true;
@@ -338,6 +641,8 @@ bool URIPath::Parse(const std::string &_str)
   // the initial / is removed from _str when splitting, so we need to
   // explicitly check for it
   this->dataPtr->isAbsolute = this->dataPtr->IsStringAbsolute(_str);
+  this->dataPtr->trailingSlash =
+    _str.back() == '/' && _str.size() != 1;
 
   return true;
 }
@@ -374,7 +679,7 @@ URIQuery::~URIQuery()
 /////////////////////////////////////////////////
 void URIQuery::Insert(const std::string &_key, const std::string &_value)
 {
-  this->dataPtr->values.insert(std::make_pair(_key, _value));
+  this->dataPtr->values.push_back(std::make_pair(_key, _value));
 }
 
 /////////////////////////////////////////////////
@@ -391,11 +696,14 @@ std::string URIQuery::Str(const std::string &_delim) const
       return "";
 
   std::string result = "?";
-  for (auto const &value : this->dataPtr->values)
+  for (const std::pair<std::string, std::string> &value : this->dataPtr->values)
   {
     if (result != "?")
       result += _delim;
-    result += value.first + "=" + value.second;
+    if (!value.second.empty())
+      result += value.first + "=" + value.second;
+    else
+      result += value.first;
   }
 
   return result;
@@ -448,12 +756,6 @@ bool URIQuery::Valid(const std::string &_str)
   if (str.find_first_not_of(allowedChars, 1) != std::string::npos)
     return false;
 
-  for (auto const &query : common::split(str.substr(1), "&"))
-  {
-    if (common::split(query, "=").size() != 2u)
-      return false;
-  }
-
   return true;
 }
 
@@ -467,10 +769,13 @@ bool URIQuery::Parse(const std::string &_str)
 
   if (!_str.empty())
   {
-    for (auto query : common::split(_str.substr(1), "&"))
+    for (const std::string &query : common::split(_str.substr(1), "&"))
     {
-      auto values = common::split(query, "=");
-      this->Insert(values.at(0), values.at(1));
+      std::vector<std::string> values = common::split(query, "=");
+      if (values.size() == 2)
+        this->Insert(values.at(0), values.at(1));
+      else
+        this->Insert(query, "");
     }
   }
 
@@ -623,9 +928,11 @@ URI::~URI()
 std::string URI::Str() const
 {
   std::string result =
-    this->dataPtr->scheme.empty() ? "" : this->dataPtr->scheme + "://";
-  result += this->dataPtr->path.Str() + this->dataPtr->query.Str() +
-      this->dataPtr->fragment.Str();
+    this->dataPtr->scheme.empty() ? "" : this->dataPtr->scheme + ":";
+  result += this->dataPtr->authority.Str() +
+            this->dataPtr->path.Str() +
+            this->dataPtr->query.Str() +
+            this->dataPtr->fragment.Str();
   return result;
 }
 
@@ -639,6 +946,18 @@ std::string URI::Scheme() const
 void URI::SetScheme(const std::string &_scheme)
 {
   this->dataPtr->scheme = _scheme;
+}
+
+/////////////////////////////////////////////////
+URIAuthority &URI::Authority()
+{
+  return this->dataPtr->authority;
+}
+
+/////////////////////////////////////////////////
+const URIAuthority &URI::Authority() const
+{
+  return this->dataPtr->authority;
 }
 
 /////////////////////////////////////////////////
@@ -681,6 +1000,7 @@ const URIFragment &URI::Fragment() const
 void URI::Clear()
 {
   this->dataPtr->scheme.clear();
+  this->dataPtr->authority.Clear();
   this->dataPtr->path.Clear();
   this->dataPtr->query.Clear();
   this->dataPtr->fragment.Clear();
@@ -690,6 +1010,7 @@ void URI::Clear()
 bool URI::operator==(const URI &_uri) const
 {
   return this->dataPtr->scheme == _uri.dataPtr->scheme &&
+         this->dataPtr->authority == _uri.dataPtr->authority &&
          this->dataPtr->path == _uri.dataPtr->path &&
          this->dataPtr->query == _uri.dataPtr->query &&
          this->dataPtr->fragment == _uri.dataPtr->fragment;
@@ -699,6 +1020,7 @@ bool URI::operator==(const URI &_uri) const
 URI &URI::operator=(const URI &_uri)
 {
   this->dataPtr->scheme = _uri.dataPtr->scheme;
+  this->dataPtr->authority = _uri.dataPtr->authority;
   this->dataPtr->path = _uri.dataPtr->path;
   this->dataPtr->query = _uri.dataPtr->query;
   this->dataPtr->fragment = _uri.dataPtr->fragment;
@@ -715,8 +1037,10 @@ bool URI::Valid() const
 bool URI::Valid(const std::string &_str)
 {
   auto str = trimmed(_str);
+
   // Validate scheme.
-  auto schemeDelimPos = str.find(kSchemeDelim);
+  size_t schemeDelimPos = str.find(kSchemeDelim);
+
   if ((str.empty()) ||
       (schemeDelimPos == std::string::npos) ||
       (schemeDelimPos == 0u))
@@ -724,33 +1048,71 @@ bool URI::Valid(const std::string &_str)
     return false;
   }
 
-  auto from = schemeDelimPos + std::strlen(kSchemeDelim);
-  std::string localPath = str.substr(from);
+  std::string localScheme;
+  std::string localAuthority;
+  std::string localPath;
   std::string localQuery;
   std::string localFragment;
 
-  auto to = str.find('?', from);
-  if (to != std::string::npos)
-  {
-    // Update path.
-    localPath = str.substr(from, to - from);
+  localScheme = str.substr(0, schemeDelimPos);
+  str.erase(0, schemeDelimPos + std::strlen(kSchemeDelim));
 
-    // Update the query.
-    localQuery = str.substr(to);
+  bool emptyHostValid = false;
+  if (localScheme == "file")
+    emptyHostValid = true;
+
+  bool authorityPresent = false;
+
+  // Get the authority delimiter position, if one is present
+  size_t authDelimPos = str.find(kAuthDelim);
+  if (authDelimPos != std::string::npos && authDelimPos == 0)
+  {
+    authorityPresent = true;
+    size_t authEndPos = str.find_first_of("/?#",
+        authDelimPos + std::strlen(kAuthDelim));
+
+    if (localScheme != "file" && authEndPos == authDelimPos+2)
+    {
+      ignerr << "A host is manadatory when using a scheme other than file\n";
+      return false;
+    }
+    else
+    {
+      localAuthority = str.substr(authDelimPos, authEndPos);
+      str.erase(0, authEndPos);
+    }
   }
 
-  auto to2 = str.find('#', to);
-  if (to2 != std::string::npos)
-  {
-    // Update query.
-    localQuery = str.substr(to, to2 - to);
+  // Get the path information
+  size_t pathEndPos = str.find_first_of("?#");
+  localPath = str.substr(0, pathEndPos);
+  str.erase(0, pathEndPos);
 
-    // Update the fragment.
-    localFragment = str.substr(to2);
+  size_t queryStartPos = str.find("?");
+  if (queryStartPos != std::string::npos)
+  {
+    size_t queryEndPos = str.find("#");
+    // Get the query.
+    localQuery = str.substr(0, queryEndPos);
+    str.erase(0, queryEndPos);
+  }
+
+  size_t fragStartPos = str.find("#");
+  if (fragStartPos != std::string::npos)
+  {
+    // Get the query.
+    localFragment = str;
+  }
+
+  if (!emptyHostValid || authorityPresent)
+  {
+    if (!URIAuthority::Valid(localAuthority, emptyHostValid))
+      return false;
   }
 
   // Validate the path and query.
-  return URIPath::Valid(localPath) && URIQuery::Valid(localQuery) &&
+  return URIPath::Valid(localPath) &&
+         URIQuery::Valid(localQuery) &&
          URIFragment::Valid(localFragment);
 }
 
@@ -760,35 +1122,81 @@ bool URI::Parse(const std::string &_str)
   if (!this->Valid(_str))
     return false;
 
-  auto schemeDelimPos = _str.find(kSchemeDelim);
-  auto from = schemeDelimPos + std::strlen(kSchemeDelim);
-  std::string localScheme = _str.substr(0, schemeDelimPos);
-  std::string localPath = _str.substr(from);
+  // Copy the string so that we can modify it.
+  std::string str = _str;
+
+  std::string localScheme;
+  std::string localAuthority;
+  std::string localPath;
   std::string localQuery;
   std::string localFragment;
 
-  auto to = _str.find('?', from);
-  if (to != std::string::npos)
-  {
-    // Update path.
-    localPath = _str.substr(from, to - from);
+  size_t schemeDelimPos = str.find(kSchemeDelim);
+  localScheme = str.substr(0, schemeDelimPos);
+  str.erase(0, schemeDelimPos + std::strlen(kSchemeDelim));
 
-    // Update the query.
-    localQuery = _str.substr(to);
+  bool emptyHostValid = false;
+  if (localScheme == "file")
+    emptyHostValid = true;
+
+  bool authorityPresent = false;
+
+  // Get the authority delimiter position, if one is present
+  size_t authDelimPos = str.find(kAuthDelim);
+  if (authDelimPos != std::string::npos && authDelimPos == 0)
+  {
+    authorityPresent = true;
+    size_t authEndPos = str.find_first_of("/?#",
+        authDelimPos + std::strlen(kAuthDelim));
+
+    // This could be a windows file path of the form file://D:/path/to/file
+    // In this case, the authority is not present.
+    if (str[authEndPos-1] == ':' && str[authEndPos] == '/')
+    {
+      str.erase(0, std::strlen(kAuthDelim));
+      authorityPresent = false;
+    }
+    else if (localScheme != "file" && authEndPos == authDelimPos+2)
+    {
+      ignerr << "A host is manadatory when using a scheme other than file\n";
+      return false;
+    }
+    else
+    {
+      localAuthority = str.substr(authDelimPos, authEndPos);
+      str.erase(0, authEndPos);
+    }
   }
 
-  auto to2 = _str.find('#', to);
-  if (to2 != std::string::npos)
-  {
-    // Update query.
-    localQuery = _str.substr(to, to2 - to);
+  // Get the path information
+  size_t pathEndPos = str.find_first_of("?#");
+  localPath = str.substr(0, pathEndPos);
+  str.erase(0, pathEndPos);
 
-    // Update the fragment.
-    localFragment = _str.substr(to2);
+  size_t queryStartPos = str.find("?");
+  if (queryStartPos != std::string::npos)
+  {
+    size_t queryEndPos = str.find("#");
+    // Get the query.
+    localQuery = str.substr(0, queryEndPos);
+    str.erase(0, queryEndPos);
+  }
+
+  size_t fragStartPos = str.find("#");
+  if (fragStartPos != std::string::npos)
+  {
+    // Get the query.
+    localFragment = str;
   }
 
   this->Clear();
   this->SetScheme(localScheme);
+
+  if (!emptyHostValid || authorityPresent)
+  {
+    if (!this->dataPtr->authority.Parse(localAuthority, emptyHostValid))
+      return false;
+  }
 
   return this->dataPtr->path.Parse(localPath) &&
          this->dataPtr->query.Parse(localQuery) &&

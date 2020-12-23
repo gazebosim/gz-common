@@ -46,21 +46,27 @@ namespace ignition
 
       /// \brief Get the elapsed time
       /// \return The time
-      public: Time Elapsed() const;
+      public: Time IGN_DEPRECATED(4) Elapsed() const;
+
+      /// \brief Get the elapsed time
+      /// \return The elapsed time
+      public: std::chrono::duration<double> ElapsedTime() const;
 
       /// \brief Stream operator friendly
       public: friend std::ostream &operator<<(std::ostream &out,
                                               const ignition::common::Timer &t)
               {
-                out << t.Elapsed();
+                out << t.ElapsedTime().count();
                 return out;
               }
 
+      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief The time of the last call to Start
-      private: Time start;
+      private: std::chrono::steady_clock::time_point start;
 
       /// \brief The time when Stop was called.
-      private: Time stop;
+      private: std::chrono::steady_clock::time_point stop;
+      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
 
       /// \brief True if the timer is running.
       private: bool running;

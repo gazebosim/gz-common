@@ -92,8 +92,7 @@ TEST(WorkerPool, WaitWithTimeout)
       {
         workSentinel = 5;
       });
-  Time time(5);
-  EXPECT_TRUE(pool.WaitForResults(time));
+  EXPECT_TRUE(pool.WaitForResults(std::chrono::seconds(5)));
   EXPECT_EQ(5, workSentinel);
 }
 
@@ -108,8 +107,7 @@ TEST(WorkerPool,
       {
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
       });
-  Time time(0.0001);
-  EXPECT_FALSE(pool.WaitForResults(time));
+  EXPECT_FALSE(pool.WaitForResults(std::chrono::nanoseconds(100000)));
 }
 
 //////////////////////////////////////////////////
@@ -139,8 +137,7 @@ TEST(WorkerPool,
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
         ++sentinel;
       });
-  Time time(0.009);
-  bool result = pool.WaitForResults(time);
+  bool result = pool.WaitForResults(std::chrono::milliseconds(9));
   // the timing test is flaky on windows and mac
   EXPECT_TRUE(result);
   if (!result)
