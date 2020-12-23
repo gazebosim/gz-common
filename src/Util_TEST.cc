@@ -297,7 +297,7 @@ TEST(Util_TEST, findFile)
   EXPECT_EQ(file1, systemPaths->FindFile(common::joinPaths("test_dir1",
       "test_f1"), true));
 
-  // Relative prefixed by file://
+  // Relative prefixed by file:
   EXPECT_EQ(file1, ignition::common::findFile("file:test_dir1/test_f1"));
 
   // Custom callback
