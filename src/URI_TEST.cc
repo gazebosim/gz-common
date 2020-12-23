@@ -497,7 +497,7 @@ TEST(URITEST, Path)
   EXPECT_TRUE(uri.Path().IsAbsolute());
 
   uri.Parse("file://C:/Users");
-  EXPECT_EQ(uri.Str(), "file://C:/Users");
+  EXPECT_EQ(uri.Str(), "file:C:/Users");
   EXPECT_TRUE(uri.Path().IsAbsolute());
 }
 
