@@ -31,12 +31,16 @@ Miniconda suffices.
 
 Create if necessary, and activate a Conda environment:
 
-    conda create -n ign-ws
-    conda activate ign-ws
+```
+conda create -n ign-ws
+conda activate ign-ws
+```
 
 Install `ignition-common`:
 
-    conda install libignition-common<#> --channel conda-forge
+```
+conda install libignition-common<#> --channel conda-forge
+```
 
 Be sure to replace `<#>` with a number value, such as 1 or 2, depending on
 which version you need.
@@ -72,23 +76,23 @@ First, follow the [ign-cmake](https://github.com/ignitionrobotics/ign-cmake) tut
 
 Install prerequisites:
 
-    ```
-    conda install freeimage gts glib dlfcn-win32 ffmpeg --channel conda-forge
-    ```
+```
+conda install freeimage gts glib dlfcn-win32 ffmpeg --channel conda-forge
+```
 
 Install Ignition dependencies:
 
 You can view the list of dependencies, replacing `<#>` with the desired version:
 
-    ```
-    conda search libignition-common<#> --channel conda-forge --info
-    ```
+```
+conda search libignition-common<#> --channel conda-forge --info
+```
 
 Install dependencies, replacing `<#>` with the desired versions:
  
-    ```
-    conda install libignition-cmake<#> libignition-math<#> --channel conda-forge
-    ```
+```
+conda install libignition-cmake<#> libignition-math<#> --channel conda-forge
+```
 
 ### Building from source
 
