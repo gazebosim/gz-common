@@ -28,14 +28,6 @@ encoding/decoding to thread pools.
 
 [Install](#install)
 
-* [Binary Install](#binary-install)
-
-* [Source Install](#source-install)
-
-    * [Prerequisites](#prerequisites)
-
-    * [Building from Source](#building-from-source)
-
 [Usage](#usage)
 
 [Documentation](#documentation)
@@ -68,67 +60,7 @@ callback system.
 
 # Install
 
-We recommend following the [Binary Install](#binary-install) instructions to get up and running as quickly and painlessly as possible.
-
-The [Source Install](#source-install) instructions should be used if you need the very latest software improvements, you need to modify the code, or you plan to make a contribution.
-
-## Binary Install
-
-On Ubuntu systems, `apt-get` can be used to install `ignition-common`:
-
-```
-sudo apt install libignition-common<#>-dev
-```
-
-Be sure to replace `<#>` with a number value, such as 2 or 3, depending on
-which version you need.
-
-## Source Install
-
-Source installation can be performed in UNIX systems by first installing the
-necessary prerequisites followed by building from source.
-
-### Prerequisites
-
-Ignition Common requires:
-
-  * [Ignition CMake](https://ignitionrobotics.org/libs/cmake)
-  * [Ignition Math](https://ignitionrobotics.org/libs/math).
-
-The Graphics component requires:
-
-  * [FreeImage](http://freeimage.sourceforge.net/)
-  * [GTS](http://gts.sourceforge.net/).
-
-The AV component requires:
-
-  * [libswscale](https://www.ffmpeg.org/libswscale.html)
-  * [libavdevice](https://www.ffmpeg.org/libavdevice.html)
-  * [libavformat](https://www.ffmpeg.org/libavformat.html)
-  * [libavcodec](https://www.ffmpeg.org/libavcodec.html)
-  * [libavutil](https://www.ffmpeg.org/libavutil.html)
-
-### Building from source
-
-1. Clone the repository
-
-    ```
-    git clone https://github.com/ignitionrobotics/ign-common
-    ```
-
-2. Install the [Prerequisites](#prerequisites).
-
-3. Configure and build
-
-    ```
-    cd ign-common; mkdir build;cd build; cmake ..;  make
-    ```
-
-4. Optionally, install Ignition Common
-
-    ```
-    sudo make install
-    ```
+See the [installation tutorial](https://ignitionrobotics.org/api/common/3.9/tutorials.html).
 
 # Usage
 
