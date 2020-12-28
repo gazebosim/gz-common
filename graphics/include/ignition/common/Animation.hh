@@ -34,7 +34,6 @@ namespace ignition
     class KeyFrame;
     class PoseKeyFrame;
     class NumericKeyFrame;
-    class AnimationPrivate;
     class TrajectoryInfoPrivate;
 
     /// \class Animation Animation.hh ignition/common/Animation.hh

@@ -19,10 +19,13 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <ignition/common/MeshExporter.hh>
 #include <ignition/common/graphics/Export.hh>
 #include <ignition/common/SuppressWarning.hh>
+
+#include <ignition/math/Matrix4.hh>
 
 namespace ignition
 {
@@ -46,6 +49,10 @@ namespace ignition
       /// '../materials/textures' folder
       public: virtual void Export(const Mesh *_mesh,
           const std::string &_filename, bool _exportTextures = false);
+
+      public: void Export(const Mesh *_mesh,
+          const std::string &_filename, bool _exportTextures,
+          const std::vector<math::Matrix4d> &_submeshToMatrix);
 
       IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \internal

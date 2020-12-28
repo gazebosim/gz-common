@@ -21,10 +21,10 @@
 
 #include "ignition/common/Console.hh"
 #include "ignition/common/WorkerPool.hh"
+#include "ignition/utilities/ExtraTestMacros.hh"
 
 namespace igncmn = ignition::common;
 using namespace igncmn;
-
 
 //////////////////////////////////////////////////
 TEST(WorkerPool, OneWorkNoCallback)
@@ -97,7 +97,10 @@ TEST(WorkerPool, WaitWithTimeout)
 }
 
 //////////////////////////////////////////////////
-TEST(WorkerPool, WaitWithTimeoutThatTimesOut)
+// /TODO(anyone) Deflake this test
+// ref: https://github.com/ignitionrobotics/ign-common/issues/52
+TEST(WorkerPool,
+     IGN_UTILS_TEST_ENABLED_ONLY_ON_LINUX(WaitWithTimeoutThatTimesOut))
 {
   WorkerPool pool;
   pool.AddWork([] ()
@@ -108,7 +111,10 @@ TEST(WorkerPool, WaitWithTimeoutThatTimesOut)
 }
 
 //////////////////////////////////////////////////
-TEST(WorkerPool, ThingsRunInParallel)
+// /TODO(anyone) Deflake this test
+// ref: https://github.com/ignitionrobotics/ign-common/issues/53
+TEST(WorkerPool,
+     IGN_UTILS_TEST_ENABLED_ONLY_ON_LINUX(ThingsRunInParallel))
 {
   const unsigned int hc = std::thread::hardware_concurrency();
   if (2 > hc)
@@ -132,10 +138,8 @@ TEST(WorkerPool, ThingsRunInParallel)
         ++sentinel;
       });
   bool result = pool.WaitForResults(std::chrono::milliseconds(9));
-#ifdef __linux__
   // the timing test is flaky on windows and mac
   EXPECT_TRUE(result);
-#endif
   if (!result)
   {
     igndbg << "WaitForResults failed" << std::endl;

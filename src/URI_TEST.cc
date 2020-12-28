@@ -157,6 +157,19 @@ TEST(URITEST, URIPath)
   URIPath path9 = path8;
   EXPECT_EQ(path9.Str(), path8.Str());
   EXPECT_TRUE(path9.IsAbsolute());
+
+  URIPath path10;
+  path10.PushFront("C:");
+  EXPECT_EQ(path10.Str(), "C:");
+  EXPECT_TRUE(path10.IsAbsolute());
+
+  path10.PushBack("Users");
+  EXPECT_EQ(path10.Str(), "C:/Users");
+  EXPECT_TRUE(path10.IsAbsolute());
+
+  // Setting a C: path to relative is illegal
+  path10.SetRelative();
+  EXPECT_TRUE(path10.IsAbsolute());
 }
 
 /////////////////////////////////////////////////
@@ -188,6 +201,8 @@ TEST(URITEST, URIPathString)
   EXPECT_TRUE(URIPath::Valid("/part1/"));
   EXPECT_TRUE(URIPath::Valid("/part1/part2"));
   EXPECT_TRUE(URIPath::Valid("/part1/part2/"));
+  EXPECT_TRUE(URIPath::Valid("C:"));
+  EXPECT_TRUE(URIPath::Valid("C:/Users"));
 
   EXPECT_TRUE(URIPath::Valid("/part 1/part 2/"));
   // TODO(anyone): switch to the following once URI class is upgraded
@@ -211,6 +226,8 @@ TEST(URITEST, URIPathString)
   EXPECT_TRUE(path.Parse("/part1/"));
   EXPECT_TRUE(path.Parse("/part1/part2"));
   EXPECT_TRUE(path.Parse("/part1/part2/"));
+  EXPECT_TRUE(path.Parse("C:"));
+  EXPECT_TRUE(path.Parse("C:/Users"));
 
   EXPECT_TRUE(path.Parse("/part 1/part 2/"));
   // TODO(anyone): switch to the following once URI class is upgraded
@@ -238,6 +255,8 @@ TEST(URITEST, URIPathString)
   EXPECT_NO_THROW(URIPath("/part1/"));
   EXPECT_NO_THROW(URIPath("/part1/part2"));
   EXPECT_NO_THROW(URIPath("/part 1/part2/"));
+  EXPECT_NO_THROW(URIPath("C:"));
+  EXPECT_NO_THROW(URIPath("C:/Users"));
 
   // TODO(anyone): uncomment following once URI class is upgraded
   // EXPECT_NO_THROW(URIPath("/part+1/part+2"));
@@ -472,10 +491,13 @@ TEST(URITEST, Path)
   EXPECT_EQ(uri.Path().Str(), "/test+space");
   EXPECT_TRUE(uri.Path().IsAbsolute());
 
-
   EXPECT_TRUE(uri.Parse("file:/test%20space"));
   EXPECT_EQ(uri.Str(), "file:/test%20space");
   EXPECT_EQ(uri.Path().Str(), "/test%20space");
+  EXPECT_TRUE(uri.Path().IsAbsolute());
+
+  uri.Parse("file://C:/Users");
+  EXPECT_EQ(uri.Str(), "file:C:/Users");
   EXPECT_TRUE(uri.Path().IsAbsolute());
 }
 

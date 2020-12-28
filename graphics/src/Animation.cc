@@ -40,11 +40,15 @@ namespace
 }
 
 /////////////////////////////////////////////////
-class ignition::common::AnimationPrivate
+namespace ignition {
+namespace common {
+class AnimationPrivate
 {
   /// \brief true if the animation is interpolated in x
   public: bool interpolateX = false;
 };
+}  // namespace ignition
+}  // namespace common
 
 // TODO(luca) Make Animation class follow PIMPL and remove global static map
 /////////////////////////////////////////////////
@@ -351,6 +355,8 @@ NumericAnimation::NumericAnimation(const std::string &_name,
 /////////////////////////////////////////////////
 NumericAnimation::~NumericAnimation()
 {
+  for (auto kf : this->keyFrames)
+    delete kf;
 }
 
 /////////////////////////////////////////////////

@@ -33,19 +33,22 @@ TEST_F(VideoEncoderTest, StartStop)
   EXPECT_EQ(video.BitRate(), static_cast<unsigned int>(
         VIDEO_ENCODER_BITRATE_DEFAULT));
 
+  auto filePathMp4 = common::joinPaths(common::cwd(), "TMP_RECORDING.mp4");
+  auto filePathMpg = common::joinPaths(common::cwd(), "TMP_RECORDING.mpg");
+
   video.Start();
   EXPECT_TRUE(video.IsEncoding());
-  EXPECT_TRUE(common::exists(common::cwd() + "/TMP_RECORDING.mp4"));
+  EXPECT_TRUE(common::exists(filePathMp4));
   EXPECT_EQ(video.BitRate(), 920000u);
 
   video.Stop();
   EXPECT_FALSE(video.IsEncoding());
-  EXPECT_FALSE(common::exists(common::cwd() + "/TMP_RECORDING.mpg"));
+  EXPECT_FALSE(common::exists(filePathMpg));
 
   video.Start("mpg", "", 1024, 768);
   EXPECT_TRUE(video.IsEncoding());
   EXPECT_STREQ(video.Format().c_str(), "mpg");
-  EXPECT_TRUE(common::exists(common::cwd() + "/TMP_RECORDING.mpg"));
+  EXPECT_TRUE(common::exists(filePathMpg));
 
   video.Start("mp4", "", 1024, 768);
   EXPECT_TRUE(video.IsEncoding());
@@ -62,12 +65,15 @@ TEST_F(VideoEncoderTest, Exists)
   EXPECT_FALSE(video.IsEncoding());
   EXPECT_STREQ(video.Format().c_str(), VIDEO_ENCODER_FORMAT_DEFAULT);
 
-  EXPECT_FALSE(common::exists(common::cwd() + "/TMP_RECORDING.mpg"));
-  EXPECT_FALSE(common::exists(common::cwd() + "/TMP_RECORDING.mp4"));
+  auto filePathMp4 = common::joinPaths(common::cwd(), "TMP_RECORDING.mp4");
+  auto filePathMpg = common::joinPaths(common::cwd(), "TMP_RECORDING.mpg");
+
+  EXPECT_FALSE(common::exists(filePathMp4));
+  EXPECT_FALSE(common::exists(filePathMpg));
 
   video.Start();
-  EXPECT_TRUE(common::exists(common::cwd() + "/TMP_RECORDING.mp4"));
+  EXPECT_TRUE(common::exists(filePathMp4));
 
   video.Reset();
-  EXPECT_FALSE(common::exists(common::cwd() + "/TMP_RECORDING.mp4"));
+  EXPECT_FALSE(common::exists(filePathMp4));
 }

@@ -175,16 +175,22 @@ namespace ignition
       /// \brief Set whether the path is to be treated absolute or not.
       /// \param[in] _absolute Whether the path is to be treated absolute or
       ///                      not.
+      /// \note If this path starts with a Windows drive specifier (e.g. 'C:'),
+      /// it cannot be set non-absolute.
       public: void SetAbsolute(bool _absolute = true);
 
       /// \brief Set the path to be relative.
+      /// \note If this path starts with a Windows drive specifier (e.g. 'C:'),
+      /// it cannot be set relative.
       public: void SetRelative();
 
       /// \brief Push a new part onto the front of this path.
       /// \param[in] _part Path part to push
       /// Empty _part is ignored. If _part starts with /, the path is set to
       /// absolute (though calling SetAbsolute() is the preferred method). All
-      /// forward slashes inside the string are URI-encoded to %2F.
+      /// forward slashes inside the string are URI-encoded to %2F. The path is
+      /// also set to absolute if a Windows drive specifier (e.g. 'C:') is
+      /// pushed to the front.
       public: void PushFront(const std::string &_part);
 
       /// \brief Push a new part onto the back of this path.
@@ -193,7 +199,8 @@ namespace ignition
       /// Empty _part is ignored. If _part starts with / and the path is empty,
       /// the path is set to absolute (though calling SetAbsolute() is the
       /// preferred method). All forward slashes inside the string are
-      /// URI-encoded to %2F.
+      /// URI-encoded to %2F. The path is also set to absolute if it is empty
+      /// and a Windows drive specifier (e.g. 'C:') is pushed to it.
       public: void PushBack(const std::string &_part);
 
       /// \brief Compound assignment operator.

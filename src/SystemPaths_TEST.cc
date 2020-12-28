@@ -322,17 +322,23 @@ TEST_F(SystemPathsFixture, FindFile)
   // Existing absolute paths
 #ifndef _WIN32
   const auto tmpDir = "/tmp";
+  const auto uriTmpDir = "file:///tmp";
   const auto homeDir = "/home";
   const auto badDir = "/bad";
+  const auto uriBadDir = "file:///bad";
 #else
   const auto tmpDir = "C:\\Windows";
+  const auto uriTmpDir = "file://C:/Windows";
   const auto homeDir = "C:\\Users";
   const auto badDir = "C:\\bad";
+  const auto uriBadDir = "file://C:/bad";
 #endif
   {
     EXPECT_EQ(tmpDir, sp.FindFile(tmpDir));
+    EXPECT_EQ(tmpDir, sp.FindFile(uriTmpDir));
     EXPECT_EQ(homeDir, sp.FindFile(homeDir));
     EXPECT_EQ("", sp.FindFile(badDir));
+    EXPECT_EQ("", sp.FindFile(uriBadDir));
   }
 
   // Custom callback
