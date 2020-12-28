@@ -66,6 +66,9 @@ TEST_F(MaterialTest, Material)
   EXPECT_DOUBLE_EQ(mat.AlphaThreshold(), 0.3);
   EXPECT_EQ(mat.TwoSidedEnabled(), false);
 
+  mat.SetRenderOrder(4.0);
+  EXPECT_DOUBLE_EQ(4.0, mat.RenderOrder());
+
   mat.SetShininess(0.2);
   EXPECT_DOUBLE_EQ(0.2, mat.Shininess());
 
