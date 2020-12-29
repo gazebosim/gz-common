@@ -136,7 +136,14 @@ bool VideoEncoder::Start(const std::string &_format,
 
   // Remove old temp file, if it exists.
   if (common::exists(this->dataPtr->filename))
-    std::remove(this->dataPtr->filename.c_str());
+  {
+    auto success = removeFile(this->dataPtr->filename.c_str());
+    if (!success)
+    {
+      ignerr << "Failed to remove temp file [" << this->dataPtr->filename
+             << "]" << std::endl;
+    }
+  }
 
   // Calculate a good bitrate if the _bitRate argument is zero
   if (_bitRate == 0)
@@ -174,7 +181,7 @@ bool VideoEncoder::Start(const std::string &_format,
   this->dataPtr->frameCount = 0;
   this->dataPtr->filename = _filename;
 
-  // Create a default filenamae if the provided filename is empty.
+  // Create a default filename if the provided filename is empty.
   if (this->dataPtr->filename.empty())
   {
     if (this->dataPtr->format.compare("v4l2") == 0)
@@ -768,7 +775,14 @@ void VideoEncoder::Reset()
 
   // Remove old temp file, if it exists.
   if (common::exists(this->dataPtr->filename))
-    std::remove(this->dataPtr->filename.c_str());
+  {
+    auto success = removeFile(this->dataPtr->filename.c_str());
+    if (!success)
+    {
+      ignerr << "Failed to remove temp file [" << this->dataPtr->filename
+             << "]" << std::endl;
+    }
+  }
 
   // set default values
   this->dataPtr->frameCount = 0;
@@ -780,4 +794,5 @@ void VideoEncoder::Reset()
   this->dataPtr->format = VIDEO_ENCODER_FORMAT_DEFAULT;
   this->dataPtr->timePrev = std::chrono::steady_clock::time_point();
   this->dataPtr->timeStart = std::chrono::steady_clock::time_point();
+  this->dataPtr->filename.clear();
 }
