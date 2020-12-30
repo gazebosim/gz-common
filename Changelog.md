@@ -2,6 +2,38 @@
 
 ## Ignition Common 3.X.X
 
+## Ignition Common 3.9.0 (2020-12-21)
+
+1. Support multiple texture coordinate sets
+    * [Pull Request 131](https://github.com/ignitionrobotics/ign-common/pull/131)
+
+1. Add Lightmap to material
+    * [Pull Request 132](https://github.com/ignitionrobotics/ign-common/pull/132)
+
+## Ignition Common 3.8.0 (2020-12-08)
+
+1. Call ignition::common::load() from Video constructor
+    * [Pull Request 111](https://github.com/ignitionrobotics/ign-common/pull/111)
+
+1. Cleanup
+    * Drop unused forward declaration: [Pull Request 113](https://github.com/ignitionrobotics/ign-common/pull/113)
+    * Remove two known flaky tests from Windows CI: [Pull Request 119](https://github.com/ignitionrobotics/ign-common/pull/119)
+    * Make ignstrtok private to Util.cc: [Pull Request 134](https://github.com/ignitionrobotics/ign-common/pull/134)
+    * Fix memory leaks [Pull Request 136](https://github.com/ignitionrobotics/ign-common/pull/136)
+
+1. Windows
+    * Do not hardcode USE_EXTERNAL_TINYXML2 to OFF: [Pull Request 116](https://github.com/ignitionrobotics/ign-common/pull/116)
+    * Fix IGN_HOMEDIR on Windows: [Pull Request 127](https://github.com/ignitionrobotics/ign-common/pull/127)
+    * Improve Windows support: [Pull Request 128](https://github.com/ignitionrobotics/ign-common/pull/128)
+    * Fix Windows AV CI warnings and test failures: [Pull Request 135](https://github.com/ignitionrobotics/ign-common/pull/135)
+
+1. Fix video encoder timing
+    * [Pull Request 105](https://github.com/ignitionrobotics/ign-common/pull/105)
+
+1. Feature: Add transformation matrix to ColladaExport
+    * [Pull Request 100](https://github.com/ignitionrobotics/ign-common/pull/100)
+    * Fix: [Pull Request 133](https://github.com/ignitionrobotics/ign-common/pull/133)
+
 ## Ignition Common 3.7.0 (2020-10-21)
 
 1. Miscellaneous Cleanups
@@ -16,10 +48,10 @@
 
 1. Support fuel URLs for textures
     * [Pull Request 102](https://github.com/ignitionrobotics/ign-common/pull/102)
-    
+
 1. Fix loading dae file with hierarchical node that does not have a name
     * [Pull Request 101](https://github.com/ignitionrobotics/ign-common/pull/101)
-    
+
 1. Fix more Animation memory leaks
     * [Pull Request 98](https://github.com/ignitionrobotics/ign-common/pull/98)
 

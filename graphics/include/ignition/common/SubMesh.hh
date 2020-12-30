@@ -115,14 +115,36 @@ namespace ignition
       /// \param[in] _z Position along z
       public: void AddNormal(const double _x, const double _y, const double _z);
 
-      /// \brief Add a texture coord to the mesh
+      /// \brief Add a texture coord to the mesh. If multiple texture
+      /// coordinate sets exist, this function adds it to the first texture
+      /// coordinate set in the submesh. If no previous texture coordinates
+      /// exist, it is added to set 0.
       /// \param[in] _u Position along u
       /// \param[in] _v Position along v
+      /// \sa AddTexCoordBySet
       public: void AddTexCoord(const double _u, const double _v);
 
-      /// \brief Add a texture coordinate to the mesh
+      /// \brief Add a texture coordinate to the mesh. If multiple texture
+      /// coordinate sets exist, this function adds it to the first texture
+      /// coordinate set in the submesh. If no previous texture coordinates
+      /// exist, it is added to set 0.
       /// \param[in] _uv The texture coordinate
+      /// \sa AddTexCoordBySet
       public: void AddTexCoord(const ignition::math::Vector2d &_uv);
+
+      /// \brief Add a texture coord to a texture coordinate set of the mesh
+      /// \param[in] _u Position along u
+      /// \param[in] _v Position along v
+      /// \param[in] _setIndex Texture coordinate set index
+      public: void AddTexCoordBySet(double _u, double _v,
+          unsigned int _setIndex);
+
+      /// \brief Add a texture coord to a texture coordinate set of the mesh
+      /// \param[in] _u Position along u
+      /// \param[in] _v Position along v
+      /// \param[in] _setIndex Texture coordinate set index
+      public: void AddTexCoordBySet(const ignition::math::Vector2d &_uv,
+          unsigned int _setIndex);
 
       /// \brief Add a vertex - skeleton node assignment
       /// \param[in] _vertex The vertex index
@@ -165,11 +187,33 @@ namespace ignition
       public: ignition::math::Vector2d TexCoord(
                   const unsigned int _index) const;
 
-      /// \brief Set a texture coordinate
+      /// \brief Get a texture coordinate for a texture coordinate set
+      /// \param[in] _index the texture index
+      /// \return The texture coordinate or ignition::math::Vector2d::Zero
+      /// if index is out of bounds.
+      /// \param[in] _setIndex Texture coordinate set index
+      /// \sa bool HasTexCoordBySet(unsigned int _index, unsigned int _setIndex)
+      /// const
+      public: ignition::math::Vector2d TexCoordBySet(
+                  unsigned int _index,
+                  unsigned int _setIndex) const;
+
+      /// \brief Set a texture coordinate. If multiple texture
+      /// coordinate sets exist, this function sets the texture
+      /// coordinate in the first texture coordinate set in the submesh.
       /// \param[in] _index Index of the texture coordinate that will be set.
       /// \param[in] _uv The new texture coordinate
+      /// \sa SetTexCoordBySet
       public: void SetTexCoord(const unsigned int _index,
                                const ignition::math::Vector2d &_uv);
+
+      /// \brief Set a texture coordinate for a texture coordinate set
+      /// \param[in] _index Index of the texture coordinate that will be set.
+      /// \param[in] _uv The new texture coordinate
+      /// \param[in] _setIndex Texture coordinate set index
+      public: void SetTexCoordBySet(unsigned int _index,
+                               const ignition::math::Vector2d &_uv,
+                               unsigned int _setIdex);
 
       /// \brief Get an index value from the index array
       /// \param[in] _index Array index.
@@ -211,9 +255,24 @@ namespace ignition
       /// \return The number of indices.
       public: unsigned int IndexCount() const;
 
-      /// \brief Return the number of texture coordinates
+      /// \brief Return the number of texture coordinates. If multiple
+      /// texture coordinate sets exist, this function checks the first
+      /// texture coordinate set in the submesh, which by default is set 0,
+      /// unless AddTexCoordBySet is called with a different set index number
+      /// the first time a texture coordinate is added.
       /// \return The number of texture coordinates.
+      /// \sa TexCoordCountBySet
       public: unsigned int TexCoordCount() const;
+
+      /// \brief Return the number of texture coordinates for a texture
+      /// coordinate set
+      /// \param[in] _setIndex Texture coordinate set index
+      /// \return The number of texture coordinates.
+      public: unsigned int TexCoordCountBySet(unsigned int _setIndex) const;
+
+      /// \brief Return the number of texture coordinate sets
+      /// \return The number of texture coordinates sets.
+      public: unsigned int TexCoordSetCount() const;
 
       /// \brief Get the number of vertex-skeleton node assignments
       /// \return The number of vertex-skeleton node assignments
@@ -252,11 +311,25 @@ namespace ignition
       public: bool HasNormal(const unsigned int _index) const;
 
       /// \brief Return true if this submesh has the texture coordinate with
-      /// the given index
+      /// the given index. If multiple texture coordinate sets exist, this
+      /// function checks the first texture coordinate set in the submesh,
+      /// which by default is set 0 unless AddTexCoordBySet is called with
+      /// a different set index number the first time a texture coordinate is
+      /// added.
       /// \param[in] _index Texture coordinate index
       /// \return Return true if this submesh has the texture coordinate with
       /// the given _index.
+      /// \sa HasTexCoordBySet
       public: bool HasTexCoord(const unsigned int _index) const;
+
+      /// \brief Return true if this submesh has the texture coordinate with
+      /// the given index in a texture coordinate set
+      /// \param[in] _index Texture coordinate index
+      /// \param[in] _setIndex Texture coordinate set index
+      /// \return Return true if this submesh has the texture coordinate with
+      /// the given _index.
+      public: bool HasTexCoordBySet(unsigned int _index, unsigned int _setIndex)
+          const;
 
       /// \brief Return true if this submesh has the node assignment with
       /// the given index
@@ -283,6 +356,14 @@ namespace ignition
       /// \param[in] _center Center of the projection.
       public: void GenSphericalTexCoord(
                   const ignition::math::Vector3d &_center);
+
+      /// \brief Generate texture coordinates for a texture coordinate set
+      ///  using spherical projection from center
+      /// \param[in] _center Center of the projection.
+      /// \param[in] _setIndex Texture coordinate set index
+      public: void GenSphericalTexCoordBySet(
+                  const ignition::math::Vector3d &_center,
+                  unsigned int _setIndex);
 
       /// \brief Scale all vertices by _factor
       /// \param[in] _factor Scaling factor

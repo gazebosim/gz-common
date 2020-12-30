@@ -32,6 +32,8 @@ TEST(Pbr, BasicAPI)
   EXPECT_EQ(std::string(), pbr.RoughnessMap());
   EXPECT_EQ(std::string(), pbr.MetalnessMap());
   EXPECT_EQ(std::string(), pbr.EmissiveMap());
+  EXPECT_EQ(std::string(), pbr.LightMap());
+  EXPECT_EQ(0u, pbr.LightMapTexCoordSet());
   EXPECT_DOUBLE_EQ(0.5, pbr.Roughness());
   EXPECT_DOUBLE_EQ(0.0, pbr.Metalness());
   EXPECT_EQ(std::string(), pbr.SpecularMap());
@@ -59,6 +61,10 @@ TEST(Pbr, BasicAPI)
 
   pbr.SetEmissiveMap("metal_emissive_map.png");
   EXPECT_EQ("metal_emissive_map.png", pbr.EmissiveMap());
+
+  pbr.SetLightMap("metal_light_map.png", 1u);
+  EXPECT_EQ("metal_light_map.png", pbr.LightMap());
+  EXPECT_EQ(1u, pbr.LightMapTexCoordSet());
 
   pbr.SetRoughnessMap("roughness_map.png");
   EXPECT_EQ("roughness_map.png", pbr.RoughnessMap());
@@ -89,6 +95,7 @@ TEST(Pbr, MoveCopy)
     pbr.SetEnvironmentMap("specular_env_map.png");
     pbr.SetAmbientOcclusionMap("specular_ambient_occlusion_map.png");
     pbr.SetEmissiveMap("specular_emissive_map.png");
+    pbr.SetLightMap("specular_light_map.png", 2u);
     pbr.SetGlossinessMap("glossiness_map.png");
     pbr.SetSpecularMap("specular_map.png");
     pbr.SetGlossiness(0.1);
@@ -102,6 +109,8 @@ TEST(Pbr, MoveCopy)
     EXPECT_EQ("specular_ambient_occlusion_map.png",
         pbr2.AmbientOcclusionMap());
     EXPECT_EQ("specular_emissive_map.png", pbr2.EmissiveMap());
+    EXPECT_EQ("specular_light_map.png", pbr2.LightMap());
+    EXPECT_EQ(2u, pbr2.LightMapTexCoordSet());
     EXPECT_EQ("specular_map.png", pbr2.SpecularMap());
     EXPECT_EQ("glossiness_map.png", pbr2.GlossinessMap());
     EXPECT_DOUBLE_EQ(0.1, pbr2.Glossiness());
@@ -122,6 +131,7 @@ TEST(Pbr, MoveCopy)
     pbr.SetEnvironmentMap("metal_env_map.png");
     pbr.SetAmbientOcclusionMap("metal_ambient_occlusion_map.png");
     pbr.SetEmissiveMap("metal_emissive_map.png");
+    pbr.SetLightMap("metal_light_map.png", 3u);
     pbr.SetRoughnessMap("roughness_map.png");
     pbr.SetMetalnessMap("metalness_map.png");
     pbr.SetRoughness(0.8);
@@ -136,6 +146,8 @@ TEST(Pbr, MoveCopy)
     EXPECT_EQ("metal_ambient_occlusion_map.png",
         pbr2.AmbientOcclusionMap());
     EXPECT_EQ("metal_emissive_map.png", pbr2.EmissiveMap());
+    EXPECT_EQ("metal_light_map.png", pbr2.LightMap());
+    EXPECT_EQ(3u, pbr2.LightMapTexCoordSet());
     EXPECT_EQ("roughness_map.png", pbr2.RoughnessMap());
     EXPECT_EQ("metalness_map.png", pbr2.MetalnessMap());
     EXPECT_DOUBLE_EQ(0.8, pbr2.Roughness());
@@ -156,6 +168,7 @@ TEST(Pbr, MoveCopy)
     pbr.SetEnvironmentMap("metal_env_map.png");
     pbr.SetAmbientOcclusionMap("metal_ambient_occlusion_map.png");
     pbr.SetEmissiveMap("metal_emissive_map.png");
+    pbr.SetLightMap("metal_light_map.png", 1u);
     pbr.SetRoughnessMap("roughness_map.png");
     pbr.SetMetalnessMap("metalness_map.png");
     pbr.SetRoughness(0.8);
@@ -171,6 +184,8 @@ TEST(Pbr, MoveCopy)
     EXPECT_EQ("metal_ambient_occlusion_map.png",
         pbr2.AmbientOcclusionMap());
     EXPECT_EQ("metal_emissive_map.png", pbr2.EmissiveMap());
+    EXPECT_EQ("metal_light_map.png", pbr2.LightMap());
+    EXPECT_EQ(1u, pbr2.LightMapTexCoordSet());
     EXPECT_EQ("roughness_map.png", pbr2.RoughnessMap());
     EXPECT_EQ("metalness_map.png", pbr2.MetalnessMap());
     EXPECT_DOUBLE_EQ(0.8, pbr2.Roughness());
@@ -191,6 +206,7 @@ TEST(Pbr, MoveCopy)
     pbr.SetEnvironmentMap("metal_env_map.png");
     pbr.SetAmbientOcclusionMap("metal_ambient_occlusion_map.png");
     pbr.SetEmissiveMap("metal_emissive_map.png");
+    pbr.SetLightMap("metal_light_map.png", 2u);
     pbr.SetRoughnessMap("roughness_map.png");
     pbr.SetMetalnessMap("metalness_map.png");
     pbr.SetRoughness(0.18);
@@ -205,6 +221,8 @@ TEST(Pbr, MoveCopy)
     EXPECT_EQ("metal_ambient_occlusion_map.png",
         pbr2.AmbientOcclusionMap());
     EXPECT_EQ("metal_emissive_map.png", pbr2.EmissiveMap());
+    EXPECT_EQ("metal_light_map.png", pbr2.LightMap());
+    EXPECT_EQ(2u, pbr2.LightMapTexCoordSet());
     EXPECT_EQ("roughness_map.png", pbr2.RoughnessMap());
     EXPECT_EQ("metalness_map.png", pbr2.MetalnessMap());
     EXPECT_DOUBLE_EQ(0.18, pbr2.Roughness());

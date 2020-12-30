@@ -68,6 +68,64 @@
         </triangles>
       </mesh>
     </geometry>
+
+    <geometry id="triangle-mesh-b" name="triangle-b">
+      <mesh>
+        <source id="triangle-mesh-b-positions">
+          <float_array id="triangle-mesh-b-positions-array" count="9">
+0 0 0
+10 0 0
+10 10 0
+          </float_array>
+          <technique_common>
+            <accessor source="#triangle-mesh-b-positions-array" count="3" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="triangle-mesh-b-normals">
+          <float_array id="triangle-mesh-b-normals-array" count="3">0 0 1</float_array>
+          <technique_common>
+            <accessor source="#triangle-mesh-b-normals-array" count="1" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="triangle-mesh-b-map-0">
+          <float_array id="triangle-mesh-b-map-0-array" count="6">0 0 0 0 0 0</float_array>
+          <technique_common>
+            <accessor source="#triangle-mesh-b-map-0-array" count="3" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="triangle-mesh-b-map-1">
+          <float_array id="triangle-mesh-b-map-1-array" count="6">0 0.5 0 0.6 0 0.7</float_array>
+          <technique_common>
+            <accessor source="#triangle-mesh-b-map-1-array" count="3" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="triangle-mesh-b-vertices">
+          <input semantic="POSITION" source="#triangle-mesh-b-positions"/>
+        </vertices>
+        <triangles count="1">
+          <input semantic="VERTEX" source="#triangle-mesh-b-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#triangle-mesh-b-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#triangle-mesh-b-map-0" offset="2" set="0"/>
+          <input semantic="TEXCOORD" source="#triangle-mesh-b-map-1" offset="3" set="1"/>
+          <p>0 0 0 0 1 0 1 1 2 0 2 2</p>
+        </triangles>
+      </mesh>
+    </geometry>
+
   </library_geometries>
   <library_controllers/>
   <library_visual_scenes>
@@ -76,6 +134,11 @@
         <matrix sid="transform">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</matrix>
         <instance_geometry url="#triangle-mesh" name="triangle"/>
       </node>
+      <node id="triangle-b" name="triangle-b" type="NODE">
+        <matrix sid="transform">1 0 0 10 0 1 0 0 0 0 1 0 0 0 0 1</matrix>
+        <instance_geometry url="#triangle-mesh-b" name="triangle-b"/>
+      </node>
+
     </visual_scene>
   </library_visual_scenes>
   <scene>
