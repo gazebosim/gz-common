@@ -193,8 +193,8 @@ bool VideoEncoder::Start(const std::string &_format,
     }
     else
     {
-      this->dataPtr->filename = common::cwd() + "/TMP_RECORDING." +
-                                this->dataPtr->format;
+      this->dataPtr->filename = joinPaths(common::cwd(), "TMP_RECORDING." +
+                                this->dataPtr->format);
     }
   }
 
