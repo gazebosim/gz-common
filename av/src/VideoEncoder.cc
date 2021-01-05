@@ -23,6 +23,18 @@
 #include "ignition/common/Console.hh"
 #include "ignition/common/VideoEncoder.hh"
 
+// Fix averr2str
+// https://github.com/joncampbell123/composite-video-simulator/issues/5#issuecomment-611885908
+#ifdef av_err2str
+#undef av_err2str
+av_always_inline char *av_err2str(int _errnum)
+{
+  thread_local char str[AV_ERROR_MAX_STRING_SIZE];
+  memset(str, 0, sizeof(str));
+  return av_make_error_string(str, AV_ERROR_MAX_STRING_SIZE, _errnum);
+}
+#endif
+
 using namespace ignition;
 using namespace common;
 
@@ -219,8 +231,13 @@ bool VideoEncoder::Start(const std::string &_format,
       if (this->dataPtr->format.compare(outputFormat->name) == 0)
       {
         // Allocate the context using the correct outputFormat
-        avformat_alloc_output_context2(&this->dataPtr->formatCtx,
+        auto result = avformat_alloc_output_context2(&this->dataPtr->formatCtx,
             outputFormat, nullptr, this->dataPtr->filename.c_str());
+        if (result < 0)
+        {
+          ignerr << "Failed to allocate AV context [" << av_err2str(result)
+                 << "]" << std::endl;
+        }
         break;
       }
     }
@@ -263,8 +280,13 @@ bool VideoEncoder::Start(const std::string &_format,
 #endif
 
 #else
-    avformat_alloc_output_context2(&this->dataPtr->formatCtx, nullptr, nullptr,
-        this->dataPtr->filename.c_str());
+    auto result = avformat_alloc_output_context2(&this->dataPtr->formatCtx,
+        nullptr, nullptr, this->dataPtr->filename.c_str());
+    if (result < 0)
+    {
+      ignerr << "Failed to allocate AV context [" << av_err2str(result)
+             << "]" << std::endl;
+    }
 #endif
   }
 
