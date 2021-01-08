@@ -74,7 +74,7 @@ The AV component requires:
 
 First, follow the [ign-cmake](https://github.com/ignitionrobotics/ign-cmake) tutorial for installing Conda, Visual Studio, CMake, etc., prerequisites, and creating a Conda environment.
 
-Navigate to ``condabin`` if necessary to use the ``conda`` command (i.e., if Conda is not in your `PATH` environment variable. You can find the location of ``condabin`` in Anaconda Prompt, ``where conda``).
+Navigate to `condabin` if necessary to use the `conda` command (i.e., if Conda is not in your `PATH` environment variable. You can find the location of `condabin` in Anaconda Prompt, `where conda`).
 
 Activate the Conda environment:
 
@@ -107,44 +107,42 @@ conda install libignition-cmake<#> libignition-math<#> --channel conda-forge
 #### Ubuntu
 
 1. Clone the repository
-
-    ```
-    git clone https://github.com/ignitionrobotics/ign-common
-    ```
+  ```
+  git clone https://github.com/ignitionrobotics/ign-common
+  ```
 
 1. Configure and build
-
-    ```
-    cd ign-common; mkdir build;cd build; cmake ..;  make
-    ```
+  ```
+  cd ign-common
+  mkdir build
+  cd build
+  cmake ..
+  make
+  ```
 
 1. Optionally, install Ignition Common
-
-    ```
-    sudo make install
-    ```
+  ```
+  sudo make install
+  ```
 
 #### Windows
 
 1. Navigate to where you would like to build the library, and clone the repository.
-
-    ```
-    # Optionally, append `-b ign-common#` (replace # with a number) to check out a specific version
-    git clone https://github.com/ignitionrobotics/ign-common.git
-    ```
+  ```
+  # Optionally, append `-b ign-common#` (replace # with a number) to check out a specific version
+  git clone https://github.com/ignitionrobotics/ign-common.git
+  ```
 
 1. Configure and build
-
-    ```
-    cd ign-common
-    mkdir build
-    cd build
-    cmake .. -DBUILD_TESTING=OFF  # Optionally, -DCMAKE_INSTALL_PREFIX=path\to\install
-    cmake --build . --config Release
-    ```
+  ```
+  cd ign-common
+  mkdir build
+  cd build
+  cmake .. -DBUILD_TESTING=OFF  # Optionally, -DCMAKE_INSTALL_PREFIX=path\to\install
+  cmake --build . --config Release
+  ```
 
 1. Optionally, install
-
-    ```
-    cmake --install . --config Release
-    ```
+  ```
+  cmake --install . --config Release
+  ```
