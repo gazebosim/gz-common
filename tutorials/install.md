@@ -42,7 +42,7 @@ Install `ignition-common`:
 conda install libignition-common<#> --channel conda-forge
 ```
 
-Be sure to replace `<#>` with a number value, such as 1 or 2, depending on
+Be sure to replace `<#>` with a number value, such as 2 or 3, depending on
 which version you need.
 
 ## Source Install
