@@ -14,8 +14,10 @@
  * limitations under the License.
  *
  */
-#include <string>
+
 #include <algorithm>
+#include <map>
+#include <string>
 
 #include "ignition/math/Helpers.hh"
 
@@ -35,8 +37,9 @@ class ignition::common::SubMeshPrivate
   /// \brief the normal array
   public: std::vector<ignition::math::Vector3d> normals;
 
-  /// \brief the texture coordinate array
-  public: std::vector<ignition::math::Vector2d> texCoords;
+  /// \brief A map of texcoord set index to texture coordinate array
+  public: std::map<unsigned int, std::vector<ignition::math::Vector2d>>
+      texCoords;
 
   /// \brief the vertex index array
   public: std::vector<unsigned int> indices;
@@ -86,9 +89,12 @@ SubMesh::SubMesh(const SubMesh &_submesh)
   std::copy(_submesh.dataPtr->normals.begin(),
       _submesh.dataPtr->normals.end(),
       std::back_inserter(this->dataPtr->normals));
-  std::copy(_submesh.dataPtr->texCoords.begin(),
-      _submesh.dataPtr->texCoords.end(),
-      std::back_inserter(this->dataPtr->texCoords));
+
+  for (const auto &set : _submesh.dataPtr->texCoords)
+  {
+    std::copy(set.second.begin(), set.second.end(),
+        std::back_inserter(this->dataPtr->texCoords[set.first]));
+  }
   std::copy(_submesh.dataPtr->vertices.begin(),
       _submesh.dataPtr->vertices.end(),
       std::back_inserter(this->dataPtr->vertices));
@@ -147,13 +153,30 @@ void SubMesh::AddNormal(const double _x, const double _y, const double _z)
 //////////////////////////////////////////////////
 void SubMesh::AddTexCoord(const double _u, const double _v)
 {
-  this->dataPtr->texCoords.push_back(ignition::math::Vector2d(_u, _v));
+  unsigned firstSetIndex = 0u;
+  if (!this->dataPtr->texCoords.empty())
+    firstSetIndex = this->dataPtr->texCoords.begin()->first;
+  this->AddTexCoordBySet(_u, _v, firstSetIndex);
 }
 
 //////////////////////////////////////////////////
 void SubMesh::AddTexCoord(const ignition::math::Vector2d &_uv)
 {
-  this->dataPtr->texCoords.push_back(_uv);
+  this->AddTexCoord(_uv.X(), _uv.Y());
+}
+
+//////////////////////////////////////////////////
+void SubMesh::AddTexCoordBySet(double _u, double _v, unsigned int _setIndex)
+{
+  this->dataPtr->texCoords[_setIndex].push_back(
+      ignition::math::Vector2d(_u, _v));
+}
+
+//////////////////////////////////////////////////
+void SubMesh::AddTexCoordBySet(const ignition::math::Vector2d &_uv,
+    unsigned int _setIndex)
+{
+  this->AddTexCoordBySet(_uv.X(), _uv.Y(), _setIndex);
 }
 
 //////////////////////////////////////////////////
@@ -220,7 +243,29 @@ bool SubMesh::HasNormal(const unsigned int _index) const
 //////////////////////////////////////////////////
 bool SubMesh::HasTexCoord(const unsigned int _index) const
 {
-  return _index < this->dataPtr->texCoords.size();
+  if (this->dataPtr->texCoords.empty())
+    return false;
+
+  unsigned firstSetIndex = this->dataPtr->texCoords.begin()->first;
+
+  if (this->dataPtr->texCoords.size() > 1u)
+  {
+    ignwarn << "Multiple texture coordinate sets exist in submesh: "
+            << this->dataPtr->name << ". Checking first set with index: "
+            << firstSetIndex << std::endl;
+  }
+
+  return this->HasTexCoordBySet(_index, firstSetIndex);
+}
+
+//////////////////////////////////////////////////
+bool SubMesh::HasTexCoordBySet(unsigned int _index,
+    unsigned int _setIndex) const
+{
+  auto it = this->dataPtr->texCoords.find(_setIndex);
+  if (it == this->dataPtr->texCoords.end())
+    return false;
+  return _index < it->second.size();
 }
 
 //////////////////////////////////////////////////
@@ -245,26 +290,81 @@ void SubMesh::SetNormal(const unsigned int _index,
 //////////////////////////////////////////////////
 ignition::math::Vector2d SubMesh::TexCoord(const unsigned int _index) const
 {
-  if (_index >= this->dataPtr->texCoords.size())
+  if (this->dataPtr->texCoords.empty())
+  {
+    ignerr << "Texture coordinate sets are empty" << std::endl;
+    return math::Vector2d::Zero;
+  }
+  unsigned firstSetIndex = this->dataPtr->texCoords.begin()->first;
+
+  if (this->dataPtr->texCoords.size() > 1u)
+  {
+    ignwarn << "Multiple texture coordinate sets exist in submesh: "
+            << this->dataPtr->name << ". Checking first set with index: "
+            << firstSetIndex << std::endl;
+  }
+
+  return this->TexCoordBySet(_index, firstSetIndex);
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector2d SubMesh::TexCoordBySet(unsigned int _index,
+    unsigned int _setIndex) const
+{
+  auto it = this->dataPtr->texCoords.find(_setIndex);
+  if (it == this->dataPtr->texCoords.end())
+  {
+    ignerr << "Texture coordinate set does not exist: " << _setIndex
+           << std::endl;
+    return math::Vector2d::Zero;
+  }
+
+  if (_index >= it->second.size())
   {
     ignerr << "Index too large" << std::endl;
     return math::Vector2d::Zero;
   }
 
-  return this->dataPtr->texCoords[_index];
+  return it->second[_index];
 }
 
 //////////////////////////////////////////////////
 void SubMesh::SetTexCoord(const unsigned int _index,
     const ignition::math::Vector2d &_t)
 {
-  if (_index >= this->dataPtr->texCoords.size())
+  unsigned firstSetIndex = 0u;
+  if (!this->dataPtr->texCoords.empty())
+    firstSetIndex = this->dataPtr->texCoords.begin()->first;
+
+  if (this->dataPtr->texCoords.size() > 1u)
+  {
+    ignwarn << "Multiple texture coordinate sets exist in submesh: "
+            << this->dataPtr->name << ". Checking first set with index: "
+            << firstSetIndex << std::endl;
+  }
+
+  this->SetTexCoordBySet(_index, _t, firstSetIndex);
+}
+
+//////////////////////////////////////////////////
+void SubMesh::SetTexCoordBySet(unsigned int _index,
+    const ignition::math::Vector2d &_t, unsigned int _setIndex)
+{
+  auto it = this->dataPtr->texCoords.find(_setIndex);
+  if (it == this->dataPtr->texCoords.end())
+  {
+    ignerr << "Texture coordinate set does not exist: " << _setIndex
+           << std::endl;
+    return;
+  }
+
+  if (_index >= it->second.size())
   {
     ignerr << "Index too large" << std::endl;
     return;
   }
 
-  this->dataPtr->texCoords[_index] = _t;
+  it->second[_index] = _t;
 }
 
 //////////////////////////////////////////////////
@@ -368,6 +468,33 @@ unsigned int SubMesh::IndexCount() const
 
 //////////////////////////////////////////////////
 unsigned int SubMesh::TexCoordCount() const
+{
+  if (this->dataPtr->texCoords.empty())
+    return 0u;
+  unsigned firstSetIndex = this->dataPtr->texCoords.begin()->first;
+
+  if (this->dataPtr->texCoords.size() > 1u)
+  {
+    ignwarn << "Multiple texture coordinate sets exist in submesh: "
+            << this->dataPtr->name << ". Checking first set with index: "
+            << firstSetIndex << std::endl;
+  }
+
+  return this->TexCoordCountBySet(firstSetIndex);
+}
+
+//////////////////////////////////////////////////
+unsigned int SubMesh::TexCoordCountBySet(unsigned int _setIndex) const
+{
+  auto it = this->dataPtr->texCoords.find(_setIndex);
+  if (it == this->dataPtr->texCoords.end())
+    return 0u;
+
+  return this->dataPtr->texCoords[_setIndex].size();
+}
+
+//////////////////////////////////////////////////
+unsigned int SubMesh::TexCoordSetCount() const
 {
   return this->dataPtr->texCoords.size();
 }
@@ -501,7 +628,18 @@ void SubMesh::RecalculateNormals()
 //////////////////////////////////////////////////
 void SubMesh::GenSphericalTexCoord(const ignition::math::Vector3d &_center)
 {
-  this->dataPtr->texCoords.clear();
+  if (this->dataPtr->texCoords.empty())
+    return;
+
+  unsigned firstSetIndex = this->dataPtr->texCoords.begin()->first;
+  this->GenSphericalTexCoordBySet(_center, firstSetIndex);
+}
+
+//////////////////////////////////////////////////
+void SubMesh::GenSphericalTexCoordBySet(const ignition::math::Vector3d &_center,
+    unsigned int _setIndex)
+{
+  this->dataPtr->texCoords[_setIndex].clear();
 
   for (const auto &vert : this->dataPtr->vertices)
   {
@@ -516,7 +654,7 @@ void SubMesh::GenSphericalTexCoord(const ignition::math::Vector3d &_center)
     double t = std::min(1.0, std::max(-1.0, y/r));
     double u = acos(s) / IGN_PI;
     double v = acos(t) / IGN_PI;
-    this->AddTexCoord(u, v);
+    this->AddTexCoordBySet(u, v, _setIndex);
   }
 }
 
