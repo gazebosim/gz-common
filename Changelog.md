@@ -2,6 +2,14 @@
 
 ## Ignition Common 3.X.X
 
+## Ignition Common 3.10.0 (2021-01-05)
+
+1. Added render order to material class
+    * [Pull Request 142](https://github.com/ignitionrobotics/ign-common/pull/142)
+
+1. Fix memory leak in Pbr.cc
+    * [Pull Request 147](https://github.com/ignitionrobotics/ign-common/pull/147)
+
 ## Ignition Common 3.9.0 (2020-12-21)
 
 1. Support multiple texture coordinate sets

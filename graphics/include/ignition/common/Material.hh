@@ -177,6 +177,15 @@ namespace ignition
       /// \return The enable two sided rendering value
       public: bool TwoSidedEnabled() const;
 
+      /// \brief Set the render order. The higher value will be rendered on top
+      /// of the other coplanar polygons.
+      /// \param[in] _renderOrder The render order value
+      public: void SetRenderOrder(float _renderOrder);
+
+      /// \brief Get the render order
+      /// \return The render order value
+      public: float RenderOrder() const;
+
       /// \brief Set the shininess
       /// \param[in] _t The shininess value
       public: void SetShininess(double _t);
@@ -265,6 +274,7 @@ namespace ignition
                 _out << "  Emissive: " << _m.Emissive() << "\n";
                 _out << "  Transparency: " << _m.Transparency() << "\n";
                 _out << "  Shininess: " << _m.Shininess() << "\n";
+                _out << "  Render order: " << _m.RenderOrder() << "\n";
                 _out << "  BlendMode: " << _m.BlendStr() << "\n";
                 _out << "  ShadeMode: " << _m.ShadeStr() << "\n";
                 _out << "  DepthWrite: " << _m.DepthWrite() << "\n";
