@@ -111,7 +111,7 @@ conda install libignition-cmake<#> libignition-math<#> --channel conda-forge
   git clone https://github.com/ignitionrobotics/ign-common
   ```
 
-1. Configure and build
+2. Configure and build
   ```
   cd ign-common
   mkdir build
@@ -120,7 +120,7 @@ conda install libignition-cmake<#> libignition-math<#> --channel conda-forge
   make
   ```
 
-1. Optionally, install Ignition Common
+3. Optionally, install Ignition Common
   ```
   sudo make install
   ```
@@ -133,7 +133,7 @@ conda install libignition-cmake<#> libignition-math<#> --channel conda-forge
   git clone https://github.com/ignitionrobotics/ign-common.git
   ```
 
-1. Configure and build
+2. Configure and build
   ```
   cd ign-common
   mkdir build
@@ -142,7 +142,7 @@ conda install libignition-cmake<#> libignition-math<#> --channel conda-forge
   cmake --build . --config Release
   ```
 
-1. Optionally, install
+3. Optionally, install
   ```
   cmake --install . --config Release
   ```
