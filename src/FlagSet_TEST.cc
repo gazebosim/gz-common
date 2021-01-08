@@ -31,6 +31,7 @@
 #include <ignition/common/FlagSet.hh>
 
 #include <cstdint>
+#include <unordered_set>
 
 #include "gtest/gtest.h"
 
@@ -168,5 +169,24 @@ TEST(FlagSet, TestStaticConstructors)
   EXPECT_FALSE(ignition::common::FlagSet<Options>::NoneSet().All());
   EXPECT_TRUE(ignition::common::FlagSet<Options>::NoneSet().None());
   EXPECT_FALSE(ignition::common::FlagSet<Options>::NoneSet().Any());
+}
 
+
+TEST(FlagSet, TestHash)
+{
+  using namespace ignition::common;
+
+  const auto options1 = FlagSet<Options>::AllSet();
+  const auto options2 = FlagSet<Options>::NoneSet();
+
+  std::hash<FlagSet<Options>> hash {};
+
+  ASSERT_NE(hash(options1), hash(options2));
+  ASSERT_EQ(hash(options1), hash(options1));
+  ASSERT_EQ(hash(options2), hash(options2));
+
+  std::unordered_set<FlagSet<Options>> valid;
+  ASSERT_EQ(valid.find(FlagSet<Options>::AllSet()), valid.end());
+  valid.insert(FlagSet<Options>::AllSet());
+  ASSERT_NE(valid.find(FlagSet<Options>::AllSet()), valid.end());
 }

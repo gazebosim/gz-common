@@ -309,6 +309,11 @@ class FlagSet
     return _stream << _self.flags;
   }
 
+  public: size_t Hash() const
+  {
+    return std::hash<decltype(this->flags)>{}(this->flags);
+  }
+
   /// \brief The underlying type of the enum.
   private: using UnderlyingType = std::underlying_type_t<T>;
 
@@ -343,6 +348,17 @@ operator|(const T& _lhs, const T& _rhs)
   fs |= _rhs;
 
   return fs;
+}
+
+namespace std
+{
+template<typename T> struct hash<ignition::common::FlagSet<T>>
+{
+  std::size_t operator()(const ignition::common::FlagSet<T>& s) const noexcept
+  {
+    return s.Hash();
+  }
+};
 }
 
 #endif
