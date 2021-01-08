@@ -275,13 +275,13 @@ class FlagSet
   }
 
   /// \brief Retrurn a FlagSet with all flags set to true.
-  public: static FlagSet ALL()
+  public: static FlagSet AllSet()
   {
     return FlagSet<T>().Set();
   }
 
   /// \brief Retrurn a FlagSet with all flags set to false.
-  public: static FlagSet NONE()
+  public: static FlagSet NoneSet()
   {
     return FlagSet<T>();
   }

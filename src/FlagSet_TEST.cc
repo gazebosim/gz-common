@@ -158,3 +158,15 @@ TEST(FlagSet, TestAnyAllNone)
   EXPECT_TRUE(options.Any());
   EXPECT_FALSE(options.All());
 }
+
+TEST(FlagSet, TestStaticConstructors)
+{
+  EXPECT_TRUE(ignition::common::FlagSet<Options>::AllSet().All());
+  EXPECT_FALSE(ignition::common::FlagSet<Options>::AllSet().None());
+  EXPECT_TRUE(ignition::common::FlagSet<Options>::AllSet().Any());
+
+  EXPECT_FALSE(ignition::common::FlagSet<Options>::NoneSet().All());
+  EXPECT_TRUE(ignition::common::FlagSet<Options>::NoneSet().None());
+  EXPECT_FALSE(ignition::common::FlagSet<Options>::NoneSet().Any());
+
+}
