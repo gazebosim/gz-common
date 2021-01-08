@@ -68,7 +68,11 @@ namespace ignition
       /// the _format is "v4l2". If blank, a default temporary file is used.
       /// However, the "v4l2" _format must be accompanied with a video
       /// loopback device filename.
-      /// \return True on success
+      /// \return True on success. Do NOT ignore the return value. If Start()
+      /// failed, encoding will not work. If Start() function failed, you can
+      /// try running the overload with _allowHwAccel=false to see if the
+      /// failure isn't a result of faulty HW encoding (e.g. when NVENC sessions
+      /// are exhausted).
       /// \note This will automatically select a HW-accelerated encoder based
       /// on the values of environment variables IGN_VIDEO_ALLOWED_ENCODERS,
       /// IGN_VIDEO_ENCODER_DEVICE and IGN_VIDEO_ENCODER_USE_HW_SURFACE.
@@ -113,13 +117,53 @@ namespace ignition
       /// the _format is "v4l2". If blank, a default temporary file is used.
       /// However, the "v4l2" _format must be accompanied with a video
       /// loopback device filename.
+      /// \param[in] _allowHwAccel If true, HW acceleration settings are read
+      /// from environment variables (see the other Start() overload for the
+      /// loading mechanism description). If set to false, only SW encoding will
+      /// be done.
+      /// \return True on success. Do NOT ignore the return value. If Start()
+      /// failed, encoding will not work. If Start() function failed and you ran
+      /// it with allowed HW acceleration, you can try running it once more
+      /// without it (this can help in case the HW encoder can be found and
+      /// detected, but it fails to start, e.g. when NVENC sessions are
+      /// exhausted).
+      public: bool Start(
+                const std::string &_format,
+                const std::string &_filename,
+                const unsigned int _width,
+                const unsigned int _height,
+                const unsigned int _fps,
+                const unsigned int _bitRate,
+                const bool _allowHwAccel);
+
+      /// \brief Start the encoder. This should be called once. Add new
+      /// frames to the video using the AddFrame function. Use SaveToFile
+      /// when the video is complete.
+      /// \param[in] _width Width in pixels of the output video.
+      /// \param[in] _height Height in pixels of the output video.
+      /// \param[in] _format String that represents the video type.
+      /// Supported types include: "avi", "ogv", mp4", "v4l2". If using
+      /// "v4l2", you must also specify a _filename.
+      /// \param[in] _bitRate Bit rate to encode the video. A value of zero
+      /// will cause this function to automatically compute a bitrate.
+      /// \param[in] _filename Name of the file that stores the video while it
+      /// is being created. This is a temporary file when recording to
+      /// disk, or a video4linux loopback device like /dev/video0 when
+      /// the _format is "v4l2". If blank, a default temporary file is used.
+      /// However, the "v4l2" _format must be accompanied with a video
+      /// loopback device filename.
       /// \param[in] _allowedHwAccel Allowed HW acceleration frameworks to
       /// probe (as a bitmask of values of HWAccelerationDevice enum).
       /// Set to HWAccelerationDevice::NONE to force software encoding only.
       /// \param[in] _hwAccelDevice If nonempty, specifies the HW device to use
       /// for encoding. If empty, the framework search method will look for some
       /// default devices.
-      /// \return True on success
+      /// \return True on success. Do NOT ignore the return value. If Start()
+      /// failed, encoding will not work. If Start() function failed and you ran
+      /// it with some HW acceleration, you can try running it once more
+      /// with a different acceleration config (this can help in case the HW
+      /// encoder can be found and detected, but it fails to start, e.g. when
+      /// NVENC sessions are exhausted).
       public: bool Start(
                 const std::string &_format,
                 const std::string &_filename,

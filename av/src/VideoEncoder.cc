@@ -176,48 +176,65 @@ bool VideoEncoder::Start(const std::string &_format,
                          const unsigned int _fps,
                          const unsigned int _bitRate)
 {
-  std::string allowedEncodersStr;
-  env("IGN_VIDEO_ALLOWED_ENCODERS", allowedEncodersStr);
+  return this->Start(_format, _filename, _width, _height, _fps, _bitRate,
+                     true);
+}
 
+/////////////////////////////////////////////////
+bool VideoEncoder::Start(const std::string &_format,
+                         const std::string &_filename,
+                         const unsigned int _width,
+                         const unsigned int _height,
+                         const unsigned int _fps,
+                         const unsigned int _bitRate,
+                         const bool _allowHwAccel)
+{
   FlagSet<HWEncoderType> allowedEncoders = HWEncoderType::NONE;
-  if (allowedEncodersStr == "ALL")
+  std::string device;
+  std::optional<bool> useHwSurface;
+
+  if (_allowHwAccel)
   {
-    allowedEncoders = FlagSet<HWEncoderType>::ALL();
-  }
-  else if (!allowedEncodersStr.empty() && allowedEncodersStr != "NONE")
-  {
-    for (const auto& encoderStr : Split(allowedEncodersStr, ':'))
+    std::string allowedEncodersStr;
+    env("IGN_VIDEO_ALLOWED_ENCODERS", allowedEncodersStr);
+
+    if (allowedEncodersStr == "ALL")
     {
-      HWEncoderType encoder = HWEncoderType::NONE;
-      HWEncoderTypeParser.Set(encoder, encoderStr);
-      if (encoder != HWEncoderType::NONE)
-        allowedEncoders |= encoder;
+      allowedEncoders = FlagSet<HWEncoderType>::AllSet();
     }
-  }
+    else if (!allowedEncodersStr.empty() && allowedEncodersStr != "NONE")
+    {
+      for (const auto& encoderStr : Split(allowedEncodersStr, ':'))
+      {
+        HWEncoderType encoder = HWEncoderType::NONE;
+        HWEncoderTypeParser.Set(encoder, encoderStr);
+        if (encoder != HWEncoderType::NONE)
+          allowedEncoders |= encoder;
+      }
+    }
 
 #ifndef IGN_COMMON_BUILD_HW_VIDEO
-  if (allowedEncoders != HWEncoderType::NONE)
-  {
-    ignwarn << "Hardware encoding with encoders " << allowedEncodersStr
-            << " was requested, but ignition-common is built without HW "
-            << "encoding support. A software encoder will be used instead."
-            << std::endl;
-  }
+    if (allowedEncoders != HWEncoderType::NONE)
+    {
+      ignwarn << "Hardware encoding with encoders " << allowedEncodersStr
+              << " was requested, but ignition-common is built without HW "
+              << "encoding support. A software encoder will be used instead."
+              << std::endl;
+    }
 #endif
 
-  std::string device;
-  env("IGN_VIDEO_ENCODER_DEVICE", device);
+    env("IGN_VIDEO_ENCODER_DEVICE", device);
 
-  std::string hwSurfaceStr;
-  env("IGN_VIDEO_USE_HW_SURFACE", hwSurfaceStr);
+    std::string hwSurfaceStr;
+    env("IGN_VIDEO_USE_HW_SURFACE", hwSurfaceStr);
 
-  std::optional<bool> useHwSurface;
-  if (!hwSurfaceStr.empty())
-  {
-    if (hwSurfaceStr == "0")
-      useHwSurface = false;
-    else
-      useHwSurface = true;
+    if (!hwSurfaceStr.empty())
+    {
+      if (hwSurfaceStr == "0")
+        useHwSurface = false;
+      else
+        useHwSurface = true;
+    }
   }
 
   return this->Start(_format, _filename, _width, _height, _fps, _bitRate,
@@ -506,6 +523,20 @@ bool VideoEncoder::Start(
   {
     ignerr << "Could not open video codec: " << av_err2str_cpp(ret)
           << ". Video encoding is not started\n";
+    if (AVUNERROR(ret) == ENOMEM &&
+      this->dataPtr->hwEncoder->GetEncoderType() == HWEncoderType::NVENC)
+    {
+      ignwarn << "If this computer has non-server-class GPUs (like GeForce), "
+              << "it is possible that you have reached the maximum number of "
+              << "simultaneous NVENC sessions (most probably 3). This limit is "
+              << "not per GPU, but per the whole computer regardless of the "
+              << "number of GPUs installed. You can try to circumvent this "
+              << "limit by using the unofficial driver patch at "
+              << "https://github.com/keylase/nvidia-patch . If you cannot (or "
+              << "do not want) install this patch, do not run more than 3 "
+              << "HW-accelerated video encoding tasks on this computer "
+              << "simultaneously.\n";
+    }
     this->Reset();
     return false;
   }

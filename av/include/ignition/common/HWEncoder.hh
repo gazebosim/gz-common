@@ -78,6 +78,10 @@ namespace ignition::common
     /// CPU buffer to the GPU before returning.
     public: AVFrame* GetFrameForEncoder(AVFrame* _inFrame);
 
+    /// \brief Returns the type of encoder that is currently being used.
+    /// The value will be NONE until ConfigHWAccel() successfully finishes.
+    public: HWEncoderType GetEncoderType() const;
+
     private: std::unique_ptr<HWVideoPrivate> dataPtr;
   };
 }

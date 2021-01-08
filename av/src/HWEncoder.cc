@@ -48,7 +48,8 @@ class ignition::common::HWVideoPrivate
   public: bool useHwSurface = false;
 
   /// \brief The set of HW encoders that were given to the constructor.
-  public: FlagSet<HWEncoderType> initHwEncoders = FlagSet<HWEncoderType>::ALL();
+  public: FlagSet<HWEncoderType> initHwEncoders =
+    FlagSet<HWEncoderType>::AllSet();
 
   /// \brief The HW device that was given to the constructor.
   public: std::string initHwDevice;
@@ -683,4 +684,9 @@ HWEncoder::~HWEncoder()
       av_buffer_unref(&this->dataPtr->hwDevice);
     if (this->dataPtr->avOutHwFrame)
       av_frame_free(&this->dataPtr->avOutHwFrame);  // lavc 55.45.101
+}
+
+HWEncoderType HWEncoder::GetEncoderType() const
+{
+  return this->dataPtr->hwEncoderType;
 }
