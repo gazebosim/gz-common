@@ -5,11 +5,11 @@ Next Tutorial: \ref profiler
 These instructions are for installing only Ignition Common.
 If you're interested in using all the Ignition libraries, check out this [Ignition installation](https://ignitionrobotics.org/docs/latest/install).
 
-We recommend following the Binary Install instructions to get up and running as quickly and painlessly as possible.
+We recommend following the Binary Installation instructions to get up and running as quickly and painlessly as possible.
 
-The Source Install instructions should be used if you need the very latest software improvements, you need to modify the code, or you plan to make a contribution.
+The Source Installation instructions should be used if you need the very latest software improvements, you need to modify the code, or you plan to make a contribution.
 
-# Binary Install
+# Binary Installation
 
 ## Ubuntu
 
@@ -40,7 +40,7 @@ conda install libignition-common<#> --channel conda-forge
 Be sure to replace `<#>` with a number value, such as 2 or 3, depending on
 which version you need.
 
-# Source Install
+# Source Installation
 
 Source installation can be performed by first installing the necessary
 prerequisites followed by building from source.
@@ -93,7 +93,7 @@ Install dependencies, replacing `<#>` with the desired versions:
 conda install libignition-cmake<#> libignition-math<#> --channel conda-forge
 ```
 
-## Building from Source
+## Build from Source
 
 ### Ubuntu
 
@@ -111,14 +111,14 @@ conda install libignition-cmake<#> libignition-math<#> --channel conda-forge
   make
   ```
 
-3. Optionally, install Ignition Common
+3. Optionally, install
   ```
   sudo make install
   ```
 
 ### Windows
 
-This assumes you have created and activated a Conda environment while installing the Dependencies.
+This assumes you have created and activated a Conda environment while installing the Prerequisites.
 
 1. Navigate to where you would like to build the library, and clone the repository.
   ```
