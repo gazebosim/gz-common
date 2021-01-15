@@ -570,12 +570,13 @@ void ColladaLoaderPrivate::LoadNode(tinyxml2::XMLElement *_elem, Mesh *_mesh,
       if (matIndex < 0)
       {
         matIndex = _mesh->AddMaterial(mat);
-      }    
+      }
       if (matIndex < 0)
       {
         ignwarn << "Unable to add material[" << matStr << "]\n";
       }
-      else{
+      else
+      {
         auto subMesh = _mesh->SubMeshByName(this->currentNodeName);
         if (subMesh.lock() == nullptr)
         {
