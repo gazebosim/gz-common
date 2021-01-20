@@ -151,10 +151,12 @@ namespace ignition
       public: math::Color Emissive() const;
 
       /// \brief Set the transparency percentage (0..1)
-      /// \param[in] _t The amount of transparency (0..1)
+      /// \param[in] _t The amount of transparency (0..1) where a value of 1
+      /// is fully transparent and 0 is not transparent.
       public: void SetTransparency(double _t);
 
       /// \brief Get the transparency percentage (0..1)
+      /// A value of 1 is fully transparent and 0 is not transparent.
       /// \return The transparency percentage
       public: double Transparency() const;
 
