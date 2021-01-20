@@ -147,28 +147,28 @@ API and tutorials can be found at [https://ignitionrobotics.org/libs/common](htt
 You can also generate the documentation from a clone of this repository by following these steps.
 
 1. You will need Doxygen. On Ubuntu Doxygen can be installed using
-
-    ```
-    sudo apt-get install doxygen
-    ```
+  ```
+  sudo apt-get install doxygen
+  ```
 
 2. Clone the repository
-
-    ```
-    git clone https://github.com/ignitionrobotics/ign-common
-    ```
+  ```
+  git clone https://github.com/ignitionrobotics/ign-common
+  ```
 
 3. Configure and build the documentation.
-
-    ```
-    cd ign-common; mkdir build; cd build; cmake ../; make doc
-    ```
+  ```
+  cd ign-common
+  mkdir build
+  cd build
+  cmake ../
+  make doc
+  ```
 
 4. View the documentation by running the following command from the build directory.
-
-    ```
-    firefox doxygen/html/index.html
-    ```
+  ```
+  firefox doxygen/html/index.html
+  ```
 
 # Testing
 
@@ -177,14 +177,12 @@ Follow these steps to run tests and static code analysis in your clone of this r
 1. Follow the [source install instruction](#source-install).
 
 2. Run tests.
-
-    ```
-    make test
-    ```
+  ```
+  make test
+  ```
 
 3. Static code checker.
-
-    ```
-    make codecheck
-    ```
+  ```
+  make codecheck
+  ```
 
