@@ -823,7 +823,7 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
 }
 
 void MeshManager::CreateEllipsoid(const std::string &_name,
-                                  const ignition::math::Vector3d _radii,
+                                  const ignition::math::Vector3d &_radii,
                                   const unsigned int _rings,
                                   const unsigned int _segments)
 {
@@ -845,9 +845,9 @@ void MeshManager::CreateEllipsoid(const std::string &_name,
   const double vmax = 2.0 * M_PI;
 
   unsigned int i, j;
-  float theta, phi;
-  float d_phi = (umax - umin) / (_rings - 1.0);
-  float d_theta = (vmax - vmin) / (_segments - 1.0);
+  double theta, phi;
+  double d_phi = (umax - umin) / (_rings - 1.0);
+  double d_theta = (vmax - vmin) / (_segments - 1.0);
 
   for (i = 0, theta = vmin; i < _segments; ++i, theta += d_theta)
   {

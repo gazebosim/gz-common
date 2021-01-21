@@ -160,7 +160,7 @@ namespace ignition
       /// \param[in] _rings the number of circles along the height
       /// \param[in] _segments the number of segment per circle
       public: void CreateEllipsoid(const std::string &_name,
-                                   const ignition::math::Vector3d _radii,
+                                   const ignition::math::Vector3d &_radii,
                                    const unsigned int _rings,
                                    const unsigned int _segments);
 
