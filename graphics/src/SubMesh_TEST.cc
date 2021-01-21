@@ -389,6 +389,25 @@ TEST_F(SubMeshTest, Volume)
         1e-2);
   }
 
+  // Ellipsoid mesh tests
+  {
+    common::MeshManager::Instance()->CreateEllipsoid("ellipsoid",
+        ignition::math::Vector3d(2, 1.4, 7), 10, 10);
+
+    const common::Mesh *unitCylinder =
+      common::MeshManager::Instance()->MeshByName("ellipsoid");
+    ASSERT_TRUE(unitCylinder != nullptr);
+
+    // A larger cylinder needs to have higher resolution in order to get the
+    // volume close to Pi * r^2 * h.
+    common::MeshManager::Instance()->CreateEllipsoid("other_cylinder",
+        ignition::math::Vector3d(0.8, 2.4, 7.5), 10, 10);
+
+    const common::Mesh *otherCylinder =
+      common::MeshManager::Instance()->MeshByName("other_cylinder");
+    ASSERT_TRUE(otherCylinder != nullptr);
+  }
+
   // Cylinder mesh tests
   {
     common::MeshManager::Instance()->CreateCylinder("unit_cylinder",
