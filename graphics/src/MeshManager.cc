@@ -832,7 +832,7 @@ void MeshManager::CreateCapsule(const std::string &_name,
   {
     return;
   }
-  std::cerr << "CreateCapsule" << '\n';
+
   Mesh *mesh = new Mesh();
   mesh->SetName(_name);
   this->dataPtr->meshes.insert(std::make_pair(_name, mesh));
