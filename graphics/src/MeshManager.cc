@@ -822,6 +822,160 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
   mesh->RecalculateNormals();
 }
 
+void MeshManager::CreateCapsule(const std::string &_name,
+                                const float _radius,
+                                const float _length,
+                                const unsigned int _rings,
+                                const unsigned int _segments)
+{
+  if (this->HasMesh(_name))
+  {
+    return;
+  }
+  std::cerr << "CreateCapsule" << '\n';
+  Mesh *mesh = new Mesh();
+  mesh->SetName(_name);
+  this->dataPtr->meshes.insert(std::make_pair(_name, mesh));
+
+  ignition::math::Vector3d vert, norm;
+  SubMesh subMesh;
+
+  // Based on https://github.com/godotengine/godot primitive_meshes.cpp
+  int prevRow, thisRow, point;
+  float x, y, z, u, v, w;
+  float oneThird = 1.0 / 3.0;
+  float twoThirds = 2.0 / 3.0;
+
+  point = 0;
+
+  /* top hemisphere */
+  thisRow = 0;
+  prevRow = 0;
+  for (unsigned int j = 0; j <= (_rings + 1); j++) {
+    v = j;
+
+    v /= (_rings + 1);
+    w = sin(0.5 * M_PI * v);
+    y = _radius * cos(0.5 * M_PI * v);
+
+    for (unsigned int i = 0; i <= _segments; i++) {
+      u = i;
+      u /= _segments;
+
+      x = -sin(u * (M_PI * 2.0));
+      z = cos(u * (M_PI * 2.0));
+
+      ignition::math::Vector3d p(
+      x * _radius * w, y, -z * _radius * w);
+      // Compute vertex
+      subMesh.AddVertex(ignition::math::Vector3d(
+      p + ignition::math::Vector3d(0.0, 0.5 * _length, 0.0)));
+      subMesh.AddTexCoord(ignition::math::Vector2d(u, v * oneThird));
+      subMesh.AddNormal(p.Normalize());
+
+      point++;
+
+      if (i > 0 && j > 0) {
+        subMesh.AddIndex(thisRow + i - 1);
+        subMesh.AddIndex(prevRow + i);
+        subMesh.AddIndex(prevRow + i - 1);
+
+        subMesh.AddIndex(thisRow + i - 1);
+        subMesh.AddIndex(thisRow + i);
+        subMesh.AddIndex(prevRow + i);
+      }
+    }
+    prevRow = thisRow;
+    thisRow = point;
+  }
+
+  /* cylinder */
+  thisRow = point;
+  prevRow = 0;
+  for (unsigned int j = 0; j <= (_rings + 1); j++) {
+    v = j;
+    v /= (_rings + 1);
+
+    y = _length * v;
+    y = (_length * 0.5) - y;
+
+    for (unsigned int i = 0; i <= _segments; i++) {
+      u = i;
+      u /= _segments;
+
+      x = -sin(u * (M_PI * 2.0));
+      z = cos(u * (M_PI * 2.0));
+
+      ignition::math::Vector3d p(
+      x * _radius, y, -z * _radius);
+
+      // Compute vertex
+      subMesh.AddVertex(p);
+      subMesh.AddTexCoord(
+      ignition::math::Vector2d(u, oneThird + (v * oneThird)));
+      subMesh.AddNormal(ignition::math::Vector3d(x, 0.0, -z));
+      point++;
+
+      if (i > 0 && j > 0) {
+        subMesh.AddIndex(thisRow + i - 1);
+        subMesh.AddIndex(prevRow + i);
+        subMesh.AddIndex(prevRow + i - 1);
+
+        subMesh.AddIndex(thisRow + i - 1);
+        subMesh.AddIndex(thisRow + i);
+        subMesh.AddIndex(prevRow + i);
+      }
+    }
+    prevRow = thisRow;
+    thisRow = point;
+  }
+
+  /* bottom hemisphere */
+  thisRow = point;
+  prevRow = 0;
+  for (unsigned int j = 0; j <= (_rings + 1); j++) {
+    v = j;
+
+    v /= (_rings + 1);
+    v += 1.0;
+    w = sin(0.5 * M_PI * v);
+    y = _radius * cos(0.5 * M_PI * v);
+
+    for (unsigned int i = 0; i <= _segments; i++) {
+      float u2 = i;
+      u2 /= _segments;
+
+      x = -sin(u2 * (M_PI * 2.0));
+      z = cos(u2 * (M_PI * 2.0));
+
+      ignition::math::Vector3d p(
+      x * _radius * w, y, -z * _radius * w);
+      // Compute vertex
+      subMesh.AddVertex(ignition::math::Vector3d(
+      p + ignition::math::Vector3d(0.0, -0.5 * _length, 0.0)));
+      subMesh.AddTexCoord(
+      ignition::math::Vector2d(u2, twoThirds + ((v - 1.0) * oneThird)));
+      subMesh.AddNormal(p.Normalize());
+      point++;
+
+      if (i > 0 && j > 0) {
+        subMesh.AddIndex(thisRow + i - 1);
+        subMesh.AddIndex(prevRow + i);
+        subMesh.AddIndex(prevRow + i - 1);
+
+        subMesh.AddIndex(thisRow + i - 1);
+        subMesh.AddIndex(thisRow + i);
+        subMesh.AddIndex(prevRow + i);
+      }
+    }
+
+    prevRow = thisRow;
+    thisRow = point;
+  }
+
+  mesh->AddSubMesh(subMesh);
+}
+
 //////////////////////////////////////////////////
 void MeshManager::CreateCylinder(const std::string &name, float radius,
                                  float height, int rings, int segments)
