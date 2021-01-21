@@ -404,8 +404,8 @@ TEST_F(SubMeshTest, Volume)
     const common::Mesh *unitEllipsoid2 =
       common::MeshManager::Instance()->MeshByName("ellipsoid");
 
-    // the new mesh should have more vertex, but it should be introduced in the meshmanager.
-    //It should be the same number becuase it was not modified.
+    // The new mesh should have more vertex, but it should be introduced in the
+    // meshmanager. It should be the same number becuase it was not modified.
     EXPECT_EQ(unitEllipsoid->VertexCount(), unitEllipsoid2->VertexCount());
 
     // A larger cylinder needs to have higher resolution in order to get the
