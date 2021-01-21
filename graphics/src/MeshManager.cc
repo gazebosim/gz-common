@@ -839,10 +839,10 @@ void MeshManager::CreateEllipsoid(const std::string &_name,
   ignition::math::Vector3d vert;
   SubMesh subMesh;
 
-  const double umin = -M_PI / 2.0;
-  const double umax = M_PI / 2.0;
+  const double umin = -IGN_PI / 2.0;
+  const double umax = IGN_PI / 2.0;
   const double vmin = 0.0;
-  const double vmax = 2.0 * M_PI;
+  const double vmax = 2.0 * IGN_PI;
 
   unsigned int i, j;
   double theta, phi;
