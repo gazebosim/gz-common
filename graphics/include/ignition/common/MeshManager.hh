@@ -161,8 +161,8 @@ namespace ignition
      /// \param[in] _rings the number of circles along the height
      /// \param[in] _segments the number of segment per circle
      public: void CreateCapsule(const std::string &_name,
-                                const float radius,
-                                const float length,
+                                const double radius,
+                                const double length,
                                 const unsigned int _rings,
                                 const unsigned int _segments);
 

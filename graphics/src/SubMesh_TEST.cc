@@ -398,6 +398,16 @@ TEST_F(SubMeshTest, Volume)
       common::MeshManager::Instance()->MeshByName("capsule");
     ASSERT_TRUE(unitCapsule != nullptr);
 
+    // Checking that we can not add or modify a new mesh with the same name
+    common::MeshManager::Instance()->CreateCapsule("capsule",
+      1, 1, 100, 100);
+    const common::Mesh *unitCapsule2 =
+      common::MeshManager::Instance()->MeshByName("capsule");
+
+    // the new mesh should have more vertex, but it should be introduced in the
+    // meshmanager. It should be the same number becuase it was not modified.
+    EXPECT_EQ(unitCapsule->VertexCount(), unitCapsule2->VertexCount());
+
     common::MeshManager::Instance()->CreateCapsule("other_capsule",
       1.5, 7.5, 10, 10);
 

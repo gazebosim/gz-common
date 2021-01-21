@@ -823,8 +823,8 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
 }
 
 void MeshManager::CreateCapsule(const std::string &_name,
-                                const float _radius,
-                                const float _length,
+                                const double _radius,
+                                const double _length,
                                 const unsigned int _rings,
                                 const unsigned int _segments)
 {
@@ -837,14 +837,13 @@ void MeshManager::CreateCapsule(const std::string &_name,
   mesh->SetName(_name);
   this->dataPtr->meshes.insert(std::make_pair(_name, mesh));
 
-  ignition::math::Vector3d vert, norm;
   SubMesh subMesh;
 
   // Based on https://github.com/godotengine/godot primitive_meshes.cpp
   int prevRow, thisRow, point;
-  float x, y, z, u, v, w;
-  float oneThird = 1.0 / 3.0;
-  float twoThirds = 2.0 / 3.0;
+  double x, y, z, u, v, w;
+  const double oneThird = 1.0 / 3.0;
+  const double twoThirds = 2.0 / 3.0;
 
   point = 0;
 
@@ -855,15 +854,15 @@ void MeshManager::CreateCapsule(const std::string &_name,
     v = j;
 
     v /= (_rings + 1);
-    w = sin(0.5 * M_PI * v);
-    y = _radius * cos(0.5 * M_PI * v);
+    w = sin(0.5 * IGN_PI * v);
+    y = _radius * cos(0.5 * IGN_PI * v);
 
     for (unsigned int i = 0; i <= _segments; i++) {
       u = i;
       u /= _segments;
 
-      x = -sin(u * (M_PI * 2.0));
-      z = cos(u * (M_PI * 2.0));
+      x = -sin(u * (IGN_PI * 2.0));
+      z = cos(u * (IGN_PI * 2.0));
 
       ignition::math::Vector3d p(
       x * _radius * w, y, -z * _radius * w);
@@ -903,8 +902,8 @@ void MeshManager::CreateCapsule(const std::string &_name,
       u = i;
       u /= _segments;
 
-      x = -sin(u * (M_PI * 2.0));
-      z = cos(u * (M_PI * 2.0));
+      x = -sin(u * (IGN_PI * 2.0));
+      z = cos(u * (IGN_PI * 2.0));
 
       ignition::math::Vector3d p(
       x * _radius, y, -z * _radius);
@@ -938,15 +937,15 @@ void MeshManager::CreateCapsule(const std::string &_name,
 
     v /= (_rings + 1);
     v += 1.0;
-    w = sin(0.5 * M_PI * v);
-    y = _radius * cos(0.5 * M_PI * v);
+    w = sin(0.5 * IGN_PI * v);
+    y = _radius * cos(0.5 * IGN_PI * v);
 
     for (unsigned int i = 0; i <= _segments; i++) {
       float u2 = i;
       u2 /= _segments;
 
-      x = -sin(u2 * (M_PI * 2.0));
-      z = cos(u2 * (M_PI * 2.0));
+      x = -sin(u2 * (IGN_PI * 2.0));
+      z = cos(u2 * (IGN_PI * 2.0));
 
       ignition::math::Vector3d p(
       x * _radius * w, y, -z * _radius * w);
