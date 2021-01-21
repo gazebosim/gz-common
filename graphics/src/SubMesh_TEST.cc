@@ -398,6 +398,16 @@ TEST_F(SubMeshTest, Volume)
       common::MeshManager::Instance()->MeshByName("ellipsoid");
     ASSERT_TRUE(unitEllipsoid != nullptr);
 
+    // Checking that we can not add or modify a new mesh with the name
+    common::MeshManager::Instance()->CreateEllipsoid("ellipsoid",
+        ignition::math::Vector3d(2, 1.4, 7), 100, 100);
+    const common::Mesh *unitEllipsoid2 =
+      common::MeshManager::Instance()->MeshByName("ellipsoid");
+
+    // the new mesh should have more vertex, but it should be introduced in the meshmanager.
+    //It should be the same number becuase it was not modified.
+    EXPECT_EQ(unitEllipsoid->VertexCount(), unitEllipsoid2->VertexCount());
+
     // A larger cylinder needs to have higher resolution in order to get the
     // volume close to Pi * r^2 * h.
     common::MeshManager::Instance()->CreateEllipsoid("other_ellipsoid",
