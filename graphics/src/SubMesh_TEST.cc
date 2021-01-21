@@ -394,18 +394,16 @@ TEST_F(SubMeshTest, Volume)
     common::MeshManager::Instance()->CreateCapsule("capsule",
       1, 1, 10, 10);
 
-    const common::Mesh *unitCylinder =
+    const common::Mesh *unitCapsule =
       common::MeshManager::Instance()->MeshByName("capsule");
-    ASSERT_TRUE(unitCylinder != nullptr);
+    ASSERT_TRUE(unitCapsule != nullptr);
 
-    // A larger cylinder needs to have higher resolution in order to get the
-    // volume close to Pi * r^2 * h.
     common::MeshManager::Instance()->CreateCapsule("other_capsule",
       1.5, 7.5, 10, 10);
 
-    const common::Mesh *otherCylinder =
+    const common::Mesh *otherCapsule =
       common::MeshManager::Instance()->MeshByName("other_capsule");
-    ASSERT_TRUE(otherCylinder != nullptr);
+    ASSERT_TRUE(otherCapsule != nullptr);
   }
 
   // Cylinder mesh tests
