@@ -154,6 +154,16 @@ namespace ignition
                                   const int _rings,
                                   const int _segments);
 
+      /// \brief Create a ellipsoid mesh
+      /// \param[in] _name the name of the new mesh
+      /// \param[in] _radii the three radius that define a ellipsoid
+      /// \param[in] _rings the number of circles along the height
+      /// \param[in] _segments the number of segment per circle
+      public: void CreateEllipsoid(const std::string &_name,
+                                   const ignition::math::Vector3d _radii,
+                                   const unsigned int _rings,
+                                   const unsigned int _segments);
+
       /// \brief Create a cone mesh
       /// \param[in] _name the name of the new mesh
       /// \param[in] _radius the radius of the cylinder in the x y plane

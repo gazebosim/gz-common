@@ -822,6 +822,87 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
   mesh->RecalculateNormals();
 }
 
+void MeshManager::CreateEllipsoid(const std::string &_name,
+                                  const ignition::math::Vector3d _radii,
+                                  const unsigned int _rings,
+                                  const unsigned int _segments)
+{
+  if (this->HasMesh(_name))
+  {
+    return;
+  }
+
+  Mesh *mesh = new Mesh();
+  mesh->SetName(_name);
+  this->dataPtr->meshes.insert(std::make_pair(_name, mesh));
+
+  ignition::math::Vector3d vert, norm;
+  SubMesh subMesh;
+
+  double umin = -M_PI / 2.0;
+  double umax = M_PI / 2.0;
+  double vmin = 0.0;
+  double vmax = 2.0 * M_PI;
+
+  unsigned int i, j;
+  float theta, phi;
+  float d_phi = (umax - umin) / (_rings - 1.0);
+  float d_theta = (vmax - vmin) / (_segments - 1.0);
+
+  float c_theta, s_theta, c_phi, s_phi;
+
+  for (i = 0, theta = vmin; i < _segments; ++i, theta += d_theta)
+  {
+    c_theta = cos(theta);
+    s_theta = sin(theta);
+
+    for (j = 0, phi = umin; j < _rings; ++j, phi += d_phi)
+    {
+      c_phi = cos(phi);
+      s_phi = sin(phi);
+
+      // Compute vertex
+      subMesh.AddVertex(ignition::math::Vector3d(
+        _radii.X() * c_phi * c_theta,
+        _radii.Y() * c_phi * s_theta,
+        _radii.Z() * s_phi));
+
+      // Compute unit normal at vertex
+      ignition::math::Vector3d du(
+        -(_radii.X() * c_phi) * s_theta,
+        +(_radii.Y() * c_phi) * c_theta,
+        0.0);
+      ignition::math::Vector3d dv(
+        -_radii.X() * s_phi * c_theta,
+        -_radii.Y() * s_phi * s_theta,
+        _radii.Z() * c_phi);
+
+      ignition::math::Vector3d normal = du.Cross(dv);
+
+      subMesh.AddNormal(norm);
+
+      if (i > 0)
+      {
+        unsigned int verticesCount = subMesh.VertexCount();
+        for (
+          unsigned int firstIndex = verticesCount - 2 * (_rings + 1);
+          firstIndex + _rings + 2 < verticesCount;
+          firstIndex++)
+        {
+          subMesh.AddIndex(firstIndex + _rings + 1);
+          subMesh.AddIndex(firstIndex + 1);
+          subMesh.AddIndex(firstIndex + 0);
+
+          subMesh.AddIndex(firstIndex + _rings + 2);
+          subMesh.AddIndex(firstIndex + 1);
+          subMesh.AddIndex(firstIndex + _rings + 1);
+        }
+      }
+    }
+  }
+  mesh->AddSubMesh(subMesh);
+}
+
 //////////////////////////////////////////////////
 void MeshManager::CreateCylinder(const std::string &name, float radius,
                                  float height, int rings, int segments)
