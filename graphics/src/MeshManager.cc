@@ -836,30 +836,28 @@ void MeshManager::CreateEllipsoid(const std::string &_name,
   mesh->SetName(_name);
   this->dataPtr->meshes.insert(std::make_pair(_name, mesh));
 
-  ignition::math::Vector3d vert, norm;
+  ignition::math::Vector3d vert;
   SubMesh subMesh;
 
-  double umin = -M_PI / 2.0;
-  double umax = M_PI / 2.0;
-  double vmin = 0.0;
-  double vmax = 2.0 * M_PI;
+  const double umin = -M_PI / 2.0;
+  const double umax = M_PI / 2.0;
+  const double vmin = 0.0;
+  const double vmax = 2.0 * M_PI;
 
   unsigned int i, j;
   float theta, phi;
   float d_phi = (umax - umin) / (_rings - 1.0);
   float d_theta = (vmax - vmin) / (_segments - 1.0);
 
-  float c_theta, s_theta, c_phi, s_phi;
-
   for (i = 0, theta = vmin; i < _segments; ++i, theta += d_theta)
   {
-    c_theta = cos(theta);
-    s_theta = sin(theta);
+    const auto c_theta = cos(theta);
+    const auto s_theta = sin(theta);
 
     for (j = 0, phi = umin; j < _rings; ++j, phi += d_phi)
     {
-      c_phi = cos(phi);
-      s_phi = sin(phi);
+      const auto c_phi = cos(phi);
+      const auto s_phi = sin(phi);
 
       // Compute vertex
       subMesh.AddVertex(ignition::math::Vector3d(
@@ -879,7 +877,7 @@ void MeshManager::CreateEllipsoid(const std::string &_name,
 
       ignition::math::Vector3d normal = du.Cross(dv);
 
-      subMesh.AddNormal(norm);
+      subMesh.AddNormal(normal);
 
       if (i > 0)
       {
