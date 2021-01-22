@@ -416,6 +416,7 @@ TEST_F(SubMeshTest, Volume)
     const common::Mesh *otherEllipsoid =
       common::MeshManager::Instance()->MeshByName("other_ellipsoid");
     ASSERT_TRUE(otherEllipsoid != nullptr);
+  }
 
   // Capsule mesh tests
   {
