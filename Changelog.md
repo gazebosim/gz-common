@@ -2,6 +2,11 @@
 
 ## Ignition Common 3.X.X
 
+## Ignition Common 3.10.1 (2021-01-20)
+
+1. Fix transparency tag in the Collada exporter.
+    * [Pull Request 152](https://github.com/ignitionrobotics/ign-common/pull/152)
+
 ## Ignition Common 3.10.0 (2021-01-05)
 
 1. Added render order to material class
