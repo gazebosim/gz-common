@@ -389,6 +389,33 @@ TEST_F(SubMeshTest, Volume)
         1e-2);
   }
 
+  // Capsule mesh tests
+  {
+    common::MeshManager::Instance()->CreateCapsule("capsule",
+      1, 1, 10, 10);
+
+    const common::Mesh *unitCapsule =
+      common::MeshManager::Instance()->MeshByName("capsule");
+    ASSERT_TRUE(unitCapsule != nullptr);
+
+    // Checking that we can not add or modify a new mesh with the same name
+    common::MeshManager::Instance()->CreateCapsule("capsule",
+      1, 1, 100, 100);
+    const common::Mesh *unitCapsule2 =
+      common::MeshManager::Instance()->MeshByName("capsule");
+
+    // the new mesh should have more vertex, but it should be introduced in the
+    // meshmanager. It should be the same number becuase it was not modified.
+    EXPECT_EQ(unitCapsule->VertexCount(), unitCapsule2->VertexCount());
+
+    common::MeshManager::Instance()->CreateCapsule("other_capsule",
+      1.5, 7.5, 10, 10);
+
+    const common::Mesh *otherCapsule =
+      common::MeshManager::Instance()->MeshByName("other_capsule");
+    ASSERT_TRUE(otherCapsule != nullptr);
+  }
+
   // Cylinder mesh tests
   {
     common::MeshManager::Instance()->CreateCylinder("unit_cylinder",

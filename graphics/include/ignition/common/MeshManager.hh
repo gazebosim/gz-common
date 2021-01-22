@@ -154,6 +154,18 @@ namespace ignition
                                   const int _rings,
                                   const int _segments);
 
+     /// \brief Create a capsule mesh
+     /// \param[in] _name the name of the new mesh
+     /// \param[in] _radius the radius of the capsule in the x y plane
+     /// \param[in] _length length of the body
+     /// \param[in] _rings the number of circles along the height
+     /// \param[in] _segments the number of segment per circle
+     public: void CreateCapsule(const std::string &_name,
+                                const double radius,
+                                const double length,
+                                const unsigned int _rings,
+                                const unsigned int _segments);
+
       /// \brief Create a cone mesh
       /// \param[in] _name the name of the new mesh
       /// \param[in] _radius the radius of the cylinder in the x y plane
