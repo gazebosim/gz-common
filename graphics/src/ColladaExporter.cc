@@ -723,7 +723,9 @@ void ColladaExporterPrivate::ExportEffects(
     specularXml->LinkEndChild(colorXml);
 
     // transparency
-    double transp = material->Transparency();
+    // In Collada, a transparency value of 1 is not transparent and 0 is
+    // fully transparent.
+    double transp = 1.0 - material->Transparency();
 
     tinyxml2::XMLElement *transparencyXml =
       _libraryEffectsXml->GetDocument()->NewElement("transparency");
