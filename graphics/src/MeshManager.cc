@@ -868,8 +868,8 @@ void MeshManager::CreateCapsule(const std::string &_name,
       x * _radius * w, y, -z * _radius * w);
       // Compute vertex
       subMesh.AddVertex(ignition::math::Vector3d(
-      p + ignition::math::Vector3d(0.0, 0.5 * _length, 0.0)));
-      subMesh.AddTexCoord(ignition::math::Vector2d(u, v * oneThird));
+        p + ignition::math::Vector3d(0.0, 0.5 * _length, 0.0)));
+      subMesh.AddTexCoord({u, v * oneThird});
       subMesh.AddNormal(p.Normalize());
 
       point++;
@@ -910,8 +910,7 @@ void MeshManager::CreateCapsule(const std::string &_name,
 
       // Compute vertex
       subMesh.AddVertex(p);
-      subMesh.AddTexCoord(
-      ignition::math::Vector2d(u, oneThird + (v * oneThird)));
+      subMesh.AddTexCoord({u, oneThird + (v * oneThird)});
       subMesh.AddNormal(ignition::math::Vector3d(x, 0.0, -z));
       point++;
 
@@ -951,9 +950,8 @@ void MeshManager::CreateCapsule(const std::string &_name,
       x * _radius * w, y, -z * _radius * w);
       // Compute vertex
       subMesh.AddVertex(ignition::math::Vector3d(
-      p + ignition::math::Vector3d(0.0, -0.5 * _length, 0.0)));
-      subMesh.AddTexCoord(
-      ignition::math::Vector2d(u2, twoThirds + ((v - 1.0) * oneThird)));
+        p + ignition::math::Vector3d(0.0, -0.5 * _length, 0.0)));
+      subMesh.AddTexCoord({u2, twoThirds + ((v - 1.0) * oneThird)});
       subMesh.AddNormal(p.Normalize());
       point++;
 
