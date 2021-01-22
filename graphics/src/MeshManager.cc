@@ -916,7 +916,7 @@ void MeshManager::CreateCapsule(const std::string &_name,
   Mesh *mesh = new Mesh();
   mesh->SetName(_name);
   this->dataPtr->meshes.insert(std::make_pair(_name, mesh));
-  
+
   SubMesh subMesh;
 
   // Based on https://github.com/godotengine/godot primitive_meshes.cpp
@@ -1049,6 +1049,7 @@ void MeshManager::CreateCapsule(const std::string &_name,
     prevRow = thisRow;
     thisRow = point;
   }
+
   mesh->AddSubMesh(subMesh);
 }
 
