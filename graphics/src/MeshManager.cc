@@ -822,6 +822,86 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
   mesh->RecalculateNormals();
 }
 
+//////////////////////////////////////////////////
+void MeshManager::CreateEllipsoid(const std::string &_name,
+                                  const ignition::math::Vector3d &_radii,
+                                  const unsigned int _rings,
+                                  const unsigned int _segments)
+{
+  if (this->HasMesh(_name))
+  {
+    return;
+  }
+
+  Mesh *mesh = new Mesh();
+  mesh->SetName(_name);
+  this->dataPtr->meshes.insert(std::make_pair(_name, mesh));
+
+  SubMesh subMesh;
+
+  const double umin = -IGN_PI / 2.0;
+  const double umax = IGN_PI / 2.0;
+  const double vmin = 0.0;
+  const double vmax = 2.0 * IGN_PI;
+
+  unsigned int i, j;
+  double theta, phi;
+  double d_phi = (umax - umin) / (_rings - 1.0);
+  double d_theta = (vmax - vmin) / (_segments - 1.0);
+
+  for (i = 0, theta = vmin; i < _segments; ++i, theta += d_theta)
+  {
+    const auto c_theta = cos(theta);
+    const auto s_theta = sin(theta);
+
+    for (j = 0, phi = umin; j < _rings; ++j, phi += d_phi)
+    {
+      const auto c_phi = cos(phi);
+      const auto s_phi = sin(phi);
+
+      // Compute vertex
+      subMesh.AddVertex(ignition::math::Vector3d(
+        _radii.X() * c_phi * c_theta,
+        _radii.Y() * c_phi * s_theta,
+        _radii.Z() * s_phi));
+
+      // Compute unit normal at vertex
+      ignition::math::Vector3d du(
+        -(_radii.X() * c_phi) * s_theta,
+        +(_radii.Y() * c_phi) * c_theta,
+        0.0);
+      ignition::math::Vector3d dv(
+        -_radii.X() * s_phi * c_theta,
+        -_radii.Y() * s_phi * s_theta,
+        _radii.Z() * c_phi);
+
+      ignition::math::Vector3d normal = du.Cross(dv);
+
+      subMesh.AddNormal(normal);
+
+      if (i > 0)
+      {
+        unsigned int verticesCount = subMesh.VertexCount();
+        for (
+          unsigned int firstIndex = verticesCount - 2 * (_rings + 1);
+          firstIndex + _rings + 2 < verticesCount;
+          firstIndex++)
+        {
+          subMesh.AddIndex(firstIndex + _rings + 1);
+          subMesh.AddIndex(firstIndex + 1);
+          subMesh.AddIndex(firstIndex + 0);
+
+          subMesh.AddIndex(firstIndex + _rings + 2);
+          subMesh.AddIndex(firstIndex + 1);
+          subMesh.AddIndex(firstIndex + _rings + 1);
+        }
+      }
+    }
+  }
+  mesh->AddSubMesh(subMesh);
+}
+
+//////////////////////////////////////////////////
 void MeshManager::CreateCapsule(const std::string &_name,
                                 const double _radius,
                                 const double _length,
