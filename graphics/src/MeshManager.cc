@@ -940,7 +940,7 @@ void MeshManager::CreateCapsule(const std::string &_name,
     y = _radius * cos(0.5 * IGN_PI * v);
 
     for (unsigned int i = 0; i <= _segments; i++) {
-      float u2 = i;
+      double u2 = static_cast<double>(i);
       u2 /= _segments;
 
       x = -sin(u2 * (IGN_PI * 2.0));
