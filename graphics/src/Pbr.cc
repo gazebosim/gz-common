@@ -110,6 +110,10 @@ Pbr &Pbr::operator=(const Pbr &_pbr)
 /////////////////////////////////////////////////
 Pbr &Pbr::operator=(Pbr &&_pbr)
 {
+  if (this->dataPtr)
+  {
+    delete this->dataPtr;
+  }
   this->dataPtr = _pbr.dataPtr;
   _pbr.dataPtr = nullptr;
   return *this;
