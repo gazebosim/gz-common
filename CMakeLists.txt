@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10.2 FATAL_ERROR)
 #============================================================================
 # Initialize the project
 #============================================================================
-project(ignition-common3 VERSION 3.10.1)
+project(ignition-common4 VERSION 4.0.0)
 
 #============================================================================
 # Find ignition-cmake
@@ -46,7 +46,7 @@ message(STATUS "\n\n-- ====== Finding Dependencies ======")
 
 #--------------------------------------
 # Find ignition-math
-ign_find_package(ignition-math6 REQUIRED_BY graphics events)
+ign_find_package(ignition-math6 REQUIRED_BY graphics events VERSION 6.6)
 set(IGN_MATH_VER ${ignition-math6_VERSION_MAJOR})
 
 #--------------------------------------

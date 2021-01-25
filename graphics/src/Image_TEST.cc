@@ -96,8 +96,6 @@ TEST_F(ImageTest, ConvertPixelFormat)
          Image::ConvertPixelFormat("RGB_FLOAT32"));
   EXPECT_EQ(Image::PixelFormatType::BAYER_RGGB8,
          Image::ConvertPixelFormat("BAYER_RGGB8"));
-  EXPECT_EQ(Image::PixelFormatType::BAYER_RGGR8,
-         Image::ConvertPixelFormat("BAYER_RGGR8"));
   EXPECT_EQ(Image::PixelFormatType::BAYER_GBRG8,
          Image::ConvertPixelFormat("BAYER_GBRG8"));
   EXPECT_EQ(Image::PixelFormatType::BAYER_GRBG8,

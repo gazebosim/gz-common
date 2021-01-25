@@ -59,10 +59,25 @@
 using namespace ignition;
 using namespace common;
 
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 Time Time::wallTime;
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 
 struct timespec Time::clockResolution;
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 const Time Time::Zero = common::Time(0, 0);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
+
 const int32_t Time::nsInSec = 1000000000L;
 const int32_t Time::nsInMs = 1000000;
 
@@ -99,13 +114,19 @@ Time::Time(const Time &_time)
 : sec(_time.sec), nsec(_time.nsec)
 {
 }
-
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 /////////////////////////////////////////////////
 Time::Time(int32_t _sec, int32_t _nsec)
 : sec(_sec), nsec(_nsec)
 {
   this->Correct();
 }
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 
 /////////////////////////////////////////////////
 Time::Time(double _time)
@@ -162,7 +183,14 @@ float Time::Float() const
 /////////////////////////////////////////////////
 Time Time::Sleep(const common::Time &_time)
 {
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   Time result;
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 
   if (_time >= clockResolution)
   {
@@ -174,7 +202,14 @@ Time Time::Sleep(const common::Time &_time)
     if (interval.tv_sec < 0)
     {
       ignerr << "Cannot sleep for negative time[" << _time << "]\n";
-      return result;
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+        return result;
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
     }
 
     // This assert conforms to the manpage for nanosleep
@@ -182,7 +217,14 @@ Time Time::Sleep(const common::Time &_time)
     {
       ignerr << "Nanoseconds of [" << interval.tv_nsec
             << "] must be in the range0 to 999999999.\n";
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
       return result;
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
     }
 
 #ifdef _WIN32
@@ -197,20 +239,41 @@ Time Time::Sleep(const common::Time &_time)
     if (timer == NULL)
     {
       ignerr << "Unable to create waitable timer. Sleep will be incorrect.\n";
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
       return result;
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
     }
 
     if (!SetWaitableTimer (timer, &sleepTime, 0, NULL, NULL, 0))
     {
       ignerr << "Unable to use waitable timer. Sleep will be incorrect.\n";
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
       return result;
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
     }
 
     if (WaitForSingleObject (timer, INFINITE) != WAIT_OBJECT_0)
     {
       ignerr <<
         "Unable to wait for a single object. Sleep will be incorrect.\n";
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
       return result;
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
     }
 
     result.sec = 0;
@@ -241,7 +304,14 @@ Time Time::Sleep(const common::Time &_time)
     ignlog << "Sleep time is larger than clock resolution, skipping sleep\n";
   }
 
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return result;
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -256,10 +326,24 @@ Time &Time::operator=(const Time &_time)
 /////////////////////////////////////////////////
 Time Time::operator+(const Time &_time) const
 {
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   Time t(this->sec + _time.sec, this->nsec + _time.nsec);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
   t.Correct();
 
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return t;
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -274,9 +358,16 @@ const Time &Time::operator+=(const Time &_time)
 /////////////////////////////////////////////////
 Time Time::operator-(const Time &_time) const
 {
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   Time t(this->sec - _time.sec, this->nsec - _time.nsec);
   t.Correct();
   return t;
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -291,9 +382,16 @@ const Time &Time::operator-=(const Time &_time)
 /////////////////////////////////////////////////
 Time Time::operator*(const Time &_time) const
 {
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   Time t(this->sec * _time.sec, this->nsec * _time.nsec);
   t.Correct();
   return t;
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -307,14 +405,26 @@ const Time &Time::operator*=(const Time &_time)
 /////////////////////////////////////////////////
 Time Time::operator/(const Time &_time) const
 {
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   Time result(*this);
-
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
   if (_time.sec == 0 && _time.nsec == 0)
     ignerr << "Time divide by zero\n";
   else
     result.Set(this->Double() / _time.Double());
-
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return result;
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -333,7 +443,14 @@ bool Time::operator==(const Time &_time) const
 /////////////////////////////////////////////////
 bool Time::operator==(double _time) const
 {
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return *this == Time(_time);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -358,7 +475,14 @@ bool Time::operator<(const Time &_time) const
 /////////////////////////////////////////////////
 bool Time::operator<(double _time) const
 {
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return *this < Time(_time);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -370,7 +494,14 @@ bool Time::operator<=(const Time &_time) const
 /////////////////////////////////////////////////
 bool Time::operator<=(double _time) const
 {
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return *this <= Time(_time);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -382,7 +513,14 @@ bool Time::operator>(const Time &_time) const
 /////////////////////////////////////////////////
 bool Time::operator>(double _time) const
 {
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return *this > Time(_time);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -394,13 +532,27 @@ bool Time::operator>=(const Time &_time) const
 /////////////////////////////////////////////////
 bool Time::operator>=(double _time) const
 {
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return *this >= Time(_time);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
 bool Time::operator>=(const struct timespec &_tv) const
 {
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return *this >= Time(_tv);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
