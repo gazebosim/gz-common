@@ -30,9 +30,8 @@ TEST_F(ImageTest, Image)
 {
   common::Image img;
   EXPECT_EQ(-1, img.Load("/file/shouldn/never/exist.png"));
-  std::string filename =  "file://";
-  filename += PROJECT_SOURCE_PATH;
-  filename += "/test/data/cordless_drill/materials/textures/cordless_drill.png";
+  std::string filename =  "file://" + ignition::testing::TestFile(
+      "data", "cordless_drill", "materials", "textures", "cordless_drill.png");
   EXPECT_EQ(0, img.Load(filename));
   EXPECT_EQ(static_cast<unsigned int>(128), img.Width());
   EXPECT_EQ(static_cast<unsigned int>(128), img.Height());
@@ -130,10 +129,8 @@ void ImagePerformanceTest::MaxColor(const std::string &_filePath,
                                     const unsigned int _width,
                                     const unsigned int _height)
 {
-  std::string fileName =  "file://";
-  fileName += PROJECT_SOURCE_PATH;
-  fileName += "/";
-  fileName += _filePath;
+  std::string fileName =  "file://" +
+    ignition::testing::TestFile("data", _filePath);
 
   common::Image img;
   EXPECT_EQ(0, img.Load(fileName));
@@ -145,10 +142,10 @@ void ImagePerformanceTest::MaxColor(const std::string &_filePath,
 
 INSTANTIATE_TEST_SUITE_P(FlatHeightmaps, ImagePerformanceTest,
   ::testing::Values(
-    std::make_tuple("test/data/heightmap_flat_129x129.png", 129u, 129u),
-    std::make_tuple("test/data/heightmap_flat_257x257.png", 257u, 257u),
-    std::make_tuple("test/data/heightmap_flat_513x513.png", 513u, 513u),
-    std::make_tuple("test/data/heightmap_flat_1025x1025.png", 1025u, 1025u)));
+    std::make_tuple("heightmap_flat_129x129.png", 129u, 129u),
+    std::make_tuple("heightmap_flat_257x257.png", 257u, 257u),
+    std::make_tuple("heightmap_flat_513x513.png", 513u, 513u),
+    std::make_tuple("heightmap_flat_1025x1025.png", 1025u, 1025u)));
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

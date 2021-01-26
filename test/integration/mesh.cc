@@ -29,6 +29,7 @@
 #include "test/util.hh"
 
 using namespace ignition;
+using TestFile = ignition::testing::TestFile;
 
 class MeshTest : public ignition::testing::AutoLogFixture { };
 
@@ -254,8 +255,7 @@ TEST_F(MeshTest, Mesh)
 TEST_F(MeshTest, MeshMove)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      std::string(PROJECT_SOURCE_PATH) + "/test/data/box_offset.dae");
+  common::Mesh *mesh = loader.Load(TestFile("data", "box_offset.dae"));
 
   // The default location of the box_offset is not centered
   EXPECT_EQ(ignition::math::Vector3d(5.46554, 2.18039, 4.8431), mesh->Max());
@@ -276,8 +276,7 @@ TEST_F(MeshTest, MeshMove)
 TEST_F(MeshTest, SubMeshCenter)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      std::string(PROJECT_SOURCE_PATH) + "/test/data/box_offset.dae");
+  common::Mesh *mesh = loader.Load(TestFile("data", "box_offset.dae"));
 
   // The default location of the box_offest is not centered
   EXPECT_EQ(ignition::math::Vector3d(5.46554, 2.18039, 4.8431), mesh->Max());

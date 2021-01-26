@@ -48,8 +48,7 @@ TEST(AudioDecoder, MissingFile)
 TEST(AudioDecoder, BufferSizeInvalid)
 {
   common::AudioDecoder audio;
-  std::string path = TEST_PATH;
-  path += "/data/cheer.wav";
+  auto path = ignition::testing::TestFile("data", "cheer.wav");
   EXPECT_TRUE(audio.SetFile(path));
 
   unsigned int *dataBufferSize = NULL;
@@ -62,8 +61,7 @@ TEST(AudioDecoder, DataBuffer)
 {
   common::AudioDecoder audio;
 
-  std::string path = TEST_PATH;
-  path += "/data/cheer.wav";
+  auto path = ignition::testing::TestFile("data", "cheer.wav");
   EXPECT_TRUE(audio.SetFile(path));
 
   unsigned int dataBufferSize;
@@ -82,8 +80,7 @@ TEST(AudioDecoder, DataBuffer)
 TEST(AudioDecoder, NoCodec)
 {
   common::AudioDecoder audio;
-  std::string path = TEST_PATH;
-  path += "/data/audio_bad_codec.mp4";
+  auto path = ignition::testing::TestFile("data", "audio_bad_codec.mp4");
   EXPECT_FALSE(audio.SetFile(path));
 }
 
@@ -96,12 +93,12 @@ TEST(AudioDecoder, CheerFile)
   EXPECT_FALSE(audio.SetFile("_bad_audio_filename_.wav"));
 
   // Test no stream info
-  auto path = common::joinPaths(TEST_PATH, "data", "audio_bad_codec.grf");
+  auto path = ignition::testing::TestFile("data", "audio_bad_codec.grf");
   EXPECT_FALSE(common::exists(path));
   EXPECT_FALSE(audio.SetFile(path));
 
   // Test a valid file without an audio stream
-  path = common::joinPaths(TEST_PATH, "data", "empty_audio.mp4");
+  path = ignition::testing::TestFile("data", "empty_audio.mp4");
   ASSERT_TRUE(common::exists(path));
   EXPECT_FALSE(audio.SetFile(path));
 
@@ -110,7 +107,7 @@ TEST(AudioDecoder, CheerFile)
 
   // WAV
   {
-    path = common::joinPaths(TEST_PATH, "data", "cheer.wav");
+    path = ignition::testing::TestFile("data", "cheer.wav");
     ASSERT_TRUE(common::exists(path));
     EXPECT_TRUE(audio.SetFile(path));
     EXPECT_EQ(audio.File(), path);
@@ -122,7 +119,7 @@ TEST(AudioDecoder, CheerFile)
 
   // OGG
   {
-    path = common::joinPaths(TEST_PATH, "data", "cheer.ogg");
+    path = ignition::testing::TestFile("data", "cheer.ogg");
     ASSERT_TRUE(common::exists(path));
     EXPECT_TRUE(audio.SetFile(path));
     EXPECT_EQ(audio.File(), path);
@@ -137,7 +134,7 @@ TEST(AudioDecoder, CheerFile)
 
   // MP3
   {
-    path = common::joinPaths(TEST_PATH, "data", "cheer.mp3");
+    path = ignition::testing::TestFile("data", "cheer.mp3");
     ASSERT_TRUE(common::exists(path));
     EXPECT_TRUE(audio.SetFile(path));
     EXPECT_EQ(audio.File(), path);

@@ -18,12 +18,13 @@
 #define IGNITION_TEST_UTIL_HH_
 
 #include <gtest/gtest.h>
+
+#include "test_config.h"
+
 #include <string>
 #include "ignition/common/Console.hh"
 #include "ignition/common/Filesystem.hh"
 #include "ignition/common/Util.hh"
-
-#define IGN_TMP_DIR "tmp-ign"
 
 namespace ignition
 {
@@ -45,9 +46,10 @@ namespace ignition
         std::string testCaseName = testInfo->test_case_name();
         this->logFilename = testCaseName + "_" + testName + ".log";
 
+        ignition::testing::TestSetHomePath(this->logBasePath);
+
         // Initialize Console
-        ignLogInit(ignition::common::joinPaths(
-                     IGN_TMP_DIR, std::string("test_logs")),
+        ignLogInit(common::joinPaths(this->logBasePath, "test_logs"), 
                    this->logFilename);
 
         ignition::common::Console::SetVerbosity(4);
@@ -86,10 +88,7 @@ namespace ignition
       public: virtual ~AutoLogFixture()
       {
         ignLogClose();
-        std::string absPath;
-        ignition::common::env(IGN_HOMEDIR, absPath);
-        ignition::common::removeAll(
-              ignition::common::joinPaths(absPath, IGN_TMP_DIR));
+        ignition::common::removeAll(this->logBasePath);
       }
 
       /// \brief String with the full path of the logfile
@@ -97,6 +96,9 @@ namespace ignition
 
       /// \brief String with the full path to log directory
       private: std::string logDirectory;
+
+      /// \brief String with the base path to log directory
+      private: std::string logBasePath;
     };
   }
 }

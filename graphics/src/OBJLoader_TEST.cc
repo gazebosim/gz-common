@@ -32,7 +32,7 @@ TEST_F(OBJLoaderTest, LoadObjBox)
 {
   common::OBJLoader loader;
   common::Mesh *mesh = loader.Load(
-      std::string(PROJECT_SOURCE_PATH) + "/test/data/box.obj");
+      ignition::testing::TestFile("data", "box.obj"));
 
   EXPECT_STREQ("unknown", mesh->Name().c_str());
   EXPECT_EQ(ignition::math::Vector3d(1, 1, 1), mesh->Max());
@@ -66,8 +66,8 @@ TEST_F(OBJLoaderTest, InvalidMaterial)
 {
   ignition::common::OBJLoader objLoader;
 
-  std::string meshFilename = std::string(PROJECT_SOURCE_PATH) +
-    "/test/data/invalid_material.obj";
+  std::string meshFilename =
+    ignition::testing::TestFile("data", "invalid_material.obj");
 
   ignition::common::Mesh *mesh = objLoader.Load(meshFilename);
   EXPECT_TRUE(mesh != nullptr);

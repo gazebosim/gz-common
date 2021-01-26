@@ -60,9 +60,7 @@ TEST_F(DemTest, UnsupportedDem)
 TEST_F(DemTest, NonSquaredDemPortrait)
 {
   common::Dem dem;
-  std::string path = TEST_PATH;
-
-  path += "/data/dem_portrait.tif";
+  const auto path = ignition::testing::TestFile("data", "dem_portrait.tif");
   EXPECT_EQ(dem.Load(path), 0);
 }
 
@@ -70,9 +68,7 @@ TEST_F(DemTest, NonSquaredDemPortrait)
 TEST_F(DemTest, NonSquaredDemLandscape)
 {
   common::Dem dem;
-  std::string path = TEST_PATH;
-
-  path += "data/dem_landscape.tif";
+  const auto path = ignition::testing::TestFile("data", "dem_landscape.tif");
   EXPECT_EQ(dem.Load(path), 0);
 }
 
@@ -80,9 +76,7 @@ TEST_F(DemTest, NonSquaredDemLandscape)
 TEST_F(DemTest, SquaredDem)
 {
   common::Dem dem;
-  std::string path = TEST_PATH;
-
-  path += "/data/dem_squared.tif";
+  const auto path = ignition::testing::TestFile("data", "dem_squared.tif");
   EXPECT_EQ(dem.Load(path), 0);
 }
 
@@ -90,9 +84,7 @@ TEST_F(DemTest, SquaredDem)
 TEST_F(DemTest, BasicAPI)
 {
   common::Dem dem;
-  std::string path = TEST_PATH;
-
-  path += "data/dem_squared.tif";
+  const auto path = ignition::testing::TestFile("data", "dem_squared.tif");
   EXPECT_EQ(dem.Load(path), 0);
 
   // Check the heights and widths
@@ -127,9 +119,7 @@ TEST_F(DemTest, BasicAPI)
 TEST_F(DemTest, FillHeightmap)
 {
   common::Dem dem;
-  std::string path = TEST_PATH;
-
-  path += "/data/dem_squared.tif";
+  const auto path = ignition::testing::TestFile("data", "dem_squared.tif");
   EXPECT_EQ(dem.Load(path), 0);
 
   // Use FillHeightMap() to retrieve a vector<float> after some transformations

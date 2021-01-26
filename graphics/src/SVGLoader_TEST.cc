@@ -26,12 +26,20 @@
 using namespace ignition;
 using namespace common;
 
+
 class SVGLoaderTest : public ignition::testing::AutoLogFixture { };
 
 
 // tolerance
 // minimum distance between 2 distinct points
 double tol = 0.05;
+
+/////////////////////////////////////////////////
+/// \brief return path to svg file in test/data/svg
+std::string TestSvg(const std::string &_filename)
+{
+  return ignition::testing::TestFile("data", "svg", _filename);
+}
 
 /////////////////////////////////////////////////
 TEST_F(SVGLoaderTest, LoadPaths)
@@ -45,8 +53,7 @@ TEST_F(SVGLoaderTest, LoadPaths)
   success = loader.Parse(bad, paths);
   EXPECT_FALSE(success);
 
-  std::string filePath = std::string(PROJECT_SOURCE_PATH);
-  filePath += "/test/data/svg/loader.svg";
+  auto filePath = TestSvg("loader.svg");
   loader.Parse(filePath, paths);
 
   // useful to see the points on screen
@@ -106,8 +113,7 @@ TEST_F(SVGLoaderTest, LoadArcs)
   SVGLoader loader(3);
   std::vector<SVGPath> paths;
 
-  std::string filePath = std::string(PROJECT_SOURCE_PATH);
-  filePath += "/test/data/svg/arc_test.svg";
+  auto filePath = TestSvg("arc_test.svg");
   bool success = loader.Parse(filePath, paths);
   EXPECT_EQ(true, success);
 
@@ -148,9 +154,7 @@ TEST_F(SVGLoaderTest, Capsule)
   SVGLoader loader(3);
   std::vector<SVGPath> paths;
 
-  std::string filePath = std::string(PROJECT_SOURCE_PATH);
-  filePath += "/test/data/svg/capsule.svg";
-
+  auto filePath = TestSvg("capsule.svg");
   bool success = loader.Parse(filePath, paths);
   EXPECT_EQ(true, success);
 
@@ -171,8 +175,7 @@ TEST_F(SVGLoaderTest, ghost_edges)
   SVGLoader loader(3);
   std::vector<SVGPath> paths;
 
-  std::string filePath = std::string(PROJECT_SOURCE_PATH);
-  filePath += "/test/data/svg/arc_circle.svg";
+  auto filePath = TestSvg("arc_circle.svg");
   bool success = loader.Parse(filePath, paths);
 
   // save for inspection
@@ -192,8 +195,8 @@ TEST_F(SVGLoaderTest, ClosedLoops)
   // this tests the PathsToClosedPolylines function
   SVGLoader loader(3);
   std::vector<SVGPath> paths;
-  std::string filePath = std::string(PROJECT_SOURCE_PATH);
-  filePath += "/test/data/svg/chassis.svg";
+
+  auto filePath = TestSvg("chassis.svg");
   bool success = loader.Parse(filePath, paths);
   EXPECT_EQ(true, success);
 
@@ -217,8 +220,7 @@ TEST_F(SVGLoaderTest, Transforms)
   // this tests the scale, matrix and rotation transforms
   SVGLoader loader(3);
   std::vector<SVGPath> paths;
-  std::string filePath = std::string(PROJECT_SOURCE_PATH);
-  filePath += "/test/data/svg/transform.svg";
+  auto filePath = TestSvg("transform.svg");
   bool success = loader.Parse(filePath, paths);
   EXPECT_EQ(true, success);
 
@@ -254,8 +256,7 @@ TEST_F(SVGLoaderTest, Transforms2)
   // this tests the skewY and skewX transforms
   SVGLoader loader(3);
   std::vector<SVGPath> paths;
-  std::string filePath = std::string(PROJECT_SOURCE_PATH);
-  filePath += "/test/data/svg/transform2.svg";
+  auto filePath = TestSvg("transform2.svg");
   bool success = loader.Parse(filePath, paths);
   EXPECT_EQ(true, success);
 
@@ -312,8 +313,7 @@ TEST_F(SVGLoaderTest, Transforms3)
   // this tests the skewY and skewX transforms
   SVGLoader loader(3);
   std::vector<SVGPath> paths;
-  std::string filePath = std::string(PROJECT_SOURCE_PATH);
-  filePath += "/test/data/svg/transform3.svg";
+  auto filePath = TestSvg("transform3.svg");
   bool success = loader.Parse(filePath, paths);
   EXPECT_EQ(true, success);
 
@@ -351,9 +351,7 @@ TEST_F(SVGLoaderTest, MultipleFiles)
     // this tests the skewY and skewX transforms
     SVGLoader loader(3);
     std::vector<SVGPath> paths;
-    std::string filePath = std::string(PROJECT_SOURCE_PATH);
-    filePath += "/test/data/svg/";
-    filePath += file;
+    auto filePath = TestSvg(file);
     bool success = loader.Parse(filePath, paths);
     EXPECT_EQ(true, success);
 

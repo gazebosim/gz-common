@@ -30,19 +30,25 @@ using namespace ignition::common;
 const int g_messageRepeat = 4;
 
 class Console_TEST : public ::testing::Test {
+  protected: virtual void SetUp()
+  {
+    // Set IGN_HOMEDIR and store it
+    ignition::testing::TestSetHomePath(this->logBasePath);
+  }
+
   /// \brief Clear out all the directories we produced during this test.
   public: virtual ~Console_TEST()
   {
-    std::string absPath;
-    ignition::common::env(IGN_HOMEDIR, absPath);
-    absPath = ignition::common::joinPaths(absPath, std::string(IGN_TMP_DIR));
+    EXPECT_TRUE(ignition::common::unsetenv(IGN_HOMEDIR));
 
-    if (ignition::common::isDirectory(absPath))
+    if (ignition::common::isDirectory(this->logBasePath))
     {
       ignLogClose();
-      EXPECT_TRUE(ignition::common::removeAll(absPath));
+      EXPECT_TRUE(ignition::common::removeAll(this->logBasePath));
     }
   }
+
+  private: std::string logBasePath;
 };
 
 std::string GetLogContent(const std::string &_filename)
@@ -93,7 +99,7 @@ TEST_F(Console_TEST, NoInitAndLog)
 TEST_F(Console_TEST, InitAndLog)
 {
   // Create a unique directory path
-  std::string path = joinPaths(IGN_TMP_DIR, ignition::common::uuid());
+  auto path = ignition::common::uuid();
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -123,7 +129,7 @@ TEST_F(Console_TEST, InitAndLog)
 TEST_F(Console_TEST, LogSlashN)
 {
   // Create a unique directory path
-  std::string path = joinPaths(IGN_TMP_DIR, ignition::common::uuid());
+  auto path = ignition::common::uuid();
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -153,7 +159,7 @@ TEST_F(Console_TEST, LogSlashN)
 TEST_F(Console_TEST, LogStdEndl)
 {
   // Create a unique directory path
-  std::string path = joinPaths(IGN_TMP_DIR, ignition::common::uuid());
+  auto path = ignition::common::uuid();
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -183,8 +189,7 @@ TEST_F(Console_TEST, LogStdEndl)
 TEST_F(Console_TEST, ColorWarnSlashN)
 {
   // Create a unique directory path
-  std::string path = ignition::common::joinPaths(
-        IGN_TMP_DIR, ignition::common::uuid());
+  auto path = ignition::common::uuid();
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -214,8 +219,7 @@ TEST_F(Console_TEST, ColorWarnSlashN)
 TEST_F(Console_TEST, ColorWarnStdEndl)
 {
   // Create a unique directory path
-  std::string path = ignition::common::joinPaths(
-        IGN_TMP_DIR, ignition::common::uuid());
+  auto path = ignition::common::uuid();
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -245,8 +249,7 @@ TEST_F(Console_TEST, ColorWarnStdEndl)
 TEST_F(Console_TEST, ColorDbgSlashN)
 {
   // Create a unique directory path
-  std::string path = ignition::common::joinPaths(
-        IGN_TMP_DIR, ignition::common::uuid());
+  auto path = ignition::common::uuid();
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -276,8 +279,7 @@ TEST_F(Console_TEST, ColorDbgSlashN)
 TEST_F(Console_TEST, ColorDbgStdEndl)
 {
   // Create a unique directory path
-  std::string path = ignition::common::joinPaths(
-        IGN_TMP_DIR, ignition::common::uuid());
+  auto path = ignition::common::uuid();
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -307,8 +309,7 @@ TEST_F(Console_TEST, ColorDbgStdEndl)
 TEST_F(Console_TEST, ColorMsgSlashN)
 {
   // Create a unique directory path
-  std::string path = ignition::common::joinPaths(
-        IGN_TMP_DIR, ignition::common::uuid());
+  auto path = ignition::common::uuid();
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -338,8 +339,7 @@ TEST_F(Console_TEST, ColorMsgSlashN)
 TEST_F(Console_TEST, ColorMsgStdEndl)
 {
   // Create a unique directory path
-  std::string path = ignition::common::joinPaths(
-        IGN_TMP_DIR, ignition::common::uuid());
+  auto path = ignition::common::uuid();
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -369,8 +369,7 @@ TEST_F(Console_TEST, ColorMsgStdEndl)
 TEST_F(Console_TEST, ColorErrSlashN)
 {
   // Create a unique directory path
-  std::string path = ignition::common::joinPaths(
-        IGN_TMP_DIR, ignition::common::uuid());
+  auto path = ignition::common::uuid();
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -400,8 +399,7 @@ TEST_F(Console_TEST, ColorErrSlashN)
 TEST_F(Console_TEST, ColorErrStdEndl)
 {
   // Create a unique directory path
-  std::string path = ignition::common::joinPaths(
-        IGN_TMP_DIR, ignition::common::uuid());
+  auto path = ignition::common::uuid();
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -431,8 +429,7 @@ TEST_F(Console_TEST, ColorErrStdEndl)
 TEST_F(Console_TEST, ColorMsg)
 {
   // Create a unique directory path
-  std::string path = ignition::common::joinPaths(
-        IGN_TMP_DIR, ignition::common::uuid());
+  auto path = ignition::common::uuid();
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -454,8 +451,7 @@ TEST_F(Console_TEST, ColorMsg)
 TEST_F(Console_TEST, ColorErr)
 {
   // Create a unique directory path
-  std::string path = ignition::common::joinPaths(
-        IGN_TMP_DIR, ignition::common::uuid());
+  auto path = ignition::common::uuid();
 
   // Initialize logging
   ignLogInit(path, "test.log");
@@ -493,8 +489,7 @@ TEST_F(Console_TEST, Prefix)
   ignition::common::Console::SetVerbosity(4);
 
   // Path to log file
-  std::string path = ignition::common::joinPaths(
-        IGN_TMP_DIR, ignition::common::uuid());
+  auto path = ignition::common::uuid();
 
   ignLogInit(path, "test.log");
   std::string logPath = ignition::common::joinPaths(path, "test.log");
@@ -531,8 +526,7 @@ TEST_F(Console_TEST, Prefix)
 TEST_F(Console_TEST, LogDirectory)
 {
   // Create a unique directory path
-  std::string path = ignition::common::joinPaths(
-        IGN_TMP_DIR, ignition::common::uuid());
+  auto path = ignition::common::uuid();
 
   // Initialize logging
   ignLogInit(path, "test.log");
