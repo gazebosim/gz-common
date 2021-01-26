@@ -22,11 +22,10 @@
 #include "ignition/common/Mesh.hh"
 #include "ignition/common/SubMesh.hh"
 #include "ignition/common/MeshManager.hh"
-#include "test_util.hh"
 
 using namespace ignition;
 
-class SubMeshTest : public ignition::testing::AutoLogFixture { };
+class SubMeshTest : public common::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
 TEST_F(SubMeshTest, SubMesh)

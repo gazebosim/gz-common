@@ -26,12 +26,11 @@
 #include "ignition/common/MeshManager.hh"
 #include "ignition/common/SystemPaths.hh"
 #include "ignition/math/Vector3.hh"
-#include "test_util.hh"
 
 using namespace ignition;
-using TestFile = ignition::testing::TestFile;
+using TestFile = common::testing::TestFile;
 
-class MeshTest : public ignition::testing::AutoLogFixture { };
+class MeshTest : public common::testing::AutoLogFixture { };
 
 char asciiSTLBox[] =
 "solid MYSOLID\n" +

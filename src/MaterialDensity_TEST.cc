@@ -17,12 +17,12 @@
 
 #include <gtest/gtest.h>
 #include "ignition/common/MaterialDensity.hh"
-#include "test_util.hh"
+#include "test_config.h"
 
 using namespace ignition;
 using namespace common;
 
-class MaterialDensityTest : public ignition::testing::AutoLogFixture { };
+class MaterialDensityTest : public common::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
 TEST_F(MaterialDensityTest, Init)

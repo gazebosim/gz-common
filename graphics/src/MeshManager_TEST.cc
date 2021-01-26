@@ -22,12 +22,11 @@
 #include "ignition/common/SubMesh.hh"
 #include "ignition/common/MeshManager.hh"
 #include "ignition/common/config.hh"
-#include "test_util.hh"
 
 using namespace ignition;
 
 #ifndef _WIN32
-class MeshManager : public ignition::testing::AutoLogFixture { };
+class MeshManager : public common::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
 TEST_F(MeshManager, CreateExtrudedPolyline)

@@ -20,11 +20,10 @@
 #include "test_config.h"
 #include "ignition/common/MouseEvent.hh"
 #include "ignition/common/config.hh"
-#include "test_util.hh"
 
 using namespace ignition;
 
-class MouseEvent : public ignition::testing::AutoLogFixture { };
+class MouseEvent : public common::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
 TEST_F(MouseEvent, CopyConstructor)

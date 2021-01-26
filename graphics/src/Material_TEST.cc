@@ -19,11 +19,10 @@
 #include "test_config.h"
 #include "ignition/common/Material.hh"
 #include "ignition/common/Pbr.hh"
-#include "test_util.hh"
 
 using namespace ignition;
 
-class MaterialTest : public ignition::testing::AutoLogFixture { };
+class MaterialTest : public common::testing::AutoLogFixture { };
 
 TEST_F(MaterialTest, Material)
 {
@@ -40,7 +39,7 @@ TEST_F(MaterialTest, Material)
       "materials", "textures", "texture_image");
   EXPECT_STREQ(texturePath.c_str(), mat.TextureImage().c_str());
 
-  texturePath = ignition::testing::TestFile("data", "box.dae");
+  texturePath = common::testing::TestFile("data", "box.dae");
 
   mat.SetTextureImage(texturePath, "bad_path");
   EXPECT_STREQ(texturePath.c_str(), mat.TextureImage().c_str());

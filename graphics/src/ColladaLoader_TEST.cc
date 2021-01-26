@@ -23,17 +23,16 @@
 #include "ignition/common/ColladaLoader.hh"
 #include "ignition/common/Skeleton.hh"
 #include "ignition/common/SkeletonAnimation.hh"
-#include "test_util.hh"
 
 using namespace ignition;
-class ColladaLoader : public ignition::testing::AutoLogFixture { };
+class ColladaLoader : public common::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
 TEST_F(ColladaLoader, LoadBox)
 {
   common::ColladaLoader loader;
   common::Mesh *mesh = loader.Load(
-      ignition::testing::TestFile("data", "box.dae"));
+      common::testing::TestFile("data", "box.dae"));
 
   EXPECT_STREQ("unknown", mesh->Name().c_str());
   EXPECT_EQ(ignition::math::Vector3d(1, 1, 1), mesh->Max());
@@ -55,7 +54,7 @@ TEST_F(ColladaLoader, ShareVertices)
 {
   common::ColladaLoader loader;
   common::Mesh *mesh = loader.Load(
-      ignition::testing::TestFile("data", "box.dae"));
+      common::testing::TestFile("data", "box.dae"));
 
   // check number of shared vertices
   std::set<unsigned int> uniqueIndices;
@@ -106,7 +105,7 @@ TEST_F(ColladaLoader, LoadZeroCount)
 {
   common::ColladaLoader loader;
   common::Mesh *mesh = loader.Load(
-      ignition::testing::TestFile("data", "zero_count.dae"));
+      common::testing::TestFile("data", "zero_count.dae"));
   ASSERT_TRUE(mesh);
 #ifndef _WIN32
   std::string log = LogContent();
@@ -130,7 +129,7 @@ TEST_F(ColladaLoader, Material)
 {
   common::ColladaLoader loader;
   common::Mesh *mesh = loader.Load(
-      ignition::testing::TestFile("data", "box.dae"));
+      common::testing::TestFile("data", "box.dae"));
   ASSERT_TRUE(mesh);
 
   EXPECT_EQ(mesh->MaterialCount(), 1u);
@@ -155,7 +154,7 @@ TEST_F(ColladaLoader, Material)
   EXPECT_DOUBLE_EQ(0.0, dstFactor);
 
   common::Mesh *meshOpaque = loader.Load(
-      ignition::testing::TestFile("data", "box_opaque.dae"));
+      common::testing::TestFile("data", "box_opaque.dae"));
   ASSERT_TRUE(meshOpaque);
 
   EXPECT_EQ(meshOpaque->MaterialCount(), 1u);
@@ -187,7 +186,7 @@ TEST_F(ColladaLoader, TexCoordSets)
   // This triangle mesh has multiple uv sets and vertices separated by
   // line breaks
   common::Mesh *mesh = loader.Load(
-      ignition::testing::TestFile("data",
+      common::testing::TestFile("data",
         "multiple_texture_coordinates_triangle.dae"));
   ASSERT_TRUE(mesh);
 
@@ -262,7 +261,7 @@ TEST_F(ColladaLoader, LoadBoxWithAnimationOutsideSkeleton)
 {
   common::ColladaLoader loader;
   common::Mesh *mesh = loader.Load(
-      ignition::testing::TestFile("data",
+      common::testing::TestFile("data",
         "box_with_animation_outside_skeleton.dae"));
 
   EXPECT_EQ(36u, mesh->IndexCount());
@@ -298,7 +297,7 @@ TEST_F(ColladaLoader, LoadBoxInstControllerWithoutSkeleton)
 {
   common::ColladaLoader loader;
   common::Mesh *mesh = loader.Load(
-      ignition::testing::TestFile("data",
+      common::testing::TestFile("data",
         "box_inst_controller_without_skeleton.dae"));
 
   EXPECT_EQ(36u, mesh->IndexCount());
@@ -316,7 +315,7 @@ TEST_F(ColladaLoader, LoadBoxMultipleInstControllers)
 {
   common::ColladaLoader loader;
   common::Mesh *mesh = loader.Load(
-      ignition::testing::TestFile("data", "box_multiple_inst_controllers.dae"));
+      common::testing::TestFile("data", "box_multiple_inst_controllers.dae"));
 
   EXPECT_EQ(72u, mesh->IndexCount());
   EXPECT_EQ(70u, mesh->VertexCount());
@@ -343,7 +342,7 @@ TEST_F(ColladaLoader, LoadBoxNestedAnimation)
 {
   common::ColladaLoader loader;
   common::Mesh *mesh = loader.Load(
-      ignition::testing::TestFile("data", "box_nested_animation.dae"));
+      common::testing::TestFile("data", "box_nested_animation.dae"));
 
   EXPECT_EQ(36u, mesh->IndexCount());
   EXPECT_EQ(35u, mesh->VertexCount());
@@ -379,7 +378,7 @@ TEST_F(ColladaLoader, LoadBoxWithDefaultStride)
 {
   common::ColladaLoader loader;
   common::Mesh *mesh = loader.Load(
-      ignition::testing::TestFile("data", "box_with_default_stride.dae"));
+      common::testing::TestFile("data", "box_with_default_stride.dae"));
 
   EXPECT_EQ(36u, mesh->IndexCount());
   EXPECT_EQ(35u, mesh->VertexCount());
@@ -394,7 +393,7 @@ TEST_F(ColladaLoader, LoadBoxWithMultipleGeoms)
 {
   common::ColladaLoader loader;
   common::Mesh *mesh = loader.Load(
-      ignition::testing::TestFile("data", "box_with_multiple_geoms.dae"));
+      common::testing::TestFile("data", "box_with_multiple_geoms.dae"));
 
   EXPECT_EQ(72u, mesh->IndexCount());
   EXPECT_EQ(48u, mesh->VertexCount());
@@ -411,7 +410,7 @@ TEST_F(ColladaLoader, LoadBoxWithHierarchicalNodes)
 {
   common::ColladaLoader loader;
   common::Mesh *mesh = loader.Load(
-      ignition::testing::TestFile("data", "box_with_hierarchical_nodes.dae"));
+      common::testing::TestFile("data", "box_with_hierarchical_nodes.dae"));
 
   ASSERT_EQ(5u, mesh->SubMeshCount());
 
@@ -436,7 +435,7 @@ TEST_F(ColladaLoader, MergeBoxWithDoubleSkeleton)
 {
   common::ColladaLoader loader;
   common::Mesh *mesh = loader.Load(
-      ignition::testing::TestFile("data", "box_with_double_skeleton.dae"));
+      common::testing::TestFile("data", "box_with_double_skeleton.dae"));
   EXPECT_TRUE(mesh->HasSkeleton());
   auto skeleton_ptr = mesh->MeshSkeleton();
   // The two skeletons have been joined and their root is the
@@ -452,7 +451,7 @@ TEST_F(ColladaLoader, LoadCylinderAnimatedFrom3dsMax)
   // addressed.
   common::ColladaLoader loader;
   common::Mesh *mesh = loader.Load(
-      ignition::testing::TestFile("data",
+      common::testing::TestFile("data",
         "cylinder_animated_from_3ds_max.dae"));
 
   EXPECT_EQ("unknown", mesh->Name());

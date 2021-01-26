@@ -19,18 +19,17 @@
 
 #include <ignition/common/Image.hh>
 #include "test_config.h"
-#include "test_util.hh"
 
 using namespace ignition;
 
-class ImageTest : public ignition::testing::AutoLogFixture { };
+class ImageTest : public common::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
 TEST_F(ImageTest, Image)
 {
   common::Image img;
   EXPECT_EQ(-1, img.Load("/file/shouldn/never/exist.png"));
-  std::string filename =  "file://" + ignition::testing::TestFile(
+  std::string filename =  "file://" + common::testing::TestFile(
       "data", "cordless_drill", "materials", "textures", "cordless_drill.png");
   EXPECT_EQ(0, img.Load(filename));
   EXPECT_EQ(static_cast<unsigned int>(128), img.Width());
@@ -130,7 +129,7 @@ void ImagePerformanceTest::MaxColor(const std::string &_filePath,
                                     const unsigned int _height)
 {
   std::string fileName =  "file://" +
-    ignition::testing::TestFile("data", _filePath);
+    common::testing::TestFile("data", _filePath);
 
   common::Image img;
   EXPECT_EQ(0, img.Load(fileName));

@@ -19,11 +19,11 @@
 
 #include "test_config.h"
 #include "ignition/common/EnumIface.hh"
-#include "test_util.hh"
+#include "test_config.h"
 
 using namespace ignition;
 
-class EnumIfaceTest : public ignition::testing::AutoLogFixture { };
+class EnumIfaceTest : public common::testing::AutoLogFixture { };
 
 enum MyType
 {

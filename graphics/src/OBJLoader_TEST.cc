@@ -21,18 +21,17 @@
 #include "ignition/common/SubMesh.hh"
 #include "ignition/common/Material.hh"
 #include "ignition/common/OBJLoader.hh"
-#include "test_util.hh"
 
 using namespace ignition;
 
-class OBJLoaderTest : public ignition::testing::AutoLogFixture { };
+class OBJLoaderTest : public common::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
 TEST_F(OBJLoaderTest, LoadObjBox)
 {
   common::OBJLoader loader;
   common::Mesh *mesh = loader.Load(
-      ignition::testing::TestFile("data", "box.obj"));
+      common::testing::TestFile("data", "box.obj"));
 
   EXPECT_STREQ("unknown", mesh->Name().c_str());
   EXPECT_EQ(ignition::math::Vector3d(1, 1, 1), mesh->Max());
@@ -67,7 +66,7 @@ TEST_F(OBJLoaderTest, InvalidMaterial)
   ignition::common::OBJLoader objLoader;
 
   std::string meshFilename =
-    ignition::testing::TestFile("data", "invalid_material.obj");
+    common::testing::TestFile("data", "invalid_material.obj");
 
   ignition::common::Mesh *mesh = objLoader.Load(meshFilename);
   EXPECT_TRUE(mesh != nullptr);

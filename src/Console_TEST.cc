@@ -23,8 +23,9 @@
 #include "ignition/common/Time.hh"
 #include "ignition/common/Util.hh"
 
-#include "test_util.hh"
+#include "test_config.h"
 
+using namespace ignition;
 using namespace ignition::common;
 
 const int g_messageRepeat = 4;
@@ -33,7 +34,7 @@ class Console_TEST : public ::testing::Test {
   protected: virtual void SetUp()
   {
     // Set IGN_HOMEDIR and store it
-    ignition::testing::TestSetHomePath(this->logBasePath);
+    common::testing::TestSetHomePath(this->logBasePath);
   }
 
   /// \brief Clear out all the directories we produced during this test.

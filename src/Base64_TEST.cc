@@ -19,11 +19,10 @@
 #include <ignition/common/Base64.hh>
 
 #include "test_config.h"
-#include "test_util.hh"
 
 using namespace ignition;
 
-class Base64 : public ignition::testing::AutoLogFixture { };
+class Base64 : public common::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
 TEST_F(Base64, Encode)

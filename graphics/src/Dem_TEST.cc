@@ -21,11 +21,10 @@
 
 #include "ignition/common/Dem.hh"
 #include "test_config.h"
-#include "test_util.hh"
 
 using namespace ignition;
 
-class DemTest : public ignition::testing::AutoLogFixture { };
+class DemTest : public common::testing::AutoLogFixture { };
 
 #ifdef HAVE_GDAL
 
@@ -60,7 +59,7 @@ TEST_F(DemTest, UnsupportedDem)
 TEST_F(DemTest, NonSquaredDemPortrait)
 {
   common::Dem dem;
-  const auto path = ignition::testing::TestFile("data", "dem_portrait.tif");
+  const auto path = common::testing::TestFile("data", "dem_portrait.tif");
   EXPECT_EQ(dem.Load(path), 0);
 }
 
@@ -68,7 +67,7 @@ TEST_F(DemTest, NonSquaredDemPortrait)
 TEST_F(DemTest, NonSquaredDemLandscape)
 {
   common::Dem dem;
-  const auto path = ignition::testing::TestFile("data", "dem_landscape.tif");
+  const auto path = common::testing::TestFile("data", "dem_landscape.tif");
   EXPECT_EQ(dem.Load(path), 0);
 }
 
@@ -76,7 +75,7 @@ TEST_F(DemTest, NonSquaredDemLandscape)
 TEST_F(DemTest, SquaredDem)
 {
   common::Dem dem;
-  const auto path = ignition::testing::TestFile("data", "dem_squared.tif");
+  const auto path = common::testing::TestFile("data", "dem_squared.tif");
   EXPECT_EQ(dem.Load(path), 0);
 }
 
@@ -84,7 +83,7 @@ TEST_F(DemTest, SquaredDem)
 TEST_F(DemTest, BasicAPI)
 {
   common::Dem dem;
-  const auto path = ignition::testing::TestFile("data", "dem_squared.tif");
+  const auto path = common::testing::TestFile("data", "dem_squared.tif");
   EXPECT_EQ(dem.Load(path), 0);
 
   // Check the heights and widths
@@ -119,7 +118,7 @@ TEST_F(DemTest, BasicAPI)
 TEST_F(DemTest, FillHeightmap)
 {
   common::Dem dem;
-  const auto path = ignition::testing::TestFile("data", "dem_squared.tif");
+  const auto path = common::testing::TestFile("data", "dem_squared.tif");
   EXPECT_EQ(dem.Load(path), 0);
 
   // Use FillHeightMap() to retrieve a vector<float> after some transformations

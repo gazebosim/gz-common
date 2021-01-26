@@ -17,12 +17,11 @@
 
 #include "ignition/common/VideoEncoder.hh"
 #include "test_config.h"
-#include "test_util.hh"
 
 using namespace ignition;
 using namespace common;
 
-class VideoEncoderTest : public ignition::testing::AutoLogFixture { };
+class VideoEncoderTest : public common::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
 TEST_F(VideoEncoderTest, StartStop)
