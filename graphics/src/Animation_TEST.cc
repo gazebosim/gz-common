@@ -21,7 +21,7 @@
 #include <ignition/math/Quaternion.hh>
 #include <ignition/common/KeyFrame.hh>
 #include <ignition/common/Animation.hh>
-#include "test/util.hh"
+#include "test_util.hh"
 
 using namespace ignition;
 

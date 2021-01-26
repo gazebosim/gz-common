@@ -26,7 +26,7 @@
 #include "ignition/common/MeshManager.hh"
 #include "ignition/common/SystemPaths.hh"
 #include "ignition/math/Vector3.hh"
-#include "test/util.hh"
+#include "test_util.hh"
 
 using namespace ignition;
 using TestFile = ignition::testing::TestFile;

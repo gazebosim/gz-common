@@ -23,7 +23,7 @@
 #include "ignition/common/Skeleton.hh"
 #include "ignition/common/SubMesh.hh"
 #include "ignition/math/Vector3.hh"
-#include "test/util.hh"
+#include "test_util.hh"
 
 using namespace ignition;
 

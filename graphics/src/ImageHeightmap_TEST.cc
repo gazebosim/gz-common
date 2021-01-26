@@ -18,7 +18,7 @@
 
 #include "ignition/common/ImageHeightmap.hh"
 #include "test_config.h"
-#include "test/util.hh"
+#include "test_util.hh"
 
 #define ELEVATION_TOL 1e-8
 

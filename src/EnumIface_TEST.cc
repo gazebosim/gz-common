@@ -19,7 +19,7 @@
 
 #include "test_config.h"
 #include "ignition/common/EnumIface.hh"
-#include "test/util.hh"
+#include "test_util.hh"
 
 using namespace ignition;
 

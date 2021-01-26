@@ -19,7 +19,7 @@
 
 #include <ignition/common/Image.hh>
 #include "test_config.h"
-#include "test/util.hh"
+#include "test_util.hh"
 
 using namespace ignition;
 

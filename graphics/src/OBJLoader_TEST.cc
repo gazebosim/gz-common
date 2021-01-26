@@ -21,7 +21,7 @@
 #include "ignition/common/SubMesh.hh"
 #include "ignition/common/Material.hh"
 #include "ignition/common/OBJLoader.hh"
-#include "test/util.hh"
+#include "test_util.hh"
 
 using namespace ignition;
 

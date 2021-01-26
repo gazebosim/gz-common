@@ -23,7 +23,7 @@
 #include "ignition/common/Filesystem.hh"
 #include "ignition/common/Mesh.hh"
 #include "ignition/common/SubMesh.hh"
-#include "test/util.hh"
+#include "test_util.hh"
 
 #ifdef _WIN32
   #define snprintf _snprintf
