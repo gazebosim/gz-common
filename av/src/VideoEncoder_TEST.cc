@@ -17,6 +17,7 @@
 
 #include "ignition/common/Console.hh"
 #include "ignition/common/VideoEncoder.hh"
+#include <ignition/utilities/ExtraTestMacros.hh>
 #include "test_config.h"
 #include "test/util.hh"
 
@@ -77,7 +78,7 @@ TEST_F(VideoEncoderTest, StartStop)
 }
 
 /////////////////////////////////////////////////
-TEST_F(VideoEncoderTest, Exists)
+TEST_F(VideoEncoderTest, IGN_UTILS_TEST_DISABLED_ON_WIN32(Exists))
 {
   auto filePathMp4 = common::joinPaths(common::cwd(), "TMP_RECORDING.mp4");
   auto filePathMpg = common::joinPaths(common::cwd(), "TMP_RECORDING.mpg");
@@ -100,8 +101,6 @@ TEST_F(VideoEncoderTest, Exists)
   // Check that temp files are removed when video goes out of scope
   // Fails on Windows with `Permission denied`
   // https://github.com/ignitionrobotics/ign-common/issues/148
-#ifndef _WIN32
   EXPECT_FALSE(common::exists(filePathMp4)) << filePathMp4;
   EXPECT_FALSE(common::exists(filePathMpg)) << filePathMpg;
-#endif
 }
