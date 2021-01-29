@@ -25,6 +25,8 @@
 #include <ignition/math/Spline.hh>
 #include <ignition/math/RotationSpline.hh>
 
+#include <ignition/utils/ImplPtr.hh>
+
 #include <ignition/common/graphics/Export.hh>
 
 namespace ignition
@@ -34,7 +36,6 @@ namespace ignition
     class KeyFrame;
     class PoseKeyFrame;
     class NumericKeyFrame;
-    class TrajectoryInfoPrivate;
 
     /// \class Animation Animation.hh ignition/common/Animation.hh
     /// \brief Manages an animation, which is a collection of keyframes and
@@ -88,6 +89,12 @@ namespace ignition
       /// \return A pointer the keyframe, NULL if the _index is invalid
       public: common::KeyFrame *KeyFrame(const unsigned int _index) const;
 
+      /// \brief Create a keyframe at the given time
+      /// \param[in] _time Time at which to create the keyframe
+      /// \return Pointer to the new keyframe
+      public: template<typename KeyFrameType>
+      KeyFrameType *CreateKeyFrame(const double _time);
+
       /// \brief Get the two key frames that bound a time value
       /// \param[in] _time The time in seconds
       /// \param[out] _kf1 Lower bound keyframe that is returned
@@ -99,36 +106,8 @@ namespace ignition
                      common::KeyFrame **_kf2,
                      unsigned int &_firstKeyIndex) const;
 
-#ifdef _WIN32
-// Disable warning C4251 which is triggered by
-// std::unique_ptr
-#pragma warning(push)
-#pragma warning(disable: 4251)
-#endif
-
-      /// \brief animation name
-      protected: std::string name;
-
-      /// \brief animation duration
-      protected: double length;
-
-      /// \brief current time position
-      protected: double timePos;
-
-      /// \brief determines if the interpolation splines need building
-      protected: mutable bool build;
-
-      /// \brief true if animation repeats
-      protected: bool loop;
-
-      /// \brief array of keyframe type alias
-      protected: typedef std::vector<common::KeyFrame *> KeyFrame_V;
-
-      /// \brief array of key frames
-      protected: KeyFrame_V keyFrames;
-#ifdef _WIN32
-#pragma warning(pop)
-#endif
+      /// \brief Private data pointer.
+      IGN_UTILS_IMPL_PTR(dataPtr)
     };
 
     /// \brief A pose animation.
@@ -141,9 +120,6 @@ namespace ignition
       public: PoseAnimation(const std::string &_name,
                   const double _length, const bool _loop);
 
-      /// \brief Destructor
-      public: virtual ~PoseAnimation();
-
       /// \brief Create a pose keyframe at the given time
       /// \param[in] _time Time at which to create the keyframe
       /// \return Pointer to the new keyframe
@@ -151,22 +127,19 @@ namespace ignition
 
       /// \brief Get a keyframe using the animation's current time.
       /// \param[out] _kf PoseKeyFrame reference to hold the interpolated result
-      public: void InterpolatedKeyFrame(PoseKeyFrame &_kf) const;
+      public: void InterpolatedKeyFrame(PoseKeyFrame &_kf);
 
       /// \brief Get a keyframe using a passed in time.
       /// \param[in] _time Time in seconds
       /// \param[out] _kf PoseKeyFrame reference to hold the interpolated result
       protected: void InterpolatedKeyFrame(const double _time,
-                                              PoseKeyFrame &_kf) const;
+                                              PoseKeyFrame &_kf);
 
       /// \brief Update the pose splines
-      protected: void BuildInterpolationSplines() const;
+      protected: void BuildInterpolationSplines();
 
-      /// \brief smooth interpolation for position
-      private: mutable math::Spline *positionSpline;
-
-      /// \brief smooth interpolation for rotation
-      private: mutable math::RotationSpline *rotationSpline;
+      /// \brief Private data pointer.
+      IGN_UTILS_IMPL_PTR(dataPtr)
     };
 
     /// \brief A numeric animation.
@@ -179,9 +152,6 @@ namespace ignition
       public: NumericAnimation(const std::string &_name,
                                const double _length, const bool _loop);
 
-      /// \brief Destructor
-      public: virtual ~NumericAnimation();
-
       /// \brief Create a numeric keyframe at the given time
       /// \param[in] _time Time at which to create the keyframe
       /// \return Pointer to the new keyframe
@@ -191,6 +161,9 @@ namespace ignition
       /// \param[out] _kf NumericKeyFrame reference to hold the
       /// interpolated result
       public: void InterpolatedKeyFrame(NumericKeyFrame &_kf) const;
+
+      /// \brief Private data pointer.
+      IGN_UTILS_IMPL_PTR(dataPtr)
     };
 
     /// \brief Information about a trajectory for an animation (e.g., Actor)
@@ -199,26 +172,6 @@ namespace ignition
     {
       /// \brief Constructor
       public: TrajectoryInfo();
-
-      /// \brief Copy constructor
-      /// \param[in] _trajInfo TrajectoryInfo to copy.
-      public: TrajectoryInfo(const TrajectoryInfo &_trajInfo);
-
-      /// \brief Move constructor
-      /// \param[in] _trajInfo TrajectoryInfo to move.
-      public: TrajectoryInfo(TrajectoryInfo &&_trajInfo) noexcept;
-
-      /// \brief Destructor
-      public: ~TrajectoryInfo();
-
-      /// \brief Assignment operator.
-      /// \param[in] _trajInfo The TrajectoryInfo to set values from.
-      /// \return *this
-      public: TrajectoryInfo &operator=(const TrajectoryInfo &_trajInfo);
-
-      /// \brief Copy TrajectoryInfo from a TrajectoryInfo instance.
-      /// \param[in] _trajInfo The TrajectoryInfo to set values from.
-      public: void CopyFrom(const TrajectoryInfo &_trajInfo);
 
       /// \brief Return the id of the trajectory
       /// \return Id of the trajectory
@@ -285,7 +238,7 @@ namespace ignition
            _waypoints);
 
       /// \brief Private data pointer.
-      private: TrajectoryInfoPrivate *dataPtr{nullptr};
+      IGN_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

@@ -15,7 +15,7 @@
  *
 */
 #include <algorithm>
-#include <unordered_map>
+#include <memory>
 
 #include <ignition/math/Spline.hh>
 #include <ignition/math/Vector2.hh>
@@ -26,6 +26,8 @@
 
 using namespace ignition;
 using namespace common;
+
+using KeyFrame_V = std::vector<common::KeyFrame *>;
 
 namespace
 {
@@ -42,45 +44,48 @@ namespace
 /////////////////////////////////////////////////
 namespace ignition {
 namespace common {
-class AnimationPrivate
+
+class Animation::Implementation
 {
   /// \brief true if the animation is interpolated in x
-  public: bool interpolateX = false;
+  public: bool interpolateX{false};
+
+  /// \brief animation name
+  public: std::string name;
+
+  /// \brief animation duration
+  public: double length;
+
+  /// \brief current time position
+  public: double timePos{0};
+
+  /// \brief true if animation repeats
+  public: bool loop;
+
+  /// \brief array of key frames
+  public: KeyFrame_V keyFrames;
 };
-}  // namespace ignition
-}  // namespace common
-
-// TODO(luca) Make Animation class follow PIMPL and remove global static map
-/////////////////////////////////////////////////
-typedef std::unordered_map<Animation *, AnimationPrivate *> AnimationPrivateMap;
-static AnimationPrivateMap animationPrivateMap;
 
 /////////////////////////////////////////////////
-static AnimationPrivate* AnimationDataPtr(Animation *_animation)
+class PoseAnimation::Implementation
 {
-  auto mapIt = animationPrivateMap.find(_animation);
-  if (mapIt == animationPrivateMap.end())
-  {
-    // Create the map entry
-    animationPrivateMap[_animation] = new AnimationPrivate;
-  }
-  return animationPrivateMap[_animation];
-}
+  /// \brief smooth interpolation for position
+  public: std::shared_ptr<math::Spline> positionSpline;
+
+  /// \brief smooth interpolation for rotation
+  public: std::shared_ptr<math::RotationSpline> rotationSpline;
+
+  /// \brief determines if the interpolation splines need building
+  public: bool build{false};
+};
 
 /////////////////////////////////////////////////
-static void DeleteAnimationDataPtr(Animation *_animation)
+class NumericAnimation::Implementation
 {
-  // Delete the data pointer class and erase the hash map entry
-  auto mapIt = animationPrivateMap.find(_animation);
-  if (mapIt != animationPrivateMap.end())
-  {
-    delete mapIt->second;
-    animationPrivateMap.erase(mapIt);
-  }
-}
+};
 
 /////////////////////////////////////////////////
-class ignition::common::TrajectoryInfoPrivate
+class TrajectoryInfo::Implementation
 {
   /// \brief ID of the trajectory
   public: unsigned int id{0};
@@ -111,48 +116,50 @@ class ignition::common::TrajectoryInfoPrivate
 /////////////////////////////////////////////////
 Animation::Animation(const std::string &_name, const double _length,
     const bool _loop)
-: name(_name), length(_length), loop(_loop)
+: dataPtr(ignition::utils::MakeImpl<Implementation>())
 {
-  this->timePos = 0;
-  this->build = false;
+  this->dataPtr->name = _name;
+  this->dataPtr->length = _length;
+  this->dataPtr->loop = _loop;
 }
 
 /////////////////////////////////////////////////
 Animation::~Animation()
 {
-  DeleteAnimationDataPtr(this);
+  for (auto kf : this->dataPtr->keyFrames)
+    delete kf;
 }
 
 /////////////////////////////////////////////////
 double Animation::Length() const
 {
-  return this->length;
+  return this->dataPtr->length;
 }
 
 /////////////////////////////////////////////////
 void Animation::Length(const double _len)
 {
-  this->length = _len;
+  this->dataPtr->length = _len;
 }
 
 /////////////////////////////////////////////////
 void Animation::Time(const double _time)
 {
-  if (!math::equal(_time, this->timePos))
+  if (!math::equal(_time, this->dataPtr->timePos))
   {
-    this->timePos = _time;
-    if (this->loop)
+    this->dataPtr->timePos = _time;
+    if (this->dataPtr->loop)
     {
-      this->timePos = fmod(this->timePos, this->length);
-      if (this->timePos < 0)
-        this->timePos += this->length;
+      this->dataPtr->timePos = fmod(this->dataPtr->timePos, this->dataPtr->length);
+      if (this->dataPtr->timePos < 0)
+        this->dataPtr->timePos += this->dataPtr->length;
     }
     else
     {
-      if (this->timePos < 0)
-        this->timePos = 0;
-      else if (this->timePos > this->length)
-        this->timePos = this->length;
+      if (this->dataPtr->timePos < 0)
+        this->dataPtr->timePos = 0;
+      else if (this->dataPtr->timePos > this->dataPtr->length)
+        this->dataPtr->timePos = this->dataPtr->length;
     }
   }
 }
@@ -160,31 +167,31 @@ void Animation::Time(const double _time)
 /////////////////////////////////////////////////
 void Animation::AddTime(const double _time)
 {
-  this->Time(this->timePos + _time);
+  this->Time(this->dataPtr->timePos + _time);
 }
 
 /////////////////////////////////////////////////
 double Animation::Time() const
 {
-  return this->timePos;
+  return this->dataPtr->timePos;
 }
 
 /////////////////////////////////////////////////
 bool Animation::InterpolateX() const
 {
-  return AnimationDataPtr(const_cast<Animation *>(this))->interpolateX;
+  return this->dataPtr->interpolateX;
 }
 
 /////////////////////////////////////////////////
 void Animation::SetInterpolateX(const bool _interpolateX)
 {
-  AnimationDataPtr(this)->interpolateX = _interpolateX;
+  this->dataPtr->interpolateX = _interpolateX;
 }
 
 /////////////////////////////////////////////////
 unsigned int Animation::KeyFrameCount() const
 {
-  return this->keyFrames.size();
+  return this->dataPtr->keyFrames.size();
 }
 
 /////////////////////////////////////////////////
@@ -192,16 +199,30 @@ common::KeyFrame *Animation::KeyFrame(const unsigned int _index) const
 {
   common::KeyFrame *result = NULL;
 
-  if (_index < this->keyFrames.size())
-    result = this->keyFrames[_index];
+  if (_index < this->dataPtr->keyFrames.size())
+    result = this->dataPtr->keyFrames[_index];
   else
   {
     ignerr << "Key frame index[" << _index
           << "] is larger than key frame array size["
-          << this->keyFrames.size() << "]\n";
+          << this->dataPtr->keyFrames.size() << "]\n";
   }
 
   return result;
+}
+
+/////////////////////////////////////////////////
+template<typename KeyFrameType>
+KeyFrameType *Animation::CreateKeyFrame(const double _time)
+{
+  KeyFrameType *frame = new KeyFrameType(_time);
+  std::vector<common::KeyFrame*>::iterator iter =
+    std::upper_bound(this->dataPtr->keyFrames.begin(), this->dataPtr->keyFrames.end(),
+        reinterpret_cast<common::KeyFrame*>(frame),
+        KeyFrameTimeLess());
+
+  this->dataPtr->keyFrames.insert(iter, frame);
+  return frame;
 }
 
 /////////////////////////////////////////////////
@@ -214,19 +235,19 @@ double Animation::KeyFramesAtTime(double _time, common::KeyFrame **_kf1,
   double t1, t2;
 
   // Find first key frame after or on current time
-  while (_time > this->length && this->length > 0.0)
-    _time -= this->length;
+  while (_time > this->dataPtr->length && this->dataPtr->length > 0.0)
+    _time -= this->dataPtr->length;
 
   KeyFrame_V::const_iterator iter;
   common::KeyFrame timeKey(_time);
-  iter = std::lower_bound(this->keyFrames.begin(), this->keyFrames.end(),
+  iter = std::lower_bound(this->dataPtr->keyFrames.begin(), this->dataPtr->keyFrames.end(),
       &timeKey, KeyFrameTimeLess());
 
-  if (iter == this->keyFrames.end())
+  if (iter == this->dataPtr->keyFrames.end())
   {
     // There is no keyframe after this time, wrap back to first
-    *_kf2 = this->keyFrames.front();
-    t2 = this->length + (*_kf2)->Time();
+    *_kf2 = this->dataPtr->keyFrames.front();
+    t2 = this->dataPtr->length + (*_kf2)->Time();
 
     // Use the last keyframe as the previous keyframe
     --iter;
@@ -237,11 +258,11 @@ double Animation::KeyFramesAtTime(double _time, common::KeyFrame **_kf1,
     t2 = (*_kf2)->Time();
 
     // Find last keyframe before or on current time
-    if (iter != this->keyFrames.begin() && _time < (*iter)->Time())
+    if (iter != this->dataPtr->keyFrames.begin() && _time < (*iter)->Time())
       --iter;
   }
 
-  _firstKeyIndex = std::distance(this->keyFrames.begin(), iter);
+  _firstKeyIndex = std::distance(this->dataPtr->keyFrames.cbegin(), iter);
 
   *_kf1 = *iter;
   t1 = (*_kf1)->Time();
@@ -255,78 +276,60 @@ double Animation::KeyFramesAtTime(double _time, common::KeyFrame **_kf1,
 /////////////////////////////////////////////////
 PoseAnimation::PoseAnimation(const std::string &_name, const double _length,
     const bool _loop)
-: Animation(_name, _length, _loop)
+: Animation(_name, _length, _loop),
+  dataPtr(ignition::utils::MakeImpl<Implementation>())
 {
-  this->positionSpline = NULL;
-  this->rotationSpline = NULL;
-}
-
-/////////////////////////////////////////////////
-PoseAnimation::~PoseAnimation()
-{
-  delete this->positionSpline;
-  delete this->rotationSpline;
-  for (auto kf : this->keyFrames)
-    delete kf;
 }
 
 /////////////////////////////////////////////////
 PoseKeyFrame *PoseAnimation::CreateKeyFrame(const double _time)
 {
-  PoseKeyFrame *frame = new PoseKeyFrame(_time);
-  std::vector<common::KeyFrame*>::iterator iter =
-    std::upper_bound(this->keyFrames.begin(), this->keyFrames.end(),
-        reinterpret_cast<common::KeyFrame*>(frame), KeyFrameTimeLess());
-
-  this->keyFrames.insert(iter, frame);
-  this->build = true;
-
-  return frame;
+  this->dataPtr->build = true;
+  return Animation::CreateKeyFrame<PoseKeyFrame>(_time);
 }
 
 /////////////////////////////////////////////////
-void PoseAnimation::BuildInterpolationSplines() const
+void PoseAnimation::BuildInterpolationSplines()
 {
-  if (!this->positionSpline)
-    this->positionSpline = new math::Spline();
+  if (!this->dataPtr->positionSpline)
+    this->dataPtr->positionSpline = std::make_unique<math::Spline>();
 
-  if (!this->rotationSpline)
-    this->rotationSpline = new math::RotationSpline();
+  if (!this->dataPtr->rotationSpline)
+    this->dataPtr->rotationSpline = std::make_unique<math::RotationSpline>();
 
-  this->positionSpline->AutoCalculate(false);
-  this->rotationSpline->AutoCalculate(false);
+  this->dataPtr->positionSpline->AutoCalculate(false);
+  this->dataPtr->rotationSpline->AutoCalculate(false);
 
-  this->positionSpline->Clear();
-  this->rotationSpline->Clear();
+  this->dataPtr->positionSpline->Clear();
+  this->dataPtr->rotationSpline->Clear();
 
-  for (KeyFrame_V::const_iterator iter = this->keyFrames.begin();
-      iter != this->keyFrames.end(); ++iter)
+  for (size_t idx = 0; idx < this->KeyFrameCount(); ++idx)
   {
-    PoseKeyFrame *pkey = reinterpret_cast<PoseKeyFrame*>(*iter);
-    this->positionSpline->AddPoint(pkey->Translation());
-    this->rotationSpline->AddPoint(pkey->Rotation());
+    PoseKeyFrame *pkey = reinterpret_cast<PoseKeyFrame*>(this->KeyFrame(idx));
+    this->dataPtr->positionSpline->AddPoint(pkey->Translation());
+    this->dataPtr->rotationSpline->AddPoint(pkey->Rotation());
   }
 
-  this->positionSpline->RecalcTangents();
-  this->rotationSpline->RecalcTangents();
-  this->build = false;
+  this->dataPtr->positionSpline->RecalcTangents();
+  this->dataPtr->rotationSpline->RecalcTangents();
+  this->dataPtr->build = false;
 }
 
 /////////////////////////////////////////////////
-void PoseAnimation::InterpolatedKeyFrame(PoseKeyFrame &_kf) const
+void PoseAnimation::InterpolatedKeyFrame(PoseKeyFrame &_kf)
 {
-  this->InterpolatedKeyFrame(this->timePos, _kf);
+  this->InterpolatedKeyFrame(this->Time(), _kf);
 }
 
 /////////////////////////////////////////////////
 void PoseAnimation::InterpolatedKeyFrame(const double _time,
-                                         PoseKeyFrame &_kf) const
+                                         PoseKeyFrame &_kf)
 {
   common::KeyFrame *kBase1, *kBase2;
   PoseKeyFrame *k1;
   unsigned int firstKeyIndex;
 
-  if (this->build)
+  if (this->dataPtr->build)
     this->BuildInterpolationSplines();
 
   double t = this->KeyFramesAtTime(_time, &kBase1, &kBase2, firstKeyIndex);
@@ -340,37 +343,23 @@ void PoseAnimation::InterpolatedKeyFrame(const double _time,
   }
   else
   {
-    _kf.Translation(this->positionSpline->Interpolate(firstKeyIndex, t));
-    _kf.Rotation(this->rotationSpline->Interpolate(firstKeyIndex, t));
+    _kf.Translation(this->dataPtr->positionSpline->Interpolate(firstKeyIndex, t));
+    _kf.Rotation(this->dataPtr->rotationSpline->Interpolate(firstKeyIndex, t));
   }
 }
 
 /////////////////////////////////////////////////
 NumericAnimation::NumericAnimation(const std::string &_name,
     const double _length, const bool _loop)
-: Animation(_name, _length, _loop)
+: Animation(_name, _length, _loop),
+  dataPtr(ignition::utils::MakeImpl<Implementation>())
 {
-}
-
-/////////////////////////////////////////////////
-NumericAnimation::~NumericAnimation()
-{
-  for (auto kf : this->keyFrames)
-    delete kf;
 }
 
 /////////////////////////////////////////////////
 NumericKeyFrame *NumericAnimation::CreateKeyFrame(const double _time)
 {
-  NumericKeyFrame *frame = new NumericKeyFrame(_time);
-  std::vector<common::KeyFrame*>::iterator iter =
-    std::upper_bound(this->keyFrames.begin(), this->keyFrames.end(),
-        reinterpret_cast<common::KeyFrame*>(frame),
-        KeyFrameTimeLess());
-
-  this->keyFrames.insert(iter, frame);
-  this->build = true;
-  return frame;
+  return Animation::CreateKeyFrame<NumericKeyFrame>(_time);
 }
 
 /////////////////////////////////////////////////
@@ -382,7 +371,7 @@ void NumericAnimation::InterpolatedKeyFrame(NumericKeyFrame &_kf) const
   unsigned int firstKeyIndex;
 
   double t;
-  t = this->KeyFramesAtTime(this->timePos, &kBase1, &kBase2, firstKeyIndex);
+  t = this->KeyFramesAtTime(this->Time(), &kBase1, &kBase2, firstKeyIndex);
 
   k1 = reinterpret_cast<NumericKeyFrame*>(kBase1);
   k2 = reinterpret_cast<NumericKeyFrame*>(kBase2);
@@ -402,47 +391,8 @@ void NumericAnimation::InterpolatedKeyFrame(NumericKeyFrame &_kf) const
 
 /////////////////////////////////////////////////
 TrajectoryInfo::TrajectoryInfo()
-  : dataPtr(new TrajectoryInfoPrivate)
+  : dataPtr(ignition::utils::MakeImpl<Implementation>())
 {
-}
-
-/////////////////////////////////////////////////
-TrajectoryInfo::TrajectoryInfo(TrajectoryInfo &&_trajInfo) noexcept
-{
-  this->dataPtr = _trajInfo.dataPtr;
-  _trajInfo.dataPtr = nullptr;
-}
-
-/////////////////////////////////////////////////
-TrajectoryInfo::~TrajectoryInfo()
-{
-  delete this->dataPtr;
-}
-
-//////////////////////////////////////////////////
-void TrajectoryInfo::CopyFrom(const TrajectoryInfo &_trajInfo)
-{
-  this->dataPtr->id = _trajInfo.dataPtr->id;
-  this->dataPtr->animIndex = _trajInfo.dataPtr->animIndex;
-  this->dataPtr->startTime = _trajInfo.dataPtr->startTime;
-  this->dataPtr->endTime = _trajInfo.dataPtr->endTime;
-  this->dataPtr->translated = _trajInfo.dataPtr->translated;
-  this->dataPtr->waypoints = _trajInfo.dataPtr->waypoints;
-  this->dataPtr->segDistance = _trajInfo.dataPtr->segDistance;
-}
-
-//////////////////////////////////////////////////
-TrajectoryInfo::TrajectoryInfo(const TrajectoryInfo &_trajInfo)
-  : dataPtr(new TrajectoryInfoPrivate)
-{
-  this->CopyFrom(_trajInfo);
-}
-
-//////////////////////////////////////////////////
-TrajectoryInfo &TrajectoryInfo::operator=(const TrajectoryInfo &_trajInfo)
-{
-  this->CopyFrom(_trajInfo);
-  return *this;
 }
 
 /////////////////////////////////////////////////
@@ -585,3 +535,5 @@ void TrajectoryInfo::SetWaypoints(
   this->dataPtr->waypoints = anim;
   this->dataPtr->translated = true;
 }
+}  // namespace ignition
+}  // namespace common
