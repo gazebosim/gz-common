@@ -27,14 +27,14 @@
 using namespace ignition;
 using namespace common;
 
-using KeyFrame_V = std::vector<common::KeyFrame *>;
+using KeyFrame_V = std::vector<std::shared_ptr<common::KeyFrame>>;
 
 namespace
 {
   struct KeyFrameTimeLess
   {
-    bool operator() (const common::KeyFrame *_kf,
-        const common::KeyFrame *_kf2) const
+    bool operator() (const std::shared_ptr<common::KeyFrame> &_kf,
+        const std::shared_ptr<common::KeyFrame> &_kf2) const
     {
       return _kf->Time() < _kf2->Time();
     }
@@ -124,13 +124,6 @@ Animation::Animation(const std::string &_name, const double _length,
 }
 
 /////////////////////////////////////////////////
-Animation::~Animation()
-{
-  for (auto kf : this->dataPtr->keyFrames)
-    delete kf;
-}
-
-/////////////////////////////////////////////////
 double Animation::Length() const
 {
   return this->dataPtr->length;
@@ -200,7 +193,7 @@ common::KeyFrame *Animation::KeyFrame(const unsigned int _index) const
   common::KeyFrame *result = NULL;
 
   if (_index < this->dataPtr->keyFrames.size())
-    result = this->dataPtr->keyFrames[_index];
+    result = this->dataPtr->keyFrames[_index].get();
   else
   {
     ignerr << "Key frame index[" << _index
@@ -215,14 +208,14 @@ common::KeyFrame *Animation::KeyFrame(const unsigned int _index) const
 template<typename KeyFrameType>
 KeyFrameType *Animation::CreateKeyFrame(const double _time)
 {
-  KeyFrameType *frame = new KeyFrameType(_time);
-  std::vector<common::KeyFrame*>::iterator iter =
+  auto frame = std::make_shared<KeyFrameType>(_time);
+  auto iter =
     std::upper_bound(this->dataPtr->keyFrames.begin(), this->dataPtr->keyFrames.end(),
-        reinterpret_cast<common::KeyFrame*>(frame),
+        std::reinterpret_pointer_cast<common::KeyFrame>(frame),
         KeyFrameTimeLess());
 
   this->dataPtr->keyFrames.insert(iter, frame);
-  return frame;
+  return frame.get();
 }
 
 /////////////////////////////////////////////////
@@ -239,14 +232,14 @@ double Animation::KeyFramesAtTime(double _time, common::KeyFrame **_kf1,
     _time -= this->dataPtr->length;
 
   KeyFrame_V::const_iterator iter;
-  common::KeyFrame timeKey(_time);
+  auto timeKey = std::make_shared<common::KeyFrame>(_time);
   iter = std::lower_bound(this->dataPtr->keyFrames.begin(), this->dataPtr->keyFrames.end(),
-      &timeKey, KeyFrameTimeLess());
+      timeKey, KeyFrameTimeLess());
 
   if (iter == this->dataPtr->keyFrames.end())
   {
     // There is no keyframe after this time, wrap back to first
-    *_kf2 = this->dataPtr->keyFrames.front();
+    *_kf2 = this->dataPtr->keyFrames.front().get();
     t2 = this->dataPtr->length + (*_kf2)->Time();
 
     // Use the last keyframe as the previous keyframe
@@ -254,7 +247,7 @@ double Animation::KeyFramesAtTime(double _time, common::KeyFrame **_kf1,
   }
   else
   {
-    *_kf2 = *iter;
+    *_kf2 = iter->get();
     t2 = (*_kf2)->Time();
 
     // Find last keyframe before or on current time
@@ -264,7 +257,7 @@ double Animation::KeyFramesAtTime(double _time, common::KeyFrame **_kf1,
 
   _firstKeyIndex = std::distance(this->dataPtr->keyFrames.cbegin(), iter);
 
-  *_kf1 = *iter;
+  *_kf1 = iter->get();
   t1 = (*_kf1)->Time();
 
   if (math::equal(t1, t2))

@@ -49,9 +49,6 @@ namespace ignition
       public: Animation(const std::string &_name,
                   const double _length, const bool _loop);
 
-      /// \brief Destructor
-      public: virtual ~Animation();
-
       /// \brief Return the duration of the animation
       /// \return Duration of the animation in seconds
       public: double Length() const;
@@ -92,7 +89,7 @@ namespace ignition
       /// \brief Create a keyframe at the given time
       /// \param[in] _time Time at which to create the keyframe
       /// \return Pointer to the new keyframe
-      public: template<typename KeyFrameType>
+      protected: template<typename KeyFrameType>
       KeyFrameType *CreateKeyFrame(const double _time);
 
       /// \brief Get the two key frames that bound a time value
