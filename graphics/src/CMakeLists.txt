@@ -20,7 +20,10 @@ target_link_libraries(${graphics_target}
     FreeImage::FreeImage)
 
 ign_build_tests(TYPE UNIT SOURCES ${gtest_sources}
-  LIB_DEPS ${graphics_target})
+  LIB_DEPS
+    ${graphics_target}
+    ignition-cmake${IGN_CMAKE_VER}::utilities
+)
 
 
 if(USE_EXTERNAL_TINYXML2)
