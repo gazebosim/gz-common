@@ -29,7 +29,7 @@ TEST_F(ImageTest, Image)
 {
   common::Image img;
   EXPECT_EQ(-1, img.Load("/file/shouldn/never/exist.png"));
-  std::string filename =  "file://" + common::testing::TestFile(
+  std::string filename =  common::testing::TestFile(
       "data", "cordless_drill", "materials", "textures", "cordless_drill.png");
   EXPECT_EQ(0, img.Load(filename));
   EXPECT_EQ(static_cast<unsigned int>(128), img.Width());
@@ -128,8 +128,7 @@ void ImagePerformanceTest::MaxColor(const std::string &_filePath,
                                     const unsigned int _width,
                                     const unsigned int _height)
 {
-  std::string fileName =  "file://" +
-    common::testing::TestFile("data", _filePath);
+  std::string fileName = common::testing::TestFile("data", _filePath);
 
   common::Image img;
   EXPECT_EQ(0, img.Load(fileName));
