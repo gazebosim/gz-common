@@ -17,6 +17,7 @@
 #include <gtest/gtest.h>
 
 #include <ignition/common/AudioDecoder.hh>
+#include <ignition/utilities/ExtraTestMacros.hh>
 
 #include "test_config.h"
 
@@ -84,7 +85,7 @@ TEST(AudioDecoder, NoCodec)
 }
 
 /////////////////////////////////////////////////
-TEST(AudioDecoder, CheerFile)
+TEST(AudioDecoder, IGN_UTILS_TEST_DISABLED_ON_WIN32(CheerFile))
 {
   common::AudioDecoder audio;
 
@@ -102,7 +103,7 @@ TEST(AudioDecoder, CheerFile)
   EXPECT_FALSE(audio.SetFile(path));
 
   unsigned int dataBufferSize;
-  uint8_t *dataBuffer = NULL;
+  uint8_t *dataBuffer = nullptr;
 
   // WAV
   {

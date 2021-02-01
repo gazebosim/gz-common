@@ -207,7 +207,7 @@ bool create_new_file_hardlink(const std::string &_hardlink,
   return ::CreateHardLinkA(_hardlink.c_str(), _target.c_str(), nullptr) == TRUE;
 }
 
-#endif
+#endif  // _WIN32
 
 #include <fstream> // NOLINT
 #include "ignition/common/Console.hh"

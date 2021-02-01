@@ -346,6 +346,19 @@ TEST_F(SubMeshTest, SubMesh)
 }
 
 /////////////////////////////////////////////////
+void checkIndexes(const common::Mesh *_mesh)
+{
+  for (auto j = 0u; j < _mesh->SubMeshCount(); j++)
+  {
+    auto submesh = _mesh->SubMeshByIndex(j).lock();
+    for (auto i = 0u; i < submesh->IndexCount(); i++)
+    {
+      EXPECT_GE(submesh->Index(i), 0);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 TEST_F(SubMeshTest, Volume)
 {
   // Box mesh tests
@@ -397,11 +410,15 @@ TEST_F(SubMeshTest, Volume)
       common::MeshManager::Instance()->MeshByName("ellipsoid");
     ASSERT_TRUE(unitEllipsoid != nullptr);
 
+    checkIndexes(unitEllipsoid);
+
     // Checking that we can not add or modify a new mesh with the name
     common::MeshManager::Instance()->CreateEllipsoid("ellipsoid",
         ignition::math::Vector3d(2, 1.4, 7), 100, 100);
     const common::Mesh *unitEllipsoid2 =
       common::MeshManager::Instance()->MeshByName("ellipsoid");
+
+    checkIndexes(unitEllipsoid2);
 
     // The new mesh should have more vertex, but it should be introduced in the
     // meshmanager. It should be the same number becuase it was not modified.
@@ -415,6 +432,8 @@ TEST_F(SubMeshTest, Volume)
     const common::Mesh *otherEllipsoid =
       common::MeshManager::Instance()->MeshByName("other_ellipsoid");
     ASSERT_TRUE(otherEllipsoid != nullptr);
+
+    checkIndexes(otherEllipsoid);
   }
 
   // Capsule mesh tests
