@@ -169,7 +169,7 @@ namespace ignition
         {
           std::string loggedString;
           // Open the log file, and read back the string
-          std::ifstream ifs(this->GetFullLogPath().c_str(), std::ios::in);
+          std::ifstream ifs(this->FullLogPath().c_str(), std::ios::in);
 
           while (!ifs.eof())
           {
