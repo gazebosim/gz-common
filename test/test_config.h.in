@@ -32,7 +32,7 @@ namespace ignition
       bool ProjectSourcePath(std::string &_sourceDir)
       {
         // Bazel builds set TEST_SRCDIR
-        if(common::env("TEST_SRCDIR", _sourceDir))
+        if (common::env("TEST_SRCDIR", _sourceDir))
         {
           _sourceDir = common::joinPaths(
               _sourceDir, "__main__", "ign_common");
@@ -44,8 +44,6 @@ namespace ignition
           _sourceDir = "${PROJECT_SOURCE_DIR}";
           return true;
         }
-
-        return false;
       }
 
       /// \brief Method to retrieve temporary directory for test outputs
@@ -159,7 +157,7 @@ namespace ignition
 
         /// \brief Get a string with the full log file path.
         /// \return The full log file path as a string.
-        protected: std::string GetFullLogPath() const
+        protected: std::string FullLogPath() const
         {
           return ignition::common::joinPaths(
             this->logDirectory, this->logFilename);
@@ -170,7 +168,6 @@ namespace ignition
         protected: std::string LogContent() const
         {
           std::string loggedString;
-          std::cout << "2 Log Path[" <<this->GetFullLogPath() << "]\n";
           // Open the log file, and read back the string
           std::ifstream ifs(this->GetFullLogPath().c_str(), std::ios::in);
 
