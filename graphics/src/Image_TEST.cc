@@ -57,6 +57,13 @@ TEST_F(ImageTest, Image)
 }
 
 /////////////////////////////////////////////////
+TEST_F(ImageTest, Data)
+{
+  common::Image img;
+
+}
+
+/////////////////////////////////////////////////
 TEST_F(ImageTest, ConvertPixelFormat)
 {
   using Image = ignition::common::Image;
