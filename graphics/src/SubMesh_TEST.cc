@@ -347,6 +347,19 @@ TEST_F(SubMeshTest, SubMesh)
 }
 
 /////////////////////////////////////////////////
+void checkIndexes(const common::Mesh *_mesh)
+{
+  for (auto j = 0u; j < _mesh->SubMeshCount(); j++)
+  {
+    auto submesh = _mesh->SubMeshByIndex(j).lock();
+    for (auto i = 0u; i < submesh->IndexCount(); i++)
+    {
+      EXPECT_GE(submesh->Index(i), 0);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 TEST_F(SubMeshTest, Volume)
 {
   // Box mesh tests
@@ -387,6 +400,68 @@ TEST_F(SubMeshTest, Volume)
     ASSERT_TRUE(otherSphere != nullptr);
     EXPECT_NEAR(4.0/3.0 * IGN_PI * std::pow(2.5, 3), otherSphere->Volume(),
         1e-2);
+  }
+
+  // Ellipsoid mesh tests
+  {
+    common::MeshManager::Instance()->CreateEllipsoid("ellipsoid",
+        ignition::math::Vector3d(2, 1.4, 7), 10, 10);
+
+    const common::Mesh *unitEllipsoid =
+      common::MeshManager::Instance()->MeshByName("ellipsoid");
+    ASSERT_TRUE(unitEllipsoid != nullptr);
+
+    checkIndexes(unitEllipsoid);
+
+    // Checking that we can not add or modify a new mesh with the name
+    common::MeshManager::Instance()->CreateEllipsoid("ellipsoid",
+        ignition::math::Vector3d(2, 1.4, 7), 100, 100);
+    const common::Mesh *unitEllipsoid2 =
+      common::MeshManager::Instance()->MeshByName("ellipsoid");
+
+    checkIndexes(unitEllipsoid2);
+
+    // The new mesh should have more vertex, but it should be introduced in the
+    // meshmanager. It should be the same number becuase it was not modified.
+    EXPECT_EQ(unitEllipsoid->VertexCount(), unitEllipsoid2->VertexCount());
+
+    // A larger cylinder needs to have higher resolution in order to get the
+    // volume close to Pi * r^2 * h.
+    common::MeshManager::Instance()->CreateEllipsoid("other_ellipsoid",
+        ignition::math::Vector3d(0.8, 2.4, 7.5), 10, 10);
+
+    const common::Mesh *otherEllipsoid =
+      common::MeshManager::Instance()->MeshByName("other_ellipsoid");
+    ASSERT_TRUE(otherEllipsoid != nullptr);
+
+    checkIndexes(otherEllipsoid);
+  }
+
+  // Capsule mesh tests
+  {
+    common::MeshManager::Instance()->CreateCapsule("capsule",
+      1, 1, 10, 10);
+
+    const common::Mesh *unitCapsule =
+      common::MeshManager::Instance()->MeshByName("capsule");
+    ASSERT_TRUE(unitCapsule != nullptr);
+
+    // Checking that we can not add or modify a new mesh with the same name
+    common::MeshManager::Instance()->CreateCapsule("capsule",
+      1, 1, 100, 100);
+    const common::Mesh *unitCapsule2 =
+      common::MeshManager::Instance()->MeshByName("capsule");
+
+    // the new mesh should have more vertex, but it should be introduced in the
+    // meshmanager. It should be the same number becuase it was not modified.
+    EXPECT_EQ(unitCapsule->VertexCount(), unitCapsule2->VertexCount());
+
+    common::MeshManager::Instance()->CreateCapsule("other_capsule",
+      1.5, 7.5, 10, 10);
+
+    const common::Mesh *otherCapsule =
+      common::MeshManager::Instance()->MeshByName("other_capsule");
+    ASSERT_TRUE(otherCapsule != nullptr);
   }
 
   // Cylinder mesh tests
