@@ -45,6 +45,25 @@ enum class Options : uint8_t
   _
 };
 
+enum class OptionsNoUnderscore : uint8_t
+{
+  FULLSCREEN,
+  INVERT_MOUSE,
+  FLASH,
+  RED_BACKGROUND,
+  RED_FOREGROUND,
+  END
+};
+
+enum class OptionsNoEnd : uint8_t
+{
+  FULLSCREEN,
+  INVERT_MOUSE,
+  FLASH,
+  RED_BACKGROUND,
+  RED_FOREGROUND
+};
+
 TEST(FlagSet, TestAnd)
 {
   ignition::common::FlagSet<Options> red(
@@ -160,6 +179,29 @@ TEST(FlagSet, TestAnyAllNone)
   EXPECT_FALSE(options.All());
 }
 
+TEST(FlagSet, TestConstructors)
+{
+  using namespace ignition::common;
+
+  ASSERT_EQ(5u, FlagSet<Options>::numElements);
+
+  EXPECT_EQ(FlagSet<Options>::NoneSet(), FlagSet<Options>());
+  EXPECT_EQ(FlagSet<Options>::AllSet(), FlagSet<Options>({
+    Options::FULLSCREEN,
+    Options::FLASH,
+    Options::INVERT_MOUSE,
+    Options::RED_BACKGROUND,
+    Options::RED_FOREGROUND
+  }));
+
+  FlagSet<Options> options(Options::RED_FOREGROUND);
+  EXPECT_TRUE(options[Options::RED_FOREGROUND]);
+  EXPECT_FALSE(options[Options::RED_BACKGROUND]);
+  EXPECT_FALSE(options[Options::INVERT_MOUSE]);
+  EXPECT_FALSE(options[Options::FLASH]);
+  EXPECT_FALSE(options[Options::FULLSCREEN]);
+}
+
 TEST(FlagSet, TestStaticConstructors)
 {
   EXPECT_TRUE(ignition::common::FlagSet<Options>::AllSet().All());
@@ -181,12 +223,161 @@ TEST(FlagSet, TestHash)
 
   std::hash<FlagSet<Options>> hash {};
 
-  ASSERT_NE(hash(options1), hash(options2));
-  ASSERT_EQ(hash(options1), hash(options1));
-  ASSERT_EQ(hash(options2), hash(options2));
+  EXPECT_NE(hash(options1), hash(options2));
+  EXPECT_EQ(hash(options1), hash(options1));
+  EXPECT_EQ(hash(options2), hash(options2));
 
   std::unordered_set<FlagSet<Options>> valid;
-  ASSERT_EQ(valid.find(FlagSet<Options>::AllSet()), valid.end());
+  EXPECT_EQ(valid.find(FlagSet<Options>::AllSet()), valid.end());
   valid.insert(FlagSet<Options>::AllSet());
-  ASSERT_NE(valid.find(FlagSet<Options>::AllSet()), valid.end());
+  EXPECT_NE(valid.find(FlagSet<Options>::AllSet()), valid.end());
+}
+
+TEST(FlagSet, TestEnumWithoutUnderscore)
+{
+  using ONU = OptionsNoUnderscore;
+
+  using TestSet = ignition::common::FlagSet<ONU, ONU::END>;
+
+  ASSERT_EQ(5u, TestSet::numElements);
+
+  EXPECT_EQ(TestSet::NoneSet(), TestSet());
+  EXPECT_EQ(TestSet::AllSet(), TestSet({
+    ONU::FULLSCREEN,
+    ONU::FLASH,
+    ONU::INVERT_MOUSE,
+    ONU::RED_BACKGROUND,
+    ONU::RED_FOREGROUND
+  }));
+
+  TestSet options(ONU::RED_FOREGROUND);
+  EXPECT_TRUE(options[ONU::RED_FOREGROUND]);
+  EXPECT_FALSE(options[ONU::RED_BACKGROUND]);
+  EXPECT_FALSE(options[ONU::INVERT_MOUSE]);
+  EXPECT_FALSE(options[ONU::FLASH]);
+  EXPECT_FALSE(options[ONU::FULLSCREEN]);
+
+  EXPECT_EQ(
+    TestSet({ONU::FULLSCREEN, ONU::FLASH}),
+    TestSet(ONU::FLASH) | TestSet(ONU::FULLSCREEN));
+
+  const auto options1 = TestSet::AllSet();
+  const auto options2 = TestSet::NoneSet();
+
+  std::hash<TestSet> hash {};
+  EXPECT_NE(hash(options1), hash(options2));
+}
+
+TEST(FlagSet, TestEnumWithoutEnd)
+{
+  using ONE = OptionsNoEnd;
+
+  using TestSet = ignition::common::FlagSet<ONE, ONE::RED_FOREGROUND, false>;
+
+  ASSERT_EQ(5u, TestSet::numElements);
+
+  EXPECT_EQ(TestSet::NoneSet(), TestSet());
+  EXPECT_EQ(TestSet::AllSet(), TestSet({
+      ONE::FULLSCREEN,
+      ONE::FLASH,
+      ONE::INVERT_MOUSE,
+      ONE::RED_BACKGROUND,
+      ONE::RED_FOREGROUND
+    }));
+
+  TestSet options(ONE::RED_FOREGROUND);
+  EXPECT_TRUE(options[ONE::RED_FOREGROUND]);
+  EXPECT_FALSE(options[ONE::RED_BACKGROUND]);
+  EXPECT_FALSE(options[ONE::INVERT_MOUSE]);
+  EXPECT_FALSE(options[ONE::FLASH]);
+  EXPECT_FALSE(options[ONE::FULLSCREEN]);
+
+  EXPECT_EQ(
+    TestSet({ONE::FULLSCREEN, ONE::FLASH}),
+    TestSet(ONE::FLASH) | TestSet(ONE::FULLSCREEN));
+
+  const auto options1 = TestSet::AllSet();
+  const auto options2 = TestSet::NoneSet();
+
+  std::hash<TestSet> hash {};
+  EXPECT_NE(hash(options1), hash(options2));
+}
+
+TEST(FlagSet, TestUnderlyingTypes)
+{
+  enum class CharEnum : char
+  {
+    A,
+    _
+  };
+  enum class UCharEnum : unsigned char
+  {
+    A,
+    _
+  };
+  enum class ShortEnum : int16_t
+  {
+    A,
+    _
+  };
+  enum class UShortEnum : uint16_t
+  {
+    A,
+    _
+  };
+  enum class IntEnum : int
+  {
+    A,
+    _
+  };
+  enum class UIntEnum : unsigned int
+  {
+    A,
+    _
+  };
+  enum class LongEnum : int32_t
+  {
+    A,
+    _
+  };
+  enum class ULongEnum : uint32_t
+  {
+    A,
+    _
+  };
+  enum class LongLongEnum : int64_t
+  {
+    A,
+    _
+  };
+  enum class ULongLongEnum : uint64_t
+  {
+    A,
+    _
+  };
+  enum OldEnum
+  {
+    A,
+    _
+  };
+  enum class TypedEnum
+  {
+    A,
+    _
+  };
+
+  using namespace ignition::common;
+
+  EXPECT_TRUE(FlagSet<CharEnum>(CharEnum::A).All());
+  EXPECT_TRUE(FlagSet<UCharEnum>(UCharEnum::A).All());
+  EXPECT_TRUE(FlagSet<ShortEnum>(ShortEnum::A).All());
+  EXPECT_TRUE(FlagSet<UShortEnum>(UShortEnum::A).All());
+  EXPECT_TRUE(FlagSet<IntEnum>(IntEnum::A).All());
+  EXPECT_TRUE(FlagSet<UIntEnum>(UIntEnum::A).All());
+  EXPECT_TRUE(FlagSet<LongEnum>(LongEnum::A).All());
+  EXPECT_TRUE(FlagSet<ULongEnum>(ULongEnum::A).All());
+  EXPECT_TRUE(FlagSet<LongLongEnum>(LongLongEnum::A).All());
+  EXPECT_TRUE(FlagSet<ULongLongEnum>(ULongLongEnum::A).All());
+  EXPECT_TRUE(FlagSet<OldEnum>(OldEnum::A).All());
+  EXPECT_TRUE(FlagSet<TypedEnum>(TypedEnum::A).All());
 }
