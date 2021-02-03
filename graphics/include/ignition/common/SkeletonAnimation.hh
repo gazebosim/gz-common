@@ -24,6 +24,8 @@
 #include <ignition/math/Matrix4.hh>
 #include <ignition/math/Pose3.hh>
 
+#include <ignition/utils/ImplPtr.hh>
+
 #include <ignition/common/NodeAnimation.hh>
 #include <ignition/common/graphics/Export.hh>
 
@@ -31,9 +33,6 @@ namespace ignition
 {
   namespace common
   {
-    /// Forward declare private data class
-    class SkeletonAnimationPrivate;
-
     /// \class SkeletonAnimation SkeletonAnimation.hh
     /// ignition/common/SkeletonAnimation.hh
     /// \brief Skeleton animation
@@ -126,8 +125,8 @@ namespace ignition
       /// \return the duration in seconds
       public: double Length() const;
 
-      /// \brief Private data pointer
-      private: SkeletonAnimationPrivate *data;
+      /// \brief Private data pointer.
+      IGN_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

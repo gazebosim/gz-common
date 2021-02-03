@@ -20,7 +20,7 @@ using namespace ignition;
 using namespace common;
 
 /// \brief Private data for NodeTransform
-class ignition::common::NodeTransformPrivate
+class ignition::common::NodeTransform::Implementation
 {
   /// \brief the sid
   public: std::string sid;
@@ -37,35 +37,21 @@ class ignition::common::NodeTransformPrivate
 
 //////////////////////////////////////////////////
 NodeTransform::NodeTransform(const NodeTransformType _type)
-  : data(new NodeTransformPrivate)
+: dataPtr(ignition::utils::MakeImpl<Implementation>())
 {
-  this->data->sid = "_default_";
-  this->data->type = _type;
-  this->data->transform = math::Matrix4d::Identity;
+  this->dataPtr->sid = "_default_";
+  this->dataPtr->type = _type;
+  this->dataPtr->transform = math::Matrix4d::Identity;
 }
 
 //////////////////////////////////////////////////
 NodeTransform::NodeTransform(const math::Matrix4d &_mat,
     const std::string &_sid, const NodeTransformType _type)
-  : data(new NodeTransformPrivate)
+: dataPtr(ignition::utils::MakeImpl<Implementation>())
 {
-  this->data->sid = _sid;
-  this->data->type = _type;
-  this->data->transform = _mat;
-}
-
-//////////////////////////////////////////////////
-NodeTransform::NodeTransform(const NodeTransform &_other)
-    : data(new NodeTransformPrivate(*_other.data))
-{
-  // do nothing
-}
-
-//////////////////////////////////////////////////
-NodeTransform &NodeTransform::operator=(const NodeTransform &_other)
-{
-  this->data.reset(new NodeTransformPrivate(*_other.data));
-  return *this;
+  this->dataPtr->sid = _sid;
+  this->dataPtr->type = _type;
+  this->dataPtr->transform = _mat;
 }
 
 //////////////////////////////////////////////////
@@ -74,55 +60,55 @@ NodeTransform::~NodeTransform() = default;
 //////////////////////////////////////////////////
 void NodeTransform::Set(const math::Matrix4d &_mat)
 {
-  this->data->transform = _mat;
+  this->dataPtr->transform = _mat;
 }
 
 //////////////////////////////////////////////////
 void NodeTransform::SetType(const NodeTransformType _type)
 {
-  this->data->type = _type;
+  this->dataPtr->type = _type;
 }
 
 //////////////////////////////////////////////////
 void NodeTransform::SetSID(const std::string &_sid)
 {
-  this->data->sid = _sid;
+  this->dataPtr->sid = _sid;
 }
 
 //////////////////////////////////////////////////
 math::Matrix4d NodeTransform::Get() const
 {
-  return this->data->transform;
+  return this->dataPtr->transform;
 }
 
 //////////////////////////////////////////////////
 NodeTransformType NodeTransform::Type() const
 {
-  return this->data->type;
+  return this->dataPtr->type;
 }
 
 //////////////////////////////////////////////////
 std::string NodeTransform::SID() const
 {
-  return this->data->sid;
+  return this->dataPtr->sid;
 }
 
 //////////////////////////////////////////////////
 void NodeTransform::SetComponent(const unsigned int _idx, const double _value)
 {
-  this->data->source[_idx] = _value;
+  this->dataPtr->source[_idx] = _value;
 }
 
 //////////////////////////////////////////////////
 void NodeTransform::SetSourceValues(const math::Matrix4d &_mat)
 {
-  this->data->source.resize(16);
+  this->dataPtr->source.resize(16);
   unsigned int idx = 0;
   for (unsigned int i = 0; i < 4; ++i)
   {
     for (unsigned int j = 0; j < 4; ++j, ++idx)
     {
-      this->data->source[idx] = _mat(i, j);
+      this->dataPtr->source[idx] = _mat(i, j);
     }
   }
 }
@@ -130,58 +116,58 @@ void NodeTransform::SetSourceValues(const math::Matrix4d &_mat)
 //////////////////////////////////////////////////
 void NodeTransform::SetSourceValues(const math::Vector3d &_vec)
 {
-  this->data->source.resize(3);
-  this->data->source[0] = _vec.X();
-  this->data->source[1] = _vec.Y();
-  this->data->source[2] = _vec.Z();
+  this->dataPtr->source.resize(3);
+  this->dataPtr->source[0] = _vec.X();
+  this->dataPtr->source[1] = _vec.Y();
+  this->dataPtr->source[2] = _vec.Z();
 }
 
 //////////////////////////////////////////////////
 void NodeTransform::SetSourceValues(const math::Vector3d &_axis,
     const double _angle)
 {
-  this->data->source.resize(4);
-  this->data->source[0] = _axis.X();
-  this->data->source[1] = _axis.Y();
-  this->data->source[2] = _axis.Z();
-  this->data->source[3] = _angle;
+  this->dataPtr->source.resize(4);
+  this->dataPtr->source[0] = _axis.X();
+  this->dataPtr->source[1] = _axis.Y();
+  this->dataPtr->source[2] = _axis.Z();
+  this->dataPtr->source[3] = _angle;
 }
 
 //////////////////////////////////////////////////
 void NodeTransform::RecalculateMatrix()
 {
-  if (this->data->type == MATRIX)
+  if (this->dataPtr->type == MATRIX)
   {
-    this->data->transform.Set(
-        this->data->source[0], this->data->source[1], this->data->source[2],
-        this->data->source[3], this->data->source[4], this->data->source[5],
-        this->data->source[6], this->data->source[7], this->data->source[8],
-        this->data->source[9], this->data->source[10], this->data->source[11],
-        this->data->source[12], this->data->source[13], this->data->source[14],
-        this->data->source[15]);
+    this->dataPtr->transform.Set(
+        this->dataPtr->source[0], this->dataPtr->source[1], this->dataPtr->source[2],
+        this->dataPtr->source[3], this->dataPtr->source[4], this->dataPtr->source[5],
+        this->dataPtr->source[6], this->dataPtr->source[7], this->dataPtr->source[8],
+        this->dataPtr->source[9], this->dataPtr->source[10], this->dataPtr->source[11],
+        this->dataPtr->source[12], this->dataPtr->source[13], this->dataPtr->source[14],
+        this->dataPtr->source[15]);
   }
   else
   {
-    if (this->data->type == TRANSLATE)
+    if (this->dataPtr->type == TRANSLATE)
     {
-      this->data->transform.SetTranslation(math::Vector3d(this->data->source[0],
-            this->data->source[1], this->data->source[2]));
+      this->dataPtr->transform.SetTranslation(math::Vector3d(this->dataPtr->source[0],
+            this->dataPtr->source[1], this->dataPtr->source[2]));
     }
     else
     {
-      if (this->data->type == ROTATE)
+      if (this->dataPtr->type == ROTATE)
       {
         math::Matrix3d mat;
-        mat.Axis(math::Vector3d(this->data->source[0],
-                                this->data->source[1],
-                                this->data->source[2]),
-                 IGN_DTOR(this->data->source[3]));
-        this->data->transform = mat;
+        mat.Axis(math::Vector3d(this->dataPtr->source[0],
+                                this->dataPtr->source[1],
+                                this->dataPtr->source[2]),
+                 IGN_DTOR(this->dataPtr->source[3]));
+        this->dataPtr->transform = mat;
       }
       else
       {
-        this->data->transform.Scale(math::Vector3d(this->data->source[0],
-            this->data->source[1], this->data->source[2]));
+        this->dataPtr->transform.Scale(math::Vector3d(this->dataPtr->source[0],
+            this->dataPtr->source[1], this->dataPtr->source[2]));
       }
     }
   }
@@ -190,26 +176,26 @@ void NodeTransform::RecalculateMatrix()
 //////////////////////////////////////////////////
 math::Matrix4d NodeTransform::operator()() const
 {
-  return this->data->transform;
+  return this->dataPtr->transform;
 }
 
 //////////////////////////////////////////////////
 math::Matrix4d NodeTransform::operator*(const NodeTransform &_t) const
 {
-  return this->data->transform * _t();
+  return this->dataPtr->transform * _t();
 }
 
 //////////////////////////////////////////////////
 math::Matrix4d NodeTransform::operator*(const math::Matrix4d &_m) const
 {
-  return this->data->transform * _m;
+  return this->dataPtr->transform * _m;
 }
 
 //////////////////////////////////////////////////
 void NodeTransform::PrintSource() const
 {
-  std::cout << this->data->sid;
-  for (unsigned int i = 0; i < this->data->source.size(); ++i)
-    std::cout << " " << this->data->source[i];
+  std::cout << this->dataPtr->sid;
+  for (unsigned int i = 0; i < this->dataPtr->source.size(); ++i)
+    std::cout << " " << this->dataPtr->source[i];
   std::cout << "\n";
 }

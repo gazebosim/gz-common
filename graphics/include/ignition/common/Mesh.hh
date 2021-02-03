@@ -24,9 +24,10 @@
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Vector2.hh>
 
+#include <ignition/utils/ImplPtr.hh>
+
 #include <ignition/common/graphics/Types.hh>
 #include <ignition/common/graphics/Export.hh>
-#include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
 {
@@ -34,7 +35,6 @@ namespace ignition
   {
     class Material;
     class Skeleton;
-    class MeshPrivate;
 
     /// \class Mesh Mesh.hh ignition/common/Mesh.hh
     /// \brief A 3D mesh
@@ -203,10 +203,8 @@ namespace ignition
       /// or there are no submeshes.
       public: double Volume() const;
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Private data pointer.
-      private: std::unique_ptr<MeshPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      IGN_UTILS_UNIQUE_IMPL_PTR(dataPtr)
     };
   }
 }

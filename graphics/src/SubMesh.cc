@@ -29,7 +29,7 @@ using namespace ignition;
 using namespace common;
 
 /// \brief Private data for SubMesh
-class ignition::common::SubMeshPrivate
+class ignition::common::SubMesh::Implementation
 {
   /// \brief the vertex array
   public: std::vector<ignition::math::Vector3d> vertices;
@@ -60,52 +60,20 @@ class ignition::common::SubMeshPrivate
 
 //////////////////////////////////////////////////
 SubMesh::SubMesh()
-: dataPtr(new SubMeshPrivate)
+: dataPtr(ignition::utils::MakeImpl<Implementation>())
 {
 }
 
 //////////////////////////////////////////////////
 SubMesh::SubMesh(const std::string &_name)
-: dataPtr(new SubMeshPrivate)
+: dataPtr(ignition::utils::MakeImpl<Implementation>())
 {
   this->dataPtr->name = _name;
 }
 
 //////////////////////////////////////////////////
-SubMesh::SubMesh(const SubMesh &_submesh)
-: dataPtr(new SubMeshPrivate)
-{
-  this->dataPtr->name = _submesh.dataPtr->name;
-  this->dataPtr->materialIndex = _submesh.dataPtr->materialIndex;
-  this->dataPtr->primitiveType = _submesh.dataPtr->primitiveType;
-
-  std::copy(_submesh.dataPtr->nodeAssignments.begin(),
-      _submesh.dataPtr->nodeAssignments.end(),
-      std::back_inserter(this->dataPtr->nodeAssignments));
-
-  std::copy(_submesh.dataPtr->indices.begin(),
-      _submesh.dataPtr->indices.end(),
-      std::back_inserter(this->dataPtr->indices));
-  std::copy(_submesh.dataPtr->normals.begin(),
-      _submesh.dataPtr->normals.end(),
-      std::back_inserter(this->dataPtr->normals));
-
-  for (const auto &set : _submesh.dataPtr->texCoords)
-  {
-    std::copy(set.second.begin(), set.second.end(),
-        std::back_inserter(this->dataPtr->texCoords[set.first]));
-  }
-  std::copy(_submesh.dataPtr->vertices.begin(),
-      _submesh.dataPtr->vertices.end(),
-      std::back_inserter(this->dataPtr->vertices));
-}
-
-//////////////////////////////////////////////////
 SubMesh::~SubMesh()
 {
-  this->dataPtr->vertices.clear();
-  this->dataPtr->indices.clear();
-  this->dataPtr->nodeAssignments.clear();
 }
 
 //////////////////////////////////////////////////
@@ -490,7 +458,7 @@ unsigned int SubMesh::TexCoordCountBySet(unsigned int _setIndex) const
   if (it == this->dataPtr->texCoords.end())
     return 0u;
 
-  return this->dataPtr->texCoords[_setIndex].size();
+  return it->second.size();
 }
 
 //////////////////////////////////////////////////

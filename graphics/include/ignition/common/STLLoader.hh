@@ -20,6 +20,8 @@
 #include <stdint.h>
 #include <string>
 
+#include <ignition/utils/ImplPtr.hh>
+
 #include "ignition/common/MeshLoader.hh"
 #include "ignition/common/graphics/Export.hh"
 
@@ -88,6 +90,9 @@ namespace ignition
       /// \param[out] the value
       /// \return true
       private: bool FloatRead(FILE *_filein, double &_value);
+
+      /// \brief Private data pointer.
+      IGN_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

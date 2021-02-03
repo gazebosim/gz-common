@@ -25,15 +25,13 @@
 #include <ignition/common/graphics/Export.hh>
 #include <ignition/common/EnumIface.hh>
 #include <ignition/common/Pbr.hh>
-#include <ignition/common/SuppressWarning.hh>
+
+#include <ignition/utils/ImplPtr.hh>
 
 namespace ignition
 {
   namespace common
   {
-    // Forward declare private data class
-    class MaterialPrivate;
-
     /// \brief Encapsulates description of a material
     class IGNITION_COMMON_GRAPHICS_VISIBLE Material
     {
@@ -283,10 +281,8 @@ namespace ignition
                 return _out;
               }
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
-      /// \brief destination blend factor
-      private: std::unique_ptr<MaterialPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      /// \brief Private data pointer.
+      IGN_UTILS_UNIQUE_IMPL_PTR(dataPtr)
     };
   }
 }

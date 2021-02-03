@@ -21,6 +21,9 @@
 
 #include <ignition/math/Matrix4.hh>
 #include <ignition/math/Vector3.hh>
+
+#include <ignition/utils/ImplPtr.hh>
+
 #include <ignition/common/graphics/Export.hh>
 #include <ignition/common/Util.hh>
 
@@ -28,9 +31,6 @@ namespace ignition
 {
   namespace common
   {
-    /// Forward declare private data structure.
-    class NodeTransformPrivate;
-
     /// \class NodeTransform NodeTransform.hh ignition/common/NodeTransform.hh
     /// \brief A transformation node
     class IGNITION_COMMON_GRAPHICS_VISIBLE NodeTransform
@@ -38,14 +38,6 @@ namespace ignition
       /// \brief Constructor
       /// \param[in] _type the type of transform
       public: explicit NodeTransform(const NodeTransformType _type = MATRIX);
-
-      /// \brief Copy constructor
-      /// \param[in] _other NodeTransform to copy
-      public: NodeTransform(const NodeTransform &_other);
-
-      /// \brief Copy assignment
-      /// \param[in] _ther NodeTransform to copy
-      public: NodeTransform &operator=(const NodeTransform &_other);
 
       /// \brief Constructor
       /// \param[in] _mat the matrix
@@ -121,10 +113,8 @@ namespace ignition
       /// \return transform matrix multiplied by _m
       public: math::Matrix4d operator*(const math::Matrix4d &_m) const;
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
-      /// \brief Data pointer
-      private: std::unique_ptr<NodeTransformPrivate> data;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      /// \brief Private data pointer.
+      IGN_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

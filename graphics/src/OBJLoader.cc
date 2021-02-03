@@ -32,7 +32,7 @@ namespace ignition
   {
     /// \internal
     /// \brief OBJLoader private data
-    class OBJLoaderPrivate
+    class OBJLoader::Implementation
     {
     };
   }
@@ -43,7 +43,7 @@ using namespace common;
 
 //////////////////////////////////////////////////
 OBJLoader::OBJLoader()
-: MeshLoader(), dataPtr(new OBJLoaderPrivate)
+: dataPtr(ignition::utils::MakeImpl<Implementation>())
 {
 }
 

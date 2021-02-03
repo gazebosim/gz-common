@@ -21,7 +21,7 @@
 #include "ignition/common/Pbr.hh"
 
 /// \brief Private data for Pbr class
-class ignition::common::PbrPrivate
+class ignition::common::Pbr::Implementation
 {
   /// \brief Workflow type
   public: PbrType type = PbrType::NONE;
@@ -78,45 +78,8 @@ using namespace common;
 
 /////////////////////////////////////////////////
 Pbr::Pbr()
-  : dataPtr(new PbrPrivate)
+  : dataPtr(ignition::utils::MakeImpl<Implementation>())
 {
-}
-
-/////////////////////////////////////////////////
-Pbr::~Pbr()
-{
-  delete this->dataPtr;
-  this->dataPtr = nullptr;
-}
-
-//////////////////////////////////////////////////
-Pbr::Pbr(const Pbr &_pbr)
-  : dataPtr(new PbrPrivate)
-{
-  *this->dataPtr = *_pbr.dataPtr;
-}
-
-/////////////////////////////////////////////////
-Pbr &Pbr::operator=(const Pbr &_pbr)
-{
-  if (!this->dataPtr)
-  {
-    this->dataPtr = new PbrPrivate;
-  }
-  *this->dataPtr = *_pbr.dataPtr;
-  return *this;
-}
-
-/////////////////////////////////////////////////
-Pbr &Pbr::operator=(Pbr &&_pbr)
-{
-  if (this->dataPtr)
-  {
-    delete this->dataPtr;
-  }
-  this->dataPtr = _pbr.dataPtr;
-  _pbr.dataPtr = nullptr;
-  return *this;
 }
 
 //////////////////////////////////////////////////
@@ -143,13 +106,6 @@ bool Pbr::operator==(const Pbr &_pbr) const
         this->dataPtr->roughness, _pbr.dataPtr->roughness))
     && (ignition::math::equal(
         this->dataPtr->glossiness, _pbr.dataPtr->glossiness));
-}
-
-/////////////////////////////////////////////////
-Pbr::Pbr(Pbr &&_pbr) noexcept
-{
-  this->dataPtr = _pbr.dataPtr;
-  _pbr.dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////

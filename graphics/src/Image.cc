@@ -33,7 +33,7 @@ namespace ignition
   namespace common
   {
     /// \brief Private data class
-    class ImagePrivate
+    class Image::Implementation
     {
       /// \brief bitmap data
       public: FIBITMAP *bitmap;
@@ -52,7 +52,7 @@ static int count = 0;
 
 //////////////////////////////////////////////////
 Image::Image(const std::string &_filename)
-  : dataPtr(new ImagePrivate)
+: dataPtr(ignition::utils::MakeImpl<Implementation>())
 {
   if (count == 0)
     FreeImage_Initialise();
@@ -219,7 +219,7 @@ void Image::Data(unsigned char **_data, unsigned int &_count) const
 }
 
 //////////////////////////////////////////////////
-void ImagePrivate::DataImpl(unsigned char **_data, unsigned int &_count,
+void Image::Implementation::DataImpl(unsigned char **_data, unsigned int &_count,
                         FIBITMAP *_img) const
 {
   int redmask = FI_RGBA_RED_MASK;

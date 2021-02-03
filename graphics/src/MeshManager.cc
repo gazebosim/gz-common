@@ -39,7 +39,7 @@
 
 using namespace ignition::common;
 
-class ignition::common::MeshManagerPrivate
+class ignition::common::MeshManager::Implementation
 {
 #ifdef _WIN32
 // Disable warning C4251
@@ -73,7 +73,7 @@ class ignition::common::MeshManagerPrivate
 
 //////////////////////////////////////////////////
 MeshManager::MeshManager()
-    : dataPtr(new MeshManagerPrivate)
+: dataPtr(ignition::utils::MakeUniqueImpl<Implementation>())
 {
   // Create some basic shapes
   this->CreatePlane("unit_plane",

@@ -32,7 +32,7 @@ IGN_ENUM(blendModeIface, Material::BlendMode,
     "ADD", "MODULATE", "REPLACE")
 
 /// \brief Private data for Material
-class ignition::common::MaterialPrivate
+class ignition::common::Material::Implementation
 {
   /// \brief the name of the material
   public: std::string name;
@@ -98,11 +98,11 @@ class ignition::common::MaterialPrivate
   public: std::unique_ptr<Pbr> pbr;
 };
 
-unsigned int MaterialPrivate::counter = 0;
+unsigned int Material::Implementation::counter = 0;
 
 //////////////////////////////////////////////////
 Material::Material()
-: dataPtr(new MaterialPrivate)
+: dataPtr(ignition::utils::MakeUniqueImpl<Implementation>())
 {
   this->dataPtr->name = "ignition_material_" +
     std::to_string(this->dataPtr->counter++);
@@ -116,7 +116,7 @@ Material::Material()
 
 //////////////////////////////////////////////////
 Material::Material(const math::Color &_clr)
-: dataPtr(new MaterialPrivate)
+: dataPtr(ignition::utils::MakeUniqueImpl<Implementation>())
 {
   this->dataPtr->name = "ignition_material_" +
     std::to_string(this->dataPtr->counter++);

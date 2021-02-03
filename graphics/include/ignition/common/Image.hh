@@ -21,15 +21,13 @@
 #include <string>
 #include <ignition/math/Color.hh>
 #include <ignition/common/graphics/Export.hh>
-#include <ignition/common/SuppressWarning.hh>
+
+#include <ignition/utils/ImplPtr.hh>
 
 namespace ignition
 {
   namespace common
   {
-    /// \brief Forward declaration of private data class
-    class ImagePrivate;
-
     /// \brief String names for the pixel formats.
     /// \sa Image::PixelFormat.
     static std::string PixelFormatNames[] =
@@ -178,10 +176,8 @@ namespace ignition
       /// \return true if image has a bitmap
       public: bool Valid() const;
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Private data pointer
-      private: std::unique_ptr<ImagePrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      IGN_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

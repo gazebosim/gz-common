@@ -31,7 +31,7 @@
 using namespace ignition;
 using namespace common;
 
-class ignition::common::SVGLoaderPrivate
+class ignition::common::SVGLoader::Implementation
 {
   /// \brief Generates polylines for each SVG subpath
   /// \param[in] _subpath The subpath commands
@@ -479,7 +479,7 @@ void arcPath(const ignition::math::Vector2d &_p0,
 }
 
 /////////////////////////////////////////////////
-ignition::math::Vector2d SVGLoaderPrivate::SubpathToPolyline(
+ignition::math::Vector2d SVGLoader::Implementation::SubpathToPolyline(
     const std::vector<SVGCommand> &_subpath,
     ignition::math::Vector2d _last,
     std::vector<ignition::math::Vector2d> &_polyline)
@@ -613,7 +613,7 @@ ignition::math::Vector2d SVGLoaderPrivate::SubpathToPolyline(
 
 /////////////////////////////////////////////////
 SVGLoader::SVGLoader(const unsigned int _samples)
-: dataPtr(new SVGLoaderPrivate())
+: dataPtr(ignition::utils::MakeImpl<Implementation>())
 {
   this->dataPtr->resolution = 1.0/std::max(1u, _samples);
 }
@@ -624,7 +624,7 @@ SVGLoader::~SVGLoader()
 }
 
 /////////////////////////////////////////////////
-bool SVGLoaderPrivate::SplitSubpaths(const std::vector<SVGCommand> &_cmds,
+bool SVGLoader::Implementation::SplitSubpaths(const std::vector<SVGCommand> &_cmds,
     std::vector< std::vector<SVGCommand> > &_subpaths)
 {
   if (_cmds.empty())
@@ -653,7 +653,7 @@ bool SVGLoaderPrivate::SplitSubpaths(const std::vector<SVGCommand> &_cmds,
 }
 
 /////////////////////////////////////////////////
-void SVGLoaderPrivate::ExpandCommands(
+void SVGLoader::Implementation::ExpandCommands(
     const std::vector< std::vector<SVGCommand> > &_subpaths, SVGPath &_path)
 {
   for (const std::vector<SVGCommand> &compressedSubpath : _subpaths)
@@ -700,7 +700,7 @@ void SVGLoaderPrivate::ExpandCommands(
 }
 
 /////////////////////////////////////////////////
-bool SVGLoaderPrivate::PathCommands(const std::vector<std::string> &_tokens,
+bool SVGLoader::Implementation::PathCommands(const std::vector<std::string> &_tokens,
     SVGPath &_path)
 {
   std::vector <SVGCommand> cmds;
@@ -783,7 +783,7 @@ bool SVGLoaderPrivate::PathCommands(const std::vector<std::string> &_tokens,
 }
 
 /////////////////////////////////////////////////
-bool SVGLoaderPrivate::PathAttribs(tinyxml2::XMLElement *_pElement,
+bool SVGLoader::Implementation::PathAttribs(tinyxml2::XMLElement *_pElement,
     SVGPath &_path)
 {
   if (!_pElement)
@@ -830,7 +830,7 @@ bool SVGLoaderPrivate::PathAttribs(tinyxml2::XMLElement *_pElement,
 }
 
 /////////////////////////////////////////////////
-bool SVGLoaderPrivate::SvgPaths(tinyxml2::XMLNode *_pParent,
+bool SVGLoader::Implementation::SvgPaths(tinyxml2::XMLNode *_pParent,
     std::vector<SVGPath> &_paths)
 {
   if (!_pParent)
