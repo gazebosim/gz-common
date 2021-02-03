@@ -39,16 +39,23 @@ namespace ignition::common
 {
 
 /// \brief Set of flags defined by a C++11 enum class.
-/// \note For FlagSet to work, the enum has to have a value called '_' (just the
-/// underscore) as the very last element.
+/// \note If the enum's last element is '_' (just underscore), the convenience
+/// signature can be used specifying just the enum type (the underscore will be
+/// automatically used as LastElement, and will be excluded from the list of
+/// valid values).
 /// \note FlagSet only works for enums that do not contain negative values.
 /// \note The underlying bitset representing this FlagSet will have as many bits
-/// as is the value of the '_' element. Be aware of that when calling Count(),
-/// Size() etc. Also be aware of that when creating a FlagSet of an enum that
-/// would contain very high numbers in the underlying representation.
+/// as is the size_t value of LastElement (+- 1). Be aware of that when calling
+/// Count(), Size() etc. Also be aware of that when creating a FlagSet of an
+/// enum that would contain very high numbers in the underlying representation.
 /// \tparam T The enum class type. The underlying type of the enum has to be
-/// implicitly convertible to size_t.
-template<typename T>
+/// convertible to size_t.
+/// \tparam LastElement Last element of the enum. If the enum's last element is
+/// '_' (just underscore), it can be deduced automatically.
+/// \tparam ExcludeLast If true, LastElement is considered as an element beyond
+/// all valid elements and will not be treated as a valid value of the FlagSet.
+/// If false, the last element is treated as a valid value.
+template<typename T, T LastElement = T::_, bool ExcludeLast = true>
 class FlagSet
 {
   /// \brief Create an empty FlagSet (no flags set).
@@ -63,6 +70,16 @@ class FlagSet
   public: FlagSet(const T& _val)
   {
     flags.set(static_cast<UnderlyingType>(_val));
+  }
+
+  /// \brief Construct a FlagSet with the given flags set and all other unset.
+  /// \param[in] _list The list of flags to set.
+  public: explicit FlagSet(const std::initializer_list<T>& _list)
+  {
+    for (const auto& val : _list)
+    {
+      flags.set(static_cast<UnderlyingType>(val));
+    }
   }
 
   // Binary operations.
@@ -174,11 +191,17 @@ class FlagSet
 
   // Methods from std::bitset.
 
+  /// \brief Test FlagSet equality.
+  /// \param[in] _o The other FlagSet.
+  /// \return Whether the FlagSets represent the same set of flags.
   public: bool operator==(const FlagSet& _o) const
   {
     return flags == _o.flags;
   }
 
+  /// \brief Test FlagSet inequality.
+  /// \param[in] _o The other FlagSet.
+  /// \return Whether the FlagSets represent different sets of flags.
   public: bool operator!=(const FlagSet& _o) const
   {
     return !(*this == _o);
@@ -277,13 +300,13 @@ class FlagSet
   /// \brief Retrurn a FlagSet with all flags set to true.
   public: static FlagSet AllSet()
   {
-    return FlagSet<T>().Set();
+    return FlagSet().Set();
   }
 
   /// \brief Retrurn a FlagSet with all flags set to false.
   public: static FlagSet NoneSet()
   {
-    return FlagSet<T>();
+    return FlagSet();
   }
 
   /// \brief Return whether the given flag is set.
@@ -292,7 +315,7 @@ class FlagSet
   /// \note This only works for enums whose underlying type is unsigned.
   public: constexpr bool operator[](const T& _val) const
   {
-    return flags[static_cast<UnderlyingType>(_val)];
+    return flags[static_cast<size_t>(static_cast<UnderlyingType>(_val))];
   }
 
   /// \brief Return a string describing this FlagSet.
@@ -302,13 +325,18 @@ class FlagSet
     return flags.to_string();
   }
 
-  // Operator for outputting to std::ostream.
+  /// \brief Operator for outputting to std::ostream.
+  /// \param[in,out] _stream The stream to write to.
+  /// \param[in] _self The FlagSet to write.
+  /// \return _stream with the contents of the given FlagSet written.
   public: friend std::ostream& operator<<(std::ostream& _stream,
       const FlagSet& _self)
   {
     return _stream << _self.flags;
   }
 
+  /// \brief Compute hash of the FlagSet.
+  /// \return The hash.
   public: size_t Hash() const
   {
     return std::hash<decltype(this->flags)>{}(this->flags);
@@ -317,8 +345,13 @@ class FlagSet
   /// \brief The underlying type of the enum.
   private: using UnderlyingType = std::underlying_type_t<T>;
 
+  /// \brief Number of elements of the bitset.
+  public: static constexpr size_t numElements = static_cast<size_t>(
+    static_cast<UnderlyingType>(LastElement) +
+    static_cast<UnderlyingType>(1 - ExcludeLast));
+
   /// \brief The bitset holding values for the flags.
-  private: std::bitset<static_cast<UnderlyingType>(T::_)> flags;
+  private: std::bitset<numElements> flags;
 };
 
 template<typename T, typename = void>
@@ -352,11 +385,14 @@ operator|(const T& _lhs, const T& _rhs)
 
 namespace std
 {
-template<typename T> struct hash<ignition::common::FlagSet<T>>
+template<typename T, T LastElement, bool ExcludeLast>
+struct hash<ignition::common::FlagSet<T, LastElement, ExcludeLast>>
 {
-  std::size_t operator()(const ignition::common::FlagSet<T>& s) const noexcept
+  std::size_t operator()(
+    const ignition::common::FlagSet<T, LastElement, ExcludeLast>& _s)
+    const noexcept
   {
-    return s.Hash();
+    return _s.Hash();
   }
 };
 }

@@ -20,12 +20,24 @@
 
 #include <ignition/common/av/Util.hh>
 #include "ignition/common/ffmpeg_inc.hh"
+#include "ignition/common/Console.hh"
 #include "ignition/common/VideoEncoder.hh"
 #include "ignition/common/StringUtils.hh"
-#include "ignition/common/Console.hh"
 
 #ifdef IGN_COMMON_BUILD_HW_VIDEO
 #include "ignition/common/HWEncoder.hh"
+#endif
+
+// Fix averr2str
+// https://github.com/joncampbell123/composite-video-simulator/issues/5#issuecomment-611885908
+#ifdef av_err2str
+#undef av_err2str
+av_always_inline char *av_err2str(int _errnum)
+{
+  thread_local char str[AV_ERROR_MAX_STRING_SIZE];
+  memset(str, 0, sizeof(str));
+  return av_make_error_string(str, AV_ERROR_MAX_STRING_SIZE, _errnum);
+}
 #endif
 
 using namespace ignition;
@@ -266,7 +278,14 @@ bool VideoEncoder::Start(
 
   // Remove old temp file, if it exists.
   if (common::exists(this->dataPtr->filename))
-    std::remove(this->dataPtr->filename.c_str());
+  {
+    auto success = removeFile(this->dataPtr->filename.c_str());
+    if (!success)
+    {
+      ignerr << "Failed to remove temp file [" << this->dataPtr->filename
+             << "]" << std::endl;
+    }
+  }
 
   // Calculate a good bitrate if the _bitRate argument is zero
   if (_bitRate == 0)
@@ -316,8 +335,8 @@ bool VideoEncoder::Start(
     }
     else
     {
-      this->dataPtr->filename = common::joinPaths(
-          common::cwd(), "TMP_RECORDING." + this->dataPtr->format);
+      this->dataPtr->filename = joinPaths(common::cwd(), "TMP_RECORDING." +
+                                this->dataPtr->format);
     }
   }
 
@@ -342,8 +361,13 @@ bool VideoEncoder::Start(
       if (this->dataPtr->format.compare(outputFormat->name) == 0)
       {
         // Allocate the context using the correct outputFormat
-        avformat_alloc_output_context2(&this->dataPtr->formatCtx,
+        auto result = avformat_alloc_output_context2(&this->dataPtr->formatCtx,
             outputFormat, nullptr, this->dataPtr->filename.c_str());
+        if (result < 0)
+        {
+          ignerr << "Failed to allocate AV context [" << av_err2str(result)
+                 << "]" << std::endl;
+        }
         break;
       }
     }
@@ -386,8 +410,13 @@ bool VideoEncoder::Start(
 #endif
 
 #else
-    avformat_alloc_output_context2(&this->dataPtr->formatCtx, nullptr, nullptr,
-        this->dataPtr->filename.c_str());
+    auto result = avformat_alloc_output_context2(&this->dataPtr->formatCtx,
+        nullptr, nullptr, this->dataPtr->filename.c_str());
+    if (result < 0)
+    {
+      ignerr << "Failed to allocate AV context [" << av_err2str(result)
+             << "]" << std::endl;
+    }
 #endif
   }
 
@@ -968,7 +997,14 @@ void VideoEncoder::Reset()
 
   // Remove old temp file, if it exists.
   if (common::exists(this->dataPtr->filename))
-    std::remove(this->dataPtr->filename.c_str());
+  {
+    auto success = removeFile(this->dataPtr->filename.c_str());
+    if (!success)
+    {
+      ignerr << "Failed to remove temp file [" << this->dataPtr->filename
+             << "]" << std::endl;
+    }
+  }
 
   // set default values
   this->dataPtr->frameCount = 0;
@@ -980,6 +1016,7 @@ void VideoEncoder::Reset()
   this->dataPtr->format = VIDEO_ENCODER_FORMAT_DEFAULT;
   this->dataPtr->timePrev = std::chrono::steady_clock::time_point();
   this->dataPtr->timeStart = std::chrono::steady_clock::time_point();
+  this->dataPtr->filename.clear();
 #ifdef IGN_COMMON_BUILD_HW_VIDEO
   if (this->dataPtr->hwEncoder)
     this->dataPtr->hwEncoder.reset();
