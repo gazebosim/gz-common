@@ -28,18 +28,6 @@
 #include "ignition/common/HWEncoder.hh"
 #endif
 
-// Fix averr2str
-// https://github.com/joncampbell123/composite-video-simulator/issues/5#issuecomment-611885908
-#ifdef av_err2str
-#undef av_err2str
-av_always_inline char *av_err2str(int _errnum)
-{
-  thread_local char str[AV_ERROR_MAX_STRING_SIZE];
-  memset(str, 0, sizeof(str));
-  return av_make_error_string(str, AV_ERROR_MAX_STRING_SIZE, _errnum);
-}
-#endif
-
 using namespace ignition;
 using namespace common;
 using namespace std;
@@ -365,7 +353,7 @@ bool VideoEncoder::Start(
             outputFormat, nullptr, this->dataPtr->filename.c_str());
         if (result < 0)
         {
-          ignerr << "Failed to allocate AV context [" << av_err2str(result)
+          ignerr << "Failed to allocate AV context [" << av_err2str_cpp(result)
                  << "]" << std::endl;
         }
         break;
@@ -414,7 +402,7 @@ bool VideoEncoder::Start(
         nullptr, nullptr, this->dataPtr->filename.c_str());
     if (result < 0)
     {
-      ignerr << "Failed to allocate AV context [" << av_err2str(result)
+      ignerr << "Failed to allocate AV context [" << av_err2str_cpp(result)
              << "]" << std::endl;
     }
 #endif

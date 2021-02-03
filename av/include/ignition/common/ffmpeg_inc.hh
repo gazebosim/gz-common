@@ -84,9 +84,11 @@ namespace ignition
         AVFrame *_frame, int *_gotFrame, AVPacket *_packet);
 
     // av_err2str only works in C99, this is a version that works in C++;
+    // https://github.com/joncampbell123/composite-video-simulator/issues/5#issuecomment-611885908
     inline std::string av_err2str_cpp(int errnum)
     {
-      char buf[AV_ERROR_MAX_STRING_SIZE];
+      thread_local char buf[AV_ERROR_MAX_STRING_SIZE];
+      memset(buf, 0, sizeof(buf));
       // lavu 51.58.100
       return av_make_error_string(buf, AV_ERROR_MAX_STRING_SIZE, errnum);
     }
