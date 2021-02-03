@@ -15,65 +15,92 @@
 */
 #include <gtest/gtest.h>
 
+#include "ignition/common/Console.hh"
 #include "ignition/common/VideoEncoder.hh"
+#include <ignition/utilities/ExtraTestMacros.hh>
 #include "test_config.h"
 #include "test/util.hh"
 
 using namespace ignition;
 using namespace common;
 
-class VideoEncoderTest : public ignition::testing::AutoLogFixture { };
+class VideoEncoderTest : public ignition::testing::AutoLogFixture
+{
+  // Documentation inherited
+  protected: void SetUp() override
+  {
+    Console::SetVerbosity(4);
+  }
+};
 
 /////////////////////////////////////////////////
 TEST_F(VideoEncoderTest, StartStop)
 {
-  VideoEncoder video;
-  EXPECT_FALSE(video.IsEncoding());
-  EXPECT_STREQ(video.Format().c_str(), VIDEO_ENCODER_FORMAT_DEFAULT);
-  EXPECT_EQ(video.BitRate(), static_cast<unsigned int>(
-        VIDEO_ENCODER_BITRATE_DEFAULT));
-
   auto filePathMp4 = common::joinPaths(common::cwd(), "TMP_RECORDING.mp4");
   auto filePathMpg = common::joinPaths(common::cwd(), "TMP_RECORDING.mpg");
 
-  video.Start();
-  EXPECT_TRUE(video.IsEncoding());
-  EXPECT_TRUE(common::exists(filePathMp4));
-  EXPECT_EQ(video.BitRate(), 920000u);
+  {
+    VideoEncoder video;
+    EXPECT_FALSE(video.IsEncoding());
+    EXPECT_STREQ(video.Format().c_str(), VIDEO_ENCODER_FORMAT_DEFAULT);
+    EXPECT_EQ(video.BitRate(), static_cast<unsigned int>(
+          VIDEO_ENCODER_BITRATE_DEFAULT));
 
-  video.Stop();
-  EXPECT_FALSE(video.IsEncoding());
-  EXPECT_FALSE(common::exists(filePathMpg));
+    video.Start();
+    EXPECT_TRUE(video.IsEncoding());
+    EXPECT_TRUE(common::exists(filePathMp4)) << filePathMp4;
+    EXPECT_EQ(video.BitRate(), 920000u);
 
-  video.Start("mpg", "", 1024, 768);
-  EXPECT_TRUE(video.IsEncoding());
-  EXPECT_STREQ(video.Format().c_str(), "mpg");
-  EXPECT_TRUE(common::exists(filePathMpg));
+    video.Stop();
+    EXPECT_FALSE(video.IsEncoding());
+    EXPECT_FALSE(common::exists(filePathMpg)) << filePathMpg;
 
-  video.Start("mp4", "", 1024, 768);
-  EXPECT_TRUE(video.IsEncoding());
-  EXPECT_STREQ(video.Format().c_str(), "mpg");
+    video.Start("mpg", "", 1024, 768);
+    EXPECT_TRUE(video.IsEncoding());
+    EXPECT_STREQ(video.Format().c_str(), "mpg");
+    EXPECT_TRUE(common::exists(filePathMpg)) << filePathMpg;
 
-  video.Stop();
-  EXPECT_FALSE(video.IsEncoding());
+    video.Start("mp4", "", 1024, 768);
+    EXPECT_TRUE(video.IsEncoding());
+    EXPECT_STREQ(video.Format().c_str(), "mpg");
+
+    video.Stop();
+    EXPECT_FALSE(video.IsEncoding());
+  }
+
+  // Check that temp files are removed when video goes out of scope
+  // Fails on Windows with `Permission denied`
+  // https://github.com/ignitionrobotics/ign-common/issues/148
+#ifndef _WIN32
+  EXPECT_FALSE(common::exists(filePathMp4)) << filePathMp4;
+  EXPECT_FALSE(common::exists(filePathMpg)) << filePathMpg;
+#endif
 }
 
 /////////////////////////////////////////////////
-TEST_F(VideoEncoderTest, Exists)
+TEST_F(VideoEncoderTest, IGN_UTILS_TEST_DISABLED_ON_WIN32(Exists))
 {
-  VideoEncoder video;
-  EXPECT_FALSE(video.IsEncoding());
-  EXPECT_STREQ(video.Format().c_str(), VIDEO_ENCODER_FORMAT_DEFAULT);
-
   auto filePathMp4 = common::joinPaths(common::cwd(), "TMP_RECORDING.mp4");
   auto filePathMpg = common::joinPaths(common::cwd(), "TMP_RECORDING.mpg");
 
-  EXPECT_FALSE(common::exists(filePathMp4));
-  EXPECT_FALSE(common::exists(filePathMpg));
+  {
+    VideoEncoder video;
+    EXPECT_FALSE(video.IsEncoding());
+    EXPECT_STREQ(video.Format().c_str(), VIDEO_ENCODER_FORMAT_DEFAULT);
 
-  video.Start();
-  EXPECT_TRUE(common::exists(filePathMp4));
+    EXPECT_FALSE(common::exists(filePathMp4)) << filePathMp4;
+    EXPECT_FALSE(common::exists(filePathMpg)) << filePathMpg;
 
-  video.Reset();
-  EXPECT_FALSE(common::exists(filePathMp4));
+    video.Start();
+    EXPECT_TRUE(common::exists(filePathMp4));
+
+    video.Reset();
+    EXPECT_FALSE(common::exists(filePathMp4));
+  }
+
+  // Check that temp files are removed when video goes out of scope
+  // Fails on Windows with `Permission denied`
+  // https://github.com/ignitionrobotics/ign-common/issues/148
+  EXPECT_FALSE(common::exists(filePathMp4)) << filePathMp4;
+  EXPECT_FALSE(common::exists(filePathMpg)) << filePathMpg;
 }
