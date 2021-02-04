@@ -55,13 +55,12 @@ TEST_F(ColladaLoader, LoadBox)
 TEST_F(ColladaLoader, LoadRectangle)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      std::string(PROJECT_SOURCE_PATH) + "/test/data/rectangle.dae");
+  common::Mesh *mesh = loader.Load(common::joinPaths(
+      std::string(PROJECT_SOURCE_PATH), "test", "data", "rectangle.dae"));
 
   EXPECT_STREQ("unknown", mesh->Name().c_str());
   EXPECT_EQ(ignition::math::Vector3d(0.35, 0.4, 1), mesh->Max());
   EXPECT_EQ(ignition::math::Vector3d(-0.35, -0.4, -1), mesh->Min());
-  // 36 vertices, 24 unique, 12 shared.
   EXPECT_EQ(35u, mesh->VertexCount());
   EXPECT_EQ(35u, mesh->NormalCount());
   EXPECT_EQ(36u, mesh->IndexCount());
@@ -71,7 +70,7 @@ TEST_F(ColladaLoader, LoadRectangle)
 
   common::MaterialPtr material = mesh->MaterialByIndex(0);
   EXPECT_NE(nullptr, material);
-  EXPECT_EQ(math::Color(0.008957128, 0.00619848, 0.64, 1),
+  EXPECT_EQ(math::Color(0.008957128f, 0.00619848f, 0.64f, 1.0f),
     material->Diffuse());
   EXPECT_EQ(math::Color(0.5, 0.5, 0.5, 1), material->Specular());
   EXPECT_EQ(math::Color(0, 0, 0, 1), material->Ambient());
