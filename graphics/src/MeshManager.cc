@@ -91,6 +91,10 @@ MeshManager::MeshManager()
   this->CreateCylinder("unit_cylinder", 0.5, 1.0, 1, 32);
   this->CreateCone("unit_cone", 0.5, 1.0, 5, 32);
   this->CreateCamera("unit_camera", 0.5);
+  this->CreateCapsule("unit_capsule", 0.5f, 0.3f, 32, 32);
+  this->CreateEllipsoid("unit_ellipsoid",
+    ignition::math::Vector3d(0.3f, 0.5f, 1.0f),
+    32, 32);
 
   this->CreateCylinder("axis_shaft", 0.01f, 0.2f, 1, 16);
   this->CreateCone("axis_head", 0.02f, 0.08f, 1, 16);
