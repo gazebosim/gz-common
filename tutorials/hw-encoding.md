@@ -27,8 +27,10 @@ In order to get HW accelerated encoding working, you need to get 3 things right:
 ## 1. Encoder types
 
 The support for HW-accelerated encoding is based on what the local installation of
-`libavcodec` offers. If the libavcodec/FFMpeg your system has doesn't support HW
+`libavcodec` (and your hardware) offers. If the libavcodec/FFMpeg your system has doesn't support HW
 acceleration, you're out of luck until you get a version that supports some.
+Some information about various aspects of the acceleration support by FFMpeg
+can be found on their [HWAccelIntro wiki page](https://trac.ffmpeg.org/wiki/HWAccelIntro).
 
 If FFMpeg is correctly installed, you can see the available HW encoders by calling
 ``ffmpeg -hide_banner -encoders | grep 264``.
@@ -62,9 +64,9 @@ Ignition Common so far supports:
 
 | Encoder | Technology | Platforms | GPU vendors | Ignition Common name |
 | ------- | ---------- | --------- | ----------- | -------------------- |
-| `h264_nvenc` | NVidia NVEnc | Windows + x86 Linux | NVidia GPUs | NVENC |
-| `h264_qsv` | Intel QuickSync | Windows + x86 Linux | Intel GPUs | QSV |
-| `h264_vaapi` | VA-API | x86 Linux | most GPUs | VAAPI |
+| `h264_nvenc` | [NVidia NVEnc](https://en.wikipedia.org/wiki/Nvidia_NVENC) | Windows + x86 Linux | NVidia GPUs | NVENC |
+| `h264_qsv` | [Intel QuickSync](https://en.wikipedia.org/wiki/Intel_Quick_Sync_Video) | Windows + x86 Linux | Intel GPUs | QSV |
+| `h264_vaapi` | [VA-API](https://en.wikipedia.org/wiki/Video_Acceleration_API) | x86 Linux | most GPUs | VAAPI |
 
 Adding support for more is possible and should not be a big problem, but needs
 someone with the right hardware to verify the implementation.

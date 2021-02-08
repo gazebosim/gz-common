@@ -8,7 +8,7 @@ Ignition @IGN_DESIGNATION_CAP@ library and how to use the library effectively.
 
 1. \subpage install "Installation"
 1. \subpage profiler "Profiler"
-1. \subpage hw-encoding "HW-accelerated Video Encoding"
+1. \subpage hw-encoding "Hardware-accelerated Video Encoding"
 
 ## License
 
