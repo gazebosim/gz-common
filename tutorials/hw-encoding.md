@@ -1,7 +1,7 @@
-\page hw-encoding HW-accelerated Video Encoding
+\page hw-encoding Hardware-accelerated Video Encoding
 
 When recording video using the `ignition::common::VideoEncoder` class, you can
-opt-in to use HW acceleration for the encoding process. By default, only software
+opt-in to use hardware (HW) acceleration for the encoding process. By default, only software
 encoders are used. This tutorial will show how to configure the encoder for HW
 acceleration and will present ready-made commandlines for some typical use-cases.
 
@@ -14,7 +14,7 @@ leaving more CPU power to the rest of your program/simulation, while taking a bi
 GPU memory (video encoding uses different chips than 3D graphics or CUDA computations,
 so performance-wise, the rest of the GPU should be unaffected).
 
-# Configuring HW acceleration
+# Configuring hardware acceleration
 
 ## What needs to be configured
 
@@ -93,7 +93,7 @@ Here are some basic naming rules:
 - VA-API
   - Linux: 
     - DRM: The devices are called `/dev/dri/renderD128`, `/dev/dri/renderD129`
-      etc. DRM stands for Direct Rendering Manager, not Digital Rights Management :)
+      etc. DRM stands for Direct Rendering Manager, not Digital Rights Management
       To use these devices, make sure your user has write permissions to the 
       device files. Ubuntu usually doesn't give write access to everybody, but just
       to members of the `video` group.
@@ -108,7 +108,7 @@ a HW surface (pixel buffer) or the default CPU-located one. With most encoders,
 this is just a performance issue and they will work both with CPU and GPU surfaces.
 
 It is best if you perform experiments with HW surface used and not used and compare
-the performance. Select the one that suits you better.
+the performance. Select the one that suits your use case better.
 
 ## Putting it together - configuration via environment variables
 
@@ -267,7 +267,7 @@ Just give them a try and dig deeper in the configuration if something is wrong.
 
     IGN_VIDEO_ALLOWED_ENCODERS=NVENC IGN_VIDEO_ENCODER_DEVICE=/dev/nvidia2
 
-# Pitfalls
+# Caveats
 
 ## NVEnc per-machine limit
 
@@ -288,5 +288,6 @@ This might be really troublesome on e.g. multi-user systems when you don't even 
 which jobs of the other users are using NVEnc.
 
 There is a workaround removing this artificial limit - patching the binary blob
-drivers using https://github.com/keylase/nvidia-patch . It is up to you if you
-can and want to do that. And there is no guarantee it will work forever.
+drivers using https://github.com/keylase/nvidia-patch . This is an unofficial 
+patch that is not supported by NVidia or the Ignition developers. It is up to 
+you if you can and want to do that. And there is no guarantee it will work forever.
