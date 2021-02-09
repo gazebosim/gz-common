@@ -20,9 +20,9 @@
 
 #include "ignition/common/VideoEncoder.hh"
 #include "ignition/common/Video.hh"
-#include "test_config.h"
-#include "test/util.hh"
 #include "ignition/common/ffmpeg_inc.hh"
+
+#include "test_config.h"
 
 using namespace ignition;
 using namespace common;
@@ -30,7 +30,7 @@ using namespace std::chrono;
 auto Now = steady_clock::now;
 using TimePoint = steady_clock::time_point;
 
-class EncoderDecoderTest : public ignition::testing::AutoLogFixture { };
+class EncoderDecoderTest : public common::testing::AutoLogFixture { };
 
 double
 computeAverageIntensity(const size_t bufferSize, const unsigned char* buf)
@@ -53,8 +53,9 @@ TEST_F(EncoderDecoderTest, DecodeEncodeDecode)
 
   const char* testVideoInName = "test_video.mp4";
   const char* testVideoOutName = "test_video_out.mp4";
-  const auto testVideoInPath = joinPaths(TEST_PATH, "data", testVideoInName);
-  const auto testVideoOutPath = joinPaths(cwd(), testVideoOutName);
+
+  const auto testVideoInPath = common::testing::TestFile("data", testVideoInName);
+  const auto testVideoOutPath = common::testing::TempPath(testVideoOutName);
 
   Video decoder;
   decoder.Load(testVideoInPath);

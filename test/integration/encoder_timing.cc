@@ -42,7 +42,7 @@ void durationTest(VideoEncoder &_vidEncoder, Video &_video,
   }
 
   _vidEncoder.Stop();
-  _video.Load(common::joinPaths(common::cwd(), "/TMP_RECORDING.mp4"));
+  _video.Load(common::joinPaths(common::cwd(), "TMP_RECORDING.mp4"));
 
   auto length = std::chrono::duration_cast<std::chrono::milliseconds>(
       _video.Duration()).count();
