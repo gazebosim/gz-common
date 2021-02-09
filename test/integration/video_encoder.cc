@@ -54,7 +54,8 @@ TEST_F(EncoderDecoderTest, DecodeEncodeDecode)
   const char* testVideoInName = "test_video.mp4";
   const char* testVideoOutName = "test_video_out.mp4";
 
-  const auto testVideoInPath = common::testing::TestFile("data", testVideoInName);
+  const auto testVideoInPath =
+    common::testing::TestFile("data", testVideoInName);
   const auto testVideoOutPath = common::testing::TempPath(testVideoOutName);
 
   Video decoder;
