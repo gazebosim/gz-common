@@ -86,7 +86,7 @@ From terminal 2, open the visualizer using one of the following commands
 
 ```{.sh}
 # Use a launcher script (Linux and macOS)
-ign_remotery_vis
+/usr/lib/ignition/ignition-common4/ign_remotery_vis
 
 # Use the source path (Linux)
 # Substitute the path to your ign-common source checkout
