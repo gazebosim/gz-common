@@ -333,7 +333,7 @@ void ColladaExporterPrivate::ExportGeometrySource(
     ignition::math::Vector2d inTexCoord;
     for (unsigned int i = 0; i < count; ++i)
     {
-      inTexCoord = _subMesh->TexCoord(i);
+      inTexCoord = _subMesh->TexCoordBySet(i, 0);
       fillData << inTexCoord.X() << " " << 1-inTexCoord.Y() << " ";
     }
   }
@@ -422,7 +422,7 @@ void ColladaExporterPrivate::ExportGeometries(
 
     this->ExportGeometrySource(subMesh.get(), meshXml, POSITION, meshId);
     this->ExportGeometrySource(subMesh.get(), meshXml, NORMAL, meshId);
-    if (subMesh->TexCoordCount() != 0)
+    if (subMesh->TexCoordCountBySet(0) != 0)
     {
       this->ExportGeometrySource(subMesh.get(), meshXml, UVMAP, meshId);
     }
@@ -468,7 +468,7 @@ void ColladaExporterPrivate::ExportGeometries(
     snprintf(attributeValue, sizeof(attributeValue), "#%s-Normals", meshId);
     inputXml->SetAttribute("source", attributeValue);
 
-    if (subMesh->TexCoordCount() != 0)
+    if (subMesh->TexCoordCountBySet(0) != 0)
     {
       inputXml = _libraryGeometriesXml->GetDocument()->NewElement("input");
       trianglesXml->LinkEndChild(inputXml);
@@ -482,7 +482,7 @@ void ColladaExporterPrivate::ExportGeometries(
     for (unsigned int j = 0; j < indexCount; ++j)
     {
       fillData << subMesh->Index(j) << " " << subMesh->Index(j) << " ";
-      if (subMesh->TexCoordCount() != 0)
+      if (subMesh->TexCoordCountBySet(0) != 0)
       {
         fillData << subMesh->Index(j) << " ";
       }
