@@ -234,7 +234,7 @@ TEST_F(SystemPathsFixture, FindFileURI)
   auto osrfCb = [dir2](const ignition::common::URI &_uri)
   {
     return _uri.Scheme() == "osrf" ?
-           ignition::common::joinPaths(dir2, _uri.PathSegments().Str()) : "";
+           ignition::common::joinPaths(dir2, _uri.Authority().Host()) : "";
   };
   auto robot2Cb = [dir2](const ignition::common::URI &_uri)
   {
@@ -266,7 +266,7 @@ TEST_F(SystemPathsFixture, FindFileURI)
   // second handler for the same protocol is available
   sp.AddFindFileURICallback(robot2Cb);
   EXPECT_EQ(file1, sp.FindFileURI("robot://test_f1"));
-  EXPECT_EQ(file2, sp.FindFileURI("osrf:test_f2"));
+  EXPECT_EQ(file2, sp.FindFileURI("osrf://test_f2"));
 
   // URI + env var
   common::setenv(kFilePath, dir1);
