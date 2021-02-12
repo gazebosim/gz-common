@@ -194,7 +194,7 @@ std::string URIAuthority::Str() const
   if (!this->dataPtr->host.empty() ||
       (this->dataPtr->emptyHostValid && this->dataPtr->hasEmptyHost))
   {
-    std::string result = "//";
+    std::string result = kAuthDelim;
     result += this->dataPtr->userInfo.empty() ? "" :
       this->dataPtr->userInfo + "@";
     result += this->dataPtr->host;
@@ -232,7 +232,7 @@ bool URIAuthority::Valid(const std::string &_str, bool _emptyHostValid)
     return true;
 
   // The authority must start with two forward slashes
-  if (str.find("//") != 0)
+  if (str.find(kAuthDelim) != 0)
     return false;
 
   auto userInfoIndex = str.find("@", 2);
@@ -333,7 +333,7 @@ bool URIAuthority::Parse(const std::string &_str, bool _emptyHostValid)
 
   this->dataPtr->emptyHostValid = _emptyHostValid;
 
-  if (_str.empty() || _str == "//")
+  if (_str.empty() || _str == kAuthDelim)
   {
     this->dataPtr->hasEmptyHost = true;
     return true;
@@ -968,6 +968,18 @@ URIPath &URI::Path()
 
 /////////////////////////////////////////////////
 const URIPath &URI::Path() const
+{
+  return this->dataPtr->path;
+}
+
+/////////////////////////////////////////////////
+URIPath &URI::PathSegments()
+{
+  return this->dataPtr->path;
+}
+
+/////////////////////////////////////////////////
+const URIPath &URI::PathSegments() const
 {
   return this->dataPtr->path;
 }

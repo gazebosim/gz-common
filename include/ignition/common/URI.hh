@@ -148,7 +148,15 @@ namespace ignition
       IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
     };
 
-    /// \brief The path component of a URI
+    /// \brief A URI path contains a sequence of segments separated by `/`.
+    /// The path may be empty in a valid URI.
+    /// When an authority is present, the path must start with a `/`.
+    ///
+    /// In the following URI:
+    ///
+    /// scheme://authority.com/seg1/seg2?query
+    ///
+    /// The path is `/seg1/seg2`
     class IGNITION_COMMON_VISIBLE URIPath
     {
       /// \brief Constructor
@@ -422,11 +430,25 @@ namespace ignition
 
       /// \brief Get a mutable version of the path component
       /// \return A reference to the path
-      public: URIPath &Path();
+      /// \deprecated Use `PathSegments()`, the path doesn't contain the
+      /// authority anymore.
+      public: URIPath IGN_DEPRECATED(4.0) &Path();
 
       /// \brief Get a const reference of the path component.
       /// \return A const reference of the path.
-      public: const URIPath &Path() const;
+      /// \deprecated Use `PathSegments()`, the path doesn't contain the
+      /// authority anymore.
+      public: const URIPath IGN_DEPRECATED(4.0) &Path() const;
+
+      /// \brief Get a mutable version of the path component.
+      /// The path doesn't contain the authority.
+      /// \return A reference to the path
+      public: URIPath &PathSegments();
+
+      /// \brief Get a const reference of the path component.
+      /// The path doesn't contain the authority.
+      /// \return A const reference of the path.
+      public: const URIPath &PathSegments() const;
 
       /// \brief Get a mutable version of the query component
       /// \return A reference to the query

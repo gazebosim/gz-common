@@ -71,9 +71,12 @@ namespace ignition
       /// \param[in] _uri the uniform resource identifier
       /// \return Returns full path name to file with platform-specific
       /// directory separators, or an empty string if URI couldn't be found.
+      /// \sa FindFileURI(const ignition::common::URI &_uri)
       public: std::string FindFileURI(const std::string &_uri) const;
 
-      /// \brief Find a file or path using a URI
+      /// \brief Find a file or path using a URI.
+      /// If URI is not an absolute path, the URI's "Host / PathSegments"
+      /// will be matched against all added paths and environment variables.
       /// \param[in] _uri the uniform resource identifier
       /// \return Returns full path name to file with platform-specific
       /// directory separators, or an empty string if URI couldn't be found.

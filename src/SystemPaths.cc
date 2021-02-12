@@ -313,7 +313,8 @@ std::string SystemPaths::FindFileURI(const std::string &_uri) const
 std::string SystemPaths::FindFileURI(const ignition::common::URI &_uri) const
 {
   std::string prefix = _uri.Scheme();
-  std::string suffix = _uri.Path().Str() + _uri.Query().Str();
+  std::string suffix = _uri.Authority().Host() + _uri.PathSegments().Str() +
+      _uri.Query().Str();
   std::string filename;
 
   if (prefix == "file")
