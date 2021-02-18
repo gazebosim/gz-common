@@ -21,8 +21,8 @@ so performance-wise, the rest of the GPU should be unaffected).
 In order to get HW accelerated encoding working, you need to get 3 things right:
 
 1. The encoder type
-1. The HW device to be used
-1. Whether to use a specialized HW surface
+2. The HW device to be used
+3. Whether to use a specialized HW surface
 
 ## 1. Encoder types
 
