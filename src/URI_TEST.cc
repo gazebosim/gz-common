@@ -457,7 +457,7 @@ TEST(URITEST, Scheme)
 }
 
 /////////////////////////////////////////////////
-TEST(URITEST, PathWhenHasAuthority)
+TEST(URITEST, PathIfHasAuthority)
 {
   URI uri;
   uri.SetHasAuthority(true);

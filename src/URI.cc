@@ -991,8 +991,8 @@ URIAuthority &URI::Authority()
 {
   if (!this->dataPtr->hasAuthority)
   {
-    ignwarn << "Getting authority of a URI whose authority is included in the"
-            << " path. Get the path instead. URI: [" << this->Str() << "]"
+    ignwarn << "Getting authority of a URI that's set not to have an authority."
+            << "Get the path instead. URI: [" << this->Str() << "]"
             << std::endl;
   }
   return this->dataPtr->authority;
@@ -1003,8 +1003,8 @@ const URIAuthority &URI::Authority() const
 {
   if (!this->dataPtr->hasAuthority)
   {
-    ignwarn << "Getting authority of a URI whose authority is included in the"
-            << " path. Get the path instead. URI: [" << this->Str() << "]"
+    ignwarn << "Getting authority of a URI that's set not to have an authority."
+            << "Get the path instead. URI: [" << this->Str() << "]"
             << std::endl;
   }
   return this->dataPtr->authority;
