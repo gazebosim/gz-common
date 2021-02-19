@@ -956,7 +956,7 @@ std::string URI::Str() const
 
   if (this->dataPtr->authority)
   {
-    result += (*this->dataPtr->authority).Str() + this->dataPtr->path.Str();
+    result += this->dataPtr->authority->Str() + this->dataPtr->path.Str();
   }
   else
   {
@@ -1036,8 +1036,7 @@ const URIFragment &URI::Fragment() const
 void URI::Clear()
 {
   this->dataPtr->scheme.clear();
-  if (this->dataPtr->authority)
-    (*this->dataPtr->authority).Clear();
+  this->dataPtr->authority.reset();
   this->dataPtr->path.Clear();
   this->dataPtr->query.Clear();
   this->dataPtr->fragment.Clear();
@@ -1239,10 +1238,9 @@ bool URI::Parse(const std::string &_str)
   this->Clear();
   this->SetScheme(localScheme);
 
-  if (this->dataPtr->authority &&
-      (!emptyHostValid || authorityPresent))
+  if (this->dataPtr->authority && (!emptyHostValid || authorityPresent))
   {
-    if (!(*this->dataPtr->authority).Parse(localAuthority, emptyHostValid))
+    if (!this->dataPtr->authority->Parse(localAuthority, emptyHostValid))
       return false;
   }
 

@@ -317,7 +317,7 @@ std::string SystemPaths::FindFileURI(const ignition::common::URI &_uri) const
   if (_uri.Authority())
   {
     // Strip //
-    suffix = (*_uri.Authority()).Str().substr(2) + _uri.Path().Str();
+    suffix = _uri.Authority()->Str().substr(2) + _uri.Path().Str();
   }
   else
   {
