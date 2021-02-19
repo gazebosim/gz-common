@@ -594,6 +594,7 @@ void URIPath::Clear()
 {
   this->dataPtr->path.clear();
   this->dataPtr->isAbsolute = false;
+  this->dataPtr->trailingSlash = false;
 }
 
 /////////////////////////////////////////////////
@@ -1036,7 +1037,9 @@ const URIFragment &URI::Fragment() const
 void URI::Clear()
 {
   this->dataPtr->scheme.clear();
-  this->dataPtr->authority.reset();
+  // Set to empty instead of removing value
+  if (this->dataPtr->authority)
+    this->dataPtr->authority = URIAuthority();
   this->dataPtr->path.Clear();
   this->dataPtr->query.Clear();
   this->dataPtr->fragment.Clear();

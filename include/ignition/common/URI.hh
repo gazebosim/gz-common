@@ -410,7 +410,8 @@ namespace ignition
 
       /// \brief Default constructor
       /// \param[in] _hasAuthority False if the URI doesn't have an authority.
-      /// Defaults to false.
+      /// Defaults to false. If true, an authority will be created and will be
+      /// empty.
       public: explicit URI(const std::string &_str,
           bool _hasAuthority = false);
 
@@ -444,6 +445,9 @@ namespace ignition
       public: void SetAuthority(const URIAuthority &_authority);
 
       /// \brief Get a copy of the URI's authority.
+      /// If the authority has no value (as opposed to being empty), it means
+      /// that it isn't present, and the authority value may be contained in
+      /// the path instead.
       /// \return The authority
       public: std::optional<URIAuthority> Authority() const;
 
@@ -491,6 +495,10 @@ namespace ignition
       public: static bool Valid(const std::string &_str);
 
       /// \brief Parse a string as URI.
+      /// If there's no authority (i.e. `Authority().has_value() == false`),
+      /// authority information will be contained within the path.
+      /// In order to populate the `Authority`, either set `hasAuthority` to
+      /// true on the constructor or set an empty authority before parsing.
       /// \param[in] _str A string.
       /// \return True if the string can be parsed as a URI.
       public: bool Parse(const std::string &_str);
