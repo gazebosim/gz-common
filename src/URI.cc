@@ -92,7 +92,7 @@ class ignition::common::URIPrivate
   public: std::string scheme;
 
   /// \brief Authority component.
-  public: URIAuthority authority;
+  public: std::optional<URIAuthority> authority;
 
   /// \brief Path component.
   public: URIPath path;
@@ -102,9 +102,6 @@ class ignition::common::URIPrivate
 
   /// \brief Fragment component.
   public: URIFragment fragment;
-
-  /// \brief False if no authority is present.
-  public: bool hasAuthority{false};
 };
 
 //////////////////////////////////////////////////
@@ -934,7 +931,8 @@ URI::URI()
 URI::URI(const std::string &_str, bool _hasAuthority)
   : URI()
 {
-  this->dataPtr->hasAuthority = _hasAuthority;
+  if (_hasAuthority)
+    this->dataPtr->authority.emplace(URIAuthority());
   this->Parse(_str);
 }
 
@@ -956,15 +954,15 @@ std::string URI::Str() const
   std::string result =
     this->dataPtr->scheme.empty() ? "" : this->dataPtr->scheme + kSchemeDelim;
 
-  if (this->dataPtr->hasAuthority)
+  if (this->dataPtr->authority)
   {
-    result += this->dataPtr->authority.Str() + this->dataPtr->path.Str();
+    result += (*this->dataPtr->authority).Str() + this->dataPtr->path.Str();
   }
   else
   {
     if (!this->dataPtr->scheme.empty())
     {
-      result += "//";
+      result += kAuthDelim;
     }
     result += this->dataPtr->path.Str();
   }
@@ -987,26 +985,14 @@ void URI::SetScheme(const std::string &_scheme)
 }
 
 /////////////////////////////////////////////////
-URIAuthority &URI::Authority()
+void URI::SetAuthority(const URIAuthority &_authority)
 {
-  if (!this->dataPtr->hasAuthority)
-  {
-    ignwarn << "Getting authority of a URI that's set not to have an authority."
-            << "Get the path instead. URI: [" << this->Str() << "]"
-            << std::endl;
-  }
-  return this->dataPtr->authority;
+  this->dataPtr->authority.emplace(_authority);
 }
 
 /////////////////////////////////////////////////
-const URIAuthority &URI::Authority() const
+std::optional <URIAuthority> URI::Authority() const
 {
-  if (!this->dataPtr->hasAuthority)
-  {
-    ignwarn << "Getting authority of a URI that's set not to have an authority."
-            << "Get the path instead. URI: [" << this->Str() << "]"
-            << std::endl;
-  }
   return this->dataPtr->authority;
 }
 
@@ -1020,18 +1006,6 @@ URIPath &URI::Path()
 const URIPath &URI::Path() const
 {
   return this->dataPtr->path;
-}
-
-/////////////////////////////////////////////////
-bool URI::HasAuthority() const
-{
-  return this->dataPtr->hasAuthority;
-}
-
-/////////////////////////////////////////////////
-void URI::SetHasAuthority(bool _hasAuthority)
-{
-  this->dataPtr->hasAuthority = _hasAuthority;
 }
 
 /////////////////////////////////////////////////
@@ -1062,7 +1036,8 @@ const URIFragment &URI::Fragment() const
 void URI::Clear()
 {
   this->dataPtr->scheme.clear();
-  this->dataPtr->authority.Clear();
+  if (this->dataPtr->authority)
+    (*this->dataPtr->authority).Clear();
   this->dataPtr->path.Clear();
   this->dataPtr->query.Clear();
   this->dataPtr->fragment.Clear();
@@ -1202,7 +1177,7 @@ bool URI::Parse(const std::string &_str)
     emptyHostValid = true;
 
   bool authorityPresent = false;
-  if (this->dataPtr->hasAuthority)
+  if (this->dataPtr->authority)
   {
     // Get the authority delimiter position, if one is present
     size_t authDelimPos = str.find(kAuthDelim);
@@ -1264,10 +1239,10 @@ bool URI::Parse(const std::string &_str)
   this->Clear();
   this->SetScheme(localScheme);
 
-  if (this->dataPtr->hasAuthority &&
+  if (this->dataPtr->authority &&
       (!emptyHostValid || authorityPresent))
   {
-    if (!this->dataPtr->authority.Parse(localAuthority, emptyHostValid))
+    if (!(*this->dataPtr->authority).Parse(localAuthority, emptyHostValid))
       return false;
   }
 

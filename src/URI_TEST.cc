@@ -16,6 +16,7 @@
 */
 
 #include <gtest/gtest.h>
+#include "ignition/common/Console.hh"
 #include "ignition/common/URI.hh"
 
 using namespace ignition;
@@ -460,7 +461,9 @@ TEST(URITEST, Scheme)
 TEST(URITEST, PathIfHasAuthority)
 {
   URI uri;
-  uri.SetHasAuthority(true);
+  EXPECT_FALSE(uri.Authority());
+  uri.SetAuthority(URIAuthority());
+  EXPECT_TRUE(uri.Authority());
 
   uri.SetScheme("data");
 
@@ -480,12 +483,12 @@ TEST(URITEST, PathIfHasAuthority)
 
   EXPECT_TRUE(uri.Parse("file://var/run/test"));
   EXPECT_EQ(uri.Str(), "file://var/run/test");
-  EXPECT_EQ(uri.Authority().Str(), "//var");
+  EXPECT_EQ((*uri.Authority()).Str(), "//var");
   EXPECT_EQ(uri.Path().Str(), "/run/test");
   EXPECT_TRUE(uri.Path().IsAbsolute());
 
   EXPECT_TRUE(uri.Parse("file://test%20space"));
-  EXPECT_EQ("//test%20space", uri.Authority().Str());
+  EXPECT_EQ("//test%20space", (*uri.Authority()).Str());
   EXPECT_EQ("", uri.Path().Str());
 
   EXPECT_TRUE(uri.Parse("file:///abs/path/test"));
@@ -536,12 +539,11 @@ TEST(URITEST, Path)
 
   EXPECT_TRUE(uri.Parse("file://var/run/test"));
   EXPECT_EQ(uri.Str(), "file://var/run/test");
-  EXPECT_TRUE(uri.Authority().Str().empty());
+  EXPECT_FALSE(uri.Authority());
   EXPECT_EQ(uri.Path().Str(), "var/run/test");
   EXPECT_FALSE(uri.Path().IsAbsolute());
 
   EXPECT_TRUE(uri.Parse("file://test%20space"));
-  EXPECT_TRUE(uri.Authority().Str().empty());
   EXPECT_EQ("test%20space", uri.Path().Str());
 
   EXPECT_TRUE(uri.Parse("file:///abs/path/test"));
@@ -736,7 +738,8 @@ TEST(URITEST, URIString)
 TEST(URITEST, WikipediaTests)
 {
   URI uri;
-  uri.SetHasAuthority(true);
+  uri.SetAuthority(URIAuthority());
+  EXPECT_TRUE(uri.Authority());
 
   // The following tests were pulled from:
   // https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Examples
@@ -744,52 +747,52 @@ TEST(URITEST, WikipediaTests)
   EXPECT_TRUE(uri.Parse("https://john.doe@www.example.com:123/forum/questions"
         "/?tag=networking&order=newest#top"));
   EXPECT_EQ("https", uri.Scheme());
-  EXPECT_EQ("john.doe", uri.Authority().UserInfo());
-  EXPECT_EQ("www.example.com", uri.Authority().Host());
-  EXPECT_EQ(123, *uri.Authority().Port());
-  EXPECT_EQ("//john.doe@www.example.com:123", uri.Authority().Str());
+  EXPECT_EQ("john.doe", (*uri.Authority()).UserInfo());
+  EXPECT_EQ("www.example.com", (*uri.Authority()).Host());
+  EXPECT_EQ(123, *(*uri.Authority()).Port());
+  EXPECT_EQ("//john.doe@www.example.com:123", (*uri.Authority()).Str());
   EXPECT_EQ("/forum/questions/", uri.Path().Str());
   EXPECT_EQ("?tag=networking&order=newest", uri.Query().Str());
   EXPECT_EQ("#top", uri.Fragment().Str());
 
   EXPECT_TRUE(uri.Parse("ldap://[2001:db8::7]/c=GB?objectClass?one"));
   EXPECT_EQ("ldap", uri.Scheme());
-  EXPECT_EQ("[2001:db8::7]", uri.Authority().Host());
-  EXPECT_EQ("//[2001:db8::7]", uri.Authority().Str());
+  EXPECT_EQ("[2001:db8::7]", (*uri.Authority()).Host());
+  EXPECT_EQ("//[2001:db8::7]", (*uri.Authority()).Str());
   EXPECT_EQ("/c=GB", uri.Path().Str());
   EXPECT_EQ("?objectClass?one", uri.Query().Str());
 
   EXPECT_TRUE(uri.Parse("mailto:John.Doe@example.com"));
   EXPECT_EQ("mailto", uri.Scheme());
-  EXPECT_TRUE(uri.Authority().Str().empty());
+  EXPECT_TRUE((*uri.Authority()).Str().empty());
   EXPECT_EQ("John.Doe@example.com", uri.Path().Str());
   EXPECT_TRUE(uri.Query().Str().empty());
   EXPECT_TRUE(uri.Fragment().Str().empty());
 
   EXPECT_TRUE(uri.Parse("news:comp.infosystems.www.servers.unix"));
   EXPECT_EQ("news", uri.Scheme());
-  EXPECT_TRUE(uri.Authority().Str().empty());
+  EXPECT_TRUE((*uri.Authority()).Str().empty());
   EXPECT_EQ("comp.infosystems.www.servers.unix", uri.Path().Str());
   EXPECT_TRUE(uri.Query().Str().empty());
   EXPECT_TRUE(uri.Fragment().Str().empty());
 
   EXPECT_TRUE(uri.Parse("tel:+1-816-555-1212"));
   EXPECT_EQ("tel", uri.Scheme());
-  EXPECT_TRUE(uri.Authority().Str().empty());
+  EXPECT_TRUE((*uri.Authority()).Str().empty());
   EXPECT_EQ("+1-816-555-1212", uri.Path().Str());
   EXPECT_TRUE(uri.Query().Str().empty());
   EXPECT_TRUE(uri.Fragment().Str().empty());
 
   EXPECT_TRUE(uri.Parse("telnet://192.0.2.16:80/"));
   EXPECT_EQ("telnet", uri.Scheme());
-  EXPECT_TRUE(uri.Authority().UserInfo().empty());
-  EXPECT_EQ("192.0.2.16", uri.Authority().Host());
-  EXPECT_EQ(80, uri.Authority().Port());
+  EXPECT_TRUE((*uri.Authority()).UserInfo().empty());
+  EXPECT_EQ("192.0.2.16", (*uri.Authority()).Host());
+  EXPECT_EQ(80, (*uri.Authority()).Port());
   EXPECT_EQ("/", uri.Path().Str());
 
   EXPECT_TRUE(uri.Parse("urn:oasis:names:specification:docbook:dtd:xml:4.1.2"));
   EXPECT_EQ("urn", uri.Scheme());
-  EXPECT_TRUE(uri.Authority().Str().empty());
+  EXPECT_TRUE((*uri.Authority()).Str().empty());
   EXPECT_EQ("oasis:names:specification:docbook:dtd:xml:4.1.2",
       uri.Path().Str());
   EXPECT_TRUE(uri.Query().Str().empty());
@@ -833,29 +836,32 @@ TEST(URITEST, URIAuthority)
 TEST(URITEST, File)
 {
   URI uri;
-  uri.SetHasAuthority(true);
+  uri.SetAuthority(URIAuthority());
+  EXPECT_TRUE(uri.Authority());
+
   EXPECT_TRUE(uri.Parse("file:relative/path"));
   EXPECT_EQ("relative/path", uri.Path().Str());
-  EXPECT_FALSE(uri.Authority().EmptyHostValid());
+  EXPECT_FALSE((*uri.Authority()).EmptyHostValid());
 
   EXPECT_TRUE(uri.Parse("file:/abs/path"));
   EXPECT_EQ("/abs/path", uri.Path().Str());
-  EXPECT_FALSE(uri.Authority().EmptyHostValid());
+  EXPECT_FALSE((*uri.Authority()).EmptyHostValid());
 
   // Empty host is valid for file: scheme
   EXPECT_TRUE(uri.Parse("file:///abs/path"));
   EXPECT_EQ("/abs/path", uri.Path().Str());
-  EXPECT_TRUE(uri.Authority().EmptyHostValid());
+  EXPECT_TRUE((*uri.Authority()).EmptyHostValid());
 }
 
 //////////////////////////////////////////////////
 TEST(URITEST, WinPath)
 {
-  // Windows path requires HasAuthority
+  // Windows path requires authority
   const auto uri = ignition::common::URI("file://D:/my/test/dir/world.sdf",
       true);
+  EXPECT_TRUE(uri.Authority());
   EXPECT_EQ("file", uri.Scheme());
-  EXPECT_TRUE(uri.Authority().Str().empty());
+  EXPECT_TRUE((*uri.Authority()).Str().empty());
   EXPECT_EQ("file:D:/my/test/dir/world.sdf", uri.Str());
 }
 
@@ -866,48 +872,35 @@ TEST(URITEST, HasAuthority)
     // No authority by default
     URI uri("https://john.doe@www.example.com:123/forum/questions/");
 
-    EXPECT_TRUE(uri.Authority().Str().empty());
-    EXPECT_EQ("john.doe@www.example.com:123/forum/questions/",
-        uri.Path().Str());
-    EXPECT_EQ("https://john.doe@www.example.com:123/forum/questions/",
-        uri.Str());
-
-    // Modifyng authority has no affect on string
-    uri.Authority() = URIAuthority("//new_authority.com");
-
-    EXPECT_TRUE(uri.Authority().UserInfo().empty());
-    EXPECT_EQ("new_authority.com", uri.Authority().Host());
-    EXPECT_FALSE(uri.Authority().Port());
-    EXPECT_EQ("//new_authority.com", uri.Authority().Str());
-
+    EXPECT_FALSE(uri.Authority());
     EXPECT_EQ("john.doe@www.example.com:123/forum/questions/",
         uri.Path().Str());
     EXPECT_EQ("https://john.doe@www.example.com:123/forum/questions/",
         uri.Str());
 
     // Modifyng path updates string
-    uri.Path() = URIPath("newest_authority.com/another/path");
+    uri.Path() = URIPath("new_authority.com/another/path");
 
-    EXPECT_EQ("newest_authority.com/another/path/", uri.Path().Str());
-    EXPECT_EQ("https://newest_authority.com/another/path/", uri.Str());
-
-    // Authority is *not* updated
-    EXPECT_TRUE(uri.Authority().UserInfo().empty());
-    EXPECT_EQ("new_authority.com", uri.Authority().Host());
-    EXPECT_FALSE(uri.Authority().Port());
-    EXPECT_EQ("//new_authority.com", uri.Authority().Str());
+    EXPECT_EQ("new_authority.com/another/path/", uri.Path().Str());
+    EXPECT_EQ("https://new_authority.com/another/path/", uri.Str());
   }
 
   {
     // Has authority
     URI uri("https://john.doe@www.example.com:123/forum/questions/", true);
 
-    EXPECT_EQ("john.doe", uri.Authority().UserInfo());
-    EXPECT_EQ("www.example.com", uri.Authority().Host());
-    EXPECT_EQ(123, *uri.Authority().Port());
-    EXPECT_EQ("//john.doe@www.example.com:123", uri.Authority().Str());
+    EXPECT_TRUE(uri.Authority());
+    EXPECT_EQ("john.doe", (*uri.Authority()).UserInfo());
+    EXPECT_EQ("www.example.com", (*uri.Authority()).Host());
+    EXPECT_EQ(123, *(*uri.Authority()).Port());
+    EXPECT_EQ("//john.doe@www.example.com:123", (*uri.Authority()).Str());
 
     EXPECT_EQ("/forum/questions/", uri.Path().Str());
+
+    uri.SetAuthority(URIAuthority("//new_authority.com"));
+    EXPECT_EQ("//new_authority.com", (*uri.Authority()).Str());
+    EXPECT_EQ("/forum/questions/", uri.Path().Str());
+    EXPECT_EQ("https://new_authority.com/forum/questions/", uri.Str());
   }
 }
 
@@ -919,7 +912,7 @@ TEST(URITEST, Resource)
     URI uri;
     EXPECT_TRUE(uri.Parse("model://model_name/meshes/mesh.dae"));
     EXPECT_EQ("model", uri.Scheme());
-    EXPECT_TRUE(uri.Authority().Str().empty());
+    EXPECT_FALSE(uri.Authority());
     EXPECT_EQ("model_name/meshes/mesh.dae", uri.Path().Str());
     EXPECT_TRUE(uri.Query().Str().empty());
     EXPECT_TRUE(uri.Fragment().Str().empty());
@@ -928,12 +921,13 @@ TEST(URITEST, Resource)
 
   {
     URI uri;
-    uri.SetHasAuthority(true);
+    uri.SetAuthority(URIAuthority());
     EXPECT_TRUE(uri.Parse("model://model_name/meshes/mesh.dae"));
     EXPECT_EQ("model", uri.Scheme());
-    EXPECT_EQ("//model_name", uri.Authority().Str());
-    EXPECT_EQ("model_name", uri.Authority().Host());
-    EXPECT_TRUE(uri.Authority().UserInfo().empty());
+    EXPECT_TRUE(uri.Authority());
+    EXPECT_EQ("//model_name", (*uri.Authority()).Str());
+    EXPECT_EQ("model_name", (*uri.Authority()).Host());
+    EXPECT_TRUE((*uri.Authority()).UserInfo().empty());
     EXPECT_EQ("/meshes/mesh.dae", uri.Path().Str());
     EXPECT_TRUE(uri.Query().Str().empty());
     EXPECT_TRUE(uri.Fragment().Str().empty());
@@ -944,7 +938,7 @@ TEST(URITEST, Resource)
     URI uri;
     EXPECT_TRUE(uri.Parse("model://model_name"));
     EXPECT_EQ("model", uri.Scheme());
-    EXPECT_TRUE(uri.Authority().Str().empty());
+    EXPECT_FALSE(uri.Authority());
     EXPECT_EQ("model_name", uri.Path().Str());
     EXPECT_TRUE(uri.Query().Str().empty());
     EXPECT_TRUE(uri.Fragment().Str().empty());
@@ -953,12 +947,13 @@ TEST(URITEST, Resource)
 
   {
     URI uri;
-    uri.SetHasAuthority(true);
+    uri.SetAuthority(URIAuthority());
     EXPECT_TRUE(uri.Parse("model://model_name"));
     EXPECT_EQ("model", uri.Scheme());
-    EXPECT_EQ("//model_name", uri.Authority().Str());
-    EXPECT_EQ("model_name", uri.Authority().Host());
-    EXPECT_TRUE(uri.Authority().UserInfo().empty());
+    EXPECT_TRUE(uri.Authority());
+    EXPECT_EQ("//model_name", (*uri.Authority()).Str());
+    EXPECT_EQ("model_name", (*uri.Authority()).Host());
+    EXPECT_TRUE((*uri.Authority()).UserInfo().empty());
     EXPECT_TRUE(uri.Path().Str().empty());
     EXPECT_TRUE(uri.Query().Str().empty());
     EXPECT_TRUE(uri.Fragment().Str().empty());
@@ -969,7 +964,7 @@ TEST(URITEST, Resource)
     URI uri;
     EXPECT_TRUE(uri.Parse("package://package_name/models/model"));
     EXPECT_EQ("package", uri.Scheme());
-    EXPECT_TRUE(uri.Authority().Str().empty());
+    EXPECT_FALSE(uri.Authority());
     EXPECT_EQ("package_name/models/model", uri.Path().Str());
     EXPECT_TRUE(uri.Query().Str().empty());
     EXPECT_TRUE(uri.Fragment().Str().empty());
@@ -978,12 +973,13 @@ TEST(URITEST, Resource)
 
   {
     URI uri;
-    uri.SetHasAuthority(true);
+    uri.SetAuthority(URIAuthority());
     EXPECT_TRUE(uri.Parse("package://package_name/models/model"));
     EXPECT_EQ("package", uri.Scheme());
-    EXPECT_EQ("//package_name", uri.Authority().Str());
-    EXPECT_EQ("package_name", uri.Authority().Host());
-    EXPECT_TRUE(uri.Authority().UserInfo().empty());
+    EXPECT_TRUE(uri.Authority());
+    EXPECT_EQ("//package_name", (*uri.Authority()).Str());
+    EXPECT_EQ("package_name", (*uri.Authority()).Host());
+    EXPECT_TRUE((*uri.Authority()).UserInfo().empty());
     EXPECT_EQ("/models/model", uri.Path().Str());
     EXPECT_TRUE(uri.Query().Str().empty());
     EXPECT_TRUE(uri.Fragment().Str().empty());

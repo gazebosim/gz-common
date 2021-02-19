@@ -13,7 +13,7 @@ release will remove the deprecated code.
    `PixelFormatType` located in `graphics/include/ignition/common/Image.hh`.
 
 1. URI parsing has updated to follow the specification more closely when
-   `URI::HasAuthority` is set to true. Changes include:
+   `URI::Authority` is set. Changes include:
     * An empty URI Path is valid.
     * Double forward slashes, `//`, are valid in a URI Path.
     * A URI Query does not require a `key=value` format. For example

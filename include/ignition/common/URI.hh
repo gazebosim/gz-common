@@ -54,7 +54,7 @@ namespace ignition
     /// a relative path using `file:abs/path`.
     ///
     /// URIs that are set not to have an authority
-    /// (i.e. `HasAuthority() == false`) preserve the legacy behaviour, which
+    /// (i.e. `Authority() == false`) preserve the legacy behaviour, which
     /// is:
     /// * `file:/abs/path` has the path `/abs/path`
     /// * `file://abs/path` has the path `abs/path`
@@ -439,15 +439,13 @@ namespace ignition
       /// \param[in] _scheme New scheme.
       public: void SetScheme(const std::string &_scheme);
 
-      /// \brief Get a mutable version of the URI's authority.
-      /// This method shouldn't be used if `HasAuthority` is false.
+      /// \brief Set the URI's authority.
       /// \return The authority
-      public: URIAuthority &Authority();
+      public: void SetAuthority(const URIAuthority &_authority);
 
-      /// \brief Get a const reference of the URI's authority.
-      /// This method shouldn't be used if `HasAuthority` is false.
+      /// \brief Get a copy of the URI's authority.
       /// \return The authority
-      public: const URIAuthority &Authority() const;
+      public: std::optional<URIAuthority> Authority() const;
 
       /// \brief Get a mutable version of the path component
       /// \return A reference to the path
@@ -456,21 +454,6 @@ namespace ignition
       /// \brief Get a const reference of the path component.
       /// \return A const reference of the path.
       public: const URIPath &Path() const;
-
-      /// \brief Set whether the URI has an authority. When false, whatever
-      /// would be part of the authority becomes the first part of the path.
-      /// Defaults to false, which is the legacy behaviour.
-      /// If false, the `Authority` functions shouldn't be used.
-      /// \param[in] _hasAuthority False to omit the authority.
-      /// \sa HasAuthority
-      public: void SetHasAuthority(bool _hasAuthority);
-
-      /// \brief Get whether the URI has an authority.
-      /// Defaults to false, which is the legacy behaviour.
-      /// If false, the `Authority` functions shouldn't be used.
-      /// \return False if there's no authority.
-      /// \sa SetHasAuthority
-      public: bool HasAuthority() const;
 
       /// \brief Get a mutable version of the query component
       /// \return A reference to the query
