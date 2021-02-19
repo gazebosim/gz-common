@@ -867,8 +867,10 @@ TEST(URITEST, HasAuthority)
     URI uri("https://john.doe@www.example.com:123/forum/questions/");
 
     EXPECT_TRUE(uri.Authority().Str().empty());
-    EXPECT_EQ("john.doe@www.example.com:123/forum/questions/", uri.Path().Str());
-    EXPECT_EQ("https://john.doe@www.example.com:123/forum/questions/", uri.Str());
+    EXPECT_EQ("john.doe@www.example.com:123/forum/questions/",
+        uri.Path().Str());
+    EXPECT_EQ("https://john.doe@www.example.com:123/forum/questions/",
+        uri.Str());
 
     // Modifyng authority has no affect on string
     uri.Authority() = URIAuthority("//new_authority.com");
@@ -878,8 +880,10 @@ TEST(URITEST, HasAuthority)
     EXPECT_FALSE(uri.Authority().Port());
     EXPECT_EQ("//new_authority.com", uri.Authority().Str());
 
-    EXPECT_EQ("john.doe@www.example.com:123/forum/questions/", uri.Path().Str());
-    EXPECT_EQ("https://john.doe@www.example.com:123/forum/questions/", uri.Str());
+    EXPECT_EQ("john.doe@www.example.com:123/forum/questions/",
+        uri.Path().Str());
+    EXPECT_EQ("https://john.doe@www.example.com:123/forum/questions/",
+        uri.Str());
 
     // Modifyng path updates string
     uri.Path() = URIPath("newest_authority.com/another/path");
