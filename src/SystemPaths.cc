@@ -313,16 +313,30 @@ std::string SystemPaths::FindFileURI(const std::string &_uri) const
 std::string SystemPaths::FindFileURI(const ignition::common::URI &_uri) const
 {
   std::string prefix = _uri.Scheme();
-  std::string suffix = _uri.Authority().Host() + _uri.PathSegments().Str() +
-      _uri.Query().Str();
+  std::string suffix;
+  if (_uri.HasAuthority())
+  {
+    // Strip //
+    suffix = _uri.Authority().Str().substr(2) + _uri.Path().Str();
+  }
+  else
+  {
+    // Strip /
+    if (_uri.Path().IsAbsolute() && prefix != "file")
+      suffix += _uri.Path().Str().substr(1);
+    else
+      suffix += _uri.Path().Str();
+  }
+  suffix += _uri.Query().Str();
+
   std::string filename;
 
-  if (prefix == "file")
-  {
-    // First try to find the file on the current system
-    filename = this->FindFile(ignition::common::copyFromUnixPath(suffix));
-  }
-  else if (this->dataPtr->findFileURICB)
+  // First try to find the file on the current system
+  filename = this->FindFile(ignition::common::copyFromUnixPath(suffix),
+      true, false);
+
+  // Try URI callback
+  if (filename.empty() && this->dataPtr->findFileURICB)
   {
     filename = this->dataPtr->findFileURICB(_uri.Str());
   }
@@ -372,7 +386,8 @@ std::string SystemPaths::FindFileURI(const ignition::common::URI &_uri) const
 
 //////////////////////////////////////////////////
 std::string SystemPaths::FindFile(const std::string &_filename,
-                                  const bool _searchLocalPath) const
+                                  const bool _searchLocalPath,
+                                  const bool _verbose) const
 {
   std::string path;
   std::string filename = _filename;
@@ -442,14 +457,20 @@ std::string SystemPaths::FindFile(const std::string &_filename,
 
   if (path.empty())
   {
-    ignerr << "Could not resolve file [" << _filename << "]" << std::endl;
+    if (_verbose)
+    {
+      ignerr << "Could not resolve file [" << _filename << "]" << std::endl;
+    }
     return std::string();
   }
 
   if (!exists(path))
   {
-    ignerr << "File [" << _filename << "] resolved to path [" << path <<
-              "] but the path does not exist" << std::endl;
+    if (_verbose)
+    {
+      ignerr << "File [" << _filename << "] resolved to path [" << path <<
+                "] but the path does not exist" << std::endl;
+    }
     return std::string();
   }
 

@@ -12,23 +12,8 @@ release will remove the deprecated code.
 1. Corrected `BAYER_RGGR8` to `BAYER_BGGR8` in `PixelFormatName` and
    `PixelFormatType` located in `graphics/include/ignition/common/Image.hh`.
 
-1. URI parsing has updated to follow the specification more closely. Changes
-   include:
-    * Deprecated `URI::Path()`, which is now divided into `URI::Authority` and
-    `URI::PathSegments`. Update your code to set / get both of them.
-     For example:
-
-        ```
-        uri.Path() = "localhost:8080/path";
-        ```
-
-        becomes
-
-        ```
-        uri.Authority() = "//localhost:8080";
-        uri.Path() = "/path";
-        ```
-
+1. URI parsing has updated to follow the specification more closely when
+   `URI::HasAuthority` is set to true. Changes include:
     * An empty URI Path is valid.
     * Double forward slashes, `//`, are valid in a URI Path.
     * A URI Query does not require a `key=value` format. For example
@@ -36,8 +21,6 @@ release will remove the deprecated code.
     * A URI authority is optional. If present, then a URI authority begins
     with two forward slashes and immediately follows the URI scheme. A host
     must be present if an authority is present and the scheme != 'file'.
-    * Trailing `/` after the authority is part of the path segments and is no
-    longer stripped.
 
 ## Ignition Common 2.X to 3.X
 

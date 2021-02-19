@@ -102,6 +102,9 @@ class ignition::common::URIPrivate
 
   /// \brief Fragment component.
   public: URIFragment fragment;
+
+  /// \brief False if no authority is present.
+  public: bool hasAuthority{false};
 };
 
 //////////////////////////////////////////////////
@@ -514,6 +517,28 @@ void URIPath::PushBack(const std::string &_part)
 }
 
 /////////////////////////////////////////////////
+std::string URIPath::PopFront()
+{
+  if (this->dataPtr->path.size() == 0)
+    return std::string();
+
+  auto result = this->dataPtr->path.front();
+  this->dataPtr->path.pop_front();
+  return result;
+}
+
+/////////////////////////////////////////////////
+std::string URIPath::PopBack()
+{
+  if (this->dataPtr->path.size() == 0)
+    return std::string();
+
+  auto result = this->dataPtr->path.back();
+  this->dataPtr->path.pop_back();
+  return result;
+}
+
+/////////////////////////////////////////////////
 const URIPath URIPath::operator/(const std::string &_part) const
 {
   URIPath result = *this;
@@ -906,9 +931,10 @@ URI::URI()
 }
 
 /////////////////////////////////////////////////
-URI::URI(const std::string &_str)
+URI::URI(const std::string &_str, bool _hasAuthority)
   : URI()
 {
+  this->dataPtr->hasAuthority = _hasAuthority;
   this->Parse(_str);
 }
 
@@ -928,10 +954,22 @@ URI::~URI()
 std::string URI::Str() const
 {
   std::string result =
-    this->dataPtr->scheme.empty() ? "" : this->dataPtr->scheme + ":";
-  result += this->dataPtr->authority.Str() +
-            this->dataPtr->path.Str() +
-            this->dataPtr->query.Str() +
+    this->dataPtr->scheme.empty() ? "" : this->dataPtr->scheme + kSchemeDelim;
+
+  if (this->dataPtr->hasAuthority)
+  {
+    result += this->dataPtr->authority.Str() + this->dataPtr->path.Str();
+  }
+  else
+  {
+    if (!this->dataPtr->scheme.empty())
+    {
+      result += "//";
+    }
+    result += this->dataPtr->path.Str();
+  }
+
+  result += this->dataPtr->query.Str() +
             this->dataPtr->fragment.Str();
   return result;
 }
@@ -951,12 +989,24 @@ void URI::SetScheme(const std::string &_scheme)
 /////////////////////////////////////////////////
 URIAuthority &URI::Authority()
 {
+  if (!this->dataPtr->hasAuthority)
+  {
+    ignwarn << "Getting authority of a URI whose authority is included in the"
+            << " path. Get the path instead. URI: [" << this->Str() << "]"
+            << std::endl;
+  }
   return this->dataPtr->authority;
 }
 
 /////////////////////////////////////////////////
 const URIAuthority &URI::Authority() const
 {
+  if (!this->dataPtr->hasAuthority)
+  {
+    ignwarn << "Getting authority of a URI whose authority is included in the"
+            << " path. Get the path instead. URI: [" << this->Str() << "]"
+            << std::endl;
+  }
   return this->dataPtr->authority;
 }
 
@@ -973,15 +1023,15 @@ const URIPath &URI::Path() const
 }
 
 /////////////////////////////////////////////////
-URIPath &URI::PathSegments()
+bool URI::HasAuthority() const
 {
-  return this->dataPtr->path;
+  return this->dataPtr->hasAuthority;
 }
 
 /////////////////////////////////////////////////
-const URIPath &URI::PathSegments() const
+void URI::SetHasAuthority(bool _hasAuthority)
 {
-  return this->dataPtr->path;
+  this->dataPtr->hasAuthority = _hasAuthority;
 }
 
 /////////////////////////////////////////////////
@@ -1152,31 +1202,41 @@ bool URI::Parse(const std::string &_str)
     emptyHostValid = true;
 
   bool authorityPresent = false;
-
-  // Get the authority delimiter position, if one is present
-  size_t authDelimPos = str.find(kAuthDelim);
-  if (authDelimPos != std::string::npos && authDelimPos == 0)
+  if (this->dataPtr->hasAuthority)
   {
-    authorityPresent = true;
-    size_t authEndPos = str.find_first_of("/?#",
-        authDelimPos + std::strlen(kAuthDelim));
+    // Get the authority delimiter position, if one is present
+    size_t authDelimPos = str.find(kAuthDelim);
+    if (authDelimPos != std::string::npos && authDelimPos == 0)
+    {
+      authorityPresent = true;
+      size_t authEndPos = str.find_first_of("/?#",
+          authDelimPos + std::strlen(kAuthDelim));
 
-    // This could be a windows file path of the form file://D:/path/to/file
-    // In this case, the authority is not present.
-    if (str[authEndPos-1] == ':' && str[authEndPos] == '/')
-    {
-      str.erase(0, std::strlen(kAuthDelim));
-      authorityPresent = false;
+      // This could be a windows file path of the form file://D:/path/to/file
+      // In this case, the authority is not present.
+      if (str[authEndPos-1] == ':' && str[authEndPos] == '/')
+      {
+        str.erase(0, std::strlen(kAuthDelim));
+        authorityPresent = false;
+      }
+      else if (localScheme != "file" && authEndPos == authDelimPos+2)
+      {
+        ignerr << "A host is manadatory when using a scheme other than file\n";
+        return false;
+      }
+      else
+      {
+        localAuthority = str.substr(authDelimPos, authEndPos);
+        str.erase(0, authEndPos);
+      }
     }
-    else if (localScheme != "file" && authEndPos == authDelimPos+2)
+  }
+  else
+  {
+    // Relative paths: remove `//` prefix if there are exactly 2
+    if (str.find("//") == 0 && str.find("///") == std::string::npos)
     {
-      ignerr << "A host is manadatory when using a scheme other than file\n";
-      return false;
-    }
-    else
-    {
-      localAuthority = str.substr(authDelimPos, authEndPos);
-      str.erase(0, authEndPos);
+      str = str.substr(2);
     }
   }
 
@@ -1204,7 +1264,8 @@ bool URI::Parse(const std::string &_str)
   this->Clear();
   this->SetScheme(localScheme);
 
-  if (!emptyHostValid || authorityPresent)
+  if (this->dataPtr->hasAuthority &&
+      (!emptyHostValid || authorityPresent))
   {
     if (!this->dataPtr->authority.Parse(localAuthority, emptyHostValid))
       return false;

@@ -52,6 +52,13 @@ namespace ignition
     /// authority. For example, `file://abs/path` will result in a host
     /// value of `abs` and the URI path will be `/path`. You can specify
     /// a relative path using `file:abs/path`.
+    ///
+    /// URIs that are set not to have an authority
+    /// (i.e. `HasAuthority() == false`) preserve the legacy behaviour, which
+    /// is:
+    /// * `file:/abs/path` has the path `/abs/path`
+    /// * `file://abs/path` has the path `abs/path`
+    /// * `file:///abs/path` has the path `/abs/path`
     class IGNITION_COMMON_VISIBLE URIAuthority
     {
       /// \brief Constructor
@@ -210,6 +217,16 @@ namespace ignition
       /// URI-encoded to %2F. The path is also set to absolute if it is empty
       /// and a Windows drive specifier (e.g. 'C:') is pushed to it.
       public: void PushBack(const std::string &_part);
+
+      /// \brief Remove the part that's in the front of this path and return it.
+      /// \return Popped part.
+      /// Returns empty string if path doesn't have parts to be popped.
+      public: std::string PopFront();
+
+      /// \brief Remove the part that's in the back of this path and return it.
+      /// \return Popped part.
+      /// Returns empty string if path doesn't have parts to be popped.
+      public: std::string PopBack();
 
       /// \brief Compound assignment operator.
       /// \param[in] _part A new path to append.
@@ -391,9 +408,11 @@ namespace ignition
       /// \brief Default constructor
       public: URI();
 
-      /// \brief Construct a URI object from a string.
-      /// \param[in] _str A string.
-      public: explicit URI(const std::string &_str);
+      /// \brief Default constructor
+      /// \param[in] _hasAuthority False if the URI doesn't have an authority.
+      /// Defaults to false.
+      public: explicit URI(const std::string &_str,
+          bool _hasAuthority = false);
 
       /// \brief Copy constructor
       /// \param[in] _uri Another URI.
@@ -421,34 +440,37 @@ namespace ignition
       public: void SetScheme(const std::string &_scheme);
 
       /// \brief Get a mutable version of the URI's authority.
+      /// This method shouldn't be used if `HasAuthority` is false.
       /// \return The authority
       public: URIAuthority &Authority();
 
       /// \brief Get a const reference of the URI's authority.
+      /// This method shouldn't be used if `HasAuthority` is false.
       /// \return The authority
       public: const URIAuthority &Authority() const;
 
       /// \brief Get a mutable version of the path component
       /// \return A reference to the path
-      /// \deprecated Use `PathSegments()`, the path doesn't contain the
-      /// authority anymore.
-      public: URIPath IGN_DEPRECATED(4.0) &Path();
+      public: URIPath &Path();
 
       /// \brief Get a const reference of the path component.
       /// \return A const reference of the path.
-      /// \deprecated Use `PathSegments()`, the path doesn't contain the
-      /// authority anymore.
-      public: const URIPath IGN_DEPRECATED(4.0) &Path() const;
+      public: const URIPath &Path() const;
 
-      /// \brief Get a mutable version of the path component.
-      /// The path doesn't contain the authority.
-      /// \return A reference to the path
-      public: URIPath &PathSegments();
+      /// \brief Set whether the URI has an authority. When false, whatever
+      /// would be part of the authority becomes the first part of the path.
+      /// Defaults to false, which is the legacy behaviour.
+      /// If false, the `Authority` functions shouldn't be used.
+      /// \param[in] _hasAuthority False to omit the authority.
+      /// \sa HasAuthority
+      public: void SetHasAuthority(bool _hasAuthority);
 
-      /// \brief Get a const reference of the path component.
-      /// The path doesn't contain the authority.
-      /// \return A const reference of the path.
-      public: const URIPath &PathSegments() const;
+      /// \brief Get whether the URI has an authority.
+      /// Defaults to false, which is the legacy behaviour.
+      /// If false, the `Authority` functions shouldn't be used.
+      /// \return False if there's no authority.
+      /// \sa SetHasAuthority
+      public: bool HasAuthority() const;
 
       /// \brief Get a mutable version of the query component
       /// \return A reference to the query

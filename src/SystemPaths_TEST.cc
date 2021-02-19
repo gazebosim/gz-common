@@ -126,7 +126,7 @@ TEST_F(SystemPathsFixture, FileSystemPaths)
   filePaths.push_back("test_dir1");
   common::setenv(kFilePath, SystemPathsJoin(filePaths));
   paths.SetFilePathEnv(kFilePath);
-  EXPECT_EQ(file1, paths.FindFile("test_f1")) << paths.FindFile("test_f1");
+  EXPECT_EQ(file1, paths.FindFile("test_f1"));
   EXPECT_EQ(file1, paths.FindFile("model://test_f1"));
 }
 
@@ -206,7 +206,7 @@ TEST_F(SystemPathsFixture, FindFileURI)
           this->filesystemRoot);
 
   EXPECT_EQ("", sp.FindFileURI("file://no_such_file"));
-  EXPECT_EQ(file1, sp.FindFileURI("file://test_dir1/test_f1"));
+  EXPECT_EQ(file1, sp.FindFileURI("file:test_dir1/test_f1"));
   EXPECT_EQ(file1, sp.FindFileURI("file://" +
                                   ignition::common::copyToUnixPath(file1)));
   EXPECT_EQ("", sp.FindFileURI("osrf://unknown.protocol"));
@@ -234,12 +234,13 @@ TEST_F(SystemPathsFixture, FindFileURI)
   auto osrfCb = [dir2](const ignition::common::URI &_uri)
   {
     return _uri.Scheme() == "osrf" ?
-           ignition::common::joinPaths(dir2, _uri.Authority().Host()) : "";
+           ignition::common::joinPaths(dir2, ignition::common::copyFromUnixPath(
+           _uri.Path().Str())) : "";
   };
   auto robot2Cb = [dir2](const ignition::common::URI &_uri)
   {
     return _uri.Scheme() == "robot" ?
-           ignition::common::joinPaths(dir2, _uri.PathSegments().Str()) : "";
+           ignition::common::joinPaths(dir2, _uri.Path().Str()) : "";
   };
 
   EXPECT_EQ("", sp.FindFileURI("robot://test_f1"));
@@ -317,7 +318,8 @@ TEST_F(SystemPathsFixture, FindFile)
   EXPECT_EQ("", sp.FindFile(this->filesystemRoot + "no_such_file"));
   EXPECT_EQ("", sp.FindFile("no_such_file"));
   EXPECT_EQ(file1, sp.FindFile(common::joinPaths("test_dir1", "test_f1")));
-  EXPECT_EQ(file1, sp.FindFile("file://test_dir1/test_f1"));
+
+  EXPECT_EQ(file1, sp.FindFile("file:test_dir1/test_f1"));
 
   // Existing absolute paths
 #ifndef _WIN32
