@@ -71,9 +71,13 @@ namespace ignition
       /// \param[in] _uri the uniform resource identifier
       /// \return Returns full path name to file with platform-specific
       /// directory separators, or an empty string if URI couldn't be found.
+      /// \sa FindFileURI(const ignition::common::URI &_uri)
       public: std::string FindFileURI(const std::string &_uri) const;
 
-      /// \brief Find a file or path using a URI
+      /// \brief Find a file or path using a URI.
+      /// If URI is not an absolute path, the URI's path will be matched against
+      /// all added paths and environment variables (including URI authority as
+      /// needed).
       /// \param[in] _uri the uniform resource identifier
       /// \return Returns full path name to file with platform-specific
       /// directory separators, or an empty string if URI couldn't be found.
@@ -87,10 +91,12 @@ namespace ignition
       /// \param[in] _filename Name of the file to find.
       /// \param[in] _searchLocalPath True to search in the current working
       /// directory.
+      /// \param[in] _verbose False to omit console messages.
       /// \return Returns full path name to file with platform-specific
       /// directory separators, or empty string on error.
       public: std::string FindFile(const std::string &_filename,
-                                   const bool _searchLocalPath = true) const;
+                                   const bool _searchLocalPath = true,
+                                   const bool _verbose = true) const;
 
       /// \brief Find a shared library by name in the plugin paths
       ///

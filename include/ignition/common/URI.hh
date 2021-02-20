@@ -52,6 +52,13 @@ namespace ignition
     /// authority. For example, `file://abs/path` will result in a host
     /// value of `abs` and the URI path will be `/path`. You can specify
     /// a relative path using `file:abs/path`.
+    ///
+    /// URIs that are set not to have an authority
+    /// (i.e. `Authority() == false`) preserve the legacy behaviour, which
+    /// is:
+    /// * `file:/abs/path` has the path `/abs/path`
+    /// * `file://abs/path` has the path `abs/path`
+    /// * `file:///abs/path` has the path `/abs/path`
     class IGNITION_COMMON_VISIBLE URIAuthority
     {
       /// \brief Constructor
@@ -148,7 +155,15 @@ namespace ignition
       IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
     };
 
-    /// \brief The path component of a URI
+    /// \brief A URI path contains a sequence of segments separated by `/`.
+    /// The path may be empty in a valid URI.
+    /// When an authority is present, the path must start with a `/`.
+    ///
+    /// In the following URI:
+    ///
+    /// scheme://authority.com/seg1/seg2?query
+    ///
+    /// The path is `/seg1/seg2`
     class IGNITION_COMMON_VISIBLE URIPath
     {
       /// \brief Constructor
@@ -202,6 +217,16 @@ namespace ignition
       /// URI-encoded to %2F. The path is also set to absolute if it is empty
       /// and a Windows drive specifier (e.g. 'C:') is pushed to it.
       public: void PushBack(const std::string &_part);
+
+      /// \brief Remove the part that's in the front of this path and return it.
+      /// \return Popped part.
+      /// Returns empty string if path doesn't have parts to be popped.
+      public: std::string PopFront();
+
+      /// \brief Remove the part that's in the back of this path and return it.
+      /// \return Popped part.
+      /// Returns empty string if path doesn't have parts to be popped.
+      public: std::string PopBack();
 
       /// \brief Compound assignment operator.
       /// \param[in] _part A new path to append.
@@ -383,9 +408,12 @@ namespace ignition
       /// \brief Default constructor
       public: URI();
 
-      /// \brief Construct a URI object from a string.
-      /// \param[in] _str A string.
-      public: explicit URI(const std::string &_str);
+      /// \brief Default constructor
+      /// \param[in] _hasAuthority False if the URI doesn't have an authority.
+      /// Defaults to false. If true, an authority will be created and will be
+      /// empty.
+      public: explicit URI(const std::string &_str,
+          bool _hasAuthority = false);
 
       /// \brief Copy constructor
       /// \param[in] _uri Another URI.
@@ -412,13 +440,16 @@ namespace ignition
       /// \param[in] _scheme New scheme.
       public: void SetScheme(const std::string &_scheme);
 
-      /// \brief Get a mutable version of the URI's authority.
+      /// \brief Set the URI's authority.
       /// \return The authority
-      public: URIAuthority &Authority();
+      public: void SetAuthority(const URIAuthority &_authority);
 
-      /// \brief Get a const reference of the URI's authority.
+      /// \brief Get a copy of the URI's authority.
+      /// If the authority has no value (as opposed to being empty), it means
+      /// that it isn't present, and the authority value may be contained in
+      /// the path instead.
       /// \return The authority
-      public: const URIAuthority &Authority() const;
+      public: std::optional<URIAuthority> Authority() const;
 
       /// \brief Get a mutable version of the path component
       /// \return A reference to the path
@@ -464,6 +495,10 @@ namespace ignition
       public: static bool Valid(const std::string &_str);
 
       /// \brief Parse a string as URI.
+      /// If there's no authority (i.e. `Authority().has_value() == false`),
+      /// authority information will be contained within the path.
+      /// In order to populate the `Authority`, either set `hasAuthority` to
+      /// true on the constructor or set an empty authority before parsing.
       /// \param[in] _str A string.
       /// \return True if the string can be parsed as a URI.
       public: bool Parse(const std::string &_str);
