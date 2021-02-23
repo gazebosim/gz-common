@@ -44,6 +44,10 @@ namespace ignition
       /// \brief Implementation of GetData
       public: void DataImpl(unsigned char **_data, unsigned int &_count,
           FIBITMAP *_img) const;
+
+      /// \brief Swap red and blue when color order is BGR
+      /// \param[in] _height Height of the image
+      public: void SwapRedBlue(const unsigned int &_height);
     };
   }
 }
@@ -123,6 +127,8 @@ int Image::Load(const std::string &_filename)
       return -1;
     }
 
+    this->dataPtr->SwapRedBlue(this->Height());
+
     return 0;
   }
 
@@ -134,32 +140,7 @@ int Image::Load(const std::string &_filename)
 //////////////////////////////////////////////////
 void Image::SavePNG(const std::string &_filename)
 {
-  if (FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_RGB)
-  {
-    FreeImage_Save(FIF_PNG, this->dataPtr->bitmap, _filename.c_str(), 0);
-    return;
-  }
-
-  // Swap red and blue, color order is BGR
-  auto copy = FreeImage_Copy(this->dataPtr->bitmap, 0, 0, this->Width(),
-      this->Height());
-
-  const unsigned bytesperpixel = FreeImage_GetBPP(copy) / 8;
-  const unsigned pitch = FreeImage_GetPitch(copy);
-  const unsigned lineSize = FreeImage_GetLine(copy);
-
-  BYTE *line = FreeImage_GetBits(copy);
-  for (unsigned y = 0; y < this->Height(); ++y, line += pitch)
-  {
-    for (BYTE *pixel = line; pixel < line + lineSize ; pixel += bytesperpixel)
-    {
-      std::swap(pixel[0], pixel[2]);
-    }
-  }
-
-  FreeImage_Save(FIF_PNG, copy, _filename.c_str(), 0);
-
-  delete copy;
+  FreeImage_Save(FIF_PNG, this->dataPtr->bitmap, _filename.c_str(), 0);
 }
 
 //////////////////////////////////////////////////
@@ -221,6 +202,8 @@ void Image::SetFromData(const unsigned char *_data,
 
   this->dataPtr->bitmap = FreeImage_ConvertFromRawBits(const_cast<BYTE*>(_data),
       _width, _height, scanlineBytes, bpp, redmask, greenmask, bluemask, true);
+
+  this->dataPtr->SwapRedBlue(this->Height());
 }
 
 //////////////////////////////////////////////////
@@ -553,4 +536,24 @@ Image::PixelFormatType Image::ConvertPixelFormat(const std::string &_format)
       return static_cast<PixelFormatType>(i);
 
   return UNKNOWN_PIXEL_FORMAT;
+}
+
+//////////////////////////////////////////////////
+void ImagePrivate::SwapRedBlue(const unsigned int &_height)
+{
+  if (FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_RGB)
+    return;
+
+  const unsigned bytesperpixel = FreeImage_GetBPP(this->bitmap) / 8;
+  const unsigned pitch = FreeImage_GetPitch(this->bitmap);
+  const unsigned lineSize = FreeImage_GetLine(this->bitmap);
+
+  BYTE *line = FreeImage_GetBits(this->bitmap);
+  for (unsigned y = 0; y < _height; ++y, line += pitch)
+  {
+    for (BYTE *pixel = line; pixel < line + lineSize ; pixel += bytesperpixel)
+    {
+      std::swap(pixel[0], pixel[2]);
+    }
+  }
 }

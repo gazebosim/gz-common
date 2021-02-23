@@ -32,35 +32,26 @@ TEST_F(ImageTest, Image)
   EXPECT_EQ(-1, img.Load("/file/shouldn/never/exist.png"));
   std::string filename =  "file://";
   filename += PROJECT_SOURCE_PATH;
-  filename += "/test/data/cordless_drill/materials/textures/cordless_drill.png";
+  filename += "/test/data/red_blue_colors.png";
   EXPECT_EQ(0, img.Load(filename));
-  EXPECT_EQ(static_cast<unsigned int>(128), img.Width());
-  EXPECT_EQ(static_cast<unsigned int>(128), img.Height());
+  EXPECT_EQ(static_cast<unsigned int>(121), img.Width());
+  EXPECT_EQ(static_cast<unsigned int>(81), img.Height());
   EXPECT_EQ(static_cast<unsigned int>(32), img.BPP());
-  EXPECT_TRUE(img.Pixel(10, 10) ==
-      math::Color(0.141176f, 0.172549f, 0.133333f, 1));
-  EXPECT_TRUE(img.AvgColor() ==
-      math::Color(0.259651f, 0.271894f, 0.414959f, 1));
-  EXPECT_TRUE(img.MaxColor() ==
-      math::Color(0.929412f, 0.921569f, 0.917647f, 1));
+  EXPECT_TRUE(img.Pixel(0, 0) == math::Color(1, 0, 0, 1));
+  EXPECT_TRUE(img.Pixel(85, 0) == math::Color(0, 0, 1, 1));
+  EXPECT_TRUE(img.AvgColor() == math::Color(0.661157f, 0, 0.338843f, 1));
+  EXPECT_TRUE(img.MaxColor() == math::Color(1, 0, 0, 1));
   EXPECT_TRUE(img.Valid());
-  EXPECT_TRUE(img.Filename().find("cordless_drill.png") !=
+  EXPECT_TRUE(img.Filename().find("red_blue_colors.png") !=
       std::string::npos);
 
   unsigned char *data = NULL;
   unsigned int size = 0;
   img.Data(&data, size);
-  EXPECT_EQ(static_cast<unsigned int>(65536), size);
+  EXPECT_EQ(static_cast<unsigned int>(39204), size);
 
   img.SetFromData(data, img.Width(), img.Height(),
                   common::Image::RGB_INT8);
-}
-
-/////////////////////////////////////////////////
-TEST_F(ImageTest, Data)
-{
-  common::Image img;
-
 }
 
 /////////////////////////////////////////////////
