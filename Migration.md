@@ -12,8 +12,8 @@ release will remove the deprecated code.
 1. Corrected `BAYER_RGGR8` to `BAYER_BGGR8` in `PixelFormatName` and
    `PixelFormatType` located in `graphics/include/ignition/common/Image.hh`.
 
-1. URI parsing has updated to follow the specification more closely. Changes
-   include:
+1. URI parsing has updated to follow the specification more closely when
+   `URI::Authority` is set. Changes include:
     * An empty URI Path is valid.
     * Double forward slashes, `//`, are valid in a URI Path.
     * A URI Query does not require a `key=value` format. For example

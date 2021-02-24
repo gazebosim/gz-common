@@ -126,8 +126,8 @@ TEST_F(SystemPathsFixture, FileSystemPaths)
   filePaths.push_back("test_dir1");
   common::setenv(kFilePath, SystemPathsJoin(filePaths));
   paths.SetFilePathEnv(kFilePath);
-  EXPECT_EQ(file1, paths.FindFile("test_f1")) << paths.FindFile("test_f1");
-  EXPECT_EQ(file1, paths.FindFile("model:test_f1"));
+  EXPECT_EQ(file1, paths.FindFile("test_f1"));
+  EXPECT_EQ(file1, paths.FindFile("model://test_f1"));
 }
 
 /////////////////////////////////////////////////
@@ -234,7 +234,8 @@ TEST_F(SystemPathsFixture, FindFileURI)
   auto osrfCb = [dir2](const ignition::common::URI &_uri)
   {
     return _uri.Scheme() == "osrf" ?
-           ignition::common::joinPaths(dir2, _uri.Path().Str()) : "";
+           ignition::common::joinPaths(dir2, ignition::common::copyFromUnixPath(
+           _uri.Path().Str())) : "";
   };
   auto robot2Cb = [dir2](const ignition::common::URI &_uri)
   {
@@ -243,7 +244,7 @@ TEST_F(SystemPathsFixture, FindFileURI)
   };
 
   EXPECT_EQ("", sp.FindFileURI("robot://test_f1"));
-  EXPECT_EQ("", sp.FindFileURI("osrf:test_f2"));
+  EXPECT_EQ("", sp.FindFileURI("osrf://test_f2"));
 
   // We still want to test the deprecated function until it is removed.
 #ifndef _WIN32
@@ -256,31 +257,31 @@ TEST_F(SystemPathsFixture, FindFileURI)
 #endif
 
   EXPECT_EQ(file1, sp.FindFileURI("robot://test_f1"));
-  EXPECT_EQ("", sp.FindFileURI("osrf:test_f2"));
+  EXPECT_EQ("", sp.FindFileURI("osrf://test_f2"));
 
   sp.AddFindFileURICallback(osrfCb);
   EXPECT_EQ(file1, sp.FindFileURI("robot://test_f1"));
-  EXPECT_EQ(file2, sp.FindFileURI("osrf:test_f2"));
+  EXPECT_EQ(file2, sp.FindFileURI("osrf://test_f2"));
 
   // Test that th CB from SetFindFileURICallback is called first even when a
   // second handler for the same protocol is available
   sp.AddFindFileURICallback(robot2Cb);
   EXPECT_EQ(file1, sp.FindFileURI("robot://test_f1"));
-  EXPECT_EQ(file2, sp.FindFileURI("osrf:test_f2"));
+  EXPECT_EQ(file2, sp.FindFileURI("osrf://test_f2"));
 
   // URI + env var
   common::setenv(kFilePath, dir1);
   sp.SetFilePathEnv(kFilePath);
   EXPECT_EQ(kFilePath, sp.FilePathEnv());
-  EXPECT_EQ(file1, sp.FindFileURI("anything:test_f1"));
-  EXPECT_NE(file2, sp.FindFileURI("anything:test_f2"));
+  EXPECT_EQ(file1, sp.FindFileURI("anything://test_f1"));
+  EXPECT_NE(file2, sp.FindFileURI("anything://test_f2"));
 
   std::string newEnv{"IGN_NEW_FILE_PATH"};
   common::setenv(newEnv, dir2);
   sp.SetFilePathEnv(newEnv);
   EXPECT_EQ(newEnv, sp.FilePathEnv());
-  EXPECT_NE(file1, sp.FindFileURI("anything:test_f1"));
-  EXPECT_EQ(file2, sp.FindFileURI("anything:test_f2"));
+  EXPECT_NE(file1, sp.FindFileURI("anything://test_f1"));
+  EXPECT_EQ(file2, sp.FindFileURI("anything://test_f2"));
 }
 
 //////////////////////////////////////////////////
@@ -317,6 +318,7 @@ TEST_F(SystemPathsFixture, FindFile)
   EXPECT_EQ("", sp.FindFile(this->filesystemRoot + "no_such_file"));
   EXPECT_EQ("", sp.FindFile("no_such_file"));
   EXPECT_EQ(file1, sp.FindFile(common::joinPaths("test_dir1", "test_f1")));
+
   EXPECT_EQ(file1, sp.FindFile("file:test_dir1/test_f1"));
 
   // Existing absolute paths
