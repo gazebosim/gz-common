@@ -849,12 +849,12 @@ void MeshManager::CreateEllipsoid(const std::string &_name,
   double d_phi = (umax - umin) / (_rings - 1.0);
   double d_theta = (vmax - vmin) / (_segments - 1.0);
 
-  for (i = 0, theta = vmin; i < _segments; ++i, theta += d_theta)
+  for (i = 0, theta = vmin; i < _rings; ++i, theta += d_theta)
   {
     const auto c_theta = cos(theta);
     const auto s_theta = sin(theta);
 
-    for (j = 0, phi = umin; j < _rings; ++j, phi += d_phi)
+    for (j = 0, phi = umin; j < _segments; ++j, phi += d_phi)
     {
       const auto c_phi = cos(phi);
       const auto s_phi = sin(phi);
@@ -883,17 +883,17 @@ void MeshManager::CreateEllipsoid(const std::string &_name,
       {
         unsigned int verticesCount = subMesh.VertexCount();
         for (
-          unsigned int firstIndex = verticesCount - 2 * (_rings + 1);
-          firstIndex + _rings + 2 < verticesCount;
+          int firstIndex = verticesCount - 2 * (_segments + 1);
+          (firstIndex + _segments + 2 < verticesCount) && (firstIndex > 0);
           firstIndex++)
         {
-          subMesh.AddIndex(firstIndex + _rings + 1);
+          subMesh.AddIndex(firstIndex + _segments + 1);
           subMesh.AddIndex(firstIndex + 1);
           subMesh.AddIndex(firstIndex + 0);
 
-          subMesh.AddIndex(firstIndex + _rings + 2);
+          subMesh.AddIndex(firstIndex + _segments + 2);
           subMesh.AddIndex(firstIndex + 1);
-          subMesh.AddIndex(firstIndex + _rings + 1);
+          subMesh.AddIndex(firstIndex + _segments + 1);
         }
       }
     }

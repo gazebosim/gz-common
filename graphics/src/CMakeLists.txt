@@ -23,7 +23,6 @@ target_link_libraries(${graphics_target}
 ign_build_tests(TYPE UNIT SOURCES ${gtest_sources}
   LIB_DEPS ${graphics_target})
 
-
 if(USE_EXTERNAL_TINYXML2)
 
   # If we are using an external copy of tinyxml2, add its imported target
