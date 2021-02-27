@@ -19,6 +19,17 @@
 #endif
 #include <FreeImage.h>
 
+#if FREEIMAGE_BIGENDIAN
+  #define ORIGINAL_FREEIMAGE_COLORORDER FREEIMAGE_COLORORDER_RGB
+#else
+  #define ORIGINAL_FREEIMAGE_COLORORDER FREEIMAGE_COLORORDER_BGR
+#endif
+
+#ifdef FREEIMAGE_COLORORDER
+#undef FREEIMAGE_COLORORDER
+#endif
+#define FREEIMAGE_COLORORDER FREEIMAGE_COLORORDER_RGB
+
 #include <string>
 
 #include <ignition/common/Console.hh>
@@ -127,8 +138,6 @@ int Image::Load(const std::string &_filename)
       return -1;
     }
 
-    this->dataPtr->SwapRedBlue(this->Height());
-
     return 0;
   }
 
@@ -140,6 +149,7 @@ int Image::Load(const std::string &_filename)
 //////////////////////////////////////////////////
 void Image::SavePNG(const std::string &_filename)
 {
+  this->dataPtr->SwapRedBlue(this->Height());
   FreeImage_Save(FIF_PNG, this->dataPtr->bitmap, _filename.c_str(), 0);
 }
 
@@ -202,8 +212,6 @@ void Image::SetFromData(const unsigned char *_data,
 
   this->dataPtr->bitmap = FreeImage_ConvertFromRawBits(const_cast<BYTE*>(_data),
       _width, _height, scanlineBytes, bpp, redmask, greenmask, bluemask, true);
-
-  this->dataPtr->SwapRedBlue(this->Height());
 }
 
 //////////////////////////////////////////////////
@@ -541,7 +549,7 @@ Image::PixelFormatType Image::ConvertPixelFormat(const std::string &_format)
 //////////////////////////////////////////////////
 void ImagePrivate::SwapRedBlue(const unsigned int &_height)
 {
-  if (FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_RGB)
+  if (ORIGINAL_FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_BGR)
     return;
 
   const unsigned bytesperpixel = FreeImage_GetBPP(this->bitmap) / 8;
