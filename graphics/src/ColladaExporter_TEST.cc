@@ -40,18 +40,6 @@ class ColladaExporter : public common::testing::AutoLogFixture {
     common::createDirectories(this->pathOut);
   }
 
-  /// \brief Tear down the test fixture. This gets called by gtest.
-  public: void TearDown() override
-  {
-    // Remove temp directory
-#ifndef _WIN32
-    // Windows can be sensitive about removing this in CI.
-    common::removeAll(this->pathOut);
-#else
-    ASSERT_TRUE(common::removeAll(this->pathOut));
-#endif
-  }
-
   /// \brief Path to temporary output (removed during TearDown)
   public: std::string pathOut;
 };
