@@ -143,7 +143,8 @@ void Animation::Time(const double _time)
     this->dataPtr->timePos = _time;
     if (this->dataPtr->loop)
     {
-      this->dataPtr->timePos = fmod(this->dataPtr->timePos, this->dataPtr->length);
+      this->dataPtr->timePos = fmod(this->dataPtr->timePos,
+                                    this->dataPtr->length);
       if (this->dataPtr->timePos < 0)
         this->dataPtr->timePos += this->dataPtr->length;
     }
@@ -210,7 +211,8 @@ KeyFrameType *Animation::CreateKeyFrame(const double _time)
 {
   auto frame = std::make_shared<KeyFrameType>(_time);
   auto iter =
-    std::upper_bound(this->dataPtr->keyFrames.begin(), this->dataPtr->keyFrames.end(),
+    std::upper_bound(this->dataPtr->keyFrames.begin(),
+        this->dataPtr->keyFrames.end(),
         std::reinterpret_pointer_cast<common::KeyFrame>(frame),
         KeyFrameTimeLess());
 
@@ -233,8 +235,8 @@ double Animation::KeyFramesAtTime(double _time, common::KeyFrame **_kf1,
 
   KeyFrame_V::const_iterator iter;
   auto timeKey = std::make_shared<common::KeyFrame>(_time);
-  iter = std::lower_bound(this->dataPtr->keyFrames.begin(), this->dataPtr->keyFrames.end(),
-      timeKey, KeyFrameTimeLess());
+  iter = std::lower_bound(this->dataPtr->keyFrames.begin(),
+      this->dataPtr->keyFrames.end(), timeKey, KeyFrameTimeLess());
 
   if (iter == this->dataPtr->keyFrames.end())
   {
@@ -336,7 +338,8 @@ void PoseAnimation::InterpolatedKeyFrame(const double _time,
   }
   else
   {
-    _kf.Translation(this->dataPtr->positionSpline->Interpolate(firstKeyIndex, t));
+    _kf.Translation(
+        this->dataPtr->positionSpline->Interpolate(firstKeyIndex, t));
     _kf.Rotation(this->dataPtr->rotationSpline->Interpolate(firstKeyIndex, t));
   }
 }
