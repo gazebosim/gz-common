@@ -19,12 +19,6 @@
 #endif
 #include <FreeImage.h>
 
-#if FREEIMAGE_BIGENDIAN
-  #define ORIGINAL_FREEIMAGE_COLORORDER FREEIMAGE_COLORORDER_RGB
-#else
-  #define ORIGINAL_FREEIMAGE_COLORORDER FREEIMAGE_COLORORDER_BGR
-#endif
-
 #ifdef FREEIMAGE_COLORORDER
 #undef FREEIMAGE_COLORORDER
 #endif
@@ -56,9 +50,12 @@ namespace ignition
       public: void DataImpl(unsigned char **_data, unsigned int &_count,
           FIBITMAP *_img) const;
 
-      /// \brief Swap red and blue when color order is BGR
+      /// \brief Swap red and blue pixels
+      /// \param[in] _width Width of the image
       /// \param[in] _height Height of the image
-      public: void SwapRedBlue(const unsigned int &_height);
+      /// \return bitmap data with red and blue pixels swapped
+      public: FIBITMAP* SwapRedBlue(const unsigned int &_width,
+                                    const unsigned int &_height);
     };
   }
 }
@@ -147,10 +144,16 @@ int Image::Load(const std::string &_filename)
 }
 
 //////////////////////////////////////////////////
-void Image::SavePNG(const std::string &_filename)
+void Image::SavePNG(const std::string &_filename, const bool _swapRedBlue)
 {
-  this->dataPtr->SwapRedBlue(this->Height());
-  FreeImage_Save(FIF_PNG, this->dataPtr->bitmap, _filename.c_str(), 0);
+  if (_swapRedBlue)
+  {
+    FIBITMAP *copy = this->dataPtr->SwapRedBlue(this->Width(), this->Height());
+    FreeImage_Save(FIF_PNG, copy, _filename.c_str(), 0);
+    FreeImage_Unload(copy);
+  }
+  else
+    FreeImage_Save(FIF_PNG, this->dataPtr->bitmap, _filename.c_str(), 0);
 }
 
 //////////////////////////////////////////////////
@@ -547,16 +550,17 @@ Image::PixelFormatType Image::ConvertPixelFormat(const std::string &_format)
 }
 
 //////////////////////////////////////////////////
-void ImagePrivate::SwapRedBlue(const unsigned int &_height)
+FIBITMAP* ImagePrivate::SwapRedBlue(const unsigned int &_width,
+                                    const unsigned int &_height)
 {
-  if (ORIGINAL_FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_BGR)
-    return;
+  FIBITMAP *copy = FreeImage_Copy(this->bitmap, 0, 0, _width,
+      _height);
 
   const unsigned bytesperpixel = FreeImage_GetBPP(this->bitmap) / 8;
   const unsigned pitch = FreeImage_GetPitch(this->bitmap);
   const unsigned lineSize = FreeImage_GetLine(this->bitmap);
 
-  BYTE *line = FreeImage_GetBits(this->bitmap);
+  BYTE *line = FreeImage_GetBits(copy);
   for (unsigned y = 0; y < _height; ++y, line += pitch)
   {
     for (BYTE *pixel = line; pixel < line + lineSize ; pixel += bytesperpixel)
@@ -564,4 +568,6 @@ void ImagePrivate::SwapRedBlue(const unsigned int &_height)
       std::swap(pixel[0], pixel[2]);
     }
   }
+
+  return copy;
 }
