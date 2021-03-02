@@ -39,6 +39,7 @@ TEST_F(ImageTest, Image)
   EXPECT_EQ(static_cast<unsigned int>(121), img.Width());
   EXPECT_EQ(static_cast<unsigned int>(81), img.Height());
   EXPECT_EQ(static_cast<unsigned int>(32), img.BPP());
+  EXPECT_EQ(484, img.Pitch());
   EXPECT_EQ(common::Image::PixelFormatType::RGBA_INT8, img.PixelFormat());
   EXPECT_EQ(img.Pixel(0, 0), math::Color::Red);
   EXPECT_EQ(img.Pixel(85, 0), math::Color::Blue);
@@ -48,15 +49,78 @@ TEST_F(ImageTest, Image)
   EXPECT_TRUE(img.Filename().find("red_blue_colors.png") !=
       std::string::npos);
 
+  // Check RGB data
   unsigned char *data = nullptr;
   unsigned int size = 0;
+  img.RGBData(&data, size);
+  EXPECT_EQ(static_cast<unsigned int>(29403), size);
+  ASSERT_NE(nullptr, data);
+
+  auto channels = 3u;
+  auto step = img.Width() * channels;
+  for (auto i = 0u; i < img.Height(); ++i)
+  {
+    for (auto j = 0u; j < step; j += channels)
+    {
+      unsigned int idx = i * step + j;
+      unsigned int r = data[idx];
+      unsigned int g = data[idx+1];
+      unsigned int b = data[idx+2];
+
+      EXPECT_EQ(0u, g) << i << "  " << j;
+      if (j / channels < 80)
+      {
+        EXPECT_EQ(255u, r) << i << "  " << j / channels;
+        EXPECT_EQ(0u, b) << i << "  " << j / channels;
+      }
+      else
+      {
+        EXPECT_EQ(0u, r) << i << "  " << j / channels;
+        EXPECT_EQ(255u, b) << i << "  " << j / channels;
+      }
+    }
+  }
+
+  // Check RGBA data
+  data = nullptr;
+  size = 0;
   img.Data(&data, size);
   EXPECT_EQ(static_cast<unsigned int>(39204), size);
+  ASSERT_NE(nullptr, data);
 
+  channels = 4u;
+  step = img.Width() * channels;
+  for (auto i = 0u; i < img.Height(); ++i)
+  {
+    for (auto j = 0u; j < step; j += channels)
+    {
+      unsigned int idx = i * step + j;
+      unsigned int r = data[idx];
+      unsigned int g = data[idx+1];
+      unsigned int b = data[idx+2];
+      unsigned int a = data[idx+3];
+
+      EXPECT_EQ(0u, g) << i << "  " << j;
+      EXPECT_EQ(255u, a) << i << "  " << j;
+      if (j / channels < 80)
+      {
+        EXPECT_EQ(255u, r) << i << "  " << j / channels;
+        EXPECT_EQ(0u, b) << i << "  " << j / channels;
+      }
+      else
+      {
+        EXPECT_EQ(0u, r) << i << "  " << j / channels;
+        EXPECT_EQ(255u, b) << i << "  " << j / channels;
+      }
+    }
+  }
+
+  // Set from RGBA data
   img.SetFromData(data, img.Width(), img.Height(), img.PixelFormat());
   EXPECT_EQ(static_cast<unsigned int>(121), img.Width());
   EXPECT_EQ(static_cast<unsigned int>(81), img.Height());
   EXPECT_EQ(static_cast<unsigned int>(32), img.BPP());
+  EXPECT_EQ(484, img.Pitch());
   EXPECT_EQ(common::Image::PixelFormatType::RGBA_INT8, img.PixelFormat());
   EXPECT_EQ(img.Pixel(0, 0), math::Color::Red);
   EXPECT_EQ(img.Pixel(85, 0), math::Color::Blue);
@@ -73,6 +137,7 @@ TEST_F(ImageTest, Image)
   EXPECT_EQ(static_cast<unsigned int>(121), img.Width());
   EXPECT_EQ(static_cast<unsigned int>(81), img.Height());
   EXPECT_EQ(static_cast<unsigned int>(24), img.BPP());
+  EXPECT_EQ(363, img.Pitch());
   EXPECT_EQ(common::Image::PixelFormatType::RGB_INT8, img.PixelFormat());
   EXPECT_EQ(img.Pixel(0, 0), math::Color::Red);
   EXPECT_EQ(img.Pixel(85, 0), math::Color::Blue);
@@ -80,16 +145,43 @@ TEST_F(ImageTest, Image)
   EXPECT_EQ(img.MaxColor(), math::Color::Red);
   EXPECT_TRUE(img.Valid());
 
-  // get data and set
+  // Check data
   data = nullptr;
   size = 0;
   img.Data(&data, size);
   EXPECT_EQ(static_cast<unsigned int>(29403), size);
+  ASSERT_NE(nullptr, data);
+
+  channels = 3u;
+  step = img.Width() * channels;
+  for (auto i = 0u; i < img.Height(); ++i)
+  {
+    for (auto j = 0u; j < step; j += channels)
+    {
+      unsigned int idx = i * step + j;
+      unsigned int r = data[idx];
+      unsigned int g = data[idx+1];
+      unsigned int b = data[idx+2];
+
+      EXPECT_EQ(0u, g) << i << "  " << j;
+      if (j / channels < 80)
+      {
+        EXPECT_EQ(255u, r) << i << "  " << j / channels;
+        EXPECT_EQ(0u, b) << i << "  " << j / channels;
+      }
+      else
+      {
+        EXPECT_EQ(0u, r) << i << "  " << j / channels;
+        EXPECT_EQ(255u, b) << i << "  " << j / channels;
+      }
+    }
+  }
 
   img.SetFromData(data, img.Width(), img.Height(), img.PixelFormat());
   EXPECT_EQ(static_cast<unsigned int>(121), img.Width());
   EXPECT_EQ(static_cast<unsigned int>(81), img.Height());
   EXPECT_EQ(static_cast<unsigned int>(24), img.BPP());
+  EXPECT_EQ(363, img.Pitch());
   EXPECT_EQ(common::Image::PixelFormatType::RGB_INT8, img.PixelFormat());
   EXPECT_EQ(img.Pixel(0, 0), math::Color::Red);
   EXPECT_EQ(img.Pixel(85, 0), math::Color::Blue);
@@ -99,17 +191,18 @@ TEST_F(ImageTest, Image)
 
   common::removeDirectoryOrFile(filename);
 
-  // save iamge with red and blue swapped, then reload and test colors
-  img.SavePNG(filename, true);
+  // save iamge then reload and test colors
+  img.SavePNG(filename);
   img.Load("file://" + filename);
   EXPECT_EQ(static_cast<unsigned int>(121), img.Width());
   EXPECT_EQ(static_cast<unsigned int>(81), img.Height());
   EXPECT_EQ(static_cast<unsigned int>(24), img.BPP());
+  EXPECT_EQ(363, img.Pitch());
   EXPECT_EQ(common::Image::PixelFormatType::RGB_INT8, img.PixelFormat());
-  EXPECT_EQ(img.Pixel(0, 0), math::Color::Blue);
-  EXPECT_EQ(img.Pixel(85, 0), math::Color::Red);
-  EXPECT_EQ(img.AvgColor(), math::Color(0.338843f, 0, 0.661157f, 1));
-  EXPECT_EQ(img.MaxColor(), math::Color::Blue);
+  EXPECT_EQ(img.Pixel(0, 0), math::Color::Red);
+  EXPECT_EQ(img.Pixel(85, 0), math::Color::Blue);
+  EXPECT_EQ(img.AvgColor(), math::Color(0.661157f, 0, 0.338843f, 1));
+  EXPECT_EQ(img.MaxColor(), math::Color::Red);
   EXPECT_TRUE(img.Valid());
 
   common::removeDirectoryOrFile(filename);

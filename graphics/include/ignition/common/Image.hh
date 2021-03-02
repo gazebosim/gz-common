@@ -107,9 +107,7 @@ namespace ignition
 
       /// \brief Save the image in PNG format
       /// \param[in] _filename The name of the saved image
-      /// \param[in] _swapRedBlue Is true to swap red and blue pixels
-      public: void SavePNG(const std::string &_filename,
-                           const bool _swapRedBlue = false);
+      public: void SavePNG(const std::string &_filename);
 
       /// \brief Set the image from raw data
       /// \param[in] _data Pointer to the raw image data

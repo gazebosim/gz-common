@@ -19,11 +19,6 @@
 #endif
 #include <FreeImage.h>
 
-#ifdef FREEIMAGE_COLORORDER
-#undef FREEIMAGE_COLORORDER
-#endif
-#define FREEIMAGE_COLORORDER FREEIMAGE_COLORORDER_RGB
-
 #include <string>
 
 #include <ignition/common/Console.hh>
@@ -144,16 +139,10 @@ int Image::Load(const std::string &_filename)
 }
 
 //////////////////////////////////////////////////
-void Image::SavePNG(const std::string &_filename, const bool _swapRedBlue)
+void Image::SavePNG(const std::string &_filename)
 {
-  if (_swapRedBlue)
-  {
-    FIBITMAP *copy = this->dataPtr->SwapRedBlue(this->Width(), this->Height());
-    FreeImage_Save(FIF_PNG, copy, _filename.c_str(), 0);
-    FreeImage_Unload(copy);
-  }
-  else
-    FreeImage_Save(FIF_PNG, this->dataPtr->bitmap, _filename.c_str(), 0);
+  FreeImage_Save(FIF_PNG, this->dataPtr->bitmap, _filename.c_str(),
+      PNG_DEFAULT);
 }
 
 //////////////////////////////////////////////////
@@ -215,6 +204,12 @@ void Image::SetFromData(const unsigned char *_data,
 
   this->dataPtr->bitmap = FreeImage_ConvertFromRawBits(const_cast<BYTE*>(_data),
       _width, _height, scanlineBytes, bpp, redmask, greenmask, bluemask, true);
+
+  if (FREEIMAGE_COLORORDER != FREEIMAGE_COLORORDER_RGB)
+  {
+    this->dataPtr->bitmap = this->dataPtr->SwapRedBlue(this->Width(),
+        this->Height());
+  }
 }
 
 //////////////////////////////////////////////////
@@ -226,7 +221,12 @@ int Image::Pitch() const
 //////////////////////////////////////////////////
 void Image::RGBData(unsigned char **_data, unsigned int &_count) const
 {
-  FIBITMAP *tmp = FreeImage_ConvertTo24Bits(this->dataPtr->bitmap);
+  FIBITMAP *tmp = this->dataPtr->bitmap;
+  if (FREEIMAGE_COLORORDER != FREEIMAGE_COLORORDER_RGB)
+  {
+    tmp = this->dataPtr->SwapRedBlue(this->Width(), this->Height());
+  }
+  tmp = FreeImage_ConvertTo24Bits(tmp);
   this->dataPtr->DataImpl(_data, _count, tmp);
   FreeImage_Unload(tmp);
 }
@@ -234,7 +234,15 @@ void Image::RGBData(unsigned char **_data, unsigned int &_count) const
 //////////////////////////////////////////////////
 void Image::Data(unsigned char **_data, unsigned int &_count) const
 {
-  this->dataPtr->DataImpl(_data, _count, this->dataPtr->bitmap);
+  if (FREEIMAGE_COLORORDER != FREEIMAGE_COLORORDER_RGB)
+  {
+    this->dataPtr->DataImpl(_data, _count, this->dataPtr->SwapRedBlue(
+        this->Width(), this->Height()));
+  }
+  else
+  {
+    this->dataPtr->DataImpl(_data, _count, this->dataPtr->bitmap);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -335,20 +343,7 @@ math::Color Image::Pixel(unsigned int _x, unsigned int _y) const
         << _x << " " << _y << "] \n";
       return clr;
     }
-
-#ifdef FREEIMAGE_COLORORDER
-    // cppcheck-suppress ConfigurationNotChecked
-    if (FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_RGB)
-      clr.Set(firgb.rgbRed, firgb.rgbGreen, firgb.rgbBlue);
-    else
-      clr.Set(firgb.rgbBlue, firgb.rgbGreen, firgb.rgbRed);
-#else
-#ifdef FREEIMAGE_BIGENDIAN
     clr.Set(firgb.rgbRed, firgb.rgbGreen, firgb.rgbBlue);
-#else
-    clr.Set(firgb.rgbBlue, firgb.rgbGreen, firgb.rgbRed);
-#endif
-#endif
   }
   else
   {
@@ -424,20 +419,8 @@ math::Color Image::MaxColor() const
             << x << " " << y << "] \n";
           continue;
         }
-
-#ifdef FREEIMAGE_COLORORDER
-        // cppcheck-suppress ConfigurationNotChecked
-        if (FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_RGB)
-          clr.Set(firgb.rgbRed, firgb.rgbGreen, firgb.rgbBlue);
-        else
-          clr.Set(firgb.rgbBlue, firgb.rgbGreen, firgb.rgbRed);
-#else
-#ifdef FREEIMAGE_BIGENDIAN
         clr.Set(firgb.rgbRed, firgb.rgbGreen, firgb.rgbBlue);
-#else
-        clr.Set(firgb.rgbBlue, firgb.rgbGreen, firgb.rgbRed);
-#endif
-#endif
+
         if (clr.R() + clr.G() + clr.B() > maxClr.R() + maxClr.G() + maxClr.B())
         {
           maxClr = clr;
