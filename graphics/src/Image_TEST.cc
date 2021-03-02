@@ -190,22 +190,6 @@ TEST_F(ImageTest, Image)
   EXPECT_TRUE(img.Valid());
 
   common::removeDirectoryOrFile(filename);
-
-  // save iamge then reload and test colors
-  img.SavePNG(filename);
-  img.Load("file://" + filename);
-  EXPECT_EQ(static_cast<unsigned int>(121), img.Width());
-  EXPECT_EQ(static_cast<unsigned int>(81), img.Height());
-  EXPECT_EQ(static_cast<unsigned int>(24), img.BPP());
-  EXPECT_EQ(363, img.Pitch());
-  EXPECT_EQ(common::Image::PixelFormatType::RGB_INT8, img.PixelFormat());
-  EXPECT_EQ(img.Pixel(0, 0), math::Color::Red);
-  EXPECT_EQ(img.Pixel(85, 0), math::Color::Blue);
-  EXPECT_EQ(img.AvgColor(), math::Color(0.661157f, 0, 0.338843f, 1));
-  EXPECT_EQ(img.MaxColor(), math::Color::Red);
-  EXPECT_TRUE(img.Valid());
-
-  common::removeDirectoryOrFile(filename);
 }
 
 /////////////////////////////////////////////////
