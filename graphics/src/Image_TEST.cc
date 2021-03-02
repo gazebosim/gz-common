@@ -40,10 +40,10 @@ TEST_F(ImageTest, Image)
   EXPECT_EQ(static_cast<unsigned int>(81), img.Height());
   EXPECT_EQ(static_cast<unsigned int>(32), img.BPP());
   EXPECT_EQ(common::Image::PixelFormatType::RGBA_INT8, img.PixelFormat());
-  EXPECT_EQ(img.Pixel(0, 0), math::Color(1, 0, 0, 1));
-  EXPECT_EQ(img.Pixel(85, 0), math::Color(0, 0, 1, 1));
+  EXPECT_EQ(img.Pixel(0, 0), math::Color::Red);
+  EXPECT_EQ(img.Pixel(85, 0), math::Color::Blue);
   EXPECT_EQ(img.AvgColor(), math::Color(0.661157f, 0, 0.338843f, 1));
-  EXPECT_EQ(img.MaxColor(), math::Color(1, 0, 0, 1));
+  EXPECT_EQ(img.MaxColor(), math::Color::Red);
   EXPECT_TRUE(img.Valid());
   EXPECT_TRUE(img.Filename().find("red_blue_colors.png") !=
       std::string::npos);
@@ -58,10 +58,10 @@ TEST_F(ImageTest, Image)
   EXPECT_EQ(static_cast<unsigned int>(81), img.Height());
   EXPECT_EQ(static_cast<unsigned int>(32), img.BPP());
   EXPECT_EQ(common::Image::PixelFormatType::RGBA_INT8, img.PixelFormat());
-  EXPECT_EQ(img.Pixel(0, 0), math::Color(1, 0, 0, 1));
-  EXPECT_EQ(img.Pixel(85, 0), math::Color(0, 0, 1, 1));
+  EXPECT_EQ(img.Pixel(0, 0), math::Color::Red);
+  EXPECT_EQ(img.Pixel(85, 0), math::Color::Blue);
   EXPECT_EQ(img.AvgColor(), math::Color(0.661157f, 0, 0.338843f, 1));
-  EXPECT_EQ(img.MaxColor(), math::Color(1, 0, 0, 1));
+  EXPECT_EQ(img.MaxColor(), math::Color::Red);
   EXPECT_TRUE(img.Valid());
 
   // save image then reload and test colors
@@ -74,10 +74,10 @@ TEST_F(ImageTest, Image)
   EXPECT_EQ(static_cast<unsigned int>(81), img.Height());
   EXPECT_EQ(static_cast<unsigned int>(24), img.BPP());
   EXPECT_EQ(common::Image::PixelFormatType::RGB_INT8, img.PixelFormat());
-  EXPECT_EQ(img.Pixel(0, 0), math::Color(1, 0, 0, 1));
-  EXPECT_EQ(img.Pixel(85, 0), math::Color(0, 0, 1, 1));
+  EXPECT_EQ(img.Pixel(0, 0), math::Color::Red);
+  EXPECT_EQ(img.Pixel(85, 0), math::Color::Blue);
   EXPECT_EQ(img.AvgColor(), math::Color(0.661157f, 0, 0.338843f, 1));
-  EXPECT_EQ(img.MaxColor(), math::Color(1, 0, 0, 1));
+  EXPECT_EQ(img.MaxColor(), math::Color::Red);
   EXPECT_TRUE(img.Valid());
 
   // get data and set
@@ -91,10 +91,25 @@ TEST_F(ImageTest, Image)
   EXPECT_EQ(static_cast<unsigned int>(81), img.Height());
   EXPECT_EQ(static_cast<unsigned int>(24), img.BPP());
   EXPECT_EQ(common::Image::PixelFormatType::RGB_INT8, img.PixelFormat());
-  EXPECT_EQ(img.Pixel(0, 0), math::Color(1, 0, 0, 1));
-  EXPECT_EQ(img.Pixel(85, 0), math::Color(0, 0, 1, 1));
+  EXPECT_EQ(img.Pixel(0, 0), math::Color::Red);
+  EXPECT_EQ(img.Pixel(85, 0), math::Color::Blue);
   EXPECT_EQ(img.AvgColor(), math::Color(0.661157f, 0, 0.338843f, 1));
-  EXPECT_EQ(img.MaxColor(), math::Color(1, 0, 0, 1));
+  EXPECT_EQ(img.MaxColor(), math::Color::Red);
+  EXPECT_TRUE(img.Valid());
+
+  common::removeDirectoryOrFile(filename);
+
+  // save iamge with red and blue swapped, then reload and test colors
+  img.SavePNG(filename, true);
+  img.Load("file://" + filename);
+  EXPECT_EQ(static_cast<unsigned int>(121), img.Width());
+  EXPECT_EQ(static_cast<unsigned int>(81), img.Height());
+  EXPECT_EQ(static_cast<unsigned int>(24), img.BPP());
+  EXPECT_EQ(common::Image::PixelFormatType::RGB_INT8, img.PixelFormat());
+  EXPECT_EQ(img.Pixel(0, 0), math::Color::Blue);
+  EXPECT_EQ(img.Pixel(85, 0), math::Color::Red);
+  EXPECT_EQ(img.AvgColor(), math::Color(0.338843f, 0, 0.661157f, 1));
+  EXPECT_EQ(img.MaxColor(), math::Color::Blue);
   EXPECT_TRUE(img.Valid());
 
   common::removeDirectoryOrFile(filename);

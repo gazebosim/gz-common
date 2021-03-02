@@ -553,8 +553,7 @@ Image::PixelFormatType Image::ConvertPixelFormat(const std::string &_format)
 FIBITMAP* ImagePrivate::SwapRedBlue(const unsigned int &_width,
                                     const unsigned int &_height)
 {
-  FIBITMAP *copy = FreeImage_Copy(this->bitmap, 0, 0, _width,
-      _height);
+  FIBITMAP *copy = FreeImage_Copy(this->bitmap, 0, 0, _width, _height);
 
   const unsigned bytesperpixel = FreeImage_GetBPP(this->bitmap) / 8;
   const unsigned pitch = FreeImage_GetPitch(this->bitmap);
