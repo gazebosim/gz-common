@@ -68,7 +68,7 @@ int common::AVCodecDecode(AVCodecContext *_codecCtx,
   }
 
   ret = avcodec_receive_frame(_codecCtx, _frame);
-  if (ret < 0 && ret != AVERROR(EAGAIN) && ret != AVERROR_EOF)
+  if (ret < 0 && ret != AVERROR(EAGAIN))
   {
     return ret;
   }
@@ -77,7 +77,8 @@ int common::AVCodecDecode(AVCodecContext *_codecCtx,
     *_gotFrame = 1;
   }
 
-  return 0;
+  // new API always consumes the whole packet
+  return _packet ? _packet->size : 0;
 #else
   // this was deprecated in ffmpeg version 3.1
   // github.com/FFmpeg/FFmpeg/commit/7fc329e2dd6226dfecaa4a1d7adf353bf2773726

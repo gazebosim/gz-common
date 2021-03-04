@@ -22,24 +22,19 @@
 #include "ignition/common/ffmpeg_inc.hh"
 #include "ignition/common/Console.hh"
 #include "ignition/common/VideoEncoder.hh"
+#include "ignition/common/StringUtils.hh"
 
-// Fix averr2str
-// https://github.com/joncampbell123/composite-video-simulator/issues/5#issuecomment-611885908
-#ifdef av_err2str
-#undef av_err2str
-av_always_inline char *av_err2str(int _errnum)
-{
-  thread_local char str[AV_ERROR_MAX_STRING_SIZE];
-  memset(str, 0, sizeof(str));
-  return av_make_error_string(str, AV_ERROR_MAX_STRING_SIZE, _errnum);
-}
+#ifdef IGN_COMMON_BUILD_HW_VIDEO
+#include "ignition/common/HWEncoder.hh"
 #endif
 
 using namespace ignition;
 using namespace common;
+using namespace std;
 
 // Private data class
-class ignition::common::VideoEncoderPrivate
+// hidden visibility specifier has to be explicitly set to silent a gcc warning
+class IGNITION_COMMON_AV_HIDDEN ignition::common::VideoEncoderPrivate
 {
   /// \brief Name of the file which stores the video while it is being
   ///        recorded.
@@ -54,18 +49,24 @@ class ignition::common::VideoEncoderPrivate
   /// \brief libav format I/O context
   public: AVFormatContext *formatCtx = nullptr;
 
-  /// \brief libav output video frame
+  /// \brief libav output video frame (aligned to 32 bytes)
   public: AVFrame *avOutFrame = nullptr;
 
-  /// \brief libav input image data
+  /// \brief libav input image data (aligned to 32 bytes)
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
   public: AVPicture *avInFrame = nullptr;
 #else
   public: AVFrame *avInFrame = nullptr;
 #endif
 
+  /// \brief Pixel format of the input frame. So far it is hardcoded.
+  public: AVPixelFormat inPixFormat = AV_PIX_FMT_RGB24;
+
   /// \brief Software scaling context
   public: SwsContext *swsCtx = nullptr;
+
+  /// \brief Line sizes of an unaligned input frame
+  public: int inputLineSizes[4];
 
   /// \brief True if the encoder is running
   public: bool encoding = false;
@@ -96,7 +97,50 @@ class ignition::common::VideoEncoderPrivate
 
   /// \brief Mutex for thread safety.
   public: std::mutex mutex;
+
+#ifdef IGN_COMMON_BUILD_HW_VIDEO
+  /// \brief The HW encoder configuration (optional).
+  public: std::unique_ptr<HWEncoder> hwEncoder = nullptr;
+#endif
+
+  /// Find a suitable encoder for the given codec ID.
+  /// \param[in] _codecId ID of the codec we seek the encoder for.
+  /// \return The matched encoder (or nullptr on failure).
+  public: AVCodec* FindEncoder(AVCodecID _codecId);
+
+  /// \brief Get a pointer to the frame that contains the encoder input. This
+  /// mainly serves for uploading the frame to GPU buffer if HW acceleration is
+  /// used and HW surfaces are configured.
+  /// \param[in] _inFrame The input frame to be encoded (in CPU buffer).
+  /// \return Either _inFrame of a pointer to the GPU buffer containing the
+  /// uploaded frame.
+  public: AVFrame* GetFrameForEncoder(AVFrame* _inFrame);
+
+  /// \brief Process an encoder packet and write it to disk.
+  /// \param avPacket The packet to process.
+  /// \return Non-negative on success, negative on error.
+  int ProcessPacket(AVPacket* avPacket);
 };
+
+/////////////////////////////////////////////////
+AVCodec* VideoEncoderPrivate::FindEncoder(AVCodecID _codecId)
+{
+#ifdef IGN_COMMON_BUILD_HW_VIDEO
+  if (this->hwEncoder)
+    return this->hwEncoder->FindEncoder(_codecId);
+#endif
+  return avcodec_find_encoder(_codecId);
+}
+
+/////////////////////////////////////////////////
+AVFrame* VideoEncoderPrivate::GetFrameForEncoder(AVFrame* _inFrame)
+{
+#ifdef IGN_COMMON_BUILD_HW_VIDEO
+  if (this->hwEncoder)
+    return this->hwEncoder->GetFrameForEncoder(_inFrame);
+#endif
+  return _inFrame;
+}
 
 /////////////////////////////////////////////////
 VideoEncoder::VideoEncoder()
@@ -131,6 +175,80 @@ bool VideoEncoder::Start(const std::string &_format,
                          const unsigned int _height,
                          const unsigned int _fps,
                          const unsigned int _bitRate)
+{
+  return this->Start(_format, _filename, _width, _height, _fps, _bitRate,
+                     true);
+}
+
+/////////////////////////////////////////////////
+bool VideoEncoder::Start(const std::string &_format,
+                         const std::string &_filename,
+                         const unsigned int _width,
+                         const unsigned int _height,
+                         const unsigned int _fps,
+                         const unsigned int _bitRate,
+                         const bool _allowHwAccel)
+{
+  FlagSet<HWEncoderType> allowedEncoders = HWEncoderType::NONE;
+  std::string device;
+  std::optional<bool> useHwSurface;
+
+  if (_allowHwAccel)
+  {
+    std::string allowedEncodersStr;
+    env("IGN_VIDEO_ALLOWED_ENCODERS", allowedEncodersStr);
+
+    if (allowedEncodersStr == "ALL")
+    {
+      allowedEncoders = FlagSet<HWEncoderType>::AllSet();
+    }
+    else if (!allowedEncodersStr.empty() && allowedEncodersStr != "NONE")
+    {
+      for (const auto& encoderStr : Split(allowedEncodersStr, ':'))
+      {
+        HWEncoderType encoder = HWEncoderType::NONE;
+        HWEncoderTypeParser.Set(encoder, encoderStr);
+        if (encoder != HWEncoderType::NONE)
+          allowedEncoders |= encoder;
+      }
+    }
+
+#ifndef IGN_COMMON_BUILD_HW_VIDEO
+    if (allowedEncoders != HWEncoderType::NONE)
+    {
+      ignwarn << "Hardware encoding with encoders " << allowedEncodersStr
+              << " was requested, but ignition-common is built without HW "
+              << "encoding support. A software encoder will be used instead."
+              << std::endl;
+    }
+#endif
+
+    env("IGN_VIDEO_ENCODER_DEVICE", device);
+
+    std::string hwSurfaceStr;
+    env("IGN_VIDEO_USE_HW_SURFACE", hwSurfaceStr);
+
+    if (!hwSurfaceStr.empty())
+    {
+      if (hwSurfaceStr == "0")
+        useHwSurface = false;
+      else
+        useHwSurface = true;
+    }
+  }
+
+  return this->Start(_format, _filename, _width, _height, _fps, _bitRate,
+                     allowedEncoders, device, useHwSurface);
+}
+
+/////////////////////////////////////////////////
+bool VideoEncoder::Start(
+  const std::string &_format, const std::string &_filename,
+  const unsigned int _width, const unsigned int _height,
+  const unsigned int _fps, const unsigned int _bitRate,
+  [[maybe_unused]] const FlagSet<HWEncoderType>& _allowedHwAccel,
+  [[maybe_unused]] const std::string& _hwAccelDevice,
+  [[maybe_unused]] std::optional<bool> _useHwSurface)
 {
   // Do not allow Start to be called more than once without Stop or Reset
   // being called first.
@@ -235,7 +353,7 @@ bool VideoEncoder::Start(const std::string &_format,
             outputFormat, nullptr, this->dataPtr->filename.c_str());
         if (result < 0)
         {
-          ignerr << "Failed to allocate AV context [" << av_err2str(result)
+          ignerr << "Failed to allocate AV context [" << av_err2str_cpp(result)
                  << "]" << std::endl;
         }
         break;
@@ -284,7 +402,7 @@ bool VideoEncoder::Start(const std::string &_format,
         nullptr, nullptr, this->dataPtr->filename.c_str());
     if (result < 0)
     {
-      ignerr << "Failed to allocate AV context [" << av_err2str(result)
+      ignerr << "Failed to allocate AV context [" << av_err2str_cpp(result)
              << "]" << std::endl;
     }
 #endif
@@ -298,21 +416,29 @@ bool VideoEncoder::Start(const std::string &_format,
     return false;
   }
 
+#ifdef IGN_COMMON_BUILD_HW_VIDEO
+  // HW encoder needs to be created before the call to FindEncoder()
+  this->dataPtr->hwEncoder = std::make_unique<HWEncoder>(
+      _allowedHwAccel, _hwAccelDevice, _useHwSurface);
+#endif
+
   // find the video encoder
-  AVCodec *encoder = avcodec_find_encoder(
-      this->dataPtr->formatCtx->oformat->video_codec);
+  const auto codecId = this->dataPtr->formatCtx->oformat->video_codec;
+  auto* encoder = this->dataPtr->FindEncoder(codecId);
   if (!encoder)
   {
     ignerr << "Codec for["
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
           << this->dataPtr->formatCtx->oformat->name
 #else
-          << avcodec_get_name(this->dataPtr->formatCtx->oformat->video_codec)
+          << avcodec_get_name(codecId)
 #endif
           << "] not found. Video encoding is not started.\n";
     this->Reset();
     return false;
   }
+
+  ignmsg << "Using encoder " << encoder->name << std::endl;
 
   // Create a new video stream
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
@@ -378,8 +504,7 @@ bool VideoEncoder::Start(const std::string &_format,
   this->dataPtr->codecCtx->thread_count = 5;
 
   // Set the codec id
-  this->dataPtr->codecCtx->codec_id =
-    this->dataPtr->formatCtx->oformat->video_codec;
+  this->dataPtr->codecCtx->codec_id = codecId;
 
   if (this->dataPtr->codecCtx->codec_id == AV_CODEC_ID_MPEG1VIDEO)
   {
@@ -401,15 +526,34 @@ bool VideoEncoder::Start(const std::string &_format,
 #endif
   }
 
+  // we misuse this field a bit, as docs say it is unused in encoders
+  // here, it stores the input format of the encoder
+  this->dataPtr->codecCtx->sw_pix_fmt = this->dataPtr->codecCtx->pix_fmt;
+#ifdef IGN_COMMON_BUILD_HW_VIDEO
+  if (this->dataPtr->hwEncoder)
+    this->dataPtr->hwEncoder->ConfigHWAccel(this->dataPtr->codecCtx);
+#endif
+
   // Open the video context
   int ret = avcodec_open2(this->dataPtr->codecCtx, encoder, 0);
   if (ret < 0)
   {
-    char errBuff[AV_ERROR_MAX_STRING_SIZE];
-    av_strerror(ret, errBuff, AV_ERROR_MAX_STRING_SIZE);
-
-    ignerr << "Could not open video codec: " << errBuff
-          << "Video encoding is not started\n";
+    ignerr << "Could not open video codec: " << av_err2str_cpp(ret)
+          << ". Video encoding is not started\n";
+    if (AVUNERROR(ret) == ENOMEM &&
+      this->dataPtr->hwEncoder->GetEncoderType() == HWEncoderType::NVENC)
+    {
+      ignwarn << "If this computer has non-server-class GPUs (like GeForce), "
+              << "it is possible that you have reached the maximum number of "
+              << "simultaneous NVENC sessions (most probably 3). This limit is "
+              << "not per GPU, but per the whole computer regardless of the "
+              << "number of GPUs installed. You can try to circumvent this "
+              << "limit by using the unofficial driver patch at "
+              << "https://github.com/keylase/nvidia-patch . If you cannot (or "
+              << "do not want) install this patch, do not run more than 3 "
+              << "HW-accelerated video encoding tasks on this computer "
+              << "simultaneously.\n";
+    }
     this->Reset();
     return false;
   }
@@ -427,20 +571,17 @@ bool VideoEncoder::Start(const std::string &_format,
     return false;
   }
 
-  this->dataPtr->avOutFrame->format = this->dataPtr->codecCtx->pix_fmt;
+  // we misuse sw_pix_fmt a bit, as docs say it is unused in encoders
+  this->dataPtr->avOutFrame->format = this->dataPtr->codecCtx->sw_pix_fmt;
   this->dataPtr->avOutFrame->width = this->dataPtr->codecCtx->width;
   this->dataPtr->avOutFrame->height = this->dataPtr->codecCtx->height;
 
-  // the image can be allocated by any means and av_image_alloc() is
-  // just the most convenient way if av_malloc() is to be used
-  if (av_image_alloc(this->dataPtr->avOutFrame->data,
-                     this->dataPtr->avOutFrame->linesize,
-                     this->dataPtr->codecCtx->width,
-                     this->dataPtr->codecCtx->height,
-                     this->dataPtr->codecCtx->pix_fmt, 32) < 0)
+  // av_image_alloc() could also allocate the image, but av_frame_get_buffer()
+  // allocates a refcounted buffer, which is easier to manage
+  if (av_frame_get_buffer(this->dataPtr->avOutFrame, 32) > 0)
   {
-    ignerr << "Could not allocate raw picture buffer."
-          << "Video encoding is not started\n";
+    ignerr << "Could not allocate raw picture buffer. "
+           << "Video encoding is not started\n";
     this->Reset();
     return false;
   }
@@ -456,11 +597,8 @@ bool VideoEncoder::Start(const std::string &_format,
 #endif
   if (ret < 0)
   {
-    char errBuff[AV_ERROR_MAX_STRING_SIZE];
-    av_strerror(ret, errBuff, AV_ERROR_MAX_STRING_SIZE);
-
-    ignerr << "Could not copy the stream parameters:" << errBuff
-          << "Video encoding not started\n";
+    ignerr << "Could not copy the stream parameters:" << av_err2str_cpp(ret)
+          << ". Video encoding not started\n";
     return false;
   }
 
@@ -478,11 +616,8 @@ bool VideoEncoder::Start(const std::string &_format,
 
     if (ret < 0)
     {
-      char errBuff[AV_ERROR_MAX_STRING_SIZE];
-      av_strerror(ret, errBuff, AV_ERROR_MAX_STRING_SIZE);
       ignerr << "Could not open '" << this->dataPtr->filename << "'. "
-            << errBuff
-            << "Video encoding is not started\n";
+            << av_err2str_cpp(ret) << ". Video encoding is not started\n";
       this->Reset();
       return false;
     }
@@ -492,10 +627,7 @@ bool VideoEncoder::Start(const std::string &_format,
   ret = avformat_write_header(this->dataPtr->formatCtx, nullptr);
   if (ret < 0)
   {
-    char errBuff[AV_ERROR_MAX_STRING_SIZE];
-    av_strerror(ret, errBuff, AV_ERROR_MAX_STRING_SIZE);
-
-    ignerr << "Error occured when opening output file: " << errBuff
+    ignerr << "Error occured when opening output file: " << av_err2str_cpp(ret)
           << ". Video encoding is not started\n";
     this->Reset();
     return false;
@@ -574,26 +706,31 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
       this->dataPtr->avInFrame = new AVPicture;
       avpicture_alloc(this->dataPtr->avInFrame,
-          AV_PIX_FMT_RGB24, this->dataPtr->inWidth,
+          this->dataPtr->inPixFormat, this->dataPtr->inWidth,
           this->dataPtr->inHeight);
 #else
       this->dataPtr->avInFrame = av_frame_alloc();
+      this->dataPtr->avInFrame->width = this->dataPtr->inWidth;
+      this->dataPtr->avInFrame->height = this->dataPtr->inHeight;
+      this->dataPtr->avInFrame->format = this->dataPtr->inPixFormat;
 
-      av_image_alloc(this->dataPtr->avInFrame->data,
-          this->dataPtr->avInFrame->linesize,
-          this->dataPtr->inWidth, this->dataPtr->inHeight,
-          AV_PIX_FMT_RGB24, 1);
+      av_frame_get_buffer(this->dataPtr->avInFrame, 32);
 #endif
     }
+
+    av_image_fill_linesizes(this->dataPtr->inputLineSizes,
+                            this->dataPtr->inPixFormat,
+                            this->dataPtr->inWidth);
 
     this->dataPtr->swsCtx = sws_getContext(
         this->dataPtr->inWidth,
         this->dataPtr->inHeight,
-        AV_PIX_FMT_RGB24,
+        this->dataPtr->inPixFormat,
         this->dataPtr->codecCtx->width,
         this->dataPtr->codecCtx->height,
-        this->dataPtr->codecCtx->pix_fmt,
-        SWS_BICUBIC, nullptr, nullptr, nullptr);
+        // we misuse this field a bit, as docs say it is unused in encoders
+        this->dataPtr->codecCtx->sw_pix_fmt,
+        0, nullptr, nullptr, nullptr);
 
     if (this->dataPtr->swsCtx == nullptr)
     {
@@ -603,8 +740,13 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
   }
 
   // encode
-  memcpy(this->dataPtr->avInFrame->data[0], _frame,
-         this->dataPtr->inWidth * this->dataPtr->inHeight * 3);
+
+  // copy the unaligned input buffer to the 32-byte-aligned avInFrame
+  av_image_copy(
+      this->dataPtr->avInFrame->data, this->dataPtr->avInFrame->linesize,
+      &_frame, this->dataPtr->inputLineSizes,
+      this->dataPtr->inPixFormat,
+      this->dataPtr->inWidth, this->dataPtr->inHeight);
 
   sws_scale(this->dataPtr->swsCtx,
       this->dataPtr->avInFrame->data,
@@ -612,6 +754,9 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
       0, this->dataPtr->inHeight,
       this->dataPtr->avOutFrame->data,
       this->dataPtr->avOutFrame->linesize);
+
+  auto* frameToEncode = this->dataPtr->GetFrameForEncoder(
+    this->dataPtr->avOutFrame);
 
   // compute frame number based on timestamp of current image
   auto timeSinceStart = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -621,12 +766,16 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
 
   uint64_t frameDiff = frameNumber + 1 - this->dataPtr->frameCount;
 
+  int ret = 0;
+
   // make sure we have continuous pts (frame number) otherwise some decoders
   // may not be happy. So encode more (duplicate) frames until the current frame
   // number
-  for (uint64_t i = 0u; i < frameDiff; ++i)
+  for (uint64_t i = 0u;
+       i < frameDiff && (ret >= 0 || ret == AVERROR(EAGAIN));
+       ++i)
   {
-    this->dataPtr->avOutFrame->pts = this->dataPtr->frameCount++;
+    frameToEncode->pts = this->dataPtr->frameCount++;
 
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 40, 101)
     int gotOutput = 0;
@@ -635,52 +784,25 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
     avPacket.data = nullptr;
     avPacket.size = 0;
 
-    int ret = avcodec_encode_video2(this->dataPtr->codecCtx, &avPacket,
-        this->dataPtr->avOutFrame, &gotOutput);
+    ret = avcodec_encode_video2(this->dataPtr->codecCtx, &avPacket,
+        frameToEncode, &gotOutput);
 
     if (ret >= 0 && gotOutput == 1)
-    {
-      avPacket.stream_index = this->dataPtr->videoStream->index;
-
-      // Scale timestamp appropriately.
-      if (avPacket.pts != static_cast<int64_t>(AV_NOPTS_VALUE))
-      {
-        avPacket.pts = av_rescale_q(avPacket.pts,
-            this->dataPtr->codecCtx->time_base,
-            this->dataPtr->videoStream->time_base);
-      }
-
-      if (avPacket.dts != static_cast<int64_t>(AV_NOPTS_VALUE))
-      {
-        avPacket.dts = av_rescale_q(
-            avPacket.dts,
-            this->dataPtr->codecCtx->time_base,
-            this->dataPtr->videoStream->time_base);
-      }
-
-      // Write frame to disk
-      ret = av_interleaved_write_frame(this->dataPtr->formatCtx, &avPacket);
-
-      if (ret < 0)
-      {
-        ignerr << "Error writing frame" << std::endl;
-        return false;
-      }
-    }
+      ret = ProcessPacket(&avPacket);
 
     av_free_packet(&avPacket);
 
     // #else for libavcodec version check
 #else
 
-    AVPacket *avPacket = av_packet_alloc();
+    AVPacket* avPacket = av_packet_alloc();
     av_init_packet(avPacket);
 
     avPacket->data = nullptr;
     avPacket->size = 0;
 
-    int ret = avcodec_send_frame(this->dataPtr->codecCtx,
-                                 this->dataPtr->avOutFrame);
+    ret = avcodec_send_frame(this->dataPtr->codecCtx,
+                                 frameToEncode);
 
     // This loop will retrieve and write available packets
     while (ret >= 0)
@@ -690,40 +812,103 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
       // Potential performance improvement: Queue the packets and write in
       // a separate thread.
       if (ret >= 0)
-      {
-        avPacket->stream_index = this->dataPtr->videoStream->index;
-
-        // Scale timestamp appropriately.
-        if (avPacket->pts != static_cast<int64_t>(AV_NOPTS_VALUE))
-        {
-          avPacket->pts = av_rescale_q(avPacket->pts,
-              this->dataPtr->codecCtx->time_base,
-              this->dataPtr->videoStream->time_base);
-        }
-
-        if (avPacket->dts != static_cast<int64_t>(AV_NOPTS_VALUE))
-        {
-          avPacket->dts = av_rescale_q(
-              avPacket->dts,
-              this->dataPtr->codecCtx->time_base,
-              this->dataPtr->videoStream->time_base);
-        }
-
-        // Write frame to disk
-        if (av_interleaved_write_frame(this->dataPtr->formatCtx, avPacket) < 0)
-          ignerr << "Error writing frame" << std::endl;
-      }
+        ret = this->dataPtr->ProcessPacket(avPacket);
     }
 
     av_packet_unref(avPacket);
 #endif
   }
-  return true;
+  return ret >= 0 || ret == AVERROR(EAGAIN);
+}
+
+/////////////////////////////////////////////////
+int VideoEncoderPrivate::ProcessPacket(AVPacket* avPacket)
+{
+  avPacket->stream_index = this->videoStream->index;
+
+  // Scale timestamp appropriately.
+  if (avPacket->pts != static_cast<int64_t>(AV_NOPTS_VALUE))
+  {
+    avPacket->pts = av_rescale_q(
+      avPacket->pts,
+      this->codecCtx->time_base,
+      this->videoStream->time_base);
+  }
+
+  if (avPacket->dts != static_cast<int64_t>(AV_NOPTS_VALUE))
+  {
+    avPacket->dts = av_rescale_q(
+      avPacket->dts,
+      this->codecCtx->time_base,
+      this->videoStream->time_base);
+  }
+
+  // Write frame to disk
+  int ret = av_interleaved_write_frame(this->formatCtx, avPacket);
+
+  if (ret < 0)
+    ignerr << "Error writing frame: " << av_err2str_cpp(ret) << std::endl;
+
+  return ret;
 }
 
 /////////////////////////////////////////////////
 bool VideoEncoder::Stop()
 {
+  // drain remaining packets from the encoder
+  if (this->dataPtr->encoding && this->dataPtr->codecCtx)
+  {
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 40, 101)
+    if ((this->dataPtr->codecCtx->capabilities & AV_CODEC_CAP_DELAY) > 0)
+    {
+      int gotOutput = 1;
+      int ret = 0;
+      AVPacket avPacket;
+      av_init_packet(&avPacket);
+      avPacket.data = nullptr;
+      avPacket.size = 0;
+
+      while (ret >= 0 && gotOutput == 1)
+      {
+        ret = avcodec_encode_video2(this->dataPtr->codecCtx, &avPacket,
+            nullptr, &gotOutput);
+
+        if (ret >= 0 && gotOutput == 1)
+          ret = ProcessPacket(&avPacket);
+      }
+
+      av_free_packet(&avPacket);
+  }
+
+// #else for libavcodec version check
+#else
+
+    int ret = 0;
+    // enter drain state
+    ret = avcodec_send_frame(this->dataPtr->codecCtx, nullptr);
+
+    if (ret >= 0)
+    {
+      AVPacket *avPacket = av_packet_alloc();
+      av_init_packet(avPacket);
+      avPacket->data = nullptr;
+      avPacket->size = 0;
+
+      // This loop will retrieve and write all remaining packets
+      while (ret >= 0)
+      {
+        ret = avcodec_receive_packet(this->dataPtr->codecCtx, avPacket);
+
+        // Potential performance improvement: Queue the packets and write in
+        // a separate thread.
+        if (ret >= 0)
+          ret = this->dataPtr->ProcessPacket(avPacket);
+      }
+      av_packet_unref(avPacket);
+    }
+#endif
+  }
+
   if (this->dataPtr->encoding && this->dataPtr->formatCtx)
     av_write_trailer(this->dataPtr->formatCtx);
 
@@ -752,6 +937,9 @@ bool VideoEncoder::Stop()
   if (this->dataPtr->swsCtx)
     sws_freeContext(this->dataPtr->swsCtx);
   this->dataPtr->swsCtx = nullptr;
+
+  if (this->dataPtr->formatCtx && this->dataPtr->formatCtx->pb)
+    avio_closep(&this->dataPtr->formatCtx->pb);
 
   // This frees the context and all the streams
   if (this->dataPtr->formatCtx)
@@ -817,4 +1005,8 @@ void VideoEncoder::Reset()
   this->dataPtr->timePrev = std::chrono::steady_clock::time_point();
   this->dataPtr->timeStart = std::chrono::steady_clock::time_point();
   this->dataPtr->filename.clear();
+#ifdef IGN_COMMON_BUILD_HW_VIDEO
+  if (this->dataPtr->hwEncoder)
+    this->dataPtr->hwEncoder.reset();
+#endif
 }
