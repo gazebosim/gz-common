@@ -34,7 +34,9 @@ TEST_F(ImageTest, Image)
       "data", "red_blue_colors.png");
 
   // load image and test colors
-  EXPECT_EQ(0, img.Load(filename));
+  ASSERT_EQ(0, img.Load(filename));
+  ASSERT_TRUE(img.Valid());
+
   EXPECT_EQ(121u, img.Width());
   EXPECT_EQ(81u, img.Height());
   EXPECT_EQ(32u, img.BPP());
@@ -44,7 +46,6 @@ TEST_F(ImageTest, Image)
   EXPECT_EQ(img.Pixel(85, 0), math::Color::Blue);
   EXPECT_EQ(img.AvgColor(), math::Color(0.661157f, 0, 0.338843f, 1));
   EXPECT_EQ(img.MaxColor(), math::Color::Red);
-  EXPECT_TRUE(img.Valid());
   EXPECT_TRUE(img.Filename().find("red_blue_colors.png") !=
       std::string::npos);
 
@@ -116,6 +117,8 @@ TEST_F(ImageTest, Image)
 
   // Set from RGBA data
   img.SetFromData(data, img.Width(), img.Height(), img.PixelFormat());
+  ASSERT_TRUE(img.Valid());
+
   EXPECT_EQ(common::Image::PixelFormatType::RGBA_INT8, img.PixelFormat());
   EXPECT_EQ(121u, img.Width());
   EXPECT_EQ(81u, img.Height());
@@ -125,14 +128,15 @@ TEST_F(ImageTest, Image)
   EXPECT_EQ(img.Pixel(85, 0), math::Color::Blue);
   EXPECT_EQ(img.AvgColor(), math::Color(0.661157f, 0, 0.338843f, 1));
   EXPECT_EQ(img.MaxColor(), math::Color::Red);
-  EXPECT_TRUE(img.Valid());
 
   // save image then reload and test colors
   std::string testSaveImage =
     common::testing::TempPath("test_red_blue_save.png");
+  std::cout << testSaveImage << std::endl;
   img.SavePNG(testSaveImage);
 
   img.Load("file://" + testSaveImage);
+  ASSERT_TRUE(img.Valid());
   EXPECT_EQ(common::Image::PixelFormatType::RGB_INT8, img.PixelFormat());
   EXPECT_EQ(121u, img.Width());
   EXPECT_EQ(81u, img.Height());
@@ -142,7 +146,6 @@ TEST_F(ImageTest, Image)
   EXPECT_EQ(img.Pixel(85, 0), math::Color::Blue);
   EXPECT_EQ(img.AvgColor(), math::Color(0.661157f, 0, 0.338843f, 1));
   EXPECT_EQ(img.MaxColor(), math::Color::Red);
-  EXPECT_TRUE(img.Valid());
 
   // Check data
   data = nullptr;
@@ -177,6 +180,8 @@ TEST_F(ImageTest, Image)
   }
 
   img.SetFromData(data, img.Width(), img.Height(), img.PixelFormat());
+  ASSERT_TRUE(img.Valid());
+
   EXPECT_EQ(common::Image::PixelFormatType::RGB_INT8, img.PixelFormat());
   EXPECT_EQ(121u, img.Width());
   EXPECT_EQ(81u, img.Height());
@@ -186,7 +191,6 @@ TEST_F(ImageTest, Image)
   EXPECT_EQ(img.Pixel(85, 0), math::Color::Blue);
   EXPECT_EQ(img.AvgColor(), math::Color(0.661157f, 0, 0.338843f, 1));
   EXPECT_EQ(img.MaxColor(), math::Color::Red);
-  EXPECT_TRUE(img.Valid());
 
   common::removeDirectoryOrFile(filename);
 }
