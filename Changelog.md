@@ -2,6 +2,41 @@
 
 ## Ignition Common 3.X.X
 
+## Ignition Common 3.11.0 (2021-03-05)
+
+1. Fix image BGR to PNG (swap red and blue)
+    * [Pull request #162](https://github.com/ignitionrobotics/ign-common/pulls/162)
+
+1. Remove issue & PR templates
+    * [Pull request #174](https://github.com/ignitionrobotics/ign-common/pulls/174)
+
+1. Prevent console spamming when exporting a mesh that has multiple texture coordinates
+    * [Pull request #171](https://github.com/ignitionrobotics/ign-common/pulls/171)
+
+1. Associate library materials effect with meshes
+    * [Pull request #151](https://github.com/ignitionrobotics/ign-common/pulls/151)
+
+1. Added issue & PR templates
+    * [Pull request #166](https://github.com/ignitionrobotics/ign-common/pulls/166)
+
+1. Added support for HW-accelerated video encoding.
+    * [Pull request #125](https://github.com/ignitionrobotics/ign-common/pulls/125)
+    * [Pull request #169](https://github.com/ignitionrobotics/ign-common/pulls/169)
+    * [Pull request #175](https://github.com/ignitionrobotics/ign-common/pulls/175)
+
+1. Added FlagSet utility class
+    * [Pull request #118](https://github.com/ignitionrobotics/ign-common/pulls/118)
+
+1. Disable failing VideoEncoder and Audioecoder tests on Windows
+    * [Pull request #149](https://github.com/ignitionrobotics/ign-common/pulls/149)
+
+1. Added ellipsoid mesh
+    * [Pull request #154](https://github.com/ignitionrobotics/ign-common/pulls/154)
+    * [Pull request #159](https://github.com/ignitionrobotics/ign-common/pulls/159)
+
+1. Added capsule mesh
+    * [Pull request #155](https://github.com/ignitionrobotics/ign-common/pulls/155)
+
 ## Ignition Common 3.10.1 (2021-01-20)
 
 1. Fix transparency tag in the Collada exporter.
