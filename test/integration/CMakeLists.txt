@@ -8,6 +8,7 @@ list(REMOVE_ITEM tests mesh.cc)
 
 if (${SKIP_av})
   list(REMOVE_ITEM tests encoder_timing.cc)
+  list(REMOVE_ITEM tests video_encoder.cc)
 endif()
 
 ign_build_tests(
@@ -24,4 +25,8 @@ endif()
 
 if(TARGET INTEGRATION_encoder_timing)
   target_link_libraries(INTEGRATION_encoder_timing ${PROJECT_LIBRARY_TARGET_NAME}-av)
+endif()
+
+if(TARGET INTEGRATION_video_encoder)
+  target_link_libraries(INTEGRATION_video_encoder ${PROJECT_LIBRARY_TARGET_NAME}-av)
 endif()

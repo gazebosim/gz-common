@@ -1,5 +1,7 @@
 \page profiler Profiler
 
+Next Tutorial: \ref hw-encoding
+
 ## Overview
 
 This tutorial describes how to get started using the Ignition Common profiler
