@@ -33,11 +33,11 @@ using KeyFrame_V = std::vector<std::shared_ptr<common::KeyFrame>>;
 /// cppreference.
 /// Needed because MacOS Catalina doesn't support this part of the standard
 /// \todo(anyone) remove withs future versions of MacOS
-template< class T, class U > 
-std::shared_ptr<T> 
+template< class T, class U >
+std::shared_ptr<T>
 reinterpret_pointer_cast( const std::shared_ptr<U>& r ) noexcept
 {
-    auto p = 
+    auto p =
       reinterpret_cast<typename std::shared_ptr<T>::element_type*>(r.get());
     return std::shared_ptr<T>(r, p);
 }
