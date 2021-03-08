@@ -9,10 +9,10 @@
 
 Build | Status
 -- | --
-Test coverage | [![codecov](https://codecov.io/gh/ignitionrobotics/ign-common/branch/master/graph/badge.svg)](https://codecov.io/gh/ignitionrobotics/ign-common)
-Ubuntu Bionic | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-master-bionic-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-master-bionic-amd64)
-Homebrew      | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-master-homebrew-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-master-homebrew-amd64)
-Windows       | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-master-windows7-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-master-windows7-amd64)
+Test coverage | [![codecov](https://codecov.io/gh/ignitionrobotics/ign-common/branch/ign-common3/graph/badge.svg)](https://codecov.io/gh/ignitionrobotics/ign-common)
+Ubuntu Bionic | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-ign-common3-bionic-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-ign-common3-bionic-amd64)
+Homebrew      | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-ign-common3-homebrew-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-ign-common3-homebrew-amd64)
+Windows       | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-ign-common3-windows7-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-ign-common3-windows7-amd64)
 
 Ignition Common, a component of [Ignition
 Robotics](https://ignitionrobotics.org), provides a set of libraries that
@@ -60,7 +60,7 @@ See the [installation tutorial](https://ignitionrobotics.org/api/common/3.9/tuto
 
 # Usage
 
-Please refer to the [examples directory](https://github.com/ignitionrobotics/ign-common/raw/master/examples/).
+Please refer to the [examples directory](https://github.com/ignitionrobotics/ign-common/raw/ign-common3/examples/).
 
 # Folder Structure
 
@@ -88,12 +88,12 @@ Refer to the following table for information about important directories and fil
 # Contributing
 
 Please see
-[CONTRIBUTING.md](https://github.com/ignitionrobotics/ign-gazebo/blob/master/CONTRIBUTING.md).
+[CONTRIBUTING.md](https://github.com/ignitionrobotics/ign-gazebo/blob/main/CONTRIBUTING.md).
 
 # Code of Conduct
 
 Please see
-[CODE_OF_CONDUCT.md](https://github.com/ignitionrobotics/ign-gazebo/blob/master/CODE_OF_CONDUCT.md).
+[CODE_OF_CONDUCT.md](https://github.com/ignitionrobotics/ign-gazebo/blob/main/CODE_OF_CONDUCT.md).
 
 # Versioning
 
@@ -101,4 +101,4 @@ This library uses [Semantic Versioning](https://semver.org/). Additionally, this
 
 # License
 
-This library is licensed under [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0). See also the [LICENSE](https://github.com/ignitionrobotics/ign-common/blob/master/LICENSE) file.
+This library is licensed under [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0). See also the [LICENSE](https://github.com/ignitionrobotics/ign-common/blob/main/LICENSE) file.

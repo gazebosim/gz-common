@@ -25,7 +25,7 @@ In order to use the profiler, inspection points must be added to the source code
 and the application or library must be linked to the `ignition-common::profiler`
 component.
 
-To start, download the [profiler.cc](https://github.com/ignitionrobotics/ign-common/raw/master/examples/profiler.cc) example.
+To start, download the [profiler.cc](https://github.com/ignitionrobotics/ign-common/raw/ign-common3/examples/profiler.cc) example.
 
 The relevant corresponding C++ would be as follows:
 
@@ -120,7 +120,7 @@ Run your Ignition library then open the profiler browser using:
 ign_remotery_vis
 ```
 
-If the profiler is run successfully, you should see output in a browser. Similar to this 
+If the profiler is run successfully, you should see output in a browser. Similar to this
 
 <img src="https://raw.githubusercontent.com/ignitionrobotics/ign-common/ign-common3/tutorials/imgs/profiler_tutorial_example.png">
 
@@ -128,7 +128,7 @@ If the profiler is run successfully, you should see output in a browser. Similar
 
 If you see ``connection error``, there are a couple of things to double check
 1. Was the profiler enabled when the project you're trying to run was compiled? Note that this isn't the case if you installed Ignition libraries from binaries, for example. You need to compile the project from source with the `ENABLE_PROFILER` variable set.
-2. Are you using the correct port number in the upper left corner ``Connection Addresss: ws://127.0.0.1:1500/rmt``? Running ``ign gazebo -v 4`` will show the port number in use near the top of the outputted text. The port number will be printed out if the profiler is enabled. 
+2. Are you using the correct port number in the upper left corner ``Connection Addresss: ws://127.0.0.1:1500/rmt``? Running ``ign gazebo -v 4`` will show the port number in use near the top of the outputted text. The port number will be printed out if the profiler is enabled.
   ```{.sh}
   [Dbg] [RemoteryProfilerImpl.cc:187] Starting ign-common profiler impl: Remotery (port: 1500)
   ```
