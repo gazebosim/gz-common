@@ -116,11 +116,11 @@ TEST_F(ImageTest, Image)
 
   // Set from RGBA data
   img.SetFromData(data, img.Width(), img.Height(), img.PixelFormat());
+  EXPECT_EQ(common::Image::PixelFormatType::RGBA_INT8, img.PixelFormat());
   EXPECT_EQ(121u, img.Width());
   EXPECT_EQ(81u, img.Height());
   EXPECT_EQ(32u, img.BPP());
   EXPECT_EQ(484, img.Pitch());
-  EXPECT_EQ(common::Image::PixelFormatType::RGBA_INT8, img.PixelFormat());
   EXPECT_EQ(img.Pixel(0, 0), math::Color::Red);
   EXPECT_EQ(img.Pixel(85, 0), math::Color::Blue);
   EXPECT_EQ(img.AvgColor(), math::Color(0.661157f, 0, 0.338843f, 1));
@@ -133,11 +133,11 @@ TEST_F(ImageTest, Image)
   img.SavePNG(testSaveImage);
 
   img.Load("file://" + testSaveImage);
+  EXPECT_EQ(common::Image::PixelFormatType::RGB_INT8, img.PixelFormat());
   EXPECT_EQ(121u, img.Width());
   EXPECT_EQ(81u, img.Height());
   EXPECT_EQ(24u, img.BPP());
   EXPECT_EQ(363, img.Pitch());
-  EXPECT_EQ(common::Image::PixelFormatType::RGB_INT8, img.PixelFormat());
   EXPECT_EQ(img.Pixel(0, 0), math::Color::Red);
   EXPECT_EQ(img.Pixel(85, 0), math::Color::Blue);
   EXPECT_EQ(img.AvgColor(), math::Color(0.661157f, 0, 0.338843f, 1));
@@ -177,11 +177,11 @@ TEST_F(ImageTest, Image)
   }
 
   img.SetFromData(data, img.Width(), img.Height(), img.PixelFormat());
+  EXPECT_EQ(common::Image::PixelFormatType::RGB_INT8, img.PixelFormat());
   EXPECT_EQ(121u, img.Width());
   EXPECT_EQ(81u, img.Height());
   EXPECT_EQ(24u, img.BPP());
   EXPECT_EQ(363, img.Pitch());
-  EXPECT_EQ(common::Image::PixelFormatType::RGB_INT8, img.PixelFormat());
   EXPECT_EQ(img.Pixel(0, 0), math::Color::Red);
   EXPECT_EQ(img.Pixel(85, 0), math::Color::Blue);
   EXPECT_EQ(img.AvgColor(), math::Color(0.661157f, 0, 0.338843f, 1));
