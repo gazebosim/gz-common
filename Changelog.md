@@ -2,6 +2,50 @@
 
 ## Ignition Common 3.X.X
 
+## Ignition Common 3.11.1 (2021-03-08)
+
+1. Relax expectation so encoder test passes on ARM
+    * [Pull request #183](https://github.com/ignitionrobotics/ign-common/pull/183)
+
+1. Revert "Associate library materials effect with meshes (#151)"
+    * [Pull request #182](https://github.com/ignitionrobotics/ign-common/pull/182)
+
+## Ignition Common 3.11.0 (2021-03-05)
+
+1. Fix image red and blue swapping
+    * [Pull request #162](https://github.com/ignitionrobotics/ign-common/pull/162)
+
+1. Remove issue & PR templates
+    * [Pull request #174](https://github.com/ignitionrobotics/ign-common/pull/174)
+
+1. Prevent console spamming when exporting a mesh that has multiple texture coordinates
+    * [Pull request #171](https://github.com/ignitionrobotics/ign-common/pull/171)
+
+1. Associate library materials effect with meshes
+    * [Pull request #151](https://github.com/ignitionrobotics/ign-common/pull/151)
+    * Reverted in 3.11.1
+
+1. Added issue & PR templates
+    * [Pull request #166](https://github.com/ignitionrobotics/ign-common/pull/166)
+
+1. Added support for HW-accelerated video encoding.
+    * [Pull request #125](https://github.com/ignitionrobotics/ign-common/pull/125)
+    * [Pull request #169](https://github.com/ignitionrobotics/ign-common/pull/169)
+    * [Pull request #175](https://github.com/ignitionrobotics/ign-common/pull/175)
+
+1. Added FlagSet utility class
+    * [Pull request #118](https://github.com/ignitionrobotics/ign-common/pull/118)
+
+1. Disable failing VideoEncoder and Audioecoder tests on Windows
+    * [Pull request #149](https://github.com/ignitionrobotics/ign-common/pull/149)
+
+1. Added ellipsoid mesh
+    * [Pull request #154](https://github.com/ignitionrobotics/ign-common/pull/154)
+    * [Pull request #159](https://github.com/ignitionrobotics/ign-common/pull/159)
+
+1. Added capsule mesh
+    * [Pull request #155](https://github.com/ignitionrobotics/ign-common/pull/155)
+
 ## Ignition Common 3.10.1 (2021-01-20)
 
 1. Fix transparency tag in the Collada exporter.

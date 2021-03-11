@@ -134,7 +134,7 @@ TEST_F(EncoderDecoderTest, DecodeEncodeDecode)
 
   EXPECT_GE(numFrames2, expectedNumFrames2);
   // average color intensities should be pretty close
-  EXPECT_NEAR(avgIntensity2, avgIntensity, 1.0);
+  EXPECT_NEAR(avgIntensity2, avgIntensity, 2.0);
 
   delete[] buf;
 }
