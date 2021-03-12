@@ -59,6 +59,9 @@ namespace ignition
       /// \brief material dictionary indexed by name
       public: std::map<std::string, std::string> materialMap;
 
+      /// \brief material dictionary indexed by mesh name
+      public: std::map<std::string, std::string> materialEffectMap;
+
       /// \brief root xml element of COLLADA data
       public: tinyxml2::XMLElement *colladaXml;
 
@@ -526,6 +529,7 @@ void ColladaLoader::Implementation::LoadNode(tinyxml2::XMLElement *_elem, Mesh *
     tinyxml2::XMLElement *geomXml = this->ElementId("geometry", geomURL);
 
     this->materialMap.clear();
+    this->materialEffectMap.clear();
     tinyxml2::XMLElement *bindMatXml, *techniqueXml, *matXml;
     bindMatXml = instGeomXml->FirstChildElement("bind_material");
     while (bindMatXml)
@@ -538,6 +542,7 @@ void ColladaLoader::Implementation::LoadNode(tinyxml2::XMLElement *_elem, Mesh *
           std::string symbol = matXml->Attribute("symbol");
           std::string target = matXml->Attribute("target");
           this->materialMap[symbol] = target;
+          this->materialEffectMap[geomURL] = target;
           matXml = matXml->NextSiblingElement("instance_material");
         }
       }
@@ -547,6 +552,41 @@ void ColladaLoader::Implementation::LoadNode(tinyxml2::XMLElement *_elem, Mesh *
     if (_mesh->HasSkeleton())
       _mesh->MeshSkeleton()->SetNumVertAttached(0);
     this->LoadGeometry(geomXml, transform, _mesh);
+
+    // Associate materials defined in library_materials with the right mesh
+    if (materialEffectMap.size() > 0)
+    {
+      std::string matStr;
+      int matIndex = -1;
+      std::map<std::string, std::string>::iterator iter;
+
+      iter = this->materialEffectMap.find(geomURL);
+      if (iter != this->materialEffectMap.end())
+        matStr = iter->second;
+      MaterialPtr mat = this->LoadMaterial(matStr);
+      matIndex = _mesh->IndexOfMaterial(mat.get());
+      if (matIndex < 0)
+      {
+        matIndex = _mesh->AddMaterial(mat);
+      }
+      if (matIndex < 0)
+      {
+        ignwarn << "Unable to add material[" << matStr << "]\n";
+      }
+      else
+      {
+        auto subMesh = _mesh->SubMeshByName(this->currentNodeName);
+        if (subMesh.lock() == nullptr)
+        {
+          ignwarn << "Unable to get submesh[" << geomURL << "]\n";
+        }
+        else
+        {
+          subMesh.lock().get()->SetMaterialIndex(matIndex);
+        }
+      }
+    }
+
     instGeomXml = instGeomXml->NextSiblingElement("instance_geometry");
   }
 

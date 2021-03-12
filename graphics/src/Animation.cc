@@ -29,6 +29,20 @@ using namespace common;
 
 using KeyFrame_V = std::vector<std::shared_ptr<common::KeyFrame>>;
 
+/// \brief Implementaiton of std::reinterpret_pointer_cast from
+/// cppreference.
+/// Needed because MacOS Catalina doesn't support this part of the standard
+/// \todo(anyone) remove withs future versions of MacOS
+template< class T, class U >
+std::shared_ptr<T>
+reinterpret_pointer_cast( const std::shared_ptr<U>& r ) noexcept
+{
+    auto p =
+      reinterpret_cast<typename std::shared_ptr<T>::element_type*>(r.get());
+    return std::shared_ptr<T>(r, p);
+}
+
+/////////////////////////////////////////////////
 namespace
 {
   struct KeyFrameTimeLess
@@ -143,7 +157,8 @@ void Animation::Time(const double _time)
     this->dataPtr->timePos = _time;
     if (this->dataPtr->loop)
     {
-      this->dataPtr->timePos = fmod(this->dataPtr->timePos, this->dataPtr->length);
+      this->dataPtr->timePos = fmod(this->dataPtr->timePos,
+                                    this->dataPtr->length);
       if (this->dataPtr->timePos < 0)
         this->dataPtr->timePos += this->dataPtr->length;
     }
@@ -210,8 +225,9 @@ KeyFrameType *Animation::CreateKeyFrame(const double _time)
 {
   auto frame = std::make_shared<KeyFrameType>(_time);
   auto iter =
-    std::upper_bound(this->dataPtr->keyFrames.begin(), this->dataPtr->keyFrames.end(),
-        std::reinterpret_pointer_cast<common::KeyFrame>(frame),
+    std::upper_bound(this->dataPtr->keyFrames.begin(),
+        this->dataPtr->keyFrames.end(),
+        ::reinterpret_pointer_cast<common::KeyFrame>(frame),
         KeyFrameTimeLess());
 
   this->dataPtr->keyFrames.insert(iter, frame);
@@ -233,8 +249,8 @@ double Animation::KeyFramesAtTime(double _time, common::KeyFrame **_kf1,
 
   KeyFrame_V::const_iterator iter;
   auto timeKey = std::make_shared<common::KeyFrame>(_time);
-  iter = std::lower_bound(this->dataPtr->keyFrames.begin(), this->dataPtr->keyFrames.end(),
-      timeKey, KeyFrameTimeLess());
+  iter = std::lower_bound(this->dataPtr->keyFrames.begin(),
+      this->dataPtr->keyFrames.end(), timeKey, KeyFrameTimeLess());
 
   if (iter == this->dataPtr->keyFrames.end())
   {
@@ -336,7 +352,8 @@ void PoseAnimation::InterpolatedKeyFrame(const double _time,
   }
   else
   {
-    _kf.Translation(this->dataPtr->positionSpline->Interpolate(firstKeyIndex, t));
+    _kf.Translation(
+        this->dataPtr->positionSpline->Interpolate(firstKeyIndex, t));
     _kf.Rotation(this->dataPtr->rotationSpline->Interpolate(firstKeyIndex, t));
   }
 }
