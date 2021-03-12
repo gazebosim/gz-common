@@ -24,19 +24,20 @@ using namespace ignition;
 
 class ImageTest : public common::testing::AutoLogFixture { };
 
-const std::string kTestData = 
+
+const std::string kTestData =  // NOLINT(*)
     common::testing::TestFile("data", "red_blue_colors.png");
 
 const auto kWidth = 121u;
 const auto kHeight = 81u;
 
 const auto kBpp_RGB = 24u;
-const auto kPitch_RGB = kWidth * kBpp_RGB/8;
-const auto kSize_RGB = kPitch_RGB * kHeight;
+const int kPitch_RGB = kWidth * kBpp_RGB/8;
+const unsigned kSize_RGB = kPitch_RGB * kHeight;
 
 const auto kBpp_RGBA = 32u;
-const auto kPitch_RGBA = kWidth * kBpp_RGBA/8;
-const auto kSize_RGBA = kPitch_RGBA * kHeight;
+const int kPitch_RGBA = kWidth * kBpp_RGBA/8;
+const unsigned kSize_RGBA = kPitch_RGBA * kHeight;
 
 const auto kAvgColor = math::Color(0.661157f, 0, 0.338843f, 1);
 const auto kMaxColor = math::Color::Red;
