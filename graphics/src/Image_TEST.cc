@@ -19,41 +19,93 @@
 
 #include <ignition/common/Image.hh>
 #include "test_config.h"
-#include "test/util.hh"
 
 using namespace ignition;
 
-class ImageTest : public ignition::testing::AutoLogFixture { };
+class ImageTest : public common::testing::AutoLogFixture { };
+
+
+const std::string kTestData =  // NOLINT(*)
+    common::testing::TestFile("data", "red_blue_colors.png");
+
+const auto kWidth = 121u;
+const auto kHeight = 81u;
+
+const auto kBpp_RGB = 24u;
+const int kPitch_RGB = kWidth * kBpp_RGB/8;
+const unsigned kSize_RGB = kPitch_RGB * kHeight;
+
+const auto kBpp_RGBA = 32u;
+const int kPitch_RGBA = kWidth * kBpp_RGBA/8;
+const unsigned kSize_RGBA = kPitch_RGBA * kHeight;
+
+const auto kAvgColor = math::Color(0.661157f, 0, 0.338843f, 1);
+const auto kMaxColor = math::Color::Red;
 
 /////////////////////////////////////////////////
-TEST_F(ImageTest, Image)
+void CheckImageRGB(const common::Image &_img)
+{
+  ASSERT_TRUE(_img.Valid());
+  ASSERT_EQ(kWidth, _img.Width());
+  ASSERT_EQ(kHeight, _img.Height());
+  ASSERT_EQ(kBpp_RGB, _img.BPP());
+  ASSERT_EQ(kPitch_RGB, _img.Pitch());
+  ASSERT_EQ(common::Image::PixelFormatType::RGB_INT8, _img.PixelFormat());
+}
+
+/////////////////////////////////////////////////
+void CheckImageRGBA(const common::Image &_img)
+{
+  ASSERT_TRUE(_img.Valid());
+  ASSERT_EQ(kWidth, _img.Width());
+  ASSERT_EQ(kHeight, _img.Height());
+  ASSERT_EQ(kBpp_RGBA, _img.BPP());
+  ASSERT_EQ(kPitch_RGBA, _img.Pitch());
+  ASSERT_EQ(common::Image::PixelFormatType::RGBA_INT8, _img.PixelFormat());
+}
+
+/////////////////////////////////////////////////
+TEST_F(ImageTest, InvalidImage)
 {
   common::Image img;
-  EXPECT_EQ(-1, img.Load("/file/shouldn/never/exist.png"));
-  std::string filename =  "file://";
-  filename += PROJECT_SOURCE_PATH;
-  filename += "/test/data/red_blue_colors.png";
+  ASSERT_EQ(-1, img.Load("/file/shouldn/never/exist.png"));
+}
+
+/////////////////////////////////////////////////
+TEST_F(ImageTest, ImageProperties)
+{
+  common::Image img;
+  ASSERT_EQ(-1, img.Load("/file/shouldn/never/exist.png"));
 
   // load image and test colors
-  EXPECT_EQ(0, img.Load(filename));
-  EXPECT_EQ(static_cast<unsigned int>(121), img.Width());
-  EXPECT_EQ(static_cast<unsigned int>(81), img.Height());
-  EXPECT_EQ(static_cast<unsigned int>(32), img.BPP());
-  EXPECT_EQ(484, img.Pitch());
-  EXPECT_EQ(common::Image::PixelFormatType::RGBA_INT8, img.PixelFormat());
-  EXPECT_EQ(img.Pixel(0, 0), math::Color::Red);
-  EXPECT_EQ(img.Pixel(85, 0), math::Color::Blue);
-  EXPECT_EQ(img.AvgColor(), math::Color(0.661157f, 0, 0.338843f, 1));
-  EXPECT_EQ(img.MaxColor(), math::Color::Red);
-  EXPECT_TRUE(img.Valid());
-  EXPECT_TRUE(img.Filename().find("red_blue_colors.png") !=
+  ASSERT_EQ(0, img.Load(kTestData));
+
+  CheckImageRGBA(img);
+
+  ASSERT_EQ(img.Pixel(0, 0), math::Color::Red);
+  ASSERT_EQ(img.Pixel(85, 0), math::Color::Blue);
+  ASSERT_EQ(kAvgColor, img.AvgColor());
+  ASSERT_EQ(kMaxColor, img.MaxColor());
+
+  ASSERT_TRUE(img.Filename().find("red_blue_colors.png") !=
       std::string::npos);
+}
+
+/////////////////////////////////////////////////
+TEST_F(ImageTest, RGBData)
+{
+  // load image and test colors
+  common::Image img;
+  ASSERT_EQ(0, img.Load(kTestData));
+  ASSERT_TRUE(img.Valid());
+
+  CheckImageRGBA(img);
 
   // Check RGB data
   unsigned char *data = nullptr;
   unsigned int size = 0;
   img.RGBData(&data, size);
-  EXPECT_EQ(static_cast<unsigned int>(29403), size);
+  ASSERT_EQ(kSize_RGB, size);
   ASSERT_NE(nullptr, data);
 
   auto channels = 3u;
@@ -67,29 +119,40 @@ TEST_F(ImageTest, Image)
       unsigned int g = data[idx+1];
       unsigned int b = data[idx+2];
 
-      EXPECT_EQ(0u, g) << i << "  " << j;
+      ASSERT_EQ(0u, g) << i << "  " << j;
       if (j / channels < 80)
       {
-        EXPECT_EQ(255u, r) << i << "  " << j / channels;
-        EXPECT_EQ(0u, b) << i << "  " << j / channels;
+        ASSERT_EQ(255u, r) << i << "  " << j / channels;
+        ASSERT_EQ(0u, b) << i << "  " << j / channels;
       }
       else
       {
-        EXPECT_EQ(0u, r) << i << "  " << j / channels;
-        EXPECT_EQ(255u, b) << i << "  " << j / channels;
+        ASSERT_EQ(0u, r) << i << "  " << j / channels;
+        ASSERT_EQ(255u, b) << i << "  " << j / channels;
       }
     }
   }
+}
+
+/////////////////////////////////////////////////
+TEST_F(ImageTest, Data)
+{
+  // load image and test colors
+  common::Image img;
+  ASSERT_EQ(0, img.Load(kTestData));
+  ASSERT_TRUE(img.Valid());
+
+  CheckImageRGBA(img);
 
   // Check RGBA data
-  data = nullptr;
-  size = 0;
+  unsigned char *data = nullptr;
+  unsigned int size = 0;
   img.Data(&data, size);
-  EXPECT_EQ(static_cast<unsigned int>(39204), size);
+  ASSERT_EQ(kSize_RGBA, size);
   ASSERT_NE(nullptr, data);
 
-  channels = 4u;
-  step = img.Width() * channels;
+  auto channels = 4u;
+  auto step = img.Width() * channels;
   for (auto i = 0u; i < img.Height(); ++i)
   {
     for (auto j = 0u; j < step; j += channels)
@@ -100,61 +163,80 @@ TEST_F(ImageTest, Image)
       unsigned int b = data[idx+2];
       unsigned int a = data[idx+3];
 
-      EXPECT_EQ(0u, g) << i << "  " << j;
-      EXPECT_EQ(255u, a) << i << "  " << j;
+      ASSERT_EQ(0u, g) << i << "  " << j;
+      ASSERT_EQ(255u, a) << i << "  " << j;
       if (j / channels < 80)
       {
-        EXPECT_EQ(255u, r) << i << "  " << j / channels;
-        EXPECT_EQ(0u, b) << i << "  " << j / channels;
+        ASSERT_EQ(255u, r) << i << "  " << j / channels;
+        ASSERT_EQ(0u, b) << i << "  " << j / channels;
       }
       else
       {
-        EXPECT_EQ(0u, r) << i << "  " << j / channels;
-        EXPECT_EQ(255u, b) << i << "  " << j / channels;
+        ASSERT_EQ(0u, r) << i << "  " << j / channels;
+        ASSERT_EQ(255u, b) << i << "  " << j / channels;
       }
     }
   }
+}
 
-  // Set from RGBA data
-  img.SetFromData(data, img.Width(), img.Height(), img.PixelFormat());
-  EXPECT_EQ(static_cast<unsigned int>(121), img.Width());
-  EXPECT_EQ(static_cast<unsigned int>(81), img.Height());
-  EXPECT_EQ(static_cast<unsigned int>(32), img.BPP());
-  EXPECT_EQ(484, img.Pitch());
-  EXPECT_EQ(common::Image::PixelFormatType::RGBA_INT8, img.PixelFormat());
-  EXPECT_EQ(img.Pixel(0, 0), math::Color::Red);
-  EXPECT_EQ(img.Pixel(85, 0), math::Color::Blue);
-  EXPECT_EQ(img.AvgColor(), math::Color(0.661157f, 0, 0.338843f, 1));
-  EXPECT_EQ(img.MaxColor(), math::Color::Red);
-  EXPECT_TRUE(img.Valid());
+/////////////////////////////////////////////////
+TEST_F(ImageTest, SetFromData)
+{
+  // load image and test colors
+  common::Image img;
+  ASSERT_EQ(0, img.Load(kTestData));
+  ASSERT_TRUE(img.Valid());
 
+  unsigned char *data = nullptr;
+  unsigned int size = 0;
+  img.Data(&data, size);
+  ASSERT_EQ(39204u, size);
+  ASSERT_NE(nullptr, data);
+
+
+  common::Image img2;
+  img2.SetFromData(data, img.Width(), img.Height(), img.PixelFormat());
+  ASSERT_TRUE(img2.Valid());
+  ASSERT_EQ(common::Image::PixelFormatType::RGBA_INT8, img2.PixelFormat());
+  ASSERT_EQ(121u, img2.Width());
+  ASSERT_EQ(81u, img2.Height());
+  ASSERT_EQ(32u, img2.BPP());
+  ASSERT_EQ(484, img2.Pitch());
+  ASSERT_EQ(img2.Pixel(0, 0), math::Color::Red);
+  ASSERT_EQ(img2.Pixel(85, 0), math::Color::Blue);
+  ASSERT_EQ(img2.AvgColor(), math::Color(0.661157f, 0, 0.338843f, 1));
+  ASSERT_EQ(img2.MaxColor(), math::Color::Red);
+}
+
+/*
   // save image then reload and test colors
-  filename = PROJECT_BINARY_PATH;
-  filename += "/test_red_blue_save.png";
-  img.SavePNG(filename);
+  std::string testSaveImage =
+    common::testing::TempPath("test_red_blue_save.png");
+  img.SavePNG(testSaveImage);
 
-  img.Load("file://" + filename);
-  EXPECT_EQ(static_cast<unsigned int>(121), img.Width());
-  EXPECT_EQ(static_cast<unsigned int>(81), img.Height());
-  EXPECT_EQ(static_cast<unsigned int>(24), img.BPP());
-  EXPECT_EQ(363, img.Pitch());
-  EXPECT_EQ(common::Image::PixelFormatType::RGB_INT8, img.PixelFormat());
-  EXPECT_EQ(img.Pixel(0, 0), math::Color::Red);
-  EXPECT_EQ(img.Pixel(85, 0), math::Color::Blue);
-  EXPECT_EQ(img.AvgColor(), math::Color(0.661157f, 0, 0.338843f, 1));
-  EXPECT_EQ(img.MaxColor(), math::Color::Red);
-  EXPECT_TRUE(img.Valid());
+  common::Image img2;
+  img2.Load(testSaveImage);
+  ASSERT_TRUE(img2.Valid());
+  ASSERT_EQ(common::Image::PixelFormatType::RGB_INT8, img2.PixelFormat());
+  ASSERT_EQ(121u, img2.Width());
+  ASSERT_EQ(81u, img2.Height());
+  ASSERT_EQ(24u, img2.BPP());
+  ASSERT_EQ(363, img2.Pitch());
+  ASSERT_EQ(img2.Pixel(0, 0), math::Color::Red);
+  ASSERT_EQ(img2.Pixel(85, 0), math::Color::Blue);
+  ASSERT_EQ(img2.AvgColor(), math::Color(0.661157f, 0, 0.338843f, 1));
+  ASSERT_EQ(img2.MaxColor(), math::Color::Red);
 
   // Check data
   data = nullptr;
   size = 0;
-  img.Data(&data, size);
-  EXPECT_EQ(static_cast<unsigned int>(29403), size);
+  img2.Data(&data, size);
+  ASSERT_EQ(29403u, size);
   ASSERT_NE(nullptr, data);
 
   channels = 3u;
-  step = img.Width() * channels;
-  for (auto i = 0u; i < img.Height(); ++i)
+  step = img2.Width() * channels;
+  for (auto i = 0u; i < img2.Height(); ++i)
   {
     for (auto j = 0u; j < step; j += channels)
     {
@@ -163,34 +245,35 @@ TEST_F(ImageTest, Image)
       unsigned int g = data[idx+1];
       unsigned int b = data[idx+2];
 
-      EXPECT_EQ(0u, g) << i << "  " << j;
+      ASSERT_EQ(0u, g) << i << "  " << j;
       if (j / channels < 80)
       {
-        EXPECT_EQ(255u, r) << i << "  " << j / channels;
-        EXPECT_EQ(0u, b) << i << "  " << j / channels;
+        ASSERT_EQ(255u, r) << i << "  " << j / channels;
+        ASSERT_EQ(0u, b) << i << "  " << j / channels;
       }
       else
       {
-        EXPECT_EQ(0u, r) << i << "  " << j / channels;
-        EXPECT_EQ(255u, b) << i << "  " << j / channels;
+        ASSERT_EQ(0u, r) << i << "  " << j / channels;
+        ASSERT_EQ(255u, b) << i << "  " << j / channels;
       }
     }
   }
 
-  img.SetFromData(data, img.Width(), img.Height(), img.PixelFormat());
-  EXPECT_EQ(static_cast<unsigned int>(121), img.Width());
-  EXPECT_EQ(static_cast<unsigned int>(81), img.Height());
-  EXPECT_EQ(static_cast<unsigned int>(24), img.BPP());
-  EXPECT_EQ(363, img.Pitch());
-  EXPECT_EQ(common::Image::PixelFormatType::RGB_INT8, img.PixelFormat());
-  EXPECT_EQ(img.Pixel(0, 0), math::Color::Red);
-  EXPECT_EQ(img.Pixel(85, 0), math::Color::Blue);
-  EXPECT_EQ(img.AvgColor(), math::Color(0.661157f, 0, 0.338843f, 1));
-  EXPECT_EQ(img.MaxColor(), math::Color::Red);
-  EXPECT_TRUE(img.Valid());
+  common::Image img3;
+  img3.SetFromData(data, img3.Width(), img3.Height(), img3.PixelFormat());
+  ASSERT_TRUE(img3.Valid());
 
-  common::removeDirectoryOrFile(filename);
+  ASSERT_EQ(common::Image::PixelFormatType::RGB_INT8, img3.PixelFormat());
+  ASSERT_EQ(121u, img3.Width());
+  ASSERT_EQ(81u, img3.Height());
+  ASSERT_EQ(24u, img3.BPP());
+  ASSERT_EQ(363, img3.Pitch());
+  ASSERT_EQ(img3.Pixel(0, 0), math::Color::Red);
+  ASSERT_EQ(img3.Pixel(85, 0), math::Color::Blue);
+  ASSERT_EQ(img3.AvgColor(), math::Color(0.661157f, 0, 0.338843f, 1));
+  ASSERT_EQ(img3.MaxColor(), math::Color::Red);
 }
+*/
 
 /////////////////////////////////////////////////
 TEST_F(ImageTest, ConvertPixelFormat)
@@ -266,10 +349,7 @@ void ImagePerformanceTest::MaxColor(const std::string &_filePath,
                                     const unsigned int _width,
                                     const unsigned int _height)
 {
-  std::string fileName =  "file://";
-  fileName += PROJECT_SOURCE_PATH;
-  fileName += "/";
-  fileName += _filePath;
+  std::string fileName = common::testing::TestFile("data", _filePath);
 
   common::Image img;
   EXPECT_EQ(0, img.Load(fileName));
@@ -281,10 +361,10 @@ void ImagePerformanceTest::MaxColor(const std::string &_filePath,
 
 INSTANTIATE_TEST_SUITE_P(FlatHeightmaps, ImagePerformanceTest,
   ::testing::Values(
-    std::make_tuple("test/data/heightmap_flat_129x129.png", 129u, 129u),
-    std::make_tuple("test/data/heightmap_flat_257x257.png", 257u, 257u),
-    std::make_tuple("test/data/heightmap_flat_513x513.png", 513u, 513u),
-    std::make_tuple("test/data/heightmap_flat_1025x1025.png", 1025u, 1025u)));
+    std::make_tuple("heightmap_flat_129x129.png", 129u, 129u),
+    std::make_tuple("heightmap_flat_257x257.png", 257u, 257u),
+    std::make_tuple("heightmap_flat_513x513.png", 513u, 513u),
+    std::make_tuple("heightmap_flat_1025x1025.png", 1025u, 1025u)));
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

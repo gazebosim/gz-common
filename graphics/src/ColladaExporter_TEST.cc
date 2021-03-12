@@ -23,7 +23,6 @@
 #include "ignition/common/Filesystem.hh"
 #include "ignition/common/Mesh.hh"
 #include "ignition/common/SubMesh.hh"
-#include "test/util.hh"
 
 #ifdef _WIN32
   #define snprintf _snprintf
@@ -31,27 +30,15 @@
 
 using namespace ignition;
 
-class ColladaExporter : public ignition::testing::AutoLogFixture {
+class ColladaExporter : public common::testing::AutoLogFixture {
   /// \brief Setup the test fixture. This gets called by gtest.
   public: void SetUp() override
   {
     // Call superclass to make sure that logging is initialized
-    this->ignition::testing::AutoLogFixture::SetUp();
-    this->pathData = common::joinPaths(PROJECT_SOURCE_PATH, "test", "data");
-    this->pathOut = common::joinPaths(common::cwd(), "tmp");
-
+    this->common::testing::AutoLogFixture::SetUp();
+    ASSERT_TRUE(common::testing::TestTmpPath(this->pathOut));
     common::createDirectories(this->pathOut);
   }
-
-  /// \brief Tear down the test fixture. This gets called by gtest.
-  public: void TearDown() override
-  {
-    // Remove temp directory
-    common::removeAll(this->pathOut);
-  }
-
-  /// \brief Path to project test data
-  public: std::string pathData;
 
   /// \brief Path to temporary output (removed during TearDown)
   public: std::string pathOut;
@@ -60,7 +47,7 @@ class ColladaExporter : public ignition::testing::AutoLogFixture {
 /////////////////////////////////////////////////
 TEST_F(ColladaExporter, ExportBox)
 {
-  const auto filenameIn = common::joinPaths(this->pathData, "box.dae");
+  const auto filenameIn = common::testing::TestFile("data", "box.dae");
   const auto filenameOut = common::joinPaths(this->pathOut, "box_exported");
   const auto filenameOutExt = filenameOut + ".dae";
 
@@ -128,7 +115,7 @@ TEST_F(ColladaExporter, ExportBox)
 /////////////////////////////////////////////////
 TEST_F(ColladaExporter, ExportCordlessDrill)
 {
-  const auto filenameIn = common::joinPaths(this->pathData,
+  const auto filenameIn = common::testing::TestFile("data",
       "cordless_drill", "meshes", "cordless_drill.dae");
   const auto filenameOut = common::joinPaths(this->pathOut,
       "cordless_drill_exported");
@@ -210,8 +197,8 @@ TEST_F(ColladaExporter, ExportCordlessDrill)
 /////////////////////////////////////////////////
 TEST_F(ColladaExporter, ExportMeshWithSubmeshes)
 {
-  const auto boxFilenameIn = common::joinPaths(this->pathData, "box.dae");
-  const auto drillFilenameIn = common::joinPaths(this->pathData,
+  const auto boxFilenameIn = common::testing::TestFile("data", "box.dae");
+  const auto drillFilenameIn = common::testing::TestFile("data",
       "cordless_drill", "meshes", "cordless_drill.dae");
 
   const auto filenameOut = common::joinPaths(this->pathOut,
