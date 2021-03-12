@@ -50,6 +50,11 @@ ign_find_package(ignition-math6 REQUIRED_BY graphics events VERSION 6.6)
 set(IGN_MATH_VER ${ignition-math6_VERSION_MAJOR})
 
 #--------------------------------------
+# Find ignition-utils
+ign_find_package(ignition-utils1 REQUIRED_BY graphics VERSION 1.0)
+set(IGN_UTILS_VER ${ignition-utils1_VERSION_MAJOR})
+
+#--------------------------------------
 # Find Tinyxml2
 if(USE_EXTERNAL_TINYXML2)
   ign_find_package(TINYXML2 PRETTY tinyxml2

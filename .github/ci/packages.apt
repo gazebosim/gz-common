@@ -6,6 +6,7 @@ libfreeimage-dev
 libgts-dev
 libignition-cmake2-dev
 libignition-math6-dev
+libignition-utils1-dev
 libswscale-dev
 libtinyxml2-dev
 pkg-config

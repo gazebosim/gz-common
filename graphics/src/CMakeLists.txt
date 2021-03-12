@@ -15,6 +15,7 @@ ign_add_component(graphics SOURCES ${sources} GET_TARGET_NAME graphics_target)
 target_link_libraries(${graphics_target}
   PUBLIC
     ignition-math${IGN_MATH_VER}::ignition-math${IGN_MATH_VER}
+    ignition-utils${IGN_UTILS_VER}::ignition-utils${IGN_UTILS_VER}
   PRIVATE
     GTS::GTS
     FreeImage::FreeImage)
