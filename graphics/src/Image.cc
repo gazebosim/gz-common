@@ -219,7 +219,7 @@ int Image::Pitch() const
 }
 
 //////////////////////////////////////////////////
-void Image::RGBData(unsigned char **_data, unsigned int &_count) const
+void Image::RGBData(unsigned char **_data, unsigned int &_count)
 {
   FIBITMAP *tmp = this->dataPtr->bitmap;
   if (FREEIMAGE_COLORORDER != FREEIMAGE_COLORORDER_RGB)
@@ -232,7 +232,7 @@ void Image::RGBData(unsigned char **_data, unsigned int &_count) const
 }
 
 //////////////////////////////////////////////////
-void Image::Data(unsigned char **_data, unsigned int &_count) const
+void Image::Data(unsigned char **_data, unsigned int &_count)
 {
   if (FREEIMAGE_COLORORDER != FREEIMAGE_COLORORDER_RGB)
   {
@@ -533,7 +533,7 @@ Image::PixelFormatType Image::ConvertPixelFormat(const std::string &_format)
 }
 
 //////////////////////////////////////////////////
-FIBITMAP* ImagePrivate::SwapRedBlue(const unsigned int &_width,
+FIBITMAP* Image::Implementation::SwapRedBlue(const unsigned int &_width,
                                     const unsigned int &_height)
 {
   FIBITMAP *copy = FreeImage_Copy(this->bitmap, 0, 0, _width, _height);
