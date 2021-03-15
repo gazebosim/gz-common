@@ -118,15 +118,13 @@ namespace ignition
       /// \brief Get the image as a data array
       /// \param[out] _data Pointer to a NULL array of char.
       /// \param[out] _count The resulting data array size
-      public: void Data(unsigned char **_data,
-                        unsigned int &_count) const;
+      public: void Data(unsigned char **_data, unsigned int &_count);
 
       /// \brief Get only the RGB data from the image. This will drop the
       /// alpha channel if one is present.
       /// \param[out] _data Pointer to a NULL array of char.
       /// \param[out] _count The resulting data array size
-      public: void RGBData(unsigned char **_data,
-                           unsigned int &_count) const;
+      public: void RGBData(unsigned char **_data, unsigned int &_count);
 
       /// \brief Get the width
       /// \return The image width
