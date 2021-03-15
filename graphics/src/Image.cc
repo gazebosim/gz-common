@@ -246,8 +246,8 @@ void Image::Data(unsigned char **_data, unsigned int &_count) const
 }
 
 //////////////////////////////////////////////////
-void Image::Implementation::DataImpl(unsigned char **_data, unsigned int &_count,
-                        FIBITMAP *_img) const
+void Image::Implementation::DataImpl(
+    unsigned char **_data, unsigned int &_count, FIBITMAP *_img) const
 {
   int redmask = FI_RGBA_RED_MASK;
   // int bluemask = 0x00ff0000;

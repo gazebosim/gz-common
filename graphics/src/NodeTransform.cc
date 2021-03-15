@@ -139,19 +139,22 @@ void NodeTransform::RecalculateMatrix()
   if (this->dataPtr->type == MATRIX)
   {
     this->dataPtr->transform.Set(
-        this->dataPtr->source[0], this->dataPtr->source[1], this->dataPtr->source[2],
-        this->dataPtr->source[3], this->dataPtr->source[4], this->dataPtr->source[5],
-        this->dataPtr->source[6], this->dataPtr->source[7], this->dataPtr->source[8],
-        this->dataPtr->source[9], this->dataPtr->source[10], this->dataPtr->source[11],
-        this->dataPtr->source[12], this->dataPtr->source[13], this->dataPtr->source[14],
-        this->dataPtr->source[15]);
+        this->dataPtr->source[0], this->dataPtr->source[1],
+        this->dataPtr->source[2], this->dataPtr->source[3],
+        this->dataPtr->source[4], this->dataPtr->source[5],
+        this->dataPtr->source[6], this->dataPtr->source[7],
+        this->dataPtr->source[8], this->dataPtr->source[9],
+        this->dataPtr->source[10], this->dataPtr->source[11],
+        this->dataPtr->source[12], this->dataPtr->source[13],
+        this->dataPtr->source[14], this->dataPtr->source[15]);
   }
   else
   {
     if (this->dataPtr->type == TRANSLATE)
     {
-      this->dataPtr->transform.SetTranslation(math::Vector3d(this->dataPtr->source[0],
-            this->dataPtr->source[1], this->dataPtr->source[2]));
+      this->dataPtr->transform.SetTranslation(math::Vector3d(
+            this->dataPtr->source[0], this->dataPtr->source[1],
+            this->dataPtr->source[2]));
     }
     else
     {

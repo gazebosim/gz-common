@@ -328,7 +328,8 @@ SkeletonAnimation *Skeleton::Animation(const unsigned int _i) const
 void Skeleton::AddAnimation(SkeletonAnimation *_anim)
 {
   this->dataPtr->mapAnimSkin.push_back(std::map<std::string, std::string>());
-  this->dataPtr->alignTranslate.push_back(std::map<std::string, math::Matrix4d>());
+  this->dataPtr->alignTranslate.push_back(
+      std::map<std::string, math::Matrix4d>());
   this->dataPtr->alignRotate.push_back(std::map<std::string, math::Matrix4d>());
   this->dataPtr->anims.push_back(_anim);
 }

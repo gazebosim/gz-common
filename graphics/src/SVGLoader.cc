@@ -624,7 +624,8 @@ SVGLoader::~SVGLoader()
 }
 
 /////////////////////////////////////////////////
-bool SVGLoader::Implementation::SplitSubpaths(const std::vector<SVGCommand> &_cmds,
+bool SVGLoader::Implementation::SplitSubpaths(
+    const std::vector<SVGCommand> &_cmds,
     std::vector< std::vector<SVGCommand> > &_subpaths)
 {
   if (_cmds.empty())
@@ -700,8 +701,8 @@ void SVGLoader::Implementation::ExpandCommands(
 }
 
 /////////////////////////////////////////////////
-bool SVGLoader::Implementation::PathCommands(const std::vector<std::string> &_tokens,
-    SVGPath &_path)
+bool SVGLoader::Implementation::PathCommands(
+    const std::vector<std::string> &_tokens, SVGPath &_path)
 {
   std::vector <SVGCommand> cmds;
   std::string lookup = "aAcCmMqQlLvVhHzZ";

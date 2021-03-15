@@ -459,7 +459,8 @@ void ColladaLoader::Implementation::LoadScene(Mesh *_mesh)
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::Implementation::LoadNode(tinyxml2::XMLElement *_elem, Mesh *_mesh,
+void ColladaLoader::Implementation::LoadNode(
+    tinyxml2::XMLElement *_elem, Mesh *_mesh,
     const ignition::math::Matrix4d &_transform)
 {
   tinyxml2::XMLElement *nodeXml;
@@ -708,7 +709,8 @@ ignition::math::Matrix4d ColladaLoader::Implementation::LoadNodeTransform(
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::Implementation::LoadController(tinyxml2::XMLElement *_contrXml,
+void ColladaLoader::Implementation::LoadController(
+    tinyxml2::XMLElement *_contrXml,
     std::vector<tinyxml2::XMLElement *> _skelXmls,
     const ignition::math::Matrix4d &_transform,
     Mesh *_mesh)
@@ -1238,8 +1240,8 @@ SkeletonNode *ColladaLoader::Implementation::LoadSkeletonNodes(
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::Implementation::SetSkeletonNodeTransform(tinyxml2::XMLElement *_elem,
-      SkeletonNode *_node)
+void ColladaLoader::Implementation::SetSkeletonNodeTransform(
+    tinyxml2::XMLElement *_elem, SkeletonNode *_node)
 {
   if (nullptr == _elem)
   {
@@ -1378,8 +1380,8 @@ void ColladaLoader::Implementation::LoadGeometry(tinyxml2::XMLElement *_xml,
 }
 
 /////////////////////////////////////////////////
-tinyxml2::XMLElement *ColladaLoader::Implementation::ElementId(const std::string &_name,
-    const std::string &_id)
+tinyxml2::XMLElement *ColladaLoader::Implementation::ElementId(
+    const std::string &_name, const std::string &_id)
 {
   return this->ElementId(this->colladaXml, _name, _id);
 }
@@ -1772,7 +1774,8 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
 }
 
 /////////////////////////////////////////////////
-MaterialPtr ColladaLoader::Implementation::LoadMaterial(const std::string &_name)
+MaterialPtr ColladaLoader::Implementation::LoadMaterial(
+    const std::string &_name)
 {
   if (this->materialIds.find(_name)
       != this->materialIds.end())
@@ -1893,8 +1896,8 @@ MaterialPtr ColladaLoader::Implementation::LoadMaterial(const std::string &_name
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::Implementation::LoadColorOrTexture(tinyxml2::XMLElement *_elem,
-    const std::string &_type, MaterialPtr _mat)
+void ColladaLoader::Implementation::LoadColorOrTexture(
+    tinyxml2::XMLElement *_elem, const std::string &_type, MaterialPtr _mat)
 {
   if (!_elem || !_elem->FirstChildElement(_type.c_str()))
     return;
@@ -1990,7 +1993,8 @@ void ColladaLoader::Implementation::LoadColorOrTexture(tinyxml2::XMLElement *_el
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::Implementation::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
+void ColladaLoader::Implementation::LoadPolylist(
+    tinyxml2::XMLElement *_polylistXml,
     const ignition::math::Matrix4d &_transform,
     Mesh *_mesh)
 {
@@ -2325,7 +2329,8 @@ void ColladaLoader::Implementation::LoadPolylist(tinyxml2::XMLElement *_polylist
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::Implementation::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
+void ColladaLoader::Implementation::LoadTriangles(
+    tinyxml2::XMLElement *_trianglesXml,
     const ignition::math::Matrix4d &_transform, Mesh *_mesh)
 {
   std::unique_ptr<SubMesh> subMesh(new SubMesh);

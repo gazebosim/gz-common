@@ -276,7 +276,8 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
 }
 
 //////////////////////////////////////////////////
-void ColladaExporter::Implementation::ExportAsset(tinyxml2::XMLElement *_assetXml)
+void ColladaExporter::Implementation::ExportAsset(
+    tinyxml2::XMLElement *_assetXml)
 {
   tinyxml2::XMLElement *unitXml = _assetXml->GetDocument()->NewElement("unit");
   unitXml->SetAttribute("meter", "1");
@@ -840,7 +841,8 @@ void ColladaExporter::Implementation::ExportVisualScenes(
 }
 
 //////////////////////////////////////////////////
-void ColladaExporter::Implementation::ExportScene(tinyxml2::XMLElement *_sceneXml)
+void ColladaExporter::Implementation::ExportScene(
+    tinyxml2::XMLElement *_sceneXml)
 {
   tinyxml2::XMLElement *instanceVisualSceneXml =
       _sceneXml->GetDocument()->NewElement("instance_visual_scene");

@@ -78,7 +78,8 @@ NodeAnimation *SkeletonAnimation::NodeAnimationByName(
 //////////////////////////////////////////////////
 bool SkeletonAnimation::HasNode(const std::string &_node) const
 {
-  return (this->dataPtr->animations.find(_node) != this->dataPtr->animations.end());
+  return (this->dataPtr->animations.find(_node) !=
+      this->dataPtr->animations.end());
 }
 
 //////////////////////////////////////////////////
