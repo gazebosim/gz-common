@@ -1,0 +1,132 @@
+load(
+    "//ign_bazel:build_defs.bzl",
+    "IGNITION_ROOT",
+    "IGNITION_VISIBILITY",
+    "cmake_configure_file",
+    "generate_include_header",
+    "ign_export_header",
+)
+
+package(
+    default_visibility = IGNITION_VISIBILITY,
+    features = [
+        "-parse_headers",
+        "-layering_check",
+    ],
+)
+
+public_headers_no_gen = [
+    "include/ignition/common/Profiler.hh",
+]
+
+sources = [
+    "src/Profiler.cc",
+    "src/RemoteryProfilerImpl.cc",
+]
+
+# Configuration for UNIX
+RMT_ENABLED = 1
+
+RMT_USE_TINYCRT = 0
+
+RMT_USE_CUDA = 0
+
+RMT_USE_D3D11 = 0
+
+RMT_USE_OPENGL = 1
+
+RMT_USE_METAL = 0
+
+cmake_configure_file(
+    name = "remotery_config",
+    src = "src/RemoteryConfig.h.in",
+    out = "include/RemoteryConfig.h",
+    cmakelists = ["CMakeLists.txt"],
+    defines = [
+        "RMT_ENABLED=%d" % RMT_ENABLED,
+        "RMT_USE_TINYCRT=%d" % RMT_USE_TINYCRT,
+        "RMT_USE_CUDA=%d" % RMT_USE_CUDA,
+        "RMT_USE_D3D11=%d" % RMT_USE_D3D11,
+        "RMT_USE_OPENGL=%d" % RMT_USE_OPENGL,
+        "RMT_USE_METAL=%d" % RMT_USE_METAL,
+    ],
+    visibility = ["//visibility:private"],
+)
+
+ign_export_header(
+    name = "include/ignition/common/profiler/Export.hh",
+    export_base = "IGNITION_COMMON_PROFILER",
+    lib_name = "ignition-common-profiler",
+    visibility = ["//visibility:private"],
+)
+
+generate_include_header(
+    name = "profiler_hh_genrule",
+    out = "include/ignition/common/profiler.hh",
+    hdrs = public_headers_no_gen + [
+        "include/ignition/common/profiler/Export.hh",
+        "include/RemoteryConfig.h",
+    ],
+)
+
+public_headers = public_headers_no_gen + [
+    "include/ignition/common/profiler/Export.hh",
+    "include/ignition/common/profiler.hh",
+    "src/ProfilerImpl.hh",
+    "src/RemoteryProfilerImpl.hh",
+    "include/RemoteryConfig.h",
+]
+
+cc_library(
+    name = "remotery",
+    srcs = ["src/Remotery/lib/Remotery.c"],
+    hdrs = ["src/Remotery/lib/Remotery.h"],
+    includes = ["src/Remotery/lib"],
+)
+
+cc_library(
+    name = "profiler",
+    srcs = sources,
+    hdrs = public_headers,
+    defines = [
+        "IGN_PROFILER_ENABLE=1",
+        "IGN_PROFILER_REMOTERY=1",
+    ],
+    includes = ["include"],
+    deps = [
+        IGNITION_ROOT + "ign_common",
+        ":remotery",
+    ],
+)
+
+cc_binary(
+    name = "libignition-common3-profiler.so",
+    includes = ["include"],
+    linkopts = ["-Wl,-soname,libignition-common3-profiler.so"],
+    linkshared = True,
+    deps = [":profiler"],
+)
+
+cc_test(
+    name = "Profiler_Disabled_TEST",
+    srcs = ["src/Profiler_Disabled_TEST.cc"],
+    defines = [
+        "IGN_PROFILER_ENABLE=0",
+        "IGN_PROFILER_REMOTERY=0",
+    ],
+    deps = [
+        ":profiler",
+        "@gtest",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "Profiler_Remotery_TEST",
+    srcs = ["src/Profiler_Remotery_TEST.cc"],
+    deps = [
+        ":profiler",
+        "@gtest",
+        "@gtest//:gtest_main",
+    ],
+)
