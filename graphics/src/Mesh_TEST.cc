@@ -23,11 +23,10 @@
 #include "ignition/common/Skeleton.hh"
 #include "ignition/common/SubMesh.hh"
 #include "ignition/math/Vector3.hh"
-#include "test/util.hh"
 
 using namespace ignition;
 
-class MeshTest : public ignition::testing::AutoLogFixture { };
+class MeshTest : public common::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
 TEST_F(MeshTest, Mesh)

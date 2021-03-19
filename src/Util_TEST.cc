@@ -20,7 +20,7 @@
 #include <string>
 
 #include <ignition/common/Util.hh>
-#include "test/util.hh"
+#include "test_config.h"
 
 using namespace ignition;
 

@@ -16,11 +16,11 @@
 */
 #include <memory>
 #include "ignition/common/Battery.hh"
-#include "test/util.hh"
+#include "test_config.h"
 
 using namespace ignition;
 
-class BatteryTest : public ignition::testing::AutoLogFixture { };
+class BatteryTest : public common::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
 TEST_F(BatteryTest, Construction)

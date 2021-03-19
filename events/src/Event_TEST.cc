@@ -17,13 +17,14 @@
 
 #include <gtest/gtest.h>
 
+#include "test_config.h"
+
 #include <functional>
 #include <ignition/common/Event.hh>
-#include "test/util.hh"
 
 using namespace ignition;
 
-class EventTest : public ignition::testing::AutoLogFixture { };
+class EventTest : public common::testing::AutoLogFixture { };
 
 int g_callback = 0;
 int g_callback1 = 0;

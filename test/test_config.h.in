@@ -1,10 +1,205 @@
-/* THIS HEADER WAS AUTOMATICALLY GENERATED 
+/* THIS HEADER WAS AUTOMATICALLY GENERATED
  * AND SHOULD NOT BE DIRECTLY MODIFIED.
  *
  * See test/test_config.h.in in the ignition-common
  * repo for the original source of this header.
 */
 
+#ifndef IGNITION_TESTING__TEST_CONFIG_H_
+#define IGNITION_TESTING__TEST_CONFIG_H_
+
+#include <gtest/gtest.h>
+
+#include <string>
+#include "ignition/common/Console.hh"
+#include "ignition/common/Filesystem.hh"
+#include "ignition/common/Util.hh"
+
 #define PROJECT_BINARY_PATH "${PROJECT_BINARY_DIR}"
 #define PROJECT_SOURCE_PATH "${PROJECT_SOURCE_DIR}"
-#define TEST_PATH "${PROJECT_SOURCE_DIR}/test"
+
+namespace ignition
+{
+  namespace common
+  {
+    namespace testing
+    {
+      /// \brief Method to retrieve root directory of project source
+      ///
+      /// This is used to get various test files
+      /// \param[inout] _sourceDir Full path to the source directory
+      /// \return True if directory is set correctly, false otherwise
+      bool ProjectSourcePath(std::string &_sourceDir)
+      {
+        // Bazel builds set TEST_SRCDIR
+        if (common::env("TEST_SRCDIR", _sourceDir))
+        {
+          _sourceDir = common::joinPaths(
+              _sourceDir, "__main__", "ign_common");
+          return true;
+        }
+        else
+        {
+          // CMake builds set PROJECT_SOURCE_DIR
+          _sourceDir = "${PROJECT_SOURCE_DIR}";
+          return true;
+        }
+      }
+
+      /// \brief Method to retrieve temporary directory for test outputs
+      ///
+      /// \param[inout] _tmpDir Full path to the temp directory
+      /// \return True if directory is set correctly, false otherwise
+      bool TestTmpPath(std::string &_tmpDir)
+      {
+        // Bazel builds set TEST_UNDECLARED_OUTPUTS_DIR
+        if (common::env("TEST_UNDECLARED_OUTPUTS_DIR", _tmpDir))
+        {
+          return true;
+        }
+        else
+        {
+          _tmpDir = common::joinPaths("${PROJECT_BINARY_DIR}", "tmp");
+          return true;
+        }
+      }
+
+      /// \brief Method to retrieve temporary home directory for tests
+      ///
+      /// This will update the contents of the home directory path variable
+      /// (HOME on Linux/MacOS, HOMEPATH on Windows) to this newly-set
+      /// directory
+      /// This additionally sets the HOME and HOMEPATH environment variables
+      ///
+      /// \param[inout] _homeDir Full path to the home directory
+      /// \return True if directory is set correctly, false otherwise
+      bool TestSetHomePath(std::string &_homeDir)
+      {
+        if (common::env("TEST_UNDECLARED_OUTPUTS_DIR", _homeDir))
+        {
+          return ignition::common::setenv(IGN_HOMEDIR, _homeDir);
+        }
+        else
+        {
+          if (TestTmpPath(_homeDir))
+          {
+            // Set both for linux and windows
+            return ignition::common::setenv(IGN_HOMEDIR, _homeDir);
+          }
+          else
+          {
+            return false;
+          }
+        }
+      }
+
+      /// \brief Retrieve a file from the project source directory
+      /// \param[in] variable length of arguments relative to the
+      ///   repository source directory
+      /// \return Full path to requested file
+      template <typename... Args>
+      std::string SourceFile(Args const &... args)
+      {
+        std::string dataDir;
+        ProjectSourcePath(dataDir);
+        return common::joinPaths(dataDir, args...);
+      }
+
+      /// \brief Retrieve a file from the test directory
+      /// \param[in] variable length of arguments relative to the
+      ///   repository test directory
+      /// \return Full path to requested test file
+      template <typename... Args>
+      std::string TestFile(Args const &... args)
+      {
+        return SourceFile("test", args...);
+      }
+
+      /// \brief Retrieve a file from the project temporary directory
+      /// \param[in] variable length of arguments relative to the
+      ///   temporary test directory
+      /// \return Full path to requested file
+      template <typename... Args>
+      std::string TempPath(Args const &... args)
+      {
+        std::string dataDir;
+        TestTmpPath(dataDir);
+        return common::joinPaths(dataDir, args...);
+      }
+
+      /// \brief A utility class that stores test logs in ~/.ignition/test_logs.
+      /// This functionality is needed to keep all the log information reported
+      /// by ignition during continuous integration. Without this, debugging
+      /// failing tests is significantly more difficult.
+      class AutoLogFixture : public ::testing::Test
+      {
+        /// \brief Setup the test fixture. This gets called by gtest.
+        protected: virtual void SetUp()
+        {
+          const ::testing::TestInfo *const testInfo =
+            ::testing::UnitTest::GetInstance()->current_test_info();
+
+          std::string testName = testInfo->name();
+          std::string testCaseName = testInfo->test_case_name();
+          this->logFilename = testCaseName + "_" + testName + ".log";
+
+          common::testing::TestSetHomePath(this->logBasePath);
+
+          // Initialize Console
+          ignLogInit(common::joinPaths(this->logBasePath, "test_logs"), 
+                     this->logFilename);
+
+          ignition::common::Console::SetVerbosity(4);
+
+          // Read the full path to the log directory.
+          this->logDirectory = ignLogDirectory();
+        }
+
+        /// \brief Get a string with the full log file path.
+        /// \return The full log file path as a string.
+        protected: std::string FullLogPath() const
+        {
+          return ignition::common::joinPaths(
+            this->logDirectory, this->logFilename);
+        }
+
+        /// \brief Get a string with all the log content loaded from the disk.
+        /// \return A string with all the log content.
+        protected: std::string LogContent() const
+        {
+          std::string loggedString;
+          // Open the log file, and read back the string
+          std::ifstream ifs(this->FullLogPath().c_str(), std::ios::in);
+
+          while (!ifs.eof())
+          {
+            std::string line;
+            std::getline(ifs, line);
+            loggedString += line;
+          }
+          return loggedString;
+        }
+
+        /// \brief Default destructor.
+        public: virtual ~AutoLogFixture()
+        {
+          ignLogClose();
+          ignition::common::removeAll(this->logBasePath);
+        }
+
+        /// \brief String with the full path of the logfile
+        private: std::string logFilename;
+
+        /// \brief String with the full path to log directory
+        private: std::string logDirectory;
+
+        /// \brief String with the base path to log directory
+        private: std::string logBasePath;
+      };
+    }  // namespace testing
+  }  // namespace common
+}  // namespace ignition
+
+
+
+#endif  // IGNITION_TESTING__TEST_CONFIG_H_
