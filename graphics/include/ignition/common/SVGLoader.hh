@@ -24,17 +24,15 @@
 #include <ignition/math/Vector2.hh>
 #include <ignition/math/Matrix3.hh>
 
+#include <ignition/utils/ImplPtr.hh>
+
 #include <ignition/common/graphics/Export.hh>
 #include <ignition/common/Console.hh>
-#include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
 {
   namespace common
   {
-    // Forward declare private data class
-    class SVGLoaderPrivate;
-
     /// \brief SVG command data structure
     class IGNITION_COMMON_GRAPHICS_VISIBLE SVGCommand
     {
@@ -123,11 +121,9 @@ namespace ignition
       public: void DumpPaths(const std::vector<SVGPath> &_paths,
                              std::ostream &_out) const;
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \internal
-      /// \brief Pointer to private data
-      private: std::unique_ptr<SVGLoaderPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      /// \brief Private data pointer.
+      IGN_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

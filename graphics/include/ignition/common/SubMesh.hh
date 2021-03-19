@@ -24,6 +24,8 @@
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Vector2.hh>
 
+#include <ignition/utils/ImplPtr.hh>
+
 #include <ignition/common/graphics/Types.hh>
 #include <ignition/common/graphics/Export.hh>
 #include <ignition/common/SuppressWarning.hh>
@@ -32,7 +34,6 @@ namespace ignition
 {
   namespace common
   {
-    class SubMeshPrivate;
     class Material;
     class NodeAssignment;
 
@@ -67,10 +68,6 @@ namespace ignition
       /// \brief Constructor
       /// \param _name Name of the submesh.
       public: explicit SubMesh(const std::string &_name);
-
-      /// \brief Copy Constructor
-      /// \brief _other Other mesh object
-      public: SubMesh(const SubMesh &_other);
 
       /// \brief Destructor
       public: virtual ~SubMesh();
@@ -396,10 +393,8 @@ namespace ignition
       /// the primitive type is not TRIANGLES, or there are no triangles.
       public: double Volume() const;
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Private data pointer.
-      private: std::unique_ptr<SubMeshPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      IGN_UTILS_IMPL_PTR(dataPtr)
     };
 
     /// \brief Vertex to node weighted assignement for skeleton animation

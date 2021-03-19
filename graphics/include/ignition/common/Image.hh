@@ -21,15 +21,13 @@
 #include <string>
 #include <ignition/math/Color.hh>
 #include <ignition/common/graphics/Export.hh>
-#include <ignition/common/SuppressWarning.hh>
+
+#include <ignition/utils/ImplPtr.hh>
 
 namespace ignition
 {
   namespace common
   {
-    /// \brief Forward declaration of private data class
-    class ImagePrivate;
-
     /// \brief String names for the pixel formats.
     /// \sa Image::PixelFormat.
     static std::string PixelFormatNames[] =
@@ -120,15 +118,13 @@ namespace ignition
       /// \brief Get the image as a data array
       /// \param[out] _data Pointer to a NULL array of char.
       /// \param[out] _count The resulting data array size
-      public: void Data(unsigned char **_data,
-                        unsigned int &_count) const;
+      public: void Data(unsigned char **_data, unsigned int &_count);
 
       /// \brief Get only the RGB data from the image. This will drop the
       /// alpha channel if one is present.
       /// \param[out] _data Pointer to a NULL array of char.
       /// \param[out] _count The resulting data array size
-      public: void RGBData(unsigned char **_data,
-                           unsigned int &_count) const;
+      public: void RGBData(unsigned char **_data, unsigned int &_count);
 
       /// \brief Get the width
       /// \return The image width
@@ -178,10 +174,8 @@ namespace ignition
       /// \return true if image has a bitmap
       public: bool Valid() const;
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Private data pointer
-      private: std::unique_ptr<ImagePrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      IGN_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

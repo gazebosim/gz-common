@@ -33,7 +33,7 @@ namespace ignition
   namespace common
   {
     /// \brief Private data class
-    class ImagePrivate
+    class Image::Implementation
     {
       /// \brief bitmap data
       public: FIBITMAP *bitmap;
@@ -59,7 +59,7 @@ static int count = 0;
 
 //////////////////////////////////////////////////
 Image::Image(const std::string &_filename)
-  : dataPtr(new ImagePrivate)
+: dataPtr(ignition::utils::MakeImpl<Implementation>())
 {
   if (count == 0)
     FreeImage_Initialise();
@@ -219,7 +219,7 @@ int Image::Pitch() const
 }
 
 //////////////////////////////////////////////////
-void Image::RGBData(unsigned char **_data, unsigned int &_count) const
+void Image::RGBData(unsigned char **_data, unsigned int &_count)
 {
   FIBITMAP *tmp = this->dataPtr->bitmap;
   if (FREEIMAGE_COLORORDER != FREEIMAGE_COLORORDER_RGB)
@@ -232,7 +232,7 @@ void Image::RGBData(unsigned char **_data, unsigned int &_count) const
 }
 
 //////////////////////////////////////////////////
-void Image::Data(unsigned char **_data, unsigned int &_count) const
+void Image::Data(unsigned char **_data, unsigned int &_count)
 {
   if (FREEIMAGE_COLORORDER != FREEIMAGE_COLORORDER_RGB)
   {
@@ -246,8 +246,8 @@ void Image::Data(unsigned char **_data, unsigned int &_count) const
 }
 
 //////////////////////////////////////////////////
-void ImagePrivate::DataImpl(unsigned char **_data, unsigned int &_count,
-                        FIBITMAP *_img) const
+void Image::Implementation::DataImpl(
+    unsigned char **_data, unsigned int &_count, FIBITMAP *_img) const
 {
   int redmask = FI_RGBA_RED_MASK;
   // int bluemask = 0x00ff0000;
@@ -533,7 +533,7 @@ Image::PixelFormatType Image::ConvertPixelFormat(const std::string &_format)
 }
 
 //////////////////////////////////////////////////
-FIBITMAP* ImagePrivate::SwapRedBlue(const unsigned int &_width,
+FIBITMAP* Image::Implementation::SwapRedBlue(const unsigned int &_width,
                                     const unsigned int &_height)
 {
   FIBITMAP *copy = FreeImage_Copy(this->bitmap, 0, 0, _width, _height);

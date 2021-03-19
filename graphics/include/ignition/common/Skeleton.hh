@@ -23,6 +23,9 @@
 #include <utility>
 
 #include <ignition/math/Matrix4.hh>
+
+#include <ignition/utils/ImplPtr.hh>
+
 #include <ignition/common/SkeletonNode.hh>
 #include <ignition/common/graphics/Export.hh>
 
@@ -30,8 +33,6 @@ namespace ignition
 {
   namespace common
   {
-    /// Forward declarations
-    class SkeletonPrivate;
     class SkeletonAnimation;
 
     /// \class Skeleton Skeleton.hh ignition/common/Skeleton.hh
@@ -170,8 +171,8 @@ namespace ignition
       /// using breadth first traversal
       private: void BuildNodeMap();
 
-      /// \brief Private data pointer
-      private: SkeletonPrivate *data;
+      /// \brief Private data pointer.
+      IGN_UTILS_UNIQUE_IMPL_PTR(dataPtr)
     };
   }
 }

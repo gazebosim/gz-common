@@ -23,16 +23,15 @@
 
 #include <ignition/common/MeshExporter.hh>
 #include <ignition/common/graphics/Export.hh>
-#include <ignition/common/SuppressWarning.hh>
 
 #include <ignition/math/Matrix4.hh>
+
+#include <ignition/utils/ImplPtr.hh>
 
 namespace ignition
 {
   namespace common
   {
-    class ColladaExporterPrivate;
-
     /// \brief Class used to export Collada mesh files
     class IGNITION_COMMON_GRAPHICS_VISIBLE ColladaExporter : public MeshExporter
     {
@@ -54,11 +53,8 @@ namespace ignition
           const std::string &_filename, bool _exportTextures,
           const std::vector<math::Matrix4d> &_submeshToMatrix);
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
-      /// \internal
       /// \brief Pointer to private data.
-      private: std::unique_ptr<ColladaExporterPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      IGN_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

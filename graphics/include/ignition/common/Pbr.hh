@@ -18,15 +18,15 @@
 #define IGNITION_COMMON_PBR_HH_
 
 #include <string>
+
+#include <ignition/utils/ImplPtr.hh>
+
 #include <ignition/common/graphics/Export.hh>
 
 namespace ignition
 {
 namespace common
 {
-  // Forward declarations.
-  class PbrPrivate;
-
   /// \brief Type of PBR workflow.
   enum class PbrType : int
   {
@@ -56,27 +56,6 @@ namespace common
   {
     /// \brief Default constructor
     public: Pbr();
-
-    /// \brief Copy constructor
-    /// \param[in] _pbr Pbr to copy.
-    public: Pbr(const Pbr &_pbr);
-
-    /// \brief Move constructor
-    /// \param[in] _pbr to move.
-    public: Pbr(Pbr &&_pbr) noexcept;
-
-    /// \brief Destructor
-    public: ~Pbr();
-
-    /// \brief Assignment operator.
-    /// \param[in] _pbr The pbr material to set values from.
-    /// \return *this
-    public: Pbr &operator=(const Pbr &_pbr);
-
-    /// \brief Move assignment operator.
-    /// \param[in] _pbr The pbr material to move from.
-    /// \return *this
-    public: Pbr &operator=(Pbr &&_pbr);
 
     /// \brief Return true if both Pbr objects contain the same values.
     /// \param[_in] _pbr Pbr value to compare.
@@ -234,7 +213,7 @@ namespace common
     public: void SetType(PbrType _type);
 
     /// \brief Private data pointer.
-    private: PbrPrivate *dataPtr = nullptr;
+    IGN_UTILS_IMPL_PTR(dataPtr)
   };
 }
 }

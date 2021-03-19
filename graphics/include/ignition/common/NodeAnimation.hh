@@ -23,14 +23,14 @@
 #include <ignition/math/Matrix4.hh>
 #include <ignition/math/Pose3.hh>
 
+#include <ignition/utils/ImplPtr.hh>
+
 #include <ignition/common/graphics/Export.hh>
 
 namespace ignition
 {
   namespace common
   {
-    class NodeAnimationPrivate;
-
     /// \class NodeAnimation NodeAnimation.hh ignition/common/NodeAnimation.hh
     /// \brief Node animation
     class IGNITION_COMMON_GRAPHICS_VISIBLE NodeAnimation
@@ -109,7 +109,7 @@ namespace ignition
       public: double TimeAtX(const double _x) const;
 
       /// \brief Private data pointer.
-      private: NodeAnimationPrivate *data;
+      IGN_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

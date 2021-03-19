@@ -28,9 +28,16 @@
 using namespace ignition;
 using namespace common;
 
+
+//////////////////////////////////////////////////
+class ignition::common::STLLoader::Implementation
+{
+};
+
 //////////////////////////////////////////////////
 STLLoader::STLLoader()
-: MeshLoader()
+: MeshLoader(),
+  dataPtr(ignition::utils::MakeImpl<Implementation>())
 {
 }
 

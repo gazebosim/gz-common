@@ -22,7 +22,7 @@ using namespace ignition;
 using namespace common;
 
 /// \brief NodeAnimation private data
-class ignition::common::NodeAnimationPrivate
+class ignition::common::NodeAnimation::Implementation
 {
   /// \brief the name of the animation
   public: std::string name;
@@ -31,45 +31,41 @@ class ignition::common::NodeAnimationPrivate
   public: std::map<double, math::Matrix4d> keyFrames;
 
   /// \brief the duration of the animations (time of last key frame)
-  public: double length;
+  public: double length = 0.0;
 };
 
 //////////////////////////////////////////////////
 NodeAnimation::NodeAnimation(const std::string &_name)
-: data(new NodeAnimationPrivate)
+: dataPtr(ignition::utils::MakeImpl<Implementation>())
 {
-  this->data->name = _name;
-  this->data->length = 0.0;
+  this->dataPtr->name = _name;
 }
 
 //////////////////////////////////////////////////
 NodeAnimation::~NodeAnimation()
 {
-  this->data->keyFrames.clear();
-  delete this->data;
-  this->data = NULL;
 }
 
 //////////////////////////////////////////////////
 void NodeAnimation::SetName(const std::string &_name)
 {
-  this->data->name = _name;
+  this->dataPtr->name = _name;
 }
 
 //////////////////////////////////////////////////
 std::string NodeAnimation::Name() const
 {
-  return this->data->name;
+  return this->dataPtr->name;
 }
 
 //////////////////////////////////////////////////
 void NodeAnimation::AddKeyFrame(const double _time,
     const math::Matrix4d &_trans)
 {
-  if (_time > this->data->length)
-    this->data->length = _time;
+  if (_time > this->dataPtr->length)
+    this->dataPtr->length = _time;
 
-  this->data->keyFrames[_time] = _trans;
+  this->dataPtr->keyFrames[_time] = _trans;
 }
 
 //////////////////////////////////////////////////
@@ -84,14 +80,14 @@ void NodeAnimation::AddKeyFrame(const double _time, const math::Pose3d &_pose)
 //////////////////////////////////////////////////
 unsigned int NodeAnimation::FrameCount() const
 {
-  return this->data->keyFrames.size();
+  return this->dataPtr->keyFrames.size();
 }
 
 //////////////////////////////////////////////////
 void NodeAnimation::KeyFrame(const unsigned int _i, double &_time,
         math::Matrix4d &_trans) const
 {
-  if (_i >= this->data->keyFrames.size())
+  if (_i >= this->dataPtr->keyFrames.size())
   {
     ignerr << "Invalid key frame index " << _i << "\n";
     _time = -1.0;
@@ -99,7 +95,7 @@ void NodeAnimation::KeyFrame(const unsigned int _i, double &_time,
   else
   {
     std::map<double, math::Matrix4d>::const_iterator iter =
-      this->data->keyFrames.begin();
+      this->dataPtr->keyFrames.begin();
 
     std::advance(iter, _i);
 
@@ -122,33 +118,33 @@ std::pair<double, math::Matrix4d> NodeAnimation::KeyFrame(
 //////////////////////////////////////////////////
 double NodeAnimation::Length() const
 {
-  return this->data->length;
+  return this->dataPtr->length;
 }
 
 //////////////////////////////////////////////////
 math::Matrix4d NodeAnimation::FrameAt(double _time, bool _loop) const
 {
   double time = _time;
-  if (time > this->data->length)
+  if (time > this->dataPtr->length)
   {
     if (_loop)
     {
-      while (time > this->data->length)
-        time = time - this->data->length;
+      while (time > this->dataPtr->length)
+        time = time - this->dataPtr->length;
     }
     else
     {
-      time = this->data->length;
+      time = this->dataPtr->length;
     }
   }
 
-  if (math::equal(time, this->data->length))
-    return this->data->keyFrames.rbegin()->second;
+  if (math::equal(time, this->dataPtr->length))
+    return this->dataPtr->keyFrames.rbegin()->second;
 
   std::map<double, math::Matrix4d>::const_iterator it1 =
-    this->data->keyFrames.upper_bound(time);
+    this->dataPtr->keyFrames.upper_bound(time);
 
-  if (it1 == this->data->keyFrames.begin() || math::equal(it1->first, time))
+  if (it1 == this->dataPtr->keyFrames.begin() || math::equal(it1->first, time))
     return it1->second;
 
   std::map<double, math::Matrix4d>::const_iterator it2 = it1--;
@@ -190,8 +186,8 @@ math::Matrix4d NodeAnimation::FrameAt(double _time, bool _loop) const
 void NodeAnimation::Scale(const double _scale)
 {
   for (std::map<double, math::Matrix4d>::iterator iter =
-      this->data->keyFrames.begin();
-      iter != this->data->keyFrames.end(); ++iter)
+      this->dataPtr->keyFrames.begin();
+      iter != this->dataPtr->keyFrames.end(); ++iter)
   {
     math::Matrix4d *mat = &iter->second;
     math::Vector3d pos = mat->Translation();
@@ -203,12 +199,12 @@ void NodeAnimation::Scale(const double _scale)
 double NodeAnimation::TimeAtX(const double _x) const
 {
   std::map<double, math::Matrix4d>::const_iterator it1 =
-    this->data->keyFrames.begin();
+    this->dataPtr->keyFrames.begin();
 
   while (it1->second.Translation().X() < _x)
     ++it1;
 
-  if (it1 == this->data->keyFrames.begin() ||
+  if (it1 == this->dataPtr->keyFrames.begin() ||
       math::equal(it1->second.Translation().X(), _x))
   {
     return it1->first;

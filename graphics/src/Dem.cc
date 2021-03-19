@@ -32,7 +32,7 @@ using namespace common;
 
 #ifdef HAVE_GDAL
 
-class ignition::common::DemPrivate
+class ignition::common::Dem::Implementation
 {
   /// \brief A set of associated raster bands.
   public: GDALDataset *dataSet;
@@ -61,7 +61,7 @@ class ignition::common::DemPrivate
 
 //////////////////////////////////////////////////
 Dem::Dem()
-  : dataPtr(new DemPrivate)
+: dataPtr(ignition::utils::MakeImpl<Implementation>())
 {
   this->dataPtr->dataSet = nullptr;
   GDALAllRegister();

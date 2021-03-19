@@ -24,7 +24,7 @@ using namespace ignition;
 using namespace common;
 
 /// Private data class
-class ignition::common::SkeletonPrivate
+class ignition::common::Skeleton::Implementation
 {
   typedef std::vector<std::vector<std::pair<std::string, double> > >
     RawNodeWeights;
@@ -66,48 +66,46 @@ class ignition::common::SkeletonPrivate
 
 //////////////////////////////////////////////////
 Skeleton::Skeleton()
-  : data(new SkeletonPrivate)
+: dataPtr(ignition::utils::MakeUniqueImpl<Implementation>())
 {
-  this->data->root = nullptr;
+  this->dataPtr->root = nullptr;
 }
 
 //////////////////////////////////////////////////
 Skeleton::Skeleton(SkeletonNode *_root)
-  : data(new SkeletonPrivate)
+: dataPtr(ignition::utils::MakeUniqueImpl<Implementation>())
 {
-  this->data->root = _root;
+  this->dataPtr->root = _root;
   this->BuildNodeMap();
 }
 
 //////////////////////////////////////////////////
 Skeleton::~Skeleton()
 {
-  for (auto& kv : this->data->nodes)
+  for (auto& kv : this->dataPtr->nodes)
     delete kv.second;
-  for (auto& a : this->data->anims)
+  for (auto& a : this->dataPtr->anims)
     delete a;
-  delete this->data;
-  this->data = NULL;
 }
 
 //////////////////////////////////////////////////
 void Skeleton::RootNode(SkeletonNode *_node)
 {
-  this->data->root = _node;
+  this->dataPtr->root = _node;
   this->BuildNodeMap();
 }
 
 //////////////////////////////////////////////////
 SkeletonNode *Skeleton::RootNode() const
 {
-  return this->data->root;
+  return this->dataPtr->root;
 }
 
 //////////////////////////////////////////////////
 SkeletonNode *Skeleton::NodeByName(const std::string &_name) const
 {
   for (SkeletonNodeMap::const_iterator iter =
-      this->data->nodes.begin(); iter != this->data->nodes.end(); ++iter)
+      this->dataPtr->nodes.begin(); iter != this->dataPtr->nodes.end(); ++iter)
   {
     if (iter->second->Name() == _name)
       return iter->second;
@@ -120,7 +118,7 @@ SkeletonNode *Skeleton::NodeByName(const std::string &_name) const
 SkeletonNode *Skeleton::NodeById(const std::string &_id) const
 {
   for (SkeletonNodeMap::const_iterator iter =
-      this->data->nodes.begin(); iter != this->data->nodes.end(); ++iter)
+      this->dataPtr->nodes.begin(); iter != this->dataPtr->nodes.end(); ++iter)
   {
     if (iter->second->Id() == _id)
       return iter->second;
@@ -132,14 +130,14 @@ SkeletonNode *Skeleton::NodeById(const std::string &_id) const
 //////////////////////////////////////////////////
 SkeletonNode *Skeleton::NodeByHandle(const unsigned int _handle) const
 {
-  SkeletonNodeMap::const_iterator iter = this->data->nodes.find(_handle);
-  return iter != this->data->nodes.end() ? iter->second : NULL;
+  SkeletonNodeMap::const_iterator iter = this->dataPtr->nodes.find(_handle);
+  return iter != this->dataPtr->nodes.end() ? iter->second : NULL;
 }
 
 //////////////////////////////////////////////////
 unsigned int Skeleton::NodeCount() const
 {
-  return this->data->nodes.size();
+  return this->dataPtr->nodes.size();
 }
 
 //////////////////////////////////////////////////
@@ -147,7 +145,7 @@ unsigned int Skeleton::JointCount() const
 {
   unsigned int c = 0;
   for (SkeletonNodeMap::const_iterator iter =
-      this->data->nodes.begin(); iter != this->data->nodes.end(); ++iter)
+      this->dataPtr->nodes.begin(); iter != this->dataPtr->nodes.end(); ++iter)
   {
     if (iter->second->IsJoint())
       c++;
@@ -159,15 +157,15 @@ unsigned int Skeleton::JointCount() const
 //////////////////////////////////////////////////
 void Skeleton::Scale(const double _scale)
 {
-  if (nullptr == this->data->root)
+  if (nullptr == this->dataPtr->root)
   {
     ignerr << "Failed to scale skeleton, null root." << std::endl;
     return;
   }
 
   //  scale skeleton structure
-  for (SkeletonNodeMap::iterator iter = this->data->nodes.begin();
-       iter != this->data->nodes.end(); ++iter)
+  for (SkeletonNodeMap::iterator iter = this->dataPtr->nodes.begin();
+       iter != this->dataPtr->nodes.end(); ++iter)
   {
     SkeletonNode *node = iter->second;
     math::Matrix4d trans = node->Transform();
@@ -177,18 +175,18 @@ void Skeleton::Scale(const double _scale)
   }
 
   //  update the nodes' model transforms
-  this->data->root->UpdateChildrenTransforms();
+  this->dataPtr->root->UpdateChildrenTransforms();
 
   //  scale the animation data
-  for (unsigned int i = 0; i < this->data->anims.size(); ++i)
-    this->data->anims[i]->Scale(_scale);
+  for (unsigned int i = 0; i < this->dataPtr->anims.size(); ++i)
+    this->dataPtr->anims[i]->Scale(_scale);
 }
 
 //////////////////////////////////////////////////
 void Skeleton::BuildNodeMap()
 {
   std::list<SkeletonNode *> toVisit;
-  toVisit.push_front(this->data->root);
+  toVisit.push_front(this->dataPtr->root);
 
   unsigned int handle = 0;
 
@@ -204,7 +202,7 @@ void Skeleton::BuildNodeMap()
       toVisit.push_front(node->Child(i));
 
     node->Handle(handle);
-    this->data->nodes[handle] = node;
+    this->dataPtr->nodes[handle] = node;
     handle++;
   }
 }
@@ -212,20 +210,20 @@ void Skeleton::BuildNodeMap()
 //////////////////////////////////////////////////
 void Skeleton::SetBindShapeTransform(const math::Matrix4d &_trans)
 {
-  this->data->bindShapeTransform = _trans;
+  this->dataPtr->bindShapeTransform = _trans;
 }
 
 //////////////////////////////////////////////////
 math::Matrix4d Skeleton::BindShapeTransform() const
 {
-  return this->data->bindShapeTransform;
+  return this->dataPtr->bindShapeTransform;
 }
 
 //////////////////////////////////////////////////
 void Skeleton::PrintTransforms() const
 {
   for (SkeletonNodeMap::const_iterator iter =
-      this->data->nodes.begin(); iter != this->data->nodes.end(); ++iter)
+      this->dataPtr->nodes.begin(); iter != this->dataPtr->nodes.end(); ++iter)
   {
     const SkeletonNode *node = iter->second;
     std::cout << "---------------\n" << node->Name() << "\n";
@@ -265,14 +263,14 @@ void Skeleton::PrintTransforms() const
 //////////////////////////////////////////////////
 const SkeletonNodeMap &Skeleton::Nodes() const
 {
-  return this->data->nodes;
+  return this->dataPtr->nodes;
 }
 
 //////////////////////////////////////////////////
 void Skeleton::SetNumVertAttached(const unsigned int _vertices)
 {
-  this->data->rawNodeWeights.clear();
-  this->data->rawNodeWeights.resize(_vertices);
+  this->dataPtr->rawNodeWeights.clear();
+  this->dataPtr->rawNodeWeights.resize(_vertices);
 }
 
 //////////////////////////////////////////////////
@@ -280,9 +278,9 @@ void Skeleton::AddVertNodeWeight(
     const unsigned int _vertex, const std::string &_node,
     const double _weight)
 {
-  if (_vertex < this->data->rawNodeWeights.size())
+  if (_vertex < this->dataPtr->rawNodeWeights.size())
   {
-    this->data->rawNodeWeights[_vertex].push_back(
+    this->dataPtr->rawNodeWeights[_vertex].push_back(
         std::make_pair(_node, _weight));
   }
 }
@@ -290,8 +288,8 @@ void Skeleton::AddVertNodeWeight(
 //////////////////////////////////////////////////
 unsigned int Skeleton::VertNodeWeightCount(const unsigned int _vertex) const
 {
-  if (_vertex < this->data->rawNodeWeights.size())
-    return this->data->rawNodeWeights[_vertex].size();
+  if (_vertex < this->dataPtr->rawNodeWeights.size())
+    return this->dataPtr->rawNodeWeights[_vertex].size();
   else
     return 0;
 }
@@ -302,10 +300,10 @@ std::pair<std::string, double> Skeleton::VertNodeWeight(
 {
   std::pair<std::string, double> result;
 
-  if (_v < this->data->rawNodeWeights.size() &&
-      _i < this->data->rawNodeWeights[_v].size())
+  if (_v < this->dataPtr->rawNodeWeights.size() &&
+      _i < this->dataPtr->rawNodeWeights[_v].size())
   {
-    result = this->data->rawNodeWeights[_v][_i];
+    result = this->dataPtr->rawNodeWeights[_v][_i];
   }
 
   return result;
@@ -314,14 +312,14 @@ std::pair<std::string, double> Skeleton::VertNodeWeight(
 //////////////////////////////////////////////////
 unsigned int Skeleton::AnimationCount() const
 {
-  return this->data->anims.size();
+  return this->dataPtr->anims.size();
 }
 
 //////////////////////////////////////////////////
 SkeletonAnimation *Skeleton::Animation(const unsigned int _i) const
 {
-  if (_i < this->data->anims.size())
-    return this->data->anims[_i];
+  if (_i < this->dataPtr->anims.size())
+    return this->dataPtr->anims[_i];
   else
     return NULL;
 }
@@ -329,10 +327,11 @@ SkeletonAnimation *Skeleton::Animation(const unsigned int _i) const
 //////////////////////////////////////////////////
 void Skeleton::AddAnimation(SkeletonAnimation *_anim)
 {
-  this->data->mapAnimSkin.push_back(std::map<std::string, std::string>());
-  this->data->alignTranslate.push_back(std::map<std::string, math::Matrix4d>());
-  this->data->alignRotate.push_back(std::map<std::string, math::Matrix4d>());
-  this->data->anims.push_back(_anim);
+  this->dataPtr->mapAnimSkin.push_back(std::map<std::string, std::string>());
+  this->dataPtr->alignTranslate.push_back(
+      std::map<std::string, math::Matrix4d>());
+  this->dataPtr->alignRotate.push_back(std::map<std::string, math::Matrix4d>());
+  this->dataPtr->anims.push_back(_anim);
 }
 
 //////////////////////////////////////////////////
@@ -463,10 +462,10 @@ bool Skeleton::AddBvhAnimation(const std::string &_bvhFile, double _scale)
           * math::Matrix4d(skinNode->Transform().Rotation());
   }
 
-  this->data->anims.push_back(skel->Animation(0u));
-  this->data->mapAnimSkin.push_back(skelMap);
-  this->data->alignTranslate.push_back(translations);
-  this->data->alignRotate.push_back(rotations);
+  this->dataPtr->anims.push_back(skel->Animation(0u));
+  this->dataPtr->mapAnimSkin.push_back(skelMap);
+  this->dataPtr->alignTranslate.push_back(translations);
+  this->dataPtr->alignRotate.push_back(rotations);
 
   return true;
 }
@@ -475,10 +474,10 @@ bool Skeleton::AddBvhAnimation(const std::string &_bvhFile, double _scale)
 std::string Skeleton::NodeNameAnimToSkin(unsigned int _index,
       const std::string &_animNodeName)
 {
-  if (this->data->mapAnimSkin[_index].find(_animNodeName)
-        != this->data->mapAnimSkin[_index].end())
+  if (this->dataPtr->mapAnimSkin[_index].find(_animNodeName)
+        != this->dataPtr->mapAnimSkin[_index].end())
   {
-    return this->data->mapAnimSkin[_index][_animNodeName];
+    return this->dataPtr->mapAnimSkin[_index][_animNodeName];
   }
   return _animNodeName;
 }
@@ -487,10 +486,10 @@ std::string Skeleton::NodeNameAnimToSkin(unsigned int _index,
 math::Matrix4d Skeleton::AlignTranslation(unsigned int _index,
       const std::string &_animNodeName)
 {
-  if (this->data->alignTranslate[_index].find(_animNodeName)
-        != this->data->alignTranslate[_index].end())
+  if (this->dataPtr->alignTranslate[_index].find(_animNodeName)
+        != this->dataPtr->alignTranslate[_index].end())
   {
-    return this->data->alignTranslate[_index][_animNodeName];
+    return this->dataPtr->alignTranslate[_index][_animNodeName];
   }
   return math::Matrix4d::Identity;
 }
@@ -499,10 +498,10 @@ math::Matrix4d Skeleton::AlignTranslation(unsigned int _index,
 math::Matrix4d Skeleton::AlignRotation(unsigned int _index,
       const std::string &_animNodeName)
 {
-  if (this->data->alignRotate[_index].find(_animNodeName)
-        != this->data->alignRotate[_index].end())
+  if (this->dataPtr->alignRotate[_index].find(_animNodeName)
+        != this->dataPtr->alignRotate[_index].end())
   {
-    return this->data->alignRotate[_index][_animNodeName];
+    return this->dataPtr->alignRotate[_index][_animNodeName];
   }
   return math::Matrix4d::Identity;
 }

@@ -69,7 +69,7 @@ static void LogTinyXml2DocumentError(
 }
 
 /// Private data for the ColladaExporter class
-class ignition::common::ColladaExporterPrivate
+class ignition::common::ColladaExporter::Implementation
 {
   /// \brief Geometry types
   public: enum GeometryType {POSITION, NORMAL, UVMAP};
@@ -141,7 +141,7 @@ class ignition::common::ColladaExporterPrivate
 
 //////////////////////////////////////////////////
 ColladaExporter::ColladaExporter()
-: MeshExporter(), dataPtr(new ColladaExporterPrivate)
+: MeshExporter(), dataPtr(ignition::utils::MakeImpl<Implementation>())
 {
 }
 
@@ -276,7 +276,8 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
 }
 
 //////////////////////////////////////////////////
-void ColladaExporterPrivate::ExportAsset(tinyxml2::XMLElement *_assetXml)
+void ColladaExporter::Implementation::ExportAsset(
+    tinyxml2::XMLElement *_assetXml)
 {
   tinyxml2::XMLElement *unitXml = _assetXml->GetDocument()->NewElement("unit");
   unitXml->SetAttribute("meter", "1");
@@ -290,7 +291,7 @@ void ColladaExporterPrivate::ExportAsset(tinyxml2::XMLElement *_assetXml)
 }
 
 //////////////////////////////////////////////////
-void ColladaExporterPrivate::ExportGeometrySource(
+void ColladaExporter::Implementation::ExportGeometrySource(
     const ignition::common::SubMesh *_subMesh,
     tinyxml2::XMLElement *_meshXml, GeometryType _type, const char *_meshID)
 {
@@ -395,7 +396,7 @@ void ColladaExporterPrivate::ExportGeometrySource(
 }
 
 //////////////////////////////////////////////////
-void ColladaExporterPrivate::ExportGeometries(
+void ColladaExporter::Implementation::ExportGeometries(
     tinyxml2::XMLElement *_libraryGeometriesXml)
 {
   for (unsigned int i = 0; i < this->subMeshCount; ++i)
@@ -497,7 +498,7 @@ void ColladaExporterPrivate::ExportGeometries(
 }
 
 //////////////////////////////////////////////////
-int ColladaExporterPrivate::ExportImages(
+int ColladaExporter::Implementation::ExportImages(
     tinyxml2::XMLElement *_libraryImagesXml)
 {
   int imageCount = 0;
@@ -544,7 +545,7 @@ int ColladaExporterPrivate::ExportImages(
 }
 
 //////////////////////////////////////////////////
-void ColladaExporterPrivate::ExportMaterials(
+void ColladaExporter::Implementation::ExportMaterials(
     tinyxml2::XMLElement *_libraryMaterialsXml)
 {
   for (unsigned int i = 0; i < this->materialCount; ++i)
@@ -566,7 +567,7 @@ void ColladaExporterPrivate::ExportMaterials(
 }
 
 //////////////////////////////////////////////////
-void ColladaExporterPrivate::ExportEffects(
+void ColladaExporter::Implementation::ExportEffects(
     tinyxml2::XMLElement *_libraryEffectsXml)
 {
   for (unsigned int i = 0; i < this->materialCount; ++i)
@@ -752,7 +753,7 @@ void ColladaExporterPrivate::ExportEffects(
 }
 
 //////////////////////////////////////////////////
-void ColladaExporterPrivate::ExportVisualScenes(
+void ColladaExporter::Implementation::ExportVisualScenes(
     tinyxml2::XMLElement *_libraryVisualScenesXml,
     const std::vector<math::Matrix4d> &_submeshToMatrix)
 {
@@ -840,7 +841,8 @@ void ColladaExporterPrivate::ExportVisualScenes(
 }
 
 //////////////////////////////////////////////////
-void ColladaExporterPrivate::ExportScene(tinyxml2::XMLElement *_sceneXml)
+void ColladaExporter::Implementation::ExportScene(
+    tinyxml2::XMLElement *_sceneXml)
 {
   tinyxml2::XMLElement *instanceVisualSceneXml =
       _sceneXml->GetDocument()->NewElement("instance_visual_scene");

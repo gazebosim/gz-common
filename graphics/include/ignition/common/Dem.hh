@@ -22,7 +22,8 @@
 #include <ignition/math/Angle.hh>
 
 #include <ignition/common/graphics/Export.hh>
-#include <ignition/common/SuppressWarning.hh>
+
+#include <ignition/utils/ImplPtr.hh>
 
 #ifdef HAVE_GDAL
 # include <string>
@@ -34,8 +35,6 @@ namespace ignition
 {
   namespace common
   {
-    class DemPrivate;
-
     /// \class DEM DEM.hh common/common.hh
     /// \brief Encapsulates a DEM (Digital Elevation Model) file.
     class IGNITION_COMMON_GRAPHICS_VISIBLE Dem : public HeightmapData
@@ -131,11 +130,9 @@ namespace ignition
       /// \return 0 when the operation succeeds to open a file.
       private: int LoadData();
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// internal
       /// \brief Pointer to the private data.
-      private: std::unique_ptr<DemPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      IGN_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

@@ -30,7 +30,7 @@ using namespace ignition;
 using namespace common;
 
 /// \brief Private data for Mesh
-class ignition::common::MeshPrivate
+class ignition::common::Mesh::Implementation
 {
   /// \brief The name of the mesh
   public: std::string name;
@@ -50,7 +50,7 @@ class ignition::common::MeshPrivate
 
 //////////////////////////////////////////////////
 Mesh::Mesh()
-: dataPtr(new MeshPrivate)
+: dataPtr(ignition::utils::MakeUniqueImpl<Implementation>())
 {
   this->dataPtr->name = "unknown";
   this->dataPtr->skeleton = NULL;
@@ -59,7 +59,6 @@ Mesh::Mesh()
 //////////////////////////////////////////////////
 Mesh::~Mesh()
 {
-  this->dataPtr->materials.clear();
 }
 
 //////////////////////////////////////////////////

@@ -30,10 +30,11 @@
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Pose3.hh>
 
+#include <ignition/utils/ImplPtr.hh>
+
 #include <ignition/common/graphics/Types.hh>
 #include <ignition/common/SingletonT.hh>
 #include <ignition/common/graphics/Export.hh>
-#include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
 {
@@ -42,7 +43,6 @@ namespace ignition
     /// \brief forward declaration
     class Mesh;
     class SubMesh;
-    class MeshManagerPrivate;
 
     /// \class MeshManager MeshManager.hh ignition/common/MeshManager.hh
     /// \brief Maintains and manages all meshes
@@ -284,10 +284,8 @@ namespace ignition
                       const ignition::math::Vector2d &_p,
                       const double _tol);
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
-      /// \brief Pointer to private data
-      private: std::unique_ptr<MeshManagerPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      /// \brief Private data pointer.
+      IGN_UTILS_UNIQUE_IMPL_PTR(dataPtr)
 
       /// \brief Singleton implementation
       private: friend class SingletonT<MeshManager>;
