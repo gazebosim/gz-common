@@ -18,6 +18,7 @@
 #include <memory>
 
 #include "ignition/common/Console.hh"
+#include "ignition/common/Filesystem.hh"
 #include "ignition/common/Material.hh"
 #include "ignition/common/Mesh.hh"
 #include "ignition/common/SubMesh.hh"
@@ -56,11 +57,7 @@ OBJLoader::~OBJLoader()
 Mesh *OBJLoader::Load(const std::string &_filename)
 {
   std::map<std::string, Material *> materialIds;
-
-  std::string path;
-  size_t idx = _filename.rfind('/');
-  if (idx != std::string::npos)
-    path = _filename.substr(0, idx+1);
+  std::string path = common::parentPath(_filename);
 
   tinyobj::attrib_t attrib;
   std::vector<tinyobj::shape_t> shapes;
