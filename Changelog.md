@@ -1,6 +1,35 @@
 ## Ignition Common 4.x
 
-## Ignition Common 4.x.x (2019-XX-XX)
+## Ignition Common 4.X.X
+
+## Ignition Common 4.0.0 (2021-03-22)
+
+1. Rotate capsule to Z-up
+    * [Pull request #186](https://github.com/ignitionrobotics/ign-common/pull/186)
+
+1. Add implementation pointer to ign-common classes 
+    * [Pull request #163](https://github.com/ignitionrobotics/ign-common/pull/163)
+
+1. Cleanup and add implementation pointer to Animation classes 
+    * [Pull request #160](https://github.com/ignitionrobotics/ign-common/pull/160)
+
+1. Install the profiler in a version-safe manner 
+    * [Pull request #170](https://github.com/ignitionrobotics/ign-common/pull/170)
+
+1. Restore support for model:// URIs 
+    * [Pull request #172](https://github.com/ignitionrobotics/ign-common/pull/172)
+
+1. Deprecated common::Time  
+    * [Pull request #90](https://github.com/ignitionrobotics/ign-common/pull/90)
+
+1. Update codeowners 
+    * [Pull request #88](https://github.com/ignitionrobotics/ign-common/pull/88)
+
+1. Workflow updates 
+    * [Pull request #64](https://github.com/ignitionrobotics/ign-common/pull/64)
+
+1. Update BitBucket Links 
+    * [Pull request #58](https://github.com/ignitionrobotics/ign-common/pull/58)
 
 1. Corrected `BAYER_RGGR8` to `BAYER_BGGR8` in `PixelFormatName` and
    `PixelFormatType` located in `graphics/include/ignition/common/Image.hh`.
