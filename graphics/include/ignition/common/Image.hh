@@ -19,6 +19,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 #include <ignition/math/Color.hh>
 #include <ignition/common/graphics/Export.hh>
 #include <ignition/common/SuppressWarning.hh>

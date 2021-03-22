@@ -142,11 +142,11 @@ void Image::SavePNGToBuffer(std::vector<unsigned char>& buffer)
 {
   FIMEMORY *hmem = FreeImage_OpenMemory();
   FreeImage_SaveToMemory(FIF_PNG, this->dataPtr->bitmap, hmem);
-  unsigned char* mem_buffer = nullptr;
-  unsigned int size_in_bytes = 0;
-  FreeImage_AcquireMemory(hmem, &mem_buffer, &size_in_bytes);
-  buffer.resize(size_in_bytes);
-  std::memcpy(buffer.data(), mem_buffer, size_in_bytes);
+  unsigned char *memBuffer = nullptr;
+  unsigned int sizeInBytes = 0;
+  FreeImage_AcquireMemory(hmem, &memBuffer, &sizeInBytes);
+  buffer.resize(sizeInBytes);
+  std::memcpy(buffer.data(), memBuffer, sizeInBytes);
   FreeImage_CloseMemory(hmem);
 }
 
