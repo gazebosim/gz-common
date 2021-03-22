@@ -540,6 +540,7 @@ bool VideoEncoder::Start(
   {
     ignerr << "Could not open video codec: " << av_err2str_cpp(ret)
           << ". Video encoding is not started\n";
+#ifdef IGN_COMMON_BUILD_HW_VIDEO
     if (AVUNERROR(ret) == ENOMEM &&
       this->dataPtr->hwEncoder->GetEncoderType() == HWEncoderType::NVENC)
     {
@@ -554,6 +555,7 @@ bool VideoEncoder::Start(
               << "HW-accelerated video encoding tasks on this computer "
               << "simultaneously.\n";
     }
+#endif
     this->Reset();
     return false;
   }

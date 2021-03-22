@@ -18,12 +18,11 @@
 #include "ignition/common/Console.hh"
 #include "ignition/common/VideoEncoder.hh"
 #include "test_config.h"
-#include "test/util.hh"
 
 using namespace ignition;
 using namespace common;
 
-class VideoEncoderTest : public ignition::testing::AutoLogFixture
+class VideoEncoderTest : public common::testing::AutoLogFixture
 {
   // Documentation inherited
   protected: void SetUp() override

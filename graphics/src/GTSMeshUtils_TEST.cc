@@ -22,11 +22,10 @@
 #include "ignition/common/GTSMeshUtils.hh"
 #include "ignition/common/Mesh.hh"
 #include "ignition/common/SubMesh.hh"
-#include "test/util.hh"
 
 using namespace ignition;
 
-class GTSMeshUtils : public ignition::testing::AutoLogFixture { };
+class GTSMeshUtils : public common::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
 TEST_F(GTSMeshUtils, DelaunayTriangulation)
