@@ -919,7 +919,8 @@ void MeshManager::CreateCapsule(const std::string &_name,
 
   SubMesh subMesh;
 
-  // Based on https://github.com/godotengine/godot primitive_meshes.cpp
+  // Based on https://github.com/godotengine/godot/blob/3.2.3-stable/scene/resources/primitive_meshes.cpp
+  // Rotated to be Z-up
   int prevRow, thisRow, point;
   double x, y, z, u, v, w;
   const double oneThird = 1.0 / 3.0;
@@ -930,31 +931,33 @@ void MeshManager::CreateCapsule(const std::string &_name,
   /* top hemisphere */
   thisRow = 0;
   prevRow = 0;
-  for (unsigned int j = 0; j <= (_rings + 1); j++) {
+  for (unsigned int j = 0; j <= (_rings + 1); j++)
+  {
     v = j;
 
     v /= (_rings + 1);
     w = sin(0.5 * IGN_PI * v);
-    y = _radius * cos(0.5 * IGN_PI * v);
+    z = _radius * cos(0.5 * IGN_PI * v);
 
-    for (unsigned int i = 0; i <= _segments; i++) {
+    for (unsigned int i = 0; i <= _segments; i++)
+    {
       u = i;
       u /= _segments;
 
       x = -sin(u * (IGN_PI * 2.0));
-      z = cos(u * (IGN_PI * 2.0));
+      y = cos(u * (IGN_PI * 2.0));
 
-      ignition::math::Vector3d p(
-      x * _radius * w, y, -z * _radius * w);
+      ignition::math::Vector3d p(x * _radius * w, y * _radius * w, z);
       // Compute vertex
       subMesh.AddVertex(ignition::math::Vector3d(
-        p + ignition::math::Vector3d(0.0, 0.5 * _length, 0.0)));
+        p + ignition::math::Vector3d(0.0, 0.0, 0.5 * _length)));
       subMesh.AddTexCoord({u, v * oneThird});
       subMesh.AddNormal(p.Normalize());
 
       point++;
 
-      if (i > 0 && j > 0) {
+      if (i > 0 && j > 0)
+      {
         subMesh.AddIndex(thisRow + i - 1);
         subMesh.AddIndex(prevRow + i);
         subMesh.AddIndex(prevRow + i - 1);
@@ -971,30 +974,32 @@ void MeshManager::CreateCapsule(const std::string &_name,
   /* cylinder */
   thisRow = point;
   prevRow = 0;
-  for (unsigned int j = 0; j <= (_rings + 1); j++) {
+  for (unsigned int j = 0; j <= (_rings + 1); j++)
+  {
     v = j;
     v /= (_rings + 1);
 
-    y = _length * v;
-    y = (_length * 0.5) - y;
+    z = _length * v;
+    z = (_length * 0.5) - z;
 
-    for (unsigned int i = 0; i <= _segments; i++) {
+    for (unsigned int i = 0; i <= _segments; i++)
+    {
       u = i;
       u /= _segments;
 
       x = -sin(u * (IGN_PI * 2.0));
-      z = cos(u * (IGN_PI * 2.0));
+      y = cos(u * (IGN_PI * 2.0));
 
-      ignition::math::Vector3d p(
-      x * _radius, y, -z * _radius);
+      ignition::math::Vector3d p(x * _radius, y * _radius, z);
 
       // Compute vertex
       subMesh.AddVertex(p);
       subMesh.AddTexCoord({u, oneThird + (v * oneThird)});
-      subMesh.AddNormal(ignition::math::Vector3d(x, 0.0, -z));
+      subMesh.AddNormal(ignition::math::Vector3d(x, y, 0.0));
       point++;
 
-      if (i > 0 && j > 0) {
+      if (i > 0 && j > 0)
+      {
         subMesh.AddIndex(thisRow + i - 1);
         subMesh.AddIndex(prevRow + i);
         subMesh.AddIndex(prevRow + i - 1);
@@ -1011,31 +1016,33 @@ void MeshManager::CreateCapsule(const std::string &_name,
   /* bottom hemisphere */
   thisRow = point;
   prevRow = 0;
-  for (unsigned int j = 0; j <= (_rings + 1); j++) {
+  for (unsigned int j = 0; j <= (_rings + 1); j++)
+  {
     v = j;
 
     v /= (_rings + 1);
     v += 1.0;
     w = sin(0.5 * IGN_PI * v);
-    y = _radius * cos(0.5 * IGN_PI * v);
+    z = _radius * cos(0.5 * IGN_PI * v);
 
-    for (unsigned int i = 0; i <= _segments; i++) {
+    for (unsigned int i = 0; i <= _segments; i++)
+    {
       double u2 = static_cast<double>(i);
       u2 /= _segments;
 
       x = -sin(u2 * (IGN_PI * 2.0));
-      z = cos(u2 * (IGN_PI * 2.0));
+      y = cos(u2 * (IGN_PI * 2.0));
 
-      ignition::math::Vector3d p(
-      x * _radius * w, y, -z * _radius * w);
+      ignition::math::Vector3d p(x * _radius * w, y * _radius * w, z);
       // Compute vertex
       subMesh.AddVertex(ignition::math::Vector3d(
-        p + ignition::math::Vector3d(0.0, -0.5 * _length, 0.0)));
+        p + ignition::math::Vector3d(0.0, 0.0, -0.5 * _length)));
       subMesh.AddTexCoord({u2, twoThirds + ((v - 1.0) * oneThird)});
       subMesh.AddNormal(p.Normalize());
       point++;
 
-      if (i > 0 && j > 0) {
+      if (i > 0 && j > 0)
+      {
         subMesh.AddIndex(thisRow + i - 1);
         subMesh.AddIndex(prevRow + i);
         subMesh.AddIndex(prevRow + i - 1);

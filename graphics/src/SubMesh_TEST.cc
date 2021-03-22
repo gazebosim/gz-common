@@ -421,7 +421,7 @@ TEST_F(SubMeshTest, Volume)
     checkIndexes(unitEllipsoid2);
 
     // The new mesh should have more vertex, but it should be introduced in the
-    // meshmanager. It should be the same number becuase it was not modified.
+    // meshmanager. It should be the same number because it was not modified.
     EXPECT_EQ(unitEllipsoid->VertexCount(), unitEllipsoid2->VertexCount());
 
     // A larger cylinder needs to have higher resolution in order to get the
@@ -452,7 +452,7 @@ TEST_F(SubMeshTest, Volume)
       common::MeshManager::Instance()->MeshByName("capsule");
 
     // the new mesh should have more vertex, but it should be introduced in the
-    // meshmanager. It should be the same number becuase it was not modified.
+    // meshmanager. It should be the same number because it was not modified.
     EXPECT_EQ(unitCapsule->VertexCount(), unitCapsule2->VertexCount());
 
     common::MeshManager::Instance()->CreateCapsule("other_capsule",
