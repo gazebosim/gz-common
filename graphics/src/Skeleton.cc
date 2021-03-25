@@ -30,7 +30,7 @@ class ignition::common::Skeleton::Implementation
     RawNodeWeights;
 
   /// \brief the root node
-  public: SkeletonNode *root;
+  public: SkeletonNode *root{nullptr};
 
   /// \brief The dictionary of nodes, indexed by name
   public: SkeletonNodeMap nodes;
@@ -68,7 +68,6 @@ class ignition::common::Skeleton::Implementation
 Skeleton::Skeleton()
 : dataPtr(ignition::utils::MakeUniqueImpl<Implementation>())
 {
-  this->dataPtr->root = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -82,10 +81,13 @@ Skeleton::Skeleton(SkeletonNode *_root)
 //////////////////////////////////////////////////
 Skeleton::~Skeleton()
 {
-  for (auto& kv : this->dataPtr->nodes)
+  for (auto &kv : this->dataPtr->nodes)
     delete kv.second;
-  for (auto& a : this->dataPtr->anims)
+  this->dataPtr->nodes.clear();
+
+  for (auto &a : this->dataPtr->anims)
     delete a;
+  this->dataPtr->anims.clear();
 }
 
 //////////////////////////////////////////////////
@@ -462,7 +464,10 @@ bool Skeleton::AddBvhAnimation(const std::string &_bvhFile, double _scale)
           * math::Matrix4d(skinNode->Transform().Rotation());
   }
 
-  this->dataPtr->anims.push_back(skel->Animation(0u));
+  // Copy pointer from temp skeleton before it's deleted
+  auto newAnim = new SkeletonAnimation(skel->Animation(0u)->Name());
+  *newAnim = *skel->Animation(0u);
+  this->dataPtr->anims.push_back(newAnim);
   this->dataPtr->mapAnimSkin.push_back(skelMap);
   this->dataPtr->alignTranslate.push_back(translations);
   this->dataPtr->alignRotate.push_back(rotations);
