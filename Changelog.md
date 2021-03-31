@@ -2,7 +2,10 @@
 
 ## Ignition Common 4.X.X
 
-## Ignition Common 4.0.0 (2021-03-22)
+## Ignition Common 4.0.0 (2021-03-30)
+
+1. Include windows instructions in examples README.md
+    * [Pull request #190](https://github.com/ignitionrobotics/ign-common/pull/190)
 
 1. Fix crash when using BVH animations
     * [Pull request #188](https://github.com/ignitionrobotics/ign-common/pull/188)
