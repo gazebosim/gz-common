@@ -1,6 +1,10 @@
+## Ignition Common 5.x
+
+## Ignition Common 5.0.0 (20XX-XX-XX)
+
 ## Ignition Common 4.x
 
-## Ignition Common 4.X.X
+## Ignition Common 4.X.X (20XX-XX-XX)
 
 ## Ignition Common 4.0.0 (2021-03-22)
 
