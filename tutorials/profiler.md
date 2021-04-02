@@ -60,10 +60,10 @@ enabled at compile time in order to function.
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
 # Find the ignition-common library
-find_package(ignition-common4 QUIET REQUIRED COMPONENTS profiler)
+find_package(ignition-common5 QUIET REQUIRED COMPONENTS profiler)
 
 add_executable(profiler_example profiler.cc)
-target_link_libraries(profiler_example ignition-common4::profiler)
+target_link_libraries(profiler_example ignition-common5::profiler)
 # Enable the profiler for the example
 target_compile_definitions(profiler_example PUBLIC "IGN_PROFILER_ENABLE=1")
 ```
@@ -99,10 +99,10 @@ xdg-open $SOURCE_DIR/ign-common/profiler/src/Remotery/vis/index.html
 
 # Use the installation path (Linux)
 # This may vary depending on where you have choosen to install
-xdg-open /usr/share/ignition/ignition-common4/profiler_vis/index.html
+xdg-open /usr/share/ignition/ignition-common5/profiler_vis/index.html
 
 # Use the installation path (macOS)
-open /usr/share/ignition/ignition-common4/profiler_vis/index.html
+open /usr/share/ignition/ignition-common5/profiler_vis/index.html
 ```
 
 ### On Ignition library
