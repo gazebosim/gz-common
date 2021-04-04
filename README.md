@@ -56,7 +56,7 @@ callback system.
 
 # Install
 
-See the [installation tutorial](https://ignitionrobotics.org/api/common/3.9/tutorials.html).
+See the [installation tutorial](https://ignitionrobotics.org/api/common/4.0/tutorials.html).
 
 # Usage
 
