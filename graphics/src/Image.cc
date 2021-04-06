@@ -151,7 +151,11 @@ void Image::SavePNGToBuffer(std::vector<unsigned char>& buffer)
   FIMEMORY *hmem = FreeImage_OpenMemory();
   FreeImage_SaveToMemory(FIF_PNG, this->dataPtr->bitmap, hmem);
   unsigned char *memBuffer = nullptr;
+#ifndef _WIN32
   unsigned int sizeInBytes = 0;
+#else
+  DWORD sizeInBytes = 0;
+#endif
   FreeImage_AcquireMemory(hmem, &memBuffer, &sizeInBytes);
   buffer.resize(sizeInBytes);
   std::memcpy(buffer.data(), memBuffer, sizeInBytes);
