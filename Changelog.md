@@ -1,6 +1,23 @@
 ## Ignition Common 3.x
 
-## Ignition Common 3.X.X
+## Ignition Common 3.xx.x (2021-xx-xx)
+
+## Ignition Common 3.12.0 (2021-04-06)
+
+1. Remove use of _SOURCE and _BINARY dirs in tests.
+    * [Pull request #158](https://github.com/ignitionrobotics/ign-common/pull/158)
+
+1. Add bazel buildsystem support.
+    * [Pull request #123](https://github.com/ignitionrobotics/ign-common/pull/123)
+
+1. Use matching malloc/free for AudioDecoder.
+    * [Pull request #192](https://github.com/ignitionrobotics/ign-common/pull/192)
+
+1. Fixed tutorial link in the README.md.
+    * [Pull request #194](https://github.com/ignitionrobotics/ign-common/pull/194)
+
+1. Added function to serialize compressed image to buffer.
+    * [Pull request #139](https://github.com/ignitionrobotics/ign-common/pull/139)
 
 ## Ignition Common 3.11.1 (2021-03-08)
 
