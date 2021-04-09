@@ -185,12 +185,6 @@ namespace ignition
     std::string IGNITION_COMMON_VISIBLE sha1(
         void const *_buffer, std::size_t _byteCount);
 
-    #ifdef _MSC_VER
-      // Disable warning C4307
-      #pragma warning(push)
-      #pragma warning(disable:4307)
-    #endif
-
     /// \brief fnv1a algorithm for 64-bit platforms.
     /// \param[in] _key The input string.
     /// \return A 64-bit unsigned hash value.
@@ -204,17 +198,13 @@ namespace ignition
 
       for (auto i = 0u; i < len; ++i)
       {
-        uint8_t value = data[i];
+        uint8_t value = static_cast<uint8_t>(data[i]);
         hash = hash ^ value;
         hash *= prime;
       }
 
       return hash;
     }
-
-    #ifdef _MSC_VER
-      #pragma warning(pop)
-    #endif
 
     /// \brief Find the environment variable '_name' and return its value.
     ///
