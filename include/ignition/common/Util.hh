@@ -186,6 +186,8 @@ namespace ignition
         void const *_buffer, std::size_t _byteCount);
 
     #ifdef _MSC_VER
+      // Disable warning C4307
+      #pragma warning(push)
       #pragma warning(disable:4307)
     #endif
 
