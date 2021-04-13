@@ -389,9 +389,13 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
   tinyxml2::XMLDocument xmlDoc;
 
   this->dataPtr->path.clear();
-  if (_filename.rfind('/') != std::string::npos)
+  std::string separator("/");
+#ifdef WIN32
+  separator = std::string("\\");
+#endif
+  if (_filename.rfind(separator) != std::string::npos)
   {
-    this->dataPtr->path = _filename.substr(0, _filename.rfind('/'));
+    this->dataPtr->path = _filename.substr(0, _filename.rfind(separator));
   }
 
   this->dataPtr->filename = _filename;
