@@ -69,7 +69,7 @@ TEST(AudioDecoder, DataBuffer)
   EXPECT_TRUE(audio.Decode(&dataBuffer, &dataBufferSize));
 
   unsigned int dataBufferSize2;
-  uint8_t *dataBuffer2 = new uint8_t[5];
+  uint8_t *dataBuffer2 = static_cast<uint8_t *>(malloc(5));
   EXPECT_TRUE(audio.Decode(&dataBuffer2, &dataBufferSize2));
 
   EXPECT_EQ(dataBufferSize2, dataBufferSize);

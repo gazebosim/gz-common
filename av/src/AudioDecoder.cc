@@ -98,7 +98,7 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
 
   if (*_outBuffer)
   {
-    delete [] *_outBuffer;
+    free(*_outBuffer);
     *_outBuffer = nullptr;
   }
 

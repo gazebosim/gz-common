@@ -19,6 +19,7 @@
 #include <cstring>
 #include <list>
 #include <map>
+#include <regex>
 #include <string>
 
 #include "ignition/common/Console.hh"
@@ -604,6 +605,12 @@ URI::URI()
 URI::URI(const std::string &_str)
   : URI()
 {
+  std::string str = _str;
+  if ((str.size() > 7 && 0 == str.compare(0, 7, "http://")) ||
+      (str.size() > 8 && 0 == str.compare(0, 8, "https://")))
+  {
+    str = std::regex_replace(str, std::regex(R"(\\)"), "/");
+  }
   this->Parse(_str);
 }
 
