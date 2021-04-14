@@ -230,10 +230,17 @@ std::string ignition::common::joinPaths(const std::string &_path1,
   // +1 for directory separator, +1 for the ending \0 character
   std::vector<CHAR> combined(_path1.length() + _path2.length() + 2);
   // TODO(anyone): Switch to PathAllocCombine once switched to wide strings
+  std::string path;
   if (::PathCombineA(combined.data(), _path1.c_str(), _path2.c_str()) != NULL)
-    return std::string(combined.data());
+    path = checkWindowsPath(std::string(combined.data()));
   else
-    return separator(_path1) + _path2;
+    path = checkWindowsPath(separator(_path1) + _path1);
+  // avoid duplicated '/' at the beginning/end of the string
+  if (path[0] == '/')
+      path.erase(0, 1);
+  if(path[path.length()-1] == '/')
+      path.erase(path.length()-1, 1);
+  return path;
 #endif  // _WIN32
 }
 
