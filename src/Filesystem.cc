@@ -260,6 +260,8 @@ std::string ignition::common::joinPaths(const std::string &_path1,
   std::string path;
 #ifndef _WIN32
   path = separator(_path1) + _path2;
+  if(path[path.length()-1] == '/')
+      path.erase(path.length()-1, 1);
 #else  // _WIN32
   // std::string path1 = checkWindowsPath(_path1);
   // std::string path2 = checkWindowsPath(_path2);
@@ -271,11 +273,11 @@ std::string ignition::common::joinPaths(const std::string &_path1,
   else
     path = checkWindowsPath(separator(_path1) + _path1);
   // avoid duplicated '/' at the beginning/end of the string
-  if (path[0] == '/')
+  if (path[0] == '\\')
       path.erase(0, 1);
+  if(path[path.length()-1] == '\\')
+      path.erase(path.length()-1, 1);
 #endif  // _WIN32
-  if (path[path.length()-1] == '/')
-    path.erase(path.length()-1, 1);
   return path;
 }
 
