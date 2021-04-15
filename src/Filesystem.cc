@@ -274,8 +274,8 @@ std::string ignition::common::joinPaths(const std::string &_path1,
   if (path[0] == '/')
       path.erase(0, 1);
 #endif  // _WIN32
-  if(path[path.length()-1] == '/')
-      path.erase(path.length()-1, 1);
+  if (path[path.length()-1] == '/')
+    path.erase(path.length()-1, 1);
   return path;
 }
 
