@@ -261,7 +261,7 @@ std::string ignition::common::joinPaths(const std::string &_path1,
   auto sanitizeSlashes = [](const std::string &_path, bool is_windows = false)
   {
     std::string result = _path;
-    if (is_windows && !result.empty() && result[0] == '\\')
+    if (is_windows && !result.empty() && (result[0] == '\\' || result[0] == '/' ))
     {
         result.erase(0, 1);
     }
