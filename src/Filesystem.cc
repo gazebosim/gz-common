@@ -266,7 +266,7 @@ std::string ignition::common::joinPaths(const std::string &_path1,
     {
         result.erase(0, 1);
     }
-    if(!result.empty() &&
+    if (!result.empty() &&
       (result[result.length()-1] == '/' || result[result.length()-1] == '\\'))
     {
         result.erase(result.length()-1, 1);
