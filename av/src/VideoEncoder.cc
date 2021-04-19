@@ -798,7 +798,6 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
 #else
 
     AVPacket* avPacket = av_packet_alloc();
-    av_init_packet(avPacket);
 
     avPacket->data = nullptr;
     avPacket->size = 0;
@@ -892,7 +891,6 @@ bool VideoEncoder::Stop()
     if (ret >= 0)
     {
       AVPacket *avPacket = av_packet_alloc();
-      av_init_packet(avPacket);
       avPacket->data = nullptr;
       avPacket->size = 0;
 
