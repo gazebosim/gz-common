@@ -340,7 +340,7 @@ TEST_F(ImageTest, ConvertToRGBImage)
     uint8_t *buffer = new uint8_t[size];
     for (unsigned int i = 0; i < height; ++i)
     {
-      uint8_t v = 10 * static_cast<int>(i / (width/ 4.0) + 1) ;
+      uint8_t v = 10 * static_cast<int>(i / (width/ 4.0) + 1);
       for (unsigned int j = 0; j < width; ++j)
       {
         buffer[i*width + j] = v;
@@ -386,7 +386,7 @@ TEST_F(ImageTest, ConvertToRGBImage)
     uint16_t *buffer = new uint16_t[size];
     for (unsigned int i = 0; i < height; ++i)
     {
-      uint16_t v = 100 * static_cast<int>(i / (height / 4.0) + 1) ;
+      uint16_t v = 100 * static_cast<int>(i / (height / 4.0) + 1);
       for (unsigned int j = 0; j < width; ++j)
       {
         buffer[i*width + j] = v;
@@ -433,7 +433,7 @@ TEST_F(ImageTest, ConvertToRGBImage)
     float *buffer = new float[size];
     for (unsigned int i = 0; i < height; ++i)
     {
-      float v = 0.5f * static_cast<int>(i / (height / 4.0) + 1) ;
+      float v = 0.5f * static_cast<int>(i / (height / 4.0) + 1);
       for (unsigned int j = 0; j < width; ++j)
       {
         buffer[i*width + j] = v;
@@ -480,7 +480,7 @@ TEST_F(ImageTest, ConvertToRGBImage)
     float *buffer = new float[size];
     for (unsigned int i = 0; i < height; ++i)
     {
-      float v = 0.5f * static_cast<int>(i / (height / 4.0) + 1) ;
+      float v = 0.5f * static_cast<int>(i / (height / 4.0) + 1);
       for (unsigned int j = 0; j < width; ++j)
       {
         buffer[i*width + j] = v;
