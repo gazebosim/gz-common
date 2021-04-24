@@ -223,9 +223,12 @@ namespace ignition
           for (unsigned int i = 0; i < samples; ++i)
           {
             T v = static_cast<T>(buffer[i]);
-            if (v > max && !std::isinf(v))
+            // ignore inf values when computing min/max
+            // cast to float when calling isinf to avoid compile error on
+            // windows
+            if (v > max && !std::isinf(static_cast<float>(v)))
               max = v;
-            if (v < min && !std::isinf(v))
+            if (v < min && !std::isinf(static_cast<float>(v)))
               min = v;
           }
         }
