@@ -198,9 +198,9 @@ namespace ignition
       /// \param[out] _output Output RGB image
       /// \param[in] _min Minimum value to be used when normalizing the input
       /// image data to RGB.
-      /// \param[in] _min Maximum value to be used when normalizing the input
+      /// \param[in] _max Maximum value to be used when normalizing the input
       /// image data to RGB.
-      /// \param[in[ _flip True to flip the values after normalization, i.e.
+      /// \param[in] _flip True to flip the values after normalization, i.e.
       /// lower values are converted to brigher pixels.
       public: template<typename T>
           static void ConvertToRGBImage(const void *_data,
