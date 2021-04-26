@@ -210,10 +210,11 @@ namespace ignition
       {
         unsigned int samples = _width * _height;
         unsigned int bufferSize = samples * sizeof(T);
-        T *buffer = new T[samples];
-        memcpy(buffer, _data, bufferSize);
 
-        unsigned char *outputRgbBuffer = new unsigned char[samples * 3];
+        auto buffer = std::vector<T>(samples);
+        memcpy(buffer.data(), _data, bufferSize);
+
+        auto outputRgbBuffer = std::vector<uint8_t>(samples * 3);
 
         // use min and max values found in the data if not specified
         T min = std::numeric_limits<T>::max();
@@ -222,7 +223,7 @@ namespace ignition
         {
           for (unsigned int i = 0; i < samples; ++i)
           {
-            T v = static_cast<T>(buffer[i]);
+            auto v = buffer[i];
             // ignore inf values when computing min/max
             // cast to float when calling isinf to avoid compile error on
             // windows
@@ -245,8 +246,8 @@ namespace ignition
         {
           for (unsigned int i = 0; i < _width; ++i)
           {
-            T v = static_cast<T>(buffer[idx++]);
-            double t = static_cast<double>(v-min) / range;
+            auto v = buffer[idx++];
+            double t = static_cast<double>(v - min) / range;
             if (_flip)
               t = 1.0 - t;
             uint8_t r = static_cast<uint8_t>(255*t);
@@ -256,9 +257,7 @@ namespace ignition
             outputRgbBuffer[outIdx + 2] = r;
           }
         }
-        _output.SetFromData(outputRgbBuffer, _width, _height, RGB_INT8);
-        delete [] outputRgbBuffer;
-        delete [] buffer;
+        _output.SetFromData(outputRgbBuffer.data(), _width, _height, RGB_INT8);
       }
 
       IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
