@@ -2,6 +2,20 @@
 
 ## Ignition Common 3.X.X
 
+## Ignition Common 3.13.0 (2021-04-27)
+
+1. Add function to convert single channel image data to RGB image 
+    * [Pull request #205](https://github.com/ignitionrobotics/ign-common/pull/205)
+
+1. Avoid duplication of / in joinPaths (Windows)
+    * [Pull request #201](https://github.com/ignitionrobotics/ign-common/pull/201)
+
+1. Fix colladaLoader on Windows 
+    * [Pull request #200](https://github.com/ignitionrobotics/ign-common/pull/200)
+
+1. Improved Windows support 
+    * [Pull request #197](https://github.com/ignitionrobotics/ign-common/pull/197)
+
 ## Ignition Common 3.12.0 (2021-04-06)
 
 1. Remove use of _SOURCE and _BINARY dirs in tests.
