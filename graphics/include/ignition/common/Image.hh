@@ -17,6 +17,7 @@
 #ifndef IGNITION_COMMON_IMAGE_HH_
 #define IGNITION_COMMON_IMAGE_HH_
 
+#include <limits>
 #include <memory>
 #include <string>
 #include <vector>
@@ -184,6 +185,80 @@ namespace ignition
       /// \brief Returns whether this is a valid image
       /// \return true if image has a bitmap
       public: bool Valid() const;
+
+      /// \brief Convert a single channel image data buffer into an RGB image.
+      /// During the conversion, the input image data are normalized to 8 bit
+      /// values i.e. [0, 255]. Optionally, specify min and max values to use
+      /// when normalizing the input image data. For example, if min and max
+      /// are set to 1 and 10, a data value 2 will be normalized to:
+      ///    (2 - 1) / (10 - 1) * 255.
+      /// \param[in] _data input image data buffer
+      /// \param[in] _width image width
+      /// \param[in] _height image height
+      /// \param[out] _output Output RGB image
+      /// \param[in] _min Minimum value to be used when normalizing the input
+      /// image data to RGB.
+      /// \param[in] _max Maximum value to be used when normalizing the input
+      /// image data to RGB.
+      /// \param[in] _flip True to flip the values after normalization, i.e.
+      /// lower values are converted to brigher pixels.
+      public: template<typename T>
+          static void ConvertToRGBImage(const void *_data,
+          unsigned int _width, unsigned int _height, Image &_output,
+          T _min = std::numeric_limits<T>::max(),
+          T _max = std::numeric_limits<T>::lowest(), bool _flip = false)
+      {
+        unsigned int samples = _width * _height;
+        unsigned int bufferSize = samples * sizeof(T);
+
+        auto buffer = std::vector<T>(samples);
+        memcpy(buffer.data(), _data, bufferSize);
+
+        auto outputRgbBuffer = std::vector<uint8_t>(samples * 3);
+
+        // use min and max values found in the data if not specified
+        T min = std::numeric_limits<T>::max();
+        T max = std::numeric_limits<T>::lowest();
+        if (_min > max)
+        {
+          for (unsigned int i = 0; i < samples; ++i)
+          {
+            auto v = buffer[i];
+            // ignore inf values when computing min/max
+            // cast to float when calling isinf to avoid compile error on
+            // windows
+            if (v > max && !std::isinf(static_cast<float>(v)))
+              max = v;
+            if (v < min && !std::isinf(static_cast<float>(v)))
+              min = v;
+          }
+        }
+        min = math::equal(_min, std::numeric_limits<T>::max()) ? min : _min;
+        max = math::equal(_max, std::numeric_limits<T>::lowest()) ? max : _max;
+
+        // convert to rgb image
+        // color is grayscale, i.e. r == b == g
+        double range = static_cast<double>(max - min);
+        if (ignition::math::equal(range, 0.0))
+          range = 1.0;
+        unsigned int idx = 0;
+        for (unsigned int j = 0; j < _height; ++j)
+        {
+          for (unsigned int i = 0; i < _width; ++i)
+          {
+            auto v = buffer[idx++];
+            double t = static_cast<double>(v - min) / range;
+            if (_flip)
+              t = 1.0 - t;
+            uint8_t r = static_cast<uint8_t>(255*t);
+            unsigned int outIdx = j * _width * 3 + i * 3;
+            outputRgbBuffer[outIdx] = r;
+            outputRgbBuffer[outIdx + 1] = r;
+            outputRgbBuffer[outIdx + 2] = r;
+          }
+        }
+        _output.SetFromData(outputRgbBuffer.data(), _width, _height, RGB_INT8);
+      }
 
       IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Private data pointer
