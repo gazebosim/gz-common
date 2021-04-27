@@ -337,7 +337,7 @@ TEST_F(ImageTest, ConvertToRGBImage)
     // create sample image data for testing
     // the image is divided into 4 sections from top to bottom
     // The values in the sections are 10, 20, 30, 40
-    uint8_t *buffer = new uint8_t[size];
+    auto buffer = std::vector<uint8_t>(size);
     for (unsigned int i = 0; i < height; ++i)
     {
       uint8_t v = 10 * static_cast<int>(i / (width/ 4.0) + 1);
@@ -348,7 +348,8 @@ TEST_F(ImageTest, ConvertToRGBImage)
     }
 
     common::Image output;
-    common::Image::ConvertToRGBImage<uint8_t>(buffer, width, height, output);
+    common::Image::ConvertToRGBImage<uint8_t>(
+        buffer.data(), width, height, output);
 
     // Check RGBA data
     unsigned char *data = nullptr;
@@ -383,7 +384,7 @@ TEST_F(ImageTest, ConvertToRGBImage)
     // create sample image data for testing
     // the image is divided into 4 sections from top to bottom
     // The values in the sections are 100, 200, 300, 400
-    uint16_t *buffer = new uint16_t[size];
+    auto buffer = std::vector<uint16_t>(size);
     for (unsigned int i = 0; i < height; ++i)
     {
       uint16_t v = 100 * static_cast<int>(i / (height / 4.0) + 1);
@@ -394,7 +395,8 @@ TEST_F(ImageTest, ConvertToRGBImage)
     }
 
     common::Image output;
-    common::Image::ConvertToRGBImage<uint16_t>(buffer, width, height, output);
+    common::Image::ConvertToRGBImage<uint16_t>(
+        buffer.data(), width, height, output);
 
     // Check RGB data
     unsigned char *data = nullptr;
@@ -430,7 +432,7 @@ TEST_F(ImageTest, ConvertToRGBImage)
     // create sample image data for testing
     // the image is divided into 4 sections from top to bottom
     // The values in the sections are 0.5, 1.0, 1.5, 2.0
-    float *buffer = new float[size];
+    auto buffer = std::vector<float>(size);
     for (unsigned int i = 0; i < height; ++i)
     {
       float v = 0.5f * static_cast<int>(i / (height / 4.0) + 1);
@@ -441,7 +443,8 @@ TEST_F(ImageTest, ConvertToRGBImage)
     }
 
     common::Image output;
-    common::Image::ConvertToRGBImage<float>(buffer, width, height, output);
+    common::Image::ConvertToRGBImage<float>(
+        buffer.data(), width, height, output);
 
     // Check RGB data
     unsigned char *data = nullptr;
@@ -477,7 +480,7 @@ TEST_F(ImageTest, ConvertToRGBImage)
     // create sample image data for testing
     // the image is divided into 4 sections from top to bottom
     // The values in the sections are 0.5, 1.0, 1.5, 2.0
-    float *buffer = new float[size];
+    auto buffer = std::vector<float>(size);
     for (unsigned int i = 0; i < height; ++i)
     {
       float v = 0.5f * static_cast<int>(i / (height / 4.0) + 1);
@@ -490,8 +493,8 @@ TEST_F(ImageTest, ConvertToRGBImage)
     float min = 0.0f;
     float max = 5.0f;
     common::Image output;
-    common::Image::ConvertToRGBImage<float>(buffer, width, height, output,
-        min, max, true);
+    common::Image::ConvertToRGBImage<float>(
+        buffer.data(), width, height, output, min, max, true);
 
     // Check RGB data
     unsigned char *data = nullptr;
