@@ -51,6 +51,19 @@ SkeletonAnimation::~SkeletonAnimation()
 }
 
 //////////////////////////////////////////////////
+SkeletonAnimation &SkeletonAnimation::operator=(const SkeletonAnimation &_other)
+{
+  if (this == &_other)
+    return *this;
+
+  this->data->name = _other.data->name;
+  this->data->length = _other.data->length;
+  this->data->animations = _other.data->animations;
+
+  return *this;
+}
+
+//////////////////////////////////////////////////
 void SkeletonAnimation::SetName(const std::string &_name)
 {
   this->data->name = _name;
