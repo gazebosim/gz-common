@@ -2167,7 +2167,7 @@ void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
               if (!inputs[TEXCOORD].empty())
               {
                 texEqual = true;
-                for (auto pair: texcoordsOffsetToSet)
+                for (auto &pair : texcoordsOffsetToSet)
                 {
                   unsigned int offset = pair.first;
                   unsigned int set = pair.second;
@@ -2252,7 +2252,7 @@ void ColladaLoaderPrivate::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
 
           if (!inputs[TEXCOORD].empty())
           {
-            for (auto pair: texcoordsOffsetToSet)
+            for (auto &pair : texcoordsOffsetToSet)
             {
               unsigned int offset = pair.first;
               unsigned int set = pair.second;
@@ -2491,7 +2491,7 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
           if (hasTexcoords)
           {
             texEqual = true;
-            for (auto pair: texcoordsOffsetToSet)
+            for (auto &pair : texcoordsOffsetToSet)
             {
               unsigned int offset = pair.first;
               unsigned int set = pair.second;
@@ -2575,7 +2575,7 @@ void ColladaLoaderPrivate::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
       }
       if (hasTexcoords)
       {
-        for (auto pair: texcoordsOffsetToSet)
+        for (auto &pair : texcoordsOffsetToSet)
         {
           unsigned int offset = pair.first;
           unsigned int set = pair.second;
