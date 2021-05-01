@@ -272,9 +272,15 @@ std::string ignition::common::joinPaths(const std::string &_path1,
   std::vector<CHAR> combined(path1.length() + path2.length() + 2);
   // TODO(anyone): Switch to PathAllocCombine once switched to wide strings
   if (::PathCombineA(combined.data(), path1.c_str(), path2.c_str()) != NULL)
-    path = sanitizeSlashes(checkWindowsPath(std::string(combined.data())));
+  {
+    path = std::regex_replace(
+        checkWindowsPath(std::string(combined.data())), reg, "\\");
+  }
   else
-    path = sanitizeSlashes(checkWindowsPath(separator(path1) + path2));
+  {
+    path = std::regex_replace(
+        checkWindowsPath(separator(path1) + path2), reg, "\\");
+  }
 #endif  // _WIN32
   return path;
 }

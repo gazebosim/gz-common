@@ -417,14 +417,14 @@ TEST_F(FilesystemTest, append)
   EXPECT_EQ(path, "base\\before\\after\\");
 #endif
 
-  path = joinPaths("base", "/before", "after//");
+  path = joinPaths("base", "/before", "after///");
 #ifndef _WIN32
   EXPECT_EQ(path, "base/before/after/");
 #else
   EXPECT_EQ(path, "base\\before\\after\\");
 #endif
 
-  path = joinPaths("//base", "/before", "after");
+  path = joinPaths("///base", "/before", "after");
 #ifndef _WIN32
   EXPECT_EQ(path, "/base/before/after");
 #else
@@ -438,7 +438,7 @@ TEST_F(FilesystemTest, append)
   EXPECT_EQ(path, "\\base\\before\\after");
 #endif
 
-  path = joinPaths("//base", "/before", "after//");
+  path = joinPaths("///base", "///before//", "/after///");
 #ifndef _WIN32
   EXPECT_EQ(path, "/base/before/after/");
 #else
