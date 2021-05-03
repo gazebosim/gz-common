@@ -266,7 +266,7 @@ std::string ignition::common::joinPaths(const std::string &_path1,
   // std::string path1 = checkWindowsPath(_path1);
   // std::string path2 = checkWindowsPath(_path2);
   // +1 for directory separator, +1 for the ending \0 character
-  std::regex reg("(\\)+");
+  std::regex reg("\\\\+");
   std::vector<CHAR> combined(_path1.length() + _path2.length() + 2);
   // TODO(anyone): Switch to PathAllocCombine once switched to wide strings
   if (::PathCombineA(combined.data(), _path1.c_str(), _path2.c_str()) != NULL)
