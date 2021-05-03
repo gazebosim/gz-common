@@ -21,6 +21,9 @@
 1. Fix colladaLoader on Windows 
     * [Pull request #200](https://github.com/ignitionrobotics/ign-common/pull/200)
 
+1. Backport #188: Fix crash when using BVH animations.
+    * [Pull request #199](https://github.com/ignitionrobotics/ign-common/pull/199)
+
 1. Improved Windows support 
     * [Pull request #197](https://github.com/ignitionrobotics/ign-common/pull/197)
 
