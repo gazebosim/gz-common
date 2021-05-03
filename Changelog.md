@@ -2,6 +2,14 @@
 
 ## Ignition Common 3.X.X
 
+## Ignition Common 3.13.1 (2021-05-03)
+
+1. Fix join paths to remove duplicate separators
+    * [Pull request #205](https://github.com/ignitionrobotics/ign-common/pull/209)
+
+1. Fix loading collada files with multiple texcoord sets using the same offset.
+    * [Pull request #208](https://github.com/ignitionrobotics/ign-common/pull/208)
+
 ## Ignition Common 3.13.0 (2021-04-27)
 
 1. Add function to convert single channel image data to RGB image 
@@ -12,6 +20,9 @@
 
 1. Fix colladaLoader on Windows 
     * [Pull request #200](https://github.com/ignitionrobotics/ign-common/pull/200)
+
+1. Backport #188: Fix crash when using BVH animations.
+    * [Pull request #199](https://github.com/ignitionrobotics/ign-common/pull/199)
 
 1. Improved Windows support 
     * [Pull request #197](https://github.com/ignitionrobotics/ign-common/pull/197)
