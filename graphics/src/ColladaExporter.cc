@@ -594,7 +594,7 @@ void ColladaExporterPrivate::ExportEffects(
         this->mesh->MaterialByIndex(i);
     std::string imageString = material->TextureImage();
 
-    if (imageString.find("meshes/") != std::string::npos)
+    if (imageString.find("/") != std::string::npos)
     {
       tinyxml2::XMLElement *newParamXml =
         _libraryEffectsXml->GetDocument()->NewElement("newparam");
@@ -689,7 +689,7 @@ void ColladaExporterPrivate::ExportEffects(
       _libraryEffectsXml->GetDocument()->NewElement("diffuse");
     phongXml->LinkEndChild(diffuseXml);
 
-    if (imageString.find("meshes/") != std::string::npos)
+    if (imageString.find("/") != std::string::npos)
     {
       tinyxml2::XMLElement *textureXml =
         _libraryEffectsXml->GetDocument()->NewElement("texture");
@@ -832,7 +832,7 @@ void ColladaExporterPrivate::ExportVisualScenes(
 
       std::string imageString = material->TextureImage();
 
-      if (imageString.find("meshes/") != std::string::npos)
+      if (imageString.find("/") != std::string::npos)
       {
         tinyxml2::XMLElement *bindVertexInputXml =
           _libraryVisualScenesXml->GetDocument()->NewElement(
