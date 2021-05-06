@@ -19,9 +19,9 @@ exports_files(["LICENSE"])
 
 PROJECT_NAME = "ignition-common"
 
-PROJECT_MAJOR = 3
+PROJECT_MAJOR = 4
 
-PROJECT_MINOR = 13
+PROJECT_MINOR = 0
 
 PROJECT_PATCH = 0
 
@@ -43,7 +43,7 @@ ign_export_header(
 
 public_headers_no_gen = glob([
     "include/ignition/common/*.hh",
-    "include/ignition/common/detail/*.hh"
+    "include/ignition/common/detail/*.hh",
 ])
 
 private_headers = [
@@ -51,7 +51,10 @@ private_headers = [
     "src/PrintWindowsSystemWarning.hh",
 ]
 
-sources = glob(["src/*.cc"], exclude=["src/*_TEST.cc"])
+sources = glob(
+    ["src/*.cc"],
+    exclude = ["src/*_TEST.cc"],
+)
 
 generate_include_header(
     name = "commonhh_genrule",
@@ -81,19 +84,22 @@ cc_library(
 )
 
 cc_binary(
-    name = "libignition-common3.so",
+    name = "libignition-common4.so",
     includes = ["include"],
-    linkopts = ["-Wl,-soname,libignition-common3.so"],
+    linkopts = ["-Wl,-soname,libignition-common4.so"],
     linkshared = True,
     deps = [":ign_common"],
 )
 
-test_srcs = glob(["src/*_TEST.cc"])
+test_srcs = glob(
+    ["src/*_TEST.cc"],
+    exclude = ["src/PluginLoader_TEST.cc"],
+)
 
 [cc_test(
     name = src.replace("/", "_").replace(".cc", "").replace("src_", ""),
     srcs = [src],
-    data = [":libignition-common3.so"],
+    data = [":libignition-common4.so"],
     deps = [
         ":ign_common",
         IGNITION_ROOT + "ign_bazel:utilities",

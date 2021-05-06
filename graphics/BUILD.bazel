@@ -16,10 +16,13 @@ package(
 
 public_headers_no_gen = glob([
     "include/ignition/common/*.hh",
-    "include/ignition/common/graphics/*.hh"
+    "include/ignition/common/**/*.hh",
 ])
 
-sources = glob(["src/*.cc"], exclude=["src/*_TEST.cc"])
+sources = glob(
+    ["src/*.cc"],
+    exclude = ["src/*_TEST.cc"],
+)
 
 test_sources = glob(["src/*_TEST.cc"])
 
@@ -55,13 +58,14 @@ cc_library(
         "@gts",
         "@tinyxml2",
         IGNITION_ROOT + "ign_common",
+        IGNITION_ROOT + "ign_utils",
     ],
 )
 
 cc_binary(
-    name = "libignition-common3-graphics.so",
+    name = "libignition-common4-graphics.so",
     includes = ["include"],
-    linkopts = ["-Wl,-soname,libignition-common3-graphics.so"],
+    linkopts = ["-Wl,-soname,libignition-common4-graphics.so"],
     linkshared = True,
     deps = [":graphics"],
 )

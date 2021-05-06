@@ -16,10 +16,16 @@ package(
 
 public_headers_no_gen = glob([
     "include/ignition/common/*.hh",
-    "include/ignition/common/av/*.hh",
+    "include/ignition/common/**/*.hh",
 ])
 
-sources = glob(["src/*.cc"], exclude=["src/*_TEST.cc"])
+sources = glob(
+    ["src/*.cc"],
+    exclude = [
+        "src/*_TEST.cc",
+        "src/HWEncoder.cc",
+    ],
+)
 
 test_sources = glob(["src/*_TEST.cc"])
 
@@ -59,9 +65,9 @@ cc_library(
 )
 
 cc_binary(
-    name = "libignition-common3-av.so",
+    name = "libignition-common4-av.so",
     includes = ["include"],
-    linkopts = ["-Wl,-soname,libignition-common3-av.so"],
+    linkopts = ["-Wl,-soname,libignition-common4-av.so"],
     linkshared = True,
     deps = [":av"],
 )
