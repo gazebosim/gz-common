@@ -133,8 +133,8 @@ TEST_F(ColladaExporter, ExportCordlessDrill)
   exporter.Export(meshOriginal, filenameOut, true);
 
   // The export directory and texture should now exist.
-  ASSERT_TRUE(common::exists(filenameOut));
-  EXPECT_TRUE(common::exists(filenameOutTexture));
+  ASSERT_TRUE(common::exists(filenameOut)) << filenameOut;
+  EXPECT_TRUE(common::exists(filenameOutTexture)) << filenameOutTexture;
 
   // Check .dae file
   tinyxml2::XMLDocument xmlDoc;
