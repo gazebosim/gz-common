@@ -229,7 +229,7 @@ TEST_F(ColladaLoader, TexCoordSets)
   EXPECT_FALSE(subMeshB->HasTexCoord(3u));
 
   // test texture coordinate set API
-  EXPECT_EQ(2u, subMeshB->TexCoordSetCount());
+  EXPECT_EQ(3u, subMeshB->TexCoordSetCount());
   EXPECT_EQ(3u, subMeshB->TexCoordCountBySet(0u));
   EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoordBySet(0u, 0u));
   EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoordBySet(1u, 0u));
@@ -251,6 +251,16 @@ TEST_F(ColladaLoader, TexCoordSets)
   EXPECT_TRUE(subMeshB->HasTexCoordBySet(1u, 1u));
   EXPECT_TRUE(subMeshB->HasTexCoordBySet(2u, 1u));
   EXPECT_FALSE(subMeshB->HasTexCoordBySet(3u, 1u));
+
+  EXPECT_EQ(3u, subMeshB->TexCoordCountBySet(2u));
+  EXPECT_EQ(math::Vector2d(0, 0.8), subMeshB->TexCoordBySet(0u, 2u));
+  EXPECT_EQ(math::Vector2d(0, 0.7), subMeshB->TexCoordBySet(1u, 2u));
+  EXPECT_EQ(math::Vector2d(0, 0.6), subMeshB->TexCoordBySet(2u, 2u));
+
+  EXPECT_TRUE(subMeshB->HasTexCoordBySet(0u, 2u));
+  EXPECT_TRUE(subMeshB->HasTexCoordBySet(1u, 2u));
+  EXPECT_TRUE(subMeshB->HasTexCoordBySet(2u, 2u));
+  EXPECT_FALSE(subMeshB->HasTexCoordBySet(3u, 2u));
 
   subMeshB->SetTexCoordBySet(2u, math::Vector2d(0.1, 0.2), 1u);
   EXPECT_EQ(math::Vector2d(0.1, 0.2), subMeshB->TexCoordBySet(2u, 1u));

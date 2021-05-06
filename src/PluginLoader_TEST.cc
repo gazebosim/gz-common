@@ -24,6 +24,10 @@
 #include "ignition/common/config.hh"
 #include "test_config.h"
 
+#ifndef IGN_COMMON_LIB_PATH
+#define IGN_COMMON_LIB_PATH "./ign_common"
+#endif
+
 /////////////////////////////////////////////////
 TEST(PluginLoader, InitialNoInterfacesImplemented)
 {

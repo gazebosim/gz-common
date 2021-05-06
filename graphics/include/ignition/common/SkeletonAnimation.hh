@@ -46,6 +46,15 @@ namespace ignition
       /// the animations
       public: ~SkeletonAnimation();
 
+      // NOTE: this is not needed starting in ign-common4 since ign-common4 uses
+      // the IGN_UTILS_IMPL_PTR instead of a raw impl pointer. So, this
+      // method should not be included in forward ports from ign-common3 to
+      // ign-common4
+      /// \brief Assignment operator
+      /// \param[in] _other The new SkeletonAnimation
+      /// \return A reference to this instance
+      public: SkeletonAnimation &operator=(const SkeletonAnimation &_other);
+
       /// \brief Changes the name
       /// \param[in] _name the new name
       public: void SetName(const std::string& _name);

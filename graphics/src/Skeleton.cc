@@ -81,13 +81,16 @@ Skeleton::Skeleton(SkeletonNode *_root)
 //////////////////////////////////////////////////
 Skeleton::~Skeleton()
 {
-  for (auto &kv : this->dataPtr->nodes)
+  for (auto &kv : this->data->nodes)
     delete kv.second;
-  this->dataPtr->nodes.clear();
+  this->data->nodes.clear();
 
-  for (auto &a : this->dataPtr->anims)
+  for (auto &a : this->data->anims)
     delete a;
-  this->dataPtr->anims.clear();
+  this->data->anims.clear();
+
+  delete this->data;
+  this->data = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -467,10 +470,17 @@ bool Skeleton::AddBvhAnimation(const std::string &_bvhFile, double _scale)
   // Copy pointer from temp skeleton before it's deleted
   auto newAnim = new SkeletonAnimation(skel->Animation(0u)->Name());
   *newAnim = *skel->Animation(0u);
+<<<<<<< HEAD
   this->dataPtr->anims.push_back(newAnim);
   this->dataPtr->mapAnimSkin.push_back(skelMap);
   this->dataPtr->alignTranslate.push_back(translations);
   this->dataPtr->alignRotate.push_back(rotations);
+=======
+  this->data->anims.push_back(newAnim);
+  this->data->mapAnimSkin.push_back(skelMap);
+  this->data->alignTranslate.push_back(translations);
+  this->data->alignRotate.push_back(rotations);
+>>>>>>> ign-common3
 
   return true;
 }
