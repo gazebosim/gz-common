@@ -257,28 +257,60 @@ std::string checkWindowsPath(const std::string _path)
 std::string ignition::common::joinPaths(const std::string &_path1,
                                         const std::string &_path2)
 {
-  // avoid duplicated '/' at the beginning/end of the string
+
+  /// This function is used to avoid duplicated path separators at the
+  /// beginning/end of the string, and between the two paths being joined.
+  /// \param[in] _path This is the string to sanitize.
+  /// \param[in] _stripLeading True if the leading separator should be
+  /// removed.
+  auto sanitizeSlashes = [](const std::string &_path,
+                            bool _stripLeading = false)
+  {
+    // Shortcut
+    if (_path.empty())
+      return _path;
+
+    std::string result = _path;
+
+    // Use the appropriate character for each platform.
+#ifndef _WIN32
+    char replacement = '/';
+#else
+    char replacement = '\\';
+#endif
+
+    // Sanitize the start of the path.
+    size_t index = 0;
+    size_t leadingIndex = _stripLeading ? 0 : 1;
+    for (; result[index] == replacement; ++index)
+    {
+    }
+    if (index > leadingIndex)
+      result.erase(leadingIndex, index-leadingIndex);
+
+    // Sanitize the end of the path.
+    index = result.length()-1;
+    for (; result[index] == replacement; --index)
+    {
+    }
+    index += 1;
+    if (index < result.length()-1)
+        result.erase(index+1);
+    return result;
+  };
+
   std::string path;
 #ifndef _WIN32
-  std::regex reg("/+");
-  path = std::regex_replace(separator(_path1) + _path2, reg, "/");
+  path = sanitizeSlashes(sanitizeSlashes(separator(_path1)) +
+      sanitizeSlashes(_path2, true));
 #else  // _WIN32
-  // std::string path1 = checkWindowsPath(_path1);
-  // std::string path2 = checkWindowsPath(_path2);
-  // +1 for directory separator, +1 for the ending \0 character
-  std::regex reg("\\\\+");
-  std::vector<CHAR> combined(_path1.length() + _path2.length() + 2);
-  // TODO(anyone): Switch to PathAllocCombine once switched to wide strings
-  if (::PathCombineA(combined.data(), _path1.c_str(), _path2.c_str()) != NULL)
-  {
-    path = std::regex_replace(
-        checkWindowsPath(std::string(combined.data())), reg, "\\");
-  }
+  std::string path1 = sanitizeSlashes(_path1);
+  std::string path2 = sanitizeSlashes(_path2, true);
+  std::vector<CHAR> combined(path1.length() + path2.length() + 2);
+  if (::PathCombineA(combined.data(), path1.c_str(), path2.c_str()) != NULL)
+    path = sanitizeSlashes(checkWindowsPath(std::string(combined.data())));
   else
-  {
-    path = std::regex_replace(
-        checkWindowsPath(separator(_path1) + _path2), reg, "\\");
-  }
+    path = sanitizeSlashes(checkWindowsPath(separator(path1) + path2));
 #endif  // _WIN32
   return path;
 }

@@ -451,6 +451,15 @@ TEST_F(FilesystemTest, append)
 #else
   EXPECT_EQ(path, "base\\before\\after");
 #endif
+
+  // Make sure that the slashes in the middle of string are not altered.
+  path = joinPaths("https://fuel.ignitionrobotics.org", "/models", "box");
+#ifndef _WIN32
+  EXPECT_EQ(path, "https://fuel.ignitionrobotics.org/models/box");
+#else
+  EXPECT_EQ(path, "https:\\\\fuel.ignitionrobotics.org\\models\\box");
+#endif
+
 }
 
 /////////////////////////////////////////////////
