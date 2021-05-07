@@ -69,7 +69,67 @@ TEST_F(OBJLoaderTest, InvalidMaterial)
     common::testing::TestFile("data", "invalid_material.obj");
 
   ignition::common::Mesh *mesh = objLoader.Load(meshFilename);
+
   EXPECT_TRUE(mesh != nullptr);
+}
+
+/////////////////////////////////////////////////
+// This tests opening an OBJ file that has PBR fields
+TEST_F(OBJLoaderTest, PBR)
+{
+  ignition::common::OBJLoader objLoader;
+
+  // load obj file exported by 3ds max that has pbr extension
+  {
+    std::string meshFilename =
+      common::testing::TestFile("data", "cube_pbr.obj");
+
+    ignition::common::Mesh *mesh = objLoader.Load(meshFilename);
+    EXPECT_TRUE(mesh != nullptr);
+
+    const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+    ASSERT_TRUE(mat.get());
+
+    EXPECT_EQ(math::Color(0.0, 0.0, 0.0, 1.0), mat->Ambient());
+    EXPECT_EQ(math::Color(0.5, 0.5, 0.5, 1.0), mat->Diffuse());
+    EXPECT_EQ(math::Color(1.0, 1.0, 1.0, 1.0), mat->Specular());
+    EXPECT_DOUBLE_EQ(mat->Transparency(), 0.0);
+    EXPECT_TRUE(mat->TextureImage().find("LightDome_Albedo.png") !=
+        std::string::npos);
+    const common::Pbr *pbr = mat->PbrMaterial();
+    EXPECT_DOUBLE_EQ(0, pbr->Roughness());
+    EXPECT_DOUBLE_EQ(0, pbr->Metalness());
+    EXPECT_EQ("LightDome_Metalness.png", pbr->MetalnessMap());
+    EXPECT_EQ("LightDome_Roughness.png", pbr->RoughnessMap());
+    EXPECT_EQ("LightDome_Normal.png", pbr->NormalMap());
+  }
+
+  // load obj file exported by blender - it shoves pbr maps into
+  // existing fields
+  {
+    std::string meshFilename =
+      common::testing::TestFile("data", "blender_pbr.obj");
+
+    ignition::common::Mesh *mesh = objLoader.Load(meshFilename);
+    EXPECT_TRUE(mesh != nullptr);
+
+    const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+    ASSERT_TRUE(mat.get());
+
+    EXPECT_EQ(math::Color(1.0, 1.0, 1.0, 1.0), mat->Ambient());
+    EXPECT_EQ(math::Color(0.8, 0.8, 0.8, 1.0), mat->Diffuse());
+    EXPECT_EQ(math::Color(0.5, 0.5, 0.5, 1.0), mat->Specular());
+    EXPECT_EQ(math::Color(0.0, 0.0, 0.0, 1.0), mat->Emissive());
+    EXPECT_DOUBLE_EQ(mat->Transparency(), 0.0);
+    EXPECT_TRUE(mat->TextureImage().find("mesh_Diffuse.png") !=
+        std::string::npos);
+    const common::Pbr *pbr = mat->PbrMaterial();
+    EXPECT_DOUBLE_EQ(0, pbr->Roughness());
+    EXPECT_DOUBLE_EQ(0, pbr->Metalness());
+    EXPECT_EQ("mesh_Metal.png", pbr->MetalnessMap());
+    EXPECT_EQ("mesh_Rough.png", pbr->RoughnessMap());
+    EXPECT_EQ("mesh_Normal.png", pbr->NormalMap());
+  }
 }
 
 /////////////////////////////////////////////////

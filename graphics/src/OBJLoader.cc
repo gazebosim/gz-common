@@ -131,6 +131,50 @@ Mesh *OBJLoader::Load(const std::string &_filename)
             mat->SetTransparency(1.0 - m.dissolve);
             if (!m.diffuse_texname.empty())
               mat->SetTextureImage(m.diffuse_texname, path.c_str());
+
+            // load PBR textures
+            // Some obj exporters put PBR maps in the standard textures
+            // while others have proper support for obj PBR extension
+            Pbr pbrMat;
+            // PBR shoved into standard textures
+            if (!m.specular_texname.empty())
+              pbrMat.SetRoughnessMap(m.specular_texname);
+
+            // We use this field to determine if obj is exported by blender
+            // blender obj exporter puts roughness map in specular highlight
+            // field and metalness map in reflection map field!
+            // see summary in https://developer.blender.org/D8868
+            // detailing the existing exporter issues
+            // todo(anyone) remove this hack when blender fixes their exporter
+            // issue?
+            if (!m.specular_highlight_texname.empty())
+            {
+              pbrMat.SetRoughnessMap(m.specular_highlight_texname);
+              if (!m.reflection_texname.empty())
+                pbrMat.SetMetalnessMap(m.reflection_texname);
+            }
+            else if (!m.reflection_texname.empty())
+            {
+              pbrMat.SetEnvironmentMap(m.reflection_texname);
+            }
+            if (!m.bump_texname.empty())
+              pbrMat.SetNormalMap(m.bump_texname);
+
+            // PBR extension - overrides standard materials
+            if (!m.roughness_texname.empty())
+              pbrMat.SetRoughnessMap(m.roughness_texname);
+            if (!m.metallic_texname.empty())
+              pbrMat.SetMetalnessMap(m.metallic_texname);
+            if (!m.normal_texname.empty())
+              pbrMat.SetNormalMap(m.normal_texname);
+            if (!m.emissive_texname.empty())
+              pbrMat.SetEmissiveMap(m.emissive_texname);
+
+            pbrMat.SetRoughness(m.roughness);
+            pbrMat.SetMetalness(m.metallic);
+
+            mat->SetPbrMaterial(pbrMat);
+
             materialIds[m.name] = mat;
           }
           int matIndex = mesh->IndexOfMaterial(mat);
