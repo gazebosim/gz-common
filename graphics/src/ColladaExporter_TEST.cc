@@ -37,6 +37,7 @@ class ColladaExporter : public common::testing::AutoLogFixture {
     // Call superclass to make sure that logging is initialized
     this->common::testing::AutoLogFixture::SetUp();
     ASSERT_TRUE(common::testing::TestTmpPath(this->pathOut));
+    std::cout << "TestTempPath[" << this->pathOut << "]\n";
     common::createDirectories(this->pathOut);
   }
 
@@ -134,6 +135,9 @@ TEST_F(ColladaExporter, ExportCordlessDrill)
 
   // The export directory and texture should now exist.
   ASSERT_TRUE(common::exists(filenameOut)) << filenameOut;
+  std::cout << "pathOut[" << this->pathOut << "] \n"
+    << "FilenameOut[" << filenameOut << "]\n"
+    <<"filenameOutTexture[" << filenameOutTexture << "]\n";
   EXPECT_TRUE(common::exists(filenameOutTexture)) << filenameOutTexture;
 
   // Check .dae file

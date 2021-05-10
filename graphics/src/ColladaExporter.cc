@@ -513,7 +513,7 @@ int ColladaExporterPrivate::ExportImages(
       this->mesh->MaterialByIndex(i);
     std::string imageString = material->TextureImage();
 
-    if (imageString.find("meshes/") != std::string::npos)
+    if (imageString.find("/") != std::string::npos)
     {
       char id[100];
       snprintf(id, sizeof(id), "image_%u", i);
@@ -534,10 +534,11 @@ int ColladaExporterPrivate::ExportImages(
 
       if (this->exportTextures)
       {
-        createDirectories(this->path + this->filename + "/materials/textures");
+        createDirectories(joinPaths(this->path, this->filename,
+              "materials", "textures"));
         std::ifstream  src(imageString.c_str(), std::ios::binary);
-        std::ofstream  dst((this->path + this->filename +
-            "/materials/textures" + imageString.substr(
+        std::ofstream  dst(joinPaths(this->path, this->filename,
+            "materials" , "textures" , imageString.substr(
             imageString.rfind("/"))).c_str(), std::ios::binary);
         dst << src.rdbuf();
       }
