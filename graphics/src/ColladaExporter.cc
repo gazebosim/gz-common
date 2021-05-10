@@ -513,6 +513,7 @@ int ColladaExporterPrivate::ExportImages(
       this->mesh->MaterialByIndex(i);
     std::string imageString = material->TextureImage();
 
+    std::cout << "exporting image[" << imageString << "]\n";
     if (imageString.find("/") != std::string::npos)
     {
       char id[100];
@@ -526,21 +527,23 @@ int ColladaExporterPrivate::ExportImages(
       tinyxml2::XMLElement *initFromXml =
         _libraryImagesXml->GetDocument()->NewElement("init_from");
       const auto imageName = imageString.substr(imageString.rfind("/"));
+      std::cout << "imageName[" << imageName << "]\n";
       const auto imagePath = ignition::common::joinPaths("..", "materials",
         "textures", imageName);
+      std::cout << "imagePath[" << imagePath << "]\n";
       initFromXml->LinkEndChild(
         _libraryImagesXml->GetDocument()->NewText(imagePath.c_str()));
       imageXml->LinkEndChild(initFromXml);
 
       if (this->exportTextures)
       {
-        createDirectories(joinPaths(this->path, this->filename,
-              "materials", "textures"));
-        std::ifstream  src(imageString.c_str(), std::ios::binary);
-        std::ofstream  dst(joinPaths(this->path, this->filename,
-            "materials" , "textures" , imageString.substr(
-            imageString.rfind("/"))).c_str(), std::ios::binary);
-        dst << src.rdbuf();
+        std::string textureDir = joinPaths(this->path, this->filename,
+            "materials", "textures");
+        std::string destFilename = joinPaths(textureDir, imageString.substr(
+              imageString.rfind("/")));
+        createDirectories(textureDir);
+        std::cout << "Copy From[" << imageString << "] To[" << destFilename << "]\n";
+        copyFile(imageString, destFilename);
       }
 
       imageCount++;

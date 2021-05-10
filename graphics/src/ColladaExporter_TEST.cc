@@ -134,10 +134,13 @@ TEST_F(ColladaExporter, ExportCordlessDrill)
   exporter.Export(meshOriginal, filenameOut, true);
 
   // The export directory and texture should now exist.
+  EXPECT_TRUE(common::exists(this->pathOut)) << this->pathOut;
   ASSERT_TRUE(common::exists(filenameOut)) << filenameOut;
-  std::cout << "pathOut[" << this->pathOut << "] \n"
-    << "FilenameOut[" << filenameOut << "]\n"
-    <<"filenameOutTexture[" << filenameOutTexture << "]\n";
+  EXPECT_TRUE(common::exists(common::joinPaths(filenameOut, "materials")))
+    << common::joinPaths(filenameOut, "materials");
+  EXPECT_TRUE(common::exists(common::joinPaths(filenameOut, "materials",
+          "textures"))) << common::joinPaths(filenameOut, "materials",
+        "textures");
   EXPECT_TRUE(common::exists(filenameOutTexture)) << filenameOutTexture;
 
   // Check .dae file
