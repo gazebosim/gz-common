@@ -90,12 +90,12 @@ TEST_F(OBJLoaderTest, PBR)
     const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
     ASSERT_TRUE(mat.get());
 
-    EXPECT_EQ(math::Color(0.0, 0.0, 0.0, 1.0), mat->Ambient());
-    EXPECT_EQ(math::Color(0.5, 0.5, 0.5, 1.0), mat->Diffuse());
-    EXPECT_EQ(math::Color(1.0, 1.0, 1.0, 1.0), mat->Specular());
-    EXPECT_DOUBLE_EQ(mat->Transparency(), 0.0);
-    EXPECT_TRUE(mat->TextureImage().find("LightDome_Albedo.png") !=
-        std::string::npos);
+    EXPECT_EQ(math::Color(0.0f, 0.0f, 0.0f, 1.0f), mat->Ambient());
+    EXPECT_EQ(math::Color(0.5f, 0.5f, 0.5f, 1.0f), mat->Diffuse());
+    EXPECT_EQ(math::Color(1.0f, 1.0f, 1.0f, 1.0f), mat->Specular());
+    EXPECT_DOUBLE_EQ(0.0, mat->Transparency());
+    EXPECT_TRUE(std::string::npos
+        != mat->TextureImage().find("LightDome_Albedo.png"));
     const common::Pbr *pbr = mat->PbrMaterial();
     EXPECT_DOUBLE_EQ(0, pbr->Roughness());
     EXPECT_DOUBLE_EQ(0, pbr->Metalness());
@@ -116,13 +116,13 @@ TEST_F(OBJLoaderTest, PBR)
     const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
     ASSERT_TRUE(mat.get());
 
-    EXPECT_EQ(math::Color(1.0, 1.0, 1.0, 1.0), mat->Ambient());
-    EXPECT_EQ(math::Color(0.8, 0.8, 0.8, 1.0), mat->Diffuse());
-    EXPECT_EQ(math::Color(0.5, 0.5, 0.5, 1.0), mat->Specular());
-    EXPECT_EQ(math::Color(0.0, 0.0, 0.0, 1.0), mat->Emissive());
-    EXPECT_DOUBLE_EQ(mat->Transparency(), 0.0);
-    EXPECT_TRUE(mat->TextureImage().find("mesh_Diffuse.png") !=
-        std::string::npos);
+    EXPECT_EQ(math::Color(1.0f, 1.0f, 1.0f, 1.0f), mat->Ambient());
+    EXPECT_EQ(math::Color(0.8f, 0.8f, 0.8f, 1.0f), mat->Diffuse());
+    EXPECT_EQ(math::Color(0.5f, 0.5f, 0.5f, 1.0f), mat->Specular());
+    EXPECT_EQ(math::Color(0.0f, 0.0f, 0.0f, 1.0f), mat->Emissive());
+    EXPECT_DOUBLE_EQ(0.0, mat->Transparency());
+    EXPECT_TRUE(std::string::npos !=
+        mat->TextureImage().find("mesh_Diffuse.png"));
     const common::Pbr *pbr = mat->PbrMaterial();
     EXPECT_DOUBLE_EQ(0, pbr->Roughness());
     EXPECT_DOUBLE_EQ(0, pbr->Metalness());
