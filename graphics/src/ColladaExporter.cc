@@ -32,7 +32,10 @@
 #endif
 
 #ifdef _WIN32
+  static const char pathSeparator = '\\';
   #define snprintf _snprintf
+#else
+  static const char pathSeparator = '/';
 #endif
 
 using namespace ignition;
@@ -514,7 +517,7 @@ int ColladaExporter::Implementation::ExportImages(
       this->mesh->MaterialByIndex(i);
     std::string imageString = material->TextureImage();
 
-    if (imageString.find("/") != std::string::npos)
+    if (imageString.find(pathSeparator) != std::string::npos)
     {
       char id[100];
       snprintf(id, sizeof(id), "image_%u", i);
@@ -526,7 +529,8 @@ int ColladaExporter::Implementation::ExportImages(
 
       tinyxml2::XMLElement *initFromXml =
         _libraryImagesXml->GetDocument()->NewElement("init_from");
-      const auto imageName = imageString.substr(imageString.rfind("/"));
+      const auto imageName = imageString.substr(
+          imageString.rfind(pathSeparator));
       const auto imagePath = ignition::common::joinPaths("..", "materials",
         "textures", imageName);
       initFromXml->LinkEndChild(
@@ -535,12 +539,12 @@ int ColladaExporter::Implementation::ExportImages(
 
       if (this->exportTextures)
       {
-        createDirectories(this->path + this->filename + "/materials/textures");
-        std::ifstream  src(imageString.c_str(), std::ios::binary);
-        std::ofstream  dst((this->path + this->filename +
-            "/materials/textures" + imageString.substr(
-            imageString.rfind("/"))).c_str(), std::ios::binary);
-        dst << src.rdbuf();
+        std::string textureDir = joinPaths(this->path, this->filename,
+            "materials", "textures");
+        std::string destFilename = joinPaths(textureDir, imageString.substr(
+              imageString.rfind(pathSeparator)));
+        createDirectories(textureDir);
+        copyFile(imageString, destFilename);
       }
 
       imageCount++;
@@ -595,7 +599,7 @@ void ColladaExporter::Implementation::ExportEffects(
         this->mesh->MaterialByIndex(i);
     std::string imageString = material->TextureImage();
 
-    if (imageString.find("/") != std::string::npos)
+    if (imageString.find(pathSeparator) != std::string::npos)
     {
       tinyxml2::XMLElement *newParamXml =
         _libraryEffectsXml->GetDocument()->NewElement("newparam");
@@ -690,7 +694,7 @@ void ColladaExporter::Implementation::ExportEffects(
       _libraryEffectsXml->GetDocument()->NewElement("diffuse");
     phongXml->LinkEndChild(diffuseXml);
 
-    if (imageString.find("/") != std::string::npos)
+    if (imageString.find(pathSeparator) != std::string::npos)
     {
       tinyxml2::XMLElement *textureXml =
         _libraryEffectsXml->GetDocument()->NewElement("texture");
@@ -833,7 +837,7 @@ void ColladaExporter::Implementation::ExportVisualScenes(
 
       std::string imageString = material->TextureImage();
 
-      if (imageString.find("/") != std::string::npos)
+      if (imageString.find(pathSeparator) != std::string::npos)
       {
         tinyxml2::XMLElement *bindVertexInputXml =
           _libraryVisualScenesXml->GetDocument()->NewElement(
