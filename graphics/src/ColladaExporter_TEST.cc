@@ -37,7 +37,6 @@ class ColladaExporter : public common::testing::AutoLogFixture {
     // Call superclass to make sure that logging is initialized
     this->common::testing::AutoLogFixture::SetUp();
     ASSERT_TRUE(common::testing::TestTmpPath(this->pathOut));
-    std::cout << "TestTempPath[" << this->pathOut << "]\n";
     common::createDirectories(this->pathOut);
   }
 

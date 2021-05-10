@@ -516,7 +516,6 @@ int ColladaExporterPrivate::ExportImages(
       this->mesh->MaterialByIndex(i);
     std::string imageString = material->TextureImage();
 
-    std::cout << "exporting image[" << imageString << "]\n";
     if (imageString.find(pathSeparator) != std::string::npos)
     {
       char id[100];
@@ -531,10 +530,8 @@ int ColladaExporterPrivate::ExportImages(
         _libraryImagesXml->GetDocument()->NewElement("init_from");
       const auto imageName = imageString.substr(
           imageString.rfind(pathSeparator));
-      std::cout << "imageName[" << imageName << "]\n";
       const auto imagePath = ignition::common::joinPaths("..", "materials",
         "textures", imageName);
-      std::cout << "imagePath[" << imagePath << "]\n";
       initFromXml->LinkEndChild(
         _libraryImagesXml->GetDocument()->NewText(imagePath.c_str()));
       imageXml->LinkEndChild(initFromXml);
@@ -546,7 +543,6 @@ int ColladaExporterPrivate::ExportImages(
         std::string destFilename = joinPaths(textureDir, imageString.substr(
               imageString.rfind(pathSeparator)));
         createDirectories(textureDir);
-        std::cout << "Copy From[" << imageString << "] To[" << destFilename << "]\n";
         copyFile(imageString, destFilename);
       }
 
