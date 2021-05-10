@@ -304,19 +304,16 @@ std::string ignition::common::joinPaths(const std::string &_path1,
   path = sanitizeSlashes(sanitizeSlashes(separator(_path1)) +
       sanitizeSlashes(_path2, true));
 #else  // _WIN32
-  std::string path1 = sanitizeSlashes(_path1);
-  std::string path2 = sanitizeSlashes(_path2, true);
+  std::string path1 = sanitizeSlashes(checkWindowsPath(_path1));
+  std::string path2 = sanitizeSlashes(checkWindowsPath(_path2), true);
   std::vector<CHAR> combined(path1.length() + path2.length() + 2);
-  std::cout << "\n\n HERE. PATH1[" << path1 << "] PATH2[" << path2 << "]\n";
   if (::PathCombineA(combined.data(), path1.c_str(), path2.c_str()) != NULL)
   {
     path = sanitizeSlashes(checkWindowsPath(std::string(combined.data())));
-    std::cout << "\n\n HERE1[" << path << "]\n";
   }
   else
   {
     path = sanitizeSlashes(checkWindowsPath(separator(path1) + path2));
-    std::cout << "\n\n HERE2[" << path << "]\n";
   }
 #endif  // _WIN32
   return path;
