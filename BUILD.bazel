@@ -23,7 +23,7 @@ PROJECT_MAJOR = 3
 
 PROJECT_MINOR = 13
 
-PROJECT_PATCH = 0
+PROJECT_PATCH = 2
 
 # Generates config.hh based on the version numbers in CMake code.
 ign_config_header(
