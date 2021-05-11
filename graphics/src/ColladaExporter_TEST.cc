@@ -121,6 +121,8 @@ TEST_F(ColladaExporter, ExportCordlessDrill)
       "cordless_drill_exported");
   const auto filenameOutExt = common::joinPaths(filenameOut,
       "meshes", "cordless_drill_exported.dae");
+  const auto filenameOutTexture = common::joinPaths(filenameOut,
+      "materials", "textures", "cordless_drill.png");
 
   // Load original mesh
   common::ColladaLoader loader;
@@ -129,6 +131,16 @@ TEST_F(ColladaExporter, ExportCordlessDrill)
   // Export with extension
   common::ColladaExporter exporter;
   exporter.Export(meshOriginal, filenameOut, true);
+
+  // The export directory and texture should now exist.
+  EXPECT_TRUE(common::exists(this->pathOut)) << this->pathOut;
+  ASSERT_TRUE(common::exists(filenameOut)) << filenameOut;
+  EXPECT_TRUE(common::exists(common::joinPaths(filenameOut, "materials")))
+    << common::joinPaths(filenameOut, "materials");
+  EXPECT_TRUE(common::exists(common::joinPaths(filenameOut, "materials",
+          "textures"))) << common::joinPaths(filenameOut, "materials",
+        "textures");
+  EXPECT_TRUE(common::exists(filenameOutTexture)) << filenameOutTexture;
 
   // Check .dae file
   tinyxml2::XMLDocument xmlDoc;
