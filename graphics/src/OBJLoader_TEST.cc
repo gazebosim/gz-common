@@ -94,8 +94,8 @@ TEST_F(OBJLoaderTest, PBR)
     EXPECT_EQ(math::Color(0.5f, 0.5f, 0.5f, 1.0f), mat->Diffuse());
     EXPECT_EQ(math::Color(1.0f, 1.0f, 1.0f, 1.0f), mat->Specular());
     EXPECT_DOUBLE_EQ(0.0, mat->Transparency());
-    EXPECT_TRUE(std::string::npos
-        != mat->TextureImage().find("LightDome_Albedo.png"));
+    EXPECT_NE(std::string::npos,
+        mat->TextureImage().find("LightDome_Albedo.png"));
     const common::Pbr *pbr = mat->PbrMaterial();
     EXPECT_DOUBLE_EQ(0, pbr->Roughness());
     EXPECT_DOUBLE_EQ(0, pbr->Metalness());
