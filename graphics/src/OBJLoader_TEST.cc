@@ -85,7 +85,7 @@ TEST_F(OBJLoaderTest, PBR)
       common::testing::TestFile("data", "cube_pbr.obj");
 
     ignition::common::Mesh *mesh = objLoader.Load(meshFilename);
-    EXPECT_TRUE(mesh != nullptr);
+    EXPECT_NE(nullptr, mesh);
 
     const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
     ASSERT_TRUE(mat.get());
@@ -111,7 +111,7 @@ TEST_F(OBJLoaderTest, PBR)
       common::testing::TestFile("data", "blender_pbr.obj");
 
     ignition::common::Mesh *mesh = objLoader.Load(meshFilename);
-    EXPECT_TRUE(mesh != nullptr);
+    EXPECT_NE(nullptr, mesh);
 
     const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
     ASSERT_TRUE(mat.get());
@@ -121,7 +121,7 @@ TEST_F(OBJLoaderTest, PBR)
     EXPECT_EQ(math::Color(0.5f, 0.5f, 0.5f, 1.0f), mat->Specular());
     EXPECT_EQ(math::Color(0.0f, 0.0f, 0.0f, 1.0f), mat->Emissive());
     EXPECT_DOUBLE_EQ(0.0, mat->Transparency());
-    EXPECT_TRUE(std::string::npos !=
+    EXPECT_NE(std::string::npos,
         mat->TextureImage().find("mesh_Diffuse.png"));
     const common::Pbr *pbr = mat->PbrMaterial();
     EXPECT_DOUBLE_EQ(0, pbr->Roughness());
