@@ -59,6 +59,21 @@ Mesh *OBJLoader::Load(const std::string &_filename)
   std::map<std::string, Material *> materialIds;
   std::string path = common::parentPath(_filename);
 
+  // check if obj is exported by blender
+  // blender shoves BR fields in standard textures
+  bool exportedByBlender = false;
+  std::ifstream infile(_filename);
+  if (infile.good())
+  {
+    std::string line;
+    std::getline(infile, line);
+    std::transform(line.begin(), line.end(), line.begin(),
+        [](unsigned char c){ return std::tolower(c); });
+    if (line.find("blender") != std::string::npos)
+      exportedByBlender = true;
+  }
+  infile.close();
+
   tinyobj::attrib_t attrib;
   std::vector<tinyobj::shape_t> shapes;
   std::vector<tinyobj::material_t> materials;
@@ -140,14 +155,14 @@ Mesh *OBJLoader::Load(const std::string &_filename)
             if (!m.specular_texname.empty())
               pbrMat.SetRoughnessMap(m.specular_texname);
 
-            // We use this field to determine if obj is exported by blender
+            // check if obj is exported by blender
             // blender obj exporter puts roughness map in specular highlight
             // field and metalness map in reflection map field!
             // see summary in https://developer.blender.org/D8868
             // detailing the existing exporter issues
-            // todo(anyone) remove this hack when blender fixes their exporter
-            // issue?
-            if (!m.specular_highlight_texname.empty())
+            // todo(anyone) add a check for blender version to avoid this hack
+            // when blender fixes their exporter issue
+            if (!m.specular_highlight_texname.empty() && exportedByBlender)
             {
               pbrMat.SetRoughnessMap(m.specular_highlight_texname);
               if (!m.reflection_texname.empty())
