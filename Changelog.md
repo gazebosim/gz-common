@@ -49,6 +49,56 @@
 
 ## Ignition Common 3.X.X
 
+## Ignition Common 3.13.2 (2021-05-11)
+
+1. Backport collada fixes (Backport #204)
+    * [Pull request #211](https://github.com/ignitionrobotics/ign-common/pull/211)
+
+1. Fix join paths again
+    * [Pull request #215](https://github.com/ignitionrobotics/ign-common/pull/215)
+
+## Ignition Common 3.13.1 (2021-05-03)
+
+1. Fix join paths to remove duplicate separators
+    * [Pull request #205](https://github.com/ignitionrobotics/ign-common/pull/209)
+
+1. Fix loading collada files with multiple texcoord sets using the same offset.
+    * [Pull request #208](https://github.com/ignitionrobotics/ign-common/pull/208)
+
+## Ignition Common 3.13.0 (2021-04-27)
+
+1. Add function to convert single channel image data to RGB image 
+    * [Pull request #205](https://github.com/ignitionrobotics/ign-common/pull/205)
+
+1. Avoid duplication of / in joinPaths (Windows)
+    * [Pull request #201](https://github.com/ignitionrobotics/ign-common/pull/201)
+
+1. Fix colladaLoader on Windows 
+    * [Pull request #200](https://github.com/ignitionrobotics/ign-common/pull/200)
+
+1. Backport #188: Fix crash when using BVH animations.
+    * [Pull request #199](https://github.com/ignitionrobotics/ign-common/pull/199)
+
+1. Improved Windows support 
+    * [Pull request #197](https://github.com/ignitionrobotics/ign-common/pull/197)
+
+## Ignition Common 3.12.0 (2021-04-06)
+
+1. Remove use of _SOURCE and _BINARY dirs in tests.
+    * [Pull request #158](https://github.com/ignitionrobotics/ign-common/pull/158)
+
+1. Add bazel buildsystem support.
+    * [Pull request #123](https://github.com/ignitionrobotics/ign-common/pull/123)
+
+1. Use matching malloc/free for AudioDecoder.
+    * [Pull request #192](https://github.com/ignitionrobotics/ign-common/pull/192)
+
+1. Fixed tutorial link in the README.md.
+    * [Pull request #194](https://github.com/ignitionrobotics/ign-common/pull/194)
+
+1. Function to serialize compressed image to buffer 
+    * [Pull request #139](https://github.com/ignitionrobotics/ign-common/pull/139)
+
 ## Ignition Common 3.11.1 (2021-03-08)
 
 1. Relax expectation so encoder test passes on ARM

@@ -323,6 +323,204 @@ TEST_F(ImageTest, ConvertPixelFormat)
          Image::ConvertPixelFormat("BAYER_BGGR8"));
 }
 
+/////////////////////////////////////////////////
+TEST_F(ImageTest, ConvertToRGBImage)
+{
+  unsigned int width = 8;
+  unsigned int height = 8;
+  unsigned int size = width * height;
+
+  // test L_INT8 format
+  {
+    // create sample image data for testing
+    // the image is divided into 4 sections from top to bottom
+    // The values in the sections are 10, 20, 30, 40
+    auto buffer = std::vector<uint8_t>(size);
+    for (unsigned int i = 0; i < height; ++i)
+    {
+      uint8_t v = 10 * static_cast<int>(i / (width/ 4.0) + 1);
+      for (unsigned int j = 0; j < width; ++j)
+      {
+        buffer[i*width + j] = v;
+      }
+    }
+
+    common::Image output;
+    common::Image::ConvertToRGBImage<uint8_t>(
+        buffer.data(), width, height, output);
+
+    // Check RGBA data
+    unsigned char *data = nullptr;
+    unsigned int outputSize = 0;
+    output.Data(&data, outputSize);
+    EXPECT_EQ(size * 3, outputSize);
+    ASSERT_NE(nullptr, data);
+
+    for (unsigned int i = 0u; i < height; ++i)
+    {
+      for (unsigned int j = 0u; j < width; ++j)
+      {
+        unsigned int r = data[i * width * 3 + j * 3];
+        unsigned int g = data[i * width * 3 + j * 3 + 1];
+        unsigned int b = data[i * width * 3 + j * 3 + 2];
+        EXPECT_EQ(r, g);
+        EXPECT_EQ(r, b);
+        if (i < (height / 4.0))
+          EXPECT_EQ(0u, r);
+        else if (i >= (height / 4.0) && i < (height / 2.0))
+          EXPECT_EQ(static_cast<unsigned int>(255 / 3), r);
+        else if (i >= (height / 2.0) && i < (height / 4.0 * 3.0))
+          EXPECT_EQ(static_cast<unsigned int>(255 / 3 * 2), r);
+        else
+          EXPECT_EQ(255u, r);
+      }
+    }
+  }
+
+  // test L_INT16 format
+  {
+    // create sample image data for testing
+    // the image is divided into 4 sections from top to bottom
+    // The values in the sections are 100, 200, 300, 400
+    auto buffer = std::vector<uint16_t>(size);
+    for (unsigned int i = 0; i < height; ++i)
+    {
+      uint16_t v = 100 * static_cast<int>(i / (height / 4.0) + 1);
+      for (unsigned int j = 0; j < width; ++j)
+      {
+        buffer[i*width + j] = v;
+      }
+    }
+
+    common::Image output;
+    common::Image::ConvertToRGBImage<uint16_t>(
+        buffer.data(), width, height, output);
+
+    // Check RGB data
+    unsigned char *data = nullptr;
+    unsigned int outputSize = 0;
+    output.Data(&data, outputSize);
+    EXPECT_EQ(size * 3, outputSize);
+    ASSERT_NE(nullptr, data);
+
+    for (unsigned int i = 0u; i < height; ++i)
+    {
+      for (unsigned int j = 0u; j < width; ++j)
+      {
+        unsigned int r = data[i * width * 3 + j * 3];
+        unsigned int g = data[i * width * 3 + j * 3 + 1];
+        unsigned int b = data[i * width * 3 + j * 3 + 2];
+        EXPECT_EQ(r, g);
+        EXPECT_EQ(r, b);
+
+        if (i < (height / 4.0))
+          EXPECT_EQ(0u, r);
+        else if (i >= (height / 4.0) && i < (height / 2.0))
+          EXPECT_EQ(static_cast<unsigned int>(255 / 3), r);
+        else if (i >= (height / 2.0) && i < (height / 4.0 * 3.0))
+          EXPECT_EQ(static_cast<unsigned int>(255 / 3 * 2), r);
+        else
+          EXPECT_EQ(255u, r);
+      }
+    }
+  }
+
+  // test R_FLOAT32 format
+  {
+    // create sample image data for testing
+    // the image is divided into 4 sections from top to bottom
+    // The values in the sections are 0.5, 1.0, 1.5, 2.0
+    auto buffer = std::vector<float>(size);
+    for (unsigned int i = 0; i < height; ++i)
+    {
+      float v = 0.5f * static_cast<int>(i / (height / 4.0) + 1);
+      for (unsigned int j = 0; j < width; ++j)
+      {
+        buffer[i*width + j] = v;
+      }
+    }
+
+    common::Image output;
+    common::Image::ConvertToRGBImage<float>(
+        buffer.data(), width, height, output);
+
+    // Check RGB data
+    unsigned char *data = nullptr;
+    unsigned int outputSize = 0;
+    output.Data(&data, outputSize);
+    EXPECT_EQ(size * 3, outputSize);
+    ASSERT_NE(nullptr, data);
+
+    for (unsigned int i = 0u; i < height; ++i)
+    {
+      for (unsigned int j = 0u; j < width; ++j)
+      {
+        unsigned int r = data[i * width * 3 + j * 3];
+        unsigned int g = data[i * width * 3 + j * 3 + 1];
+        unsigned int b = data[i * width * 3 + j * 3 + 2];
+        EXPECT_EQ(r, g);
+        EXPECT_EQ(r, b);
+
+        if (i < (height / 4.0))
+          EXPECT_EQ(0u, r);
+        else if (i >= (height / 4.0) && i < (height / 2.0))
+          EXPECT_EQ(static_cast<unsigned int>(255 / 3), r);
+        else if (i >= (height / 2.0) && i < (height / 4.0 * 3.0))
+          EXPECT_EQ(static_cast<unsigned int>(255 / 3 * 2), r);
+        else
+          EXPECT_EQ(255u, r);
+      }
+    }
+  }
+
+  // test R_FLOAT32 format with min, max, and flip values set
+  {
+    // create sample image data for testing
+    // the image is divided into 4 sections from top to bottom
+    // The values in the sections are 0.5, 1.0, 1.5, 2.0
+    auto buffer = std::vector<float>(size);
+    for (unsigned int i = 0; i < height; ++i)
+    {
+      float v = 0.5f * static_cast<int>(i / (height / 4.0) + 1);
+      for (unsigned int j = 0; j < width; ++j)
+      {
+        buffer[i*width + j] = v;
+      }
+    }
+
+    float min = 0.0f;
+    float max = 5.0f;
+    common::Image output;
+    common::Image::ConvertToRGBImage<float>(
+        buffer.data(), width, height, output, min, max, true);
+
+    // Check RGB data
+    unsigned char *data = nullptr;
+    unsigned int outputSize = 0;
+    output.Data(&data, outputSize);
+    EXPECT_EQ(size * 3, outputSize);
+    ASSERT_NE(nullptr, data);
+
+    for (unsigned int i = 0u; i < height; ++i)
+    {
+      for (unsigned int j = 0u; j < width; ++j)
+      {
+        unsigned int r = data[i * width * 3 + j * 3];
+        unsigned int g = data[i * width * 3 + j * 3 + 1];
+        unsigned int b = data[i * width * 3 + j * 3 + 2];
+        EXPECT_EQ(r, g);
+        EXPECT_EQ(r, b);
+
+        // values should be normalized by min, max and flipped
+        float v = 0.5f * static_cast<int>(i / (height / 4.0) + 1);
+        unsigned int expectedValue = static_cast<unsigned int>(
+            (1.0f - ((v - min) / (max - min))) * 255);
+        EXPECT_EQ(expectedValue, r);
+      }
+    }
+  }
+}
+
 using string_int2 = std::tuple<const char *, unsigned int, unsigned int>;
 
 class ImagePerformanceTest : public ImageTest,

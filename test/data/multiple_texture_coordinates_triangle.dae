@@ -113,6 +113,15 @@
             </accessor>
           </technique_common>
         </source>
+        <source id="triangle-mesh-b-map-2">
+          <float_array id="triangle-mesh-b-map-2-array" count="6">0 0.2 0 0.3 0 0.4</float_array>
+          <technique_common>
+            <accessor source="#triangle-mesh-b-map-2-array" count="3" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
         <vertices id="triangle-mesh-b-vertices">
           <input semantic="POSITION" source="#triangle-mesh-b-positions"/>
         </vertices>
@@ -121,6 +130,7 @@
           <input semantic="NORMAL" source="#triangle-mesh-b-normals" offset="1"/>
           <input semantic="TEXCOORD" source="#triangle-mesh-b-map-0" offset="2" set="0"/>
           <input semantic="TEXCOORD" source="#triangle-mesh-b-map-1" offset="3" set="1"/>
+          <input semantic="TEXCOORD" source="#triangle-mesh-b-map-2" offset="3" set="2"/>
           <p>0 0 0 0 1 0 1 1 2 0 2 2</p>
         </triangles>
       </mesh>
