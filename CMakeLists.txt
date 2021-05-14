@@ -19,6 +19,8 @@ ign_configure_project()
 #============================================================================
 # Set project-specific options
 #============================================================================
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #--------------------------------------
 # Option: Should Windows test symlinking?
