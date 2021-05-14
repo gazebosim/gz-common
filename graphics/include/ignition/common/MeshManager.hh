@@ -100,6 +100,9 @@ namespace ignition
       /// \param[in] the mesh to add.
       public: void AddMesh(Mesh *_mesh);
 
+      public: void RemoveMesh(const std::string &_name);
+      public: void RemoveAll();
+
       /// \brief Get a mesh by name.
       /// \param[in] _name the name of the mesh to look for
       /// \return the mesh or nullptr if not found

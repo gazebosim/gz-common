@@ -241,6 +241,39 @@ const Mesh *MeshManager::MeshByName(const std::string &_name) const
   return nullptr;
 }
 
+void MeshManager::RemoveAll()
+{
+  for (auto m : this->dataPtr->meshes)
+  {
+    delete m.second;
+  }
+  this->dataPtr->meshes.clear();
+}
+
+//////////////////////////////////////////////////
+void MeshManager::RemoveMesh(const std::string &_name)
+{
+  std::cerr << "Trying to remove " << _name << '\n';
+  bool founded = false;
+  std::string entityToRemove;
+  for (auto m : this->dataPtr->meshes)
+  {
+    std::size_t found = m.second->Name().find(_name);
+    if (found != std::string::npos)
+    {
+      std::cerr << "Mesh founded" << '\n';
+      founded = true;
+      entityToRemove = m.first;
+    }
+  }
+  if (founded)
+  {
+    std::cerr << "Calling Mesh destructor" << '\n';
+    delete this->dataPtr->meshes[entityToRemove];
+    this->dataPtr->meshes.erase(entityToRemove);
+  }
+}
+
 //////////////////////////////////////////////////
 bool MeshManager::HasMesh(const std::string &_name) const
 {
