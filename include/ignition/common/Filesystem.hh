@@ -126,7 +126,8 @@ namespace ignition
     /// \param[in] _path1 the left portion of the path
     /// \param[in] _path2 the right portion of the path
     /// \return Joined path. The function can do simplifications such as
-    /// elimination of ../ (but is not guaranteed to do so).
+    /// elimination of ../ and removal of duplicate // (but is not guaranteed to
+    /// do so).
     std::string IGNITION_COMMON_VISIBLE joinPaths(const std::string &_path1,
                                                   const std::string &_path2);
 

@@ -274,11 +274,16 @@ std::vector<std::string> SystemPathsPrivate::GenerateLibraryPaths(
     basenames.push_back("lib" + name + ".so");
     basenames.push_back(name + ".so");
     basenames.push_back(name + ".dll");
+    basenames.push_back("Release/" + name + ".dll");
+    basenames.push_back("Debug/" + name + ".dll");
+    basenames.push_back(name + ".dll");
     basenames.push_back("lib" + name + ".dylib");
     basenames.push_back(name + ".dylib");
     basenames.push_back("lib" + name + ".SO");
     basenames.push_back(name + ".SO");
     basenames.push_back(name + ".DLL");
+    basenames.push_back("Release/" + name + ".DLL");
+    basenames.push_back("Debug/" + name + ".DLL");
     basenames.push_back("lib" + name + ".DYLIB");
     basenames.push_back(name + ".DYLIB");
   }

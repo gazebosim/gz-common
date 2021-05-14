@@ -540,6 +540,7 @@ bool VideoEncoder::Start(
   {
     ignerr << "Could not open video codec: " << av_err2str_cpp(ret)
           << ". Video encoding is not started\n";
+#ifdef IGN_COMMON_BUILD_HW_VIDEO
     if (AVUNERROR(ret) == ENOMEM &&
       this->dataPtr->hwEncoder->GetEncoderType() == HWEncoderType::NVENC)
     {
@@ -554,6 +555,7 @@ bool VideoEncoder::Start(
               << "HW-accelerated video encoding tasks on this computer "
               << "simultaneously.\n";
     }
+#endif
     this->Reset();
     return false;
   }
@@ -796,7 +798,6 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
 #else
 
     AVPacket* avPacket = av_packet_alloc();
-    av_init_packet(avPacket);
 
     avPacket->data = nullptr;
     avPacket->size = 0;
@@ -890,7 +891,6 @@ bool VideoEncoder::Stop()
     if (ret >= 0)
     {
       AVPacket *avPacket = av_packet_alloc();
-      av_init_packet(avPacket);
       avPacket->data = nullptr;
       avPacket->size = 0;
 
