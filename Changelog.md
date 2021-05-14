@@ -49,6 +49,14 @@
 
 ## Ignition Common 3.X.X
 
+## Ignition Common 3.13.2 (2021-05-11)
+
+1. Backport collada fixes (Backport #204)
+    * [Pull request #211](https://github.com/ignitionrobotics/ign-common/pull/211)
+
+1. Fix join paths again
+    * [Pull request #215](https://github.com/ignitionrobotics/ign-common/pull/215)
+
 ## Ignition Common 3.13.1 (2021-05-03)
 
 1. Fix join paths to remove duplicate separators

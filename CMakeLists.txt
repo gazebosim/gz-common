@@ -8,7 +8,7 @@ project(ignition-common4 VERSION 4.0.0)
 #============================================================================
 # Find ignition-cmake
 #============================================================================
-find_package(ignition-cmake2 REQUIRED COMPONENTS utilities)
+find_package(ignition-cmake2 2.8.0 REQUIRED COMPONENTS utilities)
 set(IGN_CMAKE_VER ${ignition-cmake2_VERSION_MAJOR})
 
 #============================================================================
@@ -19,6 +19,8 @@ ign_configure_project(VERSION_SUFFIX)
 #============================================================================
 # Set project-specific options
 #============================================================================
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #--------------------------------------
 # Option: Should Windows test symlinking?
