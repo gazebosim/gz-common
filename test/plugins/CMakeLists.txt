@@ -2,7 +2,13 @@ add_library(IGNBadPluginAlign         SHARED BadPluginAlign.cc)
 add_library(IGNBadPluginAPIVersionNew SHARED BadPluginAPIVersionNew.cc)
 add_library(IGNBadPluginAPIVersionOld SHARED BadPluginAPIVersionOld.cc)
 add_library(IGNBadPluginSize          SHARED BadPluginSize.cc)
-add_library(IGNDummyPlugins SHARED DummyPlugins.cc)
+add_library(IGNDummyPlugins           SHARED DummyPlugins.cc)
+
+set_property(TARGET IGNBadPluginAlign PROPERTY CXX_STANDARD 11)
+set_property(TARGET IGNBadPluginAPIVersionNew PROPERTY CXX_STANDARD 11)
+set_property(TARGET IGNBadPluginAPIVersionOld PROPERTY CXX_STANDARD 11)
+set_property(TARGET IGNBadPluginSize PROPERTY CXX_STANDARD 11)
+set_property(TARGET IGNDummyPlugins PROPERTY CXX_STANDARD 11)
 
 # Create a variable for the name of the header which will contain the dummy plugin path.
 # This variable gets put in the cache so that it is available at generation time.
