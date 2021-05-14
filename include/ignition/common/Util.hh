@@ -18,11 +18,13 @@
 #define IGNITION_COMMON_UTIL_HH_
 
 #include <cassert>
+#include <chrono>
+#include <future>
 #include <memory>
 #include <string>
-#include <future>
+#include <thread>
 #include <vector>
-#include <chrono>
+
 #include <ignition/common/Export.hh>
 #include <ignition/common/Filesystem.hh>
 #include <ignition/common/SystemPaths.hh>
@@ -185,10 +187,6 @@ namespace ignition
     std::string IGNITION_COMMON_VISIBLE sha1(
         void const *_buffer, std::size_t _byteCount);
 
-    #ifdef _MSC_VER
-      #pragma warning(disable:4307)
-    #endif
-
     /// \brief fnv1a algorithm for 64-bit platforms.
     /// \param[in] _key The input string.
     /// \return A 64-bit unsigned hash value.
@@ -202,17 +200,13 @@ namespace ignition
 
       for (auto i = 0u; i < len; ++i)
       {
-        uint8_t value = data[i];
+        uint8_t value = static_cast<uint8_t>(data[i]);
         hash = hash ^ value;
         hash *= prime;
       }
 
       return hash;
     }
-
-    #ifdef _MSC_VER
-      #pragma warning(pop)
-    #endif
 
     /// \brief Find the environment variable '_name' and return its value.
     ///

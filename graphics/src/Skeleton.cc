@@ -471,7 +471,6 @@ bool Skeleton::AddBvhAnimation(const std::string &_bvhFile, double _scale)
   this->dataPtr->mapAnimSkin.push_back(skelMap);
   this->dataPtr->alignTranslate.push_back(translations);
   this->dataPtr->alignRotate.push_back(rotations);
-
   return true;
 }
 
