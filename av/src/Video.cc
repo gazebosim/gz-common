@@ -245,12 +245,19 @@ bool Video::Load(const std::string &_filename)
 /////////////////////////////////////////////////
 bool Video::NextFrame(unsigned char **_buffer)
 {
-  AVPacket packet;
+  AVPacket* packet;
   int frameAvailable = 0;
   int ret;
 
   while (frameAvailable == 0)
   {
+    packet = av_packet_alloc();
+    if (!packet)
+    {
+      ignerr << "Failed to allocate AVPacket" << std::endl;
+      return false;
+    }
+
     // this loop will always exit because each call to AVCodecDecode()
     // reads from the input buffer and it has to either end at some time or
     // return a valid frame
@@ -258,10 +265,8 @@ bool Video::NextFrame(unsigned char **_buffer)
     // in draining mode, we no longer read the input stream as it has ended
     if (!this->dataPtr->drainingMode)
     {
-      av_init_packet(&packet);
-
       // read a frame from the input stream
-      ret = av_read_frame(this->dataPtr->formatCtx, &packet);
+      ret = av_read_frame(this->dataPtr->formatCtx, packet);
       if (ret < 0)
       {
         if (ret == AVERROR_EOF)
@@ -277,10 +282,10 @@ bool Video::NextFrame(unsigned char **_buffer)
           return false;
         }
       }
-      else if (packet.stream_index != this->dataPtr->videoStream)
+      else if (packet->stream_index != this->dataPtr->videoStream)
       {
         // packet belongs to a stream we're not interested in (e.g. audio)
-        av_packet_unref(&packet);
+        av_packet_unref(packet);
         continue;
       }
     }
@@ -288,12 +293,12 @@ bool Video::NextFrame(unsigned char **_buffer)
     // Process all the data in the frame
     ret = AVCodecDecode(
       this->dataPtr->codecCtx, this->dataPtr->avFrame, &frameAvailable,
-      this->dataPtr->drainingMode ? nullptr : &packet);
+      this->dataPtr->drainingMode ? nullptr : packet);
 
     if (ret == AVERROR_EOF)
     {
       if (!this->dataPtr->drainingMode)
-        AVPacketUnref(&packet);
+        av_packet_unref(packet);
       return false;
     }
     else if (ret < 0)
@@ -303,7 +308,7 @@ bool Video::NextFrame(unsigned char **_buffer)
       // continue processing data
     }
     if (!this->dataPtr->drainingMode)
-      AVPacketUnref(&packet);
+      av_packet_unref(packet);
   }
 
   // processing the image if available
