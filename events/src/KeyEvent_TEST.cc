@@ -24,41 +24,109 @@ using namespace common;
 /////////////////////////////////////////////////
 TEST(KeyEventTEST, Constructor)
 {
-  KeyEvent evt;
-  EXPECT_EQ(evt.Type(), KeyEvent::NO_EVENT);
-  EXPECT_EQ(evt.Key(), 0);
-  EXPECT_TRUE(evt.Text().empty());
-  EXPECT_FALSE(evt.Control());
-  EXPECT_FALSE(evt.Shift());
-  EXPECT_FALSE(evt.Alt());
+  // copy constructor
+  {
+    KeyEvent evt;
+    EXPECT_EQ(evt.Type(), KeyEvent::NO_EVENT);
+    EXPECT_EQ(evt.Key(), 0);
+    EXPECT_TRUE(evt.Text().empty());
+    EXPECT_FALSE(evt.Control());
+    EXPECT_FALSE(evt.Shift());
+    EXPECT_FALSE(evt.Alt());
 
-  evt.SetType(KeyEvent::PRESS);
-  evt.SetKey(123);
-  evt.SetText("hello");
-  evt.SetControl(true);
-  evt.SetShift(true);
-  evt.SetAlt(true);
+    evt.SetType(KeyEvent::PRESS);
+    evt.SetKey(123);
+    evt.SetText("hello");
+    evt.SetControl(true);
+    evt.SetShift(true);
+    evt.SetAlt(true);
 
-  EXPECT_EQ(evt.Type(), KeyEvent::PRESS);
-  EXPECT_EQ(evt.Key(), 123);
-  EXPECT_EQ(evt.Text(), "hello");
-  EXPECT_TRUE(evt.Control());
-  EXPECT_TRUE(evt.Shift());
-  EXPECT_TRUE(evt.Alt());
+    KeyEvent otherEvent(evt);
+    EXPECT_EQ(otherEvent.Type(), KeyEvent::PRESS);
+    EXPECT_EQ(otherEvent.Key(), 123);
+    EXPECT_EQ(otherEvent.Text(), "hello");
+    EXPECT_TRUE(otherEvent.Control());
+    EXPECT_TRUE(otherEvent.Shift());
+    EXPECT_TRUE(otherEvent.Alt());
+  }
 
-  KeyEvent otherEvent1 = evt;
-  EXPECT_EQ(otherEvent1.Type(), KeyEvent::PRESS);
-  EXPECT_EQ(otherEvent1.Key(), 123);
-  EXPECT_EQ(otherEvent1.Text(), "hello");
-  EXPECT_TRUE(otherEvent1.Control());
-  EXPECT_TRUE(otherEvent1.Shift());
-  EXPECT_TRUE(otherEvent1.Alt());
+  // assignment
+  {
+    KeyEvent evt;
+    EXPECT_EQ(evt.Type(), KeyEvent::NO_EVENT);
+    EXPECT_EQ(evt.Key(), 0);
+    EXPECT_TRUE(evt.Text().empty());
+    EXPECT_FALSE(evt.Control());
+    EXPECT_FALSE(evt.Shift());
+    EXPECT_FALSE(evt.Alt());
 
-  KeyEvent otherEvent2(evt);
-  EXPECT_EQ(otherEvent2.Type(), KeyEvent::PRESS);
-  EXPECT_EQ(otherEvent2.Key(), 123);
-  EXPECT_EQ(otherEvent2.Text(), "hello");
-  EXPECT_TRUE(otherEvent2.Control());
-  EXPECT_TRUE(otherEvent2.Shift());
-  EXPECT_TRUE(otherEvent2.Alt());
+    evt.SetType(KeyEvent::PRESS);
+    evt.SetKey(123);
+    evt.SetText("hello");
+    evt.SetControl(true);
+    evt.SetShift(true);
+    evt.SetAlt(true);
+
+    KeyEvent otherEvent;
+    otherEvent = evt;
+    EXPECT_EQ(otherEvent.Type(), KeyEvent::PRESS);
+    EXPECT_EQ(otherEvent.Key(), 123);
+    EXPECT_EQ(otherEvent.Text(), "hello");
+    EXPECT_TRUE(otherEvent.Control());
+    EXPECT_TRUE(otherEvent.Shift());
+    EXPECT_TRUE(otherEvent.Alt());
+  }
+
+  // move assignment
+  {
+    KeyEvent evt;
+    EXPECT_EQ(evt.Type(), KeyEvent::NO_EVENT);
+    EXPECT_EQ(evt.Key(), 0);
+    EXPECT_TRUE(evt.Text().empty());
+    EXPECT_FALSE(evt.Control());
+    EXPECT_FALSE(evt.Shift());
+    EXPECT_FALSE(evt.Alt());
+
+    evt.SetType(KeyEvent::PRESS);
+    evt.SetKey(123);
+    evt.SetText("hello");
+    evt.SetControl(true);
+    evt.SetShift(true);
+    evt.SetAlt(true);
+
+    KeyEvent otherEvent;
+    otherEvent = std::move(evt);
+    EXPECT_EQ(otherEvent.Type(), KeyEvent::PRESS);
+    EXPECT_EQ(otherEvent.Key(), 123);
+    EXPECT_EQ(otherEvent.Text(), "hello");
+    EXPECT_TRUE(otherEvent.Control());
+    EXPECT_TRUE(otherEvent.Shift());
+    EXPECT_TRUE(otherEvent.Alt());
+  }
+
+  // move
+  {
+    KeyEvent evt;
+    EXPECT_EQ(evt.Type(), KeyEvent::NO_EVENT);
+    EXPECT_EQ(evt.Key(), 0);
+    EXPECT_TRUE(evt.Text().empty());
+    EXPECT_FALSE(evt.Control());
+    EXPECT_FALSE(evt.Shift());
+    EXPECT_FALSE(evt.Alt());
+
+    evt.SetType(KeyEvent::PRESS);
+    evt.SetKey(123);
+    evt.SetText("hello");
+    evt.SetControl(true);
+    evt.SetShift(true);
+    evt.SetAlt(true);
+
+    KeyEvent otherEvent(std::move(evt));
+    EXPECT_EQ(otherEvent.Type(), KeyEvent::PRESS);
+    EXPECT_EQ(otherEvent.Key(), 123);
+    EXPECT_EQ(otherEvent.Text(), "hello");
+    EXPECT_TRUE(otherEvent.Control());
+    EXPECT_TRUE(otherEvent.Shift());
+    EXPECT_TRUE(otherEvent.Alt());
+  }
 }

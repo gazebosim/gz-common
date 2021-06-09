@@ -54,6 +54,13 @@ KeyEvent::KeyEvent(const KeyEvent &_other)
 }
 
 /////////////////////////////////////////////////
+KeyEvent::KeyEvent(KeyEvent &&_other)
+  : dataPtr(new KeyEventPrivate)
+{
+  this->dataPtr = std::move(_other.dataPtr);
+}
+
+/////////////////////////////////////////////////
 KeyEvent::~KeyEvent()
 {
 }
@@ -138,5 +145,16 @@ KeyEvent &KeyEvent::operator=(const KeyEvent &_other)
 
   *this->dataPtr = *_other.dataPtr;
 
+  return *this;
+}
+
+/////////////////////////////////////////////////
+KeyEvent &KeyEvent::operator=(KeyEvent&& other)
+{
+  if (this->dataPtr)
+  {
+    this->dataPtr.reset();
+  }
+  this->dataPtr = std::move(other.dataPtr);
   return *this;
 }
