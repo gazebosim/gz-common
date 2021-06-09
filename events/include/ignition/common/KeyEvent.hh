@@ -41,7 +41,7 @@ namespace ignition
       public: KeyEvent();
 
       /// \brief Copy constructor.
-      /// \param[in] _other Other mouse event
+      /// \param[in] _other Other key event
       public: KeyEvent(const KeyEvent &_other);
 
       /// \brief Destructor
@@ -97,7 +97,7 @@ namespace ignition
       public: void SetAlt(const bool _alt);
 
       /// \brief Assignment operator
-      /// \param[in] _other Other mouse event
+      /// \param[in] _other Other key event
       /// \return this
       public: KeyEvent &operator=(const KeyEvent &_other);
 
