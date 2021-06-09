@@ -18,11 +18,13 @@
 #define IGNITION_COMMON_UTIL_HH_
 
 #include <cassert>
+#include <chrono>
+#include <future>
 #include <memory>
 #include <string>
-#include <future>
+#include <thread>
 #include <vector>
-#include <chrono>
+
 #include <ignition/common/Export.hh>
 #include <ignition/common/Filesystem.hh>
 #include <ignition/common/SystemPaths.hh>

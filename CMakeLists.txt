@@ -3,12 +3,12 @@ cmake_minimum_required(VERSION 3.10.2 FATAL_ERROR)
 #============================================================================
 # Initialize the project
 #============================================================================
-project(ignition-common3 VERSION 3.13.1)
+project(ignition-common3 VERSION 3.13.2)
 
 #============================================================================
 # Find ignition-cmake
 #============================================================================
-find_package(ignition-cmake2 REQUIRED COMPONENTS utilities)
+find_package(ignition-cmake2 2.8.0 REQUIRED COMPONENTS utilities)
 set(IGN_CMAKE_VER ${ignition-cmake2_VERSION_MAJOR})
 
 #============================================================================
@@ -19,6 +19,8 @@ ign_configure_project()
 #============================================================================
 # Set project-specific options
 #============================================================================
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #--------------------------------------
 # Option: Should Windows test symlinking?
