@@ -40,6 +40,10 @@ namespace ignition
       /// \brief Constructor.
       public: KeyEvent();
 
+      /// \brief Copy constructor.
+      /// \param[in] _other Other mouse event
+      public: KeyEvent(const KeyEvent &_other);
+
       /// \brief Destructor
       public: ~KeyEvent();
 

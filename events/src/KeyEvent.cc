@@ -47,6 +47,13 @@ KeyEvent::KeyEvent()
 }
 
 /////////////////////////////////////////////////
+KeyEvent::KeyEvent(const KeyEvent &_other)
+  : dataPtr(new KeyEventPrivate)
+{
+  *dataPtr = *_other.dataPtr;
+}
+
+/////////////////////////////////////////////////
 KeyEvent::~KeyEvent()
 {
 }

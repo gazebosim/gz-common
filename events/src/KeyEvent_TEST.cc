@@ -22,7 +22,7 @@ using namespace ignition;
 using namespace common;
 
 /////////////////////////////////////////////////
-TEST(KeyEventTEST, URIPath)
+TEST(KeyEventTEST, Constructor)
 {
   KeyEvent evt;
   EXPECT_EQ(evt.Type(), KeyEvent::NO_EVENT);
@@ -45,4 +45,12 @@ TEST(KeyEventTEST, URIPath)
   EXPECT_TRUE(evt.Control());
   EXPECT_TRUE(evt.Shift());
   EXPECT_TRUE(evt.Alt());
+
+  KeyEvent otherEvent2(evt);
+  EXPECT_EQ(otherEvent2.Type(), KeyEvent::PRESS);
+  EXPECT_EQ(otherEvent2.Key(), 123);
+  EXPECT_EQ(otherEvent2.Text(), "hello");
+  EXPECT_TRUE(otherEvent2.Control());
+  EXPECT_TRUE(otherEvent2.Shift());
+  EXPECT_TRUE(otherEvent2.Alt());
 }
