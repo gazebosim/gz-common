@@ -55,9 +55,9 @@ KeyEvent::KeyEvent(const KeyEvent &_other)
 
 /////////////////////////////////////////////////
 KeyEvent::KeyEvent(KeyEvent &&_other)
-  : dataPtr(new KeyEventPrivate)
 {
   this->dataPtr = std::move(_other.dataPtr);
+  _other.dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////
