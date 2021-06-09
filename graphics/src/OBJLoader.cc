@@ -59,6 +59,21 @@ Mesh *OBJLoader::Load(const std::string &_filename)
   std::map<std::string, Material *> materialIds;
   std::string path = common::parentPath(_filename);
 
+  // check if obj is exported by blender
+  // blender shoves BR fields in standard textures
+  bool exportedByBlender = false;
+  std::ifstream infile(_filename);
+  if (infile.good())
+  {
+    std::string line;
+    std::getline(infile, line);
+    std::transform(line.begin(), line.end(), line.begin(),
+        [](unsigned char c){ return std::tolower(c); });
+    if (line.find("blender") != std::string::npos)
+      exportedByBlender = true;
+  }
+  infile.close();
+
   tinyobj::attrib_t attrib;
   std::vector<tinyobj::shape_t> shapes;
   std::vector<tinyobj::material_t> materials;
@@ -131,6 +146,50 @@ Mesh *OBJLoader::Load(const std::string &_filename)
             mat->SetTransparency(1.0 - m.dissolve);
             if (!m.diffuse_texname.empty())
               mat->SetTextureImage(m.diffuse_texname, path.c_str());
+
+            // load PBR textures
+            // Some obj exporters put PBR maps in the standard textures
+            // while others have proper support for obj PBR extension
+            Pbr pbrMat;
+            // PBR shoved into standard textures
+            if (!m.specular_texname.empty())
+              pbrMat.SetRoughnessMap(m.specular_texname);
+
+            // check if obj is exported by blender
+            // blender obj exporter puts roughness map in specular highlight
+            // field and metalness map in reflection map field!
+            // see summary in https://developer.blender.org/D8868
+            // detailing the existing exporter issues
+            // todo(anyone) add a check for blender version to avoid this hack
+            // when blender fixes their exporter issue
+            if (!m.specular_highlight_texname.empty() && exportedByBlender)
+            {
+              pbrMat.SetRoughnessMap(m.specular_highlight_texname);
+              if (!m.reflection_texname.empty())
+                pbrMat.SetMetalnessMap(m.reflection_texname);
+            }
+            else if (!m.reflection_texname.empty())
+            {
+              pbrMat.SetEnvironmentMap(m.reflection_texname);
+            }
+            if (!m.bump_texname.empty())
+              pbrMat.SetNormalMap(m.bump_texname);
+
+            // PBR extension - overrides standard materials
+            if (!m.roughness_texname.empty())
+              pbrMat.SetRoughnessMap(m.roughness_texname);
+            if (!m.metallic_texname.empty())
+              pbrMat.SetMetalnessMap(m.metallic_texname);
+            if (!m.normal_texname.empty())
+              pbrMat.SetNormalMap(m.normal_texname);
+            if (!m.emissive_texname.empty())
+              pbrMat.SetEmissiveMap(m.emissive_texname);
+
+            pbrMat.SetRoughness(m.roughness);
+            pbrMat.SetMetalness(m.metallic);
+
+            mat->SetPbrMaterial(pbrMat);
+
             materialIds[m.name] = mat;
           }
           int matIndex = mesh->IndexOfMaterial(mat);

@@ -77,7 +77,7 @@ void AudioDecoder::Cleanup()
 /////////////////////////////////////////////////
 bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
 {
-  AVPacket packet, packet1;
+  AVPacket *packet, packet1;
   int bytesDecoded = 0;
   unsigned int maxBufferSize = 0;
   AVFrame *decodedFrame = nullptr;
@@ -110,14 +110,20 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
     result = false;
   }
 
-  av_init_packet(&packet);
-  while (av_read_frame(this->data->formatCtx, &packet) == 0)
+  packet = av_packet_alloc();
+  if (!packet)
   {
-    if (packet.stream_index == this->data->audioStream)
+    ignerr << "Failed to allocate AVPacket" << std::endl;
+    return false;
+  }
+
+  while (av_read_frame(this->data->formatCtx, packet) == 0)
+  {
+    if (packet->stream_index == this->data->audioStream)
     {
       int gotFrame = 0;
 
-      packet1 = packet;
+      packet1 = *packet;
       while (packet1.size)
       {
         // Some frames rely on multiple packets, so we have to make sure
@@ -158,10 +164,10 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
         packet1.size -= bytesDecoded;
       }
     }
-    AVPacketUnref(&packet);
+    av_packet_unref(packet);
   }
 
-  AVPacketUnref(&packet);
+  av_packet_unref(packet);
 
   // Seek to the beginning so that it can be decoded again, if necessary.
   av_seek_frame(this->data->formatCtx, this->data->audioStream, 0, 0);
