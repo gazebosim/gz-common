@@ -46,6 +46,14 @@ TEST(KeyEventTEST, Constructor)
   EXPECT_TRUE(evt.Shift());
   EXPECT_TRUE(evt.Alt());
 
+  KeyEvent otherEvent1 = evt;
+  EXPECT_EQ(otherEvent1.Type(), KeyEvent::PRESS);
+  EXPECT_EQ(otherEvent1.Key(), 123);
+  EXPECT_EQ(otherEvent1.Text(), "hello");
+  EXPECT_TRUE(otherEvent1.Control());
+  EXPECT_TRUE(otherEvent1.Shift());
+  EXPECT_TRUE(otherEvent1.Alt());
+
   KeyEvent otherEvent2(evt);
   EXPECT_EQ(otherEvent2.Type(), KeyEvent::PRESS);
   EXPECT_EQ(otherEvent2.Key(), 123);

@@ -96,6 +96,11 @@ namespace ignition
       /// \param[in] _alt Status of the alt key
       public: void SetAlt(const bool _alt);
 
+      /// \brief Assignment operator
+      /// \param[in] _other Other mouse event
+      /// \return this
+      public: KeyEvent &operator=(const KeyEvent &_other);
+
       IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Private data pointer
       private: std::unique_ptr<KeyEventPrivate> dataPtr;

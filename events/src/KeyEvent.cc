@@ -129,3 +129,14 @@ void KeyEvent::SetAlt(const bool _alt)
 {
   this->dataPtr->alt = _alt;
 }
+
+/////////////////////////////////////////////////
+KeyEvent &KeyEvent::operator=(const KeyEvent &_other)
+{
+  if (this == &_other)
+      return *this;
+
+  *this->dataPtr = *_other.dataPtr;
+
+  return *this;
+}
