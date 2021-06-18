@@ -22,27 +22,111 @@ using namespace ignition;
 using namespace common;
 
 /////////////////////////////////////////////////
-TEST(KeyEventTEST, URIPath)
+TEST(KeyEventTEST, Constructor)
 {
-  KeyEvent evt;
-  EXPECT_EQ(evt.Type(), KeyEvent::NO_EVENT);
-  EXPECT_EQ(evt.Key(), 0);
-  EXPECT_TRUE(evt.Text().empty());
-  EXPECT_FALSE(evt.Control());
-  EXPECT_FALSE(evt.Shift());
-  EXPECT_FALSE(evt.Alt());
+  // copy constructor
+  {
+    KeyEvent evt;
+    EXPECT_EQ(evt.Type(), KeyEvent::NO_EVENT);
+    EXPECT_EQ(evt.Key(), 0);
+    EXPECT_TRUE(evt.Text().empty());
+    EXPECT_FALSE(evt.Control());
+    EXPECT_FALSE(evt.Shift());
+    EXPECT_FALSE(evt.Alt());
 
-  evt.SetType(KeyEvent::PRESS);
-  evt.SetKey(123);
-  evt.SetText("hello");
-  evt.SetControl(true);
-  evt.SetShift(true);
-  evt.SetAlt(true);
+    evt.SetType(KeyEvent::PRESS);
+    evt.SetKey(123);
+    evt.SetText("hello");
+    evt.SetControl(true);
+    evt.SetShift(true);
+    evt.SetAlt(true);
 
-  EXPECT_EQ(evt.Type(), KeyEvent::PRESS);
-  EXPECT_EQ(evt.Key(), 123);
-  EXPECT_EQ(evt.Text(), "hello");
-  EXPECT_TRUE(evt.Control());
-  EXPECT_TRUE(evt.Shift());
-  EXPECT_TRUE(evt.Alt());
+    KeyEvent otherEvent(evt);
+    EXPECT_EQ(otherEvent.Type(), KeyEvent::PRESS);
+    EXPECT_EQ(otherEvent.Key(), 123);
+    EXPECT_EQ(otherEvent.Text(), "hello");
+    EXPECT_TRUE(otherEvent.Control());
+    EXPECT_TRUE(otherEvent.Shift());
+    EXPECT_TRUE(otherEvent.Alt());
+  }
+
+  // assignment
+  {
+    KeyEvent evt;
+    EXPECT_EQ(evt.Type(), KeyEvent::NO_EVENT);
+    EXPECT_EQ(evt.Key(), 0);
+    EXPECT_TRUE(evt.Text().empty());
+    EXPECT_FALSE(evt.Control());
+    EXPECT_FALSE(evt.Shift());
+    EXPECT_FALSE(evt.Alt());
+
+    evt.SetType(KeyEvent::PRESS);
+    evt.SetKey(123);
+    evt.SetText("hello");
+    evt.SetControl(true);
+    evt.SetShift(true);
+    evt.SetAlt(true);
+
+    KeyEvent otherEvent;
+    otherEvent = evt;
+    EXPECT_EQ(otherEvent.Type(), KeyEvent::PRESS);
+    EXPECT_EQ(otherEvent.Key(), 123);
+    EXPECT_EQ(otherEvent.Text(), "hello");
+    EXPECT_TRUE(otherEvent.Control());
+    EXPECT_TRUE(otherEvent.Shift());
+    EXPECT_TRUE(otherEvent.Alt());
+  }
+
+  // move assignment
+  {
+    KeyEvent evt;
+    EXPECT_EQ(evt.Type(), KeyEvent::NO_EVENT);
+    EXPECT_EQ(evt.Key(), 0);
+    EXPECT_TRUE(evt.Text().empty());
+    EXPECT_FALSE(evt.Control());
+    EXPECT_FALSE(evt.Shift());
+    EXPECT_FALSE(evt.Alt());
+
+    evt.SetType(KeyEvent::PRESS);
+    evt.SetKey(123);
+    evt.SetText("hello");
+    evt.SetControl(true);
+    evt.SetShift(true);
+    evt.SetAlt(true);
+
+    KeyEvent otherEvent;
+    otherEvent = std::move(evt);
+    EXPECT_EQ(otherEvent.Type(), KeyEvent::PRESS);
+    EXPECT_EQ(otherEvent.Key(), 123);
+    EXPECT_EQ(otherEvent.Text(), "hello");
+    EXPECT_TRUE(otherEvent.Control());
+    EXPECT_TRUE(otherEvent.Shift());
+    EXPECT_TRUE(otherEvent.Alt());
+  }
+
+  // move
+  {
+    KeyEvent evt;
+    EXPECT_EQ(evt.Type(), KeyEvent::NO_EVENT);
+    EXPECT_EQ(evt.Key(), 0);
+    EXPECT_TRUE(evt.Text().empty());
+    EXPECT_FALSE(evt.Control());
+    EXPECT_FALSE(evt.Shift());
+    EXPECT_FALSE(evt.Alt());
+
+    evt.SetType(KeyEvent::PRESS);
+    evt.SetKey(123);
+    evt.SetText("hello");
+    evt.SetControl(true);
+    evt.SetShift(true);
+    evt.SetAlt(true);
+
+    KeyEvent otherEvent(std::move(evt));
+    EXPECT_EQ(otherEvent.Type(), KeyEvent::PRESS);
+    EXPECT_EQ(otherEvent.Key(), 123);
+    EXPECT_EQ(otherEvent.Text(), "hello");
+    EXPECT_TRUE(otherEvent.Control());
+    EXPECT_TRUE(otherEvent.Shift());
+    EXPECT_TRUE(otherEvent.Alt());
+  }
 }

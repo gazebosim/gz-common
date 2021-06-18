@@ -47,6 +47,20 @@ KeyEvent::KeyEvent()
 }
 
 /////////////////////////////////////////////////
+KeyEvent::KeyEvent(const KeyEvent &_other)
+  : dataPtr(new KeyEventPrivate)
+{
+  *dataPtr = *_other.dataPtr;
+}
+
+/////////////////////////////////////////////////
+KeyEvent::KeyEvent(KeyEvent &&_other)
+{
+  this->dataPtr = std::move(_other.dataPtr);
+  _other.dataPtr = nullptr;
+}
+
+/////////////////////////////////////////////////
 KeyEvent::~KeyEvent()
 {
 }
@@ -121,4 +135,26 @@ bool KeyEvent::Alt() const
 void KeyEvent::SetAlt(const bool _alt)
 {
   this->dataPtr->alt = _alt;
+}
+
+/////////////////////////////////////////////////
+KeyEvent &KeyEvent::operator=(const KeyEvent &_other)
+{
+  if (this == &_other)
+      return *this;
+
+  *this->dataPtr = *_other.dataPtr;
+
+  return *this;
+}
+
+/////////////////////////////////////////////////
+KeyEvent &KeyEvent::operator=(KeyEvent&& other)
+{
+  if (this->dataPtr)
+  {
+    this->dataPtr.reset();
+  }
+  this->dataPtr = std::move(other.dataPtr);
+  return *this;
 }
