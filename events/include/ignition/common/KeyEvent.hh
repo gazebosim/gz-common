@@ -40,6 +40,14 @@ namespace ignition
       /// \brief Constructor.
       public: KeyEvent();
 
+      /// \brief Copy constructor.
+      /// \param[in] _other Other key event
+      public: KeyEvent(const KeyEvent &_other);
+
+      // \brief  Move constructor.
+      /// \param[in] _other Other key event
+      public: KeyEvent(KeyEvent &&_other);
+
       /// \brief Destructor
       public: ~KeyEvent();
 
@@ -91,6 +99,16 @@ namespace ignition
       /// \brief Set whether the alt key was held during this key event
       /// \param[in] _alt Status of the alt key
       public: void SetAlt(const bool _alt);
+
+      /// \brief Assignment operator
+      /// \param[in] _other Other key event
+      /// \return this
+      public: KeyEvent &operator=(const KeyEvent &_other);
+
+      /// \brief Move assignment operator.
+      /// \param[in] _other Other key event
+      /// \return this
+      public: KeyEvent& operator=(KeyEvent&& other);
 
       IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Private data pointer
