@@ -22,13 +22,10 @@
 1. Remove `tools/code_check` and update codecov
     * [Pull request #219](https://github.com/ignitionrobotics/ign-common/pull/219)
 
-1. Backport collada fixes
-    * [Pull request #211](https://github.com/ignitionrobotics/ign-common/pull/211)
-
 1. Port codecov to new configuration
     * [Pull request #212](https://github.com/ignitionrobotics/ign-common/pull/212)
 
-1.  Fix loading collada files with multiple texcoord sets using the same offset
+1. Fix loading collada files with multiple texcoord sets using the same offset
     * [Pull request #208](https://github.com/ignitionrobotics/ign-common/pull/208)
 
 1. Add function to convert single channel image data to RGB image
