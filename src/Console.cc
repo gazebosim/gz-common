@@ -122,11 +122,16 @@ Logger::Buffer::~Buffer()
 /////////////////////////////////////////////////
 int Logger::Buffer::sync()
 {
+  static std::mutex syncMutex;
+
   std::string outstr = this->str();
 
   // Log messages to disk
-  Console::log << outstr;
-  Console::log.flush();
+  {
+    std::lock_guard<std::mutex> lk(syncMutex);
+    Console::log << outstr;
+    Console::log.flush();
+  }
 
   // Output to terminal
   if (Console::Verbosity() >= this->verbosity && !outstr.empty())
@@ -143,7 +148,10 @@ int Logger::Buffer::sync()
     if (lastNewLine)
       ss << std::endl;
 
-    fprintf(outstream, "%s", ss.str().c_str());
+    {
+      std::lock_guard<std::mutex> lk(syncMutex);
+      fprintf(outstream, "%s", ss.str().c_str());
+    }
 #else
     HANDLE hConsole = CreateFileW(
       L"CONOUT$", GENERIC_WRITE|GENERIC_READ, 0, nullptr, OPEN_EXISTING,
@@ -168,10 +176,13 @@ int Logger::Buffer::sync()
     std::ostream &outStream =
         this->type == Logger::STDOUT ? std::cout : std::cerr;
 
-    if (vtProcessing)
-      outStream << "\x1b[" << this->color << "m" << outstr << "\x1b[m";
-    else
-      outStream << outstr;
+    {
+      std::lock_guard<std::mutex> lk(syncMutex);
+      if (vtProcessing)
+        outStream << "\x1b[" << this->color << "m" << outstr << "\x1b[m";
+      else
+        outStream << outstr;
+    }
 #endif
   }
 
