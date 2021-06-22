@@ -1,6 +1,64 @@
 ## Ignition Common 4.x
 
-## Ignition Common 4.X.X
+## Ignition Common 4.X.X (202X-XX-XX)
+
+## Ignition Common 4.1.0 (2021-06-22)
+
+1. Make KeyEvent rule-of-five compliant
+    * [Pull request #224](https://github.com/ignitionrobotics/ign-common/pull/224)
+
+1. Fix `av_*` API usage for deprecations
+    * [Pull request #220](https://github.com/ignitionrobotics/ign-common/pull/220)
+
+1. Set project-wide standard to C++17
+    * [Pull request #221](https://github.com/ignitionrobotics/ign-common/pull/221)
+
+1. Remove `CMAKE_CXX_FLAGS` from test targets
+    * [Pull request #214](https://github.com/ignitionrobotics/ign-common/pull/214)
+
+1. Support loading PBR textures in OBJLoader
+    * [Pull request #216](https://github.com/ignitionrobotics/ign-common/pull/216)
+
+1. Remove `tools/code_check` and update codecov
+    * [Pull request #219](https://github.com/ignitionrobotics/ign-common/pull/219)
+
+1. Backport collada fixes
+    * [Pull request #211](https://github.com/ignitionrobotics/ign-common/pull/211)
+
+1. Port codecov to new configuration
+    * [Pull request #212](https://github.com/ignitionrobotics/ign-common/pull/212)
+
+1.  Fix loading collada files with multiple texcoord sets using the same offset
+    * [Pull request #208](https://github.com/ignitionrobotics/ign-common/pull/208)
+
+1. Add function to convert single channel image data to RGB image
+    * [Pull request #205](https://github.com/ignitionrobotics/ign-common/pull/205)
+
+1. Remove ColladaExporter path constraint
+    * [Pull request #204](https://github.com/ignitionrobotics/ign-common/pull/204)
+
+1. Avoid duplication of / in joinPaths (Windows)
+    * [Pull request #201](https://github.com/ignitionrobotics/ign-common/pull/201)
+    * [Pull request #209](https://github.com/ignitionrobotics/ign-common/pull/209)
+    * [Pull request #215](https://github.com/ignitionrobotics/ign-common/pull/215)
+
+1. Fixed colladaLoader on Windows
+    * [Pull request #200](https://github.com/ignitionrobotics/ign-common/pull/200)
+
+1. Improved Windows support
+    * [Pull request #197](https://github.com/ignitionrobotics/ign-common/pull/197)
+
+1. Function to serialize compressed image to buffer
+    * [Pull request #139](https://github.com/ignitionrobotics/ign-common/pull/139)
+
+1. Fixed tutorial link
+    * [Pull request #194](https://github.com/ignitionrobotics/ign-common/pull/194)
+
+1. Use matching malloc/free for AudioDecoder.
+    * [Pull request #192](https://github.com/ignitionrobotics/ign-common/pull/192)
+
+1. Add bazel buildsystem support
+    * [Pull request #123](https://github.com/ignitionrobotics/ign-common/pull/123)
 
 ## Ignition Common 4.0.0 (2021-03-30)
 
@@ -67,19 +125,19 @@
 
 ## Ignition Common 3.13.0 (2021-04-27)
 
-1. Add function to convert single channel image data to RGB image 
+1. Add function to convert single channel image data to RGB image
     * [Pull request #205](https://github.com/ignitionrobotics/ign-common/pull/205)
 
 1. Avoid duplication of / in joinPaths (Windows)
     * [Pull request #201](https://github.com/ignitionrobotics/ign-common/pull/201)
 
-1. Fix colladaLoader on Windows 
+1. Fix colladaLoader on Windows
     * [Pull request #200](https://github.com/ignitionrobotics/ign-common/pull/200)
 
 1. Backport #188: Fix crash when using BVH animations.
     * [Pull request #199](https://github.com/ignitionrobotics/ign-common/pull/199)
 
-1. Improved Windows support 
+1. Improved Windows support
     * [Pull request #197](https://github.com/ignitionrobotics/ign-common/pull/197)
 
 ## Ignition Common 3.12.0 (2021-04-06)
@@ -96,7 +154,7 @@
 1. Fixed tutorial link in the README.md.
     * [Pull request #194](https://github.com/ignitionrobotics/ign-common/pull/194)
 
-1. Function to serialize compressed image to buffer 
+1. Function to serialize compressed image to buffer
     * [Pull request #139](https://github.com/ignitionrobotics/ign-common/pull/139)
 
 ## Ignition Common 3.11.1 (2021-03-08)
