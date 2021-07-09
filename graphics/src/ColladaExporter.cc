@@ -122,7 +122,8 @@ class ignition::common::ColladaExporter::Implementation
   /// scenes XML instance
   public: void ExportVisualScenes(
               tinyxml2::XMLElement *_libraryVisualScenesXml,
-              const std::vector<math::Matrix4d> &_submeshToMatrix);
+              const std::vector<math::Matrix4d> &_submeshToMatrix,
+              const std::vector<ColladaLight> &_lights);
 
   /// \brief Export scene element
   /// \param[in] _sceneXml Pointer to the scene XML instance
@@ -164,12 +165,14 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
     bool _exportTextures)
 {
   std::vector<math::Matrix4d> empty;
-  this->Export(_mesh, _filename, _exportTextures, empty);
+  std::vector<ColladaLight> empty_lights;
+  this->Export(_mesh, _filename, _exportTextures, empty, empty_lights);
 }
 
 //////////////////////////////////////////////////
 void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
-    bool _exportTextures, const std::vector<math::Matrix4d> &_submeshToMatrix)
+    bool _exportTextures, const std::vector<math::Matrix4d> &_submeshToMatrix,
+    const std::vector<ColladaLight> &_lights)
 {
   if ( _submeshToMatrix.size() > 0 &&
     (_mesh->SubMeshCount() != _submeshToMatrix.size()) )
@@ -239,10 +242,73 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
     colladaXml->LinkEndChild(libraryEffectsXml);
   }
 
+  tinyxml2::XMLElement *libraryLightsXml =
+      xmlDoc.NewElement("library_lights");
+  for (const auto& light : _lights)
+  {
+    tinyxml2::XMLElement *lightXml =
+      xmlDoc.NewElement("light");
+    lightXml->SetAttribute("name", light.name.c_str());
+    lightXml->SetAttribute("id", light.name.c_str());
+    libraryLightsXml->LinkEndChild(lightXml);
+
+    tinyxml2::XMLElement *techniqueCommonXml =
+      xmlDoc.NewElement("technique_common");
+    lightXml->LinkEndChild(techniqueCommonXml);
+    
+    tinyxml2::XMLElement *lightTypeXml =
+      xmlDoc.NewElement(light.type.c_str());
+    techniqueCommonXml->LinkEndChild(lightTypeXml);
+
+    // color
+    tinyxml2::XMLElement *colorXml =
+      xmlDoc.NewElement("color");
+    char color_str[100] = { 0 };
+    snprintf(color_str, sizeof(color_str), "%g %g %g", light.diffuse.R(), light.diffuse.G(), light.diffuse.B());
+    colorXml->SetText(color_str);
+    lightTypeXml->LinkEndChild(colorXml);
+
+    // attenuations
+    if (light.name == "point" || light.name == "spot")
+    {
+      auto attenuation_tag = [&](const char* tagname, double value)
+      {
+        tinyxml2::XMLElement *attenXml =
+          xmlDoc.NewElement(tagname);
+        
+        char str[100] = { 0 };
+        snprintf(str, sizeof(str), "%g", value);
+        attenXml->SetText(str);
+        lightTypeXml->LinkEndChild(attenXml);
+      };
+      attenuation_tag("constant_attenuation", light.constant_attenuation);
+      attenuation_tag("linear_attenuation", light.linear_attenuation);
+      attenuation_tag("quadratic_attenuation", light.quadratic_attenuation);
+    }
+
+    // falloff
+    if (light.name == "spot")
+    {
+      tinyxml2::XMLElement *falloffAngleXml =
+        xmlDoc.NewElement("falloff_angle");
+      char str[100] = { 0 };
+      snprintf(str, sizeof(str), "%g", light.falloff_angle_deg);
+      falloffAngleXml->SetText(str);
+      lightTypeXml->LinkEndChild(falloffAngleXml);
+
+      tinyxml2::XMLElement *falloffExpoXml =
+        xmlDoc.NewElement("falloff_angle");
+      snprintf(str, sizeof(str), "%g", light.falloff_exponent);
+      falloffExpoXml->SetText(str);
+      lightTypeXml->LinkEndChild(falloffExpoXml);
+    }
+  }
+  colladaXml->LinkEndChild(libraryLightsXml);
+
   // Library visual scenes element
   tinyxml2::XMLElement *libraryVisualScenesXml =
       xmlDoc.NewElement("library_visual_scenes");
-  this->dataPtr->ExportVisualScenes(libraryVisualScenesXml, _submeshToMatrix);
+  this->dataPtr->ExportVisualScenes(libraryVisualScenesXml, _submeshToMatrix, _lights);
   colladaXml->LinkEndChild(libraryVisualScenesXml);
 
   // Scene element
@@ -765,7 +831,8 @@ void ColladaExporter::Implementation::ExportEffects(
 //////////////////////////////////////////////////
 void ColladaExporter::Implementation::ExportVisualScenes(
     tinyxml2::XMLElement *_libraryVisualScenesXml,
-    const std::vector<math::Matrix4d> &_submeshToMatrix)
+    const std::vector<math::Matrix4d> &_submeshToMatrix,
+    const std::vector<ColladaLight> &_lights)
 {
   tinyxml2::XMLElement *visualSceneXml =
     _libraryVisualScenesXml->GetDocument()->NewElement("visual_scene");
@@ -846,6 +913,56 @@ void ColladaExporter::Implementation::ExportVisualScenes(
         bindVertexInputXml->SetAttribute("semantic", "UVSET0");
         bindVertexInputXml->SetAttribute("input_semantic", "TEXCOORD");
       }
+    }
+  }
+
+  for (const auto& light : _lights)
+  {
+    tinyxml2::XMLElement *nodeXml =
+      _libraryVisualScenesXml->GetDocument()->NewElement("node");
+    visualSceneXml->LinkEndChild(nodeXml);
+
+    nodeXml->SetAttribute("name", light.name.c_str());
+
+    tinyxml2::XMLElement *lightInstXml =
+      _libraryVisualScenesXml->GetDocument()->NewElement("instance_light");
+    char lightId[100] = { 0 };
+    snprintf(lightId, sizeof(lightId), "#%s", light.name.c_str());
+    lightInstXml->SetAttribute("url", lightId);
+    nodeXml->LinkEndChild(lightInstXml);
+
+    const auto& position = light.position;
+    // translation
+    {
+      tinyxml2::XMLElement *translateXml =
+        _libraryVisualScenesXml->GetDocument()->NewElement("translate");
+      translateXml->SetAttribute("sid", "translate");
+
+      char tx_value[100] = { 0 };
+      snprintf(tx_value, sizeof(tx_value), "%f %f %f", position.X(), position.Y(), position.Z());
+      translateXml->SetText(tx_value);
+      nodeXml->LinkEndChild(translateXml);
+    }
+
+    // rotation; blender starts off with light direction (0,0,-1),
+    // we output an axis-angle rotation to our desired direction
+    {
+      auto lightdir_norm = light.direction.Normalized();
+      math::Vector3d initial_dir(0, 0, -1);
+      math::Quaterniond q;
+      q.From2Axes(initial_dir, lightdir_norm);
+
+      math::Vector3d axis;
+      double angle = 0.0;
+      q.ToAxis(axis, angle);
+
+      tinyxml2::XMLElement *rotateXml =
+        _libraryVisualScenesXml->GetDocument()->NewElement("rotate");
+
+      char str[100] = { 0 };
+      snprintf(str, sizeof(str), "%g %g %g %g", axis.X(), axis.Y(), axis.Z(), angle / IGN_PI * 180.0);
+      rotateXml->SetText(str);
+      nodeXml->LinkEndChild(rotateXml);
     }
   }
 }

@@ -25,6 +25,7 @@
 #include <ignition/common/graphics/Export.hh>
 
 #include <ignition/math/Matrix4.hh>
+#include <ignition/math/Color.hh>
 
 #include <ignition/utils/ImplPtr.hh>
 
@@ -32,6 +33,22 @@ namespace ignition
 {
   namespace common
   {
+    // Light data structure specifically for collada export
+    // Defaults set based on collada 1.4 specifications
+    struct ColladaLight
+    {
+      std::string name;
+      std::string type; //either "point", "directional" or "spot"
+      math::Vector3d direction;
+      math::Vector3d position;
+      math::Color diffuse;
+      double constant_attenuation = 1.0;
+      double linear_attenuation   = 0.0;
+      double quadratic_attenuation = 0.0;
+      double falloff_angle_deg = 180.0;
+      double falloff_exponent = 0.0;
+    };
+
     /// \brief Class used to export Collada mesh files
     class IGNITION_COMMON_GRAPHICS_VISIBLE ColladaExporter : public MeshExporter
     {
@@ -51,7 +68,8 @@ namespace ignition
 
       public: void Export(const Mesh *_mesh,
           const std::string &_filename, bool _exportTextures,
-          const std::vector<math::Matrix4d> &_submeshToMatrix);
+          const std::vector<math::Matrix4d> &_submeshToMatrix,
+          const std::vector<ColladaLight> &_lights = std::vector<ColladaLight>());
 
       /// \brief Pointer to private data.
       IGN_UTILS_IMPL_PTR(dataPtr)
