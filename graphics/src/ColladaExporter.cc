@@ -269,7 +269,7 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
     lightTypeXml->LinkEndChild(colorXml);
 
     // attenuations
-    if (light.name == "point" || light.name == "spot")
+    if (light.type == "point" || light.type == "spot")
     {
       auto attenuation_tag = [&](const char* tagname, double value)
       {
@@ -287,7 +287,7 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
     }
 
     // falloff
-    if (light.name == "spot")
+    if (light.type == "spot")
     {
       tinyxml2::XMLElement *falloffAngleXml =
         xmlDoc.NewElement("falloff_angle");
@@ -297,7 +297,7 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
       lightTypeXml->LinkEndChild(falloffAngleXml);
 
       tinyxml2::XMLElement *falloffExpoXml =
-        xmlDoc.NewElement("falloff_angle");
+        xmlDoc.NewElement("falloff_exponent");
       snprintf(str, sizeof(str), "%g", light.falloff_exponent);
       falloffExpoXml->SetText(str);
       lightTypeXml->LinkEndChild(falloffExpoXml);

@@ -315,6 +315,150 @@ TEST_F(ColladaExporter, ExportMeshWithSubmeshes)
       meshReloaded->TexCoordCount());
 }
 
+TEST_F(ColladaExporter, ExportLights)
+{
+  const auto filenameIn = common::testing::TestFile("data", "box.dae");
+  const auto filenameOut = common::joinPaths(this->pathOut, "box_with_lights_exported");
+  const auto filenameOutExt = filenameOut + ".dae";
+
+  // Load original mesh
+  common::ColladaLoader loader;
+  const common::Mesh *meshOriginal = loader.Load(filenameIn);
+
+  // Export with extension
+  common::ColladaExporter exporter;
+  std::vector<math::Matrix4d> submesh_mtx;
+  std::vector<common::ColladaLight> lights;
+
+  // add some lights
+  {
+    common::ColladaLight directional;
+    directional.name = "sun";
+    directional.type = "directional";
+    directional.direction = math::Vector3d(0, 1, -1);
+    directional.position = math::Vector3d(0, 0, 0);
+    directional.diffuse = math::Color(1, 0.5, 1);
+    lights.push_back(directional);
+
+    common::ColladaLight point;
+    point.name = "lamp";
+    point.type = "point";
+    point.position = math::Vector3d(0, 0, 10);
+    point.diffuse = math::Color(1, 0.5, 1);
+    point.constant_attenuation = 0.8;
+    point.linear_attenuation = 0.8;
+    point.quadratic_attenuation = 0.1;
+    lights.push_back(point);
+
+    common::ColladaLight spot;
+    spot.name = "torch";
+    spot.type = "spot";
+    spot.position = math::Vector3d(0, 10, 10);
+    spot.diffuse = math::Color(1, 0.5, 1);
+    spot.constant_attenuation = 0.8;
+    spot.linear_attenuation = 0.8;
+    spot.quadratic_attenuation = 0.1;
+    spot.falloff_angle_deg = 90.0;
+    spot.falloff_exponent = 0.125;
+    lights.push_back(spot);
+  }
+
+  exporter.Export(meshOriginal, filenameOut, false, submesh_mtx, lights);
+  
+  tinyxml2::XMLDocument xmlDoc;
+  ASSERT_EQ(xmlDoc.LoadFile(filenameOutExt.c_str()), tinyxml2::XML_SUCCESS);
+  
+  tinyxml2::XMLElement* collada = xmlDoc.FirstChildElement("COLLADA");
+  ASSERT_TRUE(xmlDoc.FirstChildElement("COLLADA") != nullptr);
+
+  auto lib_lights = collada->FirstChildElement("library_lights");
+  EXPECT_TRUE(lib_lights);
+
+  int light_count = 0;  
+  auto light_ele = lib_lights->FirstChildElement("light");
+  for (; light_ele != nullptr; light_ele = light_ele->NextSiblingElement())
+  {
+    const char* light_name_cstr = light_ele->Attribute("name");
+    ASSERT_TRUE(light_name_cstr);
+    std::string light_name = light_name_cstr;
+    if (light_name == "sun")
+    {
+      auto technique = light_ele->FirstChildElement("technique_common");
+      EXPECT_TRUE(technique);
+      auto directional = technique->FirstChildElement("directional");
+      EXPECT_TRUE(directional);
+      auto color = directional->FirstChildElement("color");
+      EXPECT_TRUE(color);
+    }
+    else if (light_name == "lamp")
+    {
+      auto technique = light_ele->FirstChildElement("technique_common");
+      EXPECT_TRUE(technique);
+      auto point = technique->FirstChildElement("point");
+      EXPECT_TRUE(point);
+      auto color = point->FirstChildElement("color");
+      EXPECT_TRUE(color);
+      auto catt = point->FirstChildElement("constant_attenuation");
+      EXPECT_TRUE(catt);
+      auto latt = point->FirstChildElement("linear_attenuation");
+      EXPECT_TRUE(latt);
+      auto qatt = point->FirstChildElement("quadratic_attenuation");
+      EXPECT_TRUE(qatt);
+    }
+    else if (light_name == "torch")
+    {
+      auto technique = light_ele->FirstChildElement("technique_common");
+      EXPECT_TRUE(technique);
+      auto spot = technique->FirstChildElement("spot");
+      EXPECT_TRUE(spot);
+      auto color = spot->FirstChildElement("color");
+      EXPECT_TRUE(color);
+      auto catt = spot->FirstChildElement("constant_attenuation");
+      EXPECT_TRUE(catt);
+      auto latt = spot->FirstChildElement("linear_attenuation");
+      EXPECT_TRUE(latt);
+      auto qatt = spot->FirstChildElement("quadratic_attenuation");
+      EXPECT_TRUE(qatt);
+      auto falloff_angle = spot->FirstChildElement("falloff_angle");
+      EXPECT_TRUE(falloff_angle);
+      auto falloff_expo = spot->FirstChildElement("falloff_exponent");
+      EXPECT_TRUE(falloff_expo);
+    }
+    else
+      ASSERT_TRUE(0); // Invalid light name given
+
+    ++light_count;
+  }
+  EXPECT_EQ(light_count, 3);
+
+  // instantiation
+  auto lib_visual_scenes = collada->FirstChildElement("library_visual_scenes");
+  EXPECT_TRUE(lib_visual_scenes);
+  auto scene = lib_visual_scenes->FirstChildElement("visual_scene");
+  EXPECT_TRUE(scene);
+
+  int node_with_light_count = 0;
+  auto node_ele = scene->FirstChildElement("node");
+  for (; node_ele != nullptr; node_ele = node_ele->NextSiblingElement())
+  {
+    const char* node_name_cstr = node_ele->Attribute("name");
+    ASSERT_TRUE(node_name_cstr);
+    std::string node_name = node_name_cstr;
+    if (node_name == "sun" || node_name == "lamp" || node_name == "torch")
+    {
+      auto inst_light = node_ele->FirstChildElement("instance_light");
+      EXPECT_TRUE(inst_light);
+      auto translate = node_ele->FirstChildElement("translate");
+      EXPECT_TRUE(translate);
+      auto rotate = node_ele->FirstChildElement("rotate");
+      EXPECT_TRUE(rotate);
+
+      ++node_with_light_count;
+    }
+  }
+  EXPECT_EQ(node_with_light_count, 3);
+}
+
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
