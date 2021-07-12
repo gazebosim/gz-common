@@ -255,7 +255,7 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
     tinyxml2::XMLElement *techniqueCommonXml =
       xmlDoc.NewElement("technique_common");
     lightXml->LinkEndChild(techniqueCommonXml);
-    
+
     tinyxml2::XMLElement *lightTypeXml =
       xmlDoc.NewElement(light.type.c_str());
     techniqueCommonXml->LinkEndChild(lightTypeXml);
@@ -264,7 +264,8 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
     tinyxml2::XMLElement *colorXml =
       xmlDoc.NewElement("color");
     char color_str[100] = { 0 };
-    snprintf(color_str, sizeof(color_str), "%g %g %g", light.diffuse.R(), light.diffuse.G(), light.diffuse.B());
+    snprintf(color_str, sizeof(color_str), "%g %g %g",
+      light.diffuse.R(), light.diffuse.G(), light.diffuse.B());
     colorXml->SetText(color_str);
     lightTypeXml->LinkEndChild(colorXml);
 
@@ -275,7 +276,7 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
       {
         tinyxml2::XMLElement *attenXml =
           xmlDoc.NewElement(tagname);
-        
+
         char str[100] = { 0 };
         snprintf(str, sizeof(str), "%g", value);
         attenXml->SetText(str);
@@ -308,7 +309,8 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
   // Library visual scenes element
   tinyxml2::XMLElement *libraryVisualScenesXml =
       xmlDoc.NewElement("library_visual_scenes");
-  this->dataPtr->ExportVisualScenes(libraryVisualScenesXml, _submeshToMatrix, _lights);
+  this->dataPtr->ExportVisualScenes(libraryVisualScenesXml,
+    _submeshToMatrix, _lights);
   colladaXml->LinkEndChild(libraryVisualScenesXml);
 
   // Scene element
@@ -939,7 +941,8 @@ void ColladaExporter::Implementation::ExportVisualScenes(
       translateXml->SetAttribute("sid", "translate");
 
       char tx_value[100] = { 0 };
-      snprintf(tx_value, sizeof(tx_value), "%f %f %f", position.X(), position.Y(), position.Z());
+      snprintf(tx_value, sizeof(tx_value), "%f %f %f",
+        position.X(), position.Y(), position.Z());
       translateXml->SetText(tx_value);
       nodeXml->LinkEndChild(translateXml);
     }
@@ -960,7 +963,8 @@ void ColladaExporter::Implementation::ExportVisualScenes(
         _libraryVisualScenesXml->GetDocument()->NewElement("rotate");
 
       char str[100] = { 0 };
-      snprintf(str, sizeof(str), "%g %g %g %g", axis.X(), axis.Y(), axis.Z(), angle / IGN_PI * 180.0);
+      snprintf(str, sizeof(str), "%g %g %g %g",
+        axis.X(), axis.Y(), axis.Z(), angle / IGN_PI * 180.0);
       rotateXml->SetText(str);
       nodeXml->LinkEndChild(rotateXml);
     }

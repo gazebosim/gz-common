@@ -318,7 +318,8 @@ TEST_F(ColladaExporter, ExportMeshWithSubmeshes)
 TEST_F(ColladaExporter, ExportLights)
 {
   const auto filenameIn = common::testing::TestFile("data", "box.dae");
-  const auto filenameOut = common::joinPaths(this->pathOut, "box_with_lights_exported");
+  const auto filenameOut = common::joinPaths(this->pathOut,
+    "box_with_lights_exported");
   const auto filenameOutExt = filenameOut + ".dae";
 
   // Load original mesh
@@ -364,17 +365,17 @@ TEST_F(ColladaExporter, ExportLights)
   }
 
   exporter.Export(meshOriginal, filenameOut, false, submesh_mtx, lights);
-  
+
   tinyxml2::XMLDocument xmlDoc;
   ASSERT_EQ(xmlDoc.LoadFile(filenameOutExt.c_str()), tinyxml2::XML_SUCCESS);
-  
+
   tinyxml2::XMLElement* collada = xmlDoc.FirstChildElement("COLLADA");
   ASSERT_TRUE(xmlDoc.FirstChildElement("COLLADA") != nullptr);
 
   auto lib_lights = collada->FirstChildElement("library_lights");
   EXPECT_TRUE(lib_lights);
 
-  int light_count = 0;  
+  int light_count = 0;
   auto light_ele = lib_lights->FirstChildElement("light");
   for (; light_ele != nullptr; light_ele = light_ele->NextSiblingElement())
   {
@@ -425,7 +426,7 @@ TEST_F(ColladaExporter, ExportLights)
       EXPECT_TRUE(falloff_expo);
     }
     else
-      ASSERT_TRUE(0); // Invalid light name given
+      ASSERT_TRUE(0);  // Invalid light name given
 
     ++light_count;
   }

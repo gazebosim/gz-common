@@ -38,7 +38,7 @@ namespace ignition
     struct ColladaLight
     {
       std::string name;
-      std::string type; //either "point", "directional" or "spot"
+      std::string type;  // either "point", "directional" or "spot"
       math::Vector3d direction;
       math::Vector3d position;
       math::Color diffuse;
@@ -69,7 +69,8 @@ namespace ignition
       public: void Export(const Mesh *_mesh,
           const std::string &_filename, bool _exportTextures,
           const std::vector<math::Matrix4d> &_submeshToMatrix,
-          const std::vector<ColladaLight> &_lights = std::vector<ColladaLight>());
+          const std::vector<ColladaLight> &_lights =
+            std::vector<ColladaLight>());
 
       /// \brief Pointer to private data.
       IGN_UTILS_IMPL_PTR(dataPtr)
