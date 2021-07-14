@@ -170,6 +170,16 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
 }
 
 //////////////////////////////////////////////////
+void ColladaExporter::Export(const Mesh *_mesh,
+        const std::string &_filename, bool _exportTextures,
+        const std::vector<math::Matrix4d> &_submeshToMatrix)
+{
+  std::vector<ColladaLight> empty_lights;
+  this->Export(_mesh, _filename, _exportTextures,
+    _submeshToMatrix, empty_lights);
+}
+
+//////////////////////////////////////////////////
 void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
     bool _exportTextures, const std::vector<math::Matrix4d> &_submeshToMatrix,
     const std::vector<ColladaLight> &_lights)

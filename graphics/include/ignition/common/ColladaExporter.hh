@@ -68,9 +68,12 @@ namespace ignition
 
       public: void Export(const Mesh *_mesh,
           const std::string &_filename, bool _exportTextures,
+          const std::vector<math::Matrix4d> &_submeshToMatrix);
+
+      public: void Export(const Mesh *_mesh,
+          const std::string &_filename, bool _exportTextures,
           const std::vector<math::Matrix4d> &_submeshToMatrix,
-          const std::vector<ColladaLight> &_lights =
-            std::vector<ColladaLight>());
+          const std::vector<ColladaLight> &_lights);
 
       /// \brief Pointer to private data.
       IGN_UTILS_IMPL_PTR(dataPtr)
