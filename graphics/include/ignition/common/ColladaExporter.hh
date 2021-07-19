@@ -24,6 +24,7 @@
 #include <ignition/common/MeshExporter.hh>
 #include <ignition/common/graphics/Export.hh>
 
+#include <ignition/math/Color.hh>
 #include <ignition/math/Matrix4.hh>
 
 #include <ignition/utils/ImplPtr.hh>
@@ -32,6 +33,41 @@ namespace ignition
 {
   namespace common
   {
+    /// \brief This struct contains light data specifically for collada export
+    /// Defaults set based on collada 1.4 specifications
+    struct ColladaLight
+    {
+      /// \brief Name of the light
+      std::string name;
+
+      /// \brief Type of the light. Either "point", "directional" or "spot"
+      std::string type;
+
+      /// \brief Light direction (directional/spot lights only)
+      math::Vector3d direction;
+
+      /// \brief Light position (non directional lights only)
+      math::Vector3d position;
+
+      /// \brief Light diffuse color
+      math::Color diffuse;
+
+      /// \brief Constant attentuation
+      double constantAttenuation = 1.0;
+
+      /// \brief Linear attentuation
+      double linearAttenuation = 0.0;
+
+      /// \brief Quadratic attentuation
+      double quadraticAttenuation = 0.0;
+
+      /// \brief Falloff angle in degrees
+      double falloffAngleDeg = 180.0;
+
+      /// \brief Fallof exponent
+      double falloffExponent = 0.0;
+    };
+
     /// \brief Class used to export Collada mesh files
     class IGNITION_COMMON_GRAPHICS_VISIBLE ColladaExporter : public MeshExporter
     {
@@ -49,9 +85,27 @@ namespace ignition
       public: virtual void Export(const Mesh *_mesh,
           const std::string &_filename, bool _exportTextures = false);
 
+      /// \brief Export a mesh to a file
+      /// \param[in] _mesh Pointer to the mesh to be exported
+      /// \param[in] _filename Exported file's path and name
+      /// \param[in] _exportTextures True to export texture images to
+      /// '../materials/textures' folder
+      /// \param[in] _submeshToMatrix Matrices of submeshes
       public: void Export(const Mesh *_mesh,
           const std::string &_filename, bool _exportTextures,
           const std::vector<math::Matrix4d> &_submeshToMatrix);
+
+      /// \brief Export a mesh to a file
+      /// \param[in] _mesh Pointer to the mesh to be exported
+      /// \param[in] _filename Exported file's path and name
+      /// \param[in] _exportTextures True to export texture images to
+      /// '../materials/textures' folder
+      /// \param[in] _submeshToMatrix Matrices of submeshes
+      /// \param[in] _lights List of lights to export
+      public: void Export(const Mesh *_mesh,
+          const std::string &_filename, bool _exportTextures,
+          const std::vector<math::Matrix4d> &_submeshToMatrix,
+          const std::vector<ColladaLight> &_lights);
 
       /// \brief Pointer to private data.
       IGN_UTILS_IMPL_PTR(dataPtr)
