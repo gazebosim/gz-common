@@ -37,16 +37,35 @@ namespace ignition
     /// Defaults set based on collada 1.4 specifications
     struct ColladaLight
     {
-      std::string name;  // name of the light
-      std::string type;  // either "point", "directional" or "spot"
-      math::Vector3d direction;  // direction (directional/spot lights only)
-      math::Vector3d position;  // light position (non directional lights only)
-      math::Color diffuse;  // light diffuse color
-      double constant_attenuation = 1.0;  // Constant attentuation
-      double linear_attenuation = 0.0;  // Linear attentuation
-      double quadratic_attenuation = 0.0;  // Quadratic attentuation
-      double falloff_angle_deg = 180.0;  // Falloff angle in degrees
-      double falloff_exponent = 0.0;  // Fallof exponent
+      /// \brief Name of the light
+      std::string name;
+
+      /// \brief Type of the light. Either "point", "directional" or "spot"
+      std::string type;
+
+      /// \brief Light direction (directional/spot lights only)
+      math::Vector3d direction;
+
+      /// \brief Light position (non directional lights only)
+      math::Vector3d position;
+
+      /// \brief Light diffuse color
+      math::Color diffuse;
+
+      /// \brief Constant attentuation
+      double constantAttenuation = 1.0;
+
+      /// \brief Linear attentuation
+      double linearAttenuation = 0.0;
+
+      /// \brief Quadratic attentuation
+      double quadraticAttenuation = 0.0;
+
+      /// \brief Falloff angle in degrees
+      double falloffAngleDeg = 180.0;
+
+      /// \brief Fallof exponent
+      double falloffExponent = 0.0;
     };
 
     /// \brief Class used to export Collada mesh files
@@ -66,10 +85,23 @@ namespace ignition
       public: virtual void Export(const Mesh *_mesh,
           const std::string &_filename, bool _exportTextures = false);
 
+      /// \brief Export a mesh to a file
+      /// \param[in] _mesh Pointer to the mesh to be exported
+      /// \param[in] _filename Exported file's path and name
+      /// \param[in] _exportTextures True to export texture images to
+      /// '../materials/textures' folder
+      /// \param[in] _submeshToMatrix Matrices of submeshes
       public: void Export(const Mesh *_mesh,
           const std::string &_filename, bool _exportTextures,
           const std::vector<math::Matrix4d> &_submeshToMatrix);
 
+      /// \brief Export a mesh to a file
+      /// \param[in] _mesh Pointer to the mesh to be exported
+      /// \param[in] _filename Exported file's path and name
+      /// \param[in] _exportTextures True to export texture images to
+      /// '../materials/textures' folder
+      /// \param[in] _submeshToMatrix Matrices of submeshes
+      /// \param[in] _lights List of lights to export
       public: void Export(const Mesh *_mesh,
           const std::string &_filename, bool _exportTextures,
           const std::vector<math::Matrix4d> &_submeshToMatrix,

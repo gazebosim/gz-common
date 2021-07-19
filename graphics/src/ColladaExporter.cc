@@ -292,9 +292,9 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
         attenXml->SetText(str);
         lightTypeXml->LinkEndChild(attenXml);
       };
-      attenuation_tag("constant_attenuation", light.constant_attenuation);
-      attenuation_tag("linear_attenuation", light.linear_attenuation);
-      attenuation_tag("quadratic_attenuation", light.quadratic_attenuation);
+      attenuation_tag("constant_attenuation", light.constantAttenuation);
+      attenuation_tag("linear_attenuation", light.linearAttenuation);
+      attenuation_tag("quadratic_attenuation", light.quadraticAttenuation);
     }
 
     // falloff
@@ -303,13 +303,13 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
       tinyxml2::XMLElement *falloffAngleXml =
         xmlDoc.NewElement("falloff_angle");
       char str[100] = { 0 };
-      snprintf(str, sizeof(str), "%g", light.falloff_angle_deg);
+      snprintf(str, sizeof(str), "%g", light.falloffAngleDeg);
       falloffAngleXml->SetText(str);
       lightTypeXml->LinkEndChild(falloffAngleXml);
 
       tinyxml2::XMLElement *falloffExpoXml =
         xmlDoc.NewElement("falloff_exponent");
-      snprintf(str, sizeof(str), "%g", light.falloff_exponent);
+      snprintf(str, sizeof(str), "%g", light.falloffExponent);
       falloffExpoXml->SetText(str);
       lightTypeXml->LinkEndChild(falloffExpoXml);
     }
