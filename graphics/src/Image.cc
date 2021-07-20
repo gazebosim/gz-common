@@ -19,6 +19,7 @@
 #endif
 #include <FreeImage.h>
 
+#include <cstring>
 #include <string>
 
 #include <ignition/common/Console.hh>
