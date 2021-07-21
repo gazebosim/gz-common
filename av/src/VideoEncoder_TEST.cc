@@ -60,7 +60,7 @@ TEST_F(VideoEncoderTest, StartStop)
 
     video.Start("mp4", "", 1024, 768);
     EXPECT_TRUE(video.IsEncoding());
-    EXPECT_STREQ(video.Format().c_str(), "mpg");
+    EXPECT_STREQ(video.Format().c_str(), "mp4");
 
     video.Stop();
     EXPECT_FALSE(video.IsEncoding());
