@@ -2,6 +2,14 @@
 
 ## Ignition Common 4.X.X (202X-XX-XX)
 
+## Ignition Common 4.2.0 (2021-08-02)
+
+1. Export lights to dae
+    * [Pull request #228](https://github.com/ignitionrobotics/ign-common/pull/228)
+
+1. Add cstring for std::memcpy
+    * [Pull request #230](https://github.com/ignitionrobotics/ign-common/pull/230)
+
 ## Ignition Common 4.1.0 (2021-06-22)
 
 1. Make KeyEvent rule-of-five compliant
