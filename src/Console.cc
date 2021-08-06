@@ -119,16 +119,25 @@ Logger::Buffer::~Buffer()
   this->pubsync();
 }
 
+std::streamsize Logger::Buffer::xsputn(const char *_char,
+                                       std::streamsize _count)
+{
+  std::lock_guard<std::mutex> lk(this->syncMutex);
+  return std::stringbuf::xsputn(_char, _count);
+}
+
 /////////////////////////////////////////////////
 int Logger::Buffer::sync()
 {
-  static std::mutex syncMutex;
-
-  std::string outstr = this->str();
+  std::string outstr;
+  {
+    std::lock_guard<std::mutex> lk(this->syncMutex);
+    outstr = this->str();
+  }
 
   // Log messages to disk
   {
-    std::lock_guard<std::mutex> lk(syncMutex);
+    std::lock_guard<std::mutex> lk(this->syncMutex);
     Console::log << outstr;
     Console::log.flush();
   }
@@ -149,7 +158,7 @@ int Logger::Buffer::sync()
       ss << std::endl;
 
     {
-      std::lock_guard<std::mutex> lk(syncMutex);
+      std::lock_guard<std::mutex> lk(this->syncMutex);
       fprintf(outstream, "%s", ss.str().c_str());
     }
 #else
@@ -177,7 +186,7 @@ int Logger::Buffer::sync()
         this->type == Logger::STDOUT ? std::cout : std::cerr;
 
     {
-      std::lock_guard<std::mutex> lk(syncMutex);
+      std::lock_guard<std::mutex> lk(this->syncMutex);
       if (vtProcessing)
         outStream << "\x1b[" << this->color << "m" << outstr << "\x1b[m";
       else
@@ -186,7 +195,10 @@ int Logger::Buffer::sync()
 #endif
   }
 
-  this->str("");
+  {
+    std::lock_guard<std::mutex> lk(this->syncMutex);
+    this->str("");
+  }
   return 0;
 }
 
