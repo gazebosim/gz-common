@@ -278,7 +278,6 @@ namespace ignition
       /// \brief A custom prefix. See SetPrefix().
       private: static std::string customPrefix;
       IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
-
     };
   }
 }
