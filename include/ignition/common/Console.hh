@@ -206,7 +206,7 @@ namespace ignition
                    /// \brief Level of verbosity
                    public: int verbosity;
 
-                   /// \brief Mutex to syncronize writes to the string buffer
+                   /// \brief Mutex to synchronize writes to the string buffer
                    /// and the output stream.
                    public: std::mutex syncMutex;
                  };
