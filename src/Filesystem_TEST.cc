@@ -452,9 +452,34 @@ TEST_F(FilesystemTest, append)
   EXPECT_EQ(path, "base\\before\\after");
 #endif
 
-  // Make sure that the slashes in the middle of string are not altered.
-  path = joinPaths("https://fuel.ignitionrobotics.org", "/models", "box");
-  EXPECT_EQ(path, "https://fuel.ignitionrobotics.org/models/box");
+}
+
+/////////////////////////////////////////////////
+TEST_F(FilesystemTest, Uri)
+{
+  {
+    // Make sure that the slashes in the middle of string are not altered.
+    auto path =
+      joinPaths("https://fuel.ignitionrobotics.org", "/models", "box");
+    EXPECT_EQ(path, "https://fuel.ignitionrobotics.org/models/box");
+  }
+
+  {
+    common::URI uri{"http://localhost:8000"};
+    EXPECT_EQ("localhost:8000", uri.Path().Str());
+  }
+
+  {
+    common::URI uri{"http://localhost:8000/some/path"};
+    EXPECT_EQ(common::joinPaths("localhost:8000", "some", "path"),
+        uri.Path().Str());
+  }
+
+  {
+    common::URI uri{"http://localhost:8000/some/path/"};
+    EXPECT_EQ(common::separator(common::joinPaths("localhost:8000", "some",
+        "path")), uri.Path().Str());
+  }
 }
 
 /////////////////////////////////////////////////
