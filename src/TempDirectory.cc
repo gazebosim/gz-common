@@ -18,16 +18,12 @@
 #include <ignition/common/TempDirectory.hh>
 #include <ignition/common/Console.hh>
 
-#include <filesystem>
-
 #ifdef _WIN32
 #include <windows.h>
 #include <direct.h>
 #include <fileapi.h>
 #include <io.h>
 #endif
-
-namespace fs = std::filesystem;
 
 using namespace ignition;
 using namespace common;
@@ -51,18 +47,41 @@ inline bool fs_warn(const std::string &_fcn,
   return true;
 }
 
+
+/////////////////////////////////////////////////
+std::string temp_directory_path(std::error_code& _err)
+{
+  _err = std::error_code();
+#ifdef _WIN32
+  TCHAR temp_path[MAX_PATH];
+  DWORD size = GetTempPathA(MAX_PATH, temp_path);
+  if (size > MAX_PATH || size == 0) {
+    _err = std::error_code(
+        static_cast<int>(GetLastError()), std::system_category());
+  }
+  temp_path[size] = '\0';
+#else
+  std::string temp_path;
+  if(!ignition::common::env("TMPDIR", temp_path))
+  {
+    temp_path = "/tmp";
+  }
+#endif
+  return std::string(temp_path);
+}
+
 /////////////////////////////////////////////////
 std::string ignition::common::tempDirectoryPath()
 {
   std::error_code ec;
-  auto ret = fs::temp_directory_path(ec);
+  auto ret = temp_directory_path(ec);
 
   if (!fs_warn("tempDirectoryPath", ec))
   {
     ret = "";
   }
 
-  return ret.string();
+  return ret;
 }
 
 /////////////////////////////////////////////////
@@ -74,11 +93,11 @@ std::string createTempDirectory(
     const std::string &_baseName,
     const std::string &_parentPath)
 {
-  fs::path parentPath(_parentPath);
-  fs::path templatePath = _baseName + "XXXXXX";
+  std::string parentPath(_parentPath);
+  std::string templatePath = _baseName + "XXXXXX";
 
-  std::string fullTemplateStr = (parentPath / templatePath).string();
-  if (!createDirectories(parentPath.string())) {
+  std::string fullTemplateStr = joinPaths(parentPath, templatePath);
+  if (!createDirectories(parentPath)) {
     std::error_code ec{errno, std::system_category()};
     errno = 0;
     throw std::system_error(ec, "could not create the parent directory");
@@ -91,8 +110,8 @@ std::string createTempDirectory(
     throw std::system_error(ec,
         "could not format the temp directory name template");
   }
-  const fs::path finalPath{fullTemplateStr};
-  if (!createDirectories(finalPath.string())) {
+  const std::string finalPath{fullTemplateStr};
+  if (!createDirectories(finalPath)) {
     std::error_code ec(static_cast<int>(GetLastError()),
         std::system_category());
     throw std::system_error(ec, "could not create the temp directory");
@@ -105,10 +124,10 @@ std::string createTempDirectory(
     throw std::system_error(ec,
         "could not format or create the temp directory");
   }
-  const fs::path finalPath{dirName};
+  const std::string finalPath{dirName};
 #endif
 
-  return finalPath.string();
+  return finalPath;
 }
 
 /////////////////////////////////////////////////
@@ -161,9 +180,7 @@ TempDirectory::TempDirectory(const std::string &_prefix,
   {
     tempPath = common::joinPaths(tempPath, _subDir);
   }
-
   this->dataPtr->path = common::createTempDirectory(_prefix, tempPath);
-  std::cerr << "Created temporary directory: " << this->dataPtr->path << std::endl; 
   if (!this->dataPtr->path.empty())
   {
     this->dataPtr->isValid = true;
