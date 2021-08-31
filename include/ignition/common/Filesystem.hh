@@ -264,9 +264,6 @@ namespace ignition
       /// \param[in] _in  Directory to iterate over.
       public: explicit DirIter(const std::string &_in);
 
-      /// \brief Destructor
-      public: ~DirIter();
-
       /// \brief Dereference operator; returns current directory record.
       /// \return A string representing the entire path of the directory
       /// record.
