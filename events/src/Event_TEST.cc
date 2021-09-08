@@ -284,6 +284,21 @@ TEST_F(EventTest, typeid_test)
 }
 
 /////////////////////////////////////////////////
+TEST_F(EventTest, DestructionOrder)
+{
+  auto evt = std::make_unique<common::EventT<void()>>();
+  common::ConnectionPtr conn = evt->Connect(callback);
+  evt->Signal();
+  evt.reset();
+  // Sleep to avoid warning about deleting a connection right after creation.
+  IGN_SLEEP_MS(1);
+
+  // Check that this doesn't segfault.
+  conn.reset();
+  SUCCEED();
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

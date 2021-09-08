@@ -156,8 +156,9 @@ namespace ignition
       private: class EventConnection
       {
         /// \brief Constructor
-        public: EventConnection(const bool _on, const std::function<T> &_cb)
-                : callback(_cb)
+        public: EventConnection(const bool _on, const std::function<T> &_cb,
+                        const ConnectionPtr &_publicConn)
+            : callback(_cb), publicConnection(_publicConn)
         {
           // Windows Visual Studio 2012 does not have atomic_bool constructor,
           // so we have to set "on" using operator=
@@ -169,6 +170,11 @@ namespace ignition
 
         /// \brief Callback function
         public: std::function<T> callback;
+
+        /// \brief A weak pointer to the Connection pointer returned by Connect.
+        /// This is used to clear the Connection's Event pointer during
+        /// destruction of an Event.
+        public: std::weak_ptr<Connection> publicConnection;
       };
 
       /// \def EvtConnectionMap
@@ -197,6 +203,16 @@ namespace ignition
     template<typename T, typename N>
     EventT<T, N>::~EventT()
     {
+      // Clear the Event pointer on all connections so that they are not
+      // accessed after this Event is destructed.
+      for (auto &conn : this->connections)
+      {
+        auto publicCon = conn.second->publicConnection.lock();
+        if (publicCon)
+        {
+          publicCon->event = nullptr;
+        }
+      }
       this->connections.clear();
     }
 
@@ -211,8 +227,10 @@ namespace ignition
         auto const &iter = this->connections.rbegin();
         index = iter->first + 1;
       }
-      this->connections[index].reset(new EventConnection(true, _subscriber));
-      return ConnectionPtr(new Connection(this, index));
+      auto connection = ConnectionPtr(new Connection(this, index));
+      this->connections[index].reset(
+          new EventConnection(true, _subscriber, connection));
+      return connection;
     }
 
     /// \brief Get the number of connections.
@@ -234,6 +252,14 @@ namespace ignition
       if (it != this->connections.end())
       {
         it->second->on = false;
+        // The destructor of std::function seems to crashes if the function it
+        // points to is in a shared library and has been unloaded by the time
+        // the destructor is invoked. It's not clear whether this is a bug in
+        // the implementation of std::function or not. To avoid the crash,
+        // we call the destructor here by setting `callback = nullptr` because
+        // it is likely that EventT::Disconnect is called before the shared
+        // library is unloaded via Connection::~Connection.
+        it->second->callback = nullptr;
         this->connectionsToRemove.push_back(it);
       }
     }
