@@ -49,6 +49,9 @@ inline bool fs_warn(const std::string &_fcn,
 
 
 /////////////////////////////////////////////////
+// Helper implementation of std::filesystem::temp_directory_path
+// https://en.cppreference.com/w/cpp/filesystem/temp_directory_path
+// \TODO(anyone) remove when using `std::filesystem` in C++17 and greater.
 std::string temp_directory_path(std::error_code& _err)
 {
   _err = std::error_code();
