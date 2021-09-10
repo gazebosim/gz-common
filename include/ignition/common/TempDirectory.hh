@@ -55,6 +55,10 @@ namespace ignition
 
     /// \class TempDirectory TempDirectory.hh ignitin/common/TempDirectory.hh
     /// \brief Create a temporary directory in the OS temp location.
+    /// Upon construction, the current working directory will be set to this
+    /// new temporary directory.
+    /// Upon destruction, the current working directory will be restored to the
+    /// location when the TempDirectory object was constructed.
     class IGNITION_COMMON_VISIBLE TempDirectory
     {
       /// \brief Create a directory in the tempDirectoryPath by expanding
@@ -86,11 +90,11 @@ namespace ignition
       /// retain the contents of the TempDirectory if the test fails.
       /// \param[in] _cleanup True to indicate that the filesystem should
       ///  be cleaned as part of the destructor
-      public: void Cleanup(bool _cleanup);
+      public: void DoCleanup(bool _doCleanup);
 
       /// \brief Retrieve the current cleanup flag state
       /// \return true if filesystem cleanup will occur
-      public: bool Cleanup() const;
+      public: bool DoCleanup() const;
 
       /// \brief Retrieve the fully-expanded temporary directory path
       /// \return the temporary directory path

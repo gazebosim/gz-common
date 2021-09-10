@@ -52,7 +52,7 @@ TEST(TempDirectory, createTempDirectory)
 }
 
 /////////////////////////////////////////////////
-TEST(TempDirectory, createTempDirectory_emptybase)
+TEST(TempDirectory, createTempDirectoryEmptyBase)
 {
   // OS TMPDIR should never be empty
   auto tmpDir = ignition::common::tempDirectoryPath();
@@ -72,7 +72,7 @@ TEST(TempDirectory, TempDirectory)
   {
     ignition::common::TempDirectory tmp("temp_dir", "ignition", true);
     EXPECT_TRUE(tmp.Valid());
-    EXPECT_TRUE(tmp.Cleanup());
+    EXPECT_TRUE(tmp.DoCleanup());
     path = tmp.Path();
     EXPECT_FALSE(path.empty());
     EXPECT_TRUE(ignition::common::exists(path));
@@ -81,13 +81,13 @@ TEST(TempDirectory, TempDirectory)
 }
 
 /////////////////////////////////////////////////
-TEST(TempDirectory, TempDirectory_noclean)
+TEST(TempDirectory, TempDirectoryNoClean)
 {
   std::string path;
   {
     ignition::common::TempDirectory tmp("temp_dir", "ignition", false);
     EXPECT_TRUE(tmp.Valid());
-    EXPECT_FALSE(tmp.Cleanup());
+    EXPECT_FALSE(tmp.DoCleanup());
     path = tmp.Path();
     EXPECT_FALSE(path.empty());
     EXPECT_TRUE(ignition::common::exists(path));
@@ -97,18 +97,18 @@ TEST(TempDirectory, TempDirectory_noclean)
 }
 
 /////////////////////////////////////////////////
-TEST(TempDirectory, TempDirectory_noclean_later)
+TEST(TempDirectory, TempDirectoryNoCleanLater)
 {
   std::string path;
   {
     ignition::common::TempDirectory tmp("temp_dir", "ignition", true);
     EXPECT_TRUE(tmp.Valid());
-    EXPECT_TRUE(tmp.Cleanup());
+    EXPECT_TRUE(tmp.DoCleanup());
     path = tmp.Path();
     EXPECT_FALSE(path.empty());
     EXPECT_TRUE(ignition::common::exists(path));
-    tmp.Cleanup(false);
-    EXPECT_FALSE(tmp.Cleanup());
+    tmp.DoCleanup(false);
+    EXPECT_FALSE(tmp.DoCleanup());
   }
   EXPECT_TRUE(ignition::common::exists(path));
   EXPECT_TRUE(ignition::common::removeDirectory(path));

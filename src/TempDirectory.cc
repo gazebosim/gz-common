@@ -100,7 +100,8 @@ std::string createTempDirectory(
   std::string templatePath = _baseName + "XXXXXX";
 
   std::string fullTemplateStr = joinPaths(parentPath, templatePath);
-  if (!createDirectories(parentPath)) {
+  if (!createDirectories(parentPath))
+  {
     std::error_code ec{errno, std::system_category()};
     errno = 0;
     throw std::system_error(ec, "could not create the parent directory");
@@ -142,7 +143,9 @@ std::string ignition::common::createTempDirectory(
   std::string ret;
   try {
     ret = ::createTempDirectory(_baseName, _parentPath);
-  } catch (const std::system_error &ex) {
+  }
+  catch (const std::system_error &ex)
+  {
     ret = "";
     if(FSWO_LOG_WARNINGS == _warningOp)
     {
@@ -208,13 +211,13 @@ bool TempDirectory::Valid() const
 }
 
 /////////////////////////////////////////////////
-void TempDirectory::Cleanup(bool _cleanup)
+void TempDirectory::DoCleanup(bool _doCleanup)
 {
-  this->dataPtr->doCleanup = _cleanup;
+  this->dataPtr->doCleanup = _doCleanup;
 }
 
 /////////////////////////////////////////////////
-bool TempDirectory::Cleanup() const
+bool TempDirectory::DoCleanup() const
 {
   return this->dataPtr->doCleanup;
 }
