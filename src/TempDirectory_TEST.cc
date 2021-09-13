@@ -17,11 +17,8 @@
 
 #include <gtest/gtest.h>
 
-#include <ignition/utilities/ExtraTestMacros.hh>
 #include <ignition/common/TempDirectory.hh>
-
-#include <filesystem>
-
+#include <ignition/utilities/ExtraTestMacros.hh>
 
 /////////////////////////////////////////////////
 TEST(TempDirectory, tempDirectoryPath)
