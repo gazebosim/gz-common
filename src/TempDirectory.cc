@@ -47,7 +47,6 @@ inline bool fs_warn(const std::string &_fcn,
   return true;
 }
 
-
 /////////////////////////////////////////////////
 // Helper implementation of std::filesystem::temp_directory_path
 // https://en.cppreference.com/w/cpp/filesystem/temp_directory_path
