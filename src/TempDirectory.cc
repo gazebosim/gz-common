@@ -20,10 +20,10 @@
 #include <ignition/common/Console.hh>
 
 #ifdef _WIN32
+#include <windows.h>
 #include <direct.h>
 #include <fileapi.h>
 #include <io.h>
-#include <windows.h>
 #endif
 
 using namespace ignition;
