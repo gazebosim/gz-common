@@ -34,7 +34,6 @@ inline bool fs_warn(const std::string &_fcn,
              const std::error_code &_ec,
              const FilesystemWarningOp &_warningOp = FSWO_LOG_WARNINGS)
 {
-
   if (_ec)
   {
     if (FSWO_LOG_WARNINGS == _warningOp)

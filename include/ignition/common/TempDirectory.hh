@@ -62,7 +62,7 @@ namespace ignition
     class IGNITION_COMMON_VISIBLE TempDirectory
     {
       /// \brief Create a directory in the tempDirectoryPath by expanding
-      /// a name template.  This directory can also be automatically cleaned
+      /// a name template. This directory can also be automatically cleaned
       /// up when the object goes out of scope.
       ///
       /// The TempDirectory will have the form $TMPDIR/_subdir/_prefixXXXXX/
@@ -88,7 +88,7 @@ namespace ignition
       ///
       /// This is useful if you wish to clean by default during a test, but
       /// retain the contents of the TempDirectory if the test fails.
-      /// \param[in] _cleanup True to indicate that the filesystem should
+      /// \param[in] _doCleanup True to indicate that the filesystem should
       ///  be cleaned as part of the destructor
       public: void DoCleanup(bool _doCleanup);
 
