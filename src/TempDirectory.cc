@@ -155,7 +155,7 @@ std::string ignition::common::createTempDirectory(
 }
 
 
-class ignition::common::TempDirectory::Implementation
+class ignition::common::TempDirectoryPrivate
 {
   /// \brief Current working directory before creation of temporary dir.
   public: std::string oldPath {""};
@@ -175,7 +175,7 @@ class ignition::common::TempDirectory::Implementation
 TempDirectory::TempDirectory(const std::string &_prefix,
                              const std::string &_subDir,
                              bool _cleanup):
-  dataPtr(ignition::utils::MakeImpl<Implementation>())
+  dataPtr(std::make_unique<TempDirectoryPrivate>())
 {
 
   this->dataPtr->oldPath = common::cwd();
