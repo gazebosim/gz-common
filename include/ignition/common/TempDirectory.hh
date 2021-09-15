@@ -23,7 +23,6 @@
 
 #include <ignition/common/Export.hh>
 #include <ignition/common/Filesystem.hh>
-#include <ignition/utils/ImplPtr.hh>
 
 namespace ignition
 {
@@ -101,8 +100,10 @@ namespace ignition
       /// \return the temporary directory path
       public: std::string Path() const;
 
-      /// \brief Private data pointer.
-      IGN_UTILS_IMPL_PTR(dataPtr)
+      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
+      /// \brief Private data pointer
+      private: std::unique_ptr<TempDirectoryPrivate> dataPtr;
+      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
     };
   }  // namespace common
 }  // namespace ignition

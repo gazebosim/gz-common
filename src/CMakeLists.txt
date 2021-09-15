@@ -17,9 +17,6 @@ target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
 target_include_directories(${PROJECT_LIBRARY_TARGET_NAME} PRIVATE
   ${ignition-math${IGN_MATH_VER}_INCLUDE_DIRS})
 
-target_include_directories(${PROJECT_LIBRARY_TARGET_NAME} PUBLIC
-  ${ignition-utils${IGN_UTILS_VER}_INCLUDE_DIRS})
-
 # Handle non-Windows configuration settings
 if(NOT WIN32)
   # Link the libraries that we don't expect to find on Windows
