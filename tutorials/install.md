@@ -21,6 +21,22 @@ sudo apt install libignition-common<#>-dev
 Be sure to replace `<#>` with a number value, such as 2 or 3, depending on
 which version you need.
 
+### macOS
+
+On macOS, add OSRF packages:
+  ```
+  ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+  brew tap osrf/simulation
+  ```
+
+Install Ignition Common:
+  ```
+  brew install ignition-common<#>
+  ```
+
+Be sure to replace `<#>` with a number value, such as 1 or 2, depending on
+which version you need.
+
 ## Windows
 
 Install [Conda package management system](https://docs.conda.io/projects/conda/en/latest/user-guide/install/download.html).
@@ -116,6 +132,36 @@ conda install libignition-cmake<#> libignition-math<#> --channel conda-forge
   sudo make install
   ```
 
+### macOS
+
+1. Clone the repository
+  ```
+  git clone https://github.com/ignitionrobotics/ign-common -b ign-common<#>
+  ```
+  Be sure to replace `<#>` with a number value, such as 1 or 2, depending on
+  which version you need.
+
+2. Install dependencies
+  ```
+  brew install --only-dependencies ignition-common<#>
+  ```
+  Be sure to replace `<#>` with a number value, such as 1 or 2, depending on
+  which version you need.
+
+3. Configure and build
+  ```
+  cd ign-math
+  mkdir build
+  cd build
+  cmake ..
+  make
+  ```
+
+4. Optionally, install
+  ```
+  sudo make install
+  ```
+
 ### Windows
 
 This assumes you have created and activated a Conda environment while installing the Prerequisites.
@@ -185,4 +231,3 @@ Follow these steps to run tests and static code analysis in your clone of this r
   ```
   make codecheck
   ```
-
