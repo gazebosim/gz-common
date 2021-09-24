@@ -88,7 +88,7 @@ Refer to the following table for information about important directories and fil
 # Contributing
 
 Please see
-[CONTRIBUTING.md](https://github.com/ignitionrobotics/ign-gazebo/blob/main/CONTRIBUTING.md).
+[CONTRIBUTING.md](https://ignitionrobotics.org/docs/all/contributing).
 
 # Code of Conduct
 
