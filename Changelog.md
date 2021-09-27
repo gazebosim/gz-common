@@ -1,6 +1,6 @@
 ## Ignition Common 4.x
 
-## Ignition Common 4.3.0 (2021-09-XX)
+## Ignition Common 4.3.0 (2021-09-27)
 
 1. Remove ign-utils from TempDirectory
     * [Pull request #248](https://github.com/ignitionrobotics/ign-common/pull/248)
@@ -21,6 +21,10 @@
     * [Pull request #62](https://github.com/ignitionrobotics/ign-common/pull/62)
     * [Pull request #55](https://github.com/ignitionrobotics/ign-common/pull/55)
     * [Pull request #241](https://github.com/ignitionrobotics/ign-common/pull/241)
+  
+1. Documentation
+    * [Pull request #252](https://github.com/ignitionrobotics/ign-common/pull/252)
+    * [Pull request #253](https://github.com/ignitionrobotics/ign-common/pull/253)
 
 ## Ignition Common 4.2.0 (2021-08-02)
 
