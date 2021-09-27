@@ -34,7 +34,7 @@ Install Ignition Common:
   brew install ignition-common<#>
   ```
 
-Be sure to replace `<#>` with a number value, such as 1 or 2, depending on
+Be sure to replace `<#>` with a number value, such as 3 or 4, depending on
 which version you need.
 
 ## Windows
@@ -138,19 +138,19 @@ conda install libignition-cmake<#> libignition-math<#> --channel conda-forge
   ```
   git clone https://github.com/ignitionrobotics/ign-common -b ign-common<#>
   ```
-  Be sure to replace `<#>` with a number value, such as 1 or 2, depending on
+  Be sure to replace `<#>` with a number value, such as 3 or 4, depending on
   which version you need.
 
 2. Install dependencies
   ```
   brew install --only-dependencies ignition-common<#>
   ```
-  Be sure to replace `<#>` with a number value, such as 1 or 2, depending on
+  Be sure to replace `<#>` with a number value, such as 3 or 4, depending on
   which version you need.
 
 3. Configure and build
   ```
-  cd ign-math
+  cd ign-common
   mkdir build
   cd build
   cmake ..
