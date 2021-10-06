@@ -117,6 +117,19 @@ namespace ignition
       public: PoseAnimation(const std::string &_name,
                   const double _length, const bool _loop);
 
+      /// \brief Constructor
+      /// \param[in] _name String name of the animation. This should be unique.
+      /// \param[in] _length Length of the animation in seconds
+      /// \param[in] _loop True == loop the animation
+      /// \param[in] _tension The tension of the trajectory spline. The
+      /// default value of zero equates to a Catmull-Rom spline, which may
+      /// also cause the animation to overshoot keyframes. A value of one will
+      /// cause the animation to stick to the keyframes. This value should
+      /// be in the range 0..1.
+      public: PoseAnimation(const std::string &_name,
+                  const double _length, const bool _loop,
+                  double _tension);
+
       /// \brief Create a pose keyframe at the given time
       /// \param[in] _time Time at which to create the keyframe
       /// \return Pointer to the new keyframe
@@ -233,6 +246,18 @@ namespace ignition
       public: void SetWaypoints(
           std::map<std::chrono::steady_clock::time_point, math::Pose3d>
            _waypoints);
+
+      /// \brief Load all waypoints in the trajectory
+      /// \param[in] _waypoints Map of waypoints, where the key is the absolute
+      /// time of the waypoint and the value is the pose.
+      /// \param[in] _tension The tension of the trajectory spline. The
+      /// default value of zero equates to a Catmull-Rom spline, which may
+      /// also cause the animation to overshoot keyframes. A value of one will
+      /// cause the animation to stick to the keyframes. This value should
+      /// be in the range 0..1.
+      public: void SetWaypoints(
+          std::map<std::chrono::steady_clock::time_point, math::Pose3d>
+           _waypoints, double _tension);
 
       /// \brief Private data pointer.
       IGN_UTILS_IMPL_PTR(dataPtr)

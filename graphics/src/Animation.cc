@@ -91,6 +91,9 @@ class PoseAnimation::Implementation
 
   /// \brief determines if the interpolation splines need building
   public: bool build{false};
+
+  /// \brief Spline tension parameter.
+  public: double tension{0.0};
 };
 
 /////////////////////////////////////////////////
@@ -291,6 +294,15 @@ PoseAnimation::PoseAnimation(const std::string &_name, const double _length,
 }
 
 /////////////////////////////////////////////////
+PoseAnimation::PoseAnimation(const std::string &_name, const double _length,
+    const bool _loop, double _tension)
+: Animation(_name, _length, _loop),
+  dataPtr(ignition::utils::MakeImpl<Implementation>())
+{
+  this->dataPtr->tension = math::clamp(_tension, 0.0, 1.0);
+}
+
+/////////////////////////////////////////////////
 PoseKeyFrame *PoseAnimation::CreateKeyFrame(const double _time)
 {
   this->dataPtr->build = true;
@@ -309,6 +321,7 @@ void PoseAnimation::BuildInterpolationSplines()
   this->dataPtr->positionSpline->AutoCalculate(false);
   this->dataPtr->rotationSpline->AutoCalculate(false);
 
+  this->dataPtr->positionSpline->Tension(this->dataPtr->tension);
   this->dataPtr->positionSpline->Clear();
   this->dataPtr->rotationSpline->Clear();
 
@@ -511,6 +524,15 @@ common::PoseAnimation *TrajectoryInfo::Waypoints() const
 void TrajectoryInfo::SetWaypoints(
     std::map<std::chrono::steady_clock::time_point, math::Pose3d> _waypoints)
 {
+  this->SetWaypoints(_waypoints, 0.0);
+}
+
+/////////////////////////////////////////////////
+void TrajectoryInfo::SetWaypoints(
+    std::map<std::chrono::steady_clock::time_point, math::Pose3d> _waypoints,
+    double _tension)
+{
+  _tension = math::clamp(_tension, 0.0, 1.0);
   this->dataPtr->segDistance.clear();
 
   auto first = _waypoints.begin();
@@ -523,7 +545,7 @@ void TrajectoryInfo::SetWaypoints(
   animName << this->AnimIndex() << "_" << this->Id();
   std::shared_ptr<common::PoseAnimation> anim =
       std::make_shared<common::PoseAnimation>(animName.str(),
-      std::chrono::duration<double>(this->Duration()).count(), false);
+      std::chrono::duration<double>(this->Duration()).count(), false, _tension);
 
   auto prevPose = first->second.Pos();
   for (auto pIter = _waypoints.begin(); pIter != _waypoints.end(); ++pIter)
