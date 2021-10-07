@@ -32,9 +32,33 @@ class VideoEncoderTest : public common::testing::AutoLogFixture
 };
 
 /////////////////////////////////////////////////
-TEST_F(VideoEncoderTest, StartStop)
+TEST_F(VideoEncoderTest, StartStopDefault)
 {
   auto filePathMp4 = common::joinPaths(common::cwd(), "TMP_RECORDING.mp4");
+
+  {
+    VideoEncoder video;
+    EXPECT_FALSE(video.IsEncoding());
+    EXPECT_STREQ(video.Format().c_str(), VIDEO_ENCODER_FORMAT_DEFAULT);
+    EXPECT_EQ(video.BitRate(), static_cast<unsigned int>(
+          VIDEO_ENCODER_BITRATE_DEFAULT));
+
+    EXPECT_TRUE(video.Start());
+    EXPECT_TRUE(video.IsEncoding());
+    EXPECT_TRUE(common::exists(filePathMp4)) << filePathMp4;
+    EXPECT_EQ(video.BitRate(), 920000u);
+
+    EXPECT_TRUE(video.Stop());
+    EXPECT_FALSE(video.IsEncoding());
+  }
+
+  // Check that temp files are removed when video goes out of scope
+  EXPECT_FALSE(common::exists(filePathMp4)) << filePathMp4;
+}
+
+/////////////////////////////////////////////////
+TEST_F(VideoEncoderTest, StartStopMpg)
+{
   auto filePathMpg = common::joinPaths(common::cwd(), "TMP_RECORDING.mpg");
 
   {
@@ -44,32 +68,83 @@ TEST_F(VideoEncoderTest, StartStop)
     EXPECT_EQ(video.BitRate(), static_cast<unsigned int>(
           VIDEO_ENCODER_BITRATE_DEFAULT));
 
-    video.Start();
-    EXPECT_TRUE(video.IsEncoding());
-    EXPECT_TRUE(common::exists(filePathMp4)) << filePathMp4;
-    EXPECT_EQ(video.BitRate(), 920000u);
-
-    video.Stop();
-    EXPECT_FALSE(video.IsEncoding());
-    EXPECT_FALSE(common::exists(filePathMpg)) << filePathMpg;
-
-    video.Start("mpg", "", 1024, 768);
+    EXPECT_TRUE(video.Start("mpg", "", 1024, 768));
     EXPECT_TRUE(video.IsEncoding());
     EXPECT_STREQ(video.Format().c_str(), "mpg");
     EXPECT_TRUE(common::exists(filePathMpg)) << filePathMpg;
+    EXPECT_TRUE(video.Stop());
+    EXPECT_FALSE(video.IsEncoding());
+  }
 
-    video.Start("mp4", "", 1024, 768);
+  EXPECT_FALSE(common::exists(filePathMpg)) << filePathMpg;
+}
+
+
+/////////////////////////////////////////////////
+TEST_F(VideoEncoderTest, StartStopMp4)
+{
+  auto filePathMp4 = common::joinPaths(common::cwd(), "TMP_RECORDING.mp4");
+
+  {
+    VideoEncoder video;
+    EXPECT_FALSE(video.IsEncoding());
+    EXPECT_STREQ(video.Format().c_str(), VIDEO_ENCODER_FORMAT_DEFAULT);
+    EXPECT_EQ(video.BitRate(), static_cast<unsigned int>(
+          VIDEO_ENCODER_BITRATE_DEFAULT));
+
+    EXPECT_TRUE(video.Start("mp4", "", 1024, 768));
     EXPECT_TRUE(video.IsEncoding());
-    EXPECT_STREQ(video.Format().c_str(), "mpg");
-
+    EXPECT_STREQ(video.Format().c_str(), "mp4");
+    EXPECT_TRUE(common::exists(filePathMp4)) << filePathMp4;
     video.Stop();
     EXPECT_FALSE(video.IsEncoding());
   }
 
-  // Check that temp files are removed when video goes out of scope
   EXPECT_FALSE(common::exists(filePathMp4)) << filePathMp4;
-  EXPECT_FALSE(common::exists(filePathMpg)) << filePathMpg;
 }
+
+/////////////////////////////////////////////////
+TEST_F(VideoEncoderTest, RepeatedStart)
+{
+  auto filePathMpg = common::joinPaths(common::cwd(), "TMP_RECORDING.mpg");
+  auto filePathMp4 = common::joinPaths(common::cwd(), "TMP_RECORDING.mp4");
+
+  {
+    VideoEncoder video;
+    EXPECT_FALSE(video.IsEncoding());
+    EXPECT_STREQ(video.Format().c_str(), VIDEO_ENCODER_FORMAT_DEFAULT);
+    EXPECT_EQ(video.BitRate(), static_cast<unsigned int>(
+          VIDEO_ENCODER_BITRATE_DEFAULT));
+
+    EXPECT_TRUE(video.Start("mp4", "", 1024, 768));
+    EXPECT_TRUE(video.IsEncoding());
+    EXPECT_STREQ(video.Format().c_str(), "mp4");
+    EXPECT_TRUE(common::exists(filePathMp4)) << filePathMp4;
+
+    // Calling start again should return false and not mutate any
+    // internal state of the VideoEncoder
+    EXPECT_FALSE(video.Start("mpg", "", 1024, 768));
+    EXPECT_TRUE(video.IsEncoding());
+    EXPECT_STREQ(video.Format().c_str(), "mp4");
+    EXPECT_TRUE(common::exists(filePathMp4)) << filePathMp4;
+    EXPECT_FALSE(common::exists(filePathMpg)) << filePathMpg;
+
+    EXPECT_TRUE(video.Stop());
+    EXPECT_FALSE(video.IsEncoding());
+
+    // Once the VideoEncoder has been stopped, a new run may start.
+    EXPECT_TRUE(video.Start("mpg", "", 1024, 768));
+    EXPECT_TRUE(video.IsEncoding());
+    EXPECT_STREQ(video.Format().c_str(), "mpg");
+    EXPECT_FALSE(common::exists(filePathMp4)) << filePathMp4;
+    EXPECT_TRUE(common::exists(filePathMpg)) << filePathMpg;
+  }
+
+  // All temporary files will be removed after exiting scope.
+  EXPECT_FALSE(common::exists(filePathMp4)) << filePathMp4;
+  EXPECT_FALSE(common::exists(filePathMpg)) << filePathMp4;
+}
+
 
 /////////////////////////////////////////////////
 TEST_F(VideoEncoderTest, Exists)
