@@ -19,6 +19,7 @@
 #endif
 #include <FreeImage.h>
 
+#include <cstring>
 #include <string>
 
 #include <ignition/common/Console.hh>
@@ -44,6 +45,16 @@ namespace ignition
       /// \brief Implementation of GetData
       public: void DataImpl(unsigned char **_data, unsigned int &_count,
           FIBITMAP *_img) const;
+
+      /// \brief Returns true if SwapRedBlue can and should be called
+      /// If it returns false, it may not be safe to call SwapRedBlue
+      /// (it could lead to memory corruption!). See CanSwapRedBlue
+      /// \return True if we should call SwapRedBlue
+      public: bool ShouldSwapRedBlue() const;
+
+      /// \brief Returns true if SwapRedBlue is safe to be called
+      /// \return False if it is NOT safe to call SwapRedBlue
+      public: bool CanSwapRedBlue() const;
 
       /// \brief Swap red and blue pixels
       /// \param[in] _width Width of the image
@@ -222,10 +233,12 @@ void Image::SetFromData(const unsigned char *_data,
   this->dataPtr->bitmap = FreeImage_ConvertFromRawBits(const_cast<BYTE*>(_data),
       _width, _height, scanlineBytes, bpp, redmask, greenmask, bluemask, true);
 
-  if (FREEIMAGE_COLORORDER != FREEIMAGE_COLORORDER_RGB)
+  if (this->dataPtr->ShouldSwapRedBlue())
   {
+    FIBITMAP *toDelete = this->dataPtr->bitmap;
     this->dataPtr->bitmap = this->dataPtr->SwapRedBlue(this->Width(),
-        this->Height());
+                                                       this->Height());
+    FreeImage_Unload(toDelete);
   }
 }
 
@@ -239,22 +252,27 @@ int Image::Pitch() const
 void Image::RGBData(unsigned char **_data, unsigned int &_count)
 {
   FIBITMAP *tmp = this->dataPtr->bitmap;
-  if (FREEIMAGE_COLORORDER != FREEIMAGE_COLORORDER_RGB)
+  FIBITMAP *tmp2 = nullptr;
+  if (this->dataPtr->ShouldSwapRedBlue())
   {
     tmp = this->dataPtr->SwapRedBlue(this->Width(), this->Height());
+    tmp2 = tmp;
   }
   tmp = FreeImage_ConvertTo24Bits(tmp);
   this->dataPtr->DataImpl(_data, _count, tmp);
   FreeImage_Unload(tmp);
+  if (tmp2)
+    FreeImage_Unload(tmp2);
 }
 
 //////////////////////////////////////////////////
 void Image::Data(unsigned char **_data, unsigned int &_count)
 {
-  if (FREEIMAGE_COLORORDER != FREEIMAGE_COLORORDER_RGB)
+  if (this->dataPtr->ShouldSwapRedBlue())
   {
-    this->dataPtr->DataImpl(_data, _count, this->dataPtr->SwapRedBlue(
-        this->Width(), this->Height()));
+    FIBITMAP *tmp = this->dataPtr->SwapRedBlue(this->Width(), this->Height());
+    this->dataPtr->DataImpl(_data, _count, tmp);
+    FreeImage_Unload(tmp);
   }
   else
   {
@@ -547,6 +565,19 @@ Image::PixelFormatType Image::ConvertPixelFormat(const std::string &_format)
       return static_cast<PixelFormatType>(i);
 
   return UNKNOWN_PIXEL_FORMAT;
+}
+
+//////////////////////////////////////////////////
+bool Image::Implementation::ShouldSwapRedBlue() const
+{
+  return CanSwapRedBlue() && FREEIMAGE_COLORORDER != FREEIMAGE_COLORORDER_RGB;
+}
+
+//////////////////////////////////////////////////
+bool Image::Implementation::CanSwapRedBlue() const
+{
+  const unsigned bpp = FreeImage_GetBPP(this->bitmap);
+  return bpp == 24u || bpp == 32u;
 }
 
 //////////////////////////////////////////////////
