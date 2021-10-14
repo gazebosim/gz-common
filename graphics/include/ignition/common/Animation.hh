@@ -126,6 +126,8 @@ namespace ignition
       /// also cause the animation to overshoot keyframes. A value of one will
       /// cause the animation to stick to the keyframes. This value should
       /// be in the range 0..1.
+      /// \todo(nkoenig) Remove this in ign-common5, and use a single
+      /// consutrctory with a default _tension of 0.
       public: PoseAnimation(const std::string &_name,
                   const double _length, const bool _loop,
                   double _tension);
