@@ -287,14 +287,6 @@ double Animation::KeyFramesAtTime(double _time, common::KeyFrame **_kf1,
 
 /////////////////////////////////////////////////
 PoseAnimation::PoseAnimation(const std::string &_name, const double _length,
-    const bool _loop)
-: Animation(_name, _length, _loop),
-  dataPtr(ignition::utils::MakeImpl<Implementation>())
-{
-}
-
-/////////////////////////////////////////////////
-PoseAnimation::PoseAnimation(const std::string &_name, const double _length,
     const bool _loop, double _tension)
 : Animation(_name, _length, _loop),
   dataPtr(ignition::utils::MakeImpl<Implementation>())
@@ -518,13 +510,6 @@ void TrajectoryInfo::SetTranslated(bool _translated)
 common::PoseAnimation *TrajectoryInfo::Waypoints() const
 {
   return this->dataPtr->waypoints.get();
-}
-
-/////////////////////////////////////////////////
-void TrajectoryInfo::SetWaypoints(
-    std::map<std::chrono::steady_clock::time_point, math::Pose3d> _waypoints)
-{
-  this->SetWaypoints(_waypoints, 0.0);
 }
 
 /////////////////////////////////////////////////
