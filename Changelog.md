@@ -1,10 +1,4 @@
-## Ignition Common 5.x
-
-## Ignition Common 5.0.0 (20XX-XX-XX)
-
 ## Ignition Common 4.x
-
-## Ignition Common 4.X.X (20XX-XX-XX)
 
 ## Ignition Common 4.3.0 (2021-09-27)
 
@@ -94,7 +88,6 @@
 
 1. Add bazel buildsystem support
     * [Pull request #123](https://github.com/ignitionrobotics/ign-common/pull/123)
->>>>>>> ign-common4
 
 ## Ignition Common 4.0.0 (2021-03-30)
 

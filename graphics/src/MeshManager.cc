@@ -242,33 +242,6 @@ const Mesh *MeshManager::MeshByName(const std::string &_name) const
 }
 
 //////////////////////////////////////////////////
-void MeshManager::RemoveAll()
-{
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-  for (auto m : this->dataPtr->meshes)
-  {
-    delete m.second;
-  }
-  this->dataPtr->meshes.clear();
-}
-
-//////////////////////////////////////////////////
-bool MeshManager::RemoveMesh(const std::string &_name)
-{
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-
-  auto iter = this->dataPtr->meshes.find(_name);
-  if (iter != this->dataPtr->meshes.end())
-  {
-    delete iter->second;
-    this->dataPtr->meshes.erase(iter);
-    return true;
-  }
-
-  return false;
-}
-
-//////////////////////////////////////////////////
 bool MeshManager::HasMesh(const std::string &_name) const
 {
   if (_name.empty())

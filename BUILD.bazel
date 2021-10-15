@@ -19,11 +19,11 @@ exports_files(["LICENSE"])
 
 PROJECT_NAME = "ignition-common"
 
-PROJECT_MAJOR = 5
+PROJECT_MAJOR = 4
 
 PROJECT_MINOR = 0
 
-PROJECT_PATCH = 0
+PROJECT_PATCH = 2
 
 # Generates config.hh based on the version numbers in CMake code.
 ign_config_header(

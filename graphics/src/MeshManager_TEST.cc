@@ -268,28 +268,6 @@ TEST_F(MeshManager, CreateExtrudedPolylineInvalid)
 }
 
 /////////////////////////////////////////////////
-TEST_F(MeshManager, Remove)
-{
-  auto mgr = common::MeshManager::Instance();
-
-  EXPECT_FALSE(mgr->HasMesh("box"));
-  mgr->CreateBox("box",
-      ignition::math::Vector3d(1, 1, 1),
-      ignition::math::Vector2d(0, 0));
-  EXPECT_TRUE(mgr->HasMesh("box"));
-
-  mgr->CreateSphere("sphere", 1.0, 1, 1);
-  EXPECT_TRUE(mgr->HasMesh("sphere"));
-
-  EXPECT_TRUE(mgr->RemoveMesh("box"));
-  EXPECT_FALSE(mgr->HasMesh("box"));
-  EXPECT_TRUE(mgr->HasMesh("sphere"));
-
-  mgr->RemoveAll();
-  EXPECT_FALSE(mgr->HasMesh("sphere"));
-}
-
-/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
