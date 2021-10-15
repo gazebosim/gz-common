@@ -208,7 +208,9 @@ namespace ignition
 
                    /// \brief Mutex to synchronize writes to the string buffer
                    /// and the output stream.
-                   public: std::mutex syncMutex;
+                   /// \todo(nkoenig) Put this back in for ign-common5, and
+                   /// remove the corresponding static version.
+                   // public: std::mutex syncMutex;
                  };
 
       IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING

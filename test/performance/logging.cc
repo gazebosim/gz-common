@@ -198,6 +198,7 @@ INSTANTIATE_TEST_SUITE_P(LoggingTest, LoggingTest,
                          ::testing::Values(1, 2, 4, 8, 16, 32));
 
 /////////////////////////////////////////////////
+// This test is valid (passes) if it runs without segfaults.
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
