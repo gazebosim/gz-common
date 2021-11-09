@@ -300,7 +300,7 @@ void FileLogger::Init(const std::string &_directory,
   if (isDirectory(logPath))
     this->logDirectory = logPath;
   else
-    this->logDirectory = logPath.substr(0, logPath.rfind(separator("")));
+    this->logDirectory = common::parentPath(logPath);
 
   this->initialized = true;
 

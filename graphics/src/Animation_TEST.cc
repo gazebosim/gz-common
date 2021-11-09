@@ -88,6 +88,30 @@ TEST_F(AnimationTest, PoseAnimation)
 }
 
 /////////////////////////////////////////////////
+TEST_F(AnimationTest, PoseAnimationTension)
+{
+  // Test using a tension value of 1.0, which should cause the pose
+  // animation to hit the key frames.
+
+  common::PoseAnimation animTension("test-tension", 10.0, false, 1.0);
+  common::PoseKeyFrame *keyTension = animTension.CreateKeyFrame(0.0);
+  keyTension->Translation(math::Vector3d(0, 0, 0));
+  keyTension->Rotation(math::Quaterniond(0, 0, 0));
+
+  animTension.AddTime(5.0);
+  keyTension->Translation(math::Vector3d(10, 20, 30));
+  keyTension->Rotation(math::Quaterniond(0.1, 0.2, 0.3));
+  animTension.Time(4.0);
+
+  common::PoseKeyFrame interpolatedKeyTension(-1.0);
+  animTension.InterpolatedKeyFrame(interpolatedKeyTension);
+  EXPECT_TRUE(interpolatedKeyTension.Translation() ==
+      math::Vector3d(10, 20, 30));
+  EXPECT_TRUE(interpolatedKeyTension.Rotation() ==
+      math::Quaterniond(0.1, 0.2, 0.3));
+}
+
+/////////////////////////////////////////////////
 TEST_F(AnimationTest, NumericAnimation)
 {
   common::NumericAnimation anim("numeric_test", 10, false);

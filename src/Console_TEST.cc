@@ -33,23 +33,21 @@ const int g_messageRepeat = 4;
 class Console_TEST : public ::testing::Test {
   protected: virtual void SetUp()
   {
-    // Set IGN_HOMEDIR and store it
-    common::testing::TestSetHomePath(this->logBasePath);
+    this->temp = std::make_unique<TempDirectory>(
+        "test", "ign_common", true);
+    ASSERT_TRUE(this->temp->Valid());
+    common::setenv(IGN_HOMEDIR, this->temp->Path());
   }
 
   /// \brief Clear out all the directories we produced during this test.
-  public: virtual ~Console_TEST()
+  public: virtual void TearDown()
   {
+    ignLogClose();
     EXPECT_TRUE(ignition::common::unsetenv(IGN_HOMEDIR));
-
-    if (ignition::common::isDirectory(this->logBasePath))
-    {
-      ignLogClose();
-      EXPECT_TRUE(ignition::common::removeAll(this->logBasePath));
-    }
   }
 
-  private: std::string logBasePath;
+  /// \brief Temporary directory to run test in
+  private: std::unique_ptr<common::TempDirectory> temp;
 };
 
 std::string GetLogContent(const std::string &_filename)
@@ -58,6 +56,7 @@ std::string GetLogContent(const std::string &_filename)
   std::string path;
   EXPECT_TRUE(ignition::common::env(IGN_HOMEDIR, path));
   path = ignition::common::joinPaths(path, _filename);
+  EXPECT_TRUE(ignition::common::exists(path));
 
   // Open the log file, and read back the string
   std::ifstream ifs(path.c_str(), std::ios::in);

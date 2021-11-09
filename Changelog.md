@@ -1,6 +1,35 @@
 ## Ignition Common 4.x
 
-## Ignition Common 4.X.X (202X-XX-XX)
+## Ignition Common 4.4.0 (2021-10-15)
+
+1. Add support for animation tension 
+    * [Pull request #256](https://github.com/ignitionrobotics/ign-common/pull/256)
+
+## Ignition Common 4.3.0 (2021-09-27)
+
+1. Remove ign-utils from TempDirectory
+    * [Pull request #248](https://github.com/ignitionrobotics/ign-common/pull/248)
+
+1. Add functions and objects for Temporary Directories
+    * [Pull request #244](https://github.com/ignitionrobotics/ign-common/pull/244)
+
+1. Fix memory corruption & leaks in Image
+    * [Pull request #240](https://github.com/ignitionrobotics/ign-common/pull/240)
+
+1. Fix a typo in VideoEncoder_TEST.
+    * [Pull request #231](https://github.com/ignitionrobotics/ign-common/pull/231)
+
+1. Fix segfault caused by destruction order of Event and Connection
+    * [Pull request #234](https://github.com/ignitionrobotics/ign-common/pull/234)
+
+1. Infrastructure
+    * [Pull request #62](https://github.com/ignitionrobotics/ign-common/pull/62)
+    * [Pull request #55](https://github.com/ignitionrobotics/ign-common/pull/55)
+    * [Pull request #241](https://github.com/ignitionrobotics/ign-common/pull/241)
+  
+1. Documentation
+    * [Pull request #252](https://github.com/ignitionrobotics/ign-common/pull/252)
+    * [Pull request #253](https://github.com/ignitionrobotics/ign-common/pull/253)
 
 ## Ignition Common 4.2.0 (2021-08-02)
 
