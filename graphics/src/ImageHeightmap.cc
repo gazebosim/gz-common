@@ -61,6 +61,45 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
   unsigned int count;
   this->img.Data(&data, count);
 
+  // Get the image format so we can arrange our heightmap
+  // Currently supported: 8-bit, 16-bit and 32-bit.
+  auto imgFormat = this->img.PixelFormat();
+
+  double maxPixelValue;
+  if(imgFormat == ignition::common::Image::PixelFormatType::L_INT8 ||
+    imgFormat == ignition::common::Image::PixelFormatType::RGB_INT8 ||
+    imgFormat == ignition::common::Image::PixelFormatType::RGBA_INT8 ||
+    imgFormat == ignition::common::Image::PixelFormatType::BAYER_BGGR8 ||
+    imgFormat == ignition::common::Image::PixelFormatType::BAYER_GBRG8 ||
+    imgFormat == ignition::common::Image::PixelFormatType::BAYER_GRBG8 ||
+    imgFormat == ignition::common::Image::PixelFormatType::BAYER_GRBG8 ||
+    imgFormat == ignition::common::Image::PixelFormatType::BAYER_RGGB8 ||
+    imgFormat == ignition::common::Image::PixelFormatType::BGR_INT8 ||
+    imgFormat == ignition::common::Image::PixelFormatType::BGRA_INT8)
+  {
+    maxPixelValue = 255.0;
+  }
+  else if(imgFormat == ignition::common::Image::PixelFormatType::BGR_INT16 ||
+    imgFormat == ignition::common::Image::PixelFormatType::L_INT16 ||
+    imgFormat == ignition::common::Image::PixelFormatType::RGB_FLOAT16 ||
+    imgFormat == ignition::common::Image::PixelFormatType::RGB_INT16 ||
+    imgFormat == ignition::common::Image::PixelFormatType::R_FLOAT16)
+  {
+    maxPixelValue = 65535.0;
+  }
+  else if(imgFormat == ignition::common::Image::PixelFormatType::BGR_INT32 ||
+    imgFormat == ignition::common::Image::PixelFormatType::R_FLOAT32 ||
+    imgFormat == ignition::common::Image::PixelFormatType::RGB_FLOAT32 ||
+    imgFormat == ignition::common::Image::PixelFormatType::RGB_INT32)
+  {
+    maxPixelValue = 4294967295.0;
+  }
+  else
+  {
+    ignerr << "Unknown image format, heightmap will not be loaded" << std::endl;
+    return;
+  }
+
   // Iterate over all the vertices
   for (unsigned int y = 0; y < _vertSize; ++y)
   {
@@ -81,12 +120,16 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
         x2 = imgWidth-1;
       double dx = xf - x1;
 
-      double px1 = static_cast<int>(data[y1 * pitch + x1 * bpp]) / 255.0;
-      double px2 = static_cast<int>(data[y1 * pitch + x2 * bpp]) / 255.0;
+      double px1 = static_cast<int>(
+        data[y1 * pitch + x1 * bpp]) / maxPixelValue;
+      double px2 = static_cast<int>(
+        data[y1 * pitch + x2 * bpp]) / maxPixelValue;
       float h1 = (px1 - ((px1 - px2) * dx));
 
-      double px3 = static_cast<int>(data[y2 * pitch + x1 * bpp]) / 255.0;
-      double px4 = static_cast<int>(data[y2 * pitch + x2 * bpp]) / 255.0;
+      double px3 = static_cast<int>(
+        data[y2 * pitch + x1 * bpp]) / maxPixelValue;
+      double px4 = static_cast<int>(
+        data[y2 * pitch + x2 * bpp]) / maxPixelValue;
       float h2 = (px3 - ((px3 - px4) * dx));
 
       float h = (h1 - ((h1 - h2) * dy)) * _scale.Z();
