@@ -23,7 +23,8 @@
 #include <ignition/common/Console.hh>
 
 namespace {
-const uint64_t g_iterations{1000000};
+// Lower value than spdlog to keep CI from flaking
+const uint64_t g_iterations{10000};
 
 std::atomic<size_t> g_counter = {0};
 
