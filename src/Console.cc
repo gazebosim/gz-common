@@ -14,9 +14,9 @@
  * limitations under the License.
  *
  */
-#include <map>
 #include <string>
 #include <sstream>
+#include <unordered_map>
 
 #include <ignition/common/Console.hh>
 #include <ignition/common/config.hh>
@@ -123,12 +123,7 @@ std::lock_guard<std::mutex> BufferLock(std::uintptr_t _bufferId)
   if(nullptr == kSyncMutex)
     kSyncMutex = new std::unordered_map<uintptr_t, std::mutex>();
 
-  if (!kSyncMutex->count(_bufferId))
-  {
-    kSyncMutex->operator[](_bufferId);
-  }
-
-  return std::lock_guard<std::mutex>(kSyncMutex->at(_bufferId));
+  return std::lock_guard<std::mutex>(kSyncMutex->operator[](_bufferId));
 }
 
 /////////////////////////////////////////////////
