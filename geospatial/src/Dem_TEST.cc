@@ -26,8 +26,6 @@ using namespace ignition;
 
 class DemTest : public common::testing::AutoLogFixture { };
 
-#ifdef HAVE_GDAL
-
 /////////////////////////////////////////////////
 TEST_F(DemTest, MisingFile)
 {
@@ -87,29 +85,29 @@ TEST_F(DemTest, BasicAPI)
   EXPECT_EQ(dem.Load(path), 0);
 
   // Check the heights and widths
-  EXPECT_EQ(129, static_cast<int>(dem.GetHeight()));
-  EXPECT_EQ(129, static_cast<int>(dem.GetWidth()));
-  EXPECT_FLOAT_EQ(3984.4849, dem.GetWorldHeight());
-  EXPECT_FLOAT_EQ(3139.7456, dem.GetWorldWidth());
-  EXPECT_FLOAT_EQ(65.3583, dem.GetMinElevation());
-  EXPECT_FLOAT_EQ(318.441, dem.GetMaxElevation());
+  EXPECT_EQ(129, static_cast<int>(dem.Height()));
+  EXPECT_EQ(129, static_cast<int>(dem.Width()));
+  EXPECT_FLOAT_EQ(3984.4849, dem.WorldHeight());
+  EXPECT_FLOAT_EQ(3139.7456, dem.WorldWidth());
+  EXPECT_FLOAT_EQ(65.3583, dem.MinElevation());
+  EXPECT_FLOAT_EQ(318.441, dem.MaxElevation());
 
-  // Check GetElevation()
-  unsigned int width = dem.GetWidth();
-  unsigned int height = dem.GetHeight();
-  EXPECT_FLOAT_EQ(215.82324, dem.GetElevation(0, 0));
-  EXPECT_FLOAT_EQ(216.04961, dem.GetElevation(width - 1, 0));
-  EXPECT_FLOAT_EQ(142.2274, dem.GetElevation(0, height - 1));
-  EXPECT_FLOAT_EQ(209.14784, dem.GetElevation(width - 1, height - 1));
+  // Check Elevation()
+  unsigned int width = dem.Width();
+  unsigned int height = dem.Height();
+  EXPECT_FLOAT_EQ(215.82324, dem.Elevation(0, 0));
+  EXPECT_FLOAT_EQ(216.04961, dem.Elevation(width - 1, 0));
+  EXPECT_FLOAT_EQ(142.2274, dem.Elevation(0, height - 1));
+  EXPECT_FLOAT_EQ(209.14784, dem.Elevation(width - 1, height - 1));
 
   // Illegal coordinates
-  ASSERT_ANY_THROW(dem.GetElevation(0, height));
-  ASSERT_ANY_THROW(dem.GetElevation(width, 0));
-  ASSERT_ANY_THROW(dem.GetElevation(width, height));
+  ASSERT_ANY_THROW(dem.Elevation(0, height));
+  ASSERT_ANY_THROW(dem.Elevation(width, 0));
+  ASSERT_ANY_THROW(dem.Elevation(width, height));
 
-  // Check GetGeoReferenceOrigin()
+  // Check GeoReferenceOrigin()
   ignition::math::Angle latitude, longitude;
-  dem.GetGeoReferenceOrigin(latitude, longitude);
+  dem.GeoReferenceOrigin(latitude, longitude);
   EXPECT_FLOAT_EQ(38.001667, latitude.Degree());
   EXPECT_FLOAT_EQ(-122.22278, longitude.Degree());
 }
@@ -130,17 +128,17 @@ TEST_F(DemTest, FillHeightmap)
   std::vector<float> elevations;
 
   subsampling = 2;
-  vertSize = (dem.GetWidth() * subsampling) - 1;
-  size.X(dem.GetWorldWidth());
-  size.Y(dem.GetWorldHeight());
-  size.Z(dem.GetMaxElevation() - dem.GetMinElevation());
+  vertSize = (dem.Width() * subsampling) - 1;
+  size.X(dem.WorldWidth());
+  size.Y(dem.WorldHeight());
+  size.Z(dem.MaxElevation() - dem.MinElevation());
   scale.X(size.X() / vertSize);
   scale.Y(size.Y() / vertSize);
 
-  if (ignition::math::equal(dem.GetMaxElevation(), 0.0f))
+  if (ignition::math::equal(dem.MaxElevation(), 0.0f))
     scale.Z(fabs(size.Z()));
   else
-    scale.Z(fabs(size.Z()) / dem.GetMaxElevation());
+    scale.Z(fabs(size.Z()) / dem.MaxElevation());
   flipY = false;
 
   dem.FillHeightMap(subsampling, vertSize, size, scale, flipY, elevations);
@@ -153,7 +151,6 @@ TEST_F(DemTest, FillHeightmap)
   EXPECT_FLOAT_EQ(114.27753, elevations.at(elevations.size() - 1));
   EXPECT_FLOAT_EQ(148.07137, elevations.at(elevations.size() / 2));
 }
-#endif
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

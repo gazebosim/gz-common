@@ -16,12 +16,8 @@
 */
 #include <algorithm>
 
-#ifdef HAVE_GDAL
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wfloat-equal"
-# include <ogr_spatialref.h>
-# pragma GCC diagnostic pop
-#endif
+#include <gdal_priv.h>
+#include <ogr_spatialref.h>
 
 #include "ignition/common/Console.hh"
 #include "ignition/common/Dem.hh"
@@ -29,8 +25,6 @@
 
 using namespace ignition;
 using namespace common;
-
-#ifdef HAVE_GDAL
 
 class ignition::common::Dem::Implementation
 {
@@ -89,11 +83,11 @@ int Dem::Load(const std::string &_filename)
   // Sanity check
   std::string fullName = _filename;
   if (!exists(findFilePath(fullName)))
-    fullName = common::find_file(_filename);
+    fullName = common::findFile(_filename);
 
   if (!exists(findFilePath(fullName)))
   {
-    gzerr << "Unable to open DEM file[" << _filename
+    ignerr << "Unable to open DEM file[" << _filename
           << "], check your GAZEBO_RESOURCE_PATH settings." << std::endl;
     return -1;
   }
@@ -103,25 +97,25 @@ int Dem::Load(const std::string &_filename)
 
   if (this->dataPtr->dataSet == nullptr)
   {
-    gzerr << "Unable to open DEM file[" << fullName
+    ignerr << "Unable to open DEM file[" << fullName
           << "]. Format not recognised as a supported dataset." << std::endl;
     return -1;
   }
 
-  int nBands = this->dataPtr->dataSet->RasterCount();
+  int nBands = this->dataPtr->dataSet->GetRasterCount();
   if (nBands != 1)
   {
-    gzerr << "Unsupported number of bands in file [" << fullName + "]. Found "
+    ignerr << "Unsupported number of bands in file [" << fullName + "]. Found "
           << nBands << " but only 1 is a valid value." << std::endl;
     return -1;
   }
 
   // Set the pointer to the band
-  this->dataPtr->band = this->dataPtr->dataSet->RasterBand(1);
+  this->dataPtr->band = this->dataPtr->dataSet->GetRasterBand(1);
 
   // Raster width and height
-  xSize = this->dataPtr->dataSet->RasterXSize();
-  ySize = this->dataPtr->dataSet->RasterYSize();
+  xSize = this->dataPtr->dataSet->GetRasterXSize();
+  ySize = this->dataPtr->dataSet->GetRasterYSize();
 
   // Corner coordinates
   upLeftX = 0.0;
@@ -175,9 +169,11 @@ double Dem::Elevation(double _x, double _y)
 {
   if (_x >= this->Width() || _y >= this->Height())
   {
-    gzthrow("Illegal coordinates. You are asking for the elevation in (" <<
-          _x << "," << _y << ") but the terrain is [" << this->Width() <<
-           " x " << this->Height() << "]\n");
+    throw std::invalid_argument(
+      "Illegal coordinates. You are asking for the elevation in ("
+      + std::to_string(_x) + "," + std::to_string(_y) + ") but the terrain is ["
+      + std::to_string(this->Width()) + " x " + std::to_string(this->Height())
+      + "]\n");
   }
 
   return this->dataPtr->demData.at(_y * this->Width() + _x);
@@ -200,7 +196,7 @@ void Dem::GeoReference(double _x, double _y,
     ignition::math::Angle &_latitude, ignition::math::Angle &_longitude) const
 {
   double geoTransf[6];
-  if (this->dataPtr->dataSet->GeoTransform(geoTransf) == CE_None)
+  if (this->dataPtr->dataSet->GetGeoTransform(geoTransf) == CE_None)
   {
     OGRSpatialReference sourceCs;
     OGRSpatialReference targetCs;
@@ -208,7 +204,8 @@ void Dem::GeoReference(double _x, double _y,
     double xGeoDeg, yGeoDeg;
 
     // Transform the terrain's coordinate system to WGS84
-    char *importString = strdup(this->dataPtr->dataSet->ProjectionRef());
+    const char *importString
+        = strdup(this->dataPtr->dataSet->GetProjectionRef());
     sourceCs.importFromWkt(&importString);
     targetCs.SetWellKnownGeogCS("WGS84");
     cT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
@@ -222,8 +219,11 @@ void Dem::GeoReference(double _x, double _y,
     _longitude.Degree(xGeoDeg);
   }
   else
-    gzthrow("Unable to obtain the georeferenced values for coordinates ("
-            << _x << "," << _y << ")\n");
+  {
+    throw std::invalid_argument(
+      "Unable to obtain the georeferenced values for coordinates ("
+      + std::to_string(_x) + "," + std::to_string(_y) + ")\n");
+  }
 }
 
 //////////////////////////////////////////////////
@@ -265,7 +265,7 @@ void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
 {
   if (_subSampling <= 0)
   {
-    gzerr << "Illegal subsampling value (" << _subSampling << ")\n";
+    ignerr << "Illegal subsampling value (" << _subSampling << ")\n";
     return;
   }
 
@@ -326,14 +326,14 @@ int Dem::LoadData()
 {
     unsigned int destWidth;
     unsigned int destHeight;
-    unsigned int nXSize = this->dataPtr->dataSet->RasterXSize();
-    unsigned int nYSize = this->dataPtr->dataSet->RasterYSize();
+    unsigned int nXSize = this->dataPtr->dataSet->GetRasterXSize();
+    unsigned int nYSize = this->dataPtr->dataSet->GetRasterYSize();
     float ratio;
     std::vector<float> buffer;
 
     if (nXSize == 0 || nYSize == 0)
     {
-      gzerr << "Illegal size loading a DEM file (" << nXSize << ","
+      ignerr << "Illegal size loading a DEM file (" << nXSize << ","
             << nYSize << ")\n";
       return -1;
     }
@@ -360,7 +360,7 @@ int Dem::LoadData()
     if (this->dataPtr->band->RasterIO(GF_Read, 0, 0, nXSize, nYSize, &buffer[0],
                          destWidth, destHeight, GDT_Float32, 0, 0) != CE_None)
     {
-      gzerr << "Failure calling RasterIO while loading a DEM file\n";
+      ignerr << "Failure calling RasterIO while loading a DEM file\n";
       return -1;
     }
 
@@ -377,5 +377,3 @@ int Dem::LoadData()
 
     return 0;
 }
-
-#endif

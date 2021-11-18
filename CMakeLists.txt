@@ -48,12 +48,12 @@ message(STATUS "\n\n-- ====== Finding Dependencies ======")
 
 #--------------------------------------
 # Find ignition-math
-ign_find_package(ignition-math6 REQUIRED_BY graphics events VERSION 6.6)
+ign_find_package(ignition-math6 REQUIRED_BY geospatial graphics events VERSION 6.6)
 set(IGN_MATH_VER ${ignition-math6_VERSION_MAJOR})
 
 #--------------------------------------
 # Find ignition-utils
-ign_find_package(ignition-utils1 REQUIRED_BY graphics VERSION 1.0)
+ign_find_package(ignition-utils1 REQUIRED_BY geospatial graphics VERSION 1.0)
 set(IGN_UTILS_VER ${ignition-utils1_VERSION_MAJOR})
 
 #--------------------------------------
@@ -95,6 +95,12 @@ ign_find_package(
   PRIVATE_FOR graphics)
 
 #------------------------------------
+# Find GDAL
+ign_find_package(GDAL VERSION 3.0
+  REQUIRED_BY geospatial
+  PRIVATE_FOR geospatial)
+
+#------------------------------------
 # Find libswscale
 ign_find_package(SWSCALE REQUIRED_BY av PRETTY libswscale)
 
@@ -125,7 +131,7 @@ configure_file("${PROJECT_SOURCE_DIR}/cppcheck.suppress.in"
                ${PROJECT_BINARY_DIR}/cppcheck.suppress)
 
 ign_configure_build(QUIT_IF_BUILD_ERRORS
-  COMPONENTS av events graphics profiler)
+  COMPONENTS av events geospatial graphics profiler)
 
 #============================================================================
 # Create package information

@@ -18,18 +18,17 @@
 #define IGNITION_COMMON_DEM_HH_
 
 #include <memory>
+#include <string>
+#include <vector>
+
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Angle.hh>
 
+#include <ignition/common/HeightmapData.hh>
 #include <ignition/common/graphics/Export.hh>
 
 #include <ignition/utils/ImplPtr.hh>
 
-#ifdef HAVE_GDAL
-# include <string>
-# include <vector>
-
-# include <ignition/common/HeightmapData.hh>
 
 namespace ignition
 {
@@ -136,5 +135,4 @@ namespace ignition
     };
   }
 }
-#endif
 #endif
