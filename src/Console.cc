@@ -16,7 +16,6 @@
  */
 #include <string>
 #include <sstream>
-#include <unordered_map>
 
 #include <ignition/common/Console.hh>
 #include <ignition/common/config.hh>
@@ -109,23 +108,6 @@ Logger &Logger::operator()(const std::string &_file, int _line)
   return (*this);
 }
 
-
-/////////////////////////////////////////////////
-/// \brief Provide a lock_guard for a given buffer
-/// This is workaround to keep us from breaking ABI, and can be removed
-/// in future versions
-/// \param[in] _bufferId a unique id of the requesting buffer
-///     Acquired via reinterpret_cast<uintptr_t>(this)
-/// \returns A RAII lock guard
-std::lock_guard<std::mutex> BufferLock(std::uintptr_t _bufferId)
-{
-  static std::unordered_map<uintptr_t, std::mutex> *kSyncMutex{nullptr};
-  if(nullptr == kSyncMutex)
-    kSyncMutex = new std::unordered_map<uintptr_t, std::mutex>();
-
-  return std::lock_guard<std::mutex>(kSyncMutex->operator[](_bufferId));
-}
-
 /////////////////////////////////////////////////
 Logger::Buffer::Buffer(LogType _type, const int _color, const int _verbosity)
   :  type(_type), color(_color), verbosity(_verbosity)
@@ -142,7 +124,7 @@ Logger::Buffer::~Buffer()
 std::streamsize Logger::Buffer::xsputn(const char *_char,
                                        std::streamsize _count)
 {
-  auto lk = BufferLock(reinterpret_cast<std::uintptr_t>(this));
+  std::lock_guard<std::mutex> lk(this->syncMutex);
   return std::stringbuf::xsputn(_char, _count);
 }
 
@@ -151,13 +133,13 @@ int Logger::Buffer::sync()
 {
   std::string outstr;
   {
-    auto lk = BufferLock(reinterpret_cast<std::uintptr_t>(this));
+    std::lock_guard<std::mutex> lk(this->syncMutex);
     outstr = this->str();
   }
 
   // Log messages to disk
   {
-    auto lk = BufferLock(reinterpret_cast<std::uintptr_t>(this));
+    std::lock_guard<std::mutex> lk(this->syncMutex);
     Console::log << outstr;
     Console::log.flush();
   }
@@ -178,7 +160,7 @@ int Logger::Buffer::sync()
       ss << std::endl;
 
     {
-      auto lk = BufferLock(reinterpret_cast<std::uintptr_t>(this));
+      std::lock_guard<std::mutex> lk(this->syncMutex);
       fprintf(outstream, "%s", ss.str().c_str());
     }
 #else
@@ -206,7 +188,7 @@ int Logger::Buffer::sync()
         this->type == Logger::STDOUT ? std::cout : std::cerr;
 
     {
-      auto lk = BufferLock(reinterpret_cast<std::uintptr_t>(this));
+      std::lock_guard<std::mutex> lk(this->syncMutex);
       if (vtProcessing)
         outStream << "\x1b[" << this->color << "m" << outstr << "\x1b[m";
       else
@@ -216,7 +198,7 @@ int Logger::Buffer::sync()
   }
 
   {
-    auto lk = BufferLock(reinterpret_cast<std::uintptr_t>(this));
+    std::lock_guard<std::mutex> lk(this->syncMutex);
     this->str("");
   }
   return 0;
