@@ -16,6 +16,7 @@
  */
 #include <string>
 #include <sstream>
+#include <unordered_map>
 
 #include <ignition/common/Console.hh>
 #include <ignition/common/config.hh>
@@ -26,6 +27,7 @@
 
 using namespace ignition;
 using namespace common;
+
 
 FileLogger ignition::common::Console::log("");
 
@@ -107,6 +109,23 @@ Logger &Logger::operator()(const std::string &_file, int _line)
   return (*this);
 }
 
+
+/////////////////////////////////////////////////
+/// \brief Provide a lock_guard for a given buffer
+/// This is workaround to keep us from breaking ABI, and can be removed
+/// in future versions
+/// \param[in] _bufferId a unique id of the requesting buffer
+///     Acquired via reinterpret_cast<uintptr_t>(this)
+/// \returns A RAII lock guard
+std::lock_guard<std::mutex> BufferLock(std::uintptr_t _bufferId)
+{
+  static std::unordered_map<uintptr_t, std::mutex> *kSyncMutex{nullptr};
+  if(nullptr == kSyncMutex)
+    kSyncMutex = new std::unordered_map<uintptr_t, std::mutex>();
+
+  return std::lock_guard<std::mutex>(kSyncMutex->operator[](_bufferId));
+}
+
 /////////////////////////////////////////////////
 Logger::Buffer::Buffer(LogType _type, const int _color, const int _verbosity)
   :  type(_type), color(_color), verbosity(_verbosity)
@@ -120,13 +139,28 @@ Logger::Buffer::~Buffer()
 }
 
 /////////////////////////////////////////////////
+std::streamsize Logger::Buffer::xsputn(const char *_char,
+                                       std::streamsize _count)
+{
+  auto lk = BufferLock(reinterpret_cast<std::uintptr_t>(this));
+  return std::stringbuf::xsputn(_char, _count);
+}
+
+/////////////////////////////////////////////////
 int Logger::Buffer::sync()
 {
-  std::string outstr = this->str();
+  std::string outstr;
+  {
+    auto lk = BufferLock(reinterpret_cast<std::uintptr_t>(this));
+    outstr = this->str();
+  }
 
   // Log messages to disk
-  Console::log << outstr;
-  Console::log.flush();
+  {
+    auto lk = BufferLock(reinterpret_cast<std::uintptr_t>(this));
+    Console::log << outstr;
+    Console::log.flush();
+  }
 
   // Output to terminal
   if (Console::Verbosity() >= this->verbosity && !outstr.empty())
@@ -143,7 +177,10 @@ int Logger::Buffer::sync()
     if (lastNewLine)
       ss << std::endl;
 
-    fprintf(outstream, "%s", ss.str().c_str());
+    {
+      auto lk = BufferLock(reinterpret_cast<std::uintptr_t>(this));
+      fprintf(outstream, "%s", ss.str().c_str());
+    }
 #else
     HANDLE hConsole = CreateFileW(
       L"CONOUT$", GENERIC_WRITE|GENERIC_READ, 0, nullptr, OPEN_EXISTING,
@@ -168,14 +205,20 @@ int Logger::Buffer::sync()
     std::ostream &outStream =
         this->type == Logger::STDOUT ? std::cout : std::cerr;
 
-    if (vtProcessing)
-      outStream << "\x1b[" << this->color << "m" << outstr << "\x1b[m";
-    else
-      outStream << outstr;
+    {
+      auto lk = BufferLock(reinterpret_cast<std::uintptr_t>(this));
+      if (vtProcessing)
+        outStream << "\x1b[" << this->color << "m" << outstr << "\x1b[m";
+      else
+        outStream << outstr;
+    }
 #endif
   }
 
-  this->str("");
+  {
+    auto lk = BufferLock(reinterpret_cast<std::uintptr_t>(this));
+    this->str("");
+  }
   return 0;
 }
 
