@@ -27,6 +27,7 @@
 using namespace ignition;
 using namespace common;
 
+
 FileLogger ignition::common::Console::log("");
 
 // On UNIX, these are ANSI-based color codes. On Windows, these are colors from
@@ -120,13 +121,28 @@ Logger::Buffer::~Buffer()
 }
 
 /////////////////////////////////////////////////
+std::streamsize Logger::Buffer::xsputn(const char *_char,
+                                       std::streamsize _count)
+{
+  std::lock_guard<std::mutex> lk(this->syncMutex);
+  return std::stringbuf::xsputn(_char, _count);
+}
+
+/////////////////////////////////////////////////
 int Logger::Buffer::sync()
 {
-  std::string outstr = this->str();
+  std::string outstr;
+  {
+    std::lock_guard<std::mutex> lk(this->syncMutex);
+    outstr = this->str();
+  }
 
   // Log messages to disk
-  Console::log << outstr;
-  Console::log.flush();
+  {
+    std::lock_guard<std::mutex> lk(this->syncMutex);
+    Console::log << outstr;
+    Console::log.flush();
+  }
 
   // Output to terminal
   if (Console::Verbosity() >= this->verbosity && !outstr.empty())
@@ -143,7 +159,10 @@ int Logger::Buffer::sync()
     if (lastNewLine)
       ss << std::endl;
 
-    fprintf(outstream, "%s", ss.str().c_str());
+    {
+      std::lock_guard<std::mutex> lk(this->syncMutex);
+      fprintf(outstream, "%s", ss.str().c_str());
+    }
 #else
     HANDLE hConsole = CreateFileW(
       L"CONOUT$", GENERIC_WRITE|GENERIC_READ, 0, nullptr, OPEN_EXISTING,
@@ -168,14 +187,20 @@ int Logger::Buffer::sync()
     std::ostream &outStream =
         this->type == Logger::STDOUT ? std::cout : std::cerr;
 
-    if (vtProcessing)
-      outStream << "\x1b[" << this->color << "m" << outstr << "\x1b[m";
-    else
-      outStream << outstr;
+    {
+      std::lock_guard<std::mutex> lk(this->syncMutex);
+      if (vtProcessing)
+        outStream << "\x1b[" << this->color << "m" << outstr << "\x1b[m";
+      else
+        outStream << outstr;
+    }
 #endif
   }
 
-  this->str("");
+  {
+    std::lock_guard<std::mutex> lk(this->syncMutex);
+    this->str("");
+  }
   return 0;
 }
 
