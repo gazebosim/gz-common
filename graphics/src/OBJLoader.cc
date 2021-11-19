@@ -234,6 +234,7 @@ Mesh *OBJLoader::Load(const std::string &_filename)
           ignition::math::Vector3d normal(attrib.normals[3 * nIdx],
                                           attrib.normals[3 * nIdx + 1],
                                           attrib.normals[3 * nIdx + 2]);
+          normal.Normalize();
           subMesh->AddNormal(normal);
         }
         // texcoords
