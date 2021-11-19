@@ -16,6 +16,7 @@
 */
 
 #include <gtest/gtest.h>
+#include <limits>
 #include <ignition/math/Angle.hh>
 #include <ignition/math/Vector3.hh>
 
@@ -101,13 +102,14 @@ TEST_F(DemTest, BasicAPI)
   EXPECT_FLOAT_EQ(209.14784, dem.Elevation(width - 1, height - 1));
 
   // Illegal coordinates
-  ASSERT_ANY_THROW(dem.Elevation(0, height));
-  ASSERT_ANY_THROW(dem.Elevation(width, 0));
-  ASSERT_ANY_THROW(dem.Elevation(width, height));
+  double inf = std::numeric_limits<double>::infinity();
+  EXPECT_DOUBLE_EQ(inf, dem.Elevation(0, height));
+  EXPECT_DOUBLE_EQ(inf, dem.Elevation(width, 0));
+  EXPECT_DOUBLE_EQ(inf, dem.Elevation(width, height));
 
   // Check GeoReferenceOrigin()
   ignition::math::Angle latitude, longitude;
-  dem.GeoReferenceOrigin(latitude, longitude);
+  EXPECT_TRUE(dem.GeoReferenceOrigin(latitude, longitude));
   EXPECT_FLOAT_EQ(38.001667, latitude.Degree());
   EXPECT_FLOAT_EQ(-122.22278, longitude.Degree());
 }

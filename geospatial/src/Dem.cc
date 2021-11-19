@@ -15,6 +15,7 @@
  *
 */
 #include <algorithm>
+#include <limits>
 
 #include <gdal_priv.h>
 #include <ogr_spatialref.h>
@@ -118,34 +119,31 @@ int Dem::Load(const std::string &_filename)
   ySize = this->dataPtr->dataSet->GetRasterYSize();
 
   // Corner coordinates
-  try
-  {
-    upLeftX = 0.0;
-    upLeftY = 0.0;
-    upRightX = xSize;
-    upRightY = 0.0;
-    lowLeftX = 0.0;
-    lowLeftY = ySize;
+  upLeftX = 0.0;
+  upLeftY = 0.0;
+  upRightX = xSize;
+  upRightY = 0.0;
+  lowLeftX = 0.0;
+  lowLeftY = ySize;
 
-    // Calculate the georeferenced coordinates of the terrain corners
-    this->GeoReference(upLeftX, upLeftY, upLeftLat, upLeftLong);
-    this->GeoReference(upRightX, upRightY, upRightLat, upRightLong);
-    this->GeoReference(lowLeftX, lowLeftY, lowLeftLat, lowLeftLong);
-
-    // Set the world width and height
-    this->dataPtr->worldWidth =
-       math::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
-                                              upRightLat, upRightLong);
-    this->dataPtr->worldHeight =
-       math::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
-                                              lowLeftLat, lowLeftLong);
-  }
-  catch (const std::invalid_argument &)
+  // Calculate the georeferenced coordinates of the terrain corners
+  if (!this->GeoReference(upLeftX, upLeftY, upLeftLat, upLeftLong)
+      || !this->GeoReference(upRightX, upRightY, upRightLat, upRightLong)
+      || !this->GeoReference(lowLeftX, lowLeftY, lowLeftLat, lowLeftLong))
   {
-    ignwarn << "Failed to automatically compute DEM size. "
+    ignerr << "Failed to automatically compute DEM size. "
             << "Please use the <size> element to manually set DEM size."
             << std::endl;
+    return -1;
   }
+
+  // Set the world width and height
+  this->dataPtr->worldWidth =
+     math::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
+                                            upRightLat, upRightLong);
+  this->dataPtr->worldHeight =
+     math::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
+                                            lowLeftLat, lowLeftLong);
 
   // Set the terrain's side (the terrain will be squared after the padding)
   if (ignition::math::isPowerOfTwo(ySize - 1))
@@ -201,11 +199,10 @@ double Dem::Elevation(double _x, double _y)
 {
   if (_x >= this->Width() || _y >= this->Height())
   {
-    throw std::invalid_argument(
-      "Illegal coordinates. You are asking for the elevation in ("
-      + std::to_string(_x) + "," + std::to_string(_y) + ") but the terrain is ["
-      + std::to_string(this->Width()) + " x " + std::to_string(this->Height())
-      + "]\n");
+    ignerr << "Illegal coordinates. You are asking for the elevation in ("
+           << _x << "," << _y << ") but the terrain is ["
+           << this->Width() << " x " << this->Height() << "]" << std::endl;
+    return std::numeric_limits<double>::infinity();
   }
 
   return this->dataPtr->demData.at(_y * this->Width() + _x);
@@ -224,7 +221,7 @@ float Dem::MaxElevation() const
 }
 
 //////////////////////////////////////////////////
-void Dem::GeoReference(double _x, double _y,
+bool Dem::GeoReference(double _x, double _y,
     ignition::math::Angle &_latitude, ignition::math::Angle &_longitude) const
 {
   double geoTransf[6];
@@ -243,10 +240,9 @@ void Dem::GeoReference(double _x, double _y,
     cT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
     if (nullptr == cT)
     {
-      throw std::invalid_argument(
-        "Unable to transform terrain coordinate system to WGS84 for "
-        "coordinates (" + std::to_string(_x) + ","
-        + std::to_string(_y) + ")");
+      ignerr << "Unable to transform terrain coordinate system to WGS84 for "
+             << "coordinates (" << _x << "," << _y << ")" << std::endl;
+      return false;
     }
 
     xGeoDeg = geoTransf[0] + _x * geoTransf[1] + _y * geoTransf[2];
@@ -261,14 +257,15 @@ void Dem::GeoReference(double _x, double _y,
   }
   else
   {
-    throw std::invalid_argument(
-      "Unable to obtain the georeferenced values for coordinates ("
-      + std::to_string(_x) + "," + std::to_string(_y) + ")\n");
+    ignerr << "Unable to obtain the georeferenced values for coordinates ("
+           << _x << "," << _y << ")" << std::endl;
+    return false;
   }
+  return true;
 }
 
 //////////////////////////////////////////////////
-void Dem::GeoReferenceOrigin(ignition::math::Angle &_latitude,
+bool Dem::GeoReferenceOrigin(ignition::math::Angle &_latitude,
     ignition::math::Angle &_longitude) const
 {
   return this->GeoReference(0, 0, _latitude, _longitude);

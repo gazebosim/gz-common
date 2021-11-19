@@ -52,7 +52,8 @@ namespace ignition
       /// \brief Get the elevation of a terrain's point in meters.
       /// \param[in] _x X coordinate of the terrain.
       /// \param[in] _y Y coordinate of the terrain.
-      /// \return Terrain's elevation at (x,y) in meters.
+      /// \return Terrain's elevation at (x,y) in meters or infinity if illegal
+      /// coordinates were provided.
       public: double Elevation(double _x, double _y);
 
       /// \brief Get the terrain's minimum elevation in meters.
@@ -67,7 +68,8 @@ namespace ignition
       /// origin in WGS84.
       /// \param[out] _latitude Georeferenced latitude.
       /// \param[out] _longitude Georeferenced longitude.
-      public: void GeoReferenceOrigin(ignition::math::Angle &_latitude,
+      /// \return True if able to retrieve origin coordinates. False otherwise.
+      public: bool GeoReferenceOrigin(ignition::math::Angle &_latitude,
                   ignition::math::Angle &_longitude) const;
 
       /// \brief Get the terrain's height. Due to the Ogre constrains, this
@@ -119,7 +121,8 @@ namespace ignition
       /// \param[in] _y Y coordinate of the terrain.
       /// \param[out] _latitude Georeferenced latitude.
       /// \param[out] _longitude Georeferenced longitude.
-      private: void GeoReference(double _x, double _y,
+      /// \return True if able to retrieve coordinates. False otherwise.
+      private: bool GeoReference(double _x, double _y,
                                  ignition::math::Angle &_latitude,
                                  ignition::math::Angle &_longitude) const;
 
