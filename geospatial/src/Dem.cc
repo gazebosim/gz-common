@@ -118,25 +118,34 @@ int Dem::Load(const std::string &_filename)
   ySize = this->dataPtr->dataSet->GetRasterYSize();
 
   // Corner coordinates
-  upLeftX = 0.0;
-  upLeftY = 0.0;
-  upRightX = xSize;
-  upRightY = 0.0;
-  lowLeftX = 0.0;
-  lowLeftY = ySize;
+  try
+  {
+    upLeftX = 0.0;
+    upLeftY = 0.0;
+    upRightX = xSize;
+    upRightY = 0.0;
+    lowLeftX = 0.0;
+    lowLeftY = ySize;
 
-  // Calculate the georeferenced coordinates of the terrain corners
-  this->GeoReference(upLeftX, upLeftY, upLeftLat, upLeftLong);
-  this->GeoReference(upRightX, upRightY, upRightLat, upRightLong);
-  this->GeoReference(lowLeftX, lowLeftY, lowLeftLat, lowLeftLong);
+    // Calculate the georeferenced coordinates of the terrain corners
+    this->GeoReference(upLeftX, upLeftY, upLeftLat, upLeftLong);
+    this->GeoReference(upRightX, upRightY, upRightLat, upRightLong);
+    this->GeoReference(lowLeftX, lowLeftY, lowLeftLat, lowLeftLong);
 
-  // Set the world width and height
-  this->dataPtr->worldWidth =
-     math::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
-                                            upRightLat, upRightLong);
-  this->dataPtr->worldHeight =
-     math::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
-                                            lowLeftLat, lowLeftLong);
+    // Set the world width and height
+    this->dataPtr->worldWidth =
+       math::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
+                                              upRightLat, upRightLong);
+    this->dataPtr->worldHeight =
+       math::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
+                                              lowLeftLat, lowLeftLong);
+  }
+  catch (const std::invalid_argument &)
+  {
+    ignwarn << "Failed to automatically compute DEM size. "
+            << "Please use the <size> element to manually set DEM size."
+            << std::endl;
+  }
 
   // Set the terrain's side (the terrain will be squared after the padding)
   if (ignition::math::isPowerOfTwo(ySize - 1))
@@ -155,11 +164,34 @@ int Dem::Load(const std::string &_filename)
   if (this->LoadData() != 0)
     return -1;
 
-  // Set the min/max heights
-  this->dataPtr->minElevation = *std::min_element(&this->dataPtr->demData[0],
-      &this->dataPtr->demData[0] + this->dataPtr->side * this->dataPtr->side);
-  this->dataPtr->maxElevation = *std::max_element(&this->dataPtr->demData[0],
-      &this->dataPtr->demData[0] + this->dataPtr->side * this->dataPtr->side);
+  // Check for nodata value in dem data. This is used when computing the
+  // min elevation. If nodata value is not defined, we assume it will be one
+  // of the commonly used values such as -9999, -32768, etc.
+  // For simplicity, we will treat values <= -9999 as nodata values and
+  // ignore them when computing the min elevation.
+  int validNoData = 0;
+  const double defaultNoDataValue = -9999;
+  double noDataValue = this->dataPtr->band->GetNoDataValue(&validNoData);
+  if (validNoData <= 0)
+    noDataValue = defaultNoDataValue;
+
+  double min = ignition::math::MAX_D;
+  double max = -ignition::math::MAX_D;
+  for (auto d : this->dataPtr->demData)
+  {
+    if (d < min && d > noDataValue)
+      min = d;
+    if (d > max && d > noDataValue)
+      max = d;
+  }
+  if (ignition::math::equal(min, ignition::math::MAX_D) ||
+      ignition::math::equal(max, -ignition::math::MAX_D))
+  {
+    ignwarn << "Dem is composed of 'nodata' values!" << std::endl;
+  }
+
+  this->dataPtr->minElevation = min;
+  this->dataPtr->maxElevation = max;
 
   return 0;
 }
@@ -209,6 +241,13 @@ void Dem::GeoReference(double _x, double _y,
     sourceCs.importFromWkt(&importString);
     targetCs.SetWellKnownGeogCS("WGS84");
     cT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
+    if (nullptr == cT)
+    {
+      throw std::invalid_argument(
+        "Unable to transform terrain coordinate system to WGS84 for "
+        "coordinates (" + std::to_string(_x) + ","
+        + std::to_string(_y) + ")");
+    }
 
     xGeoDeg = geoTransf[0] + _x * geoTransf[1] + _y * geoTransf[2];
     yGeoDeg = geoTransf[3] + _x * geoTransf[4] + _y * geoTransf[5];
@@ -217,6 +256,8 @@ void Dem::GeoReference(double _x, double _y,
 
     _latitude.Degree(yGeoDeg);
     _longitude.Degree(xGeoDeg);
+
+    OCTDestroyCoordinateTransformation(cT);
   }
   else
   {
@@ -299,8 +340,8 @@ void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
       double px4 = this->dataPtr->demData[y2 * this->dataPtr->side + x2];
       float h2 = (px3 - ((px3 - px4) * dx));
 
-      float h = (h1 - ((h1 - h2) * dy) - std::max(0.0f,
-          this->MinElevation())) * _scale.Z();
+      float h = this->dataPtr->minElevation +
+          (h1 - ((h1 - h2) * dy) - this->dataPtr->minElevation) * _scale.Z();
 
       // Invert pixel definition so 1=ground, 0=full height,
       // if the terrain size has a negative z component
@@ -308,9 +349,9 @@ void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
       if (_size.Z() < 0)
         h *= -1;
 
-      // Convert to 0 if a NODATA value is found
-      if (_size.Z() >= 0 && h < 0)
-        h = 0;
+      // Convert to minElevation if a NODATA value is found
+      if (_size.Z() >= 0 && h < this->dataPtr->minElevation)
+        h = this->dataPtr->minElevation;
 
       // Store the height for future use
       if (!_flipY)

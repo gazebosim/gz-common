@@ -147,9 +147,45 @@ TEST_F(DemTest, FillHeightmap)
   EXPECT_EQ(vertSize * vertSize, elevations.size());
 
   // Check the elevation of some control points
-  EXPECT_FLOAT_EQ(119.58285, elevations.at(0));
-  EXPECT_FLOAT_EQ(114.27753, elevations.at(elevations.size() - 1));
-  EXPECT_FLOAT_EQ(148.07137, elevations.at(elevations.size() / 2));
+  EXPECT_FLOAT_EQ(184.94113, elevations.at(0));
+  EXPECT_FLOAT_EQ(179.63583, elevations.at(elevations.size() - 1));
+  EXPECT_FLOAT_EQ(213.42966, elevations.at(elevations.size() / 2));
+}
+
+/////////////////////////////////////////////////
+TEST_F(DemTest, UnfinishedDem)
+{
+  common::Dem dem;
+  auto path = common::testing::TestFile("data", "dem_unfinished.tif");
+  EXPECT_EQ(dem.Load(path), 0);
+
+  // Check that the min and max elevations are valid for an unfinished
+  // and unfilled dem.
+  EXPECT_EQ(33, static_cast<int>(dem.Height()));
+  EXPECT_EQ(33, static_cast<int>(dem.Width()));
+  EXPECT_FLOAT_EQ(111287.59, dem.WorldHeight());
+  EXPECT_FLOAT_EQ(88878.297, dem.WorldWidth());
+  // gdal reports min elevation as -32768 but this is treated as a nodata
+  // by our dem class and ignored when computing the min elevation
+  EXPECT_FLOAT_EQ(-10, dem.MinElevation());
+  EXPECT_FLOAT_EQ(1909, dem.MaxElevation());
+
+  // test another dem file with multiple nodata values
+  common::Dem demNoData;
+
+  path = common::testing::TestFile("data", "dem_nodata.dem");
+  EXPECT_EQ(demNoData.Load(path), 0);
+
+  // Check that the min and max elevations are valid for a dem with multiple
+  // nodata values
+  EXPECT_EQ(65, static_cast<int>(demNoData.Height()));
+  EXPECT_EQ(65, static_cast<int>(demNoData.Width()));
+  EXPECT_FLOAT_EQ(7499.8281, demNoData.WorldHeight());
+  EXPECT_FLOAT_EQ(14150.225, demNoData.WorldWidth());
+  // gdal reports min elevation as -32767 but this is treated as a nodata
+  // by our dem class and ignored when computing the min elevation
+  EXPECT_FLOAT_EQ(682, demNoData.MinElevation());
+  EXPECT_FLOAT_EQ(2932, demNoData.MaxElevation());
 }
 
 /////////////////////////////////////////////////
