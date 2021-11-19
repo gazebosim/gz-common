@@ -249,19 +249,36 @@ std::string ignition::common::systemTimeIso()
   return timeToIso(IGN_SYSTEM_TIME());
 }
 
+// Taken from gtest.cc
+static bool PortableLocaltime(time_t seconds, struct tm* out) {
+#if defined(_MSC_VER)
+  return localtime_s(out, &seconds) == 0;
+#elif defined(__MINGW32__) || defined(__MINGW64__)
+  // MINGW <time.h> provides neither localtime_r nor localtime_s, but uses
+  // Windows' localtime(), which has a thread-local tm buffer.
+  struct tm* tm_ptr = localtime(&seconds);  // NOLINT
+  if (tm_ptr == nullptr) return false;
+  *out = *tm_ptr;
+  return true;
+#else
+  return localtime_r(&seconds, out) != nullptr;
+#endif
+}
+
 /////////////////////////////////////////////////
 std::string ignition::common::timeToIso(
     const std::chrono::time_point<std::chrono::system_clock> &_time)
 {
   char isoStr[25];
-
   auto epoch = _time.time_since_epoch();
   auto sec = std::chrono::duration_cast<std::chrono::seconds>(epoch).count();
   auto nano = std::chrono::duration_cast<std::chrono::nanoseconds>(
       epoch).count() - sec * IGN_SEC_TO_NANO;
 
   time_t tmSec = static_cast<time_t>(sec);
-  std::strftime(isoStr, sizeof(isoStr), "%FT%T", std::localtime(&tmSec));
+  struct tm localTime;
+  PortableLocaltime(tmSec, &localTime);
+  std::strftime(isoStr, sizeof(isoStr), "%FT%T", &localTime);
 
   return std::string(isoStr) + "." + std::to_string(nano);
 }

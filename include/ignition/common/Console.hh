@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <memory>
 #include <sstream>
 #include <string>
 
@@ -183,10 +184,17 @@ namespace ignition
                    /// \brief Destructor.
                    public: virtual ~Buffer();
 
+                   /// \brief Writes _count characters to the string buffer
+                   /// \param[in] _char Input rharacter array.
+                   /// \param[in] _count Number of characters in array.
+                   /// \return The number of characters successfully written.
+                   public: std::streamsize xsputn(
+                        const char *_char, std::streamsize _count) override;
+
                    /// \brief Sync the stream (output the string buffer
                    /// contents).
                    /// \return Return 0 on success.
-                   public: virtual int sync();
+                   public: int sync() override;
 
                    /// \brief Destination type for the messages.
                    public: LogType type;
@@ -198,6 +206,10 @@ namespace ignition
 
                    /// \brief Level of verbosity
                    public: int verbosity;
+
+                   /// \brief Mutex to synchronize writes to the string buffer
+                   /// and the output stream.
+                   public: std::mutex syncMutex;
                  };
 
       IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING

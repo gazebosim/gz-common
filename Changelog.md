@@ -4,7 +4,10 @@
 
 ## Ignition Common 4.x
 
-## Ignition Common 4.X.X (20XX-XX-XX)
+## Ignition Common 4.4.0 (2021-10-15)
+
+1. Add support for animation tension 
+    * [Pull request #256](https://github.com/ignitionrobotics/ign-common/pull/256)
 
 ## Ignition Common 4.3.0 (2021-09-27)
 
