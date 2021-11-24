@@ -22,7 +22,6 @@
 #include <memory>
 
 #include <ignition/common/Export.hh>
-#include <ignition/common/Time.hh>
 #include <ignition/common/SuppressWarning.hh>
 
 namespace ignition
@@ -53,13 +52,6 @@ namespace ignition
       //               return within a finite amount of time.
       public: void AddWork(std::function<void()> _work,
                   std::function<void()> _cb = std::function<void()>());
-
-      /// \brief Waits until all work is done and threads are idle
-      /// \param[in] _timeout How long to wait, default to forever
-      /// \returns true if all work was finished
-      /// \remarks The return value can be false even when waiting forever if
-      //           the WorkerPool is destructed before all work is completed
-      public: bool IGN_DEPRECATED(4) WaitForResults(const Time &_timeout);
 
       /// \brief Waits until all work is done and threads are idle
       /// \param[in] _timeout How long to wait, default to forever

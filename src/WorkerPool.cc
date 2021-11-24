@@ -165,12 +165,6 @@ void WorkerPool::AddWork(std::function<void()> _work, std::function<void()> _cb)
 }
 
 //////////////////////////////////////////////////
-bool WorkerPool::WaitForResults(const Time &_timeout)
-{
-  return WaitForResults(math::secNsecToDuration(_timeout.sec, _timeout.nsec));
-}
-
-//////////////////////////////////////////////////
 bool WorkerPool::WaitForResults(
   const std::chrono::steady_clock::duration &_timeout)
 {

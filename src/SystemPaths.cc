@@ -536,20 +536,6 @@ void SystemPaths::AddSearchPathSuffix(const std::string &_suffix)
 }
 
 /////////////////////////////////////////////////
-void SystemPaths::SetFindFileCallback(
-    std::function<std::string(const std::string &)> _cb)
-{
-  this->dataPtr->findFileCB = _cb;
-}
-
-/////////////////////////////////////////////////
-void SystemPaths::SetFindFileURICallback(
-    std::function<std::string(const std::string &)> _cb)
-{
-  this->dataPtr->findFileURICB = _cb;
-}
-
-/////////////////////////////////////////////////
 void SystemPaths::AddFindFileCallback(
     std::function<std::string(const std::string &)> _cb)
 {

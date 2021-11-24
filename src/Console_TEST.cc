@@ -20,7 +20,6 @@
 
 #include "ignition/common/Console.hh"
 #include "ignition/common/Filesystem.hh"
-#include "ignition/common/Time.hh"
 #include "ignition/common/Util.hh"
 
 #include "test_config.h"

@@ -150,15 +150,6 @@ namespace ignition
       /// \param[in] _suffix The suffix to add
       public: void AddSearchPathSuffix(const std::string &_suffix);
 
-      /// \brief Set the callback to use when ignition can't find a file.
-      /// The callback should return a complete path to the requested file, or
-      /// and empty string if the file was not found in the callback. The path
-      /// should use platform-specific directory separators.
-      /// \param[in] _cb The callback function.
-      /// \deprecated Use AddFindFileCallback instead
-      public: void IGN_DEPRECATED(3) SetFindFileCallback(
-                  std::function<std::string(const std::string &)> _cb);
-
       /// \brief Add a callback to use when FindFile() can't find a file.
       /// The callback should return a full local path to the requested file, or
       /// and empty string if the file was not found in the callback. The path
@@ -182,15 +173,6 @@ namespace ignition
       /// and returns the full local path.
       public: void AddFindFileURICallback(
           std::function<std::string(const ignition::common::URI &)> _cb);
-
-      /// \brief Set the callback to use when ignition can't find a file uri.
-      /// The callback should return a complete path to the requested file, or
-      /// and empty string if the file was not found in the callback. The path
-      /// should use platform-specific directory separators.
-      /// \param[in] _cb The callback function.
-      /// \deprecated Use AddFindFileURICallback instead
-      public: void IGN_DEPRECATED(3) SetFindFileURICallback(
-                  std::function<std::string(const std::string &)> _cb);
 
       /// \brief look for a file in a set of search paths (not recursive)
       /// \description This method checks if a file exists in given directories.

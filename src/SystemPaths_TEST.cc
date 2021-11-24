@@ -262,16 +262,6 @@ TEST_F(SystemPathsFixture, FindFileURI)
   EXPECT_EQ("", sp.FindFileURI("robot://test_f1"));
   EXPECT_EQ("", sp.FindFileURI("osrf://test_f2"));
 
-  // We still want to test the deprecated function until it is removed.
-#ifndef _WIN32
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  sp.SetFindFileURICallback(robotCb);
-#ifndef _WIN32
-# pragma GCC diagnostic pop
-#endif
-
   EXPECT_EQ(file1, sp.FindFileURI("robot://test_f1"));
   EXPECT_EQ("", sp.FindFileURI("osrf://test_f2"));
 
@@ -361,10 +351,6 @@ TEST_F(SystemPathsFixture, FindFile)
 
   // Custom callback
   {
-    auto tmpCb = [tmpDir](const std::string &_s)
-    {
-      return _s == "tmp" ? tmpDir : "";
-    };
     auto homeCb = [homeDir](const std::string &_s)
     {
       return _s == "home" ? homeDir : "";
@@ -373,16 +359,6 @@ TEST_F(SystemPathsFixture, FindFile)
     {
       return _s == "bad" ? badDir : "";
     };
-
-    // We still want to test the deprecated function until it is removed.
-#ifndef _WIN32
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-    sp.SetFindFileCallback(tmpCb);
-#ifndef _WIN32
-# pragma GCC diagnostic pop
-#endif
 
     EXPECT_EQ(tmpDir, sp.FindFile("tmp"));
     EXPECT_EQ("", sp.FindFile("home"));
