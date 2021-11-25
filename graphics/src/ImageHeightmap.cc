@@ -62,7 +62,7 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
   this->img.Data(&data, count);
 
   // Get the image format so we can arrange our heightmap
-  // Currently supported: 8-bit, 16-bit and 32-bit.
+  // Currently supported: 8-bit and 16-bit.
   auto imgFormat = this->img.PixelFormat();
 
   double maxPixelValue;
@@ -78,6 +78,54 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
     imgFormat == ignition::common::Image::PixelFormatType::BGRA_INT8)
   {
     maxPixelValue = 255.0;
+    // Iterate over all the vertices
+    for (unsigned int y = 0; y < _vertSize; ++y)
+    {
+      // yf ranges between 0 and 4
+      double yf = y / static_cast<double>(_subSampling);
+      int y1 = static_cast<int>(std::floor(yf));
+      int y2 = static_cast<int>(std::ceil(yf));
+      if (y2 >= imgHeight)
+        y2 = imgHeight-1;
+      double dy = yf - y1;
+
+      for (unsigned int x = 0; x < _vertSize; ++x)
+      {
+        double xf = x / static_cast<double>(_subSampling);
+        int x1 = static_cast<int>(std::floor(xf));
+        int x2 = static_cast<int>(std::ceil(xf));
+        if (x2 >= imgWidth)
+          x2 = imgWidth-1;
+        double dx = xf - x1;
+
+        double px1 = static_cast<int>(
+          data[y1 * pitch / bpp + x1]) / maxPixelValue;
+        double px2 = static_cast<int>(
+          data[y1 * pitch / bpp + x2]) / maxPixelValue;
+        float h1 = (px1 - ((px1 - px2) * dx));
+
+        double px3 = static_cast<int>(
+          data[y2 * pitch / bpp + x1]) / maxPixelValue;
+        double px4 = static_cast<int>(
+          data[y2 * pitch / bpp + x2]) / maxPixelValue;
+        float h2 = (px3 - ((px3 - px4) * dx));
+
+        float h = (h1 - ((h1 - h2) * dy)) * _scale.Z();
+
+        // invert pixel definition so 1=ground, 0=full height,
+        //   if the terrain size has a negative z component
+        //   this is mainly for backward compatibility
+        if (_size.Z() < 0)
+          h = 1.0 - h;
+
+        // Store the height for future use
+        if (!_flipY)
+          _heights[y * _vertSize + x] = h;
+        else
+          _heights[(_vertSize - y - 1) * _vertSize + x] = h;
+      }
+    }
+    delete [] data;
   }
   else if(imgFormat == ignition::common::Image::PixelFormatType::BGR_INT16 ||
     imgFormat == ignition::common::Image::PixelFormatType::L_INT16 ||
@@ -86,13 +134,55 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
     imgFormat == ignition::common::Image::PixelFormatType::R_FLOAT16)
   {
     maxPixelValue = 65535.0;
-  }
-  else if(imgFormat == ignition::common::Image::PixelFormatType::BGR_INT32 ||
-    imgFormat == ignition::common::Image::PixelFormatType::R_FLOAT32 ||
-    imgFormat == ignition::common::Image::PixelFormatType::RGB_FLOAT32 ||
-    imgFormat == ignition::common::Image::PixelFormatType::RGB_INT32)
-  {
-    maxPixelValue = 4294967295.0;
+    uint16_t *dataShort = reinterpret_cast<uint16_t *>(data);
+    // Iterate over all the vertices
+    for (unsigned int y = 0; y < _vertSize; ++y)
+    {
+      // yf ranges between 0 and 4
+      double yf = y / static_cast<double>(_subSampling);
+      int y1 = static_cast<int>(std::floor(yf));
+      int y2 = static_cast<int>(std::ceil(yf));
+      if (y2 >= imgHeight)
+        y2 = imgHeight-1;
+      double dy = yf - y1;
+
+      for (unsigned int x = 0; x < _vertSize; ++x)
+      {
+        double xf = x / static_cast<double>(_subSampling);
+        int x1 = static_cast<int>(std::floor(xf));
+        int x2 = static_cast<int>(std::ceil(xf));
+        if (x2 >= imgWidth)
+          x2 = imgWidth-1;
+        double dx = xf - x1;
+
+        double px1 = static_cast<int>(
+          dataShort[y1 * pitch / bpp + x1]) / maxPixelValue;
+        double px2 = static_cast<int>(
+          dataShort[y1 * pitch / bpp + x2]) / maxPixelValue;
+        float h1 = (px1 - ((px1 - px2) * dx));
+
+        double px3 = static_cast<int>(
+          dataShort[y2 * pitch / bpp + x1]) / maxPixelValue;
+        double px4 = static_cast<int>(
+          dataShort[y2 * pitch / bpp + x2]) / maxPixelValue;
+        float h2 = (px3 - ((px3 - px4) * dx));
+
+        float h = (h1 - ((h1 - h2) * dy)) * _scale.Z();
+
+        // invert pixel definition so 1=ground, 0=full height,
+        //   if the terrain size has a negative z component
+        //   this is mainly for backward compatibility
+        if (_size.Z() < 0)
+          h = 1.0 - h;
+
+        // Store the height for future use
+        if (!_flipY)
+          _heights[y * _vertSize + x] = h;
+        else
+          _heights[(_vertSize - y - 1) * _vertSize + x] = h;
+      }
+    }
+    delete [] dataShort;
   }
   else
   {
@@ -100,55 +190,6 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
     return;
   }
 
-  // Iterate over all the vertices
-  for (unsigned int y = 0; y < _vertSize; ++y)
-  {
-    // yf ranges between 0 and 4
-    double yf = y / static_cast<double>(_subSampling);
-    int y1 = static_cast<int>(std::floor(yf));
-    int y2 = static_cast<int>(std::ceil(yf));
-    if (y2 >= imgHeight)
-      y2 = imgHeight-1;
-    double dy = yf - y1;
-
-    for (unsigned int x = 0; x < _vertSize; ++x)
-    {
-      double xf = x / static_cast<double>(_subSampling);
-      int x1 = static_cast<int>(std::floor(xf));
-      int x2 = static_cast<int>(std::ceil(xf));
-      if (x2 >= imgWidth)
-        x2 = imgWidth-1;
-      double dx = xf - x1;
-
-      double px1 = static_cast<int>(
-        data[y1 * pitch + x1 * bpp]) / maxPixelValue;
-      double px2 = static_cast<int>(
-        data[y1 * pitch + x2 * bpp]) / maxPixelValue;
-      float h1 = (px1 - ((px1 - px2) * dx));
-
-      double px3 = static_cast<int>(
-        data[y2 * pitch + x1 * bpp]) / maxPixelValue;
-      double px4 = static_cast<int>(
-        data[y2 * pitch + x2 * bpp]) / maxPixelValue;
-      float h2 = (px3 - ((px3 - px4) * dx));
-
-      float h = (h1 - ((h1 - h2) * dy)) * _scale.Z();
-
-      // invert pixel definition so 1=ground, 0=full height,
-      //   if the terrain size has a negative z component
-      //   this is mainly for backward compatibility
-      if (_size.Z() < 0)
-        h = 1.0 - h;
-
-      // Store the height for future use
-      if (!_flipY)
-        _heights[y * _vertSize + x] = h;
-      else
-        _heights[(_vertSize - y - 1) * _vertSize + x] = h;
-    }
-  }
-
-  delete [] data;
 }
 
 //////////////////////////////////////////////////
