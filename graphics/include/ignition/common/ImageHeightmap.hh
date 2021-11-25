@@ -71,7 +71,7 @@ namespace ignition
         const unsigned int& pitch, const unsigned int& bpp,
         const int& _subSampling, unsigned int& _vertSize,
         const ignition::math::Vector3d &_size,
-        const ignition::math::Vector3d &_scale, 
+        const ignition::math::Vector3d &_scale,
         const bool& _flipY, std::vector<float> &_heights)
       {
         // Iterate over all the vertices

@@ -60,7 +60,6 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
   // Get the image format so we can arrange our heightmap
   // Currently supported: 8-bit and 16-bit.
   auto imgFormat = this->img.PixelFormat();
-  ignmsg << "Heightmap format:" << imgFormat << std::endl; 
 
   unsigned char *data = nullptr;
   unsigned int count;
@@ -77,7 +76,8 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
     imgFormat == ignition::common::Image::PixelFormatType::BGR_INT8 ||
     imgFormat == ignition::common::Image::PixelFormatType::BGRA_INT8)
   {
-    getHeights(data, 255.0, imgHeight, imgWidth, pitch, bpp, _subSampling, _vertSize, _size, _scale, _flipY, _heights);
+    getHeights(data, 255.0, imgHeight, imgWidth, pitch, bpp,
+    _subSampling, _vertSize, _size, _scale, _flipY, _heights);
   }
   else if(imgFormat == ignition::common::Image::PixelFormatType::BGR_INT16 ||
     imgFormat == ignition::common::Image::PixelFormatType::L_INT16 ||
@@ -86,11 +86,13 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
     imgFormat == ignition::common::Image::PixelFormatType::R_FLOAT16)
   {
     uint16_t *dataShort = reinterpret_cast<uint16_t *>(data);
-    getHeights(dataShort, 65535.0,  imgHeight, imgWidth, pitch, bpp, _subSampling, _vertSize, _size, _scale, _flipY, _heights);
+    getHeights(dataShort, 65535.0,  imgHeight, imgWidth, pitch, bpp,
+    _subSampling, _vertSize, _size, _scale, _flipY, _heights);
   }
   else
   {
-    ignerr << "Unsupported image format, heightmaps are only supported for 8-bit and 16-bit grayscale images, heightmap will not be loaded" << std::endl;
+    ignerr << "Unsupported image format, "
+    "heightmap will not be loaded" << std::endl;
     return;
   }
 
