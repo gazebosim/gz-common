@@ -66,16 +66,7 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
   auto imgFormat = this->img.PixelFormat();
 
   double maxPixelValue;
-  if(imgFormat == ignition::common::Image::PixelFormatType::L_INT8 ||
-    imgFormat == ignition::common::Image::PixelFormatType::RGB_INT8 ||
-    imgFormat == ignition::common::Image::PixelFormatType::RGBA_INT8 ||
-    imgFormat == ignition::common::Image::PixelFormatType::BAYER_BGGR8 ||
-    imgFormat == ignition::common::Image::PixelFormatType::BAYER_GBRG8 ||
-    imgFormat == ignition::common::Image::PixelFormatType::BAYER_GRBG8 ||
-    imgFormat == ignition::common::Image::PixelFormatType::BAYER_GRBG8 ||
-    imgFormat == ignition::common::Image::PixelFormatType::BAYER_RGGB8 ||
-    imgFormat == ignition::common::Image::PixelFormatType::BGR_INT8 ||
-    imgFormat == ignition::common::Image::PixelFormatType::BGRA_INT8)
+  if(imgFormat == ignition::common::Image::PixelFormatType::L_INT8)
   {
     maxPixelValue = 255.0;
     // Iterate over all the vertices
@@ -127,11 +118,7 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
     }
     delete [] data;
   }
-  else if(imgFormat == ignition::common::Image::PixelFormatType::BGR_INT16 ||
-    imgFormat == ignition::common::Image::PixelFormatType::L_INT16 ||
-    imgFormat == ignition::common::Image::PixelFormatType::RGB_FLOAT16 ||
-    imgFormat == ignition::common::Image::PixelFormatType::RGB_INT16 ||
-    imgFormat == ignition::common::Image::PixelFormatType::R_FLOAT16)
+  else if(imgFormat == ignition::common::Image::PixelFormatType::L_INT16)
   {
     maxPixelValue = 65535.0;
     uint16_t *dataShort = reinterpret_cast<uint16_t *>(data);
@@ -186,7 +173,7 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
   }
   else
   {
-    ignerr << "Unknown image format, heightmap will not be loaded" << std::endl;
+    ignerr << "Unsupported image format, heightmaps are only supported for 8-bit and 16-bit grayscale images, heightmap will not be loaded" << std::endl;
     return;
   }
 
