@@ -22,7 +22,8 @@
 #include <string>
 
 #include <ignition/common/Export.hh>
-#include <ignition/common/SuppressWarning.hh>
+
+#include <ignition/utils/ImplPtr.hh>
 
 namespace ignition
 {
@@ -253,19 +254,19 @@ namespace ignition
     std::string IGNITION_COMMON_VISIBLE uniqueDirectoryPath(
         const std::string &_dir);
 
-    /// \internal
-    class DirIterPrivate;
-
     /// \class DirIter Filesystem.hh
     /// \brief A class for iterating over all items in a directory.
     class IGNITION_COMMON_VISIBLE DirIter
     {
+      /// \brief Constructor for end element.
+      public: DirIter();
+
       /// \brief Constructor.
       /// \param[in] _in  Directory to iterate over.
       public: explicit DirIter(const std::string &_in);
 
-      /// \brief Constructor for end element.
-      public: DirIter();
+      /// \brief Destructor
+      public: ~DirIter();
 
       /// \brief Dereference operator; returns current directory record.
       /// \return A string representing the entire path of the directory
@@ -282,9 +283,6 @@ namespace ignition
       /// \return true if the iterators are equal, false otherwise.
       public: bool operator!=(const DirIter &_other) const;
 
-      /// \brief Destructor
-      public: ~DirIter();
-
       /// \brief Move to the next directory record, skipping . and .. records.
       private: void Next();
 
@@ -294,10 +292,8 @@ namespace ignition
       /// \brief Close an open directory handle.
       private: void CloseHandle();
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
-      /// \brief Private data.
-      private: std::unique_ptr<DirIterPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      /// \brief Pointer to private data.
+      IGN_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

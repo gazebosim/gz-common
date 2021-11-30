@@ -64,7 +64,7 @@ namespace ignition
   {
     /// \internal
     /// \brief Private data for the DirIter class.
-    class DirIterPrivate
+    class DirIter::Implementation
     {
       /// \def current
       /// \brief The current directory item.
@@ -151,7 +151,8 @@ namespace ignition
     }
 
     //////////////////////////////////////////////////
-    DirIter::DirIter(const std::string &_in) : dataPtr(new DirIterPrivate)
+    DirIter::DirIter(const std::string &_in)
+      : dataPtr(ignition::utils::MakeImpl<Implementation>())
     {
       this->dataPtr->dirname = _in;
 
@@ -429,7 +430,8 @@ namespace ignition
     }
 
     //////////////////////////////////////////////////
-    DirIter::DirIter(const std::string &_in) : dataPtr(new DirIterPrivate)
+    DirIter::DirIter(const std::string &_in)
+      : dataPtr(ignition::utils::MakeImpl<Implementation>())
     {
       // use a form of search Sebastian Martel reports will work with Win98
       this->dataPtr->dirname = _in;
@@ -590,7 +592,7 @@ namespace ignition
     }
 
     //////////////////////////////////////////////////
-    DirIter::DirIter() : dataPtr(new DirIterPrivate)
+    DirIter::DirIter() : dataPtr(ignition::utils::MakeImpl<Implementation>())
     {
       this->dataPtr->current = "";
 
