@@ -52,7 +52,7 @@ namespace ignition
     };
 
     /// \brief Private implementation
-    class WorkerPoolPrivate
+    class WorkerPool::Implementation
     {
       /// \brief Does work until signaled to shut down
       public: void Worker();
@@ -82,7 +82,7 @@ namespace ignition
 }
 
 //////////////////////////////////////////////////
-void WorkerPoolPrivate::Worker()
+void WorkerPool::Implementation::Worker()
 {
   WorkOrder order;
 
@@ -125,7 +125,7 @@ void WorkerPoolPrivate::Worker()
 
 //////////////////////////////////////////////////
 WorkerPool::WorkerPool(const unsigned int _minThreadCount)
-  : dataPtr(new WorkerPoolPrivate)
+  : dataPtr(ignition::utils::MakeUniqueImpl<Implementation>())
 {
   unsigned int numWorkers = std::max(std::thread::hardware_concurrency(),
       std::max(_minThreadCount, 1u));
@@ -134,7 +134,7 @@ WorkerPool::WorkerPool(const unsigned int _minThreadCount)
   for (unsigned int w = 0; w < numWorkers; ++w)
   {
     this->dataPtr->workers.push_back(
-        std::thread(&WorkerPoolPrivate::Worker, this->dataPtr.get()));
+        std::thread(&WorkerPool::Implementation::Worker, this->dataPtr.get()));
   }
 }
 

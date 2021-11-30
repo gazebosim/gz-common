@@ -22,7 +22,8 @@
 #include <memory>
 
 #include <ignition/common/Export.hh>
-#include <ignition/common/SuppressWarning.hh>
+
+#include <ignition/utils/ImplPtr.hh>
 
 namespace ignition
 {
@@ -62,10 +63,7 @@ namespace ignition
         const std::chrono::steady_clock::duration &_timeout =
           std::chrono::steady_clock::duration::zero());
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
-      /// \brief private implementation pointer
-      private: std::unique_ptr<WorkerPoolPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      IGN_UTILS_UNIQUE_IMPL_PTR(dataPtr)
     };
   }
 }
