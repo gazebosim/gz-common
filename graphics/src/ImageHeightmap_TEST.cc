@@ -94,7 +94,7 @@ TEST_F(ImageHeightmapTest, FillHeightmap)
   // Check the elevation of some control points
   EXPECT_NEAR(0.0, elevations.at(0), ELEVATION_TOL);
   EXPECT_NEAR(10.0, elevations.at(elevations.size() - 1), ELEVATION_TOL);
-  EXPECT_NEAR(5.0, elevations.at((elevations.size() / 2)), ELEVATION_TOL);
+  EXPECT_NEAR(5.0, elevations.at(elevations.size() / 2), ELEVATION_TOL);
 }
 
 /////////////////////////////////////////////////
