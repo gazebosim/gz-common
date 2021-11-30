@@ -83,46 +83,46 @@ namespace ignition
         bool _flipY, std::vector<float> &_heights)
       {
         // bytes per pixel
-        unsigned int bpp = _pitch / _imgWidth;
+        const unsigned int bpp = _pitch / _imgWidth;
         // number of channels in a pixel
-        unsigned int channels = bpp / sizeof(T);
+        const unsigned int channels = bpp / sizeof(T);
         // number of pixels in a row of image
-        unsigned int pitchInPixels = _pitch / bpp;
+        const unsigned int pitchInPixels = _pitch / bpp;
 
-        double maxPixelValue =
+        const double maxPixelValue =
             static_cast<double>(std::numeric_limits<T>::max());
 
         // Iterate over all the vertices
         for (unsigned int y = 0; y < _vertSize; ++y)
         {
           // yf ranges between 0 and 4
-          double yf = y / static_cast<double>(_subSampling);
-          int y1 = static_cast<int>(std::floor(yf));
+          const double yf = y / static_cast<double>(_subSampling);
+          const int y1 = static_cast<int>(std::floor(yf));
           int y2 = static_cast<int>(std::ceil(yf));
           if (y2 >= _imgHeight)
-            y2 = _imgHeight-1;
-          double dy = yf - y1;
+            y2 = _imgHeight - 1;
+          const double dy = yf - y1;
 
           for (unsigned int x = 0; x < _vertSize; ++x)
           {
-            double xf = x / static_cast<double>(_subSampling);
-            int x1 = static_cast<int>(std::floor(xf));
+            const double xf = x / static_cast<double>(_subSampling);
+            const int x1 = static_cast<int>(std::floor(xf));
             int x2 = static_cast<int>(std::ceil(xf));
             if (x2 >= _imgWidth)
-              x2 = _imgWidth-1;
-            double dx = xf - x1;
+              x2 = _imgWidth - 1;
+            const double dx = xf - x1;
 
-            double px1 = static_cast<int>(
+            const double px1 = static_cast<int>(
               _data[(y1 * pitchInPixels + x1) * channels]) / maxPixelValue;
-            double px2 = static_cast<int>(
+            const double px2 = static_cast<int>(
               _data[(y1 * pitchInPixels + x2) * channels]) / maxPixelValue;
-            float h1 = (px1 - ((px1 - px2) * dx));
+            const float h1 = (px1 - ((px1 - px2) * dx));
 
-            double px3 = static_cast<int>(
+            const double px3 = static_cast<int>(
               _data[(y2 * pitchInPixels + x1) * channels]) / maxPixelValue;
-            double px4 = static_cast<int>(
+            const double px4 = static_cast<int>(
               _data[(y2 * pitchInPixels + x2) * channels]) / maxPixelValue;
-            float h2 = (px3 - ((px3 - px4) * dx));
+            const float h2 = (px3 - ((px3 - px4) * dx));
             float h = (h1 - ((h1 - h2) * dy)) * _scale.Z();
 
             // invert pixel definition so 1=ground, 0=full height,
