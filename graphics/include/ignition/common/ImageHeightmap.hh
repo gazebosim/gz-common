@@ -17,6 +17,7 @@
 #ifndef IGNITION_COMMON_IMAGEHEIGHTMAPDATA_HH_
 #define IGNITION_COMMON_IMAGEHEIGHTMAPDATA_HH_
 
+#include <limits>
 #include <string>
 #include <vector>
 #include <ignition/math/Vector3.hh>
