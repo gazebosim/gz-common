@@ -22,15 +22,13 @@
 #include <functional>
 #include <memory>
 #include <ignition/common/Export.hh>
-#include <ignition/common/SuppressWarning.hh>
+
+#include <ignition/utils/ImplPtr.hh>
 
 namespace ignition
 {
   namespace common
   {
-    // Forward declare private data class.
-    class BatteryPrivate;
-
     /// \brief A battery abstraction
     ///
     /// The default battery model is ideal: It just takes the initial voltage
@@ -59,13 +57,22 @@ namespace ignition
       /// \param[in] _battery Battery to copy.
       public: Battery(const Battery &_battery);
 
-      /// \brief Assignment operator
+      /// \brief Copy assignment operator
       /// \param[in] _battery The new battery
       /// \return a reference to this instance
       public: Battery &operator=(const Battery &_battery);
 
+      /// \brief Move constructor
+      /// \param[in] _battery Battery to move.
+      public: Battery(Battery &&_battery);
+
+      /// \brief Move assignment operator
+      /// \param[in] _battery The new battery
+      /// \return a reference to this instance
+      public: Battery &operator=(Battery &&_battery);
+
       /// \brief Destructor.
-      public: virtual ~Battery();
+      public: virtual ~Battery() = default;
 
       /// \brief Equal to operator
       /// \param[in] _battery the battery to compare to
@@ -163,11 +170,8 @@ namespace ignition
       /// \return New battery voltage.
       private: double UpdateDefault(Battery *_battery);
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
-      /// \internal
-      /// \brief Private data pointer.
-      private: std::unique_ptr<BatteryPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      /// \brief Pointer to private data.
+      IGN_UTILS_UNIQUE_IMPL_PTR(dataPtr)
     };
 
     /// \def BatteryPtr
