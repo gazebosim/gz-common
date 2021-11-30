@@ -34,8 +34,9 @@
 #include <vector>
 
 #include <ignition/common/Export.hh>
-#include <ignition/common/SuppressWarning.hh>
 #include <ignition/common/URI.hh>
+
+#include <ignition/utils/ImplPtr.hh>
 
 namespace ignition
 {
@@ -52,9 +53,6 @@ namespace ignition
     {
       /// \brief Constructor for SystemPaths
       public: SystemPaths();
-
-      /// \brief Destructor
-      public: virtual ~SystemPaths();
 
       /// \brief Get the log path. If IGN_LOG_PATH environment variable is set,
       /// then this path is used. If not, the path is $HOME/.ignition, and in
@@ -205,10 +203,8 @@ namespace ignition
       /// uses to separate different paths from each other.
       public: static char Delimiter();
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
-      /// \brief Private data pointer
-      private: std::unique_ptr<SystemPathsPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      /// \brief Pointer to private data.
+      IGN_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }
