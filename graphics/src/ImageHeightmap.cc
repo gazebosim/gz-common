@@ -54,9 +54,6 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
   // Bytes per row
   unsigned int pitch = this->img.Pitch();
 
-  // Bytes per pixel
-  unsigned int bpp = pitch / imgWidth;
-
   // Get the image format so we can arrange our heightmap
   // Currently supported: 8-bit and 16-bit.
   auto imgFormat = this->img.PixelFormat();
@@ -65,7 +62,7 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
   unsigned int count;
   this->img.Data(&data, count);
 
-  if(imgFormat == ignition::common::Image::PixelFormatType::L_INT8 ||
+  if (imgFormat == ignition::common::Image::PixelFormatType::L_INT8 ||
     imgFormat == ignition::common::Image::PixelFormatType::RGB_INT8 ||
     imgFormat == ignition::common::Image::PixelFormatType::RGBA_INT8 ||
     imgFormat == ignition::common::Image::PixelFormatType::BAYER_BGGR8 ||
@@ -76,26 +73,26 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
     imgFormat == ignition::common::Image::PixelFormatType::BGR_INT8 ||
     imgFormat == ignition::common::Image::PixelFormatType::BGRA_INT8)
   {
-    getHeights(data, 255.0, imgHeight, imgWidth, pitch, bpp,
-    _subSampling, _vertSize, _size, _scale, _flipY, _heights);
+    this->FillHeights<unsigned char>(data, imgHeight, imgWidth, pitch,
+        _subSampling, _vertSize, _size, _scale, _flipY, _heights);
   }
-  else if(imgFormat == ignition::common::Image::PixelFormatType::BGR_INT16 ||
+  else if (imgFormat == ignition::common::Image::PixelFormatType::BGR_INT16 ||
     imgFormat == ignition::common::Image::PixelFormatType::L_INT16 ||
     imgFormat == ignition::common::Image::PixelFormatType::RGB_FLOAT16 ||
     imgFormat == ignition::common::Image::PixelFormatType::RGB_INT16 ||
     imgFormat == ignition::common::Image::PixelFormatType::R_FLOAT16)
   {
     uint16_t *dataShort = reinterpret_cast<uint16_t *>(data);
-    getHeights(dataShort, 65535.0,  imgHeight, imgWidth, pitch, bpp,
-    _subSampling, _vertSize, _size, _scale, _flipY, _heights);
+    this->FillHeights<uint16_t>(dataShort, imgHeight, imgWidth, pitch,
+        _subSampling, _vertSize, _size, _scale, _flipY, _heights);
   }
   else
   {
     ignerr << "Unsupported image format, "
-    "heightmap will not be loaded" << std::endl;
+      "heightmap will not be loaded" << std::endl;
     return;
   }
-
+  delete [] data;
 }
 
 //////////////////////////////////////////////////
