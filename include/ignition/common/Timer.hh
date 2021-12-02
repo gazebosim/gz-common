@@ -17,8 +17,11 @@
 #ifndef IGNITION_COMMON_TIMER_HH_
 #define IGNITION_COMMON_TIMER_HH_
 
-#include <ignition/common/Time.hh>
 #include <ignition/common/Export.hh>
+#include <ignition/common/SuppressWarning.hh>
+
+#include <chrono>
+#include <iostream>
 
 namespace ignition
 {
@@ -43,10 +46,6 @@ namespace ignition
       /// \brief Returns true if the timer is running.
       /// \return Tue if the timer has been started and not stopped.
       public: bool Running() const;
-
-      /// \brief Get the elapsed time
-      /// \return The time
-      public: Time IGN_DEPRECATED(4) Elapsed() const;
 
       /// \brief Get the elapsed time
       /// \return The elapsed time

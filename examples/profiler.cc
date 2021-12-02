@@ -21,7 +21,6 @@
 #include "ignition/common/Console.hh"
 #include "ignition/common/Profiler.hh"
 #include "ignition/common/SignalHandler.hh"
-#include "ignition/common/Time.hh"
 
 std::atomic<bool> running;
 

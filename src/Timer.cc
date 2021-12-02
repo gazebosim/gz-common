@@ -51,19 +51,6 @@ bool Timer::Running() const
   return this->running;
 }
 
-#ifndef _WIN32
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-//////////////////////////////////////////////////
-Time Timer::Elapsed() const
-{
-  return common::Time(this->ElapsedTime().count());
-}
-#ifndef _WIN32
-# pragma GCC diagnostic pop
-#endif
-
 //////////////////////////////////////////////////
 std::chrono::duration<double> Timer::ElapsedTime() const
 {

@@ -15,7 +15,8 @@
  *
 */
 
-
+#include <condition_variable>
+#include <mutex>
 #include <queue>
 #include <thread>
 #include <utility>
@@ -162,12 +163,6 @@ void WorkerPool::AddWork(std::function<void()> _work, std::function<void()> _cb)
   std::unique_lock<std::mutex> queueLock(this->dataPtr->queueMtx);
   this->dataPtr->workOrders.emplace(_work, _cb);
   this->dataPtr->signalNewWork.notify_one();
-}
-
-//////////////////////////////////////////////////
-bool WorkerPool::WaitForResults(const Time &_timeout)
-{
-  return WaitForResults(math::secNsecToDuration(_timeout.sec, _timeout.nsec));
 }
 
 //////////////////////////////////////////////////
