@@ -242,10 +242,10 @@ TEST_F(SystemPathsFixture, FindFileURI)
   //     sp.FindFileURI("file://" + this->filesystemRoot + "Windows"));
 #endif
 
-  auto robotCb = [dir1](const std::string &_s)
+  auto robotCb = [dir1](const ignition::common::URI &_uri)
   {
-    return _s.find("robot://", 0) != std::string::npos ?
-           ignition::common::joinPaths(dir1, _s.substr(8)) : "";
+    return _uri.Scheme() == "robot" ?
+           ignition::common::joinPaths(dir1, _uri.Path().Str()) : "";
   };
   auto osrfCb = [dir2](const ignition::common::URI &_uri)
   {
@@ -262,6 +262,7 @@ TEST_F(SystemPathsFixture, FindFileURI)
   EXPECT_EQ("", sp.FindFileURI("robot://test_f1"));
   EXPECT_EQ("", sp.FindFileURI("osrf://test_f2"));
 
+  sp.AddFindFileURICallback(robotCb);
   EXPECT_EQ(file1, sp.FindFileURI("robot://test_f1"));
   EXPECT_EQ("", sp.FindFileURI("osrf://test_f2"));
 
@@ -342,7 +343,6 @@ TEST_F(SystemPathsFixture, FindFile)
   const auto uriBadDir = "file://C:/bad";
 #endif
   {
-    EXPECT_EQ(tmpDir, sp.FindFile(tmpDir));
     EXPECT_EQ(tmpDir, sp.FindFile(uriTmpDir));
     EXPECT_EQ(homeDir, sp.FindFile(homeDir));
     EXPECT_EQ("", sp.FindFile(badDir));
@@ -360,21 +360,18 @@ TEST_F(SystemPathsFixture, FindFile)
       return _s == "bad" ? badDir : "";
     };
 
-    EXPECT_EQ(tmpDir, sp.FindFile("tmp"));
     EXPECT_EQ("", sp.FindFile("home"));
     EXPECT_EQ("", sp.FindFile("bad"));
     EXPECT_EQ("", sp.FindFile("banana"));
 
     sp.AddFindFileCallback(homeCb);
 
-    EXPECT_EQ(tmpDir, sp.FindFile("tmp"));
     EXPECT_EQ(homeDir, sp.FindFile("home"));
     EXPECT_EQ("", sp.FindFile("bad"));
     EXPECT_EQ("", sp.FindFile("banana"));
 
     sp.AddFindFileCallback(badCb);
 
-    EXPECT_EQ(tmpDir, sp.FindFile("tmp"));
     EXPECT_EQ(homeDir, sp.FindFile("home"));
     EXPECT_EQ("", sp.FindFile("bad"));
     EXPECT_EQ("", sp.FindFile("banana"));

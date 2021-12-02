@@ -60,12 +60,6 @@ class ignition::common::SystemPathsPrivate
   /// \brief Log path
   public: std::string logPath;
 
-  /// \brief Find file callback.
-  public: std::function<std::string(const std::string &)> findFileCB;
-
-  /// \brief Find file URI callback.
-  public: std::function<std::string(const std::string &)> findFileURICB;
-
   /// \brief Callbacks to be called in order in case a file can't be found.
   public: std::vector <std::function <std::string(
               const std::string &)> > findFileCbs;
@@ -340,12 +334,6 @@ std::string SystemPaths::FindFileURI(const ignition::common::URI &_uri) const
   filename = this->FindFile(ignition::common::copyFromUnixPath(suffix),
       true, false);
 
-  // Try URI callback
-  if (filename.empty() && this->dataPtr->findFileURICB)
-  {
-    filename = this->dataPtr->findFileURICB(_uri.Str());
-  }
-
   // Look in custom paths.
   // Tries the suffix against all paths, regardless of the scheme
   if (filename.empty())
@@ -428,10 +416,6 @@ std::string SystemPaths::FindFile(const std::string &_filename,
     else if ((filename[0] == '.' || _searchLocalPath) && exists(filename))
     {
       path = filename;
-    }
-    else if (this->dataPtr->findFileCB)
-    {
-      path = this->dataPtr->findFileCB(filename);
     }
   }
 
