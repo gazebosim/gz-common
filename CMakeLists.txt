@@ -53,7 +53,7 @@ set(IGN_MATH_VER ${ignition-math6_VERSION_MAJOR})
 
 #--------------------------------------
 # Find ignition-utils
-ign_find_package(ignition-utils1 REQUIRED_BY graphics VERSION 1.0)
+ign_find_package(ignition-utils1 REQUIRED VERSION 1.0)
 set(IGN_UTILS_VER ${ignition-utils1_VERSION_MAJOR})
 
 #--------------------------------------
