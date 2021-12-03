@@ -32,7 +32,7 @@ static const char kSchemeDelim[] = ":";
 static const char kAuthDelim[] = "//";
 
 /// \brief URIAuthority private data.
-class ignition::common::URIAuthorityPrivate
+class ignition::common::URIAuthority::Implementation
 {
   /// \brief The user information.
   public: std::string userInfo;
@@ -52,7 +52,7 @@ class ignition::common::URIAuthorityPrivate
 };
 
 /// \brief URIPath private data.
-class ignition::common::URIPathPrivate
+class ignition::common::URIPath::Implementation
 {
   /// \brief A helper method to determine if the given string represents
   ///        an absolute path starting segment or not.
@@ -73,21 +73,21 @@ class ignition::common::URIPathPrivate
 };
 
 /// \brief URIQuery private data.
-class ignition::common::URIQueryPrivate
+class ignition::common::URIQuery::Implementation
 {
   /// \brief The key/value tuples that compose the query.
   public: std::vector<std::pair<std::string, std::string>> values;
 };
 
 /// \brief URIFragment private data.
-class ignition::common::URIFragmentPrivate
+class ignition::common::URIFragment::Implementation
 {
   /// \brief The value of the fragment.
   public: std::string value;
 };
 
 /// \brief URI private data.
-class ignition::common::URIPrivate
+class ignition::common::URI::Implementation
 {
   /// \brief The URI scheme.
   public: std::string scheme;
@@ -107,15 +107,8 @@ class ignition::common::URIPrivate
 
 //////////////////////////////////////////////////
 URIAuthority::URIAuthority()
-: dataPtr(new URIAuthorityPrivate())
+: dataPtr(ignition::utils::MakeImpl<Implementation>())
 {
-}
-
-//////////////////////////////////////////////////
-URIAuthority::URIAuthority(const URIAuthority &_authority)
-  : URIAuthority()
-{
-  *this = _authority;
 }
 
 //////////////////////////////////////////////////
@@ -127,11 +120,6 @@ URIAuthority::URIAuthority(const std::string &_str)
     ignwarn << "Unable to parse URIAuthority [" << _str << "]. Ignoring."
            << std::endl;
   }
-}
-
-//////////////////////////////////////////////////
-URIAuthority::~URIAuthority()
-{
 }
 
 //////////////////////////////////////////////////
@@ -151,7 +139,7 @@ std::string URIAuthority::UserInfo() const
 }
 
 //////////////////////////////////////////////////
-void URIAuthority::SetUserInfo(const std::string &_userInfo) const
+void URIAuthority::SetUserInfo(const std::string &_userInfo)
 {
   this->dataPtr->userInfo = _userInfo;
 }
@@ -163,7 +151,7 @@ std::string URIAuthority::Host() const
 }
 
 //////////////////////////////////////////////////
-void URIAuthority::SetHost(const std::string &_host) const
+void URIAuthority::SetHost(const std::string &_host)
 {
   this->dataPtr->host = _host;
 }
@@ -175,7 +163,7 @@ std::optional<int> URIAuthority::Port() const
 }
 
 //////////////////////////////////////////////////
-void URIAuthority::SetPort(int _port) const
+void URIAuthority::SetPort(int _port)
 {
   this->dataPtr->port.emplace(_port);
 }
@@ -205,18 +193,6 @@ std::string URIAuthority::Str() const
   }
 
   return "";
-}
-
-//////////////////////////////////////////////////
-URIAuthority &URIAuthority::operator=(const URIAuthority &_auth)
-{
-  this->dataPtr->userInfo = _auth.UserInfo();
-  this->dataPtr->host = _auth.Host();
-  this->dataPtr->port = _auth.Port();
-  this->dataPtr->emptyHostValid = _auth.EmptyHostValid();
-  this->dataPtr->hasEmptyHost = _auth.dataPtr->hasEmptyHost;
-
-  return *this;
 }
 
 //////////////////////////////////////////////////
@@ -319,7 +295,7 @@ bool URIAuthority::EmptyHostValid() const
 }
 
 //////////////////////////////////////////////////
-void URIAuthority::SetEmptyHostValid(bool _valid) const
+void URIAuthority::SetEmptyHostValid(bool _valid)
 {
   this->dataPtr->emptyHostValid = _valid;
 }
@@ -386,12 +362,7 @@ bool URIAuthority::Parse(const std::string &_str, bool _emptyHostValid)
 
 /////////////////////////////////////////////////
 URIPath::URIPath()
-: dataPtr(new URIPathPrivate())
-{
-}
-
-/////////////////////////////////////////////////
-URIPath::~URIPath()
+: dataPtr(ignition::utils::MakeImpl<Implementation>())
 {
 }
 
@@ -404,13 +375,6 @@ URIPath::URIPath(const std::string &_str)
     ignwarn << "Unable to parse URIPath [" << _str << "]. Ignoring."
            << std::endl;
   }
-}
-
-/////////////////////////////////////////////////
-URIPath::URIPath(const URIPath &_path)
-  : URIPath()
-{
-  *this = _path;
 }
 
 /////////////////////////////////////////////////
@@ -583,14 +547,6 @@ std::string URIPath::Str(const std::string &_delim) const
 }
 
 /////////////////////////////////////////////////
-URIPath &URIPath::operator=(const URIPath &_path)
-{
-  this->dataPtr->path = _path.dataPtr->path;
-  this->dataPtr->isAbsolute = _path.dataPtr->isAbsolute;
-  return *this;
-}
-
-/////////////////////////////////////////////////
 void URIPath::Clear()
 {
   this->dataPtr->path.clear();
@@ -673,7 +629,7 @@ bool URIPath::Parse(const std::string &_str)
 
 /////////////////////////////////////////////////
 URIQuery::URIQuery()
-  : dataPtr(new URIQueryPrivate())
+  : dataPtr(ignition::utils::MakeImpl<Implementation>())
 {
 }
 
@@ -689,28 +645,9 @@ URIQuery::URIQuery(const std::string &_str)
 }
 
 /////////////////////////////////////////////////
-URIQuery::URIQuery(const URIQuery &_query)
-  : URIQuery()
-{
-  *this = _query;
-}
-
-/////////////////////////////////////////////////
-URIQuery::~URIQuery()
-{
-}
-
-/////////////////////////////////////////////////
 void URIQuery::Insert(const std::string &_key, const std::string &_value)
 {
   this->dataPtr->values.push_back(std::make_pair(_key, _value));
-}
-
-/////////////////////////////////////////////////
-URIQuery &URIQuery::operator=(const URIQuery &_query)
-{
-  this->dataPtr->values = _query.dataPtr->values;
-  return *this;
 }
 
 /////////////////////////////////////////////////
@@ -808,7 +745,7 @@ bool URIQuery::Parse(const std::string &_str)
 
 /////////////////////////////////////////////////
 URIFragment::URIFragment()
-  : dataPtr(new URIFragmentPrivate())
+  : dataPtr(ignition::utils::MakeImpl<Implementation>())
 {
 }
 
@@ -821,25 +758,6 @@ URIFragment::URIFragment(const std::string &_str)
     ignwarn << "Unable to parse URIFragment [" << _str << "]. Ignoring."
            << std::endl;
   }
-}
-
-/////////////////////////////////////////////////
-URIFragment::URIFragment(const URIFragment &_fragment)
-  : URIFragment()
-{
-  *this = _fragment;
-}
-
-/////////////////////////////////////////////////
-URIFragment::~URIFragment()
-{
-}
-
-/////////////////////////////////////////////////
-URIFragment &URIFragment::operator=(const URIFragment &_fragment)
-{
-  this->dataPtr->value = _fragment.dataPtr->value;
-  return *this;
 }
 
 /////////////////////////////////////////////////
@@ -925,7 +843,7 @@ bool URIFragment::Parse(const std::string &_str)
 
 /////////////////////////////////////////////////
 URI::URI()
-  : dataPtr(new URIPrivate())
+  : dataPtr(ignition::utils::MakeImpl<Implementation>())
 {
 }
 
@@ -944,18 +862,6 @@ URI::URI(const std::string &_str, bool _hasAuthority)
   }
 
   this->Parse(_str);
-}
-
-/////////////////////////////////////////////////
-URI::URI(const URI &_uri)
-  : URI()
-{
-  *this = _uri;
-}
-
-/////////////////////////////////////////////////
-URI::~URI()
-{
 }
 
 //////////////////////////////////////////////////
@@ -1062,17 +968,6 @@ bool URI::operator==(const URI &_uri) const
          this->dataPtr->path == _uri.dataPtr->path &&
          this->dataPtr->query == _uri.dataPtr->query &&
          this->dataPtr->fragment == _uri.dataPtr->fragment;
-}
-
-/////////////////////////////////////////////////
-URI &URI::operator=(const URI &_uri)
-{
-  this->dataPtr->scheme = _uri.dataPtr->scheme;
-  this->dataPtr->authority = _uri.dataPtr->authority;
-  this->dataPtr->path = _uri.dataPtr->path;
-  this->dataPtr->query = _uri.dataPtr->query;
-  this->dataPtr->fragment = _uri.dataPtr->fragment;
-  return *this;
 }
 
 /////////////////////////////////////////////////

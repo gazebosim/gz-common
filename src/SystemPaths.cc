@@ -40,7 +40,7 @@ using namespace ignition;
 using namespace common;
 
 // Private data class
-class ignition::common::SystemPathsPrivate
+class ignition::common::SystemPaths::Implementation
 {
   /// \brief Name of the environment variable to check for plugin paths
   public: std::string pluginPathEnv = "IGN_PLUGIN_PATH";
@@ -85,7 +85,7 @@ void insertUnique(const std::string &_path, std::list<std::string> &_list)
 
 //////////////////////////////////////////////////
 SystemPaths::SystemPaths()
-: dataPtr(new SystemPathsPrivate)
+: dataPtr(ignition::utils::MakeImpl<Implementation>())
 {
   std::string home, path, fullPath;
   if (!env(IGN_HOMEDIR, home))
@@ -118,11 +118,6 @@ SystemPaths::SystemPaths()
   // Populate this->dataPtr->filePaths with values from the default
   // environment variable.
   this->SetFilePathEnv(this->dataPtr->filePathEnv);
-}
-
-/////////////////////////////////////////////////
-SystemPaths::~SystemPaths()
-{
 }
 
 /////////////////////////////////////////////////
@@ -240,7 +235,7 @@ std::string SystemPaths::NormalizeDirectoryPath(const std::string &_path)
 }
 
 /////////////////////////////////////////////////
-std::vector<std::string> SystemPathsPrivate::GenerateLibraryPaths(
+std::vector<std::string> SystemPaths::Implementation::GenerateLibraryPaths(
     const std::string &_libName) const
 {
   std::string lowercaseLibName = lowercase(_libName);

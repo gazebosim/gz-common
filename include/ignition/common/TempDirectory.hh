@@ -18,18 +18,17 @@
 #ifndef IGNITION_COMMON_TEMPDIRECTORY_HH_
 #define IGNITION_COMMON_TEMPDIRECTORY_HH_
 
-#include <memory>
 #include <string>
 
 #include <ignition/common/Export.hh>
 #include <ignition/common/Filesystem.hh>
 
+#include <ignition/utils/ImplPtr.hh>
+
 namespace ignition
 {
   namespace common
   {
-    class TempDirectoryPrivate;
-
     /// \brief Return the path to a directory suitable for temporary files.
     ///
     /// Calls std::filesystem::temp_directory_path, refer to the standard
@@ -100,10 +99,8 @@ namespace ignition
       /// \return the temporary directory path
       public: std::string Path() const;
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
-      /// \brief Private data pointer
-      private: std::unique_ptr<TempDirectoryPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      /// \brief Pointer to private data.
+      IGN_UTILS_UNIQUE_IMPL_PTR(dataPtr)
     };
   }  // namespace common
 }  // namespace ignition
