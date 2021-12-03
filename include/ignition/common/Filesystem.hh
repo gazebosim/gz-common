@@ -18,7 +18,6 @@
 #ifndef IGNITION_COMMON_FILESYSTEM_HH_
 #define IGNITION_COMMON_FILESYSTEM_HH_
 
-#include <memory>
 #include <string>
 
 #include <ignition/common/Export.hh>

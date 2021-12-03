@@ -18,9 +18,9 @@
 #ifndef IGNITION_COMMON_TEMPDIRECTORY_HH_
 #define IGNITION_COMMON_TEMPDIRECTORY_HH_
 
-#include <memory>
 #include <string>
 
+#include <ignition/common/Export.hh>
 #include <ignition/common/Filesystem.hh>
 
 #include <ignition/utils/ImplPtr.hh>

@@ -17,10 +17,11 @@
 #ifndef IGNITION_COMMON_BATTERY_HH_
 #define IGNITION_COMMON_BATTERY_HH_
 
-#include <map>
-#include <string>
 #include <functional>
+#include <map>
 #include <memory>
+#include <string>
+
 #include <ignition/common/Export.hh>
 
 #include <ignition/utils/ImplPtr.hh>

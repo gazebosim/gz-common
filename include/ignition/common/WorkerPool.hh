@@ -19,7 +19,6 @@
 #define IGNITION_COMMON_WORKER_POOL_HH_
 
 #include <functional>
-#include <memory>
 
 #include <ignition/common/Export.hh>
 

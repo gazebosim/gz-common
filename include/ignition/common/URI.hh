@@ -17,7 +17,6 @@
 #ifndef IGNITION_COMMON_URI_HH_
 #define IGNITION_COMMON_URI_HH_
 
-#include <memory>
 #include <optional>
 #include <string>
 
