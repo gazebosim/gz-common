@@ -890,8 +890,8 @@ TEST(URITEST, HasAuthority)
     // Modifyng path updates string
     uri.Path() = URIPath("new_authority.com/another/path");
 
-    EXPECT_EQ("new_authority.com/another/path/", uri.Path().Str());
-    EXPECT_EQ("https://new_authority.com/another/path/", uri.Str());
+    EXPECT_EQ("new_authority.com/another/path", uri.Path().Str());
+    EXPECT_EQ("https://new_authority.com/another/path", uri.Str());
 
     // Clearing keeps false authority
     uri.Clear();
