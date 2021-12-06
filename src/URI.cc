@@ -587,6 +587,7 @@ URIPath &URIPath::operator=(const URIPath &_path)
 {
   this->dataPtr->path = _path.dataPtr->path;
   this->dataPtr->isAbsolute = _path.dataPtr->isAbsolute;
+  this->dataPtr->trailingSlash = _path.dataPtr->trailingSlash;
   return *this;
 }
 
