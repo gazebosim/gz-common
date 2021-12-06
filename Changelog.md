@@ -141,6 +141,32 @@
 
 ## Ignition Common 3.X.X
 
+## Ignition Common 3.14.0 (2021-10-12)
+
+1. Support loading PBR textures in OBJLoader
+    * [Pull request #216](https://github.com/ignitionrobotics/ign-common/pull/216)
+   
+1. Remove CMAKE_CXX_FLAGS from test targetrs 
+    * [Pull request #214](https://github.com/ignitionrobotics/ign-common/pull/214)
+     
+1. Set project-wide standard to C++17
+    * [Pull request #221](https://github.com/ignitionrobotics/ign-common/pull/221)
+     
+1. Fix av_* API usage for deprecations 
+    * [Pull request #220](https://github.com/ignitionrobotics/ign-common/pull/220)
+     
+1. Make KeyEvent rule-of-five compliant 
+    * [Pull request #224](https://github.com/ignitionrobotics/ign-common/pull/224)
+     
+1. Fix segfault caused by destructionb order of Event and Connection 
+    * [Pull request #234](https://github.com/ignitionrobotics/ign-common/pull/234)
+     
+1. Fix a typo in VideoEncoder_TEST 
+    * [Pull request #231](https://github.com/ignitionrobotics/ign-common/pull/231)
+    
+1. Use direct evaluation for SKIP_av 
+    * [Pull request #250](https://github.com/ignitionrobotics/ign-common/pull/250)
+
 ## Ignition Common 3.13.2 (2021-05-11)
 
 1. Backport collada fixes (Backport #204)
