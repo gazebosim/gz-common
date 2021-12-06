@@ -132,6 +132,9 @@ namespace ignition
       /// \return 0 when the operation succeeds to open a file.
       private: int LoadData();
 
+      // Documentation inherited.
+      public: std::string Filename() const;
+
       /// internal
       /// \brief Pointer to the private data.
       IGN_UTILS_IMPL_PTR(dataPtr)

@@ -57,6 +57,10 @@ namespace ignition
       /// \brief Get the maximum terrain's elevation.
       /// \return The maximum terrain's elevation.
       public: virtual float MaxElevation() const = 0;
+
+      /// \brief Get the full filename of loaded heightmap image/dem
+      /// \return The filename used to load the heightmap image/dem
+      public: virtual std::string Filename() const = 0;
     };
   }
 }

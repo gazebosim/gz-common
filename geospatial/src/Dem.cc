@@ -52,6 +52,9 @@ class ignition::common::Dem::Implementation
 
   /// \brief DEM data converted to be OGRE-compatible.
   public: std::vector<float> demData;
+
+  /// \brief Full filename used to load the dem.
+  public: std::string filename;
 };
 
 //////////////////////////////////////////////////
@@ -85,6 +88,8 @@ int Dem::Load(const std::string &_filename)
   std::string fullName = _filename;
   if (!exists(findFilePath(fullName)))
     fullName = common::findFile(_filename);
+
+  this->dataPtr->filename = fullName;
 
   if (!exists(findFilePath(fullName)))
   {
@@ -414,4 +419,10 @@ int Dem::LoadData()
     buffer.clear();
 
     return 0;
+}
+
+//////////////////////////////////////////////////
+std::string Dem::Filename() const
+{
+  return this->dataPtr->filename;
 }

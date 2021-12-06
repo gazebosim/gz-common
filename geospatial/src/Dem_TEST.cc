@@ -28,7 +28,7 @@ using namespace ignition;
 class DemTest : public common::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
-TEST_F(DemTest, MisingFile)
+TEST_F(DemTest, MissingFile)
 {
   common::Dem dem;
   EXPECT_NE(dem.Load("/file/shouldn/never/exist.png"), 0);
@@ -84,6 +84,9 @@ TEST_F(DemTest, BasicAPI)
   common::Dem dem;
   const auto path = common::testing::TestFile("data", "dem_squared.tif");
   EXPECT_EQ(dem.Load(path), 0);
+
+  // Check filename
+  EXPECT_EQ(path, dem.Filename());
 
   // Check the heights and widths
   EXPECT_EQ(129, static_cast<int>(dem.Height()));
