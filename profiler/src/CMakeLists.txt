@@ -58,6 +58,7 @@ ign_add_component(profiler SOURCES ${PROFILER_SRCS} GET_TARGET_NAME profiler_tar
 # Always enable profiler so that it's built, but make it
 # private so that downstream users can still disable profiling
 target_compile_definitions(${profiler_target} PRIVATE "IGN_PROFILER_ENABLE=1")
+target_compile_definitions(${profiler_target} PRIVATE "RMT_USE_METAL=${RMT_USE_METAL}")
 
 if(IGN_PROFILER_REMOTERY)
   target_compile_definitions(${profiler_target} PRIVATE "IGN_PROFILER_REMOTERY=1")
