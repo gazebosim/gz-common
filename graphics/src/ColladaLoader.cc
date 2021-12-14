@@ -2370,7 +2370,8 @@ void ColladaLoader::Implementation::LoadTriangles(
       this->LoadNormals(source, _transform, norms, normalDupMap);
       combinedVertNorms = false;
       inputs[NORMAL].insert(ignition::math::parseInt(offset));
-      hasNormals = true;
+      if (norms.size() > 0)
+        hasNormals = true;
     }
     else if (semantic == "TEXCOORD")
     {
