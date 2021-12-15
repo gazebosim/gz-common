@@ -2248,8 +2248,11 @@ void ColladaLoader::Implementation::LoadPolylist(
               inputRemappedNormalIndex = normalDupMap[inputRemappedNormalIndex];
             }
 
-            subMesh->AddNormal(norms[inputRemappedNormalIndex]);
-            input.normalIndex = inputRemappedNormalIndex;
+            if (norms.size() < inputRemappedNormalIndex)
+            {
+              subMesh->AddNormal(norms[inputRemappedNormalIndex]);
+              input.normalIndex = inputRemappedNormalIndex;
+            }
           }
 
           if (!inputs[TEXCOORD].empty())
