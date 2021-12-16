@@ -2248,7 +2248,7 @@ void ColladaLoader::Implementation::LoadPolylist(
               inputRemappedNormalIndex = normalDupMap[inputRemappedNormalIndex];
             }
 
-            if (norms.size() < inputRemappedNormalIndex)
+            if (norms.size() > inputRemappedNormalIndex)
             {
               subMesh->AddNormal(norms[inputRemappedNormalIndex]);
               input.normalIndex = inputRemappedNormalIndex;
