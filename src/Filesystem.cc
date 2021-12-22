@@ -161,8 +161,14 @@ std::string ignition::common::joinPaths(
 
   auto ret = (p1 / p2);
 
-  if (!is_url)
+  if (is_url)
+  {
+    ret = copyToUnixPath(ret);
+  } 
+  else 
+  {
     ret = ret.lexically_normal();
+  }
 
   return ret.string();
 }
