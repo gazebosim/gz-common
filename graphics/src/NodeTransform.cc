@@ -14,7 +14,10 @@
  * limitations under the License.
  *
  */
+
 #include <ignition/common/NodeTransform.hh>
+
+#include <iostream>
 
 using namespace ignition;
 using namespace common;
@@ -161,10 +164,10 @@ void NodeTransform::RecalculateMatrix()
       if (this->dataPtr->type == ROTATE)
       {
         math::Matrix3d mat;
-        mat.Axis(math::Vector3d(this->dataPtr->source[0],
-                                this->dataPtr->source[1],
-                                this->dataPtr->source[2]),
-                 IGN_DTOR(this->dataPtr->source[3]));
+        mat.SetFromAxisAngle(math::Vector3d(this->dataPtr->source[0],
+                                            this->dataPtr->source[1],
+                                            this->dataPtr->source[2]),
+                             IGN_DTOR(this->dataPtr->source[3]));
         this->dataPtr->transform = mat;
       }
       else

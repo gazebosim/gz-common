@@ -164,8 +164,8 @@ std::string ignition::common::joinPaths(
   if (is_url)
   {
     ret = copyToUnixPath(ret);
-  } 
-  else 
+  }
+  else
   {
     ret = ret.lexically_normal();
   }
