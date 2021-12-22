@@ -242,8 +242,16 @@ std::string checkWindowsPath(const std::string _path)
   std::string result = std::regex_replace(_path, std::regex(R"(/)"), "\\");
   std::string drive_letters;
 
+<<<<<<< HEAD
   // only Windows contains absolute paths starting with drive letters
   if (result.length() > 3 && 0 == result.compare(1, 2, ":\\"))
+=======
+  if (is_url)
+  {
+    ret = copyToUnixPath(ret);
+  }
+  else
+>>>>>>> edad65f... Fix deprecations when using ign-math7
   {
     drive_letters = result.substr(0, 3);
     result = result.substr(3);
