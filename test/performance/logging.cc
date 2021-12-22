@@ -38,7 +38,7 @@ void WriteToFile(std::string result_filename, std::string content)
     std::cerr << "Error writing to " << result_filename << std::endl;
   }
   out << content << std::flush;
-  std::cout << content;
+  //std::cout << content;
 }
 
 void MeasurePeakDuringLogWrites(const size_t id, std::vector<uint64_t> &result)
@@ -196,7 +196,7 @@ TEST_P(LoggingTest, RunThreads)
 }
 
 INSTANTIATE_TEST_SUITE_P(LoggingTest, LoggingTest,
-                         ::testing::Values(1, 2, 4, 8, 16, 32));
+                         ::testing::Values(1, 2, 4, 8, 16));
 
 /////////////////////////////////////////////////
 // This test is valid (passes) if it runs without segfaults.
