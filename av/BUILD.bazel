@@ -65,9 +65,9 @@ cc_library(
 )
 
 cc_binary(
-    name = "libignition-common4-av.so",
+    name = "libignition-common5-av.so",
     includes = ["include"],
-    linkopts = ["-Wl,-soname,libignition-common4-av.so"],
+    linkopts = ["-Wl,-soname,libignition-common5-av.so"],
     linkshared = True,
     deps = [":av"],
 )

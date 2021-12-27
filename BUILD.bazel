@@ -84,9 +84,9 @@ cc_library(
 )
 
 cc_binary(
-    name = "libignition-common4.so",
+    name = "libignition-common5.so",
     includes = ["include"],
-    linkopts = ["-Wl,-soname,libignition-common4.so"],
+    linkopts = ["-Wl,-soname,libignition-common5.so"],
     linkshared = True,
     deps = [":ign_common"],
 )
@@ -99,7 +99,7 @@ test_srcs = glob(
 [cc_test(
     name = src.replace("/", "_").replace(".cc", "").replace("src_", ""),
     srcs = [src],
-    data = [":libignition-common4.so"],
+    data = [":libignition-common5.so"],
     deps = [
         ":ign_common",
         IGNITION_ROOT + "ign_bazel:utilities",
