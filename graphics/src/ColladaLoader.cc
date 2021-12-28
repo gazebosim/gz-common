@@ -648,7 +648,7 @@ ignition::math::Matrix4d ColladaLoader::Implementation::LoadNodeTransform(
 
       iss >> axis.X() >> axis.Y() >> axis.Z();
       iss >> angle;
-      mat.Axis(axis, IGN_DTOR(angle));
+      mat.SetFromAxisAngle(axis, IGN_DTOR(angle));
       ignition::math::Matrix4d mat4(ignition::math::Matrix4d::Identity);
       mat4 = mat;
 
@@ -1271,7 +1271,7 @@ void ColladaLoader::Implementation::SetSkeletonNodeTransform(
 
       iss >> axis.X() >> axis.Y() >> axis.Z();
       iss >> angle;
-      mat.Axis(axis, IGN_DTOR(angle));
+      mat.SetFromAxisAngle(axis, IGN_DTOR(angle));
 
       ignition::math::Matrix4d mat4(ignition::math::Matrix4d::Identity);
       mat4 = mat;

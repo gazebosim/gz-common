@@ -17,6 +17,7 @@
 #ifndef IGNITION_COMMON_IMAGE_HH_
 #define IGNITION_COMMON_IMAGE_HH_
 
+#include <cstring>
 #include <limits>
 #include <memory>
 #include <string>
