@@ -63,9 +63,9 @@ cc_library(
 )
 
 cc_binary(
-    name = "libignition-common4-graphics.so",
+    name = "libignition-common5-graphics.so",
     includes = ["include"],
-    linkopts = ["-Wl,-soname,libignition-common4-graphics.so"],
+    linkopts = ["-Wl,-soname,libignition-common5-graphics.so"],
     linkshared = True,
     deps = [":graphics"],
 )
