@@ -22,7 +22,6 @@
 #include <utility>
 
 #include "ignition/common/WorkerPool.hh"
-#include "ignition/math/Helpers.hh"
 
 namespace igncmn = ignition::common;
 using namespace igncmn;

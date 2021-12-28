@@ -648,7 +648,7 @@ ignition::math::Matrix4d ColladaLoader::Implementation::LoadNodeTransform(
 
       iss >> axis.X() >> axis.Y() >> axis.Z();
       iss >> angle;
-      mat.Axis(axis, IGN_DTOR(angle));
+      mat.SetFromAxisAngle(axis, IGN_DTOR(angle));
       ignition::math::Matrix4d mat4(ignition::math::Matrix4d::Identity);
       mat4 = mat;
 
@@ -1271,7 +1271,7 @@ void ColladaLoader::Implementation::SetSkeletonNodeTransform(
 
       iss >> axis.X() >> axis.Y() >> axis.Z();
       iss >> angle;
-      mat.Axis(axis, IGN_DTOR(angle));
+      mat.SetFromAxisAngle(axis, IGN_DTOR(angle));
 
       ignition::math::Matrix4d mat4(ignition::math::Matrix4d::Identity);
       mat4 = mat;
@@ -2248,8 +2248,11 @@ void ColladaLoader::Implementation::LoadPolylist(
               inputRemappedNormalIndex = normalDupMap[inputRemappedNormalIndex];
             }
 
-            subMesh->AddNormal(norms[inputRemappedNormalIndex]);
-            input.normalIndex = inputRemappedNormalIndex;
+            if (norms.size() > inputRemappedNormalIndex)
+            {
+              subMesh->AddNormal(norms[inputRemappedNormalIndex]);
+              input.normalIndex = inputRemappedNormalIndex;
+            }
           }
 
           if (!inputs[TEXCOORD].empty())
@@ -2370,7 +2373,8 @@ void ColladaLoader::Implementation::LoadTriangles(
       this->LoadNormals(source, _transform, norms, normalDupMap);
       combinedVertNorms = false;
       inputs[NORMAL].insert(ignition::math::parseInt(offset));
-      hasNormals = true;
+      if (norms.size() > 0)
+        hasNormals = true;
     }
     else if (semantic == "TEXCOORD")
     {
