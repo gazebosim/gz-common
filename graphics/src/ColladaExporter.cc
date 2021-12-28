@@ -963,11 +963,11 @@ void ColladaExporter::Implementation::ExportVisualScenes(
       auto lightdir_norm = light.direction.Normalized();
       math::Vector3d initial_dir(0, 0, -1);
       math::Quaterniond q;
-      q.From2Axes(initial_dir, lightdir_norm);
+      q.SetFrom2Axes(initial_dir, lightdir_norm);
 
       math::Vector3d axis;
       double angle = 0.0;
-      q.ToAxis(axis, angle);
+      q.AxisAngle(axis, angle);
 
       tinyxml2::XMLElement *rotateXml =
         _libraryVisualScenesXml->GetDocument()->NewElement("rotate");

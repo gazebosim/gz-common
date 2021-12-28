@@ -149,7 +149,7 @@ ignition::math::Matrix3d ParseTransformMatrixStr(
     }
     double deg = stod(numbers[0]);
     ignition::math::Angle angle;
-    angle.Degree(deg);
+    angle.SetDegree(deg);
     // get the tangent of the angle
     double t = tan(angle.Radian());
     ignition::math::Matrix3d m(1, t, 0, 0, 1, 0, 0, 0, 1);
@@ -166,7 +166,7 @@ ignition::math::Matrix3d ParseTransformMatrixStr(
     }
     double deg = stod(numbers[0]);
     ignition::math::Angle angle;
-    angle.Degree(deg);
+    angle.SetDegree(deg);
     // get the tangent of the angle
     double t = tan(angle.Radian());
     ignition::math::Matrix3d m(1, 0, 0, t, 1, 0, 0, 0, 1);
@@ -223,7 +223,7 @@ ignition::math::Matrix3d ParseTransformMatrixStr(
     }
     double deg = stod(numbers[0]);
     ignition::math::Angle angle;
-    angle.Degree(deg);
+    angle.SetDegree(deg);
     double a = angle.Radian();
     double sina = sin(a);
     double cosa = cos(a);

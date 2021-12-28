@@ -379,7 +379,7 @@ void MeshManager::CreatePlane(const std::string &_name,
   xlate = rot = ignition::math::Matrix4d::Identity;
 
   ignition::math::Matrix3d rot3;
-  rot3.Axes(xAxis, yAxis, zAxis);
+  rot3.SetAxes(xAxis, yAxis, zAxis);
 
   rot = rot3;
 

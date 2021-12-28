@@ -100,9 +100,9 @@ cc_library(
 )
 
 cc_binary(
-    name = "libignition-common4-profiler.so",
+    name = "libignition-common5-profiler.so",
     includes = ["include"],
-    linkopts = ["-Wl,-soname,libignition-common4-profiler.so"],
+    linkopts = ["-Wl,-soname,libignition-common5-profiler.so"],
     linkshared = True,
     deps = [":profiler"],
 )
