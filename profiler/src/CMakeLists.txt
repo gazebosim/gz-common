@@ -58,6 +58,7 @@ ign_add_component(profiler SOURCES ${PROFILER_SRCS} GET_TARGET_NAME profiler_tar
 # Always enable profiler so that it's built, but make it
 # private so that downstream users can still disable profiling
 target_compile_definitions(${profiler_target} PRIVATE "IGN_PROFILER_ENABLE=1")
+target_compile_definitions(${profiler_target} PRIVATE "RMT_USE_METAL=${RMT_USE_METAL}")
 
 if(IGN_PROFILER_REMOTERY)
   target_compile_definitions(${profiler_target} PRIVATE "IGN_PROFILER_REMOTERY=1")
@@ -88,7 +89,7 @@ if(TARGET UNIT_Profiler_Remotery_TEST)
 endif()
 
 if(IGN_PROFILER_REMOTERY)
-  set(IGN_PROFILER_SCRIPT_PATH ${CMAKE_INSTALL_LIBDIR}/ignition/ignition-common${PROJECT_VERSION_MAJOR})
+  set(IGN_PROFILER_SCRIPT_PATH ${CMAKE_INSTALL_LIBEXECDIR}/ignition/ignition-common${PROJECT_VERSION_MAJOR})
   set(IGN_PROFILER_VIS_PATH ${IGN_DATA_INSTALL_DIR}/profiler_vis)
 
   configure_file(Remotery/ign_remotery_vis.in

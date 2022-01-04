@@ -48,12 +48,12 @@ message(STATUS "\n\n-- ====== Finding Dependencies ======")
 
 #--------------------------------------
 # Find ignition-math
-ign_find_package(ignition-math6 REQUIRED_BY geospatial graphics events VERSION 6.6)
-set(IGN_MATH_VER ${ignition-math6_VERSION_MAJOR})
+ign_find_package(ignition-math7 REQUIRED_BY geospatial graphics events)
+set(IGN_MATH_VER ${ignition-math7_VERSION_MAJOR})
 
 #--------------------------------------
 # Find ignition-utils
-ign_find_package(ignition-utils1 REQUIRED_BY geospatial graphics VERSION 1.0)
+ign_find_package(ignition-utils1 REQUIRED VERSION 1.0)
 set(IGN_UTILS_VER ${ignition-utils1_VERSION_MAJOR})
 
 #--------------------------------------

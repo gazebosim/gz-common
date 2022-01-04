@@ -17,24 +17,17 @@
 #ifndef IGNITION_COMMON_URI_HH_
 #define IGNITION_COMMON_URI_HH_
 
-#include <memory>
 #include <optional>
 #include <string>
 
 #include <ignition/common/Export.hh>
-#include <ignition/common/SuppressWarning.hh>
+
+#include <ignition/utils/ImplPtr.hh>
 
 namespace ignition
 {
   namespace common
   {
-    // Forward declare private data classes.
-    class URIAuthorityPrivate;
-    class URIPathPrivate;
-    class URIQueryPrivate;
-    class URIFragmentPrivate;
-    class URIPrivate;
-
     /// A URI authority contains userinfo, host, and port data. The format
     /// of a URI authority is `//userinfo@host:port`. The `userinfo` and
     /// `port` components are optional.
@@ -64,16 +57,9 @@ namespace ignition
       /// \brief Constructor
       public: URIAuthority();
 
-      /// \brief Copy constructor.
-      /// \param[in] _path Another URIAuthority.
-      public: URIAuthority(const URIAuthority &_path);
-
       /// \brief Construct a URIAuthority object from a string.
       /// \param[in] _str A string.
       public: explicit URIAuthority(const std::string &_str);
-
-      /// \brief Destructor
-      public: virtual ~URIAuthority();
 
       /// \brief Remove all parts of the authority
       public: void Clear();
@@ -85,7 +71,7 @@ namespace ignition
 
       /// \brief Set the user information.
       /// \param[in] _userInfo The user information string.
-      public: void SetUserInfo(const std::string &_userInfo) const;
+      public: void SetUserInfo(const std::string &_userInfo);
 
       /// \brief Get the host.
       /// \return The host.
@@ -93,7 +79,7 @@ namespace ignition
 
       /// \brief Set the host.
       /// \param[in] _host The host.
-      public: void SetHost(const std::string &_host) const;
+      public: void SetHost(const std::string &_host);
 
       /// \brief True if an empty host is considered valid.
       /// \return True if an empty host is valid.
@@ -103,14 +89,14 @@ namespace ignition
       /// This should only be set to true if the corresponding URIScheme
       /// is "file".
       /// \param[in] _valid True if an empty host is valid.
-      public: void SetEmptyHostValid(bool _valid) const;
+      public: void SetEmptyHostValid(bool _valid);
 
       /// \brief Get the port.
       /// \return The port number, which is optional.
       public: std::optional<int> Port() const;
 
       /// \brief Set the port number.
-      public: void SetPort(int _port) const;
+      public: void SetPort(int _port);
 
       /// \brief Return true if the two authorities match.
       /// \param[in] _auth Authority.
@@ -120,11 +106,6 @@ namespace ignition
       /// \brief Get the complete authoriy as a string.
       /// \return The authority as a string.
       public: std::string Str() const;
-
-      /// \brief Assignment operator.
-      /// \param[in] _auth Another URIAuthority.
-      /// \return Itself.
-      public: URIAuthority &operator=(const URIAuthority &_auth);
 
       /// \brief Return true if the string is a valid path.
       /// \param[in] _str String to check.
@@ -148,11 +129,8 @@ namespace ignition
       public: bool Parse(const std::string &_str,
                   bool _emptyHostValid = false);
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
-      /// \internal
       /// \brief Pointer to private data.
-      private: std::unique_ptr<URIAuthorityPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      IGN_UTILS_IMPL_PTR(dataPtr)
     };
 
     /// \brief A URI path contains a sequence of segments separated by `/`.
@@ -169,16 +147,9 @@ namespace ignition
       /// \brief Constructor
       public: URIPath();
 
-      /// \brief Copy constructor.
-      /// \param[in] _path Another URIPath.
-      public: URIPath(const URIPath &_path);
-
       /// \brief Construct a URIPath object from a string.
       /// \param[in] _str A string.
       public: explicit URIPath(const std::string &_str);
-
-      /// \brief Destructor
-      public: virtual ~URIPath();
 
       /// \brief Remove all parts of the path
       public: void Clear();
@@ -249,11 +220,6 @@ namespace ignition
       /// \return The path as a string, with each path part separated by _delim.
       public: std::string Str(const std::string &_delim = "/") const;
 
-      /// \brief Assignment operator.
-      /// \param[in] _path Another URIPath.
-      /// \return Itself.
-      public: URIPath &operator=(const URIPath &_path);
-
       /// \brief Return true if the string is a valid path.
       /// \param[in] _str String to check.
       /// \return True if _str is a valid URI path.
@@ -268,11 +234,8 @@ namespace ignition
       /// \return True if the string could be parsed as a URIPath.
       public: bool Parse(const std::string &_str);
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
-      /// \internal
       /// \brief Pointer to private data.
-      private: std::unique_ptr<URIPathPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      IGN_UTILS_IMPL_PTR(dataPtr)
     };
 
     /// \brief The query component of a URI
@@ -285,13 +248,6 @@ namespace ignition
       /// \param[in] _str A string.
       public: explicit URIQuery(const std::string &_str);
 
-      /// \brief Copy constructor
-      /// \param[in] _query Another query component
-      public: URIQuery(const URIQuery &_query);
-
-      /// \brief Destructor
-      public: virtual ~URIQuery();
-
       /// \brief Remove all values of the query
       public: void Clear();
 
@@ -300,11 +256,6 @@ namespace ignition
       /// \param[in] _value Value of the query.
       public: void Insert(const std::string &_key,
                           const std::string &_value);
-
-      /// \brief Assignment operator.
-      /// \param[in] _query another URIQuery.
-      /// \return Itself.
-      public: URIQuery &operator=(const URIQuery &_query);
 
       /// \brief Return true if the two queries contain the same values.
       /// \param[in] _query A URI query to compare.
@@ -331,11 +282,8 @@ namespace ignition
       /// \return True if the string can be parsed as a URIQuery.
       public: bool Parse(const std::string &_string);
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
-      /// \internal
       /// \brief Pointer to private data.
-      private: std::unique_ptr<URIQueryPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      IGN_UTILS_IMPL_PTR(dataPtr)
     };
 
     /// \brief The fragment component of a URI
@@ -348,20 +296,8 @@ namespace ignition
       /// \param[in] _str A string.
       public: explicit URIFragment(const std::string &_str);
 
-      /// \brief Copy constructor
-      /// \param[in] _fragment Another fragment component
-      public: URIFragment(const URIFragment &_fragment);
-
-      /// \brief Destructor
-      public: virtual ~URIFragment();
-
       /// \brief Remove all values of the fragment
       public: void Clear();
-
-      /// \brief Assignment operator.
-      /// \param[in] _fragment another URIFragment.
-      /// \return Itself.
-      public: URIFragment &operator=(const URIFragment &_fragment);
 
       /// \brief Assignment operator.
       /// \param[in] _fragment another URIFragment.
@@ -391,11 +327,8 @@ namespace ignition
       /// \return True if the string can be parsed as a URIFragment.
       public: bool Parse(const std::string &_string);
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
-      /// \internal
       /// \brief Pointer to private data.
-      private: std::unique_ptr<URIFragmentPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      IGN_UTILS_IMPL_PTR(dataPtr)
     };
 
     /// \brief A complete URI which has the following components:
@@ -414,13 +347,6 @@ namespace ignition
       /// empty.
       public: explicit URI(const std::string &_str,
           bool _hasAuthority = false);
-
-      /// \brief Copy constructor
-      /// \param[in] _uri Another URI.
-      public: URI(const URI &_uri);
-
-      /// \brief Destructor.
-      public: ~URI();
 
       /// \brief Get the URI as a string, which has the form:
       ///
@@ -475,11 +401,6 @@ namespace ignition
       /// \return A const reference of the fragment.
       public: const URIFragment &Fragment() const;
 
-      /// \brief Assignment operator.
-      /// \param[in] _uri Another URI.
-      /// \return Itself.
-      public: URI &operator=(const URI &_uri);
-
       /// \brief Return true if the two URIs match.
       /// \param[in] _uri Another URI to compare.
       /// \return True if the two URIs match.
@@ -503,11 +424,8 @@ namespace ignition
       /// \return True if the string can be parsed as a URI.
       public: bool Parse(const std::string &_str);
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
-      /// \internal
       /// \brief Pointer to private data.
-      private: std::unique_ptr<URIPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      IGN_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

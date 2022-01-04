@@ -24,7 +24,7 @@ using namespace ignition;
 using namespace common;
 
 /// \brief Private data for the Battery class
-class ignition::common::BatteryPrivate
+class ignition::common::Battery::Implementation
 {
   /// \brief Initial voltage in volts.
   public: double initVoltage = 0.0;
@@ -51,7 +51,7 @@ class ignition::common::BatteryPrivate
 
 /////////////////////////////////////////////////
 Battery::Battery()
-: dataPtr(new BatteryPrivate)
+  : dataPtr(ignition::utils::MakeUniqueImpl<Implementation>())
 {
   this->SetUpdateFunc(std::bind(&Battery::UpdateDefault, this,
         std::placeholders::_1));
@@ -59,7 +59,7 @@ Battery::Battery()
 
 /////////////////////////////////////////////////
 Battery::Battery(const std::string &_name, const double _voltage)
-: dataPtr(new BatteryPrivate)
+  : Battery()
 {
   this->dataPtr->name = _name;
   this->dataPtr->initVoltage = _voltage;
@@ -67,7 +67,7 @@ Battery::Battery(const std::string &_name, const double _voltage)
 
 /////////////////////////////////////////////////
 Battery::Battery(const Battery &_battery)
-  : dataPtr(new BatteryPrivate)
+  : Battery()
 {
   this->dataPtr->initVoltage = _battery.dataPtr->initVoltage;
   this->dataPtr->realVoltage = _battery.dataPtr->realVoltage;
@@ -84,6 +84,12 @@ Battery::Battery(const Battery &_battery)
 
   this->dataPtr->name = _battery.dataPtr->name;
   // Mutex neither copyable nor movable.
+}
+
+/////////////////////////////////////////////////
+Battery::Battery(Battery &&_battery)
+  : dataPtr(std::exchange(_battery.dataPtr, nullptr))
+{
 }
 
 /////////////////////////////////////////////////
@@ -108,8 +114,10 @@ Battery &Battery::operator=(const Battery &_battery)
 }
 
 /////////////////////////////////////////////////
-Battery::~Battery()
+Battery &Battery::operator=(Battery &&_battery)
 {
+  std::swap(this->dataPtr, _battery.dataPtr);
+  return *this;
 }
 
 /////////////////////////////////////////////////

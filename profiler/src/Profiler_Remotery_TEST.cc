@@ -21,7 +21,6 @@
 #include <atomic> // NOLINT(*)
 #include <thread> // NOLINT(*)
 #include "ignition/common/Util.hh" // NOLINT(*)
-#include "ignition/common/Time.hh" // NOLINT(*)
 
 using namespace ignition;
 using namespace common;

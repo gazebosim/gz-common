@@ -29,13 +29,13 @@
 
 #include <functional>
 #include <list>
-#include <memory>
 #include <string>
 #include <vector>
 
 #include <ignition/common/Export.hh>
-#include <ignition/common/SuppressWarning.hh>
 #include <ignition/common/URI.hh>
+
+#include <ignition/utils/ImplPtr.hh>
 
 namespace ignition
 {
@@ -52,9 +52,6 @@ namespace ignition
     {
       /// \brief Constructor for SystemPaths
       public: SystemPaths();
-
-      /// \brief Destructor
-      public: virtual ~SystemPaths();
 
       /// \brief Get the log path. If IGN_LOG_PATH environment variable is set,
       /// then this path is used. If not, the path is $HOME/.ignition, and in
@@ -150,15 +147,6 @@ namespace ignition
       /// \param[in] _suffix The suffix to add
       public: void AddSearchPathSuffix(const std::string &_suffix);
 
-      /// \brief Set the callback to use when ignition can't find a file.
-      /// The callback should return a complete path to the requested file, or
-      /// and empty string if the file was not found in the callback. The path
-      /// should use platform-specific directory separators.
-      /// \param[in] _cb The callback function.
-      /// \deprecated Use AddFindFileCallback instead
-      public: void IGN_DEPRECATED(3) SetFindFileCallback(
-                  std::function<std::string(const std::string &)> _cb);
-
       /// \brief Add a callback to use when FindFile() can't find a file.
       /// The callback should return a full local path to the requested file, or
       /// and empty string if the file was not found in the callback. The path
@@ -182,15 +170,6 @@ namespace ignition
       /// and returns the full local path.
       public: void AddFindFileURICallback(
           std::function<std::string(const ignition::common::URI &)> _cb);
-
-      /// \brief Set the callback to use when ignition can't find a file uri.
-      /// The callback should return a complete path to the requested file, or
-      /// and empty string if the file was not found in the callback. The path
-      /// should use platform-specific directory separators.
-      /// \param[in] _cb The callback function.
-      /// \deprecated Use AddFindFileURICallback instead
-      public: void IGN_DEPRECATED(3) SetFindFileURICallback(
-                  std::function<std::string(const std::string &)> _cb);
 
       /// \brief look for a file in a set of search paths (not recursive)
       /// \description This method checks if a file exists in given directories.
@@ -223,10 +202,8 @@ namespace ignition
       /// uses to separate different paths from each other.
       public: static char Delimiter();
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
-      /// \brief Private data pointer
-      private: std::unique_ptr<SystemPathsPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      /// \brief Pointer to private data.
+      IGN_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

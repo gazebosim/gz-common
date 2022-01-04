@@ -40,7 +40,7 @@ using namespace ignition;
 using namespace common;
 
 // Private data class
-class ignition::common::SystemPathsPrivate
+class ignition::common::SystemPaths::Implementation
 {
   /// \brief Name of the environment variable to check for plugin paths
   public: std::string pluginPathEnv = "IGN_PLUGIN_PATH";
@@ -59,12 +59,6 @@ class ignition::common::SystemPathsPrivate
 
   /// \brief Log path
   public: std::string logPath;
-
-  /// \brief Find file callback.
-  public: std::function<std::string(const std::string &)> findFileCB;
-
-  /// \brief Find file URI callback.
-  public: std::function<std::string(const std::string &)> findFileURICB;
 
   /// \brief Callbacks to be called in order in case a file can't be found.
   public: std::vector <std::function <std::string(
@@ -91,7 +85,7 @@ void insertUnique(const std::string &_path, std::list<std::string> &_list)
 
 //////////////////////////////////////////////////
 SystemPaths::SystemPaths()
-: dataPtr(new SystemPathsPrivate)
+: dataPtr(ignition::utils::MakeImpl<Implementation>())
 {
   std::string home, path, fullPath;
   if (!env(IGN_HOMEDIR, home))
@@ -124,11 +118,6 @@ SystemPaths::SystemPaths()
   // Populate this->dataPtr->filePaths with values from the default
   // environment variable.
   this->SetFilePathEnv(this->dataPtr->filePathEnv);
-}
-
-/////////////////////////////////////////////////
-SystemPaths::~SystemPaths()
-{
 }
 
 /////////////////////////////////////////////////
@@ -246,7 +235,7 @@ std::string SystemPaths::NormalizeDirectoryPath(const std::string &_path)
 }
 
 /////////////////////////////////////////////////
-std::vector<std::string> SystemPathsPrivate::GenerateLibraryPaths(
+std::vector<std::string> SystemPaths::Implementation::GenerateLibraryPaths(
     const std::string &_libName) const
 {
   std::string lowercaseLibName = lowercase(_libName);
@@ -340,12 +329,6 @@ std::string SystemPaths::FindFileURI(const ignition::common::URI &_uri) const
   filename = this->FindFile(ignition::common::copyFromUnixPath(suffix),
       true, false);
 
-  // Try URI callback
-  if (filename.empty() && this->dataPtr->findFileURICB)
-  {
-    filename = this->dataPtr->findFileURICB(_uri.Str());
-  }
-
   // Look in custom paths.
   // Tries the suffix against all paths, regardless of the scheme
   if (filename.empty())
@@ -428,10 +411,6 @@ std::string SystemPaths::FindFile(const std::string &_filename,
     else if ((filename[0] == '.' || _searchLocalPath) && exists(filename))
     {
       path = filename;
-    }
-    else if (this->dataPtr->findFileCB)
-    {
-      path = this->dataPtr->findFileCB(filename);
     }
   }
 
@@ -533,20 +512,6 @@ void SystemPaths::AddSearchPathSuffix(const std::string &_suffix)
     s += "/";
 
   this->dataPtr->suffixPaths.push_back(s);
-}
-
-/////////////////////////////////////////////////
-void SystemPaths::SetFindFileCallback(
-    std::function<std::string(const std::string &)> _cb)
-{
-  this->dataPtr->findFileCB = _cb;
-}
-
-/////////////////////////////////////////////////
-void SystemPaths::SetFindFileURICallback(
-    std::function<std::string(const std::string &)> _cb)
-{
-  this->dataPtr->findFileURICB = _cb;
 }
 
 /////////////////////////////////////////////////

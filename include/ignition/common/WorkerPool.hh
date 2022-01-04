@@ -19,11 +19,10 @@
 #define IGNITION_COMMON_WORKER_POOL_HH_
 
 #include <functional>
-#include <memory>
 
 #include <ignition/common/Export.hh>
-#include <ignition/common/Time.hh>
-#include <ignition/common/SuppressWarning.hh>
+
+#include <ignition/utils/ImplPtr.hh>
 
 namespace ignition
 {
@@ -59,21 +58,11 @@ namespace ignition
       /// \returns true if all work was finished
       /// \remarks The return value can be false even when waiting forever if
       //           the WorkerPool is destructed before all work is completed
-      public: bool IGN_DEPRECATED(4) WaitForResults(const Time &_timeout);
-
-      /// \brief Waits until all work is done and threads are idle
-      /// \param[in] _timeout How long to wait, default to forever
-      /// \returns true if all work was finished
-      /// \remarks The return value can be false even when waiting forever if
-      //           the WorkerPool is destructed before all work is completed
       public: bool WaitForResults(
         const std::chrono::steady_clock::duration &_timeout =
           std::chrono::steady_clock::duration::zero());
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
-      /// \brief private implementation pointer
-      private: std::unique_ptr<WorkerPoolPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      IGN_UTILS_UNIQUE_IMPL_PTR(dataPtr)
     };
   }
 }
