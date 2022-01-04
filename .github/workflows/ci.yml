@@ -11,6 +11,6 @@ jobs:
         uses: actions/checkout@v2
       - name: Compile and test
         id: ci
-        uses: ignition-tooling/action-ignition-ci@focal
+        uses: ignition-tooling/action-ignition-ci@chapulina/focal/lcov
         with:
           codecov-enabled: true
