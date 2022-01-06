@@ -34,12 +34,7 @@
 
 namespace fs = std::filesystem;
 
-#ifndef _WIN32
-static const char preferred_separator = fs::path::preferred_separator;
-#else
-static const char preferred_separator = '\\';
-#endif
-
+/////////////////////////////////////////////////
 // Return true if success, false if error
 inline bool fsWarn(const std::string &_fcn,
              const std::error_code &_ec,
@@ -104,7 +99,7 @@ std::string const ignition::common::separator(std::string const &_s)
 /////////////////////////////////////////////////
 void ignition::common::changeFromUnixPath(std::string &_path) {
 
-  std::replace(_path.begin(), _path.end(), '/', preferred_separator);
+  std::replace(_path.begin(), _path.end(), '/', fs::path::preferred_separator);
 }
 
 /////////////////////////////////////////////////
@@ -117,7 +112,7 @@ std::string ignition::common::copyFromUnixPath(const std::string &_path)
 
 /////////////////////////////////////////////////
 void ignition::common::changeToUnixPath(std::string &_path) {
-  std::replace(_path.begin(), _path.end(), preferred_separator, '/');
+  std::replace(_path.begin(), _path.end(), fs::path::preferred_separator, '/');
 }
 
 /////////////////////////////////////////////////
@@ -153,7 +148,7 @@ std::string ignition::common::joinPaths(
   else
     is_url = true;
 
-  if (p2.string()[0] == preferred_separator)
+  if (p2.string()[0] == fs::path::preferred_separator)
   {
     p2 = fs::path{p2.string().substr(1)};
   }
@@ -197,7 +192,7 @@ std::string ignition::common::basename(const std::string &_path)
 {
   fs::path p(_path);
   // Maintain compatibility with ign-common
-  if (*_path.rbegin() == preferred_separator)
+  if (*_path.rbegin() == fs::path::preferred_separator)
     p = fs::path(_path.substr(0, _path.size()-1));
   return p.filename().string();
 }
@@ -207,7 +202,7 @@ std::string ignition::common::parentPath(const std::string &_path)
 {
   fs::path p(_path);
   // Maintain compatibility with ign-common
-  if (*_path.rbegin() == preferred_separator)
+  if (*_path.rbegin() == fs::path::preferred_separator)
     p = fs::path(_path.substr(0, _path.size()-1));
   return p.parent_path().string();
 }
