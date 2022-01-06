@@ -41,12 +41,11 @@ static const char preferred_separator = '\\';
 #endif
 
 // Return true if success, false if error
-inline bool fs_warn(const std::string &_fcn,
+inline bool fsWarn(const std::string &_fcn,
              const std::error_code &_ec,
              const ignition::common::FilesystemWarningOp &_warningOp =
              ignition::common::FSWO_LOG_WARNINGS)
 {
-
   if (_ec)
   {
     if (ignition::common::FSWO_LOG_WARNINGS == _warningOp)
@@ -82,7 +81,7 @@ bool ignition::common::createDirectory(const std::string &_path)
 {
   std::error_code ec;
   fs::create_directory(_path, ec);
-  return fs_warn("createDirectory", ec);
+  return fsWarn("createDirectory", ec);
 }
 
 /////////////////////////////////////////////////
@@ -92,7 +91,7 @@ bool ignition::common::createDirectories(const std::string &_path)
   // Disregard return here because it may return false if the
   // directory is not actually created (already exists)
   fs::create_directories(_path, ec);
-  return fs_warn("createDirectories", ec);
+  return fsWarn("createDirectories", ec);
 }
 
 /////////////////////////////////////////////////
@@ -177,7 +176,7 @@ std::string ignition::common::cwd()
   std::error_code ec;
   auto curdir = fs::current_path(ec);
 
-  if (!fs_warn("cwd", ec))
+  if (!fsWarn("cwd", ec))
   {
     curdir = "";
   }
@@ -190,7 +189,7 @@ bool ignition::common::chdir(const std::string &_dir)
 {
   std::error_code ec;
   fs::current_path(_dir, ec);
-  return fs_warn("chdir", ec);
+  return fsWarn("chdir", ec);
 }
 
 /////////////////////////////////////////////////
@@ -222,7 +221,7 @@ bool ignition::common::copyFile(
   const auto copyOptions = fs::copy_options::overwrite_existing;
   std::error_code ec;
   auto ret = fs::copy_file(_existingFilename, _newFilename, copyOptions, ec);
-  return ret && fs_warn("copyFile", ec, _warningOp);
+  return ret && fsWarn("copyFile", ec, _warningOp);
 }
 
 /////////////////////////////////////////////////
@@ -243,7 +242,7 @@ bool ignition::common::copyDirectory(
 
   std::error_code ec;
   fs::copy(_existingDirname, _newDirname, copyOptions, ec);
-  return fs_warn("copyDirectory", ec, _warningOp);
+  return fsWarn("copyDirectory", ec, _warningOp);
 }
 
 /////////////////////////////////////////////////
@@ -254,7 +253,7 @@ bool ignition::common::moveFile(
 {
   std::error_code ec;
   fs::rename(_existingFilename, _newFilename, ec);
-  return fs_warn("moveFile", ec, _warningOp);
+  return fsWarn("moveFile", ec, _warningOp);
 }
 
 /////////////////////////////////////////////////
@@ -299,7 +298,7 @@ bool ignition::common::removeDirectoryOrFile(
 {
   std::error_code ec;
   auto ret = fs::remove(_path, ec);
-  fs_warn("removeDirectoryOrFile", ec, _warningOp);
+  fsWarn("removeDirectoryOrFile", ec, _warningOp);
   return ret;
 }
 
@@ -310,7 +309,7 @@ bool ignition::common::removeAll(
 {
   std::error_code ec;
   fs::remove_all(_path, ec);
-  return fs_warn("removeAll", ec, _warningOp);
+  return fsWarn("removeAll", ec, _warningOp);
 }
 
 /////////////////////////////////////////////////
