@@ -28,6 +28,7 @@ namespace common
 
 class DirIter::Implementation
 {
+  /// \brief Filesystem iterator that this class is wrapping
   public: fs::directory_iterator it;
 };
 
