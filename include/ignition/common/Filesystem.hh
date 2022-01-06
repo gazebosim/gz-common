@@ -279,15 +279,6 @@ namespace ignition
       /// \return true if the iterators are equal, false otherwise.
       public: bool operator!=(const DirIter &_other) const;
 
-      /// \brief Move to the next directory record, skipping . and .. records.
-      private: void Next();
-
-      /// \brief Set the internal variable to the empty string.
-      private: void SetInternalEmpty();
-
-      /// \brief Close an open directory handle.
-      private: void CloseHandle();
-
       /// \brief Pointer to private data.
       IGN_UTILS_IMPL_PTR(dataPtr)
     };

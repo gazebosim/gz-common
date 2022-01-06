@@ -70,15 +70,5 @@ bool DirIter::operator!=(const DirIter &_other) const
   return (this->dataPtr->it != _other.dataPtr->it);
 }
 
-//////////////////////////////////////////////////
-void DirIter::Next() {}
-
-//////////////////////////////////////////////////
-void DirIter::SetInternalEmpty() {}
-
-//////////////////////////////////////////////////
-void DirIter::CloseHandle() {}
-
 }  // namespace common
 }  // namespace ignition
-
