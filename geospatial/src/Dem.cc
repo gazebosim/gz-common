@@ -255,8 +255,8 @@ bool Dem::GeoReference(double _x, double _y,
 
     cT->Transform(1, &xGeoDeg, &yGeoDeg);
 
-    _latitude.Degree(yGeoDeg);
-    _longitude.Degree(xGeoDeg);
+    _latitude.SetDegree(yGeoDeg);
+    _longitude.SetDegree(xGeoDeg);
 
     OCTDestroyCoordinateTransformation(cT);
   }
