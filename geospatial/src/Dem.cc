@@ -182,10 +182,13 @@ int Dem::Load(const std::string &_filename)
   double max = -ignition::math::MAX_D;
   for (auto d : this->dataPtr->demData)
   {
-    if (d < min && d > noDataValue)
-      min = d;
-    if (d > max && d > noDataValue)
-      max = d;
+    if (d > noDataValue)
+    {
+      if (d < min)
+        min = d;
+      if (d > max)
+        max = d;
+    }
   }
   if (ignition::math::equal(min, ignition::math::MAX_D) ||
       ignition::math::equal(max, -ignition::math::MAX_D))
