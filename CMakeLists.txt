@@ -97,8 +97,9 @@ ign_find_package(
 #------------------------------------
 # Find GDAL
 ign_find_package(GDAL VERSION 3.0
-  REQUIRED_BY geospatial
-  PRIVATE_FOR geospatial)
+  PKGCONFIG gdal
+  PRIVATE_FOR geospatial
+  REQUIRED_BY geospatial)
 
 #------------------------------------
 # Find libswscale
