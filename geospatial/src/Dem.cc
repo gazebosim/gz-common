@@ -195,7 +195,6 @@ int Dem::Load(const std::string &_filename)
 
   this->dataPtr->minElevation = min;
   this->dataPtr->maxElevation = max;
-
   return 0;
 }
 
@@ -240,7 +239,7 @@ bool Dem::GeoReference(double _x, double _y,
     // Transform the terrain's coordinate system to WGS84
     const char *importString
         = strdup(this->dataPtr->dataSet->GetProjectionRef());
-    sourceCs.importFromWkt(&importString);
+    sourceCs.importFromWkt(const_cast<char **>(&importString));
     targetCs.SetWellKnownGeogCS("WGS84");
     cT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
     if (nullptr == cT)
