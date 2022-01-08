@@ -239,7 +239,7 @@ bool Dem::GeoReference(double _x, double _y,
     // Transform the terrain's coordinate system to WGS84
     const char *importString
         = strdup(this->dataPtr->dataSet->GetProjectionRef());
-    sourceCs.importFromWkt(const_cast<char **>(&importString));
+    sourceCs.importFromWkt(&importString);
     targetCs.SetWellKnownGeogCS("WGS84");
     cT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
     if (nullptr == cT)
