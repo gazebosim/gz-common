@@ -93,8 +93,7 @@ int Dem::Load(const std::string &_filename)
 
   if (!exists(findFilePath(fullName)))
   {
-    ignerr << "Unable to open DEM file[" << _filename
-          << "], check your GAZEBO_RESOURCE_PATH settings." << std::endl;
+    ignerr << "Unable to find DEM file[" << _filename << "]." << std::endl;
     return -1;
   }
 
@@ -104,7 +103,7 @@ int Dem::Load(const std::string &_filename)
   if (this->dataPtr->dataSet == nullptr)
   {
     ignerr << "Unable to open DEM file[" << fullName
-          << "]. Format not recognised as a supported dataset." << std::endl;
+           << "]. Format not recognized as a supported dataset." << std::endl;
     return -1;
   }
 
@@ -194,7 +193,7 @@ int Dem::Load(const std::string &_filename)
   if (ignition::math::equal(min, ignition::math::MAX_D) ||
       ignition::math::equal(max, -ignition::math::MAX_D))
   {
-    ignwarn << "Dem is composed of 'nodata' values!" << std::endl;
+    ignwarn << "DEM is composed of 'nodata' values!" << std::endl;
   }
 
   this->dataPtr->minElevation = min;
@@ -250,6 +249,7 @@ bool Dem::GeoReference(double _x, double _y,
     {
       ignerr << "Unable to transform terrain coordinate system to WGS84 for "
              << "coordinates (" << _x << "," << _y << ")" << std::endl;
+      OCTDestroyCoordinateTransformation(cT);
       return false;
     }
 

@@ -38,9 +38,7 @@ TEST_F(DemTest, MissingFile)
 TEST_F(DemTest, NotDem)
 {
   common::Dem dem;
-  std::string path;
-
-  path = "file://media/materials/scripts/CMakeLists.txt";
+  const auto path = common::testing::TestFile("CMakeLists.txt");
   EXPECT_NE(dem.Load(path), 0);
 }
 
@@ -48,9 +46,7 @@ TEST_F(DemTest, NotDem)
 TEST_F(DemTest, UnsupportedDem)
 {
   common::Dem dem;
-  std::string path;
-
-  path = "file://media/materials/textures/wood.jpg";
+  const auto path = common::testing::TestFile("data", "heightmap_bowl.png");
   EXPECT_NE(dem.Load(path), 0);
 }
 
