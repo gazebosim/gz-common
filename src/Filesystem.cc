@@ -98,8 +98,8 @@ std::string const ignition::common::separator(std::string const &_s)
 
 /////////////////////////////////////////////////
 void ignition::common::changeFromUnixPath(std::string &_path) {
-
-  std::replace(_path.begin(), _path.end(), '/', fs::path::preferred_separator);
+  std::replace(_path.begin(), _path.end(), '/', 
+      static_cast<char>(fs::path::preferred_separator));
 }
 
 /////////////////////////////////////////////////
@@ -112,7 +112,8 @@ std::string ignition::common::copyFromUnixPath(const std::string &_path)
 
 /////////////////////////////////////////////////
 void ignition::common::changeToUnixPath(std::string &_path) {
-  std::replace(_path.begin(), _path.end(), fs::path::preferred_separator, '/');
+  std::replace(_path.begin(), _path.end(), 
+      static_cast<char>(fs::path::preferred_separator), '/');
 }
 
 /////////////////////////////////////////////////
