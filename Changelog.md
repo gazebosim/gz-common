@@ -1,8 +1,40 @@
 ## Ignition Common 4.x
 
+## Ignition Common 4.5.0 (2022-01-12)
+
+1. Fixed crash when a Collada file has an empty normal vector
+    * [Pull request #280](https://github.com/ignitionrobotics/ign-common/pull/280)
+
+1. Support 16 bit heightmaps
+    * [Pull request #266](https://github.com/ignitionrobotics/ign-common/pull/266)
+
+1. Fix bug in URIPath assignment operator
+    * [Pull request #275](https://github.com/ignitionrobotics/ign-common/pull/275)
+
+1. Use `libexec` to install binary `remotery_vis`
+    * [Pull request #272](https://github.com/ignitionrobotics/ign-common/pull/272)
+
+1. Normalize normal vectors from OBJ.
+    * [Pull request #269](https://github.com/ignitionrobotics/ign-common/pull/269)
+
+1. Synchronize console writes
+    * [Pull request #227](https://github.com/ignitionrobotics/ign-common/pull/227)
+
+1. Added method to remove meshes from the `MeshManager`
+    * [Pull request #222](https://github.com/ignitionrobotics/ign-common/pull/222)
+
+1. Fixed macOS symbol in `common::Profiler`
+    * [Pull request #262](https://github.com/ignitionrobotics/ign-common/pull/262)
+
+1. Fix skip logic for integration tests
+    * [Pull request #264](https://github.com/ignitionrobotics/ign-common/pull/264)
+
+1. Use direct evaluation for SKIP_av.
+    * [Pull request #250](https://github.com/ignitionrobotics/ign-common/pull/250)
+
 ## Ignition Common 4.4.0 (2021-10-15)
 
-1. Add support for animation tension 
+1. Add support for animation tension
     * [Pull request #256](https://github.com/ignitionrobotics/ign-common/pull/256)
 
 ## Ignition Common 4.3.0 (2021-09-27)
@@ -26,7 +58,7 @@
     * [Pull request #62](https://github.com/ignitionrobotics/ign-common/pull/62)
     * [Pull request #55](https://github.com/ignitionrobotics/ign-common/pull/55)
     * [Pull request #241](https://github.com/ignitionrobotics/ign-common/pull/241)
-  
+
 1. Documentation
     * [Pull request #252](https://github.com/ignitionrobotics/ign-common/pull/252)
     * [Pull request #253](https://github.com/ignitionrobotics/ign-common/pull/253)
@@ -145,26 +177,26 @@
 
 1. Support loading PBR textures in OBJLoader
     * [Pull request #216](https://github.com/ignitionrobotics/ign-common/pull/216)
-   
-1. Remove CMAKE_CXX_FLAGS from test targetrs 
+
+1. Remove CMAKE_CXX_FLAGS from test targetrs
     * [Pull request #214](https://github.com/ignitionrobotics/ign-common/pull/214)
-     
+
 1. Set project-wide standard to C++17
     * [Pull request #221](https://github.com/ignitionrobotics/ign-common/pull/221)
-     
-1. Fix av_* API usage for deprecations 
+
+1. Fix av_* API usage for deprecations
     * [Pull request #220](https://github.com/ignitionrobotics/ign-common/pull/220)
-     
-1. Make KeyEvent rule-of-five compliant 
+
+1. Make KeyEvent rule-of-five compliant
     * [Pull request #224](https://github.com/ignitionrobotics/ign-common/pull/224)
-     
-1. Fix segfault caused by destructionb order of Event and Connection 
+
+1. Fix segfault caused by destructionb order of Event and Connection
     * [Pull request #234](https://github.com/ignitionrobotics/ign-common/pull/234)
-     
-1. Fix a typo in VideoEncoder_TEST 
+
+1. Fix a typo in VideoEncoder_TEST
     * [Pull request #231](https://github.com/ignitionrobotics/ign-common/pull/231)
-    
-1. Use direct evaluation for SKIP_av 
+
+1. Use direct evaluation for SKIP_av
     * [Pull request #250](https://github.com/ignitionrobotics/ign-common/pull/250)
 
 ## Ignition Common 3.13.2 (2021-05-11)
