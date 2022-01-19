@@ -20,7 +20,7 @@
 #include <ignition/math/Angle.hh>
 #include <ignition/math/Vector3.hh>
 
-#include "ignition/common/Dem.hh"
+#include "ignition/common/geospatial/Dem.hh"
 #include "test_config.h"
 
 using namespace ignition;

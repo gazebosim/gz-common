@@ -15,7 +15,7 @@
  *
  */
 #include "ignition/common/Console.hh"
-#include "ignition/common/ImageHeightmap.hh"
+#include "ignition/common/geospatial/ImageHeightmap.hh"
 
 using namespace ignition;
 using namespace common;
