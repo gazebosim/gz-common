@@ -17,6 +17,7 @@
 #ifndef IGNITION_COMMON_HEIGHTMAPDATA_HH_
 #define IGNITION_COMMON_HEIGHTMAPDATA_HH_
 
+#include <string>
 #include <vector>
 #include <ignition/math/Vector3.hh>
 #include <ignition/common/graphics/Export.hh>
@@ -57,6 +58,17 @@ namespace ignition
       /// \brief Get the maximum terrain's elevation.
       /// \return The maximum terrain's elevation.
       public: virtual float MaxElevation() const = 0;
+
+      /// \brief Get the min terrain's elevation.
+      /// \return The min terrain's elevation.
+      public: virtual float MinElevation() const
+              {
+                return 0.0f;
+              }
+
+      /// \brief Get the full filename of loaded heightmap image/dem
+      /// \return The filename used to load the heightmap image/dem
+      public: virtual std::string Filename() const = 0;
     };
   }
 }
