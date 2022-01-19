@@ -14,16 +14,16 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_GEOSPATIAL_IMAGEHEIGHTMAPDATA_HH_
-#define IGNITION_COMMON_GEOSPATIAL_IMAGEHEIGHTMAPDATA_HH_
+#ifndef IGNITION_COMMON_IMAGEHEIGHTMAPDATA_HH_
+#define IGNITION_COMMON_IMAGEHEIGHTMAPDATA_HH_
 
 #include <limits>
 #include <string>
 #include <vector>
 #include <ignition/math/Vector3.hh>
 
-#include <ignition/common/geospatial/Export.hh>
-#include <ignition/common/geospatial/HeightmapData.hh>
+#include <ignition/common/graphics/Export.hh>
+#include <ignition/common/HeightmapData.hh>
 #include <ignition/common/Image.hh>
 
 namespace ignition
@@ -31,7 +31,7 @@ namespace ignition
   namespace common
   {
     /// \brief Encapsulates an image that will be interpreted as a heightmap.
-    class IGNITION_COMMON_GEOSPATIAL_VISIBLE ImageHeightmap
+    class IGNITION_COMMON_GRAPHICS_VISIBLE ImageHeightmap
       : public ignition::common::HeightmapData
     {
       /// \brief Constructor
@@ -49,7 +49,8 @@ namespace ignition
           const ignition::math::Vector3d &_scale, bool _flipY,
           std::vector<float> &_heights);
 
-      // Documentation inherited.
+      /// \brief Get the full filename of the image
+      /// \return The filename used to load the image
       public: std::string Filename() const;
 
       // Documentation inherited.
