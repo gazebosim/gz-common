@@ -17,7 +17,8 @@ release will remove the deprecated code.
 1. `HeightmapData.hh` and `ImageHeightmap.hh` have been moved out of the
 `graphics` component and into the new `geospatial` component
     + To use the heightmap features, users must add the `geospatial` component
-      to the `find_package` call
+      to the `find_package` call and update the include paths to use
+      the geospatial subfolder (`#include <ignition/common/geospatial/HeightmapData.hh>`)
 
 ## Ignition Common 3.X to 4.X
 
