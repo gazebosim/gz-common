@@ -21,7 +21,7 @@
 #include <ogr_spatialref.h>
 
 #include "ignition/common/Console.hh"
-#include "ignition/common/geospatial/Dem.hh"
+#include "ignition/common/Dem.hh"
 #include "ignition/math/SphericalCoordinates.hh"
 
 using namespace ignition;

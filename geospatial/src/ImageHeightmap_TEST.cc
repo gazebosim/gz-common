@@ -16,7 +16,7 @@
 */
 #include <gtest/gtest.h>
 
-#include "ignition/common/geospatial/ImageHeightmap.hh"
+#include "ignition/common/ImageHeightmap.hh"
 #include "test_config.h"
 
 #define ELEVATION_TOL 1e-8

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_GEOSPATIAL_DEM_HH_
-#define IGNITION_COMMON_GEOSPATIAL_DEM_HH_
+#ifndef IGNITION_COMMON_DEM_HH_
+#define IGNITION_COMMON_DEM_HH_
 
 #include <memory>
 #include <string>
@@ -24,8 +24,8 @@
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Angle.hh>
 
-#include <ignition/common/geospatial/Export.hh>
-#include <ignition/common/geospatial/HeightmapData.hh>
+#include <ignition/common/HeightmapData.hh>
+#include <ignition/common/graphics/Export.hh>
 
 #include <ignition/utils/ImplPtr.hh>
 
@@ -36,7 +36,7 @@ namespace ignition
   {
     /// \class DEM DEM.hh common/common.hh
     /// \brief Encapsulates a DEM (Digital Elevation Model) file.
-    class IGNITION_COMMON_GEOSPATIAL_VISIBLE Dem : public HeightmapData
+    class IGNITION_COMMON_GRAPHICS_VISIBLE Dem : public HeightmapData
     {
       /// \brief Constructor.
       public: Dem();

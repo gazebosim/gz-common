@@ -14,20 +14,20 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_GEOSPATIAL_HEIGHTMAPDATA_HH_
-#define IGNITION_COMMON_GEOSPATIAL_HEIGHTMAPDATA_HH_
+#ifndef IGNITION_COMMON_HEIGHTMAPDATA_HH_
+#define IGNITION_COMMON_HEIGHTMAPDATA_HH_
 
 #include <string>
 #include <vector>
 #include <ignition/math/Vector3.hh>
-#include <ignition/common/geospatial/Export.hh>
+#include <ignition/common/graphics/Export.hh>
 
 namespace ignition
 {
   namespace common
   {
     /// \brief Encapsulates a generic heightmap data file.
-    class IGNITION_COMMON_GEOSPATIAL_VISIBLE HeightmapData
+    class IGNITION_COMMON_GRAPHICS_VISIBLE HeightmapData
     {
       /// \brief Destructor.
       public: virtual ~HeightmapData() = default;
