@@ -49,7 +49,8 @@ namespace ignition
           const ignition::math::Vector3d &_scale, bool _flipY,
           std::vector<float> &_heights);
 
-      // Documentation inherited.
+      /// \brief Get the full filename of the image
+      /// \return The filename used to load the image
       public: std::string Filename() const;
 
       // Documentation inherited.

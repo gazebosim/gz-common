@@ -3,7 +3,6 @@ libavdevice-dev
 libavformat-dev
 libavutil-dev
 libfreeimage-dev
-libgdal-dev
 libgts-dev
 libignition-cmake2-dev
 libignition-math7-dev

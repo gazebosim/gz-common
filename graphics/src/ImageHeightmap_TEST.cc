@@ -28,7 +28,7 @@ class ImageHeightmapTest : public common::testing::AutoLogFixture { };
 class DemTest : public common::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
-TEST_F(DemTest, MissingFile)
+TEST_F(DemTest, MisingFile)
 {
   common::ImageHeightmap img;
   EXPECT_EQ(-1, img.Load("/file/shouldn/never/exist.png"));
@@ -50,9 +50,6 @@ TEST_F(ImageHeightmapTest, BasicAPI)
   const auto path = common::testing::TestFile("data", "heightmap_bowl.png");
   std::cout << "PATH[" << path << "]\n";
   EXPECT_EQ(0, img.Load(path));
-
-  // Check filename
-  EXPECT_EQ(path, img.Filename());
 
   // Check the heights and widths
   EXPECT_EQ(129, static_cast<int>(img.Height()));
