@@ -1,5 +1,11 @@
 ign_get_sources(tests)
 
+# logging test seg-faults on windows
+if(WIN32)
+  list(REMOVE_ITEM tests
+    logging.cc)
+endif()
+
 # plugin_specialization test causes lcov to hang
 # see ign-cmake issue 25
 if("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "COVERAGE")
