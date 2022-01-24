@@ -18,7 +18,7 @@
 #define IGNITION_COMMON_TIMER_HH_
 
 #include <ignition/common/Export.hh>
-#include <ignition/common/SuppressWarning.hh>
+#include <ignition/utils/SuppressWarning.hh>
 
 #include <chrono>
 #include <iostream>
@@ -59,13 +59,13 @@ namespace ignition
                 return out;
               }
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
+      IGN_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief The time of the last call to Start
       private: std::chrono::steady_clock::time_point start;
 
       /// \brief The time when Stop was called.
       private: std::chrono::steady_clock::time_point stop;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      IGN_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
 
       /// \brief True if the timer is running.
       private: bool running;
