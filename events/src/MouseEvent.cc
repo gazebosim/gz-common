@@ -100,7 +100,7 @@ void MouseEvent::SetPos(const ignition::math::Vector2i &_pos)
 }
 
 /////////////////////////////////////////////////
-void MouseEvent::SetPos(const int _x, const int _y)
+void MouseEvent::SetPos(int _x, int _y)
 {
   this->dataPtr->pos.Set(_x, _y);
 }
@@ -118,7 +118,7 @@ void MouseEvent::SetPrevPos(const ignition::math::Vector2i &_pos)
 }
 
 /////////////////////////////////////////////////
-void MouseEvent::SetPrevPos(const int _x, const int _y)
+void MouseEvent::SetPrevPos(int _x, int _y)
 {
   this->dataPtr->prevPos.Set(_x, _y);
 }
@@ -136,7 +136,7 @@ void MouseEvent::SetPressPos(const ignition::math::Vector2i &_pos)
 }
 
 /////////////////////////////////////////////////
-void MouseEvent::SetPressPos(const int _x, const int _y)
+void MouseEvent::SetPressPos(int _x, int _y)
 {
   this->dataPtr->pressPos.Set(_x, _y);
 }
@@ -154,7 +154,7 @@ void MouseEvent::SetScroll(const ignition::math::Vector2i &_scroll)
 }
 
 /////////////////////////////////////////////////
-void MouseEvent::SetScroll(const int _x, const int _y)
+void MouseEvent::SetScroll(int _x, int _y)
 {
   this->dataPtr->scroll.Set(_x, _y);
 }
@@ -166,7 +166,7 @@ float MouseEvent::MoveScale() const
 }
 
 /////////////////////////////////////////////////
-void MouseEvent::SetMoveScale(const float _scale)
+void MouseEvent::SetMoveScale(float _scale)
 {
   this->dataPtr->moveScale = _scale;
 }
@@ -178,7 +178,7 @@ bool MouseEvent::Dragging() const
 }
 
 /////////////////////////////////////////////////
-void MouseEvent::SetDragging(const bool _dragging)
+void MouseEvent::SetDragging(bool _dragging)
 {
   this->dataPtr->dragging = _dragging;
 }
@@ -190,7 +190,7 @@ MouseEvent::EventType MouseEvent::Type() const
 }
 
 /////////////////////////////////////////////////
-void MouseEvent::SetType(const EventType _type) const
+void MouseEvent::SetType(MouseEvent::EventType _type) const
 {
   this->dataPtr->type = _type;
 }
@@ -202,7 +202,7 @@ MouseEvent::MouseButton MouseEvent::Button() const
 }
 
 /////////////////////////////////////////////////
-void MouseEvent::SetButton(const MouseEvent::MouseButton _button) const
+void MouseEvent::SetButton(MouseEvent::MouseButton _button) const
 {
   this->dataPtr->button = _button;
 }
@@ -214,7 +214,7 @@ unsigned int MouseEvent::Buttons() const
 }
 
 /////////////////////////////////////////////////
-void MouseEvent::SetButtons(const unsigned int &_buttons)
+void MouseEvent::SetButtons(unsigned int _buttons)
 {
   this->dataPtr->buttons = _buttons;
 }
@@ -226,7 +226,7 @@ bool MouseEvent::Shift() const
 }
 
 /////////////////////////////////////////////////
-void MouseEvent::SetShift(const bool _shift) const
+void MouseEvent::SetShift(bool _shift) const
 {
   this->dataPtr->shift = _shift;
 }
@@ -238,7 +238,7 @@ bool MouseEvent::Alt() const
 }
 
 /////////////////////////////////////////////////
-void MouseEvent::SetAlt(const bool _alt)
+void MouseEvent::SetAlt(bool _alt)
 {
   this->dataPtr->alt = _alt;
 }
@@ -250,7 +250,7 @@ bool MouseEvent::Control() const
 }
 
 /////////////////////////////////////////////////
-void MouseEvent::SetControl(const bool _control) const
+void MouseEvent::SetControl(bool _control) const
 {
   this->dataPtr->control = _control;
 }

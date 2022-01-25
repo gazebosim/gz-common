@@ -53,7 +53,7 @@ namespace ignition
 
       /// \brief Set whether this event has been signaled.
       /// \param[in] _sig True if the event has been signaled.
-      public: void SetSignaled(const bool _sig);
+      public: void SetSignaled(bool _sig);
 
       /// \brief True if the event has been signaled.
       private: bool signaled;
@@ -65,7 +65,7 @@ namespace ignition
       /// \brief Constructor.
       /// \param[in] _e Event pointer to connect with.
       /// \param[in] _i Unique id.
-      public: Connection(Event *_e, const int _i);
+      public: Connection(Event *_e, int _i);
 
       /// \brief Destructor.
       public: ~Connection();
@@ -156,7 +156,7 @@ namespace ignition
       private: class EventConnection
       {
         /// \brief Constructor
-        public: EventConnection(const bool _on, const std::function<T> &_cb,
+        public: EventConnection(bool _on, const std::function<T> &_cb,
                         const ConnectionPtr &_publicConn)
             : callback(_cb), publicConnection(_publicConn)
         {
