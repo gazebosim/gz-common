@@ -25,7 +25,7 @@
 #include <unordered_set>
 #include <utility>
 #include "ignition/common/PluginInfo.hh"
-#include "ignition/common/SuppressWarning.hh"
+#include "ignition/utils/SuppressWarning.hh"
 
 
 #if defined _WIN32 || defined __CYGWIN__
@@ -63,7 +63,7 @@
 
 #define DETAIL_IGN_COMMON_BEGIN_ADDING_PLUGINS \
   DETAIL_IGN_COMMON_REGISTER_PLUGININFO_META_DATA \
-IGN_COMMON_WARN_IGNORE__DELETE_NON_VIRTUAL_DESTRUCTOR \
+IGN_UTILS_WARN_IGNORE__NON_VIRTUAL_DESTRUCTOR \
   /* This struct attempts to make sure that the macro is being called from */ \
   /* a global namespace */ \
   struct IGN_macro_must_be_used_in_global_namespace; \
@@ -172,7 +172,7 @@ IGN_COMMON_WARN_IGNORE__DELETE_NON_VIRTUAL_DESTRUCTOR \
     } \
     return visitedPlugins.size() - _pluginId; \
   } \
-IGN_COMMON_WARN_RESUME__DELETE_NON_VIRTUAL_DESTRUCTOR
+IGN_UTILS_WARN_RESUME__NON_VIRTUAL_DESTRUCTOR
 
 
 #endif
