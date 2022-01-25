@@ -13,8 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
-#include <gtest/gtest.h>
+ */
+
+/* This code is originally from:
+ * https://gist.github.com/KjellKod/0fde0d2564e2eb1b3560
+ * For testing worst-case console logging latency with a variable number of 
+ * threads.
+ */
 
 #include <atomic>
 #include <map>
@@ -23,8 +28,7 @@
 #include <ignition/common/Console.hh>
 
 namespace {
-// Lower value than spdlog to keep CI from flaking
-const uint64_t g_iterations{10000};
+const uint64_t g_iterations{1000000};
 
 std::atomic<size_t> g_counter = {0};
 
@@ -184,24 +188,17 @@ void run(size_t number_of_threads)
   SaveResultToBucketFile(filename_result, threads_result);
 }
 
-class LoggingTest:
-      public ::testing::TestWithParam<std::size_t>
-{
-};
-
-TEST_P(LoggingTest, RunThreads)
-{
-  run(GetParam());
-  SUCCEED();
-}
-
-INSTANTIATE_TEST_SUITE_P(LoggingTest, LoggingTest,
-                         ::testing::Values(1, 2, 4, 8, 16, 32));
-
 /////////////////////////////////////////////////
-// This test is valid (passes) if it runs without segfaults.
 int main(int argc, char **argv)
 {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+  size_t number_of_threads {0};
+  if (argc == 2) {
+    number_of_threads = atoi(argv[1]);
+  }
+  if (argc != 2 || number_of_threads == 0) {
+    std::cerr << "USAGE is: " << argv[0] << " number_threads" << std::endl;
+    return 1;
+  }
+
+  run(number_of_threads);
 }
