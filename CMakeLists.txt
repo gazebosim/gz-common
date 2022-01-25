@@ -40,6 +40,15 @@ elseif(WIN32)
   option(USE_EXTERNAL_TINYXML2 "Use a system-installed version of tinyxml2" OFF)
 endif()
 
+#--------------------------------------
+# Option: Should we skip tests of deprecated functionality 
+option(SKIP_DEPRECATED_TESTS "Skip testing deprecated funcationality" OFF)
+# Option: Should we skip building deprecated functionality entirely
+option(SKIP_DEPRECATED "Skip building deprecated functionality" OFF)
+
+if(SKIP_DEPRECATED)
+  set(SKIP_DEPRECATED_TESTS ON)
+endif()
 
 #============================================================================
 # Search for project-specific dependencies

@@ -11,6 +11,10 @@ if (SKIP_av OR INTERNAL_SKIP_av)
   list(REMOVE_ITEM tests video_encoder.cc)
 endif()
 
+if(SKIP_DEPRECATED_TESTS)
+  list(REMOVE_ITEM tests plugin.cc)
+endif()
+
 ign_build_tests(
   TYPE INTEGRATION
   SOURCES ${tests}

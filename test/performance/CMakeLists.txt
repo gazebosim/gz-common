@@ -7,6 +7,11 @@ if("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "COVERAGE")
     plugin_specialization.cc)
 endif()
 
+if(SKIP_DEPRECATED_TESTS)
+  list(REMOVE_ITEM tests
+    plugin_specialization.cc)
+endif()
+
 link_directories(${PROJECT_BINARY_DIR}/test)
 
 ign_build_tests(
