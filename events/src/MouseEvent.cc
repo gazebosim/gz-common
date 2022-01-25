@@ -190,7 +190,7 @@ MouseEvent::EventType MouseEvent::Type() const
 }
 
 /////////////////////////////////////////////////
-void MouseEvent::SetType(MouseEvent::EventType _type) const
+void MouseEvent::SetType(MouseEvent::EventType _type)
 {
   this->dataPtr->type = _type;
 }
@@ -202,7 +202,7 @@ MouseEvent::MouseButton MouseEvent::Button() const
 }
 
 /////////////////////////////////////////////////
-void MouseEvent::SetButton(MouseEvent::MouseButton _button) const
+void MouseEvent::SetButton(MouseEvent::MouseButton _button)
 {
   this->dataPtr->button = _button;
 }
@@ -226,7 +226,7 @@ bool MouseEvent::Shift() const
 }
 
 /////////////////////////////////////////////////
-void MouseEvent::SetShift(bool _shift) const
+void MouseEvent::SetShift(bool _shift)
 {
   this->dataPtr->shift = _shift;
 }
@@ -250,7 +250,7 @@ bool MouseEvent::Control() const
 }
 
 /////////////////////////////////////////////////
-void MouseEvent::SetControl(bool _control) const
+void MouseEvent::SetControl(bool _control)
 {
   this->dataPtr->control = _control;
 }

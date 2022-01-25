@@ -154,7 +154,7 @@ namespace ignition
 
       /// \brief Set the event type.
       /// \param[in] _type The EventType.
-      public: void SetType(MouseEvent::EventType _type) const;
+      public: void SetType(MouseEvent::EventType _type);
 
       /// \brief Get the button which caused this event.
       /// \return The button which caused this event.
@@ -162,7 +162,7 @@ namespace ignition
 
       /// \brief Set the button which caused the event.
       /// \param[in] _button The button which caused this event.
-      public: void SetButton(MouseEvent::MouseButton _button) const;
+      public: void SetButton(MouseEvent::MouseButton _button);
 
       /// \brief Get the state of the buttons when the event was generated.
       /// \return The state of the buttons, which can be a bitwise
@@ -180,7 +180,7 @@ namespace ignition
 
       /// \brief Set the shift key press flag.
       /// \param[in] _shift The shift key press flag.
-      public: void SetShift(bool _shift) const;
+      public: void SetShift(bool _shift);
 
       /// \brief Get the alt key press flag.
       /// \return True if the alt key is pressed.
@@ -196,7 +196,7 @@ namespace ignition
 
       /// \brief Set the control key press flag.
       /// \param[in] _control The control key flag.
-      public: void SetControl(bool _control) const;
+      public: void SetControl(bool _control);
 
       /// \brief Assignment operator
       /// \param[in] _other Other mouse event
