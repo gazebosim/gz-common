@@ -20,50 +20,59 @@
 using namespace ignition;
 using namespace common;
 
-//////////////////////////////////////////////////
-Timer::Timer()
-  : running(false)
+/// \brief Private data for the Timer class
+class ignition::common::Timer::Implementation
 {
-}
+  /// \brief The time of the last call to Start
+  public: std::chrono::steady_clock::time_point start; 
+
+  /// \brief The time when Stop was called.
+  public: std::chrono::steady_clock::time_point stop; 
+
+  /// \brief True if the timer is running.
+  public: bool running;
+};
 
 //////////////////////////////////////////////////
-Timer::~Timer()
+Timer::Timer()
+  : dataPtr(ignition::utils::MakeImpl<Implementation>())
 {
 }
 
 //////////////////////////////////////////////////
 void Timer::Start()
 {
-  this->start = std::chrono::steady_clock::now();
-  this->running = true;
+  this->dataPtr->start = std::chrono::steady_clock::now();
+  this->dataPtr->running = true;
 }
 
 //////////////////////////////////////////////////
 void Timer::Stop()
 {
-  this->stop = std::chrono::steady_clock::now();
-  this->running = false;
+  this->dataPtr->stop = std::chrono::steady_clock::now();
+  this->dataPtr->running = false;
 }
 
 //////////////////////////////////////////////////
 bool Timer::Running() const
 {
-  return this->running;
+  return this->dataPtr->running;
 }
 
 //////////////////////////////////////////////////
 std::chrono::duration<double> Timer::ElapsedTime() const
 {
-  if (this->running)
+  if (this->dataPtr->running)
   {
     std::chrono::steady_clock::time_point currentTime;
     currentTime = std::chrono::steady_clock::now();
-    std::chrono::duration<double> diff = currentTime - this->start;
+    std::chrono::duration<double> diff = currentTime - this->dataPtr->start;
     return diff;
   }
   else
   {
-    std::chrono::duration<double> diff = this->stop - this->start;
+    std::chrono::duration<double> diff = 
+      this->dataPtr->stop - this->dataPtr->start;
     return diff;
   }
 }
