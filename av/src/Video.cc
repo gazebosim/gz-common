@@ -24,7 +24,7 @@ using namespace ignition;
 using namespace common;
 
 // Private data structure for the Video class
-class ignition::common::VideoPrivate
+class ignition::common::Video::Implementation
 {
   /// \brief libav Format I/O context
   public: AVFormatContext *formatCtx = nullptr;
@@ -61,7 +61,7 @@ class ignition::common::VideoPrivate
 
 /////////////////////////////////////////////////
 Video::Video()
-: dataPtr(new VideoPrivate)
+  : dataPtr(ignition::utils::MakeUniqueImpl<Implementation>())
 {
   // Make sure libav is loaded.
   ignition::common::load();
