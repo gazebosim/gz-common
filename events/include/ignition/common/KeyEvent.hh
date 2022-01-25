@@ -17,19 +17,15 @@
 #ifndef IGNITION_COMMON_KEYEVENT_HH_
 #define IGNITION_COMMON_KEYEVENT_HH_
 
-#include <memory>
 #include <string>
 
 #include <ignition/common/events/Export.hh>
-#include <ignition/utils/SuppressWarning.hh>
+#include <ignition/utils/ImplPtr.hh>
 
 namespace ignition
 {
   namespace common
   {
-    // Forward declare private data class
-    class KeyEventPrivate;
-
     /// \class KeyEvent KeyEvent.hh ignition/common/KeyEvent.hh
     /// \brief Generic description of a keyboard event.
     class IGNITION_COMMON_EVENTS_VISIBLE KeyEvent
@@ -39,17 +35,6 @@ namespace ignition
 
       /// \brief Constructor.
       public: KeyEvent();
-
-      /// \brief Copy constructor.
-      /// \param[in] _other Other key event
-      public: KeyEvent(const KeyEvent &_other);
-
-      // \brief  Move constructor.
-      /// \param[in] _other Other key event
-      public: KeyEvent(KeyEvent &&_other);
-
-      /// \brief Destructor
-      public: ~KeyEvent();
 
       /// \brief Get the event type
       /// \return The key event type
@@ -100,20 +85,8 @@ namespace ignition
       /// \param[in] _alt Status of the alt key
       public: void SetAlt(bool _alt);
 
-      /// \brief Assignment operator
-      /// \param[in] _other Other key event
-      /// \return this
-      public: KeyEvent &operator=(const KeyEvent &_other);
-
-      /// \brief Move assignment operator.
-      /// \param[in] _other Other key event
-      /// \return this
-      public: KeyEvent& operator=(KeyEvent&& other);
-
-      IGN_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
-      /// \brief Private data pointer
-      private: std::unique_ptr<KeyEventPrivate> dataPtr;
-      IGN_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
+      /// \brief Pointer to private data.
+      IGN_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

@@ -22,68 +22,48 @@ using namespace ignition;
 using namespace common;
 
 /// \brief Mouse event private data
-class ignition::common::MouseEventPrivate
+class ignition::common::MouseEvent::Implementation
 {
-  /// \brief Constructor.
-  public: MouseEventPrivate()
-          : pos(0, 0), prevPos(0, 0), pressPos(0, 0), scroll(0, 0),
-            moveScale(0.01f), dragging(false), type(MouseEvent::NO_EVENT),
-            button(MouseEvent::NO_BUTTON), buttons(MouseEvent::NO_BUTTON),
-            shift(false), alt(false), control(false)
-          {}
-
   /// \brief Mouse pointer position on the screen.
-  public: ignition::math::Vector2i pos;
+  public: ignition::math::Vector2i pos {0, 0};
 
   /// \brief Previous position.
-  public: ignition::math::Vector2i prevPos;
+  public: ignition::math::Vector2i prevPos {0, 0};
 
   /// \brief Position of button press.
-  public: ignition::math::Vector2i pressPos;
+  public: ignition::math::Vector2i pressPos {0, 0};
 
   /// \brief Scroll position.
-  public: ignition::math::Vector2i scroll;
+  public: ignition::math::Vector2i scroll {0, 0};
 
   /// \brief Scaling factor.
-  public: float moveScale;
+  public: float moveScale {0.01f};
 
   /// \brief Flag for mouse drag motion
-  public: bool dragging;
+  public: bool dragging {false};
 
   /// \brief Event type.
-  public: MouseEvent::EventType type;
+  public: MouseEvent::EventType type {MouseEvent::NO_EVENT};
 
   /// \brief The button which caused the event.
-  public: MouseEvent::MouseButton button;
+  public: MouseEvent::MouseButton button {MouseEvent::NO_BUTTON};
 
   /// \brief State of the buttons when the event was generated.
-  public: unsigned int buttons;
+  public: unsigned int buttons {MouseEvent::NO_BUTTON};
 
   /// \brief Shift key press flag.
-  public: bool shift;
+  public: bool shift {false};
 
   /// \brief Alt key press flag.
-  public: bool alt;
+  public: bool alt {false};
 
   /// \brief Control key press flag.
-  public: bool control;
+  public: bool control {false};
 };
 
 /////////////////////////////////////////////////
 MouseEvent::MouseEvent()
-  : dataPtr(new MouseEventPrivate)
-{
-}
-
-/////////////////////////////////////////////////
-MouseEvent::MouseEvent(const MouseEvent &_other)
-  : dataPtr(new MouseEventPrivate)
-{
-  *dataPtr = *_other.dataPtr;
-}
-
-/////////////////////////////////////////////////
-MouseEvent::~MouseEvent()
+: dataPtr(ignition::utils::MakeImpl<Implementation>())
 {
 }
 
@@ -253,15 +233,4 @@ bool MouseEvent::Control() const
 void MouseEvent::SetControl(bool _control)
 {
   this->dataPtr->control = _control;
-}
-
-/////////////////////////////////////////////////
-MouseEvent &MouseEvent::operator=(const MouseEvent &_other)
-{
-  if (this == &_other)
-      return *this;
-
-  *this->dataPtr = *_other.dataPtr;
-
-  return *this;
 }

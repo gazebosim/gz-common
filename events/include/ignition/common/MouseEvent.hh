@@ -21,15 +21,12 @@
 #include <ignition/math/Vector2.hh>
 
 #include <ignition/common/events/Export.hh>
-#include <ignition/utils/SuppressWarning.hh>
+#include <ignition/utils/ImplPtr.hh>
 
 namespace ignition
 {
   namespace common
   {
-    /// Forward declare private data
-    class MouseEventPrivate;
-
     /// \class MouseEvent MouseEvent.hh ignition/common/MouseEvent.hh
     /// \brief Generic description of a mouse event.
     class IGNITION_COMMON_EVENTS_VISIBLE MouseEvent
@@ -71,13 +68,6 @@ namespace ignition
 
       /// \brief Constructor.
       public: MouseEvent();
-
-      /// \brief Copy constructor.
-      /// \param[in] _other Other mouse event
-      public: MouseEvent(const MouseEvent &_other);
-
-      /// \brief Destructor
-      public: virtual ~MouseEvent();
 
       /// \brief Get mouse pointer position on the screen.
       /// \return Mouse pointer position on the screen.
@@ -198,16 +188,8 @@ namespace ignition
       /// \param[in] _control The control key flag.
       public: void SetControl(bool _control);
 
-      /// \brief Assignment operator
-      /// \param[in] _other Other mouse event
-      /// \return this
-      public: MouseEvent &operator=(const MouseEvent &_other);
-
-      IGN_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
-      /// \internal
-      /// \brief Private data pointer
-      private: std::unique_ptr<MouseEventPrivate> dataPtr;
-      IGN_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
+      /// \brief Pointer to private data.
+      IGN_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }
