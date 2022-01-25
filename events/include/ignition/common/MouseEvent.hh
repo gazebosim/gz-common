@@ -90,7 +90,7 @@ namespace ignition
       /// \brief Set mouse pointer position on the screen.
       /// \param[in] _x Mouse pointer X position on the screen.
       /// \param[in] _y Mouse pointer Y position on the screen.
-      public: void SetPos(const int _x, const int _y);
+      public: void SetPos(int _x, int _y);
 
       /// \brief Get the previous position.
       /// \return The previous mouse position.
@@ -103,7 +103,7 @@ namespace ignition
       /// \brief Set the previous position.
       /// \param[in] _x Previous mouse pointer X position on the screen.
       /// \param[in] _y Previous mouse pointer Y position on the screen.
-      public: void SetPrevPos(const int _x, const int _y);
+      public: void SetPrevPos(int _x, int _y);
 
       /// \brief Get the position of button press.
       /// \return Screen position of a button press.
@@ -116,7 +116,7 @@ namespace ignition
       /// \brief Set the position of button press.
       /// \param[in] _x Mouse pointer X position on the screen.
       /// \param[in] _y Mouse pointer Y position on the screen.
-      public: void SetPressPos(const int _x, const int _y);
+      public: void SetPressPos(int _x, int _y);
 
       /// \brief Get the scroll position.
       /// \return The scroll position.
@@ -129,7 +129,7 @@ namespace ignition
       /// \brief Set the scroll position.
       /// \param[in] _x Scroll X position.
       /// \param[in] _y Scroll Y position.
-      public: void SetScroll(const int _x, const int _y);
+      public: void SetScroll(int _x, int _y);
 
       /// \brief Get the scaling factor.
       /// \return The move scaling factor.
@@ -137,7 +137,7 @@ namespace ignition
 
       /// \brief Set the scaling factor.
       /// \param[in] _scale The move scaling factor.
-      public: void SetMoveScale(const float _scale);
+      public: void SetMoveScale(float _scale);
 
       /// \brief Get the flag for mouse drag motion
       /// \return True if dragging, usually indicating a mouse move with
@@ -146,7 +146,7 @@ namespace ignition
 
       /// \brief Set the flag for mouse drag motion
       /// \param[in] _dragging The dragging flag.
-      public: void SetDragging(const bool _dragging);
+      public: void SetDragging(bool _dragging);
 
       /// \brief Get the event type.
       /// \return The EventType.
@@ -154,7 +154,7 @@ namespace ignition
 
       /// \brief Set the event type.
       /// \param[in] _type The EventType.
-      public: void SetType(const EventType _type) const;
+      public: void SetType(MouseEvent::EventType _type) const;
 
       /// \brief Get the button which caused this event.
       /// \return The button which caused this event.
@@ -162,7 +162,7 @@ namespace ignition
 
       /// \brief Set the button which caused the event.
       /// \param[in] _button The button which caused this event.
-      public: void SetButton(const MouseEvent::MouseButton _button) const;
+      public: void SetButton(MouseEvent::MouseButton _button) const;
 
       /// \brief Get the state of the buttons when the event was generated.
       /// \return The state of the buttons, which can be a bitwise
@@ -172,7 +172,7 @@ namespace ignition
       /// \brief Set the state of the buttons when the event was generated.
       /// \param[in] _buttons The state of the buttons, which can be a bitwise
       /// combination of MouseEvent::MouseButton.
-      public: void SetButtons(const unsigned int &_buttons);
+      public: void SetButtons(unsigned int _buttons);
 
       /// \brief Get the shift key press flag.
       /// \return True if the shift key is pressed.
@@ -180,7 +180,7 @@ namespace ignition
 
       /// \brief Set the shift key press flag.
       /// \param[in] _shift The shift key press flag.
-      public: void SetShift(const bool _shift) const;
+      public: void SetShift(bool _shift) const;
 
       /// \brief Get the alt key press flag.
       /// \return True if the alt key is pressed.
@@ -188,7 +188,7 @@ namespace ignition
 
       /// \brief Set the alt key press flag.
       /// \param[in] _alt The alt key flag.
-      public: void SetAlt(const bool _alt);
+      public: void SetAlt(bool _alt);
 
       /// \brief Get the control key press flag.
       /// \return True if the control key is pressed.
@@ -196,7 +196,7 @@ namespace ignition
 
       /// \brief Set the control key press flag.
       /// \param[in] _control The control key flag.
-      public: void SetControl(const bool _control) const;
+      public: void SetControl(bool _control) const;
 
       /// \brief Assignment operator
       /// \param[in] _other Other mouse event
