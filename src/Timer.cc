@@ -30,7 +30,7 @@ class ignition::common::Timer::Implementation
   public: std::chrono::steady_clock::time_point stop; 
 
   /// \brief True if the timer is running.
-  public: bool running;
+  public: bool running {false};
 };
 
 //////////////////////////////////////////////////
