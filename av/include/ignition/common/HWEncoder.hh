@@ -22,7 +22,6 @@
 
 #include <ignition/common/FlagSet.hh>
 #include <ignition/common/av/Export.hh>
-#include <ignition/common/SuppressWarning.hh>
 #include <ignition/common/HWVideo.hh>
 #include <ignition/common/ffmpeg_inc.hh>
 

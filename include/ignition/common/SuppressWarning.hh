@@ -15,11 +15,15 @@
  *
  */
 
-
 #ifndef IGNITION_COMMON_SUPPRESSWARNING_HH_
 #define IGNITION_COMMON_SUPPRESSWARNING_HH_
 
-#include <ignition/common/detail/SuppressWarning.hh>
+#include <ignition/utils/SuppressWarning.hh>
+
+#pragma message("ign-common SuppressWarning is deprecated, use ign-utils")
+// These macros have been moved to ign-utils so they may be more broadly used.
+// The implementations are aliases to those implementations and are deprecated
+// in ign-common5 and are to be removed in ign-common6
 
 // This header contains cross-platform macros for suppressing warnings. Please
 // only use these macros responsibly when you are certain that the compiler is
@@ -50,10 +54,10 @@
 /// of our implementation) that the pointer is definitely not pointing to a more
 /// derived type.
 #define IGN_COMMON_WARN_IGNORE__DELETE_NON_VIRTUAL_DESTRUCTOR \
-  DETAIL_IGN_COMMON_WARN_IGNORE__DELETE_NON_VIRTUAL_DESTRUCTOR
+  IGN_UTILS_WARN_IGNORE__NON_VIRTUAL_DESTRUCTOR
 
 #define IGN_COMMON_WARN_RESUME__DELETE_NON_VIRTUAL_DESTRUCTOR \
-  DETAIL_IGN_COMMON_WARN_RESUME__DELETE_NON_VIRTUAL_DESTRUCTOR
+  IGN_UTILS_WARN_RESUME__NON_VIRTUAL_DESTRUCTOR
 
 
 /// \brief Microsoft Visual Studio does not automatically export the interface
@@ -62,14 +66,9 @@
 /// choose to suppress the warning instead of needlessly adding the class
 /// information to the DLL interface.
 #define IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING \
-  DETAIL_IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
+  IGN_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
 
 #define IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING \
-  DETAIL_IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
-
-
-// TODO(anyone): Add more warning types as they become relevant.
-// Do not add warning
-// types to suppress unless they are genuinely necessary.
+  IGN_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
 
 #endif
