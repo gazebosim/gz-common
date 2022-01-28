@@ -19,6 +19,7 @@
 
 #include <ignition/common/Console.hh>
 
+#include <cstdlib>
 #include <filesystem>
 
 #ifdef _WIN32

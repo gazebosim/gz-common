@@ -25,12 +25,6 @@
 #include <string>
 #include <vector>
 
-#ifndef _WIN32
-#include <dirent.h>
-#else
-#include "win_dirent.h"
-#endif
-
 #include "ignition/common/Console.hh"
 #include "ignition/common/StringUtils.hh"
 #include "ignition/common/SystemPaths.hh"
@@ -101,18 +95,11 @@ SystemPaths::SystemPaths()
   else
     fullPath = path;
 
-  DIR *dir = opendir(fullPath.c_str());
-  if (!dir)
+  if (!exists(fullPath))
   {
-#ifdef _WIN32
-    mkdir(fullPath.c_str());
-#else
-    // cppcheck-suppress ConfigurationNotChecked
-    mkdir(fullPath.c_str(), S_IRWXU | S_IRGRP | S_IROTH);
-#endif
+    createDirectories(fullPath);
   }
-  else
-    closedir(dir);
+
 
   this->dataPtr->logPath = fullPath;
   // Populate this->dataPtr->filePaths with values from the default
@@ -403,6 +390,8 @@ std::string SystemPaths::FindFile(const std::string &_filename,
   // Try appending to local paths
   else
   {
+    ignerr << "Here: " << cwd() << " " << filename << std::endl;
+
     auto cwdPath = joinPaths(cwd(), filename);
     if (_searchLocalPath && exists(cwdPath))
     {
@@ -465,9 +454,12 @@ std::string SystemPaths::FindFile(const std::string &_filename,
 std::string SystemPaths::LocateLocalFile(const std::string &_filename,
     const std::vector<std::string> &_paths)
 {
+  std::cerr << "LocateLocalFile: " << _filename << "\n";
+
   std::string foundPath = "";
   for (auto const &path : _paths)
   {
+    std::cout << "\tPath: " << path << "\n";
     std::string checkPath = NormalizeDirectoryPath(path) + _filename;
     if (exists(checkPath))
     {
@@ -531,6 +523,8 @@ void SystemPaths::AddFindFileURICallback(
 /////////////////////////////////////////////////
 std::list<std::string> SystemPaths::PathsFromEnv(const std::string &_env)
 {
+  std::cerr << "PathsFromEnv" << std::endl;
+
   std::list<std::string> paths;
 
   std::string envPathsStr;
