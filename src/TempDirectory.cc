@@ -19,7 +19,6 @@
 
 #include <ignition/common/Console.hh>
 
-#include <cstdlib>
 #include <filesystem>
 
 #ifdef _WIN32
@@ -27,6 +26,9 @@
 #include <direct.h>
 #include <fileapi.h>
 #include <io.h>
+#else
+#include <stdlib.h>
+#include <unistd.h>
 #endif
 
 namespace fs = std::filesystem;
