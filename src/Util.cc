@@ -62,12 +62,10 @@
 ///
 /// This uses the NeverDestroyed pattern to prevent static initialization and
 /// destruction order fiasco issues.
-ignition::common::SystemPaths* GetSystemPaths()
+ignition::common::SystemPaths& GetSystemPaths()
 {
-  static const
-    ignition::utils::NeverDestroyed<ignition::common::SystemPaths*> paths{
-      new ignition::common::SystemPaths()
-    };
+  static 
+    ignition::utils::NeverDestroyed<ignition::common::SystemPaths> paths;
   return paths.Access();
 }
 
@@ -299,26 +297,26 @@ std::string ignition::common::timeToIso(
 /////////////////////////////////////////////////
 std::string ignition::common::logPath()
 {
-  return GetSystemPaths()->LogPath();
+  return GetSystemPaths().LogPath();
 }
 
 /////////////////////////////////////////////////
 void ignition::common::addSearchPathSuffix(const std::string &_suffix)
 {
-  GetSystemPaths()->AddSearchPathSuffix(_suffix);
+  GetSystemPaths().AddSearchPathSuffix(_suffix);
 }
 
 /////////////////////////////////////////////////
 std::string ignition::common::findFile(const std::string &_file)
 {
-  return GetSystemPaths()->FindFile(_file, true);
+  return GetSystemPaths().FindFile(_file, true);
 }
 
 /////////////////////////////////////////////////
 std::string ignition::common::findFile(const std::string &_file,
                                        const bool _searchLocalPath)
 {
-  return GetSystemPaths()->FindFile(_file, _searchLocalPath);
+  return GetSystemPaths().FindFile(_file, _searchLocalPath);
 }
 
 /////////////////////////////////////////////////
@@ -341,13 +339,13 @@ std::string ignition::common::findFilePath(const std::string &_file)
 void ignition::common::addFindFileURICallback(
     std::function<std::string(const ignition::common::URI &)> _cb)
 {
-  GetSystemPaths()->AddFindFileURICallback(_cb);
+  GetSystemPaths().AddFindFileURICallback(_cb);
 }
 
 /////////////////////////////////////////////////
 ignition::common::SystemPaths *ignition::common::systemPaths()
 {
-  return GetSystemPaths();
+  return &GetSystemPaths();
 }
 
 /////////////////////////////////////////////////
