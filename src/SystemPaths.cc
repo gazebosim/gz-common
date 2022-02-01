@@ -390,8 +390,6 @@ std::string SystemPaths::FindFile(const std::string &_filename,
   // Try appending to local paths
   else
   {
-    ignerr << "Here: " << cwd() << " " << filename << std::endl;
-
     auto cwdPath = joinPaths(cwd(), filename);
     if (_searchLocalPath && exists(cwdPath))
     {
