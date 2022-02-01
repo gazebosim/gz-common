@@ -290,7 +290,7 @@ std::string ignition::common::joinPaths(const std::string &_path1,
 
     // Sanitize the end of the path.
     index = result.length()-1;
-    for (; result[index] == replacement; --index)
+    for (; index <  result.length() && result[index] == replacement; --index)
     {
     }
     index += 1;
