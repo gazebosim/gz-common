@@ -667,7 +667,7 @@ bool URIPath::Parse(const std::string &_str)
   // explicitly check for it
   this->dataPtr->isAbsolute = this->dataPtr->IsStringAbsolute(_str);
   this->dataPtr->trailingSlash =
-    _str.back() == '/' && _str.size() != 1;
+    _str.size() > 1 &&_str.back() == '/';
 
   return true;
 }
@@ -1199,14 +1199,16 @@ bool URI::Parse(const std::string &_str)
       size_t authEndPos = str.find_first_of("/?#",
           authDelimPos + std::strlen(kAuthDelim));
 
+      if (authEndPos != std::string::npos &&
+          (str[authEndPos-1] == ':' && str[authEndPos] == '/'))
+      {
       // This could be a windows file path of the form file://D:/path/to/file
       // In this case, the authority is not present.
-      if (str[authEndPos-1] == ':' && str[authEndPos] == '/')
-      {
         str.erase(0, std::strlen(kAuthDelim));
         authorityPresent = false;
       }
-      else if (localScheme != "file" && authEndPos == authDelimPos+2)
+      else if (localScheme != "file" &&
+               authEndPos == authDelimPos + std::strlen(kAuthDelim))
       {
         ignerr << "A host is manadatory when using a scheme other than file\n";
         return false;
