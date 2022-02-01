@@ -454,12 +454,9 @@ std::string SystemPaths::FindFile(const std::string &_filename,
 std::string SystemPaths::LocateLocalFile(const std::string &_filename,
     const std::vector<std::string> &_paths)
 {
-  std::cerr << "LocateLocalFile: " << _filename << "\n";
-
   std::string foundPath = "";
   for (auto const &path : _paths)
   {
-    std::cout << "\tPath: " << path << "\n";
     std::string checkPath = NormalizeDirectoryPath(path) + _filename;
     if (exists(checkPath))
     {
@@ -523,8 +520,6 @@ void SystemPaths::AddFindFileURICallback(
 /////////////////////////////////////////////////
 std::list<std::string> SystemPaths::PathsFromEnv(const std::string &_env)
 {
-  std::cerr << "PathsFromEnv" << std::endl;
-
   std::list<std::string> paths;
 
   std::string envPathsStr;
