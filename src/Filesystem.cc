@@ -282,7 +282,7 @@ std::string ignition::common::joinPaths(const std::string &_path1,
     // Sanitize the start of the path.
     size_t index = 0;
     size_t leadingIndex = _stripLeading ? 0 : 1;
-    for (; result[index] == replacement; ++index)
+    for (; index < result.length() && result[index] == replacement; ++index)
     {
     }
     if (index > leadingIndex)
