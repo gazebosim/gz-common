@@ -83,9 +83,10 @@ bool ignition::common::createDirectory(const std::string &_path)
 bool ignition::common::createDirectories(const std::string &_path)
 {
   std::error_code ec;
+  bool created = fs::create_directories(_path, ec);
   // Disregard return here because it may return false if the
   // directory is not actually created (already exists)
-  fs::create_directories(_path, ec);
+  (void) created;
   return fsWarn("createDirectories", ec);
 }
 
