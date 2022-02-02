@@ -83,9 +83,9 @@ bool ignition::common::createDirectory(const std::string &_path)
 bool ignition::common::createDirectories(const std::string &_path)
 {
   std::error_code ec;
-  bool created = fs::create_directories(_path, ec);
-  // Disregard return here because it may return false if the
+  // Disregard return of create_directories, because it may return false if the
   // directory is not actually created (already exists)
+  bool created = fs::create_directories(_path, ec);
   (void) created;
   return fsWarn("createDirectories", ec);
 }
@@ -145,6 +145,9 @@ std::string ignition::common::joinPaths(
   else
     is_url = true;
 
+  // TODO(mjcarroll) Address the case that path2 is also a URI.
+  // It's likely not a valid scenario, but not currently covered by our test
+  // suite and doesn't return an error.
   if (_path2.find("://") == std::string::npos)
     p2 = p2.lexically_normal();
   else
