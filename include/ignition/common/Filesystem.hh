@@ -264,9 +264,6 @@ namespace ignition
       /// \param[in] _in  Directory to iterate over.
       public: explicit DirIter(const std::string &_in);
 
-      /// \brief Destructor
-      public: ~DirIter();
-
       /// \brief Dereference operator; returns current directory record.
       /// \return A string representing the entire path of the directory
       /// record.
@@ -281,15 +278,6 @@ namespace ignition
       /// \param[in] _other  The other iterator to compare against.
       /// \return true if the iterators are equal, false otherwise.
       public: bool operator!=(const DirIter &_other) const;
-
-      /// \brief Move to the next directory record, skipping . and .. records.
-      private: void Next();
-
-      /// \brief Set the internal variable to the empty string.
-      private: void SetInternalEmpty();
-
-      /// \brief Close an open directory handle.
-      private: void CloseHandle();
 
       /// \brief Pointer to private data.
       IGN_UTILS_IMPL_PTR(dataPtr)

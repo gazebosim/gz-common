@@ -1,8 +1,13 @@
 add_library(IGNBadPluginAlign         SHARED BadPluginAlign.cc)
+target_link_libraries(IGNBadPluginAlign PRIVATE ${PROJECT_LIBRARY_TARGET_NAME})
 add_library(IGNBadPluginAPIVersionNew SHARED BadPluginAPIVersionNew.cc)
+target_link_libraries(IGNBadPluginAPIVersionNew PRIVATE ${PROJECT_LIBRARY_TARGET_NAME})
 add_library(IGNBadPluginAPIVersionOld SHARED BadPluginAPIVersionOld.cc)
+target_link_libraries(IGNBadPluginAPIVersionOld PRIVATE ${PROJECT_LIBRARY_TARGET_NAME})
 add_library(IGNBadPluginSize          SHARED BadPluginSize.cc)
+target_link_libraries(IGNBadPluginSize PRIVATE ${PROJECT_LIBRARY_TARGET_NAME})
 add_library(IGNDummyPlugins           SHARED DummyPlugins.cc)
+target_link_libraries(IGNDummyPlugins PRIVATE ${PROJECT_LIBRARY_TARGET_NAME})
 
 set_property(TARGET IGNBadPluginAlign PROPERTY CXX_STANDARD 11)
 set_property(TARGET IGNBadPluginAPIVersionNew PROPERTY CXX_STANDARD 11)

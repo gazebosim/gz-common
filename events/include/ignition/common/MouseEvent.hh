@@ -21,7 +21,7 @@
 #include <ignition/math/Vector2.hh>
 
 #include <ignition/common/events/Export.hh>
-#include <ignition/common/SuppressWarning.hh>
+#include <ignition/utils/SuppressWarning.hh>
 
 namespace ignition
 {
@@ -203,11 +203,11 @@ namespace ignition
       /// \return this
       public: MouseEvent &operator=(const MouseEvent &_other);
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
+      IGN_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \internal
       /// \brief Private data pointer
       private: std::unique_ptr<MouseEventPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      IGN_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
     };
   }
 }

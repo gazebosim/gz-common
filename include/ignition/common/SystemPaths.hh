@@ -17,16 +17,6 @@
 #ifndef IGNITION_COMMON_SYSTEMPATHS_HH_
 #define IGNITION_COMMON_SYSTEMPATHS_HH_
 
-#include <stdio.h>
-
-#ifdef _WIN32
-  #include <direct.h>
-  #define GetCurrentDir _getcwd
-#else
-  #include <unistd.h>
-  #define GetCurrentDir getcwd
-#endif
-
 #include <functional>
 #include <list>
 #include <string>
@@ -41,9 +31,6 @@ namespace ignition
 {
   namespace common
   {
-    // Forward declare private data class
-    class SystemPathsPrivate;
-
     /// \class SystemPaths SystemPaths.hh ignition/common/SystemPaths.hh
     /// \brief Functions to handle getting system paths, keeps track of:
     ///        \li SystemPaths#pluginPaths - plugin library paths

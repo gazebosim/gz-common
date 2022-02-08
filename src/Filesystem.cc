@@ -15,16 +15,10 @@
  *
 */
 
-#include <sys/stat.h>
-
-#ifdef __linux__
-#include <sys/sendfile.h>
-#endif
-
-#include <iomanip>
 #include <array>
 #include <algorithm>
 #include <sstream>
+#include <filesystem>
 #include <fstream>
 #include <cstdlib>
 #include <cstring>
@@ -36,90 +30,265 @@
 #include <ignition/common/Util.hh>
 #include <ignition/common/Uuid.hh>
 #include <ignition/common/Console.hh>
-
-#ifndef _WIN32
-#include <dirent.h>
-#include <limits.h>
-#include <climits>
-#else
-#include <shlwapi.h>
-#include <io.h>
-#include "win_dirent.h"
-#include "PrintWindowsSystemWarning.hh"
-#endif
-
 #include "ignition/common/Filesystem.hh"
 
-#ifdef _WIN32
-# define IGN_PATH_MAX _MAX_PATH
-#elif defined(PATH_MAX)
-# define IGN_PATH_MAX PATH_MAX
-#elif defined(_XOPEN_PATH_MAX)
-# define IGN_PATH_MAX _XOPEN_PATH_MAX
-#else
-# define IGN_PATH_MAX _POSIX_PATH_MAX
-#endif
+namespace fs = std::filesystem;
 
-namespace igncmn = ignition::common;
-using namespace ignition;
-using namespace igncmn;
+/////////////////////////////////////////////////
+// Return true if success, false if error
+inline bool fsWarn(const std::string &_fcn,
+             const std::error_code &_ec,
+             const ignition::common::FilesystemWarningOp &_warningOp =
+             ignition::common::FSWO_LOG_WARNINGS)
+{
+  if (_ec)
+  {
+    if (ignition::common::FSWO_LOG_WARNINGS == _warningOp)
+    {
+      ignwarn << "Failed ignition::common::" << _fcn
+        << " (ec: " << _ec << " " << _ec.message() << ")\n";
+    }
+    return false;
+  }
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool ignition::common::exists(const std::string &_path)
+{
+  return fs::exists(_path);
+}
+
+/////////////////////////////////////////////////
+bool ignition::common::isDirectory(const std::string &_path)
+{
+  return fs::is_directory(_path);
+}
 
 /////////////////////////////////////////////////
 bool ignition::common::isFile(const std::string &_path)
 {
-  std::ifstream f(_path);
-  return (!isDirectory(_path)) && f.good();
+  return fs::is_regular_file(_path);
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::removeDirectory(const std::string &_path,
-                                       const FilesystemWarningOp _warningOp)
+bool ignition::common::createDirectory(const std::string &_path)
 {
-  bool removed = false;
-  if (ignition::common::isDirectory(_path))
-  {
-#ifdef _WIN32
-    removed = RemoveDirectory(_path.c_str());
-    if (!removed && FSWO_LOG_WARNINGS == _warningOp)
-    {
-      ignition::common::PrintWindowsSystemWarning(
-            "Failed to remove directory [" + _path + "]");
-    }
-#else
-    removed = (rmdir(_path.c_str()) == 0);
-    if (!removed)
-    {
-      // A sym link would end up here
-      removed = (std::remove(_path.c_str()) == 0);
-    }
-
-    if (!removed && FSWO_LOG_WARNINGS == _warningOp)
-    {
-      ignwarn << "Failed to remove directory [" + _path + "]: "
-              << std::strerror(errno) << "\n";
-    }
-#endif
-  }
-  else if (_warningOp)
-  {
-    ignwarn << "The path [" << _path << "] does not refer to a directory\n";
-  }
-
-  return removed;
+  std::error_code ec;
+  fs::create_directory(_path, ec);
+  return fsWarn("createDirectory", ec);
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::removeFile(const std::string &_existingFilename,
-                                  const FilesystemWarningOp _warningOp)
+bool ignition::common::createDirectories(const std::string &_path)
 {
-  const bool removed = (std::remove(_existingFilename.c_str()) == 0);
-  if (!removed && FSWO_LOG_WARNINGS == _warningOp)
+  std::error_code ec;
+  // Disregard return of create_directories, because it may return false if the
+  // directory is not actually created (already exists)
+  bool created = fs::create_directories(_path, ec);
+  (void) created;
+  return fsWarn("createDirectories", ec);
+}
+
+/////////////////////////////////////////////////
+std::string const ignition::common::separator(std::string const &_s)
+{
+  fs::path path(_s);
+  return (_s / fs::path("")).string();
+}
+
+/////////////////////////////////////////////////
+void ignition::common::changeFromUnixPath(std::string &_path) {
+  std::replace(_path.begin(), _path.end(), '/',
+      static_cast<char>(fs::path::preferred_separator));
+}
+
+/////////////////////////////////////////////////
+std::string ignition::common::copyFromUnixPath(const std::string &_path)
+{
+  std::string copy = _path;
+  changeFromUnixPath(copy);
+  return copy;
+}
+
+/////////////////////////////////////////////////
+void ignition::common::changeToUnixPath(std::string &_path) {
+  std::replace(_path.begin(), _path.end(),
+      static_cast<char>(fs::path::preferred_separator), '/');
+}
+
+/////////////////////////////////////////////////
+std::string ignition::common::copyToUnixPath(const std::string &_path)
+{
+  std::string copy = _path;
+  changeToUnixPath(copy);
+  return copy;;
+}
+
+/////////////////////////////////////////////////
+std::string ignition::common::absPath(const std::string &_path)
+{
+  return fs::absolute(_path).string();
+}
+
+/////////////////////////////////////////////////
+std::string ignition::common::joinPaths(
+    const std::string &_path1, const std::string &_path2)
+{
+  fs::path p1{_path1};
+  fs::path p2{_path2};
+
+  bool is_url = false;
+
+  if (_path1.find("://") == std::string::npos)
+    p1 = p1.lexically_normal();
+  else
+    is_url = true;
+
+  // TODO(mjcarroll) Address the case that path2 is also a URI.
+  // It's likely not a valid scenario, but not currently covered by our test
+  // suite and doesn't return an error.
+  if (_path2.find("://") == std::string::npos)
+    p2 = p2.lexically_normal();
+  else
+    is_url = true;
+
+  if (p2.string()[0] == fs::path::preferred_separator)
   {
-    ignwarn << "Failed to remove file [" << _existingFilename << "]: "
-            << std::strerror(errno) << "\n";
+    p2 = fs::path{p2.string().substr(1)};
   }
 
-  return removed;
+  auto ret = (p1 / p2);
+
+  if (is_url)
+  {
+    return copyToUnixPath(ret.string());
+  }
+  else
+  {
+    return ret.lexically_normal().string();
+  }
+}
+
+/////////////////////////////////////////////////
+std::string ignition::common::cwd()
+{
+  std::error_code ec;
+  auto curdir = fs::current_path(ec);
+
+  if (!fsWarn("cwd", ec))
+  {
+    curdir = "";
+  }
+
+  return curdir.string();
+}
+
+/////////////////////////////////////////////////
+bool ignition::common::chdir(const std::string &_dir)
+{
+  std::error_code ec;
+  fs::current_path(_dir, ec);
+  return fsWarn("chdir", ec);
+}
+
+/////////////////////////////////////////////////
+std::string ignition::common::basename(const std::string &_path)
+{
+  fs::path p(_path);
+  // Maintain compatibility with ign-common
+  if (*_path.rbegin() == fs::path::preferred_separator)
+    p = fs::path(_path.substr(0, _path.size()-1));
+  return p.filename().string();
+}
+
+/////////////////////////////////////////////////
+std::string ignition::common::parentPath(const std::string &_path)
+{
+  fs::path p(_path);
+  // Maintain compatibility with ign-common
+  if (*_path.rbegin() == fs::path::preferred_separator)
+    p = fs::path(_path.substr(0, _path.size()-1));
+  return p.parent_path().string();
+}
+
+/////////////////////////////////////////////////
+bool ignition::common::copyFile(
+    const std::string &_existingFilename,
+    const std::string &_newFilename,
+    const FilesystemWarningOp _warningOp)
+{
+  const auto copyOptions = fs::copy_options::overwrite_existing;
+  std::error_code ec;
+  auto ret = fs::copy_file(_existingFilename, _newFilename, copyOptions, ec);
+  return ret && fsWarn("copyFile", ec, _warningOp);
+}
+
+/////////////////////////////////////////////////
+bool ignition::common::copyDirectory(
+    const std::string &_existingDirname,
+    const std::string &_newDirname,
+    const FilesystemWarningOp _warningOp)
+{
+  const auto copyOptions = fs::copy_options::recursive
+                         | fs::copy_options::overwrite_existing;
+
+  // std::filesystem won't create intermediate directories
+  // before copying, this maintains compatibility with ignition behavior.
+  if (!ignition::common::createDirectories(_newDirname))
+  {
+    return false;
+  }
+
+  std::error_code ec;
+  fs::copy(_existingDirname, _newDirname, copyOptions, ec);
+  return fsWarn("copyDirectory", ec, _warningOp);
+}
+
+/////////////////////////////////////////////////
+bool ignition::common::moveFile(
+    const std::string &_existingFilename,
+    const std::string &_newFilename,
+    const FilesystemWarningOp _warningOp)
+{
+  std::error_code ec;
+  fs::rename(_existingFilename, _newFilename, ec);
+  return fsWarn("moveFile", ec, _warningOp);
+}
+
+/////////////////////////////////////////////////
+bool ignition::common::removeDirectory(
+    const std::string &_path,
+    const FilesystemWarningOp _warningOp)
+{
+  if (!isDirectory(_path))
+  {
+    if (FSWO_LOG_WARNINGS == _warningOp)
+    {
+      ignwarn << "Cannot remove, not a directory [" << _path << "]\n";
+    }
+
+    return false;
+  }
+
+  return removeDirectoryOrFile(_path, _warningOp);
+}
+
+/////////////////////////////////////////////////
+bool ignition::common::removeFile(
+    const std::string &_existingFilename,
+    const FilesystemWarningOp _warningOp)
+{
+  if (!isFile(_existingFilename))
+  {
+    if (FSWO_LOG_WARNINGS == _warningOp)
+    {
+      ignwarn << "Cannot remove, not a file [" << _existingFilename << "]\n";
+    }
+    return false;
+  }
+
+  return removeDirectoryOrFile(_existingFilename, _warningOp);
 }
 
 /////////////////////////////////////////////////
@@ -127,375 +296,26 @@ bool ignition::common::removeDirectoryOrFile(
     const std::string &_path,
     const FilesystemWarningOp _warningOp)
 {
-  if (ignition::common::isDirectory(_path))
-  {
-    return ignition::common::removeDirectory(_path, _warningOp);
-  }
-  else if (ignition::common::isFile(_path))
-  {
-    return ignition::common::removeFile(_path, _warningOp);
-  }
-  else if (FSWO_LOG_WARNINGS == _warningOp)
-  {
-    ignwarn << "The path [" << _path << "] does not refer to a "
-            << "directory nor to a file\n";
-  }
-  return false;
+  std::error_code ec;
+  auto ret = fs::remove(_path, ec);
+  fsWarn("removeDirectoryOrFile", ec, _warningOp);
+  return ret;
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::removeAll(const std::string &_path,
-                                 const FilesystemWarningOp _warningOp)
+bool ignition::common::removeAll(
+    const std::string &_path,
+    const FilesystemWarningOp _warningOp)
 {
-  if (ignition::common::isDirectory(_path))
-  {
-    DIR *dir = opendir(_path.c_str());
-    if (dir)
-    {
-      struct dirent *p;
-      while ((p=readdir(dir)))
-      {
-        // Skip special files.
-        if (!std::strcmp(p->d_name, ".") || !std::strcmp(p->d_name, ".."))
-          continue;
-
-        const auto removed = ignition::common::removeAll(
-          ignition::common::joinPaths(_path, p->d_name), _warningOp);
-        if (!removed)
-          return false;
-      }
-    }
-    closedir(dir);
-  }
-
-  return ignition::common::removeDirectoryOrFile(_path, _warningOp);
+  std::error_code ec;
+  fs::remove_all(_path, ec);
+  return fsWarn("removeAll", ec, _warningOp);
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::moveFile(const std::string &_existingFilename,
-                                const std::string &_newFilename,
-                                const FilesystemWarningOp _warningOp)
-{
-  if (!copyFile(_existingFilename, _newFilename, _warningOp))
-    return false;
-
-  if (removeFile(_existingFilename, _warningOp))
-    return true;
-
-  // The original file could not be removed, which means we are not
-  // able to "move" it (we can only copy it, apparently). Since this
-  // function is meant to move files, and we have failed to move the
-  // file, we should remove the copy that we made earlier.
-  removeFile(_newFilename, _warningOp);
-
-  return false;
-}
-
-/////////////////////////////////////////////////
-std::string ignition::common::absPath(const std::string &_path)
-{
-  std::string result;
-
-  // cppcheck-suppress ConfigurationNotChecked
-  char path[IGN_PATH_MAX] = "";
-#ifdef _WIN32
-  if (GetFullPathName(_path.c_str(), IGN_PATH_MAX, &path[0], nullptr) != 0)
-#else
-  if (realpath(_path.c_str(), &path[0]) != nullptr)
-#endif
-    result = path;
-  else if (!_path.empty())
-  {
-    // If _path is an absolute path, then return _path.
-    // An absolute path on Windows is a character followed by a colon and a
-    // backslash.
-    if (_path.compare(0, 1, "/") == 0 || _path.compare(1, 3, ":\\") == 0)
-      result = _path;
-    // Otherwise return the current working directory with _path appended.
-    else
-      result = joinPaths(ignition::common::cwd(), _path);
-  }
-
-  ignition::common::replaceAll(result, result, "//", "/");
-
-  return result;
-}
-
-// This is help function to handle windows paths, there are a mix between '/'
-// and backslashes.
-// joinPaths uses the system separator, in Windows this generate some issues
-// with URIs
-std::string checkWindowsPath(const std::string _path)
-{
-  if (_path.empty())
-    return _path;
-
-  // Check if this is a http or https, if so change backslashes generated by
-  // jointPaths to '/'
-  if ((_path.size() > 7 && 0 == _path.compare(0, 7, "http://")) ||
-      (_path.size() > 8 && 0 == _path.compare(0, 8, "https://")))
-  {
-    return std::regex_replace(_path, std::regex(R"(\\)"), "/");
-  }
-
-  // This is a Windows path, convert all '/' into backslashes
-  std::string result = std::regex_replace(_path, std::regex(R"(/)"), "\\");
-  std::string drive_letters;
-
-  // only Windows contains absolute paths starting with drive letters
-  if (result.length() > 3 && 0 == result.compare(1, 2, ":\\"))
-  {
-    drive_letters = result.substr(0, 3);
-    result = result.substr(3);
-  }
-  result = drive_letters + std::regex_replace(
-    result, std::regex("[<>:\"|?*]"), "");
-  return result;
-}
-
-//////////////////////////////////////////////////
-std::string ignition::common::joinPaths(const std::string &_path1,
-                                        const std::string &_path2)
-{
-
-  /// This function is used to avoid duplicated path separators at the
-  /// beginning/end of the string, and between the two paths being joined.
-  /// \param[in] _path This is the string to sanitize.
-  /// \param[in] _stripLeading True if the leading separator should be
-  /// removed.
-  auto sanitizeSlashes = [](const std::string &_path,
-                            bool _stripLeading = false)
-  {
-    // Shortcut
-    if (_path.empty())
-      return _path;
-
-    std::string result = _path;
-
-    // Use the appropriate character for each platform.
-#ifndef _WIN32
-    char replacement = '/';
-#else
-    char replacement = '\\';
-#endif
-
-    // Sanitize the start of the path.
-    size_t index = 0;
-    size_t leadingIndex = _stripLeading ? 0 : 1;
-    for (; result[index] == replacement; ++index)
-    {
-    }
-    if (index > leadingIndex)
-      result.erase(leadingIndex, index-leadingIndex);
-
-    // Sanitize the end of the path.
-    index = result.length()-1;
-    for (; result[index] == replacement; --index)
-    {
-    }
-    index += 1;
-    if (index < result.length()-1)
-        result.erase(index+1);
-    return result;
-  };
-
-  std::string path;
-#ifndef _WIN32
-  path = sanitizeSlashes(sanitizeSlashes(separator(_path1)) +
-      sanitizeSlashes(_path2, true));
-#else  // _WIN32
-  std::string path1 = sanitizeSlashes(checkWindowsPath(_path1));
-  std::string path2 = sanitizeSlashes(checkWindowsPath(_path2), true);
-  std::vector<CHAR> combined(path1.length() + path2.length() + 2);
-  if (::PathCombineA(combined.data(), path1.c_str(), path2.c_str()) != NULL)
-  {
-    path = sanitizeSlashes(checkWindowsPath(std::string(combined.data())));
-  }
-  else
-  {
-    path = sanitizeSlashes(checkWindowsPath(separator(path1) + path2));
-  }
-#endif  // _WIN32
-  return path;
-}
-
-/////////////////////////////////////////////////
-std::string ignition::common::parentPath(const std::string &_path)
-{
-  std::string result;
-
-  size_t last_sep = _path.find_last_of(separator(""));
-  // If slash is the last character, find its parent directory
-  if (last_sep == _path.length() - 1)
-    last_sep = _path.substr(0, last_sep).find_last_of(separator(""));
-
-  result = _path.substr(0, last_sep);
-
-  return result;
-}
-
-/////////////////////////////////////////////////
-bool ignition::common::copyFile(const std::string &_existingFilename,
-                                const std::string &_newFilename,
-                                const FilesystemWarningOp _warningOp)
-{
-  std::string absExistingFilename =
-    ignition::common::absPath(_existingFilename);
-  std::string absNewFilename = ignition::common::absPath(_newFilename);
-
-  if (absExistingFilename == absNewFilename)
-    return false;
-
-#ifdef _WIN32
-  const bool copied = CopyFile(absExistingFilename.c_str(),
-                               absNewFilename.c_str(), false);
-
-  if (!copied && FSWO_LOG_WARNINGS == _warningOp)
-  {
-    ignition::common::PrintWindowsSystemWarning(
-      "Failed to copy file [" + absExistingFilename
-      + "] to [" + absNewFilename + "]");
-  }
-
-  return copied;
-#else
-  bool result = false;
-  std::ifstream in(absExistingFilename.c_str(), std::ifstream::binary);
-
-  if (in.good())
-  {
-    std::ofstream out(absNewFilename.c_str(),
-                      std::ifstream::trunc | std::ifstream::binary);
-    if (out.good())
-    {
-      out << in.rdbuf();
-      result = ignition::common::isFile(absNewFilename);
-    }
-    else if (FSWO_LOG_WARNINGS == _warningOp)
-    {
-      ignwarn << "Failed to create file [" << absNewFilename << "]: "
-              << std::strerror(errno) << "\n";
-    }
-    out.close();
-  }
-  else if (FSWO_LOG_WARNINGS == _warningOp)
-  {
-    ignwarn << "Failed to open file [" << absExistingFilename << "]: "
-            << std::strerror(errno) << "\n";
-  }
-  in.close();
-
-  return result;
-#endif
-}
-
-/////////////////////////////////////////////////
-bool ignition::common::copyDirectory(const std::string &_existingDirname,
-                                     const std::string &_newDirname,
-                                     const FilesystemWarningOp _warningOp)
-{
-  // Check whether source directory exists
-  if (!exists(_existingDirname) || !isDirectory(_existingDirname))
-  {
-    if (FSWO_LOG_WARNINGS == _warningOp)
-    {
-      ignwarn << "Source directory [" << _existingDirname
-              << "] does not exist or is not a directory" << std::endl;
-    }
-    return false;
-  }
-
-  if (exists(_newDirname))
-  {
-    if (!removeAll(_newDirname, _warningOp))
-    {
-      if (FSWO_LOG_WARNINGS == _warningOp)
-      {
-        ignwarn << "Unable to remove existing destination directory ["
-                << _newDirname << "]\n";
-      }
-      return false;
-    }
-  }
-  // Create the destination directory
-  if (!createDirectories(_newDirname))
-  {
-    if (FSWO_LOG_WARNINGS == _warningOp)
-    {
-      ignwarn << "Unable to create the destination directory ["
-              << _newDirname << "], please check the permission\n";
-    }
-    return false;
-  }
-
-  // Start copy from source to destination directory
-  for (DirIter file(_existingDirname); file != DirIter(); ++file)
-  {
-    std::string current(*file);
-    if (isDirectory(current))
-    {
-      // Copy recursively
-      if (!copyDirectory(current, joinPaths(_newDirname, basename(current)),
-         _warningOp))
-      {
-        if (FSWO_LOG_WARNINGS == _warningOp)
-        {
-          ignwarn << "Unable to copy directory to ["
-                  << joinPaths(_newDirname, basename(current)) << "]\n";
-        }
-        return false;
-      }
-    }
-    else
-    {
-      if (!copyFile(current, joinPaths(_newDirname, basename(current)),
-        _warningOp))
-      {
-        if (FSWO_LOG_WARNINGS == _warningOp)
-        {
-          ignwarn << "Unable to copy file to ["
-                  << joinPaths(_newDirname, basename(current)) << "]\n";
-        }
-        return false;
-      }
-    }
-  }
-  return true;
-}
-
-/////////////////////////////////////////////////
-bool ignition::common::createDirectories(const std::string &_path)
-{
-  size_t index = 0;
-  while (index < _path.size())
-  {
-    size_t end = _path.find(separator(""), index+1);
-    std::string dir = _path.substr(0, end);
-    if (!exists(dir))
-    {
-#ifdef _WIN32
-      dir = checkWindowsPath(dir);
-      if (_mkdir(dir.c_str()) != 0)
-      {
-#else
-      // cppcheck-suppress ConfigurationNotChecked
-      if (mkdir(dir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != 0)
-      {
-#endif
-        ignerr << "Failed to create directory [" + dir + "]: "
-               << std::strerror(errno) << std::endl;
-        return false;
-      }
-    }
-    index = end;
-  }
-
-  return true;
-}
-
-//////////////////////////////////////////////////
-std::string ignition::common::uniqueFilePath(const std::string &_pathAndName,
-  const std::string &_extension)
+std::string ignition::common::uniqueFilePath(
+    const std::string &_pathAndName,
+    const std::string &_extension)
 {
   std::string result = _pathAndName + "." + _extension;
   int count = 1;
@@ -510,7 +330,7 @@ std::string ignition::common::uniqueFilePath(const std::string &_pathAndName,
   return result;
 }
 
-//////////////////////////////////////////////////
+/////////////////////////////////////////////////
 std::string ignition::common::uniqueDirectoryPath(const std::string &_dir)
 {
   std::string result = _dir;

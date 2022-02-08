@@ -18,6 +18,9 @@ if (UNIX)
     set_target_properties(${test} PROPERTIES
       EXCLUDE_FROM_ALL TRUE
       EXCLUDE_FROM_DEFAULT_BUILD TRUE)
+    target_link_libraries(${test} PRIVATE
+      ${PROJECT_LIBRARY_TARGET_NAME}
+    )
     if (Rflag)
       target_compile_options(${test} PRIVATE ${flag})
     endif()
