@@ -20,6 +20,8 @@ release will remove the deprecated code.
       to the `find_package` call and update the include paths to use
       the geospatial subfolder (`#include <ignition/common/geospatial/HeightmapData.hh>`)
 
+1. `HeightmapData::FillHeightmap` method is now `const`.
+
 ## Ignition Common 3.X to 4.X
 
 ### Modifications

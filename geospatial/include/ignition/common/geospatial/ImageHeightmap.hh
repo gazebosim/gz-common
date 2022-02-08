@@ -47,7 +47,7 @@ namespace ignition
       public: void FillHeightMap(int _subSampling, unsigned int _vertSize,
           const ignition::math::Vector3d &_size,
           const ignition::math::Vector3d &_scale, bool _flipY,
-          std::vector<float> &_heights);
+          std::vector<float> &_heights) const;
 
       // Documentation inherited.
       public: std::string Filename() const;
@@ -79,7 +79,7 @@ namespace ignition
         unsigned int _pitch, int _subSampling, unsigned int _vertSize,
         const ignition::math::Vector3d &_size,
         const ignition::math::Vector3d &_scale,
-        bool _flipY, std::vector<float> &_heights)
+        bool _flipY, std::vector<float> &_heights) const
       {
         // bytes per pixel
         const unsigned int bpp = _pitch / _imgWidth;

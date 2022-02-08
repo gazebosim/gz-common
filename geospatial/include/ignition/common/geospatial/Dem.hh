@@ -113,7 +113,7 @@ namespace ignition
                   const ignition::math::Vector3d &_size,
                   const ignition::math::Vector3d &_scale,
                   const bool _flipY,
-                  std::vector<float> &_heights);
+                  std::vector<float> &_heights) const;
 
       /// \brief Get the georeferenced coordinates (lat, long) of a terrain's
       /// pixel in WGS84.
