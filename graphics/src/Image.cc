@@ -398,7 +398,7 @@ math::Color Image::Pixel(unsigned int _x, unsigned int _y) const
 }
 
 //////////////////////////////////////////////////
-math::Color Image::AvgColor()
+math::Color Image::AvgColor() const
 {
   unsigned int x, y;
   double rsum, gsum, bsum;

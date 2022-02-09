@@ -166,7 +166,7 @@ namespace ignition
 
       /// \brief Get the average color
       /// \return The average color
-      public: math::Color AvgColor();
+      public: math::Color AvgColor() const;
 
       /// \brief Get the max color
       /// \return The max color
