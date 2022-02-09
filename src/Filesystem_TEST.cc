@@ -621,6 +621,16 @@ TEST_F(FilesystemTest, uniquePaths)
 }
 
 /////////////////////////////////////////////////
+TEST_F(FilesystemTest, separator)
+{
+#ifndef _WIN32
+  EXPECT_EQ("/", ignition::common::separator(""));
+#else
+  EXPECT_EQ("\\", ignition::common::separator("")); 
+#endif
+}
+
+/////////////////////////////////////////////////
 /// Main
 int main(int argc, char **argv)
 {
