@@ -61,7 +61,7 @@ namespace ignition
       /// \param[in] _height Height of the image
       /// \return bitmap data with red and blue pixels swapped
       public: FIBITMAP* SwapRedBlue(const unsigned int &_width,
-                                    const unsigned int &_height);
+                                    const unsigned int &_height) const;
     };
   }
 }
@@ -249,7 +249,7 @@ int Image::Pitch() const
 }
 
 //////////////////////////////////////////////////
-void Image::RGBData(unsigned char **_data, unsigned int &_count)
+void Image::RGBData(unsigned char **_data, unsigned int &_count) const
 {
   FIBITMAP *tmp = this->dataPtr->bitmap;
   FIBITMAP *tmp2 = nullptr;
@@ -266,7 +266,7 @@ void Image::RGBData(unsigned char **_data, unsigned int &_count)
 }
 
 //////////////////////////////////////////////////
-void Image::Data(unsigned char **_data, unsigned int &_count)
+void Image::Data(unsigned char **_data, unsigned int &_count) const
 {
   if (this->dataPtr->ShouldSwapRedBlue())
   {
@@ -582,7 +582,7 @@ bool Image::Implementation::CanSwapRedBlue() const
 
 //////////////////////////////////////////////////
 FIBITMAP* Image::Implementation::SwapRedBlue(const unsigned int &_width,
-                                    const unsigned int &_height)
+                                    const unsigned int &_height) const
 {
   FIBITMAP *copy = FreeImage_Copy(this->bitmap, 0, 0, _width, _height);
 
