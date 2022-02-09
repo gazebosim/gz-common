@@ -22,6 +22,8 @@ release will remove the deprecated code.
 
 1. `HeightmapData::FillHeightmap` method is now `const`.
 
+1. `Image::Data` and `Image::RGBData` methods are now `const`.
+
 ## Ignition Common 3.X to 4.X
 
 ### Modifications
