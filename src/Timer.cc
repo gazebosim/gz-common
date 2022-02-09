@@ -24,10 +24,10 @@ using namespace common;
 class ignition::common::Timer::Implementation
 {
   /// \brief The time of the last call to Start
-  public: std::chrono::steady_clock::time_point start; 
+  public: std::chrono::steady_clock::time_point start;
 
   /// \brief The time when Stop was called.
-  public: std::chrono::steady_clock::time_point stop; 
+  public: std::chrono::steady_clock::time_point stop;
 
   /// \brief True if the timer is running.
   public: bool running {false};
@@ -71,7 +71,7 @@ std::chrono::duration<double> Timer::ElapsedTime() const
   }
   else
   {
-    std::chrono::duration<double> diff = 
+    std::chrono::duration<double> diff =
       this->dataPtr->stop - this->dataPtr->start;
     return diff;
   }

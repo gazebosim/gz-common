@@ -64,7 +64,7 @@
 /// destruction order fiasco issues.
 ignition::common::SystemPaths& GetSystemPaths()
 {
-  static 
+  static
     ignition::utils::NeverDestroyed<ignition::common::SystemPaths> paths;
   return paths.Access();
 }
