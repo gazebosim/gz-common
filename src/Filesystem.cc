@@ -209,6 +209,10 @@ std::string ignition::common::parentPath(const std::string &_path)
   // Maintain compatibility with ign-common
   if (*_path.rbegin() == fs::path::preferred_separator)
     p = fs::path(_path.substr(0, _path.size()-1));
+
+  if (!p.has_parent_path())
+    return _path;
+
   return p.parent_path().string();
 }
 

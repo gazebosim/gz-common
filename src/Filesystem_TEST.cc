@@ -473,6 +473,9 @@ TEST_F(FilesystemTest, parentPath)
   child_with_slash = separator(child_with_slash);
   std::string parent2 = parentPath(child_with_slash);
   EXPECT_EQ(parent, parent2);
+
+  std::string childOnly = "child";
+  EXPECT_EQ(childOnly, parentPath(childOnly));
 }
 
 /////////////////////////////////////////////////
