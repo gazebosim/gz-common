@@ -66,7 +66,7 @@ TEST(Timer_TEST, Copy)
   ignition::common::Timer t2 = t1;
   EXPECT_TRUE(t2.Running());
 
-  // Stop the original 
+  // Stop the original
   t1.Stop();
   EXPECT_FALSE(t1.Running());
   EXPECT_TRUE(t2.Running());
