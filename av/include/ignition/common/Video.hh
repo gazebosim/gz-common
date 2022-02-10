@@ -18,7 +18,6 @@
 #define IGNITION_COMMON_VIDEO_HH_
 
 #include <string>
-#include <memory>
 
 #include <ignition/common/av/Export.hh>
 #include <ignition/utils/ImplPtr.hh>

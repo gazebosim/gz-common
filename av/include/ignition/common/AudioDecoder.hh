@@ -19,7 +19,6 @@
 
 #include <stdint.h>
 #include <string>
-#include <memory>
 
 #include <ignition/common/av/Export.hh>
 #include <ignition/utils/ImplPtr.hh>

@@ -19,7 +19,6 @@
 
 #include <chrono>
 #include <string>
-#include <memory>
 #include <optional>
 
 #include <ignition/common/FlagSet.hh>

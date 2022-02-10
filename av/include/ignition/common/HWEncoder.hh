@@ -16,7 +16,6 @@
 #ifndef IGNITION_COMMON_HWENCODER_HH
 #define IGNITION_COMMON_HWENCODER_HH
 
-#include <memory>
 #include <string>
 #include <optional>
 
