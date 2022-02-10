@@ -34,7 +34,7 @@ using namespace std;
 
 // Private data class
 // hidden visibility specifier has to be explicitly set to silent a gcc warning
-class IGNITION_COMMON_AV_HIDDEN ignition::common::VideoEncoderPrivate
+class IGNITION_COMMON_AV_HIDDEN ignition::common::VideoEncoder::Implementation
 {
   /// \brief Name of the file which stores the video while it is being
   ///        recorded.
@@ -123,7 +123,7 @@ class IGNITION_COMMON_AV_HIDDEN ignition::common::VideoEncoderPrivate
 };
 
 /////////////////////////////////////////////////
-AVCodec* VideoEncoderPrivate::FindEncoder(AVCodecID _codecId)
+AVCodec* VideoEncoder::Implementation::FindEncoder(AVCodecID _codecId)
 {
 #ifdef IGN_COMMON_BUILD_HW_VIDEO
   if (this->hwEncoder)
@@ -133,7 +133,7 @@ AVCodec* VideoEncoderPrivate::FindEncoder(AVCodecID _codecId)
 }
 
 /////////////////////////////////////////////////
-AVFrame* VideoEncoderPrivate::GetFrameForEncoder(AVFrame* _inFrame)
+AVFrame* VideoEncoder::Implementation::GetFrameForEncoder(AVFrame* _inFrame)
 {
 #ifdef IGN_COMMON_BUILD_HW_VIDEO
   if (this->hwEncoder)
@@ -144,7 +144,7 @@ AVFrame* VideoEncoderPrivate::GetFrameForEncoder(AVFrame* _inFrame)
 
 /////////////////////////////////////////////////
 VideoEncoder::VideoEncoder()
-: dataPtr(new VideoEncoderPrivate)
+  : dataPtr(ignition::utils::MakeUniqueImpl<Implementation>())
 {
   // Make sure libav is loaded.
   ignition::common::load();
@@ -823,7 +823,7 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
 }
 
 /////////////////////////////////////////////////
-int VideoEncoderPrivate::ProcessPacket(AVPacket* avPacket)
+int VideoEncoder::Implementation::ProcessPacket(AVPacket* avPacket)
 {
   avPacket->stream_index = this->videoStream->index;
 
