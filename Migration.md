@@ -5,6 +5,12 @@ Deprecated code produces compile-time warnings. These warning serve as
 notification to users that their code should be upgraded. The next major
 release will remove the deprecated code.
 
+## Ignition Common 4.X to 5.X
+
+### Modifications
+
+1. `Image::AvgColor`, `Image::Data` and `Image::RGBData` methods are now `const`.
+
 ## Ignition Common 3.X to 4.X
 
 ### Modifications
