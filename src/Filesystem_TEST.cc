@@ -413,38 +413,47 @@ TEST_F(FilesystemTest, IGN_UTILS_TEST_DISABLED_ON_WIN32(cwd_error))
 }
 
 /////////////////////////////////////////////////
-TEST_F(FilesystemTest, basename)
+TEST_F(FilesystemTest, decomposition)
 {
   std::string absolute = joinPaths("", "home", "bob", "foo");
   EXPECT_EQ(basename(absolute), "foo");
+  EXPECT_EQ(parentPath(absolute), "/home/bob");
 
   std::string relative = joinPaths("baz", "foobar");
   EXPECT_EQ(basename(relative), "foobar");
+  EXPECT_EQ(parentPath(relative), "baz");
 
   std::string bname = "bzzz";
   EXPECT_EQ(basename(bname), "bzzz");
+  EXPECT_EQ(parentPath(bname), "bzzz");
 
   std::string nobase = joinPaths("baz", "");
   EXPECT_EQ(basename(nobase), "baz");
+  EXPECT_EQ(parentPath(nobase), "baz/");
 
   std::string multiple_slash = separator("baz") + separator("") + separator("")
     + separator("");
   EXPECT_EQ(basename(multiple_slash), "baz");
+  EXPECT_EQ(parentPath(multiple_slash), "baz//");
 
   std::string multiple_slash_middle = separator("") + separator("home")
     + separator("") + separator("") + separator("bob") + separator("foo");
   EXPECT_EQ(basename(multiple_slash_middle), "foo");
+  EXPECT_EQ(parentPath(multiple_slash_middle), "/home///bob");
 
   std::string multiple_slash_start = separator("") + separator("")
     + separator("") + separator("home") + separator("bob") + separator("foo");
   EXPECT_EQ(basename(multiple_slash_start), "foo");
+  EXPECT_EQ(parentPath(multiple_slash_start), "///home/bob");
 
   std::string slash_only = separator("") + separator("");
   EXPECT_EQ(basename(slash_only), separator(""));
+  EXPECT_EQ(parentPath(slash_only), "");
 
   std::string multiple_slash_only = separator("") + separator("")
     + separator("") + separator("");
   EXPECT_EQ(basename(multiple_slash_only), separator(""));
+  EXPECT_EQ(parentPath(multiple_slash_only), "//");
 }
 
 /////////////////////////////////////////////////
