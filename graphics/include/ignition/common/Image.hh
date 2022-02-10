@@ -125,13 +125,13 @@ namespace ignition
       /// \brief Get the image as a data array
       /// \param[out] _data Pointer to a NULL array of char.
       /// \param[out] _count The resulting data array size
-      public: void Data(unsigned char **_data, unsigned int &_count);
+      public: void Data(unsigned char **_data, unsigned int &_count) const;
 
       /// \brief Get only the RGB data from the image. This will drop the
       /// alpha channel if one is present.
       /// \param[out] _data Pointer to a NULL array of char.
       /// \param[out] _count The resulting data array size
-      public: void RGBData(unsigned char **_data, unsigned int &_count);
+      public: void RGBData(unsigned char **_data, unsigned int &_count) const;
 
       /// \brief Get the width
       /// \return The image width
@@ -166,7 +166,7 @@ namespace ignition
 
       /// \brief Get the average color
       /// \return The average color
-      public: math::Color AvgColor();
+      public: math::Color AvgColor() const;
 
       /// \brief Get the max color
       /// \return The max color
