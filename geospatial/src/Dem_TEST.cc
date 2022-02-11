@@ -181,8 +181,11 @@ TEST_F(DemTest, UnfinishedDem)
   // nodata values
   EXPECT_EQ(65, static_cast<int>(demNoData.Height()));
   EXPECT_EQ(65, static_cast<int>(demNoData.Width()));
-  EXPECT_FLOAT_EQ(7499.8281, demNoData.WorldHeight());
-  EXPECT_FLOAT_EQ(14150.225, demNoData.WorldWidth());
+
+  // relaxed tolerances for macOS & windows
+  EXPECT_NEAR(7499.8281, demNoData.WorldHeight(), 0.1);
+  EXPECT_NEAR(14150.225, demNoData.WorldWidth(), 0.1);
+
   // gdal reports min elevation as -32767 but this is treated as a nodata
   // by our dem class and ignored when computing the min elevation
   EXPECT_FLOAT_EQ(682, demNoData.MinElevation());
