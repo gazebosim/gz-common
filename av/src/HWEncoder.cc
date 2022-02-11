@@ -29,7 +29,7 @@ using namespace ignition;
 using namespace common;
 using namespace std;
 
-class ignition::common::HWVideoPrivate
+class ignition::common::HWEncoder::Implementation
 {
   /// \brief Device reference for HW-accelerated encoding.
   public: AVBufferRef* hwDevice = nullptr;
@@ -83,6 +83,7 @@ const map<pair<string, bool>, HWEncoderType> HW_ENCODER_MATCHERS = {
     {make_pair("dxva2_", true), HWEncoderType::DXVA2},
 };
 
+/////////////////////////////////////////////////
 /// Detect the type of HW encoder the given codec uses.
 /// \param[in] _codecName The codec to examine.
 /// \return The HW encoder type, or NONE for software encoders.
@@ -106,6 +107,7 @@ HWEncoderType DetectHWEncoderType(const std::string& _codecName)
   return HWEncoderType::NONE;
 }
 
+/////////////////////////////////////////////////
 /// \brief Try if the given device can be opened as the given HW encoder type.
 /// \param _deviceName File name of the device, if it has any, or a pretty name.
 /// \param _deviceType Libav type of the acceleration device to try.
@@ -170,6 +172,7 @@ bool ProbeDevice(const std::string& _deviceName,
   return true;
 }
 
+/////////////////////////////////////////////////
 bool ProbeDevice(const std::string& _deviceName,
                  const AVHWDeviceType _deviceType,
                  const HWEncoderType _encoderType,
@@ -181,6 +184,7 @@ bool ProbeDevice(const std::string& _deviceName,
     _warnIfNoMatch, _deviceName, nullptr);
 }
 
+/////////////////////////////////////////////////
 AVCodec* HWEncoder::FindEncoder(AVCodecID _codecId)
 {
   AVCodec* foundEncoder = nullptr;
@@ -398,6 +402,7 @@ AVCodec* HWEncoder::FindEncoder(AVCodecID _codecId)
 // however it is not possible to get lambdas with C linkage.
 extern "C" {
 
+/////////////////////////////////////////////////
 static enum AVPixelFormat GetFormat(AVCodecContext*,
   const enum AVPixelFormat* _formats, const enum AVPixelFormat _format)
 {
@@ -410,18 +415,21 @@ static enum AVPixelFormat GetFormat(AVCodecContext*,
   return AV_PIX_FMT_NONE;
 }
 
+/////////////////////////////////////////////////
 static enum AVPixelFormat GetFormatVAAPI(
     AVCodecContext* _codec, const enum AVPixelFormat *_formats)
 {
   return GetFormat(_codec, _formats, AV_PIX_FMT_VAAPI);  // lavu54.31.100
 }
 
+/////////////////////////////////////////////////
 static enum AVPixelFormat GetFormatQSV(
     AVCodecContext* _codec, const enum AVPixelFormat *_formats)
 {
   return GetFormat(_codec, _formats, AV_PIX_FMT_QSV);  // lavu 54.19.100
 }
 
+/////////////////////////////////////////////////
 static enum AVPixelFormat GetFormatCUDA(
     AVCodecContext* _codec, const enum AVPixelFormat *_formats)
 {
@@ -430,6 +438,7 @@ static enum AVPixelFormat GetFormatCUDA(
 
 }
 
+/////////////////////////////////////////////////
 void HWEncoder::ConfigHWAccel(AVCodecContext* _encoderContext)
 {
   int ret;  // used for libav return codes
@@ -584,7 +593,8 @@ void HWEncoder::ConfigHWAccel(AVCodecContext* _encoderContext)
   }
 }
 
-bool HWVideoPrivate::ConfigHWSurface(AVCodecContext* _encoderContext)
+/////////////////////////////////////////////////
+bool HWEncoder::Implementation::ConfigHWSurface(AVCodecContext* _encoderContext)
 {
   int ret;
 
@@ -653,6 +663,7 @@ bool HWVideoPrivate::ConfigHWSurface(AVCodecContext* _encoderContext)
   return true;
 }
 
+/////////////////////////////////////////////////
 AVFrame* HWEncoder::GetFrameForEncoder(AVFrame* _inFrame)
 {
   auto result = _inFrame;
@@ -664,16 +675,18 @@ AVFrame* HWEncoder::GetFrameForEncoder(AVFrame* _inFrame)
   return result;
 }
 
+/////////////////////////////////////////////////
 HWEncoder::HWEncoder(const FlagSet<HWEncoderType> _allowedHwEncoders,
                      const std::string& _hwAccelDevice,
                      std::optional<bool> _useHwSurface)
-: dataPtr(new HWVideoPrivate)
+  : dataPtr(ignition::utils::MakeUniqueImpl<Implementation>())
 {
   this->dataPtr->initHwEncoders = _allowedHwEncoders;
   this->dataPtr->initHwDevice = _hwAccelDevice;
   this->dataPtr->initUseHwSurface = _useHwSurface;
 }
 
+/////////////////////////////////////////////////
 HWEncoder::~HWEncoder()
 {
     this->dataPtr->initHwEncoders.Set();
@@ -686,6 +699,7 @@ HWEncoder::~HWEncoder()
       av_frame_free(&this->dataPtr->avOutHwFrame);  // lavc 55.45.101
 }
 
+/////////////////////////////////////////////////
 HWEncoderType HWEncoder::GetEncoderType() const
 {
   return this->dataPtr->hwEncoderType;
