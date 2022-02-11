@@ -55,6 +55,11 @@ class ignition::common::Dem::Implementation
 
   /// \brief Full filename used to load the dem.
   public: std::string filename;
+
+  /// \brief Whether the DEM will be handled as from non-Earth.
+  /// If true, worldWidth & worldHeight = -1
+  /// and GeoReference[Origin] can not be used (will return false)
+  public: bool isNonEarthDem = false;
 };
 
 //////////////////////////////////////////////////
@@ -131,23 +136,28 @@ int Dem::Load(const std::string &_filename)
   lowLeftY = ySize;
 
   // Calculate the georeferenced coordinates of the terrain corners
-  if (!this->GeoReference(upLeftX, upLeftY, upLeftLat, upLeftLong)
-      || !this->GeoReference(upRightX, upRightY, upRightLat, upRightLong)
-      || !this->GeoReference(lowLeftX, lowLeftY, lowLeftLat, lowLeftLong))
+  if (this->GeoReference(upLeftX, upLeftY, upLeftLat, upLeftLong)
+      && this->GeoReference(upRightX, upRightY, upRightLat, upRightLong)
+      && this->GeoReference(lowLeftX, lowLeftY, lowLeftLat, lowLeftLong))
   {
-    ignerr << "Failed to automatically compute DEM size. "
-            << "Please use the <size> element to manually set DEM size."
-            << std::endl;
-    return -1;
+    // If successful, set the world width and height
+    this->dataPtr->worldWidth =
+       math::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
+                                              upRightLat, upRightLong);
+    this->dataPtr->worldHeight =
+       math::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
+                                              lowLeftLat, lowLeftLong);
   }
+  // Assume non-Earth DEM (e.g., moon)
+  else
+  {
+    ignwarn << "Failed to automatically compute DEM size. "
+            << "Assuming non-Earth DEM. "
+            << std::endl;
 
-  // Set the world width and height
-  this->dataPtr->worldWidth =
-     math::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
-                                            upRightLat, upRightLong);
-  this->dataPtr->worldHeight =
-     math::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
-                                            lowLeftLat, lowLeftLong);
+    this->dataPtr->worldWidth = this->dataPtr->worldHeight = -1;
+    this->dataPtr->isNonEarthDem = true;
+  }
 
   // Set the terrain's side (the terrain will be squared after the padding)
   if (ignition::math::isPowerOfTwo(ySize - 1))
@@ -231,6 +241,13 @@ float Dem::MaxElevation() const
 bool Dem::GeoReference(double _x, double _y,
     ignition::math::Angle &_latitude, ignition::math::Angle &_longitude) const
 {
+  if (this->dataPtr->isNonEarthDem)
+  {
+    ignerr << "Can not retrieve WGS84 coordinates from non-Earth DEM."
+            << std::endl;
+    return false;
+  }
+
   double geoTransf[6];
   if (this->dataPtr->dataSet->GetGeoTransform(geoTransf) == CE_None)
   {
@@ -294,12 +311,22 @@ unsigned int Dem::Width() const
 //////////////////////////////////////////////////
 double Dem::WorldWidth() const
 {
+  if (this->dataPtr->isNonEarthDem)
+  {
+    ignwarn << "Unable to determine world width of non-Earth DEM."
+            << std::endl;
+  }
   return this->dataPtr->worldWidth;
 }
 
 //////////////////////////////////////////////////
 double Dem::WorldHeight() const
 {
+  if (this->dataPtr->isNonEarthDem)
+  {
+    ignwarn << "Unable to determine world height of non-Earth DEM."
+            << std::endl;
+  }
   return this->dataPtr->worldHeight;
 }
 

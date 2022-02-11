@@ -193,6 +193,28 @@ TEST_F(DemTest, UnfinishedDem)
 }
 
 /////////////////////////////////////////////////
+TEST_F(DemTest, NonEarthDem)
+{
+  // moon
+  common::Dem dem;
+  auto path = common::testing::TestFile("data", "dem_moon.tif");
+  EXPECT_EQ(dem.Load(path), 0);
+
+  EXPECT_EQ(33, static_cast<int>(dem.Height()));
+  EXPECT_EQ(33, static_cast<int>(dem.Width()));
+  EXPECT_FLOAT_EQ(-212.29616, dem.MinElevation());
+  EXPECT_FLOAT_EQ(-205.44009, dem.MaxElevation());
+
+  // unable to determne world width/height of non earth DEM
+  EXPECT_FLOAT_EQ(-1, dem.WorldHeight());
+  EXPECT_FLOAT_EQ(-1, dem.WorldWidth());
+
+  // unable to get coordinates in WGS84
+  ignition::math::Angle latitude, longitude;
+  EXPECT_FALSE(dem.GeoReferenceOrigin(latitude, longitude));
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
