@@ -222,7 +222,9 @@ double Dem::Elevation(double _x, double _y)
     return std::numeric_limits<double>::infinity();
   }
 
-  return this->dataPtr->demData.at(_y * this->Width() + _x);
+  auto idx = static_cast<unsigned int>(_y) * this->Width()
+      + static_cast<unsigned int>(_x);
+  return this->dataPtr->demData.at(idx);
 }
 
 //////////////////////////////////////////////////
@@ -349,8 +351,8 @@ void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
   for (unsigned int y = 0; y < _vertSize; ++y)
   {
     double yf = y / static_cast<double>(_subSampling);
-    unsigned int y1 = floor(yf);
-    unsigned int y2 = ceil(yf);
+    unsigned int y1 = static_cast<unsigned int>(floor(yf));
+    unsigned int y2 = static_cast<unsigned int>(ceil(yf));
     if (y2 >= this->dataPtr->side)
       y2 = this->dataPtr->side - 1;
     double dy = yf - y1;
@@ -358,8 +360,8 @@ void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
     for (unsigned int x = 0; x < _vertSize; ++x)
     {
       double xf = x / static_cast<double>(_subSampling);
-      unsigned int x1 = floor(xf);
-      unsigned int x2 = ceil(xf);
+      unsigned int x1 = static_cast<unsigned int>(floor(xf));
+      unsigned int x2 = static_cast<unsigned int>(ceil(xf));
       if (x2 >= this->dataPtr->side)
         x2 = this->dataPtr->side - 1;
       double dx = xf - x1;
@@ -417,14 +419,16 @@ int Dem::LoadData()
       ratio = static_cast<float>(nXSize) / static_cast<float>(nYSize);
       destWidth = this->dataPtr->side;
       // The decimal part is discarted for interpret the result as pixels
-      destHeight = static_cast<float>(destWidth) / static_cast<float>(ratio);
+      float h = static_cast<float>(destWidth) / static_cast<float>(ratio);
+      destHeight = static_cast<unsigned int>(h);
     }
     else
     {
       ratio = static_cast<float>(nYSize) / static_cast<float>(nXSize);
       destHeight = this->dataPtr->side;
       // The decimal part is discarted for interpret the result as pixels
-      destWidth = static_cast<float>(destHeight) / static_cast<float>(ratio);
+      float w = static_cast<float>(destHeight) / static_cast<float>(ratio);
+      destWidth = static_cast<unsigned int>(w);
     }
 
     // Read the whole raster data and convert it to a GDT_Float32 array.

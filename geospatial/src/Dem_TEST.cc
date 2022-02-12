@@ -87,18 +87,18 @@ TEST_F(DemTest, BasicAPI)
   // Check the heights and widths
   EXPECT_EQ(129, static_cast<int>(dem.Height()));
   EXPECT_EQ(129, static_cast<int>(dem.Width()));
-  EXPECT_FLOAT_EQ(3984.4849, dem.WorldHeight());
-  EXPECT_FLOAT_EQ(3139.7456, dem.WorldWidth());
-  EXPECT_FLOAT_EQ(65.3583, dem.MinElevation());
-  EXPECT_FLOAT_EQ(318.441, dem.MaxElevation());
+  EXPECT_FLOAT_EQ(3984.4849f, dem.WorldHeight());
+  EXPECT_FLOAT_EQ(3139.7456f, dem.WorldWidth());
+  EXPECT_FLOAT_EQ(65.3583f, dem.MinElevation());
+  EXPECT_FLOAT_EQ(318.441f, dem.MaxElevation());
 
   // Check Elevation()
   unsigned int width = dem.Width();
   unsigned int height = dem.Height();
-  EXPECT_FLOAT_EQ(215.82324, dem.Elevation(0, 0));
-  EXPECT_FLOAT_EQ(216.04961, dem.Elevation(width - 1, 0));
-  EXPECT_FLOAT_EQ(142.2274, dem.Elevation(0, height - 1));
-  EXPECT_FLOAT_EQ(209.14784, dem.Elevation(width - 1, height - 1));
+  EXPECT_FLOAT_EQ(215.82324f, dem.Elevation(0, 0));
+  EXPECT_FLOAT_EQ(216.04961f, dem.Elevation(width - 1, 0));
+  EXPECT_FLOAT_EQ(142.2274f, dem.Elevation(0, height - 1));
+  EXPECT_FLOAT_EQ(209.14784f, dem.Elevation(width - 1, height - 1));
 
   // Illegal coordinates
   double inf = std::numeric_limits<double>::infinity();
@@ -109,8 +109,8 @@ TEST_F(DemTest, BasicAPI)
   // Check GeoReferenceOrigin()
   ignition::math::Angle latitude, longitude;
   EXPECT_TRUE(dem.GeoReferenceOrigin(latitude, longitude));
-  EXPECT_FLOAT_EQ(38.001667, latitude.Degree());
-  EXPECT_FLOAT_EQ(-122.22278, longitude.Degree());
+  EXPECT_FLOAT_EQ(38.001667f, latitude.Degree());
+  EXPECT_FLOAT_EQ(-122.22278f, longitude.Degree());
 }
 
 /////////////////////////////////////////////////
@@ -148,9 +148,9 @@ TEST_F(DemTest, FillHeightmap)
   EXPECT_EQ(vertSize * vertSize, elevations.size());
 
   // Check the elevation of some control points
-  EXPECT_FLOAT_EQ(184.94113, elevations.at(0));
-  EXPECT_FLOAT_EQ(179.63583, elevations.at(elevations.size() - 1));
-  EXPECT_FLOAT_EQ(213.42966, elevations.at(elevations.size() / 2));
+  EXPECT_FLOAT_EQ(184.94113f, elevations.at(0));
+  EXPECT_FLOAT_EQ(179.63583f, elevations.at(elevations.size() - 1));
+  EXPECT_FLOAT_EQ(213.42966f, elevations.at(elevations.size() / 2));
 }
 
 /////////////////////////////////////////////////
@@ -164,12 +164,12 @@ TEST_F(DemTest, UnfinishedDem)
   // and unfilled dem.
   EXPECT_EQ(33, static_cast<int>(dem.Height()));
   EXPECT_EQ(33, static_cast<int>(dem.Width()));
-  EXPECT_FLOAT_EQ(111287.59, dem.WorldHeight());
-  EXPECT_FLOAT_EQ(88878.297, dem.WorldWidth());
+  EXPECT_FLOAT_EQ(111287.59f, dem.WorldHeight());
+  EXPECT_FLOAT_EQ(88878.297f, dem.WorldWidth());
   // gdal reports min elevation as -32768 but this is treated as a nodata
   // by our dem class and ignored when computing the min elevation
-  EXPECT_FLOAT_EQ(-10, dem.MinElevation());
-  EXPECT_FLOAT_EQ(1909, dem.MaxElevation());
+  EXPECT_FLOAT_EQ(-10.0f, dem.MinElevation());
+  EXPECT_FLOAT_EQ(1909.0f, dem.MaxElevation());
 
   // test another dem file with multiple nodata values
   common::Dem demNoData;
@@ -188,8 +188,8 @@ TEST_F(DemTest, UnfinishedDem)
 
   // gdal reports min elevation as -32767 but this is treated as a nodata
   // by our dem class and ignored when computing the min elevation
-  EXPECT_FLOAT_EQ(682, demNoData.MinElevation());
-  EXPECT_FLOAT_EQ(2932, demNoData.MaxElevation());
+  EXPECT_FLOAT_EQ(682.0f, demNoData.MinElevation());
+  EXPECT_FLOAT_EQ(2932.0f, demNoData.MaxElevation());
 }
 
 /////////////////////////////////////////////////
@@ -202,8 +202,8 @@ TEST_F(DemTest, NonEarthDem)
 
   EXPECT_EQ(33, static_cast<int>(dem.Height()));
   EXPECT_EQ(33, static_cast<int>(dem.Width()));
-  EXPECT_FLOAT_EQ(-212.29616, dem.MinElevation());
-  EXPECT_FLOAT_EQ(-205.44009, dem.MaxElevation());
+  EXPECT_FLOAT_EQ(-212.29616f, dem.MinElevation());
+  EXPECT_FLOAT_EQ(-205.44009f, dem.MaxElevation());
 
   // unable to determne world width/height of non earth DEM
   EXPECT_FLOAT_EQ(-1, dem.WorldHeight());
