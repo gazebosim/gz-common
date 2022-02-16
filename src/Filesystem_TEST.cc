@@ -245,6 +245,20 @@ TEST_F(FilesystemTest, exists)
   EXPECT_FALSE(isDirectory(absoluteSubdir));
 }
 
+/////////////////////////////////////////////////
+TEST_F(FilesystemTest, relative)
+{
+  #ifndef _WIN32
+    std::string absPath {"/tmp/fstest"};
+    std::string relPath {"../fstest"};
+  #else
+    std::string absPath {"C:\\Users\\user\\Desktop\\test.txt"};
+    std::string relPath {"user\\Desktop\\test.txt"};
+  #endif
+  EXPECT_FALSE(isRelativePath(absPath));
+  EXPECT_TRUE(isRelativePath(relPath));
+}
+
 // The symlink tests require special permissions to work on Windows,
 // so they will be disabled by default. For more information, see:
 // https://github.com/ignitionrobotics/ign-common/issues/21
