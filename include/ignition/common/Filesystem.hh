@@ -57,6 +57,11 @@ namespace ignition
     /// \return True if _path is a file.
     bool IGNITION_COMMON_VISIBLE isFile(const std::string &_path);
 
+    /// \brief Check if the given path is relative.
+    /// \param[in] _path Path.
+    /// \return True if _path is relative.
+    bool IGNITION_COMMON_VISIBLE isRelativePath(const std::string &_path);
+
     /// \brief Create a new directory on the filesystem.  Intermediate
     ///        directories must already exist.
     /// \param[in] _path  The new directory path to create
