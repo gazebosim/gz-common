@@ -72,6 +72,12 @@ bool ignition::common::isFile(const std::string &_path)
 }
 
 /////////////////////////////////////////////////
+bool ignition::common::isRelativePath(const std::string &_path)
+{
+  return fs::path(_path).is_relative();
+}
+
+/////////////////////////////////////////////////
 bool ignition::common::createDirectory(const std::string &_path)
 {
   std::error_code ec;
