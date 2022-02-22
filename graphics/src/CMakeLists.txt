@@ -20,8 +20,13 @@ target_link_libraries(${graphics_target}
     GTS::GTS
     FreeImage::FreeImage)
 
-ign_build_tests(TYPE UNIT SOURCES ${gtest_sources}
-  LIB_DEPS ${graphics_target})
+ign_build_tests(
+  TYPE UNIT 
+  SOURCES ${gtest_sources}
+  LIB_DEPS 
+    ${graphics_target}
+    ignition-common${IGN_COMMON_VER}-testing
+)
 
 if(USE_EXTERNAL_TINYXML2)
 

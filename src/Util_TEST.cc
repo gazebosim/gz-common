@@ -14,13 +14,13 @@
  * limitations under the License.
  *
 */
-
-#include <stdlib.h>
 #include <gtest/gtest.h>
+
+#include <fstream>
+#include <stdlib.h>
 #include <string>
 
 #include <ignition/common/Util.hh>
-#include "test_config.h"
 
 using namespace ignition;
 

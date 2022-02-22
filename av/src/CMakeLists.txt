@@ -21,9 +21,11 @@ if(IGN_COMMON_BUILD_HW_VIDEO)
   target_compile_definitions(${av_target} PRIVATE IGN_COMMON_BUILD_HW_VIDEO)
 endif()
 
-ign_build_tests(TYPE UNIT SOURCES ${gtest_sources}
+ign_build_tests(
+  TYPE UNIT 
+  SOURCES ${gtest_sources}
   LIB_DEPS
     ${av_target}
-    ignition-cmake${IGN_CMAKE_VER}::utilities
+    ignition-common${IGN_COMMON_VER}-testing
 )
 

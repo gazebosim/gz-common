@@ -18,7 +18,7 @@
 #include <string>
 #include <ignition/common/Base64.hh>
 
-#include "test_config.h"
+#include "ignition/common/testing/AutoLogFixture.hh"
 
 using namespace ignition;
 

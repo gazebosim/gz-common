@@ -17,9 +17,8 @@
 #include <gtest/gtest.h>
 
 #include <ignition/common/AudioDecoder.hh>
-#include <ignition/utilities/ExtraTestMacros.hh>
-
-#include "test_config.h"
+#include <ignition/utils/ExtraTestMacros.hh>
+#include <ignition/common/testing/TestPaths.hh>
 
 using namespace ignition;
 

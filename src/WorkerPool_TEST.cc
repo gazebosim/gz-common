@@ -21,7 +21,7 @@
 
 #include "ignition/common/Console.hh"
 #include "ignition/common/WorkerPool.hh"
-#include "ignition/utilities/ExtraTestMacros.hh"
+#include "ignition/utils/ExtraTestMacros.hh"
 
 namespace igncmn = ignition::common;
 using namespace igncmn;

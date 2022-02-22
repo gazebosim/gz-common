@@ -49,7 +49,8 @@ ign_build_tests(
   TYPE UNIT
   SOURCES ${gtest_sources}
   LIB_DEPS
-    ignition-cmake${IGN_CMAKE_VER}::utilities
+    ignition-utils${IGN_UTILS_VER}::ignition-utils${IGN_UTILS_VER}
+    ignition-common${IGN_COMMON_VER}-testing
   INCLUDE_DIRS
     # Used to make internal source file headers visible to the unit tests
     ${CMAKE_CURRENT_SOURCE_DIR}

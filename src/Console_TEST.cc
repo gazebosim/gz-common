@@ -20,9 +20,8 @@
 
 #include "ignition/common/Console.hh"
 #include "ignition/common/Filesystem.hh"
+#include "ignition/common/TempDirectory.hh"
 #include "ignition/common/Util.hh"
-
-#include "test_config.h"
 
 using namespace ignition;
 using namespace ignition::common;
