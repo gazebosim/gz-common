@@ -161,13 +161,22 @@ class ignition::common::TempDirectory::Implementation
 TempDirectory::TempDirectory(const std::string &_prefix,
                              const std::string &_subDir,
                              bool _cleanup):
+  TempDirectory(common::tempDirectoryPath(), _prefix, _subDir, _cleanup)
+{
+}
+
+/////////////////////////////////////////////////
+TempDirectory::TempDirectory(const std::string &_root,
+                             const std::string &_prefix,
+                             const std::string &_subDir,
+                             bool _cleanup):
   dataPtr(ignition::utils::MakeUniqueImpl<Implementation>())
 {
 
   this->dataPtr->oldPath = common::cwd();
   this->dataPtr->doCleanup = _cleanup;
 
-  auto tempPath = common::tempDirectoryPath();
+  auto tempPath = _root; 
   if (!_subDir.empty())
   {
     tempPath = common::joinPaths(tempPath, _subDir);
@@ -180,6 +189,7 @@ TempDirectory::TempDirectory(const std::string &_prefix,
   }
   this->dataPtr->path = common::cwd();
 }
+
 
 /////////////////////////////////////////////////
 TempDirectory::~TempDirectory()

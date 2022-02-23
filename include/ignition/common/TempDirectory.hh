@@ -74,6 +74,22 @@ namespace ignition
                             const std::string &_subDir = "ignition",
                             bool _cleanup = true);
 
+      /// \brief Create a directory in the tempDirectoryPath by expanding
+      /// a name template. This directory can also be automatically cleaned
+      /// up when the object goes out of scope.
+      ///
+      /// The TempDirectory will have the form _root/_subdir/_prefixXXXXX/
+      ///
+      /// \param[in[ _root Explicitly set the root directory
+      /// \param[in] _prefix String to be expanded for the template
+      /// \param[in] _subDir Subdirectory in OS _root, if desired
+      /// \param[in] _cleanup True to indicate that the filesystem should
+      ///   be cleaned as part of the destructor
+      public: explicit TempDirectory(const std::string &_root,
+                            const std::string &_prefix = "temp_dir",
+                            const std::string &_subDir = "ignition",
+                            bool _cleanup = true);
+
       /// \brief Destroy the temporary directory, removing from filesystem
       /// if cleanup is true.
       public: ~TempDirectory();
