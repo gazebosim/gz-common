@@ -497,7 +497,11 @@ TEST_F(FilesystemTest, decomposition)
 {
   std::string absolute = joinPaths("", "home", "bob", "foo");
   EXPECT_EQ(basename(absolute), "foo");
-  EXPECT_EQ(parentPath(absolute), "/home/bob");
+#ifndef _WIN32
+   EXPECT_EQ(parentPath(absolute), "/home/bob");
+#else
+  EXPECT_EQ(parentPath(absolute), "home\\bob");
+#endif
 
   std::string relative = joinPaths("baz", "foobar");
   EXPECT_EQ(basename(relative), "foobar");
