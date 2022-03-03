@@ -205,11 +205,11 @@ bool ignition::common::chdir(const std::string &_dir)
 /////////////////////////////////////////////////
 std::string ignition::common::basename(const std::string &_path)
 {
-  fs::path p = fs::path(_path);
+  fs::path p(_path);
   p /= "FOO.TXT";
   p = p.lexically_normal();
   p = p.parent_path();
-  return p.filename().string().empty() ? 
+  return p.filename().string().empty() ?
     std::string{fs::path::preferred_separator} : p.filename().string();
 }
 
