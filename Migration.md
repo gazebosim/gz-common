@@ -7,6 +7,10 @@ release will remove the deprecated code.
 
 ## Ignition Common 4.X to 5.X
 
+1. `Submesh::MaterialIndex` is deprecated. `SubMesh::GetMaterialIndex` should
+   be used instead, which properly handles submeshes having no material index
+   applied to them.
+
 ### Modifications
 
 1. `Image::AvgColor`, `Image::Data` and `Image::RGBData` methods are now `const`.
