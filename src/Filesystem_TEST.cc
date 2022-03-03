@@ -493,38 +493,71 @@ TEST_F(FilesystemTest, cwd_error)
 }
 
 /////////////////////////////////////////////////
-TEST_F(FilesystemTest, basename)
+TEST_F(FilesystemTest, decomposition)
 {
   std::string absolute = joinPaths("", "home", "bob", "foo");
   EXPECT_EQ(basename(absolute), "foo");
+#ifndef _WIN32
+   EXPECT_EQ(parentPath(absolute), "/home/bob");
+#else
+  EXPECT_EQ(parentPath(absolute), "home\\bob");
+#endif
 
   std::string relative = joinPaths("baz", "foobar");
   EXPECT_EQ(basename(relative), "foobar");
+  EXPECT_EQ(parentPath(relative), "baz");
 
   std::string bname = "bzzz";
   EXPECT_EQ(basename(bname), "bzzz");
+  EXPECT_EQ(parentPath(bname), "bzzz");
 
   std::string nobase = joinPaths("baz", "");
   EXPECT_EQ(basename(nobase), "baz");
+#ifndef _WIN32
+  EXPECT_EQ(parentPath(nobase), "baz/");
+#else
+  EXPECT_EQ(parentPath(nobase), "baz");
+#endif
 
   std::string multiple_slash = separator("baz") + separator("") + separator("")
     + separator("");
   EXPECT_EQ(basename(multiple_slash), "baz");
+#ifndef _WIN32
+  EXPECT_EQ(parentPath(multiple_slash), "baz//");
+#else
+  EXPECT_EQ(parentPath(multiple_slash), "baz\\\\");
+#endif
 
   std::string multiple_slash_middle = separator("") + separator("home")
     + separator("") + separator("") + separator("bob") + separator("foo");
   EXPECT_EQ(basename(multiple_slash_middle), "foo");
+#ifndef _WIN32
+  EXPECT_EQ(parentPath(multiple_slash_middle), "/home///bob");
+#else
+  EXPECT_EQ(parentPath(multiple_slash_middle), "\\home\\\\\\bob");
+#endif
 
   std::string multiple_slash_start = separator("") + separator("")
     + separator("") + separator("home") + separator("bob") + separator("foo");
   EXPECT_EQ(basename(multiple_slash_start), "foo");
+#ifndef _WIN32
+  EXPECT_EQ(parentPath(multiple_slash_start), "///home/bob");
+#else
+  EXPECT_EQ(parentPath(multiple_slash_start), "\\\\\\home\\bob");
+#endif
 
   std::string slash_only = separator("") + separator("");
   EXPECT_EQ(basename(slash_only), separator(""));
+  EXPECT_EQ(parentPath(slash_only), "");
 
   std::string multiple_slash_only = separator("") + separator("")
     + separator("") + separator("");
   EXPECT_EQ(basename(multiple_slash_only), separator(""));
+#ifndef _WIN32
+  EXPECT_EQ(parentPath(multiple_slash_only), "//");
+#else
+  EXPECT_EQ(parentPath(multiple_slash_only), "\\\\");
+#endif
 }
 
 /////////////////////////////////////////////////
