@@ -18,6 +18,7 @@
 #define IGNITION_COMMON_SUBMESH_HH_
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -284,8 +285,15 @@ namespace ignition
       public: void SetMaterialIndex(const unsigned int _index);
 
       /// \brief Get the material index
-      /// \return The assigned material index.
-      public: unsigned int MaterialIndex() const;
+      /// \return The assigned material index. If no material index is assigned
+      /// to this submesh, std::numeric_limits<unsigned int>::max() is returned.
+      /// \note This method is deprecated, use GetMaterialIndex instead
+      public: unsigned int IGN_DEPRECATED(5) MaterialIndex() const;
+
+      /// \brief Get the material index
+      /// \return The assigned material index. Nullopt is returned if the
+      /// submesh has no assigned material index
+      public: std::optional<unsigned int> GetMaterialIndex() const;
 
       /// \brief Return true if this submesh has the vertex
       /// \param[in] _v Vertex coordinate

@@ -16,7 +16,9 @@
  */
 
 #include <algorithm>
+#include <limits>
 #include <map>
+#include <optional>
 #include <string>
 
 #include "ignition/math/Helpers.hh"
@@ -52,7 +54,7 @@ class ignition::common::SubMesh::Implementation
 
   /// \brief The material index for this mesh. Relates to the parent
   /// mesh material list.
-  public: int materialIndex = -1;
+  public: std::optional<unsigned int> materialIndex = std::nullopt;
 
   /// \brief The name of the sub-mesh
   public: std::string name;
@@ -493,6 +495,15 @@ void SubMesh::SetMaterialIndex(const unsigned int _index)
 
 //////////////////////////////////////////////////
 unsigned int SubMesh::MaterialIndex() const
+{
+  if (this-dataPtr->materialIndex.has_value())
+    return this->dataPtr->materialIndex.value();
+
+  return std::numeric_limits<unsigned int>::max();
+}
+
+//////////////////////////////////////////////////
+std::optional<unsigned int> SubMesh::GetMaterialIndex() const
 {
   return this->dataPtr->materialIndex;
 }
