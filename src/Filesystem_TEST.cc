@@ -513,22 +513,38 @@ TEST_F(FilesystemTest, decomposition)
 
   std::string nobase = joinPaths("baz", "");
   EXPECT_EQ(basename(nobase), "baz");
+#ifndef _WIN32
   EXPECT_EQ(parentPath(nobase), "baz/");
+#else
+  EXPECT_EQ(parentPath(nobase), "baz\\");
+#endif
 
   std::string multiple_slash = separator("baz") + separator("") + separator("")
     + separator("");
   EXPECT_EQ(basename(multiple_slash), "baz");
+#ifndef _WIN32
   EXPECT_EQ(parentPath(multiple_slash), "baz//");
+#else
+  EXPECT_EQ(parentPath(multiple_slash), "baz\\\\");
+#endif
 
   std::string multiple_slash_middle = separator("") + separator("home")
     + separator("") + separator("") + separator("bob") + separator("foo");
   EXPECT_EQ(basename(multiple_slash_middle), "foo");
+#ifndef _WIN32
   EXPECT_EQ(parentPath(multiple_slash_middle), "/home///bob");
+#else
+  EXPECT_EQ(parentPath(multiple_slash_middle), "/home\\\\\\bob");
+#endif
 
   std::string multiple_slash_start = separator("") + separator("")
     + separator("") + separator("home") + separator("bob") + separator("foo");
   EXPECT_EQ(basename(multiple_slash_start), "foo");
+#ifndef _WIN32
   EXPECT_EQ(parentPath(multiple_slash_start), "///home/bob");
+#else
+  EXPECT_EQ(parentPath(multiple_slash_start), "\\\\\\home\\bob");
+#endif
 
   std::string slash_only = separator("") + separator("");
   EXPECT_EQ(basename(slash_only), separator(""));
@@ -537,7 +553,11 @@ TEST_F(FilesystemTest, decomposition)
   std::string multiple_slash_only = separator("") + separator("")
     + separator("") + separator("");
   EXPECT_EQ(basename(multiple_slash_only), separator(""));
+#ifndef _WIN32
   EXPECT_EQ(parentPath(multiple_slash_only), "//");
+#else
+  EXPECT_EQ(parentPath(multiple_slash_only), "\\\\");
+#endif
 }
 
 /////////////////////////////////////////////////
