@@ -516,7 +516,7 @@ TEST_F(FilesystemTest, decomposition)
 #ifndef _WIN32
   EXPECT_EQ(parentPath(nobase), "baz/");
 #else
-  EXPECT_EQ(parentPath(nobase), "baz\\");
+  EXPECT_EQ(parentPath(nobase), "baz");
 #endif
 
   std::string multiple_slash = separator("baz") + separator("") + separator("")
