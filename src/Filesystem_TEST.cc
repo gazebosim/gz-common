@@ -534,7 +534,7 @@ TEST_F(FilesystemTest, decomposition)
 #ifndef _WIN32
   EXPECT_EQ(parentPath(multiple_slash_middle), "/home///bob");
 #else
-  EXPECT_EQ(parentPath(multiple_slash_middle), "/home\\\\\\bob");
+  EXPECT_EQ(parentPath(multiple_slash_middle), "\\home\\\\\\bob");
 #endif
 
   std::string multiple_slash_start = separator("") + separator("")
