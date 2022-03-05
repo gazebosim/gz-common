@@ -192,13 +192,17 @@ int Dem::Load(const std::string &_filename)
   double max = -ignition::math::MAX_D;
   for (auto d : this->dataPtr->demData)
   {
-    if (d > noDataValue)
-    {
-      if (d < min)
-        min = d;
-      if (d > max)
-        max = d;
-    }
+    // All comparisons to NaN return false, so guard against NaN NoData
+    if (!std::isnan(noDataValue) && d <= noDataValue)
+      continue;
+
+    if (!std::isfinite(d))
+      continue;
+
+    if (d < min)
+      min = d;
+    if (d > max)
+      max = d;
   }
   if (ignition::math::equal(min, ignition::math::MAX_D) ||
       ignition::math::equal(max, -ignition::math::MAX_D))
@@ -261,6 +265,11 @@ bool Dem::GeoReference(double _x, double _y,
     // Transform the terrain's coordinate system to WGS84
     const char *importString
         = strdup(this->dataPtr->dataSet->GetProjectionRef());
+    if (importString == nullptr || importString[0] == '\0')
+    {
+      ignwarn << "Projection coordinate system undefined." << std::endl;
+      return false;
+    }
     sourceCs.importFromWkt(&importString);
     targetCs.SetWellKnownGeogCS("WGS84");
     cT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
@@ -399,60 +408,59 @@ void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
 //////////////////////////////////////////////////
 int Dem::LoadData()
 {
-    unsigned int destWidth;
-    unsigned int destHeight;
-    unsigned int nXSize = this->dataPtr->dataSet->GetRasterXSize();
-    unsigned int nYSize = this->dataPtr->dataSet->GetRasterYSize();
-    float ratio;
-    std::vector<float> buffer;
+  unsigned int nXSize = this->dataPtr->dataSet->GetRasterXSize();
+  unsigned int nYSize = this->dataPtr->dataSet->GetRasterYSize();
+  if (nXSize == 0 || nYSize == 0)
+  {
+    ignerr << "Illegal size loading a DEM file (" << nXSize << ","
+          << nYSize << ")\n";
+    return -1;
+  }
 
-    if (nXSize == 0 || nYSize == 0)
-    {
-      ignerr << "Illegal size loading a DEM file (" << nXSize << ","
-            << nYSize << ")\n";
-      return -1;
-    }
+  // Scale the terrain keeping the same ratio between width and height
+  unsigned int destWidth;
+  unsigned int destHeight;
+  float ratio;
+  if (nXSize > nYSize)
+  {
+    ratio = static_cast<float>(nXSize) / static_cast<float>(nYSize);
+    destWidth = this->dataPtr->side;
+    // The decimal part is discarted for interpret the result as pixels
+    float h = static_cast<float>(destWidth) / static_cast<float>(ratio);
+    destHeight = static_cast<unsigned int>(h);
+  }
+  else
+  {
+    ratio = static_cast<float>(nYSize) / static_cast<float>(nXSize);
+    destHeight = this->dataPtr->side;
+    // The decimal part is discarted for interpret the result as pixels
+    float w = static_cast<float>(destHeight) / static_cast<float>(ratio);
+    destWidth = static_cast<unsigned int>(w);
+  }
 
-    // Scale the terrain keeping the same ratio between width and height
-    if (nXSize > nYSize)
-    {
-      ratio = static_cast<float>(nXSize) / static_cast<float>(nYSize);
-      destWidth = this->dataPtr->side;
-      // The decimal part is discarted for interpret the result as pixels
-      float h = static_cast<float>(destWidth) / static_cast<float>(ratio);
-      destHeight = static_cast<unsigned int>(h);
-    }
-    else
-    {
-      ratio = static_cast<float>(nYSize) / static_cast<float>(nXSize);
-      destHeight = this->dataPtr->side;
-      // The decimal part is discarted for interpret the result as pixels
-      float w = static_cast<float>(destHeight) / static_cast<float>(ratio);
-      destWidth = static_cast<unsigned int>(w);
-    }
+  // Read the whole raster data and convert it to a GDT_Float32 array.
+  // In this step the DEM is scaled to destWidth x destHeight
+  std::vector<float> buffer;
+  buffer.resize(destWidth * destHeight);
+  if (this->dataPtr->band->RasterIO(GF_Read, 0, 0, nXSize, nYSize, &buffer[0],
+                       destWidth, destHeight, GDT_Float32, 0, 0) != CE_None)
+  {
+    ignerr << "Failure calling RasterIO while loading a DEM file\n";
+    return -1;
+  }
 
-    // Read the whole raster data and convert it to a GDT_Float32 array.
-    // In this step the DEM is scaled to destWidth x destHeight
-    buffer.resize(destWidth * destHeight);
-    if (this->dataPtr->band->RasterIO(GF_Read, 0, 0, nXSize, nYSize, &buffer[0],
-                         destWidth, destHeight, GDT_Float32, 0, 0) != CE_None)
-    {
-      ignerr << "Failure calling RasterIO while loading a DEM file\n";
-      return -1;
-    }
+  // Copy and align 'buffer' into the target vector. The destination vector is
+  // initialized to 0, so all the points not contained in 'buffer' will be
+  // extra padding
+  this->dataPtr->demData.resize(this->Width() * this->Height());
+  for (unsigned int y = 0; y < destHeight; ++y)
+  {
+    std::copy(&buffer[destWidth * y], &buffer[destWidth * y] + destWidth,
+              this->dataPtr->demData.begin() + this->Width() * y);
+  }
+  buffer.clear();
 
-    // Copy and align 'buffer' into the target vector. The destination vector is
-    // initialized to 0, so all the points not contained in 'buffer' will be
-    // extra padding
-    this->dataPtr->demData.resize(this->Width() * this->Height());
-    for (unsigned int y = 0; y < destHeight; ++y)
-    {
-        std::copy(&buffer[destWidth * y], &buffer[destWidth * y] + destWidth,
-                  this->dataPtr->demData.begin() + this->Width() * y);
-    }
-    buffer.clear();
-
-    return 0;
+  return 0;
 }
 
 //////////////////////////////////////////////////
