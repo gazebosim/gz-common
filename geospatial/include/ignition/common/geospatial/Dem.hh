@@ -58,11 +58,11 @@ namespace ignition
 
       /// \brief Get the terrain's minimum elevation in meters.
       /// \return The minimum elevation (meters).
-      public: float MinElevation() const;
+      public: float MinElevation() const override;
 
       /// \brief Get the terrain's maximum elevation in meters.
       /// \return The maximum elevation (meters).
-      public: float MaxElevation() const;
+      public: float MaxElevation() const override;
 
       /// \brief Get the georeferenced coordinates (lat, long) of the terrain's
       /// origin in WGS84.
@@ -79,7 +79,7 @@ namespace ignition
       /// \return The terrain's height (points) satisfying the ogre constrains
       /// (squared terrain with a height value that must be a power of two plus
       /// one).
-      public: unsigned int Height() const;
+      public: unsigned int Height() const override;
 
       /// \brief Get the terrain's width. Due to the Ogre constrains, this
       /// value will be a power of two plus one. The value returned might be
@@ -88,7 +88,7 @@ namespace ignition
       /// \return The terrain's width (points) satisfying the ogre constrains
       /// (squared terrain with a width value that must be a power of two plus
       /// one).
-      public: unsigned int Width() const;
+      public: unsigned int Width() const override;
 
       /// \brief Get the real world width in meters.
       /// \return Terrain's real world width in meters.
@@ -113,7 +113,7 @@ namespace ignition
                   const ignition::math::Vector3d &_size,
                   const ignition::math::Vector3d &_scale,
                   const bool _flipY,
-                  std::vector<float> &_heights) const;
+                  std::vector<float> &_heights) const override;
 
       /// \brief Get the georeferenced coordinates (lat, long) of a terrain's
       /// pixel in WGS84.
@@ -133,7 +133,7 @@ namespace ignition
       private: int LoadData();
 
       // Documentation inherited.
-      public: std::string Filename() const;
+      public: std::string Filename() const override;
 
       /// internal
       /// \brief Pointer to the private data.
