@@ -44,7 +44,7 @@ namespace ignition
     /// * RMT_QUEUE_SIZE: Size of the internal message queues
     /// * RMT_MSGS_PER_UPDATE: Upper limit on messages consumed per loop
     /// * RMT_SLEEP_BETWEEN_UPDATES: Controls profile server update rate.
-    class RemoteryProfilerImpl: public ProfilerImpl
+    class RemoteryProfilerImpl final: public ProfilerImpl
     {
       /// \brief Constructor.
       public: RemoteryProfilerImpl();
