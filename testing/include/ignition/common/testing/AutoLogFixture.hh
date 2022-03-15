@@ -54,4 +54,6 @@ class AutoLogFixture : public ::testing::Test
 };
 }  // namespace ignition::common::testing
 
+#include <ignition/common/testing/detail/AutoLogFixture.hh>
+
 #endif  // IGNITION_COMMON_TESTING_AUTOLOGFIXTURE_HH_

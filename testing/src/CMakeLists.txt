@@ -1,5 +1,4 @@
 set(sources
-  AutoLogFixture.cc
   BazelTestPaths.cc
   CMakeTestPaths.cc
   TestPaths.cc

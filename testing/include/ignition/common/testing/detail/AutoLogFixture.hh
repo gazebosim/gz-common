@@ -14,8 +14,13 @@
 * limitations under the License.
 *
 */
+#ifndef IGNITION_COMMON_TESTING_DETAIL_AUTOLOGFIXTURE_HH_
+#define IGNITION_COMMON_TESTING_DETAIL_AUTOLOGFIXTURE_HH_
 
 #include "ignition/common/testing/AutoLogFixture.hh"
+
+#include <memory>
+#include <string>
 
 #include <ignition/common/Console.hh>
 #include <ignition/common/Filesystem.hh>
@@ -66,7 +71,7 @@ void AutoLogFixture::SetUp()
   this->dataPtr->logFilename = testCaseName + "_" + testName + ".log";
 
   this->dataPtr->temp = std::make_unique<TempDirectory>(
-      "test", "ign_common", true);
+      "test", "ign_common", false);
   ASSERT_TRUE(this->dataPtr->temp->Valid());
   common::setenv(IGN_HOMEDIR, this->dataPtr->temp->Path());
 
@@ -104,3 +109,6 @@ std::string AutoLogFixture::LogContent() const
 }
 
 }  // namespace ignition::common::testing
+
+#endif  // IGNITION_COMMON_TESTING_DETAIL_AUTOLOGFIXTURE_HH_
+
