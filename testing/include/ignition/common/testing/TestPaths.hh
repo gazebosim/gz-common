@@ -32,9 +32,18 @@ namespace ignition::common::testing
 {
 
 //////////////////////////////////////////////////
+/// \brief Constant referring to the project source dir of the current
+/// project.
+///
+/// For CMake builds, it is expected that this is injected via a
+/// buildsystem define of TESTING_PROJECT_SOURCE_DIR.
+/// This is done automatically for tests using ign-cmake's ign_build_tests
+///
+/// For Bazel builds, it is expected to be empty
 constexpr char kTestingProjectSourceDir[] = TESTING_PROJECT_SOURCE_DIR;
 
 //////////////////////////////////////////////////
+/// \brief List of buildsystem types
 enum class BuildType
 {
   kUnknown,
@@ -43,18 +52,45 @@ enum class BuildType
 };
 
 //////////////////////////////////////////////////
+/// \brief Helper interface to generate path information to support
+/// test access to source/data files
+///
+/// It is intended that there is an implementation of this interface for
+/// each relevant buildsystem.
 class TestPaths
 {
+  /// \brief Constructor
   public: explicit TestPaths(const std::string &_projectSourcePath =
               kTestingProjectSourceDir);
+
+  /// \brief Destructor
   public: virtual ~TestPaths() = 0;
+
+  /// brief Populate the path to the root project source directory
+  /// \param[out] _sourceDir path to the root project source directory
+  /// \return True if path successfully found and set, false otherwise
   public: virtual bool ProjectSourcePath(std::string &_sourceDir) = 0;
+
+  /// \brief Populate the path to a temporary directory
+  /// \param[out] _tmpDir path to the root temporary directory
+  /// \return True if path successfully found and set, false otherwise
   public: virtual bool TestTmpPath(std::string &_tmpDir) = 0;
 
+  /// \brief Path to the root of the project source
   protected: std::string projectSourcePath;
 };
 
 //////////////////////////////////////////////////
+/// \brief Implementation of MakeTestTempDirectory
+///
+/// The TempDirectory will have the form $TMPDIR/_subdir/_prefixXXXXX/
+///
+/// \param[in] _projectSourcePath Root of project source or empty
+/// \param[in] _prefix Prefix of the temporary directory
+/// \param[in] _subDir Additional subdirectory for temporary directory
+/// \param[in] _cleanup True to indicate that the filesystem should
+///   be cleaned as part of the destructor
+/// \return Shared pointer to TempDirectory
 std::shared_ptr<ignition::common::TempDirectory>
 MakeTestTempDirectoryImpl(const std::string &_projectSourcePath,
                           const std::string &_prefix = "test",
@@ -63,6 +99,16 @@ MakeTestTempDirectoryImpl(const std::string &_projectSourcePath,
 
 
 //////////////////////////////////////////////////
+/// \brief Create a temporary directory for test output in an OS and build
+///   appropriate location
+///
+/// The TempDirectory will have the form $TMPDIR/_subdir/_prefixXXXXX/
+///
+/// \param[in] _prefix Prefix of the temporary directory
+/// \param[in] _subDir Additional subdirectory for temporary directory
+/// \param[in] _cleanup True to indicate that the filesystem should
+///   be cleaned as part of the destructor
+/// \return Shared pointer to TempDirectory
 inline std::shared_ptr<ignition::common::TempDirectory>
 MakeTestTempDirectory(const std::string &_prefix = "test",
                       const std::string &_subDir = "ignition",
@@ -75,16 +121,31 @@ MakeTestTempDirectory(const std::string &_prefix = "test",
 }
 
 //////////////////////////////////////////////////
+/// \brief Return the current build type
+///
+/// \param[in] _projectSourcePath Root of project source or empty
+/// \return The current build type
 BuildType
 TestBuildType(
     const std::string &_projectSourcePath = kTestingProjectSourceDir);
 
 //////////////////////////////////////////////////
+/// \brief Get a TestPaths object for the current build type
+///
+/// \param[in] _projectSourcePath Root of project source or empty
+/// \return TestPaths implementation for the current build type
 std::unique_ptr<TestPaths>
 TestPathFactory(
     const std::string &_projectSourcePath = kTestingProjectSourceDir);
 
 //////////////////////////////////////////////////
+/// \brief Get the path to a file in the project source tree
+///
+/// Example: to get ign-common/test/data/box.dae
+/// SourceFile("test", "data", "box.dae");
+///
+/// \param[in] args Relative path to the source file
+/// \return Full path to the source file
 template <typename... Args>
 std::string SourceFile(Args const &... args)
 {
@@ -97,6 +158,13 @@ std::string SourceFile(Args const &... args)
 }
 
 //////////////////////////////////////////////////
+/// \brief Get the path to a file in the project test directory tree
+///
+/// Example: to get ign-common/test/data/box.dae
+/// TestFile("data", "box.dae");
+///
+/// \param[in] args Path to the file, relative to the test directory
+/// \return Full path to the source file
 template <typename... Args>
 std::string TestFile(Args const &... args)
 {
@@ -104,6 +172,13 @@ std::string TestFile(Args const &... args)
 }
 
 //////////////////////////////////////////////////
+/// \brief Get the path to a file in a temporary directory
+///
+/// Example: to get ${TMP}/.ignition/foo.log
+///  TempPath(".ignition", "foo.log");
+///
+/// \param[in] args Path to the file, relative to the temporary directory
+/// \return Full path to the temporary directory
 template <typename... Args>
 std::string TempPath(Args const &... args)
 {
@@ -112,7 +187,5 @@ std::string TempPath(Args const &... args)
   testPaths->TestTmpPath(dataDir);
   return common::joinPaths(dataDir, args...);
 }
-
 }  // namespace ignition::common::testing
-
 #endif  // IGNITION_COMMON_TESTING_TESTPATHS_HH_

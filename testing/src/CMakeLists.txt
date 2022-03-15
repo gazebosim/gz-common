@@ -1,11 +1,15 @@
 set(sources
-  TestPaths.cc
-  CMakeTestPaths.cc
+  AutoLogFixture.cc
   BazelTestPaths.cc
+  CMakeTestPaths.cc
+  TestPaths.cc
+  Utils.cc
 )
 
 set(test_sources
+  AutoLogFixture_TEST.cc
   CMakeTestPaths_TEST.cc
+  Utils_TEST.cc
 )
 
 ign_add_component(testing SOURCES ${sources} GET_TARGET_NAME testing_target)

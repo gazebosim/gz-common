@@ -24,11 +24,29 @@
 namespace ignition::common::testing
 {
 
+/// \brief Implementation of TestPaths interface for Bazel
+///
+/// It is not intended that users will directly construct this, but rather
+/// utilize the TestPathFactory.
+///
+/// The main mechanism for detecting a bazel build is via the presence of the
+/// TEST_SRCDIR and TEST_UNDECLARED_OUTPUTS_DIR environment variables.
+/// Additionally, tests built via ign-bazel should set IGN_BAZEL_DIR.
+///
+/// For source files to be available for bazel builds, they need to be set in
+/// the "data" section of the relevant cc_library or cc_test call.
 class BazelTestPaths: public TestPaths
 {
+  /// \brief Constructor from TestPaths
   public: using TestPaths::TestPaths;
+
+  /// \brief Destructor
   public: ~BazelTestPaths() override;
+
+  /// Documentation inherited
   public: bool ProjectSourcePath(std::string &_sourceDir) override;
+
+  /// Documentation inherited
   public: bool TestTmpPath(std::string &_tmpDir) override;
 };
 

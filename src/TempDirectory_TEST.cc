@@ -78,6 +78,22 @@ TEST(TempDirectory, TempDirectory)
 }
 
 /////////////////////////////////////////////////
+TEST(TempDirectory, TempDirectoryRoot)
+{
+  std::string path;
+  {
+    auto p = ignition::common::tempDirectoryPath();
+    ignition::common::TempDirectory tmp(p, "temp_dir", "ignition", true);
+    EXPECT_TRUE(tmp.Valid());
+    EXPECT_TRUE(tmp.DoCleanup());
+    path = tmp.Path();
+    EXPECT_FALSE(path.empty());
+    EXPECT_TRUE(ignition::common::exists(path));
+  }
+  EXPECT_FALSE(ignition::common::exists(path));
+}
+
+/////////////////////////////////////////////////
 TEST(TempDirectory, TempDirectoryNoClean)
 {
   std::string path;

@@ -27,7 +27,8 @@ namespace ignition::common::testing
 BazelTestPaths::~BazelTestPaths() = default;
 
 //////////////////////////////////////////////////
-bool BazelTestPaths::ProjectSourcePath(std::string &_sourceDir) {
+bool BazelTestPaths::ProjectSourcePath(std::string &_sourceDir)
+{
   std::string test_srcdir, bazel_path;
 
   if (common::env("TEST_SRCDIR", test_srcdir) &&
@@ -45,7 +46,8 @@ bool BazelTestPaths::ProjectSourcePath(std::string &_sourceDir) {
 }
 
 //////////////////////////////////////////////////
-bool BazelTestPaths::TestTmpPath(std::string &_tmpDir) {
+bool BazelTestPaths::TestTmpPath(std::string &_tmpDir)
+{
   return common::env("TEST_UNDECLARED_OUTPUTS_DIR", _tmpDir);
 }
 

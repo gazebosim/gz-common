@@ -176,7 +176,7 @@ TempDirectory::TempDirectory(const std::string &_root,
   this->dataPtr->oldPath = common::cwd();
   this->dataPtr->doCleanup = _cleanup;
 
-  auto tempPath = _root; 
+  auto tempPath = _root;
   if (!_subDir.empty())
   {
     tempPath = common::joinPaths(tempPath, _subDir);

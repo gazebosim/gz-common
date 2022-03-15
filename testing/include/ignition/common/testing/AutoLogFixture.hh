@@ -22,10 +22,7 @@
 #include <memory>
 #include <string>
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/Filesystem.hh"
-#include "ignition/common/TempDirectory.hh"
-#include "ignition/common/Util.hh"
+#include <ignition/utils/ImplPtr.hh>
 
 namespace ignition::common::testing
 {
@@ -35,74 +32,25 @@ namespace ignition::common::testing
 /// failing tests is significantly more difficult.
 class AutoLogFixture : public ::testing::Test
 {
+  /// \brief Constructor
+  public: AutoLogFixture();
+
+  /// \brief Destructor
+  public: virtual ~AutoLogFixture();
+
   /// \brief Setup the test fixture. This gets called by gtest.
-  protected: virtual void SetUp()
-  {
-    const ::testing::TestInfo *const testInfo =
-      ::testing::UnitTest::GetInstance()->current_test_info();
-
-    std::string testName = testInfo->name();
-    std::string testCaseName = testInfo->test_case_name();
-    this->logFilename = testCaseName + "_" + testName + ".log";
-
-    this->temp = std::make_unique<TempDirectory>(
-        "test", "ign_common", true);
-    ASSERT_TRUE(this->temp->Valid());
-    common::setenv(IGN_HOMEDIR, this->temp->Path());
-
-    // Initialize Console
-    ignLogInit(common::joinPaths(this->temp->Path(), "test_logs"),
-        this->logFilename);
-
-    ignition::common::Console::SetVerbosity(4);
-
-    // Read the full path to the log directory.
-    this->logDirectory = ignLogDirectory();
-  }
+  protected: virtual void SetUp() override;
 
   /// \brief Get a string with the full log file path.
   /// \return The full log file path as a string.
-  protected: std::string FullLogPath() const
-  {
-    return ignition::common::joinPaths(
-      this->logDirectory, this->logFilename);
-  }
+  protected: std::string FullLogPath() const;
 
   /// \brief Get a string with all the log content loaded from the disk.
   /// \return A string with all the log content.
-  protected: std::string LogContent() const
-  {
-    std::string loggedString;
-    // Open the log file, and read back the string
-    std::ifstream ifs(this->FullLogPath().c_str(), std::ios::in);
+  protected: std::string LogContent() const;
 
-    while (!ifs.eof())
-    {
-      std::string line;
-      std::getline(ifs, line);
-      loggedString += line;
-    }
-    return loggedString;
-  }
-
-  /// \brief Default destructor.
-  public: virtual ~AutoLogFixture()
-  {
-    ignLogClose();
-    EXPECT_TRUE(ignition::common::unsetenv(IGN_HOMEDIR));
-  }
-
-  /// \brief String with the full path of the logfile
-  private: std::string logFilename;
-
-  /// \brief String with the full path to log directory
-  private: std::string logDirectory;
-
-  /// \brief String with the base path to log directory
-  private: std::string logBasePath;
-
-  /// \brief Temporary directory to run test in
-  private: std::unique_ptr<common::TempDirectory> temp;
+  /// \brief Pointer to private data.
+  IGN_UTILS_UNIQUE_IMPL_PTR(dataPtr)
 };
 }  // namespace ignition::common::testing
 

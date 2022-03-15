@@ -269,7 +269,7 @@ bool AudioDecoder::SetFile(const std::string &_filename)
 #endif
 
   // Open codec
-  if (avcodec_open2(this->dataPtr->codecCtx, 
+  if (avcodec_open2(this->dataPtr->codecCtx,
         this->dataPtr->codec, nullptr) < 0)
   {
     ignerr << "Couldn't open audio codec.\n";

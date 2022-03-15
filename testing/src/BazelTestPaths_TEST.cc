@@ -22,18 +22,6 @@
 
 using namespace ignition::common;
 
-char **kEnv;
-
-/////////////////////////////////////////////////
-TEST(TestPaths, DISABLED_DumpEnv)
-{
-  for (char **env = kEnv ; *env != nullptr; env++)
-  {
-    char *varName = *env;
-    printf("%s\n", varName);
-  }
-}
-
 /////////////////////////////////////////////////
 TEST(BazelTestPaths, ProjectSourcePath)
 {
@@ -79,12 +67,3 @@ TEST(BazelTestPaths, TestPathFactory)
   auto testPaths = ignition::common::testing::TestPathFactory();
   ASSERT_NE(nullptr, testPaths);
 }
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv, char **envp)
-{
-  kEnv = envp;
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}
-

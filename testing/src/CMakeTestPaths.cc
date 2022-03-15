@@ -24,11 +24,12 @@ namespace ignition::common::testing
 CMakeTestPaths::~CMakeTestPaths() = default;
 
 //////////////////////////////////////////////////
-bool CMakeTestPaths::ProjectSourcePath(std::string &_sourceDir) {
+bool CMakeTestPaths::ProjectSourcePath(std::string &_sourceDir)
+{
 
-  if (!projectSourcePath.empty())
+  if (!this->projectSourcePath.empty())
   {
-    _sourceDir = projectSourcePath;
+    _sourceDir = this->projectSourcePath;
     return true;
   }
 
@@ -36,7 +37,8 @@ bool CMakeTestPaths::ProjectSourcePath(std::string &_sourceDir) {
 }
 
 //////////////////////////////////////////////////
-bool CMakeTestPaths::TestTmpPath(std::string &_tmpDir) {
+bool CMakeTestPaths::TestTmpPath(std::string &_tmpDir)
+{
   _tmpDir = ignition::common::tempDirectoryPath();
   return true;
 }
