@@ -50,6 +50,9 @@ class ignition::common::Dem::Implementation
   /// \brief Maximum elevation in meters.
   public: double maxElevation;
 
+  /// \brief Value used to mark padding buffer data.
+  public: float bufferVal{std::numeric_limits<float>::max()};
+
   /// \brief DEM data converted to be OGRE-compatible.
   public: std::vector<float> demData;
 
@@ -190,14 +193,19 @@ int Dem::Load(const std::string &_filename)
 
   double min = ignition::math::MAX_D;
   double max = -ignition::math::MAX_D;
-  for (auto d : this->dataPtr->demData)
+  for (auto &d : this->dataPtr->demData)
   {
+    if (math::equal(d, this->dataPtr->bufferVal))
+      continue;
+
     // All comparisons to NaN return false, so guard against NaN NoData
     if (!std::isnan(noDataValue) && d <= noDataValue)
       continue;
 
-    if (!std::isfinite(d))
+    if (std::isnan(d))
+    {
       continue;
+    }
 
     if (d < min)
       min = d;
@@ -212,6 +220,13 @@ int Dem::Load(const std::string &_filename)
 
   this->dataPtr->minElevation = min;
   this->dataPtr->maxElevation = max;
+
+  // Buffer to min elevation
+  for (auto &d : this->dataPtr->demData)
+  {
+    if (math::equal(d, this->dataPtr->bufferVal))
+      d = this->dataPtr->minElevation;
+  }
   return 0;
 }
 
@@ -450,9 +465,11 @@ int Dem::LoadData()
   }
 
   // Copy and align 'buffer' into the target vector. The destination vector is
-  // initialized to 0, so all the points not contained in 'buffer' will be
-  // extra padding
-  this->dataPtr->demData.resize(this->Width() * this->Height());
+  // initialized to max() and later converted to the minimum elevation, so all
+  // the points not contained in
+  // 'buffer' will be extra padding
+  this->dataPtr->demData.resize(this->Width() * this->Height(),
+      this->dataPtr->bufferVal);
   for (unsigned int y = 0; y < destHeight; ++y)
   {
     std::copy(&buffer[destWidth * y], &buffer[destWidth * y] + destWidth,
