@@ -33,11 +33,3 @@ TEST(PluginUtils, NormalizeName)
   EXPECT_EQ("::ignition::math", common::NormalizeName("ignition::math"));
   EXPECT_EQ("::ignition::math", common::NormalizeName("::ignition::math"));
 }
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}
-

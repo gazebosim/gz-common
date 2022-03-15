@@ -76,10 +76,3 @@ TEST(Timer_TEST, Copy)
   EXPECT_FALSE(t1.Running());
   EXPECT_FALSE(t2.Running());
 }
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}

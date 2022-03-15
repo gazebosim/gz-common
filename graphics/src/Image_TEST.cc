@@ -561,10 +561,3 @@ INSTANTIATE_TEST_SUITE_P(FlatHeightmaps, ImagePerformanceTest,
     std::make_tuple("heightmap_flat_257x257.png", 257u, 257u),
     std::make_tuple("heightmap_flat_513x513.png", 513u, 513u),
     std::make_tuple("heightmap_flat_1025x1025.png", 1025u, 1025u)));
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}

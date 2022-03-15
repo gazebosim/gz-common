@@ -110,4 +110,3 @@ TEST(TempDirectory, TempDirectoryNoCleanLater)
   EXPECT_TRUE(ignition::common::exists(path));
   EXPECT_TRUE(ignition::common::removeDirectory(path));
 }
-

@@ -151,10 +151,3 @@ TEST_F(MeshTest, Mesh)
   EXPECT_TRUE(math::equal(vertices[2], submesh.lock()->Vertex(0).Z()));
   EXPECT_EQ(indices[0], submesh.lock()->Index(0));
 }
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}
