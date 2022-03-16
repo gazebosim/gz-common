@@ -10,5 +10,4 @@ libignition-utils1-dev
 libswscale-dev
 libtinyxml2-dev
 pkg-config
-ruby-ronn
 uuid-dev
