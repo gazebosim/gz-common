@@ -91,7 +91,7 @@ void Video::Cleanup()
 /////////////////////////////////////////////////
 bool Video::Load(const std::string &_filename)
 {
-  AVCodec *codec = nullptr;
+  const AVCodec * codec = nullptr;
   this->dataPtr->videoStream = -1;
 
   if (this->dataPtr->formatCtx || this->dataPtr->avFrame ||
