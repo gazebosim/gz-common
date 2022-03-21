@@ -123,7 +123,7 @@ class IGNITION_COMMON_AV_HIDDEN ignition::common::VideoEncoder::Implementation
 };
 
 /////////////////////////////////////////////////
-const AVCodec* VideoEncoderPrivate::FindEncoder(AVCodecID _codecId)
+const AVCodec* VideoEncoder::Implementation::FindEncoder(AVCodecID _codecId)
 {
 #ifdef IGN_COMMON_BUILD_HW_VIDEO
   if (this->hwEncoder)
