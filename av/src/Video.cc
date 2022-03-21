@@ -100,7 +100,7 @@ bool Video::Load(const std::string &_filename)
     this->Cleanup();
   }
 
-  this->dataPtr->avFrame = common::AVFrameAlloc();
+  this->dataPtr->avFrame = av_frame_alloc();
 
   // Open video file
   if (avformat_open_input(&this->dataPtr->formatCtx, _filename.c_str(),
@@ -121,13 +121,7 @@ bool Video::Load(const std::string &_filename)
   for (unsigned int i = 0; i < this->dataPtr->formatCtx->nb_streams; ++i)
   {
     enum AVMediaType codec_type;
-    // codec parameter deprecated in ffmpeg version 3.1
-    // github.com/FFmpeg/FFmpeg/commit/9200514ad8717c
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 48, 101)
     codec_type = this->dataPtr->formatCtx->streams[i]->codecpar->codec_type;
-#else
-    codec_type = this->dataPtr->formatCtx->streams[i]->codec->codec_type;
-#endif
     if (codec_type == AVMEDIA_TYPE_VIDEO)
     {
       this->dataPtr->videoStream = static_cast<int>(i);
@@ -143,18 +137,13 @@ bool Video::Load(const std::string &_filename)
 
   // Find the decoder for the video stream
   auto stream = this->dataPtr->formatCtx->streams[this->dataPtr->videoStream];
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 48, 101)
   codec = avcodec_find_decoder(stream->codecpar->codec_id);
-#else
-  codec = avcodec_find_decoder(stream->codec->codec_id);
-#endif
   if (codec == nullptr)
   {
     ignerr << "Codec not found\n";
     return false;
   }
 
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 48, 101)
   // AVCodecContext is not included in an AVStream as of ffmpeg 3.1
   // allocate a codec context based on updated example
   // github.com/FFmpeg/FFmpeg/commit/bba6a03b2816d805d44bce4f9701a71f7d3f8dad
@@ -173,21 +162,11 @@ bool Video::Load(const std::string &_filename)
            << std::endl;
     return false;
   }
-#else
-  // Get a pointer to the codec context for the video stream
-  this->dataPtr->codecCtx = this->dataPtr->formatCtx->streams[
-    this->dataPtr->videoStream]->codec;
-#endif
 
   // Inform the codec that we can handle truncated bitstreams -- i.e.,
   // bitstreams where frame boundaries can fall in the middle of packets
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(56, 60, 100)
   if (codec->capabilities & AV_CODEC_CAP_TRUNCATED)
     this->dataPtr->codecCtx->flags |= AV_CODEC_FLAG_TRUNCATED;
-#else
-  if (codec->capabilities & CODEC_CAP_TRUNCATED)
-    this->dataPtr->codecCtx->flags |= CODEC_FLAG_TRUNCATED;
-#endif
 
   // Open codec
   if (avcodec_open2(this->dataPtr->codecCtx, codec, nullptr) < 0)
@@ -212,7 +191,7 @@ bool Video::Load(const std::string &_filename)
   }
 
   // swscale needs 32-byte-aligned output frame on some systems
-  this->dataPtr->avFrameDst = common::AVFrameAlloc();
+  this->dataPtr->avFrameDst = av_frame_alloc();
   this->dataPtr->avFrameDst->format = this->dataPtr->dstPixelFormat;
   this->dataPtr->avFrameDst->width = this->dataPtr->codecCtx->width;
   this->dataPtr->avFrameDst->height = this->dataPtr->codecCtx->height;
@@ -295,18 +274,34 @@ bool Video::NextFrame(unsigned char **_buffer)
       this->dataPtr->codecCtx, this->dataPtr->avFrame, &frameAvailable,
       this->dataPtr->drainingMode ? nullptr : packet);
 
-    if (ret == AVERROR_EOF)
+    frameAvailable = 0;
+    if (!this->dataPtr->drainingMode)
     {
-      if (!this->dataPtr->drainingMode)
-        av_packet_unref(packet);
-      return false;
+      ret = avcodec_send_packet(this->dataPtr->codecCtx, packet);
+      if (ret < 0)
+      {
+        if (ret != AVERROR_EOF)
+        {
+          av_packet_unref(packet);
+          return false;
+        }
+      }
     }
-    else if (ret < 0)
+
+    ret = avcodec_receive_frame(this->dataPtr->codecCtx,
+        this->dataPtr->avFrame);
+
+    if (ret < 0 && ret != AVERROR(EAGAIN))
     {
       ignerr << "Error while processing packet data: "
              << av_err2str_cpp(ret) << std::endl;
-      // continue processing data
     }
+
+    if (ret >= 0)
+    {
+      frameAvailable = 1;
+    }
+
     if (!this->dataPtr->drainingMode)
       av_packet_unref(packet);
   }

@@ -57,15 +57,18 @@ namespace ignition
   {
     /// \brief Helper function to avoid deprecation warnings.
     IGNITION_COMMON_AV_VISIBLE
+    IGN_DEPRECATED(6)
     AVFrame *AVFrameAlloc(void);
 
     /// \brief Helper function to avoid deprecation warnings.
     IGNITION_COMMON_AV_VISIBLE
+    IGN_DEPRECATED(6)
     void AVFrameUnref(AVFrame *_frame);
 
     /// \brief Helper function to avoid deprecation warnings.
     /// \param[in] _packet AVPacket structure that stores compressed data
     IGNITION_COMMON_AV_VISIBLE
+    IGN_DEPRECATED(6)
     void AVPacketUnref(AVPacket *_packet);
 
     /// \brief Helper function to avoid deprecation warnings

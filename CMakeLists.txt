@@ -109,6 +109,7 @@ ign_find_package(SWSCALE REQUIRED_BY av PRETTY libswscale)
 #------------------------------------
 # Find avdevice
 ign_find_package(AVDEVICE VERSION 56.4.100 REQUIRED_BY av PRETTY libavdevice)
+set(HAVE_AVDEVICE ${AVDEVICE_FOUND})
 
 #------------------------------------
 # Find avformat

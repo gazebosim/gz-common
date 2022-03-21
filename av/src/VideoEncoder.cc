@@ -53,11 +53,7 @@ class IGNITION_COMMON_AV_HIDDEN ignition::common::VideoEncoder::Implementation
   public: AVFrame *avOutFrame = nullptr;
 
   /// \brief libav input image data (aligned to 32 bytes)
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
-  public: AVPicture *avInFrame = nullptr;
-#else
   public: AVFrame *avInFrame = nullptr;
-#endif
 
   /// \brief Pixel format of the input frame. So far it is hardcoded.
   public: AVPixelFormat inPixFormat = AV_PIX_FMT_RGB24;
@@ -340,7 +336,6 @@ bool VideoEncoder::Start(
   // Special case for video4linux2. Here we attempt to find the v4l2 device
   if (this->dataPtr->format.compare("v4l2") == 0)
   {
-#if LIBAVDEVICE_VERSION_INT >= AV_VERSION_INT(56, 4, 100)
     AVOutputFormat *outputFormat = nullptr;
     while ((outputFormat = av_output_video_device_next(outputFormat))
            != nullptr)
@@ -359,11 +354,6 @@ bool VideoEncoder::Start(
         break;
       }
     }
-#else
-    ignerr << "libavdevice version >= 56.4.100 is required for v4l2 recording. "
-          << "This version is available on Ubuntu Xenial or greater.\n";
-    return false;
-#endif
   }
   else
   {
@@ -376,28 +366,6 @@ bool VideoEncoder::Start(
         << "Using MPEG.\n";
     }
 
-#if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(56, 40, 1)
-        this->dataPtr->formatCtx = avformat_alloc_context();
-        if (outputFormat)
-        {
-          this->dataPtr->formatCtx->oformat = outputFormat;
-        }
-        else
-        {
-          this->dataPtr->formatCtx->oformat =
-            av_guess_format("mpeg", nullptr, nullptr);
-        }
-#ifdef WIN32
-        _sprintf(this->dataPtr->formatCtx->filename,
-                 sizeof(this->dataPtr->formatCtx->filename),
-                 "%s", _filename.c_str());
-#else
-        snprintf(this->dataPtr->formatCtx->filename,
-                sizeof(this->dataPtr->formatCtx->filename),
-                "%s", _filename.c_str());
-#endif
-
-#else
     auto result = avformat_alloc_output_context2(&this->dataPtr->formatCtx,
         nullptr, nullptr, this->dataPtr->filename.c_str());
     if (result < 0)
@@ -405,7 +373,6 @@ bool VideoEncoder::Start(
       ignerr << "Failed to allocate AV context [" << av_err2str_cpp(result)
              << "]" << std::endl;
     }
-#endif
   }
 
   // Make sure allocation occurred.
@@ -428,11 +395,7 @@ bool VideoEncoder::Start(
   if (!encoder)
   {
     ignerr << "Codec for["
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
-          << this->dataPtr->formatCtx->oformat->name
-#else
           << avcodec_get_name(codecId)
-#endif
           << "] not found. Video encoding is not started.\n";
     this->Reset();
     return false;
@@ -441,13 +404,8 @@ bool VideoEncoder::Start(
   ignmsg << "Using encoder " << encoder->name << std::endl;
 
   // Create a new video stream
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
-  this->dataPtr->videoStream = avformat_new_stream(this->dataPtr->formatCtx,
-    encoder);
-#else
   this->dataPtr->videoStream = avformat_new_stream(this->dataPtr->formatCtx,
       nullptr);
-#endif
 
   if (!this->dataPtr->videoStream)
   {
@@ -458,11 +416,7 @@ bool VideoEncoder::Start(
   this->dataPtr->videoStream->id = this->dataPtr->formatCtx->nb_streams-1;
 
   // Allocate a new video context
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
-  this->dataPtr->codecCtx = this->dataPtr->videoStream->codec;
-#else
   this->dataPtr->codecCtx = avcodec_alloc_context3(encoder);
-#endif
 
   if (!this->dataPtr->codecCtx)
   {
@@ -475,11 +429,7 @@ bool VideoEncoder::Start(
   // some formats want stream headers to be separate
   if (this->dataPtr->formatCtx->oformat->flags & AVFMT_GLOBALHEADER)
   {
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
-    this->dataPtr->codecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
-#else
     this->dataPtr->codecCtx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
-#endif
   }
 
   // Frames per second
@@ -517,13 +467,7 @@ bool VideoEncoder::Start(
   if (this->dataPtr->codecCtx->codec_id == AV_CODEC_ID_H264)
   {
     av_opt_set(this->dataPtr->codecCtx->priv_data, "preset", "slow", 0);
-
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
-    av_opt_set(this->dataPtr->videoStream->codec->priv_data,
-        "preset", "slow", 0);
-#else
     av_opt_set(this->dataPtr->videoStream->priv_data, "preset", "slow", 0);
-#endif
   }
 
   // we misuse this field a bit, as docs say it is unused in encoders
@@ -560,11 +504,7 @@ bool VideoEncoder::Start(
     return false;
   }
 
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(55, 28, 1)
-  this->dataPtr->avOutFrame = avcodec_alloc_frame();
-#else
   this->dataPtr->avOutFrame = av_frame_alloc();
-#endif
 
   if (!this->dataPtr->avOutFrame)
   {
@@ -589,14 +529,9 @@ bool VideoEncoder::Start(
   }
 
   // Copy parameters from the context to the video stream
-#if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(57, 40, 101)
-//  ret = avcodec_copy_context(this->dataPtr->videoStream->codec,
-//                       this->dataPtr->codecCtx);
-#else
   // codecpar was implemented in ffmpeg version 3.1
   ret = avcodec_parameters_from_context(
       this->dataPtr->videoStream->codecpar, this->dataPtr->codecCtx);
-#endif
   if (ret < 0)
   {
     ignerr << "Could not copy the stream parameters:" << av_err2str_cpp(ret)
@@ -690,11 +625,7 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
     this->dataPtr->swsCtx = nullptr;
 
     if (this->dataPtr->avInFrame)
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
-      av_free(this->dataPtr->avInFrame);
-#else
       av_frame_free(&this->dataPtr->avInFrame);
-#endif
     this->dataPtr->avInFrame = nullptr;
   }
 
@@ -705,19 +636,12 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
 
     if (!this->dataPtr->avInFrame)
     {
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
-      this->dataPtr->avInFrame = new AVPicture;
-      avpicture_alloc(this->dataPtr->avInFrame,
-          this->dataPtr->inPixFormat, this->dataPtr->inWidth,
-          this->dataPtr->inHeight);
-#else
       this->dataPtr->avInFrame = av_frame_alloc();
       this->dataPtr->avInFrame->width = this->dataPtr->inWidth;
       this->dataPtr->avInFrame->height = this->dataPtr->inHeight;
       this->dataPtr->avInFrame->format = this->dataPtr->inPixFormat;
 
       av_frame_get_buffer(this->dataPtr->avInFrame, 32);
-#endif
     }
 
     av_image_fill_linesizes(this->dataPtr->inputLineSizes,
@@ -779,24 +703,6 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
   {
     frameToEncode->pts = this->dataPtr->frameCount++;
 
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 40, 101)
-    int gotOutput = 0;
-    AVPacket avPacket;
-    av_init_packet(&avPacket);
-    avPacket.data = nullptr;
-    avPacket.size = 0;
-
-    ret = avcodec_encode_video2(this->dataPtr->codecCtx, &avPacket,
-        frameToEncode, &gotOutput);
-
-    if (ret >= 0 && gotOutput == 1)
-      ret = ProcessPacket(&avPacket);
-
-    av_free_packet(&avPacket);
-
-    // #else for libavcodec version check
-#else
-
     AVPacket* avPacket = av_packet_alloc();
 
     avPacket->data = nullptr;
@@ -817,7 +723,6 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
     }
 
     av_packet_unref(avPacket);
-#endif
   }
   return ret >= 0 || ret == AVERROR(EAGAIN);
 }
@@ -859,31 +764,6 @@ bool VideoEncoder::Stop()
   // drain remaining packets from the encoder
   if (this->dataPtr->encoding && this->dataPtr->codecCtx)
   {
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 40, 101)
-    if ((this->dataPtr->codecCtx->capabilities & AV_CODEC_CAP_DELAY) > 0)
-    {
-      int gotOutput = 1;
-      int ret = 0;
-      AVPacket avPacket;
-      av_init_packet(&avPacket);
-      avPacket.data = nullptr;
-      avPacket.size = 0;
-
-      while (ret >= 0 && gotOutput == 1)
-      {
-        ret = avcodec_encode_video2(this->dataPtr->codecCtx, &avPacket,
-            nullptr, &gotOutput);
-
-        if (ret >= 0 && gotOutput == 1)
-          ret = ProcessPacket(&avPacket);
-      }
-
-      av_free_packet(&avPacket);
-  }
-
-// #else for libavcodec version check
-#else
-
     int ret = 0;
     // enter drain state
     ret = avcodec_send_frame(this->dataPtr->codecCtx, nullptr);
@@ -906,32 +786,21 @@ bool VideoEncoder::Stop()
       }
       av_packet_unref(avPacket);
     }
-#endif
   }
 
   if (this->dataPtr->encoding && this->dataPtr->formatCtx)
     av_write_trailer(this->dataPtr->formatCtx);
 
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 24, 1)
   if (this->dataPtr->codecCtx)
     avcodec_free_context(&this->dataPtr->codecCtx);
-#endif
   this->dataPtr->codecCtx = nullptr;
 
   if (this->dataPtr->avInFrame)
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
-    av_free(this->dataPtr->avInFrame);
-#else
     av_frame_free(&this->dataPtr->avInFrame);
-#endif
   this->dataPtr->avInFrame = nullptr;
 
   if (this->dataPtr->avOutFrame)
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
-    av_free(this->dataPtr->avOutFrame);
-#else
     av_frame_free(&this->dataPtr->avOutFrame);
-#endif
   this->dataPtr->avOutFrame = nullptr;
 
   if (this->dataPtr->swsCtx)
