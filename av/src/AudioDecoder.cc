@@ -35,7 +35,7 @@ class ignition::common::AudioDecoderPrivate
   public: AVCodecContext *codecCtx;
 
   /// \brief libavcodec audio codec.
-  public: AVCodec *codec;
+  public: const AVCodec *codec;
 
   /// \brief Index of the audio stream.
   public: int audioStream;
@@ -77,8 +77,12 @@ void AudioDecoder::Cleanup()
 /////////////////////////////////////////////////
 bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
 {
+#if LIBAVFORMAT_VERSION_MAJOR < 59
   AVPacket *packet, packet1;
   int bytesDecoded = 0;
+#else
+  AVPacket *packet;
+#endif
   unsigned int maxBufferSize = 0;
   AVFrame *decodedFrame = nullptr;
 
@@ -121,6 +125,53 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
   {
     if (packet->stream_index == this->data->audioStream)
     {
+#if LIBAVFORMAT_VERSION_MAJOR >= 59
+      // Inspired from
+      // https://github.com/FFmpeg/FFmpeg/blob/n5.0/doc/examples/decode_audio.c#L71
+
+      // send the packet with the compressed data to the decoder
+      int ret = avcodec_send_packet(this->data->codecCtx, packet);
+      if (ret < 0)
+      {
+        ignerr << "Error submitting the packet to the decoder" << std::endl;
+        return false;
+      }
+
+      // read all the output frames
+      // (in general there may be any number of them)
+      while (ret >= 0)
+      {
+        ret = avcodec_receive_frame(this->data->codecCtx, decodedFrame);
+        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
+        {
+          break;
+        }
+        else if (ret < 0)
+        {
+            ignerr << "Error during decoding" << std::endl;
+            return false;
+        }
+
+        // Total size of the data. Some padding can be added to
+        // decodedFrame->data[0], which is why we can't use
+        // decodedFrame->linesize[0].
+        int size = decodedFrame->nb_samples *
+          av_get_bytes_per_sample(this->data->codecCtx->sample_fmt) *
+          this->data->codecCtx->channels;
+
+        // Resize the audio buffer as necessary
+        if (*_outBufferSize + size > maxBufferSize)
+        {
+          maxBufferSize += size * 5;
+          *_outBuffer = reinterpret_cast<uint8_t*>(realloc(*_outBuffer,
+                maxBufferSize * sizeof(*_outBuffer[0])));
+        }
+
+        memcpy(*_outBuffer + *_outBufferSize, decodedFrame->data[0],
+            size);
+        *_outBufferSize += size;
+    }
+#else
       int gotFrame = 0;
 
       packet1 = *packet;
@@ -163,6 +214,7 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
         packet1.data += bytesDecoded;
         packet1.size -= bytesDecoded;
       }
+#endif
     }
     av_packet_unref(packet);
   }
@@ -224,8 +276,13 @@ bool AudioDecoder::SetFile(const std::string &_filename)
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
+#if LIBAVFORMAT_VERSION_MAJOR >= 59
+    if (this->data->formatCtx->streams[i]->codecpar->codec_type == // NOLINT(*)
+        AVMEDIA_TYPE_AUDIO)
+#else
     if (this->data->formatCtx->streams[i]->codec->codec_type == // NOLINT(*)
         AVMEDIA_TYPE_AUDIO)
+#endif
 #ifndef _WIN32
 # pragma GCC diagnostic pop
 #endif
@@ -249,14 +306,35 @@ bool AudioDecoder::SetFile(const std::string &_filename)
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
+#if LIBAVFORMAT_VERSION_MAJOR < 59
   this->data->codecCtx = this->data->formatCtx->streams[
     this->data->audioStream]->codec;
+#endif
 #ifndef _WIN32
 # pragma GCC diagnostic pop
 #endif
 
   // Find a decoder
+#if LIBAVFORMAT_VERSION_MAJOR >= 59
+  this->data->codec = avcodec_find_decoder(this->data->formatCtx->streams[
+    this->data->audioStream]->codecpar->codec_id);
+  if (!this->data->codec)
+  {
+    ignerr << "Failed to find the codec" << std::endl;
+    return false;
+  }
+  this->data->codecCtx = avcodec_alloc_context3(this->data->codec);
+  if (!this->data->codecCtx)
+  {
+    ignerr << "Failed to allocate the codec context" << std::endl;
+    return false;
+  }
+  // Copy all relevant parameters from codepar to codecCtx
+  avcodec_parameters_to_context(this->data->codecCtx,
+    this->data->formatCtx->streams[this->data->audioStream]->codecpar);
+#else
   this->data->codec = avcodec_find_decoder(this->data->codecCtx->codec_id);
+#endif
 
   if (this->data->codec == nullptr)
   {
