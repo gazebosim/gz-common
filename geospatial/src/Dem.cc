@@ -187,7 +187,8 @@ int Dem::Load(const std::string &_filename)
   // ignore them when computing the min elevation.
   int validNoData = 0;
   const double defaultNoDataValue = -9999;
-  double noDataValue = this->dataPtr->band->GetNoDataValue(&validNoData);
+  float noDataValue = this->dataPtr->band->GetNoDataValue(&validNoData);
+
   if (validNoData <= 0)
     noDataValue = defaultNoDataValue;
 
@@ -199,10 +200,10 @@ int Dem::Load(const std::string &_filename)
       continue;
 
     // All comparisons to NaN return false, so guard against NaN NoData
-    if (!std::isnan(noDataValue) && d <= noDataValue)
+    if (!std::isnan(noDataValue) &&  math::equal(d, noDataValue))
       continue;
 
-    if (std::isnan(d))
+    if (!std::isfinite(d))
     {
       continue;
     }
