@@ -128,8 +128,10 @@ TEST(AudioDecoder, IGN_UTILS_TEST_DISABLED_ON_WIN32(CheerFile))
     audio.Decode(&dataBuffer, &dataBufferSize);
     // In Ubuntu trusty the buffer size double for ogg decoding.
     // This check is suitable for both older and newer versions of Ubuntu.
+    // With ffmpeg 5.0 the value changed again (third value)
     EXPECT_TRUE(dataBufferSize == 4989184u ||
-                dataBufferSize == 4989184u * 2u);
+                dataBufferSize == 4989184u * 2u ||
+                dataBufferSize == 9975224u);
   }
 
   // MP3
