@@ -77,10 +77,3 @@ TEST_F(GTSMeshUtils, DelaunayTriangulation)
   // there should be 8 triangles.
   EXPECT_EQ(subMesh.IndexCount() / 3u, 8u);
 }
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}

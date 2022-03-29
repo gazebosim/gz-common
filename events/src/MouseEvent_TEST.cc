@@ -268,10 +268,3 @@ TEST_F(MouseEvent, Assignment)
   EXPECT_EQ(otherEvent.Alt(), alt);
   EXPECT_EQ(otherEvent.Control(), control);
 }
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}

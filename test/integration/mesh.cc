@@ -296,10 +296,3 @@ TEST_F(MeshTest, SubMeshCenter)
   EXPECT_EQ(ignition::math::Vector3d(5.46554, 2.18039, 4.8431), mesh->Max());
   EXPECT_EQ(ignition::math::Vector3d(3.46555, 0.180391, 2.8431), mesh->Min());
 }
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}
