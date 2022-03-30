@@ -106,7 +106,7 @@ class IGNITION_COMMON_AV_HIDDEN ignition::common::VideoEncoder::Implementation
   /// Find a suitable encoder for the given codec ID.
   /// \param[in] _codecId ID of the codec we seek the encoder for.
   /// \return The matched encoder (or nullptr on failure).
-  public: AVCodec* FindEncoder(AVCodecID _codecId);
+  public: const AVCodec* FindEncoder(AVCodecID _codecId);
 
   /// \brief Get a pointer to the frame that contains the encoder input. This
   /// mainly serves for uploading the frame to GPU buffer if HW acceleration is
@@ -123,7 +123,7 @@ class IGNITION_COMMON_AV_HIDDEN ignition::common::VideoEncoder::Implementation
 };
 
 /////////////////////////////////////////////////
-AVCodec* VideoEncoder::Implementation::FindEncoder(AVCodecID _codecId)
+const AVCodec* VideoEncoder::Implementation::FindEncoder(AVCodecID _codecId)
 {
 #ifdef IGN_COMMON_BUILD_HW_VIDEO
   if (this->hwEncoder)
@@ -367,7 +367,7 @@ bool VideoEncoder::Start(
   }
   else
   {
-    AVOutputFormat *outputFormat = av_guess_format(nullptr,
+    const AVOutputFormat *outputFormat = av_guess_format(nullptr,
                                    this->dataPtr->filename.c_str(), nullptr);
 
     if (!outputFormat)

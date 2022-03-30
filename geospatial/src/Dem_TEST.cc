@@ -244,10 +244,3 @@ TEST_F(DemTest, NonEarthDem)
   ignition::math::Angle latitude, longitude;
   EXPECT_FALSE(dem.GeoReferenceOrigin(latitude, longitude));
 }
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}

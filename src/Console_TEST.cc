@@ -539,10 +539,3 @@ TEST_F(Console_TEST, LogDirectory)
 
   EXPECT_EQ(logDir, absPath);
 }
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}

@@ -246,7 +246,7 @@ namespace ignition
     /// files, by appending numbers to it (i.e. (0), (1), ...)
     /// \param[in] _pathAndName Full absolute path and file name up to the
     /// file extension.
-    /// \param[in] _extension File extension, such as "ddf".
+    /// \param[in] _extension File extension, such as "sdf".
     /// \return Full path with name and extension, which doesn't collide with
     /// existing files
     std::string IGNITION_COMMON_VISIBLE uniqueFilePath(
