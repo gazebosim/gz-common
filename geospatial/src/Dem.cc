@@ -194,7 +194,7 @@ int Dem::Load(const std::string &_filename)
 
   double min = ignition::math::MAX_D;
   double max = -ignition::math::MAX_D;
-  for (auto &d : this->dataPtr->demData)
+  for (const auto &d : this->dataPtr->demData)
   {
     if (math::equal(d, this->dataPtr->bufferVal))
       continue;
