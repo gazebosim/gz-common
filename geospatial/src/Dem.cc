@@ -283,7 +283,7 @@ bool Dem::GeoReference(double _x, double _y,
         = strdup(this->dataPtr->dataSet->GetProjectionRef());
     if (importString == nullptr || importString[0] == '\0')
     {
-      ignwarn << "Projection coordinate system undefined." << std::endl;
+      igndbg << "Projection coordinate system undefined." << std::endl;
       return false;
     }
     sourceCs.importFromWkt(&importString);
@@ -309,7 +309,7 @@ bool Dem::GeoReference(double _x, double _y,
   }
   else
   {
-    ignerr << "Unable to obtain the georeferenced values for coordinates ("
+    igndbg << "Unable to obtain the georeferenced values for coordinates ("
            << _x << "," << _y << ")" << std::endl;
     return false;
   }
@@ -467,8 +467,7 @@ int Dem::LoadData()
 
   // Copy and align 'buffer' into the target vector. The destination vector is
   // initialized to max() and later converted to the minimum elevation, so all
-  // the points not contained in
-  // 'buffer' will be extra padding
+  // the points not contained in 'buffer' will be extra padding
   this->dataPtr->demData.resize(this->Width() * this->Height(),
       this->dataPtr->bufferVal);
   for (unsigned int y = 0; y < destHeight; ++y)
