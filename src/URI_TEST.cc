@@ -1006,10 +1006,3 @@ TEST(URITEST, Resource)
     EXPECT_TRUE(uri.Path().IsAbsolute());
   }
 }
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}

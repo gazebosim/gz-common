@@ -67,10 +67,3 @@ TEST_F(MaterialDensityTest, Accessors)
     EXPECT_DOUBLE_EQ(density, 19300);
   }
 }
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}

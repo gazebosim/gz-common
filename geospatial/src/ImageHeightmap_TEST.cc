@@ -99,10 +99,3 @@ TEST_F(ImageHeightmapTest, FillHeightmap)
   EXPECT_NEAR(10.0, elevations.at(elevations.size() - 1), ELEVATION_TOL);
   EXPECT_NEAR(5.0, elevations.at(elevations.size() / 2), ELEVATION_TOL);
 }
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}

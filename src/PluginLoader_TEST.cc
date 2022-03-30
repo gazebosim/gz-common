@@ -73,10 +73,3 @@ TEST(PluginLoader, InstantiateUnloadedPlugin)
       pm.Instantiate("plugin::that::is::not::loaded");
   EXPECT_FALSE(plugin);
 }
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}
