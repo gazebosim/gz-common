@@ -213,11 +213,11 @@ TEST_F(DemTest, NaNNoData)
 
   // Check that the min and max elevations are valid for a DEM with NaN
   // nodata values
-  EXPECT_EQ(65, static_cast<int>(dem.Height()));
-  EXPECT_EQ(65, static_cast<int>(dem.Width()));
+  EXPECT_EQ(129, static_cast<int>(dem.Height()));
+  EXPECT_EQ(129, static_cast<int>(dem.Width()));
 
-  EXPECT_NEAR(7499.8281, dem.WorldHeight(), 0.1);
-  EXPECT_NEAR(14150.225, dem.WorldWidth(), 0.1);
+  EXPECT_NEAR(7464.7589424555326, dem.WorldHeight(), 0.1);
+  EXPECT_NEAR(14244.280980717675, dem.WorldWidth(), 0.1);
 
   EXPECT_FLOAT_EQ(682.0f, dem.MinElevation());
   EXPECT_FLOAT_EQ(2932.0f, dem.MaxElevation());
