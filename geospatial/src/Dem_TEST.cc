@@ -56,6 +56,13 @@ TEST_F(DemTest, NonSquaredDemPortrait)
   common::Dem dem;
   const auto path = common::testing::TestFile("data", "dem_portrait.tif");
   EXPECT_EQ(dem.Load(path), 0);
+  EXPECT_DOUBLE_EQ(dem.Width(), dem.Height());
+  EXPECT_DOUBLE_EQ(257, dem.Height());
+  EXPECT_DOUBLE_EQ(257, dem.Width());
+  EXPECT_DOUBLE_EQ(111565.57640012962, dem.WorldHeight());
+  EXPECT_DOUBLE_EQ(87912.450080798269, dem.WorldWidth());
+  EXPECT_DOUBLE_EQ(-6.2633352279663086, dem.MinElevation());
+  EXPECT_DOUBLE_EQ(920.762939453125, dem.MaxElevation());
 }
 
 /////////////////////////////////////////////////
@@ -64,6 +71,13 @@ TEST_F(DemTest, NonSquaredDemLandscape)
   common::Dem dem;
   const auto path = common::testing::TestFile("data", "dem_landscape.tif");
   EXPECT_EQ(dem.Load(path), 0);
+  EXPECT_DOUBLE_EQ(dem.Width(), dem.Height());
+  EXPECT_DOUBLE_EQ(257, dem.Height());
+  EXPECT_DOUBLE_EQ(257, dem.Width());
+  EXPECT_DOUBLE_EQ(111565.57640012962, dem.WorldHeight());
+  EXPECT_DOUBLE_EQ(87912.450080798269, dem.WorldWidth());
+  EXPECT_DOUBLE_EQ(-4.7324686050415039, dem.MinElevation());
+  EXPECT_DOUBLE_EQ(921.4481201171875, dem.MaxElevation());
 }
 
 /////////////////////////////////////////////////
@@ -166,9 +180,7 @@ TEST_F(DemTest, UnfinishedDem)
   EXPECT_EQ(33, static_cast<int>(dem.Width()));
   EXPECT_FLOAT_EQ(111287.59f, dem.WorldHeight());
   EXPECT_FLOAT_EQ(88878.297f, dem.WorldWidth());
-  // gdal reports min elevation as -32768 but this is treated as a nodata
-  // by our dem class and ignored when computing the min elevation
-  EXPECT_FLOAT_EQ(-10.0f, dem.MinElevation());
+  EXPECT_FLOAT_EQ(-32768.0f, dem.MinElevation());
   EXPECT_FLOAT_EQ(1909.0f, dem.MaxElevation());
 
   // test another dem file with multiple nodata values
@@ -186,10 +198,29 @@ TEST_F(DemTest, UnfinishedDem)
   EXPECT_NEAR(7499.8281, demNoData.WorldHeight(), 0.1);
   EXPECT_NEAR(14150.225, demNoData.WorldWidth(), 0.1);
 
-  // gdal reports min elevation as -32767 but this is treated as a nodata
-  // by our dem class and ignored when computing the min elevation
+  // -32767 is the nodata value, so it's ignored when computing the min
+  // elevation
   EXPECT_FLOAT_EQ(682.0f, demNoData.MinElevation());
   EXPECT_FLOAT_EQ(2932.0f, demNoData.MaxElevation());
+}
+
+/////////////////////////////////////////////////
+TEST_F(DemTest, NaNNoData)
+{
+  common::Dem dem;
+  auto path = common::testing::TestFile("data", "dem_nodata_nan.nc");
+  EXPECT_EQ(dem.Load(path), 0);
+
+  // Check that the min and max elevations are valid for a DEM with NaN
+  // nodata values
+  EXPECT_EQ(129, static_cast<int>(dem.Height()));
+  EXPECT_EQ(129, static_cast<int>(dem.Width()));
+
+  EXPECT_NEAR(7464.7589424555326, dem.WorldHeight(), 0.1);
+  EXPECT_NEAR(14244.280980717675, dem.WorldWidth(), 0.1);
+
+  EXPECT_FLOAT_EQ(682.0f, dem.MinElevation());
+  EXPECT_FLOAT_EQ(2932.0f, dem.MaxElevation());
 }
 
 /////////////////////////////////////////////////
