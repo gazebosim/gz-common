@@ -86,7 +86,7 @@ Logger::~Logger()
 /////////////////////////////////////////////////
 Logger &Logger::operator()()
 {
-  Console::log << "(" << ignition::common::systemTimeIso() << ") ";
+  Console::log() << "(" << ignition::common::systemTimeIso() << ") ";
   (*this) << Console::Prefix() << this->prefix;
 
   return (*this);
@@ -97,7 +97,7 @@ Logger &Logger::operator()(const std::string &_file, int _line)
 {
   int index = _file.find_last_of("/") + 1;
 
-  Console::log << "(" << ignition::common::systemTimeIso() << ") ";
+  Console::log() << "(" << ignition::common::systemTimeIso() << ") ";
   std::stringstream prefixString;
   prefixString << Console::Prefix() << this->prefix
     << "[" << _file.substr(index , _file.size() - index) << ":"
