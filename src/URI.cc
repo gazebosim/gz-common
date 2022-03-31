@@ -1122,7 +1122,7 @@ bool URI::Valid(const std::string &_str)
 
     if (localScheme != "file" && authEndPos == authDelimPos+2)
     {
-      ignerr << "A host is manadatory when using a scheme other than file\n";
+      ignerr << "A host is mandatory when using a scheme other than file\n";
       return false;
     }
     else
