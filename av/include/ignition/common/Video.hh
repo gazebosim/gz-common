@@ -18,10 +18,9 @@
 #define IGNITION_COMMON_VIDEO_HH_
 
 #include <string>
-#include <memory>
 
 #include <ignition/common/av/Export.hh>
-#include <ignition/utils/SuppressWarning.hh>
+#include <ignition/utils/ImplPtr.hh>
 
 struct AVFormatContext;
 struct AVCodecContext;
@@ -33,9 +32,6 @@ namespace ignition
 {
   namespace common
   {
-    // Forward declare private data class
-    class VideoPrivate;
-
     /// \brief Handle video encoding and decoding using libavcodec
     class IGNITION_COMMON_AV_VISIBLE Video
     {
@@ -76,10 +72,8 @@ namespace ignition
       /// \brief free up open Video object, close files, streams
       private: void Cleanup();
 
-      IGN_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Private data pointer
-      private: std::unique_ptr<VideoPrivate> dataPtr;
-      IGN_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
+      IGN_UTILS_UNIQUE_IMPL_PTR(dataPtr)
     };
   }
 }

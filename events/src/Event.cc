@@ -39,13 +39,13 @@ bool Event::Signaled() const
 }
 
 //////////////////////////////////////////////////
-void Event::SetSignaled(const bool _sig)
+void Event::SetSignaled(bool _sig)
 {
   this->signaled = _sig;
 }
 
 //////////////////////////////////////////////////
-Connection::Connection(Event *_e, const int _i)
+Connection::Connection(Event *_e, int _i)
 : event(_e), id(_i)
 {
   this->creationTime = IGN_SYSTEM_TIME();

@@ -19,13 +19,12 @@
 
 #include <chrono>
 #include <string>
-#include <memory>
 #include <optional>
 
 #include <ignition/common/FlagSet.hh>
 #include <ignition/common/av/Export.hh>
 #include <ignition/common/HWVideo.hh>
-#include <ignition/utils/SuppressWarning.hh>
+#include <ignition/utils/ImplPtr.hh>
 
 // Default bitrate (0) indicates that a bitrate should be calculated when
 // Start is called.
@@ -39,9 +38,6 @@ namespace ignition
 {
   namespace common
   {
-    // Forward declare private data class
-    class VideoEncoderPrivate;
-
     /// \brief The VideoEncoder class supports encoding a series of images
     /// to a video format, and then writing the video to disk.
     class IGNITION_COMMON_AV_VISIBLE VideoEncoder
@@ -221,11 +217,8 @@ namespace ignition
       /// memory. This will also delete any temporary files.
       public: void Reset();
 
-      IGN_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
-      /// \internal
       /// \brief Private data pointer
-      private: std::unique_ptr<VideoEncoderPrivate> dataPtr;
-      IGN_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
+      IGN_UTILS_UNIQUE_IMPL_PTR(dataPtr)
     };
   }
 }

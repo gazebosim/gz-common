@@ -25,10 +25,17 @@ ign_create_core_library(
   SOURCES ${sources}
   CXX_STANDARD 17)
 
+if (CMAKE_CXX_COMPILER_ID STREQUAL GNU)
+    set(CXX_FILESYSTEM_LIBRARIES stdc++fs)
+else()
+    set(CXX_FILESYSTEM_LIBRARIES)
+endif()
+
 # Link the libraries that we always need
 target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME} 
   PRIVATE 
     ${DL_TARGET}
+    ${CXX_FILESYSTEM_LIBRARIES}
   PUBLIC
     ignition-utils${IGN_UTILS_VER}::ignition-utils${IGN_UTILS_VER}
 )

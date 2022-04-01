@@ -57,6 +57,11 @@ namespace ignition
     /// \return True if _path is a file.
     bool IGNITION_COMMON_VISIBLE isFile(const std::string &_path);
 
+    /// \brief Check if the given path is relative.
+    /// \param[in] _path Path.
+    /// \return True if _path is relative.
+    bool IGNITION_COMMON_VISIBLE isRelativePath(const std::string &_path);
+
     /// \brief Create a new directory on the filesystem.  Intermediate
     ///        directories must already exist.
     /// \param[in] _path  The new directory path to create
@@ -241,7 +246,7 @@ namespace ignition
     /// files, by appending numbers to it (i.e. (0), (1), ...)
     /// \param[in] _pathAndName Full absolute path and file name up to the
     /// file extension.
-    /// \param[in] _extension File extension, such as "ddf".
+    /// \param[in] _extension File extension, such as "sdf".
     /// \return Full path with name and extension, which doesn't collide with
     /// existing files
     std::string IGNITION_COMMON_VISIBLE uniqueFilePath(
@@ -264,9 +269,6 @@ namespace ignition
       /// \param[in] _in  Directory to iterate over.
       public: explicit DirIter(const std::string &_in);
 
-      /// \brief Destructor
-      public: ~DirIter();
-
       /// \brief Dereference operator; returns current directory record.
       /// \return A string representing the entire path of the directory
       /// record.
@@ -281,15 +283,6 @@ namespace ignition
       /// \param[in] _other  The other iterator to compare against.
       /// \return true if the iterators are equal, false otherwise.
       public: bool operator!=(const DirIter &_other) const;
-
-      /// \brief Move to the next directory record, skipping . and .. records.
-      private: void Next();
-
-      /// \brief Set the internal variable to the empty string.
-      private: void SetInternalEmpty();
-
-      /// \brief Close an open directory handle.
-      private: void CloseHandle();
 
       /// \brief Pointer to private data.
       IGN_UTILS_IMPL_PTR(dataPtr)

@@ -14,19 +14,20 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_HEIGHTMAPDATA_HH_
-#define IGNITION_COMMON_HEIGHTMAPDATA_HH_
+#ifndef IGNITION_COMMON_GEOSPATIAL_HEIGHTMAPDATA_HH_
+#define IGNITION_COMMON_GEOSPATIAL_HEIGHTMAPDATA_HH_
 
+#include <string>
 #include <vector>
 #include <ignition/math/Vector3.hh>
-#include <ignition/common/graphics/Export.hh>
+#include <ignition/common/geospatial/Export.hh>
 
 namespace ignition
 {
   namespace common
   {
     /// \brief Encapsulates a generic heightmap data file.
-    class IGNITION_COMMON_GRAPHICS_VISIBLE HeightmapData
+    class IGNITION_COMMON_GEOSPATIAL_VISIBLE HeightmapData
     {
       /// \brief Destructor.
       public: virtual ~HeightmapData() = default;
@@ -44,7 +45,7 @@ namespace ignition
       public: virtual void FillHeightMap(int _subSampling,
           unsigned int _vertSize, const ignition::math::Vector3d &_size,
           const ignition::math::Vector3d &_scale, bool _flipY,
-          std::vector<float> &_heights) = 0;
+          std::vector<float> &_heights) const = 0;
 
       /// \brief Get the terrain's height.
       /// \return The terrain's height.
@@ -57,6 +58,17 @@ namespace ignition
       /// \brief Get the maximum terrain's elevation.
       /// \return The maximum terrain's elevation.
       public: virtual float MaxElevation() const = 0;
+
+      /// \brief Get the min terrain's elevation.
+      /// \return The min terrain's elevation.
+      public: virtual float MinElevation() const
+              {
+                return 0.0f;
+              }
+
+      /// \brief Get the full filename of loaded heightmap image/dem
+      /// \return The filename used to load the heightmap image/dem
+      public: virtual std::string Filename() const = 0;
     };
   }
 }

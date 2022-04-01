@@ -15,7 +15,7 @@
  *
  */
 #include "ignition/common/Console.hh"
-#include "ignition/common/ImageHeightmap.hh"
+#include "ignition/common/geospatial/ImageHeightmap.hh"
 
 using namespace ignition;
 using namespace common;
@@ -41,7 +41,7 @@ int ImageHeightmap::Load(const std::string &_filename)
 void ImageHeightmap::FillHeightMap(int _subSampling,
     unsigned int _vertSize, const ignition::math::Vector3d &_size,
     const ignition::math::Vector3d &_scale, bool _flipY,
-    std::vector<float> &_heights)
+    std::vector<float> &_heights) const
 {
   // Resize the vector to match the size of the vertices.
   _heights.resize(_vertSize * _vertSize);

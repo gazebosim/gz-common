@@ -18,7 +18,7 @@
 #define IGNITION_COMMON_TIMER_HH_
 
 #include <ignition/common/Export.hh>
-#include <ignition/utils/SuppressWarning.hh>
+#include <ignition/utils/ImplPtr.hh>
 
 #include <chrono>
 #include <iostream>
@@ -33,9 +33,6 @@ namespace ignition
     {
       /// \brief Constructor
       public: Timer();
-
-      /// \brief Destructor
-      public: virtual ~Timer();
 
       /// \brief Start the timer
       public: virtual void Start();
@@ -59,16 +56,8 @@ namespace ignition
                 return out;
               }
 
-      IGN_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
-      /// \brief The time of the last call to Start
-      private: std::chrono::steady_clock::time_point start;
-
-      /// \brief The time when Stop was called.
-      private: std::chrono::steady_clock::time_point stop;
-      IGN_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
-
-      /// \brief True if the timer is running.
-      private: bool running;
+      /// \brief Private data pointer
+      IGN_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

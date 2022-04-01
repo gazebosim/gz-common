@@ -36,6 +36,8 @@
 #include <ignition/common/Util.hh>
 #include <ignition/common/Uuid.hh>
 
+#include <ignition/utils/NeverDestroyed.hh>
+
 #ifndef _WIN32
 #include <dirent.h>
 #include <limits.h>
@@ -55,8 +57,17 @@
   static const auto &ignstrtok = strtok_r;
 #endif
 
-static std::unique_ptr<ignition::common::SystemPaths> gSystemPaths(
-    new ignition::common::SystemPaths);
+/////////////////////////////////////////////////
+/// \brief Global instance of system paths for helper functions below
+///
+/// This uses the NeverDestroyed pattern to prevent static initialization and
+/// destruction order fiasco issues.
+ignition::common::SystemPaths& GetSystemPaths()
+{
+  static
+    ignition::utils::NeverDestroyed<ignition::common::SystemPaths> paths;
+  return paths.Access();
+}
 
 /////////////////////////////////////////////////
 // Internal class for SHA1 computation
@@ -286,26 +297,26 @@ std::string ignition::common::timeToIso(
 /////////////////////////////////////////////////
 std::string ignition::common::logPath()
 {
-  return gSystemPaths->LogPath();
+  return GetSystemPaths().LogPath();
 }
 
 /////////////////////////////////////////////////
 void ignition::common::addSearchPathSuffix(const std::string &_suffix)
 {
-  gSystemPaths->AddSearchPathSuffix(_suffix);
+  GetSystemPaths().AddSearchPathSuffix(_suffix);
 }
 
 /////////////////////////////////////////////////
 std::string ignition::common::findFile(const std::string &_file)
 {
-  return gSystemPaths->FindFile(_file, true);
+  return GetSystemPaths().FindFile(_file, true);
 }
 
 /////////////////////////////////////////////////
 std::string ignition::common::findFile(const std::string &_file,
                                        const bool _searchLocalPath)
 {
-  return gSystemPaths->FindFile(_file, _searchLocalPath);
+  return GetSystemPaths().FindFile(_file, _searchLocalPath);
 }
 
 /////////////////////////////////////////////////
@@ -328,13 +339,13 @@ std::string ignition::common::findFilePath(const std::string &_file)
 void ignition::common::addFindFileURICallback(
     std::function<std::string(const ignition::common::URI &)> _cb)
 {
-  gSystemPaths->AddFindFileURICallback(_cb);
+  GetSystemPaths().AddFindFileURICallback(_cb);
 }
 
 /////////////////////////////////////////////////
 ignition::common::SystemPaths *ignition::common::systemPaths()
 {
-  return gSystemPaths.get();
+  return &GetSystemPaths();
 }
 
 /////////////////////////////////////////////////

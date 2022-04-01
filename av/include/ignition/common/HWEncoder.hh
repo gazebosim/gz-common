@@ -16,7 +16,6 @@
 #ifndef IGNITION_COMMON_HWENCODER_HH
 #define IGNITION_COMMON_HWENCODER_HH
 
-#include <memory>
 #include <string>
 #include <optional>
 
@@ -24,14 +23,12 @@
 #include <ignition/common/av/Export.hh>
 #include <ignition/common/HWVideo.hh>
 #include <ignition/common/ffmpeg_inc.hh>
+#include <ignition/utils/ImplPtr.hh>
 
 /// This is an internal-use only class encapsulating HW video encoding. All
 /// symbols defined here are hidden from the public API.
 namespace ignition::common
 {
-  // Forward declare private data class
-  class HWVideoPrivate;
-
   /// \brief Representation of a GPU video encoder and its configuration.
   /// \note This class is intentionally hidden as it provides highly customized
   /// behavior tailored just for the use with VideoEncoder.
@@ -81,7 +78,8 @@ namespace ignition::common
     /// The value will be NONE until ConfigHWAccel() successfully finishes.
     public: HWEncoderType GetEncoderType() const;
 
-    private: std::unique_ptr<HWVideoPrivate> dataPtr;
+    /// \brief Private data pointer
+    IGN_UTILS_UNIQUE_IMPL_PTR(dataPtr)
   };
 }
 

@@ -314,10 +314,3 @@ TEST(Util_TEST, findFile)
   ignition::common::addFindFileURICallback(fileCb);
   EXPECT_EQ(tmpDir, ignition::common::findFile("model://banana"));
 }
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}

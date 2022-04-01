@@ -254,9 +254,3 @@ TEST_F(BatteryTest, SetUpdateFunc)
 
   EXPECT_DOUBLE_EQ(battery->Voltage(), origVolt);
 }
-
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}

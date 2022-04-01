@@ -48,9 +48,3 @@ TEST(TemplateHelpers, ConstCompatible)
   EXPECT_TRUE((ConstCompatible<SomeAliasedType, SomeType>::value));
   EXPECT_FALSE((ConstCompatible<SomeType, SomeAliasedType>::value));
 }
-
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}
