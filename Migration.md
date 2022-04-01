@@ -26,7 +26,8 @@ release will remove the deprecated code.
 
 ### Removals
 
-1. `PluginLoader.hh` has been removed.
+1. `PluginLoader.hh` has been removed. Please use the plugin loader from
+   ign-plugin.
 
 ## Ignition Common 3.X to 4.X
 
