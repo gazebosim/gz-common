@@ -67,11 +67,6 @@ else()
 endif()
 
 #--------------------------------------
-# Find libdl
-ign_find_package(
-  DL REQUIRED PRIVATE PRETTY libdl PURPOSE "Required for plugins")
-
-#--------------------------------------
 # Find dependencies that we ignore for Visual Studio
 if(NOT MSVC)
 

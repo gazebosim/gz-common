@@ -24,6 +24,10 @@ release will remove the deprecated code.
 
 1. `Image::AvgColor`, `Image::Data` and `Image::RGBData` methods are now `const`.
 
+### Removals
+
+1. `PluginLoader.hh` has been removed.
+
 ## Ignition Common 3.X to 4.X
 
 ### Modifications
