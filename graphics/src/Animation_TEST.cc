@@ -272,10 +272,3 @@ TEST_F(AnimationTest, TrajectoryInfo)
   EXPECT_DOUBLE_EQ(0.0, trajInfo4.DistanceSoFar(2000ms));
   EXPECT_DOUBLE_EQ(0.0, trajInfo4.DistanceSoFar(3000ms));
 }
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}
