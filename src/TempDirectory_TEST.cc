@@ -138,7 +138,7 @@ TEST(TempDirectory, TempDirectoryNoClean)
     EXPECT_TRUE(ignition::common::exists(path));
     EXPECT_EQ(path, ignition::common::cwd());
   }
-  // Current directory always changes back, regardless of doClean 
+  // Current directory always changes back, regardless of doClean
   EXPECT_EQ(curDir, ignition::common::cwd());
   EXPECT_TRUE(ignition::common::exists(path));
   EXPECT_TRUE(ignition::common::removeDirectory(path));
@@ -161,7 +161,7 @@ TEST(TempDirectory, TempDirectoryNoCleanLater)
     tmp.DoCleanup(false);
     EXPECT_FALSE(tmp.DoCleanup());
   }
-  // Current directory always changes back, regardless of doClean 
+  // Current directory always changes back, regardless of doClean
   EXPECT_EQ(curDir, ignition::common::cwd());
   EXPECT_TRUE(ignition::common::exists(path));
   EXPECT_TRUE(ignition::common::removeDirectory(path));

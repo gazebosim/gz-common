@@ -31,8 +31,8 @@ namespace ignition::common::testing
 ///
 /// \param[in] _filename Filename of the file to be created
 /// \return true if file successfully created, false otherwise
-bool 
-IGNITION_COMMON_TESTING_VISIBLE  
+bool
+IGNITION_COMMON_TESTING_VISIBLE
 createNewEmptyFile(const std::string &_filename);
 
 }  // namespace ignition::common::testing

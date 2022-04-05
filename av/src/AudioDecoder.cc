@@ -325,7 +325,8 @@ bool AudioDecoder::SetFile(const std::string &_filename)
   avcodec_parameters_to_context(this->dataPtr->codecCtx,
     this->dataPtr->formatCtx->streams[this->dataPtr->audioStream]->codecpar);
 #else
-  this->dataPtr->codec = avcodec_find_decoder(this->dataPtr->codecCtx->codec_id);
+  this->dataPtr->codec = avcodec_find_decoder(
+      this->dataPtr->codecCtx->codec_id);
 #endif
 
   if (this->dataPtr->codec == nullptr)
