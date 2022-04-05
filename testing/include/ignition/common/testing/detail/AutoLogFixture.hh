@@ -76,13 +76,19 @@ void AutoLogFixture::SetUp()
   common::setenv(IGN_HOMEDIR, this->dataPtr->temp->Path());
 
   // Initialize Console
-  ignLogInit(common::joinPaths(this->dataPtr->temp->Path(), "test_logs"),
-      this->dataPtr->logFilename);
+  auto logPath = common::joinPaths(this->dataPtr->temp->Path(), "test_logs");
+  ignLogInit(logPath, this->dataPtr->logFilename);
+
+  ASSERT_FALSE(logPath.empty());
+  ASSERT_TRUE(common::exists(
+        common::joinPaths(logPath, this->dataPtr->logFilename)));
 
   ignition::common::Console::SetVerbosity(4);
 
   // Read the full path to the log directory.
   this->dataPtr->logDirectory = ignLogDirectory();
+  ASSERT_FALSE(this->dataPtr->logDirectory.empty());
+  ASSERT_TRUE(ignition::common::exists(this->dataPtr->logDirectory));
 }
 
 //////////////////////////////////////////////////
