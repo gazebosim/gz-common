@@ -62,24 +62,25 @@ enum class IGNITION_COMMON_TESTING_VISIBLE BuildType
 class TestPaths
 {
   /// \brief Constructor
-  public: IGNITION_COMMON_TESTING_VISIBLE 
+  /// \param[in] _projectSourcePath Path to the root of the project source
+  public: IGNITION_COMMON_TESTING_VISIBLE
           explicit TestPaths(const std::string &_projectSourcePath =
               kTestingProjectSourceDir);
 
   /// \brief Destructor
-  public: IGNITION_COMMON_TESTING_VISIBLE 
+  public: IGNITION_COMMON_TESTING_VISIBLE
           virtual ~TestPaths() = 0;
 
   /// brief Populate the path to the root project source directory
   /// \param[out] _sourceDir path to the root project source directory
   /// \return True if path successfully found and set, false otherwise
-  public: virtual bool IGNITION_COMMON_TESTING_VISIBLE 
+  public: virtual bool IGNITION_COMMON_TESTING_VISIBLE
           ProjectSourcePath(std::string &_sourceDir) = 0;
 
   /// \brief Populate the path to a temporary directory
   /// \param[out] _tmpDir path to the root temporary directory
   /// \return True if path successfully found and set, false otherwise
-  public: virtual bool IGNITION_COMMON_TESTING_VISIBLE 
+  public: virtual bool IGNITION_COMMON_TESTING_VISIBLE
           TestTmpPath(std::string &_tmpDir) = 0;
 
   /// \brief Path to the root of the project source
@@ -98,7 +99,7 @@ class TestPaths
 ///   be cleaned as part of the destructor
 /// \return Shared pointer to TempDirectory
 std::shared_ptr<ignition::common::TempDirectory>
-IGNITION_COMMON_TESTING_VISIBLE 
+IGNITION_COMMON_TESTING_VISIBLE
 MakeTestTempDirectoryImpl(const std::string &_projectSourcePath,
                           const std::string &_prefix = "test",
                           const std::string &_subDir = "ignition",
@@ -133,7 +134,7 @@ MakeTestTempDirectory(const std::string &_prefix = "test",
 /// \param[in] _projectSourcePath Root of project source or empty
 /// \return The current build type
 BuildType
-IGNITION_COMMON_TESTING_VISIBLE 
+IGNITION_COMMON_TESTING_VISIBLE
 TestBuildType(
     const std::string &_projectSourcePath = kTestingProjectSourceDir);
 
@@ -143,7 +144,7 @@ TestBuildType(
 /// \param[in] _projectSourcePath Root of project source or empty
 /// \return TestPaths implementation for the current build type
 std::unique_ptr<TestPaths>
-IGNITION_COMMON_TESTING_VISIBLE 
+IGNITION_COMMON_TESTING_VISIBLE
 TestPathFactory(
     const std::string &_projectSourcePath = kTestingProjectSourceDir);
 
