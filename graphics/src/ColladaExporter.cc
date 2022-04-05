@@ -488,12 +488,17 @@ void ColladaExporter::Implementation::ExportGeometries(
 {
   for (unsigned int i = 0; i < this->subMeshCount; ++i)
   {
-    unsigned int materialIndex =
-      this->mesh->SubMeshByIndex(i).lock()->MaterialIndex();
+    std::shared_ptr<SubMesh> subMesh = this->mesh->SubMeshByIndex(i).lock();
+    if (!subMesh)
+      continue;
 
     char meshId[100], materialId[100];
     snprintf(meshId, sizeof(meshId), "mesh_%u", i);
-    snprintf(materialId, sizeof(materialId), "material_%u", materialIndex);
+    if (subMesh->GetMaterialIndex())
+    {
+      snprintf(materialId, sizeof(materialId), "material_%u",
+          subMesh->GetMaterialIndex().value());
+    }
 
     tinyxml2::XMLElement *geometryXml =
       _libraryGeometriesXml->GetDocument()->NewElement("geometry");
@@ -503,10 +508,6 @@ void ColladaExporter::Implementation::ExportGeometries(
     tinyxml2::XMLElement *meshXml =
       _libraryGeometriesXml->GetDocument()->NewElement("mesh");
     geometryXml->LinkEndChild(meshXml);
-
-    std::shared_ptr<SubMesh> subMesh = this->mesh->SubMeshByIndex(i).lock();
-    if (!subMesh)
-      continue;
 
     this->ExportGeometrySource(subMesh.get(), meshXml, POSITION, meshId);
     this->ExportGeometrySource(subMesh.get(), meshXml, NORMAL, meshId);
@@ -887,9 +888,10 @@ void ColladaExporter::Implementation::ExportVisualScenes(
     snprintf(attributeValue, sizeof(attributeValue), "#%s", meshId);
     instanceGeometryXml->SetAttribute("url", attributeValue);
 
-    unsigned int materialIndex =
-      this->mesh->SubMeshByIndex(i).lock()->MaterialIndex();
-
+    const auto subMesh = this->mesh->SubMeshByIndex(i).lock();
+    if (!subMesh->GetMaterialIndex())
+      continue;
+    const auto materialIndex = subMesh->GetMaterialIndex().value();
     const ignition::common::MaterialPtr material =
       this->mesh->MaterialByIndex(materialIndex);
 

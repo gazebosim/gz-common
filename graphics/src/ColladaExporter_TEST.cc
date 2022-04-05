@@ -227,20 +227,24 @@ TEST_F(ColladaExporter, ExportMeshWithSubmeshes)
   std::vector<math::Matrix4d> subMeshMatrix;
   math::Pose3d localPose = math::Pose3d::Zero;
 
+  const auto subMesh = boxMesh->SubMeshByIndex(0).lock();
+  ASSERT_NE(nullptr, subMesh);
+  ASSERT_TRUE(subMesh->GetMaterialIndex().has_value());
   int i = outMesh.AddMaterial(
-    boxMesh->MaterialByIndex(
-      boxMesh->SubMeshByIndex(0).lock()->MaterialIndex()));
-  subm = outMesh.AddSubMesh(*boxMesh->SubMeshByIndex(0).lock().get());
+    boxMesh->MaterialByIndex(subMesh->GetMaterialIndex().value()));
+  subm = outMesh.AddSubMesh(*subMesh.get());
   subm.lock()->SetMaterialIndex(i);
 
   localPose.SetX(10);
   math::Matrix4d matrix(localPose);
   subMeshMatrix.push_back(matrix);
 
+  const auto drillSubMesh = drillMesh->SubMeshByIndex(0).lock();
+  ASSERT_NE(nullptr, drillSubMesh);
+  ASSERT_TRUE(drillSubMesh->GetMaterialIndex().has_value());
   i = outMesh.AddMaterial(
-    drillMesh->MaterialByIndex(
-      drillMesh->SubMeshByIndex(0).lock()->MaterialIndex()));
-  subm = outMesh.AddSubMesh(*drillMesh->SubMeshByIndex(0).lock().get());
+    drillMesh->MaterialByIndex(drillSubMesh->GetMaterialIndex().value()));
+  subm = outMesh.AddSubMesh(*drillSubMesh.get());
   subm.lock()->SetMaterialIndex(i);
 
   localPose.SetX(-10);
