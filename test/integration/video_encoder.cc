@@ -138,4 +138,3 @@ TEST_F(EncoderDecoderTest, DecodeEncodeDecode)
 
   delete[] buf;
 }
-

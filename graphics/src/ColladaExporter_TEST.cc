@@ -447,10 +447,3 @@ TEST_F(ColladaExporter, ExportLights)
   }
   EXPECT_EQ(node_with_light_count, 3);
 }
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}

@@ -16,7 +16,7 @@
 */
 #include <gtest/gtest.h>
 
-#include "ignition/common/ImageHeightmap.hh"
+#include "ignition/common/geospatial/ImageHeightmap.hh"
 #include "test_config.h"
 
 #define ELEVATION_TOL 1e-8
@@ -28,7 +28,7 @@ class ImageHeightmapTest : public common::testing::AutoLogFixture { };
 class DemTest : public common::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
-TEST_F(DemTest, MisingFile)
+TEST_F(DemTest, MissingFile)
 {
   common::ImageHeightmap img;
   EXPECT_EQ(-1, img.Load("/file/shouldn/never/exist.png"));
@@ -50,6 +50,9 @@ TEST_F(ImageHeightmapTest, BasicAPI)
   const auto path = common::testing::TestFile("data", "heightmap_bowl.png");
   std::cout << "PATH[" << path << "]\n";
   EXPECT_EQ(0, img.Load(path));
+
+  // Check filename
+  EXPECT_EQ(path, img.Filename());
 
   // Check the heights and widths
   EXPECT_EQ(129, static_cast<int>(img.Height()));
@@ -95,11 +98,4 @@ TEST_F(ImageHeightmapTest, FillHeightmap)
   EXPECT_NEAR(0.0, elevations.at(0), ELEVATION_TOL);
   EXPECT_NEAR(10.0, elevations.at(elevations.size() - 1), ELEVATION_TOL);
   EXPECT_NEAR(5.0, elevations.at(elevations.size() / 2), ELEVATION_TOL);
-}
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
 }

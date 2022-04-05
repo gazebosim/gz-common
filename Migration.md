@@ -7,11 +7,26 @@ release will remove the deprecated code.
 
 ## Ignition Common 4.X to 5.X
 
+### Deprecations
+
 1. `Submesh::MaterialIndex` is deprecated. `SubMesh::GetMaterialIndex` should
    be used instead, which properly handles submeshes having no material index
    applied to them.
 
+### Additions
+
+1. **geospatial** component that loads heightmap images and DEMs
+    + Depends on the ign-common's `graphics` component and the `gdal` library
+
 ### Modifications
+
+1. `HeightmapData.hh` and `ImageHeightmap.hh` have been moved out of the
+`graphics` component and into the new `geospatial` component
+    + To use the heightmap features, users must add the `geospatial` component
+      to the `find_package` call and update the include paths to use
+      the geospatial subfolder (`#include <ignition/common/geospatial/HeightmapData.hh>`)
+
+1. `HeightmapData::FillHeightmap` method is now `const`.
 
 1. `Image::AvgColor`, `Image::Data` and `Image::RGBData` methods are now `const`.
 

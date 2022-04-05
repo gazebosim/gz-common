@@ -49,10 +49,3 @@ TEST_F(Base64, EncodeDecode)
   }
   EXPECT_EQ(original, common::Base64::Decode(encoded));
 }
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}

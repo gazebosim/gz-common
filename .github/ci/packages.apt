@@ -3,6 +3,7 @@ libavdevice-dev
 libavformat-dev
 libavutil-dev
 libfreeimage-dev
+libgdal-dev
 libgts-dev
 libignition-cmake2-dev
 libignition-math7-dev
@@ -10,5 +11,4 @@ libignition-utils1-dev
 libswscale-dev
 libtinyxml2-dev
 pkg-config
-ruby-ronn
 uuid-dev

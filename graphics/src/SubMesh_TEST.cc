@@ -503,10 +503,3 @@ TEST_F(SubMeshTest, Volume)
   boxSub.AddIndex(1);
   EXPECT_DOUBLE_EQ(0.0, boxSub.Volume());
 }
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}

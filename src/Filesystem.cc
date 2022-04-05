@@ -99,8 +99,7 @@ bool ignition::common::createDirectories(const std::string &_path)
 /////////////////////////////////////////////////
 std::string const ignition::common::separator(std::string const &_s)
 {
-  fs::path path(_s);
-  return (_s / fs::path("")).string();
+  return _s + std::string{fs::path::preferred_separator};
 }
 
 /////////////////////////////////////////////////
@@ -143,6 +142,11 @@ std::string ignition::common::joinPaths(
 {
   fs::path p1{_path1};
   fs::path p2{_path2};
+
+  if (p1.empty())
+  {
+    p1 = ignition::common::separator("");
+  }
 
   bool is_url = false;
 
@@ -202,24 +206,23 @@ bool ignition::common::chdir(const std::string &_dir)
 std::string ignition::common::basename(const std::string &_path)
 {
   fs::path p(_path);
-  // Maintain compatibility with ign-common
-  if (*_path.rbegin() == fs::path::preferred_separator)
-    p = fs::path(_path.substr(0, _path.size()-1));
-  return p.filename().string();
+  p /= "FOO.TXT";
+  p = p.lexically_normal();
+  p = p.parent_path();
+  return p.filename().string().empty() ?
+    std::string{fs::path::preferred_separator} : p.filename().string();
 }
 
 /////////////////////////////////////////////////
 std::string ignition::common::parentPath(const std::string &_path)
 {
-  fs::path p(_path);
-  // Maintain compatibility with ign-common
-  if (*_path.rbegin() == fs::path::preferred_separator)
-    p = fs::path(_path.substr(0, _path.size()-1));
-
-  if (!p.has_parent_path())
-    return _path;
-
-  return p.parent_path().string();
+  std::string result;
+  size_t last_sep = _path.find_last_of(separator(""));
+  // If slash is the last character, find its parent directory
+  if (last_sep == _path.length() - 1)
+    last_sep = _path.substr(0, last_sep).find_last_of(separator(""));
+  result = _path.substr(0, last_sep);
+  return result;
 }
 
 /////////////////////////////////////////////////
