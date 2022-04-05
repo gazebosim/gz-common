@@ -73,14 +73,14 @@ class TestPaths
   /// brief Populate the path to the root project source directory
   /// \param[out] _sourceDir path to the root project source directory
   /// \return True if path successfully found and set, false otherwise
-  public: virtual IGNITION_COMMON_TESTING_VISIBLE 
-          bool ProjectSourcePath(std::string &_sourceDir) = 0;
+  public: virtual bool IGNITION_COMMON_TESTING_VISIBLE 
+          ProjectSourcePath(std::string &_sourceDir) = 0;
 
   /// \brief Populate the path to a temporary directory
   /// \param[out] _tmpDir path to the root temporary directory
   /// \return True if path successfully found and set, false otherwise
-  public: virtual IGNITION_COMMON_TESTING_VISIBLE
-          bool TestTmpPath(std::string &_tmpDir) = 0;
+  public: virtual bool IGNITION_COMMON_TESTING_VISIBLE 
+          TestTmpPath(std::string &_tmpDir) = 0;
 
   /// \brief Path to the root of the project source
   protected: std::string projectSourcePath;
