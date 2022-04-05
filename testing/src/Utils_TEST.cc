@@ -23,28 +23,6 @@ using namespace ignition::common;
 using namespace ignition::common::testing;
 
 /////////////////////////////////////////////////
-TEST(Utils, GetRandomNumber)
-{
-  // Force to 1
-  auto val1 = getRandomNumber(1, 1);
-  EXPECT_EQ("1", val1);
-
-  // Force to 100
-  auto val100 = getRandomNumber(100, 100);
-  EXPECT_EQ("100", val100);
-
-
-  for (size_t ii = 0; ii < 1000; ++ii)
-  {
-    auto val_str = getRandomNumber(0, 100);
-    EXPECT_FALSE(val_str.empty());
-    auto vv = std::stoi(val_str);
-    EXPECT_GE(vv, 0);
-    EXPECT_LE(vv, 100);
-  }
-}
-
-/////////////////////////////////////////////////
 TEST(Utils, CreateNewEmptyFile)
 {
   auto tmpDir = MakeTestTempDirectory();

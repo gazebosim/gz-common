@@ -27,13 +27,6 @@ namespace ignition::common::testing
 {
 
 /////////////////////////////////////////////////
-/// \brief Get a random number based on an integer converted to string.
-/// \return A random integer converted to string.
-std::string 
-IGNITION_COMMON_TESTING_VISIBLE  
-getRandomNumber(int32_t _min = 0, int32_t _max = INT_MAX);
-
-/////////////////////////////////////////////////
 /// \brief Create an empty file with no content
 ///
 /// \param[in] _filename Filename of the file to be created
