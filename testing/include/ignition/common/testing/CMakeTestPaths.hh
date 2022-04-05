@@ -31,16 +31,18 @@ namespace ignition::common::testing
 class CMakeTestPaths: public TestPaths
 {
   /// \brief Constructor from TestPaths
-  public: using TestPaths::TestPaths;
+  public: IGNITION_COMMON_TESTING_VISIBLE using TestPaths::TestPaths;
 
   /// \brief Destructor
-  public: ~CMakeTestPaths() override;
+  public: IGNITION_COMMON_TESTING_VISIBLE ~CMakeTestPaths() override;
 
   /// Documentation inherited
-  public: bool ProjectSourcePath(std::string &_sourceDir) override;
+  public: bool IGNITION_COMMON_TESTING_VISIBLE 
+          ProjectSourcePath(std::string &_sourceDir) override;
 
   /// Documentation inherited
-  public: bool TestTmpPath(std::string &_tmpDir) override;
+  public: bool IGNITION_COMMON_TESTING_VISIBLE 
+          TestTmpPath(std::string &_tmpDir) override;
 };
 }  // namespace ignition::common::testing
 #endif  // IGNITION_COMMON_TESTING_CMAKETESTPATHS_HH_
