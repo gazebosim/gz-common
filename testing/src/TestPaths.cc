@@ -39,10 +39,15 @@ BuildType TestBuildType(const std::string &_projectSourcePath)
   bool ign_bazel_set = common::env("IGN_BAZEL", ign_bazel);
   bool ign_cmake_set = !_projectSourcePath.empty();
 
-  if (ign_bazel_set)
-    return BuildType::kBazel;
-  else if (ign_cmake_set)
+  if (ign_bazel_set && ign_cmake_set)
+  {
+    ignwarn << "Detected settings from Bazel and CMake, preferring CMake\n";
+  }
+
+  if (ign_cmake_set)
     return BuildType::kCMake;
+  else if (ign_bazel_set)
+    return BuildType::kBazel;
   else
     return BuildType::kUnknown;
 }
