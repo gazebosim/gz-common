@@ -31,7 +31,7 @@ namespace ignition::common::testing
 class CMakeTestPaths: public TestPaths
 {
   /// \brief Constructor from TestPaths
-  public: IGNITION_COMMON_TESTING_VISIBLE using TestPaths::TestPaths;
+  public: using TestPaths::TestPaths;
 
   /// \brief Destructor
   public: IGNITION_COMMON_TESTING_VISIBLE ~CMakeTestPaths() override;
