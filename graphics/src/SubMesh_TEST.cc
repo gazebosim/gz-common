@@ -31,7 +31,7 @@ class SubMeshTest : public common::testing::AutoLogFixture { };
 TEST_F(SubMeshTest, SubMesh)
 {
   common::SubMeshPtr submesh(new common::SubMesh());
-  EXPECT_TRUE(submesh != NULL);
+  ASSERT_NE(nullptr, submesh);
 
   submesh->SetName("new_submesh");
   EXPECT_EQ(submesh->Name(), "new_submesh");
@@ -39,8 +39,10 @@ TEST_F(SubMeshTest, SubMesh)
   submesh->SetPrimitiveType(common::SubMesh::TRIANGLES);
   EXPECT_EQ(submesh->SubMeshPrimitiveType(), common::SubMesh::TRIANGLES);
 
+  EXPECT_FALSE(submesh->GetMaterialIndex().has_value());
   submesh->SetMaterialIndex(3u);
-  EXPECT_EQ(submesh->MaterialIndex(), 3u);
+  ASSERT_TRUE(submesh->GetMaterialIndex().has_value());
+  EXPECT_EQ(submesh->GetMaterialIndex(), 3u);
 
   // verify empty submesh
   EXPECT_EQ(submesh->Min(), math::Vector3d::Zero);
@@ -238,9 +240,9 @@ TEST_F(SubMeshTest, SubMesh)
 
   // copy constructor
   common::SubMeshPtr submeshCopy(new common::SubMesh(*(submesh.get())));
-  EXPECT_TRUE(submeshCopy != NULL);
+  ASSERT_NE(nullptr, submeshCopy);
   EXPECT_EQ(submeshCopy->Name(), submesh->Name());
-  EXPECT_EQ(submeshCopy->MaterialIndex(), submesh->MaterialIndex());
+  EXPECT_EQ(submeshCopy->GetMaterialIndex(), submesh->GetMaterialIndex());
   EXPECT_EQ(submeshCopy->SubMeshPrimitiveType(),
       submesh->SubMeshPrimitiveType());
   EXPECT_EQ(submeshCopy->VertexCount(), submesh->VertexCount());
