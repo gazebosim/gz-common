@@ -24,6 +24,8 @@
 #include "ignition/common/TempDirectory.hh"
 #include "ignition/common/Util.hh"
 
+#include "ignition/common/testing/Export.hh"
+
 #ifndef TESTING_PROJECT_SOURCE_DIR
 #define TESTING_PROJECT_SOURCE_DIR ""
 #endif
@@ -44,7 +46,7 @@ constexpr char kTestingProjectSourceDir[] = TESTING_PROJECT_SOURCE_DIR;
 
 //////////////////////////////////////////////////
 /// \brief List of buildsystem types
-enum class BuildType
+enum class IGNITION_COMMON_TESTING_VISIBLE BuildType
 {
   kUnknown,
   kCMake,
@@ -60,21 +62,25 @@ enum class BuildType
 class TestPaths
 {
   /// \brief Constructor
-  public: explicit TestPaths(const std::string &_projectSourcePath =
+  public: IGNITION_COMMON_TESTING_VISIBLE 
+          explicit TestPaths(const std::string &_projectSourcePath =
               kTestingProjectSourceDir);
 
   /// \brief Destructor
-  public: virtual ~TestPaths() = 0;
+  public: IGNITION_COMMON_TESTING_VISIBLE 
+          virtual ~TestPaths() = 0;
 
   /// brief Populate the path to the root project source directory
   /// \param[out] _sourceDir path to the root project source directory
   /// \return True if path successfully found and set, false otherwise
-  public: virtual bool ProjectSourcePath(std::string &_sourceDir) = 0;
+  public: virtual IGNITION_COMMON_TESTING_VISIBLE 
+          bool ProjectSourcePath(std::string &_sourceDir) = 0;
 
   /// \brief Populate the path to a temporary directory
   /// \param[out] _tmpDir path to the root temporary directory
   /// \return True if path successfully found and set, false otherwise
-  public: virtual bool TestTmpPath(std::string &_tmpDir) = 0;
+  public: virtual IGNITION_COMMON_TESTING_VISIBLE
+          bool TestTmpPath(std::string &_tmpDir) = 0;
 
   /// \brief Path to the root of the project source
   protected: std::string projectSourcePath;
@@ -92,6 +98,7 @@ class TestPaths
 ///   be cleaned as part of the destructor
 /// \return Shared pointer to TempDirectory
 std::shared_ptr<ignition::common::TempDirectory>
+IGNITION_COMMON_TESTING_VISIBLE 
 MakeTestTempDirectoryImpl(const std::string &_projectSourcePath,
                           const std::string &_prefix = "test",
                           const std::string &_subDir = "ignition",
@@ -126,6 +133,7 @@ MakeTestTempDirectory(const std::string &_prefix = "test",
 /// \param[in] _projectSourcePath Root of project source or empty
 /// \return The current build type
 BuildType
+IGNITION_COMMON_TESTING_VISIBLE 
 TestBuildType(
     const std::string &_projectSourcePath = kTestingProjectSourceDir);
 
@@ -135,6 +143,7 @@ TestBuildType(
 /// \param[in] _projectSourcePath Root of project source or empty
 /// \return TestPaths implementation for the current build type
 std::unique_ptr<TestPaths>
+IGNITION_COMMON_TESTING_VISIBLE 
 TestPathFactory(
     const std::string &_projectSourcePath = kTestingProjectSourceDir);
 

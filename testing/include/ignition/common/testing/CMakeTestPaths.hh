@@ -20,6 +20,7 @@
 #include <string>
 
 #include "ignition/common/testing/TestPaths.hh"
+#include "ignition/common/testing/Export.hh"
 
 namespace ignition::common::testing
 {
