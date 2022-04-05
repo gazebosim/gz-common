@@ -172,14 +172,20 @@ TempDirectory::TempDirectory(const std::string &_root,
                              bool _cleanup):
   dataPtr(ignition::utils::MakeUniqueImpl<Implementation>())
 {
-
   this->dataPtr->oldPath = common::cwd();
   this->dataPtr->doCleanup = _cleanup;
+
+  if (_root.empty())
+  {
+    this->dataPtr->isValid = false;
+    ignwarn << "Failed to create temp directory: _root was empty\n";
+    return;
+  }
 
   auto tempPath = _root;
   if (!_subDir.empty())
   {
-    tempPath = common::joinPaths(tempPath, _subDir);
+    tempPath = common::joinPaths(_root, _subDir);
   }
   this->dataPtr->path = common::createTempDirectory(_prefix, tempPath);
   if (!this->dataPtr->path.empty())
