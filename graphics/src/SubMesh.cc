@@ -496,10 +496,8 @@ void SubMesh::SetMaterialIndex(const unsigned int _index)
 //////////////////////////////////////////////////
 unsigned int SubMesh::MaterialIndex() const
 {
-  if (this-dataPtr->materialIndex.has_value())
-    return this->dataPtr->materialIndex.value();
-
-  return std::numeric_limits<unsigned int>::max();
+  return this->dataPtr->materialIndex.value_or(
+      std::numeric_limits<unsigned int>::max());
 }
 
 //////////////////////////////////////////////////
