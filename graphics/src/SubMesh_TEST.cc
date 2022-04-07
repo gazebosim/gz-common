@@ -39,6 +39,22 @@ TEST_F(SubMeshTest, SubMesh)
   submesh->SetPrimitiveType(common::SubMesh::TRIANGLES);
   EXPECT_EQ(submesh->SubMeshPrimitiveType(), common::SubMesh::TRIANGLES);
 
+  {
+    // Test deprecated API
+    // TODO(azeey) Remove this scope block when MaterialIndex is removed
+    IGN_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
+    EXPECT_EQ(submesh->MaterialIndex(),
+              std::numeric_limits<unsigned int>::max());
+    submesh->SetMaterialIndex(3u);
+    EXPECT_EQ(submesh->MaterialIndex(), 3u);
+    // Recreate submesh to so test expectations following this block won't
+    // break.
+    submesh = std::make_shared<common::SubMesh>();
+    ASSERT_NE(nullptr, submesh);
+    IGN_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
+  }
+
+  // Use new API
   EXPECT_FALSE(submesh->GetMaterialIndex().has_value());
   submesh->SetMaterialIndex(3u);
   ASSERT_TRUE(submesh->GetMaterialIndex().has_value());
