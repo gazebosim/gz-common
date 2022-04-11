@@ -70,6 +70,10 @@ void AutoLogFixture::SetUp()
   std::string testCaseName = testInfo->test_case_name();
   this->dataPtr->logFilename = testCaseName + "_" + testName + ".log";
 
+  std::replace(this->dataPtr->logFilename.begin(),
+               this->dataPtr->logFilename.end(),
+               '/', '_');
+
   this->dataPtr->temp = std::make_unique<TempDirectory>(
       "test", "ign_common", false);
   ASSERT_TRUE(this->dataPtr->temp->Valid());
@@ -84,6 +88,9 @@ void AutoLogFixture::SetUp()
         common::joinPaths(logPath, this->dataPtr->logFilename)));
 
   ignition::common::Console::SetVerbosity(4);
+  igndbg << "Initialized AutoLogFixture (logPath: " 
+    << logPath << ") (logFilename: " 
+    << this->dataPtr->logFilename << ")\n";
 
   // Read the full path to the log directory.
   this->dataPtr->logDirectory = ignLogDirectory();
