@@ -325,7 +325,8 @@ bool AudioDecoder::SetFile(const std::string &_filename)
   avcodec_parameters_to_context(this->dataPtr->codecCtx,
     this->dataPtr->formatCtx->streams[this->dataPtr->audioStream]->codecpar);
 #else
-  this->dataPtr->codec = avcodec_find_decoder(this->dataPtr->codecCtx->codec_id);
+  this->dataPtr->codec = avcodec_find_decoder(
+      this->dataPtr->codecCtx->codec_id);
 #endif
 
   if (this->dataPtr->codec == nullptr)
@@ -346,7 +347,7 @@ bool AudioDecoder::SetFile(const std::string &_filename)
 #endif
 
   // Open codec
-  if (avcodec_open2(this->dataPtr->codecCtx, 
+  if (avcodec_open2(this->dataPtr->codecCtx,
         this->dataPtr->codec, nullptr) < 0)
   {
     ignerr << "Couldn't open audio codec.\n";

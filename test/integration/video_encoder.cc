@@ -18,6 +18,7 @@
 // needed on MacOS
 #include <cmath>
 
+#include "ignition/common/Console.hh"
 #include "ignition/common/VideoEncoder.hh"
 #include "ignition/common/Video.hh"
 #include "ignition/common/ffmpeg_inc.hh"

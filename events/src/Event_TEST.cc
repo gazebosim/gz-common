@@ -21,6 +21,7 @@
 
 #include <functional>
 #include <ignition/common/Event.hh>
+#include <ignition/common/Util.hh>
 
 using namespace ignition;
 

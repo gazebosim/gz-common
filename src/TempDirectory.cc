@@ -161,16 +161,31 @@ class ignition::common::TempDirectory::Implementation
 TempDirectory::TempDirectory(const std::string &_prefix,
                              const std::string &_subDir,
                              bool _cleanup):
+  TempDirectory(common::tempDirectoryPath(), _prefix, _subDir, _cleanup)
+{
+}
+
+/////////////////////////////////////////////////
+TempDirectory::TempDirectory(const std::string &_root,
+                             const std::string &_prefix,
+                             const std::string &_subDir,
+                             bool _cleanup):
   dataPtr(ignition::utils::MakeUniqueImpl<Implementation>())
 {
-
   this->dataPtr->oldPath = common::cwd();
   this->dataPtr->doCleanup = _cleanup;
 
-  auto tempPath = common::tempDirectoryPath();
+  if (_root.empty())
+  {
+    this->dataPtr->isValid = false;
+    ignwarn << "Failed to create temp directory: _root was empty\n";
+    return;
+  }
+
+  auto tempPath = _root;
   if (!_subDir.empty())
   {
-    tempPath = common::joinPaths(tempPath, _subDir);
+    tempPath = common::joinPaths(_root, _subDir);
   }
   this->dataPtr->path = common::createTempDirectory(_prefix, tempPath);
   if (!this->dataPtr->path.empty())
@@ -180,6 +195,7 @@ TempDirectory::TempDirectory(const std::string &_prefix,
   }
   this->dataPtr->path = common::cwd();
 }
+
 
 /////////////////////////////////////////////////
 TempDirectory::~TempDirectory()
