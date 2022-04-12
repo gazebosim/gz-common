@@ -75,19 +75,12 @@ void AutoLogFixture::SetUp()
                '/', '_');
 
   this->dataPtr->temp = std::make_unique<TempDirectory>(
-      "test", "ign_common", false);
+      "test", "ign_common", true);
   ASSERT_TRUE(this->dataPtr->temp->Valid());
   common::setenv(IGN_HOMEDIR, this->dataPtr->temp->Path());
 
   // Initialize Console
   auto logPath = common::joinPaths(this->dataPtr->temp->Path(), "test_logs");
-  ignition::common::Console::SetVerbosity(4);
-
-  // Put this one before ignLogInit to prevent extra output to log file
-  igndbg << "Initialized AutoLogFixture (logPath: "
-    << logPath << ") (logFilename: "
-    << this->dataPtr->logFilename << ")\n";
-
   ignLogInit(logPath, this->dataPtr->logFilename);
 
   ASSERT_FALSE(logPath.empty());
@@ -98,6 +91,8 @@ void AutoLogFixture::SetUp()
   this->dataPtr->logDirectory = ignLogDirectory();
   ASSERT_FALSE(this->dataPtr->logDirectory.empty());
   ASSERT_TRUE(ignition::common::exists(this->dataPtr->logDirectory));
+
+  ignition::common::Console::SetVerbosity(4);
 }
 
 //////////////////////////////////////////////////
