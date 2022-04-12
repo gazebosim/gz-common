@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
 # Find the ignition-common library
-set(IGN_COMMON_VER 5)
-find_package(ignition-common${IGN_COMMON_VER} QUIET REQUIRED COMPONENTS events profiler)
+find_package(ignition-common5 QUIET REQUIRED COMPONENTS events profiler)
+set(IGN_COMMON_VER ${ignition-common5_VERSION_MAJOR})
 
 add_executable(assert_example assert_example.cc)
 target_link_libraries(assert_example ignition-common${IGN_COMMON_VER}::core)
