@@ -81,16 +81,18 @@ void AutoLogFixture::SetUp()
 
   // Initialize Console
   auto logPath = common::joinPaths(this->dataPtr->temp->Path(), "test_logs");
+  ignition::common::Console::SetVerbosity(4);
+
+  // Put this one before ignLogInit to prevent extra output to log file
+  igndbg << "Initialized AutoLogFixture (logPath: "
+    << logPath << ") (logFilename: "
+    << this->dataPtr->logFilename << ")\n";
+
   ignLogInit(logPath, this->dataPtr->logFilename);
 
   ASSERT_FALSE(logPath.empty());
   ASSERT_TRUE(common::exists(
         common::joinPaths(logPath, this->dataPtr->logFilename)));
-
-  ignition::common::Console::SetVerbosity(4);
-  igndbg << "Initialized AutoLogFixture (logPath: " 
-    << logPath << ") (logFilename: " 
-    << this->dataPtr->logFilename << ")\n";
 
   // Read the full path to the log directory.
   this->dataPtr->logDirectory = ignLogDirectory();

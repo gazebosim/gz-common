@@ -1,10 +1,4 @@
-# This is to make test_config.h visible
-include_directories("${CMAKE_BINARY_DIR}")
-
 ign_get_sources(tests)
-
-# FIXME the mesh test does not work
-list(REMOVE_ITEM tests mesh.cc)
 
 if (SKIP_av OR INTERNAL_SKIP_av)
   list(REMOVE_ITEM tests encoder_timing.cc)
@@ -22,6 +16,10 @@ if(TARGET INTEGRATION_plugin)
   # before INTEGRATION_plugin so that its auto-generated header is available.
   # We do not want to link INTEGRATION_plugin to the DummyPlugins library.
   add_dependencies(INTEGRATION_plugin IGNDummyPlugins)
+endif()
+
+if(TARGET INTEGRATION_mesh)
+  target_link_libraries(INTEGRATION_mesh ${PROJECT_LIBRARY_TARGET_NAME}-graphics)
 endif()
 
 if(TARGET INTEGRATION_encoder_timing)

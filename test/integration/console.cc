@@ -47,14 +47,15 @@ TEST(Console_TEST, LogInitAfterConsoleOut)
     std::string buffer((std::istreambuf_iterator<char>(t)),
                    std::istreambuf_iterator<char>());
 
-    EXPECT_TRUE(buffer.find("Error before logging initialized") != std::string::npos)
+    EXPECT_NE(
+        std::string::npos, buffer.find("Error before logging initialized"))
       << "Log file content[" << buffer << "]\n";
   }
 
   // Initialize the log file.
   ignLogInit(logDir, logFilename);
 
-  // After consolie is initialized, logs go to designated location 
+  // After consolie is initialized, logs go to designated location
   ignerr << "Error after logging initialized" << std::endl;
 
   {
@@ -62,7 +63,8 @@ TEST(Console_TEST, LogInitAfterConsoleOut)
     std::string buffer((std::istreambuf_iterator<char>(t)),
                    std::istreambuf_iterator<char>());
 
-    EXPECT_TRUE(buffer.find("Error after logging initialized") != std::string::npos)
+    EXPECT_NE(
+        std::string::npos, buffer.find("Error after logging initialized"))
       << "Log file content[" << buffer << "]\n";
   }
 }

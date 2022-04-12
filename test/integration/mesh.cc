@@ -17,8 +17,6 @@
 
 #include <gtest/gtest.h>
 
-#include "test_config.h"
-#include "ignition/common/ColladaLoader.hh"
 #include "ignition/common/Material.hh"
 #include "ignition/common/Mesh.hh"
 #include "ignition/common/Skeleton.hh"
@@ -27,119 +25,131 @@
 #include "ignition/common/SystemPaths.hh"
 #include "ignition/math/Vector3.hh"
 
+#include <ignition/common/testing/AutoLogFixture.hh>
+#include <ignition/common/testing/TestPaths.hh>
+
 using namespace ignition;
-using TestFile = common::testing::TestFile;
 
 class MeshTest : public common::testing::AutoLogFixture { };
 
-char asciiSTLBox[] =
-"solid MYSOLID\n" +
-"  facet normal  0.0   0.0  -1.0\n" +
-"    outer loop\n" +
-"      vertex    0.0   0.0   0.0\n"
-"      vertex    1.0   1.0   0.0\n" +
-"      vertex    1.0   0.0   0.0\n" +
-"    endloop\n" +
-"  endfacet\n" +
-"  facet normal  0.0   0.0  -1.0\n" +
-"    outer loop\n" +
-"      vertex    0.0   0.0   0.0\n" +
-"      vertex    0.0   1.0   0.0\n" +
-"      vertex    1.0   1.0   0.0\n" +
-"    endloop\n" +
-"  endfacet\n" +
-"  facet normal -1.0   0.0   0.0\n" +
-"    outer loop\n" +
-"      vertex    0.0   0.0   0.0\n" +
-"      vertex    0.0   1.0   1.0\n" +
-"      vertex    0.0   1.0   0.0\n" +
-"    endloop\n" +
-"  endfacet\n" +
-"  facet normal -1.0   0.0   0.0\n" +
-"    outer loop\n" +
-"      vertex    0.0   0.0   0.0\n" +
-"      vertex    0.0   0.0   1.0\n" +
-"      vertex    0.0   1.0   1.0\n" +
-"    endloop\n" +
-"  endfacet\n" +
-"  facet normal  0.0   1.0   0.0\n" +
-"    outer loop\n" +
-"      vertex    0.0   1.0   0.0\n" +
-"      vertex    1.0   1.0   1.0\n" +
-"      vertex    1.0   1.0   0.0\n" +
-"    endloop\n" +
-"  endfacet\n" +
-"  facet normal  0.0   1.0   0.0\n" +
-"    outer loop\n" +
-"      vertex    0.0   1.0   0.0\n" +
-"      vertex    0.0   1.0   1.0\n" +
-"      vertex    1.0   1.0   1.0\n" +
-"    endloop\n" +
-"  endfacet\n" +
-"  facet normal  1.0   0.0   0.0\n" +
-"    outer loop\n" +
-"      vertex    1.0   0.0   0.0\n" +
-"      vertex    1.0   1.0   0.0\n" +
-"      vertex    1.0   1.0   1.0\n" +
-"    endloop\n" +
-"  endfacet\n" +
-"  facet normal  1.0   0.0   0.0\n" +
-"    outer loop\n" +
-"      vertex    1.0   0.0   0.0\n" +
-"      vertex    1.0   1.0   1.0\n" +
-"      vertex    1.0   0.0   1.0\n" +
-"    endloop\n" +
-"  endfacet\n" +
-"  facet normal  0.0  -1.0   0.0\n" +
-"    outer loop\n" +
-"      vertex    0.0   0.0   0.0\n" +
-"      vertex    1.0   0.0   0.0\n" +
-"      vertex    1.0   0.0   1.0\n" +
-"    endloop\n" +
-"  endfacet\n" +
-"  facet normal  0.0  -1.0   0.0\n" +
-"    outer loop\n" +
-"      vertex    0.0   0.0   0.0\n" +
-"      vertex    1.0   0.0   1.0\n" +
-"      vertex    0.0   0.0   1.0\n" +
-"    endloop\n" +
-"  endfacet\n" +
-"  facet normal  0.0   0.0   1.0\n" +
-"    outer loop\n" +
-"      vertex    0.0   0.0   1.0\n" +
-"      vertex    1.0   0.0   1.0\n" +
-"      vertex    1.0   1.0   1.0\n" +
-"    endloop\n" +
-"  endfacet\n" +
-"  facet normal  0.0   0.0   1.0\n" +
-"    outer loop\n" +
-"      vertex    0.0   0.0   1.0\n" +
-"      vertex    1.0   1.0   1.0\n" +
-"      vertex    0.0   1.0   1.0\n" +
-"    endloop\n" +
-"  endfacet\n" +
-"endsolid MYSOLID";
+constexpr const char asciiSTLBox[] =
+R"(solid MYSOLID
+  facet normal  0.0   0.0  -1.0
+    outer loop
+      vertex    0.0   0.0   0.0
+      vertex    1.0   1.0   0.0
+      vertex    1.0   0.0   0.0
+    endloop
+  endfacet
+  facet normal  0.0   0.0  -1.0
+    outer loop
+      vertex    0.0   0.0   0.0
+      vertex    0.0   1.0   0.0
+      vertex    1.0   1.0   0.0
+    endloop
+  endfacet
+  facet normal -1.0   0.0   0.0
+    outer loop
+      vertex    0.0   0.0   0.0
+      vertex    0.0   1.0   1.0
+      vertex    0.0   1.0   0.0
+    endloop
+  endfacet
+  facet normal -1.0   0.0   0.0
+    outer loop
+      vertex    0.0   0.0   0.0
+      vertex    0.0   0.0   1.0
+      vertex    0.0   1.0   1.0
+    endloop
+  endfacet
+  facet normal  0.0   1.0   0.0
+    outer loop
+      vertex    0.0   1.0   0.0
+      vertex    1.0   1.0   1.0
+      vertex    1.0   1.0   0.0
+    endloop
+  endfacet
+  facet normal  0.0   1.0   0.0
+    outer loop
+      vertex    0.0   1.0   0.0
+      vertex    0.0   1.0   1.0
+      vertex    1.0   1.0   1.0
+    endloop
+  endfacet
+  facet normal  1.0   0.0   0.0
+    outer loop
+      vertex    1.0   0.0   0.0
+      vertex    1.0   1.0   0.0
+      vertex    1.0   1.0   1.0
+    endloop
+  endfacet
+  facet normal  1.0   0.0   0.0
+    outer loop
+      vertex    1.0   0.0   0.0
+      vertex    1.0   1.0   1.0
+      vertex    1.0   0.0   1.0
+    endloop
+  endfacet
+  facet normal  0.0  -1.0   0.0
+    outer loop
+      vertex    0.0   0.0   0.0
+      vertex    1.0   0.0   0.0
+      vertex    1.0   0.0   1.0
+    endloop
+  endfacet
+  facet normal  0.0  -1.0   0.0
+    outer loop
+      vertex    0.0   0.0   0.0
+      vertex    1.0   0.0   1.0
+      vertex    0.0   0.0   1.0
+    endloop
+  endfacet
+  facet normal  0.0   0.0   1.0
+    outer loop
+      vertex    0.0   0.0   1.0
+      vertex    1.0   0.0   1.0
+      vertex    1.0   1.0   1.0
+    endloop
+  endfacet
+  facet normal  0.0   0.0   1.0
+    outer loop
+      vertex    0.0   0.0   1.0
+      vertex    1.0   1.0   1.0
+      vertex    0.0   1.0   1.0
+    endloop
+  endfacet
+endsolid MYSOLID)";
 
 
 /////////////////////////////////////////////////
-TEST_F(MeshTest, Mesh)
+TEST_F(MeshTest, Load)
 {
-  // Cleanup test directory.
-  common::SystemPaths *paths = common::SystemPaths::Instance();
-  ignition::common::removeAll(paths->DefaultTestPath());
-  ignition::common::createDirectories(paths->DefaultTestPath());
+  // Load things that we know are invalid extensions
+  EXPECT_EQ(nullptr, common::MeshManager::Instance()->Load("break.mesh"));
+  EXPECT_EQ(nullptr, common::MeshManager::Instance()->Load("break.3ds"));
+  EXPECT_EQ(nullptr, common::MeshManager::Instance()->Load("break.xml"));
 
-  EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.mesh"));
-  EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.3ds"));
-  EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.xml"));
+  common::systemPaths()->AddFilePaths(common::testing::TestFile("data"));
 
-  const common::Mesh *mesh =
-    common::MeshManager::Instance()->Mesh("unit_box");
-  EXPECT_EQ(static_cast<unsigned int>(24), mesh->VertexCount());
-  EXPECT_EQ(static_cast<unsigned int>(24), mesh->NormalCount());
-  EXPECT_EQ(static_cast<unsigned int>(36), mesh->IndexCount());
-  EXPECT_EQ(static_cast<unsigned int>(24), mesh->TexCoordCount());
-  EXPECT_EQ(static_cast<unsigned int>(0), mesh->MaterialCount());
+  // Loading should be successful
+  EXPECT_NE(nullptr, common::MeshManager::Instance()->Load("box.dae"));
+  EXPECT_NE(nullptr, common::MeshManager::Instance()->Load("box.obj"));
+
+  // Reloading should not cause errors
+  EXPECT_NE(nullptr, common::MeshManager::Instance()->Load("box.dae"));
+  EXPECT_NE(nullptr, common::MeshManager::Instance()->Load("box.obj"));
+}
+
+/////////////////////////////////////////////////
+TEST_F(MeshTest, Access)
+{
+  auto mesh = common::MeshManager::Instance()->MeshByName("unit_box");
+  ASSERT_NE(nullptr, mesh);
+  EXPECT_EQ(24u, mesh->VertexCount());
+  EXPECT_EQ(24u, mesh->NormalCount());
+  EXPECT_EQ(36u, mesh->IndexCount());
+  EXPECT_EQ(24u, mesh->TexCoordCount());
+  EXPECT_EQ(0u, mesh->MaterialCount());
 
   ignition::math::Vector3d center, min, max;
   mesh->AABB(center, min, max);
@@ -147,8 +157,8 @@ TEST_F(MeshTest, Mesh)
   EXPECT_TRUE(min == ignition::math::Vector3d(-.5, -.5, -.5));
   EXPECT_TRUE(max == ignition::math::Vector3d(.5, .5, .5));
 
-  float *vertArray = NULL;
-  int *indArray = NULL;
+  double *vertArray = nullptr;
+  int *indArray = nullptr;
   mesh->FillArrays(&vertArray, &indArray);
 
   int i = 0;
@@ -184,115 +194,58 @@ TEST_F(MeshTest, Mesh)
   EXPECT_FLOAT_EQ(.5, vertArray[i++]);
   EXPECT_FLOAT_EQ(-.5, vertArray[i++]);
 
-  common::Mesh *newMesh = new common::Mesh();
-  newMesh->SetName("testBox");
-  common::SubMesh *subMesh = new common::SubMesh();
-  newMesh->AddSubMesh(subMesh);
+  delete vertArray;
+  delete indArray;
 
-  std::vector<ignition::math::Vector3d> verts;
-  std::vector<ignition::math::Vector3d> norms;
+  EXPECT_FALSE(common::MeshManager::Instance()->HasMesh(""));
+  EXPECT_TRUE(common::MeshManager::Instance()->HasMesh("unit_box"));
 
-  EXPECT_THROW(mesh->SubMesh(1), common::Exception);
+  mesh = common::MeshManager::Instance()->MeshByName("foo_box_doesnt_exist");
+  EXPECT_EQ(nullptr, mesh);
+  EXPECT_FALSE(
+      common::MeshManager::Instance()->RemoveMesh("foo_box_doesnt_exist"));
+  EXPECT_TRUE(common::MeshManager::Instance()->RemoveMesh("unit_box"));
+}
 
-  for (i = 0; i < 24; ++i)
-  {
-    verts.push_back(mesh->SubMesh(0)->Vertex(i));
-    norms.push_back(mesh->SubMesh(0)->Normal(i));
-  }
-
-  subMesh->CopyVertices(verts);
-  subMesh->CopyNormals(norms);
-  EXPECT_TRUE(subMesh->HasVertex(ignition::math::Vector3d(-.5, -.5, -.5)));
-  EXPECT_FALSE(subMesh->HasVertex(ignition::math::Vector3d(0, 0, 0)));
-
-  newMesh->AABB(center, min, max);
-  EXPECT_TRUE(center == ignition::math::Vector3d(0, 0, 0));
-  EXPECT_TRUE(min == ignition::math::Vector3d(-.5, -.5, -.5));
-  EXPECT_TRUE(max == ignition::math::Vector3d(.5, .5, .5));
-
-  subMesh->SetVertexCount(1);
-  subMesh->SetIndexCount(1);
-  subMesh->SetNormalCount(1);
-  subMesh->SetTexCoordCount(1);
-
-  EXPECT_EQ(static_cast<unsigned int>(1), subMesh->VertexCount());
-  EXPECT_EQ(static_cast<unsigned int>(1), subMesh->IndexCount());
-  EXPECT_EQ(static_cast<unsigned int>(1), subMesh->NormalCount());
-  EXPECT_EQ(static_cast<unsigned int>(1), subMesh->TexCoordCount());
-
-  subMesh->SetVertex(0, ignition::math::Vector3d(1, 2, 3));
-  EXPECT_TRUE(subMesh->Vertex(0) == ignition::math::Vector3d(1, 2, 3));
-
-  subMesh->SetTexCoord(0, ignition::math::Vector2d(.1, .2));
-  EXPECT_TRUE(subMesh->TexCoord(0) == ignition::math::Vector2d(.1, .2));
-
-  newMesh->GenSphericalTexCoord(ignition::math::Vector3d(0, 0, 0));
-  delete newMesh;
-
-  std::ofstream stlFile((paths->DefaultTestPath() +
-      "/ignition_stl_test.stl").c_str(), std::ios::out);
+/////////////////////////////////////////////////
+TEST_F(MeshTest, RoundtripStl)
+{
+  std::ofstream stlFile("ignition_stl_test.stl", std::ios::out);
   stlFile << asciiSTLBox;
   stlFile.close();
 
-  mesh = common::MeshManager::Instance()->Load(
-      paths->DefaultTestPath() + "/ignition_stl_test-bad.stl");
-  EXPECT_EQ(NULL, mesh);
+  auto mesh =
+    common::MeshManager::Instance()->Load("ignition_stl_test-bad.stl");
+  EXPECT_EQ(nullptr, mesh);
 
-  mesh = common::MeshManager::Instance()->Load(
-      paths->DefaultTestPath() + "/ignition_stl_test.stl");
+  common::systemPaths()->AddFilePaths(common::cwd());
+  mesh = common::MeshManager::Instance()->Load("ignition_stl_test.stl");
+  ASSERT_NE(nullptr, mesh);
+
+  math::Vector3d center, min, max;
   mesh->AABB(center, min, max);
   EXPECT_TRUE(center == ignition::math::Vector3d(0.5, 0.5, 0.5));
   EXPECT_TRUE(min == ignition::math::Vector3d(0, 0, 0));
   EXPECT_TRUE(max == ignition::math::Vector3d(1, 1, 1));
-
-  // Cleanup test directory.
-  igntion::common::removeAll(paths->DefaultTestPath());
 }
 
 /////////////////////////////////////////////////
-// Test centering a submesh.
-TEST_F(MeshTest, MeshMove)
+TEST_F(MeshTest, Export)
 {
-  common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(TestFile("data", "box_offset.dae"));
+  std::ofstream stlFile("ignition_stl_test.stl", std::ios::out);
+  stlFile << asciiSTLBox;
+  stlFile.close();
 
-  // The default location of the box_offset is not centered
-  EXPECT_EQ(ignition::math::Vector3d(5.46554, 2.18039, 4.8431), mesh->Max());
-  EXPECT_EQ(ignition::math::Vector3d(3.46555, 0.180391, 2.8431), mesh->Min());
+  common::systemPaths()->AddFilePaths(common::cwd());
+  auto mesh = common::MeshManager::Instance()->Load("ignition_stl_test.stl");
 
-  mesh->Center(ignition::math::Vector3d::Zero);
+  ASSERT_NE(nullptr, mesh);
+  common::MeshManager::Instance()->Export(mesh,
+      common::joinPaths(common::cwd(), "ignition_stl_test2"), "stl", false);
+  common::MeshManager::Instance()->Export(mesh,
+      common::joinPaths(common::cwd(), "ignition_stl_test2"), "dae", false);
 
-  EXPECT_EQ(ignition::math::Vector3d(1.0, 1.0, 1.0), mesh->Max());
-  EXPECT_EQ(ignition::math::Vector3d(-1.0, -1.0, -1.0), mesh->Min());
-
-  mesh->Translate(ignition::math::Vector3d(1, 2, 3));
-  EXPECT_EQ(ignition::math::Vector3d(2.0, 3.0, 4.0), mesh->Max());
-  EXPECT_EQ(ignition::math::Vector3d(0.0, 1.0, 2.0), mesh->Min());
+  EXPECT_FALSE(common::exists("ignition_stl_test2.stl"));
+  EXPECT_TRUE(common::exists("ignition_stl_test2.dae"));
 }
 
-/////////////////////////////////////////////////
-// Test centering a submesh.
-TEST_F(MeshTest, SubMeshCenter)
-{
-  common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(TestFile("data", "box_offset.dae"));
-
-  // The default location of the box_offest is not centered
-  EXPECT_EQ(ignition::math::Vector3d(5.46554, 2.18039, 4.8431), mesh->Max());
-  EXPECT_EQ(ignition::math::Vector3d(3.46555, 0.180391, 2.8431), mesh->Min());
-
-  // Get the Cube submesh
-  common::SubMesh submesh(mesh->SubMesh("Cube"));
-
-  submesh.Center(ignition::math::Vector3d(1, 2, 3));
-  EXPECT_EQ(ignition::math::Vector3d(0, 1, 2), submesh.Min());
-  EXPECT_EQ(ignition::math::Vector3d(2, 3, 4), submesh.Max());
-
-  submesh.Translate(ignition::math::Vector3d(1, 2, 3));
-  EXPECT_EQ(ignition::math::Vector3d(1, 3, 5), submesh.Min());
-  EXPECT_EQ(ignition::math::Vector3d(3, 5, 7), submesh.Max());
-
-  // The original mesh should not change
-  EXPECT_EQ(ignition::math::Vector3d(5.46554, 2.18039, 4.8431), mesh->Max());
-  EXPECT_EQ(ignition::math::Vector3d(3.46555, 0.180391, 2.8431), mesh->Min());
-}
