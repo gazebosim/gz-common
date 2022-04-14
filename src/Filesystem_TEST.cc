@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 
-#include <ignition/utilities/ExtraTestMacros.hh>
+#include <ignition/utils/ExtraTestMacros.hh>
 
 #include <ignition/common/Console.hh>
 #include <ignition/common/Filesystem.hh>
