@@ -24,6 +24,5 @@ endif()
 ign_build_tests(TYPE UNIT SOURCES ${gtest_sources}
   LIB_DEPS
     ${av_target}
-    ignition-cmake${IGN_CMAKE_VER}::utilities
 )
 
