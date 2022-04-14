@@ -15,8 +15,8 @@ else()
 endif()
 
 # Link the libraries that we always need
-target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME} 
-  PRIVATE 
+target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
+  PRIVATE
     ${DL_TARGET}
     ${CXX_FILESYSTEM_LIBRARIES}
   PUBLIC
@@ -53,11 +53,7 @@ ign_build_tests(
     ignition-common${IGN_COMMON_VER}-testing
   INCLUDE_DIRS
     # Used to make internal source file headers visible to the unit tests
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    # Used to make test-directory headers visible to the unit tests
-    ${PROJECT_SOURCE_DIR}
-    # Used to make test_config.h visible to the unit tests
-    ${PROJECT_BINARY_DIR})
+    ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(TARGET UNIT_MovingWindowFilter_TEST)
   target_include_directories(UNIT_MovingWindowFilter_TEST PRIVATE
