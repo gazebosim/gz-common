@@ -59,6 +59,37 @@ class ignition::common::Video::Implementation
   public: bool drainingMode = false;
 };
 
+int AVCodecDecode(AVCodecContext *_codecCtx,
+    AVFrame *_frame, int *_gotFrame, AVPacket *_packet)
+{
+  // from https://blogs.gentoo.org/lu_zero/2016/03/29/new-avcodec-api/
+  int ret;
+
+  *_gotFrame = 0;
+
+  if (_packet)
+  {
+    ret = avcodec_send_packet(_codecCtx, _packet);
+    if (ret < 0)
+    {
+      return ret == AVERROR_EOF ? 0 : ret;
+    }
+  }
+
+  ret = avcodec_receive_frame(_codecCtx, _frame);
+  if (ret < 0 && ret != AVERROR(EAGAIN))
+  {
+    return ret;
+  }
+  if (ret >= 0)
+  {
+    *_gotFrame = 1;
+  }
+
+  // new API always consumes the whole packet
+  return _packet ? _packet->size : 0;
+}
+
 /////////////////////////////////////////////////
 Video::Video()
   : dataPtr(ignition::utils::MakeUniqueImpl<Implementation>())
@@ -270,38 +301,22 @@ bool Video::NextFrame(unsigned char **_buffer)
     }
 
     // Process all the data in the frame
-    ret = AVCodecDecode(
+    ret = ::AVCodecDecode(
       this->dataPtr->codecCtx, this->dataPtr->avFrame, &frameAvailable,
       this->dataPtr->drainingMode ? nullptr : packet);
 
-    frameAvailable = 0;
-    if (!this->dataPtr->drainingMode)
+    if (ret == AVERROR_EOF)
     {
-      ret = avcodec_send_packet(this->dataPtr->codecCtx, packet);
-      if (ret < 0)
-      {
-        if (ret != AVERROR_EOF)
-        {
-          av_packet_unref(packet);
-          return false;
-        }
-      }
+      if (!this->dataPtr->drainingMode)
+        av_packet_unref(packet);
+      return false;
     }
-
-    ret = avcodec_receive_frame(this->dataPtr->codecCtx,
-        this->dataPtr->avFrame);
-
-    if (ret < 0 && ret != AVERROR(EAGAIN))
+    else if (ret < 0)
     {
       ignerr << "Error while processing packet data: "
              << av_err2str_cpp(ret) << std::endl;
+      // continue processing data
     }
-
-    if (ret >= 0)
-    {
-      frameAvailable = 1;
-    }
-
     if (!this->dataPtr->drainingMode)
       av_packet_unref(packet);
   }

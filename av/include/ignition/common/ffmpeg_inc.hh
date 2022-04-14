@@ -57,18 +57,18 @@ namespace ignition
   {
     /// \brief Helper function to avoid deprecation warnings.
     IGNITION_COMMON_AV_VISIBLE
-    IGN_DEPRECATED(6)
+    IGN_DEPRECATED(5)
     AVFrame *AVFrameAlloc(void);
 
     /// \brief Helper function to avoid deprecation warnings.
     IGNITION_COMMON_AV_VISIBLE
-    IGN_DEPRECATED(6)
+    IGN_DEPRECATED(5)
     void AVFrameUnref(AVFrame *_frame);
 
     /// \brief Helper function to avoid deprecation warnings.
     /// \param[in] _packet AVPacket structure that stores compressed data
     IGNITION_COMMON_AV_VISIBLE
-    IGN_DEPRECATED(6)
+    IGN_DEPRECATED(5)
     void AVPacketUnref(AVPacket *_packet);
 
     /// \brief Helper function to avoid deprecation warnings
@@ -83,6 +83,7 @@ namespace ignition
     /// \note If the codec is in draining mode, _packet can be null. The return
     /// value on success will then be 0, but _gotFrame will be non-zero.
     IGNITION_COMMON_AV_VISIBLE
+    IGN_DEPRECATED(5)
     int AVCodecDecode(AVCodecContext *_codecCtx,
         AVFrame *_frame, int *_gotFrame, AVPacket *_packet);
 
