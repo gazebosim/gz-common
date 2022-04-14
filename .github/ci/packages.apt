@@ -7,7 +7,7 @@ libgdal-dev
 libgts-dev
 libignition-cmake2-dev
 libignition-math7-dev
-libignition-utils1-dev
+libignition-utils2-dev
 libswscale-dev
 libtinyxml2-dev
 pkg-config
