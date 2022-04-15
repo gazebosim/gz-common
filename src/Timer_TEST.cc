@@ -36,7 +36,7 @@ TEST(Timer_TEST, Sequence)
   // Start the timer
   t.Start();
   EXPECT_TRUE(t.Running());
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  std::this_thread::sleep_for(std::chrono::milliseconds(1));
   EXPECT_LT(0.0, t.ElapsedTime().count());
 
   t.Stop();
