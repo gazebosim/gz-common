@@ -41,7 +41,6 @@ TEST(Timer_TEST, Sequence)
 
   t.Stop();
   EXPECT_FALSE(t.Running());
-  std::this_thread::sleep_for(std::chrono::milliseconds(1));
   EXPECT_LT(0.0, t.ElapsedTime().count());
 }
 
