@@ -32,6 +32,7 @@
 #include "ignition/common/ColladaLoader.hh"
 #include "ignition/common/ColladaExporter.hh"
 #include "ignition/common/OBJLoader.hh"
+#include "ignition/common/AssimpLoader.hh"
 #include "ignition/common/STLLoader.hh"
 #include "ignition/common/config.hh"
 
@@ -57,6 +58,9 @@ class ignition::common::MeshManager::Implementation
 
   /// \brief 3D mesh loader for OBJ files
   public: OBJLoader objLoader;
+
+  /// \brief 3D mesh loader which uses assimps
+  public: AssimpLoader assimpLoader;
 
   /// \brief Dictionary of meshes, indexed by name
   public: std::map<std::string, Mesh*> meshes;
@@ -144,6 +148,10 @@ const Mesh *MeshManager::Load(const std::string &_filename)
       loader = &this->dataPtr->colladaLoader;
     else if (extension == "obj")
       loader = &this->dataPtr->objLoader;
+    else if (extension == "gltf")
+      loader = &this->dataPtr->assimpLoader;
+    else if (extension == "fbx")
+      loader = &this->dataPtr->assimpLoader;
     else
     {
       ignerr << "Unsupported mesh format for file[" << _filename << "]\n";
