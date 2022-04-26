@@ -7,7 +7,7 @@
 #include "ignition/common/Console.hh"
 #include "ignition/common/Mesh.hh"
 #include "ignition/common/SubMesh.hh"
-#include "AssimpLoader.hh"
+#include "ignition/common/AssimpLoader.hh"
 
 using namespace ignition;
 using namespace common;
