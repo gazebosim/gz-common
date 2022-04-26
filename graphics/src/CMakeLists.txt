@@ -18,7 +18,8 @@ target_link_libraries(${graphics_target}
     ignition-utils${IGN_UTILS_VER}::ignition-utils${IGN_UTILS_VER}
   PRIVATE
     GTS::GTS
-    FreeImage::FreeImage)
+    FreeImage::FreeImage
+    assimp)
 
 ign_build_tests(TYPE UNIT SOURCES ${gtest_sources}
   LIB_DEPS ${graphics_target})
