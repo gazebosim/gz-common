@@ -14,15 +14,15 @@
 * limitations under the License.
 *
 */
-#ifndef IGNITION_COMMON_TESTING_AUTOLOGFIXTURE_HH_
-#define IGNITION_COMMON_TESTING_AUTOLOGFIXTURE_HH_
+#ifndef GZ_COMMON_TESTING_AUTOLOGFIXTURE_HH_
+#define GZ_COMMON_TESTING_AUTOLOGFIXTURE_HH_
 
 #include <gtest/gtest.h>
 
 #include <memory>
 #include <string>
 
-#include <ignition/utils/ImplPtr.hh>
+#include <gz/utils/ImplPtr.hh>
 
 namespace ignition::common::testing
 {
@@ -54,6 +54,6 @@ class AutoLogFixture : public ::testing::Test
 };
 }  // namespace ignition::common::testing
 
-#include <ignition/common/testing/detail/AutoLogFixture.hh>
+#include <gz/common/testing/detail/AutoLogFixture.hh>
 
-#endif  // IGNITION_COMMON_TESTING_AUTOLOGFIXTURE_HH_
+#endif  // GZ_COMMON_TESTING_AUTOLOGFIXTURE_HH_

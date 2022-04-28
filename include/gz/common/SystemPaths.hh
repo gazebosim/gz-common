@@ -14,24 +14,24 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_SYSTEMPATHS_HH_
-#define IGNITION_COMMON_SYSTEMPATHS_HH_
+#ifndef GZ_COMMON_SYSTEMPATHS_HH_
+#define GZ_COMMON_SYSTEMPATHS_HH_
 
 #include <functional>
 #include <list>
 #include <string>
 #include <vector>
 
-#include <ignition/common/Export.hh>
-#include <ignition/common/URI.hh>
+#include <gz/common/Export.hh>
+#include <gz/common/URI.hh>
 
-#include <ignition/utils/ImplPtr.hh>
+#include <gz/utils/ImplPtr.hh>
 
 namespace ignition
 {
   namespace common
   {
-    /// \class SystemPaths SystemPaths.hh ignition/common/SystemPaths.hh
+    /// \class SystemPaths SystemPaths.hh gz/common/SystemPaths.hh
     /// \brief Functions to handle getting system paths, keeps track of:
     ///        \li SystemPaths#pluginPaths - plugin library paths
     ///            for common::WorldPlugin

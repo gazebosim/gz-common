@@ -15,15 +15,15 @@
  *
  */
 
-#ifndef IGNITION_COMMON_PROFILER_HH_
-#define IGNITION_COMMON_PROFILER_HH_
+#ifndef GZ_COMMON_PROFILER_HH_
+#define GZ_COMMON_PROFILER_HH_
 
 #include <memory>
 #include <string>
 
-#include <ignition/common/profiler/Export.hh>
-#include <ignition/common/SingletonT.hh>
-#include <ignition/common/config.hh>
+#include <gz/common/profiler/Export.hh>
+#include <gz/common/SingletonT.hh>
+#include <gz/common/config.hh>
 
 namespace ignition
 {
@@ -162,4 +162,4 @@ ignition::common::ScopedProfile __profile##line(name, &__hash##line);
 #define IGN_PROFILER_VALID \
     IGN_PROFILER_ENABLE && ignition::common::Profiler::Instance()->Valid()
 
-#endif  // IGNITION_COMMON_PROFILER_HH_
+#endif  // GZ_COMMON_PROFILER_HH_

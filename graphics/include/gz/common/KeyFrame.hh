@@ -14,22 +14,22 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_KEYFRAME_HH_
-#define IGNITION_COMMON_KEYFRAME_HH_
+#ifndef GZ_COMMON_KEYFRAME_HH_
+#define GZ_COMMON_KEYFRAME_HH_
 
-#include <ignition/math/Vector3.hh>
-#include <ignition/math/Quaternion.hh>
+#include <gz/math/Vector3.hh>
+#include <gz/math/Quaternion.hh>
 
-#include <ignition/utils/ImplPtr.hh>
+#include <gz/utils/ImplPtr.hh>
 
-#include <ignition/common/graphics/Export.hh>
+#include <gz/common/graphics/Export.hh>
 
 
 namespace ignition
 {
   namespace common
   {
-    /// \class KeyFrame KeyFrame.hh ignition/common/KeyFrame.hh
+    /// \class KeyFrame KeyFrame.hh gz/common/KeyFrame.hh
     /// \brief A key frame in an animation
     class IGNITION_COMMON_GRAPHICS_VISIBLE KeyFrame
     {

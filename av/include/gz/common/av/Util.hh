@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef IGNITION_COMMON_AV_UTIL_HH_
-#define IGNITION_COMMON_AV_UTIL_HH_
+#ifndef GZ_COMMON_AV_UTIL_HH_
+#define GZ_COMMON_AV_UTIL_HH_
 
 namespace ignition
 {

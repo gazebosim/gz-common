@@ -14,20 +14,20 @@
  * limitations under the License.
  *
  */
-#ifndef IGNITION_COMMON_SVGLOADER_HH_
-#define IGNITION_COMMON_SVGLOADER_HH_
+#ifndef GZ_COMMON_SVGLOADER_HH_
+#define GZ_COMMON_SVGLOADER_HH_
 
 #include <memory>
 #include <string>
 #include <vector>
 
-#include <ignition/math/Vector2.hh>
-#include <ignition/math/Matrix3.hh>
+#include <gz/math/Vector2.hh>
+#include <gz/math/Matrix3.hh>
 
-#include <ignition/utils/ImplPtr.hh>
+#include <gz/utils/ImplPtr.hh>
 
-#include <ignition/common/graphics/Export.hh>
-#include <ignition/common/Console.hh>
+#include <gz/common/graphics/Export.hh>
+#include <gz/common/Console.hh>
 
 namespace ignition
 {

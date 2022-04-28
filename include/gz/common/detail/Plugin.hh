@@ -16,12 +16,12 @@
  */
 
 
-#ifndef IGNITION_COMMON_DETAIL_PLUGIN_HH_
-#define IGNITION_COMMON_DETAIL_PLUGIN_HH_
+#ifndef GZ_COMMON_DETAIL_PLUGIN_HH_
+#define GZ_COMMON_DETAIL_PLUGIN_HH_
 
 #include <memory>
 #include <string>
-#include "ignition/common/Plugin.hh"
+#include "gz/common/Plugin.hh"
 
 namespace ignition
 {

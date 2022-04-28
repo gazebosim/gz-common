@@ -14,12 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_MESHCSG_HH_
-#define IGNITION_COMMON_MESHCSG_HH_
+#ifndef GZ_COMMON_MESHCSG_HH_
+#define GZ_COMMON_MESHCSG_HH_
 
-#include <ignition/math/Pose3.hh>
+#include <gz/math/Pose3.hh>
 
-#include <ignition/common/graphics/Export.hh>
+#include <gz/common/graphics/Export.hh>
 
 struct _GtsSurface;
 typedef _GtsSurface GtsSurface;
@@ -32,7 +32,7 @@ namespace ignition
   {
     class Mesh;
 
-    /// \class MeshCSG MeshCSG.hh ignition/common/MeshCSG.hh
+    /// \class MeshCSG MeshCSG.hh gz/common/MeshCSG.hh
     /// \brief Creates CSG meshes
     class IGNITION_COMMON_GRAPHICS_VISIBLE MeshCSG
     {

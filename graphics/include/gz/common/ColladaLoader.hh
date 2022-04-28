@@ -14,20 +14,20 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_COLLADALOADER_HH_
-#define IGNITION_COMMON_COLLADALOADER_HH_
+#ifndef GZ_COMMON_COLLADALOADER_HH_
+#define GZ_COMMON_COLLADALOADER_HH_
 
 #include <string>
-#include <ignition/common/graphics/Export.hh>
-#include <ignition/common/MeshLoader.hh>
+#include <gz/common/graphics/Export.hh>
+#include <gz/common/MeshLoader.hh>
 
-#include <ignition/utils/ImplPtr.hh>
+#include <gz/utils/ImplPtr.hh>
 
 namespace ignition
 {
   namespace common
   {
-    /// \class ColladaLoader ColladaLoader.hh ignition/common/ColladaLoader.hh
+    /// \class ColladaLoader ColladaLoader.hh gz/common/ColladaLoader.hh
     /// \brief Class used to load Collada mesh files
     class IGNITION_COMMON_GRAPHICS_VISIBLE ColladaLoader : public MeshLoader
     {

@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-#ifndef IGNITION_COMMON_HWENCODER_HH
-#define IGNITION_COMMON_HWENCODER_HH
+#ifndef GZ_COMMON_HWENCODER_HH
+#define GZ_COMMON_HWENCODER_HH
 
 #include <string>
 #include <optional>
 
-#include <ignition/common/FlagSet.hh>
-#include <ignition/common/av/Export.hh>
-#include <ignition/common/HWVideo.hh>
-#include <ignition/common/ffmpeg_inc.hh>
-#include <ignition/utils/ImplPtr.hh>
+#include <gz/common/FlagSet.hh>
+#include <gz/common/av/Export.hh>
+#include <gz/common/HWVideo.hh>
+#include <gz/common/ffmpeg_inc.hh>
+#include <gz/utils/ImplPtr.hh>
 
 /// This is an internal-use only class encapsulating HW video encoding. All
 /// symbols defined here are hidden from the public API.

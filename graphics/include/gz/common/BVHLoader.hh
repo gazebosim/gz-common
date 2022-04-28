@@ -14,14 +14,14 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_BVHLOADER_HH_
-#define IGNITION_COMMON_BVHLOADER_HH_
+#ifndef GZ_COMMON_BVHLOADER_HH_
+#define GZ_COMMON_BVHLOADER_HH_
 
 #include <memory>
 #include <string>
 
-#include <ignition/math/Pose3.hh>
-#include <ignition/common/graphics/Export.hh>
+#include <gz/math/Pose3.hh>
+#include <gz/common/graphics/Export.hh>
 
 namespace ignition
 {
@@ -29,7 +29,7 @@ namespace ignition
   {
     class Skeleton;
 
-    /// \class BVHLoader BVHLoader.hh ignition/common/BVHLoader.hh
+    /// \class BVHLoader BVHLoader.hh gz/common/BVHLoader.hh
     /// \brief Handles loading BVH animation files
     class IGNITION_COMMON_GRAPHICS_VISIBLE BVHLoader
     {

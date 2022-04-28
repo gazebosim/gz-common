@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef IGNITION_COMMON_FLAGSET_HH
-#define IGNITION_COMMON_FLAGSET_HH
+#ifndef GZ_COMMON_FLAGSET_HH
+#define GZ_COMMON_FLAGSET_HH
 
 // FlagSet is a type-safe class for using enums as flags in C++14 with an
 // underlying std::bitset.

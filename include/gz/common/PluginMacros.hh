@@ -16,10 +16,10 @@
 */
 
 
-#ifndef IGNITION_COMMON_REGISTERMACROS_HH_
-#define IGNITION_COMMON_REGISTERMACROS_HH_
+#ifndef GZ_COMMON_REGISTERMACROS_HH_
+#define GZ_COMMON_REGISTERMACROS_HH_
 
-#include "ignition/common/detail/PluginMacros.hh"
+#include "gz/common/detail/PluginMacros.hh"
 
 // --------------- Specialize a plugin interface (optional) -------------------
 

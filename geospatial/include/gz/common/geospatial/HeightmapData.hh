@@ -14,13 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_GEOSPATIAL_HEIGHTMAPDATA_HH_
-#define IGNITION_COMMON_GEOSPATIAL_HEIGHTMAPDATA_HH_
+#ifndef GZ_COMMON_GEOSPATIAL_HEIGHTMAPDATA_HH_
+#define GZ_COMMON_GEOSPATIAL_HEIGHTMAPDATA_HH_
 
 #include <string>
 #include <vector>
-#include <ignition/math/Vector3.hh>
-#include <ignition/common/geospatial/Export.hh>
+#include <gz/math/Vector3.hh>
+#include <gz/common/geospatial/Export.hh>
 
 namespace ignition
 {

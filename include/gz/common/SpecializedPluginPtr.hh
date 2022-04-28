@@ -16,11 +16,11 @@
  */
 
 
-#ifndef IGNITION_COMMON_SPECIALIZEDPLUGINPTR_HH_
-#define IGNITION_COMMON_SPECIALIZEDPLUGINPTR_HH_
+#ifndef GZ_COMMON_SPECIALIZEDPLUGINPTR_HH_
+#define GZ_COMMON_SPECIALIZEDPLUGINPTR_HH_
 
-#include "ignition/common/PluginPtr.hh"
-#include "ignition/common/SpecializedPlugin.hh"
+#include "gz/common/PluginPtr.hh"
+#include "gz/common/SpecializedPlugin.hh"
 
 namespace ignition
 {
@@ -64,7 +64,7 @@ namespace ignition
     /// Only interfaces that have been "specialized" can be passed as arguments
     /// to the SpecializedPluginPtr template. To specialize an interface, simply
     /// put the macro IGN_COMMON_SPECIALIZE_INTERFACE(~) from
-    /// ignition/common/PluginMacros.hh into a public location of its class
+    /// gz/common/PluginMacros.hh into a public location of its class
     /// definition.
     template <typename... SpecInterfaces>
     using SpecializedPluginPtr =

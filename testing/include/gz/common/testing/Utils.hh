@@ -14,14 +14,14 @@
 * limitations under the License.
 *
 */
-#ifndef IGNITION_COMMON_TESTING_UTILS_HH_
-#define IGNITION_COMMON_TESTING_UTILS_HH_
+#ifndef GZ_COMMON_TESTING_UTILS_HH_
+#define GZ_COMMON_TESTING_UTILS_HH_
 
 #include <climits>
 #include <cstdint>
 #include <string>
 
-#include "ignition/common/testing/Export.hh"
+#include "gz/common/testing/Export.hh"
 
 namespace ignition::common::testing
 {
@@ -37,4 +37,4 @@ createNewEmptyFile(const std::string &_filename);
 
 }  // namespace ignition::common::testing
 
-#endif  // IGNITION_COMMON_TESTING_TESTPATHS_HH_
+#endif  // GZ_COMMON_TESTING_TESTPATHS_HH_

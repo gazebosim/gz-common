@@ -14,19 +14,19 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_MATERIAL_HH_
-#define IGNITION_COMMON_MATERIAL_HH_
+#ifndef GZ_COMMON_MATERIAL_HH_
+#define GZ_COMMON_MATERIAL_HH_
 
 #include <iostream>
 #include <memory>
 #include <string>
 
-#include <ignition/math/Color.hh>
-#include <ignition/common/graphics/Export.hh>
-#include <ignition/common/EnumIface.hh>
-#include <ignition/common/Pbr.hh>
+#include <gz/math/Color.hh>
+#include <gz/common/graphics/Export.hh>
+#include <gz/common/EnumIface.hh>
+#include <gz/common/Pbr.hh>
 
-#include <ignition/utils/ImplPtr.hh>
+#include <gz/utils/ImplPtr.hh>
 
 namespace ignition
 {

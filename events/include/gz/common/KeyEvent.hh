@@ -14,14 +14,14 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_KEYEVENT_HH_
-#define IGNITION_COMMON_KEYEVENT_HH_
+#ifndef GZ_COMMON_KEYEVENT_HH_
+#define GZ_COMMON_KEYEVENT_HH_
 
 #include <memory>
 #include <string>
 
-#include <ignition/common/events/Export.hh>
-#include <ignition/utils/SuppressWarning.hh>
+#include <gz/common/events/Export.hh>
+#include <gz/utils/SuppressWarning.hh>
 
 namespace ignition
 {
@@ -30,7 +30,7 @@ namespace ignition
     // Forward declare private data class
     class KeyEventPrivate;
 
-    /// \class KeyEvent KeyEvent.hh ignition/common/KeyEvent.hh
+    /// \class KeyEvent KeyEvent.hh gz/common/KeyEvent.hh
     /// \brief Generic description of a keyboard event.
     class IGNITION_COMMON_EVENTS_VISIBLE KeyEvent
     {

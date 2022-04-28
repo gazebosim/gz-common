@@ -14,11 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_TIMER_HH_
-#define IGNITION_COMMON_TIMER_HH_
+#ifndef GZ_COMMON_TIMER_HH_
+#define GZ_COMMON_TIMER_HH_
 
-#include <ignition/common/Export.hh>
-#include <ignition/utils/ImplPtr.hh>
+#include <gz/common/Export.hh>
+#include <gz/utils/ImplPtr.hh>
 
 #include <chrono>
 #include <iostream>

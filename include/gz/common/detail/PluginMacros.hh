@@ -16,16 +16,16 @@
 */
 
 
-#ifndef IGNITION_COMMON_DETAIL_PLUGINMACROS_HH_
-#define IGNITION_COMMON_DETAIL_PLUGINMACROS_HH_
+#ifndef GZ_COMMON_DETAIL_PLUGINMACROS_HH_
+#define GZ_COMMON_DETAIL_PLUGINMACROS_HH_
 
 #include <string>
 #include <typeinfo>
 #include <type_traits>
 #include <unordered_set>
 #include <utility>
-#include "ignition/common/PluginInfo.hh"
-#include "ignition/utils/SuppressWarning.hh"
+#include "gz/common/PluginInfo.hh"
+#include "gz/utils/SuppressWarning.hh"
 
 
 #if defined _WIN32 || defined __CYGWIN__

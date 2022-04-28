@@ -16,11 +16,11 @@
  */
 
 
-#ifndef IGNITION_COMMON_TEMPLATEHELPERS_HH_
-#define IGNITION_COMMON_TEMPLATEHELPERS_HH_
+#ifndef GZ_COMMON_TEMPLATEHELPERS_HH_
+#define GZ_COMMON_TEMPLATEHELPERS_HH_
 
 
-#include "ignition/common/detail/TemplateHelpers.hh"
+#include "gz/common/detail/TemplateHelpers.hh"
 
 namespace ignition
 {

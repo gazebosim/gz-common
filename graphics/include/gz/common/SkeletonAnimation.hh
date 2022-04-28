@@ -14,27 +14,27 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_SKELETONANIMATION_HH_
-#define IGNITION_COMMON_SKELETONANIMATION_HH_
+#ifndef GZ_COMMON_SKELETONANIMATION_HH_
+#define GZ_COMMON_SKELETONANIMATION_HH_
 
 #include <map>
 #include <utility>
 #include <string>
 
-#include <ignition/math/Matrix4.hh>
-#include <ignition/math/Pose3.hh>
+#include <gz/math/Matrix4.hh>
+#include <gz/math/Pose3.hh>
 
-#include <ignition/utils/ImplPtr.hh>
+#include <gz/utils/ImplPtr.hh>
 
-#include <ignition/common/NodeAnimation.hh>
-#include <ignition/common/graphics/Export.hh>
+#include <gz/common/NodeAnimation.hh>
+#include <gz/common/graphics/Export.hh>
 
 namespace ignition
 {
   namespace common
   {
     /// \class SkeletonAnimation SkeletonAnimation.hh
-    /// ignition/common/SkeletonAnimation.hh
+    /// gz/common/SkeletonAnimation.hh
     /// \brief Skeleton animation
     class IGNITION_COMMON_GRAPHICS_VISIBLE SkeletonAnimation
     {
