@@ -15,16 +15,16 @@
  *
 */
 
-#ifndef IGNITION_COMMON_OBJLOADER_HH_
-#define IGNITION_COMMON_OBJLOADER_HH_
+#ifndef GZ_COMMON_OBJLOADER_HH_
+#define GZ_COMMON_OBJLOADER_HH_
 
 #include <string>
 #include <memory>
 
-#include <ignition/utils/ImplPtr.hh>
+#include <gz/utils/ImplPtr.hh>
 
-#include <ignition/common/MeshLoader.hh>
-#include <ignition/common/graphics/Export.hh>
+#include <gz/common/MeshLoader.hh>
+#include <gz/common/graphics/Export.hh>
 
 namespace ignition
 {

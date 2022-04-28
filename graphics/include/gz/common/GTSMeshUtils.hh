@@ -15,13 +15,13 @@
  *
  */
 
-#ifndef IGNITION_COMMON_GTSMESHUTILS_HH_
-#define IGNITION_COMMON_GTSMESHUTILS_HH_
+#ifndef GZ_COMMON_GTSMESHUTILS_HH_
+#define GZ_COMMON_GTSMESHUTILS_HH_
 
 #include <vector>
 
-#include <ignition/math/Vector2.hh>
-#include <ignition/common/graphics/Export.hh>
+#include <gz/math/Vector2.hh>
+#include <gz/common/graphics/Export.hh>
 
 
 struct _GtsSurface;
@@ -33,7 +33,7 @@ namespace ignition
   {
     class SubMesh;
 
-    /// \class GTSMeshUtils GTSMeshUtils.hh ignition/common/GTSMeshUtils.hh
+    /// \class GTSMeshUtils GTSMeshUtils.hh gz/common/GTSMeshUtils.hh
     /// \brief Creates GTS utilities for meshes
     class IGNITION_COMMON_GRAPHICS_VISIBLE GTSMeshUtils
     {

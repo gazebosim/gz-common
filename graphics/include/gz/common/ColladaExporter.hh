@@ -14,20 +14,20 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_COLLADAEXPORTER_HH_
-#define IGNITION_COMMON_COLLADAEXPORTER_HH_
+#ifndef GZ_COMMON_COLLADAEXPORTER_HH_
+#define GZ_COMMON_COLLADAEXPORTER_HH_
 
 #include <memory>
 #include <string>
 #include <vector>
 
-#include <ignition/common/MeshExporter.hh>
-#include <ignition/common/graphics/Export.hh>
+#include <gz/common/MeshExporter.hh>
+#include <gz/common/graphics/Export.hh>
 
-#include <ignition/math/Color.hh>
-#include <ignition/math/Matrix4.hh>
+#include <gz/math/Color.hh>
+#include <gz/math/Matrix4.hh>
 
-#include <ignition/utils/ImplPtr.hh>
+#include <gz/utils/ImplPtr.hh>
 
 namespace ignition
 {

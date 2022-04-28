@@ -15,10 +15,10 @@
  *
  */
 
-#ifndef IGNITION_COMMON_SUPPRESSWARNING_HH_
-#define IGNITION_COMMON_SUPPRESSWARNING_HH_
+#ifndef GZ_COMMON_SUPPRESSWARNING_HH_
+#define GZ_COMMON_SUPPRESSWARNING_HH_
 
-#include <ignition/utils/SuppressWarning.hh>
+#include <gz/utils/SuppressWarning.hh>
 
 #pragma message("ign-common SuppressWarning is deprecated, use ign-utils")
 // These macros have been moved to ign-utils so they may be more broadly used.

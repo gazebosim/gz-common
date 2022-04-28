@@ -14,21 +14,21 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_SUBMESH_HH_
-#define IGNITION_COMMON_SUBMESH_HH_
+#ifndef GZ_COMMON_SUBMESH_HH_
+#define GZ_COMMON_SUBMESH_HH_
 
 #include <memory>
 #include <optional>
 #include <string>
 #include <vector>
 
-#include <ignition/math/Vector3.hh>
-#include <ignition/math/Vector2.hh>
+#include <gz/math/Vector3.hh>
+#include <gz/math/Vector2.hh>
 
-#include <ignition/utils/ImplPtr.hh>
+#include <gz/utils/ImplPtr.hh>
 
-#include <ignition/common/graphics/Types.hh>
-#include <ignition/common/graphics/Export.hh>
+#include <gz/common/graphics/Types.hh>
+#include <gz/common/graphics/Export.hh>
 
 namespace ignition
 {

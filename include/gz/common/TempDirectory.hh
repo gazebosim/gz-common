@@ -15,15 +15,15 @@
  *
  */
 
-#ifndef IGNITION_COMMON_TEMPDIRECTORY_HH_
-#define IGNITION_COMMON_TEMPDIRECTORY_HH_
+#ifndef GZ_COMMON_TEMPDIRECTORY_HH_
+#define GZ_COMMON_TEMPDIRECTORY_HH_
 
 #include <string>
 
-#include <ignition/common/Export.hh>
-#include <ignition/common/Filesystem.hh>
+#include <gz/common/Export.hh>
+#include <gz/common/Filesystem.hh>
 
-#include <ignition/utils/ImplPtr.hh>
+#include <gz/utils/ImplPtr.hh>
 
 namespace ignition
 {
@@ -120,5 +120,5 @@ namespace ignition
     };
   }  // namespace common
 }  // namespace ignition
-#endif  // IGNITION_COMMON_TEMPDIRECTORY_HH_
+#endif  // GZ_COMMON_TEMPDIRECTORY_HH_
 

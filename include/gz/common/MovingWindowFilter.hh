@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_MOVINGWINDOWFILTER_HH_
-#define IGNITION_COMMON_MOVINGWINDOWFILTER_HH_
+#ifndef GZ_COMMON_MOVINGWINDOWFILTER_HH_
+#define GZ_COMMON_MOVINGWINDOWFILTER_HH_
 
 #include <memory>
 #include <vector>

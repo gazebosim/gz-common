@@ -14,20 +14,20 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_GEOSPATIAL_DEM_HH_
-#define IGNITION_COMMON_GEOSPATIAL_DEM_HH_
+#ifndef GZ_COMMON_GEOSPATIAL_DEM_HH_
+#define GZ_COMMON_GEOSPATIAL_DEM_HH_
 
 #include <memory>
 #include <string>
 #include <vector>
 
-#include <ignition/math/Vector3.hh>
-#include <ignition/math/Angle.hh>
+#include <gz/math/Vector3.hh>
+#include <gz/math/Angle.hh>
 
-#include <ignition/common/geospatial/Export.hh>
-#include <ignition/common/geospatial/HeightmapData.hh>
+#include <gz/common/geospatial/Export.hh>
+#include <gz/common/geospatial/HeightmapData.hh>
 
-#include <ignition/utils/ImplPtr.hh>
+#include <gz/utils/ImplPtr.hh>
 
 
 namespace ignition

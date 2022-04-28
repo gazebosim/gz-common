@@ -14,18 +14,18 @@
 * limitations under the License.
 *
 */
-#ifndef IGNITION_COMMON_TESTING_DETAIL_AUTOLOGFIXTURE_HH_
-#define IGNITION_COMMON_TESTING_DETAIL_AUTOLOGFIXTURE_HH_
+#ifndef GZ_COMMON_TESTING_DETAIL_AUTOLOGFIXTURE_HH_
+#define GZ_COMMON_TESTING_DETAIL_AUTOLOGFIXTURE_HH_
 
-#include "ignition/common/testing/AutoLogFixture.hh"
+#include "gz/common/testing/AutoLogFixture.hh"
 
 #include <memory>
 #include <string>
 
-#include <ignition/common/Console.hh>
-#include <ignition/common/Filesystem.hh>
-#include <ignition/common/TempDirectory.hh>
-#include <ignition/common/Util.hh>
+#include <gz/common/Console.hh>
+#include <gz/common/Filesystem.hh>
+#include <gz/common/TempDirectory.hh>
+#include <gz/common/Util.hh>
 
 namespace ignition::common::testing
 {
@@ -116,5 +116,5 @@ std::string AutoLogFixture::LogContent() const
 
 }  // namespace ignition::common::testing
 
-#endif  // IGNITION_COMMON_TESTING_DETAIL_AUTOLOGFIXTURE_HH_
+#endif  // GZ_COMMON_TESTING_DETAIL_AUTOLOGFIXTURE_HH_
 

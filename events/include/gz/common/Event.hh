@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_EVENT_HH_
-#define IGNITION_COMMON_EVENT_HH_
+#ifndef GZ_COMMON_EVENT_HH_
+#define GZ_COMMON_EVENT_HH_
 
 #include <atomic>
 #include <functional>
@@ -25,15 +25,15 @@
 #include <mutex>
 #include <utility>
 
-#include <ignition/common/config.hh>
-#include <ignition/common/events/Export.hh>
-#include <ignition/common/events/Types.hh>
+#include <gz/common/config.hh>
+#include <gz/common/events/Export.hh>
+#include <gz/common/events/Types.hh>
 
 namespace ignition
 {
   namespace common
   {
-    /// \class Event Event.hh ignition/common/Event.hh
+    /// \class Event Event.hh gz/common/Event.hh
     /// \brief Base class for all events
     class IGNITION_COMMON_EVENTS_VISIBLE Event
     {

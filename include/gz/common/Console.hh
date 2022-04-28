@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_CONSOLE_HH_
-#define IGNITION_COMMON_CONSOLE_HH_
+#ifndef GZ_COMMON_CONSOLE_HH_
+#define GZ_COMMON_CONSOLE_HH_
 
 #include <iostream>
 #include <fstream>
@@ -23,9 +23,9 @@
 #include <sstream>
 #include <string>
 
-#include <ignition/common/Util.hh>
-#include <ignition/common/Export.hh>
-#include <ignition/utils/SuppressWarning.hh>
+#include <gz/common/Util.hh>
+#include <gz/common/Export.hh>
+#include <gz/utils/SuppressWarning.hh>
 
 namespace ignition
 {

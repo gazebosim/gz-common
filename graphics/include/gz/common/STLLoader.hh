@@ -14,16 +14,16 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_STLLOADER_HH_
-#define IGNITION_COMMON_STLLOADER_HH_
+#ifndef GZ_COMMON_STLLOADER_HH_
+#define GZ_COMMON_STLLOADER_HH_
 
 #include <stdint.h>
 #include <string>
 
-#include <ignition/utils/ImplPtr.hh>
+#include <gz/utils/ImplPtr.hh>
 
-#include "ignition/common/MeshLoader.hh"
-#include "ignition/common/graphics/Export.hh"
+#include "gz/common/MeshLoader.hh"
+#include "gz/common/graphics/Export.hh"
 
 #define LINE_MAX_LEN 256
 #define COR3_MAX 200000
@@ -34,7 +34,7 @@ namespace ignition
 {
   namespace common
   {
-    /// \class STLLoader STLLoader.hh ignition/common/STLLoader.hh
+    /// \class STLLoader STLLoader.hh gz/common/STLLoader.hh
     /// \brief Class used to load STL mesh files
     class IGNITION_COMMON_GRAPHICS_VISIBLE STLLoader : public MeshLoader
     {

@@ -14,14 +14,14 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_ENUMITERATOR_HH_
-#define IGNITION_COMMON_ENUMITERATOR_HH_
+#ifndef GZ_COMMON_ENUMITERATOR_HH_
+#define GZ_COMMON_ENUMITERATOR_HH_
 
 #include <string>
 #include <vector>
 #include <algorithm>
-#include <ignition/common/Util.hh>
-#include <ignition/common/Export.hh>
+#include <gz/common/Util.hh>
+#include <gz/common/Export.hh>
 
 namespace ignition
 {

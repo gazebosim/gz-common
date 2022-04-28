@@ -14,13 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_UUID_HH_INCLUDED_
-#define IGNITION_COMMON_UUID_HH_INCLUDED_
+#ifndef GZ_COMMON_UUID_HH_INCLUDED_
+#define GZ_COMMON_UUID_HH_INCLUDED_
 
 #include <iostream>
 #include <string>
 
-#include <ignition/common/Export.hh>
+#include <gz/common/Export.hh>
 
 #ifdef _WIN32
   #include <Rpc.h>

@@ -14,17 +14,17 @@
 * limitations under the License.
 *
 */
-#ifndef IGNITION_COMMON_TESTING_TESTPATHS_HH_
-#define IGNITION_COMMON_TESTING_TESTPATHS_HH_
+#ifndef GZ_COMMON_TESTING_TESTPATHS_HH_
+#define GZ_COMMON_TESTING_TESTPATHS_HH_
 
 #include <memory>
 #include <string>
 
-#include "ignition/common/Filesystem.hh"
-#include "ignition/common/TempDirectory.hh"
-#include "ignition/common/Util.hh"
+#include "gz/common/Filesystem.hh"
+#include "gz/common/TempDirectory.hh"
+#include "gz/common/Util.hh"
 
-#include "ignition/common/testing/Export.hh"
+#include "gz/common/testing/Export.hh"
 
 #ifndef TESTING_PROJECT_SOURCE_DIR
 #define TESTING_PROJECT_SOURCE_DIR ""
@@ -198,4 +198,4 @@ std::string TempPath(Args const &... args)
   return common::joinPaths(dataDir, args...);
 }
 }  // namespace ignition::common::testing
-#endif  // IGNITION_COMMON_TESTING_TESTPATHS_HH_
+#endif  // GZ_COMMON_TESTING_TESTPATHS_HH_

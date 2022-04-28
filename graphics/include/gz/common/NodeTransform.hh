@@ -14,24 +14,24 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_NODE_TRANSFORM_HH_
-#define IGNITION_COMMON_NODE_TRANSFORM_HH_
+#ifndef GZ_COMMON_NODE_TRANSFORM_HH_
+#define GZ_COMMON_NODE_TRANSFORM_HH_
 #include <memory>
 #include <string>
 
-#include <ignition/math/Matrix4.hh>
-#include <ignition/math/Vector3.hh>
+#include <gz/math/Matrix4.hh>
+#include <gz/math/Vector3.hh>
 
-#include <ignition/utils/ImplPtr.hh>
+#include <gz/utils/ImplPtr.hh>
 
-#include <ignition/common/graphics/Export.hh>
-#include <ignition/common/Util.hh>
+#include <gz/common/graphics/Export.hh>
+#include <gz/common/Util.hh>
 
 namespace ignition
 {
   namespace common
   {
-    /// \class NodeTransform NodeTransform.hh ignition/common/NodeTransform.hh
+    /// \class NodeTransform NodeTransform.hh gz/common/NodeTransform.hh
     /// \brief A transformation node
     class IGNITION_COMMON_GRAPHICS_VISIBLE NodeTransform
     {

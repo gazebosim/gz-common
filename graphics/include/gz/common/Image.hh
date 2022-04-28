@@ -14,18 +14,18 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_IMAGE_HH_
-#define IGNITION_COMMON_IMAGE_HH_
+#ifndef GZ_COMMON_IMAGE_HH_
+#define GZ_COMMON_IMAGE_HH_
 
 #include <cstring>
 #include <limits>
 #include <memory>
 #include <string>
 #include <vector>
-#include <ignition/math/Color.hh>
-#include <ignition/common/graphics/Export.hh>
+#include <gz/math/Color.hh>
+#include <gz/common/graphics/Export.hh>
 
-#include <ignition/utils/ImplPtr.hh>
+#include <gz/utils/ImplPtr.hh>
 
 namespace ignition
 {
@@ -56,7 +56,7 @@ namespace ignition
       "BAYER_GRBG8"
     };
 
-    /// \class Image Image.hh ignition/common/common.hh
+    /// \class Image Image.hh gz/common/common.hh
     /// \brief Encapsulates an image
     class IGNITION_COMMON_GRAPHICS_VISIBLE Image
     {

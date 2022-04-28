@@ -14,20 +14,20 @@
 * limitations under the License.
 *
 */
-#ifndef IGNITION_COMMON_AUDIO_DECODER_HH_
-#define IGNITION_COMMON_AUDIO_DECODER_HH_
+#ifndef GZ_COMMON_AUDIO_DECODER_HH_
+#define GZ_COMMON_AUDIO_DECODER_HH_
 
 #include <stdint.h>
 #include <string>
 
-#include <ignition/common/av/Export.hh>
-#include <ignition/utils/ImplPtr.hh>
+#include <gz/common/av/Export.hh>
+#include <gz/utils/ImplPtr.hh>
 
 namespace ignition
 {
   namespace common
   {
-    /// \class AudioDecoder AudioDecoder.hh ignition/common/common.hh
+    /// \class AudioDecoder AudioDecoder.hh gz/common/common.hh
     /// \brief An audio decoder based on FFMPEG.
     class IGNITION_COMMON_AV_VISIBLE AudioDecoder
     {

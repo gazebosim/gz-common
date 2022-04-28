@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-#ifndef IGNITION_COMMON_HWVIDEO_HH
-#define IGNITION_COMMON_HWVIDEO_HH
+#ifndef GZ_COMMON_HWVIDEO_HH
+#define GZ_COMMON_HWVIDEO_HH
 
-#include <ignition/common/EnumIface.hh>
+#include <gz/common/EnumIface.hh>
 
 namespace ignition::common
 {

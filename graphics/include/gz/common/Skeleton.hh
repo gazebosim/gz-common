@@ -14,20 +14,20 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_SKELETON_HH_
-#define IGNITION_COMMON_SKELETON_HH_
+#ifndef GZ_COMMON_SKELETON_HH_
+#define GZ_COMMON_SKELETON_HH_
 
 #include <vector>
 #include <string>
 #include <map>
 #include <utility>
 
-#include <ignition/math/Matrix4.hh>
+#include <gz/math/Matrix4.hh>
 
-#include <ignition/utils/ImplPtr.hh>
+#include <gz/utils/ImplPtr.hh>
 
-#include <ignition/common/SkeletonNode.hh>
-#include <ignition/common/graphics/Export.hh>
+#include <gz/common/SkeletonNode.hh>
+#include <gz/common/graphics/Export.hh>
 
 namespace ignition
 {
@@ -35,7 +35,7 @@ namespace ignition
   {
     class SkeletonAnimation;
 
-    /// \class Skeleton Skeleton.hh ignition/common/Skeleton.hh
+    /// \class Skeleton Skeleton.hh gz/common/Skeleton.hh
     /// \brief A skeleton, usually used for animation purposes.
     class IGNITION_COMMON_GRAPHICS_VISIBLE Skeleton
     {

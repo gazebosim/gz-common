@@ -14,12 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_MESHLOADER_HH_
-#define IGNITION_COMMON_MESHLOADER_HH_
+#ifndef GZ_COMMON_MESHLOADER_HH_
+#define GZ_COMMON_MESHLOADER_HH_
 
 #include <string>
 
-#include <ignition/common/graphics/Export.hh>
+#include <gz/common/graphics/Export.hh>
 
 namespace ignition
 {
@@ -27,7 +27,7 @@ namespace ignition
   {
     class Mesh;
 
-    /// \class MeshLoader MeshLoader.hh ignition/common/MeshLoader.hh
+    /// \class MeshLoader MeshLoader.hh gz/common/MeshLoader.hh
     /// \brief Base class for loading meshes
     class IGNITION_COMMON_GRAPHICS_VISIBLE MeshLoader
     {

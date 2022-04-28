@@ -14,13 +14,13 @@
 * limitations under the License.
 *
 */
-#ifndef IGNITION_COMMON_TESTING_BAZELTESTPATHS_HH_
-#define IGNITION_COMMON_TESTING_BAZELTESTPATHS_HH_
+#ifndef GZ_COMMON_TESTING_BAZELTESTPATHS_HH_
+#define GZ_COMMON_TESTING_BAZELTESTPATHS_HH_
 
 #include <string>
 
-#include "ignition/common/testing/TestPaths.hh"
-#include "ignition/common/testing/Export.hh"
+#include "gz/common/testing/TestPaths.hh"
+#include "gz/common/testing/Export.hh"
 
 namespace ignition::common::testing
 {
@@ -55,4 +55,4 @@ class BazelTestPaths: public TestPaths
 
 }  // namespace ignition::common::testing
 
-#endif  // IGNITION_COMMON_TESTING_AUTOLOGFIXTURE_HH_
+#endif  // GZ_COMMON_TESTING_AUTOLOGFIXTURE_HH_

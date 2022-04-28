@@ -14,14 +14,14 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_MOUSEEVENT_HH_
-#define IGNITION_COMMON_MOUSEEVENT_HH_
+#ifndef GZ_COMMON_MOUSEEVENT_HH_
+#define GZ_COMMON_MOUSEEVENT_HH_
 
 #include <memory>
-#include <ignition/math/Vector2.hh>
+#include <gz/math/Vector2.hh>
 
-#include <ignition/common/events/Export.hh>
-#include <ignition/utils/SuppressWarning.hh>
+#include <gz/common/events/Export.hh>
+#include <gz/utils/SuppressWarning.hh>
 
 namespace ignition
 {
@@ -30,7 +30,7 @@ namespace ignition
     /// Forward declare private data
     class MouseEventPrivate;
 
-    /// \class MouseEvent MouseEvent.hh ignition/common/MouseEvent.hh
+    /// \class MouseEvent MouseEvent.hh gz/common/MouseEvent.hh
     /// \brief Generic description of a mouse event.
     class IGNITION_COMMON_EVENTS_VISIBLE MouseEvent
     {

@@ -14,13 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_VIDEO_HH_
-#define IGNITION_COMMON_VIDEO_HH_
+#ifndef GZ_COMMON_VIDEO_HH_
+#define GZ_COMMON_VIDEO_HH_
 
 #include <string>
 
-#include <ignition/common/av/Export.hh>
-#include <ignition/utils/ImplPtr.hh>
+#include <gz/common/av/Export.hh>
+#include <gz/utils/ImplPtr.hh>
 
 struct AVFormatContext;
 struct AVCodecContext;

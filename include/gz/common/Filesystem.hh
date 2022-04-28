@@ -15,14 +15,14 @@
  *
  */
 
-#ifndef IGNITION_COMMON_FILESYSTEM_HH_
-#define IGNITION_COMMON_FILESYSTEM_HH_
+#ifndef GZ_COMMON_FILESYSTEM_HH_
+#define GZ_COMMON_FILESYSTEM_HH_
 
 #include <string>
 
-#include <ignition/common/Export.hh>
+#include <gz/common/Export.hh>
 
-#include <ignition/utils/ImplPtr.hh>
+#include <gz/utils/ImplPtr.hh>
 
 namespace ignition
 {

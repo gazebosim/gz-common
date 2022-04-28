@@ -16,17 +16,17 @@
  */
 
 
-#ifndef IGNITION_COMMON_PLUGINLOADER_HH_
-#define IGNITION_COMMON_PLUGINLOADER_HH_
+#ifndef GZ_COMMON_PLUGINLOADER_HH_
+#define GZ_COMMON_PLUGINLOADER_HH_
 
 #include <memory>
 #include <string>
 #include <typeinfo>
 #include <unordered_set>
 
-#include <ignition/common/Export.hh>
-#include <ignition/common/PluginPtr.hh>
-#include <ignition/utils/SuppressWarning.hh>
+#include <gz/common/Export.hh>
+#include <gz/common/PluginPtr.hh>
+#include <gz/utils/SuppressWarning.hh>
 
 namespace ignition
 {
@@ -99,6 +99,6 @@ namespace ignition
   }
 }
 
-#include "ignition/common/detail/PluginLoader.hh"
+#include "gz/common/detail/PluginLoader.hh"
 
 #endif

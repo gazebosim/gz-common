@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_UTIL_HH_
-#define IGNITION_COMMON_UTIL_HH_
+#ifndef GZ_COMMON_UTIL_HH_
+#define GZ_COMMON_UTIL_HH_
 
 #include <cassert>
 #include <chrono>
@@ -25,10 +25,10 @@
 #include <thread>
 #include <vector>
 
-#include <ignition/common/Export.hh>
-#include <ignition/common/Filesystem.hh>
-#include <ignition/common/SystemPaths.hh>
-#include <ignition/common/URI.hh>
+#include <gz/common/Export.hh>
+#include <gz/common/Filesystem.hh>
+#include <gz/common/SystemPaths.hh>
+#include <gz/common/URI.hh>
 
 /////////////////////////////////////////////////
 // Defines

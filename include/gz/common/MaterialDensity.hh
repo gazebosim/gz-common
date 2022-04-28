@@ -14,14 +14,14 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_MATERIALDENSITY_HH_
-#define IGNITION_COMMON_MATERIALDENSITY_HH_
+#ifndef GZ_COMMON_MATERIALDENSITY_HH_
+#define GZ_COMMON_MATERIALDENSITY_HH_
 
 #include <string>
 #include <limits>
 #include <map>
 #include <tuple>
-#include "ignition/common/Export.hh"
+#include "gz/common/Export.hh"
 
 namespace ignition
 {

@@ -14,23 +14,23 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_SKELETON_NODE_HH_
-#define IGNITION_COMMON_SKELETON_NODE_HH_
+#ifndef GZ_COMMON_SKELETON_NODE_HH_
+#define GZ_COMMON_SKELETON_NODE_HH_
 
 #include <map>
 #include <string>
 #include <vector>
 
-#include <ignition/utils/ImplPtr.hh>
+#include <gz/utils/ImplPtr.hh>
 
-#include <ignition/common/NodeTransform.hh>
-#include <ignition/common/graphics/Export.hh>
+#include <gz/common/NodeTransform.hh>
+#include <gz/common/graphics/Export.hh>
 
 namespace ignition
 {
   namespace common
   {
-    /// \class SkeletonNode Skeleton.hh ignition/common/SkeletonNode.hh
+    /// \class SkeletonNode Skeleton.hh gz/common/SkeletonNode.hh
     /// \brief A skeleton node
     class IGNITION_COMMON_GRAPHICS_VISIBLE SkeletonNode
     {

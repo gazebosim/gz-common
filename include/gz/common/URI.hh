@@ -14,15 +14,15 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_URI_HH_
-#define IGNITION_COMMON_URI_HH_
+#ifndef GZ_COMMON_URI_HH_
+#define GZ_COMMON_URI_HH_
 
 #include <optional>
 #include <string>
 
-#include <ignition/common/Export.hh>
+#include <gz/common/Export.hh>
 
-#include <ignition/utils/ImplPtr.hh>
+#include <gz/utils/ImplPtr.hh>
 
 namespace ignition
 {

@@ -14,17 +14,17 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_VIDEOENCODER_HH_
-#define IGNITION_COMMON_VIDEOENCODER_HH_
+#ifndef GZ_COMMON_VIDEOENCODER_HH_
+#define GZ_COMMON_VIDEOENCODER_HH_
 
 #include <chrono>
 #include <string>
 #include <optional>
 
-#include <ignition/common/FlagSet.hh>
-#include <ignition/common/av/Export.hh>
-#include <ignition/common/HWVideo.hh>
-#include <ignition/utils/ImplPtr.hh>
+#include <gz/common/FlagSet.hh>
+#include <gz/common/av/Export.hh>
+#include <gz/common/HWVideo.hh>
+#include <gz/utils/ImplPtr.hh>
 
 // Default bitrate (0) indicates that a bitrate should be calculated when
 // Start is called.
