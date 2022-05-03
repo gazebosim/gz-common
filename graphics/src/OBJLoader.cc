@@ -114,7 +114,7 @@ Mesh *OBJLoader::Load(const std::string &_filename)
     std::map<int, SubMesh *> subMeshMatId;
     for (auto const id :  s.mesh.material_ids)
     {
-      if (subMeshMatId.find(id) == subMeshMatId.end())
+      if (subMeshMatId.find(id) == subMeshMatId.end()) //Checks whether object' mesh material id exist in the data structure or not.
       {
         std::unique_ptr<SubMesh> subMesh(new SubMesh());
         subMesh->SetName(s.name);
@@ -134,14 +134,10 @@ Mesh *OBJLoader::Load(const std::string &_filename)
             // Create new material and pass it to mesh who will take ownership
             // of the object
             mat = new Material();
-            mat->SetAmbient(
-                math::Color(m.ambient[0], m.ambient[1], m.ambient[2]));
-            mat->SetDiffuse(
-                math::Color(m.diffuse[0], m.diffuse[1], m.diffuse[2]));
-            mat->SetSpecular(
-                math::Color(m.specular[0], m.specular[1], m.specular[2]));
-            mat->SetEmissive(
-                math::Color(m.emission[0], m.emission[1], m.emission[2]));
+            mat->SetAmbient(math::Color(m.ambient[0], m.ambient[1], m.ambient[2]));
+            mat->SetDiffuse(math::Color(m.diffuse[0], m.diffuse[1], m.diffuse[2]));
+            mat->SetSpecular(math::Color(m.specular[0], m.specular[1], m.specular[2]));
+            mat->SetEmissive(math::Color(m.emission[0], m.emission[1], m.emission[2]));
             mat->SetShininess(m.shininess);
             mat->SetTransparency(1.0 - m.dissolve);
             if (!m.diffuse_texname.empty())

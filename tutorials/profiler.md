@@ -118,9 +118,10 @@ When compiling with ``colcon``:
 colcon build --cmake-args -DENABLE_PROFILER=1
 ```
 
-Run your Ignition library then open the profiler browser using:
+Run your Ignition library then go to ignition installation path and open the profiler browser using:
+
 ```
-ign_remotery_vis
+libexec/ignition/ignition-common5/ign_remotery_vis
 ```
 
 If the profiler is run successfully, you should see output in a browser. Similar to this

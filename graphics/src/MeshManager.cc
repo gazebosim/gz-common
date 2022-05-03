@@ -35,6 +35,7 @@
 #include "ignition/common/AssimpLoader.hh"
 #include "ignition/common/STLLoader.hh"
 #include "ignition/common/config.hh"
+#include "ignition/common/Profiler.hh"
 
 #include "ignition/common/MeshManager.hh"
 
@@ -104,6 +105,8 @@ MeshManager::MeshManager()
   this->dataPtr->fileExtensions.push_back("stl");
   this->dataPtr->fileExtensions.push_back("dae");
   this->dataPtr->fileExtensions.push_back("obj");
+  this->dataPtr->fileExtensions.push_back("gltf");
+  this->dataPtr->fileExtensions.push_back("fbx");
 }
 
 //////////////////////////////////////////////////
@@ -132,9 +135,11 @@ const Mesh *MeshManager::Load(const std::string &_filename)
   {
     return this->dataPtr->meshes[_filename];
   }
+  IGN_PROFILE_THREAD_NAME("Mesh loading");
+  IGN_PROFILE("Mesh loading Profile");
 
   std::string fullname = common::findFile(_filename);
-
+  IGN_PROFILE_BEGIN("Loading Test");
   if (!fullname.empty())
   {
     extension = fullname.substr(fullname.rfind(".")+1, fullname.size());
@@ -145,7 +150,7 @@ const Mesh *MeshManager::Load(const std::string &_filename)
     if (extension == "stl" || extension == "stlb" || extension == "stla")
       loader = &this->dataPtr->stlLoader;
     else if (extension == "dae")
-      loader = &this->dataPtr->colladaLoader;
+      loader = &this->dataPtr->assimpLoader;
     else if (extension == "obj")
       loader = &this->dataPtr->objLoader;
     else if (extension == "gltf")
@@ -178,7 +183,7 @@ const Mesh *MeshManager::Load(const std::string &_filename)
   }
   else
     ignerr << "Unable to find file[" << _filename << "]\n";
-
+  IGN_PROFILE_END();
   return mesh;
 }
 
