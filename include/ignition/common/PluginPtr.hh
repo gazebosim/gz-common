@@ -23,7 +23,7 @@
 #include <string>
 #include <memory>
 
-#include "gz/common/Plugin.hh"
+#include "ignition/common/Plugin.hh"
 
 namespace ignition
 {
@@ -226,6 +226,6 @@ namespace ignition
   }
 }
 
-#include "gz/common/detail/PluginPtr.hh"
+#include "ignition/common/detail/PluginPtr.hh"
 
 #endif
