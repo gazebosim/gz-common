@@ -153,7 +153,7 @@ namespace ignition
 
       /// \brief Default constructor. This is kept private to ensure that
       /// Plugins are always managed by a PluginPtr object.
-      private: Plugin();
+      private: GZ_DEPRECATED(5) Plugin();
 
       /// \brief Type-agnostic retriever for interfaces
       private: void *PrivateGetInterface(

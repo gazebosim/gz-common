@@ -15,9 +15,13 @@
  *
 */
 
+#include <gz/utils/SuppressWarning.hh>
+
+IGN_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
 #include "ignition/common/PluginPtr.hh"
 
 int main()
 {
   ignition::common::PluginPtr ptr{ignition::common::ConstPluginPtr()};
 }
+IGN_UTILS_WARN_RESUME__DEPRECATED_DECLARATION

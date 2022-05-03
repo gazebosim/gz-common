@@ -15,6 +15,10 @@
  *
 */
 
+#include <gz/utils/SuppressWarning.hh>
+
+IGN_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
+
 #include "ignition/common/PluginMacros.hh"
 
 namespace ns
@@ -36,3 +40,5 @@ class A : public Base
 using ns::Base;
 
 IGN_COMMON_REGISTER_SINGLE_PLUGIN(ns::A, Base)
+
+IGN_UTILS_WARN_RESUME__DEPRECATED_DECLARATION

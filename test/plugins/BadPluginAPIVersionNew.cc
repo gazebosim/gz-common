@@ -17,6 +17,9 @@
 
 #include <limits>
 #include "ignition/common/PluginMacros.hh"
+#include "gz/utils/SuppressWarning.hh"
+
+IGN_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
 
 extern "C" {
   std::size_t DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONPluginInfoSize =
@@ -34,4 +37,6 @@ extern "C" std::size_t DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONMultiPluginInfo(
 {
   return 0u;
 }
+
+IGN_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
 

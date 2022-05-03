@@ -20,8 +20,9 @@
 #include <algorithm>
 #include <fstream>
 
+#include <gz/utils/SuppressWarning.hh>
+
 #include "ignition/common/config.hh"
-#include "ignition/common/PluginLoader.hh"
 #include "ignition/common/SystemPaths.hh"
 #include "ignition/common/TempDirectory.hh"
 
@@ -35,6 +36,9 @@ class TestTempDirectory : public ignition::common::TempDirectory
   {
   }
 };
+
+IGN_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
+#include "ignition/common/PluginLoader.hh"
 
 /////////////////////////////////////////////////
 TEST(PluginLoader, InitialNoInterfacesImplemented)
@@ -94,3 +98,4 @@ TEST(PluginLoader, InstantiateUnloadedPlugin)
       pm.Instantiate("plugin::that::is::not::loaded");
   EXPECT_FALSE(plugin);
 }
+IGN_UTILS_WARN_RESUME__DEPRECATED_DECLARATION

@@ -23,12 +23,15 @@
 #include <sstream>
 #include <unordered_map>
 
+#include "gz/utils/SuppressWarning.hh"
 #include "ignition/common/Console.hh"
+#include "ignition/common/StringUtils.hh"
+#include "ignition/common/Util.hh"
+
+IGN_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
 #include "ignition/common/PluginInfo.hh"
 #include "ignition/common/PluginLoader.hh"
 #include "ignition/common/PluginPtr.hh"
-#include "ignition/common/StringUtils.hh"
-#include "ignition/common/Util.hh"
 
 #include "PluginUtils.hh"
 
@@ -315,3 +318,4 @@ namespace ignition
     }
   }
 }
+IGN_UTILS_WARN_RESUME__DEPRECATED_DECLARATION

@@ -22,6 +22,7 @@
 #include <functional>
 #include <string>
 #include <unordered_map>
+#include <gz/common/Export.hh>
 
 namespace ignition
 {
@@ -35,7 +36,7 @@ namespace ignition
 
 
     /// \brief Holds info required to construct a plugin
-    struct PluginInfo
+    struct GZ_DEPRECATED(5) PluginInfo
     {
       /// \brief The name of the plugin
       std::string name;

@@ -21,6 +21,8 @@
 
 #include "ignition/common/detail/PluginMacros.hh"
 
+// Deprecated, use gz-plugin
+
 // --------------- Specialize a plugin interface (optional) -------------------
 
 /// \brief Call this macro inside a public scope of an interface in order to get

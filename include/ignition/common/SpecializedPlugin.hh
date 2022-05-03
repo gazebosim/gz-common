@@ -103,7 +103,7 @@ namespace ignition
       template <class> friend class TemplatePluginPtr;
 
       /// \brief Default constructor
-      private: SpecializedPlugin();
+      private: GZ_DEPRECATED(5) SpecializedPlugin();
 
       /// \brief type is an empty placeholder class which is used by the private
       /// member functions to provide two overloads: a high-performance one for
