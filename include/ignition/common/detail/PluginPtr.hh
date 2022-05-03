@@ -21,7 +21,7 @@
 #include <memory>
 #include <utility>
 
-#include "gz/common/PluginPtr.hh"
+#include "ignition/common/PluginPtr.hh"
 #include "gz/common/TemplateHelpers.hh"
 
 namespace ignition

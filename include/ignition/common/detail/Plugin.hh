@@ -21,7 +21,7 @@
 
 #include <memory>
 #include <string>
-#include "gz/common/Plugin.hh"
+#include "ignition/common/Plugin.hh"
 
 namespace ignition
 {

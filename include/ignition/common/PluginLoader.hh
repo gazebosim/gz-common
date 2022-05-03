@@ -25,7 +25,7 @@
 #include <unordered_set>
 
 #include <gz/common/Export.hh>
-#include <gz/common/PluginPtr.hh>
+#include <ignition/common/PluginPtr.hh>
 #include <gz/utils/SuppressWarning.hh>
 
 namespace ignition
@@ -99,6 +99,6 @@ namespace ignition
   }
 }
 
-#include "gz/common/detail/PluginLoader.hh"
+#include "ignition/common/detail/PluginLoader.hh"
 
 #endif

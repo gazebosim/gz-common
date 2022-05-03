@@ -20,7 +20,7 @@
 #define GZ_COMMON_DETAIL_PLUGINLOADER_HH_
 
 #include <string>
-#include "gz/common/PluginLoader.hh"
+#include "ignition/common/PluginLoader.hh"
 
 namespace ignition
 {

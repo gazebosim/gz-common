@@ -19,7 +19,7 @@
 #ifndef GZ_COMMON_REGISTERMACROS_HH_
 #define GZ_COMMON_REGISTERMACROS_HH_
 
-#include "gz/common/detail/PluginMacros.hh"
+#include "ignition/common/detail/PluginMacros.hh"
 
 // --------------- Specialize a plugin interface (optional) -------------------
 

@@ -19,7 +19,7 @@
 
 #include <memory>
 
-#include "gz/common/Plugin.hh"
+#include "ignition/common/Plugin.hh"
 
 namespace ignition
 {
@@ -62,7 +62,7 @@ namespace ignition
     /// Only interfaces that have been "specialized" can be passed as arguments
     /// to the SpecializedPlugin template. To specialize an interface, simply
     /// put the macro IGN_COMMON_SPECIALIZE_INTERFACE(~) from
-    /// gz/common/PluginMacros.hh into a public location of its class
+    /// ignition/common/PluginMacros.hh into a public location of its class
     /// definition.
     template <class SpecInterface>
     class SpecializedPlugin<SpecInterface> : public virtual Plugin
@@ -165,6 +165,6 @@ namespace ignition
   }
 }
 
-#include "gz/common/detail/SpecializedPlugin.hh"
+#include "ignition/common/detail/SpecializedPlugin.hh"
 
 #endif

@@ -191,6 +191,6 @@ namespace ignition
   }
 }
 
-#include "gz/common/detail/Plugin.hh"
+#include "ignition/common/detail/Plugin.hh"
 
 #endif
