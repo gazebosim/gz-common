@@ -15,10 +15,12 @@
  *
  */
 
+#include "gz/utils/SuppressWarning.hh"
+#include "ignition/common/Console.hh"
 
+IGN_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
 #include "ignition/common/Plugin.hh"
 #include "ignition/common/PluginInfo.hh"
-#include "ignition/common/Console.hh"
 #include "PluginUtils.hh"
 
 namespace ignition
@@ -184,3 +186,4 @@ namespace ignition
     }
   }
 }
+IGN_UTILS_WARN_RESUME__DEPRECATED_DECLARATION

@@ -20,13 +20,18 @@
 #include <iomanip>
 #include <cmath>
 
-#include "ignition/common/PluginLoader.hh"
+#include "gz/utils/SuppressWarning.hh"
+
 #include "ignition/common/SystemPaths.hh"
-#include "ignition/common/SpecializedPluginPtr.hh"
 #include "ignition/common/Console.hh"
 
 #include "DummyPluginsPath.h"
 #include "plugins/DummyPlugins.hh"
+
+
+IGN_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
+#include "ignition/common/PluginLoader.hh"
+#include "ignition/common/SpecializedPluginPtr.hh"
 
 
 #define IGN_CREATE_SPEC_INTERFACE(name)\
@@ -227,3 +232,5 @@ TEST(PluginSpecialization, AccessTime)
               << "ns\n" << std::endl;
   }
 }
+
+IGN_UTILS_WARN_RESUME__DEPRECATED_DECLARATION

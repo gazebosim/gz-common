@@ -66,12 +66,14 @@ namespace ignition
     /// put the macro IGN_COMMON_SPECIALIZE_INTERFACE(~) from
     /// ignition/common/PluginMacros.hh into a public location of its class
     /// definition.
+    /// \deprecated Use gz-plugin
     template <typename... SpecInterfaces>
     using SpecializedPluginPtr =
               TemplatePluginPtr< SpecializedPlugin<SpecInterfaces...> >;
 
     /// \brief This alias creates a specialized PluginPtr whose interfaces are
     /// all const-qualified.
+    /// \deprecated Use gz-plugin
     template <typename... SpecInterfaces>
     using ConstSpecializedPluginPtr =
               TemplatePluginPtr< const SpecializedPlugin<SpecInterfaces...> >;

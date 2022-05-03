@@ -40,7 +40,7 @@ namespace ignition
     class IGNITION_COMMON_VISIBLE PluginLoader
     {
       /// \brief Constructor
-      public: PluginLoader();
+      public: GZ_DEPRECATED(5) PluginLoader();
 
       /// \brief Destructor
       public: ~PluginLoader();

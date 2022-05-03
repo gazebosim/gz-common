@@ -13,6 +13,9 @@ release will remove the deprecated code.
    be used instead, which properly handles submeshes having no material index
    applied to them.
 
+1. All the plugin APIs are deprecated, use the gz-plugin library instead. See
+   the [migration guide](https://github.com/ignitionrobotics/ign-plugin/blob/ign-plugin1/MIGRATION.md).
+
 ### Additions
 
 1. **geospatial** component that loads heightmap images and DEMs

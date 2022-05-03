@@ -27,13 +27,16 @@
 #include <iostream>
 #include "ignition/common/Console.hh"
 #include "ignition/common/Filesystem.hh"
-#include "ignition/common/PluginLoader.hh"
 #include "ignition/common/SystemPaths.hh"
-#include "ignition/common/PluginPtr.hh"
-#include "ignition/common/SpecializedPluginPtr.hh"
+#include "gz/utils/SuppressWarning.hh"
 
 #include "DummyPluginsPath.h"
 #include "plugins/DummyPlugins.hh"
+
+IGN_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
+#include "ignition/common/PluginLoader.hh"
+#include "ignition/common/PluginPtr.hh"
+#include "ignition/common/SpecializedPluginPtr.hh"
 
 /////////////////////////////////////////////////
 TEST(PluginLoader, LoadBadPlugins)
@@ -434,3 +437,4 @@ TEST(PluginPtr, QueryInterfaceSharedPtr)
   SetSomeValues(setter);
   CheckSomeValues(getInt, getDouble, getName);
 }
+IGN_UTILS_WARN_RESUME__DEPRECATED_DECLARATION

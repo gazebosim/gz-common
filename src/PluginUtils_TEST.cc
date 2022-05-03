@@ -16,11 +16,13 @@
 */
 #include <gtest/gtest.h>
 #include <string>
+#include "gz/utils/SuppressWarning.hh"
 
 #include "PluginUtils.hh"
 
 using namespace ignition;
 
+IGN_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
 /////////////////////////////////////////////////
 TEST(PluginUtils, NormalizeName)
 {
@@ -33,3 +35,4 @@ TEST(PluginUtils, NormalizeName)
   EXPECT_EQ("::ignition::math", common::NormalizeName("ignition::math"));
   EXPECT_EQ("::ignition::math", common::NormalizeName("::ignition::math"));
 }
+IGN_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
