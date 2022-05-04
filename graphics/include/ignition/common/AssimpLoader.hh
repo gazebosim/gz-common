@@ -49,20 +49,11 @@ namespace ignition
       /// \param[in] _filename the mesh file
       public: virtual Mesh *Load(const std::string &_filename);
 
-      /// \brief Process assimp node
-      /// \param[in] _node assimp node obj
-      /// \param[in] _scene assimp scene obj
-      /// \param[in] _mesh Gazebo mesh obj
-      /// \param[out]
-      /// \return true if read was successful
-      private: bool ProcessNode(aiNode *_node, const aiScene *_scene, Mesh *_mesh);
+      // TODO: Write doc
+      private: void buildMesh(const aiScene* scene, const aiNode* node, const MeshPtr& mesh, aiMatrix4x4 transform = aiMatrix4x4());
 
-
-      /// \brief Converts an assimp mesh into Gazebo mesh.
-      /// \param[in] _node assimp node
-      /// \param[out]  the mesh where to load the data
-      /// \return true if read was successful
-      private: SubMesh Assimp2GazeboMesh(aiMesh *_mesh);
+      // TODO: Write doc
+      private: Mesh *MeshFromAssimpScene(const std::string& name, const aiScene *scene);
 
 
 

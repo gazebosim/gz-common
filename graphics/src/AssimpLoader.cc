@@ -31,7 +31,7 @@ AssimpLoader::~AssimpLoader()
 }
 
 //////////////////////////////////////////////////
-Assimp::Mesh *AssimpLoader::Load(const std::string &resource_path)
+Mesh *AssimpLoader::Load(const std::string &resource_path)
 {
 
   /*
@@ -59,10 +59,11 @@ Assimp::Mesh *AssimpLoader::Load(const std::string &resource_path)
     aiProcess_SortByPType);
 
 
-  if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode || !scene->HasMeshes())
+  if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode || !scene->HasMeshes())
   {
     ignerr << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
-    return Assimp::MeshPtr();
+    Mesh *mesh = new Mesh();
+    return mesh;
   }
 
   std::cout << "Succesfully loaded the scene." << std::endl ;
@@ -72,29 +73,30 @@ Assimp::Mesh *AssimpLoader::Load(const std::string &resource_path)
 }
 
 //////////////////////////////////////////////////
-Assimp::Mesh * AssimpLoader::MeshFromAssimpScene(const std::string& name, const aiScene *scene)
+Mesh *AssimpLoader::MeshFromAssimpScene(const std::string& name, const aiScene *scene)
 {
+  
+  Mesh *mesh = new Mesh();
   if (!scene->HasMeshes())
   {
     ignerr << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
-    return Assimp::MeshPtr();
+    return mesh;
   }
 
   //We are not going to load the materials here.
 
-  Assimp::Mesh *mesh = new Assimp::Mesh();
   float radius = 0.0f; //TO-DO: Why?
   // buildMesh(scene, scene->mRootNode, mesh, aabb, radius, material_table);
   /*
   TO-DO: We dont need aabb, and radius
   */
-  return buildMesh(scene, scene->mRootNode, mesh) 
+  return buildMesh(scene, scene->mRootNode, mesh);
 }
 
 
 void buildMesh(const aiScene* scene,
                const aiNode* node,
-               const Assimp::MeshPtr& mesh,
+               const MeshPtr& mesh,
                aiMatrix4x4 transform = aiMatrix4x4())
 {
   if (!node)
@@ -121,14 +123,24 @@ void buildMesh(const aiScene* scene,
   {
 
     aiMesh* input_mesh = scene->mMeshes[node->mMeshes[i]];
-    SubMesh subMesh;
+    std::unique_ptr<SubMesh> subMesh(new SubMesh());
 
     /*
     TO-DO: Do we need to create a vertex buffer
     as Rviz did? STL and OBJ doesnt use them.
     */
 
-    // Add the vertices
+
+
+    /*
+    OBJLoader creates new submesh for each face. Because
+    each face has a different submesh. This requires additional 
+    checking.
+
+    However, Assimp, has one material for each mesh, so we
+    dont need that, we are just going to add vertices, normals
+    texture coordinates.  And that is basically it.
+    */
     for (uint32_t j = 0; j < input_mesh->mNumVertices; j++)
     {
       //Process vertex positions
@@ -156,61 +168,59 @@ void buildMesh(const aiScene* scene,
         texcoords.y = 0.0f;
       }
 
-      subMesh.AddTexCoord(texcoords);
-      subMesh.AddVertex(vertex);
-      subMesh.AddNormal(normal);
+      subMesh->AddTexCoord(texcoords);
+      subMesh->AddVertex(vertex);
+      subMesh->AddNormal(normal);
+      subMesh->AddIndex(subMesh->IndexCount())
     }
     if(input_mesh->mMaterialIndex >= 0)
     {
+
+      math::Color diffuse(1.0, 1.0, 1.0, 1.0);
+      math::Color specular(1.0, 1.0, 1.0, 1.0);
+      math::Colour ambient(0, 0, 0, 1.0);
+
       mat = new Material();
       aiMaterial *input_material = scene->mMaterials[input_mesh->mMaterialIndex];
       for (uint32_t j = 0; j < input_material->mNumProperties; j++)
       {
-        aiMaterialProperty* prob = input_material->mProperties[j];
+        assimp::aiMaterialProperty* prob = input_material->mProperties[j];
         std::string propKey = prop->mKey.data;
         if (propKey == "$tex.file")
         {
-          aiString texName;
-          aiTextureMapping mapping;
-          uint32_t uvIndex;
-          input_material->GetTexture(aiTextureType_DIFFUSE, 0, &texName, &mapping, &uvIndex);
-
-          // Assume textures are in paths relative to the mesh
-          std::string texture_path = fs::path(resource_path).parent_path().string() + "/" + texName.data;
-          loadTexture(texture_path); //TODO: Image loader
-          Ogre::TextureUnitState* tu = pass->createTextureUnitState();
-          tu->setTextureName(texture_path);
+          //TO-DO: Look from Rviz source code.
+          //What does it actually do?
+          //What is OGRE::Pass
         }
         else if(propKey == "$clr.diffuse")
         {
-          aiColor3D clr;
+          assimp::aiColor3D clr;
           input_material->Get(AI_MATKEY_COLOR_DIFFUSE, clr);
-          diffuse = Ogre::ColourValue(clr.r, clr.g, clr.b)
+          diffuse = (math::Color(clr.r, clr.g, ));
         }
         else if(propKey == "$clr.ambient")
         {
           aiColor3D clr;
           input_material->Get(AI_MATKEY_COLOR_AMBIENT, clr);
-          ambient = Ogre::ColourValue(clr.r, clr.g, clr.b)
+          ambient = math::colour(clr.r, clr.g, clr.b)
         }
         else if(propKey == "$clr.specular")
         {
           aiColor3D clr;
           input_material->Get(AI_MATKEY_COLOR_SPECULAR, clr);
-          specular = Ogre::ColourValue(clr.r, clr.g, clr.b)
+          specular = math::colour(clr.r, clr.g, clr.b)
         }
         else if (propKey == "$clr.emissive")
         {
           aiColor3D clr;
           input_material->Get(AI_MATKEY_COLOR_EMISSIVE, clr);
-          mat->setSelfIllumination(clr.r, clr.g, clr.b);
-          //TO-DO: This might be set emissive
+          mat->SetEmissive(math::Color(clr.r, clr.g, clr.b));
         }
         else if(propKey == "$clr.opacity")
         {
           float o;
           input_material->Get(AI_MATKEY_OPACITY, o);
-          difuse.a = o;
+          diffuse.a = o;
         }
         else if(propKey == "$mat.shininess")
         {
@@ -225,14 +235,14 @@ void buildMesh(const aiScene* scene,
           switch(model)
           {
             case aiShadingMode_Flat:
-            mat->setShadingMode(Ogre::SO_FLAT);
+            mat->setShadingMode(FLAT);
             break;
           case aiShadingMode_Phong:
-            mat->setShadingMode(Ogre::SO_PHONG);
+            mat->setShadingMode(PHONG);
             break;
           case aiShadingMode_Gouraud:
           default:
-            mat->setShadingMode(Ogre::SO_GOURAUD);
+            mat->setShadingMode(GOURAUD);
             break;
           }
         }
@@ -242,18 +252,21 @@ void buildMesh(const aiScene* scene,
       switch (mode)
       {
       case aiBlendMode_Additive:
-        mat->setSceneBlending(Ogre::SBT_ADD);
+        mat->setSceneBlending(ADD);
         break;
       case aiBlendMode_Default:
       default:
       {
         if (diffuse.a < 0.99)
         {
-          pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
+          //TO-DO What is this?
+          //pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
+          //TO-DO: What is this?
         }
         else
         {
-          pass->setSceneBlending(Ogre::SBT_REPLACE);
+          //TO-DO What is this?
+          //pass->setSceneBlending(REPLACE);
         }
       }
       break;
@@ -263,169 +276,15 @@ void buildMesh(const aiScene* scene,
       mat->setDiffuse(diffuse);
       specular.a = diffuse.a;
       mat->setSpecular(specular);
-
+      //TODO: Add this material to main mesh material index.
+      //TODO: Refer the index in the submesh.
     }
-  mesh->AddSubMesh(subMesh);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      Ogre::Vector3 v(p.x, p.y, p.z);
-      aabb.merge(v);
-      float dist = v.length();
-      if (dist > radius)
-      {
-        radius = dist;
-      }
-
-      if (input_mesh->HasNormals())
-      {
-        aiVector3D n = input_mesh->mNormals[j];
-        n *= rotation;
-        n.Normalize();
-        *vertices++ = n.x;
-        *vertices++ = n.y;
-        *vertices++ = n.z;
-      }
-
-      if (input_mesh->HasTextureCoords(0))
-      {
-        *vertices++ = input_mesh->mTextureCoords[0][j].x;
-        *vertices++ = input_mesh->mTextureCoords[0][j].y;
-      }
-    }
-
-    // calculate index count
-    submesh->indexData->indexCount = 0;
-    for (uint32_t j = 0; j < input_mesh->mNumFaces; j++)
-    {
-      aiFace& face = input_mesh->mFaces[j];
-      submesh->indexData->indexCount += face.mNumIndices;
-    }
-
-    // If we have less than 65536 (2^16) vertices, we can use a 16-bit index buffer.
-    if (vertex_data->vertexCount < (1 << 16))
-    {
-      // allocate index buffer
-      submesh->indexData->indexBuffer = Ogre::HardwareBufferManager::getSingleton().createIndexBuffer(
-          Ogre::HardwareIndexBuffer::IT_16BIT, submesh->indexData->indexCount,
-          Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY, false);
-
-      Ogre::HardwareIndexBufferSharedPtr ibuf = submesh->indexData->indexBuffer;
-      uint16_t* indices = static_cast<uint16_t*>(ibuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
-
-      // add the indices
-      for (uint32_t j = 0; j < input_mesh->mNumFaces; j++)
-      {
-        aiFace& face = input_mesh->mFaces[j];
-        for (uint32_t k = 0; k < face.mNumIndices; ++k)
-        {
-          *indices++ = face.mIndices[k];
-        }
-      }
-
-      ibuf->unlock();
-    }
-    else
-    {
-      // Else we have more than 65536 (2^16) vertices, so we must
-      // use a 32-bit index buffer (or subdivide the mesh, which
-      // I'm too impatient to do right now)
-
-      // allocate index buffer
-      submesh->indexData->indexBuffer = Ogre::HardwareBufferManager::getSingleton().createIndexBuffer(
-          Ogre::HardwareIndexBuffer::IT_32BIT, submesh->indexData->indexCount,
-          Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY, false);
-
-      Ogre::HardwareIndexBufferSharedPtr ibuf = submesh->indexData->indexBuffer;
-      uint32_t* indices = static_cast<uint32_t*>(ibuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
-
-      // add the indices
-      for (uint32_t j = 0; j < input_mesh->mNumFaces; j++)
-      {
-        aiFace& face = input_mesh->mFaces[j];
-        for (uint32_t k = 0; k < face.mNumIndices; ++k)
-        {
-          *indices++ = face.mIndices[k];
-        }
-      }
-
-      ibuf->unlock();
-    }
-    vbuf->unlock();
-
-    Ogre::MaterialPtr const& material = material_table[input_mesh->mMaterialIndex];
-    submesh->setMaterialName(material->getName(), material->getGroup());
+    mesh->AddSubMesh(subMesh);
   }
-
-  for (uint32_t i = 0; i < node->mNumChildren; ++i)
+  for (uint32_t i = 0; i < node->mNumChildren; ++i),
   {
     buildMesh(scene, node->mChildren[i], mesh, aabb, radius, material_table, transform);
   }
 }
 
-}
 
-SubMesh AssimpLoader::Assimp2GazeboMesh(aiMesh *mesh)
-{
-  SubMesh subMesh;
-
-  // Retrieve all the vertex data;
-  for(unsigned int i = 0; i < mesh->mNumVertices; i++)
-  {
-
-    //Process vertex positions
-    ignition::math::Vector3d vertex;
-    vertex.X(mesh->mVertices[i].x);
-    vertex.Y(mesh->mVertices[i].y);
-    vertex.Z(mesh->mVertices[i].z);
-
-    //Process vertex normals
-    ignition::math::Vector3d normal;
-    normal.X(mesh->mNormals[i].x);
-    normal.Y(mesh->mNormals[i].y);
-    normal.Z(mesh->mNormals[i].z);
-
-    //Process texture coordinates
-      //TO-DO: Implement this later...
-
-    subMesh.AddVertex(vertex);
-    subMesh.AddNormal(normal);
-  }
-
-  // Retrieve all the mesh's indices
-  for(unsigned int i = 0; i < mesh->mNumFaces; i++)
-  {
-    aiFace face = mesh->mFaces[i];
-    for(unsigned int j = 0; j < face.mNumIndices; j++)
-      subMesh.AddIndex(face.mIndices[j]);
-  }
-  // Retrieve material data
-    //TO-DO: Implement this later...
-  return subMesh;
-}
-
-int main(void)
-{
-  printf("Hello world!\n");
-  return 0;
-}
