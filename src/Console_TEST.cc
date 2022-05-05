@@ -73,17 +73,6 @@ std::string GetLogContent(const std::string &_filename)
 
 /////////////////////////////////////////////////
 /// \brief Test Console::Init and Console::Log
-/// This specifically tests with an unset HOME variable
-TEST_F(Console_TEST, NoInitAndLogNoHome)
-{
-  EXPECT_TRUE(ignition::common::unsetenv(IGN_HOMEDIR));
-  
-  // This should not throw
-  ignlog << "this is a test" << std::endl;
-}
- 
-/////////////////////////////////////////////////
-/// \brief Test Console::Init and Console::Log
 TEST_F(Console_TEST, NoInitAndLog)
 {
   // Log the string
@@ -549,4 +538,15 @@ TEST_F(Console_TEST, LogDirectory)
   absPath = ignition::common::joinPaths(absPath, path);
 
   EXPECT_EQ(logDir, absPath);
+}
+
+/////////////////////////////////////////////////
+/// \brief Test Console::Init and Console::Log
+/// This specifically tests with an unset HOME variable
+TEST_F(Console_TEST, NoInitAndLogNoHome)
+{
+  ignLogClose();
+  EXPECT_TRUE(ignition::common::unsetenv(IGN_HOMEDIR));
+  // This should not throw
+  ignlog << "this is a test" << std::endl;
 }

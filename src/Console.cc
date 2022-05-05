@@ -246,7 +246,7 @@ void FileLogger::Init(const std::string &_directory,
       // Use stderr here to prevent infinite recursion
       // trying to get the log initialized
       std::cerr << "Missing HOME environment variable."
-        << "No log file will be generated.";
+        << "No log file will be generated." << std::endl;
       return;
     }
     logPath = joinPaths(logPath, _directory);
