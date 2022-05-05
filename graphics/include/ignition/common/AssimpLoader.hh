@@ -55,8 +55,6 @@ namespace ignition
       // TODO: Write doc
       private: Mesh *MeshFromAssimpScene(const std::string& name, const aiScene *scene);
 
-
-
       /// \brief Private data pointer.
       IGN_UTILS_IMPL_PTR(dataPtr)
     };

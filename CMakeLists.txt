@@ -123,7 +123,7 @@ ign_find_package(AVUTIL REQUIRED_BY av PRETTY libavutil)
 
 
 #------------------------------------
-# Find avutil
+# Find assimp
 ign_find_package(ASSIMP REQUIRED_BY graphics PRETTY libassimp)
 
 

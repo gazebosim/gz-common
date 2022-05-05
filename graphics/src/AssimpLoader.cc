@@ -83,7 +83,7 @@ Mesh *AssimpLoader::MeshFromAssimpScene(const std::string& name, const aiScene *
   float radius = 0.0f; //TO-DO: Why?
   // buildMesh(scene, scene->mRootNode, mesh, aabb, radius, material_table);
   /*
-  TO-DO: We dont need aabb, and radius
+  TO-DO: We dont need aabb, and radius, SURE?
   */
   buildMesh(scene, scene->mRootNode, mesh);
   return mesh;
@@ -91,10 +91,7 @@ Mesh *AssimpLoader::MeshFromAssimpScene(const std::string& name, const aiScene *
 
 
 
-void buildMesh(const aiScene* scene,
-               const aiNode* node,
-               Mesh *mesh,
-               aiMatrix4x4 transform = aiMatrix4x4())
+void AssimpLoader::buildMesh(const aiScene* scene, const aiNode* node, Mesh *mesh, aiMatrix4x4 transform)
 {
   if (!node)
     return;
