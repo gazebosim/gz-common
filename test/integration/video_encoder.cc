@@ -23,7 +23,8 @@
 #include "ignition/common/Video.hh"
 #include "ignition/common/ffmpeg_inc.hh"
 
-#include "test_config.h"
+#include <ignition/common/testing/AutoLogFixture.hh>
+#include <ignition/common/testing/TestPaths.hh>
 
 using namespace ignition;
 using namespace common;

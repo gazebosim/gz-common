@@ -18,7 +18,9 @@
 #include <gtest/gtest.h>
 
 #include <ignition/common/Image.hh>
-#include "test_config.h"
+
+#include "ignition/common/testing/AutoLogFixture.hh"
+#include "ignition/common/testing/TestPaths.hh"
 
 using namespace ignition;
 

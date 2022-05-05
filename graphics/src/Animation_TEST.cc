@@ -17,12 +17,12 @@
 
 #include <gtest/gtest.h>
 
-#include "test_config.h"
-
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Quaternion.hh>
 #include <ignition/common/KeyFrame.hh>
 #include <ignition/common/Animation.hh>
+
+#include "ignition/common/testing/AutoLogFixture.hh"
 
 using namespace ignition;
 

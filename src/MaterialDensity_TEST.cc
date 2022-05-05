@@ -14,10 +14,10 @@
  * limitations under the License.
  *
 */
-
 #include <gtest/gtest.h>
+
 #include "ignition/common/MaterialDensity.hh"
-#include "test_config.h"
+#include "ignition/common/testing/AutoLogFixture.hh"
 
 using namespace ignition;
 using namespace common;
