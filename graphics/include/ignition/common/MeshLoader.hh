@@ -13,35 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
-#ifndef IGNITION_COMMON_MESHLOADER_HH_
-#define IGNITION_COMMON_MESHLOADER_HH_
+ */
 
-#include <string>
-
-#include <ignition/common/graphics/Export.hh>
-
-namespace ignition
-{
-  namespace common
-  {
-    class Mesh;
-
-    /// \class MeshLoader MeshLoader.hh ignition/common/MeshLoader.hh
-    /// \brief Base class for loading meshes
-    class IGNITION_COMMON_GRAPHICS_VISIBLE MeshLoader
-    {
-      /// \brief Constructor
-      public: MeshLoader() = default;
-
-      /// \brief Destructor
-      public: virtual ~MeshLoader() = default;
-
-      /// \brief Load a 3D mesh
-      /// \param[in] _filename the path to the mesh
-      /// \return a pointer to the created mesh
-      public: virtual Mesh *Load(const std::string &_filename) = 0;
-    };
-  }
-}
-#endif
+#include <gz/common/MeshLoader.hh>

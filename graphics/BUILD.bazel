@@ -15,8 +15,8 @@ package(
 )
 
 public_headers_no_gen = glob([
-    "include/ignition/common/*.hh",
-    "include/ignition/common/**/*.hh",
+    "include/gz/common/*.hh",
+    "include/gz/common/**/*.hh",
 ])
 
 sources = glob(
@@ -27,7 +27,7 @@ sources = glob(
 test_sources = glob(["src/*_TEST.cc"])
 
 ign_export_header(
-    name = "include/ignition/common/graphics/Export.hh",
+    name = "include/gz/common/graphics/Export.hh",
     export_base = "IGNITION_COMMON_GRAPHICS",
     lib_name = "ignition-common-graphics",
     visibility = ["//visibility:private"],
@@ -35,15 +35,15 @@ ign_export_header(
 
 generate_include_header(
     name = "graphics_hh_genrule",
-    out = "include/ignition/common/graphics.hh",
+    out = "include/gz/common/graphics.hh",
     hdrs = public_headers_no_gen + [
-        "include/ignition/common/graphics/Export.hh",
+        "include/gz/common/graphics/Export.hh",
     ],
 )
 
 public_headers = public_headers_no_gen + [
-    "include/ignition/common/graphics/Export.hh",
-    "include/ignition/common/graphics.hh",
+    "include/gz/common/graphics/Export.hh",
+    "include/gz/common/graphics.hh",
     "src/tiny_obj_loader.h",
 ]
 

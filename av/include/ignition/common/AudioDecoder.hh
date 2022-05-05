@@ -14,51 +14,5 @@
 * limitations under the License.
 *
 */
-#ifndef IGNITION_COMMON_AUDIO_DECODER_HH_
-#define IGNITION_COMMON_AUDIO_DECODER_HH_
 
-#include <stdint.h>
-#include <string>
-
-#include <ignition/common/av/Export.hh>
-#include <ignition/utils/ImplPtr.hh>
-
-namespace ignition
-{
-  namespace common
-  {
-    /// \class AudioDecoder AudioDecoder.hh ignition/common/common.hh
-    /// \brief An audio decoder based on FFMPEG.
-    class IGNITION_COMMON_AV_VISIBLE AudioDecoder
-    {
-      /// \brief Constructor.
-      public: AudioDecoder();
-
-      /// \brief Set the file to decode.
-      /// \param[in] _filename Path to an audio file.
-      /// \return True if the file was successfull opened.
-      public: bool SetFile(const std::string &_filename);
-
-      /// \brief Get the audio filename that was set.
-      /// \return The name of the set audio file.
-      /// \sa AudioDecoder::SetFile
-      public: std::string File() const;
-
-      /// \brief Decode the loaded audio file.
-      /// \sa AudioDecoder::SetFile
-      /// \param[out] _outBuffer Buffer that holds the decoded audio data.
-      /// \param[out] _outBufferSize Size of the _outBuffer.
-      /// \return True if decoding was succesful.
-      public: bool Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize);
-
-      /// \brief Get the sample rate from the latest decoded file.
-      /// \return Integer sample rate, such as 44100.
-      /// If no file is decoded, -1 is returned.
-      public: int SampleRate();
-
-      /// \brief Private data pointer
-      IGN_UTILS_UNIQUE_IMPL_PTR(dataPtr)
-    };
-  }
-}
-#endif
+#include <gz/common/AudioDecoder.hh>

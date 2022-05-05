@@ -15,33 +15,4 @@
  *
  */
 
-
-#ifndef IGNITION_COMMON_DETAIL_TEMPLATEHELPERS_HH_
-#define IGNITION_COMMON_DETAIL_TEMPLATEHELPERS_HH_
-
-
-#include <type_traits>
-
-namespace ignition
-{
-  namespace common
-  {
-    namespace detail
-    {
-      //////////////////////////////////////////////////
-      template <typename To, typename From>
-      struct ConstCompatible : std::true_type
-      {
-      };
-
-      //////////////////////////////////////////////////
-      template <typename To, typename From>
-      struct ConstCompatible<To, const From>
-          : std::integral_constant<bool, std::is_const<To>::value>
-      {
-      };
-    }
-  }
-}
-
-#endif
+#include <gz/common/detail/TemplateHelpers.hh>

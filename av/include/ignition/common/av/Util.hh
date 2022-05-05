@@ -13,19 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 
-#ifndef IGNITION_COMMON_AV_UTIL_HH_
-#define IGNITION_COMMON_AV_UTIL_HH_
-
-namespace ignition
-{
-  namespace common
-  {
-    /// \brief Load external libraries, such as libav. It is safe to call
-    /// this multiple times.
-    void load();
-  }
-}
-
-#endif
+#include <gz/common/av/Util.hh>

@@ -18,9 +18,9 @@
 #include <atomic>
 #include <thread>
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/Profiler.hh"
-#include "ignition/common/SignalHandler.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/Profiler.hh"
+#include "gz/common/SignalHandler.hh"
 
 std::atomic<bool> running;
 

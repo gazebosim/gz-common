@@ -13,40 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
-#ifndef IGNITION_COMMON_BVHLOADER_HH_
-#define IGNITION_COMMON_BVHLOADER_HH_
+ */
 
-#include <memory>
-#include <string>
-
-#include <ignition/math/Pose3.hh>
-#include <ignition/common/graphics/Export.hh>
-
-namespace ignition
-{
-  namespace common
-  {
-    class Skeleton;
-
-    /// \class BVHLoader BVHLoader.hh ignition/common/BVHLoader.hh
-    /// \brief Handles loading BVH animation files
-    class IGNITION_COMMON_GRAPHICS_VISIBLE BVHLoader
-    {
-      /// \brief Constructor
-      public: BVHLoader();
-
-      /// \brief Desutrctor
-      public: ~BVHLoader();
-
-      /// \brief Load a BVH file
-      /// \param[in] _filename BVH file to load
-      /// \param[in] _scale Scaling factor to apply to the skeleton
-      /// \return A pointer to a new Skeleton
-      public: std::unique_ptr<Skeleton> Load(
-                  const std::string &_filename, const double _scale);
-    };
-  }
-}
-
-#endif
+#include <gz/common/BVHLoader.hh>
