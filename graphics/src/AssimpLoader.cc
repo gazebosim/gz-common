@@ -227,18 +227,18 @@ void buildMesh(const aiScene* scene,
         else if(propKey == "$mat.shadingm")
         {
           int model;
-          input_material->Get(AI_MATKEY_SHADING_MODEL, model)
+          input_material->Get(AI_MATKEY_SHADING_MODEL, model);
           switch(model)
           {
             case aiShadingMode_Flat:
-            mat->setShadingMode(FLAT);
+            mat->SetShade(Material::FLAT);
             break;
           case aiShadingMode_Phong:
-            mat->setShadingMode(PHONG);
+            mat->SetShade(Material::PHONG);
             break;
           case aiShadingMode_Gouraud:
           default:
-            mat->setShadingMode(GOURAUD);
+            mat->SetShade(Material::GOURAUD);
             break;
           }
         }
@@ -248,7 +248,7 @@ void buildMesh(const aiScene* scene,
       switch (mode)
       {
       case aiBlendMode_Additive:
-        mat->SetBlend(ADD);
+        mat->SetBlend(Material::ADD);
         break;
       case aiBlendMode_Default:
       default:
@@ -268,18 +268,18 @@ void buildMesh(const aiScene* scene,
       break;
       }
 
-      mat->setAmbient(ambient * 0.5);
-      mat->setDiffuse(diffuse);
+      mat->SetAmbient(ambient * 0.5);
+      mat->SetDiffuse(diffuse);
       specular.A(diffuse.A());
-      mat->setSpecular(specular);
+      mat->SetSpecular(specular);
       //TODO: Add this material to main mesh material index.
       //TODO: Refer the index in the submesh.
     }
-    mesh->AddSubMesh(subMesh);
+    mesh->AddSubMesh(std::move(subMesh));
   }
-  for (uint32_t i = 0; i < node->mNumChildren; ++i),
+  for (uint32_t i = 0; i < node->mNumChildren; ++i)
   {
-    buildMesh(scene, node->mChildren[i], mesh, aabb, radius, material_table, transform);
+    buildMesh(scene, node->mChildren[i], mesh, transform);
   }
 }
 
