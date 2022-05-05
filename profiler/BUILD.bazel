@@ -16,7 +16,7 @@ package(
 )
 
 public_headers_no_gen = [
-    "include/ignition/common/Profiler.hh",
+    "include/gz/common/Profiler.hh",
 ]
 
 sources = [
@@ -54,7 +54,7 @@ cmake_configure_file(
 )
 
 ign_export_header(
-    name = "include/ignition/common/profiler/Export.hh",
+    name = "include/gz/common/profiler/Export.hh",
     export_base = "IGNITION_COMMON_PROFILER",
     lib_name = "ignition-common-profiler",
     visibility = ["//visibility:private"],
@@ -62,16 +62,16 @@ ign_export_header(
 
 generate_include_header(
     name = "profiler_hh_genrule",
-    out = "include/ignition/common/profiler.hh",
+    out = "include/gz/common/profiler.hh",
     hdrs = public_headers_no_gen + [
-        "include/ignition/common/profiler/Export.hh",
+        "include/gz/common/profiler/Export.hh",
         "include/RemoteryConfig.h",
     ],
 )
 
 public_headers = public_headers_no_gen + [
-    "include/ignition/common/profiler/Export.hh",
-    "include/ignition/common/profiler.hh",
+    "include/gz/common/profiler/Export.hh",
+    "include/gz/common/profiler.hh",
     "src/ProfilerImpl.hh",
     "src/RemoteryProfilerImpl.hh",
     "include/RemoteryConfig.h",

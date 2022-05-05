@@ -25,7 +25,7 @@
 #include <map>
 #include <thread>
 
-#include <ignition/common/Console.hh>
+#include <gz/common/Console.hh>
 
 namespace {
 const uint64_t g_iterations{1000000};

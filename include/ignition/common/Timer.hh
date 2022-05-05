@@ -13,52 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
-#ifndef IGNITION_COMMON_TIMER_HH_
-#define IGNITION_COMMON_TIMER_HH_
+ */
 
-#include <ignition/common/Export.hh>
-#include <ignition/utils/ImplPtr.hh>
-
-#include <chrono>
-#include <iostream>
-
-namespace ignition
-{
-  namespace common
-  {
-    /// \class Timer Timer.hh common/common.hh
-    /// \brief A timer class, used to time things in real world walltime
-    class IGNITION_COMMON_VISIBLE Timer
-    {
-      /// \brief Constructor
-      public: Timer();
-
-      /// \brief Start the timer
-      public: virtual void Start();
-
-      /// \brief Stop the timer
-      public: virtual void Stop();
-
-      /// \brief Returns true if the timer is running.
-      /// \return Tue if the timer has been started and not stopped.
-      public: bool Running() const;
-
-      /// \brief Get the elapsed time
-      /// \return The elapsed time
-      public: std::chrono::duration<double> ElapsedTime() const;
-
-      /// \brief Stream operator friendly
-      public: friend std::ostream &operator<<(std::ostream &out,
-                                              const ignition::common::Timer &t)
-              {
-                out << t.ElapsedTime().count();
-                return out;
-              }
-
-      /// \brief Private data pointer
-      IGN_UTILS_IMPL_PTR(dataPtr)
-    };
-  }
-}
-#endif
+#include <gz/common/Timer.hh>
