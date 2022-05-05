@@ -4,14 +4,17 @@
 #include <memory>
 
 #include "ignition/math/Helpers.hh"
+#include "ignition/common/Filesystem.hh"
 #include "ignition/common/Console.hh"
 #include "ignition/common/Mesh.hh"
+#include "ignition/common/Material.hh"
 #include "ignition/common/SubMesh.hh"
 #include "ignition/common/AssimpLoader.hh"
 
 using namespace ignition;
 using namespace common;
 
+//TODO: Conventions
 
 //////////////////////////////////////////////////
 class ignition::common::AssimpLoader::Implementation
@@ -33,12 +36,10 @@ AssimpLoader::~AssimpLoader()
 //////////////////////////////////////////////////
 Mesh *AssimpLoader::Load(const std::string &resource_path)
 {
-
   /*
     Check whether a mesh with same path already loaded.
     TO-DO: I believe this is not a good idea.
   */
-
 
   // Create an instance of the Assimp Importer class
   Assimp::Importer importer;
@@ -62,8 +63,7 @@ Mesh *AssimpLoader::Load(const std::string &resource_path)
   if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode || !scene->HasMeshes())
   {
     ignerr << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
-    Mesh *mesh = new Mesh();
-    return mesh;
+    return new Mesh();
   }
 
   std::cout << "Succesfully loaded the scene." << std::endl ;
@@ -77,11 +77,6 @@ Mesh *AssimpLoader::MeshFromAssimpScene(const std::string& name, const aiScene *
 {
   
   Mesh *mesh = new Mesh();
-  if (!scene->HasMeshes())
-  {
-    ignerr << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
-    return mesh;
-  }
 
   //We are not going to load the materials here.
 
@@ -90,13 +85,15 @@ Mesh *AssimpLoader::MeshFromAssimpScene(const std::string& name, const aiScene *
   /*
   TO-DO: We dont need aabb, and radius
   */
-  return buildMesh(scene, scene->mRootNode, mesh);
+  buildMesh(scene, scene->mRootNode, mesh);
+  return mesh;
 }
+
 
 
 void buildMesh(const aiScene* scene,
                const aiNode* node,
-               const MeshPtr& mesh,
+               Mesh *mesh,
                aiMatrix4x4 transform = aiMatrix4x4())
 {
   if (!node)
@@ -124,13 +121,12 @@ void buildMesh(const aiScene* scene,
 
     aiMesh* input_mesh = scene->mMeshes[node->mMeshes[i]];
     std::unique_ptr<SubMesh> subMesh(new SubMesh());
+    Material *mat = nullptr;
 
     /*
     TO-DO: Do we need to create a vertex buffer
     as Rviz did? STL and OBJ doesnt use them.
     */
-
-
 
     /*
     OBJLoader creates new submesh for each face. Because
@@ -145,46 +141,45 @@ void buildMesh(const aiScene* scene,
     {
       //Process vertex positions
       ignition::math::Vector3d vertex;
-      vertex.X(mesh->mVertices[j].x);
-      vertex.Y(mesh->mVertices[j].y);
-      vertex.Z(mesh->mVertices[j].z);
+      vertex.X(input_mesh->mVertices[j].x);
+      vertex.Y(input_mesh->mVertices[j].y);
+      vertex.Z(input_mesh->mVertices[j].z);
 
       //Process vertex normals
       ignition::math::Vector3d normal;
-      normal.X(mesh->mNormals[j].x);
-      normal.Y(mesh->mNormals[j].y);
-      normal.Z(mesh->mNormals[j].z);
+      normal.X(input_mesh->mNormals[j].x);
+      normal.Y(input_mesh->mNormals[j].y);
+      normal.Z(input_mesh->mNormals[j].z);
 
       //Process textures
-      ignition::math::Vector2d texcoords;
+      ignition::math::Vector2d texcoords(0,0);
       if (input_mesh->HasTextureCoords(0)) //TO-DO: Why just first texture?
       {
-        texcoords.x = mesh->mTextureCoords[0][i].x; 
-        texcoords.y = mesh->mTextureCoords[0][i].y;
+        texcoords.Set(input_mesh->mTextureCoords[0][i].x, input_mesh->mTextureCoords[0][i].y);
       }
       else
       {
-        texcoords.x = 0.0f;
-        texcoords.y = 0.0f;
+        texcoords.Set(0, 0);
       }
 
       subMesh->AddTexCoord(texcoords);
       subMesh->AddVertex(vertex);
       subMesh->AddNormal(normal);
-      subMesh->AddIndex(subMesh->IndexCount())
+      subMesh->AddIndex(subMesh->IndexCount());
     }
     if(input_mesh->mMaterialIndex >= 0)
     {
 
-      math::Color diffuse(1.0, 1.0, 1.0, 1.0);
-      math::Color specular(1.0, 1.0, 1.0, 1.0);
-      math::Colour ambient(0, 0, 0, 1.0);
+      math::Color diffuse(0, 0, 0);
+      math::Color specular(0, 0, 0);
+      math::Color ambient(0, 0, 0);
+      math::Color emissive(0, 0, 0);
 
       mat = new Material();
       aiMaterial *input_material = scene->mMaterials[input_mesh->mMaterialIndex];
       for (uint32_t j = 0; j < input_material->mNumProperties; j++)
       {
-        assimp::aiMaterialProperty* prob = input_material->mProperties[j];
+        aiMaterialProperty* prop = input_material->mProperties[j];
         std::string propKey = prop->mKey.data;
         if (propKey == "$tex.file")
         {
@@ -194,44 +189,45 @@ void buildMesh(const aiScene* scene,
         }
         else if(propKey == "$clr.diffuse")
         {
-          assimp::aiColor3D clr;
+          aiColor3D clr;
           input_material->Get(AI_MATKEY_COLOR_DIFFUSE, clr);
-          diffuse = (math::Color(clr.r, clr.g, ));
+          diffuse.Set(clr.r, clr.g, clr.b);
         }
         else if(propKey == "$clr.ambient")
         {
           aiColor3D clr;
           input_material->Get(AI_MATKEY_COLOR_AMBIENT, clr);
-          ambient = math::colour(clr.r, clr.g, clr.b)
+          ambient.Set(clr.r, clr.g, clr.b);
         }
         else if(propKey == "$clr.specular")
         {
           aiColor3D clr;
           input_material->Get(AI_MATKEY_COLOR_SPECULAR, clr);
-          specular = math::colour(clr.r, clr.g, clr.b)
+          specular.Set(clr.r, clr.g, clr.b);
         }
         else if (propKey == "$clr.emissive")
         {
           aiColor3D clr;
           input_material->Get(AI_MATKEY_COLOR_EMISSIVE, clr);
-          mat->SetEmissive(math::Color(clr.r, clr.g, clr.b));
+          emissive.Set(clr.r, clr.g, clr.b);
+          mat->SetEmissive(emissive);
         }
         else if(propKey == "$clr.opacity")
         {
           float o;
           input_material->Get(AI_MATKEY_OPACITY, o);
-          diffuse.a = o;
+          diffuse.A(o);
         }
         else if(propKey == "$mat.shininess")
         {
           float s;
-          amat->Get(AI_MATKEY_SHININESS, s);
-          mat->setShininess(s);
+          input_material->Get(AI_MATKEY_SHININESS, s);
+          mat->SetShininess(s);
         }
         else if(propKey == "$mat.shadingm")
         {
           int model;
-          amat->Get(AI_MATKEY_SHADING_MODEL, model)
+          input_material->Get(AI_MATKEY_SHADING_MODEL, model)
           switch(model)
           {
             case aiShadingMode_Flat:
@@ -248,16 +244,16 @@ void buildMesh(const aiScene* scene,
         }
       }
       int mode = aiBlendMode_Default;
-      amat->Get(AI_MATKEY_BLEND_FUNC, mode);
+      input_material->Get(AI_MATKEY_BLEND_FUNC, mode);
       switch (mode)
       {
       case aiBlendMode_Additive:
-        mat->setSceneBlending(ADD);
+        mat->SetBlend(ADD);
         break;
       case aiBlendMode_Default:
       default:
       {
-        if (diffuse.a < 0.99)
+        if (diffuse.A() < 0.99)
         {
           //TO-DO What is this?
           //pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
@@ -274,7 +270,7 @@ void buildMesh(const aiScene* scene,
 
       mat->setAmbient(ambient * 0.5);
       mat->setDiffuse(diffuse);
-      specular.a = diffuse.a;
+      specular.A(diffuse.A());
       mat->setSpecular(specular);
       //TODO: Add this material to main mesh material index.
       //TODO: Refer the index in the submesh.

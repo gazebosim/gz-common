@@ -50,7 +50,7 @@ namespace ignition
       public: virtual Mesh *Load(const std::string &_filename);
 
       // TODO: Write doc
-      private: void buildMesh(const aiScene* scene, const aiNode* node, const MeshPtr& mesh, aiMatrix4x4 transform = aiMatrix4x4());
+      private: void buildMesh(const aiScene* scene, const aiNode* node, Mesh *mesh, aiMatrix4x4 transform = aiMatrix4x4());
 
       // TODO: Write doc
       private: Mesh *MeshFromAssimpScene(const std::string& name, const aiScene *scene);
