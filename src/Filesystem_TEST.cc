@@ -24,6 +24,8 @@
 #include <ignition/common/TempDirectory.hh>
 #include <ignition/common/Util.hh>
 
+#include <ignition/common/testing/Utils.hh>
+
 #include <filesystem>
 #include <fstream>
 
@@ -45,20 +47,6 @@ class TestTempDirectory : public TempDirectory
   {
   }
 };
-
-/////////////////////////////////////////////////
-bool create_new_empty_file(const std::string &_filename)
-{
-  try
-  {
-    std::fstream fs(_filename, std::ios::out);
-  }
-  catch(...)
-  {
-    return false;
-  }
-  return true;
-}
 
 /////////////////////////////////////////////////
 bool create_new_file_symlink(const std::string &_symlink,
@@ -218,12 +206,12 @@ TEST_F(FilesystemTest, moreFileOps)
 /////////////////////////////////////////////////
 TEST_F(FilesystemTest, exists)
 {
-  ASSERT_TRUE(create_new_empty_file("newfile"));
+  ASSERT_TRUE(common::testing::createNewEmptyFile("newfile"));
   ASSERT_TRUE(createDirectory("fstestexists"));
 
   const auto &relativeSubdir = joinPaths("fstestexists", "newfile2");
   const auto &absoluteSubdir = joinPaths(cwd(), relativeSubdir);
-  ASSERT_TRUE(create_new_empty_file(relativeSubdir));
+  ASSERT_TRUE(common::testing::createNewEmptyFile(relativeSubdir));
 
   EXPECT_TRUE(exists("fstestexists"));
   EXPECT_TRUE(isDirectory("fstestexists"));
@@ -273,7 +261,7 @@ TEST_F(FilesystemTest, symlink_exists)
   // 3. symbolic link to existing directory
   // 4. symbolic link to non-existent directory
   // 5. hard link to existing file
-  ASSERT_TRUE(create_new_empty_file("newfile"));
+  ASSERT_TRUE(common::testing::createNewEmptyFile("newfile"));
   ASSERT_TRUE(createDirectory("newdir"));
 
   // Case 1
@@ -483,7 +471,7 @@ TEST_F(FilesystemTest, decomposition)
 /////////////////////////////////////////////////
 TEST_F(FilesystemTest, directory_iterator)
 {
-  ASSERT_TRUE(create_new_empty_file("newfile"));
+  ASSERT_TRUE(common::testing::createNewEmptyFile("newfile"));
   ASSERT_TRUE(createDirectory("newdir"));
 #ifdef BUILD_SYMLINK_TESTS
   ASSERT_TRUE(create_new_file_symlink("symlink-file", "newfile"));
@@ -589,7 +577,7 @@ TEST_F(FilesystemTest, copyDirectories)
 
   std::string subFile = joinPaths(subDir, "sub_file");
   EXPECT_FALSE(exists(subFile));
-  EXPECT_TRUE(create_new_empty_file(subFile));
+  EXPECT_TRUE(common::testing::createNewEmptyFile(subFile));
   EXPECT_TRUE(exists(subFile));
 
   std::string recDirCopied = "rec_dir_copied";
@@ -627,12 +615,12 @@ TEST_F(FilesystemTest, uniquePaths)
   std::string fileRt = uniqueFilePath(newFile, "txt");
   EXPECT_EQ(newFileWithExt, fileRt);
 
-  ASSERT_TRUE(create_new_empty_file(newFileWithExt));
+  ASSERT_TRUE(common::testing::createNewEmptyFile(newFileWithExt));
   EXPECT_TRUE(exists(newFileWithExt));
   std::string fileExistingRt = uniqueFilePath(newFile, "txt");
   EXPECT_EQ(fileExistingRt, newFile + "(1).txt");
 
-  ASSERT_TRUE(create_new_empty_file(fileExistingRt));
+  ASSERT_TRUE(common::testing::createNewEmptyFile(fileExistingRt));
   EXPECT_TRUE(exists(fileExistingRt));
   std::string fileExistingRt2 = uniqueFilePath(newFile, "txt");
   EXPECT_EQ(fileExistingRt2, newFile + "(2).txt");

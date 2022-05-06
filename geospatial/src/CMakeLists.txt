@@ -19,4 +19,7 @@ target_include_directories(${geospatial_target}
     ${GDAL_INCLUDE_DIR})
 
 ign_build_tests(TYPE UNIT SOURCES ${gtest_sources}
-  LIB_DEPS ${geospatial_target})
+  LIB_DEPS 
+    ${geospatial_target}
+    ignition-common${IGN_COMMON_VER}-testing
+)

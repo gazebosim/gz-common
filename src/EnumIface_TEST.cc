@@ -18,7 +18,8 @@
 #include <gtest/gtest.h>
 
 #include "ignition/common/EnumIface.hh"
-#include "test_config.h"
+
+#include "ignition/common/testing/AutoLogFixture.hh"
 
 using namespace ignition;
 

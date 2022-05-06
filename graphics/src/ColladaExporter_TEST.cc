@@ -17,12 +17,14 @@
 #include <gtest/gtest.h>
 #include "tinyxml2.h"
 
-#include "test_config.h"
 #include "ignition/common/ColladaLoader.hh"
 #include "ignition/common/ColladaExporter.hh"
 #include "ignition/common/Filesystem.hh"
 #include "ignition/common/Mesh.hh"
 #include "ignition/common/SubMesh.hh"
+
+#include "ignition/common/testing/AutoLogFixture.hh"
+#include "ignition/common/testing/TestPaths.hh"
 
 #ifdef _WIN32
   #define snprintf _snprintf
@@ -36,7 +38,7 @@ class ColladaExporter : public common::testing::AutoLogFixture {
   {
     // Call superclass to make sure that logging is initialized
     this->common::testing::AutoLogFixture::SetUp();
-    ASSERT_TRUE(common::testing::TestTmpPath(this->pathOut));
+    this->pathOut = common::testing::TempPath();
     common::createDirectories(this->pathOut);
   }
 

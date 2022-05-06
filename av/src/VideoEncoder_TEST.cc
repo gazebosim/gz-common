@@ -17,7 +17,9 @@
 
 #include "ignition/common/Console.hh"
 #include "ignition/common/VideoEncoder.hh"
-#include "test_config.h"
+
+#include "ignition/common/testing/AutoLogFixture.hh"
+#include "ignition/common/testing/TestPaths.hh"
 
 using namespace ignition;
 using namespace common;
@@ -28,7 +30,11 @@ class VideoEncoderTest : public common::testing::AutoLogFixture
   protected: void SetUp() override
   {
     Console::SetVerbosity(4);
+    tempDir = common::testing::MakeTestTempDirectory();
+    ASSERT_TRUE(tempDir->Valid()) << tempDir->Path();
   }
+
+  public: std::shared_ptr<ignition::common::TempDirectory> tempDir;
 };
 
 /////////////////////////////////////////////////

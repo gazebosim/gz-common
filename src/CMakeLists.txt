@@ -48,13 +48,12 @@ endif()
 ign_build_tests(
   TYPE UNIT
   SOURCES ${gtest_sources}
+  LIB_DEPS
+    ignition-utils${IGN_UTILS_VER}::ignition-utils${IGN_UTILS_VER}
+    ignition-common${IGN_COMMON_VER}-testing
   INCLUDE_DIRS
     # Used to make internal source file headers visible to the unit tests
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    # Used to make test-directory headers visible to the unit tests
-    ${PROJECT_SOURCE_DIR}
-    # Used to make test_config.h visible to the unit tests
-    ${PROJECT_BINARY_DIR})
+    ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(TARGET UNIT_MovingWindowFilter_TEST)
   target_include_directories(UNIT_MovingWindowFilter_TEST PRIVATE
