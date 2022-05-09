@@ -93,7 +93,7 @@ gz_build_tests(
   SOURCES ${PROFILER_TESTS}
   LIB_DEPS
     ${profiler_target}
-    ignition-common${IGN_COMMON_VER}-testing
+    gz-common${GZ_COMMON_VER}-testing
   TEST_LIST profiler_tests)
 
 if(TARGET UNIT_Profiler_Remotery_TEST)

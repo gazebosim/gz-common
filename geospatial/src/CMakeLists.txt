@@ -8,8 +8,8 @@ gz_add_component(geospatial
 target_link_libraries(${geospatial_target}
   PUBLIC
     ${PROJECT_LIBRARY_TARGET_NAME}-graphics
-    ignition-math${IGN_MATH_VER}::ignition-math${IGN_MATH_VER}
-    ignition-utils${IGN_UTILS_VER}::ignition-utils${IGN_UTILS_VER}
+    gz-math${GZ_MATH_VER}::gz-math${GZ_MATH_VER}
+    gz-utils${GZ_UTILS_VER}::gz-utils${GZ_UTILS_VER}
   PRIVATE
     ${GDAL_LIBRARY})
 
@@ -20,5 +20,5 @@ target_include_directories(${geospatial_target}
 gz_build_tests(TYPE UNIT SOURCES ${gtest_sources}
   LIB_DEPS
     ${geospatial_target}
-    ignition-common${IGN_COMMON_VER}-testing
+    gz-common${GZ_COMMON_VER}-testing
 )
