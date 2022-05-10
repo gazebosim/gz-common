@@ -17,32 +17,54 @@
 
 #include <gtest/gtest.h>
 
-#include "ignition/common/Console.hh"
-#include "test_config.h"
+#include <ignition/common/Console.hh>
+#include <ignition/common/testing/TestPaths.hh>
 
-using namespace ignition;
-
+//////////////////////////////////////////////////
 TEST(Console_TEST, LogInitAfterConsoleOut)
 {
   std::string logFilename = "uri.log";
-  std::string logDir = common::joinPaths(PROJECT_BINARY_PATH, "test", "uri");
-  std::string logFile = common::joinPaths(logDir, logFilename);
+  auto tempDir = ignition::common::testing::MakeTestTempDirectory();
+  ASSERT_TRUE(tempDir->Valid());
 
-  common::Console::SetVerbosity(4);
+  ignition::common::setenv(IGN_HOMEDIR, tempDir->Path());
+  std::string home;
+  ASSERT_TRUE(ignition::common::env(IGN_HOMEDIR, home));
 
-  // We are not logging to a file yet.
-  ignerr << "This is an error" << std::endl;
+  auto logDir = tempDir->Path();
+  std::string logFile = ignition::common::joinPaths(logDir, logFilename);
+
+  ignition::common::Console::SetVerbosity(4);
+
+  // Before console is initialized, logs go to default file location
+  ignerr << "Error before logging initialized" << std::endl;
+
+  {
+    auto defaultPath = ignition::common::joinPaths(home,
+        ".ignition", "auto_default.log");
+
+    std::ifstream t(defaultPath);
+    std::string buffer((std::istreambuf_iterator<char>(t)),
+                   std::istreambuf_iterator<char>());
+
+    EXPECT_NE(
+        std::string::npos, buffer.find("Error before logging initialized"))
+      << "Log file content[" << buffer << "]\n";
+  }
 
   // Initialize the log file.
   ignLogInit(logDir, logFilename);
 
-  // Run the same console output, which should output the message to the log
-  // file.
-  ignerr << "This is an error" << std::endl;
-  std::ifstream t(logFile);
-  std::string buffer((std::istreambuf_iterator<char>(t)),
-                 std::istreambuf_iterator<char>());
+  // After consolie is initialized, logs go to designated location
+  ignerr << "Error after logging initialized" << std::endl;
 
-  EXPECT_TRUE(buffer.find("This is an error") != std::string::npos)
-    << "Log file content[" << buffer << "]\n";
+  {
+    std::ifstream t(logFile);
+    std::string buffer((std::istreambuf_iterator<char>(t)),
+                   std::istreambuf_iterator<char>());
+
+    EXPECT_NE(
+        std::string::npos, buffer.find("Error after logging initialized"))
+      << "Log file content[" << buffer << "]\n";
+  }
 }

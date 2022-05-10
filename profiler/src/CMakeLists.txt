@@ -79,8 +79,12 @@ if(IGN_PROFILER_REMOTERY)
   endif()
 endif()
 
-ign_build_tests(TYPE UNIT SOURCES ${PROFILER_TESTS}
-  LIB_DEPS ${profiler_target}
+ign_build_tests(
+  TYPE UNIT 
+  SOURCES ${PROFILER_TESTS}
+  LIB_DEPS 
+    ${profiler_target}
+    ignition-common${IGN_COMMON_VER}-testing
   TEST_LIST profiler_tests)
 
 if(TARGET UNIT_Profiler_Remotery_TEST)

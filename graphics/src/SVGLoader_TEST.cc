@@ -17,9 +17,10 @@
 
 #include <gtest/gtest.h>
 
-#include "test_config.h"
-
 #include "ignition/common/SVGLoader.hh"
+
+#include "ignition/common/testing/AutoLogFixture.hh"
+#include "ignition/common/testing/TestPaths.hh"
 
 using namespace ignition;
 using namespace common;
@@ -36,7 +37,9 @@ double tol = 0.05;
 /// \brief return path to svg file in test/data/svg
 std::string testSvg(const std::string &_filename)
 {
-  return common::testing::TestFile("data", "svg", _filename);
+  std::string file = common::testing::TestFile("data", "svg", _filename);
+  EXPECT_TRUE(exists(file));
+  return file;
 }
 
 /////////////////////////////////////////////////

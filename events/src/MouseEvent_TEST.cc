@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 
-#include "test_config.h"
+#include "ignition/common/testing/AutoLogFixture.hh"
 #include "ignition/common/MouseEvent.hh"
 #include "ignition/common/config.hh"
 

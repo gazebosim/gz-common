@@ -17,12 +17,13 @@
 
 #include <gtest/gtest.h>
 
-#include "test_config.h"
 #include "ignition/common/Material.hh"
 #include "ignition/common/Mesh.hh"
 #include "ignition/common/Skeleton.hh"
 #include "ignition/common/SubMesh.hh"
 #include "ignition/math/Vector3.hh"
+
+#include "ignition/common/testing/AutoLogFixture.hh"
 
 using namespace ignition;
 

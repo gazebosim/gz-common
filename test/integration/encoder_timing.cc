@@ -17,7 +17,6 @@
 #include <array>
 #include "ignition/common/VideoEncoder.hh"
 #include "ignition/common/Video.hh"
-#include "test_config.h"
 
 using namespace ignition;
 using namespace common;

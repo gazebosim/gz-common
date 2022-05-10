@@ -7,5 +7,10 @@ target_link_libraries(${events_target}
   PUBLIC
     ignition-math${IGN_MATH_VER}::ignition-math${IGN_MATH_VER})
 
-ign_build_tests(TYPE UNIT SOURCES ${gtest_sources}
-  LIB_DEPS ${events_target})
+ign_build_tests(
+  TYPE UNIT 
+  SOURCES ${gtest_sources}
+  LIB_DEPS 
+    ${events_target} 
+    ignition-common${IGN_COMMON_VER}-testing
+)

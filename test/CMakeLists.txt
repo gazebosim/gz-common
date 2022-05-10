@@ -17,5 +17,3 @@ add_subdirectory(performance)
 add_subdirectory(regression)
 add_subdirectory(plugins)
 add_subdirectory(static_assertions)
-
-configure_file(test_config.h.in ${PROJECT_BINARY_DIR}/test_config.h)

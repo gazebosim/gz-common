@@ -16,9 +16,11 @@
 
 #include <gtest/gtest.h>
 
-#include "test_config.h"
 #include "ignition/common/Material.hh"
 #include "ignition/common/Pbr.hh"
+
+#include "ignition/common/testing/AutoLogFixture.hh"
+#include "ignition/common/testing/TestPaths.hh"
 
 using namespace ignition;
 
