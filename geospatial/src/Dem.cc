@@ -83,6 +83,12 @@ Dem::~Dem()
 }
 
 //////////////////////////////////////////////////
+void Dem::SetNonEarthDEM(bool isNonEarthDem)
+{
+  this->dataPtr->isNonEarthDem = isNonEarthDem;
+}
+
+//////////////////////////////////////////////////
 int Dem::Load(const std::string &_filename)
 {
   unsigned int width;
