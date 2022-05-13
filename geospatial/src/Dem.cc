@@ -83,9 +83,15 @@ Dem::~Dem()
 }
 
 //////////////////////////////////////////////////
-void Dem::SetNonEarthDEM(bool isNonEarthDem)
+void Dem::SetNonEarthDEM(bool _isNonEarthDem)
 {
-  this->dataPtr->isNonEarthDem = isNonEarthDem;
+  this->dataPtr->isNonEarthDem = _isNonEarthDem;
+}
+
+//////////////////////////////////////////////////
+bool Dem::GetNonEarthDEM()
+{
+  return this->dataPtr->isNonEarthDem;
 }
 
 //////////////////////////////////////////////////
