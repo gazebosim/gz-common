@@ -34,10 +34,6 @@
 #include <assimp/scene.h>           // Output data structure
 #include <assimp/postprocess.h>     // Post processing flags
 
-void hello_world()
-{
-}
-
 namespace ignition
 {
 namespace common
@@ -49,10 +45,10 @@ class AssimpLoader::Implementation
   /// Convert a color from assimp implementation to Ignition common
   public: ignition::math::Color ConvertColor(aiColor4D& _color);
 
-  public: MaterialPtr CreateMaterial(const aiScene* scene, unsigned mat_idx, const std::string& path);
+  /// Convert a transformation from assimp implementation to Ignition math
+  public: ignition::math::Matrix4d ConvertTransform(aiMatrix4x4& _matrix);
 
-  /// Maps assimp material index to Ignition common's material index
-  public: std::unordered_map<unsigned, unsigned> addedMaterialIndexes;
+  public: MaterialPtr CreateMaterial(const aiScene* scene, unsigned mat_idx, const std::string& path);
 };
 
 ignition::math::Color AssimpLoader::Implementation::ConvertColor(aiColor4D& _color)
@@ -61,11 +57,18 @@ ignition::math::Color AssimpLoader::Implementation::ConvertColor(aiColor4D& _col
   return col;
 }
 
+ignition::math::Matrix4d AssimpLoader::Implementation::ConvertTransform(aiMatrix4x4& _sm)
+{
+  return ignition::math::Matrix4d(
+      _sm.a1, _sm.a2, _sm.a3, _sm.a4,
+      _sm.b1, _sm.b2, _sm.b3, _sm.b4,
+      _sm.c1, _sm.c2, _sm.c3, _sm.c4,
+      _sm.d1, _sm.d2, _sm.d3, _sm.d4);
+}
+
 //////////////////////////////////////////////////
 MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* scene, unsigned mat_idx, const std::string& path)
 {
-  if (addedMaterialIndexes.find(mat_idx) != addedMaterialIndexes.end())
-    return nullptr;
   MaterialPtr mat = std::make_shared<Material>();
   aiColor4D color;
   igndbg << "Processing material with name " << scene->mMaterials[mat_idx]->GetName().C_Str() << std::endl;
@@ -150,6 +153,11 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     return mesh;
   }
   auto root_node = scene->mRootNode;
+  auto root_transformation = this->dataPtr->ConvertTransform(scene->mRootNode->mTransformation);
+  // TODO remove workaround, it seems imported assets are rotated by 90 degrees
+  // as documented here https://github.com/assimp/assimp/issues/849, remove workaround when fixed
+  // TODO find actual workaround to remove rotation
+  // root_transformation = root_transformation * root_transformation.Rotation();
   // TODO recursive call for children?
   // Add the materials first
   for (unsigned mat_idx = 0; mat_idx < scene->mNumMaterials; ++mat_idx)
@@ -164,19 +172,13 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     ignmsg << "Processing mesh with " << node->mNumMeshes << " meshes" << std::endl;
     for (unsigned mesh_idx = 0; mesh_idx < node->mNumMeshes; ++mesh_idx)
     {
-      // TODO transformation with mTransformation
       SubMesh subMesh;
       auto assimp_mesh_idx = node->mMeshes[mesh_idx];
       auto assimp_mesh = scene->mMeshes[assimp_mesh_idx];
-      auto sm = node->mTransformation;
-      ignition::math::Matrix4d trans(
-          sm.a1, sm.a2, sm.a3, sm.a4,
-          sm.b1, sm.b2, sm.b3, sm.b4,
-          sm.c1, sm.c2, sm.c3, sm.c4,
-          sm.d1, sm.d2, sm.d3, sm.d4);
+      auto trans = this->dataPtr->ConvertTransform(node->mTransformation);
+      trans = root_transformation * trans;
       ignition::math::Matrix4d rot = trans;
       rot.SetTranslation(ignition::math::Vector3d::Zero);
-      // TODO only rotation for normals, full transform for positions
       // Now create the submesh
       for (unsigned vertex_idx = 0; vertex_idx < assimp_mesh->mNumVertices; ++vertex_idx)
       {
@@ -194,9 +196,6 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
         normal.Normalize();
         subMesh.AddVertex(vertex);
         subMesh.AddNormal(normal);
-        // TODO index of vertex is very inefficient...
-        //subMesh.AddIndex(subMesh.IndexCount());
-        // Texture coordinates
         // Iterate over sets of texture coordinates
         int i = 0;
         while(assimp_mesh->HasTextureCoords(i))
@@ -204,6 +203,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
           ignition::math::Vector3d texcoords;
           texcoords.X(assimp_mesh->mTextureCoords[i][vertex_idx].x);
           texcoords.Y(assimp_mesh->mTextureCoords[i][vertex_idx].y);
+          // TODO why do we need 1.0 - Y?
           subMesh.AddTexCoordBySet(texcoords.X(), 1.0 - texcoords.Y(), i);
           ++i;
         }
@@ -218,14 +218,30 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
       subMesh.SetName(std::string(node->mName.C_Str()));
 
       ignmsg << "Submesh " << node->mName.C_Str() << " has material index " << assimp_mesh->mMaterialIndex << std::endl;
-      subMesh.SetMaterialIndex(this->dataPtr->addedMaterialIndexes[assimp_mesh->mMaterialIndex]);
-      mesh->AddSubMesh(subMesh);
-      }
+      subMesh.SetMaterialIndex(assimp_mesh->mMaterialIndex);
+      mesh->AddSubMesh(std::move(subMesh));
+    }
   }
   // Process animations
+  ignmsg << "Processing " << scene->mNumAnimations << " animations" << std::endl;
+  ignmsg << "Scene has " << scene->mNumMeshes << " meshes" << std::endl;
+  // Iterate over meshes in scene not contained in root node
+  // this is a strict superset of the above that also contains animation meshes
+  for (unsigned mesh_idx = 0; mesh_idx < scene->mNumMeshes; ++mesh_idx)
+  {
+    // Skip if the mesh was found in the previous step
+    auto mesh_name = std::string(scene->mMeshes[mesh_idx]->mName.C_Str());
+    if (!mesh->SubMeshByName(mesh_name).expired())
+      continue;
+    auto assimp_mesh = scene->mMeshes[mesh_idx];
+    ignmsg << "New mesh found with name " << scene->mMeshes[mesh_idx]->mName.C_Str() << std::endl;
+  }
   for (unsigned anim_idx = 0; anim_idx < scene->mNumAnimations; ++anim_idx)
   {
     auto anim = scene->mAnimations[anim_idx];
+    ignmsg << "Animation has " << anim->mNumMeshChannels << " mesh channels" << std::endl;
+    ignmsg << "Animation has " << anim->mNumChannels << " channels" << std::endl;
+    ignmsg << "Animation has " << anim->mNumMorphMeshChannels << " morph mesh channels" << std::endl;
     // Process t
   }
   // Iterate over nodes and add a submesh for each
