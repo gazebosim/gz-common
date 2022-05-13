@@ -49,6 +49,8 @@ class AssimpLoader::Implementation
   public: ignition::math::Matrix4d ConvertTransform(aiMatrix4x4& _matrix);
 
   public: MaterialPtr CreateMaterial(const aiScene* scene, unsigned mat_idx, const std::string& path);
+
+  public: SubMesh CreateSubMesh(const aiScene* scene, unsigned mesh_idx, const ignition::math::Matrix4d& transformation);
 };
 
 ignition::math::Color AssimpLoader::Implementation::ConvertColor(aiColor4D& _color)
@@ -120,6 +122,53 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* scene, u
   return mat;
 }
 
+SubMesh AssimpLoader::Implementation::CreateSubMesh(const aiScene* scene, unsigned mesh_idx, const ignition::math::Matrix4d& transformation)
+{
+  SubMesh subMesh;
+  auto assimp_mesh = scene->mMeshes[mesh_idx];
+  ignition::math::Matrix4d rot = transformation;
+  rot.SetTranslation(ignition::math::Vector3d::Zero);
+  // Now create the submesh
+  for (unsigned vertex_idx = 0; vertex_idx < assimp_mesh->mNumVertices; ++vertex_idx)
+  {
+    // Add the vertex
+    ignition::math::Vector3d vertex;
+    ignition::math::Vector3d normal;
+    vertex.X(assimp_mesh->mVertices[vertex_idx].x);
+    vertex.Y(assimp_mesh->mVertices[vertex_idx].y);
+    vertex.Z(assimp_mesh->mVertices[vertex_idx].z);
+    normal.X(assimp_mesh->mNormals[vertex_idx].x);
+    normal.Y(assimp_mesh->mNormals[vertex_idx].y);
+    normal.Z(assimp_mesh->mNormals[vertex_idx].z);
+    vertex = transformation * vertex;
+    normal = rot * normal;
+    normal.Normalize();
+    subMesh.AddVertex(vertex);
+    subMesh.AddNormal(normal);
+    // Iterate over sets of texture coordinates
+    int i = 0;
+    while(assimp_mesh->HasTextureCoords(i))
+    {
+      ignition::math::Vector3d texcoords;
+      texcoords.X(assimp_mesh->mTextureCoords[i][vertex_idx].x);
+      texcoords.Y(assimp_mesh->mTextureCoords[i][vertex_idx].y);
+      // TODO why do we need 1.0 - Y?
+      subMesh.AddTexCoordBySet(texcoords.X(), 1.0 - texcoords.Y(), i);
+      ++i;
+    }
+  }
+  for (unsigned face_idx = 0; face_idx < assimp_mesh->mNumFaces; ++face_idx)
+  {
+    auto face = assimp_mesh->mFaces[face_idx];
+    subMesh.AddIndex(face.mIndices[0]);
+    subMesh.AddIndex(face.mIndices[1]);
+    subMesh.AddIndex(face.mIndices[2]);
+  }
+
+  subMesh.SetMaterialIndex(assimp_mesh->mMaterialIndex);
+  return subMesh;
+}
+
 //////////////////////////////////////////////////
 AssimpLoader::AssimpLoader()
 : MeshLoader(), dataPtr(ignition::utils::MakeImpl<Implementation>())
@@ -168,57 +217,16 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   for (unsigned node_idx = 0; node_idx < root_node->mNumChildren; ++node_idx)
   {
     auto node = root_node->mChildren[node_idx];
+    auto trans = this->dataPtr->ConvertTransform(node->mTransformation);
+    trans = root_transformation * trans;
+    // TODO 90 degree rotation issue with collada
     // TODO node name
     ignmsg << "Processing mesh with " << node->mNumMeshes << " meshes" << std::endl;
     for (unsigned mesh_idx = 0; mesh_idx < node->mNumMeshes; ++mesh_idx)
     {
-      SubMesh subMesh;
       auto assimp_mesh_idx = node->mMeshes[mesh_idx];
-      auto assimp_mesh = scene->mMeshes[assimp_mesh_idx];
-      auto trans = this->dataPtr->ConvertTransform(node->mTransformation);
-      trans = root_transformation * trans;
-      ignition::math::Matrix4d rot = trans;
-      rot.SetTranslation(ignition::math::Vector3d::Zero);
-      // Now create the submesh
-      for (unsigned vertex_idx = 0; vertex_idx < assimp_mesh->mNumVertices; ++vertex_idx)
-      {
-        // Add the vertex
-        ignition::math::Vector3d vertex;
-        ignition::math::Vector3d normal;
-        vertex.X(assimp_mesh->mVertices[vertex_idx].x);
-        vertex.Y(assimp_mesh->mVertices[vertex_idx].y);
-        vertex.Z(assimp_mesh->mVertices[vertex_idx].z);
-        normal.X(assimp_mesh->mNormals[vertex_idx].x);
-        normal.Y(assimp_mesh->mNormals[vertex_idx].y);
-        normal.Z(assimp_mesh->mNormals[vertex_idx].z);
-        vertex = trans * vertex;
-        normal = rot * normal;
-        normal.Normalize();
-        subMesh.AddVertex(vertex);
-        subMesh.AddNormal(normal);
-        // Iterate over sets of texture coordinates
-        int i = 0;
-        while(assimp_mesh->HasTextureCoords(i))
-        {
-          ignition::math::Vector3d texcoords;
-          texcoords.X(assimp_mesh->mTextureCoords[i][vertex_idx].x);
-          texcoords.Y(assimp_mesh->mTextureCoords[i][vertex_idx].y);
-          // TODO why do we need 1.0 - Y?
-          subMesh.AddTexCoordBySet(texcoords.X(), 1.0 - texcoords.Y(), i);
-          ++i;
-        }
-      }
-      for (unsigned face_idx = 0; face_idx < assimp_mesh->mNumFaces; ++face_idx)
-      {
-        auto face = assimp_mesh->mFaces[face_idx];
-        subMesh.AddIndex(face.mIndices[0]);
-        subMesh.AddIndex(face.mIndices[1]);
-        subMesh.AddIndex(face.mIndices[2]);
-      }
+      auto subMesh = this->dataPtr->CreateSubMesh(scene, assimp_mesh_idx, trans);
       subMesh.SetName(std::string(node->mName.C_Str()));
-
-      ignmsg << "Submesh " << node->mName.C_Str() << " has material index " << assimp_mesh->mMaterialIndex << std::endl;
-      subMesh.SetMaterialIndex(assimp_mesh->mMaterialIndex);
       mesh->AddSubMesh(std::move(subMesh));
     }
   }
