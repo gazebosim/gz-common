@@ -243,8 +243,10 @@ void FileLogger::Init(const std::string &_directory,
   {
     if (!env(IGN_HOMEDIR, logPath))
     {
-      ignerr << "Missing HOME environment variable."
-        << "No log file will be generated.";
+      // Use stderr here to prevent infinite recursion
+      // trying to get the log initialized
+      std::cerr << "Missing HOME environment variable."
+        << "No log file will be generated." << std::endl;
       return;
     }
     logPath = joinPaths(logPath, _directory);
