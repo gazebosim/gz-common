@@ -33,6 +33,7 @@
 #include "ignition/common/ColladaExporter.hh"
 #include "ignition/common/OBJLoader.hh"
 #include "ignition/common/STLLoader.hh"
+#include "gz/common/AssimpLoader.hh"
 #include "ignition/common/config.hh"
 
 #include "ignition/common/MeshManager.hh"
@@ -57,6 +58,9 @@ class ignition::common::MeshManager::Implementation
 
   /// \brief 3D mesh loader for OBJ files
   public: OBJLoader objLoader;
+
+  /// \brief 3D mesh loader for Assimp assets (others)
+  public: AssimpLoader assimpLoader;
 
   /// \brief Dictionary of meshes, indexed by name
   public: std::map<std::string, Mesh*> meshes;
@@ -138,6 +142,8 @@ const Mesh *MeshManager::Load(const std::string &_filename)
         extension.begin(), ::tolower);
     MeshLoader *loader = nullptr;
 
+    loader = &this->dataPtr->assimpLoader;
+    /*
     if (extension == "stl" || extension == "stlb" || extension == "stla")
       loader = &this->dataPtr->stlLoader;
     else if (extension == "dae")
@@ -149,6 +155,7 @@ const Mesh *MeshManager::Load(const std::string &_filename)
       ignerr << "Unsupported mesh format for file[" << _filename << "]\n";
       return nullptr;
     }
+    */
 
     // This mutex prevents two threads from loading the same mesh at the
     // same time.
