@@ -245,12 +245,4 @@ TEST_F(DemTest, NonEarthDem)
   // unable to get coordinates in WGS84
   ignition::math::Angle latitude, longitude;
   EXPECT_FALSE(dem.GeoReferenceOrigin(latitude, longitude));
-
-  // The Load() method in Dem.cc should set the
-  // isNonEarthDEM flag.
-  EXPECT_TRUE(dem.GetNonEarthDEM());
-
-  // This flag can be overridden externally.
-  dem.SetNonEarthDEM(false);
-  EXPECT_FALSE(dem.GetNonEarthDEM());
 }
