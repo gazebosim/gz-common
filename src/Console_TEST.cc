@@ -538,3 +538,14 @@ TEST_F(Console_TEST, LogDirectory)
 
   EXPECT_EQ(logDir, absPath);
 }
+
+/////////////////////////////////////////////////
+/// \brief Test Console::Init and Console::Log
+/// This specifically tests with an unset HOME variable
+TEST_F(Console_TEST, NoInitAndLogNoHome)
+{
+  ignLogClose();
+  EXPECT_TRUE(ignition::common::unsetenv(IGN_HOMEDIR));
+  // This should not throw
+  ignlog << "this is a test" << std::endl;
+}
