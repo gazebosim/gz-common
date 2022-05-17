@@ -50,7 +50,7 @@ namespace ignition
       public: int Load(const std::string &_filename = "");
 
       /// \brief Indicate that this is a non Earth DEM.
-      /// \param[in] isNonEarthDem Should be true if this is a
+      /// \param[in] _isNonEarthDem Should be true if this is a
       /// non earth DEM, otherwise false.
       public: void SetNonEarthDEM(bool _isNonEarthDem);
 
