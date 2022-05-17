@@ -49,6 +49,16 @@ namespace ignition
       /// \return 0 when the operation succeeds to open a file.
       public: int Load(const std::string &_filename = "");
 
+      /// \brief Indicate that this is a non Earth DEM.
+      /// \param[in] _isNonEarthDem Should be true if this is a
+      /// non earth DEM, otherwise false.
+      public: void SetNonEarthDEM(bool _isNonEarthDem);
+
+      /// \brief Check if the loaded DEM is not from the Earth.
+      /// \return True if the loaded DEM is from the Earth, otherwise
+      /// returns False.
+      public: bool GetNonEarthDEM();
+
       /// \brief Get the elevation of a terrain's point in meters.
       /// \param[in] _x X coordinate of the terrain.
       /// \param[in] _y Y coordinate of the terrain.
