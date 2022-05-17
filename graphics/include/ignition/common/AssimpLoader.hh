@@ -48,12 +48,17 @@ namespace ignition
       /// \brief Creates a new mesh and loads the data from a file
       /// \param[in] _filename the mesh file
       public: virtual Mesh *Load(const std::string &_filename);
+      public: std::unordered_map<unsigned, unsigned> addedMaterialIndexes;
 
       // TODO: Write doc
-      private: void buildMesh(const aiScene* scene, const aiNode* node, Mesh *mesh, aiMatrix4x4 transform = aiMatrix4x4());
+      private: void buildMesh(const aiScene* scene, const aiNode* node, Mesh *mesh, const std::string &name, aiMatrix4x4 transform = aiMatrix4x4());
 
       // TODO: Write doc
-      private: Mesh *MeshFromAssimpScene(const std::string& name, const aiScene *scene);
+      private: Mesh *MeshFromAssimpScene(const std::string& path, const aiScene *scene);
+
+      private: MaterialPtr CreateMaterial(const aiScene* scene, unsigned mat_idx, const std::string& path);
+
+      private: math::Color ConvertColor(aiColor4D& _color);
 
       /// \brief Private data pointer.
       IGN_UTILS_IMPL_PTR(dataPtr)

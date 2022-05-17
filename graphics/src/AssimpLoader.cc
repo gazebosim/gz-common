@@ -14,7 +14,7 @@
 using namespace ignition;
 using namespace common;
 
-//TODO: Conventions
+// TODO: Conventions
 
 //////////////////////////////////////////////////
 class ignition::common::AssimpLoader::Implementation
@@ -23,14 +23,23 @@ class ignition::common::AssimpLoader::Implementation
 
 //////////////////////////////////////////////////
 AssimpLoader::AssimpLoader()
-: MeshLoader(),
-  dataPtr(ignition::utils::MakeImpl<Implementation>())
+    : MeshLoader(),
+      dataPtr(ignition::utils::MakeImpl<Implementation>())
 {
+  /// Maps assimp material index to Ignition common's material index
+
 }
 
 //////////////////////////////////////////////////
 AssimpLoader::~AssimpLoader()
 {
+}
+
+
+ignition::math::Color AssimpLoader::ConvertColor(aiColor4D& _color)
+{
+  ignition::math::Color col(_color.r, _color.g, _color.b, _color.a);
+  return col;
 }
 
 //////////////////////////////////////////////////
@@ -51,47 +60,101 @@ Mesh *AssimpLoader::Load(const std::string &resource_path)
   // Usually - if speed is not the most important aspect for you - you'll
   // probably to request more postprocessing than we do in this example.
   // TO-DO: Should we add more post-procesing: https://learnopengl.com/Model-Loading/Model
-  const aiScene* scene = importer.ReadFile(resource_path,
-    aiProcess_FlipUVs |
-    aiProcess_GenUVCoords |
-    aiProcess_Triangulate |
-    aiProcess_GenNormals |
-    aiProcess_FindInvalidData |
-    aiProcess_SortByPType);
+  const aiScene *scene = importer.ReadFile(resource_path,
+                                           aiProcess_FlipUVs |
+                                               aiProcess_GenUVCoords |
+                                               aiProcess_Triangulate |
+                                               aiProcess_GenNormals |
+                                               aiProcess_FindInvalidData |
+                                               aiProcess_SortByPType);
 
+  std::cout << "Succesfully loaded the scene." << std::endl;
 
-  if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode || !scene->HasMeshes())
+  if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode || !scene->HasMeshes())
   {
     ignerr << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
     return new Mesh();
   }
 
-  std::cout << "Succesfully loaded the scene." << std::endl ;
-
   return MeshFromAssimpScene(resource_path, scene);
-
 }
 
 //////////////////////////////////////////////////
-Mesh *AssimpLoader::MeshFromAssimpScene(const std::string& name, const aiScene *scene)
+Mesh *AssimpLoader::MeshFromAssimpScene(const std::string &path, const aiScene *scene)
 {
-  
+
   Mesh *mesh = new Mesh();
 
-  //We are not going to load the materials here.
+  // We are not going to load the materials here.
 
-  float radius = 0.0f; //TO-DO: Why?
+  float radius = 0.0f; // TO-DO: Why?
   // buildMesh(scene, scene->mRootNode, mesh, aabb, radius, material_table);
   /*
   TO-DO: We dont need aabb, and radius, SURE?
   */
-  buildMesh(scene, scene->mRootNode, mesh);
+  buildMesh(scene, scene->mRootNode, mesh, path);
   return mesh;
 }
 
 
+MaterialPtr AssimpLoader::CreateMaterial(const aiScene* scene, unsigned mat_idx, const std::string& path)
+{
+  if (this->addedMaterialIndexes.find(mat_idx) != this->addedMaterialIndexes.end())
+    return nullptr;
+  MaterialPtr mat = std::make_shared<Material>();
+  aiColor4D color;
+  igndbg << "Processing material with name " << scene->mMaterials[mat_idx]->GetName().C_Str() << std::endl;
+  auto ret = scene->mMaterials[mat_idx]->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+  if (ret == AI_SUCCESS)
+  {
+    mat->SetDiffuse(this->ConvertColor(color));
+  }
+  ret = scene->mMaterials[mat_idx]->Get(AI_MATKEY_COLOR_AMBIENT, color);
+  if (ret == AI_SUCCESS)
+  {
+    mat->SetAmbient(this->ConvertColor(color));
+  }
+  ret = scene->mMaterials[mat_idx]->Get(AI_MATKEY_COLOR_SPECULAR, color);
+  if (ret == AI_SUCCESS)
+  {
+    mat->SetSpecular(this->ConvertColor(color));
+  }
+  ret = scene->mMaterials[mat_idx]->Get(AI_MATKEY_COLOR_EMISSIVE, color);
+  if (ret == AI_SUCCESS)
+  {
+    mat->SetEmissive(this->ConvertColor(color));
+  }
+  double shininess;
+  ret = scene->mMaterials[mat_idx]->Get(AI_MATKEY_SHININESS, shininess);
+  if (ret == AI_SUCCESS)
+  {
+    mat->SetShininess(shininess);
+  }
+  // TODO more than one texture
+  aiString texturePath(path.c_str());
+  unsigned textureIndex = 0;
+  unsigned uvIndex = 10000;
+  ret = scene->mMaterials[mat_idx]->GetTexture(aiTextureType_DIFFUSE, textureIndex, &texturePath,
+      NULL, // Type of mapping, TODO check that it is UV
+      &uvIndex,
+      NULL, // Blend mode, TODO implement
+      NULL, // Texture operation, unneeded?
+      NULL); // Mapping modes, unneeded?
+  if (ret == AI_SUCCESS)
+  {
+    mat->SetTextureImage(std::string(texturePath.C_Str()), path.c_str());
+    if (uvIndex < 10000)
+    {
 
-void AssimpLoader::buildMesh(const aiScene* scene, const aiNode* node, Mesh *mesh, aiMatrix4x4 transform)
+    }
+  }
+  // TODO other properties
+  return mat;
+}
+
+
+
+void AssimpLoader::buildMesh(const aiScene *scene, const aiNode *node, Mesh *mesh,  const std::string &name, aiMatrix4x4 transform)
 {
   if (!node)
     return;
@@ -116,9 +179,9 @@ void AssimpLoader::buildMesh(const aiScene* scene, const aiNode* node, Mesh *mes
   for (uint32_t i = 0; i < node->mNumMeshes; i++)
   {
 
-    aiMesh* input_mesh = scene->mMeshes[node->mMeshes[i]];
+    aiMesh *input_mesh = scene->mMeshes[node->mMeshes[i]];
     std::unique_ptr<SubMesh> subMesh(new SubMesh());
-    Material *mat = nullptr;
+    /*Material *mat = nullptr;*/
 
     /*
     TO-DO: Do we need to create a vertex buffer
@@ -127,7 +190,7 @@ void AssimpLoader::buildMesh(const aiScene* scene, const aiNode* node, Mesh *mes
 
     /*
     OBJLoader creates new submesh for each face. Because
-    each face has a different submesh. This requires additional 
+    each face has a different submesh. This requires additional
     checking.
 
     However, Assimp, has one material for each mesh, so we
@@ -136,21 +199,21 @@ void AssimpLoader::buildMesh(const aiScene* scene, const aiNode* node, Mesh *mes
     */
     for (uint32_t j = 0; j < input_mesh->mNumVertices; j++)
     {
-      //Process vertex positions
+      // Process vertex positions
       ignition::math::Vector3d vertex;
       vertex.X(input_mesh->mVertices[j].x);
       vertex.Y(input_mesh->mVertices[j].y);
       vertex.Z(input_mesh->mVertices[j].z);
 
-      //Process vertex normals
+      // Process vertex normals
       ignition::math::Vector3d normal;
       normal.X(input_mesh->mNormals[j].x);
       normal.Y(input_mesh->mNormals[j].y);
       normal.Z(input_mesh->mNormals[j].z);
 
-      //Process textures
-      ignition::math::Vector2d texcoords(0,0);
-      if (input_mesh->HasTextureCoords(0)) //TO-DO: Why just first texture?
+      // Process textures
+      ignition::math::Vector2d texcoords(0, 0);
+      if (input_mesh->HasTextureCoords(0)) // TO-DO: Why just first texture?
       {
         texcoords.Set(input_mesh->mTextureCoords[0][i].x, input_mesh->mTextureCoords[0][i].y);
       }
@@ -159,14 +222,37 @@ void AssimpLoader::buildMesh(const aiScene* scene, const aiNode* node, Mesh *mes
         texcoords.Set(0, 0);
       }
 
-      subMesh->AddTexCoord(texcoords);
+      // subMesh->AddTexCoord(texcoords);
       subMesh->AddVertex(vertex);
       subMesh->AddNormal(normal);
-      subMesh->AddIndex(subMesh->IndexCount());
+
+      int i = 0;
+      while(input_mesh->HasTextureCoords(i))
+      {
+        ignition::math::Vector3d texcoords;
+        texcoords.X(input_mesh->mTextureCoords[i][j].x);
+        texcoords.Y(input_mesh->mTextureCoords[i][j].y);
+        subMesh->AddTexCoordBySet(texcoords.X(), 1.0 - texcoords.Y(), i);
+        ++i;
+      }
+
     }
+
+    for (unsigned face_idx = 0; face_idx < input_mesh->mNumFaces; ++face_idx)
+    {
+      auto face = input_mesh->mFaces[face_idx];
+      subMesh->AddIndex(face.mIndices[0]);
+      subMesh->AddIndex(face.mIndices[1]);
+      subMesh->AddIndex(face.mIndices[2]);
+    }
+
+    //Create the material on the go.
     if(input_mesh->mMaterialIndex >= 0)
     {
-
+      std::string path = common::parentPath(name);
+      auto mat = CreateMaterial(scene, input_mesh->mMaterialIndex, path);
+      mesh->AddMaterial(mat);
+      /*
       math::Color diffuse(0, 0, 0);
       math::Color specular(0, 0, 0);
       math::Color ambient(0, 0, 0);
@@ -240,6 +326,7 @@ void AssimpLoader::buildMesh(const aiScene* scene, const aiNode* node, Mesh *mes
           }
         }
       }
+
       int mode = aiBlendMode_Default;
       input_material->Get(AI_MATKEY_BLEND_FUNC, mode);
       switch (mode)
@@ -271,13 +358,13 @@ void AssimpLoader::buildMesh(const aiScene* scene, const aiNode* node, Mesh *mes
       mat->SetSpecular(specular);
       //TODO: Add this material to main mesh material index.
       //TODO: Refer the index in the submesh.
+    */
     }
+    subMesh->SetMaterialIndex(this->addedMaterialIndexes[input_mesh->mMaterialIndex]);
     mesh->AddSubMesh(std::move(subMesh));
   }
   for (uint32_t i = 0; i < node->mNumChildren; ++i)
   {
-    buildMesh(scene, node->mChildren[i], mesh, transform);
+    buildMesh(scene, node->mChildren[i], mesh, name, transform);
   }
 }
-
-
