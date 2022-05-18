@@ -34,7 +34,7 @@
 #define BUILD_SYMLINK_TESTS
 #endif  // _WIN32
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 namespace fs = std::filesystem;
@@ -636,8 +636,8 @@ TEST_F(FilesystemTest, uniquePaths)
 TEST_F(FilesystemTest, separator)
 {
 #ifndef _WIN32
-  EXPECT_EQ("/", ignition::common::separator(""));
+  EXPECT_EQ("/", gz::common::separator(""));
 #else
-  EXPECT_EQ("\\", ignition::common::separator(""));
+  EXPECT_EQ("\\", gz::common::separator(""));
 #endif
 }

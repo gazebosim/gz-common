@@ -30,7 +30,7 @@
   #define snprintf _snprintf
 #endif
 
-using namespace ignition;
+using namespace gz;
 
 class ColladaExporter : public common::testing::AutoLogFixture {
   /// \brief Setup the test fixture. This gets called by gtest.

@@ -18,11 +18,11 @@
 #include <ignition/math/Vector2.hh>
 #include "ignition/common/MouseEvent.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 /// \brief Mouse event private data
-class ignition::common::MouseEventPrivate
+class gz::common::MouseEventPrivate
 {
   /// \brief Constructor.
   public: MouseEventPrivate()
@@ -33,16 +33,16 @@ class ignition::common::MouseEventPrivate
           {}
 
   /// \brief Mouse pointer position on the screen.
-  public: ignition::math::Vector2i pos;
+  public: gz::math::Vector2i pos;
 
   /// \brief Previous position.
-  public: ignition::math::Vector2i prevPos;
+  public: gz::math::Vector2i prevPos;
 
   /// \brief Position of button press.
-  public: ignition::math::Vector2i pressPos;
+  public: gz::math::Vector2i pressPos;
 
   /// \brief Scroll position.
-  public: ignition::math::Vector2i scroll;
+  public: gz::math::Vector2i scroll;
 
   /// \brief Scaling factor.
   public: float moveScale;
@@ -88,13 +88,13 @@ MouseEvent::~MouseEvent()
 }
 
 /////////////////////////////////////////////////
-ignition::math::Vector2i MouseEvent::Pos() const
+gz::math::Vector2i MouseEvent::Pos() const
 {
   return this->dataPtr->pos;
 }
 
 /////////////////////////////////////////////////
-void MouseEvent::SetPos(const ignition::math::Vector2i &_pos)
+void MouseEvent::SetPos(const gz::math::Vector2i &_pos)
 {
   this->dataPtr->pos = _pos;
 }
@@ -106,13 +106,13 @@ void MouseEvent::SetPos(int _x, int _y)
 }
 
 /////////////////////////////////////////////////
-ignition::math::Vector2i MouseEvent::PrevPos() const
+gz::math::Vector2i MouseEvent::PrevPos() const
 {
   return this->dataPtr->prevPos;
 }
 
 /////////////////////////////////////////////////
-void MouseEvent::SetPrevPos(const ignition::math::Vector2i &_pos)
+void MouseEvent::SetPrevPos(const gz::math::Vector2i &_pos)
 {
   this->dataPtr->prevPos = _pos;
 }
@@ -124,13 +124,13 @@ void MouseEvent::SetPrevPos(int _x, int _y)
 }
 
 /////////////////////////////////////////////////
-ignition::math::Vector2i MouseEvent::PressPos() const
+gz::math::Vector2i MouseEvent::PressPos() const
 {
   return this->dataPtr->pressPos;
 }
 
 /////////////////////////////////////////////////
-void MouseEvent::SetPressPos(const ignition::math::Vector2i &_pos)
+void MouseEvent::SetPressPos(const gz::math::Vector2i &_pos)
 {
   this->dataPtr->pressPos = _pos;
 }
@@ -142,13 +142,13 @@ void MouseEvent::SetPressPos(int _x, int _y)
 }
 
 /////////////////////////////////////////////////
-ignition::math::Vector2i MouseEvent::Scroll() const
+gz::math::Vector2i MouseEvent::Scroll() const
 {
   return this->dataPtr->scroll;
 }
 
 /////////////////////////////////////////////////
-void MouseEvent::SetScroll(const ignition::math::Vector2i &_scroll)
+void MouseEvent::SetScroll(const gz::math::Vector2i &_scroll)
 {
   this->dataPtr->scroll = _scroll;
 }

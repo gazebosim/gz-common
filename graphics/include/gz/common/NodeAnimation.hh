@@ -27,7 +27,7 @@
 
 #include <gz/common/graphics/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -92,7 +92,7 @@ namespace ignition
       /// \param[in] _time the time
       /// \param[in] _loop when true, the time is divided by the duration
       /// (see GetLength)
-      public: ignition::math::Matrix4d FrameAt(const double _time,
+      public: gz::math::Matrix4d FrameAt(const double _time,
                   const bool _loop = true) const;
 
       /// \brief Scales each transformation in the key frames. This only affects

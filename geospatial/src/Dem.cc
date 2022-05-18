@@ -24,10 +24,10 @@
 #include "ignition/common/geospatial/Dem.hh"
 #include "ignition/math/SphericalCoordinates.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
-class ignition::common::Dem::Implementation
+class gz::common::Dem::Implementation
 {
   /// \brief A set of associated raster bands.
   public: GDALDataset *dataSet;
@@ -67,7 +67,7 @@ class ignition::common::Dem::Implementation
 
 //////////////////////////////////////////////////
 Dem::Dem()
-: dataPtr(ignition::utils::MakeImpl<Implementation>())
+: dataPtr(gz::utils::MakeImpl<Implementation>())
 {
   this->dataPtr->dataSet = nullptr;
   GDALAllRegister();
@@ -101,8 +101,8 @@ int Dem::Load(const std::string &_filename)
   unsigned int height;
   int xSize, ySize;
   double upLeftX, upLeftY, upRightX, upRightY, lowLeftX, lowLeftY;
-  ignition::math::Angle upLeftLat, upLeftLong, upRightLat, upRightLong;
-  ignition::math::Angle lowLeftLat, lowLeftLong;
+  gz::math::Angle upLeftLat, upLeftLong, upRightLat, upRightLong;
+  gz::math::Angle lowLeftLat, lowLeftLong;
 
   // Sanity check
   std::string fullName = _filename;
@@ -175,15 +175,15 @@ int Dem::Load(const std::string &_filename)
   }
 
   // Set the terrain's side (the terrain will be squared after the padding)
-  if (ignition::math::isPowerOfTwo(ySize - 1))
+  if (gz::math::isPowerOfTwo(ySize - 1))
     height = ySize;
   else
-    height = ignition::math::roundUpPowerOfTwo(ySize) + 1;
+    height = gz::math::roundUpPowerOfTwo(ySize) + 1;
 
-  if (ignition::math::isPowerOfTwo(xSize - 1))
+  if (gz::math::isPowerOfTwo(xSize - 1))
     width = xSize;
   else
-    width = ignition::math::roundUpPowerOfTwo(xSize) + 1;
+    width = gz::math::roundUpPowerOfTwo(xSize) + 1;
 
   this->dataPtr->side = std::max(width, height);
 
@@ -204,8 +204,8 @@ int Dem::Load(const std::string &_filename)
   if (validNoData <= 0)
     noDataValue = defaultNoDataValue;
 
-  double min = ignition::math::MAX_D;
-  double max = -ignition::math::MAX_D;
+  double min = gz::math::MAX_D;
+  double max = -gz::math::MAX_D;
   for (const auto &d : this->dataPtr->demData)
   {
     if (math::equal(d, this->dataPtr->bufferVal))
@@ -225,8 +225,8 @@ int Dem::Load(const std::string &_filename)
     if (d > max)
       max = d;
   }
-  if (ignition::math::equal(min, ignition::math::MAX_D) ||
-      ignition::math::equal(max, -ignition::math::MAX_D))
+  if (gz::math::equal(min, gz::math::MAX_D) ||
+      gz::math::equal(max, -gz::math::MAX_D))
   {
     ignwarn << "DEM is composed of 'nodata' values!" << std::endl;
   }
@@ -273,7 +273,7 @@ float Dem::MaxElevation() const
 
 //////////////////////////////////////////////////
 bool Dem::GeoReference(double _x, double _y,
-    ignition::math::Angle &_latitude, ignition::math::Angle &_longitude) const
+    gz::math::Angle &_latitude, gz::math::Angle &_longitude) const
 {
   if (this->dataPtr->isNonEarthDem)
   {
@@ -329,8 +329,8 @@ bool Dem::GeoReference(double _x, double _y,
 }
 
 //////////////////////////////////////////////////
-bool Dem::GeoReferenceOrigin(ignition::math::Angle &_latitude,
-    ignition::math::Angle &_longitude) const
+bool Dem::GeoReferenceOrigin(gz::math::Angle &_latitude,
+    gz::math::Angle &_longitude) const
 {
   return this->GeoReference(0, 0, _latitude, _longitude);
 }
@@ -371,8 +371,8 @@ double Dem::WorldHeight() const
 
 //////////////////////////////////////////////////
 void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
-    const ignition::math::Vector3d &_size,
-    const ignition::math::Vector3d &_scale,
+    const gz::math::Vector3d &_size,
+    const gz::math::Vector3d &_scale,
     bool _flipY, std::vector<float> &_heights) const
 {
   if (_subSampling <= 0)

@@ -32,15 +32,15 @@
   #define snprintf _snprintf
 #endif
 
-using namespace ignition;
+using namespace gz;
 
 const char kPluginPath[] = "IGN_PLUGIN_PATH";
 const char kFilePath[] = "IGN_FILE_PATH";
 
-class TestTempDirectory : public ignition::common::TempDirectory
+class TestTempDirectory : public gz::common::TempDirectory
 {
   public: TestTempDirectory():
-          ignition::common::TempDirectory("systempaths", "ign_common", true)
+          gz::common::TempDirectory("systempaths", "ign_common", true)
   {
   }
 };
@@ -128,9 +128,9 @@ TEST_F(SystemPathsFixture, FileSystemPaths)
   EXPECT_EQ(static_cast<unsigned int>(0), paths.FilePaths().size());
 
   std::string dir1 = "test_dir1";
-  ignition::common::createDirectories(dir1);
-  auto file1 = ignition::common::copyFromUnixPath(
-      ignition::common::joinPaths(dir1, "test_f1"));
+  gz::common::createDirectories(dir1);
+  auto file1 = gz::common::copyFromUnixPath(
+      gz::common::joinPaths(dir1, "test_f1"));
   std::ofstream fout;
   fout.open(file1, std::ofstream::out);
   fout << "asdf";
@@ -200,14 +200,14 @@ TEST_F(SystemPathsFixture, SearchPathUsesForwardSlashes)
 //////////////////////////////////////////////////
 TEST_F(SystemPathsFixture, FindFileURI)
 {
-  auto dir1 = ignition::common::absPath("test_dir1");
-  auto dir2 = ignition::common::absPath("test_dir2");
-  ignition::common::createDirectories(dir1);
-  ignition::common::createDirectories(dir2);
-  auto file1 = ignition::common::absPath(
-      ignition::common::joinPaths(dir1, "test_f1"));
-  auto file2 = ignition::common::absPath(
-      ignition::common::joinPaths(dir2, "test_f2"));
+  auto dir1 = gz::common::absPath("test_dir1");
+  auto dir2 = gz::common::absPath("test_dir2");
+  gz::common::createDirectories(dir1);
+  gz::common::createDirectories(dir2);
+  auto file1 = gz::common::absPath(
+      gz::common::joinPaths(dir1, "test_f1"));
+  auto file2 = gz::common::absPath(
+      gz::common::joinPaths(dir2, "test_f2"));
 
   std::ofstream fout;
   fout.open(file1, std::ofstream::out);
@@ -218,13 +218,13 @@ TEST_F(SystemPathsFixture, FindFileURI)
   fout.close();
 
   common::SystemPaths sp;
-  auto filesystemRootUnix = ignition::common::copyToUnixPath(
+  auto filesystemRootUnix = gz::common::copyToUnixPath(
           this->filesystemRoot);
 
   EXPECT_EQ("", sp.FindFileURI("file://no_such_file"));
   EXPECT_EQ(file1, sp.FindFileURI("file:test_dir1/test_f1"));
   EXPECT_EQ(file1, sp.FindFileURI("file://" +
-                                  ignition::common::copyToUnixPath(file1)));
+                                  gz::common::copyToUnixPath(file1)));
   EXPECT_EQ("", sp.FindFileURI("osrf://unknown.protocol"));
   EXPECT_EQ("", sp.FindFileURI(this->filesystemRoot + "no_such_file"));
   EXPECT_EQ("", sp.FindFileURI("file://" + filesystemRootUnix +
@@ -242,21 +242,21 @@ TEST_F(SystemPathsFixture, FindFileURI)
   //     sp.FindFileURI("file://" + this->filesystemRoot + "Windows"));
 #endif
 
-  auto robotCb = [dir1](const ignition::common::URI &_uri)
+  auto robotCb = [dir1](const gz::common::URI &_uri)
   {
     return _uri.Scheme() == "robot" ?
-           ignition::common::joinPaths(dir1, _uri.Path().Str()) : "";
+           gz::common::joinPaths(dir1, _uri.Path().Str()) : "";
   };
-  auto osrfCb = [dir2](const ignition::common::URI &_uri)
+  auto osrfCb = [dir2](const gz::common::URI &_uri)
   {
     return _uri.Scheme() == "osrf" ?
-           ignition::common::joinPaths(dir2, ignition::common::copyFromUnixPath(
+           gz::common::joinPaths(dir2, gz::common::copyFromUnixPath(
            _uri.Path().Str())) : "";
   };
-  auto robot2Cb = [dir2](const ignition::common::URI &_uri)
+  auto robot2Cb = [dir2](const gz::common::URI &_uri)
   {
     return _uri.Scheme() == "robot" ?
-           ignition::common::joinPaths(dir2, _uri.Path().Str()) : "";
+           gz::common::joinPaths(dir2, _uri.Path().Str()) : "";
   };
 
   EXPECT_EQ("", sp.FindFileURI("robot://test_f1"));
@@ -294,14 +294,14 @@ TEST_F(SystemPathsFixture, FindFileURI)
 //////////////////////////////////////////////////
 TEST_F(SystemPathsFixture, FindFile)
 {
-  auto dir1 = ignition::common::absPath("test_dir1");
-  auto dir2 = ignition::common::absPath("test_dir2");
-  ignition::common::createDirectories(dir1);
-  ignition::common::createDirectories(dir2);
-  auto file1 = ignition::common::absPath(
-      ignition::common::joinPaths(dir1, "test_f1"));
-  auto file2 = ignition::common::absPath(
-      ignition::common::joinPaths(dir2, "test_f2"));
+  auto dir1 = gz::common::absPath("test_dir1");
+  auto dir2 = gz::common::absPath("test_dir2");
+  gz::common::createDirectories(dir1);
+  gz::common::createDirectories(dir2);
+  auto file1 = gz::common::absPath(
+      gz::common::joinPaths(dir1, "test_f1"));
+  auto file2 = gz::common::absPath(
+      gz::common::joinPaths(dir2, "test_f2"));
 
   std::ofstream fout;
   fout.open(file1, std::ofstream::out);
@@ -313,10 +313,10 @@ TEST_F(SystemPathsFixture, FindFile)
 
   // LocateLocalFile
   common::SystemPaths sp;
-  EXPECT_EQ(ignition::common::copyToUnixPath(file1),
+  EXPECT_EQ(gz::common::copyToUnixPath(file1),
             sp.LocateLocalFile("test_f1", {dir1, dir2}));
 
-  EXPECT_EQ(ignition::common::copyToUnixPath(file2),
+  EXPECT_EQ(gz::common::copyToUnixPath(file2),
             sp.LocateLocalFile("test_f2", {dir1, dir2}));
 
   EXPECT_EQ("", sp.LocateLocalFile("test_f3", {dir1, dir2}));
@@ -381,17 +381,17 @@ TEST_F(SystemPathsFixture, FindFile)
 //////////////////////////////////////////////////
 TEST_F(SystemPathsFixture, NormalizeDirectoryPath)
 {
-  EXPECT_EQ(ignition::common::SystemPaths::NormalizeDirectoryPath("a/b/c/"),
+  EXPECT_EQ(gz::common::SystemPaths::NormalizeDirectoryPath("a/b/c/"),
                                                                   "a/b/c/");
-  EXPECT_EQ(ignition::common::SystemPaths::NormalizeDirectoryPath("a/b/c"),
+  EXPECT_EQ(gz::common::SystemPaths::NormalizeDirectoryPath("a/b/c"),
                                                                   "a/b/c/");
-  EXPECT_EQ(ignition::common::SystemPaths::NormalizeDirectoryPath("/a/b/c/"),
+  EXPECT_EQ(gz::common::SystemPaths::NormalizeDirectoryPath("/a/b/c/"),
                                                                   "/a/b/c/");
-  EXPECT_EQ(ignition::common::SystemPaths::NormalizeDirectoryPath("/a/b/c"),
+  EXPECT_EQ(gz::common::SystemPaths::NormalizeDirectoryPath("/a/b/c"),
                                                                   "/a/b/c/");
-  EXPECT_EQ(ignition::common::SystemPaths::NormalizeDirectoryPath("a\\b\\c"),
+  EXPECT_EQ(gz::common::SystemPaths::NormalizeDirectoryPath("a\\b\\c"),
                                                                   "a/b/c/");
-  EXPECT_EQ(ignition::common::SystemPaths::NormalizeDirectoryPath("a\\b\\c\\"),
+  EXPECT_EQ(gz::common::SystemPaths::NormalizeDirectoryPath("a\\b\\c\\"),
                                                                   "a/b/c/");
 }
 
@@ -401,7 +401,7 @@ TEST_F(SystemPathsFixture, PathsFromEnv)
   common::setenv(kPluginPath,
       SystemPathsJoin({"/tmp/plugin", "/test/plugin/now/", "/tmp/plugin"}));
 
-  auto paths = ignition::common::SystemPaths::PathsFromEnv(kPluginPath);
+  auto paths = gz::common::SystemPaths::PathsFromEnv(kPluginPath);
 
   EXPECT_EQ(paths.size(), 2u);
 

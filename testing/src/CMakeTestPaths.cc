@@ -17,7 +17,7 @@
 
 #include "ignition/common/testing/CMakeTestPaths.hh"
 
-namespace ignition::common::testing
+namespace gz::common::testing
 {
 
 //////////////////////////////////////////////////
@@ -39,8 +39,8 @@ bool CMakeTestPaths::ProjectSourcePath(std::string &_sourceDir)
 //////////////////////////////////////////////////
 bool CMakeTestPaths::TestTmpPath(std::string &_tmpDir)
 {
-  _tmpDir = ignition::common::tempDirectoryPath();
+  _tmpDir = gz::common::tempDirectoryPath();
   return true;
 }
 
-}  // namespace ignition::common::testing
+}  // namespace gz::common::testing

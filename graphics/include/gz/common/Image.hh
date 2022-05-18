@@ -27,7 +27,7 @@
 
 #include <gz/utils/ImplPtr.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -234,7 +234,7 @@ namespace ignition
         // convert to rgb image
         // color is grayscale, i.e. r == b == g
         double range = static_cast<double>(max - min);
-        if (ignition::math::equal(range, 0.0))
+        if (gz::math::equal(range, 0.0))
           range = 1.0;
         unsigned int idx = 0;
         for (unsigned int j = 0; j < _height; ++j)

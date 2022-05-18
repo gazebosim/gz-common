@@ -28,7 +28,7 @@
 #include <ignition/common/testing/AutoLogFixture.hh>
 #include <ignition/common/testing/TestPaths.hh>
 
-using namespace ignition;
+using namespace gz;
 
 class MeshTest : public common::testing::AutoLogFixture { };
 
@@ -151,11 +151,11 @@ TEST_F(MeshTest, Access)
   EXPECT_EQ(24u, mesh->TexCoordCount());
   EXPECT_EQ(0u, mesh->MaterialCount());
 
-  ignition::math::Vector3d center, min, max;
+  gz::math::Vector3d center, min, max;
   mesh->AABB(center, min, max);
-  EXPECT_TRUE(center == ignition::math::Vector3d(0, 0, 0));
-  EXPECT_TRUE(min == ignition::math::Vector3d(-.5, -.5, -.5));
-  EXPECT_TRUE(max == ignition::math::Vector3d(.5, .5, .5));
+  EXPECT_TRUE(center == gz::math::Vector3d(0, 0, 0));
+  EXPECT_TRUE(min == gz::math::Vector3d(-.5, -.5, -.5));
+  EXPECT_TRUE(max == gz::math::Vector3d(.5, .5, .5));
 
   double *vertArray = nullptr;
   int *indArray = nullptr;
@@ -224,9 +224,9 @@ TEST_F(MeshTest, RoundtripStl)
 
   math::Vector3d center, min, max;
   mesh->AABB(center, min, max);
-  EXPECT_TRUE(center == ignition::math::Vector3d(0.5, 0.5, 0.5));
-  EXPECT_TRUE(min == ignition::math::Vector3d(0, 0, 0));
-  EXPECT_TRUE(max == ignition::math::Vector3d(1, 1, 1));
+  EXPECT_TRUE(center == gz::math::Vector3d(0.5, 0.5, 0.5));
+  EXPECT_TRUE(min == gz::math::Vector3d(0, 0, 0));
+  EXPECT_TRUE(max == gz::math::Vector3d(1, 1, 1));
 }
 
 /////////////////////////////////////////////////

@@ -19,8 +19,8 @@
 #include <ignition/common/testing/TestPaths.hh>
 #include <ignition/common/testing/Utils.hh>
 
-using namespace ignition::common;
-using namespace ignition::common::testing;
+using namespace gz::common;
+using namespace gz::common::testing;
 
 /////////////////////////////////////////////////
 TEST(Utils, CreateNewEmptyFile)

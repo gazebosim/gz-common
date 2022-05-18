@@ -24,27 +24,27 @@
 TEST(TempDirectory, tempDirectoryPath)
 {
   // OS TMPDIR should never be empty
-  ASSERT_FALSE(ignition::common::tempDirectoryPath().empty());
+  ASSERT_FALSE(gz::common::tempDirectoryPath().empty());
 }
 
 /////////////////////////////////////////////////
 TEST(TempDirectory, createTempDirectory)
 {
   // OS TMPDIR should never be empty
-  auto tmpDir = ignition::common::tempDirectoryPath();
+  auto tmpDir = gz::common::tempDirectoryPath();
   ASSERT_FALSE(tmpDir.empty());
 
   // Nominal case
   // eg /tmp/fooXXXXXX
-  auto tmp = ignition::common::createTempDirectory("foo", tmpDir);
+  auto tmp = gz::common::createTempDirectory("foo", tmpDir);
   ASSERT_FALSE(tmp.empty());
   EXPECT_NE(std::string::npos, tmp.find("foo"));
   EXPECT_NE(std::string::npos, tmp.find(tmpDir));
 
   // Should also work for subdirectories
   // eg /tmp/bar/fooXXXXXX
-  tmpDir = ignition::common::joinPaths(tmpDir, "bar");
-  auto tmp2 = ignition::common::createTempDirectory("bar", tmpDir);
+  tmpDir = gz::common::joinPaths(tmpDir, "bar");
+  auto tmp2 = gz::common::createTempDirectory("bar", tmpDir);
   ASSERT_FALSE(tmp2.empty());
 }
 
@@ -52,11 +52,11 @@ TEST(TempDirectory, createTempDirectory)
 TEST(TempDirectory, createTempDirectoryEmptyBase)
 {
   // OS TMPDIR should never be empty
-  auto tmpDir = ignition::common::tempDirectoryPath();
+  auto tmpDir = gz::common::tempDirectoryPath();
   ASSERT_FALSE(tmpDir.empty());
 
   // Create with an empty basename (eg /tmp/XXXXXX)
-  auto tmp = ignition::common::createTempDirectory("", tmpDir);
+  auto tmp = gz::common::createTempDirectory("", tmpDir);
   ASSERT_FALSE(tmp.empty());
   EXPECT_EQ(std::string::npos, tmp.find("foo"));
   EXPECT_NE(std::string::npos, tmp.find(tmpDir));
@@ -66,103 +66,103 @@ TEST(TempDirectory, createTempDirectoryEmptyBase)
 TEST(TempDirectory, TempDirectory)
 {
   std::string path;
-  auto curDir = ignition::common::cwd();
+  auto curDir = gz::common::cwd();
   {
-    ignition::common::TempDirectory tmp("temp_dir", "ignition", true);
+    gz::common::TempDirectory tmp("temp_dir", "ignition", true);
     EXPECT_TRUE(tmp.Valid());
     EXPECT_TRUE(tmp.DoCleanup());
     // Current directory changed to tempdir
-    EXPECT_NE(curDir, ignition::common::cwd());
+    EXPECT_NE(curDir, gz::common::cwd());
     path = tmp.Path();
     EXPECT_FALSE(path.empty());
-    EXPECT_TRUE(ignition::common::exists(path));
-    EXPECT_EQ(path, ignition::common::cwd());
+    EXPECT_TRUE(gz::common::exists(path));
+    EXPECT_EQ(path, gz::common::cwd());
   }
   // Current directory changed back to previous
-  EXPECT_EQ(curDir, ignition::common::cwd());
-  EXPECT_FALSE(ignition::common::exists(path));
+  EXPECT_EQ(curDir, gz::common::cwd());
+  EXPECT_FALSE(gz::common::exists(path));
 }
 
 /////////////////////////////////////////////////
 TEST(TempDirectory, TempDirectoryRoot)
 {
   std::string path;
-  auto curDir = ignition::common::cwd();
+  auto curDir = gz::common::cwd();
   {
-    auto p = ignition::common::tempDirectoryPath();
-    ignition::common::TempDirectory tmp(p, "temp_dir", "ignition", true);
+    auto p = gz::common::tempDirectoryPath();
+    gz::common::TempDirectory tmp(p, "temp_dir", "ignition", true);
     EXPECT_TRUE(tmp.Valid());
     EXPECT_TRUE(tmp.DoCleanup());
-    EXPECT_NE(curDir, ignition::common::cwd());
+    EXPECT_NE(curDir, gz::common::cwd());
     path = tmp.Path();
     EXPECT_FALSE(path.empty());
-    EXPECT_TRUE(ignition::common::exists(path));
-    EXPECT_EQ(path, ignition::common::cwd());
+    EXPECT_TRUE(gz::common::exists(path));
+    EXPECT_EQ(path, gz::common::cwd());
   }
   // Current directory changed back to previous
-  EXPECT_EQ(curDir, ignition::common::cwd());
-  EXPECT_FALSE(ignition::common::exists(path));
+  EXPECT_EQ(curDir, gz::common::cwd());
+  EXPECT_FALSE(gz::common::exists(path));
 }
 
 /////////////////////////////////////////////////
 TEST(TempDirectory, TempDirectoryEmptyRoot)
 {
   std::string path;
-  auto curDir = ignition::common::cwd();
+  auto curDir = gz::common::cwd();
   {
-    ignition::common::TempDirectory tmp("", "temp_dir", "ignition", true);
+    gz::common::TempDirectory tmp("", "temp_dir", "ignition", true);
     EXPECT_FALSE(tmp.Valid());
     EXPECT_TRUE(tmp.DoCleanup());
     // Since not successfully created, no update
-    EXPECT_EQ(curDir, ignition::common::cwd());
+    EXPECT_EQ(curDir, gz::common::cwd());
     path = tmp.Path();
     EXPECT_TRUE(path.empty());
-    EXPECT_FALSE(ignition::common::exists(path));
+    EXPECT_FALSE(gz::common::exists(path));
   }
-  EXPECT_EQ(curDir, ignition::common::cwd());
-  EXPECT_FALSE(ignition::common::exists(path));
+  EXPECT_EQ(curDir, gz::common::cwd());
+  EXPECT_FALSE(gz::common::exists(path));
 }
 
 /////////////////////////////////////////////////
 TEST(TempDirectory, TempDirectoryNoClean)
 {
   std::string path;
-  auto curDir = ignition::common::cwd();
+  auto curDir = gz::common::cwd();
   {
-    ignition::common::TempDirectory tmp("temp_dir", "ignition", false);
+    gz::common::TempDirectory tmp("temp_dir", "ignition", false);
     EXPECT_TRUE(tmp.Valid());
     EXPECT_FALSE(tmp.DoCleanup());
-    EXPECT_NE(curDir, ignition::common::cwd());
+    EXPECT_NE(curDir, gz::common::cwd());
     path = tmp.Path();
     EXPECT_FALSE(path.empty());
-    EXPECT_TRUE(ignition::common::exists(path));
-    EXPECT_EQ(path, ignition::common::cwd());
+    EXPECT_TRUE(gz::common::exists(path));
+    EXPECT_EQ(path, gz::common::cwd());
   }
   // Current directory always changes back, regardless of doClean
-  EXPECT_EQ(curDir, ignition::common::cwd());
-  EXPECT_TRUE(ignition::common::exists(path));
-  EXPECT_TRUE(ignition::common::removeDirectory(path));
+  EXPECT_EQ(curDir, gz::common::cwd());
+  EXPECT_TRUE(gz::common::exists(path));
+  EXPECT_TRUE(gz::common::removeDirectory(path));
 }
 
 /////////////////////////////////////////////////
 TEST(TempDirectory, TempDirectoryNoCleanLater)
 {
   std::string path;
-  auto curDir = ignition::common::cwd();
+  auto curDir = gz::common::cwd();
   {
-    ignition::common::TempDirectory tmp("temp_dir", "ignition", true);
+    gz::common::TempDirectory tmp("temp_dir", "ignition", true);
     EXPECT_TRUE(tmp.Valid());
     EXPECT_TRUE(tmp.DoCleanup());
-    EXPECT_NE(curDir, ignition::common::cwd());
+    EXPECT_NE(curDir, gz::common::cwd());
     path = tmp.Path();
     EXPECT_FALSE(path.empty());
-    EXPECT_TRUE(ignition::common::exists(path));
-    EXPECT_EQ(path, ignition::common::cwd());
+    EXPECT_TRUE(gz::common::exists(path));
+    EXPECT_EQ(path, gz::common::cwd());
     tmp.DoCleanup(false);
     EXPECT_FALSE(tmp.DoCleanup());
   }
   // Current directory always changes back, regardless of doClean
-  EXPECT_EQ(curDir, ignition::common::cwd());
-  EXPECT_TRUE(ignition::common::exists(path));
-  EXPECT_TRUE(ignition::common::removeDirectory(path));
+  EXPECT_EQ(curDir, gz::common::cwd());
+  EXPECT_TRUE(gz::common::exists(path));
+  EXPECT_TRUE(gz::common::removeDirectory(path));
 }

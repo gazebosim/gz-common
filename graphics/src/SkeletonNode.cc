@@ -20,11 +20,11 @@
 #include "ignition/common/Console.hh"
 #include "ignition/common/SkeletonNode.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 /// \brief SkeletonNode private data
-class ignition::common::SkeletonNode::Implementation
+class gz::common::SkeletonNode::Implementation
 {
   /// \brief the name of the skeletal node
   public: std::string name;
@@ -62,7 +62,7 @@ class ignition::common::SkeletonNode::Implementation
 
 //////////////////////////////////////////////////
 SkeletonNode::SkeletonNode(SkeletonNode *_parent)
-: dataPtr(ignition::utils::MakeImpl<Implementation>())
+: dataPtr(gz::utils::MakeImpl<Implementation>())
 {
   this->dataPtr->parent = _parent;
 
@@ -74,7 +74,7 @@ SkeletonNode::SkeletonNode(SkeletonNode *_parent)
 SkeletonNode::SkeletonNode(SkeletonNode *_parent,
     const std::string &_name, const std::string &_id,
     const SkeletonNodeType _type)
-: dataPtr(ignition::utils::MakeImpl<Implementation>())
+: dataPtr(gz::utils::MakeImpl<Implementation>())
 {
   this->dataPtr->parent = _parent;
 

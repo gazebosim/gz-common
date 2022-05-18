@@ -22,7 +22,7 @@
 #include "gz/common/testing/TestPaths.hh"
 #include "gz/common/testing/Export.hh"
 
-namespace ignition::common::testing
+namespace gz::common::testing
 {
 /// \brief Implementation of TestPaths interface for CMake
 ///
@@ -44,5 +44,5 @@ class CMakeTestPaths: public TestPaths
   public: bool IGNITION_COMMON_TESTING_VISIBLE
           TestTmpPath(std::string &_tmpDir) override;
 };
-}  // namespace ignition::common::testing
+}  // namespace gz::common::testing
 #endif  // GZ_COMMON_TESTING_CMAKETESTPATHS_HH_

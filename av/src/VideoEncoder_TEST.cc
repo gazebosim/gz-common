@@ -21,7 +21,7 @@
 #include "ignition/common/testing/AutoLogFixture.hh"
 #include "ignition/common/testing/TestPaths.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 class VideoEncoderTest : public common::testing::AutoLogFixture
@@ -34,7 +34,7 @@ class VideoEncoderTest : public common::testing::AutoLogFixture
     ASSERT_TRUE(tempDir->Valid()) << tempDir->Path();
   }
 
-  public: std::shared_ptr<ignition::common::TempDirectory> tempDir;
+  public: std::shared_ptr<gz::common::TempDirectory> tempDir;
 };
 
 /////////////////////////////////////////////////

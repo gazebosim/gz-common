@@ -23,7 +23,7 @@ IGN_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
 #include "ignition/common/PluginInfo.hh"
 #include "PluginUtils.hh"
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

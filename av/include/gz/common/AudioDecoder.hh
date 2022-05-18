@@ -23,7 +23,7 @@
 #include <gz/common/av/Export.hh>
 #include <gz/utils/ImplPtr.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

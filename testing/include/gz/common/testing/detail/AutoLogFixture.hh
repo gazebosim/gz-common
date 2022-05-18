@@ -27,7 +27,7 @@
 #include <gz/common/TempDirectory.hh>
 #include <gz/common/Util.hh>
 
-namespace ignition::common::testing
+namespace gz::common::testing
 {
 
 //////////////////////////////////////////////////
@@ -49,7 +49,7 @@ class AutoLogFixture::Implementation
 
 //////////////////////////////////////////////////
 AutoLogFixture::AutoLogFixture():
-  dataPtr(ignition::utils::MakeUniqueImpl<Implementation>())
+  dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
 {
 }
 
@@ -57,7 +57,7 @@ AutoLogFixture::AutoLogFixture():
 AutoLogFixture::~AutoLogFixture()
 {
   ignLogClose();
-  EXPECT_TRUE(ignition::common::unsetenv(IGN_HOMEDIR));
+  EXPECT_TRUE(gz::common::unsetenv(IGN_HOMEDIR));
 }
 
 //////////////////////////////////////////////////
@@ -90,15 +90,15 @@ void AutoLogFixture::SetUp()
   // Read the full path to the log directory.
   this->dataPtr->logDirectory = ignLogDirectory();
   ASSERT_FALSE(this->dataPtr->logDirectory.empty());
-  ASSERT_TRUE(ignition::common::exists(this->dataPtr->logDirectory));
+  ASSERT_TRUE(gz::common::exists(this->dataPtr->logDirectory));
 
-  ignition::common::Console::SetVerbosity(4);
+  gz::common::Console::SetVerbosity(4);
 }
 
 //////////////////////////////////////////////////
 std::string AutoLogFixture::FullLogPath() const
 {
-  return ignition::common::joinPaths(
+  return gz::common::joinPaths(
     this->dataPtr->logDirectory, this->dataPtr->logFilename);
 }
 
@@ -118,7 +118,7 @@ std::string AutoLogFixture::LogContent() const
   return loggedString;
 }
 
-}  // namespace ignition::common::testing
+}  // namespace gz::common::testing
 
 #endif  // GZ_COMMON_TESTING_DETAIL_AUTOLOGFIXTURE_HH_
 

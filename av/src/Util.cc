@@ -67,7 +67,7 @@ void logCallback(void *_ptr, int _level, const char *_fmt, va_list _args)
 }
 
 /////////////////////////////////////////////////
-void ignition::common::load()
+void gz::common::load()
 {
   static bool first = true;
   if (first)

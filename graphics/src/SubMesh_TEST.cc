@@ -24,7 +24,7 @@
 
 #include "ignition/common/testing/AutoLogFixture.hh"
 
-using namespace ignition;
+using namespace gz;
 
 class SubMeshTest : public common::testing::AutoLogFixture { };
 
@@ -383,7 +383,7 @@ TEST_F(SubMeshTest, Volume)
   // Box mesh tests
   {
     common::MeshManager::Instance()->CreateBox("unit_box",
-        ignition::math::Vector3d::One, ignition::math::Vector2d::One);
+        gz::math::Vector3d::One, gz::math::Vector2d::One);
 
     const common::Mesh *unitBox =
       common::MeshManager::Instance()->MeshByName("unit_box");
@@ -391,7 +391,7 @@ TEST_F(SubMeshTest, Volume)
     EXPECT_DOUBLE_EQ(1.0, unitBox->Volume());
 
     common::MeshManager::Instance()->CreateBox("other_box",
-        ignition::math::Vector3d(2, 3, 4), ignition::math::Vector2d::One);
+        gz::math::Vector3d(2, 3, 4), gz::math::Vector2d::One);
     const common::Mesh *otherBox =
       common::MeshManager::Instance()->MeshByName("other_box");
     ASSERT_TRUE(otherBox != nullptr);
@@ -423,7 +423,7 @@ TEST_F(SubMeshTest, Volume)
   // Ellipsoid mesh tests
   {
     common::MeshManager::Instance()->CreateEllipsoid("ellipsoid",
-        ignition::math::Vector3d(2, 1.4, 7), 10, 10);
+        gz::math::Vector3d(2, 1.4, 7), 10, 10);
 
     const common::Mesh *unitEllipsoid =
       common::MeshManager::Instance()->MeshByName("ellipsoid");
@@ -433,7 +433,7 @@ TEST_F(SubMeshTest, Volume)
 
     // Checking that we can not add or modify a new mesh with the name
     common::MeshManager::Instance()->CreateEllipsoid("ellipsoid",
-        ignition::math::Vector3d(2, 1.4, 7), 100, 100);
+        gz::math::Vector3d(2, 1.4, 7), 100, 100);
     const common::Mesh *unitEllipsoid2 =
       common::MeshManager::Instance()->MeshByName("ellipsoid");
 
@@ -446,7 +446,7 @@ TEST_F(SubMeshTest, Volume)
     // A larger cylinder needs to have higher resolution in order to get the
     // volume close to Pi * r^2 * h.
     common::MeshManager::Instance()->CreateEllipsoid("other_ellipsoid",
-        ignition::math::Vector3d(0.8, 2.4, 7.5), 10, 10);
+        gz::math::Vector3d(0.8, 2.4, 7.5), 10, 10);
 
     const common::Mesh *otherEllipsoid =
       common::MeshManager::Instance()->MeshByName("other_ellipsoid");

@@ -25,7 +25,7 @@
 /////////////////////////////////////////////////
 TEST(Timer_TEST, Sequence)
 {
-  ignition::common::Timer t;
+  gz::common::Timer t;
   EXPECT_FALSE(t.Running());
   EXPECT_DOUBLE_EQ(0.0, t.ElapsedTime().count());
 
@@ -47,7 +47,7 @@ TEST(Timer_TEST, Sequence)
 /////////////////////////////////////////////////
 TEST(Timer_TEST, Elapsed)
 {
-  ignition::common::Timer t;
+  gz::common::Timer t;
   t.Start();
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   t.Stop();
@@ -60,11 +60,11 @@ TEST(Timer_TEST, Elapsed)
 /////////////////////////////////////////////////
 TEST(Timer_TEST, Copy)
 {
-  ignition::common::Timer t1;
+  gz::common::Timer t1;
   t1.Start();
   EXPECT_TRUE(t1.Running());
 
-  ignition::common::Timer t2 = t1;
+  gz::common::Timer t2 = t1;
   EXPECT_TRUE(t2.Running());
 
   // Stop the original

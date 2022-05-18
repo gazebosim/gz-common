@@ -20,11 +20,11 @@
 #include <ignition/common/Console.hh>
 #include <ignition/common/Battery.hh>
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 /// \brief Private data for the Battery class
-class ignition::common::Battery::Implementation
+class gz::common::Battery::Implementation
 {
   /// \brief Initial voltage in volts.
   public: double initVoltage = 0.0;
@@ -51,7 +51,7 @@ class ignition::common::Battery::Implementation
 
 /////////////////////////////////////////////////
 Battery::Battery()
-  : dataPtr(ignition::utils::MakeUniqueImpl<Implementation>())
+  : dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
 {
   this->SetUpdateFunc(std::bind(&Battery::UpdateDefault, this,
         std::placeholders::_1));

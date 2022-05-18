@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 
-// ignition::common::FlagSet is a type-safe class for using enums as flags in
+// gz::common::FlagSet is a type-safe class for using enums as flags in
 // C++14 with an underlying std::bitset.
 // See https://github.com/mrts/flag-set-cpp
 // Licence: MIT
@@ -66,7 +66,7 @@ enum class OptionsNoEnd : uint8_t
 
 TEST(FlagSet, TestAnd)
 {
-  ignition::common::FlagSet<Options> red(
+  gz::common::FlagSet<Options> red(
       Options::RED_FOREGROUND | Options::RED_BACKGROUND);
 
   auto result = red & Options::RED_BACKGROUND;
@@ -85,26 +85,26 @@ TEST(FlagSet, TestAnd)
   EXPECT_FALSE(result);
   EXPECT_EQ(result.Count(), 0u);
 
-  ignition::common::FlagSet<Options> red_foreground(Options::RED_FOREGROUND);
+  gz::common::FlagSet<Options> red_foreground(Options::RED_FOREGROUND);
   red &= Options::RED_FOREGROUND;
   EXPECT_TRUE(red == red_foreground);
 }
 
 TEST(FlagSet, TestOr)
 {
-  ignition::common::FlagSet<Options> red;
+  gz::common::FlagSet<Options> red;
   red |= Options::RED_FOREGROUND | Options::RED_BACKGROUND;
   EXPECT_TRUE(red);
   EXPECT_EQ(red.Count(), 2u);
 
-  ignition::common::FlagSet<Options> options;
+  gz::common::FlagSet<Options> options;
   options |= (Options::FULLSCREEN | Options::FLASH);
 
   auto result = options & (Options::FULLSCREEN | Options::FLASH |
                            Options::RED_FOREGROUND);
   EXPECT_TRUE(result);
 
-  ignition::common::FlagSet<Options> expected;
+  gz::common::FlagSet<Options> expected;
   expected |= Options::FULLSCREEN;
   EXPECT_EQ(options & expected, expected);
 
@@ -122,7 +122,7 @@ TEST(FlagSet, TestOr)
 
 TEST(FlagSet, TestSetReset)
 {
-  ignition::common::FlagSet<Options> options;
+  gz::common::FlagSet<Options> options;
   EXPECT_EQ(options.Count(), 0u);
 
   options.Set();
@@ -147,7 +147,7 @@ TEST(FlagSet, TestSetReset)
 
 TEST(FlagSet, TestAnyAllNone)
 {
-  ignition::common::FlagSet<Options> options;
+  gz::common::FlagSet<Options> options;
   EXPECT_TRUE(options.None());
   EXPECT_FALSE(options.Any());
   EXPECT_FALSE(options.All());
@@ -181,7 +181,7 @@ TEST(FlagSet, TestAnyAllNone)
 
 TEST(FlagSet, TestConstructors)
 {
-  using namespace ignition::common;
+  using namespace gz::common;
 
   ASSERT_EQ(5u, FlagSet<Options>::numElements);
 
@@ -204,19 +204,19 @@ TEST(FlagSet, TestConstructors)
 
 TEST(FlagSet, TestStaticConstructors)
 {
-  EXPECT_TRUE(ignition::common::FlagSet<Options>::AllSet().All());
-  EXPECT_FALSE(ignition::common::FlagSet<Options>::AllSet().None());
-  EXPECT_TRUE(ignition::common::FlagSet<Options>::AllSet().Any());
+  EXPECT_TRUE(gz::common::FlagSet<Options>::AllSet().All());
+  EXPECT_FALSE(gz::common::FlagSet<Options>::AllSet().None());
+  EXPECT_TRUE(gz::common::FlagSet<Options>::AllSet().Any());
 
-  EXPECT_FALSE(ignition::common::FlagSet<Options>::NoneSet().All());
-  EXPECT_TRUE(ignition::common::FlagSet<Options>::NoneSet().None());
-  EXPECT_FALSE(ignition::common::FlagSet<Options>::NoneSet().Any());
+  EXPECT_FALSE(gz::common::FlagSet<Options>::NoneSet().All());
+  EXPECT_TRUE(gz::common::FlagSet<Options>::NoneSet().None());
+  EXPECT_FALSE(gz::common::FlagSet<Options>::NoneSet().Any());
 }
 
 
 TEST(FlagSet, TestHash)
 {
-  using namespace ignition::common;
+  using namespace gz::common;
 
   const auto options1 = FlagSet<Options>::AllSet();
   const auto options2 = FlagSet<Options>::NoneSet();
@@ -237,7 +237,7 @@ TEST(FlagSet, TestEnumWithoutUnderscore)
 {
   using ONU = OptionsNoUnderscore;
 
-  using TestSet = ignition::common::FlagSet<ONU, ONU::END>;
+  using TestSet = gz::common::FlagSet<ONU, ONU::END>;
 
   ASSERT_EQ(5u, TestSet::numElements);
 
@@ -272,7 +272,7 @@ TEST(FlagSet, TestEnumWithoutEnd)
 {
   using ONE = OptionsNoEnd;
 
-  using TestSet = ignition::common::FlagSet<ONE, ONE::RED_FOREGROUND, false>;
+  using TestSet = gz::common::FlagSet<ONE, ONE::RED_FOREGROUND, false>;
 
   ASSERT_EQ(5u, TestSet::numElements);
 
@@ -366,7 +366,7 @@ TEST(FlagSet, TestUnderlyingTypes)
     _
   };
 
-  using namespace ignition::common;
+  using namespace gz::common;
 
   EXPECT_TRUE(FlagSet<CharEnum>(CharEnum::A).All());
   EXPECT_TRUE(FlagSet<UCharEnum>(UCharEnum::A).All());

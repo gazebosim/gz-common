@@ -21,7 +21,7 @@
 
 #include "ignition/common/testing/AutoLogFixture.hh"
 
-using namespace ignition;
+using namespace gz;
 
 class EnumIfaceTest : public common::testing::AutoLogFixture { };
 

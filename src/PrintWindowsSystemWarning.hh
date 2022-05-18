@@ -25,13 +25,13 @@
 #include <cstdint>
 #include <ignition/common/Console.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
     /// \brief This is a Windows-specific function that prints warnings from the
     /// system in a pretty and convenient way. They get logged using the
-    /// ignition::common::Console.
+    /// gz::common::Console.
     inline void PrintWindowsSystemWarning(const std::string &_flavorText)
     {
       // Based on example code by Microsoft: "Retrieving the Last-Error Code"

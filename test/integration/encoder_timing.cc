@@ -18,7 +18,7 @@
 #include "ignition/common/VideoEncoder.hh"
 #include "ignition/common/Video.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 const unsigned int kSize = 10;

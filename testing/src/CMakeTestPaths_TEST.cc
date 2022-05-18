@@ -20,8 +20,8 @@
 #include "ignition/common/testing/TestPaths.hh"
 #include "ignition/common/testing/CMakeTestPaths.hh"
 
-using namespace ignition::common;
-using namespace ignition::common::testing;
+using namespace gz::common;
+using namespace gz::common::testing;
 
 constexpr char kFakeTestPaths[] = "";
 
@@ -40,13 +40,13 @@ TEST(TestPaths, ProjectSourcePathUnset)
 /////////////////////////////////////////////////
 TEST(CMakeTestPaths, TestingProjectSourceDir)
 {
-  ASSERT_NE(0u, strlen(ignition::common::testing::kTestingProjectSourceDir));
+  ASSERT_NE(0u, strlen(gz::common::testing::kTestingProjectSourceDir));
 }
 
 /////////////////////////////////////////////////
 TEST(CMakeTestPaths, ProjectSourcePathUnset)
 {
-  ignition::common::testing::CMakeTestPaths testPaths(kFakeTestPaths);
+  gz::common::testing::CMakeTestPaths testPaths(kFakeTestPaths);
   std::string sourceDir;
   EXPECT_FALSE(testPaths.ProjectSourcePath(sourceDir));
   EXPECT_TRUE(sourceDir.empty());
@@ -55,13 +55,13 @@ TEST(CMakeTestPaths, ProjectSourcePathUnset)
 /////////////////////////////////////////////////
 TEST(CMakeTestPaths, TestBuildType)
 {
-  ASSERT_EQ(BuildType::kCMake, ignition::common::testing::TestBuildType());
+  ASSERT_EQ(BuildType::kCMake, gz::common::testing::TestBuildType());
 }
 
 /////////////////////////////////////////////////
 TEST(CMakeTestPaths, ProjectSourcePath)
 {
-  ignition::common::testing::CMakeTestPaths testPaths;
+  gz::common::testing::CMakeTestPaths testPaths;
 
   std::string sourceDir;
   ASSERT_TRUE(testPaths.ProjectSourcePath(sourceDir));
@@ -81,7 +81,7 @@ TEST(CMakeTestPaths, ProjectSourcePath)
 /////////////////////////////////////////////////
 TEST(CMakeTestPaths, TestTmpPath)
 {
-  ignition::common::testing::CMakeTestPaths testPaths;
+  gz::common::testing::CMakeTestPaths testPaths;
 
   std::string tmpDir;
   ASSERT_TRUE(testPaths.TestTmpPath(tmpDir));

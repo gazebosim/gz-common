@@ -23,10 +23,10 @@
 
 #include "ignition/common/WorkerPool.hh"
 
-namespace igncmn = ignition::common;
+namespace igncmn = gz::common;
 using namespace igncmn;
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -124,7 +124,7 @@ void WorkerPool::Implementation::Worker()
 
 //////////////////////////////////////////////////
 WorkerPool::WorkerPool(const unsigned int _minThreadCount)
-  : dataPtr(ignition::utils::MakeUniqueImpl<Implementation>())
+  : dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
 {
   unsigned int numWorkers = std::max(std::thread::hardware_concurrency(),
       std::max(_minThreadCount, 1u));

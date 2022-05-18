@@ -22,7 +22,7 @@
 #include "ignition/common/Export.hh"
 #include "ignition/common/StringUtils.hh"
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

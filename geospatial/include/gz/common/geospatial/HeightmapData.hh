@@ -22,7 +22,7 @@
 #include <gz/math/Vector3.hh>
 #include <gz/common/geospatial/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -43,8 +43,8 @@ namespace ignition
       /// is filled.
       /// \param[out] _heights Vector containing the terrain heights.
       public: virtual void FillHeightMap(int _subSampling,
-          unsigned int _vertSize, const ignition::math::Vector3d &_size,
-          const ignition::math::Vector3d &_scale, bool _flipY,
+          unsigned int _vertSize, const gz::math::Vector3d &_size,
+          const gz::math::Vector3d &_scale, bool _flipY,
           std::vector<float> &_heights) const = 0;
 
       /// \brief Get the terrain's height.

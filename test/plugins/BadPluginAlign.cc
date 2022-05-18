@@ -22,13 +22,13 @@ IGN_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
 
 extern "C" {
   std::size_t DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONPluginInfoSize =
-    sizeof(ignition::common::PluginInfo);
+    sizeof(gz::common::PluginInfo);
 
   std::size_t DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONPluginInfoAlignment =
-    1 + alignof(ignition::common::PluginInfo);
+    1 + alignof(gz::common::PluginInfo);
 
   int DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONPluginAPIVersion =
-    ignition::common::PLUGIN_API_VERSION;
+    gz::common::PLUGIN_API_VERSION;
 }
 
 extern "C" std::size_t DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONMultiPluginInfo(

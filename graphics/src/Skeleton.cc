@@ -20,11 +20,11 @@
 #include <ignition/common/Skeleton.hh>
 #include <ignition/common/BVHLoader.hh>
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 /// Private data class
-class ignition::common::Skeleton::Implementation
+class gz::common::Skeleton::Implementation
 {
   typedef std::vector<std::vector<std::pair<std::string, double> > >
     RawNodeWeights;
@@ -66,13 +66,13 @@ class ignition::common::Skeleton::Implementation
 
 //////////////////////////////////////////////////
 Skeleton::Skeleton()
-: dataPtr(ignition::utils::MakeUniqueImpl<Implementation>())
+: dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
 {
 }
 
 //////////////////////////////////////////////////
 Skeleton::Skeleton(SkeletonNode *_root)
-: dataPtr(ignition::utils::MakeUniqueImpl<Implementation>())
+: dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
 {
   this->dataPtr->root = _root;
   this->BuildNodeMap();

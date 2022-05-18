@@ -115,13 +115,13 @@ void sigHandler(int _signal)
 
 int main(int argc, char** argv)
 {
-  ignition::common::Console::SetVerbosity(4);
+  gz::common::Console::SetVerbosity(4);
 
   IGN_PROFILE_THREAD_NAME("main");
   running = true;
 
   // Connect signal handler
-  ignition::common::SignalHandler handler;
+  gz::common::SignalHandler handler;
   handler.AddCallback(sigHandler);
 
   // Spin up a couple threads with interesting content.

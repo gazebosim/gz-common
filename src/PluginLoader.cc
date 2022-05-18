@@ -35,7 +35,7 @@ IGN_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
 
 #include "PluginUtils.hh"
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -264,7 +264,7 @@ namespace ignition
       if (version < PLUGIN_API_VERSION)
       {
         ignwarn << "The library [" << _pathToLibrary <<"] is using an outdated "
-                << "version [" << version << "] of the ignition::common Plugin "
+                << "version [" << version << "] of the gz::common Plugin "
                 << "API. The version in this library is [" << PLUGIN_API_VERSION
                 << "].\n";
       }
@@ -272,7 +272,7 @@ namespace ignition
       if (version > PLUGIN_API_VERSION)
       {
         ignerr << "The library [" << _pathToLibrary << "] is using a newer "
-               << "version [" << version << "] of the ignition::common Plugin "
+               << "version [" << version << "] of the gz::common Plugin "
                << "API. The version in this library is [" << PLUGIN_API_VERSION
                << "].\n";
         return loadedPlugins;

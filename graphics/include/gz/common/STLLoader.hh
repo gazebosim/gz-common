@@ -30,7 +30,7 @@
 #define ORDER_MAX 10
 #define FACE_MAX 200000
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

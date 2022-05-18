@@ -29,7 +29,7 @@
 #include <gz/common/SkeletonNode.hh>
 #include <gz/common/graphics/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

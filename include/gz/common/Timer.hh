@@ -23,7 +23,7 @@
 #include <chrono>
 #include <iostream>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -50,7 +50,7 @@ namespace ignition
 
       /// \brief Stream operator friendly
       public: friend std::ostream &operator<<(std::ostream &out,
-                                              const ignition::common::Timer &t)
+                                              const gz::common::Timer &t)
               {
                 out << t.ElapsedTime().count();
                 return out;

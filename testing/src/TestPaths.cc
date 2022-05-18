@@ -21,7 +21,7 @@
 #include <ignition/common/Console.hh>
 #include <ignition/common/Util.hh>
 
-namespace ignition::common::testing
+namespace gz::common::testing
 {
 //////////////////////////////////////////////////
 TestPaths::TestPaths(const std::string &_projectSourcePath)
@@ -77,7 +77,7 @@ TestPathFactory(const std::string &_projectSourcePath)
 }
 
 //////////////////////////////////////////////////
-std::shared_ptr<ignition::common::TempDirectory>
+std::shared_ptr<gz::common::TempDirectory>
 MakeTestTempDirectoryImpl(const std::string &_projectSourcePath,
                           const std::string &_prefix,
                           const std::string &_subDir,
@@ -94,8 +94,8 @@ MakeTestTempDirectoryImpl(const std::string &_projectSourcePath,
   if (dataDir.empty())
     return nullptr;
 
-  return std::make_shared<ignition::common::TempDirectory>(
+  return std::make_shared<gz::common::TempDirectory>(
       dataDir, _prefix, _subDir, _cleanup);
 }
 
-}  // namespace ignition::common::testing
+}  // namespace gz::common::testing

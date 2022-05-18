@@ -30,7 +30,7 @@
 #define TESTING_PROJECT_SOURCE_DIR ""
 #endif
 
-namespace ignition::common::testing
+namespace gz::common::testing
 {
 
 //////////////////////////////////////////////////
@@ -98,7 +98,7 @@ class TestPaths
 /// \param[in] _cleanup True to indicate that the filesystem should
 ///   be cleaned as part of the destructor
 /// \return Shared pointer to TempDirectory
-std::shared_ptr<ignition::common::TempDirectory>
+std::shared_ptr<gz::common::TempDirectory>
 IGNITION_COMMON_TESTING_VISIBLE
 MakeTestTempDirectoryImpl(const std::string &_projectSourcePath,
                           const std::string &_prefix = "test",
@@ -117,7 +117,7 @@ MakeTestTempDirectoryImpl(const std::string &_projectSourcePath,
 /// \param[in] _cleanup True to indicate that the filesystem should
 ///   be cleaned as part of the destructor
 /// \return Shared pointer to TempDirectory
-inline std::shared_ptr<ignition::common::TempDirectory>
+inline std::shared_ptr<gz::common::TempDirectory>
 MakeTestTempDirectory(const std::string &_prefix = "test",
                       const std::string &_subDir = "ignition",
                       bool _cleanup = true)
@@ -197,5 +197,5 @@ std::string TempPath(Args const &... args)
   testPaths->TestTmpPath(dataDir);
   return common::joinPaths(dataDir, args...);
 }
-}  // namespace ignition::common::testing
+}  // namespace gz::common::testing
 #endif  // GZ_COMMON_TESTING_TESTPATHS_HH_

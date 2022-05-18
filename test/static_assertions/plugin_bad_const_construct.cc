@@ -22,6 +22,6 @@ IGN_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
 
 int main()
 {
-  ignition::common::PluginPtr ptr{ignition::common::ConstPluginPtr()};
+  gz::common::PluginPtr ptr{gz::common::ConstPluginPtr()};
 }
 IGN_UTILS_WARN_RESUME__DEPRECATED_DECLARATION

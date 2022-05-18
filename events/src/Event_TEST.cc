@@ -23,7 +23,7 @@
 #include <ignition/common/Event.hh>
 #include <ignition/common/Util.hh>
 
-using namespace ignition;
+using namespace gz;
 
 class EventTest : public common::testing::AutoLogFixture { };
 

@@ -20,7 +20,7 @@
 
 #include "ignition/common/testing/AutoLogFixture.hh"
 
-using namespace ignition;
+using namespace gz;
 
 class Base64 : public common::testing::AutoLogFixture { };
 
