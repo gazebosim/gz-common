@@ -12,6 +12,7 @@ release will remove the deprecated code.
 1. `Submesh::MaterialIndex` is deprecated. `SubMesh::GetMaterialIndex` should
    be used instead, which properly handles submeshes having no material index
    applied to them.
+2. The `ignition` namespace is deprecated and will be removed in future versions.  Use `gz` instead.
 
 ### Additions
 
