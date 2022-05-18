@@ -46,8 +46,8 @@ THE SOFTWARE.
 //   #include "tiny_obj_loader.h"
 //
 
-#ifndef IGNITION_COMMON_TINY_OBJ_LOADER_H_
-#define IGNITION_COMMON_TINY_OBJ_LOADER_H_
+#ifndef GZ_COMMON_TINY_OBJ_LOADER_H_
+#define GZ_COMMON_TINY_OBJ_LOADER_H_
 
 #include <map>
 #include <string>
@@ -399,7 +399,7 @@ bool ParseTextureNameAndOption(std::string *texname, texture_option_t *texopt,
 }  // namespace tinyobj
 }  // namespace ignition
 
-#endif  // IGNITION_COMMON_TINY_OBJ_LOADER_H_
+#endif  // GZ_COMMON_TINY_OBJ_LOADER_H_
 
 #ifdef IGNITION_COMMON_TINYOBJLOADER_IMPLEMENTATION
 #include <cassert>
