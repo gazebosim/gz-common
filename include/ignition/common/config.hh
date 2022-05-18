@@ -15,4 +15,14 @@
  *
  */
 
+#ifndef IGNITION_COMMON__CONFIG_HH_
+#define IGNITION_COMMON__CONFIG_HH_
+
 #include <gz/common/config.hh>
+
+namespace [[deprecated("Use gz namespace.")]]  ignition
+{
+  using namespace gz;
+}
+
+#endif
