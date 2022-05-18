@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/WorkerPool.hh>
+#include <ignition/common/config.hh>

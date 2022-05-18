@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/EnumIface.hh>
+#include <ignition/common/config.hh>

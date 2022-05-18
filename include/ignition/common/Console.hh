@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/Console.hh>
+#include <ignition/common/config.hh>

@@ -15,6 +15,7 @@
  *
  */
 
+#include <ignition/common/config.hh>
 
 #ifndef GZ_COMMON_DETAIL_SPECIALIZEDPLUGIN_HH_
 #define GZ_COMMON_DETAIL_SPECIALIZEDPLUGIN_HH_

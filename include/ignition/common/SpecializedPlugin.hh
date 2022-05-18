@@ -17,7 +17,7 @@
 #ifndef GZ_COMMON_SPECIALIZEDPLUGIN_HH_
 #define GZ_COMMON_SPECIALIZEDPLUGIN_HH_
 
-#include <memory>
+#include <ignition/common/config.hh>
 
 #include "ignition/common/Plugin.hh"
 

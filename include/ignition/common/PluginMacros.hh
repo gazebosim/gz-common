@@ -98,6 +98,7 @@
 // doing something that is not permitted). Recommended practice is to have a
 // single source file (e.g. plugins.cpp) in your library's codebase that is
 // dedicated to hosting these macros.
+#include <ignition/common/config.hh>
 
 
 /// \brief Begin registering a set of plugins that are contained within this
