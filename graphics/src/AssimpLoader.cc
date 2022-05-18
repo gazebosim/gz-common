@@ -128,6 +128,7 @@ SubMesh AssimpLoader::Implementation::CreateSubMesh(const aiScene* scene, unsign
   auto assimp_mesh = scene->mMeshes[mesh_idx];
   ignition::math::Matrix4d rot = transformation;
   rot.SetTranslation(ignition::math::Vector3d::Zero);
+  ignmsg << "Mesh has " << assimp_mesh->mNumVertices << " vertices" << std::endl;
   // Now create the submesh
   for (unsigned vertex_idx = 0; vertex_idx < assimp_mesh->mNumVertices; ++vertex_idx)
   {
@@ -203,6 +204,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   }
   auto root_node = scene->mRootNode;
   auto root_transformation = this->dataPtr->ConvertTransform(scene->mRootNode->mTransformation);
+  root_transformation = ignition::math::Matrix4d::Identity;
   // TODO remove workaround, it seems imported assets are rotated by 90 degrees
   // as documented here https://github.com/assimp/assimp/issues/849, remove workaround when fixed
   // TODO find actual workaround to remove rotation
@@ -243,14 +245,102 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
       continue;
     auto assimp_mesh = scene->mMeshes[mesh_idx];
     ignmsg << "New mesh found with name " << scene->mMeshes[mesh_idx]->mName.C_Str() << std::endl;
+    ignmsg << "Mesh has " << scene->mMeshes[mesh_idx]->mNumAnimMeshes << " anim meshes" << std::endl;
+    ignmsg << "Mesh has " << scene->mMeshes[mesh_idx]->mNumBones << " bones" << std::endl;
+    // Add the bones
+    if (scene->mMeshes[mesh_idx]->HasBones() && scene->HasAnimations())
+    {
+      // First find the root node, guaranteed to have at least one animation
+      // TODO check for multiple root nodes and merge them if needed
+      std::unordered_set<std::string> bone_names;
+      for (unsigned bone_idx = 0; bone_idx < scene->mMeshes[mesh_idx]->mNumBones; ++bone_idx)
+      {
+        bone_names.insert(std::string(scene->mMeshes[mesh_idx]->mBones[bone_idx]->mName.C_Str()));
+      }
+      SkeletonNode* skel_root_node = nullptr;
+      for (unsigned chan_idx = 0; chan_idx < scene->mAnimations[0]->mNumChannels; ++chan_idx)
+      {
+        auto chan_name = std::string(scene->mAnimations[0]->mChannels[chan_idx]->mNodeName.C_Str());
+        if (bone_names.find(chan_name) ==
+            bone_names.end())
+        {
+          // This is a joint and root node
+          skel_root_node = new SkeletonNode(nullptr, chan_name, chan_name, SkeletonNode::JOINT);
+          skel_root_node->SetTransform(ignition::math::Matrix4d::Identity);
+          skel_root_node->AddRawTransform(ignition::math::Matrix4d::Identity);
+          // TODO root transform for this node
+          ignmsg << "Added new root node " << chan_name << std::endl;
+        }
+      }
+      for (unsigned bone_idx = 0; bone_idx < scene->mMeshes[mesh_idx]->mNumBones; ++bone_idx)
+      {
+        auto bone = scene->mMeshes[mesh_idx]->mBones[bone_idx];
+        igndbg << "Found bone with name " << bone->mName.C_Str() << std::endl;
+        // Now add to the skeleton
+        // TODO name vs id?
+        auto skel_node = new SkeletonNode(skel_root_node,
+            std::string(bone->mName.C_Str()),
+            std::string(bone->mName.C_Str()),
+            SkeletonNode::NODE);
+        auto trans = this->dataPtr->ConvertTransform(bone->mOffsetMatrix);
+        skel_node->SetTransform(trans);
+        skel_node->AddRawTransform(trans);
+      }
+      SkeletonPtr skel(new Skeleton(skel_root_node));
+      // Set vertex weights, TODO check if we can put above
+      for (unsigned bone_idx = 0; bone_idx < scene->mMeshes[mesh_idx]->mNumBones; ++bone_idx)
+      {
+        auto bone = scene->mMeshes[mesh_idx]->mBones[bone_idx];
+        auto bone_name = std::string(bone->mName.C_Str());
+        ignmsg << "Bone " << bone_name << " has " << bone->mNumWeights << " weights" << std::endl;
+        for (unsigned weight_idx = 0; weight_idx < bone->mNumWeights; ++weight_idx)
+        {
+          auto vertex_weight = bone->mWeights[weight_idx];
+          // TODO SetNumVertAttached for performance
+          skel->AddVertNodeWeight(vertex_weight.mVertexId, bone_name, vertex_weight.mWeight);
+        }
+      }
+      // Now add the skeleton to the mesh
+      mesh->SetSkeleton(skel);
+    }
+    // This mesh doesn't have a node transform
+    auto subMesh = this->dataPtr->CreateSubMesh(scene, mesh_idx, root_transformation);
+    subMesh.SetName(std::string(assimp_mesh->mName.C_Str()));
+    mesh->AddSubMesh(std::move(subMesh));
   }
   for (unsigned anim_idx = 0; anim_idx < scene->mNumAnimations; ++anim_idx)
   {
     auto anim = scene->mAnimations[anim_idx];
+    auto anim_name = std::string(anim->mName.C_Str());
+    ignmsg << "Found animation with name " << anim_name << std::endl;
     ignmsg << "Animation has " << anim->mNumMeshChannels << " mesh channels" << std::endl;
     ignmsg << "Animation has " << anim->mNumChannels << " channels" << std::endl;
     ignmsg << "Animation has " << anim->mNumMorphMeshChannels << " morph mesh channels" << std::endl;
-    // Process t
+    SkeletonAnimation* skel_anim = new SkeletonAnimation(anim_name);
+    for (unsigned chan_idx = 0; chan_idx < anim->mNumChannels; ++chan_idx)
+    {
+      auto anim_chan = anim->mChannels[chan_idx];
+      auto chan_name = std::string(anim_chan->mNodeName.C_Str());
+      auto skel_ptr = mesh->MeshSkeleton();
+      igndbg << "Node " << chan_name << " has " << anim_chan->mNumPositionKeys << " position keys, " <<
+        anim_chan->mNumRotationKeys << " rotation keys, " << anim_chan->mNumScalingKeys << " scaling keys" << std::endl;
+      for (unsigned key_idx = 0; key_idx < anim_chan->mNumPositionKeys; ++key_idx)
+      {
+        // Note, Scaling keys are not supported right now
+        //void SkeletonAnimation::AddKeyFrame(const std::string &_node,
+        //const double _time, const math::Pose3d &_pose)
+        // Compute the position into a ignition math pose
+        auto pos_key = anim_chan->mPositionKeys[key_idx];
+        auto quat_key = anim_chan->mRotationKeys[key_idx];
+        ignition::math::Vector3d pos(pos_key.mValue.x, pos_key.mValue.y, pos_key.mValue.z);
+        ignition::math::Quaterniond quat(quat_key.mValue.w, quat_key.mValue.x, quat_key.mValue.y, quat_key.mValue.z);
+        ignition::math::Pose3d pose(pos, quat);
+        skel_anim->AddKeyFrame(chan_name, pos_key.mTime, pose);
+        //igndbg << "Adding animation at time " << pos_key.mTime << " with position (" << pos.X() << "," << pos.Y() << "," <<
+        //  pos.Z() << ")" << std::endl;
+      }
+    }
+    mesh->MeshSkeleton()->AddAnimation(skel_anim);
   }
   // Iterate over nodes and add a submesh for each
   /*
