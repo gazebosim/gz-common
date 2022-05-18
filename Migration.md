@@ -12,6 +12,7 @@ release will remove the deprecated code.
 1. `Submesh::MaterialIndex` is deprecated. `SubMesh::GetMaterialIndex` should
    be used instead, which properly handles submeshes having no material index
    applied to them.
+2. The `ignition` namespace is deprecated and will be removed in future versions.  Use `gz` instead.
 
 1. All the plugin APIs are deprecated, use the gz-plugin library instead. See
    the [migration guide](https://github.com/ignitionrobotics/ign-plugin/blob/ign-plugin1/MIGRATION.md).
@@ -47,8 +48,7 @@ release will remove the deprecated code.
     * A URI Query does not require a `key=value` format. For example
     a valid query can be "?aquery", "?aquery?", and `??`.
     * A URI authority is optional. If present, then a URI authority begins
-    with two forward slashes and immediately follows the URI scheme. A host
-    must be present if an authority is present and the scheme != 'file'.
+    with two forward slashes and immediately follows the URI scheme. A host must be present if an authority is present and the scheme != 'file'.
 
 ## Ignition Common 2.X to 3.X
 
