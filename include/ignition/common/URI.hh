@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/URI.hh>
+#include <ignition/common/config.hh>

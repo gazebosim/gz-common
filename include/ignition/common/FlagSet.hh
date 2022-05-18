@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/FlagSet.hh>
+#include <ignition/common/config.hh>

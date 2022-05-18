@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/detail/PluginLoader.hh>
+#include <ignition/common/config.hh>

@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/detail/PluginMacros.hh>
+#include <ignition/common/config.hh>
