@@ -75,7 +75,7 @@ TEST(PluginLoader, LoadExistingLibrary)
   gz::common::SystemPaths sp;
   sp.AddPluginPaths(dummyPath);
 
-  std::string path = sp.FindSharedLibrary("IGNDummyPlugins");
+  std::string path = sp.FindSharedLibrary("GzDummyPlugins");
   ASSERT_FALSE(path.empty());
 
   gz::common::PluginLoader pl;
@@ -167,7 +167,7 @@ TEST(SpecializedPluginPtr, Construction)
 {
   gz::common::SystemPaths sp;
   sp.AddPluginPaths(IGN_DUMMY_PLUGIN_PATH);
-  std::string path = sp.FindSharedLibrary("IGNDummyPlugins");
+  std::string path = sp.FindSharedLibrary("GzDummyPlugins");
   ASSERT_FALSE(path.empty());
 
   gz::common::PluginLoader pl;
@@ -294,7 +294,7 @@ TEST(PluginPtr, CopyMoveSemantics)
 
   gz::common::SystemPaths sp;
   sp.AddPluginPaths(IGN_DUMMY_PLUGIN_PATH);
-  std::string path = sp.FindSharedLibrary("IGNDummyPlugins");
+  std::string path = sp.FindSharedLibrary("GzDummyPlugins");
   ASSERT_FALSE(path.empty());
 
   gz::common::PluginLoader pl;
@@ -374,7 +374,7 @@ TEST(PluginPtr, QueryInterfaceSharedPtr)
 {
   gz::common::SystemPaths sp;
   sp.AddPluginPaths(IGN_DUMMY_PLUGIN_PATH);
-  std::string path = sp.FindSharedLibrary("IGNDummyPlugins");
+  std::string path = sp.FindSharedLibrary("GzDummyPlugins");
   ASSERT_FALSE(path.empty());
 
   gz::common::PluginLoader pl;

@@ -136,7 +136,7 @@ TEST(PluginSpecialization, AccessTime)
 {
   gz::common::SystemPaths sp;
   sp.AddPluginPaths(IGN_DUMMY_PLUGIN_PATH);
-  std::string path = sp.FindSharedLibrary("IGNDummyPlugins");
+  std::string path = sp.FindSharedLibrary("GzDummyPlugins");
   ASSERT_FALSE(path.empty());
 
   gz::common::PluginLoader pl;
