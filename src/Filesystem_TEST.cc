@@ -58,7 +58,7 @@ bool create_new_file_symlink(const std::string &_symlink,
   }
   catch(const std::exception& e)
   {
-    ignerr << "Failed to create link: " << e.what() << '\n';
+    gzerr << "Failed to create link: " << e.what() << '\n';
     return false;
   }
   return true;
@@ -74,7 +74,7 @@ bool create_new_dir_symlink(const std::string &_symlink,
   }
   catch(const std::exception& e)
   {
-    ignerr << "Failed to create link: " << e.what() << '\n';
+    gzerr << "Failed to create link: " << e.what() << '\n';
     return false;
   }
   return true;
@@ -90,7 +90,7 @@ bool create_new_file_hardlink(const std::string &_hardlink,
   }
   catch(const std::exception& e)
   {
-    ignerr << "Failed to create link: " << e.what() << '\n';
+    gzerr << "Failed to create link: " << e.what() << '\n';
     return false;
   }
   return true;

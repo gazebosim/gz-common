@@ -148,7 +148,7 @@ std::map<std::string, math::Matrix4d> SkeletonAnimation::PoseAtX(
   auto nodeAnim = this->dataPtr->animations.find(_node);
   if (nodeAnim == this->dataPtr->animations.end())
   {
-    ignerr << "Can't find animation named [" << _node << "]" << std::endl;
+    gzerr << "Can't find animation named [" << _node << "]" << std::endl;
     return {};
   }
 

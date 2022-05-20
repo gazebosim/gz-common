@@ -281,7 +281,7 @@ std::string SystemPaths::FindFileURI(const std::string &_uri) const
 {
   if (!gz::common::URI::Valid(_uri))
   {
-    ignerr << "The passed value [" << _uri << "] is not a valid URI, "
+    gzerr << "The passed value [" << _uri << "] is not a valid URI, "
               "trying as a file" << std::endl;
     return this->FindFile(_uri);
   }
@@ -344,14 +344,14 @@ std::string SystemPaths::FindFileURI(const gz::common::URI &_uri) const
 
   if (filename.empty())
   {
-    ignerr << "Unable to find file with URI [" << _uri.Str() << "]" <<
+    gzerr << "Unable to find file with URI [" << _uri.Str() << "]" <<
            std::endl;
     return std::string();
   }
 
   if (!exists(filename))
   {
-    ignerr << "URI [" << _uri.Str() << "] resolved to path [" << filename <<
+    gzerr << "URI [" << _uri.Str() << "] resolved to path [" << filename <<
            "] but the path does not exist" << std::endl;
     return std::string();
   }
@@ -430,7 +430,7 @@ std::string SystemPaths::FindFile(const std::string &_filename,
   {
     if (_verbose)
     {
-      ignerr << "Could not resolve file [" << _filename << "]" << std::endl;
+      gzerr << "Could not resolve file [" << _filename << "]" << std::endl;
     }
     return std::string();
   }
@@ -439,7 +439,7 @@ std::string SystemPaths::FindFile(const std::string &_filename,
   {
     if (_verbose)
     {
-      ignerr << "File [" << _filename << "] resolved to path [" << path <<
+      gzerr << "File [" << _filename << "] resolved to path [" << path <<
                 "] but the path does not exist" << std::endl;
     }
     return std::string();

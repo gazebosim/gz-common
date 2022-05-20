@@ -45,7 +45,7 @@ inline bool fsWarn(const std::string &_fcn,
   {
     if (gz::common::FSWO_LOG_WARNINGS == _warningOp)
     {
-      ignwarn << "Failed gz::common::" << _fcn
+      gzwarn << "Failed gz::common::" << _fcn
         << " (ec: " << _ec << " " << _ec.message() << ")\n";
     }
     return false;
@@ -278,7 +278,7 @@ bool gz::common::removeDirectory(
   {
     if (FSWO_LOG_WARNINGS == _warningOp)
     {
-      ignwarn << "Cannot remove, not a directory [" << _path << "]\n";
+      gzwarn << "Cannot remove, not a directory [" << _path << "]\n";
     }
 
     return false;
@@ -296,7 +296,7 @@ bool gz::common::removeFile(
   {
     if (FSWO_LOG_WARNINGS == _warningOp)
     {
-      ignwarn << "Cannot remove, not a file [" << _existingFilename << "]\n";
+      gzwarn << "Cannot remove, not a file [" << _existingFilename << "]\n";
     }
     return false;
   }

@@ -205,13 +205,13 @@ Mesh *MeshCSG::CreateBoolean(const Mesh *_m1, const Mesh *_m2, int _operation,
       isOpen1, isOpen2);
   if (!gts_surface_inter_check(si, &closed))
   {
-    ignerr << "si is not an orientable manifold\n";
+    gzerr << "si is not an orientable manifold\n";
     return nullptr;
   }
 
   if (!closed)
   {
-    ignerr << "the intersection of " << _m1->Name() << " and "
+    gzerr << "the intersection of " << _m1->Name() << " and "
         << _m2->Name() << " is not a closed curve\n";
     return nullptr;
   }
@@ -284,7 +284,7 @@ void MeshCSG::ConvertMeshToGTS(const Mesh *_mesh, GtsSurface *_surface)
 {
   if (!_surface)
   {
-    ignerr << _mesh->Name() << ": Surface is null\n";
+    gzerr << _mesh->Name() << ": Surface is null\n";
 //    _surface = gts_surface_new(gts_surface_class(), gts_face_class(),
 //        gts_edge_class(), gts_vertex_class());
     return;
@@ -350,7 +350,7 @@ void MeshCSG::ConvertMeshToGTS(const Mesh *_mesh, GtsSurface *_surface)
       }
       else
       {
-        ignwarn << _mesh->Name() << ": Ignoring degenerate facet!";
+        gzwarn << _mesh->Name() << ": Ignoring degenerate facet!";
       }
     }
   }

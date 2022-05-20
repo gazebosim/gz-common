@@ -478,7 +478,7 @@
 
 ## Gazebo Common 3.2.0 (2019-08-07)
 
-1. Allow ignLogInit to use an absolute path. Added a timeToIso that converts a given time to an ISO string. Some console timestamps were using `IGN_SYSTEM_TIME_NS()` and others `gz::common::systemTimeISO()`. Switched all to use `gz::common::systemTimeISO()`.
+1. Allow gzLogInit to use an absolute path. Added a timeToIso that converts a given time to an ISO string. Some console timestamps were using `IGN_SYSTEM_TIME_NS()` and others `gz::common::systemTimeISO()`. Switched all to use `gz::common::systemTimeISO()`.
     * [BitBucket pull request 203](https://osrf-migration.github.io/ignition-gh-pages/#!/gazebosim/gz-common/pull-requests/203)
 
 1. Port ColladaLoader fix: use default value of 1 for stride parameter when unset.

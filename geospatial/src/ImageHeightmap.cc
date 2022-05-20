@@ -30,7 +30,7 @@ int ImageHeightmap::Load(const std::string &_filename)
 {
   if (this->img.Load(_filename) != 0)
   {
-    ignerr << "Unable to load image file as a terrain [" << _filename << "]\n";
+    gzerr << "Unable to load image file as a terrain [" << _filename << "]\n";
     return -1;
   }
 
@@ -88,7 +88,7 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
   }
   else
   {
-    ignerr << "Unsupported image format, "
+    gzerr << "Unsupported image format, "
       "heightmap will not be loaded" << std::endl;
     return;
   }

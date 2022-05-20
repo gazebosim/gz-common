@@ -199,7 +199,7 @@ bool Battery::RemoveConsumer(uint32_t _consumerId)
   }
   else
   {
-    ignerr << "Invalid battery consumer id[" << _consumerId << "]\n";
+    gzerr << "Invalid battery consumer id[" << _consumerId << "]\n";
     return false;
   }
 }
@@ -211,7 +211,7 @@ bool Battery::SetPowerLoad(const uint32_t _consumerId, const double _powerLoad)
   auto iter = this->dataPtr->powerLoads.find(_consumerId);
   if (iter == this->dataPtr->powerLoads.end())
   {
-    ignerr << "Invalid param value[_consumerId] : " << _consumerId << "\n";
+    gzerr << "Invalid param value[_consumerId] : " << _consumerId << "\n";
     return false;
   }
 
@@ -226,7 +226,7 @@ bool Battery::PowerLoad(const uint32_t _consumerId, double &_powerLoad) const
   auto iter = this->dataPtr->powerLoads.find(_consumerId);
   if (iter == this->dataPtr->powerLoads.end())
   {
-    ignerr << "Invalid param value[_consumerId] : " << _consumerId << "\n";
+    gzerr << "Invalid param value[_consumerId] : " << _consumerId << "\n";
     return false;
   }
 

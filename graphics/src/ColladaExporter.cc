@@ -74,7 +74,7 @@ static void LogTinyXml2DocumentError(
     warning += "none)";
   }
 
-  ignwarn << warning << "\n";
+  gzwarn << warning << "\n";
 }
 
 /// Private data for the ColladaExporter class
@@ -187,7 +187,7 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
   if ( _submeshToMatrix.size() > 0 &&
     (_mesh->SubMeshCount() != _submeshToMatrix.size()) )
   {
-    ignerr << "_submeshToMatrix.size() : " << _mesh->SubMeshCount()
+    gzerr << "_submeshToMatrix.size() : " << _mesh->SubMeshCount()
         << " , must be equal to SubMeshCount() : " << _mesh->SubMeshCount()
         << std::endl;
     return;

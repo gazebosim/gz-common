@@ -20,16 +20,16 @@ int main(int argc, char **argv)
 {
   // Default verbosity is 1, only error messages show
   igndbg << "This is a debug message" << std::endl;
-  ignmsg << "This is an informational message" << std::endl;
-  ignwarn << "This is a warning" << std::endl;
-  ignerr << "This is an error" << std::endl;
+  gzmsg << "This is an informational message" << std::endl;
+  gzwarn << "This is a warning" << std::endl;
+  gzerr << "This is an error" << std::endl;
 
   // Change verbosity to level 4, all messages show
   gz::common::Console::SetVerbosity(4);
   igndbg << "This is a debug message" << std::endl;
-  ignmsg << "This is an informational message" << std::endl;
-  ignwarn << "This is a warning" << std::endl;
-  ignerr << "This is an error" << std::endl;
+  gzmsg << "This is an informational message" << std::endl;
+  gzwarn << "This is a warning" << std::endl;
+  gzerr << "This is an error" << std::endl;
 
   return 0;
 }

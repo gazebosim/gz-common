@@ -192,7 +192,7 @@ std::unique_ptr<Skeleton> BVHLoader::Load(const std::string &_filename,
     words = split(line, " ");
     if (words.size() < totalChannels)
     {
-      ignwarn << "Frame " << frameNo << " invalid.\n";
+      gzwarn << "Frame " << frameNo << " invalid.\n";
       frameNo++;
       time += frameTime;
       continue;
@@ -279,7 +279,7 @@ std::unique_ptr<Skeleton> BVHLoader::Load(const std::string &_filename,
       break;
   }
   if (frameNo < frameCount - 1)
-    ignwarn << "BVH file ended unexpectedly.\n";
+    gzwarn << "BVH file ended unexpectedly.\n";
 
   skeleton->AddAnimation(animation);
 

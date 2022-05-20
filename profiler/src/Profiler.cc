@@ -36,7 +36,7 @@ Profiler::Profiler():
 
   if (this->impl == nullptr)
   {
-    ignwarn << "No profiler implementation detected, profiling is disabled"
+    gzwarn << "No profiler implementation detected, profiling is disabled"
             << std::endl;
   }
   else

@@ -203,7 +203,7 @@ std::weak_ptr<SubMesh> Mesh::SubMeshByIndex(unsigned int _index) const
   if (_index < this->dataPtr->submeshes.size())
     return this->dataPtr->submeshes[_index];
 
-  ignerr << "Invalid index: " << _index << " >= " <<
+  gzerr << "Invalid index: " << _index << " >= " <<
       this->dataPtr->submeshes.size() << std::endl;
 
   return std::shared_ptr<SubMesh>(nullptr);

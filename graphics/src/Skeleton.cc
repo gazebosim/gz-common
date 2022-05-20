@@ -161,7 +161,7 @@ void Skeleton::Scale(const double _scale)
 {
   if (nullptr == this->dataPtr->root)
   {
-    ignerr << "Failed to scale skeleton, null root." << std::endl;
+    gzerr << "Failed to scale skeleton, null root." << std::endl;
     return;
   }
 

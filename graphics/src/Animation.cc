@@ -214,7 +214,7 @@ common::KeyFrame *Animation::KeyFrame(const unsigned int _index) const
     result = this->dataPtr->keyFrames[_index].get();
   else
   {
-    ignerr << "Key frame index[" << _index
+    gzerr << "Key frame index[" << _index
           << "] is larger than key frame array size["
           << this->dataPtr->keyFrames.size() << "]\n";
   }

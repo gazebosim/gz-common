@@ -116,7 +116,7 @@ const Mesh *MeshManager::Load(const std::string &_filename)
 {
   if (!this->IsValidFilename(_filename))
   {
-    ignerr << "Invalid mesh filename extension[" << _filename << "]\n";
+    gzerr << "Invalid mesh filename extension[" << _filename << "]\n";
     return nullptr;
   }
 
@@ -146,7 +146,7 @@ const Mesh *MeshManager::Load(const std::string &_filename)
       loader = &this->dataPtr->objLoader;
     else
     {
-      ignerr << "Unsupported mesh format for file[" << _filename << "]\n";
+      gzerr << "Unsupported mesh format for file[" << _filename << "]\n";
       return nullptr;
     }
 
@@ -161,7 +161,7 @@ const Mesh *MeshManager::Load(const std::string &_filename)
         this->dataPtr->meshes.insert(std::make_pair(_filename, mesh));
       }
       else
-        ignerr << "Unable to load mesh[" << fullname << "]\n";
+        gzerr << "Unable to load mesh[" << fullname << "]\n";
     }
     else
     {
@@ -169,7 +169,7 @@ const Mesh *MeshManager::Load(const std::string &_filename)
     }
   }
   else
-    ignerr << "Unable to find file[" << _filename << "]\n";
+    gzerr << "Unable to find file[" << _filename << "]\n";
 
   return mesh;
 }
@@ -184,7 +184,7 @@ void MeshManager::Export(const Mesh *_mesh, const std::string &_filename,
   }
   else
   {
-    ignerr << "Unsupported mesh format for file[" << _filename << "]\n";
+    gzerr << "Unsupported mesh format for file[" << _filename << "]\n";
   }
 }
 
@@ -411,7 +411,7 @@ void MeshManager::CreatePlane(const std::string &_name,
         vec.Z() = -z;
         if (!xform.TransformAffine(vec, vec))
         {
-          ignerr << "Unable tor transform matrix4d\n";
+          gzerr << "Unable tor transform matrix4d\n";
           continue;
         }
         subMesh.AddVertex(vec);
@@ -419,7 +419,7 @@ void MeshManager::CreatePlane(const std::string &_name,
         // Compute the normal
         if (!xform.TransformAffine(norm, vec))
         {
-          ignerr << "Unable to tranform matrix4d\n";
+          gzerr << "Unable to tranform matrix4d\n";
           continue;
         }
 
@@ -584,7 +584,7 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
                                                   edges);
   if (!GTSMeshUtils::DelaunayTriangulation(vertices, edges, &subMesh))
   {
-    ignerr << "Unable to triangulate polyline." << std::endl;
+    gzerr << "Unable to triangulate polyline." << std::endl;
     delete mesh;
     return;
   }
@@ -673,7 +673,7 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
   // exterior edges
   if (normals.size() != edges.size())
   {
-    ignerr << "Unable to extrude mesh. Triangulation failed" << std::endl;
+    gzerr << "Unable to extrude mesh. Triangulation failed" << std::endl;
     delete mesh;
     return;
   }
@@ -1604,7 +1604,7 @@ void MeshManager::ConvertPolylinesToVerticesAndEdges(
       previous = p;
       if (startPointIndex == endPointIndex)
       {
-        ignwarn << "Ignoring edge without 2 distinct vertices" << std::endl;
+        gzwarn << "Ignoring edge without 2 distinct vertices" << std::endl;
         continue;
       }
       // add the new edge

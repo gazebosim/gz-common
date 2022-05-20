@@ -214,7 +214,7 @@ bool GTSMeshUtils::DelaunayTriangulation(
 {
   if (_edges.empty() || _vertices.empty())
   {
-    ignerr << "Unable to create an extruded outline mesh with "
+    gzerr << "Unable to create an extruded outline mesh with "
       << "no paths\n";
     return false;
   }

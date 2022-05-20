@@ -92,7 +92,7 @@ TEST_F(EncoderDecoderTest, DecodeEncodeDecode)
     if ((Now() - fps_start) > seconds(1)) {
       double dur = duration<double>(Now() - fps_start).count();
       double currentFps = fps_frames / dur;
-      ignmsg << "FPS: " << currentFps << std::endl;
+      gzmsg << "FPS: " << currentFps << std::endl;
       fps_start = Now();
       fps_frames = 0;
     }

@@ -161,7 +161,7 @@ void Material::SetTextureImage(const std::string &_tex,
           "materials", "textures", _tex);
       if (!exists(this->dataPtr->texImage))
       {
-        ignerr << "Unable to find texture [" << _tex << "] as a locally"
+        gzerr << "Unable to find texture [" << _tex << "] as a locally"
               " cached texture or in path ["<< _resourcePath << "]\n";
       }
     }

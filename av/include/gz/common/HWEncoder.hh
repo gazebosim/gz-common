@@ -62,7 +62,7 @@ namespace gz::common
     /// \param[in] _encoderContext Context of the encoder for which hardware
     /// acceleration should be set up.
     /// \note If the configuration fails, the codec will be left configured for
-    /// software encoding and an error will be written to ignerr describing what
+    /// software encoding and an error will be written to gzerr describing what
     /// failed.
     public: void ConfigHWAccel(AVCodecContext* _encoderContext);
 

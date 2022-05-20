@@ -37,7 +37,7 @@ TEST(Console_TEST, LogInitAfterConsoleOut)
   gz::common::Console::SetVerbosity(4);
 
   // Before console is initialized, logs go to default file location
-  ignerr << "Error before logging initialized" << std::endl;
+  gzerr << "Error before logging initialized" << std::endl;
 
   {
     auto defaultPath = gz::common::joinPaths(home,
@@ -53,10 +53,10 @@ TEST(Console_TEST, LogInitAfterConsoleOut)
   }
 
   // Initialize the log file.
-  ignLogInit(logDir, logFilename);
+  gzLogInit(logDir, logFilename);
 
   // After consolie is initialized, logs go to designated location
-  ignerr << "Error after logging initialized" << std::endl;
+  gzerr << "Error after logging initialized" << std::endl;
 
   {
     std::ifstream t(logFile);

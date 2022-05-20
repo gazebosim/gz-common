@@ -109,7 +109,7 @@ void thread(const char *_thread_name)
 
 void sigHandler(int _signal)
 {
-  ignmsg << "Received signal: " << _signal << std::endl;
+  gzmsg << "Received signal: " << _signal << std::endl;
   running = false;
 }
 
@@ -129,7 +129,7 @@ int main(int argc, char** argv)
   auto t2 = std::thread([](){thread("thread2");});
   auto t3 = std::thread([](){thread("thread3");});
 
-  ignmsg << "All threads started, now connect with visualizer" << std::endl;
+  gzmsg << "All threads started, now connect with visualizer" << std::endl;
 
   size_t ii = 0;
   while(running)

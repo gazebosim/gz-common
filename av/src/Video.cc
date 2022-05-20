@@ -106,14 +106,14 @@ bool Video::Load(const std::string &_filename)
   if (avformat_open_input(&this->dataPtr->formatCtx, _filename.c_str(),
         nullptr, nullptr) < 0)
   {
-    ignerr << "Unable to read video file[" << _filename << "]\n";
+    gzerr << "Unable to read video file[" << _filename << "]\n";
     return false;
   }
 
   // Retrieve stream information
   if (avformat_find_stream_info(this->dataPtr->formatCtx, nullptr) < 0)
   {
-    ignerr << "Couldn't find stream information\n";
+    gzerr << "Couldn't find stream information\n";
     return false;
   }
 
@@ -137,7 +137,7 @@ bool Video::Load(const std::string &_filename)
 
   if (this->dataPtr->videoStream == -1)
   {
-    ignerr << "Unable to find a video stream\n";
+    gzerr << "Unable to find a video stream\n";
     return false;
   }
 
@@ -150,7 +150,7 @@ bool Video::Load(const std::string &_filename)
 #endif
   if (codec == nullptr)
   {
-    ignerr << "Codec not found\n";
+    gzerr << "Codec not found\n";
     return false;
   }
 
@@ -161,7 +161,7 @@ bool Video::Load(const std::string &_filename)
   this->dataPtr->codecCtx = avcodec_alloc_context3(codec);
   if (!this->dataPtr->codecCtx)
   {
-    ignerr << "Failed to allocate the codec context" << std::endl;
+    gzerr << "Failed to allocate the codec context" << std::endl;
     return false;
   }
 
@@ -169,7 +169,7 @@ bool Video::Load(const std::string &_filename)
   if (avcodec_parameters_to_context(this->dataPtr->codecCtx,
                                     stream->codecpar) < 0)
   {
-    ignerr << "Failed to copy codec parameters to decoder context"
+    gzerr << "Failed to copy codec parameters to decoder context"
            << std::endl;
     return false;
   }
@@ -192,7 +192,7 @@ bool Video::Load(const std::string &_filename)
   // Open codec
   if (avcodec_open2(this->dataPtr->codecCtx, codec, nullptr) < 0)
   {
-    ignerr << "Could not open codec\n";
+    gzerr << "Could not open codec\n";
     return false;
   }
 
@@ -207,7 +207,7 @@ bool Video::Load(const std::string &_filename)
 
   if (this->dataPtr->swsCtx == nullptr)
   {
-    ignerr << "Error while calling sws_getContext\n";
+    gzerr << "Error while calling sws_getContext\n";
     return false;
   }
 
@@ -254,7 +254,7 @@ bool Video::NextFrame(unsigned char **_buffer)
     packet = av_packet_alloc();
     if (!packet)
     {
-      ignerr << "Failed to allocate AVPacket" << std::endl;
+      gzerr << "Failed to allocate AVPacket" << std::endl;
       return false;
     }
 
@@ -277,7 +277,7 @@ bool Video::NextFrame(unsigned char **_buffer)
         }
         else
         {
-          ignerr << "Error reading packet: " << av_err2str_cpp(ret)
+          gzerr << "Error reading packet: " << av_err2str_cpp(ret)
                  << ". Stopped reading the file." << std::endl;
           return false;
         }
@@ -303,7 +303,7 @@ bool Video::NextFrame(unsigned char **_buffer)
     }
     else if (ret < 0)
     {
-      ignerr << "Error while processing packet data: "
+      gzerr << "Error while processing packet data: "
              << av_err2str_cpp(ret) << std::endl;
       // continue processing data
     }

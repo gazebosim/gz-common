@@ -113,7 +113,7 @@ int Dem::Load(const std::string &_filename)
 
   if (!exists(findFilePath(fullName)))
   {
-    ignerr << "Unable to find DEM file[" << _filename << "]." << std::endl;
+    gzerr << "Unable to find DEM file[" << _filename << "]." << std::endl;
     return -1;
   }
 
@@ -122,7 +122,7 @@ int Dem::Load(const std::string &_filename)
 
   if (this->dataPtr->dataSet == nullptr)
   {
-    ignerr << "Unable to open DEM file[" << fullName
+    gzerr << "Unable to open DEM file[" << fullName
            << "]. Format not recognized as a supported dataset." << std::endl;
     return -1;
   }
@@ -130,7 +130,7 @@ int Dem::Load(const std::string &_filename)
   int nBands = this->dataPtr->dataSet->GetRasterCount();
   if (nBands != 1)
   {
-    ignerr << "Unsupported number of bands in file [" << fullName + "]. Found "
+    gzerr << "Unsupported number of bands in file [" << fullName + "]. Found "
           << nBands << " but only 1 is a valid value." << std::endl;
     return -1;
   }
@@ -166,7 +166,7 @@ int Dem::Load(const std::string &_filename)
   // Assume non-Earth DEM (e.g., moon)
   else
   {
-    ignwarn << "Failed to automatically compute DEM size. "
+    gzwarn << "Failed to automatically compute DEM size. "
             << "Assuming non-Earth DEM. "
             << std::endl;
 
@@ -228,7 +228,7 @@ int Dem::Load(const std::string &_filename)
   if (gz::math::equal(min, gz::math::MAX_D) ||
       gz::math::equal(max, -gz::math::MAX_D))
   {
-    ignwarn << "DEM is composed of 'nodata' values!" << std::endl;
+    gzwarn << "DEM is composed of 'nodata' values!" << std::endl;
   }
 
   this->dataPtr->minElevation = min;
@@ -248,7 +248,7 @@ double Dem::Elevation(double _x, double _y)
 {
   if (_x >= this->Width() || _y >= this->Height())
   {
-    ignerr << "Illegal coordinates. You are asking for the elevation in ("
+    gzerr << "Illegal coordinates. You are asking for the elevation in ("
            << _x << "," << _y << ") but the terrain is ["
            << this->Width() << " x " << this->Height() << "]" << std::endl;
     return std::numeric_limits<double>::infinity();
@@ -277,7 +277,7 @@ bool Dem::GeoReference(double _x, double _y,
 {
   if (this->dataPtr->isNonEarthDem)
   {
-    ignerr << "Can not retrieve WGS84 coordinates from non-Earth DEM."
+    gzerr << "Can not retrieve WGS84 coordinates from non-Earth DEM."
             << std::endl;
     return false;
   }
@@ -303,7 +303,7 @@ bool Dem::GeoReference(double _x, double _y,
     cT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
     if (nullptr == cT)
     {
-      ignerr << "Unable to transform terrain coordinate system to WGS84 for "
+      gzerr << "Unable to transform terrain coordinate system to WGS84 for "
              << "coordinates (" << _x << "," << _y << ")" << std::endl;
       OCTDestroyCoordinateTransformation(cT);
       return false;
@@ -352,7 +352,7 @@ double Dem::WorldWidth() const
 {
   if (this->dataPtr->isNonEarthDem)
   {
-    ignwarn << "Unable to determine world width of non-Earth DEM."
+    gzwarn << "Unable to determine world width of non-Earth DEM."
             << std::endl;
   }
   return this->dataPtr->worldWidth;
@@ -363,7 +363,7 @@ double Dem::WorldHeight() const
 {
   if (this->dataPtr->isNonEarthDem)
   {
-    ignwarn << "Unable to determine world height of non-Earth DEM."
+    gzwarn << "Unable to determine world height of non-Earth DEM."
             << std::endl;
   }
   return this->dataPtr->worldHeight;
@@ -377,7 +377,7 @@ void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
 {
   if (_subSampling <= 0)
   {
-    ignerr << "Illegal subsampling value (" << _subSampling << ")\n";
+    gzerr << "Illegal subsampling value (" << _subSampling << ")\n";
     return;
   }
 
@@ -440,7 +440,7 @@ int Dem::LoadData()
   unsigned int nYSize = this->dataPtr->dataSet->GetRasterYSize();
   if (nXSize == 0 || nYSize == 0)
   {
-    ignerr << "Illegal size loading a DEM file (" << nXSize << ","
+    gzerr << "Illegal size loading a DEM file (" << nXSize << ","
           << nYSize << ")\n";
     return -1;
   }
@@ -473,7 +473,7 @@ int Dem::LoadData()
   if (this->dataPtr->band->RasterIO(GF_Read, 0, 0, nXSize, nYSize, &buffer[0],
                        destWidth, destHeight, GDT_Float32, 0, 0) != CE_None)
   {
-    ignerr << "Failure calling RasterIO while loading a DEM file\n";
+    gzerr << "Failure calling RasterIO while loading a DEM file\n";
     return -1;
   }
 

@@ -398,15 +398,15 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
 
   this->dataPtr->filename = _filename;
   if (xmlDoc.LoadFile(_filename.c_str()) != tinyxml2::XML_SUCCESS)
-    ignerr << "Unable to load collada file[" << _filename << "]\n";
+    gzerr << "Unable to load collada file[" << _filename << "]\n";
 
   this->dataPtr->colladaXml = xmlDoc.FirstChildElement("COLLADA");
   if (!this->dataPtr->colladaXml)
-    ignerr << "Missing COLLADA tag\n";
+    gzerr << "Missing COLLADA tag\n";
 
   if (std::string(this->dataPtr->colladaXml->Attribute("version")) != "1.4.0" &&
       std::string(this->dataPtr->colladaXml->Attribute("version")) != "1.4.1")
-    ignerr << "Invalid collada file. Must be version 1.4.0 or 1.4.1\n";
+    gzerr << "Invalid collada file. Must be version 1.4.0 or 1.4.1\n";
 
   tinyxml2::XMLElement *assetXml =
       this->dataPtr->colladaXml->FirstChildElement("asset");
@@ -447,7 +447,7 @@ void ColladaLoader::Implementation::LoadScene(Mesh *_mesh)
 
   if (!visSceneXml)
   {
-    ignerr << "Unable to find visual_scene id ='" << sceneURL << "'\n";
+    gzerr << "Unable to find visual_scene id ='" << sceneURL << "'\n";
     return;
   }
 
@@ -515,7 +515,7 @@ void ColladaLoader::Implementation::LoadNode(
     nodeXml = this->ElementId("node", nodeURLStr);
     if (!nodeXml)
     {
-      ignerr << "Unable to find node[" << nodeURLStr << "]\n";
+      gzerr << "Unable to find node[" << nodeURLStr << "]\n";
       return;
     }
     this->LoadNode(nodeXml, _mesh, transform);
@@ -681,14 +681,14 @@ void ColladaLoader::Implementation::LoadController(
 {
   if (nullptr == _contrXml)
   {
-    ignerr << "Can't load null controller element." << std::endl;
+    gzerr << "Can't load null controller element." << std::endl;
     return;
   }
 
   tinyxml2::XMLElement *skinXml = _contrXml->FirstChildElement("skin");
   if (nullptr == skinXml)
   {
-    ignerr << "Failed to find skin element" << std::endl;
+    gzerr << "Failed to find skin element" << std::endl;
     return;
   }
 
@@ -697,7 +697,7 @@ void ColladaLoader::Implementation::LoadController(
   auto shapeMat = skinXml->FirstChildElement("bind_shape_matrix");
   if (nullptr == shapeMat || nullptr == shapeMat->GetText())
   {
-    ignerr << "Missing <bind_shape_matrix>" << std::endl;
+    gzerr << "Missing <bind_shape_matrix>" << std::endl;
     return;
   }
   std::string matrixStr = shapeMat->GetText();
@@ -715,7 +715,7 @@ void ColladaLoader::Implementation::LoadController(
   tinyxml2::XMLElement *jointsXml = skinXml->FirstChildElement("joints");
   if (nullptr == jointsXml)
   {
-    ignerr << "Failed to find <joints> element" << std::endl;
+    gzerr << "Failed to find <joints> element" << std::endl;
     return;
   }
 
@@ -735,19 +735,19 @@ void ColladaLoader::Implementation::LoadController(
 
   if (jointsURL.empty())
   {
-    ignwarn << "Missing semantic='JOINT' input source" << std::endl;
+    gzwarn << "Missing semantic='JOINT' input source" << std::endl;
   }
 
   if (invBindMatURL.empty())
   {
-    ignwarn << "Missing semantic='INV__BIND_MATRIX' input source" << std::endl;
+    gzwarn << "Missing semantic='INV__BIND_MATRIX' input source" << std::endl;
   }
 
   jointsXml = this->ElementId("source", jointsURL);
 
   if (!jointsXml)
   {
-    ignerr << "Could not find node [" << jointsURL << "]. "
+    gzerr << "Could not find node [" << jointsURL << "]. "
         << "Failed to parse skinning information in Collada file." << std::endl;
     return;
   }
@@ -755,7 +755,7 @@ void ColladaLoader::Implementation::LoadController(
   auto nameArray = jointsXml->FirstChildElement("Name_array");
   if (nullptr == nameArray)
   {
-    ignerr << "Missing <Name_array>" << std::endl;
+    gzerr << "Missing <Name_array>" << std::endl;
     return;
   }
 
@@ -782,7 +782,7 @@ void ColladaLoader::Implementation::LoadController(
   }
   if (nullptr == skeleton)
   {
-    ignerr << "Failed to create skeleton." << std::endl;
+    gzerr << "Failed to create skeleton." << std::endl;
     return;
   }
   skeleton->SetBindShapeTransform(bindTrans);
@@ -798,7 +798,7 @@ void ColladaLoader::Implementation::LoadController(
 
   if (nullptr == invBMXml)
   {
-    ignerr << "Could not find node[" << invBindMatURL << "]. "
+    gzerr << "Could not find node[" << invBindMatURL << "]. "
         << "Faild to parse skinning information in Collada file." << std::endl;
     return;
   }
@@ -812,7 +812,7 @@ void ColladaLoader::Implementation::LoadController(
     auto node = skeleton->NodeByName(joints[i]);
     if (nullptr == node)
     {
-      ignerr << "Node [" << joints[i] << "] is null." << std::endl;
+      gzerr << "Node [" << joints[i] << "] is null." << std::endl;
       continue;
     }
 
@@ -842,7 +842,7 @@ void ColladaLoader::Implementation::LoadController(
       skinXml->FirstChildElement("vertex_weights");
   if (nullptr == vertWeightsXml)
   {
-    ignerr << "Failed to find vertex_weights" << std::endl;
+    gzerr << "Failed to find vertex_weights" << std::endl;
     return;
   }
 
@@ -1052,7 +1052,7 @@ void ColladaLoader::Implementation::LoadAnimationSet(tinyxml2::XMLElement *_xml,
             this->ElementId("node", targetBone);
         if (targetNodeXml == nullptr)
         {
-          ignerr << "Failed to load animation, [" << targetBone << "] not found"
+          gzerr << "Failed to load animation, [" << targetBone << "] not found"
               << std::endl;
           continue;
         }
@@ -1061,7 +1061,7 @@ void ColladaLoader::Implementation::LoadAnimationSet(tinyxml2::XMLElement *_xml,
       }
       if (targetNode == nullptr)
       {
-        ignerr << "Failed to load bone [" << targetBone << "]." << std::endl;
+        gzerr << "Failed to load bone [" << targetBone << "]." << std::endl;
         continue;
       }
 
@@ -1081,7 +1081,7 @@ void ColladaLoader::Implementation::LoadAnimationSet(tinyxml2::XMLElement *_xml,
           }
           else
           {
-            ignerr << "Failed to find node with ID [" << targetBone << "]"
+            gzerr << "Failed to find node with ID [" << targetBone << "]"
                    << std::endl;
           }
         }
@@ -1139,7 +1139,7 @@ SkeletonNode *ColladaLoader::Implementation::LoadSingleSkeletonNode(
 {
   if (nullptr == _xml)
   {
-    ignerr << "Can't load single skeleton node from null XML." << std::endl;
+    gzerr << "Can't load single skeleton node from null XML." << std::endl;
     return nullptr;
   }
 
@@ -1152,7 +1152,7 @@ SkeletonNode *ColladaLoader::Implementation::LoadSingleSkeletonNode(
     name = _xml->Attribute("id");
   else
   {
-    ignerr << "Failed to create skeleton node without a name." << std::endl;
+    gzerr << "Failed to create skeleton node without a name." << std::endl;
     return nullptr;
   }
 
@@ -1173,20 +1173,20 @@ SkeletonNode *ColladaLoader::Implementation::LoadSkeletonNodes(
 {
   if (nullptr == _xml)
   {
-    ignerr << "Can't load skeleton nodes from null XML element." << std::endl;
+    gzerr << "Can't load skeleton nodes from null XML element." << std::endl;
     return nullptr;
   }
 
   // Skip extras
   if (std::string(_xml->Value()) == "extra")
   {
-    ignwarn << "Skipping [extra] element." << std::endl;
+    gzwarn << "Skipping [extra] element." << std::endl;
     return nullptr;
   }
 
   if (std::string(_xml->Value()) != "node")
   {
-    ignwarn << "Failed to load element [" << _xml->Value()
+    gzwarn << "Failed to load element [" << _xml->Value()
             << "] as skeleton node." << std::endl;
     return nullptr;
   }
@@ -1209,13 +1209,13 @@ void ColladaLoader::Implementation::SetSkeletonNodeTransform(
 {
   if (nullptr == _elem)
   {
-    ignerr << "Can't set transform from null XML." << std::endl;
+    gzerr << "Can't set transform from null XML." << std::endl;
     return;
   }
 
   if (nullptr == _node)
   {
-    ignerr << "Can't set transform to null skeleton node." << std::endl;
+    gzerr << "Can't set transform to null skeleton node." << std::endl;
     return;
   }
 
@@ -1405,7 +1405,7 @@ void ColladaLoader::Implementation::LoadVertices(const std::string &_id,
 
   if (!verticesXml)
   {
-    ignerr << "Unable to find vertices[" << _id << "] in collada file\n";
+    gzerr << "Unable to find vertices[" << _id << "] in collada file\n";
     return;
   }
 
@@ -1443,7 +1443,7 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
   tinyxml2::XMLElement *sourceXml = this->ElementId("source", _id);
   if (!sourceXml)
   {
-    ignerr << "Unable to find source\n";
+    gzerr << "Unable to find source\n";
     return;
   }
 
@@ -1466,12 +1466,12 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
 
     if (count)
     {
-      ignerr << "Vertex source missing float_array element, "
+      gzerr << "Vertex source missing float_array element, "
         << "or count is invalid.\n";
     }
     else
     {
-      ignlog << "Vertex source has a float_array with a count of zero. "
+      gzlog << "Vertex source has a float_array with a count of zero. "
         << "This is likely not desired\n";
     }
 
@@ -1524,7 +1524,7 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
   tinyxml2::XMLElement *normalsXml = this->ElementId("source", _id);
   if (!normalsXml)
   {
-    ignerr << "Unable to find normals[" << _id << "] in collada file\n";
+    gzerr << "Unable to find normals[" << _id << "] in collada file\n";
     return;
   }
 
@@ -1547,12 +1547,12 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
 
     if (count)
     {
-      ignwarn << "Normal source missing float_array element, or count is "
+      gzwarn << "Normal source missing float_array element, or count is "
         << "invalid.\n";
     }
     else
     {
-      ignlog << "Normal source has a float_array with a count of zero. "
+      gzlog << "Normal source has a float_array with a count of zero. "
         << "This is likely not desired\n";
     }
 
@@ -1606,7 +1606,7 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
   tinyxml2::XMLElement *xml = this->ElementId("source", _id);
   if (!xml)
   {
-    ignerr << "Unable to find tex coords[" << _id << "] in collada file\n";
+    gzerr << "Unable to find tex coords[" << _id << "] in collada file\n";
     return;
   }
 
@@ -1630,12 +1630,12 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
 
     if (count)
     {
-      ignerr << "Normal source missing float_array element, or count is "
+      gzerr << "Normal source missing float_array element, or count is "
         << "invalid.\n";
     }
     else
     {
-      ignlog << "Normal source has a float_array with a count of zero. "
+      gzlog << "Normal source has a float_array with a count of zero. "
         << "This is likely not desired\n";
     }
 
@@ -1646,7 +1646,7 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
     totCount = std::stoi(floatArrayXml->Attribute("count"));
   else
   {
-    ignerr << "<float_array> has no count attribute in texture coordinate "
+    gzerr << "<float_array> has no count attribute in texture coordinate "
           << "element with id[" << _id << "]\n";
     return;
   }
@@ -1656,7 +1656,7 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
   xml = xml->FirstChildElement("technique_common");
   if (!xml)
   {
-    ignerr << "Unable to find technique_common element for texture "
+    gzerr << "Unable to find technique_common element for texture "
           << "coordinates with id[" << _id << "]\n";
     return;
   }
@@ -1665,7 +1665,7 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
   xml = xml->FirstChildElement("accessor");
   if (!xml)
   {
-    ignerr << "Unable to find <accessor> as a child of <technique_common> "
+    gzerr << "Unable to find <accessor> as a child of <technique_common> "
           << "for texture coordinates with id[" << _id << "]\n";
     return;
   }
@@ -1679,7 +1679,7 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
   }
   else
   {
-    ignerr << "<accessor> has no stride attribute in texture coordinate "
+    gzerr << "<accessor> has no stride attribute in texture coordinate "
           << "element with id[" << _id << "]\n";
     return;
   }
@@ -1689,7 +1689,7 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
     texCount = std::stoi(xml->Attribute("count"));
   else
   {
-    ignerr << "<accessor> has no count attribute in texture coordinate element "
+    gzerr << "<accessor> has no count attribute in texture coordinate element "
           << "with id[" << _id << "]\n";
     return;
   }
@@ -1699,7 +1699,7 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
   // by the number of texture coordinates.
   if (texCount * stride != totCount)
   {
-    ignerr << "Error reading texture coordinates. Coordinate counts in element "
+    gzerr << "Error reading texture coordinates. Coordinate counts in element "
              "with id[" << _id << "] do not add up correctly\n";
     return;
   }
@@ -1848,11 +1848,11 @@ MaterialPtr ColladaLoader::Implementation::LoadMaterial(
 
   tinyxml2::XMLElement *glslXml = effectXml->FirstChildElement("profile_GLSL");
   if (glslXml)
-    ignerr << "profile_GLSL unsupported\n";
+    gzerr << "profile_GLSL unsupported\n";
 
   tinyxml2::XMLElement *cgXml = effectXml->FirstChildElement("profile_CG");
   if (cgXml)
-    ignerr << "profile_CG unsupported\n";
+    gzerr << "profile_CG unsupported\n";
 
   this->materialIds[_name] = mat;
 
@@ -1886,17 +1886,17 @@ void ColladaLoader::Implementation::LoadColorOrTexture(
   {
     if (_type == "ambient")
     {
-      ignwarn << "ambient texture not supported" << std::endl;
+      gzwarn << "ambient texture not supported" << std::endl;
       return;
     }
     if (_type == "emission")
     {
-      ignwarn << "emission texture not supported" << std::endl;
+      gzwarn << "emission texture not supported" << std::endl;
       return;
     }
     if (_type == "specular")
     {
-      ignwarn << "specular texture not supported" << std::endl;
+      gzwarn << "specular texture not supported" << std::endl;
       return;
     }
 
@@ -1989,7 +1989,7 @@ void ColladaLoader::Implementation::LoadPolylist(
       matIndex = _mesh->AddMaterial(mat);
 
     if (matIndex < 0)
-      ignwarn << "Unable to add material[" << matStr << "]\n";
+      gzwarn << "Unable to add material[" << matStr << "]\n";
     else
       subMesh->SetMaterialIndex(matIndex);
   }
@@ -2055,7 +2055,7 @@ void ColladaLoader::Implementation::LoadPolylist(
     else
     {
       inputs[otherSemantics++].insert(gz::math::parseInt(offset));
-      ignwarn << "Polylist input semantic: '" << semantic << "' is currently"
+      gzwarn << "Polylist input semantic: '" << semantic << "' is currently"
           << " not supported" << std::endl;
     }
 
@@ -2321,7 +2321,7 @@ void ColladaLoader::Implementation::LoadTriangles(
       matIndex = _mesh->AddMaterial(mat);
 
     if (matIndex < 0)
-      ignwarn << "Unable to add material[" << matStr << "]\n";
+      gzwarn << "Unable to add material[" << matStr << "]\n";
     else
       subMesh->SetMaterialIndex(matIndex);
   }
@@ -2391,7 +2391,7 @@ void ColladaLoader::Implementation::LoadTriangles(
     else
     {
       inputs[otherSemantics++].insert(gz::math::parseInt(offset));
-      ignwarn << "Triangle input semantic: '" << semantic << "' is currently"
+      gzwarn << "Triangle input semantic: '" << semantic << "' is currently"
           << " not supported" << std::endl;
     }
     trianglesInputXml = trianglesInputXml->NextSiblingElement("input");
@@ -2420,12 +2420,12 @@ void ColladaLoader::Implementation::LoadTriangles(
     // should not output an error message
     if (count)
     {
-      ignerr << "Collada file[" << this->filename
+      gzerr << "Collada file[" << this->filename
         << "] is invalid. Loading what we can...\n";
     }
     else
     {
-      ignlog << "Triangle input has a count of zero. "
+      gzlog << "Triangle input has a count of zero. "
         << "This is likely not desired\n";
     }
 
@@ -2560,7 +2560,7 @@ void ColladaLoader::Implementation::LoadTriangles(
                 _mesh->MeshSkeleton()->NodeByName(node_weight.first);
             if (nullptr == node)
             {
-              ignerr << "Failed to find skeleton node named ["
+              gzerr << "Failed to find skeleton node named ["
                      << node_weight.first << "]" << std::endl;
               continue;
             }
@@ -2690,7 +2690,7 @@ void ColladaLoader::Implementation::LoadTransparent(tinyxml2::XMLElement *_elem,
     const char *colorCStr = _elem->FirstChildElement("color")->GetText();
     if (!colorCStr)
     {
-      ignerr << "No color string\n";
+      gzerr << "No color string\n";
       return;
     }
 
@@ -2777,13 +2777,13 @@ void ColladaLoader::Implementation::MergeSkeleton(SkeletonPtr _skeleton,
 {
   if (nullptr == _skeleton)
   {
-    ignerr << "Fail to merge null skeleton." << std::endl;
+    gzerr << "Fail to merge null skeleton." << std::endl;
     return;
   }
 
   if (nullptr == _mergeNode)
   {
-    ignerr << "Fail to merge null skeleton node." << std::endl;
+    gzerr << "Fail to merge null skeleton node." << std::endl;
     return;
   }
 
@@ -2792,7 +2792,7 @@ void ColladaLoader::Implementation::MergeSkeleton(SkeletonPtr _skeleton,
 
   if (nullptr == _skeleton->RootNode())
   {
-    ignerr << "Skeleton missing root node." << std::endl;
+    gzerr << "Skeleton missing root node." << std::endl;
     return;
   }
 

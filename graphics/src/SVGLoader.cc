@@ -100,7 +100,7 @@ gz::math::Matrix3d ParseTransformMatrixStr(
   // check for transformation
   if (_transformStr.empty())
   {
-    ignerr << "no data for ParseTransformMatrixStr";
+    gzerr << "no data for ParseTransformMatrixStr";
     return gz::math::Matrix3d::Identity;
   }
 
@@ -111,7 +111,7 @@ gz::math::Matrix3d ParseTransformMatrixStr(
 
   if (tx.size() < 2)
   {
-    ignerr << "Invalid path transform: '" << &_transformStr << "'"
+    gzerr << "Invalid path transform: '" << &_transformStr << "'"
           << std::endl;
     return gz::math::Matrix3d::Identity;
   }
@@ -124,7 +124,7 @@ gz::math::Matrix3d ParseTransformMatrixStr(
   {
     if (numbers.size() != 6)
     {
-      ignerr << "Unsupported matrix transform with "
+      gzerr << "Unsupported matrix transform with "
             << numbers.size() << " parameters. Should be 6."
             << std::endl;
       return gz::math::Matrix3d::Identity;
@@ -143,7 +143,7 @@ gz::math::Matrix3d ParseTransformMatrixStr(
   {
     if (numbers.size() != 1)
     {
-      ignerr << "Unsupported skewX transform. Needs 1 parameter only"
+      gzerr << "Unsupported skewX transform. Needs 1 parameter only"
             << std::endl;
       return gz::math::Matrix3d::Identity;
     }
@@ -160,7 +160,7 @@ gz::math::Matrix3d ParseTransformMatrixStr(
   {
     if (numbers.size() != 1)
     {
-      ignerr << "Unsupported skewY transform. Needs 1 parameter only"
+      gzerr << "Unsupported skewY transform. Needs 1 parameter only"
             << std::endl;
       return gz::math::Matrix3d::Identity;
     }
@@ -179,7 +179,7 @@ gz::math::Matrix3d ParseTransformMatrixStr(
   {
     if (numbers.size() == 0 || numbers.size() > 2)
     {
-      ignerr << "Unsupported scale transform with more than 2 parameters"
+      gzerr << "Unsupported scale transform with more than 2 parameters"
             << std::endl;
       return gz::math::Matrix3d::Identity;
     }
@@ -198,7 +198,7 @@ gz::math::Matrix3d ParseTransformMatrixStr(
   {
     if (numbers.size() == 0 || numbers.size() > 2)
     {
-      ignerr << "Unsupported translate transform with more than 2 parameters"
+      gzerr << "Unsupported translate transform with more than 2 parameters"
             << std::endl;
       return gz::math::Matrix3d::Identity;
     }
@@ -217,7 +217,7 @@ gz::math::Matrix3d ParseTransformMatrixStr(
   {
     if (numbers.size() ==0 || numbers.size() == 2 || numbers.size() > 3 )
     {
-      ignerr << "Unsupported rotate transform. Only angle and optional x y"
+      gzerr << "Unsupported rotate transform. Only angle and optional x y"
             << " are supported" << std::endl;
       return gz::math::Matrix3d::Identity;
     }
@@ -242,7 +242,7 @@ gz::math::Matrix3d ParseTransformMatrixStr(
     return m;
   }
   // we have no business being here
-  ignerr << "Unknown transformation: " << transform << std::endl;
+  gzerr << "Unknown transformation: " << transform << std::endl;
   gz::math::Matrix3d m = gz::math::Matrix3d::Identity;
   return m;
 }
@@ -492,7 +492,7 @@ gz::math::Vector2d SVGLoader::Implementation::SubpathToPolyline(
 {
   if (!_polyline.empty())
   {
-    ignerr << "polyline not empty";
+    gzerr << "polyline not empty";
     return gz::math::Vector2d::Zero;
   }
 
@@ -606,13 +606,13 @@ gz::math::Vector2d SVGLoader::Implementation::SubpathToPolyline(
           auto &p = _polyline.front();
           if (_polyline.back().Distance(p) > 1e-5)
           {
-            ignerr << "Zz" << _polyline.back().Distance(p) << std::endl;
+            gzerr << "Zz" << _polyline.back().Distance(p) << std::endl;
             _polyline.push_back(p);
           }
           break;
         }
       default:
-        ignerr << "Unexpected SVGCommand value: " << cmd.cmd << std::endl;
+        gzerr << "Unexpected SVGCommand value: " << cmd.cmd << std::endl;
     }
   }
   return _last;
@@ -637,7 +637,7 @@ bool SVGLoader::Implementation::SplitSubpaths(
 {
   if (_cmds.empty())
   {
-    ignerr << "SVGPath has no commands";
+    gzerr << "SVGPath has no commands";
     return false;
   }
 
@@ -796,7 +796,7 @@ bool SVGLoader::Implementation::PathAttribs(tinyxml2::XMLElement *_pElement,
 {
   if (!_pElement)
   {
-    ignerr << "empty XML element where a path was expected.\n";
+    gzerr << "empty XML element where a path was expected.\n";
     return false;
   }
 
@@ -828,7 +828,7 @@ bool SVGLoader::Implementation::PathAttribs(tinyxml2::XMLElement *_pElement,
     }
     else
     {
-      ignwarn << "Ignoring attribute \"" << name  << "\" in path"  << std::endl;
+      gzwarn << "Ignoring attribute \"" << name  << "\" in path"  << std::endl;
     }
     pAttrib = pAttrib->Next();
   }
@@ -895,7 +895,7 @@ bool SVGLoader::Parse(const std::string &_filename,
     std::string err1 = str1 ? str1 : "n/a";
     std::string err2 = str2 ? str2 : "n/a";
 
-    ignerr << "Failed to load file " <<  _filename << std::endl
+    gzerr << "Failed to load file " <<  _filename << std::endl
            << "XML error type " << doc.ErrorName() << "\n"
            << "XML error info 1 " << err1 << "\n"
            << "XML error info 2 " << err2 << "\n";
@@ -1123,7 +1123,7 @@ void SVGLoader::PathsToClosedPolylines(
         double length = endPoint.Distance(startPoint);
         if (length < _tol)
         {
-          ignmsg << "Ignoring short segment (length: "
+          gzmsg << "Ignoring short segment (length: "
                  << length << ")" <<std::endl;
         }
         else
@@ -1194,7 +1194,7 @@ void SVGLoader::PathsToClosedPolylines(
     }
     else
     {
-      ignmsg << "Line segments that are not part of a closed paths have"
+      gzmsg << "Line segments that are not part of a closed paths have"
          << " been found with the current minimum distance of " << _tol
          << " between 2 points."  << std::endl << std::endl;
       _openPolys.push_back(polyline);

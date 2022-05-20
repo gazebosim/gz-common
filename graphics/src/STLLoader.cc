@@ -53,7 +53,7 @@ Mesh *STLLoader::Load(const std::string &_filename)
 
   if (!file)
   {
-    ignerr << "Unable to open file[" << _filename << "]\n";
+    gzerr << "Unable to open file[" << _filename << "]\n";
     return nullptr;
   }
 
@@ -65,7 +65,7 @@ Mesh *STLLoader::Load(const std::string &_filename)
     fclose(file);
     file = fopen(_filename.c_str(), "rb");
     if (!this->ReadBinary(file, mesh))
-      ignerr << "Unable to read STL[" << _filename << "]\n";
+      gzerr << "Unable to read STL[" << _filename << "]\n";
   }
 
   fclose(file);

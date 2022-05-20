@@ -41,7 +41,7 @@ BuildType TestBuildType(const std::string &_projectSourcePath)
 
   if (ign_bazel_set && ign_cmake_set)
   {
-    ignwarn << "Detected settings from Bazel and CMake, preferring CMake\n";
+    gzwarn << "Detected settings from Bazel and CMake, preferring CMake\n";
   }
 
   if (ign_cmake_set)

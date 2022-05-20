@@ -75,14 +75,14 @@ SignalHandler::SignalHandler()
 
   if (std::signal(SIGINT, onSignal) == SIG_ERR)
   {
-    ignerr << "Unable to catch SIGINT.\n"
+    gzerr << "Unable to catch SIGINT.\n"
            << " Please visit http://community.gazebosim.org for help.\n";
     return;
   }
 
   if (std::signal(SIGTERM, onSignal) == SIG_ERR)
   {
-    ignerr << "Unable to catch SIGTERM.\n"
+    gzerr << "Unable to catch SIGTERM.\n"
            << " Please visit http://community.gazebosim.org for help.\n";
     return;
   }
@@ -128,7 +128,7 @@ bool SignalHandler::AddCallback(std::function<void(int)> _cb)
   }
   else
   {
-    ignerr << "The SignalHandler was not initialized. Adding a callback will "
+    gzerr << "The SignalHandler was not initialized. Adding a callback will "
       << "have no effect.\n";
   }
   return result;

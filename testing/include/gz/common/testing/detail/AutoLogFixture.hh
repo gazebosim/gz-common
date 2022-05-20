@@ -56,7 +56,7 @@ AutoLogFixture::AutoLogFixture():
 //////////////////////////////////////////////////
 AutoLogFixture::~AutoLogFixture()
 {
-  ignLogClose();
+  gzLogClose();
   EXPECT_TRUE(gz::common::unsetenv(IGN_HOMEDIR));
 }
 
@@ -81,14 +81,14 @@ void AutoLogFixture::SetUp()
 
   // Initialize Console
   auto logPath = common::joinPaths(this->dataPtr->temp->Path(), "test_logs");
-  ignLogInit(logPath, this->dataPtr->logFilename);
+  gzLogInit(logPath, this->dataPtr->logFilename);
 
   ASSERT_FALSE(logPath.empty());
   ASSERT_TRUE(common::exists(
         common::joinPaths(logPath, this->dataPtr->logFilename)));
 
   // Read the full path to the log directory.
-  this->dataPtr->logDirectory = ignLogDirectory();
+  this->dataPtr->logDirectory = gzLogDirectory();
   ASSERT_FALSE(this->dataPtr->logDirectory.empty());
   ASSERT_TRUE(gz::common::exists(this->dataPtr->logDirectory));
 

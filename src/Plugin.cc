@@ -79,7 +79,7 @@ namespace gz
 
         if (!_other)
         {
-          ignerr << "Received a nullptr _other in the constructor "
+          gzerr << "Received a nullptr _other in the constructor "
                  << "which uses `const PluginPrivate*`. This should "
                  << "not be possible! Please report this bug."
                  << std::endl;

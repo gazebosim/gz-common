@@ -45,7 +45,7 @@ namespace gz
         NULL, dw, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
         (LPTSTR)&lpMsgBuf, 0, NULL);
 
-      ignwarn << _flavorText << ": " << static_cast<LPCTSTR>(lpMsgBuf) << "\n";
+      gzwarn << _flavorText << ": " << static_cast<LPCTSTR>(lpMsgBuf) << "\n";
     }
   }
 }

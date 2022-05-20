@@ -376,7 +376,7 @@ bool gz::common::env(const std::string &_name,
 
   if (_allowEmpty)
   {
-    ignwarn << "Reading environment variable with _allowEmpty==true"
+    gzwarn << "Reading environment variable with _allowEmpty==true"
             << " is unsupported on Windows.\n";
   }
 
@@ -408,7 +408,7 @@ bool gz::common::setenv(const std::string &_name,
 #ifdef _WIN32
   if (0 != _putenv_s(_name.c_str(), _value.c_str()))
   {
-    ignwarn << "Failed to set environment variable: "
+    gzwarn << "Failed to set environment variable: "
             << "[" << _name << "]"
             << strerror(errno) << std::endl;
     return false;
@@ -416,7 +416,7 @@ bool gz::common::setenv(const std::string &_name,
 #else
   if (0 != ::setenv(_name.c_str(), _value.c_str(), true))
   {
-    ignwarn << "Failed to set environment variable: "
+    gzwarn << "Failed to set environment variable: "
             << "[" << _name << "]"
             << strerror(errno) << std::endl;
     return false;
@@ -430,7 +430,7 @@ bool gz::common::unsetenv(const std::string &_name)
 #ifdef _WIN32
   if (0 != _putenv_s(_name.c_str(), ""))
   {
-    ignwarn << "Failed to unset environment variable: "
+    gzwarn << "Failed to unset environment variable: "
             << "[" << _name << "]"
             << strerror(errno) << std::endl;
     return false;
@@ -438,7 +438,7 @@ bool gz::common::unsetenv(const std::string &_name)
 #else
   if (0 != ::unsetenv(_name.c_str()))
   {
-    ignwarn << "Failed to unset environment variable: "
+    gzwarn << "Failed to unset environment variable: "
             << "[" << _name << "]"
             << strerror(errno) << std::endl;
     return false;

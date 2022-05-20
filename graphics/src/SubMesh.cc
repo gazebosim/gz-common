@@ -166,7 +166,7 @@ gz::math::Vector3d SubMesh::Vertex(const unsigned int _index) const
 {
   if (_index >= this->dataPtr->vertices.size())
   {
-    ignerr << "Index too large" << std::endl;
+    gzerr << "Index too large" << std::endl;
     return math::Vector3d::Zero;
   }
 
@@ -185,7 +185,7 @@ void SubMesh::SetVertex(const unsigned int _index,
 {
   if (_index >= this->dataPtr->vertices.size())
   {
-    ignerr << "Index too large" << std::endl;
+    gzerr << "Index too large" << std::endl;
     return;
   }
 
@@ -197,7 +197,7 @@ gz::math::Vector3d SubMesh::Normal(const unsigned int _index) const
 {
   if (_index >= this->dataPtr->normals.size())
   {
-    ignerr << "Index too large" << std::endl;
+    gzerr << "Index too large" << std::endl;
     return math::Vector3d::Zero;
   }
 
@@ -220,7 +220,7 @@ bool SubMesh::HasTexCoord(const unsigned int _index) const
 
   if (this->dataPtr->texCoords.size() > 1u)
   {
-    ignwarn << "Multiple texture coordinate sets exist in submesh: "
+    gzwarn << "Multiple texture coordinate sets exist in submesh: "
             << this->dataPtr->name << ". Checking first set with index: "
             << firstSetIndex << std::endl;
   }
@@ -250,7 +250,7 @@ void SubMesh::SetNormal(const unsigned int _index,
 {
   if (_index >= this->dataPtr->normals.size())
   {
-    ignerr << "Index too large" << std::endl;
+    gzerr << "Index too large" << std::endl;
     return;
   }
 
@@ -262,14 +262,14 @@ gz::math::Vector2d SubMesh::TexCoord(const unsigned int _index) const
 {
   if (this->dataPtr->texCoords.empty())
   {
-    ignerr << "Texture coordinate sets are empty" << std::endl;
+    gzerr << "Texture coordinate sets are empty" << std::endl;
     return math::Vector2d::Zero;
   }
   unsigned firstSetIndex = this->dataPtr->texCoords.begin()->first;
 
   if (this->dataPtr->texCoords.size() > 1u)
   {
-    ignwarn << "Multiple texture coordinate sets exist in submesh: "
+    gzwarn << "Multiple texture coordinate sets exist in submesh: "
             << this->dataPtr->name << ". Checking first set with index: "
             << firstSetIndex << std::endl;
   }
@@ -284,14 +284,14 @@ gz::math::Vector2d SubMesh::TexCoordBySet(unsigned int _index,
   auto it = this->dataPtr->texCoords.find(_setIndex);
   if (it == this->dataPtr->texCoords.end())
   {
-    ignerr << "Texture coordinate set does not exist: " << _setIndex
+    gzerr << "Texture coordinate set does not exist: " << _setIndex
            << std::endl;
     return math::Vector2d::Zero;
   }
 
   if (_index >= it->second.size())
   {
-    ignerr << "Index too large" << std::endl;
+    gzerr << "Index too large" << std::endl;
     return math::Vector2d::Zero;
   }
 
@@ -308,7 +308,7 @@ void SubMesh::SetTexCoord(const unsigned int _index,
 
   if (this->dataPtr->texCoords.size() > 1u)
   {
-    ignwarn << "Multiple texture coordinate sets exist in submesh: "
+    gzwarn << "Multiple texture coordinate sets exist in submesh: "
             << this->dataPtr->name << ". Checking first set with index: "
             << firstSetIndex << std::endl;
   }
@@ -323,14 +323,14 @@ void SubMesh::SetTexCoordBySet(unsigned int _index,
   auto it = this->dataPtr->texCoords.find(_setIndex);
   if (it == this->dataPtr->texCoords.end())
   {
-    ignerr << "Texture coordinate set does not exist: " << _setIndex
+    gzerr << "Texture coordinate set does not exist: " << _setIndex
            << std::endl;
     return;
   }
 
   if (_index >= it->second.size())
   {
-    ignerr << "Index too large" << std::endl;
+    gzerr << "Index too large" << std::endl;
     return;
   }
 
@@ -342,7 +342,7 @@ int SubMesh::Index(const unsigned int _index) const
 {
   if (_index >= this->dataPtr->indices.size())
   {
-    ignerr << "Index too large" << std::endl;
+    gzerr << "Index too large" << std::endl;
     return -1;
   }
 
@@ -354,7 +354,7 @@ void SubMesh::SetIndex(const unsigned int _index, const unsigned int _i)
 {
   if (_index >= this->dataPtr->indices.size())
   {
-    ignerr << "Index too large" << std::endl;
+    gzerr << "Index too large" << std::endl;
     return;
   }
 
@@ -367,7 +367,7 @@ NodeAssignment SubMesh::NodeAssignmentByIndex(
 {
   if (_index >= this->dataPtr->nodeAssignments.size())
   {
-    ignerr << "Index too large" << std::endl;
+    gzerr << "Index too large" << std::endl;
     return NodeAssignment();
   }
 
@@ -445,7 +445,7 @@ unsigned int SubMesh::TexCoordCount() const
 
   if (this->dataPtr->texCoords.size() > 1u)
   {
-    ignwarn << "Multiple texture coordinate sets exist in submesh: "
+    gzwarn << "Multiple texture coordinate sets exist in submesh: "
             << this->dataPtr->name << ". Checking first set with index: "
             << firstSetIndex << std::endl;
   }
@@ -533,7 +533,7 @@ void SubMesh::FillArrays(double **_vertArr, int **_indArr) const
 {
   if (this->dataPtr->vertices.empty() || this->dataPtr->indices.empty())
   {
-    ignerr << "No vertices or indices\n";
+    gzerr << "No vertices or indices\n";
     return;
   }
 
@@ -701,12 +701,12 @@ double SubMesh::Volume() const
     }
     else
     {
-      ignerr << "The number of indices is not a multiple of three.\n";
+      gzerr << "The number of indices is not a multiple of three.\n";
     }
   }
   else
   {
-    ignerr << "Volume calculation can only be accomplished on a triangulated "
+    gzerr << "Volume calculation can only be accomplished on a triangulated "
       << " mesh.\n";
   }
 

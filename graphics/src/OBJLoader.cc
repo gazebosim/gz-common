@@ -88,17 +88,17 @@ Mesh *OBJLoader::Load(const std::string &_filename)
 
   if (!warn.empty())
   {
-    ignwarn << warn << std::endl;
+    gzwarn << warn << std::endl;
   }
 
   if (!err.empty())
   {
-    ignerr << err << std::endl;
+    gzerr << err << std::endl;
   }
 
   if (!ret)
   {
-    ignerr << "Failed to load/parse " << _filename << std::endl;
+    gzerr << "Failed to load/parse " << _filename << std::endl;
     return nullptr;
   }
 
@@ -199,7 +199,7 @@ Mesh *OBJLoader::Load(const std::string &_filename)
         }
         else
         {
-          ignwarn << "Missing material for shape[" << s.name << "] "
+          gzwarn << "Missing material for shape[" << s.name << "] "
               << "in OBJ file[" << _filename << "]" << std::endl;
         }
         mesh->AddSubMesh(std::move(subMesh));

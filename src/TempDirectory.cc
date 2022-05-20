@@ -46,7 +46,7 @@ inline bool fs_warn(const std::string &_fcn,
   {
     if (FSWO_LOG_WARNINGS == _warningOp)
     {
-      ignwarn << "Failed gz::common::" << _fcn
+      gzwarn << "Failed gz::common::" << _fcn
         << " (ec: " << _ec << " " << _ec.message() << ")\n";
     }
     return false;
@@ -134,7 +134,7 @@ std::string gz::common::createTempDirectory(
     ret = "";
     if(FSWO_LOG_WARNINGS == _warningOp)
     {
-      ignwarn << "Failed to create temp directory: " << ex.what() << "\n";
+      gzwarn << "Failed to create temp directory: " << ex.what() << "\n";
     }
   }
   return ret;
@@ -178,7 +178,7 @@ TempDirectory::TempDirectory(const std::string &_root,
   if (_root.empty())
   {
     this->dataPtr->isValid = false;
-    ignwarn << "Failed to create temp directory: _root was empty\n";
+    gzwarn << "Failed to create temp directory: _root was empty\n";
     return;
   }
 

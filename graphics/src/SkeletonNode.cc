@@ -260,7 +260,7 @@ SkeletonNode *SkeletonNode::Child(const unsigned int _index) const
   SkeletonNode *result = NULL;
 
   if (_index >= this->dataPtr->children.size())
-    ignerr << "Index out of range[" << _index << "]\n";
+    gzerr << "Index out of range[" << _index << "]\n";
   else
     result = this->dataPtr->children[_index];
 

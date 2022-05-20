@@ -84,7 +84,7 @@ Image::Image(const std::string &_filename)
     if (!filename.empty())
       this->Load(filename);
     else
-      ignerr << "Unable to find image[" << _filename << "]\n";
+      gzerr << "Unable to find image[" << _filename << "]\n";
   }
 }
 
@@ -137,14 +137,14 @@ int Image::Load(const std::string &_filename)
     }
     else
     {
-      ignerr << "Unknown image format[" << this->dataPtr->fullName << "]\n";
+      gzerr << "Unknown image format[" << this->dataPtr->fullName << "]\n";
       return -1;
     }
 
     return 0;
   }
 
-  ignerr << "Unable to open image file[" << this->dataPtr->fullName
+  gzerr << "Unable to open image file[" << this->dataPtr->fullName
         << "], check your IGNITION_RESOURCE_PATH settings.\n";
   return -1;
 }
@@ -226,7 +226,7 @@ void Image::SetFromData(const unsigned char *_data,
   }
   else
   {
-    ignerr << "Unable to handle format[" << _format << "]\n";
+    gzerr << "Unable to handle format[" << _format << "]\n";
     return;
   }
 
@@ -374,7 +374,7 @@ math::Color Image::Pixel(unsigned int _x, unsigned int _y) const
 
     if (FreeImage_GetPixelColor(this->dataPtr->bitmap, _x, _y, &firgb) == FALSE)
     {
-      ignerr << "Image: Coordinates out of range["
+      gzerr << "Image: Coordinates out of range["
         << _x << " " << _y << "] \n";
       return clr;
     }
@@ -386,7 +386,7 @@ math::Color Image::Pixel(unsigned int _x, unsigned int _y) const
     if (FreeImage_GetPixelIndex(
           this->dataPtr->bitmap, _x, _y, &byteValue) == FALSE)
     {
-      ignerr << "Image: Coordinates out of range ["
+      gzerr << "Image: Coordinates out of range ["
         << _x << " " << _y << "] \n";
       return clr;
     }
@@ -450,7 +450,7 @@ math::Color Image::MaxColor() const
         if (FALSE ==
               FreeImage_GetPixelColor(this->dataPtr->bitmap, x, y, &firgb))
         {
-          ignerr << "Image: Coordinates out of range["
+          gzerr << "Image: Coordinates out of range["
             << x << " " << y << "] \n";
           continue;
         }
@@ -475,7 +475,7 @@ math::Color Image::MaxColor() const
         if (FreeImage_GetPixelIndex(
               this->dataPtr->bitmap, x, y, &byteValue) == FALSE)
         {
-          ignerr << "Image: Coordinates out of range ["
+          gzerr << "Image: Coordinates out of range ["
             << x << " " << y << "] \n";
           continue;
         }
