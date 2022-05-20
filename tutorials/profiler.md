@@ -25,7 +25,7 @@ In order to use the profiler, inspection points must be added to the source code
 and the application or library must be linked to the `ignition-common::profiler`
 component.
 
-To start, download the [profiler.cc](https://github.com/ignitionrobotics/ign-common/raw/main/examples/profiler.cc) example.
+To start, download the [profiler.cc](https://github.com/gazebosim/gz-common/raw/main/examples/profiler.cc) example.
 
 The relevant corresponding C++ would be as follows:
 
@@ -125,7 +125,7 @@ libexec/ignition/ignition-common<N>/ign_remotery_vis
 
 If the profiler is run successfully, you should see output in a browser. Similar to this
 
-<img src="https://raw.githubusercontent.com/ignitionrobotics/ign-common/main/tutorials/imgs/profiler_tutorial_example.png">
+<img src="https://raw.githubusercontent.com/gazebosim/gz-common/main/tutorials/imgs/profiler_tutorial_example.png">
 
 ### Troubleshoot the web viewer
 

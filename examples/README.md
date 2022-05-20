@@ -7,7 +7,7 @@ These examples demonstrate various Ignition Common features.
 After installing Ignition Common, from source or from binaries, build with:
 
 ```
-git clone https://github.com/ignitionrobotics/ign-common/
+git clone https://github.com/gazebosim/gz-common/
 cd ign-common/examples
 mkdir build
 cd build

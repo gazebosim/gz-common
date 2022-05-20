@@ -98,7 +98,7 @@ TEST(WorkerPool, WaitWithTimeout)
 
 //////////////////////////////////////////////////
 // /TODO(anyone) Deflake this test
-// ref: https://github.com/ignitionrobotics/ign-common/issues/52
+// ref: https://github.com/gazebosim/gz-common/issues/52
 TEST(WorkerPool,
      IGN_UTILS_TEST_ENABLED_ONLY_ON_LINUX(WaitWithTimeoutThatTimesOut))
 {
@@ -112,7 +112,7 @@ TEST(WorkerPool,
 
 //////////////////////////////////////////////////
 // /TODO(anyone) Deflake this test
-// ref: https://github.com/ignitionrobotics/ign-common/issues/53
+// ref: https://github.com/gazebosim/gz-common/issues/53
 TEST(WorkerPool,
      IGN_UTILS_TEST_ENABLED_ONLY_ON_LINUX(ThingsRunInParallel))
 {
