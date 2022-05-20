@@ -16,8 +16,8 @@
 */
 #include <gtest/gtest.h>
 
-#include "ignition/common/MaterialDensity.hh"
-#include "ignition/common/testing/AutoLogFixture.hh"
+#include "gz/common/MaterialDensity.hh"
+#include "gz/common/testing/AutoLogFixture.hh"
 
 using namespace gz;
 using namespace common;

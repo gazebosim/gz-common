@@ -28,7 +28,7 @@
 // See https://github.com/mrts/flag-set-cpp
 // Licence: MIT
 
-#include <ignition/common/FlagSet.hh>
+#include <gz/common/FlagSet.hh>
 
 #include <cstdint>
 #include <unordered_set>

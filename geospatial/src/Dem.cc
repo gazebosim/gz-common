@@ -20,9 +20,9 @@
 #include <gdal_priv.h>
 #include <ogr_spatialref.h>
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/geospatial/Dem.hh"
-#include "ignition/math/SphericalCoordinates.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/geospatial/Dem.hh"
+#include "gz/math/SphericalCoordinates.hh"
 
 using namespace gz;
 using namespace common;

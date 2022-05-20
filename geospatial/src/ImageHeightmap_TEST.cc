@@ -16,10 +16,10 @@
 */
 #include <gtest/gtest.h>
 
-#include "ignition/common/geospatial/ImageHeightmap.hh"
+#include "gz/common/geospatial/ImageHeightmap.hh"
 
-#include "ignition/common/testing/AutoLogFixture.hh"
-#include "ignition/common/testing/TestPaths.hh"
+#include "gz/common/testing/AutoLogFixture.hh"
+#include "gz/common/testing/TestPaths.hh"
 
 #define ELEVATION_TOL 1e-8
 

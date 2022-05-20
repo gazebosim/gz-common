@@ -16,9 +16,9 @@
 */
 #include <gtest/gtest.h>
 #include <string>
-#include <ignition/common/Base64.hh>
+#include <gz/common/Base64.hh>
 
-#include "ignition/common/testing/AutoLogFixture.hh"
+#include "gz/common/testing/AutoLogFixture.hh"
 
 using namespace gz;
 

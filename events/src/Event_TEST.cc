@@ -17,11 +17,11 @@
 
 #include <gtest/gtest.h>
 
-#include "ignition/common/testing/AutoLogFixture.hh"
+#include "gz/common/testing/AutoLogFixture.hh"
 
 #include <functional>
-#include <ignition/common/Event.hh>
-#include <ignition/common/Util.hh>
+#include <gz/common/Event.hh>
+#include <gz/common/Util.hh>
 
 using namespace gz;
 

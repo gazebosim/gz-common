@@ -16,9 +16,9 @@
 */
 #include <string>
 #include <vector>
-#include <ignition/math/Vector3.hh>
+#include <gz/math/Vector3.hh>
 
-#include "ignition/common/Pbr.hh"
+#include "gz/common/Pbr.hh"
 
 /// \brief Private data for Pbr class
 class gz::common::Pbr::Implementation

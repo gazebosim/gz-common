@@ -17,13 +17,13 @@
 
 #include <gtest/gtest.h>
 #include <limits>
-#include <ignition/math/Angle.hh>
-#include <ignition/math/Vector3.hh>
+#include <gz/math/Angle.hh>
+#include <gz/math/Vector3.hh>
 
-#include "ignition/common/geospatial/Dem.hh"
+#include "gz/common/geospatial/Dem.hh"
 
-#include "ignition/common/testing/AutoLogFixture.hh"
-#include "ignition/common/testing/TestPaths.hh"
+#include "gz/common/testing/AutoLogFixture.hh"
+#include "gz/common/testing/TestPaths.hh"
 
 using namespace gz;
 

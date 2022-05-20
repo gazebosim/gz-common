@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <string>
 
-#include <ignition/common/Util.hh>
+#include <gz/common/Util.hh>
 
 using namespace gz;
 

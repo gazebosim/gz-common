@@ -16,8 +16,8 @@
 */
 #include <gtest/gtest.h>
 
-#include <ignition/common/Console.hh>
-#include <ignition/common/testing/AutoLogFixture.hh>
+#include <gz/common/Console.hh>
+#include <gz/common/testing/AutoLogFixture.hh>
 
 using namespace gz::common;
 using namespace gz::common::testing;

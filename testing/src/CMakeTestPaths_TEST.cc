@@ -16,9 +16,9 @@
 */
 #include <gtest/gtest.h>
 
-#include "ignition/common/Filesystem.hh"
-#include "ignition/common/testing/TestPaths.hh"
-#include "ignition/common/testing/CMakeTestPaths.hh"
+#include "gz/common/Filesystem.hh"
+#include "gz/common/testing/TestPaths.hh"
+#include "gz/common/testing/CMakeTestPaths.hh"
 
 using namespace gz::common;
 using namespace gz::common::testing;

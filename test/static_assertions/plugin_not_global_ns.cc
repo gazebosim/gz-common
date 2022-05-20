@@ -18,7 +18,7 @@
 
 IGN_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
 
-#include "ignition/common/PluginMacros.hh"
+#include "gz/common/PluginMacros.hh"
 
 namespace ns
 {

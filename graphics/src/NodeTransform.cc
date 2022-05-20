@@ -15,7 +15,7 @@
  *
  */
 
-#include <ignition/common/NodeTransform.hh>
+#include <gz/common/NodeTransform.hh>
 
 #include <iostream>
 

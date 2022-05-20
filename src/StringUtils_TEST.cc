@@ -19,7 +19,7 @@
 #include <vector>
 
 
-#include "ignition/common/StringUtils.hh"
+#include "gz/common/StringUtils.hh"
 
 using namespace gz;
 

@@ -15,10 +15,10 @@
  *
  */
 #include <algorithm>
-#include <ignition/math/Color.hh>
+#include <gz/math/Color.hh>
 
-#include "ignition/common/Material.hh"
-#include "ignition/common/Console.hh"
+#include "gz/common/Material.hh"
+#include "gz/common/Console.hh"
 
 using namespace gz;
 using namespace common;

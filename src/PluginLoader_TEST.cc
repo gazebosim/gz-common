@@ -26,7 +26,7 @@
 #include "ignition/common/SystemPaths.hh"
 #include "ignition/common/TempDirectory.hh"
 
-#include "ignition/common/testing/Utils.hh"
+#include "gz/common/testing/Utils.hh"
 
 /////////////////////////////////////////////////
 class TestTempDirectory : public gz::common::TempDirectory

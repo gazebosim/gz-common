@@ -15,9 +15,9 @@
  *
 */
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/NodeAnimation.hh"
-#include "ignition/common/SkeletonAnimation.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/NodeAnimation.hh"
+#include "gz/common/SkeletonAnimation.hh"
 
 using namespace gz;
 using namespace common;

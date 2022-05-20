@@ -16,8 +16,8 @@
 */
 #include <gtest/gtest.h>
 
-#include <ignition/common/testing/TestPaths.hh>
-#include <ignition/common/testing/Utils.hh>
+#include <gz/common/testing/TestPaths.hh>
+#include <gz/common/testing/Utils.hh>
 
 using namespace gz::common;
 using namespace gz::common::testing;

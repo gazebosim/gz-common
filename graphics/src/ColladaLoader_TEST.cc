@@ -16,15 +16,15 @@
 */
 #include <gtest/gtest.h>
 
-#include "ignition/common/Mesh.hh"
-#include "ignition/common/SubMesh.hh"
-#include "ignition/common/Material.hh"
-#include "ignition/common/ColladaLoader.hh"
-#include "ignition/common/Skeleton.hh"
-#include "ignition/common/SkeletonAnimation.hh"
+#include "gz/common/Mesh.hh"
+#include "gz/common/SubMesh.hh"
+#include "gz/common/Material.hh"
+#include "gz/common/ColladaLoader.hh"
+#include "gz/common/Skeleton.hh"
+#include "gz/common/SkeletonAnimation.hh"
 
-#include "ignition/common/testing/AutoLogFixture.hh"
-#include "ignition/common/testing/TestPaths.hh"
+#include "gz/common/testing/AutoLogFixture.hh"
+#include "gz/common/testing/TestPaths.hh"
 
 using namespace gz;
 class ColladaLoader : public common::testing::AutoLogFixture { };

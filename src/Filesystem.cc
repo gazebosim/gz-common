@@ -25,12 +25,12 @@
 #include <cctype>
 #include <regex>
 
-#include <ignition/common/config.hh>
-#include <ignition/common/SystemPaths.hh>
-#include <ignition/common/Util.hh>
-#include <ignition/common/Uuid.hh>
-#include <ignition/common/Console.hh>
-#include "ignition/common/Filesystem.hh"
+#include <gz/common/config.hh>
+#include <gz/common/SystemPaths.hh>
+#include <gz/common/Util.hh>
+#include <gz/common/Uuid.hh>
+#include <gz/common/Console.hh>
+#include "gz/common/Filesystem.hh"
 
 namespace fs = std::filesystem;
 

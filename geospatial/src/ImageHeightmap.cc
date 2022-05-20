@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#include "ignition/common/Console.hh"
-#include "ignition/common/geospatial/ImageHeightmap.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/geospatial/ImageHeightmap.hh"
 
 using namespace gz;
 using namespace common;

@@ -17,10 +17,10 @@
 
 #include <gtest/gtest.h>
 
-#include "ignition/common/SVGLoader.hh"
+#include "gz/common/SVGLoader.hh"
 
-#include "ignition/common/testing/AutoLogFixture.hh"
-#include "ignition/common/testing/TestPaths.hh"
+#include "gz/common/testing/AutoLogFixture.hh"
+#include "gz/common/testing/TestPaths.hh"
 
 using namespace gz;
 using namespace common;

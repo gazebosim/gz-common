@@ -21,11 +21,11 @@
 #include <optional>
 #include <string>
 
-#include "ignition/math/Helpers.hh"
+#include "gz/math/Helpers.hh"
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/Material.hh"
-#include "ignition/common/SubMesh.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/Material.hh"
+#include "gz/common/SubMesh.hh"
 
 using namespace gz;
 using namespace common;

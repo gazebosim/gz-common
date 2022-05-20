@@ -14,14 +14,14 @@
  * limitations under the License.
  *
  */
-#include <ignition/math/Vector3.hh>
+#include <gz/math/Vector3.hh>
 
-#include <ignition/common/Material.hh>
-#include <ignition/common/Mesh.hh>
-#include <ignition/common/SubMesh.hh>
-#include <ignition/common/Console.hh>
-#include <ignition/common/ColladaExporter.hh>
-#include <ignition/common/Filesystem.hh>
+#include <gz/common/Material.hh>
+#include <gz/common/Mesh.hh>
+#include <gz/common/SubMesh.hh>
+#include <gz/common/Console.hh>
+#include <gz/common/ColladaExporter.hh>
+#include <gz/common/Filesystem.hh>
 
 #include "tinyxml2.h"
 

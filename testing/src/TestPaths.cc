@@ -14,12 +14,12 @@
 * limitations under the License.
 *
 */
-#include "ignition/common/testing/TestPaths.hh"
-#include "ignition/common/testing/BazelTestPaths.hh"
-#include "ignition/common/testing/CMakeTestPaths.hh"
+#include "gz/common/testing/TestPaths.hh"
+#include "gz/common/testing/BazelTestPaths.hh"
+#include "gz/common/testing/CMakeTestPaths.hh"
 
-#include <ignition/common/Console.hh>
-#include <ignition/common/Util.hh>
+#include <gz/common/Console.hh>
+#include <gz/common/Util.hh>
 
 namespace gz::common::testing
 {

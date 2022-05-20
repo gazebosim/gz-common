@@ -18,7 +18,7 @@
 #include <gtest/gtest.h>
 #include <string>
 
-#include "ignition/common/TemplateHelpers.hh"
+#include "gz/common/TemplateHelpers.hh"
 
 struct SomeType { };
 

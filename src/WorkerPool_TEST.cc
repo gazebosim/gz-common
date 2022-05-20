@@ -19,9 +19,9 @@
 
 #include <atomic>
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/WorkerPool.hh"
-#include "ignition/utils/ExtraTestMacros.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/WorkerPool.hh"
+#include "gz/utils/ExtraTestMacros.hh"
 
 namespace igncmn = gz::common;
 using namespace igncmn;

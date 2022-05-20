@@ -17,12 +17,12 @@
 
 #include <memory>
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/Filesystem.hh"
-#include "ignition/common/Material.hh"
-#include "ignition/common/Mesh.hh"
-#include "ignition/common/SubMesh.hh"
-#include "ignition/common/OBJLoader.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/Filesystem.hh"
+#include "gz/common/Material.hh"
+#include "gz/common/Mesh.hh"
+#include "gz/common/SubMesh.hh"
+#include "gz/common/OBJLoader.hh"
 
 #define IGNITION_COMMON_TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"

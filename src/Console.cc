@@ -17,8 +17,8 @@
 #include <string>
 #include <sstream>
 
-#include <ignition/common/Console.hh>
-#include <ignition/common/config.hh>
+#include <gz/common/Console.hh>
+#include <gz/common/config.hh>
 
 #ifdef _WIN32
 #include <Windows.h>

@@ -15,7 +15,7 @@
 *
 */
 
-#include "ignition/common/testing/Utils.hh"
+#include "gz/common/testing/Utils.hh"
 
 #include <fstream>
 #include <random>

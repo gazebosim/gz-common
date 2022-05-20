@@ -15,9 +15,9 @@
  *
  */
 
-#include <ignition/common/TempDirectory.hh>
+#include <gz/common/TempDirectory.hh>
 
-#include <ignition/common/Console.hh>
+#include <gz/common/Console.hh>
 
 #include <filesystem>
 

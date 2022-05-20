@@ -17,7 +17,7 @@
 
 #include <filesystem>
 
-#include "ignition/common/Filesystem.hh"
+#include "gz/common/Filesystem.hh"
 
 namespace fs = std::filesystem;
 

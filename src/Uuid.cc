@@ -18,7 +18,7 @@
 #include <string>
 #include <vector>
 
-#include "ignition/common/Uuid.hh"
+#include "gz/common/Uuid.hh"
 
 using namespace gz;
 using namespace common;

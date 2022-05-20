@@ -18,13 +18,13 @@
 // needed on MacOS
 #include <cmath>
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/VideoEncoder.hh"
-#include "ignition/common/Video.hh"
-#include "ignition/common/ffmpeg_inc.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/VideoEncoder.hh"
+#include "gz/common/Video.hh"
+#include "gz/common/ffmpeg_inc.hh"
 
-#include <ignition/common/testing/AutoLogFixture.hh>
-#include <ignition/common/testing/TestPaths.hh>
+#include <gz/common/testing/AutoLogFixture.hh>
+#include <gz/common/testing/TestPaths.hh>
 
 using namespace gz;
 using namespace common;

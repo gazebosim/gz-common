@@ -17,9 +17,9 @@
 
 #include <gtest/gtest.h>
 
-#include "ignition/common/testing/AutoLogFixture.hh"
-#include "ignition/common/MouseEvent.hh"
-#include "ignition/common/config.hh"
+#include "gz/common/testing/AutoLogFixture.hh"
+#include "gz/common/MouseEvent.hh"
+#include "gz/common/config.hh"
 
 using namespace gz;
 

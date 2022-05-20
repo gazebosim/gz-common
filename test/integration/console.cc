@@ -17,8 +17,8 @@
 
 #include <gtest/gtest.h>
 
-#include <ignition/common/Console.hh>
-#include <ignition/common/testing/TestPaths.hh>
+#include <gz/common/Console.hh>
+#include <gz/common/testing/TestPaths.hh>
 
 //////////////////////////////////////////////////
 TEST(Console_TEST, LogInitAfterConsoleOut)

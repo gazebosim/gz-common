@@ -18,11 +18,11 @@
 #include <gtest/gtest.h>
 #include <memory>
 
-#include "ignition/common/GTSMeshUtils.hh"
-#include "ignition/common/Mesh.hh"
-#include "ignition/common/SubMesh.hh"
+#include "gz/common/GTSMeshUtils.hh"
+#include "gz/common/Mesh.hh"
+#include "gz/common/SubMesh.hh"
 
-#include "ignition/common/testing/AutoLogFixture.hh"
+#include "gz/common/testing/AutoLogFixture.hh"
 
 using namespace gz;
 

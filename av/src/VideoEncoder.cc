@@ -18,14 +18,14 @@
 
 #include <mutex>
 
-#include <ignition/common/av/Util.hh>
-#include "ignition/common/ffmpeg_inc.hh"
-#include "ignition/common/Console.hh"
-#include "ignition/common/VideoEncoder.hh"
-#include "ignition/common/StringUtils.hh"
+#include <gz/common/av/Util.hh>
+#include "gz/common/ffmpeg_inc.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/VideoEncoder.hh"
+#include "gz/common/StringUtils.hh"
 
 #ifdef IGN_COMMON_BUILD_HW_VIDEO
-#include "ignition/common/HWEncoder.hh"
+#include "gz/common/HWEncoder.hh"
 #endif
 
 using namespace gz;

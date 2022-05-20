@@ -15,7 +15,7 @@
 *
 */
 
-#include "ignition/common/testing/CMakeTestPaths.hh"
+#include "gz/common/testing/CMakeTestPaths.hh"
 
 namespace gz::common::testing
 {
