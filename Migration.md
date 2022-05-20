@@ -13,6 +13,8 @@ release will remove the deprecated code.
    be used instead, which properly handles submeshes having no material index
    applied to them.
 2. The `ignition` namespace is deprecated and will be removed in future versions.  Use `gz` instead.
+3. Header files under `ignition/...` are deprecated and will be removed in future versions.
+   Use `gz/...` instead.
 
 1. All the plugin APIs are deprecated, use the gz-plugin library instead. See
    the [migration guide](https://github.com/ignitionrobotics/ign-plugin/blob/ign-plugin1/MIGRATION.md).
@@ -100,4 +102,3 @@ release will remove the deprecated code.
 1. **ignition-cmake**
     + Ignition-math now has a build dependency on ignition-cmake, which
       allows cmake scripts to be shared across all the ignition packages.
-
