@@ -108,7 +108,7 @@ namespace gz
     typedef std::runtime_error exception;
 
     /// \brief Please use systemTimeIso() as this function will be deprecated
-    /// in Ignition Common 4.
+    /// in Gazebo Common 4.
     /// Get the wall time as an ISO string: YYYY-MM-DDTHH:MM:SS.NS
     /// \return The current wall time as an ISO string.
     /// \sa systemTimeIso();

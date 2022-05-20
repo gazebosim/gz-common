@@ -5,7 +5,7 @@ Deprecated code produces compile-time warnings. These warning serve as
 notification to users that their code should be upgraded. The next major
 release will remove the deprecated code.
 
-## Ignition Common 4.X to 5.X
+## Gazebo Common 4.X to 5.X
 
 ### Deprecations
 
@@ -36,7 +36,7 @@ release will remove the deprecated code.
 
 1. `Image::AvgColor`, `Image::Data` and `Image::RGBData` methods are now `const`.
 
-## Ignition Common 3.X to 4.X
+## Gazebo Common 3.X to 4.X
 
 ### Modifications
 
@@ -52,7 +52,7 @@ release will remove the deprecated code.
     * A URI authority is optional. If present, then a URI authority begins
     with two forward slashes and immediately follows the URI scheme. A host must be present if an authority is present and the scheme != 'file'.
 
-## Ignition Common 2.X to 3.X
+## Gazebo Common 2.X to 3.X
 
 ### Additions
 
@@ -79,7 +79,7 @@ release will remove the deprecated code.
 
 1. (New in 3.8.0) On Windows, the value of C++ macro `IGN_HOMEDIR` changed from `HOMEPATH` to `USERPROFILE`. It is usually used to read the path to the user's home from environment. The old value pointed to a path relative to the (a) current drive letter as reported by `pwd`, not the system drive letter. The new value correctly points to an environment variable that contains the full absolute path to the user's profile. If the code did not use the macro in some unexpected way, the new behavior should work either the same or even better (it would work even when the current directory is on a non-system drive). If the code relied on this value to be relative to the current drive letter, it needs to be changed to use `HOMEPATH` directly.
 
-## Ignition Common 1.X to 2.X
+## Gazebo Common 1.X to 2.X
 
 ### Modifications
 
@@ -95,7 +95,7 @@ release will remove the deprecated code.
       - events: registering and handling event callbacks
       - graphics: animation, images, and triangle meshes
 
-## Ignition Common 0.X to 1.X
+## Gazebo Common 0.X to 1.X
 
 ### Added dependencies
 

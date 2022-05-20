@@ -2,7 +2,7 @@
 
 Next Tutorial: \ref profiler
 
-These instructions are for installing only Ignition Common.
+These instructions are for installing only Gazebo Common.
 If you're interested in using all the Ignition libraries, check out this [Ignition installation](https://ignitionrobotics.org/docs/latest/install).
 
 We recommend following the Binary Installation instructions to get up and running as quickly and painlessly as possible.
@@ -29,7 +29,7 @@ On macOS, add OSRF packages:
   brew tap osrf/simulation
   ```
 
-Install Ignition Common:
+Install Gazebo Common:
   ```
   brew install ignition-common<#>
   ```
@@ -63,10 +63,10 @@ prerequisites followed by building from source.
 
 ## Prerequisites
 
-Ignition Common requires:
+Gazebo Common requires:
 
-  * [Ignition CMake](https://ignitionrobotics.org/libs/cmake)
-  * [Ignition Math](https://ignitionrobotics.org/libs/math).
+  * [Gazebo CMake](https://ignitionrobotics.org/libs/cmake)
+  * [Gazebo Math](https://ignitionrobotics.org/libs/math).
 
 The Graphics component requires:
 

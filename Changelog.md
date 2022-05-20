@@ -1,10 +1,10 @@
-## Ignition Common 5.x
+## Gazebo Common 5.x
 
-## Ignition Common 5.0.0 (20XX-XX-XX)
+## Gazebo Common 5.0.0 (20XX-XX-XX)
 
-## Ignition Common 4.x
+## Gazebo Common 4.x
 
-## Ignition Common 4.5.0 (2022-01-12)
+## Gazebo Common 4.5.0 (2022-01-12)
 
 1. Fixed crash when a Collada file has an empty normal vector
     * [Pull request #280](https://github.com/gazebosim/gz-common/pull/280)
@@ -36,12 +36,12 @@
 1. Use direct evaluation for SKIP_av.
     * [Pull request #250](https://github.com/gazebosim/gz-common/pull/250)
 
-## Ignition Common 4.4.0 (2021-10-15)
+## Gazebo Common 4.4.0 (2021-10-15)
 
 1. Add support for animation tension
     * [Pull request #256](https://github.com/gazebosim/gz-common/pull/256)
 
-## Ignition Common 4.3.0 (2021-09-27)
+## Gazebo Common 4.3.0 (2021-09-27)
 
 1. Remove ign-utils from TempDirectory
     * [Pull request #248](https://github.com/gazebosim/gz-common/pull/248)
@@ -67,7 +67,7 @@
     * [Pull request #252](https://github.com/gazebosim/gz-common/pull/252)
     * [Pull request #253](https://github.com/gazebosim/gz-common/pull/253)
 
-## Ignition Common 4.2.0 (2021-08-02)
+## Gazebo Common 4.2.0 (2021-08-02)
 
 1. Export lights to dae
     * [Pull request #228](https://github.com/gazebosim/gz-common/pull/228)
@@ -75,7 +75,7 @@
 1. Add cstring for std::memcpy
     * [Pull request #230](https://github.com/gazebosim/gz-common/pull/230)
 
-## Ignition Common 4.1.0 (2021-06-22)
+## Gazebo Common 4.1.0 (2021-06-22)
 
 1. Make KeyEvent rule-of-five compliant
     * [Pull request #224](https://github.com/gazebosim/gz-common/pull/224)
@@ -131,7 +131,7 @@
     * [Pull request #123](https://github.com/gazebosim/gz-common/pull/123)
 >>>>>>> ign-common4
 
-## Ignition Common 4.0.0 (2021-03-30)
+## Gazebo Common 4.0.0 (2021-03-30)
 
 1. Include windows instructions in examples README.md
     * [Pull request #190](https://github.com/gazebosim/gz-common/pull/190)
@@ -174,11 +174,11 @@
    be found [here](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Generic_syntax). This update also caused some formally valid syntax to become invalid, and some formally invalid syntax to become valid. See the migration guide.
     * [BitBucket pull request xxx](https://osrf-migration.github.io/ignition-gh-pages/#!/gazebosim/gz-common/pull-requests/213)
 
-## Ignition Common 3.x
+## Gazebo Common 3.x
 
-## Ignition Common 3.X.X
+## Gazebo Common 3.X.X
 
-## Ignition Common 3.14.0 (2021-10-12)
+## Gazebo Common 3.14.0 (2021-10-12)
 
 1. Support loading PBR textures in OBJLoader
     * [Pull request #216](https://github.com/gazebosim/gz-common/pull/216)
@@ -204,7 +204,7 @@
 1. Use direct evaluation for SKIP_av
     * [Pull request #250](https://github.com/gazebosim/gz-common/pull/250)
 
-## Ignition Common 3.13.2 (2021-05-11)
+## Gazebo Common 3.13.2 (2021-05-11)
 
 1. Backport collada fixes (Backport #204)
     * [Pull request #211](https://github.com/gazebosim/gz-common/pull/211)
@@ -212,7 +212,7 @@
 1. Fix join paths again
     * [Pull request #215](https://github.com/gazebosim/gz-common/pull/215)
 
-## Ignition Common 3.13.1 (2021-05-03)
+## Gazebo Common 3.13.1 (2021-05-03)
 
 1. Fix join paths to remove duplicate separators
     * [Pull request #205](https://github.com/gazebosim/gz-common/pull/209)
@@ -220,7 +220,7 @@
 1. Fix loading collada files with multiple texcoord sets using the same offset.
     * [Pull request #208](https://github.com/gazebosim/gz-common/pull/208)
 
-## Ignition Common 3.13.0 (2021-04-27)
+## Gazebo Common 3.13.0 (2021-04-27)
 
 1. Add function to convert single channel image data to RGB image
     * [Pull request #205](https://github.com/gazebosim/gz-common/pull/205)
@@ -237,7 +237,7 @@
 1. Improved Windows support
     * [Pull request #197](https://github.com/gazebosim/gz-common/pull/197)
 
-## Ignition Common 3.12.0 (2021-04-06)
+## Gazebo Common 3.12.0 (2021-04-06)
 
 1. Remove use of _SOURCE and _BINARY dirs in tests.
     * [Pull request #158](https://github.com/gazebosim/gz-common/pull/158)
@@ -254,7 +254,7 @@
 1. Function to serialize compressed image to buffer
     * [Pull request #139](https://github.com/gazebosim/gz-common/pull/139)
 
-## Ignition Common 3.11.1 (2021-03-08)
+## Gazebo Common 3.11.1 (2021-03-08)
 
 1. Relax expectation so encoder test passes on ARM
     * [Pull request #183](https://github.com/gazebosim/gz-common/pull/183)
@@ -262,7 +262,7 @@
 1. Revert "Associate library materials effect with meshes (#151)"
     * [Pull request #182](https://github.com/gazebosim/gz-common/pull/182)
 
-## Ignition Common 3.11.0 (2021-03-05)
+## Gazebo Common 3.11.0 (2021-03-05)
 
 1. Fix image red and blue swapping
     * [Pull request #162](https://github.com/gazebosim/gz-common/pull/162)
@@ -298,12 +298,12 @@
 1. Added capsule mesh
     * [Pull request #155](https://github.com/gazebosim/gz-common/pull/155)
 
-## Ignition Common 3.10.1 (2021-01-20)
+## Gazebo Common 3.10.1 (2021-01-20)
 
 1. Fix transparency tag in the Collada exporter.
     * [Pull Request 152](https://github.com/gazebosim/gz-common/pull/152)
 
-## Ignition Common 3.10.0 (2021-01-05)
+## Gazebo Common 3.10.0 (2021-01-05)
 
 1. Added render order to material class
     * [Pull Request 142](https://github.com/gazebosim/gz-common/pull/142)
@@ -311,7 +311,7 @@
 1. Fix memory leak in Pbr.cc
     * [Pull Request 147](https://github.com/gazebosim/gz-common/pull/147)
 
-## Ignition Common 3.9.0 (2020-12-21)
+## Gazebo Common 3.9.0 (2020-12-21)
 
 1. Support multiple texture coordinate sets
     * [Pull Request 131](https://github.com/gazebosim/gz-common/pull/131)
@@ -319,7 +319,7 @@
 1. Add Lightmap to material
     * [Pull Request 132](https://github.com/gazebosim/gz-common/pull/132)
 
-## Ignition Common 3.8.0 (2020-12-08)
+## Gazebo Common 3.8.0 (2020-12-08)
 
 1. Call gz::common::load() from Video constructor
     * [Pull Request 111](https://github.com/gazebosim/gz-common/pull/111)
@@ -343,7 +343,7 @@
     * [Pull Request 100](https://github.com/gazebosim/gz-common/pull/100)
     * Fix: [Pull Request 133](https://github.com/gazebosim/gz-common/pull/133)
 
-## Ignition Common 3.7.0 (2020-10-21)
+## Gazebo Common 3.7.0 (2020-10-21)
 
 1. Miscellaneous Cleanups
     * Feature: Join function for combining strings with a delimiter
@@ -370,7 +370,7 @@
     * Feature: Add alternative env implementation that respects empty variables
     * [Pull Request 97](https://github.com/gazebosim/gz-common/pull/97)
 
-## Ignition Common 3.6.1 (2020-09-16)
+## Gazebo Common 3.6.1 (2020-09-16)
 
 1. Fix hierarchical submesh processing in the ColladaLoader.
     * [Pull Request 78](https://github.com/gazebosim/gz-common/pull/78)
@@ -392,7 +392,7 @@
 1. Remove URI warning on constructor
     * [Pull Request 94](https://github.com/gazebosim/gz-common/pull/94)
 
-## Ignition Common 3.6.0 (2020-06-09)
+## Gazebo Common 3.6.0 (2020-06-09)
 
 1. Refactor Image::MaxColor to reduce computation time
     * [Pull request 66](https://github.com/gazebosim/gz-common/pull/66)
@@ -409,7 +409,7 @@
 1. More file path APIs
     * [Pull request 70](https://github.com/gazebosim/gz-common/pull/70)
 
-## Ignition Common 3.5.0 (2020-04-09)
+## Gazebo Common 3.5.0 (2020-04-09)
 
 1. Add interpolate\_x property to actor animations
     * [BitBucket pull request 232](https://osrf-migration.github.io/ignition-gh-pages/#!/gazebosim/gz-common/pull-requests/232)
@@ -420,7 +420,7 @@
 1. Fix crash when loading OBJ meshes with invalid materials
     * [BitBucket pull request 230](https://osrf-migration.github.io/ignition-gh-pages/#!/gazebosim/gz-common/pull-requests/230)
 
-## Ignition Common 3.4.0 (2020-02-20)
+## Gazebo Common 3.4.0 (2020-02-20)
 
 1. Add PBR material class
     * [BitBucket pull request 227](https://osrf-migration.github.io/ignition-gh-pages/#!/gazebosim/gz-common/pull-requests/227)
@@ -462,7 +462,7 @@
 1. Support custom callbacks to find files on global interface
     * [BitBucket pull request 226](https://osrf-migration.github.io/ignition-gh-pages/#!/gazebosim/gz-common/pull-requests/226)
 
-## Ignition Common 3.3.0 (2019-08-27)
+## Gazebo Common 3.3.0 (2019-08-27)
 
 1. skip GTSMeshUtils test on Windows due to issue #50
     * [BitBucket pull request 205](https://osrf-migration.github.io/ignition-gh-pages/#!/gazebosim/gz-common/pull-requests/205)
@@ -476,7 +476,7 @@
 1. Filesystem copy directory and parentpath
     * [BitBucket pull request 200](https://osrf-migration.github.io/ignition-gh-pages/#!/gazebosim/gz-common/pull-requests/200)
 
-## Ignition Common 3.2.0 (2019-08-07)
+## Gazebo Common 3.2.0 (2019-08-07)
 
 1. Allow ignLogInit to use an absolute path. Added a timeToIso that converts a given time to an ISO string. Some console timestamps were using `IGN_SYSTEM_TIME_NS()` and others `gz::common::systemTimeISO()`. Switched all to use `gz::common::systemTimeISO()`.
     * [BitBucket pull request 203](https://osrf-migration.github.io/ignition-gh-pages/#!/gazebosim/gz-common/pull-requests/203)
@@ -484,7 +484,7 @@
 1. Port ColladaLoader fix: use default value of 1 for stride parameter when unset.
     * [BitBucket pull request 196](https://osrf-migration.github.io/ignition-gh-pages/#!/gazebosim/gz-common/pull-requests/196)
 
-## Ignition Common 3.1.0 (2019-05-17)
+## Gazebo Common 3.1.0 (2019-05-17)
 
 1. Image::PixelFormatType: append `BAYER_BGGR8` instead of replacing `BAYER_RGGR8`
     * [BitBucket pull request 192](https://osrf-migration.github.io/ignition-gh-pages/#!/gazebosim/gz-common/pull-requests/192)
@@ -512,7 +512,7 @@
     * [BitBucket pull request 179](https://osrf-migration.github.io/ignition-gh-pages/#!/gazebosim/gz-common/pull-requests/179)
     * [BitBucket osrf/gazebo pull request 3071](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/3071)
 
-## Ignition Common 3.0.0 (2019-02-28)
+## Gazebo Common 3.0.0 (2019-02-28)
 
 1. Use ign-cmake2 and support Ubuntu Bionic (18.04).
     * [BitBucket pull request 131](https://osrf-migration.github.io/ignition-gh-pages/#!/gazebosim/gz-common/pull-requests/131)
@@ -550,11 +550,11 @@
 1. NodeTransform: use unique_ptr for private data, add copy constructor/assignment
     * [BitBucket pull request 181](https://osrf-migration.github.io/ignition-gh-pages/#!/gazebosim/gz-common/pull-requests/181)
 
-## Ignition Common 2.x
+## Gazebo Common 2.x
 
-## Ignition Common 2.x.x (2018-XX-XX)
+## Gazebo Common 2.x.x (2018-XX-XX)
 
-## Ignition Common 2.0.0 (2018-02-11)
+## Gazebo Common 2.0.0 (2018-02-11)
 
 1. Use ignition-cmake1 and components for av, events, and graphics
     * [BitBucket pull request 102](https://osrf-migration.github.io/ignition-gh-pages/#!/gazebosim/gz-common/pull-requests/102)
@@ -574,16 +574,16 @@
 1. Update tinyobjloader to version that supports triangulating meshes with concave polygons.
     * [BitBucket pull request 160](https://osrf-migration.github.io/ignition-gh-pages/#!/gazebosim/gz-common/pull-requests/160)
 
-## Ignition Common 1.x.x (2018-XX-XX)
+## Gazebo Common 1.x.x (2018-XX-XX)
 
 
-## Ignition Common 1.X.X (20XX-XX-XX)
+## Gazebo Common 1.X.X (20XX-XX-XX)
 
 1. Time::Sleep: use CLOCK_MONOTONIC on Linux
     * [BitBucket pull request 159](https://osrf-migration.github.io/ignition-gh-pages/#!/gazebosim/gz-common/pull-requests/159)
 
 
-## Ignition Common 1.1.1 (2018-05-23)
+## Gazebo Common 1.1.1 (2018-05-23)
 
 1. Documentation upload improvements
     * [BitBucket pull request 117](https://osrf-migration.github.io/ignition-gh-pages/#!/gazebosim/gz-common/pull-requests/117)
@@ -595,7 +595,7 @@
     * [BitBucket pull request 124](https://osrf-migration.github.io/ignition-gh-pages/#!/gazebosim/gz-common/pull-requests/124)
 
 
-## Ignition Common 1.1.0 (2018-04-16)
+## Gazebo Common 1.1.0 (2018-04-16)
 
 1. Accept spaces on URI path
     * [BitBucket pull request 110](https://osrf-migration.github.io/ignition-gh-pages/#!/gazebosim/gz-common/pull-requests/110)

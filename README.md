@@ -1,4 +1,4 @@
-# Ignition Common : AV, Graphics, Events, and much more.
+# Gazebo Common : AV, Graphics, Events, and much more.
 
 **Maintainer:** nate AT openrobotics DOT org
 
@@ -14,12 +14,12 @@ Ubuntu Focal | [![Build Status](https://build.osrfoundation.org/buildStatus/icon
 Homebrew      | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-main-homebrew-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-main-homebrew-amd64)
 Windows       | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-main-windows7-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-main-windows7-amd64)
 
-Ignition Common, a component of [Ignition
+Gazebo Common, a component of [Ignition
 Robotics](https://ignitionrobotics.org), provides a set of libraries that
 cover many different use cases. An audio-visual library supports
 processing audio and video files, a graphics library can load a variety 3D
 mesh file formats into a generic in-memory representation, and the core
-library of Ignition Common contains functionality that spans Base64
+library of Gazebo Common contains functionality that spans Base64
 encoding/decoding to thread pools.
 
 # Table of Contents
@@ -42,7 +42,7 @@ encoding/decoding to thread pools.
 
 # Features
 
-Some of the many capabilities contained in Ignition Common are:
+Some of the many capabilities contained in Gazebo Common are:
 
 * **AV**: FFMpeg based audio decoder, and video encoder and decoder.
 * **Core**: Base64 encoding and decoding, battery model, console logging,
@@ -97,7 +97,7 @@ Please see
 
 # Versioning
 
-This library uses [Semantic Versioning](https://semver.org/). Additionally, this library is part of the [Ignition Robotics project](https://ignitionrobotics.org) which periodically releases a versioned set of compatible and complimentary libraries. See the [Ignition Robotics website](https://ignitionrobotics.org) for version and release information.
+This library uses [Semantic Versioning](https://semver.org/). Additionally, this library is part of the [Gazebo Robotics project](https://ignitionrobotics.org) which periodically releases a versioned set of compatible and complimentary libraries. See the [Gazebo Robotics website](https://ignitionrobotics.org) for version and release information.
 
 # License
 

@@ -6,7 +6,7 @@ encoders are used. This tutorial will show how to configure the encoder for HW
 acceleration and will present ready-made commandlines for some typical use-cases.
 
 You can either use the `VideoEncoder` class directly, or you can "meet it" in the
-video recorder plugin in Ignition Gazebo. In both cases, HW-accelerated encoding
+video recorder plugin in Gazebo. In both cases, HW-accelerated encoding
 can be set up.
 
 HW acceleration should provide you with higher encoding performance, potentially
@@ -60,9 +60,9 @@ Here are some sample outputs:
  V..... nvenc_h264           NVIDIA NVENC H.264 encoder (codec h264)
 ```
 
-Ignition Common so far supports:
+Gazebo Common so far supports:
 
-| Encoder | Technology | Platforms | GPU vendors | Ignition Common name |
+| Encoder | Technology | Platforms | GPU vendors | Gazebo Common name |
 | ------- | ---------- | --------- | ----------- | -------------------- |
 | `h264_nvenc` | [NVidia NVEnc](https://en.wikipedia.org/wiki/Nvidia_NVENC) | Windows + x86 Linux | NVidia GPUs | NVENC |
 | `h264_qsv` | [Intel QuickSync](https://en.wikipedia.org/wiki/Intel_Quick_Sync_Video) | Windows + x86 Linux | Intel GPUs | QSV |

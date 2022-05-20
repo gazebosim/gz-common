@@ -4,7 +4,7 @@ Next Tutorial: \ref hw-encoding
 
 ## Overview
 
-This tutorial describes how to get started using the Ignition Common profiler
+This tutorial describes how to get started using the Gazebo Common profiler
 to measure and visualize run-time performance of your software.
 
 The `gz::common::Profiler` provides a common interface that can allow for
