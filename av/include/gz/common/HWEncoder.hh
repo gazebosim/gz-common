@@ -32,7 +32,7 @@ namespace gz::common
   /// \brief Representation of a GPU video encoder and its configuration.
   /// \note This class is intentionally hidden as it provides highly customized
   /// behavior tailored just for the use with VideoEncoder.
-  class IGNITION_COMMON_AV_HIDDEN HWEncoder
+  class GZ_COMMON_AV_HIDDEN HWEncoder
   {
     /// \brief Set up the HW encoder configurator.
     /// \param[in] _allowedHwEncoders HW encoders to try.

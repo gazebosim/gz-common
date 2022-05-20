@@ -53,7 +53,7 @@ namespace gz
     /// * IGN_PROFILE_END - End a named profile sample
     /// * IGN_PROFILE - RAII-style profile sample. The sample will end at the
     ///     end of the current scope.
-    class IGNITION_COMMON_PROFILER_VISIBLE Profiler
+    class GZ_COMMON_PROFILER_VISIBLE Profiler
         : public virtual SingletonT<Profiler>
     {
       /// \brief Constructor
@@ -102,7 +102,7 @@ namespace gz
     /// \brief Used to provide C++ RAII-style profiling sample.
     /// The sample will start on the construction of the `ScopedProfile` object
     /// and stop when the object leaves scope.
-    class IGNITION_COMMON_PROFILER_VISIBLE ScopedProfile
+    class GZ_COMMON_PROFILER_VISIBLE ScopedProfile
     {
       /// \brief Constructor. Starts profile sample.
       /// \param[in] _name Name of the sample

@@ -32,7 +32,7 @@ namespace gz::common::testing
 /// \param[in] _filename Filename of the file to be created
 /// \return true if file successfully created, false otherwise
 bool
-IGNITION_COMMON_TESTING_VISIBLE
+GZ_COMMON_TESTING_VISIBLE
 createNewEmptyFile(const std::string &_filename);
 
 }  // namespace gz::common::testing

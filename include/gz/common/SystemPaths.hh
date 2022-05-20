@@ -35,7 +35,7 @@ namespace gz
     /// \brief Functions to handle getting system paths, keeps track of:
     ///        \li SystemPaths#pluginPaths - plugin library paths
     ///            for common::WorldPlugin
-    class IGNITION_COMMON_VISIBLE  SystemPaths
+    class GZ_COMMON_VISIBLE  SystemPaths
     {
       /// \brief Constructor for SystemPaths
       public: SystemPaths();

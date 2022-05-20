@@ -32,7 +32,7 @@ namespace gz
     class WorkerPoolPrivate;
 
     /// \brief A pool of worker threads that do stuff in parallel
-    class IGNITION_COMMON_VISIBLE WorkerPool
+    class GZ_COMMON_VISIBLE WorkerPool
     {
       /// \brief Creates worker threads. The number of worker threads is
       /// determined by max(std::thread::hardware_concurrency, _minThreadCount).

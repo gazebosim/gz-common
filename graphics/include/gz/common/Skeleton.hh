@@ -37,7 +37,7 @@ namespace gz
 
     /// \class Skeleton Skeleton.hh gz/common/Skeleton.hh
     /// \brief A skeleton, usually used for animation purposes.
-    class IGNITION_COMMON_GRAPHICS_VISIBLE Skeleton
+    class GZ_COMMON_GRAPHICS_VISIBLE Skeleton
     {
       /// \brief Constructor
       public: Skeleton();

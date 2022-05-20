@@ -31,7 +31,7 @@ namespace gz
   namespace common
   {
     /// \brief Encapsulates an image that will be interpreted as a heightmap.
-    class IGNITION_COMMON_GEOSPATIAL_VISIBLE ImageHeightmap
+    class GZ_COMMON_GEOSPATIAL_VISIBLE ImageHeightmap
       : public gz::common::HeightmapData
     {
       /// \brief Constructor

@@ -28,7 +28,7 @@ namespace gz
   namespace common
   {
     /// \brief Encapsulates density types.
-    class IGNITION_COMMON_VISIBLE MaterialDensity
+    class GZ_COMMON_VISIBLE MaterialDensity
     {
       /// \enum Type
       /// \brief Types of materials.

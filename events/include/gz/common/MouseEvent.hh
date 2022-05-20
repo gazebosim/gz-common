@@ -32,7 +32,7 @@ namespace gz
 
     /// \class MouseEvent MouseEvent.hh gz/common/MouseEvent.hh
     /// \brief Generic description of a mouse event.
-    class IGNITION_COMMON_EVENTS_VISIBLE MouseEvent
+    class GZ_COMMON_EVENTS_VISIBLE MouseEvent
     {
       /// \brief Standard mouse buttons enumeration.
       public: enum MouseButton

@@ -29,7 +29,7 @@ namespace gz
   {
     /// \class AudioDecoder AudioDecoder.hh gz/common/common.hh
     /// \brief An audio decoder based on FFMPEG.
-    class IGNITION_COMMON_AV_VISIBLE AudioDecoder
+    class GZ_COMMON_AV_VISIBLE AudioDecoder
     {
       /// \brief Constructor.
       public: AudioDecoder();

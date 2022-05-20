@@ -27,7 +27,7 @@ namespace gz
   namespace common
   {
     /// \brief Encapsulates a generic heightmap data file.
-    class IGNITION_COMMON_GEOSPATIAL_VISIBLE HeightmapData
+    class GZ_COMMON_GEOSPATIAL_VISIBLE HeightmapData
     {
       /// \brief Destructor.
       public: virtual ~HeightmapData() = default;

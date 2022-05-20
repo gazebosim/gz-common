@@ -69,7 +69,7 @@ namespace gz
     };
 
     /// \brief Class used to export Collada mesh files
-    class IGNITION_COMMON_GRAPHICS_VISIBLE ColladaExporter : public MeshExporter
+    class GZ_COMMON_GRAPHICS_VISIBLE ColladaExporter : public MeshExporter
     {
       /// \brief Constructor
       public: ColladaExporter();

@@ -31,7 +31,7 @@ namespace gz
   {
     /// \class KeyFrame KeyFrame.hh gz/common/KeyFrame.hh
     /// \brief A key frame in an animation
-    class IGNITION_COMMON_GRAPHICS_VISIBLE KeyFrame
+    class GZ_COMMON_GRAPHICS_VISIBLE KeyFrame
     {
       /// \brief Constructor
       /// \param[in] _time Time of the keyframe in seconds
@@ -49,7 +49,7 @@ namespace gz
     };
 
     /// \brief A keyframe for a PoseAnimation
-    class IGNITION_COMMON_GRAPHICS_VISIBLE PoseKeyFrame : public KeyFrame
+    class GZ_COMMON_GRAPHICS_VISIBLE PoseKeyFrame : public KeyFrame
     {
       /// \brief Constructor
       /// \param[in] _time of the keyframe
@@ -79,7 +79,7 @@ namespace gz
     };
 
     /// \brief A keyframe for a NumericAnimation
-    class IGNITION_COMMON_GRAPHICS_VISIBLE NumericKeyFrame : public KeyFrame
+    class GZ_COMMON_GRAPHICS_VISIBLE NumericKeyFrame : public KeyFrame
     {
       /// \brief Constructor
       /// \param[in] _time Time of the keyframe

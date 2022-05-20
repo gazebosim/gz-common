@@ -46,7 +46,7 @@ namespace gz
 
     /// \class MeshManager MeshManager.hh gz/common/MeshManager.hh
     /// \brief Maintains and manages all meshes
-    class IGNITION_COMMON_GRAPHICS_VISIBLE MeshManager
+    class GZ_COMMON_GRAPHICS_VISIBLE MeshManager
         : public SingletonT<MeshManager>
     {
       /// \brief Constructor

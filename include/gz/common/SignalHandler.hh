@@ -45,7 +45,7 @@ namespace gz
     /// });
     /// ~~~
     ///
-    class IGNITION_COMMON_VISIBLE SignalHandler
+    class GZ_COMMON_VISIBLE SignalHandler
     {
       /// \brief Constructor
       public: SignalHandler();

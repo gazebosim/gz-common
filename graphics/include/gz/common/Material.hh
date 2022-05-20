@@ -33,7 +33,7 @@ namespace gz
   namespace common
   {
     /// \brief Encapsulates description of a material
-    class IGNITION_COMMON_GRAPHICS_VISIBLE Material
+    class GZ_COMMON_GRAPHICS_VISIBLE Material
     {
       /// \def Shade modes
       /// \brief Enumeration of shade mode types

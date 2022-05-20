@@ -45,39 +45,39 @@ namespace gz
     /// \brief Determine whether the given path exists on the filesystem.
     /// \param[in] _path  The path to check for existence
     /// \return True if the path exists on the filesystem, false otherwise.
-    bool IGNITION_COMMON_VISIBLE exists(const std::string &_path);
+    bool GZ_COMMON_VISIBLE exists(const std::string &_path);
 
     /// \brief Determine whether the given path is a directory.
     /// \param[in] _path  The path to check
     /// \return True if given path exists and is a directory, false otherwise.
-    bool IGNITION_COMMON_VISIBLE isDirectory(const std::string &_path);
+    bool GZ_COMMON_VISIBLE isDirectory(const std::string &_path);
 
     /// \brief Check if the given path is a file.
     /// \param[in] _path Path to a file.
     /// \return True if _path is a file.
-    bool IGNITION_COMMON_VISIBLE isFile(const std::string &_path);
+    bool GZ_COMMON_VISIBLE isFile(const std::string &_path);
 
     /// \brief Check if the given path is relative.
     /// \param[in] _path Path.
     /// \return True if _path is relative.
-    bool IGNITION_COMMON_VISIBLE isRelativePath(const std::string &_path);
+    bool GZ_COMMON_VISIBLE isRelativePath(const std::string &_path);
 
     /// \brief Create a new directory on the filesystem.  Intermediate
     ///        directories must already exist.
     /// \param[in] _path  The new directory path to create
     /// \return True if directory creation was successful, false otherwise.
-    bool IGNITION_COMMON_VISIBLE createDirectory(const std::string &_path);
+    bool GZ_COMMON_VISIBLE createDirectory(const std::string &_path);
 
     /// \brief Create directories for the given path
     /// \param[in] _path Path to create directories from
     /// \return true on success
-    bool IGNITION_COMMON_VISIBLE createDirectories(const std::string &_path);
+    bool GZ_COMMON_VISIBLE createDirectories(const std::string &_path);
 
     /// \brief Append the preferred path separator character for this platform
     ///        onto the passed-in string.
     /// \param[in] _s  The path to start with.
     /// \return The original path with the platform path separator appended.
-    std::string IGNITION_COMMON_VISIBLE const separator(
+    std::string GZ_COMMON_VISIBLE const separator(
         std::string const &_s);
 
     /// \brief Replace forward-slashes '/' with the preferred directory
@@ -93,7 +93,7 @@ namespace gz
     /// replacing its
     /// forward-slashes with the preferred directory separator of the current
     /// operating system.
-    void IGNITION_COMMON_VISIBLE changeFromUnixPath(std::string &_path);
+    void GZ_COMMON_VISIBLE changeFromUnixPath(std::string &_path);
 
     /// \brief Returns a copy of _path which has been passed through
     /// changeFromUnixPath.
@@ -101,7 +101,7 @@ namespace gz
     /// \param[in] _path The path to start with
     /// \return A modified path that uses the preferred directory separator of
     /// the current operating system.
-    std::string IGNITION_COMMON_VISIBLE copyFromUnixPath(
+    std::string GZ_COMMON_VISIBLE copyFromUnixPath(
         const std::string &_path);
 
     /// \brief Replace the preferred directory separator of the current
@@ -110,7 +110,7 @@ namespace gz
     ///
     /// \param[out] _path This string will be directly modified to use forward
     /// slashes to separate its directory names.
-    void IGNITION_COMMON_VISIBLE changeToUnixPath(std::string &_path);
+    void GZ_COMMON_VISIBLE changeToUnixPath(std::string &_path);
 
     /// \brief Returns a copy of _path which has been passed through
     /// changeToUnixPath.
@@ -118,14 +118,14 @@ namespace gz
     /// \param[in] _path The path to start with
     /// \return A modified path that uses forward slashes to separate
     /// directory names.
-    std::string IGNITION_COMMON_VISIBLE copyToUnixPath(
+    std::string GZ_COMMON_VISIBLE copyToUnixPath(
         const std::string &_path);
 
     /// \brief Get the absolute path of a provided path. Relative paths are
     /// resolved relative to the current working directory.
     /// \param[in] _path Relative or absolute path.
     /// \return Absolute path (with platform-dependent directory separators).
-    std::string IGNITION_COMMON_VISIBLE absPath(const std::string &_path);
+    std::string GZ_COMMON_VISIBLE absPath(const std::string &_path);
 
     /// \brief Join two strings together to form a path
     /// \param[in] _path1 the left portion of the path
@@ -133,7 +133,7 @@ namespace gz
     /// \return Joined path. The function can do simplifications such as
     /// elimination of ../ and removal of duplicate // (but is not guaranteed to
     /// do so).
-    std::string IGNITION_COMMON_VISIBLE joinPaths(const std::string &_path1,
+    std::string GZ_COMMON_VISIBLE joinPaths(const std::string &_path1,
                                                   const std::string &_path2);
 
     /// \brief base case for joinPaths(...) below
@@ -160,24 +160,24 @@ namespace gz
 
     /// \brief Get the current working directory
     /// \return Name of the current directory
-    std::string IGNITION_COMMON_VISIBLE cwd();
+    std::string GZ_COMMON_VISIBLE cwd();
 
     /// \brief Change current working directory to _dir.
     /// \param[in] _dir The directory to change to.
     /// \return Whether the operation succeeded.
-    bool IGNITION_COMMON_VISIBLE chdir(const std::string &_dir);
+    bool GZ_COMMON_VISIBLE chdir(const std::string &_dir);
 
     /// \brief Given a path, get just the basename portion.
     /// \param[in] _path  The full path.
     /// \return A new string with just the basename portion of the path.
-    std::string IGNITION_COMMON_VISIBLE basename(
+    std::string GZ_COMMON_VISIBLE basename(
         const std::string &_path);
 
     /// \brief Given a path, get just its parent path portion, without
     /// separator at the end.
     /// \param[in] _path  Path of which to find parent path
     /// \return A new string with just the parent path of the path.
-    std::string IGNITION_COMMON_VISIBLE parentPath(
+    std::string GZ_COMMON_VISIBLE parentPath(
         const std::string &_path);
 
     /// \brief Copy a file.
@@ -185,7 +185,7 @@ namespace gz
     /// \param[in] _newFilename Path of the new file.
     /// \param[in] _warningOp Log or suppress warnings that may occur.
     /// \return True on success.
-    bool IGNITION_COMMON_VISIBLE copyFile(
+    bool GZ_COMMON_VISIBLE copyFile(
         const std::string &_existingFilename,
         const std::string &_newFilename,
         const FilesystemWarningOp _warningOp = FSWO_LOG_WARNINGS);
@@ -194,7 +194,7 @@ namespace gz
     /// \param[in] _source Path to an existing directory to copy from.
     /// \param[in] _destination Path to the destination directory.
     /// \return True on success.
-    bool IGNITION_COMMON_VISIBLE copyDirectory(
+    bool GZ_COMMON_VISIBLE copyDirectory(
         const std::string &_existingDirname,
         const std::string &_newDirname,
         const FilesystemWarningOp _warningOp = FSWO_LOG_WARNINGS);
@@ -204,7 +204,7 @@ namespace gz
     /// \param[in] _newFilename Full path of the new file.
     /// \param[in] _warningOp Log or suppress warnings that may occur.
     /// \return True on success.
-    bool IGNITION_COMMON_VISIBLE moveFile(
+    bool GZ_COMMON_VISIBLE moveFile(
         const std::string &_existingFilename,
         const std::string &_newFilename,
         const FilesystemWarningOp _warningOp = FSWO_LOG_WARNINGS);
@@ -214,7 +214,7 @@ namespace gz
     /// \param[in] _path Path to a directory.
     /// \param[in] _warningOp Log or suppress warnings that may occur.
     /// \return True if _path is a directory and was removed.
-    bool IGNITION_COMMON_VISIBLE removeDirectory(
+    bool GZ_COMMON_VISIBLE removeDirectory(
         const std::string &_path,
         const FilesystemWarningOp _warningOp = FSWO_LOG_WARNINGS);
 
@@ -222,7 +222,7 @@ namespace gz
     /// \param[in] _existingFilename Full path to an existing file.
     /// \param[in] _warningOp Log or suppress warnings that may occur.
     /// \return True on success.
-    bool IGNITION_COMMON_VISIBLE removeFile(
+    bool GZ_COMMON_VISIBLE removeFile(
         const std::string &_existingFilename,
         const FilesystemWarningOp _warningOp = FSWO_LOG_WARNINGS);
 
@@ -230,7 +230,7 @@ namespace gz
     /// \param[in] _path Path to a directory or file.
     /// \param[in] _warningOp Log or suppress warnings that may occur.
     /// \return True if _path was removed.
-    bool IGNITION_COMMON_VISIBLE removeDirectoryOrFile(
+    bool GZ_COMMON_VISIBLE removeDirectoryOrFile(
         const std::string &_path,
         const FilesystemWarningOp _warningOp = FSWO_LOG_WARNINGS);
 
@@ -238,7 +238,7 @@ namespace gz
     /// \param[in] _path Path to a directory or file.
     /// \param[in] _warningOp Log or suppress warnings that may occur.
     /// \return True if _path was removed.
-    bool IGNITION_COMMON_VISIBLE removeAll(
+    bool GZ_COMMON_VISIBLE removeAll(
         const std::string &_path,
         const FilesystemWarningOp _warningOp = FSWO_LOG_WARNINGS);
 
@@ -249,18 +249,18 @@ namespace gz
     /// \param[in] _extension File extension, such as "sdf".
     /// \return Full path with name and extension, which doesn't collide with
     /// existing files
-    std::string IGNITION_COMMON_VISIBLE uniqueFilePath(
+    std::string GZ_COMMON_VISIBLE uniqueFilePath(
         const std::string &_pathAndName, const std::string &_extension);
 
     /// \brief Unique directory path to not overwrite existing directory
     /// \param[in] _pathAndName Full absolute path
     /// \return Full path which doesn't collide with existing files
-    std::string IGNITION_COMMON_VISIBLE uniqueDirectoryPath(
+    std::string GZ_COMMON_VISIBLE uniqueDirectoryPath(
         const std::string &_dir);
 
     /// \class DirIter Filesystem.hh
     /// \brief A class for iterating over all items in a directory.
-    class IGNITION_COMMON_VISIBLE DirIter
+    class GZ_COMMON_VISIBLE DirIter
     {
       /// \brief Constructor for end element.
       public: DirIter();

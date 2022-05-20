@@ -37,7 +37,7 @@ namespace gz
   namespace common
   {
     /// \brief A portable class for representing a Universally Unique Identifier
-    class IGNITION_COMMON_VISIBLE Uuid
+    class GZ_COMMON_VISIBLE Uuid
     {
       /// \brief Constructor.
       public: Uuid();

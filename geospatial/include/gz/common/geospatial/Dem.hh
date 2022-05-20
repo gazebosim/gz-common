@@ -36,7 +36,7 @@ namespace gz
   {
     /// \class DEM DEM.hh common/common.hh
     /// \brief Encapsulates a DEM (Digital Elevation Model) file.
-    class IGNITION_COMMON_GEOSPATIAL_VISIBLE Dem : public HeightmapData
+    class GZ_COMMON_GEOSPATIAL_VISIBLE Dem : public HeightmapData
     {
       /// \brief Constructor.
       public: Dem();

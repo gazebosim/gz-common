@@ -35,7 +35,7 @@ namespace gz
 
     /// \class GTSMeshUtils GTSMeshUtils.hh gz/common/GTSMeshUtils.hh
     /// \brief Creates GTS utilities for meshes
-    class IGNITION_COMMON_GRAPHICS_VISIBLE GTSMeshUtils
+    class GZ_COMMON_GRAPHICS_VISIBLE GTSMeshUtils
     {
       /// \brief Perform delaunay triangulation on input vertices.
       /// \param[in] _vertices A list of all vertices

@@ -38,7 +38,7 @@ namespace gz
     class NodeAssignment;
 
     /// \brief A child mesh
-    class IGNITION_COMMON_GRAPHICS_VISIBLE SubMesh
+    class GZ_COMMON_GRAPHICS_VISIBLE SubMesh
     {
       /// \brief An enumeration of the geometric mesh primitives
       public: enum PrimitiveType
@@ -288,7 +288,7 @@ namespace gz
       /// \return The assigned material index. If no material index is assigned
       /// to this submesh, std::numeric_limits<unsigned int>::max() is returned.
       /// \note This method is deprecated, use GetMaterialIndex instead
-      public: unsigned int IGN_DEPRECATED(5) MaterialIndex() const;
+      public: unsigned int GZ_DEPRECATED(5) MaterialIndex() const;
 
       /// \brief Get the material index
       /// \return The assigned material index. Nullopt is returned if the
@@ -406,7 +406,7 @@ namespace gz
 
     /// \brief Vertex to node weighted assignement for skeleton animation
     /// visualization
-    class IGNITION_COMMON_GRAPHICS_VISIBLE NodeAssignment
+    class GZ_COMMON_GRAPHICS_VISIBLE NodeAssignment
     {
       /// \brief Constructor.
       public: NodeAssignment();

@@ -34,7 +34,7 @@ namespace gz
     class OBJLoaderPrivate;
 
     /// \brief Class used to load obj mesh files
-    class IGNITION_COMMON_GRAPHICS_VISIBLE OBJLoader : public MeshLoader
+    class GZ_COMMON_GRAPHICS_VISIBLE OBJLoader : public MeshLoader
     {
       /// \brief Constructor
       public: OBJLoader();

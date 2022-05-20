@@ -29,7 +29,7 @@ namespace gz
   {
     /// \class ColladaLoader ColladaLoader.hh gz/common/ColladaLoader.hh
     /// \brief Class used to load Collada mesh files
-    class IGNITION_COMMON_GRAPHICS_VISIBLE ColladaLoader : public MeshLoader
+    class GZ_COMMON_GRAPHICS_VISIBLE ColladaLoader : public MeshLoader
     {
       /// \brief Constructor
       public: ColladaLoader();

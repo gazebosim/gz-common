@@ -38,7 +38,7 @@ namespace gz
 
     /// \class Mesh Mesh.hh gz/common/Mesh.hh
     /// \brief A 3D mesh
-    class IGNITION_COMMON_GRAPHICS_VISIBLE Mesh
+    class GZ_COMMON_GRAPHICS_VISIBLE Mesh
     {
       /// \brief Constructor
       public: Mesh();

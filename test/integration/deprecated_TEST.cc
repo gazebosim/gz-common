@@ -28,3 +28,5 @@ TEST(Deprecated, IgnitionNamespace)
 {
   ignition::common::Battery battery;
 }
+
+#undef SUPPRESS_IGNITION_HEADER_DEPRECATION

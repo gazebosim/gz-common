@@ -40,7 +40,7 @@ namespace gz
     /// simulation iteration. The update function takes the power loads for each
     /// consumer and current voltage value as inputs and returns a new voltage
     /// value.
-    class IGNITION_COMMON_VISIBLE Battery
+    class GZ_COMMON_VISIBLE Battery
     {
       /// \brief Typedef the powerload map.
       /// \sa SetUpdateFunc

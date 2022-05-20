@@ -33,7 +33,7 @@ namespace gz
   {
     /// \class NodeTransform NodeTransform.hh gz/common/NodeTransform.hh
     /// \brief A transformation node
-    class IGNITION_COMMON_GRAPHICS_VISIBLE NodeTransform
+    class GZ_COMMON_GRAPHICS_VISIBLE NodeTransform
     {
       /// \brief Constructor
       /// \param[in] _type the type of transform

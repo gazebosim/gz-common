@@ -42,14 +42,14 @@ class BazelTestPaths: public TestPaths
   public: using TestPaths::TestPaths;
 
   /// \brief Destructor
-  public: IGNITION_COMMON_TESTING_VISIBLE ~BazelTestPaths() override;
+  public: GZ_COMMON_TESTING_VISIBLE ~BazelTestPaths() override;
 
   /// Documentation inherited
-  public: bool IGNITION_COMMON_TESTING_VISIBLE
+  public: bool GZ_COMMON_TESTING_VISIBLE
           ProjectSourcePath(std::string &_sourceDir) override;
 
   /// Documentation inherited
-  public: bool IGNITION_COMMON_TESTING_VISIBLE
+  public: bool GZ_COMMON_TESTING_VISIBLE
           TestTmpPath(std::string &_tmpDir) override;
 };
 

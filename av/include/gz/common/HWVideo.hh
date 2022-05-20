@@ -20,7 +20,7 @@
 
 namespace gz::common
 {
-  enum class IGNITION_COMMON_AV_VISIBLE HWEncoderType
+  enum class GZ_COMMON_AV_VISIBLE HWEncoderType
   {
     NONE,
     NVENC,  // Linux device is /dev/nvidia*

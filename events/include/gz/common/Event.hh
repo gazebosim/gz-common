@@ -35,7 +35,7 @@ namespace gz
   {
     /// \class Event Event.hh gz/common/Event.hh
     /// \brief Base class for all events
-    class IGNITION_COMMON_EVENTS_VISIBLE Event
+    class GZ_COMMON_EVENTS_VISIBLE Event
     {
       /// \brief Constructor
       public: Event();
@@ -60,7 +60,7 @@ namespace gz
     };
 
     /// \brief A class that encapsulates a connection.
-    class IGNITION_COMMON_EVENTS_VISIBLE Connection
+    class GZ_COMMON_EVENTS_VISIBLE Connection
     {
       /// \brief Constructor.
       /// \param[in] _e Event pointer to connect with.

@@ -58,7 +58,7 @@ namespace gz
 
     /// \class Image Image.hh gz/common/common.hh
     /// \brief Encapsulates an image
-    class IGNITION_COMMON_GRAPHICS_VISIBLE Image
+    class GZ_COMMON_GRAPHICS_VISIBLE Image
     {
       /// \brief Pixel formats enumeration
       public: enum PixelFormatType

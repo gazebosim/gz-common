@@ -40,7 +40,7 @@ namespace gz
   {
     /// \brief The VideoEncoder class supports encoding a series of images
     /// to a video format, and then writing the video to disk.
-    class IGNITION_COMMON_AV_VISIBLE VideoEncoder
+    class GZ_COMMON_AV_VISIBLE VideoEncoder
     {
       /// \brief Constructor
       public: VideoEncoder();

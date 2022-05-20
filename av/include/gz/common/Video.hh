@@ -33,7 +33,7 @@ namespace gz
   namespace common
   {
     /// \brief Handle video encoding and decoding using libavcodec
-    class IGNITION_COMMON_AV_VISIBLE Video
+    class GZ_COMMON_AV_VISIBLE Video
     {
       /// \brief Constructor
       public: Video();

@@ -24,7 +24,7 @@ namespace gz
 {
   namespace common
   {
-    class IGNITION_COMMON_VISIBLE Base64
+    class GZ_COMMON_VISIBLE Base64
     {
       /// \brief Encode a binary string into base 64, padded with '='.
       /// \param[in] _bytesToEncode String of bytes to encode.

@@ -29,7 +29,7 @@ namespace gz
 
     /// \class MeshLoader MeshLoader.hh gz/common/MeshLoader.hh
     /// \brief Base class for loading meshes
-    class IGNITION_COMMON_GRAPHICS_VISIBLE MeshLoader
+    class GZ_COMMON_GRAPHICS_VISIBLE MeshLoader
     {
       /// \brief Constructor
       public: MeshLoader() = default;

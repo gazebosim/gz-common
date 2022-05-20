@@ -33,7 +33,7 @@ namespace gz
   {
     /// \class NodeAnimation NodeAnimation.hh gz/common/NodeAnimation.hh
     /// \brief Node animation
-    class IGNITION_COMMON_GRAPHICS_VISIBLE NodeAnimation
+    class GZ_COMMON_GRAPHICS_VISIBLE NodeAnimation
     {
       /// \brief constructor
       /// \param[in] _name the name of the node

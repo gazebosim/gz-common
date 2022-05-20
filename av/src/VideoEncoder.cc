@@ -34,7 +34,7 @@ using namespace std;
 
 // Private data class
 // hidden visibility specifier has to be explicitly set to silent a gcc warning
-class IGNITION_COMMON_AV_HIDDEN gz::common::VideoEncoder::Implementation
+class GZ_COMMON_AV_HIDDEN gz::common::VideoEncoder::Implementation
 {
   /// \brief Name of the file which stores the video while it is being
   ///        recorded.
