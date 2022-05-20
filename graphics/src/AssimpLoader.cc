@@ -26,6 +26,7 @@
 #include "gz/common/Util.hh"
 #include "gz/common/AssimpLoader.hh"
 
+#include <queue>
 #include <unordered_set>
 
 #include <assimp/Logger.hpp>      // C++ importer interface
@@ -46,11 +47,26 @@ class AssimpLoader::Implementation
   public: ignition::math::Color ConvertColor(aiColor4D& _color);
 
   /// Convert a transformation from assimp implementation to Ignition math
-  public: ignition::math::Matrix4d ConvertTransform(aiMatrix4x4& _matrix);
+  public: ignition::math::Matrix4d ConvertTransform(const aiMatrix4x4& _matrix);
 
   public: MaterialPtr CreateMaterial(const aiScene* scene, unsigned mat_idx, const std::string& path);
 
-  public: SubMesh CreateSubMesh(const aiScene* scene, unsigned mesh_idx, const ignition::math::Matrix4d& transformation);
+  public: SubMesh CreateSubMesh(const aiMesh* assimp_mesh, const ignition::math::Matrix4d& transformation);
+
+  public: std::unordered_map<std::string, ignition::math::Matrix4d> PopulateTransformMap(const aiScene* scene);
+
+  public: void RecursiveCreate(const aiScene* scene, const aiNode* node, const ignition::math::Matrix4d& transformation, Mesh* mesh);
+
+  public: void RecursiveSkeletonCreate(const aiNode* node, SkeletonNode* root_node, const ignition::math::Matrix4d& transformation);
+
+  /// \brief Apply the the inv bind transform to the skeleton pose.
+  /// \remarks have to set the model transforms starting from the root in
+  /// breadth first order. Because setting the model transform also updates
+  /// the transform based on the parent's inv model transform. Setting the
+  /// child before the parent results in the child's transform being
+  /// calculated from the "old" parent model transform.
+  /// \param[in] _skeleton the skeleton to work on
+  public: void ApplyInvBindTransform(SkeletonPtr _skeleton);
 };
 
 ignition::math::Color AssimpLoader::Implementation::ConvertColor(aiColor4D& _color)
@@ -59,13 +75,109 @@ ignition::math::Color AssimpLoader::Implementation::ConvertColor(aiColor4D& _col
   return col;
 }
 
-ignition::math::Matrix4d AssimpLoader::Implementation::ConvertTransform(aiMatrix4x4& _sm)
+ignition::math::Matrix4d AssimpLoader::Implementation::ConvertTransform(const aiMatrix4x4& _sm)
 {
   return ignition::math::Matrix4d(
       _sm.a1, _sm.a2, _sm.a3, _sm.a4,
       _sm.b1, _sm.b2, _sm.b3, _sm.b4,
       _sm.c1, _sm.c2, _sm.c3, _sm.c4,
       _sm.d1, _sm.d2, _sm.d3, _sm.d4);
+}
+
+void AssimpLoader::Implementation::RecursiveCreate(const aiScene* scene, const aiNode* node, const ignition::math::Matrix4d& transformation, Mesh* mesh)
+{
+  // Visit this node, add the submesh
+  ignmsg << "Processing node " << node->mName.C_Str() << " with " << node->mNumMeshes << " meshes" << std::endl;
+  for (unsigned mesh_idx = 0; mesh_idx < node->mNumMeshes; ++mesh_idx)
+  {
+    auto assimp_mesh_idx = node->mMeshes[mesh_idx];
+    auto assimp_mesh = scene->mMeshes[assimp_mesh_idx];
+    auto node_name = std::string(node->mName.C_Str());
+    auto subMesh = this->CreateSubMesh(assimp_mesh, transformation);
+    subMesh.SetName(node_name);
+    // Now add the bones to the skeleton
+    if (assimp_mesh->HasBones() && scene->HasAnimations())
+    {
+      // TODO merging skeletons here
+      auto skeleton = mesh->MeshSkeleton();
+      auto skel_root_node = skeleton->RootNode();
+      // TODO Append to existing skeleton if multiple submeshes?
+      skeleton->SetNumVertAttached(subMesh.VertexCount());
+      // Now add the bone weights
+      for (unsigned bone_idx = 0; bone_idx < scene->mMeshes[mesh_idx]->mNumBones; ++bone_idx)
+      {
+        auto bone = assimp_mesh->mBones[bone_idx];
+        auto bone_name = std::string(bone->mName.C_Str());
+        // Apply inverse bind transform to the matching node
+        SkeletonNode *skel_node =
+            mesh->MeshSkeleton()->NodeByName(bone_name);
+        skel_node->SetInverseBindTransform(this->ConvertTransform(bone->mOffsetMatrix));
+        ignmsg << "Bone " << bone_name << " has " << bone->mNumWeights << " weights" << std::endl;
+        for (unsigned weight_idx = 0; weight_idx < bone->mNumWeights; ++weight_idx)
+        {
+          auto vertex_weight = bone->mWeights[weight_idx];
+          // TODO SetNumVertAttached for performance
+          skeleton->AddVertNodeWeight(vertex_weight.mVertexId, bone_name, vertex_weight.mWeight);
+          //igndbg << "Adding weight at idx " << vertex_weight.mVertexId << " for bone " << bone_name << " of " << vertex_weight.mWeight << std::endl;
+        }
+      }
+      // Add node assignment to mesh
+      ignmsg << "submesh has " << subMesh.VertexCount() << " vertices" << std::endl;
+      for (unsigned vert_idx = 0; vert_idx < subMesh.VertexCount(); ++vert_idx)
+      {
+        //ignmsg << "skel at id " << vert_idx << " has " << skel->VertNodeWeightCount(vert_idx) << " indices" << std::endl;
+        for (unsigned int i = 0;
+            i < skeleton->VertNodeWeightCount(vert_idx); ++i)
+        {
+          std::pair<std::string, double> node_weight =
+            skeleton->VertNodeWeight(vert_idx, i);
+          SkeletonNode *node =
+              mesh->MeshSkeleton()->NodeByName(node_weight.first);
+          if (node == nullptr)
+          {
+            igndbg << "Not found while Looking for node with name " << node_weight.first << std::endl;
+          }
+          subMesh.AddNodeAssignment(vert_idx,
+                          node->Handle(), node_weight.second);
+          //igndbg << "Adding node assignment for vertex " << vert_idx << " to node " << node->Name() << " of weight " << node_weight.second << std::endl;
+        }
+      }
+    }
+    mesh->AddSubMesh(std::move(subMesh));
+  }
+
+  // Iterate over children
+  for (unsigned child_idx = 0; child_idx < node->mNumChildren; ++child_idx)
+  {
+    // Calculate the transform
+    auto child_node = node->mChildren[child_idx];
+    auto node_trans = this->ConvertTransform(child_node->mTransformation);
+    node_trans = transformation * node_trans;
+
+    // Finally recursive call to explore subnode
+    this->RecursiveCreate(scene, child_node, node_trans, mesh);
+  }
+}
+
+void AssimpLoader::Implementation::RecursiveSkeletonCreate(const aiNode* node, SkeletonNode* root_node, const ignition::math::Matrix4d& transformation)
+{
+  // First explore this node
+  auto node_name = std::string(node->mName.C_Str());
+  ignmsg << "Exploring node " << node_name << std::endl;
+  // TODO check if node or joint?
+  auto skel_node = new SkeletonNode(root_node, node_name, node_name, SkeletonNode::JOINT);
+  // Calculate transform
+  auto node_trans = this->ConvertTransform(node->mTransformation);
+  igndbg << node_trans << std::endl;
+  skel_node->SetTransform(node_trans);
+  //skel_node->SetModelTransform(node_trans.Inverse(), false);
+  node_trans = transformation * node_trans;
+
+  // TODO Set the vertex weights
+  for (unsigned child_idx = 0; child_idx < node->mNumChildren; ++child_idx)
+  {
+    this->RecursiveSkeletonCreate(node->mChildren[child_idx], skel_node, node_trans);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -122,10 +234,9 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* scene, u
   return mat;
 }
 
-SubMesh AssimpLoader::Implementation::CreateSubMesh(const aiScene* scene, unsigned mesh_idx, const ignition::math::Matrix4d& transformation)
+SubMesh AssimpLoader::Implementation::CreateSubMesh(const aiMesh* assimp_mesh, const ignition::math::Matrix4d& transformation)
 {
   SubMesh subMesh;
-  auto assimp_mesh = scene->mMeshes[mesh_idx];
   ignition::math::Matrix4d rot = transformation;
   rot.SetTranslation(ignition::math::Vector3d::Zero);
   ignmsg << "Mesh has " << assimp_mesh->mNumVertices << " vertices" << std::endl;
@@ -203,111 +314,44 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     return mesh;
   }
   auto root_node = scene->mRootNode;
-  auto root_transformation = this->dataPtr->ConvertTransform(scene->mRootNode->mTransformation);
-  root_transformation = ignition::math::Matrix4d::Identity;
+  auto root_name = std::string(root_node->mName.C_Str());
+  auto transform = scene->mRootNode->mTransformation;
+  aiVector3D scaling, axis, pos;
+  float angle;
+  transform.Decompose(scaling, axis, angle, pos);
+  // drop rotation, but keep scaling and position
+  transform = aiMatrix4x4(scaling, aiQuaternion(), pos);
+
+  auto root_transformation = this->dataPtr->ConvertTransform(transform);
+
+  //root_transformation = ignition::math::Matrix4d::Identity;
   // TODO remove workaround, it seems imported assets are rotated by 90 degrees
   // as documented here https://github.com/assimp/assimp/issues/849, remove workaround when fixed
-  // TODO find actual workaround to remove rotation
-  // root_transformation = root_transformation * root_transformation.Rotation();
-  // TODO recursive call for children?
   // Add the materials first
   for (unsigned mat_idx = 0; mat_idx < scene->mNumMaterials; ++mat_idx)
   {
     auto mat = this->dataPtr->CreateMaterial(scene, mat_idx, path);
     mesh->AddMaterial(mat);
   }
-  for (unsigned node_idx = 0; node_idx < root_node->mNumChildren; ++node_idx)
+  auto root_skel_node = new SkeletonNode(nullptr, root_name, root_name, SkeletonNode::NODE);
+  root_skel_node->SetTransform(root_transformation);
+  root_skel_node->SetModelTransform(root_transformation);
+  for (unsigned child_idx = 0; child_idx < root_node->mNumChildren; ++child_idx)
   {
-    auto node = root_node->mChildren[node_idx];
-    auto trans = this->dataPtr->ConvertTransform(node->mTransformation);
-    trans = root_transformation * trans;
-    // TODO 90 degree rotation issue with collada
-    // TODO node name
-    ignmsg << "Processing mesh with " << node->mNumMeshes << " meshes" << std::endl;
-    for (unsigned mesh_idx = 0; mesh_idx < node->mNumMeshes; ++mesh_idx)
-    {
-      auto assimp_mesh_idx = node->mMeshes[mesh_idx];
-      auto subMesh = this->dataPtr->CreateSubMesh(scene, assimp_mesh_idx, trans);
-      subMesh.SetName(std::string(node->mName.C_Str()));
-      mesh->AddSubMesh(std::move(subMesh));
-    }
+    // First populate the skeleton with the node transforms
+    // TODO parse different skeletons and merge them
+    this->dataPtr->RecursiveSkeletonCreate(root_node->mChildren[child_idx], root_skel_node, root_transformation);
   }
-  // Process animations
-  ignmsg << "Processing " << scene->mNumAnimations << " animations" << std::endl;
-  ignmsg << "Scene has " << scene->mNumMeshes << " meshes" << std::endl;
-  // Iterate over meshes in scene not contained in root node
-  // this is a strict superset of the above that also contains animation meshes
-  for (unsigned mesh_idx = 0; mesh_idx < scene->mNumMeshes; ++mesh_idx)
+  SkeletonPtr root_skeleton = std::make_shared<Skeleton>(root_skel_node);
+  mesh->SetSkeleton(root_skeleton);
+  for (unsigned child_idx = 0; child_idx < root_node->mNumChildren; ++child_idx)
   {
-    // Skip if the mesh was found in the previous step
-    auto mesh_name = std::string(scene->mMeshes[mesh_idx]->mName.C_Str());
-    if (!mesh->SubMeshByName(mesh_name).expired())
-      continue;
-    auto assimp_mesh = scene->mMeshes[mesh_idx];
-    ignmsg << "New mesh found with name " << scene->mMeshes[mesh_idx]->mName.C_Str() << std::endl;
-    ignmsg << "Mesh has " << scene->mMeshes[mesh_idx]->mNumAnimMeshes << " anim meshes" << std::endl;
-    ignmsg << "Mesh has " << scene->mMeshes[mesh_idx]->mNumBones << " bones" << std::endl;
-    // Add the bones
-    if (scene->mMeshes[mesh_idx]->HasBones() && scene->HasAnimations())
-    {
-      // First find the root node, guaranteed to have at least one animation
-      // TODO check for multiple root nodes and merge them if needed
-      std::unordered_set<std::string> bone_names;
-      for (unsigned bone_idx = 0; bone_idx < scene->mMeshes[mesh_idx]->mNumBones; ++bone_idx)
-      {
-        bone_names.insert(std::string(scene->mMeshes[mesh_idx]->mBones[bone_idx]->mName.C_Str()));
-      }
-      SkeletonNode* skel_root_node = nullptr;
-      for (unsigned chan_idx = 0; chan_idx < scene->mAnimations[0]->mNumChannels; ++chan_idx)
-      {
-        auto chan_name = std::string(scene->mAnimations[0]->mChannels[chan_idx]->mNodeName.C_Str());
-        if (bone_names.find(chan_name) ==
-            bone_names.end())
-        {
-          // This is a joint and root node
-          skel_root_node = new SkeletonNode(nullptr, chan_name, chan_name, SkeletonNode::JOINT);
-          skel_root_node->SetTransform(ignition::math::Matrix4d::Identity);
-          skel_root_node->AddRawTransform(ignition::math::Matrix4d::Identity);
-          // TODO root transform for this node
-          ignmsg << "Added new root node " << chan_name << std::endl;
-        }
-      }
-      for (unsigned bone_idx = 0; bone_idx < scene->mMeshes[mesh_idx]->mNumBones; ++bone_idx)
-      {
-        auto bone = scene->mMeshes[mesh_idx]->mBones[bone_idx];
-        igndbg << "Found bone with name " << bone->mName.C_Str() << std::endl;
-        // Now add to the skeleton
-        // TODO name vs id?
-        auto skel_node = new SkeletonNode(skel_root_node,
-            std::string(bone->mName.C_Str()),
-            std::string(bone->mName.C_Str()),
-            SkeletonNode::NODE);
-        auto trans = this->dataPtr->ConvertTransform(bone->mOffsetMatrix);
-        skel_node->SetTransform(trans);
-        skel_node->AddRawTransform(trans);
-      }
-      SkeletonPtr skel(new Skeleton(skel_root_node));
-      // Set vertex weights, TODO check if we can put above
-      for (unsigned bone_idx = 0; bone_idx < scene->mMeshes[mesh_idx]->mNumBones; ++bone_idx)
-      {
-        auto bone = scene->mMeshes[mesh_idx]->mBones[bone_idx];
-        auto bone_name = std::string(bone->mName.C_Str());
-        ignmsg << "Bone " << bone_name << " has " << bone->mNumWeights << " weights" << std::endl;
-        for (unsigned weight_idx = 0; weight_idx < bone->mNumWeights; ++weight_idx)
-        {
-          auto vertex_weight = bone->mWeights[weight_idx];
-          // TODO SetNumVertAttached for performance
-          skel->AddVertNodeWeight(vertex_weight.mVertexId, bone_name, vertex_weight.mWeight);
-        }
-      }
-      // Now add the skeleton to the mesh
-      mesh->SetSkeleton(skel);
-    }
-    // This mesh doesn't have a node transform
-    auto subMesh = this->dataPtr->CreateSubMesh(scene, mesh_idx, root_transformation);
-    subMesh.SetName(std::string(assimp_mesh->mName.C_Str()));
-    mesh->AddSubMesh(std::move(subMesh));
+    // Now create the meshes
+    // Recursive call to keep track of transforms, mesh is passed by reference and edited throughout
+    ignmsg << "Parsing root child " << root_node->mChildren[child_idx]->mName.C_Str() << std::endl;
+    this->dataPtr->RecursiveCreate(scene, root_node->mChildren[child_idx], root_transformation, mesh);
   }
+  // Add the animations
   for (unsigned anim_idx = 0; anim_idx < scene->mNumAnimations; ++anim_idx)
   {
     auto anim = scene->mAnimations[anim_idx];
@@ -342,23 +386,36 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     }
     mesh->MeshSkeleton()->AddAnimation(skel_anim);
   }
-  // Iterate over nodes and add a submesh for each
-  /*
-  mesh->SetPath(this->dataPtr->path);
-
-  this->dataPtr->LoadScene(mesh);
 
   if (mesh->HasSkeleton())
     this->dataPtr->ApplyInvBindTransform(mesh->MeshSkeleton());
 
-  // This will make the model the correct size.
-  mesh->Scale(ignition::math::Vector3d(
-      this->dataPtr->meter, this->dataPtr->meter, this->dataPtr->meter));
-  if (mesh->HasSkeleton())
-    mesh->MeshSkeleton()->Scale(this->dataPtr->meter);
-  */
-
   return mesh;
+}
+
+/////////////////////////////////////////////////
+void AssimpLoader::Implementation::ApplyInvBindTransform(SkeletonPtr _skeleton)
+{
+  std::list<SkeletonNode *> queue;
+  queue.push_back(_skeleton->RootNode());
+
+  while (!queue.empty())
+  {
+    SkeletonNode *node = queue.front();
+    queue.pop_front();
+    if (nullptr == node)
+      continue;
+
+    if (node->HasInvBindTransform())
+    {
+      node->SetModelTransform(node->InverseBindTransform().Inverse(), false);
+      igndbg << "Node " << node->Name() << " model transform is:" << std::endl << node->ModelTransform() << std::endl;
+      igndbg << "Parent " << node->Parent()->Name() << " transform is:" << std::endl << node->Parent()->ModelTransform() << std::endl;
+      igndbg << "Node " << node->Name() << " transform is:" << std::endl << node->Transform() << std::endl;
+    }
+    for (unsigned int i = 0; i < node->ChildCount(); i++)
+      queue.push_back(node->Child(i));
+  }
 }
 
 }
