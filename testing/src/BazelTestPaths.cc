@@ -34,7 +34,7 @@ bool BazelTestPaths::ProjectSourcePath(std::string &_sourceDir)
   if (common::env("TEST_SRCDIR", test_srcdir) &&
       common::env("IGN_BAZEL_PATH", bazel_path))
   {
-    _sourceDir = ignition::common::joinPaths(test_srcdir,
+    _sourceDir = gz::common::joinPaths(test_srcdir,
                                              "ignition",
                                              bazel_path);
     return true;

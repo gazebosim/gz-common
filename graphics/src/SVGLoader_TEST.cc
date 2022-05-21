@@ -207,8 +207,8 @@ TEST_F(SVGLoaderTest, ClosedLoops)
   out.close();
 
 
-  std::vector< std::vector<ignition::math::Vector2d> > closedPolys;
-  std::vector< std::vector<ignition::math::Vector2d> > openPolys;
+  std::vector< std::vector<gz::math::Vector2d> > closedPolys;
+  std::vector< std::vector<gz::math::Vector2d> > openPolys;
 
   loader.PathsToClosedPolylines(paths, tol, closedPolys, openPolys);
   EXPECT_EQ(0u, openPolys.size());
@@ -231,8 +231,8 @@ TEST_F(SVGLoaderTest, Transforms)
   out.close();
 
 
-  std::vector< std::vector<ignition::math::Vector2d> > closedPolys;
-  std::vector< std::vector<ignition::math::Vector2d> > openPolys;
+  std::vector< std::vector<gz::math::Vector2d> > closedPolys;
+  std::vector< std::vector<gz::math::Vector2d> > openPolys;
 
   loader.PathsToClosedPolylines(paths, tol, closedPolys, openPolys);
 
@@ -267,8 +267,8 @@ TEST_F(SVGLoaderTest, Transforms2)
   out.close();
 
 
-  std::vector< std::vector<ignition::math::Vector2d> > closedPolys;
-  std::vector< std::vector<ignition::math::Vector2d> > openPolys;
+  std::vector< std::vector<gz::math::Vector2d> > closedPolys;
+  std::vector< std::vector<gz::math::Vector2d> > openPolys;
 
   loader.PathsToClosedPolylines(paths, tol, closedPolys, openPolys);
 
@@ -332,8 +332,8 @@ TEST_F(SVGLoaderTest, Transforms3)
   loader.DumpPaths(paths, out);
   out.close();
 
-  std::vector< std::vector<ignition::math::Vector2d> > closedPolys;
-  std::vector< std::vector<ignition::math::Vector2d> > openPolys;
+  std::vector< std::vector<gz::math::Vector2d> > closedPolys;
+  std::vector< std::vector<gz::math::Vector2d> > openPolys;
   loader.PathsToClosedPolylines(paths, tol, closedPolys, openPolys);
 
   EXPECT_EQ(0u, openPolys.size());

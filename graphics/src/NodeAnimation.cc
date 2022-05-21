@@ -22,7 +22,7 @@ using namespace gz;
 using namespace common;
 
 /// \brief NodeAnimation private data
-class ignition::common::NodeAnimation::Implementation
+class gz::common::NodeAnimation::Implementation
 {
   /// \brief the name of the animation
   public: std::string name;
@@ -36,7 +36,7 @@ class ignition::common::NodeAnimation::Implementation
 
 //////////////////////////////////////////////////
 NodeAnimation::NodeAnimation(const std::string &_name)
-: dataPtr(ignition::utils::MakeImpl<Implementation>())
+: dataPtr(gz::utils::MakeImpl<Implementation>())
 {
   this->dataPtr->name = _name;
 }

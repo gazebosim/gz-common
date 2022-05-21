@@ -25,7 +25,7 @@ int main(int argc, char **argv)
   ignerr << "This is an error" << std::endl;
 
   // Change verbosity to level 4, all messages show
-  ignition::common::Console::SetVerbosity(4);
+  gz::common::Console::SetVerbosity(4);
   igndbg << "This is a debug message" << std::endl;
   ignmsg << "This is an informational message" << std::endl;
   ignwarn << "This is a warning" << std::endl;

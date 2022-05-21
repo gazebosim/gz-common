@@ -34,7 +34,7 @@ using namespace gz;
 using namespace common;
 
 // Private data class
-class ignition::common::SystemPaths::Implementation
+class gz::common::SystemPaths::Implementation
 {
   /// \brief Name of the environment variable to check for plugin paths
   public: std::string pluginPathEnv = "IGN_PLUGIN_PATH";
@@ -60,7 +60,7 @@ class ignition::common::SystemPaths::Implementation
 
   /// \brief Callbacks to be called in order in case a file can't be found.
   public: std::vector <std::function <std::string(
-              const ignition::common::URI &)> > findFileURICbs;
+              const gz::common::URI &)> > findFileURICbs;
 
   /// \brief generates paths to try searching for the named library
   public: std::vector<std::string> GenerateLibraryPaths(
@@ -79,7 +79,7 @@ void insertUnique(const std::string &_path, std::list<std::string> &_list)
 
 //////////////////////////////////////////////////
 SystemPaths::SystemPaths()
-: dataPtr(ignition::utils::MakeImpl<Implementation>())
+: dataPtr(gz::utils::MakeImpl<Implementation>())
 {
   std::string home, path, fullPath;
   if (!env(IGN_HOMEDIR, home))
@@ -279,19 +279,19 @@ std::vector<std::string> SystemPaths::Implementation::GenerateLibraryPaths(
 //////////////////////////////////////////////////
 std::string SystemPaths::FindFileURI(const std::string &_uri) const
 {
-  if (!ignition::common::URI::Valid(_uri))
+  if (!gz::common::URI::Valid(_uri))
   {
     ignerr << "The passed value [" << _uri << "] is not a valid URI, "
               "trying as a file" << std::endl;
     return this->FindFile(_uri);
   }
 
-  const auto uri = ignition::common::URI(_uri);
+  const auto uri = gz::common::URI(_uri);
   return this->FindFileURI(uri);
 }
 
 //////////////////////////////////////////////////
-std::string SystemPaths::FindFileURI(const ignition::common::URI &_uri) const
+std::string SystemPaths::FindFileURI(const gz::common::URI &_uri) const
 {
   std::string prefix = _uri.Scheme();
   std::string suffix;
@@ -313,7 +313,7 @@ std::string SystemPaths::FindFileURI(const ignition::common::URI &_uri) const
   std::string filename;
 
   // First try to find the file on the current system
-  filename = this->FindFile(ignition::common::copyFromUnixPath(suffix),
+  filename = this->FindFile(gz::common::copyFromUnixPath(suffix),
       true, false);
 
   // Look in custom paths.
@@ -325,7 +325,7 @@ std::string SystemPaths::FindFileURI(const ignition::common::URI &_uri) const
       auto withSuffix = NormalizeDirectoryPath(filePath) + suffix;
       if (exists(withSuffix))
       {
-        filename = ignition::common::copyFromUnixPath(withSuffix);
+        filename = gz::common::copyFromUnixPath(withSuffix);
         break;
       }
     }
@@ -371,9 +371,9 @@ std::string SystemPaths::FindFile(const std::string &_filename,
     return path;
 
   // Handle as URI
-  if (ignition::common::URI::Valid(filename))
+  if (gz::common::URI::Valid(filename))
   {
-    path = this->FindFileURI(ignition::common::URI(filename));
+    path = this->FindFileURI(gz::common::URI(filename));
   }
   // Handle as local absolute path
   else if (filename[0] == '/')
@@ -409,7 +409,7 @@ std::string SystemPaths::FindFile(const std::string &_filename,
       auto withSuffix = NormalizeDirectoryPath(filePath) + filename;
       if (exists(withSuffix))
       {
-        path = ignition::common::copyFromUnixPath(withSuffix);
+        path = gz::common::copyFromUnixPath(withSuffix);
         break;
       }
     }
@@ -510,7 +510,7 @@ void SystemPaths::AddFindFileCallback(
 
 /////////////////////////////////////////////////
 void SystemPaths::AddFindFileURICallback(
-    std::function<std::string(const ignition::common::URI &)> _cb)
+    std::function<std::string(const gz::common::URI &)> _cb)
 {
   this->dataPtr->findFileURICbs.push_back(_cb);
 }
@@ -527,7 +527,7 @@ std::list<std::string> SystemPaths::PathsFromEnv(const std::string &_env)
   if (envPathsStr.empty())
     return paths;
 
-  auto ps = ignition::common::Split(envPathsStr, Delimiter());
+  auto ps = gz::common::Split(envPathsStr, Delimiter());
   for (auto const &path : ps)
   {
     std::string normalPath = NormalizeDirectoryPath(path);

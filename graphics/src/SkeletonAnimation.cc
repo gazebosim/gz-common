@@ -23,7 +23,7 @@ using namespace gz;
 using namespace common;
 
 /// Prvate data class
-class ignition::common::SkeletonAnimation::Implementation
+class gz::common::SkeletonAnimation::Implementation
 {
   /// \brief the node name
   public: std::string name;
@@ -37,7 +37,7 @@ class ignition::common::SkeletonAnimation::Implementation
 
 //////////////////////////////////////////////////
 SkeletonAnimation::SkeletonAnimation(const std::string &_name)
-: dataPtr(ignition::utils::MakeImpl<Implementation>())
+: dataPtr(gz::utils::MakeImpl<Implementation>())
 {
   this->dataPtr->name = _name;
 }

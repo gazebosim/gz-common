@@ -39,7 +39,7 @@ bool CMakeTestPaths::ProjectSourcePath(std::string &_sourceDir)
 //////////////////////////////////////////////////
 bool CMakeTestPaths::TestTmpPath(std::string &_tmpDir)
 {
-  _tmpDir = ignition::common::tempDirectoryPath();
+  _tmpDir = gz::common::tempDirectoryPath();
   return true;
 }
 

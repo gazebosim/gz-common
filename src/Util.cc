@@ -62,10 +62,10 @@
 ///
 /// This uses the NeverDestroyed pattern to prevent static initialization and
 /// destruction order fiasco issues.
-ignition::common::SystemPaths& GetSystemPaths()
+gz::common::SystemPaths& GetSystemPaths()
 {
   static
-    ignition::utils::NeverDestroyed<ignition::common::SystemPaths> paths;
+    gz::utils::NeverDestroyed<gz::common::SystemPaths> paths;
   return paths.Access();
 }
 
@@ -249,13 +249,13 @@ bool Sha1::Digest(void const *_buffer, std::size_t _byteCount,
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::systemTimeISO()
+std::string gz::common::systemTimeISO()
 {
   return timeToIso(IGN_SYSTEM_TIME());
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::systemTimeIso()
+std::string gz::common::systemTimeIso()
 {
   return timeToIso(IGN_SYSTEM_TIME());
 }
@@ -277,7 +277,7 @@ static bool PortableLocaltime(time_t seconds, struct tm* out) {
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::timeToIso(
+std::string gz::common::timeToIso(
     const std::chrono::time_point<std::chrono::system_clock> &_time)
 {
   char isoStr[25];
@@ -295,32 +295,32 @@ std::string ignition::common::timeToIso(
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::logPath()
+std::string gz::common::logPath()
 {
   return GetSystemPaths().LogPath();
 }
 
 /////////////////////////////////////////////////
-void ignition::common::addSearchPathSuffix(const std::string &_suffix)
+void gz::common::addSearchPathSuffix(const std::string &_suffix)
 {
   GetSystemPaths().AddSearchPathSuffix(_suffix);
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::findFile(const std::string &_file)
+std::string gz::common::findFile(const std::string &_file)
 {
   return GetSystemPaths().FindFile(_file, true);
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::findFile(const std::string &_file,
+std::string gz::common::findFile(const std::string &_file,
                                        const bool _searchLocalPath)
 {
   return GetSystemPaths().FindFile(_file, _searchLocalPath);
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::findFilePath(const std::string &_file)
+std::string gz::common::findFilePath(const std::string &_file)
 {
   std::string filepath = findFile(_file);
 
@@ -336,26 +336,26 @@ std::string ignition::common::findFilePath(const std::string &_file)
 }
 
 /////////////////////////////////////////////////
-void ignition::common::addFindFileURICallback(
-    std::function<std::string(const ignition::common::URI &)> _cb)
+void gz::common::addFindFileURICallback(
+    std::function<std::string(const gz::common::URI &)> _cb)
 {
   GetSystemPaths().AddFindFileURICallback(_cb);
 }
 
 /////////////////////////////////////////////////
-ignition::common::SystemPaths *ignition::common::systemPaths()
+gz::common::SystemPaths *gz::common::systemPaths()
 {
   return &GetSystemPaths();
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::env(const std::string &_name, std::string &_value)
+bool gz::common::env(const std::string &_name, std::string &_value)
 {
   return env(_name, _value, false);
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::env(const std::string &_name,
+bool gz::common::env(const std::string &_name,
                            std::string &_value,
                            bool _allowEmpty)
 {
@@ -402,7 +402,7 @@ bool ignition::common::env(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::setenv(const std::string &_name,
+bool gz::common::setenv(const std::string &_name,
                               const std::string &_value)
 {
 #ifdef _WIN32
@@ -425,7 +425,7 @@ bool ignition::common::setenv(const std::string &_name,
   return true;
 }
 /////////////////////////////////////////////////
-bool ignition::common::unsetenv(const std::string &_name)
+bool gz::common::unsetenv(const std::string &_name)
 {
 #ifdef _WIN32
   if (0 != _putenv_s(_name.c_str(), ""))
@@ -448,7 +448,7 @@ bool ignition::common::unsetenv(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::sha1(void const *_buffer, std::size_t _byteCount)
+std::string gz::common::sha1(void const *_buffer, std::size_t _byteCount)
 {
   Sha1 sha1;
   std::stringstream stream;
@@ -464,14 +464,14 @@ std::string ignition::common::sha1(void const *_buffer, std::size_t _byteCount)
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::uuid()
+std::string gz::common::uuid()
 {
-  ignition::common::Uuid uuid;
+  gz::common::Uuid uuid;
   return uuid.String();
 }
 
 /////////////////////////////////////////////////
-std::vector<std::string> ignition::common::split(const std::string &_str,
+std::vector<std::string> gz::common::split(const std::string &_str,
     const std::string &_delim)
 {
   std::vector<std::string> tokens;
@@ -491,14 +491,14 @@ std::vector<std::string> ignition::common::split(const std::string &_str,
 }
 
 /////////////////////////////////////////////////
-void ignition::common::ltrim(std::string &_s)
+void gz::common::ltrim(std::string &_s)
 {
   _s.erase(_s.begin(), std::find_if(_s.begin(), _s.end(),
         [](int c) {return !std::isspace(c);}));
 }
 
 /////////////////////////////////////////////////
-void ignition::common::rtrim(std::string &_s)
+void gz::common::rtrim(std::string &_s)
 {
   _s.erase(std::find_if(_s.rbegin(), _s.rend(),
         [](int c) {return !std::isspace(c);}).base(),
@@ -506,35 +506,35 @@ void ignition::common::rtrim(std::string &_s)
 }
 
 /////////////////////////////////////////////////
-void ignition::common::trim(std::string &_s)
+void gz::common::trim(std::string &_s)
 {
-  ignition::common::ltrim(_s);
-  ignition::common::rtrim(_s);
+  gz::common::ltrim(_s);
+  gz::common::rtrim(_s);
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::ltrimmed(std::string _s)
+std::string gz::common::ltrimmed(std::string _s)
 {
-  ignition::common::ltrim(_s);
+  gz::common::ltrim(_s);
   return _s;
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::rtrimmed(std::string _s)
+std::string gz::common::rtrimmed(std::string _s)
 {
-  ignition::common::rtrim(_s);
+  gz::common::rtrim(_s);
   return _s;
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::trimmed(std::string _s)
+std::string gz::common::trimmed(std::string _s)
 {
-  ignition::common::trim(_s);
+  gz::common::trim(_s);
   return _s;
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::lowercase(const std::string &_in)
+std::string gz::common::lowercase(const std::string &_in)
 {
   std::string out = _in;
   for (size_t i = 0; i < out.size(); ++i)
@@ -543,14 +543,14 @@ std::string ignition::common::lowercase(const std::string &_in)
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::lowercase(const char *_in)
+std::string gz::common::lowercase(const char *_in)
 {
   std::string ins = _in;
   return lowercase(ins);
 }
 
 /////////////////////////////////////////////////
-void ignition::common::replaceAll(std::string &_result,
+void gz::common::replaceAll(std::string &_result,
                                   const std::string &_orig,
                                   const std::string &_key,
                                   const std::string &_replacement)
@@ -565,7 +565,7 @@ void ignition::common::replaceAll(std::string &_result,
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::replaceAll(const std::string &_orig,
+std::string gz::common::replaceAll(const std::string &_orig,
                                         const std::string &_key,
                                         const std::string &_replacement)
 {

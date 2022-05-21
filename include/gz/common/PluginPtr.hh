@@ -34,7 +34,7 @@ namespace gz
     namespace detail { template<class, class> class ComposePlugin; }
 
     /// \brief This class manages the lifecycle of a plugin instance. It can
-    /// receive a plugin instance from the ignition::common::PluginLoader class
+    /// receive a plugin instance from the gz::common::PluginLoader class
     /// or by copy-construction or assignment from another PluginPtr instance.
     ///
     /// This class behaves similarly to a std::shared_ptr where multiple

@@ -81,11 +81,11 @@ namespace gz
 
       /// \brief Get mouse pointer position on the screen.
       /// \return Mouse pointer position on the screen.
-      public: ignition::math::Vector2i Pos() const;
+      public: gz::math::Vector2i Pos() const;
 
       /// \brief Set mouse pointer position on the screen.
       /// \param[in] _pos Mouse pointer position on the screen.
-      public: void SetPos(const ignition::math::Vector2i &_pos);
+      public: void SetPos(const gz::math::Vector2i &_pos);
 
       /// \brief Set mouse pointer position on the screen.
       /// \param[in] _x Mouse pointer X position on the screen.
@@ -94,11 +94,11 @@ namespace gz
 
       /// \brief Get the previous position.
       /// \return The previous mouse position.
-      public: ignition::math::Vector2i PrevPos() const;
+      public: gz::math::Vector2i PrevPos() const;
 
       /// \brief Set the previous position.
       /// \param[in] _pos Previous mouse pointer position on the screen.
-      public: void SetPrevPos(const ignition::math::Vector2i &_pos);
+      public: void SetPrevPos(const gz::math::Vector2i &_pos);
 
       /// \brief Set the previous position.
       /// \param[in] _x Previous mouse pointer X position on the screen.
@@ -107,11 +107,11 @@ namespace gz
 
       /// \brief Get the position of button press.
       /// \return Screen position of a button press.
-      public: ignition::math::Vector2i PressPos() const;
+      public: gz::math::Vector2i PressPos() const;
 
       /// \brief Set the position of button press.
       /// \param[in] _pos Mouse pointer position on the screen.
-      public: void SetPressPos(const ignition::math::Vector2i &_pos);
+      public: void SetPressPos(const gz::math::Vector2i &_pos);
 
       /// \brief Set the position of button press.
       /// \param[in] _x Mouse pointer X position on the screen.
@@ -120,11 +120,11 @@ namespace gz
 
       /// \brief Get the scroll position.
       /// \return The scroll position.
-      public: ignition::math::Vector2i Scroll() const;
+      public: gz::math::Vector2i Scroll() const;
 
       /// \brief Set the scroll position.
       /// \param[in] _scroll Scroll position.
-      public: void SetScroll(const ignition::math::Vector2i &_scroll);
+      public: void SetScroll(const gz::math::Vector2i &_scroll);
 
       /// \brief Set the scroll position.
       /// \param[in] _x Scroll X position.

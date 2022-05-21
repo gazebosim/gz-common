@@ -322,13 +322,13 @@ namespace gz
 ///////////////////////////////////////////////
 // Implementation of get_sha1
 template<typename T>
-std::string ignition::common::sha1(const T &_buffer)
+std::string gz::common::sha1(const T &_buffer)
 {
   if (_buffer.size() == 0)
-    return ignition::common::sha1(NULL, 0);
+    return gz::common::sha1(NULL, 0);
   else
   {
-    return ignition::common::sha1(
+    return gz::common::sha1(
         &(_buffer[0]), _buffer.size() * sizeof(_buffer[0]));
   }
 }

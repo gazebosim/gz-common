@@ -866,7 +866,7 @@ TEST(URITEST, File)
 TEST(URITEST, WinPath)
 {
   // Windows path requires authority
-  const auto uri = ignition::common::URI("file://D:/my/test/dir/world.sdf",
+  const auto uri = gz::common::URI("file://D:/my/test/dir/world.sdf",
       true);
   ASSERT_TRUE(uri.Authority());
   EXPECT_EQ("file", uri.Scheme());

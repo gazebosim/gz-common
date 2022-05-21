@@ -50,7 +50,7 @@ namespace gz
 
       /// \brief Stream operator friendly
       public: friend std::ostream &operator<<(std::ostream &out,
-                                              const ignition::common::Timer &t)
+                                              const gz::common::Timer &t)
               {
                 out << t.ElapsedTime().count();
                 return out;

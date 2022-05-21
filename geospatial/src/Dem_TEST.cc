@@ -123,7 +123,7 @@ TEST_F(DemTest, BasicAPI)
   EXPECT_DOUBLE_EQ(inf, dem.Elevation(width, height));
 
   // Check GeoReferenceOrigin()
-  ignition::math::Angle latitude, longitude;
+  gz::math::Angle latitude, longitude;
   EXPECT_TRUE(dem.GeoReferenceOrigin(latitude, longitude));
   EXPECT_FLOAT_EQ(38.001667f, latitude.Degree());
   EXPECT_FLOAT_EQ(-122.22278f, longitude.Degree());
@@ -139,8 +139,8 @@ TEST_F(DemTest, FillHeightmap)
   // Use FillHeightMap() to retrieve a vector<float> after some transformations
   int subsampling;
   unsigned vertSize;
-  ignition::math::Vector3d size;
-  ignition::math::Vector3d scale;
+  gz::math::Vector3d size;
+  gz::math::Vector3d scale;
   bool flipY;
   std::vector<float> elevations;
 
@@ -152,7 +152,7 @@ TEST_F(DemTest, FillHeightmap)
   scale.X(size.X() / vertSize);
   scale.Y(size.Y() / vertSize);
 
-  if (ignition::math::equal(dem.MaxElevation(), 0.0f))
+  if (gz::math::equal(dem.MaxElevation(), 0.0f))
     scale.Z(fabs(size.Z()));
   else
     scale.Z(fabs(size.Z()) / dem.MaxElevation());
@@ -243,7 +243,7 @@ TEST_F(DemTest, NonEarthDem)
   EXPECT_FLOAT_EQ(-1, dem.WorldWidth());
 
   // unable to get coordinates in WGS84
-  ignition::math::Angle latitude, longitude;
+  gz::math::Angle latitude, longitude;
   EXPECT_FALSE(dem.GeoReferenceOrigin(latitude, longitude));
 
   // The Load() method in Dem.cc should set the

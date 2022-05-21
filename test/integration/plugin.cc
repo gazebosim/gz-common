@@ -39,9 +39,9 @@
 TEST(PluginLoader, LoadBadPlugins)
 {
   std::string dummyPath =
-    ignition::common::copyFromUnixPath(IGN_DUMMY_PLUGIN_PATH);
+    gz::common::copyFromUnixPath(IGN_DUMMY_PLUGIN_PATH);
 
-  ignition::common::SystemPaths sp;
+  gz::common::SystemPaths sp;
   sp.AddPluginPaths(dummyPath);
 
   std::vector<std::string> libraryNames = {
@@ -54,10 +54,10 @@ TEST(PluginLoader, LoadBadPlugins)
     std::string path = sp.FindSharedLibrary(libraryName);
     ASSERT_FALSE(path.empty());
 
-    ignition::common::PluginLoader pl;
+    gz::common::PluginLoader pl;
 
     // Make sure the expected plugins were loaded.
-    ignition::common::Console::SetVerbosity(2);
+    gz::common::Console::SetVerbosity(2);
     std::unordered_set<std::string> pluginNames = pl.LoadLibrary(path);
     EXPECT_TRUE(pluginNames.empty());
   }
@@ -67,15 +67,15 @@ TEST(PluginLoader, LoadBadPlugins)
 TEST(PluginLoader, LoadExistingLibrary)
 {
   std::string dummyPath =
-    ignition::common::copyFromUnixPath(IGN_DUMMY_PLUGIN_PATH);
+    gz::common::copyFromUnixPath(IGN_DUMMY_PLUGIN_PATH);
 
-  ignition::common::SystemPaths sp;
+  gz::common::SystemPaths sp;
   sp.AddPluginPaths(dummyPath);
 
   std::string path = sp.FindSharedLibrary("IGNDummyPlugins");
   ASSERT_FALSE(path.empty());
 
-  ignition::common::PluginLoader pl;
+  gz::common::PluginLoader pl;
 
   // Make sure the expected plugins were loaded.
   std::unordered_set<std::string> pluginNames = pl.LoadLibrary(path);
@@ -92,7 +92,7 @@ TEST(PluginLoader, LoadExistingLibrary)
   EXPECT_EQ(1u, pl.PluginsImplementing("::test::util::DummyDoubleBase").size());
 
 
-  ignition::common::PluginPtr firstPlugin =
+  gz::common::PluginPtr firstPlugin =
       pl.Instantiate("test::util::DummySinglePlugin");
   EXPECT_FALSE(firstPlugin.IsEmpty());
   EXPECT_TRUE(firstPlugin->HasInterface("test::util::DummyNameBase"));
@@ -100,7 +100,7 @@ TEST(PluginLoader, LoadExistingLibrary)
   EXPECT_FALSE(firstPlugin->HasInterface("test::util::DummyIntBase"));
   EXPECT_FALSE(firstPlugin->HasInterface("test::util::DummySetterBase"));
 
-  ignition::common::PluginPtr secondPlugin =
+  gz::common::PluginPtr secondPlugin =
       pl.Instantiate("test::util::DummyMultiPlugin");
   EXPECT_FALSE(secondPlugin.IsEmpty());
   EXPECT_TRUE(secondPlugin->HasInterface("test::util::DummyNameBase"));
@@ -155,19 +155,19 @@ class SomeInterface
 };
 
 using SomeSpecializedPluginPtr =
-    ignition::common::SpecializedPluginPtr<
+    gz::common::SpecializedPluginPtr<
         SomeInterface,
         test::util::DummyIntBase,
         test::util::DummySetterBase>;
 
 TEST(SpecializedPluginPtr, Construction)
 {
-  ignition::common::SystemPaths sp;
+  gz::common::SystemPaths sp;
   sp.AddPluginPaths(IGN_DUMMY_PLUGIN_PATH);
   std::string path = sp.FindSharedLibrary("IGNDummyPlugins");
   ASSERT_FALSE(path.empty());
 
-  ignition::common::PluginLoader pl;
+  gz::common::PluginLoader pl;
   pl.LoadLibrary(path);
 
   SomeSpecializedPluginPtr plugin(
@@ -222,8 +222,8 @@ TEST(SpecializedPluginPtr, Construction)
 
 template <typename PluginPtrType1, typename PluginPtrType2>
 void TestSetAndMapUsage(
-    const ignition::common::PluginLoader &loader,
-    const ignition::common::PluginPtr &plugin)
+    const gz::common::PluginLoader &loader,
+    const gz::common::PluginPtr &plugin)
 {
   PluginPtrType1 plugin1 = plugin;
   PluginPtrType2 plugin2 = plugin1;
@@ -236,22 +236,22 @@ void TestSetAndMapUsage(
   EXPECT_TRUE(plugin2 == plugin1);
   EXPECT_FALSE(plugin2 != plugin1);
 
-  std::set<ignition::common::PluginPtr> orderedSet;
+  std::set<gz::common::PluginPtr> orderedSet;
   EXPECT_TRUE(orderedSet.insert(plugin1).second);
   EXPECT_FALSE(orderedSet.insert(plugin1).second);
   EXPECT_FALSE(orderedSet.insert(plugin2).second);
 
-  std::unordered_set<ignition::common::PluginPtr> unorderedSet;
+  std::unordered_set<gz::common::PluginPtr> unorderedSet;
   EXPECT_TRUE(unorderedSet.insert(plugin1).second);
   EXPECT_FALSE(unorderedSet.insert(plugin1).second);
   EXPECT_FALSE(unorderedSet.insert(plugin2).second);
 
-  std::map<ignition::common::PluginPtr, std::string> orderedMap;
+  std::map<gz::common::PluginPtr, std::string> orderedMap;
   EXPECT_TRUE(orderedMap.insert(std::make_pair(plugin1, "some string")).second);
   EXPECT_FALSE(orderedMap.insert(std::make_pair(plugin1, "a string")).second);
   EXPECT_FALSE(orderedMap.insert(std::make_pair(plugin2, "chars")).second);
 
-  std::unordered_map<ignition::common::PluginPtr, std::string> unorderedMap;
+  std::unordered_map<gz::common::PluginPtr, std::string> unorderedMap;
   EXPECT_TRUE(unorderedMap.insert(std::make_pair(plugin1, "strings")).second);
   EXPECT_FALSE(unorderedMap.insert(std::make_pair(plugin1, "letters")).second);
   EXPECT_FALSE(unorderedMap.insert(std::make_pair(plugin2, "")).second);
@@ -277,30 +277,30 @@ void TestSetAndMapUsage(
 }
 
 using SingleSpecializedPluginPtr =
-    ignition::common::SpecializedPluginPtr<SomeInterface>;
+    gz::common::SpecializedPluginPtr<SomeInterface>;
 
 using AnotherSpecializedPluginPtr =
-    ignition::common::SpecializedPluginPtr<
+    gz::common::SpecializedPluginPtr<
         SomeInterface,
         test::util::DummyIntBase>;
 
 TEST(PluginPtr, CopyMoveSemantics)
 {
-  ignition::common::PluginPtr plugin;
+  gz::common::PluginPtr plugin;
   EXPECT_TRUE(plugin.IsEmpty());
 
-  ignition::common::SystemPaths sp;
+  gz::common::SystemPaths sp;
   sp.AddPluginPaths(IGN_DUMMY_PLUGIN_PATH);
   std::string path = sp.FindSharedLibrary("IGNDummyPlugins");
   ASSERT_FALSE(path.empty());
 
-  ignition::common::PluginLoader pl;
+  gz::common::PluginLoader pl;
   pl.LoadLibrary(path);
 
   plugin = pl.Instantiate("test::util::DummySinglePlugin");
   EXPECT_FALSE(plugin.IsEmpty());
 
-  ignition::common::PluginPtr otherPlugin =
+  gz::common::PluginPtr otherPlugin =
       pl.Instantiate("test::util::DummySinglePlugin");
   EXPECT_FALSE(otherPlugin.IsEmpty());
 
@@ -313,14 +313,14 @@ TEST(PluginPtr, CopyMoveSemantics)
 
   igndbg << "Testing sets and maps with PluginPtr and PluginPtr\n";
   TestSetAndMapUsage<
-      ignition::common::PluginPtr,
-      ignition::common::PluginPtr>(
+      gz::common::PluginPtr,
+      gz::common::PluginPtr>(
         pl, plugin);
 
   igndbg << "Testing sets and maps with PluginPtr and "
          << "SomeSpecializedPluginPtr\n";
   TestSetAndMapUsage<
-      ignition::common::PluginPtr,
+      gz::common::PluginPtr,
       SomeSpecializedPluginPtr>(
         pl, plugin);
 
@@ -338,7 +338,7 @@ TEST(PluginPtr, CopyMoveSemantics)
       SingleSpecializedPluginPtr>(
         pl, plugin);
 
-  ignition::common::ConstPluginPtr c_plugin(plugin);
+  gz::common::ConstPluginPtr c_plugin(plugin);
   EXPECT_FALSE(c_plugin.IsEmpty());
   EXPECT_TRUE(c_plugin == plugin);
 
@@ -369,17 +369,17 @@ void CheckSomeValues(
 
 TEST(PluginPtr, QueryInterfaceSharedPtr)
 {
-  ignition::common::SystemPaths sp;
+  gz::common::SystemPaths sp;
   sp.AddPluginPaths(IGN_DUMMY_PLUGIN_PATH);
   std::string path = sp.FindSharedLibrary("IGNDummyPlugins");
   ASSERT_FALSE(path.empty());
 
-  ignition::common::PluginLoader pl;
+  gz::common::PluginLoader pl;
   pl.LoadLibrary(path);
 
   // as_shared_pointer without specialization
   {
-    ignition::common::PluginPtr plugin =
+    gz::common::PluginPtr plugin =
       pl.Instantiate("test::util::DummyMultiPlugin");
 
     std::shared_ptr<test::util::DummyIntBase> int_ptr =

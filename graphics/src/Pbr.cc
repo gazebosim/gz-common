@@ -21,7 +21,7 @@
 #include "ignition/common/Pbr.hh"
 
 /// \brief Private data for Pbr class
-class ignition::common::Pbr::Implementation
+class gz::common::Pbr::Implementation
 {
   /// \brief Workflow type
   public: PbrType type = PbrType::NONE;
@@ -78,7 +78,7 @@ using namespace common;
 
 /////////////////////////////////////////////////
 Pbr::Pbr()
-  : dataPtr(ignition::utils::MakeImpl<Implementation>())
+  : dataPtr(gz::utils::MakeImpl<Implementation>())
 {
 }
 
@@ -100,11 +100,11 @@ bool Pbr::operator==(const Pbr &_pbr) const
     && (this->dataPtr->emissiveMap == _pbr.dataPtr->emissiveMap)
     && (this->dataPtr->ambientOcclusionMap ==
         _pbr.dataPtr->ambientOcclusionMap)
-    && (ignition::math::equal(
+    && (gz::math::equal(
         this->dataPtr->metalness, _pbr.dataPtr->metalness))
-    && (ignition::math::equal(
+    && (gz::math::equal(
         this->dataPtr->roughness, _pbr.dataPtr->roughness))
-    && (ignition::math::equal(
+    && (gz::math::equal(
         this->dataPtr->glossiness, _pbr.dataPtr->glossiness));
 }
 

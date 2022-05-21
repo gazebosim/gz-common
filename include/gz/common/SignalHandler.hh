@@ -38,7 +38,7 @@ namespace gz
     /// Example using a lambda callback:
     ///
     /// ~~~
-    /// ignition::common::SignalHandler handler;
+    /// gz::common::SignalHandler handler;
     /// handler.AddCallback([] (int _sig)
     /// {
     ///   printf("Signal[%d] received\n", _sig);

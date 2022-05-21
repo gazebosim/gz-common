@@ -24,23 +24,23 @@
 TEST(Console_TEST, LogInitAfterConsoleOut)
 {
   std::string logFilename = "uri.log";
-  auto tempDir = ignition::common::testing::MakeTestTempDirectory();
+  auto tempDir = gz::common::testing::MakeTestTempDirectory();
   ASSERT_TRUE(tempDir->Valid());
 
-  ignition::common::setenv(IGN_HOMEDIR, tempDir->Path());
+  gz::common::setenv(IGN_HOMEDIR, tempDir->Path());
   std::string home;
-  ASSERT_TRUE(ignition::common::env(IGN_HOMEDIR, home));
+  ASSERT_TRUE(gz::common::env(IGN_HOMEDIR, home));
 
   auto logDir = tempDir->Path();
-  std::string logFile = ignition::common::joinPaths(logDir, logFilename);
+  std::string logFile = gz::common::joinPaths(logDir, logFilename);
 
-  ignition::common::Console::SetVerbosity(4);
+  gz::common::Console::SetVerbosity(4);
 
   // Before console is initialized, logs go to default file location
   ignerr << "Error before logging initialized" << std::endl;
 
   {
-    auto defaultPath = ignition::common::joinPaths(home,
+    auto defaultPath = gz::common::joinPaths(home,
         ".ignition", "auto_default.log");
 
     std::ifstream t(defaultPath);

@@ -28,10 +28,10 @@
 #include "ignition/common/testing/Utils.hh"
 
 /////////////////////////////////////////////////
-class TestTempDirectory : public ignition::common::TempDirectory
+class TestTempDirectory : public gz::common::TempDirectory
 {
   public: TestTempDirectory():
-    ignition::common::TempDirectory("plugin_loader", "ign_common", true)
+    gz::common::TempDirectory("plugin_loader", "ign_common", true)
   {
   }
 };
@@ -39,14 +39,14 @@ class TestTempDirectory : public ignition::common::TempDirectory
 /////////////////////////////////////////////////
 TEST(PluginLoader, InitialNoInterfacesImplemented)
 {
-  ignition::common::PluginLoader pm;
+  gz::common::PluginLoader pm;
   EXPECT_EQ(0u, pm.InterfacesImplemented().size());
 }
 
 /////////////////////////////////////////////////
 TEST(PluginLoader, LoadNonexistantLibrary)
 {
-  ignition::common::PluginLoader pm;
+  gz::common::PluginLoader pm;
   EXPECT_TRUE(pm.LoadLibrary("/path/to/libDoesNotExist.so").empty());
 }
 
@@ -54,9 +54,9 @@ TEST(PluginLoader, LoadNonexistantLibrary)
 TEST(PluginLoader, LoadNonLibrary)
 {
   TestTempDirectory tempDir;
-  ignition::common::testing::createNewEmptyFile("not_a_library.txt");
+  gz::common::testing::createNewEmptyFile("not_a_library.txt");
 
-  ignition::common::PluginLoader pm;
+  gz::common::PluginLoader pm;
   EXPECT_TRUE(pm.LoadLibrary("not_a_library.txt").empty());
 }
 
@@ -67,30 +67,30 @@ TEST(PluginLoader, LoadNonPluginLibrary)
   std::string libName = "foobar";
 
   TestTempDirectory tempDir;
-  ignition::common::createDirectory(libDir);
-  ignition::common::testing::createNewEmptyFile(
-      ignition::common::joinPaths(libDir, "lib" + libName + ".so"));
+  gz::common::createDirectory(libDir);
+  gz::common::testing::createNewEmptyFile(
+      gz::common::joinPaths(libDir, "lib" + libName + ".so"));
 
-  ignition::common::SystemPaths sp;
+  gz::common::SystemPaths sp;
 
   // Fails without plugin dirs setup
   std::string path = sp.FindSharedLibrary("foo");
   ASSERT_TRUE(path.empty());
 
   sp.AddPluginPaths(
-      ignition::common::joinPaths(ignition::common::cwd(), libDir));
+      gz::common::joinPaths(gz::common::cwd(), libDir));
   path = sp.FindSharedLibrary(libName);
   ASSERT_FALSE(path.empty());
 
-  ignition::common::PluginLoader pm;
+  gz::common::PluginLoader pm;
   EXPECT_TRUE(pm.LoadLibrary(path).empty());
 }
 
 /////////////////////////////////////////////////
 TEST(PluginLoader, InstantiateUnloadedPlugin)
 {
-  ignition::common::PluginLoader pm;
-  ignition::common::PluginPtr plugin =
+  gz::common::PluginLoader pm;
+  gz::common::PluginPtr plugin =
       pm.Instantiate("plugin::that::is::not::loaded");
   EXPECT_FALSE(plugin);
 }

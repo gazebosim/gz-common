@@ -34,7 +34,7 @@ class DirIter::Implementation
 
 //////////////////////////////////////////////////
 DirIter::DirIter():
-  dataPtr(ignition::utils::MakeImpl<Implementation>())
+  dataPtr(gz::utils::MakeImpl<Implementation>())
 {
   this->dataPtr->it = fs::directory_iterator();
 }

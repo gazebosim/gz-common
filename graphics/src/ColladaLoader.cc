@@ -70,15 +70,15 @@ namespace gz
 
       /// \brief Map of collada POSITION ids to list of vectors.
       public: std::map<std::string,
-              std::vector<ignition::math::Vector3d> > positionIds;
+              std::vector<gz::math::Vector3d> > positionIds;
 
       /// \brief Map of collada NORMAL ids to list of normals.
       public: std::map<std::string,
-              std::vector<ignition::math::Vector3d> > normalIds;
+              std::vector<gz::math::Vector3d> > normalIds;
 
       /// \brief Map of collada TEXCOORD ids to list of texture coordinates.
       public: std::map<std::string,
-              std::vector<ignition::math::Vector2d> >texcoordIds;
+              std::vector<gz::math::Vector2d> >texcoordIds;
 
       /// \brief Map of collada Material ids to Gazebo materials.
       public: std::map<std::string, MaterialPtr> materialIds;
@@ -108,7 +108,7 @@ namespace gz
       /// \param[in,out] _mesh The mesh being loaded
       public: void LoadController(tinyxml2::XMLElement *_contrXml,
                                    std::vector<tinyxml2::XMLElement*> _skelXmls,
-                                   const ignition::math::Matrix4d &_transform,
+                                   const gz::math::Matrix4d &_transform,
                                    Mesh *_mesh);
 
       /// \brief Load animations for a skeleton
@@ -146,7 +146,7 @@ namespace gz
       /// \param[in] _tranform Transform to apply to the loaded geometry
       /// \param[in,out] _mesh Pointer to the mesh currently being loaded
       public: void LoadGeometry(tinyxml2::XMLElement *_xml,
-                                 const ignition::math::Matrix4d &_transform,
+                                 const gz::math::Matrix4d &_transform,
                                  Mesh *_mesh);
 
       /// \brief Get an XML element by ID
@@ -171,12 +171,12 @@ namespace gz
       /// \param[in] _transform Transform to apply to the node
       public: void LoadNode(tinyxml2::XMLElement *_elem,
                              Mesh *_mesh,
-                             const ignition::math::Matrix4d &_transform);
+                             const gz::math::Matrix4d &_transform);
 
       /// \brief Load a transform
       /// \param[in] _elem Pointer to the transform XML instance
       /// \return A Matrix4 transform
-      public: ignition::math::Matrix4d LoadNodeTransform(
+      public: gz::math::Matrix4d LoadNodeTransform(
           tinyxml2::XMLElement *_elem);
 
       /// \brief Load vertices
@@ -185,9 +185,9 @@ namespace gz
       /// \param[out] _verts Holds the resulting vertices
       /// \param[out] _norms Holds the resulting normals
       public: void LoadVertices(const std::string &_id,
-          const ignition::math::Matrix4d &_transform,
-          std::vector<ignition::math::Vector3d> &_verts,
-          std::vector<ignition::math::Vector3d> &_norms);
+          const gz::math::Matrix4d &_transform,
+          std::vector<gz::math::Vector3d> &_verts,
+          std::vector<gz::math::Vector3d> &_norms);
 
       /// \brief Load vertices
       /// \param[in] _id String id of the vertices XML node
@@ -197,9 +197,9 @@ namespace gz
       /// \param[out] _vertDup Holds a map of duplicate position indices
       /// \param[out] _normDup Holds a map of duplicate normal indices
       public: void LoadVertices(const std::string &_id,
-                                 const ignition::math::Matrix4d &_transform,
-                                 std::vector<ignition::math::Vector3d> &_verts,
-                                 std::vector<ignition::math::Vector3d> &_norms,
+                                 const gz::math::Matrix4d &_transform,
+                                 std::vector<gz::math::Vector3d> &_verts,
+                                 std::vector<gz::math::Vector3d> &_norms,
                                  std::map<unsigned int, unsigned int> &_vertDup,
                                 std::map<unsigned int, unsigned int> &_normDup);
 
@@ -209,8 +209,8 @@ namespace gz
       /// \param[out] _values Holds the resulting position values
       /// \param[out] _duplicates Holds a map of duplicate position indices
       public: void LoadPositions(const std::string &_id,
-                                  const ignition::math::Matrix4d &_transform,
-                                 std::vector<ignition::math::Vector3d> &_values,
+                                  const gz::math::Matrix4d &_transform,
+                                 std::vector<gz::math::Vector3d> &_values,
                              std::map<unsigned int, unsigned int> &_duplicates);
 
       /// \brief Load normals
@@ -219,8 +219,8 @@ namespace gz
       /// \param[out] _values Holds the resulting normal values
       /// \param[out] _duplicates Holds a map of duplicate normal indices
       public: void LoadNormals(const std::string &_id,
-                                const ignition::math::Matrix4d &_transform,
-                                std::vector<ignition::math::Vector3d> &_values,
+                                const gz::math::Matrix4d &_transform,
+                                std::vector<gz::math::Vector3d> &_values,
                              std::map<unsigned int, unsigned int> &_duplicates);
 
       /// \brief Load texture coordinates
@@ -228,7 +228,7 @@ namespace gz
       /// \param[out] _values Holds the resulting uv values
       /// \param[out] _duplicates Holds a map of duplicate uv indices
       public: void LoadTexCoords(const std::string &_id,
-                                 std::vector<ignition::math::Vector2d> &_values,
+                                 std::vector<gz::math::Vector2d> &_values,
                              std::map<unsigned int, unsigned int> &_duplicates);
 
       /// \brief Load a material
@@ -249,7 +249,7 @@ namespace gz
       /// \param[in] _transform Transform to apply to all triangles
       /// \param[out] _mesh Mesh that is currently being loaded
       public: void LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
-                                  const ignition::math::Matrix4d &_transform,
+                                  const gz::math::Matrix4d &_transform,
                                   Mesh *_mesh);
 
       /// \brief Load a polygon list
@@ -257,7 +257,7 @@ namespace gz
       /// \param[in] _transform Transform to apply to each polygon
       /// \param[out] _mesh Mesh that is currently being loaded
       public: void LoadPolylist(tinyxml2::XMLElement *_polylistXml,
-                                   const ignition::math::Matrix4d &_transform,
+                                   const gz::math::Matrix4d &_transform,
                                    Mesh *_mesh);
 
       /// \brief Load lines
@@ -265,7 +265,7 @@ namespace gz
       /// \param[in] _transform Transform to apply
       /// \param[out] _mesh Mesh that is currently being loaded
       public: void LoadLines(tinyxml2::XMLElement *_xml,
-                              const ignition::math::Matrix4d &_transform,
+                              const gz::math::Matrix4d &_transform,
                               Mesh *_mesh);
 
       /// \brief Load an entire scene
@@ -336,7 +336,7 @@ void hash_combine(std::size_t &_seed, const double &_v)
 /////////////////////////////////////////////////
 struct Vector3Hash
 {
-  std::size_t operator()(const ignition::math::Vector3d &_v) const
+  std::size_t operator()(const gz::math::Vector3d &_v) const
   {
     std::size_t seed = 0;
     hash_combine(seed, _v.X());
@@ -349,7 +349,7 @@ struct Vector3Hash
 /////////////////////////////////////////////////
 struct Vector2dHash
 {
-  std::size_t operator()(const ignition::math::Vector2d &_v) const
+  std::size_t operator()(const gz::math::Vector2d &_v) const
   {
     std::size_t seed = 0;
     hash_combine(seed, _v.X());
@@ -360,7 +360,7 @@ struct Vector2dHash
 
 //////////////////////////////////////////////////
 ColladaLoader::ColladaLoader()
-: MeshLoader(), dataPtr(ignition::utils::MakeImpl<Implementation>())
+: MeshLoader(), dataPtr(gz::utils::MakeImpl<Implementation>())
 {
   this->dataPtr->meter = 1.0;
 }
@@ -414,7 +414,7 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
   {
     tinyxml2::XMLElement *unitXml = assetXml->FirstChildElement("unit");
     if (unitXml && unitXml->Attribute("meter"))
-      this->dataPtr->meter = ignition::math::parseFloat(
+      this->dataPtr->meter = gz::math::parseFloat(
           unitXml->Attribute("meter"));
   }
 
@@ -427,7 +427,7 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
     this->dataPtr->ApplyInvBindTransform(mesh->MeshSkeleton());
 
   // This will make the model the correct size.
-  mesh->Scale(ignition::math::Vector3d(
+  mesh->Scale(gz::math::Vector3d(
       this->dataPtr->meter, this->dataPtr->meter, this->dataPtr->meter));
   if (mesh->HasSkeleton())
     mesh->MeshSkeleton()->Scale(this->dataPtr->meter);
@@ -454,7 +454,7 @@ void ColladaLoader::Implementation::LoadScene(Mesh *_mesh)
   tinyxml2::XMLElement *nodeXml = visSceneXml->FirstChildElement("node");
   while (nodeXml)
   {
-    this->LoadNode(nodeXml, _mesh, ignition::math::Matrix4d::Identity);
+    this->LoadNode(nodeXml, _mesh, gz::math::Matrix4d::Identity);
     nodeXml = nodeXml->NextSiblingElement("node");
   }
 }
@@ -462,12 +462,12 @@ void ColladaLoader::Implementation::LoadScene(Mesh *_mesh)
 /////////////////////////////////////////////////
 void ColladaLoader::Implementation::LoadNode(
     tinyxml2::XMLElement *_elem, Mesh *_mesh,
-    const ignition::math::Matrix4d &_transform)
+    const gz::math::Matrix4d &_transform)
 {
   tinyxml2::XMLElement *nodeXml;
   tinyxml2::XMLElement *instGeomXml;
 
-  ignition::math::Matrix4d transform = this->LoadNodeTransform(_elem);
+  gz::math::Matrix4d transform = this->LoadNodeTransform(_elem);
   transform = _transform * transform;
 
   nodeXml = _elem->FirstChildElement("node");
@@ -607,10 +607,10 @@ void ColladaLoader::Implementation::LoadNode(
 }
 
 /////////////////////////////////////////////////
-ignition::math::Matrix4d ColladaLoader::Implementation::LoadNodeTransform(
+gz::math::Matrix4d ColladaLoader::Implementation::LoadNodeTransform(
     tinyxml2::XMLElement *_elem)
 {
-  ignition::math::Matrix4d transform(ignition::math::Matrix4d::Identity);
+  gz::math::Matrix4d transform(gz::math::Matrix4d::Identity);
 
   if (_elem->FirstChildElement("matrix"))
   {
@@ -629,7 +629,7 @@ ignition::math::Matrix4d ColladaLoader::Implementation::LoadNodeTransform(
     if (_elem->FirstChildElement("translate"))
     {
       std::string transStr = _elem->FirstChildElement("translate")->GetText();
-      ignition::math::Vector3d translate;
+      gz::math::Vector3d translate;
       std::istringstream stream(transStr);
       stream >> translate;
       // translate *= this->meter;
@@ -639,8 +639,8 @@ ignition::math::Matrix4d ColladaLoader::Implementation::LoadNodeTransform(
     tinyxml2::XMLElement *rotateXml = _elem->FirstChildElement("rotate");
     while (rotateXml)
     {
-      ignition::math::Matrix3d mat;
-      ignition::math::Vector3d axis;
+      gz::math::Matrix3d mat;
+      gz::math::Vector3d axis;
       double angle;
 
       std::string rotateStr = rotateXml->GetText();
@@ -649,7 +649,7 @@ ignition::math::Matrix4d ColladaLoader::Implementation::LoadNodeTransform(
       iss >> axis.X() >> axis.Y() >> axis.Z();
       iss >> angle;
       mat.SetFromAxisAngle(axis, IGN_DTOR(angle));
-      ignition::math::Matrix4d mat4(ignition::math::Matrix4d::Identity);
+      gz::math::Matrix4d mat4(gz::math::Matrix4d::Identity);
       mat4 = mat;
 
       transform = transform * mat4;
@@ -660,10 +660,10 @@ ignition::math::Matrix4d ColladaLoader::Implementation::LoadNodeTransform(
     if (_elem->FirstChildElement("scale"))
     {
       std::string scaleStr = _elem->FirstChildElement("scale")->GetText();
-      ignition::math::Vector3d scale;
+      gz::math::Vector3d scale;
       std::istringstream stream(scaleStr);
       stream >> scale;
-      ignition::math::Matrix4d scaleMat;
+      gz::math::Matrix4d scaleMat;
       scaleMat.Scale(scale);
       transform = transform * scaleMat;
     }
@@ -676,7 +676,7 @@ ignition::math::Matrix4d ColladaLoader::Implementation::LoadNodeTransform(
 void ColladaLoader::Implementation::LoadController(
     tinyxml2::XMLElement *_contrXml,
     std::vector<tinyxml2::XMLElement *> _skelXmls,
-    const ignition::math::Matrix4d &_transform,
+    const gz::math::Matrix4d &_transform,
     Mesh *_mesh)
 {
   if (nullptr == _contrXml)
@@ -706,7 +706,7 @@ void ColladaLoader::Implementation::LoadController(
   for (unsigned int i = 0; i < 16; ++i)
     iss >> values[i];
 
-  ignition::math::Matrix4d bindTrans;
+  gz::math::Matrix4d bindTrans;
   bindTrans.Set(values[0], values[1], values[2], values[3],
                 values[4], values[5], values[6], values[7],
                 values[8], values[9], values[10], values[11],
@@ -817,23 +817,23 @@ void ColladaLoader::Implementation::LoadController(
     }
 
     unsigned int id = i * 16;
-    ignition::math::Matrix4d mat;
-    mat.Set(ignition::math::parseFloat(strs[id +  0]),
-            ignition::math::parseFloat(strs[id +  1]),
-            ignition::math::parseFloat(strs[id +  2]),
-            ignition::math::parseFloat(strs[id +  3]),
-            ignition::math::parseFloat(strs[id +  4]),
-            ignition::math::parseFloat(strs[id +  5]),
-            ignition::math::parseFloat(strs[id +  6]),
-            ignition::math::parseFloat(strs[id +  7]),
-            ignition::math::parseFloat(strs[id +  8]),
-            ignition::math::parseFloat(strs[id +  9]),
-            ignition::math::parseFloat(strs[id + 10]),
-            ignition::math::parseFloat(strs[id + 11]),
-            ignition::math::parseFloat(strs[id + 12]),
-            ignition::math::parseFloat(strs[id + 13]),
-            ignition::math::parseFloat(strs[id + 14]),
-            ignition::math::parseFloat(strs[id + 15]));
+    gz::math::Matrix4d mat;
+    mat.Set(gz::math::parseFloat(strs[id +  0]),
+            gz::math::parseFloat(strs[id +  1]),
+            gz::math::parseFloat(strs[id +  2]),
+            gz::math::parseFloat(strs[id +  3]),
+            gz::math::parseFloat(strs[id +  4]),
+            gz::math::parseFloat(strs[id +  5]),
+            gz::math::parseFloat(strs[id +  6]),
+            gz::math::parseFloat(strs[id +  7]),
+            gz::math::parseFloat(strs[id +  8]),
+            gz::math::parseFloat(strs[id +  9]),
+            gz::math::parseFloat(strs[id + 10]),
+            gz::math::parseFloat(strs[id + 11]),
+            gz::math::parseFloat(strs[id + 12]),
+            gz::math::parseFloat(strs[id + 13]),
+            gz::math::parseFloat(strs[id + 14]),
+            gz::math::parseFloat(strs[id + 15]));
 
     node->SetInverseBindTransform(mat);
   }
@@ -986,11 +986,11 @@ void ColladaLoader::Implementation::LoadAnimationSet(tinyxml2::XMLElement *_xml,
         if (sep == '(')
         {
           std::string idx1Str = idxStr.substr(0, 1);
-          idx1 = ignition::math::parseInt(idx1Str);
+          idx1 = gz::math::parseInt(idx1Str);
           if (idxStr.length() > 4)
           {
             std::string idx2Str = idxStr.substr(3, 1);
-            idx2 = ignition::math::parseInt(idx2Str);
+            idx2 = gz::math::parseInt(idx2Str);
           }
         }
       }
@@ -1042,7 +1042,7 @@ void ColladaLoader::Implementation::LoadAnimationSet(tinyxml2::XMLElement *_xml,
       if (strideAttribute)
       {
         stride = static_cast<unsigned int>(
-            ignition::math::parseInt(strideAttribute));
+            gz::math::parseInt(strideAttribute));
       }
 
       SkeletonNode *targetNode = _skel->NodeById(targetBone);
@@ -1121,7 +1121,7 @@ void ColladaLoader::Implementation::LoadAnimationSet(tinyxml2::XMLElement *_xml,
     for (RawNodeAnim::iterator niter = iter->second.begin();
           niter != iter->second.end(); ++niter)
     {
-      ignition::math::Matrix4d transform(ignition::math::Matrix4d::Identity);
+      gz::math::Matrix4d transform(gz::math::Matrix4d::Identity);
       for (unsigned int i = 0; i < niter->second.size(); ++i)
       {
         niter->second[i].RecalculateMatrix();
@@ -1219,7 +1219,7 @@ void ColladaLoader::Implementation::SetSkeletonNodeTransform(
     return;
   }
 
-  ignition::math::Matrix4d transform(ignition::math::Matrix4d::Identity);
+  gz::math::Matrix4d transform(gz::math::Matrix4d::Identity);
 
   if (_elem->FirstChildElement("matrix"))
   {
@@ -1244,7 +1244,7 @@ void ColladaLoader::Implementation::SetSkeletonNodeTransform(
     if (_elem->FirstChildElement("translate"))
     {
       std::string transStr = _elem->FirstChildElement("translate")->GetText();
-      ignition::math::Vector3d translate;
+      gz::math::Vector3d translate;
       std::istringstream stream(transStr);
       stream >> translate;
       // translate *= this->meter;
@@ -1262,8 +1262,8 @@ void ColladaLoader::Implementation::SetSkeletonNodeTransform(
     tinyxml2::XMLElement *rotateXml = _elem->FirstChildElement("rotate");
     while (rotateXml)
     {
-      ignition::math::Matrix3d mat;
-      ignition::math::Vector3d axis;
+      gz::math::Matrix3d mat;
+      gz::math::Vector3d axis;
       double angle;
 
       std::string rotateStr = rotateXml->GetText();
@@ -1273,7 +1273,7 @@ void ColladaLoader::Implementation::SetSkeletonNodeTransform(
       iss >> angle;
       mat.SetFromAxisAngle(axis, IGN_DTOR(angle));
 
-      ignition::math::Matrix4d mat4(ignition::math::Matrix4d::Identity);
+      gz::math::Matrix4d mat4(gz::math::Matrix4d::Identity);
       mat4 = mat;
       NodeTransform nt(mat4);
       if (rotateXml->Attribute("sid"))
@@ -1290,10 +1290,10 @@ void ColladaLoader::Implementation::SetSkeletonNodeTransform(
     if (_elem->FirstChildElement("scale"))
     {
       std::string scaleStr = _elem->FirstChildElement("scale")->GetText();
-      ignition::math::Vector3d scale;
+      gz::math::Vector3d scale;
       std::istringstream stream(scaleStr);
       stream >> scale;
-      ignition::math::Matrix4d scaleMat;
+      gz::math::Matrix4d scaleMat;
       scaleMat.Scale(scale);
 
       NodeTransform nt(scaleMat);
@@ -1313,7 +1313,7 @@ void ColladaLoader::Implementation::SetSkeletonNodeTransform(
 
 /////////////////////////////////////////////////
 void ColladaLoader::Implementation::LoadGeometry(tinyxml2::XMLElement *_xml,
-    const ignition::math::Matrix4d &_transform, Mesh *_mesh)
+    const gz::math::Matrix4d &_transform, Mesh *_mesh)
 {
   tinyxml2::XMLElement *meshXml = _xml->FirstChildElement("mesh");
   tinyxml2::XMLElement *childXml;
@@ -1383,9 +1383,9 @@ tinyxml2::XMLElement *ColladaLoader::Implementation::ElementId(
 
 /////////////////////////////////////////////////
 void ColladaLoader::Implementation::LoadVertices(const std::string &_id,
-    const ignition::math::Matrix4d &_transform,
-    std::vector<ignition::math::Vector3d> &_verts,
-    std::vector<ignition::math::Vector3d> &_norms)
+    const gz::math::Matrix4d &_transform,
+    std::vector<gz::math::Vector3d> &_verts,
+    std::vector<gz::math::Vector3d> &_norms)
 {
   std::map<unsigned int, unsigned int> vertDup;
   std::map<unsigned int, unsigned int> normDup;
@@ -1394,9 +1394,9 @@ void ColladaLoader::Implementation::LoadVertices(const std::string &_id,
 
 /////////////////////////////////////////////////
 void ColladaLoader::Implementation::LoadVertices(const std::string &_id,
-    const ignition::math::Matrix4d &_transform,
-    std::vector<ignition::math::Vector3d> &_verts,
-    std::vector<ignition::math::Vector3d> &_norms,
+    const gz::math::Matrix4d &_transform,
+    std::vector<gz::math::Vector3d> &_verts,
+    std::vector<gz::math::Vector3d> &_norms,
     std::map<unsigned int, unsigned int> &_vertDups,
     std::map<unsigned int, unsigned int> &_normDups)
 {
@@ -1429,8 +1429,8 @@ void ColladaLoader::Implementation::LoadVertices(const std::string &_id,
 
 /////////////////////////////////////////////////
 void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
-    const ignition::math::Matrix4d &_transform,
-    std::vector<ignition::math::Vector3d> &_values,
+    const gz::math::Matrix4d &_transform,
+    std::vector<gz::math::Vector3d> &_values,
     std::map<unsigned int, unsigned int> &_duplicates)
 {
   if (this->positionIds.find(_id) != this->positionIds.end())
@@ -1479,7 +1479,7 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
   }
   std::string valueStr = floatArrayXml->GetText();
 
-  std::unordered_map<ignition::math::Vector3d,
+  std::unordered_map<gz::math::Vector3d,
       unsigned int, Vector3Hash> unique;
 
   std::vector<std::string>::iterator iter, end;
@@ -1487,9 +1487,9 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
   end = strs.end();
   for (iter = strs.begin(); iter != end; iter += 3)
   {
-    ignition::math::Vector3d vec(math::parseFloat(*iter),
-        ignition::math::parseFloat(*(iter+1)),
-        ignition::math::parseFloat(*(iter+2)));
+    gz::math::Vector3d vec(math::parseFloat(*iter),
+        gz::math::parseFloat(*(iter+1)),
+        gz::math::parseFloat(*(iter+2)));
 
     vec = _transform * vec;
     _values.push_back(vec);
@@ -1507,8 +1507,8 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
 
 /////////////////////////////////////////////////
 void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
-    const ignition::math::Matrix4d &_transform,
-    std::vector<ignition::math::Vector3d> &_values,
+    const gz::math::Matrix4d &_transform,
+    std::vector<gz::math::Vector3d> &_values,
     std::map<unsigned int, unsigned int> &_duplicates)
 {
   if (this->normalIds.find(_id) != this->normalIds.end())
@@ -1518,8 +1518,8 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
     return;
   }
 
-  ignition::math::Matrix4d rotMat = _transform;
-  rotMat.SetTranslation(ignition::math::Vector3d::Zero);
+  gz::math::Matrix4d rotMat = _transform;
+  rotMat.SetTranslation(gz::math::Vector3d::Zero);
 
   tinyxml2::XMLElement *normalsXml = this->ElementId("source", _id);
   if (!normalsXml)
@@ -1559,14 +1559,14 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
     return;
   }
 
-  std::unordered_map<ignition::math::Vector3d,
+  std::unordered_map<gz::math::Vector3d,
       unsigned int, Vector3Hash> unique;
 
   std::string valueStr = floatArrayXml->GetText();
   std::istringstream iss(valueStr);
   do
   {
-    ignition::math::Vector3d vec;
+    gz::math::Vector3d vec;
     iss >> vec.X() >> vec.Y() >> vec.Z();
     if (iss)
     {
@@ -1588,7 +1588,7 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
 
 /////////////////////////////////////////////////
 void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
-    std::vector<ignition::math::Vector2d> &_values,
+    std::vector<gz::math::Vector2d> &_values,
     std::map<unsigned int, unsigned int> &_duplicates)
 {
   if (this->texcoordIds.find(_id) != this->texcoordIds.end())
@@ -1709,7 +1709,7 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
   if (totCount == 0)
     return;
 
-  std::unordered_map<ignition::math::Vector2d,
+  std::unordered_map<gz::math::Vector2d,
       unsigned int, Vector2dHash> unique;
 
   // Read the raw texture values, and split them on spaces.
@@ -1720,7 +1720,7 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
   for (int i = 0; i < totCount; i += stride)
   {
     // We only handle 2D texture coordinates right now.
-    ignition::math::Vector2d vec(std::stod(values[i]),
+    gz::math::Vector2d vec(std::stod(values[i]),
           1.0 - std::stod(values[i+1]));
     _values.push_back(vec);
 
@@ -1959,7 +1959,7 @@ void ColladaLoader::Implementation::LoadColorOrTexture(
 /////////////////////////////////////////////////
 void ColladaLoader::Implementation::LoadPolylist(
     tinyxml2::XMLElement *_polylistXml,
-    const ignition::math::Matrix4d &_transform,
+    const gz::math::Matrix4d &_transform,
     Mesh *_mesh)
 {
   // This function parses polylist types in collada into
@@ -1997,9 +1997,9 @@ void ColladaLoader::Implementation::LoadPolylist(
   tinyxml2::XMLElement *polylistInputXml =
       _polylistXml->FirstChildElement("input");
 
-  std::vector<ignition::math::Vector3d> verts;
-  std::vector<ignition::math::Vector3d> norms;
-  std::map<unsigned int, std::vector<ignition::math::Vector2d>> texcoords;
+  std::vector<gz::math::Vector3d> verts;
+  std::vector<gz::math::Vector3d> norms;
+  std::map<unsigned int, std::vector<gz::math::Vector2d>> texcoords;
   std::vector<std::pair<unsigned int, unsigned int>> texcoordsOffsetToSet;
 
   const unsigned int VERTEX = 0;
@@ -2013,7 +2013,7 @@ void ColladaLoader::Implementation::LoadPolylist(
   std::map<unsigned int, unsigned int> normalDupMap;
   std::map<unsigned int, unsigned int> positionDupMap;
 
-  ignition::math::Matrix4d bindShapeMat(ignition::math::Matrix4d::Identity);
+  gz::math::Matrix4d bindShapeMat(gz::math::Matrix4d::Identity);
   if (_mesh->HasSkeleton())
     bindShapeMat = _mesh->MeshSkeleton()->BindShapeTransform();
 
@@ -2033,28 +2033,28 @@ void ColladaLoader::Implementation::LoadPolylist(
           positionDupMap, normalDupMap);
       if (norms.size() > count)
         combinedVertNorms = true;
-      inputs[VERTEX].insert(ignition::math::parseInt(offset));
+      inputs[VERTEX].insert(gz::math::parseInt(offset));
     }
     else if (semantic == "NORMAL")
     {
       this->LoadNormals(source, _transform, norms, normalDupMap);
       combinedVertNorms = false;
-      inputs[NORMAL].insert(ignition::math::parseInt(offset));
+      inputs[NORMAL].insert(gz::math::parseInt(offset));
     }
     else if (semantic == "TEXCOORD")
     {
-      int offsetInt = ignition::math::parseInt(offset);
+      int offsetInt = gz::math::parseInt(offset);
       unsigned int set = 0u;
       auto setStr = polylistInputXml->Attribute("set");
       if (setStr)
-        set = ignition::math::parseInt(setStr);
+        set = gz::math::parseInt(setStr);
       this->LoadTexCoords(source, texcoords[set], texDupMap[set]);
       inputs[TEXCOORD].insert(offsetInt);
       texcoordsOffsetToSet.push_back(std::make_pair(offsetInt, set));
     }
     else
     {
-      inputs[otherSemantics++].insert(ignition::math::parseInt(offset));
+      inputs[otherSemantics++].insert(gz::math::parseInt(offset));
       ignwarn << "Polylist input semantic: '" << semantic << "' is currently"
           << " not supported" << std::endl;
     }
@@ -2113,7 +2113,7 @@ void ColladaLoader::Implementation::LoadPolylist(
 
         for (unsigned int i = 0; i < inputSize; ++i)
         {
-          values[i] = ignition::math::parseInt(strs_iter[triangle_index+i]);
+          values[i] = gz::math::parseInt(strs_iter[triangle_index+i]);
         }
 
         unsigned int daeVertIndex = 0;
@@ -2297,7 +2297,7 @@ void ColladaLoader::Implementation::LoadPolylist(
 /////////////////////////////////////////////////
 void ColladaLoader::Implementation::LoadTriangles(
     tinyxml2::XMLElement *_trianglesXml,
-    const ignition::math::Matrix4d &_transform, Mesh *_mesh)
+    const gz::math::Matrix4d &_transform, Mesh *_mesh)
 {
   std::unique_ptr<SubMesh> subMesh(new SubMesh);
   subMesh->SetName(this->currentNodeName);
@@ -2329,9 +2329,9 @@ void ColladaLoader::Implementation::LoadTriangles(
   tinyxml2::XMLElement *trianglesInputXml =
       _trianglesXml->FirstChildElement("input");
 
-  std::vector<ignition::math::Vector3d> verts;
-  std::vector<ignition::math::Vector3d> norms;
-  std::map<unsigned int, std::vector<ignition::math::Vector2d>> texcoords;
+  std::vector<gz::math::Vector3d> verts;
+  std::vector<gz::math::Vector3d> norms;
+  std::map<unsigned int, std::vector<gz::math::Vector2d>> texcoords;
   std::vector<std::pair<unsigned int, unsigned int>> texcoordsOffsetToSet;
 
   const unsigned int VERTEX = 0;
@@ -2365,24 +2365,24 @@ void ColladaLoader::Implementation::LoadTriangles(
           positionDupMap, normalDupMap);
       if (norms.size() > count)
         combinedVertNorms = true;
-      inputs[VERTEX].insert(ignition::math::parseInt(offset));
+      inputs[VERTEX].insert(gz::math::parseInt(offset));
       hasVertices = true;
     }
     else if (semantic == "NORMAL")
     {
       this->LoadNormals(source, _transform, norms, normalDupMap);
       combinedVertNorms = false;
-      inputs[NORMAL].insert(ignition::math::parseInt(offset));
+      inputs[NORMAL].insert(gz::math::parseInt(offset));
       if (norms.size() > 0)
         hasNormals = true;
     }
     else if (semantic == "TEXCOORD")
     {
-      int offsetInt = ignition::math::parseInt(offset);
+      int offsetInt = gz::math::parseInt(offset);
       unsigned int set = 0u;
       auto setStr = trianglesInputXml->Attribute("set");
       if (setStr)
-        set = ignition::math::parseInt(setStr);
+        set = gz::math::parseInt(setStr);
       this->LoadTexCoords(source, texcoords[set], texDupMap[set]);
       inputs[TEXCOORD].insert(offsetInt);
       texcoordsOffsetToSet.push_back(std::make_pair(offsetInt, set));
@@ -2390,7 +2390,7 @@ void ColladaLoader::Implementation::LoadTriangles(
     }
     else
     {
-      inputs[otherSemantics++].insert(ignition::math::parseInt(offset));
+      inputs[otherSemantics++].insert(gz::math::parseInt(offset));
       ignwarn << "Triangle input semantic: '" << semantic << "' is currently"
           << " not supported" << std::endl;
     }
@@ -2449,7 +2449,7 @@ void ColladaLoader::Implementation::LoadTriangles(
   for (unsigned int j = 0; j < strs.size(); j += offsetSize)
   {
     for (unsigned int i = 0; i < offsetSize; ++i)
-      values.at(i) = ignition::math::parseInt(strs[j+i]);
+      values.at(i) = gz::math::parseInt(strs[j+i]);
 
     unsigned int daeVertIndex = 0;
     bool addIndex = !hasVertices;
@@ -2617,7 +2617,7 @@ void ColladaLoader::Implementation::LoadTriangles(
 
 /////////////////////////////////////////////////
 void ColladaLoader::Implementation::LoadLines(tinyxml2::XMLElement *_xml,
-    const ignition::math::Matrix4d &_transform, Mesh *_mesh)
+    const gz::math::Matrix4d &_transform, Mesh *_mesh)
 {
   std::unique_ptr<SubMesh> subMesh(new SubMesh);
   subMesh->SetName(this->currentNodeName);
@@ -2627,8 +2627,8 @@ void ColladaLoader::Implementation::LoadLines(tinyxml2::XMLElement *_xml,
   // std::string semantic = inputXml->Attribute("semantic");
   std::string source = inputXml->Attribute("source");
 
-  std::vector<ignition::math::Vector3d> verts;
-  std::vector<ignition::math::Vector3d> norms;
+  std::vector<gz::math::Vector3d> verts;
+  std::vector<gz::math::Vector3d> norms;
   this->LoadVertices(source, _transform, verts, norms);
 
   tinyxml2::XMLElement *pXml = _xml->FirstChildElement("p");
@@ -2659,7 +2659,7 @@ float ColladaLoader::Implementation::LoadFloat(tinyxml2::XMLElement *_elem)
   if (_elem->FirstChildElement("float"))
   {
     value =
-      ignition::math::parseFloat(_elem->FirstChildElement("float")->GetText());
+      gz::math::parseFloat(_elem->FirstChildElement("float")->GetText());
   }
 
   return value;

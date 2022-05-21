@@ -46,7 +46,7 @@ inline bool fs_warn(const std::string &_fcn,
   {
     if (FSWO_LOG_WARNINGS == _warningOp)
     {
-      ignwarn << "Failed ignition::common::" << _fcn
+      ignwarn << "Failed gz::common::" << _fcn
         << " (ec: " << _ec << " " << _ec.message() << ")\n";
     }
     return false;
@@ -55,7 +55,7 @@ inline bool fs_warn(const std::string &_fcn,
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::tempDirectoryPath()
+std::string gz::common::tempDirectoryPath()
 {
   std::error_code ec;
   auto ret = fs::temp_directory_path(ec);
@@ -119,7 +119,7 @@ std::string createTempDirectory(
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::createTempDirectory(
+std::string gz::common::createTempDirectory(
     const std::string &_baseName,
     const std::string &_parentPath,
     const FilesystemWarningOp _warningOp)
@@ -141,7 +141,7 @@ std::string ignition::common::createTempDirectory(
 }
 
 
-class ignition::common::TempDirectory::Implementation
+class gz::common::TempDirectory::Implementation
 {
   /// \brief Current working directory before creation of temporary dir.
   public: std::string oldPath {""};
@@ -170,7 +170,7 @@ TempDirectory::TempDirectory(const std::string &_root,
                              const std::string &_prefix,
                              const std::string &_subDir,
                              bool _cleanup):
-  dataPtr(ignition::utils::MakeUniqueImpl<Implementation>())
+  dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
 {
   this->dataPtr->oldPath = common::cwd();
   this->dataPtr->doCleanup = _cleanup;

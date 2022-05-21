@@ -34,7 +34,7 @@ class VideoEncoderTest : public common::testing::AutoLogFixture
     ASSERT_TRUE(tempDir->Valid()) << tempDir->Path();
   }
 
-  public: std::shared_ptr<ignition::common::TempDirectory> tempDir;
+  public: std::shared_ptr<gz::common::TempDirectory> tempDir;
 };
 
 /////////////////////////////////////////////////

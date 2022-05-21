@@ -7,7 +7,7 @@ Next Tutorial: \ref hw-encoding
 This tutorial describes how to get started using the Ignition Common profiler
 to measure and visualize run-time performance of your software.
 
-The `ignition::common::Profiler` provides a common interface that can allow for
+The `gz::common::Profiler` provides a common interface that can allow for
 multiple underlying profiler implementations. Currently, the only available
 implementation is [Remotery](https://github.com/Celtoys/Remotery).
 

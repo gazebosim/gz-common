@@ -261,7 +261,7 @@ namespace gz
       if (version < PLUGIN_API_VERSION)
       {
         ignwarn << "The library [" << _pathToLibrary <<"] is using an outdated "
-                << "version [" << version << "] of the ignition::common Plugin "
+                << "version [" << version << "] of the gz::common Plugin "
                 << "API. The version in this library is [" << PLUGIN_API_VERSION
                 << "].\n";
       }
@@ -269,7 +269,7 @@ namespace gz
       if (version > PLUGIN_API_VERSION)
       {
         ignerr << "The library [" << _pathToLibrary << "] is using a newer "
-               << "version [" << version << "] of the ignition::common Plugin "
+               << "version [" << version << "] of the gz::common Plugin "
                << "API. The version in this library is [" << PLUGIN_API_VERSION
                << "].\n";
         return loadedPlugins;

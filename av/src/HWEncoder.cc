@@ -29,7 +29,7 @@ using namespace gz;
 using namespace common;
 using namespace std;
 
-class ignition::common::HWEncoder::Implementation
+class gz::common::HWEncoder::Implementation
 {
   /// \brief Device reference for HW-accelerated encoding.
   public: AVBufferRef* hwDevice = nullptr;
@@ -679,7 +679,7 @@ AVFrame* HWEncoder::GetFrameForEncoder(AVFrame* _inFrame)
 HWEncoder::HWEncoder(const FlagSet<HWEncoderType> _allowedHwEncoders,
                      const std::string& _hwAccelDevice,
                      std::optional<bool> _useHwSurface)
-  : dataPtr(ignition::utils::MakeUniqueImpl<Implementation>())
+  : dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
 {
   this->dataPtr->initHwEncoders = _allowedHwEncoders;
   this->dataPtr->initHwDevice = _hwAccelDevice;

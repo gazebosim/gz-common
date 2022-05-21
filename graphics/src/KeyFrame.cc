@@ -45,7 +45,7 @@ class NumericKeyFrame::Implementation
 
 /////////////////////////////////////////////////
 KeyFrame::KeyFrame(const double _time)
-: dataPtr(ignition::utils::MakeImpl<Implementation>())
+: dataPtr(gz::utils::MakeImpl<Implementation>())
 {
   this->dataPtr->time = _time;
 }
@@ -65,7 +65,7 @@ double KeyFrame::Time() const
 /////////////////////////////////////////////////
 PoseKeyFrame::PoseKeyFrame(const double _time)
 : KeyFrame(_time),
-  dataPtr(ignition::utils::MakeImpl<Implementation>())
+  dataPtr(gz::utils::MakeImpl<Implementation>())
 {
 }
 
@@ -101,7 +101,7 @@ const math::Quaterniond &PoseKeyFrame::Rotation() const
 /////////////////////////////////////////////////
 NumericKeyFrame::NumericKeyFrame(const double _time)
 : KeyFrame(_time),
-  dataPtr(ignition::utils::MakeImpl<Implementation>())
+  dataPtr(gz::utils::MakeImpl<Implementation>())
 {
 }
 

@@ -34,7 +34,7 @@ using namespace std;
 
 // Private data class
 // hidden visibility specifier has to be explicitly set to silent a gcc warning
-class IGNITION_COMMON_AV_HIDDEN ignition::common::VideoEncoder::Implementation
+class IGNITION_COMMON_AV_HIDDEN gz::common::VideoEncoder::Implementation
 {
   /// \brief Name of the file which stores the video while it is being
   ///        recorded.
@@ -144,10 +144,10 @@ AVFrame* VideoEncoder::Implementation::GetFrameForEncoder(AVFrame* _inFrame)
 
 /////////////////////////////////////////////////
 VideoEncoder::VideoEncoder()
-  : dataPtr(ignition::utils::MakeUniqueImpl<Implementation>())
+  : dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
 {
   // Make sure libav is loaded.
-  ignition::common::load();
+  gz::common::load();
 }
 
 /////////////////////////////////////////////////

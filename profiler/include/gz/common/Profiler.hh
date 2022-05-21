@@ -130,21 +130,21 @@ namespace gz
 #if IGN_PROFILER_ENABLE
 /// \brief Set name of profiled thread
 #define IGN_PROFILE_THREAD_NAME(name) \
-    ignition::common::Profiler::Instance()->SetThreadName(name);
+    gz::common::Profiler::Instance()->SetThreadName(name);
 /// \brief Log profiling text, if supported by implementation
 #define IGN_PROFILE_LOG_TEXT(name) \
-    ignition::common::Profiler::Instance()->LogText(name);
+    gz::common::Profiler::Instance()->LogText(name);
 /// \brief Being profiling sample
 #define IGN_PROFILE_BEGIN(name) \
-    ignition::common::Profiler::Instance()->BeginSample(name)
+    gz::common::Profiler::Instance()->BeginSample(name)
 /// \brief End profiling sample
 #define IGN_PROFILE_END() \
-    ignition::common::Profiler::Instance()->EndSample()
+    gz::common::Profiler::Instance()->EndSample()
 
 /// \brief Convenience wrapper for scoped profiling sample. Use IGN_PROFILE
 #define IGN_PROFILE_L(name, line) \
 static uint32_t __hash##line = 0; \
-ignition::common::ScopedProfile __profile##line(name, &__hash##line);
+gz::common::ScopedProfile __profile##line(name, &__hash##line);
 /// \brief Scoped profiling sample. Sample will stop at end of scope.
 #define IGN_PROFILE(name)             IGN_PROFILE_L(name, __LINE__);
 
@@ -160,6 +160,6 @@ ignition::common::ScopedProfile __profile##line(name, &__hash##line);
 
 /// \brief Macro to determine if profiler is enabled and has an implementation.
 #define IGN_PROFILER_VALID \
-    IGN_PROFILER_ENABLE && ignition::common::Profiler::Instance()->Valid()
+    IGN_PROFILER_ENABLE && gz::common::Profiler::Instance()->Valid()
 
 #endif  // GZ_COMMON_PROFILER_HH_

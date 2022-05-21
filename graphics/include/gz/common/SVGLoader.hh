@@ -73,13 +73,13 @@ namespace gz
       std::string style;
 
       /// \brief A 2D transform (or a list of transforms)
-      ignition::math::Matrix3d transform;
+      gz::math::Matrix3d transform;
 
       /// \brief A list of subpaths (as lists of commands)
       std::vector< std::vector<SVGCommand> > subpaths;
 
       /// \brief The polylines described by the commands
-      std::vector< std::vector<ignition::math::Vector2d> > polylines;
+      std::vector< std::vector<gz::math::Vector2d> > polylines;
 #ifdef _WIN32
 #pragma warning(pop)
 #endif
@@ -112,8 +112,8 @@ namespace gz
       public: static void PathsToClosedPolylines(
           const std::vector<common::SVGPath> &_paths,
           const double _tol,
-          std::vector< std::vector<ignition::math::Vector2d> > &_closedPolys,
-          std::vector< std::vector<ignition::math::Vector2d> > &_openPolys);
+          std::vector< std::vector<gz::math::Vector2d> > &_closedPolys,
+          std::vector< std::vector<gz::math::Vector2d> > &_openPolys);
 
       /// \brief Outputs the content of the paths to file (or console)
       /// \param[in] _paths The paths

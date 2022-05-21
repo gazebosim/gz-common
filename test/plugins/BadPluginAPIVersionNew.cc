@@ -20,10 +20,10 @@
 
 extern "C" {
   std::size_t DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONPluginInfoSize =
-    sizeof(ignition::common::PluginInfo);
+    sizeof(gz::common::PluginInfo);
 
   std::size_t DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONPluginInfoAlignment =
-    alignof(ignition::common::PluginInfo);
+    alignof(gz::common::PluginInfo);
 
   int DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONPluginAPIVersion =
     std::numeric_limits<int>::max();

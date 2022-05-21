@@ -70,7 +70,7 @@ static int count = 0;
 
 //////////////////////////////////////////////////
 Image::Image(const std::string &_filename)
-: dataPtr(ignition::utils::MakeImpl<Implementation>())
+: dataPtr(gz::utils::MakeImpl<Implementation>())
 {
   if (count == 0)
     FreeImage_Initialise();
@@ -80,7 +80,7 @@ Image::Image(const std::string &_filename)
   this->dataPtr->bitmap = NULL;
   if (!_filename.empty())
   {
-    std::string filename = ignition::common::findFile(_filename);
+    std::string filename = gz::common::findFile(_filename);
     if (!filename.empty())
       this->Load(filename);
     else

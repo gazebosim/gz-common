@@ -133,7 +133,7 @@ class TrajectoryInfo::Implementation
 /////////////////////////////////////////////////
 Animation::Animation(const std::string &_name, const double _length,
     const bool _loop)
-: dataPtr(ignition::utils::MakeImpl<Implementation>())
+: dataPtr(gz::utils::MakeImpl<Implementation>())
 {
   this->dataPtr->name = _name;
   this->dataPtr->length = _length;
@@ -289,7 +289,7 @@ double Animation::KeyFramesAtTime(double _time, common::KeyFrame **_kf1,
 PoseAnimation::PoseAnimation(const std::string &_name, const double _length,
     const bool _loop, double _tension)
 : Animation(_name, _length, _loop),
-  dataPtr(ignition::utils::MakeImpl<Implementation>())
+  dataPtr(gz::utils::MakeImpl<Implementation>())
 {
   this->dataPtr->tension = math::clamp(_tension, 0.0, 1.0);
 }
@@ -367,7 +367,7 @@ void PoseAnimation::InterpolatedKeyFrame(const double _time,
 NumericAnimation::NumericAnimation(const std::string &_name,
     const double _length, const bool _loop)
 : Animation(_name, _length, _loop),
-  dataPtr(ignition::utils::MakeImpl<Implementation>())
+  dataPtr(gz::utils::MakeImpl<Implementation>())
 {
 }
 
@@ -406,7 +406,7 @@ void NumericAnimation::InterpolatedKeyFrame(NumericKeyFrame &_kf) const
 
 /////////////////////////////////////////////////
 TrajectoryInfo::TrajectoryInfo()
-  : dataPtr(ignition::utils::MakeImpl<Implementation>())
+  : dataPtr(gz::utils::MakeImpl<Implementation>())
 {
 }
 

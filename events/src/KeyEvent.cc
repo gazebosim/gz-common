@@ -19,7 +19,7 @@
 using namespace gz;
 using namespace common;
 
-class ignition::common::KeyEventPrivate
+class gz::common::KeyEventPrivate
 {
   /// \brief Event type.
   public: KeyEvent::EventType type = KeyEvent::NO_EVENT;

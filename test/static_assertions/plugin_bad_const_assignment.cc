@@ -19,7 +19,7 @@
 
 int main()
 {
-  ignition::common::ConstPluginPtr const_ptr;
-  ignition::common::PluginPtr ptr;
+  gz::common::ConstPluginPtr const_ptr;
+  gz::common::PluginPtr ptr;
   ptr = const_ptr;
 }

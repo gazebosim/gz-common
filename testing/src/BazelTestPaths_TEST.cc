@@ -25,7 +25,7 @@ using namespace gz::common;
 /////////////////////////////////////////////////
 TEST(BazelTestPaths, ProjectSourcePath)
 {
-  ignition::common::testing::BazelTestPaths testPaths;
+  gz::common::testing::BazelTestPaths testPaths;
 
   std::string sourceDir;
   ASSERT_TRUE(testPaths.ProjectSourcePath(sourceDir));
@@ -45,7 +45,7 @@ TEST(BazelTestPaths, ProjectSourcePath)
 /////////////////////////////////////////////////
 TEST(BazelTestPaths, TestTmpPath)
 {
-  ignition::common::testing::BazelTestPaths testPaths;
+  gz::common::testing::BazelTestPaths testPaths;
 
   std::string tmpDir;
   ASSERT_TRUE(testPaths.TestTmpPath(tmpDir));
@@ -57,13 +57,13 @@ TEST(BazelTestPaths, TestTmpPath)
 /////////////////////////////////////////////////
 TEST(BazelTestPaths, TestBuildType)
 {
-  using BuildType = ignition::common::testing::BuildType;
-  ASSERT_EQ(BuildType::kBazel, ignition::common::testing::TestBuildType());
+  using BuildType = gz::common::testing::BuildType;
+  ASSERT_EQ(BuildType::kBazel, gz::common::testing::TestBuildType());
 }
 
 /////////////////////////////////////////////////
 TEST(BazelTestPaths, TestPathFactory)
 {
-  auto testPaths = ignition::common::testing::TestPathFactory();
+  auto testPaths = gz::common::testing::TestPathFactory();
   ASSERT_NE(nullptr, testPaths);
 }
