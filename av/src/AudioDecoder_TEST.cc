@@ -20,7 +20,7 @@
 #include <ignition/utils/ExtraTestMacros.hh>
 #include <ignition/common/testing/TestPaths.hh>
 
-using namespace ignition;
+using namespace gz;
 
 /////////////////////////////////////////////////
 TEST(AudioDecoder, FileNotSet)

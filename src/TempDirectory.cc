@@ -33,7 +33,7 @@
 
 namespace fs = std::filesystem;
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 /////////////////////////////////////////////////

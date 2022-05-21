@@ -22,7 +22,7 @@
 #include <gz/math/Vector3.hh>
 #include <gz/common/geospatial/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

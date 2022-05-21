@@ -25,7 +25,7 @@
 
 #include <gz/utils/ImplPtr.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -119,6 +119,6 @@ namespace ignition
       IGN_UTILS_UNIQUE_IMPL_PTR(dataPtr)
     };
   }  // namespace common
-}  // namespace ignition
+}  // namespace gz
 #endif  // GZ_COMMON_TEMPDIRECTORY_HH_
 

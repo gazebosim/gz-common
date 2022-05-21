@@ -21,7 +21,7 @@
 
 #include "gz/common/Plugin.hh"
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

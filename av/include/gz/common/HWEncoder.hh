@@ -27,7 +27,7 @@
 
 /// This is an internal-use only class encapsulating HW video encoding. All
 /// symbols defined here are hidden from the public API.
-namespace ignition::common
+namespace gz::common
 {
   /// \brief Representation of a GPU video encoder and its configuration.
   /// \note This class is intentionally hidden as it provides highly customized

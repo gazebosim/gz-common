@@ -21,7 +21,7 @@
 #include "ignition/common/Console.hh"
 #include "ignition/common/Util.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 std::string rmtErrorToString(rmtError error) {

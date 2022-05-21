@@ -35,7 +35,7 @@
 #include <cassert>
 #include <string>
 
-namespace ignition::common
+namespace gz::common
 {
 
 /// \brief Set of flags defined by a C++11 enum class.

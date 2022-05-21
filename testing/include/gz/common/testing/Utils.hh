@@ -23,7 +23,7 @@
 
 #include "gz/common/testing/Export.hh"
 
-namespace ignition::common::testing
+namespace gz::common::testing
 {
 
 /////////////////////////////////////////////////
@@ -35,6 +35,6 @@ bool
 IGNITION_COMMON_TESTING_VISIBLE
 createNewEmptyFile(const std::string &_filename);
 
-}  // namespace ignition::common::testing
+}  // namespace gz::common::testing
 
 #endif  // GZ_COMMON_TESTING_TESTPATHS_HH_

@@ -30,7 +30,7 @@
 #include "ignition/common/SystemPaths.hh"
 #include "ignition/common/Util.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 // Private data class

@@ -17,7 +17,7 @@
 
 #include <ignition/common/Timer.hh>
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 /// \brief Private data for the Timer class

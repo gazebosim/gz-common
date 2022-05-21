@@ -20,7 +20,7 @@
 #include <ignition/common/Console.hh>
 #include <ignition/common/Battery.hh>
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 /// \brief Private data for the Battery class

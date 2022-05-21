@@ -23,7 +23,7 @@
 #include <gz/common/events/Export.hh>
 #include <gz/utils/SuppressWarning.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

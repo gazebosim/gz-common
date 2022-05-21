@@ -19,7 +19,7 @@
 
 #include <iostream>
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 /// \brief Private data for NodeTransform

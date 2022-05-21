@@ -97,7 +97,7 @@
 #define IGN_ASSERT(_expr, _msg) assert((_msg, _expr))
 
 /// \brief Forward declarations for the common classes
-namespace ignition
+namespace gz
 {
   namespace common
   {

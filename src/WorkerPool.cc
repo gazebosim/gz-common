@@ -26,7 +26,7 @@
 namespace igncmn = ignition::common;
 using namespace igncmn;
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

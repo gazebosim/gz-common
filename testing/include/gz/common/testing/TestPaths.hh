@@ -30,7 +30,7 @@
 #define TESTING_PROJECT_SOURCE_DIR ""
 #endif
 
-namespace ignition::common::testing
+namespace gz::common::testing
 {
 
 //////////////////////////////////////////////////
@@ -197,5 +197,5 @@ std::string TempPath(Args const &... args)
   testPaths->TestTmpPath(dataDir);
   return common::joinPaths(dataDir, args...);
 }
-}  // namespace ignition::common::testing
+}  // namespace gz::common::testing
 #endif  // GZ_COMMON_TESTING_TESTPATHS_HH_

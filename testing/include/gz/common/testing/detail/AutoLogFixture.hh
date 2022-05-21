@@ -27,7 +27,7 @@
 #include <gz/common/TempDirectory.hh>
 #include <gz/common/Util.hh>
 
-namespace ignition::common::testing
+namespace gz::common::testing
 {
 
 //////////////////////////////////////////////////
@@ -118,7 +118,7 @@ std::string AutoLogFixture::LogContent() const
   return loggedString;
 }
 
-}  // namespace ignition::common::testing
+}  // namespace gz::common::testing
 
 #endif  // GZ_COMMON_TESTING_DETAIL_AUTOLOGFIXTURE_HH_
 

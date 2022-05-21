@@ -26,7 +26,7 @@
 #include <gz/common/geospatial/HeightmapData.hh>
 #include <gz/common/Image.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

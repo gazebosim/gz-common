@@ -23,7 +23,7 @@
 #include <chrono>
 #include <iostream>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

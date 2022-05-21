@@ -22,7 +22,7 @@
 #include <thread> // NOLINT(*)
 #include "ignition/common/Util.hh" // NOLINT(*)
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 /////////////////////////////////////////////////

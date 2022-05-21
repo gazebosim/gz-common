@@ -24,7 +24,7 @@
 
 #include "ignition/common/testing/AutoLogFixture.hh"
 
-using namespace ignition;
+using namespace gz;
 
 class GTSMeshUtils : public common::testing::AutoLogFixture { };
 

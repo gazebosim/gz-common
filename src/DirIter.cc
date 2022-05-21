@@ -21,7 +21,7 @@
 
 namespace fs = std::filesystem;
 
-namespace ignition
+namespace gz
 {
 namespace common
 {
@@ -72,4 +72,4 @@ bool DirIter::operator!=(const DirIter &_other) const
 }
 
 }  // namespace common
-}  // namespace ignition
+}  // namespace gz

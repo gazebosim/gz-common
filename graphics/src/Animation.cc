@@ -24,7 +24,7 @@
 #include <ignition/common/KeyFrame.hh>
 #include <ignition/common/Animation.hh>
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 using KeyFrame_V = std::vector<std::shared_ptr<common::KeyFrame>>;
@@ -56,7 +56,7 @@ namespace
 }
 
 /////////////////////////////////////////////////
-namespace ignition {
+namespace gz {
 namespace common {
 
 class Animation::Implementation
@@ -552,5 +552,5 @@ void TrajectoryInfo::SetWaypoints(
   this->dataPtr->waypoints = anim;
   this->dataPtr->translated = true;
 }
-}  // namespace ignition
+}  // namespace gz
 }  // namespace common

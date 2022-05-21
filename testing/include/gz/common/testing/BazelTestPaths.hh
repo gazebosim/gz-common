@@ -22,7 +22,7 @@
 #include "gz/common/testing/TestPaths.hh"
 #include "gz/common/testing/Export.hh"
 
-namespace ignition::common::testing
+namespace gz::common::testing
 {
 
 /// \brief Implementation of TestPaths interface for Bazel
@@ -53,6 +53,6 @@ class BazelTestPaths: public TestPaths
           TestTmpPath(std::string &_tmpDir) override;
 };
 
-}  // namespace ignition::common::testing
+}  // namespace gz::common::testing
 
 #endif  // GZ_COMMON_TESTING_AUTOLOGFIXTURE_HH_

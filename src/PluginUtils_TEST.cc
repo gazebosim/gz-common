@@ -19,7 +19,7 @@
 
 #include "PluginUtils.hh"
 
-using namespace ignition;
+using namespace gz;
 
 /////////////////////////////////////////////////
 TEST(PluginUtils, NormalizeName)

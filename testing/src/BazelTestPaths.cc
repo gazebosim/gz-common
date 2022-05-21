@@ -20,7 +20,7 @@
 #include <ignition/common/Console.hh>
 #include <ignition/common/Util.hh>
 
-namespace ignition::common::testing
+namespace gz::common::testing
 {
 
 //////////////////////////////////////////////////
@@ -51,5 +51,5 @@ bool BazelTestPaths::TestTmpPath(std::string &_tmpDir)
   return common::env("TEST_UNDECLARED_OUTPUTS_DIR", _tmpDir);
 }
 
-}  // namespace ignition::common::testing
+}  // namespace gz::common::testing
 

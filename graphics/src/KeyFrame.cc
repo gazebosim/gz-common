@@ -16,7 +16,7 @@
 */
 #include <ignition/common/KeyFrame.hh>
 
-namespace ignition {
+namespace gz {
 namespace common {
 
 /////////////////////////////////////////////////
@@ -121,5 +121,5 @@ const double &NumericKeyFrame::Value() const
 {
   return this->dataPtr->value;
 }
-}  // namespace ignition
+}  // namespace gz
 }  // namespace common

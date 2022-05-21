@@ -18,7 +18,7 @@
 #include <ignition/math/Vector2.hh>
 #include "ignition/common/MouseEvent.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 /// \brief Mouse event private data

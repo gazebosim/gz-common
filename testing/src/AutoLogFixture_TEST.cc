@@ -19,8 +19,8 @@
 #include <ignition/common/Console.hh>
 #include <ignition/common/testing/AutoLogFixture.hh>
 
-using namespace ignition::common;
-using namespace ignition::common::testing;
+using namespace gz::common;
+using namespace gz::common::testing;
 
 /////////////////////////////////////////////////
 TEST_F(AutoLogFixture, AutoLogFixture)

@@ -22,7 +22,7 @@
 #include "gz/common/PluginPtr.hh"
 #include "gz/common/SpecializedPlugin.hh"
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

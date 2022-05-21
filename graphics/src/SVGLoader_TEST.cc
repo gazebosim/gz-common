@@ -22,7 +22,7 @@
 #include "ignition/common/testing/AutoLogFixture.hh"
 #include "ignition/common/testing/TestPaths.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 

@@ -25,7 +25,7 @@
 
 #include "ignition/common/testing/AutoLogFixture.hh"
 
-using namespace ignition;
+using namespace gz;
 
 class MeshTest : public common::testing::AutoLogFixture { };
 

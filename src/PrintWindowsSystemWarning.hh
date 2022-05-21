@@ -25,7 +25,7 @@
 #include <cstdint>
 #include <ignition/common/Console.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

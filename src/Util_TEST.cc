@@ -22,7 +22,7 @@
 
 #include <ignition/common/Util.hh>
 
-using namespace ignition;
+using namespace gz;
 
 /////////////////////////////////////////////////
 /// \brief Test Util::SHA1

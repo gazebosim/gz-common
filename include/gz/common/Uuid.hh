@@ -32,7 +32,7 @@
   using portable_uuid_t = uuid_t;
 #endif
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

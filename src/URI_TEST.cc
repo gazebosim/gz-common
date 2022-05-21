@@ -19,7 +19,7 @@
 #include "ignition/common/Console.hh"
 #include "ignition/common/URI.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 /////////////////////////////////////////////////

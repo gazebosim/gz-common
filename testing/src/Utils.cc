@@ -20,7 +20,7 @@
 #include <fstream>
 #include <random>
 
-namespace ignition::common::testing
+namespace gz::common::testing
 {
 
 /////////////////////////////////////////////////
@@ -50,4 +50,4 @@ bool createNewEmptyFile(const std::string &_filename)
   return true;
 }
 
-}  // namespace ignition::common::testing
+}  // namespace gz::common::testing

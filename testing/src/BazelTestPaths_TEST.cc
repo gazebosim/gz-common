@@ -20,7 +20,7 @@
 #include "ignition/common/testing/TestPaths.hh"
 #include "ignition/common/testing/BazelTestPaths.hh"
 
-using namespace ignition::common;
+using namespace gz::common;
 
 /////////////////////////////////////////////////
 TEST(BazelTestPaths, ProjectSourcePath)

@@ -73,7 +73,7 @@ class ignition::common::Pbr::Implementation
 };
 
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 /////////////////////////////////////////////////

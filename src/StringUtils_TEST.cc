@@ -21,7 +21,7 @@
 
 #include "ignition/common/StringUtils.hh"
 
-using namespace ignition;
+using namespace gz;
 
 /////////////////////////////////////////////////
 TEST(StringUtils, SplitNoDelimiterPresent)

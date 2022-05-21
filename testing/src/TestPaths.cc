@@ -21,7 +21,7 @@
 #include <ignition/common/Console.hh>
 #include <ignition/common/Util.hh>
 
-namespace ignition::common::testing
+namespace gz::common::testing
 {
 //////////////////////////////////////////////////
 TestPaths::TestPaths(const std::string &_projectSourcePath)
@@ -98,4 +98,4 @@ MakeTestTempDirectoryImpl(const std::string &_projectSourcePath,
       dataDir, _prefix, _subDir, _cleanup);
 }
 
-}  // namespace ignition::common::testing
+}  // namespace gz::common::testing

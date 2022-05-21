@@ -23,8 +23,8 @@
 #include "ignition/common/TempDirectory.hh"
 #include "ignition/common/Util.hh"
 
-using namespace ignition;
-using namespace ignition::common;
+using namespace gz;
+using namespace gz::common;
 
 const int g_messageRepeat = 4;
 

@@ -37,7 +37,7 @@
 
 #include "ignition/common/MeshManager.hh"
 
-using namespace ignition::common;
+using namespace gz::common;
 
 class ignition::common::MeshManager::Implementation
 {

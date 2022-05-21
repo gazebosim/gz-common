@@ -24,7 +24,7 @@
 #include "ignition/common/geospatial/Dem.hh"
 #include "ignition/math/SphericalCoordinates.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 class ignition::common::Dem::Implementation

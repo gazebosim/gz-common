@@ -28,7 +28,7 @@ struct AVFrame;
 struct AVPicture;
 struct SwsContext;
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

@@ -25,7 +25,7 @@
 #include <gz/common/SingletonT.hh>
 #include <gz/common/config.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

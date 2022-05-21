@@ -20,7 +20,7 @@
 #include <ignition/common/Skeleton.hh>
 #include <ignition/common/BVHLoader.hh>
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 /// Private data class

@@ -34,7 +34,7 @@
 #define BUILD_SYMLINK_TESTS
 #endif  // _WIN32
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 namespace fs = std::filesystem;

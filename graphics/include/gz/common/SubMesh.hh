@@ -30,7 +30,7 @@
 #include <gz/common/graphics/Types.hh>
 #include <gz/common/graphics/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

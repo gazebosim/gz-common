@@ -21,7 +21,7 @@
 
 #include <gz/common/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

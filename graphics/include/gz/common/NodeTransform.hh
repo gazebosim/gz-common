@@ -27,7 +27,7 @@
 #include <gz/common/graphics/Export.hh>
 #include <gz/common/Util.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

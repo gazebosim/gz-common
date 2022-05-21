@@ -23,7 +23,7 @@
 #include <gz/common/Util.hh>
 #include <gz/common/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
