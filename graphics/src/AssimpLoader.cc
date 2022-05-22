@@ -86,9 +86,6 @@ ignition::math::Matrix4d AssimpLoader::Implementation::ConvertTransform(const ai
 
 void AssimpLoader::Implementation::RecursiveCreate(const aiScene* scene, const aiNode* node, const ignition::math::Matrix4d& transformation, Mesh* mesh)
 {
-  if (!node)
-    return;
-
   // Visit this node, add the submesh
   ignmsg << "Processing node " << node->mName.C_Str() << " with " << node->mNumMeshes << " meshes" << std::endl;
   for (unsigned mesh_idx = 0; mesh_idx < node->mNumMeshes; ++mesh_idx)
@@ -347,10 +344,13 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   }
   SkeletonPtr root_skeleton = std::make_shared<Skeleton>(root_skel_node);
   mesh->SetSkeleton(root_skeleton);
-  // Now create the meshes
-  // Recursive call to keep track of transforms, mesh is passed by reference and edited throughout
-  this->dataPtr->RecursiveCreate(scene, root_node, root_transformation, mesh);
-
+  for (unsigned child_idx = 0; child_idx < root_node->mNumChildren; ++child_idx)
+  {
+    // Now create the meshes
+    // Recursive call to keep track of transforms, mesh is passed by reference and edited throughout
+    ignmsg << "Parsing root child " << root_node->mChildren[child_idx]->mName.C_Str() << std::endl;
+    this->dataPtr->RecursiveCreate(scene, root_node->mChildren[child_idx], root_transformation, mesh);
+  }
   // Add the animations
   for (unsigned anim_idx = 0; anim_idx < scene->mNumAnimations; ++anim_idx)
   {
