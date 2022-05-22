@@ -16,3 +16,4 @@
 */
 
 #include <gz/common/AudioDecoder.hh>
+#include <ignition/common/config.hh>

@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/HWEncoder.hh>
+#include <ignition/common/config.hh>

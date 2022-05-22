@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/OBJLoader.hh>
+#include <ignition/common/config.hh>

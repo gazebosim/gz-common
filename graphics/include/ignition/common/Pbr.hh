@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/Pbr.hh>
+#include <ignition/common/config.hh>
