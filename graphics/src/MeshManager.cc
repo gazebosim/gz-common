@@ -146,19 +146,23 @@ const Mesh *MeshManager::Load(const std::string &_filename)
     MeshLoader *loader = nullptr;
 
     loader = &this->dataPtr->assimpLoader;
-    /*
+
     if (extension == "stl" || extension == "stlb" || extension == "stla")
       loader = &this->dataPtr->stlLoader;
     else if (extension == "dae")
       loader = &this->dataPtr->colladaLoader;
     else if (extension == "obj")
-      loader = &this->dataPtr->objLoader;
+      //loader = &this->dataPtr->objLoader;
+      loader = &this->dataPtr->assimpLoader;
+    else if (extension == "gltf")
+      loader = &this->dataPtr->assimpLoader;
+    else if (extension == "fbx")
+      loader = &this->dataPtr->assimpLoader;
     else
     {
       ignerr << "Unsupported mesh format for file[" << _filename << "]\n";
       return nullptr;
     }
-    */
 
     // This mutex prevents two threads from loading the same mesh at the
     // same time.
