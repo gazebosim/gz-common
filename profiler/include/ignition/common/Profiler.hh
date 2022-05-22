@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/Profiler.hh>
+#include <ignition/common/config.hh>

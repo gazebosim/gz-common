@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/NodeTransform.hh>
+#include <ignition/common/config.hh>

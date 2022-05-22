@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/geospatial/HeightmapData.hh>
+#include <ignition/common/config.hh>

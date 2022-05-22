@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/graphics/Export.hh>
+#include <ignition/common/config.hh>

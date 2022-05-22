@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/testing/Utils.hh>
+#include <ignition/common/config.hh>

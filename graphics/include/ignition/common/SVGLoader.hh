@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/SVGLoader.hh>
+#include <ignition/common/config.hh>

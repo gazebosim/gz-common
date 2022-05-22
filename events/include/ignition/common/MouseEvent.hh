@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/MouseEvent.hh>
+#include <ignition/common/config.hh>

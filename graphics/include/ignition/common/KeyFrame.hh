@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/KeyFrame.hh>
+#include <ignition/common/config.hh>
