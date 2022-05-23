@@ -17,7 +17,7 @@
 
 #include <functional>
 #include <iostream>
-#include <ignition/common/Event.hh>
+#include <gz/common/Event.hh>
 
 using namespace ignition;
 

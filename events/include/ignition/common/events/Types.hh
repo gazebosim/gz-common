@@ -13,24 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 
-#ifndef IGNITION_COMMON_EVENTS_TYPES_HH_
-#define IGNITION_COMMON_EVENTS_TYPES_HH_
-
-#include <memory>
-
-// This header contains forward declarations for some event types
-namespace ignition
-{
-  namespace common
-  {
-    class Connection;
-
-    /// \def ConnectionPtr
-    /// \brief Shared pointer to a Connection object
-    using ConnectionPtr = std::shared_ptr<Connection>;
-  }
-}
-
-#endif
+#include <gz/common/events/Types.hh>
