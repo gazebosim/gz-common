@@ -276,7 +276,6 @@ SubMesh AssimpLoader::Implementation::CreateSubMesh(const aiMesh* assimp_mesh, c
     subMesh.AddIndex(face.mIndices[1]);
     subMesh.AddIndex(face.mIndices[2]);
   }
-
   subMesh.SetMaterialIndex(assimp_mesh->mMaterialIndex);
   return subMesh;
 }
@@ -307,6 +306,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
       aiProcess_RemoveRedundantMaterials |
       aiProcess_SortByPType |
       aiProcess_Triangulate |
+      aiProcess_GenNormals |
       0);
   if (scene == nullptr)
   {

@@ -21,6 +21,11 @@
 #include <map>
 #include <cctype>
 
+#include <chrono>
+#include <ctime>
+#include <ratio>
+#include <iostream>
+
 #ifndef _WIN32
   #include "ignition/common/GTSMeshUtils.hh"
   #include "ignition/common/MeshCSG.hh"
@@ -37,6 +42,7 @@
 #include "ignition/common/config.hh"
 
 #include "ignition/common/MeshManager.hh"
+
 
 using namespace ignition::common;
 
@@ -145,23 +151,29 @@ const Mesh *MeshManager::Load(const std::string &_filename)
         extension.begin(), ::tolower);
     MeshLoader *loader = nullptr;
 
-    loader = &this->dataPtr->assimpLoader;
-    /*
     if (extension == "stl" || extension == "stlb" || extension == "stla")
-      loader = &this->dataPtr->stlLoader;
+      // loader = &this->dataPtr->stlLoader;
+      loader = &this->dataPtr->assimpLoader;
     else if (extension == "dae")
       loader = &this->dataPtr->colladaLoader;
     else if (extension == "obj")
-      loader = &this->dataPtr->objLoader;
+      //loader = &this->dataPtr->objLoader;
+      loader = &this->dataPtr->assimpLoader;
+    else if (extension == "gltf")
+      loader = &this->dataPtr->assimpLoader;
+    else if (extension == "fbx")
+      loader = &this->dataPtr->assimpLoader;
     else
     {
       ignerr << "Unsupported mesh format for file[" << _filename << "]\n";
       return nullptr;
     }
-    */
 
     // This mutex prevents two threads from loading the same mesh at the
     // same time.
+
+    std::chrono::steady_clock::time_point t1 =  std::chrono::steady_clock::now();
+
     std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
     if (!this->HasMesh(_filename))
     {
@@ -177,11 +189,17 @@ const Mesh *MeshManager::Load(const std::string &_filename)
     {
       mesh = this->dataPtr->meshes[_filename];
     }
+
+  std::chrono::steady_clock::time_point t2 =  std::chrono::steady_clock::now();
+  std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
+  ignmsg << "Importing took " << time_span.count() << std::endl;
+
   }
   else
     ignerr << "Unable to find file[" << _filename << "]\n";
 
   return mesh;
+
 }
 
 //////////////////////////////////////////////////
