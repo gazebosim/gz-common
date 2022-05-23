@@ -362,8 +362,8 @@ TEST_F(FilesystemTest, append)
 #endif
 
   // Make sure that the slashes in the middle of string are not altered.
-  path = joinPaths("https://fuel.ignitionrobotics.org", "/models", "box");
-  EXPECT_EQ(path, "https://fuel.ignitionrobotics.org/models/box");
+  path = joinPaths("https://fuel.gazebosim.org", "/models", "box");
+  EXPECT_EQ(path, "https://fuel.gazebosim.org/models/box");
 }
 
 /////////////////////////////////////////////////

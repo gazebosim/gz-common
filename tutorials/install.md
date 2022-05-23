@@ -3,7 +3,7 @@
 Next Tutorial: \ref profiler
 
 These instructions are for installing only Gazebo Common.
-If you're interested in using all the Ignition libraries, check out this [Ignition installation](https://ignitionrobotics.org/docs/latest/install).
+If you're interested in using all the Ignition libraries, check out this [Ignition installation](https://gazebosim.org/docs/latest/install).
 
 We recommend following the Binary Installation instructions to get up and running as quickly and painlessly as possible.
 
@@ -65,8 +65,8 @@ prerequisites followed by building from source.
 
 Gazebo Common requires:
 
-  * [Gazebo CMake](https://ignitionrobotics.org/libs/cmake)
-  * [Gazebo Math](https://ignitionrobotics.org/libs/math).
+  * [Gazebo CMake](https://gazebosim.org/libs/cmake)
+  * [Gazebo Math](https://gazebosim.org/libs/math).
 
 The Graphics component requires:
 
@@ -188,7 +188,7 @@ This assumes you have created and activated a Conda environment while installing
 
 # Documentation
 
-API and tutorials can be found at [https://ignitionrobotics.org/libs/common](https://ignitionrobotics.org/libs/common).
+API and tutorials can be found at [https://gazebosim.org/libs/common](https://gazebosim.org/libs/common).
 
 You can also generate the documentation from a clone of this repository by following these steps.
 

@@ -15,7 +15,7 @@ Homebrew      | [![Build Status](https://build.osrfoundation.org/buildStatus/ico
 Windows       | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-main-windows7-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-main-windows7-amd64)
 
 Gazebo Common, a component of [Ignition
-Robotics](https://ignitionrobotics.org), provides a set of libraries that
+Robotics](https://gazebosim.org), provides a set of libraries that
 cover many different use cases. An audio-visual library supports
 processing audio and video files, a graphics library can load a variety 3D
 mesh file formats into a generic in-memory representation, and the core
@@ -56,7 +56,7 @@ callback system.
 
 # Install
 
-See the [installation tutorial](https://ignitionrobotics.org/api/common/4.0/tutorials.html).
+See the [installation tutorial](https://gazebosim.org/api/common/4.0/tutorials.html).
 
 # Usage
 
@@ -88,7 +88,7 @@ Refer to the following table for information about important directories and fil
 # Contributing
 
 Please see
-[CONTRIBUTING.md](https://ignitionrobotics.org/docs/all/contributing).
+[CONTRIBUTING.md](https://gazebosim.org/docs/all/contributing).
 
 # Code of Conduct
 
@@ -97,7 +97,7 @@ Please see
 
 # Versioning
 
-This library uses [Semantic Versioning](https://semver.org/). Additionally, this library is part of the [Gazebo project](https://ignitionrobotics.org) which periodically releases a versioned set of compatible and complimentary libraries. See the [Gazebo website](https://ignitionrobotics.org) for version and release information.
+This library uses [Semantic Versioning](https://semver.org/). Additionally, this library is part of the [Gazebo project](https://gazebosim.org) which periodically releases a versioned set of compatible and complimentary libraries. See the [Gazebo website](https://gazebosim.org) for version and release information.
 
 # License
 
