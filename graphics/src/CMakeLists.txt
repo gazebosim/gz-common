@@ -36,6 +36,9 @@ if(USE_EXTERNAL_TINYXML2)
     PRIVATE
       TINYXML2::TINYXML2)
 
+  target_include_directories(${graphics_target}
+    PRIVATE ${ASSIMP_INCLUDE_DIRS})
+
     # The collada exporter test uses tinyxml2, so we must link it if we're using
     # an external copy. The graphics target considers tinyxml2 to be a private
     # dependency, so it will not automatically get linked to this test.
@@ -49,7 +52,8 @@ else()
   # directories. We do not want this to be visible to consumers of
   # ignition-common.
   target_include_directories(${graphics_target}
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tinyxml2)
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tinyxml2
+    ${ASSIMP_INCLUDE_DIRS})
 
   if(TARGET UNIT_ColladaExporter_TEST)
 
