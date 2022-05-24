@@ -15,6 +15,9 @@ release will remove the deprecated code.
 2. The `ignition` namespace is deprecated and will be removed in future versions.  Use `gz` instead.
 3. Header files under `ignition/...` are deprecated and will be removed in future versions.
    Use `gz/...` instead.
+4. The logging macros (`ignmsg`, `ignwarn`, `ignerr`, etc.) and logging function macros
+   (`ignLogInit()`, etc.) are deprecated and will be removed in future versions. Use `gz` instead
+   (e.g. `gzmsg`, `gzwarn`, `gzLogInit()`)
 
 1. All the plugin APIs are deprecated, use the gz-plugin library instead. See
    the [migration guide](https://github.com/ignitionrobotics/ign-plugin/blob/ign-plugin1/MIGRATION.md).
