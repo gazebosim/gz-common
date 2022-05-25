@@ -295,7 +295,7 @@ bool Dem::GeoReference(double _x, double _y,
         = strdup(this->dataPtr->dataSet->GetProjectionRef());
     if (importString == nullptr || importString[0] == '\0')
     {
-      igndbg << "Projection coordinate system undefined." << std::endl;
+      gzdbg << "Projection coordinate system undefined." << std::endl;
       return false;
     }
     sourceCs.importFromWkt(&importString);
@@ -321,7 +321,7 @@ bool Dem::GeoReference(double _x, double _y,
   }
   else
   {
-    igndbg << "Unable to obtain the georeferenced values for coordinates ("
+    gzdbg << "Unable to obtain the georeferenced values for coordinates ("
            << _x << "," << _y << ")" << std::endl;
     return false;
   }

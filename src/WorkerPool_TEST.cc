@@ -119,7 +119,7 @@ TEST(WorkerPool,
   const unsigned int hc = std::thread::hardware_concurrency();
   if (2 > hc)
   {
-    igndbg << "Skipping the ThingsRunInParallel test because hardware "
+    gzdbg << "Skipping the ThingsRunInParallel test because hardware "
            << "concurrency (" << hc << ") is too low (min: 2), making the test "
            << "less likely to succeed.\n";
     return;
@@ -142,7 +142,7 @@ TEST(WorkerPool,
   EXPECT_TRUE(result);
   if (!result)
   {
-    igndbg << "WaitForResults failed" << std::endl;
+    gzdbg << "WaitForResults failed" << std::endl;
   }
   EXPECT_EQ(2, sentinel);
 }

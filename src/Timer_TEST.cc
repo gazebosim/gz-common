@@ -54,7 +54,7 @@ TEST(Timer_TEST, Elapsed)
 
   // Loose margin just to make sure it is close without being flaky
   EXPECT_LT(0.0, t.ElapsedTime().count());
-  igndbg << "Actual Elapsed: " << t.ElapsedTime().count() << std::endl;
+  gzdbg << "Actual Elapsed: " << t.ElapsedTime().count() << std::endl;
 }
 
 /////////////////////////////////////////////////

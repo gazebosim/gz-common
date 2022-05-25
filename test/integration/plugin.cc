@@ -314,27 +314,27 @@ TEST(PluginPtr, CopyMoveSemantics)
   EXPECT_TRUE(plugin == otherPlugin);
   EXPECT_FALSE(plugin != otherPlugin);
 
-  igndbg << "Testing sets and maps with PluginPtr and PluginPtr\n";
+  gzdbg << "Testing sets and maps with PluginPtr and PluginPtr\n";
   TestSetAndMapUsage<
       gz::common::PluginPtr,
       gz::common::PluginPtr>(
         pl, plugin);
 
-  igndbg << "Testing sets and maps with PluginPtr and "
+  gzdbg << "Testing sets and maps with PluginPtr and "
          << "SomeSpecializedPluginPtr\n";
   TestSetAndMapUsage<
       gz::common::PluginPtr,
       SomeSpecializedPluginPtr>(
         pl, plugin);
 
-  igndbg << "Testing sets and maps with SomeSpecializedPluginPtr and "
+  gzdbg << "Testing sets and maps with SomeSpecializedPluginPtr and "
          << "AnotherSpecializedPluginPtr\n";
   TestSetAndMapUsage<
       SomeSpecializedPluginPtr,
       AnotherSpecializedPluginPtr>(
         pl, plugin);
 
-  igndbg << "Testing sets and maps with AnotherSpecializedPluginPtr and "
+  gzdbg << "Testing sets and maps with AnotherSpecializedPluginPtr and "
          << "SingleSpecializedPluginPtr\n";
   TestSetAndMapUsage<
       AnotherSpecializedPluginPtr,

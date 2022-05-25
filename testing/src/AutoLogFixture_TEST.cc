@@ -29,6 +29,6 @@ TEST_F(AutoLogFixture, AutoLogFixture)
   EXPECT_TRUE(this->LogContent().empty());
 
   Console::SetVerbosity(0);
-  igndbg << "This is a debug" << std::endl;
+  gzdbg << "This is a debug" << std::endl;
   EXPECT_FALSE(this->LogContent().empty());
 }

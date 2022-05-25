@@ -259,7 +259,7 @@ TEST_F(Console_TEST, ColorDbgSlashN)
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
-    igndbg << logString << " _n__ " << i << '\n';
+    gzdbg << logString << " _n__ " << i << '\n';
   }
 
   std::string logContent = GetLogContent(logPath);
@@ -289,7 +289,7 @@ TEST_F(Console_TEST, ColorDbgStdEndl)
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
-    igndbg << logString << " endl " << i << std::endl;
+    gzdbg << logString << " endl " << i << std::endl;
   }
 
   std::string logContent = GetLogContent(logPath);
@@ -503,7 +503,7 @@ TEST_F(Console_TEST, Prefix)
   gzerr << "error" << std::endl;
   gzwarn << "warning" << std::endl;
   gzmsg << "message" << std::endl;
-  igndbg << "debug" << std::endl;
+  gzdbg << "debug" << std::endl;
 
   // Get the logged content
   std::string logContent = GetLogContent(logPath);

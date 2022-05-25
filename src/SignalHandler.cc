@@ -138,7 +138,7 @@ bool SignalHandler::AddCallback(std::function<void(int)> _cb)
 void SignalHandlerPrivate::OnSignal(int _sig)
 {
   std::lock_guard<std::mutex> lock(this->cbMutex);
-  igndbg << "Received signal[" << _sig << "].\n";
+  gzdbg << "Received signal[" << _sig << "].\n";
   for (std::function<void(int)> cb : this->callbacks)
     cb(_sig);
 }
