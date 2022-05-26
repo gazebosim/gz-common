@@ -33,7 +33,7 @@ namespace gz
 {
 }
 
-namespace ignition
+namespace gz
 {
   #ifndef SUPPRESS_IGNITION_HEADER_DEPRECATION
     #pragma message("ignition namespace is deprecated! Use gz instead!")

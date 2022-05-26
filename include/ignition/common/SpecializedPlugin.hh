@@ -20,7 +20,7 @@
 #include <ignition/common/config.hh>
 #include "ignition/common/Plugin.hh"
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

@@ -24,7 +24,7 @@
 #include "ignition/common/PluginPtr.hh"
 #include "gz/common/TemplateHelpers.hh"
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
