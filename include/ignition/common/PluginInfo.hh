@@ -15,14 +15,14 @@
  *
  */
 
-#include <ignition/common/config.hh>
-
-#ifndef GZ_COMMON_PLUGININFO_HH_
-#define GZ_COMMON_PLUGININFO_HH_
+#ifndef IGNITION_COMMON_PLUGININFO_HH_
+#define IGNITION_COMMON_PLUGININFO_HH_
 
 #include <functional>
 #include <string>
 #include <unordered_map>
+
+#include <ignition/common/config.hh>
 #include <gz/common/Export.hh>
 
 namespace ignition

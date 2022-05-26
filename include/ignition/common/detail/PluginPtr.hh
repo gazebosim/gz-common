@@ -15,13 +15,12 @@
  *
  */
 
-#include <ignition/common/config.hh>
-
-#ifndef GZ_COMMON_DETAIL_PLUGINPTR_HH_
-#define GZ_COMMON_DETAIL_PLUGINPTR_HH_
+#ifndef IGNITION_COMMON_DETAIL_PLUGINPTR_HH_
+#define IGNITION_COMMON_DETAIL_PLUGINPTR_HH_
 #include <memory>
 #include <utility>
 
+#include <ignition/common/config.hh>
 #include "ignition/common/PluginPtr.hh"
 #include "gz/common/TemplateHelpers.hh"
 

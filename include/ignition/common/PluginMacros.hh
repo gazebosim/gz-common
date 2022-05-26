@@ -16,9 +16,10 @@
 */
 
 
-#ifndef GZ_COMMON_REGISTERMACROS_HH_
-#define GZ_COMMON_REGISTERMACROS_HH_
+#ifndef IGNITION_COMMON_REGISTERMACROS_HH_
+#define IGNITION_COMMON_REGISTERMACROS_HH_
 
+#include <ignition/common/config.hh>
 #include "ignition/common/detail/PluginMacros.hh"
 
 // Deprecated, use gz-plugin
@@ -98,7 +99,6 @@
 // doing something that is not permitted). Recommended practice is to have a
 // single source file (e.g. plugins.cpp) in your library's codebase that is
 // dedicated to hosting these macros.
-#include <ignition/common/config.hh>
 
 
 /// \brief Begin registering a set of plugins that are contained within this

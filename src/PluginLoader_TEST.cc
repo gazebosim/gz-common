@@ -17,6 +17,8 @@
 
 #include <gtest/gtest.h>
 
+#define SUPPRESS_IGNITION_HEADER_DEPRECATION
+
 #include <algorithm>
 #include <fstream>
 
@@ -99,3 +101,5 @@ TEST(PluginLoader, InstantiateUnloadedPlugin)
   EXPECT_FALSE(plugin);
 }
 IGN_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
+
+#undef SUPPRESS_IGNITION_HEADER_DEPRECATION

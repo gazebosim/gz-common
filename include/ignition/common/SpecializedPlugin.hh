@@ -14,11 +14,10 @@
  * limitations under the License.
  *
  */
-#ifndef GZ_COMMON_SPECIALIZEDPLUGIN_HH_
-#define GZ_COMMON_SPECIALIZEDPLUGIN_HH_
+#ifndef IGNITION_COMMON_SPECIALIZEDPLUGIN_HH_
+#define IGNITION_COMMON_SPECIALIZEDPLUGIN_HH_
 
 #include <ignition/common/config.hh>
-
 #include "ignition/common/Plugin.hh"
 
 namespace ignition
