@@ -19,10 +19,12 @@
 #ifndef GZ_COMMON_TEST_PLUGINS_DUMMY_PLUGINS_HH_
 #define GZ_COMMON_TEST_PLUGINS_DUMMY_PLUGINS_HH_
 
+#define SUPPRESS_IGNITION_HEADER_DEPRECATION
+
 #include <string>
 #include <memory>
 
-#include <gz/common/PluginMacros.hh>
+#include <ignition/common/PluginMacros.hh>
 
 namespace test
 {
@@ -98,5 +100,6 @@ class DummyMultiPlugin
 }
 }
 
-
 #endif
+
+#undef SUPPRESS_IGNITION_HEADER_DEPRECATION

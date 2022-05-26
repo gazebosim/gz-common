@@ -18,6 +18,8 @@
 #include <gz/utils/SuppressWarning.hh>
 
 IGN_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
+#define SUPPRESS_IGNITION_HEADER_DEPRECATION
+
 #include "ignition/common/PluginPtr.hh"
 
 int main()
@@ -27,3 +29,5 @@ int main()
   ptr = const_ptr;
 }
 IGN_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
+
+#undef SUPPRESS_IGNITION_HEADER_DEPRECATION

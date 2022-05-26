@@ -15,6 +15,8 @@
  *
 */
 
+#define SUPPRESS_IGNITION_HEADER_DEPRECATION
+
 #include "ignition/common/PluginMacros.hh"
 #include "gz/utils/SuppressWarning.hh"
 #include "DummyPlugins.hh"
@@ -91,3 +93,5 @@ IGN_COMMON_BEGIN_ADDING_PLUGINS
 IGN_COMMON_FINISH_ADDING_PLUGINS
 
 IGN_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
+
+#undef SUPPRESS_IGNITION_HEADER_DEPRECATION

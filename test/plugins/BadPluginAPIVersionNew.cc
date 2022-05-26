@@ -15,6 +15,8 @@
  *
 */
 
+#define SUPPRESS_IGNITION_HEADER_DEPRECATION
+
 #include <limits>
 #include "ignition/common/PluginMacros.hh"
 #include "gz/utils/SuppressWarning.hh"
@@ -40,3 +42,4 @@ extern "C" std::size_t DETAIL_GZ_PLUGIN_VISIBLE IGNCOMMONMultiPluginInfo(
 
 IGN_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
 
+#undef SUPPRESS_IGNITION_HEADER_DEPRECATION

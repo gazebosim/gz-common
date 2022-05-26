@@ -22,6 +22,8 @@
 
 #include <gtest/gtest.h>
 
+#define SUPPRESS_IGNITION_HEADER_DEPRECATION
+
 #include <string>
 #include <vector>
 #include <iostream>
@@ -438,3 +440,5 @@ TEST(PluginPtr, QueryInterfaceSharedPtr)
   CheckSomeValues(getInt, getDouble, getName);
 }
 IGN_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
+
+#undef SUPPRESS_IGNITION_HEADER_DEPRECATION

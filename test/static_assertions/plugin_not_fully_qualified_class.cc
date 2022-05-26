@@ -18,6 +18,8 @@
 #include <gz/utils/SuppressWarning.hh>
 
 IGN_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
+#define SUPPRESS_IGNITION_HEADER_DEPRECATION
+
 #include "ignition/common/PluginMacros.hh"
 
 namespace ns
@@ -41,3 +43,5 @@ using ns::A;
 IGN_COMMON_REGISTER_SINGLE_PLUGIN(A, ns::Base)
 
 IGN_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
+
+#undef SUPPRESS_IGNITION_HEADER_DEPRECATION

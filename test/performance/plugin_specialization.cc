@@ -16,6 +16,8 @@
 */
 #include <gtest/gtest.h>
 
+#define SUPPRESS_IGNITION_HEADER_DEPRECATION
+
 #include <chrono>
 #include <iomanip>
 #include <cmath>
@@ -234,3 +236,5 @@ TEST(PluginSpecialization, AccessTime)
 }
 
 IGN_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
+
+#undef SUPPRESS_IGNITION_HEADER_DEPRECATION

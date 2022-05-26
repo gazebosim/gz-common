@@ -23,6 +23,8 @@
 #include <sstream>
 #include <unordered_map>
 
+#define SUPPRESS_IGNITION_HEADER_DEPRECATION
+
 #include "gz/utils/SuppressWarning.hh"
 #include "ignition/common/Console.hh"
 #include "ignition/common/StringUtils.hh"
@@ -319,3 +321,5 @@ namespace gz
   }
 }
 IGN_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
+
+#undef SUPPRESS_IGNITION_HEADER_DEPRECATION

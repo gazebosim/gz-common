@@ -15,6 +15,9 @@
  *
 */
 #include <gtest/gtest.h>
+
+#define SUPPRESS_IGNITION_HEADER_DEPRECATION
+
 #include <string>
 #include "gz/utils/SuppressWarning.hh"
 
@@ -36,3 +39,5 @@ TEST(PluginUtils, NormalizeName)
   EXPECT_EQ("::gz::math", common::NormalizeName("::gz::math"));
 }
 IGN_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
+
+#undef SUPPRESS_IGNITION_HEADER_DEPRECATION
