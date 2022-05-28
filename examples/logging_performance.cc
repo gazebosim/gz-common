@@ -57,7 +57,7 @@ void MeasurePeakDuringLogWrites(const size_t id, std::vector<uint64_t> &result)
     std::stringstream ss;
     ss << "Some text to log for thread: " << id << "\n";
     auto start_time = std::chrono::high_resolution_clock::now();
-    ignmsg << ss.str();
+    gzmsg << ss.str();
     auto stop_time = std::chrono::high_resolution_clock::now();
     uint64_t time_us = std::chrono::duration_cast<std::chrono::microseconds>(
                            stop_time - start_time)
@@ -145,7 +145,7 @@ void SaveResultToBucketFile(
 void run(size_t number_of_threads)
 {
   g_counter = 0;
-  ignition::common::Console::SetVerbosity(4);
+  gz::common::Console::SetVerbosity(4);
   std::vector<std::thread> threads(number_of_threads);
   std::map<size_t, std::vector<uint64_t>> threads_result;
 

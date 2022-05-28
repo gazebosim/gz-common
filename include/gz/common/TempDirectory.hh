@@ -25,7 +25,7 @@
 
 #include <gz/utils/ImplPtr.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -34,7 +34,7 @@ namespace ignition
     /// Calls std::filesystem::temp_directory_path, refer to the standard
     /// documentation for your platform for behaviors.
     /// \return A directory suitable for temporary files.
-    std::string IGNITION_COMMON_VISIBLE tempDirectoryPath();
+    std::string GZ_COMMON_VISIBLE tempDirectoryPath();
 
     /// \brief Create a directory in the tempDirectoryPath by expanding
     /// a name template
@@ -47,7 +47,7 @@ namespace ignition
     /// \param[in] _parentPath Location to create the directory
     /// \param[in] _warningOp Allow or suppress filesystem warnings
     /// \return Path to newly-created temporary directory
-    std::string IGNITION_COMMON_VISIBLE createTempDirectory(
+    std::string GZ_COMMON_VISIBLE createTempDirectory(
         const std::string &_baseName,
         const std::string &_parentPath,
         const FilesystemWarningOp _warningOp = FSWO_LOG_WARNINGS);
@@ -58,7 +58,7 @@ namespace ignition
     /// new temporary directory.
     /// Upon destruction, the current working directory will be restored to the
     /// location when the TempDirectory object was constructed.
-    class IGNITION_COMMON_VISIBLE TempDirectory
+    class GZ_COMMON_VISIBLE TempDirectory
     {
       /// \brief Create a directory in the tempDirectoryPath by expanding
       /// a name template. This directory can also be automatically cleaned
@@ -119,6 +119,6 @@ namespace ignition
       IGN_UTILS_UNIQUE_IMPL_PTR(dataPtr)
     };
   }  // namespace common
-}  // namespace ignition
+}  // namespace gz
 #endif  // GZ_COMMON_TEMPDIRECTORY_HH_
 

@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/detail/TemplateHelpers.hh>
+#include <ignition/common/config.hh>

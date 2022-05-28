@@ -15,14 +15,16 @@
  *
  */
 
-#ifndef IGNITION_COMMON_PLUGINUTILS_HH_
-#define IGNITION_COMMON_PLUGINUTILS_HH_
+#ifndef GZ_COMMON_PLUGINUTILS_HH_
+#define GZ_COMMON_PLUGINUTILS_HH_
+
+#define SUPPRESS_IGNITION_HEADER_DEPRECATION
 
 #include <string>
 #include "ignition/common/Export.hh"
 #include "ignition/common/StringUtils.hh"
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -41,5 +43,6 @@ namespace ignition
   }
 }
 
+#undef SUPPRESS_IGNITION_HEADER_DEPRECATION
 
 #endif

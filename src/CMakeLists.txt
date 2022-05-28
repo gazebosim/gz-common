@@ -24,7 +24,7 @@ target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
 )
 
 # This is required by the WorkerPool::WaitForResults(const Time &_timeout)
-# TODO(anyone): IGN_DEPRECATED(4). Remove this part when the method is removed
+# TODO(anyone): GZ_DEPRECATED(4). Remove this part when the method is removed
 target_include_directories(${PROJECT_LIBRARY_TARGET_NAME} PRIVATE
   ${ignition-math${IGN_MATH_VER}_INCLUDE_DIRS})
 
@@ -74,7 +74,7 @@ if(WIN32)
     message(STATUS "You have opted to enable symlink tests on a Windows platform.")
     message(STATUS "The test UNIT_Filesystem_TEST will require elevated privileges")
     message(STATUS "in order to succeed. For more information, see the issue")
-    message(STATUS "https://github.com/ignitionrobotics/ign-common/issues/21")
+    message(STATUS "https://github.com/gazebosim/gz-common/issues/21")
     message(STATUS "")
     target_compile_definitions(UNIT_Filesystem_TEST PRIVATE IGN_BUILD_SYMLINK_TESTS_ON_WINDOWS)
   endif()

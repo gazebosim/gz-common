@@ -14,14 +14,14 @@
  * limitations under the License.
  *
  */
-#include <ignition/math/Vector3.hh>
+#include <gz/math/Vector3.hh>
 
-#include <ignition/common/Material.hh>
-#include <ignition/common/Mesh.hh>
-#include <ignition/common/SubMesh.hh>
-#include <ignition/common/Console.hh>
-#include <ignition/common/ColladaExporter.hh>
-#include <ignition/common/Filesystem.hh>
+#include <gz/common/Material.hh>
+#include <gz/common/Mesh.hh>
+#include <gz/common/SubMesh.hh>
+#include <gz/common/Console.hh>
+#include <gz/common/ColladaExporter.hh>
+#include <gz/common/Filesystem.hh>
 
 #include "tinyxml2.h"
 
@@ -38,7 +38,7 @@
   static const char pathSeparator = '/';
 #endif
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 static void LogTinyXml2DocumentError(
@@ -74,11 +74,11 @@ static void LogTinyXml2DocumentError(
     warning += "none)";
   }
 
-  ignwarn << warning << "\n";
+  gzwarn << warning << "\n";
 }
 
 /// Private data for the ColladaExporter class
-class ignition::common::ColladaExporter::Implementation
+class gz::common::ColladaExporter::Implementation
 {
   /// \brief Geometry types
   public: enum GeometryType {POSITION, NORMAL, UVMAP};
@@ -151,7 +151,7 @@ class ignition::common::ColladaExporter::Implementation
 
 //////////////////////////////////////////////////
 ColladaExporter::ColladaExporter()
-: MeshExporter(), dataPtr(ignition::utils::MakeImpl<Implementation>())
+: MeshExporter(), dataPtr(gz::utils::MakeImpl<Implementation>())
 {
 }
 
@@ -187,7 +187,7 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
   if ( _submeshToMatrix.size() > 0 &&
     (_mesh->SubMeshCount() != _submeshToMatrix.size()) )
   {
-    ignerr << "_submeshToMatrix.size() : " << _mesh->SubMeshCount()
+    gzerr << "_submeshToMatrix.size() : " << _mesh->SubMeshCount()
         << " , must be equal to SubMeshCount() : " << _mesh->SubMeshCount()
         << std::endl;
     return;
@@ -331,12 +331,12 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
   // Save file
   if (this->dataPtr->exportTextures)
   {
-    const std::string directory = ignition::common::joinPaths(
+    const std::string directory = gz::common::joinPaths(
       this->dataPtr->path, this->dataPtr->filename, "meshes");
 
     createDirectories(directory);
 
-    const std::string finalFilename = ignition::common::joinPaths(
+    const std::string finalFilename = gz::common::joinPaths(
       this->dataPtr->path, this->dataPtr->filename, "meshes",
       this->dataPtr->filename + ".dae");
 
@@ -350,7 +350,7 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
   }
   else
   {
-    const std::string finalFilename = ignition::common::joinPaths(
+    const std::string finalFilename = gz::common::joinPaths(
       this->dataPtr->path, this->dataPtr->filename + std::string(".dae"));
 
     const tinyxml2::XMLError error = xmlDoc.SaveFile(finalFilename.c_str());
@@ -379,7 +379,7 @@ void ColladaExporter::Implementation::ExportAsset(
 
 //////////////////////////////////////////////////
 void ColladaExporter::Implementation::ExportGeometrySource(
-    const ignition::common::SubMesh *_subMesh,
+    const gz::common::SubMesh *_subMesh,
     tinyxml2::XMLElement *_meshXml, GeometryType _type, const char *_meshID)
 {
   char sourceId[100], sourceArrayId[107];
@@ -394,7 +394,7 @@ void ColladaExporter::Implementation::ExportGeometrySource(
     snprintf(sourceId, sizeof(sourceId), "%s-Positions", _meshID);
     count = _subMesh->VertexCount();
     stride = 3;
-    ignition::math::Vector3d vertex;
+    gz::math::Vector3d vertex;
     for (unsigned int i = 0; i < count; ++i)
     {
       vertex = _subMesh->Vertex(i);
@@ -406,7 +406,7 @@ void ColladaExporter::Implementation::ExportGeometrySource(
     snprintf(sourceId, sizeof(sourceId), "%s-Normals", _meshID);
     count = _subMesh->NormalCount();
     stride = 3;
-    ignition::math::Vector3d normal;
+    gz::math::Vector3d normal;
     for (unsigned int i = 0; i < count; ++i)
     {
       normal = _subMesh->Normal(i);
@@ -418,7 +418,7 @@ void ColladaExporter::Implementation::ExportGeometrySource(
     snprintf(sourceId, sizeof(sourceId), "%s-UVMap", _meshID);
     count = _subMesh->VertexCount();
     stride = 2;
-    ignition::math::Vector2d inTexCoord;
+    gz::math::Vector2d inTexCoord;
     for (unsigned int i = 0; i < count; ++i)
     {
       inTexCoord = _subMesh->TexCoordBySet(i, 0);
@@ -592,7 +592,7 @@ int ColladaExporter::Implementation::ExportImages(
   int imageCount = 0;
   for (unsigned int i = 0; i < this->materialCount; ++i)
   {
-    const ignition::common::MaterialPtr material =
+    const gz::common::MaterialPtr material =
       this->mesh->MaterialByIndex(i);
     std::string imageString = material->TextureImage();
 
@@ -610,7 +610,7 @@ int ColladaExporter::Implementation::ExportImages(
         _libraryImagesXml->GetDocument()->NewElement("init_from");
       const auto imageName = imageString.substr(
           imageString.rfind(pathSeparator));
-      const auto imagePath = ignition::common::joinPaths("..", "materials",
+      const auto imagePath = gz::common::joinPaths("..", "materials",
         "textures", imageName);
       initFromXml->LinkEndChild(
         _libraryImagesXml->GetDocument()->NewText(imagePath.c_str()));
@@ -674,7 +674,7 @@ void ColladaExporter::Implementation::ExportEffects(
     effectXml->LinkEndChild(profileCommonXml);
 
     // Image
-    const ignition::common::MaterialPtr material =
+    const gz::common::MaterialPtr material =
         this->mesh->MaterialByIndex(i);
     std::string imageString = material->TextureImage();
 
@@ -892,7 +892,7 @@ void ColladaExporter::Implementation::ExportVisualScenes(
     if (!subMesh->GetMaterialIndex())
       continue;
     const auto materialIndex = subMesh->GetMaterialIndex().value();
-    const ignition::common::MaterialPtr material =
+    const gz::common::MaterialPtr material =
       this->mesh->MaterialByIndex(materialIndex);
 
     if (material)

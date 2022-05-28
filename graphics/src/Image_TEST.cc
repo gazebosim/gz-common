@@ -17,12 +17,12 @@
 
 #include <gtest/gtest.h>
 
-#include <ignition/common/Image.hh>
+#include <gz/common/Image.hh>
 
-#include "ignition/common/testing/AutoLogFixture.hh"
-#include "ignition/common/testing/TestPaths.hh"
+#include "gz/common/testing/AutoLogFixture.hh"
+#include "gz/common/testing/TestPaths.hh"
 
-using namespace ignition;
+using namespace gz;
 
 class ImageTest : public common::testing::AutoLogFixture { };
 
@@ -280,7 +280,7 @@ TEST_F(ImageTest, SetFromData)
 /////////////////////////////////////////////////
 TEST_F(ImageTest, ConvertPixelFormat)
 {
-  using Image = ignition::common::Image;
+  using Image = gz::common::Image;
   EXPECT_EQ(Image::PixelFormatType::UNKNOWN_PIXEL_FORMAT,
          Image::ConvertPixelFormat("fake"));
   EXPECT_EQ(Image::PixelFormatType::UNKNOWN_PIXEL_FORMAT,
@@ -553,7 +553,7 @@ void ImagePerformanceTest::MaxColor(const std::string &_filePath,
   EXPECT_EQ(0, img.Load(fileName));
   EXPECT_EQ(_width, img.Width());
   EXPECT_EQ(_height, img.Height());
-  EXPECT_EQ(ignition::math::Color(0., 0., 0., 0), img.MaxColor());
+  EXPECT_EQ(gz::math::Color(0., 0., 0., 0), img.MaxColor());
   EXPECT_TRUE(img.Valid());
 }
 

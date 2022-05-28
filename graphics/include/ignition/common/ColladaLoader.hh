@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/ColladaLoader.hh>
+#include <ignition/common/config.hh>

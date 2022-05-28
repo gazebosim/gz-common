@@ -16,9 +16,10 @@
 */
 
 
-#ifndef GZ_COMMON_REGISTERMACROS_HH_
-#define GZ_COMMON_REGISTERMACROS_HH_
+#ifndef IGNITION_COMMON_REGISTERMACROS_HH_
+#define IGNITION_COMMON_REGISTERMACROS_HH_
 
+#include <ignition/common/config.hh>
 #include "ignition/common/detail/PluginMacros.hh"
 
 // Deprecated, use gz-plugin

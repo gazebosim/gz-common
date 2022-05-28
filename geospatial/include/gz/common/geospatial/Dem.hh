@@ -30,13 +30,13 @@
 #include <gz/utils/ImplPtr.hh>
 
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
     /// \class DEM DEM.hh common/common.hh
     /// \brief Encapsulates a DEM (Digital Elevation Model) file.
-    class IGNITION_COMMON_GEOSPATIAL_VISIBLE Dem : public HeightmapData
+    class GZ_COMMON_GEOSPATIAL_VISIBLE Dem : public HeightmapData
     {
       /// \brief Constructor.
       public: Dem();
@@ -79,8 +79,8 @@ namespace ignition
       /// \param[out] _latitude Georeferenced latitude.
       /// \param[out] _longitude Georeferenced longitude.
       /// \return True if able to retrieve origin coordinates. False otherwise.
-      public: bool GeoReferenceOrigin(ignition::math::Angle &_latitude,
-                  ignition::math::Angle &_longitude) const;
+      public: bool GeoReferenceOrigin(gz::math::Angle &_latitude,
+                  gz::math::Angle &_longitude) const;
 
       /// \brief Get the terrain's height. Due to the Ogre constrains, this
       /// value will be a power of two plus one. The value returned might be
@@ -120,8 +120,8 @@ namespace ignition
       /// \param[out] _heights Vector containing the terrain heights.
       public: void FillHeightMap(const int _subSampling,
                   const unsigned int _vertSize,
-                  const ignition::math::Vector3d &_size,
-                  const ignition::math::Vector3d &_scale,
+                  const gz::math::Vector3d &_size,
+                  const gz::math::Vector3d &_scale,
                   const bool _flipY,
                   std::vector<float> &_heights) const override;
 
@@ -133,8 +133,8 @@ namespace ignition
       /// \param[out] _longitude Georeferenced longitude.
       /// \return True if able to retrieve coordinates. False otherwise.
       private: bool GeoReference(double _x, double _y,
-                                 ignition::math::Angle &_latitude,
-                                 ignition::math::Angle &_longitude) const;
+                                 gz::math::Angle &_latitude,
+                                 gz::math::Angle &_longitude) const;
 
       /// \brief Get the terrain file as a data array. Due to the Ogre
       /// constrains, the data might be stored in a bigger vector representing

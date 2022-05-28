@@ -15,15 +15,15 @@
  *
 */
 
-
-#ifndef GZ_COMMON_DETAIL_PLUGINMACROS_HH_
-#define GZ_COMMON_DETAIL_PLUGINMACROS_HH_
+#ifndef IGNITION_COMMON_DETAIL_PLUGINMACROS_HH_
+#define IGNITION_COMMON_DETAIL_PLUGINMACROS_HH_
 
 #include <string>
 #include <typeinfo>
 #include <type_traits>
 #include <unordered_set>
 #include <utility>
+#include <ignition/common/config.hh>
 #include "ignition/common/PluginInfo.hh"
 #include "gz/utils/SuppressWarning.hh"
 
@@ -51,13 +51,13 @@
 #define DETAIL_IGN_COMMON_REGISTER_PLUGININFO_META_DATA \
   extern "C" { \
     std::size_t DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONPluginInfoSize = \
-      sizeof(ignition::common::PluginInfo); \
+      sizeof(gz::common::PluginInfo); \
     \
     std::size_t DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONPluginInfoAlignment = \
-      alignof(ignition::common::PluginInfo); \
+      alignof(gz::common::PluginInfo); \
     \
     int DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONPluginAPIVersion = \
-      ignition::common::PLUGIN_API_VERSION; \
+      gz::common::PLUGIN_API_VERSION; \
   }
 
 
@@ -92,18 +92,18 @@ IGN_UTILS_WARN_IGNORE__NON_VIRTUAL_DESTRUCTOR \
       const std::size_t _pluginId, \
       const std::size_t _size) \
   { \
-    if (_size != sizeof(ignition::common::PluginInfo)) \
+    if (_size != sizeof(gz::common::PluginInfo)) \
     { \
       return 0u; \
     } \
     std::unordered_set<std::string> visitedPlugins; \
-    ignition::common::PluginInfo * * const ptrToPlugin = \
-        reinterpret_cast<ignition::common::PluginInfo * *>(_outputInfo); \
+    gz::common::PluginInfo * * const ptrToPlugin = \
+        reinterpret_cast<gz::common::PluginInfo * *>(_outputInfo); \
     if ( !(*ptrToPlugin) ) \
     { \
-       *ptrToPlugin = new ignition::common::PluginInfo; \
+       *ptrToPlugin = new gz::common::PluginInfo; \
     } \
-    ignition::common::PluginInfo *plugin = *ptrToPlugin; \
+    gz::common::PluginInfo *plugin = *ptrToPlugin; \
     plugin->name.clear(); \
     plugin->interfaces.clear(); \
     plugin->factory = nullptr; \

@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/NodeAnimation.hh>
+#include <ignition/common/config.hh>

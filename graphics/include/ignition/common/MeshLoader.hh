@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/MeshLoader.hh>
+#include <ignition/common/config.hh>

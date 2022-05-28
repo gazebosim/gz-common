@@ -15,20 +15,20 @@
  *
  */
 
-
-#ifndef GZ_COMMON_PLUGINLOADER_HH_
-#define GZ_COMMON_PLUGINLOADER_HH_
+#ifndef IGNITION_COMMON_PLUGINLOADER_HH_
+#define IGNITION_COMMON_PLUGINLOADER_HH_
 
 #include <memory>
 #include <string>
 #include <typeinfo>
 #include <unordered_set>
 
+#include <ignition/common/config.hh>
 #include <gz/common/Export.hh>
 #include <ignition/common/PluginPtr.hh>
 #include <gz/utils/SuppressWarning.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

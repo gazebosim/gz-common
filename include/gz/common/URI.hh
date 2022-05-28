@@ -24,7 +24,7 @@
 
 #include <gz/utils/ImplPtr.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -52,7 +52,7 @@ namespace ignition
     /// * `file:/abs/path` has the path `/abs/path`
     /// * `file://abs/path` has the path `abs/path`
     /// * `file:///abs/path` has the path `/abs/path`
-    class IGNITION_COMMON_VISIBLE URIAuthority
+    class GZ_COMMON_VISIBLE URIAuthority
     {
       /// \brief Constructor
       public: URIAuthority();
@@ -142,7 +142,7 @@ namespace ignition
     /// scheme://authority.com/seg1/seg2?query
     ///
     /// The path is `/seg1/seg2`
-    class IGNITION_COMMON_VISIBLE URIPath
+    class GZ_COMMON_VISIBLE URIPath
     {
       /// \brief Constructor
       public: URIPath();
@@ -239,7 +239,7 @@ namespace ignition
     };
 
     /// \brief The query component of a URI
-    class IGNITION_COMMON_VISIBLE URIQuery
+    class GZ_COMMON_VISIBLE URIQuery
     {
       /// \brief Constructor
       public: URIQuery();
@@ -287,7 +287,7 @@ namespace ignition
     };
 
     /// \brief The fragment component of a URI
-    class IGNITION_COMMON_VISIBLE URIFragment
+    class GZ_COMMON_VISIBLE URIFragment
     {
       /// \brief Constructor
       public: URIFragment();
@@ -336,7 +336,7 @@ namespace ignition
     /// scheme:[//authority]path[?query][#fragment]
     ///
     // cppcheck-suppress class_X_Y
-    class IGNITION_COMMON_VISIBLE URI
+    class GZ_COMMON_VISIBLE URI
     {
       /// \brief Default constructor
       public: URI();

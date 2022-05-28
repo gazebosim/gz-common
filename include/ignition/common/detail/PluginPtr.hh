@@ -15,16 +15,16 @@
  *
  */
 
-
-#ifndef GZ_COMMON_DETAIL_PLUGINPTR_HH_
-#define GZ_COMMON_DETAIL_PLUGINPTR_HH_
+#ifndef IGNITION_COMMON_DETAIL_PLUGINPTR_HH_
+#define IGNITION_COMMON_DETAIL_PLUGINPTR_HH_
 #include <memory>
 #include <utility>
 
+#include <ignition/common/config.hh>
 #include "ignition/common/PluginPtr.hh"
 #include "gz/common/TemplateHelpers.hh"
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -185,10 +185,10 @@ namespace std
   /// so that it can easily be used in STL objects like std::unordered_set and
   /// std::unordered_map
   template <typename PluginType>
-  struct hash<ignition::common::TemplatePluginPtr<PluginType>>
+  struct hash<gz::common::TemplatePluginPtr<PluginType>>
   {
     size_t operator()(
-        const ignition::common::TemplatePluginPtr<PluginType> &ptr) const
+        const gz::common::TemplatePluginPtr<PluginType> &ptr) const
     {
       return ptr.Hash();
     }

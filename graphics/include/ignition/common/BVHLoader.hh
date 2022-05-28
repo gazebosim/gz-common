@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/BVHLoader.hh>
+#include <ignition/common/config.hh>

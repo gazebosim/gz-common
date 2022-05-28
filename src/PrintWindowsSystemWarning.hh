@@ -15,23 +15,23 @@
  *
  */
 
-#ifndef IGNITION_COMMON_PRINTWINDOWSSYSTEMWARNING_HH_
-#define IGNITION_COMMON_PRINTWINDOWSSYSTEMWARNING_HH_
+#ifndef GZ_COMMON_PRINTWINDOWSSYSTEMWARNING_HH_
+#define GZ_COMMON_PRINTWINDOWSSYSTEMWARNING_HH_
 
 #ifdef _WIN32
 #include <windows.h>
 #include <winnt.h>
 #include <string>
 #include <cstdint>
-#include <ignition/common/Console.hh>
+#include <gz/common/Console.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
     /// \brief This is a Windows-specific function that prints warnings from the
     /// system in a pretty and convenient way. They get logged using the
-    /// ignition::common::Console.
+    /// gz::common::Console.
     inline void PrintWindowsSystemWarning(const std::string &_flavorText)
     {
       // Based on example code by Microsoft: "Retrieving the Last-Error Code"
@@ -45,7 +45,7 @@ namespace ignition
         NULL, dw, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
         (LPTSTR)&lpMsgBuf, 0, NULL);
 
-      ignwarn << _flavorText << ": " << static_cast<LPCTSTR>(lpMsgBuf) << "\n";
+      gzwarn << _flavorText << ": " << static_cast<LPCTSTR>(lpMsgBuf) << "\n";
     }
   }
 }

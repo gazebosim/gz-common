@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/Timer.hh>
+#include <ignition/common/config.hh>

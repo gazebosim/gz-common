@@ -17,14 +17,14 @@
 
 #include <gtest/gtest.h>
 
-#include <ignition/math/Vector3.hh>
-#include <ignition/math/Quaternion.hh>
-#include <ignition/common/KeyFrame.hh>
-#include <ignition/common/Animation.hh>
+#include <gz/math/Vector3.hh>
+#include <gz/math/Quaternion.hh>
+#include <gz/common/KeyFrame.hh>
+#include <gz/common/Animation.hh>
 
-#include "ignition/common/testing/AutoLogFixture.hh"
+#include "gz/common/testing/AutoLogFixture.hh"
 
-using namespace ignition;
+using namespace gz;
 
 class AnimationTest : public common::testing::AutoLogFixture { };
 

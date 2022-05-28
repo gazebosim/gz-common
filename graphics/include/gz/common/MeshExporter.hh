@@ -20,14 +20,14 @@
 #include <string>
 #include <gz/common/graphics/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
     class Mesh;
 
     /// \brief Base class for exporting meshes
-    class IGNITION_COMMON_GRAPHICS_VISIBLE MeshExporter
+    class GZ_COMMON_GRAPHICS_VISIBLE MeshExporter
     {
       /// \brief Constructor
       public: MeshExporter();

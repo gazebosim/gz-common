@@ -15,12 +15,12 @@
 *
 */
 
-#include "ignition/common/testing/BazelTestPaths.hh"
+#include "gz/common/testing/BazelTestPaths.hh"
 
-#include <ignition/common/Console.hh>
-#include <ignition/common/Util.hh>
+#include <gz/common/Console.hh>
+#include <gz/common/Util.hh>
 
-namespace ignition::common::testing
+namespace gz::common::testing
 {
 
 //////////////////////////////////////////////////
@@ -34,7 +34,7 @@ bool BazelTestPaths::ProjectSourcePath(std::string &_sourceDir)
   if (common::env("TEST_SRCDIR", test_srcdir) &&
       common::env("IGN_BAZEL_PATH", bazel_path))
   {
-    _sourceDir = ignition::common::joinPaths(test_srcdir,
+    _sourceDir = gz::common::joinPaths(test_srcdir,
                                              "ignition",
                                              bazel_path);
     return true;
@@ -51,5 +51,5 @@ bool BazelTestPaths::TestTmpPath(std::string &_tmpDir)
   return common::env("TEST_UNDECLARED_OUTPUTS_DIR", _tmpDir);
 }
 
-}  // namespace ignition::common::testing
+}  // namespace gz::common::testing
 

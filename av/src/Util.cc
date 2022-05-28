@@ -17,9 +17,9 @@
 
 #include <string>
 
-#include <ignition/common/Console.hh>
-#include <ignition/common/av/Util.hh>
-#include <ignition/common/ffmpeg_inc.hh>
+#include <gz/common/Console.hh>
+#include <gz/common/av/Util.hh>
+#include <gz/common/ffmpeg_inc.hh>
 
 /////////////////////////////////////////////////
 // avcodec log callback. We use this to redirect message to gazebo's console
@@ -55,19 +55,19 @@ void logCallback(void *_ptr, int _level, const char *_fmt, va_list _args)
     case AV_LOG_PANIC:
     case AV_LOG_FATAL:
     case AV_LOG_ERROR:
-      ignerr << msg << std::endl;
+      gzerr << msg << std::endl;
       break;
     case AV_LOG_WARNING:
-      ignwarn << msg << std::endl;
+      gzwarn << msg << std::endl;
       break;
     default:
-      ignmsg << msg << std::endl;
+      gzmsg << msg << std::endl;
       break;
   }
 }
 
 /////////////////////////////////////////////////
-void ignition::common::load()
+void gz::common::load()
 {
   static bool first = true;
   if (first)

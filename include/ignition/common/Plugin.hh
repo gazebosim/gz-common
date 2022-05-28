@@ -15,18 +15,18 @@
  *
  */
 
-
-#ifndef GZ_COMMON_PLUGIN_HH_
-#define GZ_COMMON_PLUGIN_HH_
+#ifndef IGNITION_COMMON_PLUGIN_HH_
+#define IGNITION_COMMON_PLUGIN_HH_
 
 #include <memory>
 #include <map>
 #include <string>
 
+#include <ignition/common/config.hh>
 #include <gz/common/Export.hh>
 #include <gz/utils/SuppressWarning.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

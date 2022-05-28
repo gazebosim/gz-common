@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/MaterialDensity.hh>
+#include <ignition/common/config.hh>

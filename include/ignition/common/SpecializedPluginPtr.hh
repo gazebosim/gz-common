@@ -15,14 +15,14 @@
  *
  */
 
+#ifndef IGNITION_COMMON_SPECIALIZEDPLUGINPTR_HH_
+#define IGNITION_COMMON_SPECIALIZEDPLUGINPTR_HH_
 
-#ifndef GZ_COMMON_SPECIALIZEDPLUGINPTR_HH_
-#define GZ_COMMON_SPECIALIZEDPLUGINPTR_HH_
-
+#include <ignition/common/config.hh>
 #include "ignition/common/PluginPtr.hh"
 #include "ignition/common/SpecializedPlugin.hh"
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

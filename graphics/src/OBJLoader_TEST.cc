@@ -16,15 +16,15 @@
 */
 #include <gtest/gtest.h>
 
-#include "ignition/common/Mesh.hh"
-#include "ignition/common/SubMesh.hh"
-#include "ignition/common/Material.hh"
-#include "ignition/common/OBJLoader.hh"
+#include "gz/common/Mesh.hh"
+#include "gz/common/SubMesh.hh"
+#include "gz/common/Material.hh"
+#include "gz/common/OBJLoader.hh"
 
-#include "ignition/common/testing/AutoLogFixture.hh"
-#include "ignition/common/testing/TestPaths.hh"
+#include "gz/common/testing/AutoLogFixture.hh"
+#include "gz/common/testing/TestPaths.hh"
 
-using namespace ignition;
+using namespace gz;
 
 class OBJLoaderTest : public common::testing::AutoLogFixture { };
 
@@ -36,8 +36,8 @@ TEST_F(OBJLoaderTest, LoadObjBox)
       common::testing::TestFile("data", "box.obj"));
 
   EXPECT_STREQ("unknown", mesh->Name().c_str());
-  EXPECT_EQ(ignition::math::Vector3d(1, 1, 1), mesh->Max());
-  EXPECT_EQ(ignition::math::Vector3d(-1, -1, -1), mesh->Min());
+  EXPECT_EQ(gz::math::Vector3d(1, 1, 1), mesh->Max());
+  EXPECT_EQ(gz::math::Vector3d(-1, -1, -1), mesh->Min());
   // 36 vertices
   EXPECT_EQ(36u, mesh->VertexCount());
   EXPECT_EQ(36u, mesh->NormalCount());
@@ -65,12 +65,12 @@ TEST_F(OBJLoaderTest, LoadObjBox)
 // This tests opening an OBJ file that has an invalid material reference
 TEST_F(OBJLoaderTest, InvalidMaterial)
 {
-  ignition::common::OBJLoader objLoader;
+  gz::common::OBJLoader objLoader;
 
   std::string meshFilename =
     common::testing::TestFile("data", "invalid_material.obj");
 
-  ignition::common::Mesh *mesh = objLoader.Load(meshFilename);
+  gz::common::Mesh *mesh = objLoader.Load(meshFilename);
 
   EXPECT_TRUE(mesh != nullptr);
 }
@@ -79,14 +79,14 @@ TEST_F(OBJLoaderTest, InvalidMaterial)
 // This tests opening an OBJ file that has PBR fields
 TEST_F(OBJLoaderTest, PBR)
 {
-  ignition::common::OBJLoader objLoader;
+  gz::common::OBJLoader objLoader;
 
   // load obj file exported by 3ds max that has pbr extension
   {
     std::string meshFilename =
       common::testing::TestFile("data", "cube_pbr.obj");
 
-    ignition::common::Mesh *mesh = objLoader.Load(meshFilename);
+    gz::common::Mesh *mesh = objLoader.Load(meshFilename);
     EXPECT_NE(nullptr, mesh);
 
     const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
@@ -112,7 +112,7 @@ TEST_F(OBJLoaderTest, PBR)
     std::string meshFilename =
       common::testing::TestFile("data", "blender_pbr.obj");
 
-    ignition::common::Mesh *mesh = objLoader.Load(meshFilename);
+    gz::common::Mesh *mesh = objLoader.Load(meshFilename);
     EXPECT_NE(nullptr, mesh);
 
     const common::MaterialPtr mat = mesh->MaterialByIndex(0u);

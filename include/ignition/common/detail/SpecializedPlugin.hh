@@ -15,10 +15,10 @@
  *
  */
 
+#ifndef IGNITION_COMMON_DETAIL_SPECIALIZEDPLUGIN_HH_
+#define IGNITION_COMMON_DETAIL_SPECIALIZEDPLUGIN_HH_
 
-#ifndef GZ_COMMON_DETAIL_SPECIALIZEDPLUGIN_HH_
-#define GZ_COMMON_DETAIL_SPECIALIZEDPLUGIN_HH_
-
+#include <ignition/common/config.hh>
 #include "ignition/common/SpecializedPlugin.hh"
 #include <memory>
 
@@ -30,7 +30,7 @@ bool usedSpecializedInterfaceAccess;
 #endif
 
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -253,7 +253,7 @@ namespace ignition
 
 
         // Declare friendship
-        template <class...> friend class ignition::common::SpecializedPlugin;
+        template <class...> friend class gz::common::SpecializedPlugin;
         template <class, class> friend class ComposePlugin;
 
         private: ComposePlugin() = default;

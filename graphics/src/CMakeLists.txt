@@ -66,7 +66,7 @@ else()
 endif()
 
 # define of tinxml2 major version >= 6
-# https://github.com/ignitionrobotics/ign-common/issues/28
+# https://github.com/gazebosim/gz-common/issues/28
 if (NOT TINYXML2_VERSION VERSION_LESS "6.0.0")
   message(STATUS "TINYXML2_VERSION ${TINYXML2_VERSION} >= 6.0.0")
   target_compile_definitions(${graphics_target}

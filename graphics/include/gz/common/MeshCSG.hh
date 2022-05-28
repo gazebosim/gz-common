@@ -26,7 +26,7 @@ typedef _GtsSurface GtsSurface;
 struct _GPtrArray;
 typedef _GPtrArray GPtrArray;
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -34,7 +34,7 @@ namespace ignition
 
     /// \class MeshCSG MeshCSG.hh gz/common/MeshCSG.hh
     /// \brief Creates CSG meshes
-    class IGNITION_COMMON_GRAPHICS_VISIBLE MeshCSG
+    class GZ_COMMON_GRAPHICS_VISIBLE MeshCSG
     {
       /// \brief An enumeration of the boolean operations
       public: enum BooleanOperation {UNION, INTERSECTION, DIFFERENCE};
@@ -53,7 +53,7 @@ namespace ignition
       /// \return a pointer to the created mesh
       public: Mesh *CreateBoolean(const Mesh *_m1, const Mesh *_m2,
           const int _operation,
-          const ignition::math::Pose3d &_offset = ignition::math::Pose3d::Zero);
+          const gz::math::Pose3d &_offset = gz::math::Pose3d::Zero);
 
       /// \brief Helper method for converting Mesh to GTS Surface
       private: void ConvertMeshToGTS(const Mesh *mesh, GtsSurface *surface);

@@ -22,17 +22,17 @@
 #include <regex>
 #include <string>
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/URI.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/URI.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 static const char kSchemeDelim[] = ":";
 static const char kAuthDelim[] = "//";
 
 /// \brief URIAuthority private data.
-class ignition::common::URIAuthority::Implementation
+class gz::common::URIAuthority::Implementation
 {
   /// \brief The user information.
   public: std::string userInfo;
@@ -52,7 +52,7 @@ class ignition::common::URIAuthority::Implementation
 };
 
 /// \brief URIPath private data.
-class ignition::common::URIPath::Implementation
+class gz::common::URIPath::Implementation
 {
   /// \brief A helper method to determine if the given string represents
   ///        an absolute path starting segment or not.
@@ -73,21 +73,21 @@ class ignition::common::URIPath::Implementation
 };
 
 /// \brief URIQuery private data.
-class ignition::common::URIQuery::Implementation
+class gz::common::URIQuery::Implementation
 {
   /// \brief The key/value tuples that compose the query.
   public: std::vector<std::pair<std::string, std::string>> values;
 };
 
 /// \brief URIFragment private data.
-class ignition::common::URIFragment::Implementation
+class gz::common::URIFragment::Implementation
 {
   /// \brief The value of the fragment.
   public: std::string value;
 };
 
 /// \brief URI private data.
-class ignition::common::URI::Implementation
+class gz::common::URI::Implementation
 {
   /// \brief The URI scheme.
   public: std::string scheme;
@@ -107,7 +107,7 @@ class ignition::common::URI::Implementation
 
 //////////////////////////////////////////////////
 URIAuthority::URIAuthority()
-: dataPtr(ignition::utils::MakeImpl<Implementation>())
+: dataPtr(gz::utils::MakeImpl<Implementation>())
 {
 }
 
@@ -117,7 +117,7 @@ URIAuthority::URIAuthority(const std::string &_str)
 {
   if (!this->Parse(_str))
   {
-    ignwarn << "Unable to parse URIAuthority [" << _str << "]. Ignoring."
+    gzwarn << "Unable to parse URIAuthority [" << _str << "]. Ignoring."
            << std::endl;
   }
 }
@@ -362,7 +362,7 @@ bool URIAuthority::Parse(const std::string &_str, bool _emptyHostValid)
 
 /////////////////////////////////////////////////
 URIPath::URIPath()
-: dataPtr(ignition::utils::MakeImpl<Implementation>())
+: dataPtr(gz::utils::MakeImpl<Implementation>())
 {
 }
 
@@ -372,7 +372,7 @@ URIPath::URIPath(const std::string &_str)
 {
   if (!this->Parse(_str))
   {
-    ignwarn << "Unable to parse URIPath [" << _str << "]. Ignoring."
+    gzwarn << "Unable to parse URIPath [" << _str << "]. Ignoring."
            << std::endl;
   }
 }
@@ -390,7 +390,7 @@ void URIPath::SetAbsolute(const bool _absolute)
       this->dataPtr->path.front().length() >= 2 &&
       this->dataPtr->path.front()[1] == ':')
   {
-    ignerr << "URIPath " << this->Str() << " cannot be set to represent a "
+    gzerr << "URIPath " << this->Str() << " cannot be set to represent a "
               "relative path because it starts with a Windows drive "
               "specifier." << std::endl;
     return;
@@ -410,7 +410,7 @@ void URIPath::PushFront(const std::string &_part)
 {
   if (_part.empty())
   {
-    ignwarn << "Adding empty path segment to URI " << this->Str()
+    gzwarn << "Adding empty path segment to URI " << this->Str()
             << " has no effect." << std::endl;
     return;
   }
@@ -418,7 +418,7 @@ void URIPath::PushFront(const std::string &_part)
   auto part = _part;
   if (_part[0] == '/')
   {
-    ignwarn << "Instead of pushing a string starting with slash, call "
+    gzwarn << "Instead of pushing a string starting with slash, call "
                "SetAbsolute() instead." << std::endl;
     part = _part.substr(1);
     this->SetAbsolute();
@@ -434,7 +434,7 @@ void URIPath::PushFront(const std::string &_part)
     // TODO(anyone): Once URI encoding is implemented,
     // all invalid characters should be
     // encoded, not just slashes.
-    ignwarn << "Unencoded slashes in URI part, encoding them." << std::endl;
+    gzwarn << "Unencoded slashes in URI part, encoding them." << std::endl;
     part = common::replaceAll(part, "/", "%2F");
   }
 
@@ -447,7 +447,7 @@ void URIPath::PushBack(const std::string &_part)
 {
   if (_part.empty())
   {
-    ignwarn << "Adding empty path segment to URI " << this->Str()
+    gzwarn << "Adding empty path segment to URI " << this->Str()
             << " has no effect." << std::endl;
     return;
   }
@@ -455,7 +455,7 @@ void URIPath::PushBack(const std::string &_part)
   auto part = _part;
   if (this->dataPtr->path.size() == 0 && _part[0] == '/')
   {
-    ignwarn << "Instead of pushing a string starting with slash, call "
+    gzwarn << "Instead of pushing a string starting with slash, call "
                "SetAbsolute() instead." << std::endl;
     part = _part.substr(1);
     this->SetAbsolute();
@@ -471,7 +471,7 @@ void URIPath::PushBack(const std::string &_part)
     // TODO(anyone): Once URI encoding is implemented,
     // all invalid characters should be
     // encoded, not just slashes.
-    ignwarn << "Unencoded slashes in URI part, encoding them." << std::endl;
+    gzwarn << "Unencoded slashes in URI part, encoding them." << std::endl;
     part = common::replaceAll(part, "/", "%2F");
   }
 
@@ -629,7 +629,7 @@ bool URIPath::Parse(const std::string &_str)
 
 /////////////////////////////////////////////////
 URIQuery::URIQuery()
-  : dataPtr(ignition::utils::MakeImpl<Implementation>())
+  : dataPtr(gz::utils::MakeImpl<Implementation>())
 {
 }
 
@@ -639,7 +639,7 @@ URIQuery::URIQuery(const std::string &_str)
 {
   if (!this->Parse(_str))
   {
-    ignwarn << "Unable to parse URIQuery [" << _str << "]. Ignoring."
+    gzwarn << "Unable to parse URIQuery [" << _str << "]. Ignoring."
            << std::endl;
   }
 }
@@ -745,7 +745,7 @@ bool URIQuery::Parse(const std::string &_str)
 
 /////////////////////////////////////////////////
 URIFragment::URIFragment()
-  : dataPtr(ignition::utils::MakeImpl<Implementation>())
+  : dataPtr(gz::utils::MakeImpl<Implementation>())
 {
 }
 
@@ -755,7 +755,7 @@ URIFragment::URIFragment(const std::string &_str)
 {
   if (!this->Parse(_str))
   {
-    ignwarn << "Unable to parse URIFragment [" << _str << "]. Ignoring."
+    gzwarn << "Unable to parse URIFragment [" << _str << "]. Ignoring."
            << std::endl;
   }
 }
@@ -843,7 +843,7 @@ bool URIFragment::Parse(const std::string &_str)
 
 /////////////////////////////////////////////////
 URI::URI()
-  : dataPtr(ignition::utils::MakeImpl<Implementation>())
+  : dataPtr(gz::utils::MakeImpl<Implementation>())
 {
 }
 
@@ -1016,7 +1016,7 @@ bool URI::Valid(const std::string &_str)
 
     if (localScheme != "file" && authEndPos == authDelimPos+2)
     {
-      ignerr << "A host is mandatory when using a scheme other than file\n";
+      gzerr << "A host is mandatory when using a scheme other than file\n";
       return false;
     }
     else
@@ -1104,7 +1104,7 @@ bool URI::Parse(const std::string &_str)
       else if (localScheme != "file" &&
                authEndPos == authDelimPos + std::strlen(kAuthDelim))
       {
-        ignerr << "A host is manadatory when using a scheme other than file\n";
+        gzerr << "A host is manadatory when using a scheme other than file\n";
         return false;
       }
       else

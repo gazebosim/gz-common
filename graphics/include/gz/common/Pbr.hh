@@ -23,7 +23,7 @@
 
 #include <gz/common/graphics/Export.hh>
 
-namespace ignition
+namespace gz
 {
 namespace common
 {
@@ -52,7 +52,7 @@ namespace common
 
   /// \brief This class contains Physically-Based-Rendering (PBR) workflow
   /// properties.
-  class IGNITION_COMMON_GRAPHICS_VISIBLE Pbr
+  class GZ_COMMON_GRAPHICS_VISIBLE Pbr
   {
     /// \brief Default constructor
     public: Pbr();

@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/Animation.hh>
+#include <ignition/common/config.hh>

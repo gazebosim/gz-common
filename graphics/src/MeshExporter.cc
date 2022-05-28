@@ -14,9 +14,9 @@
  * limitations under the License.
  *
 */
-#include "ignition/common/MeshExporter.hh"
+#include "gz/common/MeshExporter.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 //////////////////////////////////////////////////

@@ -29,14 +29,14 @@
 #include <gz/common/NodeAnimation.hh>
 #include <gz/common/graphics/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
     /// \class SkeletonAnimation SkeletonAnimation.hh
     /// gz/common/SkeletonAnimation.hh
     /// \brief Skeleton animation
-    class IGNITION_COMMON_GRAPHICS_VISIBLE SkeletonAnimation
+    class GZ_COMMON_GRAPHICS_VISIBLE SkeletonAnimation
     {
       /// \brief The Constructor
       /// \param[in] _name the name of the animation

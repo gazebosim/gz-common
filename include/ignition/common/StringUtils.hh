@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/StringUtils.hh>
+#include <ignition/common/config.hh>
