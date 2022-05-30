@@ -105,6 +105,7 @@ MeshManager::MeshManager()
   this->dataPtr->fileExtensions.push_back("dae");
   this->dataPtr->fileExtensions.push_back("obj");
   this->dataPtr->fileExtensions.push_back("gltf");
+  this->dataPtr->fileExtensions.push_back("glb");
   this->dataPtr->fileExtensions.push_back("fbx");
   
 }

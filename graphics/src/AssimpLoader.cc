@@ -51,6 +51,8 @@ class AssimpLoader::Implementation
 
   public: MaterialPtr CreateMaterial(const aiScene* scene, unsigned mat_idx, const std::string& path);
 
+  public: void LoadEmbeddedTexture(const aiTexture* texture);
+
   public: SubMesh CreateSubMesh(const aiMesh* assimp_mesh, const ignition::math::Matrix4d& transformation);
 
   public: std::unordered_map<std::string, ignition::math::Matrix4d> PopulateTransformMap(const aiScene* scene);
@@ -88,7 +90,6 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* scene, const a
 {
   if (!node)
     return;
-
   // Visit this node, add the submesh
   ignmsg << "Processing node " << node->mName.C_Str() << " with " << node->mNumMeshes << " meshes" << std::endl;
   for (unsigned mesh_idx = 0; mesh_idx < node->mNumMeshes; ++mesh_idx)
@@ -110,17 +111,17 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* scene, const a
       for (unsigned bone_idx = 0; bone_idx < scene->mMeshes[mesh_idx]->mNumBones; ++bone_idx)
       {
         auto bone = assimp_mesh->mBones[bone_idx];
-        auto bone_name = std::string(bone->mName.C_Str());
+        auto bone_node_name = std::string(bone->mNode->mName.C_Str());
         // Apply inverse bind transform to the matching node
         SkeletonNode *skel_node =
-            mesh->MeshSkeleton()->NodeByName(bone_name);
+            mesh->MeshSkeleton()->NodeByName(bone_node_name);
         skel_node->SetInverseBindTransform(this->ConvertTransform(bone->mOffsetMatrix));
-        igndbg << "Bone " << bone_name << " has " << bone->mNumWeights << " weights" << std::endl;
+        igndbg << "Bone " << bone_node_name << " has " << bone->mNumWeights << " weights" << std::endl;
         for (unsigned weight_idx = 0; weight_idx < bone->mNumWeights; ++weight_idx)
         {
           auto vertex_weight = bone->mWeights[weight_idx];
           // TODO SetNumVertAttached for performance
-          skeleton->AddVertNodeWeight(vertex_weight.mVertexId, bone_name, vertex_weight.mWeight);
+          skeleton->AddVertNodeWeight(vertex_weight.mVertexId, bone_node_name, vertex_weight.mWeight);
           //igndbg << "Adding weight at idx " << vertex_weight.mVertexId << " for bone " << bone_name << " of " << vertex_weight.mWeight << std::endl;
         }
       }
@@ -173,10 +174,8 @@ void AssimpLoader::Implementation::RecursiveSkeletonCreate(const aiNode* node, S
   auto node_trans = this->ConvertTransform(node->mTransformation);
   igndbg << node_trans << std::endl;
   skel_node->SetTransform(node_trans);
-  //skel_node->SetModelTransform(node_trans.Inverse(), false);
   node_trans = transformation * node_trans;
 
-  // TODO Set the vertex weights
   for (unsigned child_idx = 0; child_idx < node->mNumChildren; ++child_idx)
   {
     this->RecursiveSkeletonCreate(node->mChildren[child_idx], skel_node, node_trans);
@@ -188,7 +187,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* scene, u
 {
   MaterialPtr mat = std::make_shared<Material>();
   aiColor4D color;
-  igndbg << "Processing material with name " << scene->mMaterials[mat_idx]->GetName().C_Str() << std::endl;
+  //igndbg << "Processing material with name " << scene->mMaterials[mat_idx]->GetName().C_Str() << std::endl;
   auto ret = scene->mMaterials[mat_idx]->Get(AI_MATKEY_COLOR_DIFFUSE, color);
   if (ret == AI_SUCCESS)
   {
@@ -215,26 +214,52 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* scene, u
   {
     mat->SetShininess(shininess);
   }
-  // TODO more than one texture
+  // TODO more than one texture, Gazebo assumes UV index 0
   aiString texturePath(path.c_str());
-  unsigned textureIndex = 0;
-  unsigned uvIndex = 10000;
-  ret = scene->mMaterials[mat_idx]->GetTexture(aiTextureType_DIFFUSE, textureIndex, &texturePath,
-      NULL, // Type of mapping, TODO check that it is UV
-      &uvIndex,
-      NULL, // Blend mode, TODO implement
-      NULL, // Texture operation, unneeded?
-      NULL); // Mapping modes, unneeded?
+  ret = scene->mMaterials[mat_idx]->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath);
+  // TODO check other arguments, type of mappings to be UV, uv index, blend mode
   if (ret == AI_SUCCESS)
   {
-    mat->SetTextureImage(std::string(texturePath.C_Str()), path.c_str());
-    if (uvIndex < 10000)
+    // Check if the texture is embedded or not
+    auto embeddedTexture = scene->GetEmbeddedTexture(texturePath.C_Str());
+    if (embeddedTexture)
     {
-
+      // Load embedded texture
+      ignmsg << "Found embedded texture " << texturePath.C_Str() << std::endl;
+      this->LoadEmbeddedTexture(embeddedTexture);
+    }
+    else
+    {
+      mat->SetTextureImage(std::string(texturePath.C_Str()), path.c_str());
     }
   }
+  ret = scene->mMaterials[mat_idx]->GetTexture(aiTextureType_METALNESS, 0, &texturePath);
+  Pbr pbr;
+  if (ret == AI_SUCCESS)
+  {
+    ignmsg << "Found metalness map " << texturePath.C_Str() << std::endl;
+    pbr.SetMetalnessMap(std::string(texturePath.C_Str()));
+  }
+  ret = scene->mMaterials[mat_idx]->GetTexture(aiTextureType_NORMALS, 0, &texturePath);
+  if (ret == AI_SUCCESS)
+  {
+    ignmsg << "Found normal map " << texturePath.C_Str() << std::endl;
+    pbr.SetNormalMap(std::string(texturePath.C_Str()));
+  }
+  mat->SetPbrMaterial(pbr);
   // TODO other properties
   return mat;
+}
+
+//////////////////////////////////////////////////
+void AssimpLoader::Implementation::LoadEmbeddedTexture(const aiTexture* texture)
+{
+  if (texture->mHeight == 0)
+  {
+    ignwarn << "Found not supported compressed format " << texture->achFormatHint << std::endl;
+    return;
+  }
+  ignmsg << "Processing texture in format " << texture->achFormatHint << std::endl;
 }
 
 SubMesh AssimpLoader::Implementation::CreateSubMesh(const aiMesh* assimp_mesh, const ignition::math::Matrix4d& transformation)
@@ -309,6 +334,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
       //aiProcess_JoinIdenticalVertices |
       aiProcess_RemoveRedundantMaterials |
       aiProcess_SortByPType |
+      aiProcess_PopulateArmatureData |
       aiProcess_Triangulate |
       0);
   if (scene == nullptr)
@@ -335,22 +361,23 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     auto mat = this->dataPtr->CreateMaterial(scene, mat_idx, path);
     mesh->AddMaterial(mat);
   }
-  auto root_skel_node = new SkeletonNode(nullptr, root_name, root_name, SkeletonNode::NODE);
-  root_skel_node->SetTransform(root_transformation);
-  root_skel_node->SetModelTransform(root_transformation);
-  for (unsigned child_idx = 0; child_idx < root_node->mNumChildren; ++child_idx)
+  if (scene->HasAnimations())
   {
-    // First populate the skeleton with the node transforms
-    // TODO parse different skeletons and merge them
-    this->dataPtr->RecursiveSkeletonCreate(root_node->mChildren[child_idx], root_skel_node, root_transformation);
+    auto root_skel_node = new SkeletonNode(nullptr, root_name, root_name, SkeletonNode::NODE);
+    root_skel_node->SetTransform(root_transformation);
+    root_skel_node->SetModelTransform(root_transformation);
+    for (unsigned child_idx = 0; child_idx < root_node->mNumChildren; ++child_idx)
+    {
+      // First populate the skeleton with the node transforms
+      // TODO parse different skeletons and merge them
+      this->dataPtr->RecursiveSkeletonCreate(root_node->mChildren[child_idx], root_skel_node, root_transformation);
+    }
+    SkeletonPtr root_skeleton = std::make_shared<Skeleton>(root_skel_node);
+    mesh->SetSkeleton(root_skeleton);
   }
-  SkeletonPtr root_skeleton = std::make_shared<Skeleton>(root_skel_node);
-  mesh->SetSkeleton(root_skeleton);
-
   // Now create the meshes
   // Recursive call to keep track of transforms, mesh is passed by reference and edited throughout
   this->dataPtr->RecursiveCreate(scene, root_node, root_transformation, mesh);
-
   // Add the animations
   for (unsigned anim_idx = 0; anim_idx < scene->mNumAnimations; ++anim_idx)
   {
