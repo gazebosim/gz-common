@@ -49,17 +49,17 @@ class AssimpLoader::Implementation
   /// Convert a transformation from assimp implementation to Ignition math
   public: ignition::math::Matrix4d ConvertTransform(const aiMatrix4x4& _matrix);
 
-  public: MaterialPtr CreateMaterial(const aiScene* scene, unsigned mat_idx, const std::string& path);
+  public: MaterialPtr CreateMaterial(const aiScene* _scene, unsigned _matIdx, const std::string& _path);
 
-  public: void LoadEmbeddedTexture(const aiTexture* texture);
+  public: void LoadEmbeddedTexture(const aiTexture* _texture);
 
-  public: SubMesh CreateSubMesh(const aiMesh* assimp_mesh, const ignition::math::Matrix4d& transformation);
+  public: SubMesh CreateSubMesh(const aiMesh* _assimpMesh, const ignition::math::Matrix4d& _transform);
 
-  public: std::unordered_map<std::string, ignition::math::Matrix4d> PopulateTransformMap(const aiScene* scene);
+  public: std::unordered_map<std::string, ignition::math::Matrix4d> PopulateTransformMap(const aiScene* _scene);
 
-  public: void RecursiveCreate(const aiScene* scene, const aiNode* node, const ignition::math::Matrix4d& transformation, Mesh* mesh);
+  public: void RecursiveCreate(const aiScene* _scene, const aiNode* _node, const ignition::math::Matrix4d& _transform, Mesh* _mesh);
 
-  public: void RecursiveSkeletonCreate(const aiNode* node, SkeletonNode* root_node, const ignition::math::Matrix4d& transformation);
+  public: void RecursiveSkeletonCreate(const aiNode* _node, SkeletonNode* _parent, const ignition::math::Matrix4d& _transform);
 
   /// \brief Apply the the inv bind transform to the skeleton pose.
   /// \remarks have to set the model transforms starting from the root in
@@ -86,36 +86,35 @@ ignition::math::Matrix4d AssimpLoader::Implementation::ConvertTransform(const ai
       _sm.d1, _sm.d2, _sm.d3, _sm.d4);
 }
 
-void AssimpLoader::Implementation::RecursiveCreate(const aiScene* scene, const aiNode* node, const ignition::math::Matrix4d& transformation, Mesh* mesh)
+void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene, const aiNode* _node, const ignition::math::Matrix4d& _transform, Mesh* _mesh)
 {
-  if (!node)
+  if (!_node)
     return;
   // Visit this node, add the submesh
-  ignmsg << "Processing node " << node->mName.C_Str() << " with " << node->mNumMeshes << " meshes" << std::endl;
-  for (unsigned mesh_idx = 0; mesh_idx < node->mNumMeshes; ++mesh_idx)
+  ignmsg << "Processing node " << _node->mName.C_Str() << " with " << _node->mNumMeshes << " meshes" << std::endl;
+  for (unsigned meshIdx = 0; meshIdx < _node->mNumMeshes; ++meshIdx)
   {
-    auto assimp_mesh_idx = node->mMeshes[mesh_idx];
-    auto assimp_mesh = scene->mMeshes[assimp_mesh_idx];
-    auto node_name = std::string(node->mName.C_Str());
-    auto subMesh = this->CreateSubMesh(assimp_mesh, transformation);
-    subMesh.SetName(node_name);
+    auto assimpMeshIdx = _node->mMeshes[meshIdx];
+    auto assimpMesh = _scene->mMeshes[assimpMeshIdx];
+    auto nodeName = std::string(_node->mName.C_Str());
+    auto subMesh = this->CreateSubMesh(assimpMesh, _transform);
+    subMesh.SetName(nodeName);
     // Now add the bones to the skeleton
-    if (assimp_mesh->HasBones() && scene->HasAnimations())
+    if (assimpMesh->HasBones() && _scene->HasAnimations())
     {
       // TODO merging skeletons here
-      auto skeleton = mesh->MeshSkeleton();
-      auto skel_root_node = skeleton->RootNode();
+      auto skeleton = _mesh->MeshSkeleton();
       // TODO Append to existing skeleton if multiple submeshes?
       skeleton->SetNumVertAttached(subMesh.VertexCount());
       // Now add the bone weights
-      for (unsigned bone_idx = 0; bone_idx < scene->mMeshes[mesh_idx]->mNumBones; ++bone_idx)
+      for (unsigned bone_idx = 0; bone_idx < _scene->mMeshes[meshIdx]->mNumBones; ++bone_idx)
       {
-        auto bone = assimp_mesh->mBones[bone_idx];
+        auto bone = assimpMesh->mBones[bone_idx];
         auto bone_node_name = std::string(bone->mNode->mName.C_Str());
         // Apply inverse bind transform to the matching node
-        SkeletonNode *skel_node =
-            mesh->MeshSkeleton()->NodeByName(bone_node_name);
-        skel_node->SetInverseBindTransform(this->ConvertTransform(bone->mOffsetMatrix));
+        SkeletonNode *skelNode =
+            skeleton->NodeByName(bone_node_name);
+        skelNode->SetInverseBindTransform(this->ConvertTransform(bone->mOffsetMatrix));
         igndbg << "Bone " << bone_node_name << " has " << bone->mNumWeights << " weights" << std::endl;
         for (unsigned weight_idx = 0; weight_idx < bone->mNumWeights; ++weight_idx)
         {
@@ -136,7 +135,7 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* scene, const a
           std::pair<std::string, double> node_weight =
             skeleton->VertNodeWeight(vert_idx, i);
           SkeletonNode *node =
-              mesh->MeshSkeleton()->NodeByName(node_weight.first);
+              skeleton->NodeByName(node_weight.first);
           if (node == nullptr)
           {
             igndbg << "Not found while Looking for node with name " << node_weight.first << std::endl;
@@ -147,100 +146,97 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* scene, const a
         }
       }
     }
-    mesh->AddSubMesh(std::move(subMesh));
+    _mesh->AddSubMesh(std::move(subMesh));
   }
 
   // Iterate over children
-  for (unsigned child_idx = 0; child_idx < node->mNumChildren; ++child_idx)
+  for (unsigned childIdx = 0; childIdx < _node->mNumChildren; ++childIdx)
   {
     // Calculate the transform
-    auto child_node = node->mChildren[child_idx];
-    auto node_trans = this->ConvertTransform(child_node->mTransformation);
-    node_trans = transformation * node_trans;
+    auto child_node = _node->mChildren[childIdx];
+    auto nodeTrans = this->ConvertTransform(child_node->mTransformation);
+    nodeTrans = _transform * nodeTrans;
 
     // Finally recursive call to explore subnode
-    this->RecursiveCreate(scene, child_node, node_trans, mesh);
+    this->RecursiveCreate(_scene, child_node, nodeTrans, _mesh);
   }
 }
 
-void AssimpLoader::Implementation::RecursiveSkeletonCreate(const aiNode* node, SkeletonNode* root_node, const ignition::math::Matrix4d& transformation)
+void AssimpLoader::Implementation::RecursiveSkeletonCreate(const aiNode* _node, SkeletonNode* _parent, const ignition::math::Matrix4d& _transform)
 {
   // First explore this node
-  auto node_name = std::string(node->mName.C_Str());
-  //ignmsg << "Exploring node " << node_name << std::endl;
+  auto nodeName = std::string(_node->mName.C_Str());
+  //ignmsg << "Exploring node " << nodeName << std::endl;
   // TODO check if node or joint?
-  auto skel_node = new SkeletonNode(root_node, node_name, node_name, SkeletonNode::JOINT);
+  auto skelNode = new SkeletonNode(_parent, nodeName, nodeName, SkeletonNode::JOINT);
   // Calculate transform
-  auto node_trans = this->ConvertTransform(node->mTransformation);
-  igndbg << node_trans << std::endl;
-  skel_node->SetTransform(node_trans);
-  node_trans = transformation * node_trans;
-
-  for (unsigned child_idx = 0; child_idx < node->mNumChildren; ++child_idx)
+  auto nodeTrans = this->ConvertTransform(_node->mTransformation);
+  skelNode->SetTransform(nodeTrans);
+  nodeTrans = _transform * nodeTrans;
+  for (unsigned childIdx = 0; childIdx < _node->mNumChildren; ++childIdx)
   {
-    this->RecursiveSkeletonCreate(node->mChildren[child_idx], skel_node, node_trans);
+    this->RecursiveSkeletonCreate(_node->mChildren[childIdx], skelNode, nodeTrans);
   }
 }
 
 //////////////////////////////////////////////////
-MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* scene, unsigned mat_idx, const std::string& path)
+MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* _scene, unsigned _matIdx, const std::string& _path)
 {
   MaterialPtr mat = std::make_shared<Material>();
   aiColor4D color;
-  //igndbg << "Processing material with name " << scene->mMaterials[mat_idx]->GetName().C_Str() << std::endl;
-  auto ret = scene->mMaterials[mat_idx]->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+  //igndbg << "Processing material with name " << _scene->mMaterials[_matIdx]->GetName().C_Str() << std::endl;
+  auto ret = _scene->mMaterials[_matIdx]->Get(AI_MATKEY_COLOR_DIFFUSE, color);
   if (ret == AI_SUCCESS)
   {
     mat->SetDiffuse(this->ConvertColor(color));
   }
-  ret = scene->mMaterials[mat_idx]->Get(AI_MATKEY_COLOR_AMBIENT, color);
+  ret = _scene->mMaterials[_matIdx]->Get(AI_MATKEY_COLOR_AMBIENT, color);
   if (ret == AI_SUCCESS)
   {
     mat->SetAmbient(this->ConvertColor(color));
   }
-  ret = scene->mMaterials[mat_idx]->Get(AI_MATKEY_COLOR_SPECULAR, color);
+  ret = _scene->mMaterials[_matIdx]->Get(AI_MATKEY_COLOR_SPECULAR, color);
   if (ret == AI_SUCCESS)
   {
     mat->SetSpecular(this->ConvertColor(color));
   }
-  ret = scene->mMaterials[mat_idx]->Get(AI_MATKEY_COLOR_EMISSIVE, color);
+  ret = _scene->mMaterials[_matIdx]->Get(AI_MATKEY_COLOR_EMISSIVE, color);
   if (ret == AI_SUCCESS)
   {
     mat->SetEmissive(this->ConvertColor(color));
   }
   double shininess;
-  ret = scene->mMaterials[mat_idx]->Get(AI_MATKEY_SHININESS, shininess);
+  ret = _scene->mMaterials[_matIdx]->Get(AI_MATKEY_SHININESS, shininess);
   if (ret == AI_SUCCESS)
   {
     mat->SetShininess(shininess);
   }
   // TODO more than one texture, Gazebo assumes UV index 0
-  aiString texturePath(path.c_str());
-  ret = scene->mMaterials[mat_idx]->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath);
+  aiString texturePath(_path.c_str());
+  ret = _scene->mMaterials[_matIdx]->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath);
   // TODO check other arguments, type of mappings to be UV, uv index, blend mode
   if (ret == AI_SUCCESS)
   {
     // Check if the texture is embedded or not
-    auto embeddedTexture = scene->GetEmbeddedTexture(texturePath.C_Str());
+    auto embeddedTexture = _scene->GetEmbeddedTexture(texturePath.C_Str());
     if (embeddedTexture)
     {
       // Load embedded texture
-      ignmsg << "Found embedded texture " << texturePath.C_Str() << std::endl;
       this->LoadEmbeddedTexture(embeddedTexture);
     }
     else
     {
-      mat->SetTextureImage(std::string(texturePath.C_Str()), path.c_str());
+      mat->SetTextureImage(std::string(texturePath.C_Str()), _path.c_str());
     }
   }
-  ret = scene->mMaterials[mat_idx]->GetTexture(aiTextureType_METALNESS, 0, &texturePath);
+  ret = _scene->mMaterials[_matIdx]->GetTexture(aiTextureType_METALNESS, 0, &texturePath);
   Pbr pbr;
   if (ret == AI_SUCCESS)
   {
     ignmsg << "Found metalness map " << texturePath.C_Str() << std::endl;
     pbr.SetMetalnessMap(std::string(texturePath.C_Str()));
   }
-  ret = scene->mMaterials[mat_idx]->GetTexture(aiTextureType_NORMALS, 0, &texturePath);
+  ret = _scene->mMaterials[_matIdx]->GetTexture(aiTextureType_NORMALS, 0, &texturePath);
   if (ret == AI_SUCCESS)
   {
     ignmsg << "Found normal map " << texturePath.C_Str() << std::endl;
@@ -252,60 +248,60 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* scene, u
 }
 
 //////////////////////////////////////////////////
-void AssimpLoader::Implementation::LoadEmbeddedTexture(const aiTexture* texture)
+void AssimpLoader::Implementation::LoadEmbeddedTexture(const aiTexture* _texture)
 {
-  if (texture->mHeight == 0)
+  if (_texture->mHeight == 0)
   {
-    ignwarn << "Found not supported compressed format " << texture->achFormatHint << std::endl;
+    ignwarn << "Found not supported compressed format " << _texture->achFormatHint << std::endl;
     return;
   }
-  ignmsg << "Processing texture in format " << texture->achFormatHint << std::endl;
+  ignmsg << "Processing texture in format " << _texture->achFormatHint << std::endl;
 }
 
-SubMesh AssimpLoader::Implementation::CreateSubMesh(const aiMesh* assimp_mesh, const ignition::math::Matrix4d& transformation)
+SubMesh AssimpLoader::Implementation::CreateSubMesh(const aiMesh* _assimpMesh, const ignition::math::Matrix4d& _transform)
 {
   SubMesh subMesh;
-  ignition::math::Matrix4d rot = transformation;
+  ignition::math::Matrix4d rot = _transform;
   rot.SetTranslation(ignition::math::Vector3d::Zero);
-  ignmsg << "Mesh has " << assimp_mesh->mNumVertices << " vertices" << std::endl;
+  ignmsg << "Mesh has " << _assimpMesh->mNumVertices << " vertices" << std::endl;
   // Now create the submesh
-  for (unsigned vertex_idx = 0; vertex_idx < assimp_mesh->mNumVertices; ++vertex_idx)
+  for (unsigned vertexIdx = 0; vertexIdx < _assimpMesh->mNumVertices; ++vertexIdx)
   {
     // Add the vertex
     ignition::math::Vector3d vertex;
     ignition::math::Vector3d normal;
-    vertex.X(assimp_mesh->mVertices[vertex_idx].x);
-    vertex.Y(assimp_mesh->mVertices[vertex_idx].y);
-    vertex.Z(assimp_mesh->mVertices[vertex_idx].z);
-    normal.X(assimp_mesh->mNormals[vertex_idx].x);
-    normal.Y(assimp_mesh->mNormals[vertex_idx].y);
-    normal.Z(assimp_mesh->mNormals[vertex_idx].z);
-    vertex = transformation * vertex;
+    vertex.X(_assimpMesh->mVertices[vertexIdx].x);
+    vertex.Y(_assimpMesh->mVertices[vertexIdx].y);
+    vertex.Z(_assimpMesh->mVertices[vertexIdx].z);
+    normal.X(_assimpMesh->mNormals[vertexIdx].x);
+    normal.Y(_assimpMesh->mNormals[vertexIdx].y);
+    normal.Z(_assimpMesh->mNormals[vertexIdx].z);
+    vertex = _transform * vertex;
     normal = rot * normal;
     normal.Normalize();
     subMesh.AddVertex(vertex);
     subMesh.AddNormal(normal);
     // Iterate over sets of texture coordinates
-    int i = 0;
-    while(assimp_mesh->HasTextureCoords(i))
+    int uvIdx = 0;
+    while(_assimpMesh->HasTextureCoords(uvIdx))
     {
       ignition::math::Vector3d texcoords;
-      texcoords.X(assimp_mesh->mTextureCoords[i][vertex_idx].x);
-      texcoords.Y(assimp_mesh->mTextureCoords[i][vertex_idx].y);
+      texcoords.X(_assimpMesh->mTextureCoords[uvIdx][vertexIdx].x);
+      texcoords.Y(_assimpMesh->mTextureCoords[uvIdx][vertexIdx].y);
       // TODO why do we need 1.0 - Y?
-      subMesh.AddTexCoordBySet(texcoords.X(), 1.0 - texcoords.Y(), i);
-      ++i;
+      subMesh.AddTexCoordBySet(texcoords.X(), 1.0 - texcoords.Y(), uvIdx);
+      ++uvIdx;
     }
   }
-  for (unsigned face_idx = 0; face_idx < assimp_mesh->mNumFaces; ++face_idx)
+  for (unsigned faceIdx = 0; faceIdx < _assimpMesh->mNumFaces; ++faceIdx)
   {
-    auto face = assimp_mesh->mFaces[face_idx];
+    auto face = _assimpMesh->mFaces[faceIdx];
     subMesh.AddIndex(face.mIndices[0]);
     subMesh.AddIndex(face.mIndices[1]);
     subMesh.AddIndex(face.mIndices[2]);
   }
 
-  subMesh.SetMaterialIndex(assimp_mesh->mMaterialIndex);
+  subMesh.SetMaterialIndex(_assimpMesh->mMaterialIndex);
   return subMesh;
 }
 
@@ -342,77 +338,74 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     ignerr << "Unable to import mesh [" << _filename << "]" << std::endl;
     return mesh;
   }
-  auto root_node = scene->mRootNode;
-  auto root_name = std::string(root_node->mName.C_Str());
+  auto rootNode = scene->mRootNode;
+  auto rootName = std::string(rootNode->mName.C_Str());
   auto transform = scene->mRootNode->mTransformation;
-  aiVector3D scaling, axis, pos;
+  aiVector3D rootScaling, rootAxis, rootPos;
   float angle;
-  transform.Decompose(scaling, axis, angle, pos);
+  transform.Decompose(rootScaling, rootAxis, angle, rootPos);
   // drop rotation, but keep scaling and position
-  transform = aiMatrix4x4(scaling, aiQuaternion(), pos);
+  transform = aiMatrix4x4(rootScaling, aiQuaternion(), rootPos);
 
-  auto root_transformation = this->dataPtr->ConvertTransform(transform);
+  auto rootTransform = this->dataPtr->ConvertTransform(transform);
 
   // TODO remove workaround, it seems imported assets are rotated by 90 degrees
   // as documented here https://github.com/assimp/assimp/issues/849, remove workaround when fixed
   // Add the materials first
-  for (unsigned mat_idx = 0; mat_idx < scene->mNumMaterials; ++mat_idx)
+  for (unsigned _matIdx = 0; _matIdx < scene->mNumMaterials; ++_matIdx)
   {
-    auto mat = this->dataPtr->CreateMaterial(scene, mat_idx, path);
+    auto mat = this->dataPtr->CreateMaterial(scene, _matIdx, path);
     mesh->AddMaterial(mat);
   }
   if (scene->HasAnimations())
   {
-    auto root_skel_node = new SkeletonNode(nullptr, root_name, root_name, SkeletonNode::NODE);
-    root_skel_node->SetTransform(root_transformation);
-    root_skel_node->SetModelTransform(root_transformation);
-    for (unsigned child_idx = 0; child_idx < root_node->mNumChildren; ++child_idx)
+    auto rootSkelNode = new SkeletonNode(nullptr, rootName, rootName, SkeletonNode::NODE);
+    rootSkelNode->SetTransform(rootTransform);
+    rootSkelNode->SetModelTransform(rootTransform);
+    for (unsigned childIdx = 0; childIdx < rootNode->mNumChildren; ++childIdx)
     {
       // First populate the skeleton with the node transforms
       // TODO parse different skeletons and merge them
-      this->dataPtr->RecursiveSkeletonCreate(root_node->mChildren[child_idx], root_skel_node, root_transformation);
+      this->dataPtr->RecursiveSkeletonCreate(rootNode->mChildren[childIdx], rootSkelNode, rootTransform);
     }
-    SkeletonPtr root_skeleton = std::make_shared<Skeleton>(root_skel_node);
-    mesh->SetSkeleton(root_skeleton);
+    SkeletonPtr rootSkeleton = std::make_shared<Skeleton>(rootSkelNode);
+    mesh->SetSkeleton(rootSkeleton);
   }
   // Now create the meshes
   // Recursive call to keep track of transforms, mesh is passed by reference and edited throughout
-  this->dataPtr->RecursiveCreate(scene, root_node, root_transformation, mesh);
+  this->dataPtr->RecursiveCreate(scene, rootNode, rootTransform, mesh);
   // Add the animations
-  for (unsigned anim_idx = 0; anim_idx < scene->mNumAnimations; ++anim_idx)
+  for (unsigned animIdx = 0; animIdx < scene->mNumAnimations; ++animIdx)
   {
-    auto anim = scene->mAnimations[anim_idx];
-    auto anim_name = std::string(anim->mName.C_Str());
-    ignmsg << "Found animation with name " << anim_name << std::endl;
+    auto anim = scene->mAnimations[animIdx];
+    auto animName = std::string(anim->mName.C_Str());
+    ignmsg << "Found animation with name " << animName << std::endl;
     ignmsg << "Animation has " << anim->mNumMeshChannels << " mesh channels" << std::endl;
     ignmsg << "Animation has " << anim->mNumChannels << " channels" << std::endl;
     ignmsg << "Animation has " << anim->mNumMorphMeshChannels << " morph mesh channels" << std::endl;
-    SkeletonAnimation* skel_anim = new SkeletonAnimation(anim_name);
-    for (unsigned chan_idx = 0; chan_idx < anim->mNumChannels; ++chan_idx)
+    SkeletonAnimation* skelAnim = new SkeletonAnimation(animName);
+    for (unsigned chanIdx = 0; chanIdx < anim->mNumChannels; ++chanIdx)
     {
-      auto anim_chan = anim->mChannels[chan_idx];
-      auto chan_name = std::string(anim_chan->mNodeName.C_Str());
-      auto skel_ptr = mesh->MeshSkeleton();
-      igndbg << "Node " << chan_name << " has " << anim_chan->mNumPositionKeys << " position keys, " <<
-        anim_chan->mNumRotationKeys << " rotation keys, " << anim_chan->mNumScalingKeys << " scaling keys" << std::endl;
-      for (unsigned key_idx = 0; key_idx < anim_chan->mNumPositionKeys; ++key_idx)
+      auto animChan = anim->mChannels[chanIdx];
+      auto chanName = std::string(animChan->mNodeName.C_Str());
+      igndbg << "Node " << chanName << " has " << animChan->mNumPositionKeys << " position keys, " <<
+        animChan->mNumRotationKeys << " rotation keys, " << animChan->mNumScalingKeys << " scaling keys" << std::endl;
+      for (unsigned key_idx = 0; key_idx < animChan->mNumPositionKeys; ++key_idx)
       {
         // Note, Scaling keys are not supported right now
-        //void SkeletonAnimation::AddKeyFrame(const std::string &_node,
-        //const double _time, const math::Pose3d &_pose)
         // Compute the position into a ignition math pose
-        auto pos_key = anim_chan->mPositionKeys[key_idx];
-        auto quat_key = anim_chan->mRotationKeys[key_idx];
-        ignition::math::Vector3d pos(pos_key.mValue.x, pos_key.mValue.y, pos_key.mValue.z);
-        ignition::math::Quaterniond quat(quat_key.mValue.w, quat_key.mValue.x, quat_key.mValue.y, quat_key.mValue.z);
+        auto posKey = animChan->mPositionKeys[key_idx];
+        auto quatKey = animChan->mRotationKeys[key_idx];
+        ignition::math::Vector3d pos(posKey.mValue.x, posKey.mValue.y, posKey.mValue.z);
+        ignition::math::Quaterniond quat(quatKey.mValue.w, quatKey.mValue.x, quatKey.mValue.y, quatKey.mValue.z);
         ignition::math::Pose3d pose(pos, quat);
         // Time is in ms after 5.0.1?
-        skel_anim->AddKeyFrame(chan_name, pos_key.mTime / 1000.0, pose);
-        igndbg << "Adding animation at time " << pos_key.mTime / 1000.0 << " with position (" << pos.X() << "," << pos.Y() << "," <<
+        skelAnim->AddKeyFrame(chanName, posKey.mTime / 1000.0, pose);
+        igndbg << "Adding animation at time " << posKey.mTime / 1000.0 << " with position (" << pos.X() << "," << pos.Y() << "," <<
           pos.Z() << ")" << std::endl;
       }
     }
-    mesh->MeshSkeleton()->AddAnimation(skel_anim);
+    mesh->MeshSkeleton()->AddAnimation(skelAnim);
   }
 
   if (mesh->HasSkeleton())
