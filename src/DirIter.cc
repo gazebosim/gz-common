@@ -17,11 +17,11 @@
 
 #include <filesystem>
 
-#include "ignition/common/Filesystem.hh"
+#include "gz/common/Filesystem.hh"
 
 namespace fs = std::filesystem;
 
-namespace ignition
+namespace gz
 {
 namespace common
 {
@@ -34,7 +34,7 @@ class DirIter::Implementation
 
 //////////////////////////////////////////////////
 DirIter::DirIter():
-  dataPtr(ignition::utils::MakeImpl<Implementation>())
+  dataPtr(gz::utils::MakeImpl<Implementation>())
 {
   this->dataPtr->it = fs::directory_iterator();
 }
@@ -72,4 +72,4 @@ bool DirIter::operator!=(const DirIter &_other) const
 }
 
 }  // namespace common
-}  // namespace ignition
+}  // namespace gz

@@ -21,7 +21,7 @@
 #include <memory>
 
 // This header contains forward declarations for some graphics types
-namespace ignition
+namespace gz
 {
   namespace common
   {

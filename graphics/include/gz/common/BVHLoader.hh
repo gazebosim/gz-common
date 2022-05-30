@@ -23,7 +23,7 @@
 #include <gz/math/Pose3.hh>
 #include <gz/common/graphics/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -31,7 +31,7 @@ namespace ignition
 
     /// \class BVHLoader BVHLoader.hh gz/common/BVHLoader.hh
     /// \brief Handles loading BVH animation files
-    class IGNITION_COMMON_GRAPHICS_VISIBLE BVHLoader
+    class GZ_COMMON_GRAPHICS_VISIBLE BVHLoader
     {
       /// \brief Constructor
       public: BVHLoader();

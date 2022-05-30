@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/ffmpeg_inc.hh>
+#include <ignition/common/config.hh>

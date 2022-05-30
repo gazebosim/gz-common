@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Open Source Robotics Foundation
+ * Copyright (C) 2022 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,26 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- */
+*/
 
+#include <gtest/gtest.h>
 
-#ifndef GZ_COMMON_DETAIL_PLUGINLOADER_HH_
-#define GZ_COMMON_DETAIL_PLUGINLOADER_HH_
+#define SUPPRESS_IGNITION_HEADER_DEPRECATION
 
-#include <string>
-#include "gz/common/PluginLoader.hh"
+#include <ignition/common/Battery.hh>
+#include <ignition/utils/SuppressWarning.hh>
 
-namespace ignition
+/////////////////////////////////////////////////
+// Make sure the ignition namespace still works
+TEST(Deprecated, IgnitionNamespace)
 {
-  namespace common
-  {
-    template <typename PluginPtrType>
-    PluginPtrType PluginLoader::Instantiate(
-        const std::string &_pluginName) const
-    {
-      return PluginPtrType(this->PrivateGetPluginInfo(_pluginName));
-    }
-  }
+  ignition::common::Battery battery;
 }
 
-#endif
+#undef SUPPRESS_IGNITION_HEADER_DEPRECATION

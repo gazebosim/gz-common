@@ -27,7 +27,7 @@
 
 #include <gz/utils/ImplPtr.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -35,7 +35,7 @@ namespace ignition
     /// \brief Functions to handle getting system paths, keeps track of:
     ///        \li SystemPaths#pluginPaths - plugin library paths
     ///            for common::WorldPlugin
-    class IGNITION_COMMON_VISIBLE  SystemPaths
+    class GZ_COMMON_VISIBLE  SystemPaths
     {
       /// \brief Constructor for SystemPaths
       public: SystemPaths();
@@ -55,7 +55,7 @@ namespace ignition
       /// \param[in] _uri the uniform resource identifier
       /// \return Returns full path name to file with platform-specific
       /// directory separators, or an empty string if URI couldn't be found.
-      /// \sa FindFileURI(const ignition::common::URI &_uri)
+      /// \sa FindFileURI(const gz::common::URI &_uri)
       public: std::string FindFileURI(const std::string &_uri) const;
 
       /// \brief Find a file or path using a URI.
@@ -65,7 +65,7 @@ namespace ignition
       /// \param[in] _uri the uniform resource identifier
       /// \return Returns full path name to file with platform-specific
       /// directory separators, or an empty string if URI couldn't be found.
-      public: std::string FindFileURI(const ignition::common::URI &_uri) const;
+      public: std::string FindFileURI(const gz::common::URI &_uri) const;
 
       /// \brief Set the plugin path environment variable to use
       /// \param [in] _env name of the environment variable
@@ -156,7 +156,7 @@ namespace ignition
       /// \param[in] _cb The callback function, which takes a file path or URI
       /// and returns the full local path.
       public: void AddFindFileURICallback(
-          std::function<std::string(const ignition::common::URI &)> _cb);
+          std::function<std::string(const gz::common::URI &)> _cb);
 
       /// \brief look for a file in a set of search paths (not recursive)
       /// \description This method checks if a file exists in given directories.

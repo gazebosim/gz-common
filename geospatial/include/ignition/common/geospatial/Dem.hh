@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/geospatial/Dem.hh>
+#include <ignition/common/config.hh>

@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/testing/detail/AutoLogFixture.hh>
+#include <ignition/common/config.hh>

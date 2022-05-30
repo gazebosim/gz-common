@@ -2,8 +2,8 @@
 
 Next Tutorial: \ref profiler
 
-These instructions are for installing only Ignition Common.
-If you're interested in using all the Ignition libraries, check out this [Ignition installation](https://ignitionrobotics.org/docs/latest/install).
+These instructions are for installing only Gazebo Common.
+If you're interested in using all the Ignition libraries, check out this [Ignition installation](https://gazebosim.org/docs/latest/install).
 
 We recommend following the Binary Installation instructions to get up and running as quickly and painlessly as possible.
 
@@ -29,7 +29,7 @@ On macOS, add OSRF packages:
   brew tap osrf/simulation
   ```
 
-Install Ignition Common:
+Install Gazebo Common:
   ```
   brew install ignition-common<#>
   ```
@@ -63,10 +63,10 @@ prerequisites followed by building from source.
 
 ## Prerequisites
 
-Ignition Common requires:
+Gazebo Common requires:
 
-  * [Ignition CMake](https://ignitionrobotics.org/libs/cmake)
-  * [Ignition Math](https://ignitionrobotics.org/libs/math).
+  * [Gazebo CMake](https://gazebosim.org/libs/cmake)
+  * [Gazebo Math](https://gazebosim.org/libs/math).
 
 The Graphics component requires:
 
@@ -83,7 +83,7 @@ The AV component requires:
 
 ### Windows
 
-First, follow the [ign-cmake](https://github.com/ignitionrobotics/ign-cmake) tutorial for installing Conda, Visual Studio, CMake, etc., prerequisites, and creating a Conda environment.
+First, follow the [ign-cmake](https://github.com/gazebosim/gz-cmake) tutorial for installing Conda, Visual Studio, CMake, etc., prerequisites, and creating a Conda environment.
 
 Navigate to `condabin` if necessary to use the `conda` command (i.e., if Conda is not in your `PATH` environment variable. You can find the location of `condabin` in Anaconda Prompt, `where conda`).
 
@@ -115,7 +115,7 @@ conda install libignition-cmake<#> libignition-math<#> --channel conda-forge
 
 1. Clone the repository
   ```
-  git clone https://github.com/ignitionrobotics/ign-common
+  git clone https://github.com/gazebosim/gz-common
   ```
 
 2. Configure and build
@@ -136,7 +136,7 @@ conda install libignition-cmake<#> libignition-math<#> --channel conda-forge
 
 1. Clone the repository
   ```
-  git clone https://github.com/ignitionrobotics/ign-common -b ign-common<#>
+  git clone https://github.com/gazebosim/gz-common -b ign-common<#>
   ```
   Be sure to replace `<#>` with a number value, such as 3 or 4, depending on
   which version you need.
@@ -169,7 +169,7 @@ This assumes you have created and activated a Conda environment while installing
 1. Navigate to where you would like to build the library, and clone the repository.
   ```
   # Optionally, append `-b ign-common#` (replace # with a number) to check out a specific version
-  git clone https://github.com/ignitionrobotics/ign-common.git
+  git clone https://github.com/gazebosim/gz-common.git
   ```
 
 2. Configure and build
@@ -188,7 +188,7 @@ This assumes you have created and activated a Conda environment while installing
 
 # Documentation
 
-API and tutorials can be found at [https://ignitionrobotics.org/libs/common](https://ignitionrobotics.org/libs/common).
+API and tutorials can be found at [https://gazebosim.org/libs/common](https://gazebosim.org/libs/common).
 
 You can also generate the documentation from a clone of this repository by following these steps.
 
@@ -199,7 +199,7 @@ You can also generate the documentation from a clone of this repository by follo
 
 2. Clone the repository
   ```
-  git clone https://github.com/ignitionrobotics/ign-common
+  git clone https://github.com/gazebosim/gz-common
   ```
 
 3. Configure and build the documentation.

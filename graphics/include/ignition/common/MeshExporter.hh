@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/MeshExporter.hh>
+#include <ignition/common/config.hh>

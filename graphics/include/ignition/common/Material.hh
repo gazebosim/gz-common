@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/Material.hh>
+#include <ignition/common/config.hh>

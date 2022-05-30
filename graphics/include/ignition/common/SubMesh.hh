@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/SubMesh.hh>
+#include <ignition/common/config.hh>

@@ -18,10 +18,10 @@
 
 #include <memory>
 
-#include "ignition/common/Battery.hh"
-#include "ignition/common/testing/AutoLogFixture.hh"
+#include "gz/common/Battery.hh"
+#include "gz/common/testing/AutoLogFixture.hh"
 
-using namespace ignition;
+using namespace gz;
 
 class BatteryTest : public common::testing::AutoLogFixture { };
 

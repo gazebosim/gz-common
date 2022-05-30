@@ -1,12 +1,12 @@
 \page hw-encoding Hardware-accelerated Video Encoding
 
-When recording video using the `ignition::common::VideoEncoder` class, you can
+When recording video using the `gz::common::VideoEncoder` class, you can
 opt-in to use hardware (HW) acceleration for the encoding process. By default, only software
 encoders are used. This tutorial will show how to configure the encoder for HW
 acceleration and will present ready-made commandlines for some typical use-cases.
 
 You can either use the `VideoEncoder` class directly, or you can "meet it" in the
-video recorder plugin in Ignition Gazebo. In both cases, HW-accelerated encoding
+video recorder plugin in Gazebo. In both cases, HW-accelerated encoding
 can be set up.
 
 HW acceleration should provide you with higher encoding performance, potentially
@@ -60,9 +60,9 @@ Here are some sample outputs:
  V..... nvenc_h264           NVIDIA NVENC H.264 encoder (codec h264)
 ```
 
-Ignition Common so far supports:
+Gazebo Common so far supports:
 
-| Encoder | Technology | Platforms | GPU vendors | Ignition Common name |
+| Encoder | Technology | Platforms | GPU vendors | Gazebo Common name |
 | ------- | ---------- | --------- | ----------- | -------------------- |
 | `h264_nvenc` | [NVidia NVEnc](https://en.wikipedia.org/wiki/Nvidia_NVENC) | Windows + x86 Linux | NVidia GPUs | NVENC |
 | `h264_qsv` | [Intel QuickSync](https://en.wikipedia.org/wiki/Intel_Quick_Sync_Video) | Windows + x86 Linux | Intel GPUs | QSV |
@@ -191,7 +191,7 @@ no effect then). This would be useful if you want to e.g. implement a GUI choose
 for the acceleration.
 
 The `FlagSet<HWEncoderType>` captures a set of allowed encoders. Its value may be
-e.g. `ignition::Common::HWEncoderType::QSV | ignition::common::HWEncoderType::NVENC`.
+e.g. `gz::Common::HWEncoderType::QSV | gz::common::HWEncoderType::NVENC`.
 
 ## How do I know it's working
 

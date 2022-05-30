@@ -23,7 +23,7 @@
 #include <gz/common/events/Export.hh>
 #include <gz/utils/SuppressWarning.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -32,7 +32,7 @@ namespace ignition
 
     /// \class KeyEvent KeyEvent.hh gz/common/KeyEvent.hh
     /// \brief Generic description of a keyboard event.
-    class IGNITION_COMMON_EVENTS_VISIBLE KeyEvent
+    class GZ_COMMON_EVENTS_VISIBLE KeyEvent
     {
       /// \brief Key event types enumeration.
       public: enum EventType {NO_EVENT, PRESS, RELEASE};

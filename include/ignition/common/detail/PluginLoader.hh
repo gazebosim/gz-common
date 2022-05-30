@@ -15,4 +15,24 @@
  *
  */
 
-#include <gz/common/detail/PluginLoader.hh>
+#ifndef IGNITION_COMMON_DETAIL_PLUGINLOADER_HH_
+#define IGNITION_COMMON_DETAIL_PLUGINLOADER_HH_
+
+#include <string>
+#include <ignition/common/config.hh>
+#include "ignition/common/PluginLoader.hh"
+
+namespace gz
+{
+  namespace common
+  {
+    template <typename PluginPtrType>
+    PluginPtrType PluginLoader::Instantiate(
+        const std::string &_pluginName) const
+    {
+      return PluginPtrType(this->PrivateGetPluginInfo(_pluginName));
+    }
+  }
+}
+
+#endif

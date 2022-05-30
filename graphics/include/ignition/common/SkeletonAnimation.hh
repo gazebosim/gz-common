@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/SkeletonAnimation.hh>
+#include <ignition/common/config.hh>

@@ -15,4 +15,98 @@
  *
  */
 
-#include <gz/common/detail/Plugin.hh>
+#ifndef IGNITION_COMMON_DETAIL_PLUGIN_HH_
+#define IGNITION_COMMON_DETAIL_PLUGIN_HH_
+
+#include <memory>
+#include <string>
+#include <ignition/common/config.hh>
+#include "ignition/common/Plugin.hh"
+
+namespace gz
+{
+  namespace common
+  {
+    //////////////////////////////////////////////////
+    template <class Interface>
+    Interface *Plugin::QueryInterface()
+    {
+      return static_cast<Interface*>(
+            this->PrivateGetInterface(Interface::IGNCOMMONInterfaceName));
+    }
+
+    //////////////////////////////////////////////////
+    template <class Interface>
+    const Interface *Plugin::QueryInterface() const
+    {
+      return static_cast<const Interface*>(
+            this->PrivateGetInterface(Interface::IGNCOMMONInterfaceName));
+    }
+
+    //////////////////////////////////////////////////
+    template <class Interface>
+    Interface *Plugin::QueryInterface(const std::string &_interfaceName)
+    {
+      return static_cast<Interface*>(
+            this->PrivateGetInterface(_interfaceName));
+    }
+
+    //////////////////////////////////////////////////
+    template <class Interface>
+    const Interface *Plugin::QueryInterface(
+        const std::string &_interfaceName) const
+    {
+      return static_cast<const Interface*>(
+            this->PrivateGetInterface(_interfaceName));
+    }
+
+    //////////////////////////////////////////////////
+    template <class Interface>
+    std::shared_ptr<Interface> Plugin::QueryInterfaceSharedPtr()
+    {
+      return this->QueryInterfaceSharedPtr<Interface>(
+            Interface::IGNCOMMONInterfaceName);
+    }
+
+    //////////////////////////////////////////////////
+    template <class Interface>
+    std::shared_ptr<const Interface> Plugin::QueryInterfaceSharedPtr() const
+    {
+      return this->QueryInterfaceSharedPtr<Interface>(
+            Interface::IGNCOMMONInterfaceName);
+    }
+
+    //////////////////////////////////////////////////
+    template <class Interface>
+    std::shared_ptr<Interface> Plugin::QueryInterfaceSharedPtr(
+        const std::string &_interfaceName)
+    {
+      Interface *ptr = this->QueryInterface<Interface>(_interfaceName);
+      if (ptr)
+        return std::shared_ptr<Interface>(this->PrivateGetInstancePtr(), ptr);
+
+      return nullptr;
+    }
+
+    //////////////////////////////////////////////////
+    template <class Interface>
+    std::shared_ptr<const Interface> Plugin::QueryInterfaceSharedPtr(
+        const std::string &_interfaceName) const
+    {
+      const Interface *ptr = this->QueryInterface<Interface>(_interfaceName);
+      if (ptr)
+        return std::shared_ptr<Interface>(this->PrivateGetInstancePtr(), ptr);
+
+      return nullptr;
+    }
+
+    //////////////////////////////////////////////////
+    template <class Interface>
+    bool Plugin::HasInterface() const
+    {
+      return this->HasInterface(Interface::IGNCOMMONInterfaceName);
+    }
+  }
+}
+
+#endif

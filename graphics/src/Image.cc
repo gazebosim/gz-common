@@ -22,14 +22,14 @@
 #include <cstring>
 #include <string>
 
-#include <ignition/common/Console.hh>
-#include <ignition/common/Util.hh>
-#include <ignition/common/Image.hh>
+#include <gz/common/Console.hh>
+#include <gz/common/Util.hh>
+#include <gz/common/Image.hh>
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -70,7 +70,7 @@ static int count = 0;
 
 //////////////////////////////////////////////////
 Image::Image(const std::string &_filename)
-: dataPtr(ignition::utils::MakeImpl<Implementation>())
+: dataPtr(gz::utils::MakeImpl<Implementation>())
 {
   if (count == 0)
     FreeImage_Initialise();
@@ -80,11 +80,11 @@ Image::Image(const std::string &_filename)
   this->dataPtr->bitmap = NULL;
   if (!_filename.empty())
   {
-    std::string filename = ignition::common::findFile(_filename);
+    std::string filename = gz::common::findFile(_filename);
     if (!filename.empty())
       this->Load(filename);
     else
-      ignerr << "Unable to find image[" << _filename << "]\n";
+      gzerr << "Unable to find image[" << _filename << "]\n";
   }
 }
 
@@ -137,14 +137,14 @@ int Image::Load(const std::string &_filename)
     }
     else
     {
-      ignerr << "Unknown image format[" << this->dataPtr->fullName << "]\n";
+      gzerr << "Unknown image format[" << this->dataPtr->fullName << "]\n";
       return -1;
     }
 
     return 0;
   }
 
-  ignerr << "Unable to open image file[" << this->dataPtr->fullName
+  gzerr << "Unable to open image file[" << this->dataPtr->fullName
         << "], check your IGNITION_RESOURCE_PATH settings.\n";
   return -1;
 }
@@ -226,7 +226,7 @@ void Image::SetFromData(const unsigned char *_data,
   }
   else
   {
-    ignerr << "Unable to handle format[" << _format << "]\n";
+    gzerr << "Unable to handle format[" << _format << "]\n";
     return;
   }
 
@@ -374,7 +374,7 @@ math::Color Image::Pixel(unsigned int _x, unsigned int _y) const
 
     if (FreeImage_GetPixelColor(this->dataPtr->bitmap, _x, _y, &firgb) == FALSE)
     {
-      ignerr << "Image: Coordinates out of range["
+      gzerr << "Image: Coordinates out of range["
         << _x << " " << _y << "] \n";
       return clr;
     }
@@ -386,7 +386,7 @@ math::Color Image::Pixel(unsigned int _x, unsigned int _y) const
     if (FreeImage_GetPixelIndex(
           this->dataPtr->bitmap, _x, _y, &byteValue) == FALSE)
     {
-      ignerr << "Image: Coordinates out of range ["
+      gzerr << "Image: Coordinates out of range ["
         << _x << " " << _y << "] \n";
       return clr;
     }
@@ -450,7 +450,7 @@ math::Color Image::MaxColor() const
         if (FALSE ==
               FreeImage_GetPixelColor(this->dataPtr->bitmap, x, y, &firgb))
         {
-          ignerr << "Image: Coordinates out of range["
+          gzerr << "Image: Coordinates out of range["
             << x << " " << y << "] \n";
           continue;
         }
@@ -475,7 +475,7 @@ math::Color Image::MaxColor() const
         if (FreeImage_GetPixelIndex(
               this->dataPtr->bitmap, x, y, &byteValue) == FALSE)
         {
-          ignerr << "Image: Coordinates out of range ["
+          gzerr << "Image: Coordinates out of range ["
             << x << " " << y << "] \n";
           continue;
         }

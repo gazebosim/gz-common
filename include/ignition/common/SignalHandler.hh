@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/SignalHandler.hh>
+#include <ignition/common/config.hh>

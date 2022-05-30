@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/TempDirectory.hh>
+#include <ignition/common/config.hh>

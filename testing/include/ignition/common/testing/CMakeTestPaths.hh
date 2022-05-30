@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/testing/CMakeTestPaths.hh>
+#include <ignition/common/config.hh>

@@ -29,7 +29,7 @@
 
 #include <gz/common/graphics/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -40,7 +40,7 @@ namespace ignition
     /// \class Animation Animation.hh gz/common/Animation.hh
     /// \brief Manages an animation, which is a collection of keyframes and
     /// the ability to interpolate between the keyframes
-    class IGNITION_COMMON_GRAPHICS_VISIBLE Animation
+    class GZ_COMMON_GRAPHICS_VISIBLE Animation
     {
       /// \brief Constructor
       /// \param[in] _name Name of the animation, should be unique
@@ -108,7 +108,7 @@ namespace ignition
     };
 
     /// \brief A pose animation.
-    class IGNITION_COMMON_GRAPHICS_VISIBLE PoseAnimation : public Animation
+    class GZ_COMMON_GRAPHICS_VISIBLE PoseAnimation : public Animation
     {
       /// \brief Constructor
       /// \param[in] _name String name of the animation. This should be unique.
@@ -146,7 +146,7 @@ namespace ignition
     };
 
     /// \brief A numeric animation.
-    class IGNITION_COMMON_GRAPHICS_VISIBLE NumericAnimation : public Animation
+    class GZ_COMMON_GRAPHICS_VISIBLE NumericAnimation : public Animation
     {
       /// \brief Constructor
       /// \param[in] _name String name of the animation. This should be unique.
@@ -171,7 +171,7 @@ namespace ignition
 
     /// \brief Information about a trajectory for an animation (e.g., Actor)
     /// This contains the keyframe information.
-    class IGNITION_COMMON_GRAPHICS_VISIBLE TrajectoryInfo
+    class GZ_COMMON_GRAPHICS_VISIBLE TrajectoryInfo
     {
       /// \brief Constructor
       public: TrajectoryInfo();

@@ -22,7 +22,7 @@
 
 #include <gz/common/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -30,7 +30,7 @@ namespace ignition
     /// \param[in] _orig The string to split
     /// \param[in] _delim a character to split the string at
     /// \returns vector of split pieces of the string excluding the delimiter
-    std::vector<std::string> IGNITION_COMMON_VISIBLE Split(
+    std::vector<std::string> GZ_COMMON_VISIBLE Split(
         const std::string &_orig, char _delim);
 
     /// \brief Join a sequence of strings with a delimiter
@@ -42,7 +42,7 @@ namespace ignition
     /// \param[in] _orig The input sequence of strings
     /// \param[in] _delim a string delimiter to join the string with
     /// \returns a single string composed of strings joined with the delimiter
-    std::string IGNITION_COMMON_VISIBLE Join(
+    std::string GZ_COMMON_VISIBLE Join(
         const std::vector<std::string> &_orig, const std::string &_delim);
 
     /// \brief Join a sequence of strings with a delimiter
@@ -54,21 +54,21 @@ namespace ignition
     /// \param[in] _orig The input sequence of strings
     /// \param[in] _delim a character to join the string with
     /// \returns a single string composed of strings joined with the delimiter
-    std::string IGNITION_COMMON_VISIBLE Join(
+    std::string GZ_COMMON_VISIBLE Join(
         const std::vector<std::string> &_orig, char _delim);
 
     /// \brief return true if string starts with another string
     /// \param[in] _s1 the string to check
     /// \param[in] _s2 the possible prefix
     /// \returns true if _s1 starts with _s2
-    bool IGNITION_COMMON_VISIBLE StartsWith(const std::string &_s1,
+    bool GZ_COMMON_VISIBLE StartsWith(const std::string &_s1,
         const std::string &_s2);
 
     /// \brief return true if string ends with another string
     /// \param[in] _s1 the string to check
     /// \param[in] _s2 the possible suffix
     /// \returns  true if _s1 ends with _s2
-    bool IGNITION_COMMON_VISIBLE EndsWith(const std::string &_s1,
+    bool GZ_COMMON_VISIBLE EndsWith(const std::string &_s1,
         const std::string &_s2);
 
     /// \brief Choose whether to use a singular or plural version of a noun
@@ -78,7 +78,7 @@ namespace ignition
     /// \param[in] _baseWord the singular version of the word to return
     /// \param[in] _n the quantity that _baseWord is describing
     /// \return _baseWord if std::abs(_n)==1, otherwise return _baseWords
-    std::string IGNITION_COMMON_VISIBLE PluralCast(
+    std::string GZ_COMMON_VISIBLE PluralCast(
         const std::string &_baseWord, const int _n);
 
     /// \brief A version of PluralCast that works for irregular nouns. If
@@ -87,7 +87,7 @@ namespace ignition
     /// \param[in] _singular the return value when std::abs(_n) == 1
     /// \param[in] _plural the return value when std::abs(_n) != 1
     /// \return _singular if std::abs(_n)==1, otherwise return _plural
-    std::string IGNITION_COMMON_VISIBLE PluralCast(
+    std::string GZ_COMMON_VISIBLE PluralCast(
         const std::string &_singular,
         const std::string &_plural,
         const int _n);

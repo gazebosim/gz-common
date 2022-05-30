@@ -23,13 +23,13 @@
 #include <chrono>
 #include <iostream>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
     /// \class Timer Timer.hh common/common.hh
     /// \brief A timer class, used to time things in real world walltime
-    class IGNITION_COMMON_VISIBLE Timer
+    class GZ_COMMON_VISIBLE Timer
     {
       /// \brief Constructor
       public: Timer();
@@ -50,7 +50,7 @@ namespace ignition
 
       /// \brief Stream operator friendly
       public: friend std::ostream &operator<<(std::ostream &out,
-                                              const ignition::common::Timer &t)
+                                              const gz::common::Timer &t)
               {
                 out << t.ElapsedTime().count();
                 return out;

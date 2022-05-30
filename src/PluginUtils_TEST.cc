@@ -15,12 +15,17 @@
  *
 */
 #include <gtest/gtest.h>
+
+#define SUPPRESS_IGNITION_HEADER_DEPRECATION
+
 #include <string>
+#include "gz/utils/SuppressWarning.hh"
 
 #include "PluginUtils.hh"
 
-using namespace ignition;
+using namespace gz;
 
+IGN_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
 /////////////////////////////////////////////////
 TEST(PluginUtils, NormalizeName)
 {
@@ -30,6 +35,9 @@ TEST(PluginUtils, NormalizeName)
   EXPECT_EQ("::ignition", common::NormalizeName("ignition"));
   EXPECT_EQ("::ignition", common::NormalizeName("::ignition"));
 
-  EXPECT_EQ("::ignition::math", common::NormalizeName("ignition::math"));
-  EXPECT_EQ("::ignition::math", common::NormalizeName("::ignition::math"));
+  EXPECT_EQ("::gz::math", common::NormalizeName("gz::math"));
+  EXPECT_EQ("::gz::math", common::NormalizeName("::gz::math"));
 }
+IGN_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
+
+#undef SUPPRESS_IGNITION_HEADER_DEPRECATION

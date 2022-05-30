@@ -20,9 +20,9 @@
 #include <stdlib.h>
 #include <string>
 
-#include <ignition/common/Util.hh>
+#include <gz/common/Util.hh>
 
-using namespace ignition;
+using namespace gz;
 
 /////////////////////////////////////////////////
 /// \brief Test Util::SHA1
@@ -278,13 +278,13 @@ TEST(Util_TEST, envSetEmpty)
 /////////////////////////////////////////////////
 TEST(Util_TEST, findFile)
 {
-  EXPECT_EQ("", ignition::common::findFile("no_such_file"));
+  EXPECT_EQ("", gz::common::findFile("no_such_file"));
 
   // Create file to find
-  auto dir1 = ignition::common::absPath("test_dir1");
-  ignition::common::createDirectories(dir1);
-  auto file1 = ignition::common::absPath(
-      ignition::common::joinPaths(dir1, "test_f1"));
+  auto dir1 = gz::common::absPath("test_dir1");
+  gz::common::createDirectories(dir1);
+  auto file1 = gz::common::absPath(
+      gz::common::joinPaths(dir1, "test_f1"));
 
   std::ofstream fout;
   fout.open(file1, std::ofstream::out);
@@ -292,13 +292,13 @@ TEST(Util_TEST, findFile)
   fout.close();
 
   // Relative path
-  auto systemPaths = ignition::common::systemPaths();
+  auto systemPaths = gz::common::systemPaths();
   ASSERT_NE(nullptr, systemPaths);
   EXPECT_EQ(file1, systemPaths->FindFile(common::joinPaths("test_dir1",
       "test_f1"), true));
 
   // Relative prefixed by file:
-  EXPECT_EQ(file1, ignition::common::findFile("file:test_dir1/test_f1"));
+  EXPECT_EQ(file1, gz::common::findFile("file:test_dir1/test_f1"));
 
   // Custom callback
 #ifndef _WIN32
@@ -306,11 +306,11 @@ TEST(Util_TEST, findFile)
 #else
   const auto tmpDir = "C:\\Windows";
 #endif
-  auto fileCb = [&tmpDir](const ignition::common::URI &)
+  auto fileCb = [&tmpDir](const gz::common::URI &)
   {
     return tmpDir;
   };
 
-  ignition::common::addFindFileURICallback(fileCb);
-  EXPECT_EQ(tmpDir, ignition::common::findFile("model://banana"));
+  gz::common::addFindFileURICallback(fileCb);
+  EXPECT_EQ(tmpDir, gz::common::findFile("model://banana"));
 }

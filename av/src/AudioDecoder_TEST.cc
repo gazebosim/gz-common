@@ -16,11 +16,11 @@
 */
 #include <gtest/gtest.h>
 
-#include <ignition/common/AudioDecoder.hh>
-#include <ignition/utils/ExtraTestMacros.hh>
-#include <ignition/common/testing/TestPaths.hh>
+#include <gz/common/AudioDecoder.hh>
+#include <gz/utils/ExtraTestMacros.hh>
+#include <gz/common/testing/TestPaths.hh>
 
-using namespace ignition;
+using namespace gz;
 
 /////////////////////////////////////////////////
 TEST(AudioDecoder, FileNotSet)

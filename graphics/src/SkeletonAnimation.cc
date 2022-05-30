@@ -15,15 +15,15 @@
  *
 */
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/NodeAnimation.hh"
-#include "ignition/common/SkeletonAnimation.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/NodeAnimation.hh"
+#include "gz/common/SkeletonAnimation.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 /// Prvate data class
-class ignition::common::SkeletonAnimation::Implementation
+class gz::common::SkeletonAnimation::Implementation
 {
   /// \brief the node name
   public: std::string name;
@@ -37,7 +37,7 @@ class ignition::common::SkeletonAnimation::Implementation
 
 //////////////////////////////////////////////////
 SkeletonAnimation::SkeletonAnimation(const std::string &_name)
-: dataPtr(ignition::utils::MakeImpl<Implementation>())
+: dataPtr(gz::utils::MakeImpl<Implementation>())
 {
   this->dataPtr->name = _name;
 }
@@ -148,7 +148,7 @@ std::map<std::string, math::Matrix4d> SkeletonAnimation::PoseAtX(
   auto nodeAnim = this->dataPtr->animations.find(_node);
   if (nodeAnim == this->dataPtr->animations.end())
   {
-    ignerr << "Can't find animation named [" << _node << "]" << std::endl;
+    gzerr << "Can't find animation named [" << _node << "]" << std::endl;
     return {};
   }
 

@@ -18,13 +18,13 @@
 #include <fstream>
 #include <sstream>
 
-#include <ignition/common/SystemPaths.hh>
-#include <ignition/common/Skeleton.hh>
-#include <ignition/common/SkeletonAnimation.hh>
-#include <ignition/common/Console.hh>
-#include <ignition/common/BVHLoader.hh>
+#include <gz/common/SystemPaths.hh>
+#include <gz/common/Skeleton.hh>
+#include <gz/common/SkeletonAnimation.hh>
+#include <gz/common/Console.hh>
+#include <gz/common/BVHLoader.hh>
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 /////////////////////////////////////////////////
@@ -192,7 +192,7 @@ std::unique_ptr<Skeleton> BVHLoader::Load(const std::string &_filename,
     words = split(line, " ");
     if (words.size() < totalChannels)
     {
-      ignwarn << "Frame " << frameNo << " invalid.\n";
+      gzwarn << "Frame " << frameNo << " invalid.\n";
       frameNo++;
       time += frameTime;
       continue;
@@ -279,7 +279,7 @@ std::unique_ptr<Skeleton> BVHLoader::Load(const std::string &_filename,
       break;
   }
   if (frameNo < frameCount - 1)
-    ignwarn << "BVH file ended unexpectedly.\n";
+    gzwarn << "BVH file ended unexpectedly.\n";
 
   skeleton->AddAnimation(animation);
 

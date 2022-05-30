@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/SingletonT.hh>
+#include <ignition/common/config.hh>
