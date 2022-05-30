@@ -23,13 +23,13 @@
 
 #include <gz/utils/ImplPtr.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
     /// \class AssimpLoader AssimpLoader.hh gz/common/AssimpLoader.hh
     /// \brief Class used to load Assimp mesh files
-    class IGNITION_COMMON_GRAPHICS_VISIBLE AssimpLoader : public MeshLoader
+    class GZ_COMMON_GRAPHICS_VISIBLE AssimpLoader : public MeshLoader
     {
       /// \brief Constructor
       public: AssimpLoader();

@@ -35,7 +35,7 @@
 #include <assimp/scene.h>           // Output data structure
 #include <assimp/postprocess.h>     // Post processing flags
 
-namespace ignition
+namespace gz
 {
 namespace common
 {
@@ -44,22 +44,22 @@ namespace common
 class AssimpLoader::Implementation
 {
   /// Convert a color from assimp implementation to Ignition common
-  public: ignition::math::Color ConvertColor(aiColor4D& _color);
+  public: math::Color ConvertColor(aiColor4D& _color);
 
   /// Convert a transformation from assimp implementation to Ignition math
-  public: ignition::math::Matrix4d ConvertTransform(const aiMatrix4x4& _matrix);
+  public: math::Matrix4d ConvertTransform(const aiMatrix4x4& _matrix);
 
   public: MaterialPtr CreateMaterial(const aiScene* _scene, unsigned _matIdx, const std::string& _path);
 
   public: void LoadEmbeddedTexture(const aiTexture* _texture);
 
-  public: SubMesh CreateSubMesh(const aiMesh* _assimpMesh, const ignition::math::Matrix4d& _transform);
+  public: SubMesh CreateSubMesh(const aiMesh* _assimpMesh, const math::Matrix4d& _transform);
 
-  public: std::unordered_map<std::string, ignition::math::Matrix4d> PopulateTransformMap(const aiScene* _scene);
+  public: std::unordered_map<std::string, math::Matrix4d> PopulateTransformMap(const aiScene* _scene);
 
-  public: void RecursiveCreate(const aiScene* _scene, const aiNode* _node, const ignition::math::Matrix4d& _transform, Mesh* _mesh);
+  public: void RecursiveCreate(const aiScene* _scene, const aiNode* _node, const math::Matrix4d& _transform, Mesh* _mesh);
 
-  public: void RecursiveSkeletonCreate(const aiNode* _node, SkeletonNode* _parent, const ignition::math::Matrix4d& _transform);
+  public: void RecursiveSkeletonCreate(const aiNode* _node, SkeletonNode* _parent, const math::Matrix4d& _transform);
 
   /// \brief Apply the the inv bind transform to the skeleton pose.
   /// \remarks have to set the model transforms starting from the root in
@@ -71,22 +71,22 @@ class AssimpLoader::Implementation
   public: void ApplyInvBindTransform(SkeletonPtr _skeleton);
 };
 
-ignition::math::Color AssimpLoader::Implementation::ConvertColor(aiColor4D& _color)
+math::Color AssimpLoader::Implementation::ConvertColor(aiColor4D& _color)
 {
-  ignition::math::Color col(_color.r, _color.g, _color.b, _color.a);
+  math::Color col(_color.r, _color.g, _color.b, _color.a);
   return col;
 }
 
-ignition::math::Matrix4d AssimpLoader::Implementation::ConvertTransform(const aiMatrix4x4& _sm)
+math::Matrix4d AssimpLoader::Implementation::ConvertTransform(const aiMatrix4x4& _sm)
 {
-  return ignition::math::Matrix4d(
+  return math::Matrix4d(
       _sm.a1, _sm.a2, _sm.a3, _sm.a4,
       _sm.b1, _sm.b2, _sm.b3, _sm.b4,
       _sm.c1, _sm.c2, _sm.c3, _sm.c4,
       _sm.d1, _sm.d2, _sm.d3, _sm.d4);
 }
 
-void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene, const aiNode* _node, const ignition::math::Matrix4d& _transform, Mesh* _mesh)
+void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene, const aiNode* _node, const math::Matrix4d& _transform, Mesh* _mesh)
 {
   if (!_node)
     return;
@@ -107,42 +107,42 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene, const 
       // TODO Append to existing skeleton if multiple submeshes?
       skeleton->SetNumVertAttached(subMesh.VertexCount());
       // Now add the bone weights
-      for (unsigned bone_idx = 0; bone_idx < _scene->mMeshes[meshIdx]->mNumBones; ++bone_idx)
+      for (unsigned boneIdx = 0; boneIdx < _scene->mMeshes[meshIdx]->mNumBones; ++boneIdx)
       {
-        auto bone = assimpMesh->mBones[bone_idx];
-        auto bone_node_name = std::string(bone->mNode->mName.C_Str());
+        auto bone = assimpMesh->mBones[boneIdx];
+        auto boneNodeName = std::string(bone->mNode->mName.C_Str());
         // Apply inverse bind transform to the matching node
         SkeletonNode *skelNode =
-            skeleton->NodeByName(bone_node_name);
+            skeleton->NodeByName(boneNodeName);
         skelNode->SetInverseBindTransform(this->ConvertTransform(bone->mOffsetMatrix));
-        igndbg << "Bone " << bone_node_name << " has " << bone->mNumWeights << " weights" << std::endl;
-        for (unsigned weight_idx = 0; weight_idx < bone->mNumWeights; ++weight_idx)
+        igndbg << "Bone " << boneNodeName << " has " << bone->mNumWeights << " weights" << std::endl;
+        for (unsigned weightIdx = 0; weightIdx < bone->mNumWeights; ++weightIdx)
         {
-          auto vertex_weight = bone->mWeights[weight_idx];
+          auto vertexWeight = bone->mWeights[weightIdx];
           // TODO SetNumVertAttached for performance
-          skeleton->AddVertNodeWeight(vertex_weight.mVertexId, bone_node_name, vertex_weight.mWeight);
-          //igndbg << "Adding weight at idx " << vertex_weight.mVertexId << " for bone " << bone_name << " of " << vertex_weight.mWeight << std::endl;
+          skeleton->AddVertNodeWeight(vertexWeight.mVertexId, boneNodeName, vertexWeight.mWeight);
+          //igndbg << "Adding weight at idx " << vertexWeight.mVertexId << " for bone " << bone_name << " of " << vertexWeight.mWeight << std::endl;
         }
       }
       // Add node assignment to mesh
       ignmsg << "submesh has " << subMesh.VertexCount() << " vertices" << std::endl;
-      for (unsigned vert_idx = 0; vert_idx < subMesh.VertexCount(); ++vert_idx)
+      for (unsigned vertexIdx = 0; vertexIdx < subMesh.VertexCount(); ++vertexIdx)
       {
-        //ignmsg << "skel at id " << vert_idx << " has " << skel->VertNodeWeightCount(vert_idx) << " indices" << std::endl;
+        //ignmsg << "skel at id " << vertexIdx << " has " << skel->VertNodeWeightCount(vertexIdx) << " indices" << std::endl;
         for (unsigned int i = 0;
-            i < skeleton->VertNodeWeightCount(vert_idx); ++i)
+            i < skeleton->VertNodeWeightCount(vertexIdx); ++i)
         {
-          std::pair<std::string, double> node_weight =
-            skeleton->VertNodeWeight(vert_idx, i);
+          std::pair<std::string, double> nodeWeight =
+            skeleton->VertNodeWeight(vertexIdx, i);
           SkeletonNode *node =
-              skeleton->NodeByName(node_weight.first);
+              skeleton->NodeByName(nodeWeight.first);
           if (node == nullptr)
           {
-            igndbg << "Not found while Looking for node with name " << node_weight.first << std::endl;
+            igndbg << "Not found while Looking for node with name " << nodeWeight.first << std::endl;
           }
-          subMesh.AddNodeAssignment(vert_idx,
-                          node->Handle(), node_weight.second);
-          //igndbg << "Adding node assignment for vertex " << vert_idx << " to node " << node->Name() << " of weight " << node_weight.second << std::endl;
+          subMesh.AddNodeAssignment(vertexIdx,
+                          node->Handle(), nodeWeight.second);
+          //igndbg << "Adding node assignment for vertex " << vertexIdx << " to node " << node->Name() << " of weight " << nodeWeight.second << std::endl;
         }
       }
     }
@@ -162,7 +162,7 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene, const 
   }
 }
 
-void AssimpLoader::Implementation::RecursiveSkeletonCreate(const aiNode* _node, SkeletonNode* _parent, const ignition::math::Matrix4d& _transform)
+void AssimpLoader::Implementation::RecursiveSkeletonCreate(const aiNode* _node, SkeletonNode* _parent, const math::Matrix4d& _transform)
 {
   // First explore this node
   auto nodeName = std::string(_node->mName.C_Str());
@@ -258,18 +258,18 @@ void AssimpLoader::Implementation::LoadEmbeddedTexture(const aiTexture* _texture
   ignmsg << "Processing texture in format " << _texture->achFormatHint << std::endl;
 }
 
-SubMesh AssimpLoader::Implementation::CreateSubMesh(const aiMesh* _assimpMesh, const ignition::math::Matrix4d& _transform)
+SubMesh AssimpLoader::Implementation::CreateSubMesh(const aiMesh* _assimpMesh, const math::Matrix4d& _transform)
 {
   SubMesh subMesh;
-  ignition::math::Matrix4d rot = _transform;
-  rot.SetTranslation(ignition::math::Vector3d::Zero);
+  math::Matrix4d rot = _transform;
+  rot.SetTranslation(math::Vector3d::Zero);
   ignmsg << "Mesh has " << _assimpMesh->mNumVertices << " vertices" << std::endl;
   // Now create the submesh
   for (unsigned vertexIdx = 0; vertexIdx < _assimpMesh->mNumVertices; ++vertexIdx)
   {
     // Add the vertex
-    ignition::math::Vector3d vertex;
-    ignition::math::Vector3d normal;
+    math::Vector3d vertex;
+    math::Vector3d normal;
     vertex.X(_assimpMesh->mVertices[vertexIdx].x);
     vertex.Y(_assimpMesh->mVertices[vertexIdx].y);
     vertex.Z(_assimpMesh->mVertices[vertexIdx].z);
@@ -285,7 +285,7 @@ SubMesh AssimpLoader::Implementation::CreateSubMesh(const aiMesh* _assimpMesh, c
     int uvIdx = 0;
     while(_assimpMesh->HasTextureCoords(uvIdx))
     {
-      ignition::math::Vector3d texcoords;
+      math::Vector3d texcoords;
       texcoords.X(_assimpMesh->mTextureCoords[uvIdx][vertexIdx].x);
       texcoords.Y(_assimpMesh->mTextureCoords[uvIdx][vertexIdx].y);
       // TODO why do we need 1.0 - Y?
@@ -307,7 +307,7 @@ SubMesh AssimpLoader::Implementation::CreateSubMesh(const aiMesh* _assimpMesh, c
 
 //////////////////////////////////////////////////
 AssimpLoader::AssimpLoader()
-: MeshLoader(), dataPtr(ignition::utils::MakeImpl<Implementation>())
+: MeshLoader(), dataPtr(utils::MakeImpl<Implementation>())
 {
 }
 
@@ -393,12 +393,12 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
       for (unsigned key_idx = 0; key_idx < animChan->mNumPositionKeys; ++key_idx)
       {
         // Note, Scaling keys are not supported right now
-        // Compute the position into a ignition math pose
+        // Compute the position into a math pose
         auto posKey = animChan->mPositionKeys[key_idx];
         auto quatKey = animChan->mRotationKeys[key_idx];
-        ignition::math::Vector3d pos(posKey.mValue.x, posKey.mValue.y, posKey.mValue.z);
-        ignition::math::Quaterniond quat(quatKey.mValue.w, quatKey.mValue.x, quatKey.mValue.y, quatKey.mValue.z);
-        ignition::math::Pose3d pose(pos, quat);
+        math::Vector3d pos(posKey.mValue.x, posKey.mValue.y, posKey.mValue.z);
+        math::Quaterniond quat(quatKey.mValue.w, quatKey.mValue.x, quatKey.mValue.y, quatKey.mValue.z);
+        math::Pose3d pose(pos, quat);
         // Time is in ms after 5.0.1?
         skelAnim->AddKeyFrame(chanName, posKey.mTime / 1000.0, pose);
         igndbg << "Adding animation at time " << posKey.mTime / 1000.0 << " with position (" << pos.X() << "," << pos.Y() << "," <<
