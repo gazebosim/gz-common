@@ -115,7 +115,7 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* scene, const a
         SkeletonNode *skel_node =
             mesh->MeshSkeleton()->NodeByName(bone_name);
         skel_node->SetInverseBindTransform(this->ConvertTransform(bone->mOffsetMatrix));
-        ignmsg << "Bone " << bone_name << " has " << bone->mNumWeights << " weights" << std::endl;
+        igndbg << "Bone " << bone_name << " has " << bone->mNumWeights << " weights" << std::endl;
         for (unsigned weight_idx = 0; weight_idx < bone->mNumWeights; ++weight_idx)
         {
           auto vertex_weight = bone->mWeights[weight_idx];
@@ -166,7 +166,7 @@ void AssimpLoader::Implementation::RecursiveSkeletonCreate(const aiNode* node, S
 {
   // First explore this node
   auto node_name = std::string(node->mName.C_Str());
-  ignmsg << "Exploring node " << node_name << std::endl;
+  //ignmsg << "Exploring node " << node_name << std::endl;
   // TODO check if node or joint?
   auto skel_node = new SkeletonNode(root_node, node_name, node_name, SkeletonNode::JOINT);
   // Calculate transform
@@ -327,7 +327,6 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
 
   auto root_transformation = this->dataPtr->ConvertTransform(transform);
 
-  //root_transformation = ignition::math::Matrix4d::Identity;
   // TODO remove workaround, it seems imported assets are rotated by 90 degrees
   // as documented here https://github.com/assimp/assimp/issues/849, remove workaround when fixed
   // Add the materials first
@@ -347,6 +346,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   }
   SkeletonPtr root_skeleton = std::make_shared<Skeleton>(root_skel_node);
   mesh->SetSkeleton(root_skeleton);
+
   // Now create the meshes
   // Recursive call to keep track of transforms, mesh is passed by reference and edited throughout
   this->dataPtr->RecursiveCreate(scene, root_node, root_transformation, mesh);
@@ -379,9 +379,10 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
         ignition::math::Vector3d pos(pos_key.mValue.x, pos_key.mValue.y, pos_key.mValue.z);
         ignition::math::Quaterniond quat(quat_key.mValue.w, quat_key.mValue.x, quat_key.mValue.y, quat_key.mValue.z);
         ignition::math::Pose3d pose(pos, quat);
-        skel_anim->AddKeyFrame(chan_name, pos_key.mTime, pose);
-        //igndbg << "Adding animation at time " << pos_key.mTime << " with position (" << pos.X() << "," << pos.Y() << "," <<
-        //  pos.Z() << ")" << std::endl;
+        // Time is in ms after 5.0.1?
+        skel_anim->AddKeyFrame(chan_name, pos_key.mTime / 1000.0, pose);
+        igndbg << "Adding animation at time " << pos_key.mTime / 1000.0 << " with position (" << pos.X() << "," << pos.Y() << "," <<
+          pos.Z() << ")" << std::endl;
       }
     }
     mesh->MeshSkeleton()->AddAnimation(skel_anim);
@@ -409,9 +410,9 @@ void AssimpLoader::Implementation::ApplyInvBindTransform(SkeletonPtr _skeleton)
     if (node->HasInvBindTransform())
     {
       node->SetModelTransform(node->InverseBindTransform().Inverse(), false);
-      igndbg << "Node " << node->Name() << " model transform is:" << std::endl << node->ModelTransform() << std::endl;
-      igndbg << "Parent " << node->Parent()->Name() << " transform is:" << std::endl << node->Parent()->ModelTransform() << std::endl;
-      igndbg << "Node " << node->Name() << " transform is:" << std::endl << node->Transform() << std::endl;
+      //igndbg << "Node " << node->Name() << " model transform is:" << std::endl << node->ModelTransform() << std::endl;
+      //igndbg << "Parent " << node->Parent()->Name() << " transform is:" << std::endl << node->Parent()->ModelTransform() << std::endl;
+      //igndbg << "Node " << node->Name() << " transform is:" << std::endl << node->Transform() << std::endl;
     }
     for (unsigned int i = 0; i < node->ChildCount(); i++)
       queue.push_back(node->Child(i));
