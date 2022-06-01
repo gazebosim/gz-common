@@ -1,31 +1,55 @@
 ## Ignition Common 3.x
 
-## Ignition Common 3.X.X
+## Ignition Common 3.14.1 (2022-06-01)
+
+1. Profiler tutorial: viewing from Docker container
+    * [Pull request #362](https://github.com/ignitionrobotics/ign-common/pull/362)
+
+1. ignLogInit can be called after an ignerr, etc
+    * [Pull request #332](https://github.com/ignitionrobotics/ign-common/pull/332)
+
+1. Fix compatibility with FFmpeg 5.0
+    * [Pull request #325](https://github.com/ignitionrobotics/ign-common/pull/325)
+
+1. Fix out-of-bounds access in sanitizeSlashes
+    * [Pull request #303](https://github.com/ignitionrobotics/ign-common/pull/303)
+
+1. Fix memory corruption & leaks in Image
+    * [Pull request #287](https://github.com/ignitionrobotics/ign-common/pull/287)
+
+1. Normalize normal vectors from OBJ.
+    * [Pull request #269](https://github.com/ignitionrobotics/ign-common/pull/269)
+
+1. Fixed macos symbol in `common::profiler`
+    * [Pull request #262](https://github.com/ignitionrobotics/ign-common/pull/262)
+
+1. Fix skip logic for integration tests
+    * [Pull request #264](https://github.com/ignitionrobotics/ign-common/pull/264)
 
 ## Ignition Common 3.14.0 (2021-10-12)
 
 1. Support loading PBR textures in OBJLoader
     * [Pull request #216](https://github.com/ignitionrobotics/ign-common/pull/216)
-   
-1. Remove CMAKE_CXX_FLAGS from test targetrs 
+
+1. Remove CMAKE_CXX_FLAGS from test targetrs
     * [Pull request #214](https://github.com/ignitionrobotics/ign-common/pull/214)
-     
+
 1. Set project-wide standard to C++17
     * [Pull request #221](https://github.com/ignitionrobotics/ign-common/pull/221)
-     
-1. Fix av_* API usage for deprecations 
+
+1. Fix av_* API usage for deprecations
     * [Pull request #220](https://github.com/ignitionrobotics/ign-common/pull/220)
-     
-1. Make KeyEvent rule-of-five compliant 
+
+1. Make KeyEvent rule-of-five compliant
     * [Pull request #224](https://github.com/ignitionrobotics/ign-common/pull/224)
-     
-1. Fix segfault caused by destructionb order of Event and Connection 
+
+1. Fix segfault caused by destructionb order of Event and Connection
     * [Pull request #234](https://github.com/ignitionrobotics/ign-common/pull/234)
-     
-1. Fix a typo in VideoEncoder_TEST 
+
+1. Fix a typo in VideoEncoder_TEST
     * [Pull request #231](https://github.com/ignitionrobotics/ign-common/pull/231)
-    
-1. Use direct evaluation for SKIP_av 
+
+1. Use direct evaluation for SKIP_av
     * [Pull request #250](https://github.com/ignitionrobotics/ign-common/pull/250)
 
 ## Ignition Common 3.13.2 (2021-05-11)
@@ -46,19 +70,19 @@
 
 ## Ignition Common 3.13.0 (2021-04-27)
 
-1. Add function to convert single channel image data to RGB image 
+1. Add function to convert single channel image data to RGB image
     * [Pull request #205](https://github.com/ignitionrobotics/ign-common/pull/205)
 
 1. Avoid duplication of / in joinPaths (Windows)
     * [Pull request #201](https://github.com/ignitionrobotics/ign-common/pull/201)
 
-1. Fix colladaLoader on Windows 
+1. Fix colladaLoader on Windows
     * [Pull request #200](https://github.com/ignitionrobotics/ign-common/pull/200)
 
 1. Backport #188: Fix crash when using BVH animations.
     * [Pull request #199](https://github.com/ignitionrobotics/ign-common/pull/199)
 
-1. Improved Windows support 
+1. Improved Windows support
     * [Pull request #197](https://github.com/ignitionrobotics/ign-common/pull/197)
 
 ## Ignition Common 3.12.0 (2021-04-06)
@@ -75,7 +99,7 @@
 1. Fixed tutorial link in the README.md.
     * [Pull request #194](https://github.com/ignitionrobotics/ign-common/pull/194)
 
-1. Function to serialize compressed image to buffer 
+1. Function to serialize compressed image to buffer
     * [Pull request #139](https://github.com/ignitionrobotics/ign-common/pull/139)
 
 ## Ignition Common 3.11.1 (2021-03-08)
