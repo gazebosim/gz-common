@@ -17,6 +17,7 @@
 #ifndef GZ_COMMON_EVENT_HH_
 #define GZ_COMMON_EVENT_HH_
 
+#include <any>
 #include <atomic>
 #include <functional>
 #include <list>
@@ -41,11 +42,21 @@ namespace gz
       public: Event();
 
       /// \brief Destructor
-      public: virtual ~Event();
+      // WARNING: This should never be changed to virtual. See the class
+      // documentation for EventT. Otherwise, segfaults may occur in downstream
+      // libraries.
+      public: ~Event();
 
-      /// \brief Disconnect
-      /// \param[in] _id Integer ID of a connection
-      public: virtual void Disconnect(int _id) = 0;
+      /// \brief Disconnect a callback to this event.
+      /// \param[in] _id The id of the connection to disconnect.
+      public: virtual void Disconnect(int _id);
+
+      /// \brief Get the number of connections.
+      /// \return Number of connections.
+      unsigned int ConnectionCount() const
+      {
+        return this->connections.size();
+      }
 
       /// \brief Get whether this event has been signaled.
       /// \return True if the event has been signaled.
@@ -55,8 +66,53 @@ namespace gz
       /// \param[in] _sig True if the event has been signaled.
       public: void SetSignaled(bool _sig);
 
+      /// \internal
+      /// \brief Removes queued connections.
+      /// We assume that this function is called from a Signal function.
+      protected: void Cleanup();
+
       /// \brief True if the event has been signaled.
       private: bool signaled;
+
+      /// \brief A private helper class used in maintaining connections.
+      protected: class EventConnection
+      {
+        /// \brief Constructor
+       public: EventConnection(bool _on, const std::any &_cb,
+                        const ConnectionPtr &_publicConn)
+            : callback(_cb), publicConnection(_publicConn)
+        {
+          // Windows Visual Studio 2012 does not have atomic_bool constructor,
+          // so we have to set "on" using operator=
+          this->on = _on;
+        }
+
+        /// \brief On/off value for the event callback
+        public: std::atomic_bool on;
+
+        /// \brief Callback function
+        public: std::any callback;
+
+        /// \brief A weak pointer to the Connection pointer returned by Connect.
+        /// This is used to clear the Connection's Event pointer during
+        /// destruction of an Event.
+        public: std::weak_ptr<Connection> publicConnection;
+      };
+
+      /// \def EvtConnectionMap
+      /// \brief Event Connection map typedef.
+      protected: typedef std::map<int, std::unique_ptr<EventConnection>>
+                    EvtConnectionMap;
+
+      /// \brief Array of connection callbacks.
+      protected: EvtConnectionMap connections;
+
+      /// \brief A thread lock.
+      private: std::mutex mutex;
+
+      /// \brief List of connections to remove
+      private: std::list<typename EvtConnectionMap::const_iterator>
+              connectionsToRemove;
     };
 
     /// \brief A class that encapsulates a connection.
@@ -93,38 +149,36 @@ namespace gz
 
       /// \brief Friend class.
       public: template<typename T, typename N> friend class EventT;
+      public: friend class Event;
     };
 
     /// \brief A class for event processing.
     /// \tparam T function event callback function signature
     /// \tparam N optional additional type to disambiguate events with same
     ///   function signature
+    //
+    // WARNING: This class should not have any data members. Instead all data
+    // members should go into the base class `Event`. This is to ensure that
+    // this class behaves as expected when used with shared libraries (plugins)
+    // that get unloaded after emitting an event.
+    //
+    // Explanation: TODO
+    //
     template<typename T, typename N = void>
-    class EventT : public Event
+    class EventT final : public Event
     {
       public: using CallbackT = std::function<T>;
       static_assert(std::is_same<typename CallbackT::result_type, void>::value,
           "Event callback must have void return type");
 
       /// \brief Constructor.
-      public: EventT();
-
-      /// \brief Destructor.
-      public: virtual ~EventT();
+      public: EventT() = default;
 
       /// \brief Connect a callback to this event.
       /// \param[in] _subscriber Pointer to a callback function.
       /// \return A Connection object, which will automatically call
       /// Disconnect when it goes out of scope.
       public: ConnectionPtr Connect(const CallbackT &_subscriber);
-
-      /// \brief Disconnect a callback to this event.
-      /// \param[in] _id The id of the connection to disconnect.
-      public: virtual void Disconnect(int _id);
-
-      /// \brief Get the number of connections.
-      /// \return Number of connection to this Event.
-      public: unsigned int ConnectionCount() const;
 
       /// \brief Access the signal.
       public: template<typename ... Args>
@@ -143,83 +197,18 @@ namespace gz
         for (const auto &iter : this->connections)
         {
           if (iter.second->on)
-            iter.second->callback(std::forward<Args>(args)...);
+          {
+            auto callback = std::any_cast<CallbackT>(iter.second->callback);
+            callback(std::forward<Args>(args)...);
+          }
         }
       }
-
-      /// \internal
-      /// \brief Removes queued connections.
-      /// We assume that this function is called from a Signal function.
-      private: void Cleanup();
-
-      /// \brief A private helper class used in maintaining connections.
-      private: class EventConnection
-      {
-        /// \brief Constructor
-        public: EventConnection(bool _on, const std::function<T> &_cb,
-                        const ConnectionPtr &_publicConn)
-            : callback(_cb), publicConnection(_publicConn)
-        {
-          // Windows Visual Studio 2012 does not have atomic_bool constructor,
-          // so we have to set "on" using operator=
-          this->on = _on;
-        }
-
-        /// \brief On/off value for the event callback
-        public: std::atomic_bool on;
-
-        /// \brief Callback function
-        public: std::function<T> callback;
-
-        /// \brief A weak pointer to the Connection pointer returned by Connect.
-        /// This is used to clear the Connection's Event pointer during
-        /// destruction of an Event.
-        public: std::weak_ptr<Connection> publicConnection;
-      };
-
-      /// \def EvtConnectionMap
-      /// \brief Event Connection map typedef.
-      typedef std::map<int, std::unique_ptr<EventConnection>> EvtConnectionMap;
-
-      /// \brief Array of connection callbacks.
-      private: EvtConnectionMap connections;
-
-      /// \brief A thread lock.
-      private: std::mutex mutex;
-
-      /// \brief List of connections to remove
-      private: std::list<typename EvtConnectionMap::const_iterator>
-              connectionsToRemove;
     };
-
-    /// \brief Constructor.
-    template<typename T, typename N>
-    EventT<T, N>::EventT()
-    : Event()
-    {
-    }
-
-    /// \brief Destructor. Deletes all the associated connections.
-    template<typename T, typename N>
-    EventT<T, N>::~EventT()
-    {
-      // Clear the Event pointer on all connections so that they are not
-      // accessed after this Event is destructed.
-      for (auto &conn : this->connections)
-      {
-        auto publicCon = conn.second->publicConnection.lock();
-        if (publicCon)
-        {
-          publicCon->event = nullptr;
-        }
-      }
-      this->connections.clear();
-    }
 
     /// \brief Adds a connection.
     /// \param[in] _subscriber the subscriber to connect.
     template<typename T, typename N>
-    ConnectionPtr EventT<T, N>::Connect(const std::function<T> &_subscriber)
+    ConnectionPtr EventT<T, N>::Connect(const CallbackT &_subscriber)
     {
       int index = 0;
       if (!this->connections.empty())
@@ -231,48 +220,6 @@ namespace gz
       this->connections[index].reset(
           new EventConnection(true, _subscriber, connection));
       return connection;
-    }
-
-    /// \brief Get the number of connections.
-    /// \return Number of connections.
-    template<typename T, typename N>
-    unsigned int EventT<T, N>::ConnectionCount() const
-    {
-      return this->connections.size();
-    }
-
-    /// \brief Removes a connection.
-    /// \param[in] _id the connection index.
-    template<typename T, typename N>
-    void EventT<T, N>::Disconnect(int _id)
-    {
-      // Find the connection
-      auto const &it = this->connections.find(_id);
-
-      if (it != this->connections.end())
-      {
-        it->second->on = false;
-        // The destructor of std::function seems to crashes if the function it
-        // points to is in a shared library and has been unloaded by the time
-        // the destructor is invoked. It's not clear whether this is a bug in
-        // the implementation of std::function or not. To avoid the crash,
-        // we call the destructor here by setting `callback = nullptr` because
-        // it is likely that EventT::Disconnect is called before the shared
-        // library is unloaded via Connection::~Connection.
-        it->second->callback = nullptr;
-        this->connectionsToRemove.push_back(it);
-      }
-    }
-
-    /////////////////////////////////////////////
-    template<typename T, typename N>
-    void EventT<T, N>::Cleanup()
-    {
-      std::lock_guard<std::mutex> lock(this->mutex);
-      // Remove all queue connections.
-      for (auto &conn : this->connectionsToRemove)
-        this->connections.erase(conn);
-      this->connectionsToRemove.clear();
     }
   }
 }

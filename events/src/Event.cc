@@ -30,6 +30,17 @@ Event::Event()
 //////////////////////////////////////////////////
 Event::~Event()
 {
+  // Clear the Event pointer on all connections so that they are not
+  // accessed after this Event is destructed.
+  for (auto &conn : this->connections)
+  {
+    auto publicCon = conn.second->publicConnection.lock();
+    if (publicCon)
+    {
+      publicCon->event = nullptr;
+    }
+  }
+  this->connections.clear();
 }
 
 //////////////////////////////////////////////////
@@ -42,6 +53,35 @@ bool Event::Signaled() const
 void Event::SetSignaled(bool _sig)
 {
   this->signaled = _sig;
+}
+
+//////////////////////////////////////////////////
+void Event::Disconnect(int _id) {
+  // Find the connection
+  auto const &it = this->connections.find(_id);
+
+  if (it != this->connections.end()) {
+    it->second->on = false;
+    // The destructor of std::function seems to crashes if the function it
+    // points to is in a shared library and has been unloaded by the time
+    // the destructor is invoked. It's not clear whether this is a bug in
+    // the implementation of std::function or not. To avoid the crash,
+    // we call the destructor here by setting `callback = nullptr` because
+    // it is likely that EventT::Disconnect is called before the shared
+    // library is unloaded via Connection::~Connection.
+    // it->second->callback = nullptr;
+    this->connectionsToRemove.push_back(it);
+  }
+}
+
+/////////////////////////////////////////////
+void Event::Cleanup()
+{
+  std::lock_guard<std::mutex> lock(this->mutex);
+  // Remove all queue connections.
+  for (auto &conn : this->connectionsToRemove)
+    this->connections.erase(conn);
+  this->connectionsToRemove.clear();
 }
 
 //////////////////////////////////////////////////
@@ -75,3 +115,4 @@ int Connection::Id() const
 {
   return this->id;
 }
+
