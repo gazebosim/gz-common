@@ -44,6 +44,7 @@ namespace common
 /// \brief Private data for the AssimpLoader class
 class AssimpLoader::Implementation
 {
+  public: Assimp::Importer importer;
   /// Convert a color from assimp implementation to Ignition common
   public: math::Color ConvertColor(aiColor4D& _color);
 
@@ -251,14 +252,23 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* _scene, 
   Pbr pbr;
   if (ret == AI_SUCCESS)
   {
-    ignmsg << "Found metalness map " << texturePath.C_Str() << std::endl;
     pbr.SetMetalnessMap(std::string(texturePath.C_Str()));
   }
   ret = assimpMat->GetTexture(aiTextureType_NORMALS, 0, &texturePath);
   if (ret == AI_SUCCESS)
   {
-    ignmsg << "Found normal map " << texturePath.C_Str() << std::endl;
     pbr.SetNormalMap(std::string(texturePath.C_Str()));
+  }
+  double value;
+  ret = assimpMat->Get(AI_MATKEY_METALLIC_FACTOR, value);
+  if (ret == AI_SUCCESS)
+  {
+    pbr.SetMetalness(value);
+  }
+  ret = assimpMat->Get(AI_MATKEY_ROUGHNESS_FACTOR, value);
+  if (ret == AI_SUCCESS)
+  {
+    pbr.SetRoughness(value);
   }
   mat->SetPbrMaterial(pbr);
   // TODO other properties
@@ -325,8 +335,11 @@ SubMesh AssimpLoader::Implementation::CreateSubMesh(const aiMesh* _assimpMesh, c
 
 //////////////////////////////////////////////////
 AssimpLoader::AssimpLoader()
-: MeshLoader(), dataPtr(utils::MakeImpl<Implementation>())
+: MeshLoader(), dataPtr(utils::MakeUniqueImpl<Implementation>())
 {
+  // TODO: remove logger from stdout
+  Assimp::DefaultLogger::create("", Assimp::Logger::VERBOSE, aiDefaultLogStream_STDOUT);
+  this->dataPtr->importer.SetPropertyBool(AI_CONFIG_PP_FD_REMOVE, true);
 }
 
 //////////////////////////////////////////////////
@@ -340,12 +353,9 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   // TODO share importer
   Mesh *mesh = new Mesh();
   std::string path = common::parentPath(_filename);
-  Assimp::DefaultLogger::create("", Assimp::Logger::VERBOSE, aiDefaultLogStream_STDOUT);
-  Assimp::Importer importer;
-  importer.SetPropertyBool(AI_CONFIG_PP_FD_REMOVE, true);
   // Load the asset, TODO check if we need to do preprocessing
-  const aiScene* scene = importer.ReadFile(_filename,
-      //aiProcess_JoinIdenticalVertices |
+  const aiScene* scene = this->dataPtr->importer.ReadFile(_filename,
+      aiProcess_JoinIdenticalVertices |
       aiProcess_RemoveRedundantMaterials |
       aiProcess_SortByPType |
       aiProcess_PopulateArmatureData |
