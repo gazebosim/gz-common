@@ -31,6 +31,7 @@
 
 #include <assimp/Logger.hpp>      // C++ importer interface
 #include <assimp/DefaultLogger.hpp>      // C++ importer interface
+#include <assimp/GltfMaterial.h>      // GLTF specific material properties
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/scene.h>           // Output data structure
 #include <assimp/postprocess.h>     // Post processing flags
@@ -184,36 +185,37 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* _scene, 
 {
   MaterialPtr mat = std::make_shared<Material>();
   aiColor4D color;
-  //igndbg << "Processing material with name " << _scene->mMaterials[_matIdx]->GetName().C_Str() << std::endl;
-  auto ret = _scene->mMaterials[_matIdx]->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+  auto& assimpMat = _scene->mMaterials[_matIdx];
+  //igndbg << "Processing material with name " << assimpMat->GetName().C_Str() << std::endl;
+  auto ret = assimpMat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
   if (ret == AI_SUCCESS)
   {
     mat->SetDiffuse(this->ConvertColor(color));
   }
-  ret = _scene->mMaterials[_matIdx]->Get(AI_MATKEY_COLOR_AMBIENT, color);
+  ret = assimpMat->Get(AI_MATKEY_COLOR_AMBIENT, color);
   if (ret == AI_SUCCESS)
   {
     mat->SetAmbient(this->ConvertColor(color));
   }
-  ret = _scene->mMaterials[_matIdx]->Get(AI_MATKEY_COLOR_SPECULAR, color);
+  ret = assimpMat->Get(AI_MATKEY_COLOR_SPECULAR, color);
   if (ret == AI_SUCCESS)
   {
     mat->SetSpecular(this->ConvertColor(color));
   }
-  ret = _scene->mMaterials[_matIdx]->Get(AI_MATKEY_COLOR_EMISSIVE, color);
+  ret = assimpMat->Get(AI_MATKEY_COLOR_EMISSIVE, color);
   if (ret == AI_SUCCESS)
   {
     mat->SetEmissive(this->ConvertColor(color));
   }
   double shininess;
-  ret = _scene->mMaterials[_matIdx]->Get(AI_MATKEY_SHININESS, shininess);
+  ret = assimpMat->Get(AI_MATKEY_SHININESS, shininess);
   if (ret == AI_SUCCESS)
   {
     mat->SetShininess(shininess);
   }
   // TODO more than one texture, Gazebo assumes UV index 0
   aiString texturePath(_path.c_str());
-  ret = _scene->mMaterials[_matIdx]->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath);
+  ret = assimpMat->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath);
   // TODO check other arguments, type of mappings to be UV, uv index, blend mode
   if (ret == AI_SUCCESS)
   {
@@ -228,15 +230,31 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* _scene, 
     {
       mat->SetTextureImage(std::string(texturePath.C_Str()), _path.c_str());
     }
+    // Now set the alpha from texture, if enabled, only supported in GLTF
+    aiString alphaMode;
+    auto paramRet = assimpMat->Get(AI_MATKEY_GLTF_ALPHAMODE, alphaMode);
+    if (paramRet == AI_SUCCESS)
+    {
+      // Only enable if it's set to MASK, BLEND not supported yet
+      if (strcmp(alphaMode.C_Str(), "MASK") == 0)
+      {
+        double alphaCutoff = mat->AlphaThreshold();
+        bool twoSided = mat->TwoSidedEnabled();
+        // Ignore return value, parameter unchanged if value is not set
+        assimpMat->Get(AI_MATKEY_GLTF_ALPHACUTOFF, alphaCutoff);
+        assimpMat->Get(AI_MATKEY_TWOSIDED, twoSided);
+        mat->SetAlphaFromTexture(true, alphaCutoff, twoSided);
+      }
+    }
   }
-  ret = _scene->mMaterials[_matIdx]->GetTexture(aiTextureType_METALNESS, 0, &texturePath);
+  ret = assimpMat->GetTexture(aiTextureType_METALNESS, 0, &texturePath);
   Pbr pbr;
   if (ret == AI_SUCCESS)
   {
     ignmsg << "Found metalness map " << texturePath.C_Str() << std::endl;
     pbr.SetMetalnessMap(std::string(texturePath.C_Str()));
   }
-  ret = _scene->mMaterials[_matIdx]->GetTexture(aiTextureType_NORMALS, 0, &texturePath);
+  ret = assimpMat->GetTexture(aiTextureType_NORMALS, 0, &texturePath);
   if (ret == AI_SUCCESS)
   {
     ignmsg << "Found normal map " << texturePath.C_Str() << std::endl;
