@@ -30,13 +30,13 @@
 #define ORDER_MAX 10
 #define FACE_MAX 200000
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
     /// \class STLLoader STLLoader.hh gz/common/STLLoader.hh
     /// \brief Class used to load STL mesh files
-    class IGNITION_COMMON_GRAPHICS_VISIBLE STLLoader : public MeshLoader
+    class GZ_COMMON_GRAPHICS_VISIBLE STLLoader : public MeshLoader
     {
       /// \brief Constructor
       public: STLLoader();

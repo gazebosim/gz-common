@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/testing/BazelTestPaths.hh>
+#include <ignition/common/config.hh>

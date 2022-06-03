@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/GTSMeshUtils.hh>
+#include <ignition/common/config.hh>

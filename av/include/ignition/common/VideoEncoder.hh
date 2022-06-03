@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/VideoEncoder.hh>
+#include <ignition/common/config.hh>

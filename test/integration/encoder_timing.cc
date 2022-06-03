@@ -15,10 +15,10 @@
 */
 #include <gtest/gtest.h>
 #include <array>
-#include "ignition/common/VideoEncoder.hh"
-#include "ignition/common/Video.hh"
+#include "gz/common/VideoEncoder.hh"
+#include "gz/common/Video.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 const unsigned int kSize = 10;

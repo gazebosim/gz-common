@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/Battery.hh>
+#include <ignition/common/config.hh>

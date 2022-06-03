@@ -16,11 +16,11 @@
 */
 #include <gtest/gtest.h>
 
-#include <ignition/common/Console.hh>
-#include <ignition/common/testing/AutoLogFixture.hh>
+#include <gz/common/Console.hh>
+#include <gz/common/testing/AutoLogFixture.hh>
 
-using namespace ignition::common;
-using namespace ignition::common::testing;
+using namespace gz::common;
+using namespace gz::common::testing;
 
 /////////////////////////////////////////////////
 TEST_F(AutoLogFixture, AutoLogFixture)
@@ -29,6 +29,6 @@ TEST_F(AutoLogFixture, AutoLogFixture)
   EXPECT_TRUE(this->LogContent().empty());
 
   Console::SetVerbosity(0);
-  igndbg << "This is a debug" << std::endl;
+  gzdbg << "This is a debug" << std::endl;
   EXPECT_FALSE(this->LogContent().empty());
 }

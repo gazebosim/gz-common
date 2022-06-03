@@ -32,12 +32,12 @@
   using portable_uuid_t = uuid_t;
 #endif
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
     /// \brief A portable class for representing a Universally Unique Identifier
-    class IGNITION_COMMON_VISIBLE Uuid
+    class GZ_COMMON_VISIBLE Uuid
     {
       /// \brief Constructor.
       public: Uuid();
@@ -53,7 +53,7 @@ namespace ignition
       /// \param[out] _out The output stream.
       /// \param[in] _msg AdvMsg to write to the stream.
       public: friend std::ostream &operator<<(std::ostream &_out,
-                  const ignition::common::Uuid &_uuid)
+                  const gz::common::Uuid &_uuid)
       {
         _out << _uuid.String();
         return _out;

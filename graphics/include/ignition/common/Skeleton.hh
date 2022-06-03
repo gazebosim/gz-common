@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/Skeleton.hh>
+#include <ignition/common/config.hh>

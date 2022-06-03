@@ -23,13 +23,13 @@
 
 #include <gz/utils/ImplPtr.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
     /// \class AssimpLoader AssimpLoader.hh gz/common/AssimpLoader.hh
     /// \brief Class used to load Assimp mesh files
-    class IGNITION_COMMON_GRAPHICS_VISIBLE AssimpLoader : public MeshLoader
+    class GZ_COMMON_GRAPHICS_VISIBLE AssimpLoader : public MeshLoader
     {
       /// \brief Constructor
       public: AssimpLoader();
@@ -44,7 +44,7 @@ namespace ignition
 
       /// \internal
       /// \brief Pointer to private data.
-      IGN_UTILS_IMPL_PTR(dataPtr)
+      IGN_UTILS_UNIQUE_IMPL_PTR(dataPtr)
     };
   }
 }

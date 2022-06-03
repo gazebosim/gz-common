@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/av/Util.hh>
+#include <ignition/common/config.hh>

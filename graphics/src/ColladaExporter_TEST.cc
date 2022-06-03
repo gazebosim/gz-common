@@ -17,20 +17,20 @@
 #include <gtest/gtest.h>
 #include "tinyxml2.h"
 
-#include "ignition/common/ColladaLoader.hh"
-#include "ignition/common/ColladaExporter.hh"
-#include "ignition/common/Filesystem.hh"
-#include "ignition/common/Mesh.hh"
-#include "ignition/common/SubMesh.hh"
+#include "gz/common/ColladaLoader.hh"
+#include "gz/common/ColladaExporter.hh"
+#include "gz/common/Filesystem.hh"
+#include "gz/common/Mesh.hh"
+#include "gz/common/SubMesh.hh"
 
-#include "ignition/common/testing/AutoLogFixture.hh"
-#include "ignition/common/testing/TestPaths.hh"
+#include "gz/common/testing/AutoLogFixture.hh"
+#include "gz/common/testing/TestPaths.hh"
 
 #ifdef _WIN32
   #define snprintf _snprintf
 #endif
 
-using namespace ignition;
+using namespace gz;
 
 class ColladaExporter : public common::testing::AutoLogFixture {
   /// \brief Setup the test fixture. This gets called by gtest.

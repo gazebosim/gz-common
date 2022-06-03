@@ -17,11 +17,11 @@
 
 #include <gtest/gtest.h>
 
-#include "ignition/common/EnumIface.hh"
+#include "gz/common/EnumIface.hh"
 
-#include "ignition/common/testing/AutoLogFixture.hh"
+#include "gz/common/testing/AutoLogFixture.hh"
 
-using namespace ignition;
+using namespace gz;
 
 class EnumIfaceTest : public common::testing::AutoLogFixture { };
 

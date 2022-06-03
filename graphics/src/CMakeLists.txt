@@ -29,12 +29,16 @@ ign_build_tests(
     ignition-common${IGN_COMMON_VER}-testing
 )
 
+message ("ASSIMP INCLUDE IS ${ASSIMP_INCLUDE_DIRS}")
 if(USE_EXTERNAL_TINYXML2)
 
   # If we are using an external copy of tinyxml2, add its imported target
   target_link_libraries(${graphics_target}
     PRIVATE
       TINYXML2::TINYXML2)
+
+  target_include_directories(${graphics_target}
+    PRIVATE ${ASSIMP_INCLUDE_DIRS})
 
     # The collada exporter test uses tinyxml2, so we must link it if we're using
     # an external copy. The graphics target considers tinyxml2 to be a private
@@ -49,7 +53,8 @@ else()
   # directories. We do not want this to be visible to consumers of
   # ignition-common.
   target_include_directories(${graphics_target}
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tinyxml2)
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tinyxml2
+    ${ASSIMP_INCLUDE_DIRS})
 
   if(TARGET UNIT_ColladaExporter_TEST)
 
@@ -67,7 +72,7 @@ else()
 endif()
 
 # define of tinxml2 major version >= 6
-# https://github.com/ignitionrobotics/ign-common/issues/28
+# https://github.com/gazebosim/gz-common/issues/28
 if (NOT TINYXML2_VERSION VERSION_LESS "6.0.0")
   message(STATUS "TINYXML2_VERSION ${TINYXML2_VERSION} >= 6.0.0")
   target_compile_definitions(${graphics_target}

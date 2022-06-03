@@ -15,13 +15,13 @@
  *
  */
 
-#include <ignition/common/Timer.hh>
+#include <gz/common/Timer.hh>
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 /// \brief Private data for the Timer class
-class ignition::common::Timer::Implementation
+class gz::common::Timer::Implementation
 {
   /// \brief The time of the last call to Start
   public: std::chrono::steady_clock::time_point start;
@@ -35,7 +35,7 @@ class ignition::common::Timer::Implementation
 
 //////////////////////////////////////////////////
 Timer::Timer()
-  : dataPtr(ignition::utils::MakeImpl<Implementation>())
+  : dataPtr(gz::utils::MakeImpl<Implementation>())
 {
 }
 

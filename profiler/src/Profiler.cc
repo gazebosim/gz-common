@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#include "ignition/common/Profiler.hh" // NOLINT(*)
-#include "ignition/common/Console.hh"
+#include "gz/common/Profiler.hh" // NOLINT(*)
+#include "gz/common/Console.hh"
 
 #include "ProfilerImpl.hh"
 
@@ -23,7 +23,7 @@
 #include "RemoteryProfilerImpl.hh"
 #endif  // IGN_PROFILER_REMOTERY
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 //////////////////////////////////////////////////
@@ -36,12 +36,12 @@ Profiler::Profiler():
 
   if (this->impl == nullptr)
   {
-    ignwarn << "No profiler implementation detected, profiling is disabled"
+    gzwarn << "No profiler implementation detected, profiling is disabled"
             << std::endl;
   }
   else
   {
-    igndbg << "Ignition profiling with: " << impl->Name() << std::endl;
+    gzdbg << "Ignition profiling with: " << impl->Name() << std::endl;
   }
 }
 

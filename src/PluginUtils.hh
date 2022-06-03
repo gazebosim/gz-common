@@ -15,20 +15,23 @@
  *
  */
 
-#ifndef IGNITION_COMMON_PLUGINUTILS_HH_
-#define IGNITION_COMMON_PLUGINUTILS_HH_
+#ifndef GZ_COMMON_PLUGINUTILS_HH_
+#define GZ_COMMON_PLUGINUTILS_HH_
+
+#define SUPPRESS_IGNITION_HEADER_DEPRECATION
 
 #include <string>
+#include "ignition/common/Export.hh"
 #include "ignition/common/StringUtils.hh"
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
     /// \brief Format the name to start with "::"
     /// \param[in] _name The name of a plugin or interface
     /// \return The input, but with "::" prepended if it was not there already.
-    inline std::string NormalizeName(const std::string &_name)
+    inline std::string IGN_DEPRECATED(5) NormalizeName(const std::string &_name)
     {
       std::string name = _name;
       if (!StartsWith(_name, "::"))
@@ -40,5 +43,6 @@ namespace ignition
   }
 }
 
+#undef SUPPRESS_IGNITION_HEADER_DEPRECATION
 
 #endif

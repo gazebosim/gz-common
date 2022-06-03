@@ -24,7 +24,7 @@
 
 #include <gz/utils/ImplPtr.hh>
 
-namespace ignition::common::testing
+namespace gz::common::testing
 {
 /// \brief A utility class that stores test logs in ~/.ignition/test_logs.
 /// This functionality is needed to keep all the log information reported
@@ -52,7 +52,7 @@ class AutoLogFixture : public ::testing::Test
   /// \brief Pointer to private data.
   IGN_UTILS_UNIQUE_IMPL_PTR(dataPtr)
 };
-}  // namespace ignition::common::testing
+}  // namespace gz::common::testing
 
 #include <gz/common/testing/detail/AutoLogFixture.hh>
 

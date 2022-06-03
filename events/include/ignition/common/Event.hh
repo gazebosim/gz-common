@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/Event.hh>
+#include <ignition/common/config.hh>

@@ -16,13 +16,13 @@
 
 #include <gtest/gtest.h>
 
-#include "ignition/common/Material.hh"
-#include "ignition/common/Pbr.hh"
+#include "gz/common/Material.hh"
+#include "gz/common/Pbr.hh"
 
-#include "ignition/common/testing/AutoLogFixture.hh"
-#include "ignition/common/testing/TestPaths.hh"
+#include "gz/common/testing/AutoLogFixture.hh"
+#include "gz/common/testing/TestPaths.hh"
 
-using namespace ignition;
+using namespace gz;
 
 class MaterialTest : public common::testing::AutoLogFixture { };
 

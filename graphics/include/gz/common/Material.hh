@@ -28,12 +28,12 @@
 
 #include <gz/utils/ImplPtr.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
     /// \brief Encapsulates description of a material
-    class IGNITION_COMMON_GRAPHICS_VISIBLE Material
+    class GZ_COMMON_GRAPHICS_VISIBLE Material
     {
       /// \def Shade modes
       /// \brief Enumeration of shade mode types
@@ -263,7 +263,7 @@ namespace ignition
       /// param[in] _out the output stream to extract from
       /// param[out] _m the material information
       public: friend std::ostream &operator<<(std::ostream &_out,
-                  const ignition::common::Material &_m)
+                  const gz::common::Material &_m)
               {
                 _out << "Material:\n";
                 _out << "  Name: " << _m.Name() << "\n";

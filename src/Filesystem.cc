@@ -25,12 +25,12 @@
 #include <cctype>
 #include <regex>
 
-#include <ignition/common/config.hh>
-#include <ignition/common/SystemPaths.hh>
-#include <ignition/common/Util.hh>
-#include <ignition/common/Uuid.hh>
-#include <ignition/common/Console.hh>
-#include "ignition/common/Filesystem.hh"
+#include <gz/common/config.hh>
+#include <gz/common/SystemPaths.hh>
+#include <gz/common/Util.hh>
+#include <gz/common/Uuid.hh>
+#include <gz/common/Console.hh>
+#include "gz/common/Filesystem.hh"
 
 namespace fs = std::filesystem;
 
@@ -38,14 +38,14 @@ namespace fs = std::filesystem;
 // Return true if success, false if error
 inline bool fsWarn(const std::string &_fcn,
              const std::error_code &_ec,
-             const ignition::common::FilesystemWarningOp &_warningOp =
-             ignition::common::FSWO_LOG_WARNINGS)
+             const gz::common::FilesystemWarningOp &_warningOp =
+             gz::common::FSWO_LOG_WARNINGS)
 {
   if (_ec)
   {
-    if (ignition::common::FSWO_LOG_WARNINGS == _warningOp)
+    if (gz::common::FSWO_LOG_WARNINGS == _warningOp)
     {
-      ignwarn << "Failed ignition::common::" << _fcn
+      gzwarn << "Failed gz::common::" << _fcn
         << " (ec: " << _ec << " " << _ec.message() << ")\n";
     }
     return false;
@@ -54,31 +54,31 @@ inline bool fsWarn(const std::string &_fcn,
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::exists(const std::string &_path)
+bool gz::common::exists(const std::string &_path)
 {
   return fs::exists(_path);
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::isDirectory(const std::string &_path)
+bool gz::common::isDirectory(const std::string &_path)
 {
   return fs::is_directory(_path);
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::isFile(const std::string &_path)
+bool gz::common::isFile(const std::string &_path)
 {
   return fs::is_regular_file(_path);
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::isRelativePath(const std::string &_path)
+bool gz::common::isRelativePath(const std::string &_path)
 {
   return fs::path(_path).is_relative();
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::createDirectory(const std::string &_path)
+bool gz::common::createDirectory(const std::string &_path)
 {
   std::error_code ec;
   fs::create_directory(_path, ec);
@@ -86,7 +86,7 @@ bool ignition::common::createDirectory(const std::string &_path)
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::createDirectories(const std::string &_path)
+bool gz::common::createDirectories(const std::string &_path)
 {
   std::error_code ec;
   // Disregard return of create_directories, because it may return false if the
@@ -97,19 +97,19 @@ bool ignition::common::createDirectories(const std::string &_path)
 }
 
 /////////////////////////////////////////////////
-std::string const ignition::common::separator(std::string const &_s)
+std::string const gz::common::separator(std::string const &_s)
 {
   return _s + std::string{fs::path::preferred_separator};
 }
 
 /////////////////////////////////////////////////
-void ignition::common::changeFromUnixPath(std::string &_path) {
+void gz::common::changeFromUnixPath(std::string &_path) {
   std::replace(_path.begin(), _path.end(), '/',
       static_cast<char>(fs::path::preferred_separator));
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::copyFromUnixPath(const std::string &_path)
+std::string gz::common::copyFromUnixPath(const std::string &_path)
 {
   std::string copy = _path;
   changeFromUnixPath(copy);
@@ -117,13 +117,13 @@ std::string ignition::common::copyFromUnixPath(const std::string &_path)
 }
 
 /////////////////////////////////////////////////
-void ignition::common::changeToUnixPath(std::string &_path) {
+void gz::common::changeToUnixPath(std::string &_path) {
   std::replace(_path.begin(), _path.end(),
       static_cast<char>(fs::path::preferred_separator), '/');
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::copyToUnixPath(const std::string &_path)
+std::string gz::common::copyToUnixPath(const std::string &_path)
 {
   std::string copy = _path;
   changeToUnixPath(copy);
@@ -131,13 +131,13 @@ std::string ignition::common::copyToUnixPath(const std::string &_path)
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::absPath(const std::string &_path)
+std::string gz::common::absPath(const std::string &_path)
 {
   return fs::absolute(_path).string();
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::joinPaths(
+std::string gz::common::joinPaths(
     const std::string &_path1, const std::string &_path2)
 {
   fs::path p1{_path1};
@@ -145,7 +145,7 @@ std::string ignition::common::joinPaths(
 
   if (p1.empty())
   {
-    p1 = ignition::common::separator("");
+    p1 = gz::common::separator("");
   }
 
   bool is_url = false;
@@ -181,7 +181,7 @@ std::string ignition::common::joinPaths(
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::cwd()
+std::string gz::common::cwd()
 {
   std::error_code ec;
   auto curdir = fs::current_path(ec);
@@ -195,7 +195,7 @@ std::string ignition::common::cwd()
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::chdir(const std::string &_dir)
+bool gz::common::chdir(const std::string &_dir)
 {
   std::error_code ec;
   fs::current_path(_dir, ec);
@@ -203,7 +203,7 @@ bool ignition::common::chdir(const std::string &_dir)
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::basename(const std::string &_path)
+std::string gz::common::basename(const std::string &_path)
 {
   fs::path p(_path);
   p /= "FOO.TXT";
@@ -214,7 +214,7 @@ std::string ignition::common::basename(const std::string &_path)
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::parentPath(const std::string &_path)
+std::string gz::common::parentPath(const std::string &_path)
 {
   std::string result;
   size_t last_sep = _path.find_last_of(separator(""));
@@ -226,7 +226,7 @@ std::string ignition::common::parentPath(const std::string &_path)
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::copyFile(
+bool gz::common::copyFile(
     const std::string &_existingFilename,
     const std::string &_newFilename,
     const FilesystemWarningOp _warningOp)
@@ -238,7 +238,7 @@ bool ignition::common::copyFile(
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::copyDirectory(
+bool gz::common::copyDirectory(
     const std::string &_existingDirname,
     const std::string &_newDirname,
     const FilesystemWarningOp _warningOp)
@@ -248,7 +248,7 @@ bool ignition::common::copyDirectory(
 
   // std::filesystem won't create intermediate directories
   // before copying, this maintains compatibility with ignition behavior.
-  if (!ignition::common::createDirectories(_newDirname))
+  if (!gz::common::createDirectories(_newDirname))
   {
     return false;
   }
@@ -259,7 +259,7 @@ bool ignition::common::copyDirectory(
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::moveFile(
+bool gz::common::moveFile(
     const std::string &_existingFilename,
     const std::string &_newFilename,
     const FilesystemWarningOp _warningOp)
@@ -270,7 +270,7 @@ bool ignition::common::moveFile(
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::removeDirectory(
+bool gz::common::removeDirectory(
     const std::string &_path,
     const FilesystemWarningOp _warningOp)
 {
@@ -278,7 +278,7 @@ bool ignition::common::removeDirectory(
   {
     if (FSWO_LOG_WARNINGS == _warningOp)
     {
-      ignwarn << "Cannot remove, not a directory [" << _path << "]\n";
+      gzwarn << "Cannot remove, not a directory [" << _path << "]\n";
     }
 
     return false;
@@ -288,7 +288,7 @@ bool ignition::common::removeDirectory(
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::removeFile(
+bool gz::common::removeFile(
     const std::string &_existingFilename,
     const FilesystemWarningOp _warningOp)
 {
@@ -296,7 +296,7 @@ bool ignition::common::removeFile(
   {
     if (FSWO_LOG_WARNINGS == _warningOp)
     {
-      ignwarn << "Cannot remove, not a file [" << _existingFilename << "]\n";
+      gzwarn << "Cannot remove, not a file [" << _existingFilename << "]\n";
     }
     return false;
   }
@@ -305,7 +305,7 @@ bool ignition::common::removeFile(
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::removeDirectoryOrFile(
+bool gz::common::removeDirectoryOrFile(
     const std::string &_path,
     const FilesystemWarningOp _warningOp)
 {
@@ -316,7 +316,7 @@ bool ignition::common::removeDirectoryOrFile(
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::removeAll(
+bool gz::common::removeAll(
     const std::string &_path,
     const FilesystemWarningOp _warningOp)
 {
@@ -326,7 +326,7 @@ bool ignition::common::removeAll(
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::uniqueFilePath(
+std::string gz::common::uniqueFilePath(
     const std::string &_pathAndName,
     const std::string &_extension)
 {
@@ -344,7 +344,7 @@ std::string ignition::common::uniqueFilePath(
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::uniqueDirectoryPath(const std::string &_dir)
+std::string gz::common::uniqueDirectoryPath(const std::string &_dir)
 {
   std::string result = _dir;
   int count = 1;

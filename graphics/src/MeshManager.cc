@@ -22,25 +22,25 @@
 #include <cctype>
 
 #ifndef _WIN32
-  #include "ignition/common/GTSMeshUtils.hh"
-  #include "ignition/common/MeshCSG.hh"
+  #include "gz/common/GTSMeshUtils.hh"
+  #include "gz/common/MeshCSG.hh"
 #endif
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/Mesh.hh"
-#include "ignition/common/SubMesh.hh"
-#include "ignition/common/ColladaLoader.hh"
-#include "ignition/common/ColladaExporter.hh"
-#include "ignition/common/OBJLoader.hh"
-#include "ignition/common/STLLoader.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/Mesh.hh"
+#include "gz/common/SubMesh.hh"
 #include "gz/common/AssimpLoader.hh"
-#include "ignition/common/config.hh"
+#include "gz/common/ColladaLoader.hh"
+#include "gz/common/ColladaExporter.hh"
+#include "gz/common/OBJLoader.hh"
+#include "gz/common/STLLoader.hh"
+#include "gz/common/config.hh"
 
-#include "ignition/common/MeshManager.hh"
+#include "gz/common/MeshManager.hh"
 
-using namespace ignition::common;
+using namespace gz::common;
 
-class ignition::common::MeshManager::Implementation
+class gz::common::MeshManager::Implementation
 {
 #ifdef _WIN32
 // Disable warning C4251
@@ -77,21 +77,21 @@ class ignition::common::MeshManager::Implementation
 
 //////////////////////////////////////////////////
 MeshManager::MeshManager()
-: dataPtr(ignition::utils::MakeUniqueImpl<Implementation>())
+: dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
 {
   // Create some basic shapes
   this->CreatePlane("unit_plane",
-      ignition::math::Planed(
-        ignition::math::Vector3d(0, 0, 1), ignition::math::Vector2d(1, 1), 0),
-      ignition::math::Vector2d(1, 1),
-      ignition::math::Vector2d(1, 1));
+      gz::math::Planed(
+        gz::math::Vector3d(0, 0, 1), gz::math::Vector2d(1, 1), 0),
+      gz::math::Vector2d(1, 1),
+      gz::math::Vector2d(1, 1));
 
   this->CreateSphere("unit_sphere", 0.5f, 32, 32);
   this->CreateSphere("joint_anchor", 0.01f, 32, 32);
-  this->CreateBox("body_cg", ignition::math::Vector3d(0.014, 0.014, 0.014),
-      ignition::math::Vector2d(0.014, 0.014));
-  this->CreateBox("unit_box", ignition::math::Vector3d(1, 1, 1),
-      ignition::math::Vector2d(1, 1));
+  this->CreateBox("body_cg", gz::math::Vector3d(0.014, 0.014, 0.014),
+      gz::math::Vector2d(0.014, 0.014));
+  this->CreateBox("unit_box", gz::math::Vector3d(1, 1, 1),
+      gz::math::Vector2d(1, 1));
   this->CreateCylinder("unit_cylinder", 0.5, 1.0, 1, 32);
   this->CreateCone("unit_cone", 0.5, 1.0, 5, 32);
   this->CreateCamera("unit_camera", 0.5);
@@ -105,6 +105,7 @@ MeshManager::MeshManager()
   this->dataPtr->fileExtensions.push_back("dae");
   this->dataPtr->fileExtensions.push_back("obj");
   this->dataPtr->fileExtensions.push_back("gltf");
+  this->dataPtr->fileExtensions.push_back("glb");
   this->dataPtr->fileExtensions.push_back("fbx");
   
 }
@@ -123,7 +124,7 @@ const Mesh *MeshManager::Load(const std::string &_filename)
 {
   if (!this->IsValidFilename(_filename))
   {
-    ignerr << "Invalid mesh filename extension[" << _filename << "]\n";
+    gzerr << "Invalid mesh filename extension[" << _filename << "]\n";
     return nullptr;
   }
 
@@ -155,7 +156,7 @@ const Mesh *MeshManager::Load(const std::string &_filename)
       loader = &this->dataPtr->objLoader;
     else
     {
-      ignerr << "Unsupported mesh format for file[" << _filename << "]\n";
+      gzerr << "Unsupported mesh format for file[" << _filename << "]\n";
       return nullptr;
     }
     */
@@ -170,7 +171,7 @@ const Mesh *MeshManager::Load(const std::string &_filename)
         this->dataPtr->meshes.insert(std::make_pair(_filename, mesh));
       }
       else
-        ignerr << "Unable to load mesh[" << fullname << "]\n";
+        gzerr << "Unable to load mesh[" << fullname << "]\n";
     }
     else
     {
@@ -178,7 +179,7 @@ const Mesh *MeshManager::Load(const std::string &_filename)
     }
   }
   else
-    ignerr << "Unable to find file[" << _filename << "]\n";
+    gzerr << "Unable to find file[" << _filename << "]\n";
 
   return mesh;
 }
@@ -193,7 +194,7 @@ void MeshManager::Export(const Mesh *_mesh, const std::string &_filename,
   }
   else
   {
-    ignerr << "Unsupported mesh format for file[" << _filename << "]\n";
+    gzerr << "Unsupported mesh format for file[" << _filename << "]\n";
   }
 }
 
@@ -215,8 +216,8 @@ bool MeshManager::IsValidFilename(const std::string &_filename)
 
 //////////////////////////////////////////////////
 void MeshManager::MeshAABB(const Mesh *_mesh,
-    ignition::math::Vector3d &_center,
-    ignition::math::Vector3d &_minXYZ, ignition::math::Vector3d &_maxXYZ)
+    gz::math::Vector3d &_center,
+    gz::math::Vector3d &_minXYZ, gz::math::Vector3d &_maxXYZ)
 {
   if (this->HasMesh(_mesh->Name()))
     this->dataPtr->meshes[_mesh->Name()]->AABB(_center, _minXYZ, _maxXYZ);
@@ -224,7 +225,7 @@ void MeshManager::MeshAABB(const Mesh *_mesh,
 
 //////////////////////////////////////////////////
 void MeshManager::GenSphericalTexCoord(const Mesh *_mesh,
-    const ignition::math::Vector3d &_center)
+    const gz::math::Vector3d &_center)
 {
   if (this->HasMesh(_mesh->Name()))
     this->dataPtr->meshes[_mesh->Name()]->GenSphericalTexCoord(_center);
@@ -301,7 +302,7 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
   int ring, seg;
   float deltaSegAngle = (2.0 * IGN_PI / segments);
   float deltaRingAngle = (IGN_PI / rings);
-  ignition::math::Vector3d vert, norm;
+  gz::math::Vector3d vert, norm;
   unsigned int verticeIndex = 0;
 
   Mesh *mesh = new Mesh();
@@ -351,9 +352,9 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
 
 //////////////////////////////////////////////////
 void MeshManager::CreatePlane(const std::string &_name,
-    const ignition::math::Planed &_plane,
-    const ignition::math::Vector2d &_segments,
-    const ignition::math::Vector2d &_uvTile)
+    const gz::math::Planed &_plane,
+    const gz::math::Vector2d &_segments,
+    const gz::math::Vector2d &_uvTile)
 {
   this->CreatePlane(_name, _plane.Normal(), _plane.Offset(), _plane.Size(),
       _segments, _uvTile);
@@ -361,11 +362,11 @@ void MeshManager::CreatePlane(const std::string &_name,
 
 //////////////////////////////////////////////////
 void MeshManager::CreatePlane(const std::string &_name,
-    const ignition::math::Vector3d &_normal,
+    const gz::math::Vector3d &_normal,
     const double _d,
-    const ignition::math::Vector2d &_size,
-    const ignition::math::Vector2d &_segments,
-    const ignition::math::Vector2d &_uvTile)
+    const gz::math::Vector2d &_size,
+    const gz::math::Vector2d &_segments,
+    const gz::math::Vector2d &_uvTile)
 {
   if (this->HasMesh(_name))
   {
@@ -378,16 +379,16 @@ void MeshManager::CreatePlane(const std::string &_name,
 
   SubMesh subMesh;
 
-  ignition::math::Vector3d zAxis, yAxis, xAxis;
+  gz::math::Vector3d zAxis, yAxis, xAxis;
   zAxis = _normal;
   zAxis.Normalize();
   yAxis = zAxis.Perpendicular();
   xAxis = yAxis.Cross(zAxis);
 
-  ignition::math::Matrix4d xlate, xform, rot;
-  xlate = rot = ignition::math::Matrix4d::Identity;
+  gz::math::Matrix4d xlate, xform, rot;
+  xlate = rot = gz::math::Matrix4d::Identity;
 
-  ignition::math::Matrix3d rot3;
+  gz::math::Matrix3d rot3;
   rot3.SetAxes(xAxis, yAxis, zAxis);
 
   rot = rot3;
@@ -395,8 +396,8 @@ void MeshManager::CreatePlane(const std::string &_name,
   xlate.SetTranslation(_normal * -_d);
   xform = xlate * rot;
 
-  ignition::math::Vector3d vec;
-  ignition::math::Vector3d norm(0, 0, 1);
+  gz::math::Vector3d vec;
+  gz::math::Vector3d norm(0, 0, 1);
   double xSpace = _size.X() / _segments.X();
   double ySpace = _size.Y() / _segments.Y();
   double halfWidth = _size.X() / 2.0;
@@ -420,7 +421,7 @@ void MeshManager::CreatePlane(const std::string &_name,
         vec.Z() = -z;
         if (!xform.TransformAffine(vec, vec))
         {
-          ignerr << "Unable tor transform matrix4d\n";
+          gzerr << "Unable tor transform matrix4d\n";
           continue;
         }
         subMesh.AddVertex(vec);
@@ -428,7 +429,7 @@ void MeshManager::CreatePlane(const std::string &_name,
         // Compute the normal
         if (!xform.TransformAffine(norm, vec))
         {
-          ignerr << "Unable to tranform matrix4d\n";
+          gzerr << "Unable to tranform matrix4d\n";
           continue;
         }
 
@@ -448,8 +449,8 @@ void MeshManager::CreatePlane(const std::string &_name,
 
 //////////////////////////////////////////////////
 void MeshManager::CreateBox(const std::string &_name,
-    const ignition::math::Vector3d &_sides,
-    const ignition::math::Vector2d &_uvCoords)
+    const gz::math::Vector3d &_sides,
+    const gz::math::Vector2d &_uvCoords)
 {
   int i, k;
 
@@ -550,7 +551,7 @@ void MeshManager::CreateBox(const std::string &_name,
 
 //////////////////////////////////////////////////
 void MeshManager::CreateExtrudedPolyline(const std::string &_name,
-    const std::vector<std::vector<ignition::math::Vector2d> > &_polys,
+    const std::vector<std::vector<gz::math::Vector2d> > &_polys,
     double _height)
 {
 #ifndef _WIN32
@@ -585,36 +586,36 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
 
   SubMesh subMesh;
 
-  std::vector<ignition::math::Vector2d> vertices;
-  std::vector<ignition::math::Vector2i> edges;
+  std::vector<gz::math::Vector2d> vertices;
+  std::vector<gz::math::Vector2i> edges;
   MeshManager::ConvertPolylinesToVerticesAndEdges(polys,
                                                   tol,
                                                   vertices,
                                                   edges);
   if (!GTSMeshUtils::DelaunayTriangulation(vertices, edges, &subMesh))
   {
-    ignerr << "Unable to triangulate polyline." << std::endl;
+    gzerr << "Unable to triangulate polyline." << std::endl;
     delete mesh;
     return;
   }
 
-  std::vector<ignition::math::Vector3d> normals;
+  std::vector<gz::math::Vector3d> normals;
   for (unsigned int i  = 0; i < edges.size(); ++i)
   {
     // we retrieve each edge's coordinates
     int i0 = edges[i][0];
     int i1 = edges[i][1];
-    ignition::math::Vector2d edgeV0 = vertices[i0];
-    ignition::math::Vector2d edgeV1 = vertices[i1];
+    gz::math::Vector2d edgeV0 = vertices[i0];
+    gz::math::Vector2d edgeV1 = vertices[i1];
 
     // we look for those points in the subMesh (where indices may have changed)
     for (unsigned int j = 0; j < subMesh.IndexCount(); j+=3)
     {
-      ignition::math::Vector3d v0 = subMesh.Vertex(subMesh.Index(j));
-      ignition::math::Vector3d v1 = subMesh.Vertex(subMesh.Index(j+1));
-      ignition::math::Vector3d v2 = subMesh.Vertex(subMesh.Index(j+2));
+      gz::math::Vector3d v0 = subMesh.Vertex(subMesh.Index(j));
+      gz::math::Vector3d v1 = subMesh.Vertex(subMesh.Index(j+1));
+      gz::math::Vector3d v2 = subMesh.Vertex(subMesh.Index(j+2));
 
-      std::vector<ignition::math::Vector3d> triangle;
+      std::vector<gz::math::Vector3d> triangle;
       triangle.push_back(v0);
       triangle.push_back(v1);
       triangle.push_back(v2);
@@ -622,7 +623,7 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
       int ev0 = -1;
       for (unsigned int k = 0; k < triangle.size(); ++k)
       {
-        if (ignition::math::Vector2d(triangle[k].X(), triangle[k].Y()) ==
+        if (gz::math::Vector2d(triangle[k].X(), triangle[k].Y()) ==
             edgeV0)
         {
           // found a vertex in triangle that matches the vertex of the edge
@@ -637,7 +638,7 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
         for (unsigned int k = 0; k < triangle.size()-1; ++k)
         {
           int index = (ev0 + k + 1) % triangle.size();
-          ignition::math::Vector3d triV = triangle[index];
+          gz::math::Vector3d triV = triangle[index];
           if (math::Vector2d(triV.X(), triV.Y()) == edgeV1)
           {
             // found another vertex in triangle that matches the vertex of the
@@ -654,11 +655,11 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
           // Found an edge in triangle that matches the exterior edge.
           // Now find its normal.
 
-          ignition::math::Vector3d edgeVec = triangle[ev0] - triangle[ev1];
+          gz::math::Vector3d edgeVec = triangle[ev0] - triangle[ev1];
           edgeVec.Normalize();
-          ignition::math::Vector3d normal(edgeVec.Y(), -edgeVec.X(), 0);
+          gz::math::Vector3d normal(edgeVec.Y(), -edgeVec.X(), 0);
 
-          ignition::math::Vector3d otherEdgeVec = triangle[ev0] - triangle[ev2];
+          gz::math::Vector3d otherEdgeVec = triangle[ev0] - triangle[ev2];
           otherEdgeVec.Normalize();
           double angle0 = otherEdgeVec.Dot(normal);
           double angle1 = otherEdgeVec.Dot(-normal);
@@ -682,7 +683,7 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
   // exterior edges
   if (normals.size() != edges.size())
   {
-    ignerr << "Unable to extrude mesh. Triangulation failed" << std::endl;
+    gzerr << "Unable to extrude mesh. Triangulation failed" << std::endl;
     delete mesh;
     return;
   }
@@ -691,14 +692,14 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
 
   // add normal for bottom face
   for (unsigned int i = 0; i < numVertices; ++i)
-    subMesh.AddNormal(-ignition::math::Vector3d::UnitZ);
+    subMesh.AddNormal(-gz::math::Vector3d::UnitZ);
 
   // create the top face
   for (unsigned int i = 0; i < numVertices; ++i)
   {
-    ignition::math::Vector3d v = subMesh.Vertex(i);
+    gz::math::Vector3d v = subMesh.Vertex(i);
     subMesh.AddVertex(v.X(), v.Y(), _height);
-    subMesh.AddNormal(ignition::math::Vector3d::UnitZ);
+    subMesh.AddNormal(gz::math::Vector3d::UnitZ);
   }
   unsigned int numIndices = subMesh.IndexCount();
   for (unsigned int i = 0; i < numIndices; i+=3)
@@ -717,36 +718,36 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
     // we retrieve each edge's coordinates
     int i0 = edges[i][0];
     int i1 = edges[i][1];
-    ignition::math::Vector2d v0 = vertices[i0];
-    ignition::math::Vector2d v1 = vertices[i1];
+    gz::math::Vector2d v0 = vertices[i0];
+    gz::math::Vector2d v1 = vertices[i1];
 
-    ignition::math::Vector2d edge2d = v1 - v0;
-    ignition::math::Vector3d edge(edge2d.X(), edge2d.Y(), 0);
-    ignition::math::Vector3d cross = edge.Cross(normals[i]);
+    gz::math::Vector2d edge2d = v1 - v0;
+    gz::math::Vector3d edge(edge2d.X(), edge2d.Y(), 0);
+    gz::math::Vector3d cross = edge.Cross(normals[i]);
 
     unsigned int vCount = subMesh.VertexCount();
 
-    subMesh.AddVertex(ignition::math::Vector3d(v0.X(), v0.Y(), 0));
+    subMesh.AddVertex(gz::math::Vector3d(v0.X(), v0.Y(), 0));
     if (cross.Z() >0)
     {
-      subMesh.AddVertex(ignition::math::Vector3d(v0.X(), v0.Y(), _height));
-      subMesh.AddVertex(ignition::math::Vector3d(v1.X(), v1.Y(), _height));
+      subMesh.AddVertex(gz::math::Vector3d(v0.X(), v0.Y(), _height));
+      subMesh.AddVertex(gz::math::Vector3d(v1.X(), v1.Y(), _height));
     }
     else
     {
-      subMesh.AddVertex(ignition::math::Vector3d(v1.X(), v1.Y(), _height));
-      subMesh.AddVertex(ignition::math::Vector3d(v0.X(), v0.Y(), _height));
+      subMesh.AddVertex(gz::math::Vector3d(v1.X(), v1.Y(), _height));
+      subMesh.AddVertex(gz::math::Vector3d(v0.X(), v0.Y(), _height));
     }
-    subMesh.AddVertex(ignition::math::Vector3d(v0.X(), v0.Y(), 0));
+    subMesh.AddVertex(gz::math::Vector3d(v0.X(), v0.Y(), 0));
     if (cross.Z() >0)
     {
-      subMesh.AddVertex(ignition::math::Vector3d(v1.X(), v1.Y(), _height));
-      subMesh.AddVertex(ignition::math::Vector3d(v1.X(), v1.Y(), 0));
+      subMesh.AddVertex(gz::math::Vector3d(v1.X(), v1.Y(), _height));
+      subMesh.AddVertex(gz::math::Vector3d(v1.X(), v1.Y(), 0));
     }
     else
     {
-      subMesh.AddVertex(ignition::math::Vector3d(v1.X(), v1.Y(), 0));
-      subMesh.AddVertex(ignition::math::Vector3d(v1.X(), v1.Y(), _height));
+      subMesh.AddVertex(gz::math::Vector3d(v1.X(), v1.Y(), 0));
+      subMesh.AddVertex(gz::math::Vector3d(v1.X(), v1.Y(), _height));
     }
     for (unsigned int j = 0; j < 6; ++j)
     {
@@ -860,7 +861,7 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
 
 //////////////////////////////////////////////////
 void MeshManager::CreateEllipsoid(const std::string &_name,
-                                  const ignition::math::Vector3d &_radii,
+                                  const gz::math::Vector3d &_radii,
                                   const unsigned int _rings,
                                   const unsigned int _segments)
 {
@@ -896,22 +897,22 @@ void MeshManager::CreateEllipsoid(const std::string &_name,
       const auto s_phi = sin(phi);
 
       // Compute vertex
-      subMesh.AddVertex(ignition::math::Vector3d(
+      subMesh.AddVertex(gz::math::Vector3d(
         _radii.X() * c_phi * c_theta,
         _radii.Y() * c_phi * s_theta,
         _radii.Z() * s_phi));
 
       // Compute unit normal at vertex
-      ignition::math::Vector3d du(
+      gz::math::Vector3d du(
         -(_radii.X() * c_phi) * s_theta,
         +(_radii.Y() * c_phi) * c_theta,
         0.0);
-      ignition::math::Vector3d dv(
+      gz::math::Vector3d dv(
         -_radii.X() * s_phi * c_theta,
         -_radii.Y() * s_phi * s_theta,
         _radii.Z() * c_phi);
 
-      ignition::math::Vector3d normal = du.Cross(dv);
+      gz::math::Vector3d normal = du.Cross(dv);
 
       subMesh.AddNormal(normal);
 
@@ -983,10 +984,10 @@ void MeshManager::CreateCapsule(const std::string &_name,
       x = -sin(u * (IGN_PI * 2.0));
       y = cos(u * (IGN_PI * 2.0));
 
-      ignition::math::Vector3d p(x * _radius * w, y * _radius * w, z);
+      gz::math::Vector3d p(x * _radius * w, y * _radius * w, z);
       // Compute vertex
-      subMesh.AddVertex(ignition::math::Vector3d(
-        p + ignition::math::Vector3d(0.0, 0.0, 0.5 * _length)));
+      subMesh.AddVertex(gz::math::Vector3d(
+        p + gz::math::Vector3d(0.0, 0.0, 0.5 * _length)));
       subMesh.AddTexCoord({u, v * oneThird});
       subMesh.AddNormal(p.Normalize());
 
@@ -1026,12 +1027,12 @@ void MeshManager::CreateCapsule(const std::string &_name,
       x = -sin(u * (IGN_PI * 2.0));
       y = cos(u * (IGN_PI * 2.0));
 
-      ignition::math::Vector3d p(x * _radius, y * _radius, z);
+      gz::math::Vector3d p(x * _radius, y * _radius, z);
 
       // Compute vertex
       subMesh.AddVertex(p);
       subMesh.AddTexCoord({u, oneThird + (v * oneThird)});
-      subMesh.AddNormal(ignition::math::Vector3d(x, y, 0.0));
+      subMesh.AddNormal(gz::math::Vector3d(x, y, 0.0));
       point++;
 
       if (i > 0 && j > 0)
@@ -1069,10 +1070,10 @@ void MeshManager::CreateCapsule(const std::string &_name,
       x = -sin(u2 * (IGN_PI * 2.0));
       y = cos(u2 * (IGN_PI * 2.0));
 
-      ignition::math::Vector3d p(x * _radius * w, y * _radius * w, z);
+      gz::math::Vector3d p(x * _radius * w, y * _radius * w, z);
       // Compute vertex
-      subMesh.AddVertex(ignition::math::Vector3d(
-        p + ignition::math::Vector3d(0.0, 0.0, -0.5 * _length)));
+      subMesh.AddVertex(gz::math::Vector3d(
+        p + gz::math::Vector3d(0.0, 0.0, -0.5 * _length)));
       subMesh.AddTexCoord({u2, twoThirds + ((v - 1.0) * oneThird)});
       subMesh.AddNormal(p.Normalize());
       point++;
@@ -1100,7 +1101,7 @@ void MeshManager::CreateCapsule(const std::string &_name,
 void MeshManager::CreateCylinder(const std::string &name, float radius,
                                  float height, int rings, int segments)
 {
-  ignition::math::Vector3d vert, norm;
+  gz::math::Vector3d vert, norm;
   unsigned int verticeIndex = 0;
   int ring, seg;
   float deltaSegAngle = (2.0 * IGN_PI / segments);
@@ -1217,7 +1218,7 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
 void MeshManager::CreateCone(const std::string &name, float radius,
     float height, int rings, int segments)
 {
-  ignition::math::Vector3d vert, norm;
+  gz::math::Vector3d vert, norm;
   unsigned int verticeIndex = 0;
   unsigned int i, j;
   int ring, seg;
@@ -1327,7 +1328,7 @@ void MeshManager::CreateCone(const std::string &name, float radius,
 void MeshManager::CreateTube(const std::string &_name, float _innerRadius,
     float _outerRadius, float _height, int _rings, int _segments, double _arc)
 {
-  ignition::math::Vector3d vert, norm;
+  gz::math::Vector3d vert, norm;
   unsigned int verticeIndex = 0;
   int ring, seg;
 
@@ -1462,7 +1463,7 @@ void MeshManager::CreateTube(const std::string &_name, float _innerRadius,
   }
 
   // Close ends in case it's not a full circle
-  if (!ignition::math::equal(_arc, 2.0 * IGN_PI))
+  if (!gz::math::equal(_arc, 2.0 * IGN_PI))
   {
     for (ring = 0; ring < rings; ++ring)
     {
@@ -1558,7 +1559,7 @@ void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
 
 //////////////////////////////////////////////////
 void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
-    const Mesh *_m2, int _operation, const ignition::math::Pose3d &_offset)
+    const Mesh *_m2, int _operation, const gz::math::Pose3d &_offset)
 {
   if (this->HasMesh(_name))
     return;
@@ -1573,8 +1574,8 @@ void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
 
 //////////////////////////////////////////////////
 size_t MeshManager::AddUniquePointToVerticesTable(
-                     std::vector<ignition::math::Vector2d> &_vertices,
-                     const ignition::math::Vector2d &_p,
+                     std::vector<gz::math::Vector2d> &_vertices,
+                     const gz::math::Vector2d &_p,
                      double _tol)
 {
   double sqrTol = _tol * _tol;
@@ -1594,14 +1595,14 @@ size_t MeshManager::AddUniquePointToVerticesTable(
 
 //////////////////////////////////////////////////
 void MeshManager::ConvertPolylinesToVerticesAndEdges(
-    const std::vector<std::vector<ignition::math::Vector2d> > &_polys,
+    const std::vector<std::vector<gz::math::Vector2d> > &_polys,
     double _tol,
-    std::vector<ignition::math::Vector2d> &_vertices,
-    std::vector<ignition::math::Vector2i> &edges)
+    std::vector<gz::math::Vector2d> &_vertices,
+    std::vector<gz::math::Vector2i> &edges)
 {
   for (auto poly : _polys)
   {
-    ignition::math::Vector2d previous = poly[0];
+    gz::math::Vector2d previous = poly[0];
     for (auto i = 1u; i != poly.size(); ++i)
     {
       auto p = poly[i];
@@ -1613,11 +1614,11 @@ void MeshManager::ConvertPolylinesToVerticesAndEdges(
       previous = p;
       if (startPointIndex == endPointIndex)
       {
-        ignwarn << "Ignoring edge without 2 distinct vertices" << std::endl;
+        gzwarn << "Ignoring edge without 2 distinct vertices" << std::endl;
         continue;
       }
       // add the new edge
-      ignition::math::Vector2i e(startPointIndex, endPointIndex);
+      gz::math::Vector2i e(startPointIndex, endPointIndex);
       edges.push_back(e);
     }
   }

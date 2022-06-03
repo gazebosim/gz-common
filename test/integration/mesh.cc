@@ -17,18 +17,18 @@
 
 #include <gtest/gtest.h>
 
-#include "ignition/common/Material.hh"
-#include "ignition/common/Mesh.hh"
-#include "ignition/common/Skeleton.hh"
-#include "ignition/common/SubMesh.hh"
-#include "ignition/common/MeshManager.hh"
-#include "ignition/common/SystemPaths.hh"
-#include "ignition/math/Vector3.hh"
+#include "gz/common/Material.hh"
+#include "gz/common/Mesh.hh"
+#include "gz/common/Skeleton.hh"
+#include "gz/common/SubMesh.hh"
+#include "gz/common/MeshManager.hh"
+#include "gz/common/SystemPaths.hh"
+#include "gz/math/Vector3.hh"
 
-#include <ignition/common/testing/AutoLogFixture.hh>
-#include <ignition/common/testing/TestPaths.hh>
+#include <gz/common/testing/AutoLogFixture.hh>
+#include <gz/common/testing/TestPaths.hh>
 
-using namespace ignition;
+using namespace gz;
 
 class MeshTest : public common::testing::AutoLogFixture { };
 
@@ -151,11 +151,11 @@ TEST_F(MeshTest, Access)
   EXPECT_EQ(24u, mesh->TexCoordCount());
   EXPECT_EQ(0u, mesh->MaterialCount());
 
-  ignition::math::Vector3d center, min, max;
+  gz::math::Vector3d center, min, max;
   mesh->AABB(center, min, max);
-  EXPECT_TRUE(center == ignition::math::Vector3d(0, 0, 0));
-  EXPECT_TRUE(min == ignition::math::Vector3d(-.5, -.5, -.5));
-  EXPECT_TRUE(max == ignition::math::Vector3d(.5, .5, .5));
+  EXPECT_TRUE(center == gz::math::Vector3d(0, 0, 0));
+  EXPECT_TRUE(min == gz::math::Vector3d(-.5, -.5, -.5));
+  EXPECT_TRUE(max == gz::math::Vector3d(.5, .5, .5));
 
   double *vertArray = nullptr;
   int *indArray = nullptr;
@@ -224,9 +224,9 @@ TEST_F(MeshTest, RoundtripStl)
 
   math::Vector3d center, min, max;
   mesh->AABB(center, min, max);
-  EXPECT_TRUE(center == ignition::math::Vector3d(0.5, 0.5, 0.5));
-  EXPECT_TRUE(min == ignition::math::Vector3d(0, 0, 0));
-  EXPECT_TRUE(max == ignition::math::Vector3d(1, 1, 1));
+  EXPECT_TRUE(center == gz::math::Vector3d(0.5, 0.5, 0.5));
+  EXPECT_TRUE(min == gz::math::Vector3d(0, 0, 0));
+  EXPECT_TRUE(max == gz::math::Vector3d(1, 1, 1));
 }
 
 /////////////////////////////////////////////////

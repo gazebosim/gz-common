@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/HWVideo.hh>
+#include <ignition/common/config.hh>

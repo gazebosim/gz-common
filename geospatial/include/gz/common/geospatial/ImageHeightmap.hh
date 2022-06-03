@@ -26,13 +26,13 @@
 #include <gz/common/geospatial/HeightmapData.hh>
 #include <gz/common/Image.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
     /// \brief Encapsulates an image that will be interpreted as a heightmap.
-    class IGNITION_COMMON_GEOSPATIAL_VISIBLE ImageHeightmap
-      : public ignition::common::HeightmapData
+    class GZ_COMMON_GEOSPATIAL_VISIBLE ImageHeightmap
+      : public gz::common::HeightmapData
     {
       /// \brief Constructor
       /// \param[in] _filename the path to the image
@@ -45,8 +45,8 @@ namespace ignition
 
       // Documentation inherited.
       public: void FillHeightMap(int _subSampling, unsigned int _vertSize,
-          const ignition::math::Vector3d &_size,
-          const ignition::math::Vector3d &_scale, bool _flipY,
+          const gz::math::Vector3d &_size,
+          const gz::math::Vector3d &_scale, bool _flipY,
           std::vector<float> &_heights) const;
 
       // Documentation inherited.
@@ -62,7 +62,7 @@ namespace ignition
       public: float MaxElevation() const;
 
       /// \brief Image containing the heightmap data.
-      private: ignition::common::Image img;
+      private: gz::common::Image img;
 
       /// \brief Get Heightmap heights given the image
       /// \param[in] _data Image data
@@ -77,8 +77,8 @@ namespace ignition
       private: template <typename T>
       void FillHeights(T *_data, int _imgHeight, int _imgWidth,
         unsigned int _pitch, int _subSampling, unsigned int _vertSize,
-        const ignition::math::Vector3d &_size,
-        const ignition::math::Vector3d &_scale,
+        const gz::math::Vector3d &_size,
+        const gz::math::Vector3d &_scale,
         bool _flipY, std::vector<float> &_heights) const
       {
         // bytes per pixel

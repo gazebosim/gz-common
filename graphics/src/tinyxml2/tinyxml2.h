@@ -95,7 +95,7 @@ distribution.
 static const int TIXML2_MAJOR_VERSION = 3;
 static const int TIXML2_MINOR_VERSION = 0;
 static const int TIXML2_PATCH_VERSION = 0;
-namespace ignition
+namespace gz
 {
 namespace tinyxml2
 {

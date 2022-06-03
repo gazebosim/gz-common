@@ -34,13 +34,13 @@
 #define VIDEO_ENCODER_FPS_DEFAULT 25
 #define VIDEO_ENCODER_FORMAT_DEFAULT "mp4"
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
     /// \brief The VideoEncoder class supports encoding a series of images
     /// to a video format, and then writing the video to disk.
-    class IGNITION_COMMON_AV_VISIBLE VideoEncoder
+    class GZ_COMMON_AV_VISIBLE VideoEncoder
     {
       /// \brief Constructor
       public: VideoEncoder();

@@ -27,12 +27,12 @@
 
 /// This is an internal-use only class encapsulating HW video encoding. All
 /// symbols defined here are hidden from the public API.
-namespace ignition::common
+namespace gz::common
 {
   /// \brief Representation of a GPU video encoder and its configuration.
   /// \note This class is intentionally hidden as it provides highly customized
   /// behavior tailored just for the use with VideoEncoder.
-  class IGNITION_COMMON_AV_HIDDEN HWEncoder
+  class GZ_COMMON_AV_HIDDEN HWEncoder
   {
     /// \brief Set up the HW encoder configurator.
     /// \param[in] _allowedHwEncoders HW encoders to try.
@@ -62,7 +62,7 @@ namespace ignition::common
     /// \param[in] _encoderContext Context of the encoder for which hardware
     /// acceleration should be set up.
     /// \note If the configuration fails, the codec will be left configured for
-    /// software encoding and an error will be written to ignerr describing what
+    /// software encoding and an error will be written to gzerr describing what
     /// failed.
     public: void ConfigHWAccel(AVCodecContext* _encoderContext);
 
