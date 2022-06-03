@@ -160,7 +160,6 @@ const Mesh *MeshManager::Load(const std::string &_filename)
       return nullptr;
     }
     */
-
     // This mutex prevents two threads from loading the same mesh at the
     // same time.
     std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
