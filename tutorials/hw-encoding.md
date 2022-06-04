@@ -83,7 +83,7 @@ If your computer has more GPUs, it is important to specify which one to use.
 Here are some basic naming rules:
 
 - NVEnc
-  - Linux: Devices `/dev/nvidia0`, `/dev/nvidia1` etc. Beware that the numbers 
+  - Linux: Devices `/dev/nvidia0`, `/dev/nvidia1` etc. Beware that the numbers
     in names of these devices can differ from the numbers CUDA assigns the GPUs
     (CUDA orders the GPUs according to their compute capability, whereas numbering
     of these devices is probably by the order on PCI bus).
@@ -93,16 +93,16 @@ Here are some basic naming rules:
   - Windows: The devices are called just `0`, `1` and so on.
   - Linux: When using QSV on Linux, you can use VA-API device names.
 - VA-API
-  - Linux: 
+  - Linux:
     - DRM: The devices are called `/dev/dri/renderD128`, `/dev/dri/renderD129`
       etc. DRM stands for Direct Rendering Manager, not Digital Rights Management
-      To use these devices, make sure your user has write permissions to the 
+      To use these devices, make sure your user has write permissions to the
       device files. Ubuntu usually doesn't give write access to everybody, but just
       to members of the `video` group.
     - GLX: You can also pass an X-server string like `:0`, which means the encoder
       should use the GPU on which this X server is running (it needs to support
       the GLX extension). On headless machines, you should use DRM.
-      
+
 ## 3. Using HW surface
 
 The last thing you need to decide is whether the selected encoder should use
@@ -120,11 +120,11 @@ on implementing the recording procedure itself, and completely ignore any HW
 acceleration of the recording process. Users of the code can then enable the HW
 acceleration just using these 3 environment variables:
 
-### `IGN_VIDEO_ALLOWED_ENCODERS`
+### `GZ_VIDEO_ALLOWED_ENCODERS`
 
 This is the main variable that allows the `VideoEncoder` to probe for supported
 HW-accelerated encoders. It is a colon-separated list of names described in the
-table above. Example: `IGN_VIDEO_ALLOWED_ENCODERS=NVENC:QSV`. Special value `ALL`
+table above. Example: `GZ_VIDEO_ALLOWED_ENCODERS=NVENC:QSV`. Special value `ALL`
 means that all encoders should be tried. Special value `NONE` (or empty value) means
 that a SW encoder should be used.
 
@@ -140,14 +140,14 @@ encoder is considered working. Sometimes, something can go wrong in a later stag
 (e.g. insufficient GPU memory), and that is a kind of thing you have to
 handle yourself.
 
-### `IGN_VIDEO_ENCODER_DEVICE`
+### `GZ_VIDEO_ENCODER_DEVICE`
 
 This is a name of the encoder device as specified in the "Device Names" section.
 If empty, first working device will be used. This auto detection should suffice on
 single-GPU systems or if you don't care which GPU will be used. If a device is
 specified, only encoders accepting this device name as an argument will be probed.
 
-### `IGN_VIDEO_USE_HW_SURFACE`
+### `GZ_VIDEO_USE_HW_SURFACE`
 
 This variable has three possible values:
 
@@ -255,19 +255,19 @@ Just give them a try and dig deeper in the configuration if something is wrong.
 
 ## Linux/Win + Intel GPU
 
-    IGN_VIDEO_ALLOWED_ENCODERS=QSV
+    GZ_VIDEO_ALLOWED_ENCODERS=QSV
 
 ## Linux/Win + NVidia GPU
 
-    IGN_VIDEO_ALLOWED_ENCODERS=NVENC
+    GZ_VIDEO_ALLOWED_ENCODERS=NVENC
 
 ## Linux + Intel/NVidia GPU
 
-    IGN_VIDEO_ALLOWED_ENCODERS=VAAPI
+    GZ_VIDEO_ALLOWED_ENCODERS=VAAPI
 
 ## Linux NVidia Multi-GPU machine
 
-    IGN_VIDEO_ALLOWED_ENCODERS=NVENC IGN_VIDEO_ENCODER_DEVICE=/dev/nvidia2
+    GZ_VIDEO_ALLOWED_ENCODERS=NVENC GZ_VIDEO_ENCODER_DEVICE=/dev/nvidia2
 
 # Caveats
 
@@ -290,6 +290,6 @@ This might be really troublesome on e.g. multi-user systems when you don't even 
 which jobs of the other users are using NVEnc.
 
 There is a workaround removing this artificial limit - patching the binary blob
-drivers using https://github.com/keylase/nvidia-patch . This is an unofficial 
-patch that is not supported by NVidia or the Ignition developers. It is up to 
+drivers using https://github.com/keylase/nvidia-patch . This is an unofficial
+patch that is not supported by NVidia or the Ignition developers. It is up to
 you if you can and want to do that. And there is no guarantee it will work forever.
