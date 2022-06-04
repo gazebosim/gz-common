@@ -245,11 +245,33 @@ void SystemPaths::SetFilePathEnv(const std::string &_env)
       this->AddFilePaths(result);
     }
   }
+  // TODO(CH3): Deprecated. Remove on tock.
+  else if (!this->dataPtr->filePathEnvDeprecated.empty())
+  {
+    this->ClearFilePaths();
+    if (env(this->dataPtr->filePathEnvDeprecated, result))
+    {
+      gzwarn << "Finding files using deprecated environment variable "
+             << "[" << this->dataPtr->filePathEnvDeprecated
+             << "]. Please use [" << this->dataPtr->filePathEnv
+             << "] instead." << std::endl;
+      this->AddFilePaths(result);
+    }
+  }
 }
 
 /////////////////////////////////////////////////
 std::string SystemPaths::FilePathEnv() const
 {
+  // TODO(CH3): Deprecated. Remove on tock.
+  if (this->dataPtr->filePathEnv.empty())
+  {
+    gzwarn << "Returning deprecated file path environment variable "
+           << "[" << this->dataPtr->filePathEnvDeprecated
+           << "]. Please use [" << this->dataPtr->filePathEnv
+           << "] instead." << std::endl;
+    return this->dataPtr->filePathEnvDeprecated;
+  }
   return this->dataPtr->filePathEnv;
 }
 
