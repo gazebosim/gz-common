@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-SCRIPT_PATH=@IGN_PROFILER_SCRIPT_PATH@/ign_remotery_vis
-VIS_PATH=@IGN_PROFILER_VIS_PATH@/index.html
+SCRIPT_PATH=@GZ_PROFILER_SCRIPT_PATH@/ign_remotery_vis
+VIS_PATH=@GZ_PROFILER_VIS_PATH@/index.html
 
 # Get the full path to this script
 SCRIPT=`realpath $0`

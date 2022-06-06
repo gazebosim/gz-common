@@ -88,7 +88,7 @@ SystemPaths::SystemPaths()
 : dataPtr(gz::utils::MakeImpl<Implementation>())
 {
   std::string home, path, fullPath;
-  if (!env(IGN_HOMEDIR, home))
+  if (!env(GZ_HOMEDIR, home))
     home = "/tmp/gz";
 
   if (!env("GZ_LOG_PATH", path))

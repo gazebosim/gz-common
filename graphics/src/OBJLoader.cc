@@ -24,7 +24,7 @@
 #include "gz/common/SubMesh.hh"
 #include "gz/common/OBJLoader.hh"
 
-#define IGNITION_COMMON_TINYOBJLOADER_IMPLEMENTATION
+#define GZ_COMMON_TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
 
 namespace gz

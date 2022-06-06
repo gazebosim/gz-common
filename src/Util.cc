@@ -251,13 +251,13 @@ bool Sha1::Digest(void const *_buffer, std::size_t _byteCount,
 /////////////////////////////////////////////////
 std::string gz::common::systemTimeISO()
 {
-  return timeToIso(IGN_SYSTEM_TIME());
+  return timeToIso(GZ_SYSTEM_TIME());
 }
 
 /////////////////////////////////////////////////
 std::string gz::common::systemTimeIso()
 {
-  return timeToIso(IGN_SYSTEM_TIME());
+  return timeToIso(GZ_SYSTEM_TIME());
 }
 
 // Taken from gtest.cc
@@ -284,7 +284,7 @@ std::string gz::common::timeToIso(
   auto epoch = _time.time_since_epoch();
   auto sec = std::chrono::duration_cast<std::chrono::seconds>(epoch).count();
   auto nano = std::chrono::duration_cast<std::chrono::nanoseconds>(
-      epoch).count() - sec * IGN_SEC_TO_NANO;
+      epoch).count() - sec * GZ_SEC_TO_NANO;
 
   time_t tmSec = static_cast<time_t>(sec);
   struct tm localTime;

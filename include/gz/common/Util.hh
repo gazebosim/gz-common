@@ -34,67 +34,67 @@
 // Defines
 
 #ifdef _WIN32
-# define IGN_HOMEDIR "USERPROFILE"
+# define GZ_HOMEDIR "USERPROFILE"
 #else
-# define IGN_HOMEDIR "HOME"
+# define GZ_HOMEDIR "HOME"
 #endif
 
 /// \brief Seconds in one nano second.
-#define IGN_NANO_TO_SEC 1e-9
+#define GZ_NANO_TO_SEC 1e-9
 
 /// \brief Nano seconds in one second.
-#define IGN_SEC_TO_NANO 1000000000
+#define GZ_SEC_TO_NANO 1000000000
 
 /// \brief Nano seconds in one millisecond.
-#define IGN_MS_TO_NANO 1000000
+#define GZ_MS_TO_NANO 1000000
 
 /// \brief Nano seconds in one microsecond.
-#define IGN_US_TO_NANO 1000
+#define GZ_US_TO_NANO 1000
 
 /// \brief Speed of light.
-#define IGN_SPEED_OF_LIGHT = 299792458.0
+#define GZ_SPEED_OF_LIGHT = 299792458.0
 
 /// \brief Sleep for the specifed number of seconds
-#define IGN_SLEEP_S(_s) (std::this_thread::sleep_for(\
+#define GZ_SLEEP_S(_s) (std::this_thread::sleep_for(\
                          std::chrono::seconds(_s)))
 
 /// \brief Sleep for the specifed number of microseconds
-#define IGN_SLEEP_US(_us) (std::this_thread::sleep_for(\
+#define GZ_SLEEP_US(_us) (std::this_thread::sleep_for(\
                            std::chrono::microseconds(_us)))
 
 /// \brief Sleep for the specifed number of milliseconds
-#define IGN_SLEEP_MS(_ms) (std::this_thread::sleep_for(\
+#define GZ_SLEEP_MS(_ms) (std::this_thread::sleep_for(\
                            std::chrono::milliseconds(_ms)))
 
 /// \brief Sleep for the specifed number of nanoseconds
-#define IGN_SLEEP_NS(_ns) (std::this_thread::sleep_for(\
+#define GZ_SLEEP_NS(_ns) (std::this_thread::sleep_for(\
                            std::chrono::nanoseconds(_ns)))
 
 /// \brief Get the system time.
-#define IGN_SYSTEM_TIME() (std::chrono::system_clock::now())
+#define GZ_SYSTEM_TIME() (std::chrono::system_clock::now())
 
 /// \brief Get the system time in seconds since epoch.
-#define IGN_SYSTEM_TIME_S() (std::chrono::duration_cast<std::chrono::seconds>(\
+#define GZ_SYSTEM_TIME_S() (std::chrono::duration_cast<std::chrono::seconds>(\
       std::chrono::system_clock::now().time_since_epoch()).count())
 
 /// \brief Get the system time in microseconds since epoch.
-#define IGN_SYSTEM_TIME_US() (\
+#define GZ_SYSTEM_TIME_US() (\
     std::chrono::duration_cast<std::chrono::microseconds>(\
       std::chrono::system_clock::now().time_since_epoch()).count())
 
 /// \brief Get the system time in milliseconds since epoch.
-#define IGN_SYSTEM_TIME_MS() (\
+#define GZ_SYSTEM_TIME_MS() (\
     std::chrono::duration_cast<std::chrono::milliseconds>(\
       std::chrono::system_clock::now().time_since_epoch()).count())
 
 /// \brief Get the system time in nanoseconds since epoch.
-#define IGN_SYSTEM_TIME_NS() (\
+#define GZ_SYSTEM_TIME_NS() (\
     std::chrono::duration_cast<std::chrono::nanoseconds>(\
       std::chrono::system_clock::now().time_since_epoch()).count())
 
 /// \brief This macro defines the standard way of launching an exception
 /// inside ignition.
-#define IGN_ASSERT(_expr, _msg) assert((_msg, _expr))
+#define GZ_ASSERT(_expr, _msg) assert((_msg, _expr))
 
 /// \brief Forward declarations for the common classes
 namespace gz
@@ -120,7 +120,7 @@ namespace gz
 
     /// \brief Converts a time point to an ISO string: YYYY-MM-DDTHH:MM:SS.NS
     /// \param[in] _time A time point, such as one created by
-    /// IGN_SYSTEM_TIME().
+    /// GZ_SYSTEM_TIME().
     /// \return An ISO string that represents the given _time.
     std::string GZ_COMMON_VISIBLE timeToIso(
         const std::chrono::time_point<std::chrono::system_clock> &_time);

@@ -63,7 +63,7 @@
 
 #define DETAIL_IGN_COMMON_BEGIN_ADDING_PLUGINS \
   DETAIL_IGN_COMMON_REGISTER_PLUGININFO_META_DATA \
-IGN_UTILS_WARN_IGNORE__NON_VIRTUAL_DESTRUCTOR \
+GZ_UTILS_WARN_IGNORE__NON_VIRTUAL_DESTRUCTOR \
   /* This struct attempts to make sure that the macro is being called from */ \
   /* a global namespace */ \
   struct IGN_macro_must_be_used_in_global_namespace; \
@@ -172,7 +172,7 @@ IGN_UTILS_WARN_IGNORE__NON_VIRTUAL_DESTRUCTOR \
     } \
     return visitedPlugins.size() - _pluginId; \
   } \
-IGN_UTILS_WARN_RESUME__NON_VIRTUAL_DESTRUCTOR
+GZ_UTILS_WARN_RESUME__NON_VIRTUAL_DESTRUCTOR
 
 
 #endif

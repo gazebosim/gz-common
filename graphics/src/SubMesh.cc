@@ -629,8 +629,8 @@ void SubMesh::GenSphericalTexCoordBySet(const gz::math::Vector3d &_center,
     double r = std::max(0.000001, sqrt(x*x+y*y+z*z));
     double s = std::min(1.0, std::max(-1.0, z/r));
     double t = std::min(1.0, std::max(-1.0, y/r));
-    double u = acos(s) / IGN_PI;
-    double v = acos(t) / IGN_PI;
+    double u = acos(s) / GZ_PI;
+    double v = acos(t) / GZ_PI;
     this->AddTexCoordBySet(u, v, _setIndex);
   }
 }

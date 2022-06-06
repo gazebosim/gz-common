@@ -167,7 +167,7 @@ void NodeTransform::RecalculateMatrix()
         mat.SetFromAxisAngle(math::Vector3d(this->dataPtr->source[0],
                                             this->dataPtr->source[1],
                                             this->dataPtr->source[2]),
-                             IGN_DTOR(this->dataPtr->source[3]));
+                             GZ_DTOR(this->dataPtr->source[3]));
         this->dataPtr->transform = mat;
       }
       else

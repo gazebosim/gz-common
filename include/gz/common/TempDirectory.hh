@@ -116,7 +116,7 @@ namespace gz
       public: std::string Path() const;
 
       /// \brief Pointer to private data.
-      IGN_UTILS_UNIQUE_IMPL_PTR(dataPtr)
+      GZ_UTILS_UNIQUE_IMPL_PTR(dataPtr)
     };
   }  // namespace common
 }  // namespace gz

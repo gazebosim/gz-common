@@ -23,11 +23,11 @@
 using namespace gz;
 using namespace common;
 
-IGN_ENUM(shadeModeIface, Material::ShadeMode,
+GZ_ENUM(shadeModeIface, Material::ShadeMode,
     Material::SHADE_MODE_BEGIN, Material::SHADE_MODE_END,
     "FLAT", "GOURAUD", "PHONG", "BLINN")
 
-IGN_ENUM(blendModeIface, Material::BlendMode,
+GZ_ENUM(blendModeIface, Material::BlendMode,
     Material::BLEND_MODE_BEGIN, Material::BLEND_MODE_END,
     "ADD", "MODULATE", "REPLACE")
 

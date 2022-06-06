@@ -100,7 +100,7 @@ TEST(WorkerPool, WaitWithTimeout)
 // /TODO(anyone) Deflake this test
 // ref: https://github.com/gazebosim/gz-common/issues/52
 TEST(WorkerPool,
-     IGN_UTILS_TEST_ENABLED_ONLY_ON_LINUX(WaitWithTimeoutThatTimesOut))
+     GZ_UTILS_TEST_ENABLED_ONLY_ON_LINUX(WaitWithTimeoutThatTimesOut))
 {
   WorkerPool pool;
   pool.AddWork([] ()
@@ -114,7 +114,7 @@ TEST(WorkerPool,
 // /TODO(anyone) Deflake this test
 // ref: https://github.com/gazebosim/gz-common/issues/53
 TEST(WorkerPool,
-     IGN_UTILS_TEST_ENABLED_ONLY_ON_LINUX(ThingsRunInParallel))
+     GZ_UTILS_TEST_ENABLED_ONLY_ON_LINUX(ThingsRunInParallel))
 {
   const unsigned int hc = std::thread::hardware_concurrency();
   if (2 > hc)

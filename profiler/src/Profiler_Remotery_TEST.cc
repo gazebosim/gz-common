@@ -28,8 +28,8 @@ using namespace common;
 /////////////////////////////////////////////////
 TEST(Profiler, ProfilerDisabled)
 {
-  EXPECT_TRUE(IGN_PROFILER_ENABLE);
-  EXPECT_TRUE(IGN_PROFILER_VALID);
+  EXPECT_TRUE(GZ_PROFILER_ENABLE);
+  EXPECT_TRUE(GZ_PROFILER_VALID);
   EXPECT_EQ(Profiler::Instance()->ImplementationName(),
             "ign_profiler_remotery");
 }

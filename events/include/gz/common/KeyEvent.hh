@@ -110,10 +110,10 @@ namespace gz
       /// \return this
       public: KeyEvent& operator=(KeyEvent&& other);
 
-      IGN_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
+      GZ_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Private data pointer
       private: std::unique_ptr<KeyEventPrivate> dataPtr;
-      IGN_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
+      GZ_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
     };
   }
 }

@@ -347,7 +347,7 @@ void arcPath(const gz::math::Vector2d &_p0,
   // Ported from canvg (https://code.google.com/p/canvg/)
   double rx = _rx;
   double ry = _ry;
-  double rotx = _rotxDeg / 180.0 * IGN_PI;
+  double rotx = _rotxDeg / 180.0 * GZ_PI;
 
   double x1, y1, x2, y2, cx, cy, dx, dy, d;
   double x1p, y1p, cxp, cyp, s, sa, sb;
@@ -421,18 +421,18 @@ void arcPath(const gz::math::Vector2d &_p0,
   {
     // Choose large arc
     if (da > 0.0)
-      da = da - 2 * IGN_PI;
+      da = da - 2 * GZ_PI;
     else
-      da = 2 * IGN_PI + da;
+      da = 2 * GZ_PI + da;
   }
 
   // rounding errors for half circles
-  if (IGN_PI - fabs(da) < 0.001)
+  if (GZ_PI - fabs(da) < 0.001)
   {
     if (_sweepDirection)
-      da = IGN_PI;
+      da = GZ_PI;
     else
-      da = -IGN_PI;
+      da = -GZ_PI;
   }
 
   // Approximate the arc using cubic spline segments.
@@ -446,7 +446,7 @@ void arcPath(const gz::math::Vector2d &_p0,
   // Split arc into max 90 degree segments.
   // The loop assumes an iteration per end point
   // (including start and end), this +1.
-  size_t ndivs = static_cast<int>(fabs(da) / (IGN_PI * 0.5) + 1.0);
+  size_t ndivs = static_cast<int>(fabs(da) / (GZ_PI * 0.5) + 1.0);
   hda = (da / ndivs) / 2.0;
   kappa = fabs(4.0 / 3.0 * (1.0 - cos(hda)) / sin(hda));
   if (da < 0.0)

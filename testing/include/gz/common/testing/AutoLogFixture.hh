@@ -50,7 +50,7 @@ class AutoLogFixture : public ::testing::Test
   protected: std::string LogContent() const;
 
   /// \brief Pointer to private data.
-  IGN_UTILS_UNIQUE_IMPL_PTR(dataPtr)
+  GZ_UTILS_UNIQUE_IMPL_PTR(dataPtr)
 };
 }  // namespace gz::common::testing
 

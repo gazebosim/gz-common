@@ -648,7 +648,7 @@ gz::math::Matrix4d ColladaLoader::Implementation::LoadNodeTransform(
 
       iss >> axis.X() >> axis.Y() >> axis.Z();
       iss >> angle;
-      mat.SetFromAxisAngle(axis, IGN_DTOR(angle));
+      mat.SetFromAxisAngle(axis, GZ_DTOR(angle));
       gz::math::Matrix4d mat4(gz::math::Matrix4d::Identity);
       mat4 = mat;
 
@@ -1271,7 +1271,7 @@ void ColladaLoader::Implementation::SetSkeletonNodeTransform(
 
       iss >> axis.X() >> axis.Y() >> axis.Z();
       iss >> angle;
-      mat.SetFromAxisAngle(axis, IGN_DTOR(angle));
+      mat.SetFromAxisAngle(axis, GZ_DTOR(angle));
 
       gz::math::Matrix4d mat4(gz::math::Matrix4d::Identity);
       mat4 = mat;
@@ -1694,7 +1694,7 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
     return;
   }
 
-  // \TODO This is a good a IGN_ASSERT
+  // \TODO This is a good a GZ_ASSERT
   // The total number of texture values should equal the stride multiplied
   // by the number of texture coordinates.
   if (texCount * stride != totCount)

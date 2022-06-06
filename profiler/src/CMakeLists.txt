@@ -1,4 +1,4 @@
-option(IGN_PROFILER_REMOTERY "Enable the Remotery profiler" TRUE)
+option(GZ_PROFILER_REMOTERY "Enable the Remotery profiler" TRUE)
 
 set(
   PROFILER_SRCS
@@ -10,7 +10,7 @@ set(
   Profiler_Disabled_TEST.cc
 )
 
-if(IGN_PROFILER_REMOTERY)
+if(GZ_PROFILER_REMOTERY)
   set(
     Remotery_SRC
     ./Remotery/lib/Remotery.c
@@ -57,11 +57,11 @@ gz_add_component(profiler SOURCES ${PROFILER_SRCS} GET_TARGET_NAME profiler_targ
 
 # Always enable profiler so that it's built, but make it
 # private so that downstream users can still disable profiling
-target_compile_definitions(${profiler_target} PRIVATE "IGN_PROFILER_ENABLE=1")
+target_compile_definitions(${profiler_target} PRIVATE "GZ_PROFILER_ENABLE=1")
 target_compile_definitions(${profiler_target} PRIVATE "RMT_USE_METAL=${RMT_USE_METAL}")
 
-if(IGN_PROFILER_REMOTERY)
-  target_compile_definitions(${profiler_target} PRIVATE "IGN_PROFILER_REMOTERY=1")
+if(GZ_PROFILER_REMOTERY)
+  target_compile_definitions(${profiler_target} PRIVATE "GZ_PROFILER_REMOTERY=1")
 
   target_include_directories(
     ${profiler_target}
@@ -89,12 +89,12 @@ gz_build_tests(
 
 if(TARGET UNIT_Profiler_Remotery_TEST)
   target_compile_definitions(UNIT_Profiler_Remotery_TEST
-    PUBLIC "IGN_PROFILER_ENABLE=1")
+    PUBLIC "GZ_PROFILER_ENABLE=1")
 endif()
 
-if(IGN_PROFILER_REMOTERY)
-  set(IGN_PROFILER_SCRIPT_PATH ${CMAKE_INSTALL_LIBEXECDIR}/ignition/ignition-common${PROJECT_VERSION_MAJOR})
-  set(IGN_PROFILER_VIS_PATH ${IGN_DATA_INSTALL_DIR}/profiler_vis)
+if(GZ_PROFILER_REMOTERY)
+  set(GZ_PROFILER_SCRIPT_PATH ${CMAKE_INSTALL_LIBEXECDIR}/ignition/ignition-common${PROJECT_VERSION_MAJOR})
+  set(GZ_PROFILER_VIS_PATH ${IGN_DATA_INSTALL_DIR}/profiler_vis)
 
   configure_file(Remotery/ign_remotery_vis.in
     ${CMAKE_CURRENT_BINARY_DIR}/ign_remotery_vis
@@ -102,8 +102,8 @@ if(IGN_PROFILER_REMOTERY)
 
   install(PROGRAMS
     ${CMAKE_CURRENT_BINARY_DIR}/ign_remotery_vis
-    DESTINATION ${IGN_PROFILER_SCRIPT_PATH})
+    DESTINATION ${GZ_PROFILER_SCRIPT_PATH})
 
   install(DIRECTORY Remotery/vis/
-          DESTINATION ${IGN_PROFILER_VIS_PATH})
+          DESTINATION ${GZ_PROFILER_VIS_PATH})
 endif()

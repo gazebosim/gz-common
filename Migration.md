@@ -18,18 +18,31 @@ release will remove the deprecated code.
 4. The logging macros (`ignmsg`, `ignwarn`, `ignerr`, etc.) and logging function macros
    (`ignLogInit()`, etc.) are deprecated and will be removed in future versions. Use `gz` instead
    (e.g. `gzmsg`, `gzwarn`, `gzLogInit()`)
-
 5. All the plugin APIs are deprecated, use the gz-plugin library instead. See
    the [migration guide](https://github.com/ignitionrobotics/ign-plugin/blob/ign-plugin1/MIGRATION.md).
-
 6. The following `IGN_` prefixed environment variables are deprecated and will be removed.
    Please use the `GZ_` prefixed versions instead!
    1. `IGN_VIDEO_ALLOWED_ENCODERS` -> `GZ_VIDEO_ALLOWED_ENCODERS`
-   2.  `IGN_VIDEO_ENCODER_DEVICE` -> `GZ_VIDEO_ENCODER_DEVICE`
-   3.  `IGN_VIDEO_USE_HW_SURFACE` -> `GZ_VIDEO_USE_HW_SURFACE`
-   4.  `IGN_FILE_PATH` -> `GZ_FILE_PATH`
-   5.  `IGN_LOG_PATH` -> `GZ_LOG_PATH`
-   6.  `IGN_PLUGIN_PATH` -> `GZ_PLUGIN_PATH`
+   2. `IGN_VIDEO_ENCODER_DEVICE` -> `GZ_VIDEO_ENCODER_DEVICE`
+   3. `IGN_VIDEO_USE_HW_SURFACE` -> `GZ_VIDEO_USE_HW_SURFACE`
+   4. `IGN_FILE_PATH` -> `GZ_FILE_PATH`
+   5. `IGN_LOG_PATH` -> `GZ_LOG_PATH`
+   6. `IGN_PLUGIN_PATH` -> `GZ_PLUGIN_PATH`
+7. The following `IGN_` / `IGNITION_` prefixed macros are deprecated and will be removed in future versions.
+   Use the `GZ_` prefix instead.
+   1. `IGN_ENUM`
+   2. `IGN_HOMEDIR`
+   3. `IGN_NANO_TO_SEC`, `IGN_SEC_TO_NANO`, `IGN_MS_TO_NANO`, `IGN_US_TO_NANO`
+   4. `IGN_SPEED_OF_LIGHT`
+   5. `IGN_SLEEP_S`, `IGN_SLEEP_US`, `IGN_SLEEP_MS`, `IGN_SLEEP_NS`
+   6. `IGN_SYSTEM_TIME`, `IGN_SYSTEM_TIME_S`, `IGN_SYSTEM_TIME_US`, `IGN_SYSTEM_TIME_MS`, `IGN_SYSTEM_TIME_NS`
+   7. `IGN_ASSERT`
+   8. `IGNITION_COMMON_TINYOBJLOADER_IMPLEMENTATION` (`src` local, hard-tocked)
+   9. `IGN_PROFILER_ENABLE`, `IGN_PROFILE_THREAD_NAME`, `IGN_PROFILE_LOG_TEXT`, `IGN_PROFILE_BEGIN`, `IGN_PROFILE_END`, `IGN_PROFILE_L`, `IGN_PROFILE`, `IGN_PROFILE_VALID`
+   10. `IGN_CREATE_SPEC_INTERFACE`
+   11. `IGN_DUMMY_PLUGIN_PATH`
+   12. `IGNITION_UNITTEST_SPECIALIZED_PLUGIN_ACCESS`
+
 
 
 ### Additions
@@ -90,7 +103,7 @@ release will remove the deprecated code.
 
 1. Requires c++17.
 
-1. (New in 3.8.0) On Windows, the value of C++ macro `IGN_HOMEDIR` changed from `HOMEPATH` to `USERPROFILE`. It is usually used to read the path to the user's home from environment. The old value pointed to a path relative to the (a) current drive letter as reported by `pwd`, not the system drive letter. The new value correctly points to an environment variable that contains the full absolute path to the user's profile. If the code did not use the macro in some unexpected way, the new behavior should work either the same or even better (it would work even when the current directory is on a non-system drive). If the code relied on this value to be relative to the current drive letter, it needs to be changed to use `HOMEPATH` directly.
+1. (New in 3.8.0) On Windows, the value of C++ macro `GZ_HOMEDIR` changed from `HOMEPATH` to `USERPROFILE`. It is usually used to read the path to the user's home from environment. The old value pointed to a path relative to the (a) current drive letter as reported by `pwd`, not the system drive letter. The new value correctly points to an environment variable that contains the full absolute path to the user's profile. If the code did not use the macro in some unexpected way, the new behavior should work either the same or even better (it would work even when the current directory is on a non-system drive). If the code relied on this value to be relative to the current drive letter, it needs to be changed to use `HOMEPATH` directly.
 
 ## Gazebo Common 1.X to 2.X
 
