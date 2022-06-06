@@ -29,6 +29,7 @@ release will remove the deprecated code.
    5. `IGN_LOG_PATH` -> `GZ_LOG_PATH`
    6. `IGN_PLUGIN_PATH` -> `GZ_PLUGIN_PATH`
 7. The following `IGN_` / `IGNITION_` prefixed macros are deprecated and will be removed in future versions.
+   Additionally, they will only be available when including the corresponding `ignition/...` header.
    Use the `GZ_` prefix instead.
    1. `IGN_ENUM`
    2. `IGN_HOMEDIR`
