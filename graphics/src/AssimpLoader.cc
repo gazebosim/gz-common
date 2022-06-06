@@ -53,7 +53,7 @@ class AssimpLoader::Implementation
 
   public: MaterialPtr CreateMaterial(const aiScene* _scene, unsigned _matIdx, const std::string& _path);
 
-  public: void LoadEmbeddedTexture(MaterialPtr _mat, const aiTexture* _texture);
+  public: void LoadEmbeddedTexture(MaterialPtr _mat, const std::string& _textureName, const aiTexture* _texture);
 
   public: SubMesh CreateSubMesh(const aiMesh* _assimpMesh, const math::Matrix4d& _transform);
 
@@ -226,7 +226,9 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* _scene, 
     if (embeddedTexture)
     {
       // Load embedded texture
-      this->LoadEmbeddedTexture(mat, embeddedTexture);
+      auto textureName = std::string(_scene->mName.C_Str()) + "_" +
+        std::string(assimpMat->GetName().C_Str()) + "_Diffuse";
+      this->LoadEmbeddedTexture(mat, textureName, embeddedTexture);
     }
     else
     {
@@ -276,7 +278,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* _scene, 
 }
 
 //////////////////////////////////////////////////
-void AssimpLoader::Implementation::LoadEmbeddedTexture(MaterialPtr _mat, const aiTexture* _texture)
+void AssimpLoader::Implementation::LoadEmbeddedTexture(MaterialPtr _mat, const std::string& _textureName, const aiTexture* _texture)
 {
   if (_texture->mHeight == 0)
   {
@@ -285,7 +287,7 @@ void AssimpLoader::Implementation::LoadEmbeddedTexture(MaterialPtr _mat, const a
     {
       ignmsg << "Parsing png texture" << std::endl;
       auto startIt = reinterpret_cast<unsigned char*>(_texture->pcData);
-      _mat->SetTextureImageData({startIt, startIt + _texture->mWidth}, std::string("png"));
+      _mat->SetTextureImageData({startIt, startIt + _texture->mWidth}, _textureName);
     }
     return;
   }

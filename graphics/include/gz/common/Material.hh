@@ -112,7 +112,7 @@ namespace gz
                                    const std::string &_resourcePath);
 
       /// TODO docs
-      public: void SetTextureImageData(const std::vector<unsigned char>& buf, const std::string& format);
+      public: void SetTextureImageData(const std::vector<unsigned char>& buf, const std::string& name);
 
       public: std::pair<std::vector<unsigned char>, std::string> TextureData() const;
 

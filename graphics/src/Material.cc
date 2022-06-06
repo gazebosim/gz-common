@@ -43,7 +43,7 @@ class gz::common::Material::Implementation
   /// \brief Texture raw data
   public: std::vector<unsigned char> textureData;
 
-  /// \brief Texture format
+  /// \brief Texture name
   public: std::string textureFormat;
 
   /// \brief the ambient light color
@@ -150,10 +150,10 @@ void Material::SetTextureImage(const std::string &_tex)
 }
 
 //////////////////////////////////////////////////
-void Material::SetTextureImageData(const std::vector<unsigned char>& buf, const std::string& format)
+void Material::SetTextureImageData(const std::vector<unsigned char>& buf, const std::string& name)
 {
   this->dataPtr->textureData = buf;
-  this->dataPtr->textureFormat = format;
+  this->dataPtr->textureFormat = name;
 }
 
 //////////////////////////////////////////////////
