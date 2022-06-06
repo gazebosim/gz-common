@@ -111,6 +111,11 @@ namespace gz
       public: void SetTextureImage(const std::string &_tex,
                                    const std::string &_resourcePath);
 
+      /// TODO docs
+      public: void SetTextureImageData(const std::vector<unsigned char>& buf, const std::string& format);
+
+      public: std::pair<std::vector<unsigned char>, std::string> TextureData() const;
+
       /// \brief Get a texture image
       /// \return The name of the texture image (if one exists) or an empty
       /// string

@@ -40,6 +40,12 @@ class gz::common::Material::Implementation
   /// \brief the texture image file name
   public: std::string texImage;
 
+  /// \brief Texture raw data
+  public: std::vector<unsigned char> textureData;
+
+  /// \brief Texture format
+  public: std::string textureFormat;
+
   /// \brief the ambient light color
   public: math::Color ambient;
 
@@ -141,6 +147,20 @@ std::string Material::Name() const
 void Material::SetTextureImage(const std::string &_tex)
 {
   this->dataPtr->texImage = _tex;
+}
+
+//////////////////////////////////////////////////
+void Material::SetTextureImageData(const std::vector<unsigned char>& buf, const std::string& format)
+{
+  this->dataPtr->textureData = buf;
+  this->dataPtr->textureFormat = format;
+}
+
+//////////////////////////////////////////////////
+std::pair<std::vector<unsigned char>, std::string> Material::TextureData() const
+{
+  // TODO this API does a copy on return, check if we want to use shared memory
+  return {this->dataPtr->textureData, this->dataPtr->textureFormat};
 }
 
 //////////////////////////////////////////////////

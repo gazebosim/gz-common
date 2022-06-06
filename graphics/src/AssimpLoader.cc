@@ -53,7 +53,7 @@ class AssimpLoader::Implementation
 
   public: MaterialPtr CreateMaterial(const aiScene* _scene, unsigned _matIdx, const std::string& _path);
 
-  public: void LoadEmbeddedTexture(const aiTexture* _texture);
+  public: void LoadEmbeddedTexture(MaterialPtr _mat, const aiTexture* _texture);
 
   public: SubMesh CreateSubMesh(const aiMesh* _assimpMesh, const math::Matrix4d& _transform);
 
@@ -215,6 +215,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* _scene, 
     mat->SetShininess(shininess);
   }
   // TODO more than one texture, Gazebo assumes UV index 0
+  Pbr pbr;
   aiString texturePath(_path.c_str());
   ret = assimpMat->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath);
   // TODO check other arguments, type of mappings to be UV, uv index, blend mode
@@ -225,7 +226,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* _scene, 
     if (embeddedTexture)
     {
       // Load embedded texture
-      this->LoadEmbeddedTexture(embeddedTexture);
+      this->LoadEmbeddedTexture(mat, embeddedTexture);
     }
     else
     {
@@ -249,7 +250,6 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* _scene, 
     }
   }
   ret = assimpMat->GetTexture(aiTextureType_METALNESS, 0, &texturePath);
-  Pbr pbr;
   if (ret == AI_SUCCESS)
   {
     pbr.SetMetalnessMap(std::string(texturePath.C_Str()));
@@ -276,11 +276,17 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* _scene, 
 }
 
 //////////////////////////////////////////////////
-void AssimpLoader::Implementation::LoadEmbeddedTexture(const aiTexture* _texture)
+void AssimpLoader::Implementation::LoadEmbeddedTexture(MaterialPtr _mat, const aiTexture* _texture)
 {
   if (_texture->mHeight == 0)
   {
     ignwarn << "Found not supported compressed format " << _texture->achFormatHint << std::endl;
+    if (_texture->CheckFormat("png"))
+    {
+      ignmsg << "Parsing png texture" << std::endl;
+      auto startIt = reinterpret_cast<unsigned char*>(_texture->pcData);
+      _mat->SetTextureImageData({startIt, startIt + _texture->mWidth}, std::string("png"));
+    }
     return;
   }
   ignmsg << "Processing texture in format " << _texture->achFormatHint << std::endl;
