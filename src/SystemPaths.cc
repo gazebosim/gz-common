@@ -122,7 +122,7 @@ SystemPaths::SystemPaths()
   // environment variable.
 
   if (this->dataPtr->filePathEnv.empty() &&
-      !this->dataPtr->filePathEnv.empty())
+      !this->dataPtr->filePathEnvDeprecated.empty())
   {
     gzwarn << "Setting file path using deprecated environment variable ["
            <<  this->dataPtr->filePathEnvDeprecated
@@ -146,6 +146,26 @@ std::string SystemPaths::LogPath() const
 void SystemPaths::SetPluginPathEnv(const std::string &_env)
 {
   this->dataPtr->pluginPathEnv = _env;
+
+  // TODO(CH3): Deprecated. Remove on tock.
+  std::string result;
+  if (!this->dataPtr->pluginPathEnv.empty())
+  {
+    if (env(this->dataPtr->pluginPathEnv, result))
+    {
+      // TODO(CH3): Deprecated. Remove on tock.
+      std::string ign_prefix = "IGN_";
+
+      // Emit warning if env starts with IGN_
+      if (env_.compare(0, ign_prefix.length(), ign_prefix) == 0)
+      {
+        gzwarn << "Finding plugins using deprecated IGN_ prefixed environment "
+               << "variable ["
+               << _env << "]. Please use the GZ_ prefix instead"
+               << std::endl;
+      }
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -159,7 +179,7 @@ const std::list<std::string> &SystemPaths::PluginPaths()
       this->AddPluginPaths(result);
     }
     // TODO(CH3): Deprecated. Remove on tock.
-    else if (env(this->dataPtr->pluginPathEnvDeprecated, result))
+    if (env(this->dataPtr->pluginPathEnvDeprecated, result))
     {
       this->AddPluginPaths(result);
       gzwarn << "Finding plugins using deprecated environment variable "
@@ -210,19 +230,18 @@ void SystemPaths::SetFilePathEnv(const std::string &_env)
     this->ClearFilePaths();
     if (env(this->dataPtr->filePathEnv, result))
     {
-      this->AddFilePaths(result);
-    }
-  }
-  // TODO(CH3): Deprecated. Remove on tock.
-  else if (!this->dataPtr->filePathEnvDeprecated.empty())
-  {
-    this->ClearFilePaths();
-    if (env(this->dataPtr->filePathEnvDeprecated, result))
-    {
-      gzwarn << "Finding files using deprecated environment variable "
-             << "[" << this->dataPtr->filePathEnvDeprecated
-             << "]. Please use [" << this->dataPtr->filePathEnv
-             << "] instead." << std::endl;
+      // TODO(CH3): Deprecated. Remove on tock.
+      std::string ign_prefix = "IGN_";
+
+      // Emit warning if env starts with IGN_
+      if (env_.compare(0, ign_prefix.length(), ign_prefix) == 0)
+      {
+        gzwarn << "Finding files using deprecated IGN_ prefixed environment "
+               << "variable ["
+               << _env << "]. Please use the GZ_ prefix instead"
+               << std::endl;
+      }
+
       this->AddFilePaths(result);
     }
   }
@@ -231,15 +250,6 @@ void SystemPaths::SetFilePathEnv(const std::string &_env)
 /////////////////////////////////////////////////
 std::string SystemPaths::FilePathEnv() const
 {
-  // TODO(CH3): Deprecated. Remove on tock.
-  if (this->dataPtr->filePathEnv.empty())
-  {
-    gzwarn << "Returning deprecated file path environment variable "
-           << "[" << this->dataPtr->filePathEnvDeprecated
-           << "]. Please use [" << this->dataPtr->filePathEnv
-           << "] instead." << std::endl;
-    return this->dataPtr->filePathEnvDeprecated;
-  }
   return this->dataPtr->filePathEnv;
 }
 
