@@ -161,7 +161,7 @@ void SystemPaths::SetPluginPathEnv(const std::string &_env)
       {
         gzwarn << "Finding plugins using deprecated IGN_ prefixed environment "
                << "variable ["
-               << _env << "]. Please use the GZ_ prefix instead"
+               << _env << "]. Please use the GZ_ prefix instead."
                << std::endl;
       }
     }
