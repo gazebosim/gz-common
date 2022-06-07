@@ -71,7 +71,7 @@ namespace gz
       /// \param[in] _cleanup True to indicate that the filesystem should
       ///   be cleaned as part of the destructor
       public: TempDirectory(const std::string &_prefix = "temp_dir",
-                            const std::string &_subDir = "ignition",
+                            const std::string &_subDir = "gz",
                             bool _cleanup = true);
 
       /// \brief Create a directory in the tempDirectoryPath by expanding
@@ -87,7 +87,7 @@ namespace gz
       ///   be cleaned as part of the destructor
       public: explicit TempDirectory(const std::string &_root,
                             const std::string &_prefix = "temp_dir",
-                            const std::string &_subDir = "ignition",
+                            const std::string &_subDir = "gz",
                             bool _cleanup = true);
 
       /// \brief Destroy the temporary directory, removing from filesystem
@@ -121,4 +121,3 @@ namespace gz
   }  // namespace common
 }  // namespace gz
 #endif  // GZ_COMMON_TEMPDIRECTORY_HH_
-

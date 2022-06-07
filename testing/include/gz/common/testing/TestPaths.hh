@@ -102,7 +102,7 @@ std::shared_ptr<gz::common::TempDirectory>
 GZ_COMMON_TESTING_VISIBLE
 MakeTestTempDirectoryImpl(const std::string &_projectSourcePath,
                           const std::string &_prefix = "test",
-                          const std::string &_subDir = "ignition",
+                          const std::string &_subDir = "gz",
                           bool _cleanup = true);
 
 
@@ -119,7 +119,7 @@ MakeTestTempDirectoryImpl(const std::string &_projectSourcePath,
 /// \return Shared pointer to TempDirectory
 inline std::shared_ptr<gz::common::TempDirectory>
 MakeTestTempDirectory(const std::string &_prefix = "test",
-                      const std::string &_subDir = "ignition",
+                      const std::string &_subDir = "gz",
                       bool _cleanup = true)
 {
   return MakeTestTempDirectoryImpl(kTestingProjectSourceDir,
