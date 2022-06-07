@@ -93,7 +93,7 @@
       std::chrono::system_clock::now().time_since_epoch()).count())
 
 /// \brief This macro defines the standard way of launching an exception
-/// inside ignition.
+/// inside Gazebo.
 #define GZ_ASSERT(_expr, _msg) assert((_msg, _expr))
 
 /// \brief Forward declarations for the common classes

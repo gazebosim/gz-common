@@ -184,8 +184,8 @@ std::string TestFile(Args const &... args)
 //////////////////////////////////////////////////
 /// \brief Get the path to a file in a temporary directory
 ///
-/// Example: to get ${TMP}/.ignition/foo.log
-///  TempPath(".ignition", "foo.log");
+/// Example: to get ${TMP}/.gz/foo.log
+///  TempPath(".gz", "foo.log");
 ///
 /// \param[in] args Path to the file, relative to the temporary directory
 /// \return Full path to the temporary directory

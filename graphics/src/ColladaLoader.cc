@@ -2278,7 +2278,7 @@ void ColladaLoader::Implementation::LoadPolylist(
             }
           }
 
-          // add the new ignition submesh vertex index to the map
+          // add the new Gazebo submesh vertex index to the map
           if (!inputs[VERTEX].empty())
           {
             std::vector<GeometryIndices> inputValues;
@@ -2602,7 +2602,7 @@ void ColladaLoader::Implementation::LoadTriangles(
         }
       }
 
-      // add the new ignition submesh vertex index to the map
+      // add the new Gazebo submesh vertex index to the map
       if (hasVertices)
       {
         std::vector<GeometryIndices> inputValues;
