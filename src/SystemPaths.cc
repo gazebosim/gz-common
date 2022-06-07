@@ -154,10 +154,10 @@ void SystemPaths::SetPluginPathEnv(const std::string &_env)
     if (env(this->dataPtr->pluginPathEnv, result))
     {
       // TODO(CH3): Deprecated. Remove on tock.
-      std::string ign_prefix = "IGN_";
+      std::string ignPrefix = "IGN_";
 
       // Emit warning if env starts with IGN_
-      if (env_.compare(0, ign_prefix.length(), ign_prefix) == 0)
+      if (_env.compare(0, ignPrefix.length(), ignPrefix) == 0)
       {
         gzwarn << "Finding plugins using deprecated IGN_ prefixed environment "
                << "variable ["
@@ -231,10 +231,10 @@ void SystemPaths::SetFilePathEnv(const std::string &_env)
     if (env(this->dataPtr->filePathEnv, result))
     {
       // TODO(CH3): Deprecated. Remove on tock.
-      std::string ign_prefix = "IGN_";
+      std::string ignPrefix = "IGN_";
 
       // Emit warning if env starts with IGN_
-      if (env_.compare(0, ign_prefix.length(), ign_prefix) == 0)
+      if (_env.compare(0, ignPrefix.length(), ignPrefix) == 0)
       {
         gzwarn << "Finding files using deprecated IGN_ prefixed environment "
                << "variable ["
