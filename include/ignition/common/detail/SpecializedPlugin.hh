@@ -25,7 +25,7 @@
 // This preprocessor token should only be used by the unittest that is
 // responsible for checking that the specialized routines are being used to
 // access specialized plugin interfaces.
-#ifdef GZ_UNITTEST_SPECIALIZED_PLUGIN_ACCESS
+#ifdef IGNITION_UNITTEST_SPECIALIZED_PLUGIN_ACCESS
 bool usedSpecializedInterfaceAccess;
 #endif
 
@@ -100,7 +100,7 @@ namespace gz
     SpecInterface *SpecializedPlugin<SpecInterface>::PrivateQueryInterface(
         type<SpecInterface>)
     {
-      #ifdef GZ_UNITTEST_SPECIALIZED_PLUGIN_ACCESS
+      #ifdef IGNITION_UNITTEST_SPECIALIZED_PLUGIN_ACCESS
       usedSpecializedInterfaceAccess = true;
       #endif
       return static_cast<SpecInterface*>(
@@ -121,7 +121,7 @@ namespace gz
     const SpecInterface *SpecializedPlugin<SpecInterface>::
     PrivateQueryInterface(type<SpecInterface>) const
     {
-      #ifdef GZ_UNITTEST_SPECIALIZED_PLUGIN_ACCESS
+      #ifdef IGNITION_UNITTEST_SPECIALIZED_PLUGIN_ACCESS
       usedSpecializedInterfaceAccess = true;
       #endif
       return static_cast<SpecInterface*>(
@@ -142,7 +142,7 @@ namespace gz
     bool SpecializedPlugin<SpecInterface>::PrivateHasInterface(
         type<SpecInterface>) const
     {
-      #ifdef GZ_UNITTEST_SPECIALIZED_PLUGIN_ACCESS
+      #ifdef IGNITION_UNITTEST_SPECIALIZED_PLUGIN_ACCESS
       usedSpecializedInterfaceAccess = true;
       #endif
       return (nullptr != this->privateSpecializedInterfaceIterator->second);
