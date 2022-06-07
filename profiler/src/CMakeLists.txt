@@ -1,4 +1,14 @@
-option(GZ_PROFILER_REMOTERY "Enable the Remotery profiler" TRUE)
+option(IGN_PROFILER_REMOTERY "Deprecated. Enable the Remotery profiler"
+  TRUE)
+
+# TODO(CH3): Remove the IGN_PROFILER_REMOTERY on deprecation
+#            and set the option to TRUE instead
+option(GZ_PROFILER_REMOTERY "Enable the Remotery profiler"
+  IGN_PROFILER_REMOTERY)
+
+if(NOT IGN_PROFILER_REMOTERY)
+  message(DEPRECATION "The IGN_PROFILER_REMOTERY option is deprecated! Please use GZ_PROFILER_REMOTERY instead.")
+endif()
 
 set(
   PROFILER_SRCS
@@ -60,9 +70,11 @@ gz_add_component(profiler SOURCES ${PROFILER_SRCS} GET_TARGET_NAME profiler_targ
 target_compile_definitions(${profiler_target} PRIVATE "GZ_PROFILER_ENABLE=1")
 target_compile_definitions(${profiler_target} PRIVATE "RMT_USE_METAL=${RMT_USE_METAL}")
 
+# TODO(CH3): Deprecated. Remove on tock.
+target_compile_definitions(${profiler_target} PRIVATE "IGN_PROFILER_ENABLE=1")
+
 if(GZ_PROFILER_REMOTERY)
   target_compile_definitions(${profiler_target} PRIVATE "GZ_PROFILER_REMOTERY=1")
-
   target_include_directories(
     ${profiler_target}
     PRIVATE
