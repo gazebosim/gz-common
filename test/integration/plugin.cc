@@ -50,10 +50,10 @@ TEST(PluginLoader, LoadBadPlugins)
   sp.AddPluginPaths(dummyPath);
 
   std::vector<std::string> libraryNames = {
-    "IGNBadPluginAPIVersionOld",
-    "IGNBadPluginAPIVersionNew",
-    "IGNBadPluginAlign",
-    "IGNBadPluginSize"};
+    "GzBadPluginAPIVersionOld",
+    "GzBadPluginAPIVersionNew",
+    "GzBadPluginAlign",
+    "GzBadPluginSize"};
   for (auto const & libraryName : libraryNames)
   {
     std::string path = sp.FindSharedLibrary(libraryName);
