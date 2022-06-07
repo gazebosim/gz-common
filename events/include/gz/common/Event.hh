@@ -29,6 +29,7 @@
 #include <gz/common/config.hh>
 #include <gz/common/events/Export.hh>
 #include <gz/common/events/Types.hh>
+#include <gz/utils/SuppressWarning.hh>
 
 namespace gz
 {
@@ -98,7 +99,7 @@ namespace gz
         /// destruction of an Event.
         public: std::weak_ptr<Connection> publicConnection;
       };
-
+IGN_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \def EvtConnectionMap
       /// \brief Event Connection map typedef.
       protected: typedef std::map<int, std::unique_ptr<EventConnection>>
@@ -113,6 +114,7 @@ namespace gz
       /// \brief List of connections to remove
       private: std::list<typename EvtConnectionMap::const_iterator>
               connectionsToRemove;
+IGN_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
     };
 
     /// \brief A class that encapsulates a connection.
