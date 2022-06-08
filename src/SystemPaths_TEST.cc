@@ -34,8 +34,8 @@
 
 using namespace gz;
 
-const char kPluginPath[] = "IGN_PLUGIN_PATH";
-const char kFilePath[] = "IGN_FILE_PATH";
+const char kPluginPath[] = "GZ_PLUGIN_PATH";
+const char kFilePath[] = "GZ_FILE_PATH";
 
 class TestTempDirectory : public gz::common::TempDirectory
 {
