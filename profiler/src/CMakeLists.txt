@@ -70,9 +70,6 @@ gz_add_component(profiler SOURCES ${PROFILER_SRCS} GET_TARGET_NAME profiler_targ
 target_compile_definitions(${profiler_target} PRIVATE "GZ_PROFILER_ENABLE=1")
 target_compile_definitions(${profiler_target} PRIVATE "RMT_USE_METAL=${RMT_USE_METAL}")
 
-# TODO(CH3): Deprecated. Remove on tock.
-target_compile_definitions(${profiler_target} PRIVATE "IGN_PROFILER_ENABLE=1")
-
 if(GZ_PROFILER_REMOTERY)
   target_compile_definitions(${profiler_target} PRIVATE "GZ_PROFILER_REMOTERY=1")
   target_include_directories(
