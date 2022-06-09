@@ -134,6 +134,7 @@ TEST_F(ImageTest, RGBData)
       }
     }
   }
+  delete[] data;
 }
 
 /////////////////////////////////////////////////
@@ -179,6 +180,7 @@ TEST_F(ImageTest, Data)
       }
     }
   }
+  delete[] data;
 }
 
 /////////////////////////////////////////////////
@@ -208,6 +210,7 @@ TEST_F(ImageTest, SetFromData)
   ASSERT_EQ(img2.Pixel(85, 0), math::Color::Blue);
   ASSERT_EQ(img2.AvgColor(), math::Color(0.661157f, 0, 0.338843f, 1));
   ASSERT_EQ(img2.MaxColor(), math::Color::Red);
+  delete[] data;
 }
 
 TEST_F(ImageTest, SetFromCompressedData)
@@ -241,6 +244,7 @@ TEST_F(ImageTest, SetFromCompressedData)
   ASSERT_EQ(img.Pixel(85, 0), math::Color::Blue);
   ASSERT_EQ(img.AvgColor(), math::Color(0.661157f, 0, 0.338843f, 1));
   ASSERT_EQ(img.MaxColor(), math::Color::Red);
+  delete[] data;
 }
 
 /*
