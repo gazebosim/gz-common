@@ -24,6 +24,7 @@
 #include <gz/math/Color.hh>
 #include <gz/common/graphics/Export.hh>
 #include <gz/common/EnumIface.hh>
+#include <gz/common/Image.hh>
 #include <gz/common/Pbr.hh>
 
 #include <gz/utils/ImplPtr.hh>
@@ -102,8 +103,11 @@ namespace gz
 
       /// \brief Set a texture image
       /// \param[in] _tex The name of the texture, which must be in the
-      /// resource path
-      public: void SetTextureImage(const std::string &_tex);
+      /// resource path or its name if _img is provided
+      /// \param[in] _img The image containing the texture if image has been
+      /// loaded in memory
+      public: void SetTextureImage(const std::string &_tex,
+                                   const std::shared_ptr<Image> &_img = nullptr);
 
       /// \brief Set a texture image
       /// \param[in] _tex The name of the texture
@@ -111,10 +115,7 @@ namespace gz
       public: void SetTextureImage(const std::string &_tex,
                                    const std::string &_resourcePath);
 
-      /// TODO docs
-      public: void SetTextureImageData(const std::vector<unsigned char>& buf, const std::string& name);
-
-      public: std::pair<std::vector<unsigned char>, std::string> TextureData() const;
+      public: std::shared_ptr<Image> TextureData() const;
 
       /// \brief Get a texture image
       /// \return The name of the texture image (if one exists) or an empty

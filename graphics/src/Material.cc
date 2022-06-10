@@ -41,10 +41,7 @@ class gz::common::Material::Implementation
   public: std::string texImage;
 
   /// \brief Texture raw data
-  public: std::vector<unsigned char> textureData;
-
-  /// \brief Texture name
-  public: std::string textureFormat;
+  public: std::shared_ptr<Image> texData;
 
   /// \brief the ambient light color
   public: math::Color ambient;
@@ -144,23 +141,16 @@ std::string Material::Name() const
 }
 
 //////////////////////////////////////////////////
-void Material::SetTextureImage(const std::string &_tex)
+void Material::SetTextureImage(const std::string &_tex, const std::shared_ptr<Image> &_img)
 {
   this->dataPtr->texImage = _tex;
+  this->dataPtr->texData = _img;
 }
 
 //////////////////////////////////////////////////
-void Material::SetTextureImageData(const std::vector<unsigned char>& buf, const std::string& name)
+std::shared_ptr<Image> Material::TextureData() const
 {
-  this->dataPtr->textureData = buf;
-  this->dataPtr->textureFormat = name;
-}
-
-//////////////////////////////////////////////////
-std::pair<std::vector<unsigned char>, std::string> Material::TextureData() const
-{
-  // TODO this API does a copy on return, check if we want to use shared memory
-  return {this->dataPtr->textureData, this->dataPtr->textureFormat};
+  return this->dataPtr->texData;
 }
 
 //////////////////////////////////////////////////
