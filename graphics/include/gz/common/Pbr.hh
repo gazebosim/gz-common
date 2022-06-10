@@ -22,6 +22,7 @@
 #include <gz/utils/ImplPtr.hh>
 
 #include <gz/common/graphics/Export.hh>
+#include <gz/common/Image.hh>
 
 namespace gz
 {
@@ -72,27 +73,11 @@ namespace common
     /// an albedo map has not been set.
     /// \return Filename of the albedo map, or empty string if an albedo map
     /// has not been specified.
-    /// TODO deprecate
     public: std::string AlbedoMap() const;
-
-            /*
-    /// \brief Get the albedo map buffer. This will be an empty string if
-    /// an albedo map has not been set.
-    /// \return A pair with the buffer as the first element and the data format on the second
-    public: std::pair<std::vector<unsigned char>, std::string> AlbedoMapData() const;
-    */
-
-    /// \brief Return true if the Pbr object has an albedo map data buffer
-    /// \return True if an albedo map was loaded as raw data
-    public: bool HasAlbedoMapData() const;
 
     /// \brief Set the albedo map filename.
     /// \param[in] _map Filename of the albedo map.
     public: void SetAlbedoMap(const std::string &_map);
-
-    /// \brief Set the albedo map from a loaded file.
-    /// \param[in] _map Filename of the albedo map.
-    public: void SetAlbedoMap(const std::vector<unsigned char>& buf, const std::string& format);
 
     /// \brief Get the normal map filename. This will be an empty string if
     /// a normal map has not been set.
@@ -100,12 +85,20 @@ namespace common
     /// has not been specified.
     public: std::string NormalMap() const;
 
+    /// \brief Gets the normal map data,
+    /// if the texture was loaded from memory, otherwise a nullptr
+    /// \return A pointer to the image that was loaded from memory
+    public: std::shared_ptr<Image> NormalMapData() const;
+
     /// \brief Set the normal map filename.
     /// \param[in] _map Filename of the normal map.
     /// \param[in] _space Space that the normal map is defined in.
     /// Defaults to tangent space.
+    /// \param[in] _img The image containing the texture if image has been
+    /// loaded in memory
     public: void SetNormalMap(const std::string &_map,
-        NormalMapSpace _space = NormalMapSpace::TANGENT);
+        NormalMapSpace _space = NormalMapSpace::TANGENT,
+        const std::shared_ptr<Image> &_img = nullptr);
 
     /// \brief Get the normal map type, either tangent or object space
     /// \return Space that the normal map is defined in
@@ -139,7 +132,15 @@ namespace common
 
     /// \brief Set the roughness map filename for metal workflow.
     /// \param[in] _map Filename of the roughness map.
-    public: void SetRoughnessMap(const std::string &_map);
+    /// \param[in] _img The image containing the texture if image has been
+    /// loaded in memory
+    public: void SetRoughnessMap(const std::string &_map,
+        const std::shared_ptr<Image> &_img = nullptr);
+
+    /// \brief Gets the roughness map data,
+    /// if the texture was loaded from memory, otherwise a nullptr
+    /// \return A pointer to the image that was loaded from memory
+    public: std::shared_ptr<Image> RoughnessMapData() const;
 
     /// \brief Get the metalness map filename for metal workflow. This will be
     /// an empty string if a metalness map has not been set.
@@ -149,7 +150,15 @@ namespace common
 
     /// \brief Set the metalness map filename for metal workflow.
     /// \param[in] _map Filename of the metalness map.
-    public: void SetMetalnessMap(const std::string &_map);
+    /// \param[in] _img The image containing the texture if image has been
+    /// loaded in memory
+    public: void SetMetalnessMap(const std::string &_map,
+        const std::shared_ptr<Image> &_img = nullptr);
+
+    /// \brief Gets the metalness map data,
+    /// if the texture was loaded from memory, otherwise a nullptr
+    /// \return A pointer to the image that was loaded from memory
+    public: std::shared_ptr<Image> MetalnessMapData() const;
 
     /// \brief Get the emissive map filename. This will be an empty string
     /// if an emissive map has not been set.

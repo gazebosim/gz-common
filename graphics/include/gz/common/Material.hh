@@ -115,6 +115,8 @@ namespace gz
       public: void SetTextureImage(const std::string &_tex,
                                    const std::string &_resourcePath);
 
+      /// \brief Gets the texture image, if the texture was loaded from memory
+      /// \return A pointer to the image that was loaded from memory
       public: std::shared_ptr<Image> TextureData() const;
 
       /// \brief Get a texture image

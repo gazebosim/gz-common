@@ -29,14 +29,11 @@ class gz::common::Pbr::Implementation
   /// \brief Albedo map
   public: std::string albedoMap = "";
 
-  /// \brief Albedo map raw data
-  public: std::vector<unsigned char> albedoMapData;
-
-  /// \brief Albedo map format
-  public: std::string albedoMapFormat;
-
   /// \brief Normal map
   public: std::string normalMap = "";
+
+  /// \brief Pointer containing the normal map data, if loaded from memory
+  public: std::shared_ptr<Image> normalMapData = nullptr;
 
   /// \brief Normal map space
   public: NormalMapSpace normalMapSpace = NormalMapSpace::TANGENT;
@@ -50,8 +47,16 @@ class gz::common::Pbr::Implementation
   /// \brief Roughness map (metal workflow only)
   public: std::string roughnessMap = "";
 
+  /// \brief Pointer containing the roughness map data,
+  /// if loaded from memory
+  public: std::shared_ptr<Image> roughnessMapData = nullptr;
+
   /// \brief Metalness map (metal workflow only)
   public: std::string metalnessMap = "";
+
+  /// \brief Pointer containing the metalness map data,
+  /// if loaded from memory
+  public: std::shared_ptr<Image> metalnessMapData = nullptr;
 
   /// \brief Emissive map
   public: std::string emissiveMap = "";
@@ -126,28 +131,6 @@ void Pbr::SetAlbedoMap(const std::string &_map)
   this->dataPtr->albedoMap = _map;
 }
 
-/*
-//////////////////////////////////////////////////
-void Pbr::SetAlbedoMap(const std::vector<unsigned char>& buf, const std::string& format)
-{
-  this->dataPtr->albedoMapData = buf;
-  this->dataPtr->albedoMapFormat = format;
-}
-
-//////////////////////////////////////////////////
-bool Pbr::HasAlbedoMapData() const
-{
-  return this->dataPtr->albedoMapData.size() > 0;
-}
-
-//////////////////////////////////////////////////
-std::pair<std::vector<unsigned char>, std::string> Pbr::AlbedoMapData() const
-{
-  // TODO this API does a copy on return, check if we want to use shared memory
-  return {this->dataPtr->albedoMapData, this->dataPtr->albedoMapFormat};
-}
-*/
-
 //////////////////////////////////////////////////
 std::string Pbr::NormalMap() const
 {
@@ -161,10 +144,18 @@ NormalMapSpace Pbr::NormalMapType() const
 }
 
 //////////////////////////////////////////////////
-void Pbr::SetNormalMap(const std::string &_map, NormalMapSpace _space)
+std::shared_ptr<Image> Pbr::NormalMapData() const
+{
+  return this->dataPtr->normalMapData;
+}
+
+//////////////////////////////////////////////////
+void Pbr::SetNormalMap(const std::string &_map, NormalMapSpace _space,
+                       const std::shared_ptr<Image> &_img)
 {
   this->dataPtr->normalMap = _map;
   this->dataPtr->normalMapSpace = _space;
+  this->dataPtr->normalMapData = _img;
 }
 
 //////////////////////////////////////////////////
@@ -198,9 +189,17 @@ std::string Pbr::RoughnessMap() const
 }
 
 //////////////////////////////////////////////////
-void Pbr::SetRoughnessMap(const std::string &_map)
+std::shared_ptr<Image> Pbr::RoughnessMapData() const
+{
+  return this->dataPtr->roughnessMapData;
+}
+
+//////////////////////////////////////////////////
+void Pbr::SetRoughnessMap(const std::string &_map,
+                          const std::shared_ptr<Image> &_img)
 {
   this->dataPtr->roughnessMap = _map;
+  this->dataPtr->roughnessMapData = _img;
 }
 
 //////////////////////////////////////////////////
@@ -210,9 +209,17 @@ std::string Pbr::MetalnessMap() const
 }
 
 //////////////////////////////////////////////////
-void Pbr::SetMetalnessMap(const std::string &_map)
+std::shared_ptr<Image> Pbr::MetalnessMapData() const
+{
+  return this->dataPtr->metalnessMapData;
+}
+
+//////////////////////////////////////////////////
+void Pbr::SetMetalnessMap(const std::string &_map,
+                          const std::shared_ptr<Image> &_img)
 {
   this->dataPtr->metalnessMap = _map;
+  this->dataPtr->metalnessMapData = _img;
 }
 
 //////////////////////////////////////////////////
