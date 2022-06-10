@@ -82,6 +82,7 @@ namespace gz
                 BAYER_BGGR8,
                 BAYER_GBRG8,
                 BAYER_GRBG8,
+                COMPRESSED_PNG,
                 PIXEL_FORMAT_COUNT
               };
 
@@ -122,6 +123,14 @@ namespace gz
                                unsigned int _height,
                                Image::PixelFormatType _format);
 
+      /// \brief Set the image from compressed (i.e. png) data
+      /// \param[in] _data Pointer to the raw image data
+      /// \param[in] _size Size of the buffer
+      /// \param[in] _format Pixel format of the provided data
+      public: void SetFromCompressedData(const unsigned char *_data,
+                                         unsigned int _size,
+                                         Image::PixelFormatType _format);
+
       /// \brief Get the image as a data array
       /// \param[out] _data Pointer to a NULL array of char.
       /// \param[out] _count The resulting data array size
@@ -132,6 +141,12 @@ namespace gz
       /// \param[out] _data Pointer to a NULL array of char.
       /// \param[out] _count The resulting data array size
       public: void RGBData(unsigned char **_data, unsigned int &_count) const;
+
+      /// \brief Get the RGBA data from the image. This will add an alpha
+      /// channel if one is not present.
+      /// \param[out] _data Pointer to a NULL array of char.
+      /// \param[out] _count The resulting data array size
+      public: void RGBAData(unsigned char **_data, unsigned int &_count) const;
 
       /// \brief Get the width
       /// \return The image width

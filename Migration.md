@@ -19,8 +19,18 @@ release will remove the deprecated code.
    (`ignLogInit()`, etc.) are deprecated and will be removed in future versions. Use `gz` instead
    (e.g. `gzmsg`, `gzwarn`, `gzLogInit()`)
 
-1. All the plugin APIs are deprecated, use the gz-plugin library instead. See
+5. All the plugin APIs are deprecated, use the gz-plugin library instead. See
    the [migration guide](https://github.com/ignitionrobotics/ign-plugin/blob/ign-plugin1/MIGRATION.md).
+
+6. The following `IGN_` prefixed environment variables are deprecated and will be removed.
+   Please use the `GZ_` prefixed versions instead!
+   1. `IGN_VIDEO_ALLOWED_ENCODERS` -> `GZ_VIDEO_ALLOWED_ENCODERS`
+   2.  `IGN_VIDEO_ENCODER_DEVICE` -> `GZ_VIDEO_ENCODER_DEVICE`
+   3.  `IGN_VIDEO_USE_HW_SURFACE` -> `GZ_VIDEO_USE_HW_SURFACE`
+   4.  `IGN_FILE_PATH` -> `GZ_FILE_PATH`
+   5.  `IGN_LOG_PATH` -> `GZ_LOG_PATH`
+   6.  `IGN_PLUGIN_PATH` -> `GZ_PLUGIN_PATH`
+
 
 ### Additions
 
@@ -66,7 +76,7 @@ release will remove the deprecated code.
 1. **profiler** component that helps measure software performance.
 
 1. **SystemPaths.hh**
-    + Search paths specified in `IGN_FILE_PATH` environment variable when
+    + Search paths specified in `GZ_FILE_PATH` environment variable when
       finding files.
 
 1. **Util.hh**

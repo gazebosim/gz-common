@@ -29,6 +29,12 @@ class gz::common::Pbr::Implementation
   /// \brief Albedo map
   public: std::string albedoMap = "";
 
+  /// \brief Albedo map raw data
+  public: std::vector<unsigned char> albedoMapData;
+
+  /// \brief Albedo map format
+  public: std::string albedoMapFormat;
+
   /// \brief Normal map
   public: std::string normalMap = "";
 
@@ -119,6 +125,28 @@ void Pbr::SetAlbedoMap(const std::string &_map)
 {
   this->dataPtr->albedoMap = _map;
 }
+
+/*
+//////////////////////////////////////////////////
+void Pbr::SetAlbedoMap(const std::vector<unsigned char>& buf, const std::string& format)
+{
+  this->dataPtr->albedoMapData = buf;
+  this->dataPtr->albedoMapFormat = format;
+}
+
+//////////////////////////////////////////////////
+bool Pbr::HasAlbedoMapData() const
+{
+  return this->dataPtr->albedoMapData.size() > 0;
+}
+
+//////////////////////////////////////////////////
+std::pair<std::vector<unsigned char>, std::string> Pbr::AlbedoMapData() const
+{
+  // TODO this API does a copy on return, check if we want to use shared memory
+  return {this->dataPtr->albedoMapData, this->dataPtr->albedoMapFormat};
+}
+*/
 
 //////////////////////////////////////////////////
 std::string Pbr::NormalMap() const

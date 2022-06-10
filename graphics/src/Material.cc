@@ -40,6 +40,9 @@ class gz::common::Material::Implementation
   /// \brief the texture image file name
   public: std::string texImage;
 
+  /// \brief Texture raw data
+  public: std::shared_ptr<Image> texData;
+
   /// \brief the ambient light color
   public: math::Color ambient;
 
@@ -138,9 +141,16 @@ std::string Material::Name() const
 }
 
 //////////////////////////////////////////////////
-void Material::SetTextureImage(const std::string &_tex)
+void Material::SetTextureImage(const std::string &_tex, const std::shared_ptr<Image> &_img)
 {
   this->dataPtr->texImage = _tex;
+  this->dataPtr->texData = _img;
+}
+
+//////////////////////////////////////////////////
+std::shared_ptr<Image> Material::TextureData() const
+{
+  return this->dataPtr->texData;
 }
 
 //////////////////////////////////////////////////

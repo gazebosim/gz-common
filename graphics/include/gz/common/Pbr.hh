@@ -72,11 +72,27 @@ namespace common
     /// an albedo map has not been set.
     /// \return Filename of the albedo map, or empty string if an albedo map
     /// has not been specified.
+    /// TODO deprecate
     public: std::string AlbedoMap() const;
+
+            /*
+    /// \brief Get the albedo map buffer. This will be an empty string if
+    /// an albedo map has not been set.
+    /// \return A pair with the buffer as the first element and the data format on the second
+    public: std::pair<std::vector<unsigned char>, std::string> AlbedoMapData() const;
+    */
+
+    /// \brief Return true if the Pbr object has an albedo map data buffer
+    /// \return True if an albedo map was loaded as raw data
+    public: bool HasAlbedoMapData() const;
 
     /// \brief Set the albedo map filename.
     /// \param[in] _map Filename of the albedo map.
     public: void SetAlbedoMap(const std::string &_map);
+
+    /// \brief Set the albedo map from a loaded file.
+    /// \param[in] _map Filename of the albedo map.
+    public: void SetAlbedoMap(const std::vector<unsigned char>& buf, const std::string& format);
 
     /// \brief Get the normal map filename. This will be an empty string if
     /// a normal map has not been set.
