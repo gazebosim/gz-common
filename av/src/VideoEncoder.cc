@@ -24,7 +24,7 @@
 #include "gz/common/VideoEncoder.hh"
 #include "gz/common/StringUtils.hh"
 
-#ifdef IGN_COMMON_BUILD_HW_VIDEO
+#ifdef GZ_COMMON_BUILD_HW_VIDEO
 #include "gz/common/HWEncoder.hh"
 #endif
 
@@ -98,7 +98,7 @@ class GZ_COMMON_AV_HIDDEN gz::common::VideoEncoder::Implementation
   /// \brief Mutex for thread safety.
   public: std::mutex mutex;
 
-#ifdef IGN_COMMON_BUILD_HW_VIDEO
+#ifdef GZ_COMMON_BUILD_HW_VIDEO
   /// \brief The HW encoder configuration (optional).
   public: std::unique_ptr<HWEncoder> hwEncoder = nullptr;
 #endif
@@ -125,7 +125,7 @@ class GZ_COMMON_AV_HIDDEN gz::common::VideoEncoder::Implementation
 /////////////////////////////////////////////////
 const AVCodec* VideoEncoder::Implementation::FindEncoder(AVCodecID _codecId)
 {
-#ifdef IGN_COMMON_BUILD_HW_VIDEO
+#ifdef GZ_COMMON_BUILD_HW_VIDEO
   if (this->hwEncoder)
     return this->hwEncoder->FindEncoder(_codecId);
 #endif
@@ -135,7 +135,7 @@ const AVCodec* VideoEncoder::Implementation::FindEncoder(AVCodecID _codecId)
 /////////////////////////////////////////////////
 AVFrame* VideoEncoder::Implementation::GetFrameForEncoder(AVFrame* _inFrame)
 {
-#ifdef IGN_COMMON_BUILD_HW_VIDEO
+#ifdef GZ_COMMON_BUILD_HW_VIDEO
   if (this->hwEncoder)
     return this->hwEncoder->GetFrameForEncoder(_inFrame);
 #endif
@@ -196,7 +196,18 @@ bool VideoEncoder::Start(const std::string &_format,
   if (_allowHwAccel)
   {
     std::string allowedEncodersStr;
-    env("IGN_VIDEO_ALLOWED_ENCODERS", allowedEncodersStr);
+    env("GZ_VIDEO_ALLOWED_ENCODERS", allowedEncodersStr);
+
+    // TODO(CH3): Deprecated. Remove on tock.
+    if (allowedEncodersStr.empty())
+    {
+      env("IGN_VIDEO_ALLOWED_ENCODERS", allowedEncodersStr);
+      if (!allowedEncodersStr.empty())
+      {
+        gzwarn << "IGN_VIDEO_ALLOWED_ENCODERS is deprecated! "
+               << "Use GZ_VIDEO_ALLOWED_ENCODERS instead!" << std::endl;
+      }
+    }
 
     if (allowedEncodersStr == "ALL")
     {
@@ -213,7 +224,7 @@ bool VideoEncoder::Start(const std::string &_format,
       }
     }
 
-#ifndef IGN_COMMON_BUILD_HW_VIDEO
+#ifndef GZ_COMMON_BUILD_HW_VIDEO
     if (allowedEncoders != HWEncoderType::NONE)
     {
       gzwarn << "Hardware encoding with encoders " << allowedEncodersStr
@@ -223,10 +234,34 @@ bool VideoEncoder::Start(const std::string &_format,
     }
 #endif
 
-    env("IGN_VIDEO_ENCODER_DEVICE", device);
+    env("GZ_VIDEO_ENCODER_DEVICE", device);
+
+    // TODO(CH3): Deprecated. Remove on tock.
+    if (device.empty())
+    {
+      env("IGN_VIDEO_ENCODER_DEVICE", device);
+
+      if (!device.empty())
+      {
+        gzwarn << "IGN_VIDEO_ENCODER_DEVICE is deprecated! "
+               << "Use GZ_VIDEO_ENCODER_DEVICE instead!" << std::endl;
+      }
+    }
 
     std::string hwSurfaceStr;
-    env("IGN_VIDEO_USE_HW_SURFACE", hwSurfaceStr);
+    env("GZ_VIDEO_USE_HW_SURFACE", hwSurfaceStr);
+
+    // TODO(CH3): Deprecated. Remove on tock.
+    if (hwSurfaceStr.empty())
+    {
+      env("IGN_VIDEO_USE_HW_SURFACE", hwSurfaceStr);
+
+      if (!hwSurfaceStr.empty())
+      {
+        gzwarn << "IGN_VIDEO_USE_HW_SURFACE is deprecated! "
+               << "Use GZ_VIDEO_USE_HW_SURFACE instead!" << std::endl;
+      }
+    }
 
     if (!hwSurfaceStr.empty())
     {
@@ -416,7 +451,7 @@ bool VideoEncoder::Start(
     return false;
   }
 
-#ifdef IGN_COMMON_BUILD_HW_VIDEO
+#ifdef GZ_COMMON_BUILD_HW_VIDEO
   // HW encoder needs to be created before the call to FindEncoder()
   this->dataPtr->hwEncoder = std::make_unique<HWEncoder>(
       _allowedHwAccel, _hwAccelDevice, _useHwSurface);
@@ -529,7 +564,7 @@ bool VideoEncoder::Start(
   // we misuse this field a bit, as docs say it is unused in encoders
   // here, it stores the input format of the encoder
   this->dataPtr->codecCtx->sw_pix_fmt = this->dataPtr->codecCtx->pix_fmt;
-#ifdef IGN_COMMON_BUILD_HW_VIDEO
+#ifdef GZ_COMMON_BUILD_HW_VIDEO
   if (this->dataPtr->hwEncoder)
     this->dataPtr->hwEncoder->ConfigHWAccel(this->dataPtr->codecCtx);
 #endif
@@ -540,7 +575,7 @@ bool VideoEncoder::Start(
   {
     gzerr << "Could not open video codec: " << av_err2str_cpp(ret)
           << ". Video encoding is not started\n";
-#ifdef IGN_COMMON_BUILD_HW_VIDEO
+#ifdef GZ_COMMON_BUILD_HW_VIDEO
     if (AVUNERROR(ret) == ENOMEM &&
       this->dataPtr->hwEncoder->GetEncoderType() == HWEncoderType::NVENC)
     {
@@ -1005,7 +1040,7 @@ void VideoEncoder::Reset()
   this->dataPtr->timePrev = std::chrono::steady_clock::time_point();
   this->dataPtr->timeStart = std::chrono::steady_clock::time_point();
   this->dataPtr->filename.clear();
-#ifdef IGN_COMMON_BUILD_HW_VIDEO
+#ifdef GZ_COMMON_BUILD_HW_VIDEO
   if (this->dataPtr->hwEncoder)
     this->dataPtr->hwEncoder.reset();
 #endif
