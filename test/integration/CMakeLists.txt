@@ -5,6 +5,10 @@ if (SKIP_av OR INTERNAL_SKIP_av)
   list(REMOVE_ITEM tests video_encoder.cc)
 endif()
 
+if (WIN32)
+  list(REMOVE_ITEM tests events_with_plugins.cc)
+endif()
+
 ign_build_tests(
   TYPE INTEGRATION
   SOURCES ${tests}
@@ -28,4 +32,11 @@ endif()
 
 if(TARGET INTEGRATION_video_encoder)
   target_link_libraries(INTEGRATION_video_encoder ${PROJECT_LIBRARY_TARGET_NAME}-av)
+endif()
+
+if(TARGET INTEGRATION_events_with_plugins)
+  target_link_libraries(INTEGRATION_events_with_plugins ${PROJECT_LIBRARY_TARGET_NAME}-events dl)
+  add_dependencies(INTEGRATION_events_with_plugins EventEmitterPlugin)
+  target_compile_definitions(INTEGRATION_events_with_plugins  PRIVATE
+    "EventEmitterPlugin_LIB=\"$<TARGET_FILE:EventEmitterPlugin>\"")
 endif()

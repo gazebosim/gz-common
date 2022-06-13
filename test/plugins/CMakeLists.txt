@@ -8,12 +8,14 @@ add_library(IGNBadPluginSize          SHARED BadPluginSize.cc)
 target_link_libraries(IGNBadPluginSize PRIVATE ${PROJECT_LIBRARY_TARGET_NAME})
 add_library(GzDummyPlugins           SHARED DummyPlugins.cc)
 target_link_libraries(GzDummyPlugins PRIVATE ${PROJECT_LIBRARY_TARGET_NAME})
+add_library(EventEmitterPlugin           SHARED EventEmitterPlugin.cc)
 
 set_property(TARGET IGNBadPluginAlign PROPERTY CXX_STANDARD 11)
 set_property(TARGET IGNBadPluginAPIVersionNew PROPERTY CXX_STANDARD 11)
 set_property(TARGET IGNBadPluginAPIVersionOld PROPERTY CXX_STANDARD 11)
 set_property(TARGET IGNBadPluginSize PROPERTY CXX_STANDARD 11)
 set_property(TARGET GzDummyPlugins PROPERTY CXX_STANDARD 11)
+set_property(TARGET EventEmitterPlugin PROPERTY CXX_STANDARD 17)
 
 # Create a variable for the name of the header which will contain the dummy plugin path.
 # This variable gets put in the cache so that it is available at generation time.
@@ -47,3 +49,8 @@ else()
       VERBATIM)
 endif()
 add_dependencies(GzDummyPlugins GzDummyPluginsPathHeader)
+
+
+if (NOT SKIP_event)
+  target_link_libraries(EventEmitterPlugin ${PROJECT_LIBRARY_TARGET_NAME}-events)
+endif()
