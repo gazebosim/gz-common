@@ -56,7 +56,7 @@ class AssimpLoader::Implementation
 
   public: std::shared_ptr<Image> LoadEmbeddedTexture(const aiTexture* _texture);
 
-  public: std::pair<std::string, std::shared_ptr<Image>> LoadTexture(const aiScene* _scene, const aiString& _texturePath, const std::string& _matName);
+  public: std::pair<std::string, std::shared_ptr<Image>> LoadTexture(const aiScene* _scene, const aiString& _texturePath, const std::string& _matName, const std::string& _type);
 
   public: SubMesh CreateSubMesh(const aiMesh* _assimpMesh, const math::Matrix4d& _transform);
 
@@ -230,7 +230,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* _scene, 
   if (ret == AI_SUCCESS)
   {
     // Check if the texture is embedded or not
-    auto [texName, texData] = this->LoadTexture(_scene, texturePath, ToString(assimpMat->GetName()));
+    auto [texName, texData] = this->LoadTexture(_scene, texturePath, ToString(assimpMat->GetName()), "Diffuse");
     mat->SetTextureImage(texName, texData);
     // Now set the alpha from texture, if enabled, only supported in GLTF
     aiString alphaMode;
@@ -252,14 +252,17 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* _scene, 
   ret = assimpMat->GetTexture(aiTextureType_METALNESS, 0, &texturePath);
   if (ret == AI_SUCCESS)
   {
-    gzmsg << "Found metalness map with name " << texturePath.C_Str() << std::endl;
-    pbr.SetMetalnessMap(ToString(texturePath));
+    auto [texName, texData] = this->LoadTexture(_scene, texturePath, ToString(assimpMat->GetName()), "Metalness");
+    pbr.SetMetalnessMap(texName, texData);
   }
   ret = assimpMat->GetTexture(aiTextureType_NORMALS, 0, &texturePath);
   if (ret == AI_SUCCESS)
   {
-    pbr.SetNormalMap(ToString(texturePath));
+    auto [texName, texData] = this->LoadTexture(_scene, texturePath, ToString(assimpMat->GetName()), "Normal");
+    // TODO different normal map spaces
+    pbr.SetNormalMap(texName, NormalMapSpace::TANGENT, texData);
   }
+  // TODO roughness map, as well as converting GLTF's metallicroughness map
   double value;
   ret = assimpMat->Get(AI_MATKEY_METALLIC_FACTOR, value);
   if (ret == AI_SUCCESS)
@@ -276,7 +279,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* _scene, 
   return mat;
 }
 
-std::pair<std::string, std::shared_ptr<Image>> AssimpLoader::Implementation::LoadTexture(const aiScene* _scene, const aiString& _texturePath, const std::string& _matName)
+std::pair<std::string, std::shared_ptr<Image>> AssimpLoader::Implementation::LoadTexture(const aiScene* _scene, const aiString& _texturePath, const std::string& _matName, const std::string& _type)
 {
   std::pair<std::string, std::shared_ptr<Image>> ret;
   // Check if the texture is embedded or not
@@ -284,7 +287,7 @@ std::pair<std::string, std::shared_ptr<Image>> AssimpLoader::Implementation::Loa
   if (embeddedTexture)
   {
     // Load embedded texture
-    ret.first = ToString(_scene->mName) + "_" + _matName + "_Diffuse";
+    ret.first = ToString(_scene->mName) + "_" + _matName + _type;
     ret.second = this->LoadEmbeddedTexture(embeddedTexture);
   }
   else
@@ -300,11 +303,11 @@ std::shared_ptr<Image> AssimpLoader::Implementation::LoadEmbeddedTexture(const a
   auto img = std::make_shared<Image>();
   if (_texture->mHeight == 0)
   {
-    ignwarn << "Found compressed format " << _texture->achFormatHint << std::endl;
     if (_texture->CheckFormat("png"))
     {
       img->SetFromCompressedData((unsigned char*)_texture->pcData, _texture->mWidth, Image::PixelFormatType::COMPRESSED_PNG);
     }
+    // TODO other formats
   }
   return img;
 }
