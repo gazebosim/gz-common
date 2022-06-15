@@ -118,7 +118,7 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene, const 
       // TODO Append to existing skeleton if multiple submeshes?
       skeleton->SetNumVertAttached(subMesh.VertexCount());
       // Now add the bone weights
-      for (unsigned boneIdx = 0; boneIdx < _scene->mMeshes[meshIdx]->mNumBones; ++boneIdx)
+      for (unsigned boneIdx = 0; boneIdx < assimpMesh->mNumBones; ++boneIdx)
       {
         auto& bone = assimpMesh->mBones[boneIdx];
         auto boneNodeName = ToString(bone->mNode->mName);
