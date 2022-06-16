@@ -53,7 +53,7 @@ if(IGN_PROFILER_REMOTERY)
   list(APPEND PROFILER_TESTS Profiler_Remotery_TEST.cc)
 endif()
 
-ign_add_component(profiler SOURCES ${PROFILER_SRCS} GET_TARGET_NAME profiler_target)
+gz_add_component(profiler SOURCES ${PROFILER_SRCS} GET_TARGET_NAME profiler_target)
 
 # Always enable profiler so that it's built, but make it
 # private so that downstream users can still disable profiling
@@ -79,10 +79,10 @@ if(IGN_PROFILER_REMOTERY)
   endif()
 endif()
 
-ign_build_tests(
-  TYPE UNIT 
+gz_build_tests(
+  TYPE UNIT
   SOURCES ${PROFILER_TESTS}
-  LIB_DEPS 
+  LIB_DEPS
     ${profiler_target}
     ignition-common${IGN_COMMON_VER}-testing
   TEST_LIST profiler_tests)
