@@ -9,13 +9,13 @@ if(NOT IGN_COMMON_BUILD_HW_VIDEO)
   set(GZ_COMMON_BUILD_HW_VIDEO IGN_COMMON_BUILD_HW_VIDEO)
 endif()
 
-ign_get_libsources_and_unittests(sources gtest_sources)
+gz_get_libsources_and_unittests(sources gtest_sources)
 
 if(NOT GZ_COMMON_BUILD_HW_VIDEO)
   list(REMOVE_ITEM sources HWEncoder.cc)
 endif()
 
-ign_add_component(av SOURCES ${sources} GET_TARGET_NAME av_target)
+gz_add_component(av SOURCES ${sources} GET_TARGET_NAME av_target)
 
 target_link_libraries(${av_target}
   PUBLIC
@@ -29,7 +29,7 @@ if(GZ_COMMON_BUILD_HW_VIDEO)
   target_compile_definitions(${av_target} PRIVATE GZ_COMMON_BUILD_HW_VIDEO)
 endif()
 
-ign_build_tests(
+gz_build_tests(
   TYPE UNIT
   SOURCES ${gtest_sources}
   LIB_DEPS
