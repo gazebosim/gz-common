@@ -56,7 +56,11 @@ class AssimpLoader::Implementation
 
   public: std::shared_ptr<Image> LoadEmbeddedTexture(const aiTexture* _texture);
 
-  public: std::pair<std::string, std::shared_ptr<Image>> LoadTexture(const aiScene* _scene, const aiString& _texturePath, const std::string& _matName, const std::string& _type);
+  public: std::string GenerateTextureName(const aiScene* _scene, const aiMaterial*  _mat, const std::string& _type);
+
+  public: std::pair<std::string, std::shared_ptr<Image>> LoadTexture(const aiScene* _scene, const aiString& _texturePath, const std::string& _textureName);
+
+  public: std::pair<std::shared_ptr<Image>, std::shared_ptr<Image>> SplitMetallicRoughnessMap(const common::Image& _img) const;
 
   public: SubMesh CreateSubMesh(const aiMesh* _assimpMesh, const math::Matrix4d& _transform);
 
@@ -230,7 +234,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* _scene, 
   if (ret == AI_SUCCESS)
   {
     // Check if the texture is embedded or not
-    auto [texName, texData] = this->LoadTexture(_scene, texturePath, ToString(assimpMat->GetName()), "Diffuse");
+    auto [texName, texData] = this->LoadTexture(_scene, texturePath, this->GenerateTextureName(_scene, assimpMat, "Diffuse"));
     mat->SetTextureImage(texName, texData);
     // Now set the alpha from texture, if enabled, only supported in GLTF
     aiString alphaMode;
@@ -249,20 +253,43 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* _scene, 
       }
     }
   }
-  ret = assimpMat->GetTexture(aiTextureType_METALNESS, 0, &texturePath);
+  // Edge case for GLTF, Metal and Rough texture are embedded in a
+  // MetallicRoughness texture with metalness in B and roughness in G
+  // Open, preprocess and split into metal and roughness map
+  ret = assimpMat->GetTexture(AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLICROUGHNESS_TEXTURE, &texturePath);
   if (ret == AI_SUCCESS)
   {
-    auto [texName, texData] = this->LoadTexture(_scene, texturePath, ToString(assimpMat->GetName()), "Metalness");
-    pbr.SetMetalnessMap(texName, texData);
+    ignmsg << "Found metallic roughness texture, splitting" << std::endl;
+    auto [texName, texData] = this->LoadTexture(_scene, texturePath, this->GenerateTextureName(_scene, assimpMat, "MetallicRoughness"));
+    // Load it into a common::Image then split it
+    auto texImg = texData != nullptr ? texData : std::make_shared<common::Image>(texName);
+    auto [metalTexture, roughTexture] = this->SplitMetallicRoughnessMap(*texImg);
+    pbr.SetMetalnessMap(this->GenerateTextureName(_scene, assimpMat, "Metalness"), metalTexture);
+    pbr.SetRoughnessMap(this->GenerateTextureName(_scene, assimpMat, "Roughness"), roughTexture);
+  }
+  else
+  {
+    // Load the textures separately
+    ret = assimpMat->GetTexture(aiTextureType_METALNESS, 0, &texturePath);
+    if (ret == AI_SUCCESS)
+    {
+      auto [texName, texData] = this->LoadTexture(_scene, texturePath, this->GenerateTextureName(_scene, assimpMat, "Metalness"));
+      pbr.SetMetalnessMap(texName, texData);
+    }
+    ret = assimpMat->GetTexture(aiTextureType_DIFFUSE_ROUGHNESS, 0, &texturePath);
+    if (ret == AI_SUCCESS)
+    {
+      auto [texName, texData] = this->LoadTexture(_scene, texturePath, this->GenerateTextureName(_scene, assimpMat, "Roughness"));
+      pbr.SetRoughnessMap(texName, texData);
+    }
   }
   ret = assimpMat->GetTexture(aiTextureType_NORMALS, 0, &texturePath);
   if (ret == AI_SUCCESS)
   {
-    auto [texName, texData] = this->LoadTexture(_scene, texturePath, ToString(assimpMat->GetName()), "Normal");
+    auto [texName, texData] = this->LoadTexture(_scene, texturePath, this->GenerateTextureName(_scene, assimpMat, "Normal"));
     // TODO different normal map spaces
     pbr.SetNormalMap(texName, NormalMapSpace::TANGENT, texData);
   }
-  // TODO roughness map, as well as converting GLTF's metallicroughness map
   double value;
   ret = assimpMat->Get(AI_MATKEY_METALLIC_FACTOR, value);
   if (ret == AI_SUCCESS)
@@ -275,11 +302,10 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* _scene, 
     pbr.SetRoughness(value);
   }
   mat->SetPbrMaterial(pbr);
-  // TODO other properties
   return mat;
 }
 
-std::pair<std::string, std::shared_ptr<Image>> AssimpLoader::Implementation::LoadTexture(const aiScene* _scene, const aiString& _texturePath, const std::string& _matName, const std::string& _type)
+std::pair<std::string, std::shared_ptr<Image>> AssimpLoader::Implementation::LoadTexture(const aiScene* _scene, const aiString& _texturePath, const std::string& _textureName)
 {
   std::pair<std::string, std::shared_ptr<Image>> ret;
   // Check if the texture is embedded or not
@@ -287,13 +313,49 @@ std::pair<std::string, std::shared_ptr<Image>> AssimpLoader::Implementation::Loa
   if (embeddedTexture)
   {
     // Load embedded texture
-    ret.first = ToString(_scene->mName) + "_" + _matName + _type;
+    ret.first = _textureName;
     ret.second = this->LoadEmbeddedTexture(embeddedTexture);
   }
   else
   {
     ret.first = ToString(_texturePath);
   }
+  return ret;
+}
+
+std::pair<std::shared_ptr<Image>, std::shared_ptr<Image>> AssimpLoader::Implementation::SplitMetallicRoughnessMap(const common::Image& _img) const
+{
+  std::pair<std::shared_ptr<Image>, std::shared_ptr<Image>> ret;
+  // Metalness in B roughness in G
+  const auto width = _img.Width();
+  const auto height = _img.Height();
+  const auto bytesPerPixel = 4;
+
+  std::vector<unsigned char> metalnessData(width * height * bytesPerPixel);
+  std::vector<unsigned char> roughnessData(width * height * bytesPerPixel);
+
+  for (unsigned int x = 0; x < width; ++x)
+  {
+    for (unsigned int y = 0; y < height; ++y)
+    {
+      // RGBA so 4 bytes per pixel, alpha fully opaque
+      auto baseIndex = bytesPerPixel * (x * height + y);
+      auto color = _img.Pixel(x, y);
+      metalnessData[baseIndex] = color.B();
+      metalnessData[baseIndex + 1] = color.B();
+      metalnessData[baseIndex + 2] = color.B();
+      metalnessData[baseIndex + 3] = 255;
+      roughnessData[baseIndex] = color.G();
+      roughnessData[baseIndex + 1] = color.G();
+      roughnessData[baseIndex + 2] = color.G();
+      roughnessData[baseIndex + 3] = 255;
+    }
+  }
+  // First is metal, second is rough
+  ret.first = std::make_shared<Image>();
+  ret.first->SetFromData(&metalnessData[0], width, height, Image::RGBA_INT8);
+  ret.second = std::make_shared<Image>();
+  ret.second->SetFromData(&roughnessData[0], width, height, Image::RGBA_INT8);
   return ret;
 }
 
@@ -310,6 +372,12 @@ std::shared_ptr<Image> AssimpLoader::Implementation::LoadEmbeddedTexture(const a
     // TODO other formats
   }
   return img;
+}
+
+//////////////////////////////////////////////////
+std::string AssimpLoader::Implementation::GenerateTextureName(const aiScene* _scene, const aiMaterial* _mat, const std::string& _type)
+{
+  return ToString(_scene->mName) + "_" + ToString(_mat->GetName()) + "_" + _type;
 }
 
 SubMesh AssimpLoader::Implementation::CreateSubMesh(const aiMesh* _assimpMesh, const math::Matrix4d& _transform)
@@ -375,7 +443,6 @@ AssimpLoader::~AssimpLoader()
 //////////////////////////////////////////////////
 Mesh *AssimpLoader::Load(const std::string &_filename)
 {
-  // TODO share importer
   Mesh *mesh = new Mesh();
   std::string path = common::parentPath(_filename);
   // Load the asset, TODO check if we need to do preprocessing
