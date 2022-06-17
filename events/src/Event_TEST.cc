@@ -292,7 +292,7 @@ TEST_F(EventTest, DestructionOrder)
   evt->Signal();
   evt.reset();
   // Sleep to avoid warning about deleting a connection right after creation.
-  IGN_SLEEP_MS(1);
+  GZ_SLEEP_MS(1);
 
   // Check that this doesn't segfault.
   conn.reset();

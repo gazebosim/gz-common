@@ -132,11 +132,11 @@ namespace gz
                    public: std::ofstream *stream;
                  };
 
-      IGN_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
+      GZ_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Stores the full path of the directory where all the log files
       /// are stored.
       private: std::string logDirectory;
-      IGN_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
+      GZ_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
 
       /// \brief True if initialized.
       private: bool initialized;
@@ -221,10 +221,10 @@ namespace gz
                    public: std::mutex syncMutex;
                  };
 
-      IGN_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
+      GZ_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Prefix to use when logging to file.
       private: std::string prefix;
-      IGN_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
+      GZ_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
     };
 
     /// \class Console Console.hh common/common.hh
@@ -284,10 +284,10 @@ namespace gz
       /// \brief The level of verbosity, the default level is 1.
       private: static int verbosity;
 
-      IGN_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
+      GZ_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief A custom prefix. See SetPrefix().
       private: static std::string customPrefix;
-      IGN_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
+      GZ_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
     };
   }
 }

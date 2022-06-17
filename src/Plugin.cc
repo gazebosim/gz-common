@@ -20,7 +20,7 @@
 #include "gz/utils/SuppressWarning.hh"
 #include "ignition/common/Console.hh"
 
-IGN_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
+GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
 #include "ignition/common/Plugin.hh"
 #include "ignition/common/PluginInfo.hh"
 #include "PluginUtils.hh"
@@ -188,6 +188,6 @@ namespace gz
     }
   }
 }
-IGN_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
+GZ_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
 
 #undef SUPPRESS_IGNITION_HEADER_DEPRECATION

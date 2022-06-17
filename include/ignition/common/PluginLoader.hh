@@ -91,10 +91,10 @@ namespace gz
       private: const PluginInfo *PrivateGetPluginInfo(
                   const std::string &_pluginName) const;
 
-      IGN_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
+      GZ_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief PIMPL pointer to class implementation
       private: std::unique_ptr<PluginLoaderPrivate> dataPtr;
-      IGN_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
+      GZ_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
     };
   }
 }

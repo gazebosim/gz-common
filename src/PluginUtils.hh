@@ -31,7 +31,7 @@ namespace gz
     /// \brief Format the name to start with "::"
     /// \param[in] _name The name of a plugin or interface
     /// \return The input, but with "::" prepended if it was not there already.
-    inline std::string IGN_DEPRECATED(5) NormalizeName(const std::string &_name)
+    inline std::string GZ_DEPRECATED(5) NormalizeName(const std::string &_name)
     {
       std::string name = _name;
       if (!StartsWith(_name, "::"))

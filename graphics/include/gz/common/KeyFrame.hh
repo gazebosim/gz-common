@@ -45,7 +45,7 @@ namespace gz
       public: double Time() const;
 
       /// \brief Private data pointer.
-      IGN_UTILS_IMPL_PTR(dataPtr)
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
 
     /// \brief A keyframe for a PoseAnimation
@@ -75,7 +75,7 @@ namespace gz
       public: const math::Quaterniond &Rotation() const;
 
       /// \brief Private data pointer.
-      IGN_UTILS_IMPL_PTR(dataPtr)
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
 
     /// \brief A keyframe for a NumericAnimation
@@ -97,7 +97,7 @@ namespace gz
       public: const double &Value() const;
 
       /// \brief Private data pointer.
-      IGN_UTILS_IMPL_PTR(dataPtr)
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

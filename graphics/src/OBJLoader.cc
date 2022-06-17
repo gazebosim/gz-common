@@ -24,7 +24,7 @@
 #include "gz/common/SubMesh.hh"
 #include "gz/common/OBJLoader.hh"
 
-#define IGNITION_COMMON_TINYOBJLOADER_IMPLEMENTATION
+#define GZ_COMMON_TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
 
 namespace gz
@@ -107,7 +107,7 @@ Mesh *OBJLoader::Load(const std::string &_filename)
 
   for (auto const &s : shapes)
   {
-    // obj mesh assigns a material id to each 'face' but ignition assigns a
+    // obj mesh assigns a material id to each 'face' but Gazebo assigns a
     // single material to each 'submesh'. The strategy here is to identify
     // the number of unique material ids in each obj shape and create a new
     // submesh per unique material id

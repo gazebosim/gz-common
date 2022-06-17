@@ -28,6 +28,6 @@ using namespace common;
 /////////////////////////////////////////////////
 TEST(Profiler, ProfilerDisabled)
 {
-  EXPECT_FALSE(IGN_PROFILER_ENABLE);
-  EXPECT_FALSE(IGN_PROFILER_VALID);
+  EXPECT_FALSE(GZ_PROFILER_ENABLE);
+  EXPECT_FALSE(GZ_PROFILER_VALID);
 }

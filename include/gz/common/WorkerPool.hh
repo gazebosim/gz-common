@@ -62,7 +62,7 @@ namespace gz
         const std::chrono::steady_clock::duration &_timeout =
           std::chrono::steady_clock::duration::zero());
 
-      IGN_UTILS_UNIQUE_IMPL_PTR(dataPtr)
+      GZ_UTILS_UNIQUE_IMPL_PTR(dataPtr)
     };
   }
 }
