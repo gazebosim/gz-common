@@ -210,16 +210,16 @@ TEST_F(MeshTest, Access)
 /////////////////////////////////////////////////
 TEST_F(MeshTest, RoundtripStl)
 {
-  std::ofstream stlFile("ignition_stl_test.stl", std::ios::out);
+  std::ofstream stlFile("gz_stl_test.stl", std::ios::out);
   stlFile << asciiSTLBox;
   stlFile.close();
 
   auto mesh =
-    common::MeshManager::Instance()->Load("ignition_stl_test-bad.stl");
+    common::MeshManager::Instance()->Load("gz_stl_test-bad.stl");
   EXPECT_EQ(nullptr, mesh);
 
   common::systemPaths()->AddFilePaths(common::cwd());
-  mesh = common::MeshManager::Instance()->Load("ignition_stl_test.stl");
+  mesh = common::MeshManager::Instance()->Load("gz_stl_test.stl");
   ASSERT_NE(nullptr, mesh);
 
   math::Vector3d center, min, max;
@@ -232,20 +232,20 @@ TEST_F(MeshTest, RoundtripStl)
 /////////////////////////////////////////////////
 TEST_F(MeshTest, Export)
 {
-  std::ofstream stlFile("ignition_stl_test.stl", std::ios::out);
+  std::ofstream stlFile("gz_stl_test.stl", std::ios::out);
   stlFile << asciiSTLBox;
   stlFile.close();
 
   common::systemPaths()->AddFilePaths(common::cwd());
-  auto mesh = common::MeshManager::Instance()->Load("ignition_stl_test.stl");
+  auto mesh = common::MeshManager::Instance()->Load("gz_stl_test.stl");
 
   ASSERT_NE(nullptr, mesh);
   common::MeshManager::Instance()->Export(mesh,
-      common::joinPaths(common::cwd(), "ignition_stl_test2"), "stl", false);
+      common::joinPaths(common::cwd(), "gz_stl_test2"), "stl", false);
   common::MeshManager::Instance()->Export(mesh,
-      common::joinPaths(common::cwd(), "ignition_stl_test2"), "dae", false);
+      common::joinPaths(common::cwd(), "gz_stl_test2"), "dae", false);
 
-  EXPECT_FALSE(common::exists("ignition_stl_test2.stl"));
-  EXPECT_TRUE(common::exists("ignition_stl_test2.dae"));
+  EXPECT_FALSE(common::exists("gz_stl_test2.stl"));
+  EXPECT_TRUE(common::exists("gz_stl_test2.dae"));
 }
 

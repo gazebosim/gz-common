@@ -104,7 +104,7 @@ unsigned int Material::Implementation::counter = 0;
 Material::Material()
 : dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
 {
-  this->dataPtr->name = "ignition_material_" +
+  this->dataPtr->name = "gz_material_" +
     std::to_string(this->dataPtr->counter++);
   this->dataPtr->blendMode = REPLACE;
   this->dataPtr->shadeMode = GOURAUD;
@@ -118,7 +118,7 @@ Material::Material()
 Material::Material(const math::Color &_clr)
 : dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
 {
-  this->dataPtr->name = "ignition_material_" +
+  this->dataPtr->name = "gz_material_" +
     std::to_string(this->dataPtr->counter++);
   this->dataPtr->blendMode = REPLACE;
   this->dataPtr->shadeMode = GOURAUD;
