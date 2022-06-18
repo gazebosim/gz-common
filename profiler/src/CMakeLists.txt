@@ -4,7 +4,7 @@ option(IGN_PROFILER_REMOTERY "Deprecated. Enable the Remotery profiler"
 # TODO(CH3): Remove the IGN_PROFILER_REMOTERY on deprecation
 #            and set the option to TRUE instead
 option(GZ_PROFILER_REMOTERY "Enable the Remotery profiler"
-  IGN_PROFILER_REMOTERY)
+  ${IGN_PROFILER_REMOTERY})
 
 if(NOT IGN_PROFILER_REMOTERY)
   message(DEPRECATION "The IGN_PROFILER_REMOTERY option is deprecated! Please use GZ_PROFILER_REMOTERY instead.")
