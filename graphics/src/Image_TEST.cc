@@ -134,6 +134,7 @@ TEST_F(ImageTest, RGBData)
       }
     }
   }
+  delete[] data;
 }
 
 /////////////////////////////////////////////////
@@ -179,6 +180,7 @@ TEST_F(ImageTest, Data)
       }
     }
   }
+  delete[] data;
 }
 
 /////////////////////////////////////////////////
@@ -208,6 +210,51 @@ TEST_F(ImageTest, SetFromData)
   ASSERT_EQ(img2.Pixel(85, 0), math::Color::Blue);
   ASSERT_EQ(img2.AvgColor(), math::Color(0.661157f, 0, 0.338843f, 1));
   ASSERT_EQ(img2.MaxColor(), math::Color::Red);
+  delete[] data;
+}
+
+TEST_F(ImageTest, SetFromCompressedData)
+{
+  // Open file and move to end
+  std::ifstream ifs(kTestData, std::ios::binary | std::ios::ate);
+  std::ifstream::pos_type fileEnd = ifs.tellg();
+  std::vector<unsigned char> fileData(fileEnd);
+
+  // Rewind to beginning of file and read data
+  ifs.seekg(0);
+  ifs.read(reinterpret_cast<char *>(&fileData[0]), fileEnd);
+
+  common::Image img;
+  img.SetFromCompressedData(&fileData[0], fileEnd,
+      common::Image::PixelFormatType::COMPRESSED_PNG);
+  ASSERT_TRUE(img.Valid());
+
+  unsigned char *data = nullptr;
+  unsigned int size = 0;
+  img.RGBAData(&data, size);
+  ASSERT_EQ(39204u, size);
+  ASSERT_NE(nullptr, data);
+
+  ASSERT_EQ(common::Image::PixelFormatType::RGBA_INT8, img.PixelFormat());
+  ASSERT_EQ(121u, img.Width());
+  ASSERT_EQ(81u, img.Height());
+  ASSERT_EQ(32u, img.BPP());
+  ASSERT_EQ(484, img.Pitch());
+  ASSERT_EQ(img.Pixel(0, 0), math::Color::Red);
+  ASSERT_EQ(img.Pixel(85, 0), math::Color::Blue);
+  ASSERT_EQ(img.AvgColor(), math::Color(0.661157f, 0, 0.338843f, 1));
+  ASSERT_EQ(img.MaxColor(), math::Color::Red);
+  delete[] data;
+
+  // Reloading the image should not cause any leaks.
+  img.SetFromCompressedData(&fileData[0], fileEnd,
+      common::Image::PixelFormatType::COMPRESSED_PNG);
+  ASSERT_TRUE(img.Valid());
+
+  // Loading from unsupported pixel format fails.
+  img.SetFromCompressedData(&fileData[0], fileEnd,
+      common::Image::PixelFormatType::UNKNOWN_PIXEL_FORMAT);
+  ASSERT_FALSE(img.Valid());
 }
 
 /*

@@ -243,6 +243,28 @@ void Image::SetFromData(const unsigned char *_data,
 }
 
 //////////////////////////////////////////////////
+void Image::SetFromCompressedData(unsigned char *_data,
+                                  unsigned int _size,
+                                  Image::PixelFormatType _format)
+{
+  if (this->dataPtr->bitmap)
+    FreeImage_Unload(this->dataPtr->bitmap);
+  this->dataPtr->bitmap = nullptr;
+
+  if (_format == COMPRESSED_PNG)
+  {
+    FIMEMORY *fiMem = FreeImage_OpenMemory(_data, _size);
+    this->dataPtr->bitmap = FreeImage_LoadFromMemory(FIF_PNG, fiMem);
+    FreeImage_CloseMemory(fiMem);
+  }
+  else
+  {
+    gzerr << "Unable to handle format[" << _format << "]\n";
+    return;
+  }
+}
+
+//////////////////////////////////////////////////
 int Image::Pitch() const
 {
   return FreeImage_GetLine(this->dataPtr->bitmap);
@@ -259,6 +281,23 @@ void Image::RGBData(unsigned char **_data, unsigned int &_count) const
     tmp2 = tmp;
   }
   tmp = FreeImage_ConvertTo24Bits(tmp);
+  this->dataPtr->DataImpl(_data, _count, tmp);
+  FreeImage_Unload(tmp);
+  if (tmp2)
+    FreeImage_Unload(tmp2);
+}
+
+//////////////////////////////////////////////////
+void Image::RGBAData(unsigned char **_data, unsigned int &_count) const
+{
+  FIBITMAP *tmp = this->dataPtr->bitmap;
+  FIBITMAP *tmp2 = nullptr;
+  if (this->dataPtr->ShouldSwapRedBlue())
+  {
+    tmp = this->dataPtr->SwapRedBlue(this->Width(), this->Height());
+    tmp2 = tmp;
+  }
+  tmp = FreeImage_ConvertTo32Bits(tmp);
   this->dataPtr->DataImpl(_data, _count, tmp);
   FreeImage_Unload(tmp);
   if (tmp2)
