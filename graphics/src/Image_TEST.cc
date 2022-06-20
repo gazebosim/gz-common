@@ -245,6 +245,16 @@ TEST_F(ImageTest, SetFromCompressedData)
   ASSERT_EQ(img.AvgColor(), math::Color(0.661157f, 0, 0.338843f, 1));
   ASSERT_EQ(img.MaxColor(), math::Color::Red);
   delete[] data;
+
+  // Reloading the image should not cause any leaks.
+  img.SetFromCompressedData(&fileData[0], fileEnd,
+      common::Image::PixelFormatType::COMPRESSED_PNG);
+  ASSERT_TRUE(img.Valid());
+
+  // Loading from unsupported pixel format fails.
+  img.SetFromCompressedData(&fileData[0], fileEnd,
+      common::Image::PixelFormatType::UNKNOWN_PIXEL_FORMAT);
+  ASSERT_FALSE(img.Valid());
 }
 
 /*
