@@ -241,7 +241,7 @@ void FileLogger::Init(const std::string &_directory,
 #endif
     )
   {
-    if (!env(IGN_HOMEDIR, logPath))
+    if (!env(GZ_HOMEDIR, logPath))
     {
       // Use stderr here to prevent infinite recursion
       // trying to get the log initialized

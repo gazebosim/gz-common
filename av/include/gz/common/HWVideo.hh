@@ -37,7 +37,7 @@ namespace gz::common
     _  // For FlagSet to work.
   };
 
-  IGN_ENUM(HWEncoderTypeParser, HWEncoderType,
+  GZ_ENUM(HWEncoderTypeParser, HWEncoderType,
     HWEncoderType::NONE, HWEncoderType::_,
     "NONE",
     "NVENC",

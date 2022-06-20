@@ -23,11 +23,11 @@
 using namespace gz;
 using namespace common;
 
-IGN_ENUM(shadeModeIface, Material::ShadeMode,
+GZ_ENUM(shadeModeIface, Material::ShadeMode,
     Material::SHADE_MODE_BEGIN, Material::SHADE_MODE_END,
     "FLAT", "GOURAUD", "PHONG", "BLINN")
 
-IGN_ENUM(blendModeIface, Material::BlendMode,
+GZ_ENUM(blendModeIface, Material::BlendMode,
     Material::BLEND_MODE_BEGIN, Material::BLEND_MODE_END,
     "ADD", "MODULATE", "REPLACE")
 
@@ -104,7 +104,7 @@ unsigned int Material::Implementation::counter = 0;
 Material::Material()
 : dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
 {
-  this->dataPtr->name = "ignition_material_" +
+  this->dataPtr->name = "gz_material_" +
     std::to_string(this->dataPtr->counter++);
   this->dataPtr->blendMode = REPLACE;
   this->dataPtr->shadeMode = GOURAUD;
@@ -118,7 +118,7 @@ Material::Material()
 Material::Material(const math::Color &_clr)
 : dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
 {
-  this->dataPtr->name = "ignition_material_" +
+  this->dataPtr->name = "gz_material_" +
     std::to_string(this->dataPtr->counter++);
   this->dataPtr->blendMode = REPLACE;
   this->dataPtr->shadeMode = GOURAUD;

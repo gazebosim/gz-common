@@ -26,9 +26,9 @@
 
 namespace gz::common::testing
 {
-/// \brief A utility class that stores test logs in ~/.ignition/test_logs.
+/// \brief A utility class that stores test logs in ~/.gz/test_logs.
 /// This functionality is needed to keep all the log information reported
-/// by ignition during continuous integration. Without this, debugging
+/// by Gazebo during continuous integration. Without this, debugging
 /// failing tests is significantly more difficult.
 class AutoLogFixture : public ::testing::Test
 {
@@ -50,7 +50,7 @@ class AutoLogFixture : public ::testing::Test
   protected: std::string LogContent() const;
 
   /// \brief Pointer to private data.
-  IGN_UTILS_UNIQUE_IMPL_PTR(dataPtr)
+  GZ_UTILS_UNIQUE_IMPL_PTR(dataPtr)
 };
 }  // namespace gz::common::testing
 

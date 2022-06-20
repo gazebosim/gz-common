@@ -401,7 +401,7 @@ namespace gz
       public: double Volume() const;
 
       /// \brief Private data pointer.
-      IGN_UTILS_IMPL_PTR(dataPtr)
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
 
     /// \brief Vertex to node weighted assignement for skeleton animation

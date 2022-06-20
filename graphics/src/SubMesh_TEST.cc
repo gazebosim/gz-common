@@ -43,7 +43,7 @@ TEST_F(SubMeshTest, SubMesh)
   {
     // Test deprecated API
     // TODO(azeey) Remove this scope block when MaterialIndex is removed
-    IGN_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
+    GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
     EXPECT_EQ(submesh->MaterialIndex(),
               std::numeric_limits<unsigned int>::max());
     submesh->SetMaterialIndex(3u);
@@ -52,7 +52,7 @@ TEST_F(SubMeshTest, SubMesh)
     // break.
     submesh = std::make_shared<common::SubMesh>();
     ASSERT_NE(nullptr, submesh);
-    IGN_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
+    GZ_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
   }
 
   // Use new API
@@ -405,7 +405,7 @@ TEST_F(SubMeshTest, Volume)
     const common::Mesh *unitSphere =
       common::MeshManager::Instance()->MeshByName("unit_sphere");
     ASSERT_TRUE(unitSphere != nullptr);
-    EXPECT_NEAR(4.0/3.0 * IGN_PI * std::pow(0.5, 3), unitSphere->Volume(),
+    EXPECT_NEAR(4.0/3.0 * GZ_PI * std::pow(0.5, 3), unitSphere->Volume(),
         1e-2);
 
     // A larger sphere needs to have higher resolution in order to get the
@@ -416,7 +416,7 @@ TEST_F(SubMeshTest, Volume)
     const common::Mesh *otherSphere =
       common::MeshManager::Instance()->MeshByName("other_sphere");
     ASSERT_TRUE(otherSphere != nullptr);
-    EXPECT_NEAR(4.0/3.0 * IGN_PI * std::pow(2.5, 3), otherSphere->Volume(),
+    EXPECT_NEAR(4.0/3.0 * GZ_PI * std::pow(2.5, 3), otherSphere->Volume(),
         1e-2);
   }
 
@@ -490,7 +490,7 @@ TEST_F(SubMeshTest, Volume)
     const common::Mesh *unitCylinder =
       common::MeshManager::Instance()->MeshByName("unit_cylinder");
     ASSERT_TRUE(unitCylinder != nullptr);
-    EXPECT_NEAR(IGN_PI * std::pow(0.5, 2) * 1.0, unitCylinder->Volume(),
+    EXPECT_NEAR(GZ_PI * std::pow(0.5, 2) * 1.0, unitCylinder->Volume(),
         1e-2);
 
     // A larger cylinder needs to have higher resolution in order to get the
@@ -501,7 +501,7 @@ TEST_F(SubMeshTest, Volume)
     const common::Mesh *otherCylinder =
       common::MeshManager::Instance()->MeshByName("other_cylinder");
     ASSERT_TRUE(otherCylinder != nullptr);
-    EXPECT_NEAR(IGN_PI * std::pow(2.5, 2) * 12, otherCylinder->Volume(),
+    EXPECT_NEAR(GZ_PI * std::pow(2.5, 2) * 12, otherCylinder->Volume(),
         1e-2);
   }
 

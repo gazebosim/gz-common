@@ -42,7 +42,7 @@ THE SOFTWARE.
 
 //
 // Use this in *one* .cc
-//   #define IGNITION_COMMON_TINYOBJLOADER_IMPLEMENTATION
+//   #define GZ_COMMON_TINYOBJLOADER_IMPLEMENTATION
 //   #include "tiny_obj_loader.h"
 //
 
@@ -401,7 +401,7 @@ bool ParseTextureNameAndOption(std::string *texname, texture_option_t *texopt,
 
 #endif  // GZ_COMMON_TINY_OBJ_LOADER_H_
 
-#ifdef IGNITION_COMMON_TINYOBJLOADER_IMPLEMENTATION
+#ifdef GZ_COMMON_TINYOBJLOADER_IMPLEMENTATION
 #include <cassert>
 #include <cctype>
 #include <cmath>

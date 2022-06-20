@@ -35,7 +35,7 @@
 #include "DummyPluginsPath.h"
 #include "plugins/DummyPlugins.hh"
 
-IGN_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
+GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
 #include "ignition/common/PluginLoader.hh"
 #include "ignition/common/PluginPtr.hh"
 #include "ignition/common/SpecializedPluginPtr.hh"
@@ -44,16 +44,16 @@ IGN_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
 TEST(PluginLoader, LoadBadPlugins)
 {
   std::string dummyPath =
-    gz::common::copyFromUnixPath(IGN_DUMMY_PLUGIN_PATH);
+    gz::common::copyFromUnixPath(GZ_DUMMY_PLUGIN_PATH);
 
   gz::common::SystemPaths sp;
   sp.AddPluginPaths(dummyPath);
 
   std::vector<std::string> libraryNames = {
-    "IGNBadPluginAPIVersionOld",
-    "IGNBadPluginAPIVersionNew",
-    "IGNBadPluginAlign",
-    "IGNBadPluginSize"};
+    "GzBadPluginAPIVersionOld",
+    "GzBadPluginAPIVersionNew",
+    "GzBadPluginAlign",
+    "GzBadPluginSize"};
   for (auto const & libraryName : libraryNames)
   {
     std::string path = sp.FindSharedLibrary(libraryName);
@@ -72,7 +72,7 @@ TEST(PluginLoader, LoadBadPlugins)
 TEST(PluginLoader, LoadExistingLibrary)
 {
   std::string dummyPath =
-    gz::common::copyFromUnixPath(IGN_DUMMY_PLUGIN_PATH);
+    gz::common::copyFromUnixPath(GZ_DUMMY_PLUGIN_PATH);
 
   gz::common::SystemPaths sp;
   sp.AddPluginPaths(dummyPath);
@@ -168,7 +168,7 @@ using SomeSpecializedPluginPtr =
 TEST(SpecializedPluginPtr, Construction)
 {
   gz::common::SystemPaths sp;
-  sp.AddPluginPaths(IGN_DUMMY_PLUGIN_PATH);
+  sp.AddPluginPaths(GZ_DUMMY_PLUGIN_PATH);
   std::string path = sp.FindSharedLibrary("GzDummyPlugins");
   ASSERT_FALSE(path.empty());
 
@@ -295,7 +295,7 @@ TEST(PluginPtr, CopyMoveSemantics)
   EXPECT_TRUE(plugin.IsEmpty());
 
   gz::common::SystemPaths sp;
-  sp.AddPluginPaths(IGN_DUMMY_PLUGIN_PATH);
+  sp.AddPluginPaths(GZ_DUMMY_PLUGIN_PATH);
   std::string path = sp.FindSharedLibrary("GzDummyPlugins");
   ASSERT_FALSE(path.empty());
 
@@ -375,7 +375,7 @@ void CheckSomeValues(
 TEST(PluginPtr, QueryInterfaceSharedPtr)
 {
   gz::common::SystemPaths sp;
-  sp.AddPluginPaths(IGN_DUMMY_PLUGIN_PATH);
+  sp.AddPluginPaths(GZ_DUMMY_PLUGIN_PATH);
   std::string path = sp.FindSharedLibrary("GzDummyPlugins");
   ASSERT_FALSE(path.empty());
 
@@ -439,6 +439,6 @@ TEST(PluginPtr, QueryInterfaceSharedPtr)
   SetSomeValues(setter);
   CheckSomeValues(getInt, getDouble, getName);
 }
-IGN_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
+GZ_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
 
 #undef SUPPRESS_IGNITION_HEADER_DEPRECATION

@@ -109,7 +109,7 @@ namespace gz
       public: double TimeAtX(const double _x) const;
 
       /// \brief Private data pointer.
-      IGN_UTILS_IMPL_PTR(dataPtr)
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

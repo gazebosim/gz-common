@@ -214,7 +214,7 @@ namespace gz
                               const float _height,
                               const int _rings,
                               const int _segments,
-                              const double _arc = 2.0 * IGN_PI);
+                              const double _arc = 2.0 * GZ_PI);
 
       /// \brief Create mesh for a plane
       /// \param[in] _name
@@ -294,7 +294,7 @@ namespace gz
                       const double _tol);
 
       /// \brief Private data pointer.
-      IGN_UTILS_UNIQUE_IMPL_PTR(dataPtr)
+      GZ_UTILS_UNIQUE_IMPL_PTR(dataPtr)
 
       /// \brief Singleton implementation
       private: friend class SingletonT<MeshManager>;

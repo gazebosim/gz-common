@@ -54,10 +54,10 @@
 /// of our implementation) that the pointer is definitely not pointing to a more
 /// derived type.
 #define IGN_COMMON_WARN_IGNORE__DELETE_NON_VIRTUAL_DESTRUCTOR \
-  IGN_UTILS_WARN_IGNORE__NON_VIRTUAL_DESTRUCTOR
+  GZ_UTILS_WARN_IGNORE__NON_VIRTUAL_DESTRUCTOR
 
 #define IGN_COMMON_WARN_RESUME__DELETE_NON_VIRTUAL_DESTRUCTOR \
-  IGN_UTILS_WARN_RESUME__NON_VIRTUAL_DESTRUCTOR
+  GZ_UTILS_WARN_RESUME__NON_VIRTUAL_DESTRUCTOR
 
 
 /// \brief Microsoft Visual Studio does not automatically export the interface
@@ -66,9 +66,9 @@
 /// choose to suppress the warning instead of needlessly adding the class
 /// information to the DLL interface.
 #define IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING \
-  IGN_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
+  GZ_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
 
 #define IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING \
-  IGN_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
+  GZ_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
 
 #endif

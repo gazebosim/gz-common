@@ -79,7 +79,7 @@ namespace gz::common
     public: HWEncoderType GetEncoderType() const;
 
     /// \brief Private data pointer
-    IGN_UTILS_UNIQUE_IMPL_PTR(dataPtr)
+    GZ_UTILS_UNIQUE_IMPL_PTR(dataPtr)
   };
 }
 

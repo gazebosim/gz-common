@@ -104,7 +104,7 @@ namespace gz
                      unsigned int &_firstKeyIndex) const;
 
       /// \brief Private data pointer.
-      IGN_UTILS_IMPL_PTR(dataPtr)
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
 
     /// \brief A pose animation.
@@ -142,7 +142,7 @@ namespace gz
       protected: void BuildInterpolationSplines();
 
       /// \brief Private data pointer.
-      IGN_UTILS_IMPL_PTR(dataPtr)
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
 
     /// \brief A numeric animation.
@@ -166,7 +166,7 @@ namespace gz
       public: void InterpolatedKeyFrame(NumericKeyFrame &_kf) const;
 
       /// \brief Private data pointer.
-      IGN_UTILS_IMPL_PTR(dataPtr)
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
 
     /// \brief Information about a trajectory for an animation (e.g., Actor)
@@ -246,7 +246,7 @@ namespace gz
            _waypoints, double _tension = 0.0);
 
       /// \brief Private data pointer.
-      IGN_UTILS_IMPL_PTR(dataPtr)
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

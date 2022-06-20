@@ -23,7 +23,7 @@ using namespace gz;
 using namespace common;
 
 // Initialize enum iterator, and string converter
-IGN_ENUM(materialDensityIface, MaterialDensity::Type,
+GZ_ENUM(materialDensityIface, MaterialDensity::Type,
   MaterialDensity::Type::BEGIN,
   MaterialDensity::Type::END,
   "Styrofoam",

@@ -27,9 +27,9 @@ TEST(Console_TEST, LogInitAfterConsoleOut)
   auto tempDir = gz::common::testing::MakeTestTempDirectory();
   ASSERT_TRUE(tempDir->Valid());
 
-  gz::common::setenv(IGN_HOMEDIR, tempDir->Path());
+  gz::common::setenv(GZ_HOMEDIR, tempDir->Path());
   std::string home;
-  ASSERT_TRUE(gz::common::env(IGN_HOMEDIR, home));
+  ASSERT_TRUE(gz::common::env(GZ_HOMEDIR, home));
 
   auto logDir = tempDir->Path();
   std::string logFile = gz::common::joinPaths(logDir, logFilename);
