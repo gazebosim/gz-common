@@ -238,7 +238,7 @@ namespace common
     public: void SetType(PbrType _type);
 
     /// \brief Private data pointer.
-    IGN_UTILS_IMPL_PTR(dataPtr)
+    GZ_UTILS_IMPL_PTR(dataPtr)
   };
 }
 }

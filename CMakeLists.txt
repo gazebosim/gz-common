@@ -15,7 +15,7 @@ set(IGN_CMAKE_VER ${ignition-cmake3_VERSION_MAJOR})
 #============================================================================
 # Configure the project
 #============================================================================
-ign_configure_project(
+gz_configure_project(
   REPLACE_IGNITION_INCLUDE_PATH gz/common
   VERSION_SUFFIX pre1)
 
@@ -51,18 +51,18 @@ message(STATUS "\n\n-- ====== Finding Dependencies ======")
 
 #--------------------------------------
 # Find ignition-math
-ign_find_package(ignition-math7 REQUIRED_BY geospatial graphics events)
+gz_find_package(ignition-math7 REQUIRED_BY geospatial graphics events)
 set(IGN_MATH_VER ${ignition-math7_VERSION_MAJOR})
 
 #--------------------------------------
 # Find ignition-utils
-ign_find_package(ignition-utils2 REQUIRED)
+gz_find_package(ignition-utils2 REQUIRED)
 set(IGN_UTILS_VER ${ignition-utils2_VERSION_MAJOR})
 
 #--------------------------------------
 # Find Tinyxml2
 if(USE_EXTERNAL_TINYXML2)
-  ign_find_package(TINYXML2 PRETTY tinyxml2
+  gz_find_package(TINYXML2 PRETTY tinyxml2
     REQUIRED_BY graphics
     PRIVATE_FOR graphics)
 else()
@@ -71,7 +71,7 @@ endif()
 
 #--------------------------------------
 # Find libdl
-ign_find_package(
+gz_find_package(
   DL REQUIRED PRIVATE PRETTY libdl PURPOSE "Required for plugins")
 
 #--------------------------------------
@@ -80,49 +80,49 @@ if(NOT MSVC)
 
   #------------------------------------
   # Find uuid
-  ign_find_package(UUID REQUIRED PRETTY uuid)
+  gz_find_package(UUID REQUIRED PRETTY uuid)
 
 endif()
 
 #------------------------------------
 # Find Freeimage
-ign_find_package(FreeImage VERSION 3.9
+gz_find_package(FreeImage VERSION 3.9
   REQUIRED_BY graphics
   PRIVATE_FOR graphics)
 
 #------------------------------------
 # Find GNU Triangulation Surface Library
-ign_find_package(
+gz_find_package(
   GTS PRETTY gts PURPOSE "GNU Triangulation Surface library"
   REQUIRED_BY graphics
   PRIVATE_FOR graphics)
 
 #------------------------------------
 # Find GDAL
-ign_find_package(GDAL VERSION 3.0
+gz_find_package(GDAL VERSION 3.0
   PKGCONFIG gdal
   PRIVATE_FOR geospatial
   REQUIRED_BY geospatial)
 
 #------------------------------------
 # Find libswscale
-ign_find_package(SWSCALE REQUIRED_BY av PRETTY libswscale)
+gz_find_package(SWSCALE REQUIRED_BY av PRETTY libswscale)
 
 #------------------------------------
 # Find avdevice
-ign_find_package(AVDEVICE VERSION 56.4.100 REQUIRED_BY av PRETTY libavdevice)
+gz_find_package(AVDEVICE VERSION 56.4.100 REQUIRED_BY av PRETTY libavdevice)
 
 #------------------------------------
 # Find avformat
-ign_find_package(AVFORMAT REQUIRED_BY av PRETTY libavformat)
+gz_find_package(AVFORMAT REQUIRED_BY av PRETTY libavformat)
 
 #------------------------------------
 # Find avcodec
-ign_find_package(AVCODEC REQUIRED_BY av PRETTY libavcodec)
+gz_find_package(AVCODEC REQUIRED_BY av PRETTY libavcodec)
 
 #------------------------------------
 # Find avutil
-ign_find_package(AVUTIL REQUIRED_BY av PRETTY libavutil)
+gz_find_package(AVUTIL REQUIRED_BY av PRETTY libavutil)
 
 #------------------------------------
 # Find assimp
@@ -138,13 +138,13 @@ message(STATUS "-------------------------------------------\n")
 configure_file("${PROJECT_SOURCE_DIR}/cppcheck.suppress.in"
                ${PROJECT_BINARY_DIR}/cppcheck.suppress)
 
-ign_configure_build(QUIT_IF_BUILD_ERRORS
+gz_configure_build(QUIT_IF_BUILD_ERRORS
   COMPONENTS av events geospatial graphics profiler testing)
 
 #============================================================================
 # Create package information
 #============================================================================
-ign_create_packages()
+gz_create_packages()
 
 
 #============================================================================
@@ -153,7 +153,7 @@ ign_create_packages()
 configure_file(${CMAKE_SOURCE_DIR}/api.md.in ${CMAKE_BINARY_DIR}/api.md)
 configure_file(${CMAKE_SOURCE_DIR}/tutorials.md.in ${CMAKE_BINARY_DIR}/tutorials.md)
 
-ign_create_docs(
+gz_create_docs(
   API_MAINPAGE_MD "${CMAKE_BINARY_DIR}/api.md"
   TUTORIALS_MAINPAGE_MD "${CMAKE_BINARY_DIR}/tutorials.md"
   TAGFILES

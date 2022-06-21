@@ -243,7 +243,7 @@ void Image::SetFromData(const unsigned char *_data,
 }
 
 //////////////////////////////////////////////////
-void Image::SetFromCompressedData(const unsigned char *_data,
+void Image::SetFromCompressedData(unsigned char *_data,
                                   unsigned int _size,
                                   Image::PixelFormatType _format)
 {
@@ -253,7 +253,7 @@ void Image::SetFromCompressedData(const unsigned char *_data,
 
   if (_format == COMPRESSED_PNG)
   {
-    FIMEMORY *fiMem = FreeImage_OpenMemory(const_cast<unsigned char*>(_data), _size);
+    FIMEMORY *fiMem = FreeImage_OpenMemory(_data, _size);
     this->dataPtr->bitmap = FreeImage_LoadFromMemory(FIF_PNG, fiMem);
     FreeImage_CloseMemory(fiMem);
   }

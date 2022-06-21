@@ -19,9 +19,9 @@
 
 #include "ProfilerImpl.hh"
 
-#ifdef IGN_PROFILER_REMOTERY
+#ifdef GZ_PROFILER_REMOTERY
 #include "RemoteryProfilerImpl.hh"
-#endif  // IGN_PROFILER_REMOTERY
+#endif  // GZ_PROFILER_REMOTERY
 
 using namespace gz;
 using namespace common;
@@ -30,9 +30,9 @@ using namespace common;
 Profiler::Profiler():
   impl(nullptr)
 {
-#ifdef IGN_PROFILER_REMOTERY
+#ifdef GZ_PROFILER_REMOTERY
   impl = new RemoteryProfilerImpl();
-#endif  // IGN_PROFILER_REMOTERY
+#endif  // GZ_PROFILER_REMOTERY
 
   if (this->impl == nullptr)
   {

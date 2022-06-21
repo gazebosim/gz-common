@@ -290,7 +290,7 @@ namespace gz
               }
 
       /// \brief Private data pointer.
-      IGN_UTILS_UNIQUE_IMPL_PTR(dataPtr)
+      GZ_UTILS_UNIQUE_IMPL_PTR(dataPtr)
     };
   }
 }

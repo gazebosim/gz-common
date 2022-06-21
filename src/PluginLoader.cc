@@ -30,7 +30,7 @@
 #include "ignition/common/StringUtils.hh"
 #include "ignition/common/Util.hh"
 
-IGN_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
+GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
 #include "ignition/common/PluginInfo.hh"
 #include "ignition/common/PluginLoader.hh"
 #include "ignition/common/PluginPtr.hh"
@@ -320,6 +320,6 @@ namespace gz
     }
   }
 }
-IGN_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
+GZ_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
 
 #undef SUPPRESS_IGNITION_HEADER_DEPRECATION

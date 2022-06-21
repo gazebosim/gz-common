@@ -25,7 +25,7 @@
 
 using namespace gz;
 
-IGN_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
+GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
 /////////////////////////////////////////////////
 TEST(PluginUtils, NormalizeName)
 {
@@ -38,6 +38,6 @@ TEST(PluginUtils, NormalizeName)
   EXPECT_EQ("::gz::math", common::NormalizeName("gz::math"));
   EXPECT_EQ("::gz::math", common::NormalizeName("::gz::math"));
 }
-IGN_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
+GZ_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
 
 #undef SUPPRESS_IGNITION_HEADER_DEPRECATION

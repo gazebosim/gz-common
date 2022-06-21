@@ -976,7 +976,7 @@ void ColladaExporter::Implementation::ExportVisualScenes(
 
       char str[100] = { 0 };
       snprintf(str, sizeof(str), "%g %g %g %g",
-        axis.X(), axis.Y(), axis.Z(), angle / IGN_PI * 180.0);
+        axis.X(), axis.Y(), axis.Z(), angle / GZ_PI * 180.0);
       rotateXml->SetText(str);
       nodeXml->LinkEndChild(rotateXml);
     }

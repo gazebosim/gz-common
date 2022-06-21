@@ -14,7 +14,7 @@ implementation is [Remotery](https://github.com/Celtoys/Remotery).
 The goal of the profiler is to provide introspection and analysis when enabled
 at compile time, but to introduce no overhead when it is disabled at compile-time.
 
-To control if the profiler is enabled, set the `IGN_PROFILER_ENABLE` flag using
+To control if the profiler is enabled, set the `GZ_PROFILER_ENABLE` flag using
 cmake on the targets or sources that you are interested in (described below).
 
 ## Enabling the Profiler
@@ -37,11 +37,11 @@ The relevant corresponding C++ would be as follows:
 void thread(const char *_thread_name)
 {
   // Sets the name of the thread to appear in the UI
-  IGN_PROFILE_THREAD_NAME(_thread_name);
+  GZ_PROFILE_THREAD_NAME(_thread_name);
   while (running)
   {
     // Add a profiling point to this scope.
-    IGN_PROFILE("Loop");
+    GZ_PROFILE("Loop");
     // Execute some arbitrary tasks
     for (size_t ii = 0; ii < 10; ++ii)
     {
@@ -65,7 +65,7 @@ find_package(ignition-common5 QUIET REQUIRED COMPONENTS profiler)
 add_executable(profiler_example profiler.cc)
 target_link_libraries(profiler_example ignition-common5::profiler)
 # Enable the profiler for the example
-target_compile_definitions(profiler_example PUBLIC "IGN_PROFILER_ENABLE=1")
+target_compile_definitions(profiler_example PUBLIC "GZ_PROFILER_ENABLE=1")
 ```
 
 Run `cmake` and build the example
@@ -148,17 +148,17 @@ If you see ``connection error``, there are a couple of things to double check
 The profiler is used through a series of macros.
 
 The two primary ways of profiling a section of code are to either use
-a matched pair of `IGN_PROFILE_BEGIN` and `IGN_PROFILE_END` macros, or to use
-a single RAII-style macro `IGN_PROFILE`. The RAII style will stop measuring
+a matched pair of `GZ_PROFILE_BEGIN` and `GZ_PROFILE_END` macros, or to use
+a single RAII-style macro `GZ_PROFILE`. The RAII style will stop measuring
 once the scope that the macro was invoked in is left.
 
 Using begin/end:
 
 ```{.cpp}
   // An example of using start/stop profiling.
-  IGN_PROFILE_BEGIN("a");
+  GZ_PROFILE_BEGIN("a");
   std::this_thread::sleep_for(std::chrono::milliseconds(2));
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 ```
 
 Using RAII-style:
@@ -166,7 +166,7 @@ Using RAII-style:
 ```{.cpp}
   {
     // An example of using scope-based profiling.
-    IGN_PROFILE("a");
+    GZ_PROFILE("a");
     std::this_thread::sleep_for(std::chrono::milliseconds(2));
   }
 ```
@@ -174,9 +174,9 @@ Using RAII-style:
 Additionally, each thread can be given a name for easy reference in the UI:
 
 ```{.cpp}
-  IGN_PROFILE_THREAD_NAME("main");
-  IGN_PROFILE_THREAD_NAME("physics");
-  IGN_PROFILE_THREAD_NAME("gui");
+  GZ_PROFILE_THREAD_NAME("main");
+  GZ_PROFILE_THREAD_NAME("physics");
+  GZ_PROFILE_THREAD_NAME("gui");
 ```
 
 ## Configuring the Profiler
