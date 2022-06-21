@@ -43,8 +43,13 @@ namespace gz
       public: std::string fullName;
 
       /// \brief Implementation of GetData
+      /// \deprecated remove once the Data functions using raw pointers
+      /// are removed, in favor of returning vectors of bytes
       public: void DataImpl(unsigned char **_data, unsigned int &_count,
           FIBITMAP *_img) const;
+
+      /// \brief Implementation of Data, returns vector of bytes
+      public: std::vector<unsigned char> DataImpl(FIBITMAP *_img) const;
 
       /// \brief Returns true if SwapRedBlue can and should be called
       /// If it returns false, it may not be safe to call SwapRedBlue
@@ -288,6 +293,27 @@ void Image::RGBData(unsigned char **_data, unsigned int &_count) const
 }
 
 //////////////////////////////////////////////////
+std::vector<unsigned char> Image::RGBData() const
+{
+  std::vector<unsigned char> data;
+
+  FIBITMAP *tmp = this->dataPtr->bitmap;
+  FIBITMAP *tmp2 = nullptr;
+  if (this->dataPtr->ShouldSwapRedBlue())
+  {
+    tmp = this->dataPtr->SwapRedBlue(this->Width(), this->Height());
+    tmp2 = tmp;
+  }
+  tmp = FreeImage_ConvertTo24Bits(tmp);
+  data = this->dataPtr->DataImpl(tmp);
+  FreeImage_Unload(tmp);
+  if (tmp2)
+    FreeImage_Unload(tmp2);
+
+  return data;
+}
+
+//////////////////////////////////////////////////
 void Image::RGBAData(unsigned char **_data, unsigned int &_count) const
 {
   FIBITMAP *tmp = this->dataPtr->bitmap;
@@ -305,6 +331,27 @@ void Image::RGBAData(unsigned char **_data, unsigned int &_count) const
 }
 
 //////////////////////////////////////////////////
+std::vector<unsigned char> Image::RGBAData() const
+{
+  std::vector<unsigned char> data;
+
+  FIBITMAP *tmp = this->dataPtr->bitmap;
+  FIBITMAP *tmp2 = nullptr;
+  if (this->dataPtr->ShouldSwapRedBlue())
+  {
+    tmp = this->dataPtr->SwapRedBlue(this->Width(), this->Height());
+    tmp2 = tmp;
+  }
+  tmp = FreeImage_ConvertTo32Bits(tmp);
+  data = this->dataPtr->DataImpl(tmp);
+  FreeImage_Unload(tmp);
+  if (tmp2)
+    FreeImage_Unload(tmp2);
+
+  return data;
+}
+
+//////////////////////////////////////////////////
 void Image::Data(unsigned char **_data, unsigned int &_count) const
 {
   if (this->dataPtr->ShouldSwapRedBlue())
@@ -317,6 +364,45 @@ void Image::Data(unsigned char **_data, unsigned int &_count) const
   {
     this->dataPtr->DataImpl(_data, _count, this->dataPtr->bitmap);
   }
+}
+
+//////////////////////////////////////////////////
+std::vector<unsigned char> Image::Data() const
+{
+  std::vector<unsigned char> data;
+  if (this->dataPtr->ShouldSwapRedBlue())
+  {
+    FIBITMAP *tmp = this->dataPtr->SwapRedBlue(this->Width(), this->Height());
+    data = this->dataPtr->DataImpl(tmp);
+    FreeImage_Unload(tmp);
+  }
+  else
+  {
+    data = this->dataPtr->DataImpl(this->dataPtr->bitmap);
+  }
+  return data;
+}
+
+//////////////////////////////////////////////////
+std::vector<unsigned char> Image::Implementation::DataImpl(FIBITMAP *_img) const
+{
+  int redmask = FI_RGBA_RED_MASK;
+  // int bluemask = 0x00ff0000;
+
+  int greenmask = FI_RGBA_GREEN_MASK;
+  // int greenmask = 0x0000ff00;
+
+  int bluemask = FI_RGBA_BLUE_MASK;
+  // int redmask = 0x000000ff;
+
+  int scanWidth = FreeImage_GetLine(_img);
+
+  std::vector<unsigned char> data(scanWidth * FreeImage_GetHeight(_img));
+
+  FreeImage_ConvertToRawBits(reinterpret_cast<BYTE*>(&data[0]), _img,
+      scanWidth, FreeImage_GetBPP(_img), redmask, greenmask, bluemask, true);
+
+  return data;
 }
 
 //////////////////////////////////////////////////
