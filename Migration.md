@@ -43,6 +43,8 @@ release will remove the deprecated code.
    10. `IGN_CREATE_SPEC_INTERFACE`
    11. `IGN_DUMMY_PLUGIN_PATH`
    12. `IGNITION_UNITTEST_SPECIALIZED_PLUGIN_ACCESS`
+8. The `Image::Data(unsigned char**, unsigned int&)` functions that accept a pointer and a size and internally allocate memory are deprecated and will be removed in future versions.
+   Use the new `Data` functions that return a `std::vector<unsigned char>` to have automatic memory management.
 
 
 
