@@ -49,6 +49,9 @@ class AssimpLoader::Implementation
   /// Convert a color from assimp implementation to Ignition common
   public: math::Color ConvertColor(aiColor4D& _color);
 
+  // Stores the loaded bone names 
+  public: std::vector<std::string> BoneNames;
+
   /// Convert a transformation from assimp implementation to Ignition math
   public: math::Matrix4d ConvertTransform(const aiMatrix4x4& _matrix);
 
@@ -69,6 +72,8 @@ class AssimpLoader::Implementation
   public: void RecursiveCreate(const aiScene* _scene, const aiNode* _node, const math::Matrix4d& _transform, Mesh* _mesh);
 
   public: void RecursiveSkeletonCreate(const aiNode* _node, SkeletonNode* _parent, const math::Matrix4d& _transform);
+
+  public: void RecursiveStoreBoneNames(const aiScene *_scene, const aiNode* _node);
 
   /// \brief Apply the the inv bind transform to the skeleton pose.
   /// \remarks have to set the model transforms starting from the root in
@@ -177,16 +182,50 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene, const 
   }
 }
 
+void AssimpLoader::Implementation::RecursiveStoreBoneNames(const aiScene *_scene, const aiNode *_node)
+{
+  if (!_node)
+    return;
+
+  for (unsigned meshIdx = 0; meshIdx < _node->mNumMeshes; ++meshIdx)
+  {
+    auto assimpMeshIdx = _node->mMeshes[meshIdx];
+    auto assimpMesh = _scene->mMeshes[assimpMeshIdx];
+    for (unsigned boneIdx = 0; boneIdx < assimpMesh->mNumBones; ++boneIdx)
+    {
+      auto bone = assimpMesh->mBones[boneIdx];
+      auto boneName = std::string(bone->mName.C_Str());
+      gzdbg << "\t" << "RecursiveStoreBoneNames: Bone name: " << boneName << std::endl;
+      BoneNames.push_back(boneName);
+    }
+  }
+
+  // Iterate over children
+  for (unsigned childIdx = 0; childIdx < _node->mNumChildren; ++childIdx)
+  {
+    auto child_node = _node->mChildren[childIdx];
+    // Finally recursive call to explore subnode
+    this->RecursiveStoreBoneNames(_scene, child_node);
+  }
+}
+
 void AssimpLoader::Implementation::RecursiveSkeletonCreate(const aiNode* _node, SkeletonNode* _parent, const math::Matrix4d& _transform)
 {
   // First explore this node
   auto nodeName = ToString(_node->mName);
   // TODO check if node or joint?
-  auto skelNode = new SkeletonNode(_parent, nodeName, nodeName, SkeletonNode::JOINT);
-  // Calculate transform
+  auto boneExist = std::find(BoneNames.begin(), BoneNames.end(), nodeName) != BoneNames.end();
   auto nodeTrans = this->ConvertTransform(_node->mTransformation);
-  skelNode->SetTransform(nodeTrans);
+  auto skelNode = _parent;
+
+  if (boneExist)
+  {
+    skelNode = new SkeletonNode(_parent, nodeName, nodeName, SkeletonNode::JOINT);
+    skelNode->SetTransform(nodeTrans);
+  }
+
   nodeTrans = _transform * nodeTrans;
+
   for (unsigned childIdx = 0; childIdx < _node->mNumChildren; ++childIdx)
   {
     this->RecursiveSkeletonCreate(_node->mChildren[childIdx], skelNode, nodeTrans);
@@ -469,6 +508,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   transform = aiMatrix4x4(rootScaling, aiQuaternion(), rootPos);
 
   auto rootTransform = this->dataPtr->ConvertTransform(transform);
+  this->dataPtr->RecursiveStoreBoneNames(scene, rootNode);
 
   // TODO remove workaround, it seems imported assets are rotated by 90 degrees
   // as documented here https://github.com/assimp/assimp/issues/849, remove workaround when fixed
@@ -489,6 +529,9 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
       // TODO parse different skeletons and merge them
       this->dataPtr->RecursiveSkeletonCreate(rootNode->mChildren[childIdx], rootSkelNode, rootTransform);
     }
+    rootSkelNode = rootSkelNode->Child(0); //We dont need scene node and adding will create inverse model
+    rootSkelNode->SetParent(nullptr);
+
     SkeletonPtr rootSkeleton = std::make_shared<Skeleton>(rootSkelNode);
     mesh->SetSkeleton(rootSkeleton);
   }
