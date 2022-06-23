@@ -44,6 +44,9 @@ namespace gz
       /// \brief Destructor.
       public: virtual ~Dem();
 
+      /// \brief Sets the spherical coordinates reference object.
+      public: void SetSphericalCoordinates(const math::SphericalCoordinates);
+
       /// \brief Load a DEM file.
       /// \param[in] _filename the path to the terrain file.
       /// \return 0 when the operation succeeds to open a file.

@@ -63,6 +63,10 @@ class gz::common::Dem::Implementation
   /// If true, worldWidth & worldHeight = -1
   /// and GeoReference[Origin] can not be used (will return false)
   public: bool isNonEarthDem = false;
+
+  /// \brief Holds the spherical coordinates object from the world.
+  public : math::SphericalCoordinates sphericalCoordinates =
+           math::SphericalCoordinates();
 };
 
 //////////////////////////////////////////////////
@@ -80,6 +84,13 @@ Dem::~Dem()
 
   if (this->dataPtr->dataSet)
     GDALClose(reinterpret_cast<GDALDataset *>(this->dataPtr->dataSet));
+}
+
+//////////////////////////////////////////////////
+void Dem::SetSphericalCoordinates(
+    const math::SphericalCoordinates _worldSphericalCoordinates)
+{
+  this->dataPtr->sphericalCoordinates =_worldSphericalCoordinates;
 }
 
 //////////////////////////////////////////////////
@@ -285,39 +296,57 @@ bool Dem::GeoReference(double _x, double _y,
   double geoTransf[6];
   if (this->dataPtr->dataSet->GetGeoTransform(geoTransf) == CE_None)
   {
-    OGRSpatialReference sourceCs;
-    OGRSpatialReference targetCs;
-    OGRCoordinateTransformation *cT;
-    double xGeoDeg, yGeoDeg;
+    if (this->dataPtr->sphericalCoordinates.Surface() ==
+        math::SphericalCoordinates::EARTH_WGS84)
+    {
+      OGRSpatialReference sourceCs;
+      OGRSpatialReference targetCs;
+      OGRCoordinateTransformation *cT;
+      double xGeoDeg, yGeoDeg;
 
-    // Transform the terrain's coordinate system to WGS84
-    const char *importString
-        = strdup(this->dataPtr->dataSet->GetProjectionRef());
-    if (importString == nullptr || importString[0] == '\0')
-    {
-      gzdbg << "Projection coordinate system undefined." << std::endl;
-      return false;
-    }
-    sourceCs.importFromWkt(&importString);
-    targetCs.SetWellKnownGeogCS("WGS84");
-    cT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
-    if (nullptr == cT)
-    {
-      gzerr << "Unable to transform terrain coordinate system to WGS84 for "
-             << "coordinates (" << _x << "," << _y << ")" << std::endl;
+      // Transform the terrain's coordinate system to WGS84
+      const char *importString
+          = strdup(this->dataPtr->dataSet->GetProjectionRef());
+      if (importString == nullptr || importString[0] == '\0')
+      {
+        gzdbg << "Projection coordinate system undefined." << std::endl;
+        return false;
+      }
+      sourceCs.importFromWkt(&importString);
+      targetCs.SetWellKnownGeogCS("WGS84");
+      cT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
+      if (nullptr == cT)
+      {
+        gzerr << "Unable to transform terrain coordinate system to WGS84 for "
+               << "coordinates (" << _x << "," << _y << ")" << std::endl;
+        OCTDestroyCoordinateTransformation(cT);
+        return false;
+      }
+
+      xGeoDeg = geoTransf[0] + _x * geoTransf[1] + _y * geoTransf[2];
+      yGeoDeg = geoTransf[3] + _x * geoTransf[4] + _y * geoTransf[5];
+
+      cT->Transform(1, &xGeoDeg, &yGeoDeg);
+
+      _latitude.SetDegree(yGeoDeg);
+      _longitude.SetDegree(xGeoDeg);
+
       OCTDestroyCoordinateTransformation(cT);
+    }
+    else if (this->dataPtr->sphericalCoordinates.Surface() ==
+        math::SphericalCoordinates::MOON_SCS)
+    {
+      // TODO
+      auto demSrs = this->dataPtr->dataSet->GetSpatialRef();
+
+
+    }
+    else
+    {
+      gzerr << "Unknown surface found in spherical coordinates"
+        << std::endl;
       return false;
     }
-
-    xGeoDeg = geoTransf[0] + _x * geoTransf[1] + _y * geoTransf[2];
-    yGeoDeg = geoTransf[3] + _x * geoTransf[4] + _y * geoTransf[5];
-
-    cT->Transform(1, &xGeoDeg, &yGeoDeg);
-
-    _latitude.SetDegree(yGeoDeg);
-    _longitude.SetDegree(xGeoDeg);
-
-    OCTDestroyCoordinateTransformation(cT);
   }
   else
   {
