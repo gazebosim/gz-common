@@ -433,6 +433,7 @@ AssimpLoader::AssimpLoader()
   // TODO: remove logger from stdout
   Assimp::DefaultLogger::create("", Assimp::Logger::VERBOSE, aiDefaultLogStream_STDOUT);
   this->dataPtr->importer.SetPropertyBool(AI_CONFIG_PP_FD_REMOVE, true);
+  this->dataPtr->importer.SetPropertyBool(AI_CONFIG_IMPORT_REMOVE_EMPTY_BONES, false);
 }
 
 //////////////////////////////////////////////////
