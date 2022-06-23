@@ -295,14 +295,14 @@ bool Dem::GeoReference(double _x, double _y,
   double geoTransf[6];
   if (this->dataPtr->dataSet->GetGeoTransform(geoTransf) == CE_None)
   {
+    OGRCoordinateTransformation *cT;
+    double xGeoDeg, yGeoDeg;
+
     if (this->dataPtr->sphericalCoordinates.Surface() ==
         math::SphericalCoordinates::EARTH_WGS84)
     {
       OGRSpatialReference sourceCs;
       OGRSpatialReference targetCs;
-      OGRCoordinateTransformation *cT;
-      double xGeoDeg, yGeoDeg;
-
       // Transform the terrain's coordinate system to WGS84
       const char *importString
           = strdup(this->dataPtr->dataSet->GetProjectionRef());
@@ -314,56 +314,43 @@ bool Dem::GeoReference(double _x, double _y,
       sourceCs.importFromWkt(&importString);
       targetCs.SetWellKnownGeogCS("WGS84");
       cT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
-      if (nullptr == cT)
-      {
-        gzerr << "Unable to transform terrain coordinate system to WGS84 for "
-               << "coordinates (" << _x << "," << _y << ")" << std::endl;
-        OCTDestroyCoordinateTransformation(cT);
-        return false;
-      }
-
-      xGeoDeg = geoTransf[0] + _x * geoTransf[1] + _y * geoTransf[2];
-      yGeoDeg = geoTransf[3] + _x * geoTransf[4] + _y * geoTransf[5];
-
-      cT->Transform(1, &xGeoDeg, &yGeoDeg);
-
-      _latitude.SetDegree(yGeoDeg);
-      _longitude.SetDegree(xGeoDeg);
-
-      OCTDestroyCoordinateTransformation(cT);
     }
     else if (this->dataPtr->sphericalCoordinates.Surface() ==
         math::SphericalCoordinates::MOON_SCS)
     {
-      // TODO
-      double xGeoDeg, yGeoDeg;
-      const OGRSpatialReference* demSrs =
-        this->dataPtr->dataSet->GetSpatialRef();
-      OGRSpatialReference moonLatLonSrs = OGRSpatialReference();
+      auto sourceCs = this->dataPtr->dataSet->GetSpatialRef();
+      OGRSpatialReference targetCs = OGRSpatialReference();
 
       const char* MOON_LAT_LON_PROJ_STR =
         "+proj=latlong +a=1737400 +b=1737400";
 
-      moonLatLonSrs.importFromProj4(MOON_LAT_LON_PROJ_STR);
+      targetCs.importFromProj4(MOON_LAT_LON_PROJ_STR);
 
-      auto demToLonLat = OGRCreateCoordinateTransformation(
-          demSrs, &moonLatLonSrs);
-
-      xGeoDeg = geoTransf[0] + _x * geoTransf[1] + _y * geoTransf[2];
-      yGeoDeg = geoTransf[3] + _x * geoTransf[4] + _y * geoTransf[5];
-
-      demToLonLat->Transform(1, &xGeoDeg, &yGeoDeg);
-      _latitude.SetDegree(yGeoDeg);
-      _longitude.SetDegree(xGeoDeg);
-
-      OCTDestroyCoordinateTransformation(demToLonLat);
+      cT = OGRCreateCoordinateTransformation(
+          sourceCs, &targetCs);
     }
     else
     {
-      gzerr << "Unknown surface found in spherical coordinates"
-        << std::endl;
+      gzerr << "Unsupported spherical coordinates found" << std::endl;
+    }
+
+    if (nullptr == cT)
+    {
+      gzerr << "Unable to transform terrain coordinate system for "
+             << "coordinates (" << _x << "," << _y << ")" << std::endl;
+      OCTDestroyCoordinateTransformation(cT);
       return false;
     }
+
+    xGeoDeg = geoTransf[0] + _x * geoTransf[1] + _y * geoTransf[2];
+    yGeoDeg = geoTransf[3] + _x * geoTransf[4] + _y * geoTransf[5];
+
+    cT->Transform(1, &xGeoDeg, &yGeoDeg);
+
+    _latitude.SetDegree(yGeoDeg);
+    _longitude.SetDegree(xGeoDeg);
+
+    OCTDestroyCoordinateTransformation(cT);
   }
   else
   {
