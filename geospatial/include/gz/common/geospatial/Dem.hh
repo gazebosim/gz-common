@@ -23,6 +23,7 @@
 
 #include <gz/math/Vector3.hh>
 #include <gz/math/Angle.hh>
+#include "gz/math/SphericalCoordinates.hh"
 
 #include <gz/common/geospatial/Export.hh>
 #include <gz/common/geospatial/HeightmapData.hh>
@@ -45,7 +46,8 @@ namespace gz
       public: virtual ~Dem();
 
       /// \brief Sets the spherical coordinates reference object.
-      public: void SetSphericalCoordinates(const math::SphericalCoordinates);
+      public: void SetSphericalCoordinates(
+                  const math::SphericalCoordinates _worldSphericalCoordinates);
 
       /// \brief Load a DEM file.
       /// \param[in] _filename the path to the terrain file.

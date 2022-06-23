@@ -254,3 +254,18 @@ TEST_F(DemTest, NonEarthDem)
   dem.SetNonEarthDEM(false);
   EXPECT_FALSE(dem.GetNonEarthDEM());
 }
+
+TEST_F(DemTest, LunarDemLoad)
+{
+  // moon
+  common::Dem dem;
+  auto path = common::testing::TestFile("data", "dem_moon.tif");
+  // Providing spherical coordinates object.
+  auto moonSc = math::SphericalCoordinates(
+      math::SphericalCoordinates::MOON_SCS);
+  dem.SetSphericalCoordinates(moonSc);
+  EXPECT_EQ(dem.Load(path), 0);
+
+  std::cout << "WH:" << dem.WorldHeight() << std::endl;
+  std::cout << "WW:" << dem.WorldWidth() << std::endl;
+}

@@ -22,7 +22,6 @@
 
 #include "gz/common/Console.hh"
 #include "gz/common/geospatial/Dem.hh"
-#include "gz/math/SphericalCoordinates.hh"
 
 using namespace gz;
 using namespace common;
@@ -168,11 +167,11 @@ int Dem::Load(const std::string &_filename)
   {
     // If successful, set the world width and height
     this->dataPtr->worldWidth =
-       math::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
-                                              upRightLat, upRightLong);
+       this->dataPtr->sphericalCoordinates.DistanceBetweenPoints(
+           upLeftLat, upLeftLong, upRightLat, upRightLong);
     this->dataPtr->worldHeight =
-       math::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
-                                              lowLeftLat, lowLeftLong);
+       this->dataPtr->sphericalCoordinates.DistanceBetweenPoints(
+           upLeftLat, upLeftLong, lowLeftLat, lowLeftLong);
   }
   // Assume non-Earth DEM (e.g., moon)
   else
@@ -337,9 +336,27 @@ bool Dem::GeoReference(double _x, double _y,
         math::SphericalCoordinates::MOON_SCS)
     {
       // TODO
-      auto demSrs = this->dataPtr->dataSet->GetSpatialRef();
+      double xGeoDeg, yGeoDeg;
+      const OGRSpatialReference* demSrs =
+        this->dataPtr->dataSet->GetSpatialRef();
+      OGRSpatialReference moonLatLonSrs = OGRSpatialReference();
 
+      const char* MOON_LAT_LON_PROJ_STR =
+        "+proj=latlong +a=1737400 +b=1737400";
 
+      moonLatLonSrs.importFromProj4(MOON_LAT_LON_PROJ_STR);
+
+      auto demToLonLat = OGRCreateCoordinateTransformation(
+          demSrs, &moonLatLonSrs);
+
+      xGeoDeg = geoTransf[0] + _x * geoTransf[1] + _y * geoTransf[2];
+      yGeoDeg = geoTransf[3] + _x * geoTransf[4] + _y * geoTransf[5];
+
+      demToLonLat->Transform(1, &xGeoDeg, &yGeoDeg);
+      _latitude.SetDegree(yGeoDeg);
+      _longitude.SetDegree(xGeoDeg);
+
+      OCTDestroyCoordinateTransformation(demToLonLat);
     }
     else
     {
