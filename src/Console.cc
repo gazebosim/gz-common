@@ -363,15 +363,31 @@ FileLogger::Buffer::~Buffer()
 }
 
 /////////////////////////////////////////////////
+std::streamsize FileLogger::Buffer::xsputn(const char *_char,
+                                           std::streamsize _count)
+{
+  auto lk = BufferLock(reinterpret_cast<std::uintptr_t>(this));
+  return std::stringbuf::xsputn(_char, _count);
+}
+
+/////////////////////////////////////////////////
 int FileLogger::Buffer::sync()
 {
   if (!this->stream)
     return -1;
 
-  *this->stream << this->str();
+  {
+    auto lk = BufferLock(reinterpret_cast<std::uintptr_t>(this));
+    *this->stream << this->str();
+  }
 
-  this->stream->flush();
-
-  this->str("");
+  {
+    auto lk = BufferLock(reinterpret_cast<std::uintptr_t>(this));
+    this->stream->flush();
+  }
+  {
+    auto lk = BufferLock(reinterpret_cast<std::uintptr_t>(this));
+    this->str("");
+  }
   return !(*this->stream);
 }
