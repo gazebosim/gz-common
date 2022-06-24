@@ -266,6 +266,6 @@ TEST_F(DemTest, LunarDemLoad)
   dem.SetSphericalCoordinates(moonSc);
   EXPECT_EQ(dem.Load(path), 0);
 
-  EXPECT_NEAR(dem.WorldWidth(), 80.0417);
-  EXPECT_NEAR(dem.WorldHeight(), 80.0417);
+  EXPECT_NEAR(dem.WorldWidth(), 80.0417, 1e-2);
+  EXPECT_NEAR(dem.WorldHeight(), 80.0417, 1e-2);
 }
