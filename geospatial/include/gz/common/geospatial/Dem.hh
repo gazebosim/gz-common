@@ -46,6 +46,9 @@ namespace gz
       public: virtual ~Dem();
 
       /// \brief Sets the spherical coordinates reference object.
+      /// \param[in] _worldSphericalCoordinates The spherical coordiantes
+      /// object contained in the world. This is used to compute accurate
+      /// sizes of the DEM object.
       public: void SetSphericalCoordinates(
                   const math::SphericalCoordinates _worldSphericalCoordinates);
 
