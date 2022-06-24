@@ -50,7 +50,7 @@ class AssimpLoader::Implementation
   public: math::Color ConvertColor(aiColor4D& _color);
 
   // Stores the loaded bone names 
-  public: std::vector<std::string> BoneNames;
+  public: std::unordered_set<std::string> boneNames;
 
   /// Convert a transformation from assimp implementation to Ignition math
   public: math::Matrix4d ConvertTransform(const aiMatrix4x4& _matrix);
@@ -194,9 +194,9 @@ void AssimpLoader::Implementation::RecursiveStoreBoneNames(const aiScene *_scene
     for (unsigned boneIdx = 0; boneIdx < assimpMesh->mNumBones; ++boneIdx)
     {
       auto bone = assimpMesh->mBones[boneIdx];
-      auto boneName = std::string(bone->mName.C_Str());
+      auto boneName = std::string(ToString(bone->mName));
       gzdbg << "\t" << "RecursiveStoreBoneNames: Bone name: " << boneName << std::endl;
-      BoneNames.push_back(boneName);
+      this->boneNames.insert(boneName);
     }
   }
 
@@ -214,7 +214,7 @@ void AssimpLoader::Implementation::RecursiveSkeletonCreate(const aiNode* _node, 
   // First explore this node
   auto nodeName = ToString(_node->mName);
   // TODO check if node or joint?
-  auto boneExist = std::find(BoneNames.begin(), BoneNames.end(), nodeName) != BoneNames.end();
+  auto boneExist = this->boneNames.find(nodeName) != this->boneNames.end();
   auto nodeTrans = this->ConvertTransform(_node->mTransformation);
   auto skelNode = _parent;
 
@@ -472,6 +472,7 @@ AssimpLoader::AssimpLoader()
   // TODO: remove logger from stdout
   Assimp::DefaultLogger::create("", Assimp::Logger::VERBOSE, aiDefaultLogStream_STDOUT);
   this->dataPtr->importer.SetPropertyBool(AI_CONFIG_PP_FD_REMOVE, true);
+  this->dataPtr->importer.SetPropertyBool(AI_CONFIG_IMPORT_REMOVE_EMPTY_BONES, false);
 }
 
 //////////////////////////////////////////////////
