@@ -266,6 +266,6 @@ TEST_F(DemTest, LunarDemLoad)
   dem.SetSphericalCoordinates(moonSc);
   EXPECT_EQ(dem.Load(path), 0);
 
-  std::cout << "WH:" << dem.WorldHeight() << std::endl;
-  std::cout << "WW:" << dem.WorldWidth() << std::endl;
+  EXPECT_NEAR(dem.WorldWidth(), 80.0417);
+  EXPECT_NEAR(dem.WorldHeight(), 80.0417);
 }

@@ -173,7 +173,7 @@ int Dem::Load(const std::string &_filename)
        this->dataPtr->sphericalCoordinates.DistanceBetweenPoints(
            upLeftLat, upLeftLong, lowLeftLat, lowLeftLong);
   }
-  // Assume non-Earth DEM (e.g., moon)
+  // Assume unknown DEM.
   else
   {
     gzwarn << "Failed to automatically compute DEM size. "
