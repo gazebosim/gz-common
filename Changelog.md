@@ -1,8 +1,42 @@
 ## Gazebo Common 5.x
-
 ## Gazebo Common 5.0.0 (20XX-XX-XX)
 
 ## Gazebo Common 4.x
+
+## Gazebo Common 4.5.1 (2022-06-21)
+
+1. Fix spelling in URI error message
+    * [Pull request #333](https://github.com/gazebosim/gz-common/pull/333)
+
+1. `ignLogInit` fails if run after console output
+    * [Pull request #332](https://github.com/gazebosim/gz-common/pull/332)
+
+1. Fix compatibility with FFmpeg 5.0
+    * [Pull request #325](https://github.com/gazebosim/gz-common/pull/325)
+
+1. packages.apt: don't install ruby-ronn
+    * [Pull request #324](https://github.com/gazebosim/gz-common/pull/324)
+
+1. Add some tests for `parentPath`/`basename`
+    * [Pull request #309](https://github.com/gazebosim/gz-common/pull/309)
+
+1. Add CI support for Jammy
+    * [Pull request #316](https://github.com/gazebosim/gz-common/pull/316)
+
+1. Minor typo in filesystem documentation
+    * [Pull request #313](https://github.com/gazebosim/gz-common/pull/313)
+
+1. Fix out-of-bounds access in sanitizeSlashes
+    * [Pull request #303](https://github.com/gazebosim/gz-common/pull/303)
+
+1. Fix out-of-bound access in URI
+    * [Pull request #304](https://github.com/gazebosim/gz-common/pull/304)
+
+1. Move performance test to examples
+    * [Pull request #294](https://github.com/gazebosim/gz-common/pull/294)
+
+1. Fix memory corruption & leaks in Image
+    * [Pull request #240](https://github.com/gazebosim/gz-common/pull/240)
 
 ## Gazebo Common 4.5.0 (2022-01-12)
 
