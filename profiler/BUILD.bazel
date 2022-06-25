@@ -1,10 +1,10 @@
 load(
-    "//ign_bazel:build_defs.bzl",
+    "//gz_bazel:build_defs.bzl",
     "IGNITION_ROOT",
     "IGNITION_VISIBILITY",
     "cmake_configure_file",
     "generate_include_header",
-    "ign_export_header",
+    "gz_export_header",
 )
 
 package(
@@ -53,7 +53,7 @@ cmake_configure_file(
     visibility = ["//visibility:private"],
 )
 
-ign_export_header(
+gz_export_header(
     name = "include/gz/common/profiler/Export.hh",
     export_base = "IGNITION_COMMON_PROFILER",
     lib_name = "ignition-common-profiler",
@@ -94,7 +94,7 @@ cc_library(
     ],
     includes = ["include"],
     deps = [
-        IGNITION_ROOT + "ign_common",
+        IGNITION_ROOT + "gz_common",
         ":remotery",
     ],
 )
