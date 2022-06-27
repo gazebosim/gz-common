@@ -13,8 +13,8 @@ gz_add_component(graphics SOURCES ${sources} GET_TARGET_NAME graphics_target)
 
 target_link_libraries(${graphics_target}
   PUBLIC
-    ignition-math${IGN_MATH_VER}::ignition-math${IGN_MATH_VER}
-    ignition-utils${IGN_UTILS_VER}::ignition-utils${IGN_UTILS_VER}
+    gz-math${GZ_MATH_VER}::gz-math${GZ_MATH_VER}
+    gz-utils${GZ_UTILS_VER}::gz-utils${GZ_UTILS_VER}
   PRIVATE
     GTS::GTS
     FreeImage::FreeImage
@@ -25,7 +25,7 @@ gz_build_tests(
   SOURCES ${gtest_sources}
   LIB_DEPS
     ${graphics_target}
-    ignition-common${IGN_COMMON_VER}-testing
+    gz-common${GZ_COMMON_VER}-testing
 )
 
 message ("ASSIMP INCLUDE IS ${ASSIMP_INCLUDE_DIRS}")
@@ -50,7 +50,7 @@ else()
 
   # Otherwise, add its source directory to our target's PRIVATE include
   # directories. We do not want this to be visible to consumers of
-  # ignition-common.
+  # gz-common.
   target_include_directories(${graphics_target}
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tinyxml2
     ${ASSIMP_INCLUDE_DIRS})
@@ -62,7 +62,7 @@ else()
     target_include_directories(UNIT_ColladaExporter_TEST PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tinyxml2)
     # We also need to add this as a source file to the collada exporter test's
     # target, because we do not export the tinyxml2 symbols that get generated
-    # in the ignition-common library. Therefore, the collada exporter test
+    # in the gz-common library. Therefore, the collada exporter test
     # cannot link to those symbols and must generate its own.
     target_sources(UNIT_ColladaExporter_TEST PRIVATE tinyxml2/tinyxml2.cpp)
 
