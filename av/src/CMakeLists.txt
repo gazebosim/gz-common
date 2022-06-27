@@ -34,5 +34,5 @@ gz_build_tests(
   SOURCES ${gtest_sources}
   LIB_DEPS
     ${av_target}
-    ignition-common${IGN_COMMON_VER}-testing
+    gz-common${GZ_COMMON_VER}-testing
 )

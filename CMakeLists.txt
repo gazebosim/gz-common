@@ -3,14 +3,14 @@ cmake_minimum_required(VERSION 3.10.2 FATAL_ERROR)
 #============================================================================
 # Initialize the project
 #============================================================================
-project(ignition-common5 VERSION 5.0.0)
-set(IGN_COMMON_VER ${PROJECT_VERSION_MAJOR})
+project(gz-common5 VERSION 5.0.0)
+set(GZ_COMMON_VER ${PROJECT_VERSION_MAJOR})
 
 #============================================================================
-# Find ignition-cmake
+# Find gz-cmake
 #============================================================================
-find_package(ignition-cmake3 REQUIRED)
-set(IGN_CMAKE_VER ${ignition-cmake3_VERSION_MAJOR})
+find_package(gz-cmake3 REQUIRED)
+set(GZ_CMAKE_VER ${gz-cmake3_VERSION_MAJOR})
 
 #============================================================================
 # Configure the project
@@ -50,14 +50,14 @@ endif()
 message(STATUS "\n\n-- ====== Finding Dependencies ======")
 
 #--------------------------------------
-# Find ignition-math
-gz_find_package(ignition-math7 REQUIRED_BY geospatial graphics events)
-set(IGN_MATH_VER ${ignition-math7_VERSION_MAJOR})
+# Find gz-math
+gz_find_package(gz-math7 REQUIRED_BY geospatial graphics events)
+set(GZ_MATH_VER ${gz-math7_VERSION_MAJOR})
 
 #--------------------------------------
-# Find ignition-utils
-gz_find_package(ignition-utils2 REQUIRED)
-set(IGN_UTILS_VER ${ignition-utils2_VERSION_MAJOR})
+# Find gz-utils
+gz_find_package(gz-utils2 REQUIRED)
+set(GZ_UTILS_VER ${gz-utils2_VERSION_MAJOR})
 
 #--------------------------------------
 # Find Tinyxml2
@@ -153,5 +153,5 @@ gz_create_docs(
   API_MAINPAGE_MD "${CMAKE_BINARY_DIR}/api.md"
   TUTORIALS_MAINPAGE_MD "${CMAKE_BINARY_DIR}/tutorials.md"
   TAGFILES
-    "${IGNITION-MATH_DOXYGEN_TAGFILE} = ${IGNITION-MATH_API_URL}"
+    "${GZ-MATH_DOXYGEN_TAGFILE} = ${GZ-MATH_API_URL}"
   )
