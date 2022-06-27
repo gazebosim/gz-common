@@ -14,7 +14,7 @@ Ubuntu Focal | [![Build Status](https://build.osrfoundation.org/buildStatus/icon
 Homebrew      | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-main-homebrew-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-main-homebrew-amd64)
 Windows       | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-main-windows7-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-main-windows7-amd64)
 
-Gazebo Common, a component of [Ignition
+Gazebo Common, a component of [Gazebo
 Robotics](https://gazebosim.org), provides a set of libraries that
 cover many different use cases. An audio-visual library supports
 processing audio and video files, a graphics library can load a variety 3D

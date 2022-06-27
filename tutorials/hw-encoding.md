@@ -291,5 +291,5 @@ which jobs of the other users are using NVEnc.
 
 There is a workaround removing this artificial limit - patching the binary blob
 drivers using https://github.com/keylase/nvidia-patch . This is an unofficial
-patch that is not supported by NVidia or the Ignition developers. It is up to
+patch that is not supported by NVidia or the Gazebo developers. It is up to
 you if you can and want to do that. And there is no guarantee it will work forever.

@@ -22,7 +22,7 @@ cmake on the targets or sources that you are interested in (described below).
 ### On custom example
 
 In order to use the profiler, inspection points must be added to the source code,
-and the application or library must be linked to the `ignition-common::profiler`
+and the application or library must be linked to the `gz-common::profiler`
 component.
 
 To start, download the [profiler.cc](https://github.com/gazebosim/gz-common/raw/main/examples/profiler.cc) example.
@@ -59,8 +59,8 @@ enabled at compile time in order to function.
 ```{.cpp}
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
-# Find the ignition-common library
-find_package(ignition-common5 QUIET REQUIRED COMPONENTS profiler)
+# Find the gz-common library
+find_package(gz-common5 QUIET REQUIRED COMPONENTS profiler)
 
 add_executable(profiler_example profiler.cc)
 target_link_libraries(profiler_example ignition-common5::profiler)
@@ -105,9 +105,9 @@ xdg-open /usr/share/ignition/ignition-common5/profiler_vis/index.html
 open /usr/share/ignition/ignition-common5/profiler_vis/index.html
 ```
 
-### On Ignition library
+### On Gazebo library
 
-If you want to use profiler on any other ignition library, enable the profiler at compile time with ``ENABLE_PROFILER`` cmake argument.
+If you want to use profiler on any other Gazebo library, enable the profiler at compile time with ``ENABLE_PROFILER`` cmake argument.
 
 When compiling with ``CMake``:
 ```{.sh}
@@ -118,7 +118,7 @@ When compiling with ``colcon``:
 colcon build --cmake-args -DENABLE_PROFILER=1
 ```
 
-Run your Ignition library then go to your ignition installation path and open the profiler browser using:
+Run your Gazebo library then go to your ignition installation path and open the profiler browser using:
 ```
 libexec/ignition/ignition-common<N>/ign_remotery_vis
 ```
@@ -130,7 +130,7 @@ If the profiler is run successfully, you should see output in a browser. Similar
 ### Troubleshoot the web viewer
 
 If you see ``connection error``, there are a couple of things to double check
-1. Was the profiler enabled when the project you're trying to run was compiled? Note that this isn't the case if you installed Ignition libraries from binaries, for example. You need to compile the project from source with the `ENABLE_PROFILER` variable set.
+1. Was the profiler enabled when the project you're trying to run was compiled? Note that this isn't the case if you installed Gazebo libraries from binaries, for example. You need to compile the project from source with the `ENABLE_PROFILER` variable set.
 2. Are you using the correct port number in the upper left corner ``Connection Addresss: ws://127.0.0.1:1500/rmt``? Running ``ign gazebo -v 4`` will show the port number in use near the top of the outputted text. The port number will be printed out if the profiler is enabled.
   ```{.sh}
   [Dbg] [RemoteryProfilerImpl.cc:187] Starting ign-common profiler impl: Remotery (port: 1500)
