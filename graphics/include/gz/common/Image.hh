@@ -127,7 +127,7 @@ namespace gz
       /// \param[in] _data Pointer to the raw image data
       /// \param[in] _size Size of the buffer
       /// \param[in] _format Pixel format of the provided data
-      public: void SetFromCompressedData(const unsigned char *_data,
+      public: void SetFromCompressedData(unsigned char *_data,
                                          unsigned int _size,
                                          Image::PixelFormatType _format);
 
@@ -271,7 +271,7 @@ namespace gz
       }
 
       /// \brief Private data pointer
-      IGN_UTILS_IMPL_PTR(dataPtr)
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

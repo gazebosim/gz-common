@@ -1,10 +1,9 @@
-
 # Collect source files into the "sources" variable and unit test files into the
 # "gtest_sources" variable
-ign_get_libsources_and_unittests(sources gtest_sources)
+gz_get_libsources_and_unittests(sources gtest_sources)
 
 # Create the library target
-ign_create_core_library(
+gz_create_core_library(
   SOURCES ${sources}
   CXX_STANDARD 17)
 
@@ -20,13 +19,13 @@ target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
     ${DL_TARGET}
     ${CXX_FILESYSTEM_LIBRARIES}
   PUBLIC
-    ignition-utils${IGN_UTILS_VER}::ignition-utils${IGN_UTILS_VER}
+    gz-utils${GZ_UTILS_VER}::gz-utils${GZ_UTILS_VER}
 )
 
 # This is required by the WorkerPool::WaitForResults(const Time &_timeout)
 # TODO(anyone): GZ_DEPRECATED(4). Remove this part when the method is removed
 target_include_directories(${PROJECT_LIBRARY_TARGET_NAME} PRIVATE
-  ${ignition-math${IGN_MATH_VER}_INCLUDE_DIRS})
+  ${gz-math${GZ_MATH_VER}_INCLUDE_DIRS})
 
 # Handle non-Windows configuration settings
 if(NOT WIN32)
@@ -39,25 +38,25 @@ else()
     PRIVATE shlwapi)
 endif()
 
-# don't build MovingWindowFilter_TEST if we don't have ignition-math
-if(NOT ignition-math${IGN_MATH_VER}_FOUND)
+# don't build MovingWindowFilter_TEST if we don't have gz-math
+if(NOT gz-math${GZ_MATH_VER}_FOUND)
   list(REMOVE_ITEM gtest_sources MovingWindowFilter_TEST.cc)
 endif()
 
 # Build the unit tests
-ign_build_tests(
+gz_build_tests(
   TYPE UNIT
   SOURCES ${gtest_sources}
   LIB_DEPS
-    ignition-utils${IGN_UTILS_VER}::ignition-utils${IGN_UTILS_VER}
-    ignition-common${IGN_COMMON_VER}-testing
+    gz-utils${GZ_UTILS_VER}::gz-utils${GZ_UTILS_VER}
+    gz-common${GZ_COMMON_VER}-testing
   INCLUDE_DIRS
     # Used to make internal source file headers visible to the unit tests
     ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(TARGET UNIT_MovingWindowFilter_TEST)
   target_include_directories(UNIT_MovingWindowFilter_TEST PRIVATE
-    ${ignition-math${IGN_MATH_VER}_INCLUDE_DIRS})
+    ${gz-math${GZ_MATH_VER}_INCLUDE_DIRS})
 endif()
 
 if(TARGET UNIT_PluginLoader_TEST)

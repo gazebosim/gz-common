@@ -57,7 +57,7 @@ AutoLogFixture::AutoLogFixture():
 AutoLogFixture::~AutoLogFixture()
 {
   gzLogClose();
-  EXPECT_TRUE(gz::common::unsetenv(IGN_HOMEDIR));
+  EXPECT_TRUE(gz::common::unsetenv(GZ_HOMEDIR));
 }
 
 //////////////////////////////////////////////////
@@ -77,7 +77,7 @@ void AutoLogFixture::SetUp()
   this->dataPtr->temp = std::make_unique<TempDirectory>(
       "test", "ign_common", true);
   ASSERT_TRUE(this->dataPtr->temp->Valid());
-  common::setenv(IGN_HOMEDIR, this->dataPtr->temp->Path());
+  common::setenv(GZ_HOMEDIR, this->dataPtr->temp->Path());
 
   // Initialize Console
   auto logPath = common::joinPaths(this->dataPtr->temp->Path(), "test_logs");

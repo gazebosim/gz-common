@@ -88,7 +88,7 @@ SystemPaths::SystemPaths()
 : dataPtr(gz::utils::MakeImpl<Implementation>())
 {
   std::string home, path, fullPath;
-  if (!env(IGN_HOMEDIR, home))
+  if (!env(GZ_HOMEDIR, home))
     home = "/tmp/gz";
 
   if (!env("GZ_LOG_PATH", path))
@@ -161,7 +161,7 @@ void SystemPaths::SetPluginPathEnv(const std::string &_env)
       {
         gzwarn << "Finding plugins using deprecated IGN_ prefixed environment "
                << "variable ["
-               << _env << "]. Please use the GZ_ prefix instead"
+               << _env << "]. Please use the GZ_ prefix instead."
                << std::endl;
       }
     }

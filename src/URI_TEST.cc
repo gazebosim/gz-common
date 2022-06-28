@@ -927,7 +927,7 @@ TEST(URITEST, HasAuthority)
 //////////////////////////////////////////////////
 TEST(URITEST, Resource)
 {
-  // Test URIs that are commonly used for resources in Ignition
+  // Test URIs that are commonly used for resources in Gazebo
   {
     URI uri;
     EXPECT_TRUE(uri.Parse("model://model_name/meshes/mesh.dae"));

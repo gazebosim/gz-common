@@ -247,7 +247,7 @@ bool gz::common::copyDirectory(
                          | fs::copy_options::overwrite_existing;
 
   // std::filesystem won't create intermediate directories
-  // before copying, this maintains compatibility with ignition behavior.
+  // before copying, this maintains compatibility with Gazebo behavior.
   if (!gz::common::createDirectories(_newDirname))
   {
     return false;

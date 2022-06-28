@@ -1,9 +1,9 @@
 load(
-    "//ign_bazel:build_defs.bzl",
+    "//gz_bazel:build_defs.bzl",
     "IGNITION_ROOT",
     "IGNITION_VISIBILITY",
     "generate_include_header",
-    "ign_export_header",
+    "gz_export_header",
 )
 
 package(
@@ -26,7 +26,7 @@ sources = glob(
 
 test_sources = glob(["src/*_TEST.cc"])
 
-ign_export_header(
+gz_export_header(
     name = "include/gz/common/graphics/Export.hh",
     export_base = "IGNITION_COMMON_GRAPHICS",
     lib_name = "ignition-common-graphics",
@@ -57,8 +57,8 @@ cc_library(
         "@glib",
         "@gts",
         "@tinyxml2",
-        IGNITION_ROOT + "ign_common",
-        IGNITION_ROOT + "ign_utils",
+        IGNITION_ROOT + "gz_common",
+        IGNITION_ROOT + "gz_utils",
     ],
 )
 
@@ -74,11 +74,11 @@ cc_binary(
     name = src.replace("/", "_").replace(".cc", "").replace("src_", ""),
     srcs = [src],
     data = [
-        IGNITION_ROOT + "ign_common/test:data",
+        IGNITION_ROOT + "gz_common/test:data",
     ],
     deps = [
         ":graphics",
-        IGNITION_ROOT + "ign_common/test:test_utils",
+        IGNITION_ROOT + "gz_common/test:test_utils",
         "@gtest",
         "@gtest//:gtest_main",
     ],

@@ -203,11 +203,11 @@ namespace gz
       /// \return this
       public: MouseEvent &operator=(const MouseEvent &_other);
 
-      IGN_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
+      GZ_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \internal
       /// \brief Private data pointer
       private: std::unique_ptr<MouseEventPrivate> dataPtr;
-      IGN_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
+      GZ_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
     };
   }
 }

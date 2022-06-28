@@ -190,7 +190,7 @@ namespace gz
       public: std::vector<NodeTransform> Transforms() const;
 
       /// \brief Private data pointer.
-      IGN_UTILS_IMPL_PTR(dataPtr)
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
 
     typedef std::map<unsigned int, SkeletonNode*> SkeletonNodeMap;

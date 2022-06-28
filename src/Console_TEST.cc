@@ -34,14 +34,14 @@ class Console_TEST : public ::testing::Test {
     this->temp = std::make_unique<TempDirectory>(
         "test", "ign_common", true);
     ASSERT_TRUE(this->temp->Valid());
-    common::setenv(IGN_HOMEDIR, this->temp->Path());
+    common::setenv(GZ_HOMEDIR, this->temp->Path());
   }
 
   /// \brief Clear out all the directories we produced during this test.
   public: virtual void TearDown()
   {
     gzLogClose();
-    EXPECT_TRUE(gz::common::unsetenv(IGN_HOMEDIR));
+    EXPECT_TRUE(gz::common::unsetenv(GZ_HOMEDIR));
   }
 
   /// \brief Temporary directory to run test in
@@ -52,7 +52,7 @@ std::string GetLogContent(const std::string &_filename)
 {
   // Get the absolute path
   std::string path;
-  EXPECT_TRUE(gz::common::env(IGN_HOMEDIR, path));
+  EXPECT_TRUE(gz::common::env(GZ_HOMEDIR, path));
   path = gz::common::joinPaths(path, _filename);
   EXPECT_TRUE(gz::common::exists(path));
 
@@ -87,7 +87,7 @@ TEST_F(Console_TEST, NoInitAndLog)
   // Cleanup
   gzLogClose();
   std::string path;
-  EXPECT_TRUE(gz::common::env(IGN_HOMEDIR, path));
+  EXPECT_TRUE(gz::common::env(GZ_HOMEDIR, path));
   path = gz::common::joinPaths(path, logPath);
   EXPECT_TRUE(gz::common::removeAll(path));
 }
@@ -108,7 +108,7 @@ TEST_F(Console_TEST, InitAndLog)
 
   // Get the absolute path
   std::string basePath;
-  EXPECT_TRUE(gz::common::env(IGN_HOMEDIR, basePath));
+  EXPECT_TRUE(gz::common::env(GZ_HOMEDIR, basePath));
   basePath = gz::common::joinPaths(basePath, path);
 
   // Get the absolute log file path
@@ -533,7 +533,7 @@ TEST_F(Console_TEST, LogDirectory)
 
   // Get the absolute path
   std::string absPath;
-  EXPECT_TRUE(gz::common::env(IGN_HOMEDIR, absPath));
+  EXPECT_TRUE(gz::common::env(GZ_HOMEDIR, absPath));
   absPath = gz::common::joinPaths(absPath, path);
 
   EXPECT_EQ(logDir, absPath);
@@ -545,7 +545,7 @@ TEST_F(Console_TEST, LogDirectory)
 TEST_F(Console_TEST, NoInitAndLogNoHome)
 {
   gzLogClose();
-  EXPECT_TRUE(gz::common::unsetenv(IGN_HOMEDIR));
+  EXPECT_TRUE(gz::common::unsetenv(GZ_HOMEDIR));
   // This should not throw
   gzlog << "this is a test" << std::endl;
 }

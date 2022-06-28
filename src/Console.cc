@@ -241,7 +241,7 @@ void FileLogger::Init(const std::string &_directory,
 #endif
     )
   {
-    if (!env(IGN_HOMEDIR, logPath))
+    if (!env(GZ_HOMEDIR, logPath))
     {
       // Use stderr here to prevent infinite recursion
       // trying to get the log initialized
@@ -347,15 +347,31 @@ FileLogger::Buffer::~Buffer()
 }
 
 /////////////////////////////////////////////////
+std::streamsize FileLogger::Buffer::xsputn(const char *_char,
+                                           std::streamsize _count)
+{
+  std::lock_guard<std::mutex> lk(this->syncMutex);
+  return std::stringbuf::xsputn(_char, _count);
+}
+
+/////////////////////////////////////////////////
 int FileLogger::Buffer::sync()
 {
   if (!this->stream)
     return -1;
 
-  *this->stream << this->str();
+  {
+    std::lock_guard<std::mutex> lk(this->syncMutex);
+    *this->stream << this->str();
+  }
 
-  this->stream->flush();
-
-  this->str("");
+  {
+    std::lock_guard<std::mutex> lk(this->syncMutex);
+    this->stream->flush();
+  }
+  {
+    std::lock_guard<std::mutex> lk(this->syncMutex);
+    this->str("");
+  }
   return !(*this->stream);
 }

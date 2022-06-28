@@ -1,2 +1,1 @@
-
-ign_install_all_headers(COMPONENT geospatial)
+gz_install_all_headers(COMPONENT geospatial)

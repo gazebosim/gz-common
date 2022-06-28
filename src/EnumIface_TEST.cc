@@ -33,7 +33,7 @@ enum MyType
   MY_TYPE_END
 };
 
-IGN_ENUM(myTypeIface, MyType, MY_TYPE_BEGIN, MY_TYPE_END,
+GZ_ENUM(myTypeIface, MyType, MY_TYPE_BEGIN, MY_TYPE_END,
   "TYPE1",
   "TYPE2",
   "MY_TYPE_END"
