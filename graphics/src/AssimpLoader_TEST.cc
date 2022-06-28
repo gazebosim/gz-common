@@ -200,8 +200,7 @@ TEST_F(AssimpLoader, TexCoordSets)
   EXPECT_EQ(6u, mesh->IndexCount());
   EXPECT_EQ(6u, mesh->TexCoordCount());
   EXPECT_EQ(2u, mesh->SubMeshCount());
-  // TODO check material definition in assimp API, it returns 1
-  //EXPECT_EQ(0u, mesh->MaterialCount());
+  EXPECT_EQ(1u, mesh->MaterialCount());
 
   auto sm = mesh->SubMeshByIndex(0u);
   auto subMesh = sm.lock();
@@ -212,12 +211,9 @@ TEST_F(AssimpLoader, TexCoordSets)
   EXPECT_EQ(math::Vector3d(0, 0, 1), subMesh->Normal(0u));
   EXPECT_EQ(math::Vector3d(0, 0, 1), subMesh->Normal(1u));
   EXPECT_EQ(math::Vector3d(0, 0, 1), subMesh->Normal(2u));
-  // TODO reenable, looks OK in dae file and test looks a bit strange?
-  /*
   EXPECT_EQ(math::Vector2d(0, 1), subMesh->TexCoord(0u));
   EXPECT_EQ(math::Vector2d(0, 1), subMesh->TexCoord(1u));
   EXPECT_EQ(math::Vector2d(0, 1), subMesh->TexCoord(2u));
-  */
 
   auto smb = mesh->SubMeshByIndex(1u);
   auto subMeshB = smb.lock();
@@ -228,12 +224,9 @@ TEST_F(AssimpLoader, TexCoordSets)
   EXPECT_EQ(math::Vector3d(0, 0, 1), subMeshB->Normal(0u));
   EXPECT_EQ(math::Vector3d(0, 0, 1), subMeshB->Normal(1u));
   EXPECT_EQ(math::Vector3d(0, 0, 1), subMeshB->Normal(2u));
-  // TODO reenable, looks OK in dae file and test looks a bit strange?
-  /*
   EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoord(0u));
   EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoord(1u));
   EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoord(2u));
-  */
 
   EXPECT_TRUE(subMeshB->HasTexCoord(0u));
   EXPECT_TRUE(subMeshB->HasTexCoord(1u));
@@ -243,14 +236,11 @@ TEST_F(AssimpLoader, TexCoordSets)
   // test texture coordinate set API
   EXPECT_EQ(3u, subMeshB->TexCoordSetCount());
   EXPECT_EQ(3u, subMeshB->TexCoordCountBySet(0u));
-  // TODO reenable, looks OK in dae file and test looks a bit strange?
-  /*
   EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoordBySet(0u, 0u));
   EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoordBySet(1u, 0u));
   EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoordBySet(2u, 0u));
   EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoordBySet(1u, 0u));
   EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoordBySet(2u, 0u));
-  */
 
   EXPECT_TRUE(subMeshB->HasTexCoordBySet(0u, 0u));
   EXPECT_TRUE(subMeshB->HasTexCoordBySet(1u, 0u));
@@ -258,12 +248,9 @@ TEST_F(AssimpLoader, TexCoordSets)
   EXPECT_FALSE(subMeshB->HasTexCoordBySet(3u, 0u));
 
   EXPECT_EQ(3u, subMeshB->TexCoordCountBySet(1u));
-  // TODO reenable, looks OK in dae file and test looks a bit strange?
-  /*
   EXPECT_EQ(math::Vector2d(0, 0.5), subMeshB->TexCoordBySet(0u, 1u));
   EXPECT_EQ(math::Vector2d(0, 0.4), subMeshB->TexCoordBySet(1u, 1u));
   EXPECT_EQ(math::Vector2d(0, 0.3), subMeshB->TexCoordBySet(2u, 1u));
-  */
 
   EXPECT_TRUE(subMeshB->HasTexCoordBySet(0u, 1u));
   EXPECT_TRUE(subMeshB->HasTexCoordBySet(1u, 1u));
@@ -271,12 +258,9 @@ TEST_F(AssimpLoader, TexCoordSets)
   EXPECT_FALSE(subMeshB->HasTexCoordBySet(3u, 1u));
 
   EXPECT_EQ(3u, subMeshB->TexCoordCountBySet(2u));
-  // TODO reenable, looks OK in dae file and test looks a bit strange?
-  /*
   EXPECT_EQ(math::Vector2d(0, 0.8), subMeshB->TexCoordBySet(0u, 2u));
   EXPECT_EQ(math::Vector2d(0, 0.7), subMeshB->TexCoordBySet(1u, 2u));
   EXPECT_EQ(math::Vector2d(0, 0.6), subMeshB->TexCoordBySet(2u, 2u));
-  */
 
   EXPECT_TRUE(subMeshB->HasTexCoordBySet(0u, 2u));
   EXPECT_TRUE(subMeshB->HasTexCoordBySet(1u, 2u));
