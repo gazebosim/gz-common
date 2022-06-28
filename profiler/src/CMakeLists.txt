@@ -79,6 +79,20 @@ if(GZ_PROFILER_REMOTERY)
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
   )
 
+  set(PROFILER_COMPILE_OPTIONS
+    "-Wno-unused-but-set-variable"
+    "-Wno-unused-function"
+    "-Wno-unused-parameter"
+    "-Wno-unused-variable"
+    "-Wno-gnu-zero-variadic-macro-arguments"
+    "-Wno-pedantic"
+    "-Wno-shadow")
+
+  target_compile_options(${profiler_target} 
+    PRIVATE  
+    ${PROFILER_COMPILE_OPTIONS}
+  )
+
   if (UNIX)
     target_link_libraries(${profiler_target} PUBLIC pthread)
   endif()

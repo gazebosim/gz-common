@@ -30,6 +30,16 @@ std::string rmtErrorToString(rmtError error) {
       return "none";
     case RMT_ERROR_RECURSIVE_SAMPLE:
       return "Not an error but an internal message to calling code";
+    case RMT_ERROR_UNKNOWN:
+      return "An error with a message yet to be defined, only for internal error handling";
+    case RMT_ERROR_INVALID_INPUT:
+      return "An invalid input to a function call was provided";
+    case RMT_ERROR_RESOURCE_CREATE_FAIL:
+      return "Creation of an internal resource failed";
+    case RMT_ERROR_RESOURCE_ACCESS_FAIL:
+      return "Access of an internal resource failed";
+    case RMT_ERROR_TIMEOUT:
+      return "Internal system timeout";
 
     // System errors
     case RMT_ERROR_MALLOC_FAIL:
@@ -40,30 +50,18 @@ std::string rmtErrorToString(rmtError error) {
       return "Failed to create a virtual memory mirror buffer";
     case RMT_ERROR_CREATE_THREAD_FAIL:
       return "Failed to create a thread for the server";
+    case RMT_ERROR_OPEN_THREAD_HANDLE_FAIL:
+      return "Failed to open a thread handle, give an thread id";
 
     // Network TCP/IP socket errors
-    case RMT_ERROR_SOCKET_INIT_NETWORK_FAIL:
-      return "Network initialisation failure (e.g. on Win32, WSAStartup fails)"; //NOLINT
-    case RMT_ERROR_SOCKET_CREATE_FAIL:
-      return "Can't create a socket for connection to the remote viewer";
-    case RMT_ERROR_SOCKET_BIND_FAIL:
-      return "Can't bind a socket for the server";
-    case RMT_ERROR_SOCKET_LISTEN_FAIL:
-      return "Created server socket failed to enter a listen state";
-    case RMT_ERROR_SOCKET_SET_NON_BLOCKING_FAIL:
-      return "Created server socket failed to switch to a non-blocking state";
     case RMT_ERROR_SOCKET_INVALID_POLL:
       return "Poll attempt on an invalid socket";
     case RMT_ERROR_SOCKET_SELECT_FAIL:
       return "Server failed to call select on socket";
     case RMT_ERROR_SOCKET_POLL_ERRORS:
       return "Poll notified that the socket has errors";
-    case RMT_ERROR_SOCKET_ACCEPT_FAIL:
-      return "Server failed to accept connection from client";
-    case RMT_ERROR_SOCKET_SEND_TIMEOUT:
-      return "Timed out trying to send data";
     case RMT_ERROR_SOCKET_SEND_FAIL:
-      return "Unrecoverable error occured while client/server tried to send data"; //NOLINT
+      return "Unrecoverable error occured while client/server tried to send data";
     case RMT_ERROR_SOCKET_RECV_NO_DATA:
       return "No data available when attempting a receive";
     case RMT_ERROR_SOCKET_RECV_TIMEOUT:
