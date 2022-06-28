@@ -9,12 +9,6 @@ target_link_libraries(GzBadPluginSize PRIVATE ${PROJECT_LIBRARY_TARGET_NAME})
 add_library(GzDummyPlugins           SHARED DummyPlugins.cc)
 target_link_libraries(GzDummyPlugins PRIVATE ${PROJECT_LIBRARY_TARGET_NAME})
 
-set_property(TARGET GzBadPluginAlign PROPERTY CXX_STANDARD 11)
-set_property(TARGET GzBadPluginAPIVersionNew PROPERTY CXX_STANDARD 11)
-set_property(TARGET GzBadPluginAPIVersionOld PROPERTY CXX_STANDARD 11)
-set_property(TARGET GzBadPluginSize PROPERTY CXX_STANDARD 11)
-set_property(TARGET GzDummyPlugins PROPERTY CXX_STANDARD 11)
-
 # Create a variable for the name of the header which will contain the dummy plugin path.
 # This variable gets put in the cache so that it is available at generation time.
 set(GZ_DUMMY_PLUGIN_PATH_HEADER "DummyPluginsPath.h" CACHE INTERNAL "Name of header which contains DummyPlugin library path")
