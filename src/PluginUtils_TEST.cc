@@ -32,8 +32,8 @@ TEST(PluginUtils, NormalizeName)
   EXPECT_EQ("::", common::NormalizeName(""));
   EXPECT_EQ("::", common::NormalizeName("::"));
 
-  EXPECT_EQ("::ignition", common::NormalizeName("ignition"));
-  EXPECT_EQ("::ignition", common::NormalizeName("::ignition"));
+  EXPECT_EQ("::gz", common::NormalizeName("gz"));
+  EXPECT_EQ("::gz", common::NormalizeName("::gz"));
 
   EXPECT_EQ("::gz::math", common::NormalizeName("gz::math"));
   EXPECT_EQ("::gz::math", common::NormalizeName("::gz::math"));
