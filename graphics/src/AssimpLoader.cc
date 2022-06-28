@@ -235,7 +235,10 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* _scene, 
   {
     // Check if the texture is embedded or not
     auto [texName, texData] = this->LoadTexture(_scene, texturePath, this->GenerateTextureName(_scene, assimpMat, "Diffuse"));
-    mat->SetTextureImage(texName, texData);
+    if (texData != nullptr)
+      mat->SetTextureImage(texName, texData);
+    else
+      mat->SetTextureImage(texName, _path);
     // Now set the alpha from texture, if enabled, only supported in GLTF
     aiString alphaMode;
     auto paramRet = assimpMat->Get(AI_MATKEY_GLTF_ALPHAMODE, alphaMode);
