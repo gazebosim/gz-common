@@ -15,7 +15,7 @@ Homebrew      | [![Build Status](https://build.osrfoundation.org/buildStatus/ico
 Windows       | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-main-windows7-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-main-windows7-amd64)
 
 Gazebo Common, a component of [Gazebo
-Robotics](https://gazebosim.org), provides a set of libraries that
+Sim](https://gazebosim.org), provides a set of libraries that
 cover many different use cases. An audio-visual library supports
 processing audio and video files, a graphics library can load a variety 3D
 mesh file formats into a generic in-memory representation, and the core
@@ -102,4 +102,3 @@ This library uses [Semantic Versioning](https://semver.org/). Additionally, this
 # License
 
 This library is licensed under [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0). See also the [LICENSE](https://github.com/gazebosim/gz-common/blob/main/LICENSE) file.
-
