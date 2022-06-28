@@ -20,8 +20,8 @@
 
 #include <gz/utils/SuppressWarning.hh>
 
-#pragma message("ign-common SuppressWarning is deprecated, use ign-utils")
-// These macros have been moved to ign-utils so they may be more broadly used.
+#pragma message("gz-common SuppressWarning is deprecated, use gz-utils")
+// These macros have been moved to gz-utils so they may be more broadly used.
 // The implementations are aliases to those implementations and are deprecated
 // in gz-common5 and are to be removed in gz-common6
 

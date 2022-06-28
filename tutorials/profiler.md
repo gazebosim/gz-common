@@ -94,8 +94,8 @@ find /usr | grep ign_remotery_vis
 /usr/<path_to>/ign_remotery_vis
 
 # Use the source path (Linux)
-# Substitute the path to your ign-common source checkout
-xdg-open $SOURCE_DIR/ign-common/profiler/src/Remotery/vis/index.html
+# Substitute the path to your gz-common source checkout
+xdg-open $SOURCE_DIR/gz-common/profiler/src/Remotery/vis/index.html
 
 # Use the installation path (Linux)
 # This may vary depending on where you have choosen to install

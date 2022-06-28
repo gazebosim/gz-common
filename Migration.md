@@ -56,7 +56,7 @@ release will remove the deprecated code.
 ### Additions
 
 1. **geospatial** component that loads heightmap images and DEMs
-    + Depends on the ign-common's `graphics` component and the `gdal` library
+    + Depends on the gz-common's `graphics` component and the `gdal` library
 
 ### Modifications
 
