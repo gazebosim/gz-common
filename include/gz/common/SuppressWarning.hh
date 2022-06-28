@@ -23,7 +23,7 @@
 #pragma message("ign-common SuppressWarning is deprecated, use ign-utils")
 // These macros have been moved to ign-utils so they may be more broadly used.
 // The implementations are aliases to those implementations and are deprecated
-// in ign-common5 and are to be removed in ign-common6
+// in gz-common5 and are to be removed in gz-common6
 
 // This header contains cross-platform macros for suppressing warnings. Please
 // only use these macros responsibly when you are certain that the compiler is

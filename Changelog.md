@@ -163,7 +163,7 @@
 
 1. Add bazel buildsystem support
     * [Pull request #123](https://github.com/gazebosim/gz-common/pull/123)
->>>>>>> ign-common4
+>>>>>>> gz-common4
 
 ## Gazebo Common 4.0.0 (2021-03-30)
 
