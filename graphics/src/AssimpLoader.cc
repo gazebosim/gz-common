@@ -220,12 +220,16 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* _scene, 
   {
     mat->SetEmissive(this->ConvertColor(color));
   }
-  double shininess;
+  float shininess;
   ret = assimpMat->Get(AI_MATKEY_SHININESS, shininess);
   if (ret == AI_SUCCESS)
   {
     mat->SetShininess(shininess);
   }
+  float opacity = 1.0;
+  ret = assimpMat->Get(AI_MATKEY_OPACITY, opacity);
+  mat->SetTransparency(1.0 - opacity);
+  mat->SetBlendFactors(opacity, 1.0 - opacity);
   // TODO more than one texture, Gazebo assumes UV index 0
   Pbr pbr;
   aiString texturePath(_path.c_str());
@@ -482,7 +486,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     auto mat = this->dataPtr->CreateMaterial(scene, _matIdx, path);
     mesh->AddMaterial(mat);
   }
-  if (scene->HasAnimations())
+  // Create the skeleton
   {
     auto rootSkelNode = new SkeletonNode(nullptr, rootName, rootName, SkeletonNode::NODE);
     rootSkelNode->SetTransform(rootTransform);

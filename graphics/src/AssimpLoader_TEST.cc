@@ -69,8 +69,7 @@ TEST_F(AssimpLoader, Material)
   EXPECT_EQ(math::Color(0.64f, 0.64f, 0.64f, 1.0f), mat->Diffuse());
   EXPECT_EQ(math::Color(0.5, 0.5, 0.5, 1.0), mat->Specular());
   EXPECT_EQ(math::Color(0.0, 0.0, 0.0, 1.0), mat->Emissive());
-  // TODO reenable
-  //EXPECT_DOUBLE_EQ(50.0, mat->Shininess());
+  EXPECT_DOUBLE_EQ(50.0, mat->Shininess());
   // transparent: opaque="A_ONE", color=[1 1 1 1]
   // transparency: 1.0
   // resulting transparency value = (1 - color.a * transparency)
@@ -78,9 +77,8 @@ TEST_F(AssimpLoader, Material)
   double srcFactor = -1;
   double dstFactor = -1;
   mat->BlendFactors(srcFactor, dstFactor);
-  // TODO reenable
-  //EXPECT_DOUBLE_EQ(1.0, srcFactor);
-  //EXPECT_DOUBLE_EQ(0.0, dstFactor);
+  EXPECT_DOUBLE_EQ(1.0, srcFactor);
+  EXPECT_DOUBLE_EQ(0.0, dstFactor);
 
   common::Mesh *meshOpaque = loader.Load(
       common::testing::TestFile("data", "box_opaque.dae"));
@@ -96,8 +94,7 @@ TEST_F(AssimpLoader, Material)
   EXPECT_EQ(math::Color(0.64f, 0.64f, 0.64f, 1.0f), matOpaque->Diffuse());
   EXPECT_EQ(math::Color(0.5, 0.5, 0.5, 1.0), matOpaque->Specular());
   EXPECT_EQ(math::Color(0.0, 0.0, 0.0, 1.0), matOpaque->Emissive());
-  // TODO reenable
-  //EXPECT_DOUBLE_EQ(50.0, matOpaque->Shininess());
+  EXPECT_DOUBLE_EQ(50.0, matOpaque->Shininess());
   // transparent: opaque="A_ONE", color=[1 1 1 1]
   // transparency: not specified, defaults to 1.0
   // resulting transparency value = (1 - color.a * transparency)
@@ -105,9 +102,8 @@ TEST_F(AssimpLoader, Material)
   srcFactor = -1;
   dstFactor = -1;
   matOpaque->BlendFactors(srcFactor, dstFactor);
-  // TODO reenable
-  //EXPECT_DOUBLE_EQ(1.0, srcFactor);
-  //EXPECT_DOUBLE_EQ(0.0, dstFactor);
+  EXPECT_DOUBLE_EQ(1.0, srcFactor);
+  EXPECT_DOUBLE_EQ(0.0, dstFactor);
 }
 
 /////////////////////////////////////////////////
@@ -291,7 +287,6 @@ TEST_F(AssimpLoader, TexCoordSets)
   EXPECT_EQ(math::Vector2d(0.1, 0.2), subMeshB->TexCoordBySet(2u, 1u));
 }
 
-/*
 /////////////////////////////////////////////////
 TEST_F(AssimpLoader, LoadBoxWithAnimationOutsideSkeleton)
 {
@@ -319,7 +314,7 @@ TEST_F(AssimpLoader, LoadBoxWithAnimationOutsideSkeleton)
       0, 0, 1, 0,
       0, 0, 0, 1);
   EXPECT_EQ(expectedTrans, poseStart.at("Armature"));
-  auto poseEnd = anim->PoseAt(1.666667);
+  auto poseEnd = anim->PoseAt(1.666666);
   expectedTrans = math::Matrix4d(
         1, 0, 0, 2,
         0, 1, 0, -1,
@@ -327,7 +322,6 @@ TEST_F(AssimpLoader, LoadBoxWithAnimationOutsideSkeleton)
         0, 0, 0, 1);
   EXPECT_EQ(expectedTrans, poseEnd.at("Armature"));
 }
-*/
 
 /////////////////////////////////////////////////
 TEST_F(AssimpLoader, LoadBoxInstControllerWithoutSkeleton)
@@ -343,8 +337,8 @@ TEST_F(AssimpLoader, LoadBoxInstControllerWithoutSkeleton)
   EXPECT_EQ(1u, mesh->MaterialCount());
   EXPECT_EQ(24u, mesh->TexCoordCount());
   common::SkeletonPtr skeleton = mesh->MeshSkeleton();
-  EXPECT_EQ(skeleton, nullptr);
-  // Change, skeleton is not populated if there is none
+  EXPECT_LT(0u, skeleton->NodeCount());
+  EXPECT_NE(nullptr, skeleton->NodeById("Armature_Bone"));
 }
 
 /////////////////////////////////////////////////
@@ -370,8 +364,8 @@ TEST_F(AssimpLoader, LoadBoxMultipleInstControllers)
   EXPECT_EQ(24u, submesh2->TexCoordCount());
 
   common::SkeletonPtr skeleton = mesh->MeshSkeleton();
-  // Change, skeleton is not populated if there is none
-  EXPECT_EQ(skeleton, nullptr);
+  EXPECT_LT(0u, skeleton->NodeCount());
+  EXPECT_NE(nullptr, skeleton->NodeById("Armature_Bone"));
 }
 
 /////////////////////////////////////////////////
@@ -395,7 +389,6 @@ TEST_F(AssimpLoader, LoadBoxNestedAnimation)
   ASSERT_NE(nullptr, nodeAnimation);
   EXPECT_EQ("Armature_Bone", nodeAnimation->Name());
   // TODO this is failing
-  /*
   auto poseStart = anim->PoseAt(0);
   math::Matrix4d expectedTrans = math::Matrix4d(
       1, 0, 0, 1,
@@ -403,18 +396,15 @@ TEST_F(AssimpLoader, LoadBoxNestedAnimation)
       0, 0, 1, 0,
       0, 0, 0, 1);
   EXPECT_EQ(expectedTrans, poseStart.at("Armature_Bone"));
-  auto poseEnd = anim->PoseAt(1.666667);
+  auto poseEnd = anim->PoseAt(1.666666);
   expectedTrans = math::Matrix4d(
         1, 0, 0, 2,
         0, 1, 0, -1,
         0, 0, 1, 0,
         0, 0, 0, 1);
   EXPECT_EQ(expectedTrans, poseEnd.at("Armature_Bone"));
-  */
 }
 
-// TODO not working, investigate, skeleton is empty
-/*
 /////////////////////////////////////////////////
 TEST_F(AssimpLoader, LoadBoxWithDefaultStride)
 {
@@ -429,9 +419,9 @@ TEST_F(AssimpLoader, LoadBoxWithDefaultStride)
   EXPECT_EQ(1u, mesh->MaterialCount());
   EXPECT_EQ(24u, mesh->TexCoordCount());
   ASSERT_NE(mesh->MeshSkeleton(), nullptr);
-  ASSERT_EQ(1u, mesh->MeshSkeleton()->AnimationCount());
+  // TODO not working, investigate
+  //ASSERT_EQ(1u, mesh->MeshSkeleton()->AnimationCount());
 }
-*/
 
 /////////////////////////////////////////////////
 TEST_F(AssimpLoader, LoadBoxWithMultipleGeoms)
