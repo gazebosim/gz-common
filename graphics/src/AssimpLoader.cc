@@ -30,9 +30,9 @@
 #include <queue>
 #include <unordered_set>
 
-#include <assimp/Logger.hpp>      // C++ importer interface
-#include <assimp/DefaultLogger.hpp>      // C++ importer interface
-#include <assimp/GltfMaterial.h>      // GLTF specific material properties
+#include <assimp/Logger.hpp>
+#include <assimp/DefaultLogger.hpp>
+#include <assimp/GltfMaterial.h>    // GLTF specific material properties
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/scene.h>           // Output data structure
 #include <assimp/postprocess.h>     // Post processing flags
@@ -106,7 +106,7 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene, const 
   if (!_node)
     return;
   // Visit this node, add the submesh
-  ignmsg << "Processing node " << _node->mName.C_Str() << " with " << _node->mNumMeshes << " meshes" << std::endl;
+  gzmsg << "Processing node " << _node->mName.C_Str() << " with " << _node->mNumMeshes << " meshes" << std::endl;
   for (unsigned meshIdx = 0; meshIdx < _node->mNumMeshes; ++meshIdx)
   {
     auto assimpMeshIdx = _node->mMeshes[meshIdx];
@@ -130,20 +130,20 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene, const 
         SkeletonNode *skelNode =
             skeleton->NodeByName(boneNodeName);
         skelNode->SetInverseBindTransform(this->ConvertTransform(bone->mOffsetMatrix));
-        igndbg << "Bone " << boneNodeName << " has " << bone->mNumWeights << " weights" << std::endl;
+        gzdbg << "Bone " << boneNodeName << " has " << bone->mNumWeights << " weights" << std::endl;
         for (unsigned weightIdx = 0; weightIdx < bone->mNumWeights; ++weightIdx)
         {
           auto vertexWeight = bone->mWeights[weightIdx];
           // TODO SetNumVertAttached for performance
           skeleton->AddVertNodeWeight(vertexWeight.mVertexId, boneNodeName, vertexWeight.mWeight);
-          //igndbg << "Adding weight at idx " << vertexWeight.mVertexId << " for bone " << bone_name << " of " << vertexWeight.mWeight << std::endl;
+          //gzdbg << "Adding weight at idx " << vertexWeight.mVertexId << " for bone " << bone_name << " of " << vertexWeight.mWeight << std::endl;
         }
       }
       // Add node assignment to mesh
-      ignmsg << "submesh has " << subMesh.VertexCount() << " vertices" << std::endl;
+      gzmsg << "submesh has " << subMesh.VertexCount() << " vertices" << std::endl;
       for (unsigned vertexIdx = 0; vertexIdx < subMesh.VertexCount(); ++vertexIdx)
       {
-        //ignmsg << "skel at id " << vertexIdx << " has " << skel->VertNodeWeightCount(vertexIdx) << " indices" << std::endl;
+        //gzmsg << "skel at id " << vertexIdx << " has " << skel->VertNodeWeightCount(vertexIdx) << " indices" << std::endl;
         for (unsigned int i = 0;
             i < skeleton->VertNodeWeightCount(vertexIdx); ++i)
         {
@@ -153,11 +153,11 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene, const 
               skeleton->NodeByName(nodeWeight.first);
           if (node == nullptr)
           {
-            igndbg << "Not found while Looking for node with name " << nodeWeight.first << std::endl;
+            gzdbg << "Not found while Looking for node with name " << nodeWeight.first << std::endl;
           }
           subMesh.AddNodeAssignment(vertexIdx,
                           node->Handle(), nodeWeight.second);
-          //igndbg << "Adding node assignment for vertex " << vertexIdx << " to node " << node->Name() << " of weight " << nodeWeight.second << std::endl;
+          //gzdbg << "Adding node assignment for vertex " << vertexIdx << " to node " << node->Name() << " of weight " << nodeWeight.second << std::endl;
         }
       }
     }
@@ -199,7 +199,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* _scene, 
   MaterialPtr mat = std::make_shared<Material>();
   aiColor4D color;
   auto& assimpMat = _scene->mMaterials[_matIdx];
-  //igndbg << "Processing material with name " << assimpMat->GetName().C_Str() << std::endl;
+  //gzdbg << "Processing material with name " << assimpMat->GetName().C_Str() << std::endl;
   auto ret = assimpMat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
   if (ret == AI_SUCCESS)
   {
@@ -262,7 +262,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* _scene, 
   ret = assimpMat->GetTexture(AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLICROUGHNESS_TEXTURE, &texturePath);
   if (ret == AI_SUCCESS)
   {
-    ignmsg << "Found metallic roughness texture, splitting" << std::endl;
+    gzmsg << "Found metallic roughness texture, splitting" << std::endl;
     auto [texName, texData] = this->LoadTexture(_scene, texturePath, this->GenerateTextureName(_scene, assimpMat, "MetallicRoughness"));
     // Load it into a common::Image then split it
     auto texImg = texData != nullptr ? texData : std::make_shared<common::Image>(texName);
@@ -388,7 +388,7 @@ SubMesh AssimpLoader::Implementation::CreateSubMesh(const aiMesh* _assimpMesh, c
   SubMesh subMesh;
   math::Matrix4d rot = _transform;
   rot.SetTranslation(math::Vector3d::Zero);
-  ignmsg << "Mesh has " << _assimpMesh->mNumVertices << " vertices" << std::endl;
+  gzmsg << "Mesh has " << _assimpMesh->mNumVertices << " vertices" << std::endl;
   // Now create the submesh
   for (unsigned vertexIdx = 0; vertexIdx < _assimpMesh->mNumVertices; ++vertexIdx)
   {
@@ -504,16 +504,16 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   {
     auto& anim = scene->mAnimations[animIdx];
     auto animName = ToString(anim->mName);
-    ignmsg << "Found animation with name " << animName << std::endl;
-    ignmsg << "Animation has " << anim->mNumMeshChannels << " mesh channels" << std::endl;
-    ignmsg << "Animation has " << anim->mNumChannels << " channels" << std::endl;
-    ignmsg << "Animation has " << anim->mNumMorphMeshChannels << " morph mesh channels" << std::endl;
+    gzmsg << "Found animation with name " << animName << std::endl;
+    gzmsg << "Animation has " << anim->mNumMeshChannels << " mesh channels" << std::endl;
+    gzmsg << "Animation has " << anim->mNumChannels << " channels" << std::endl;
+    gzmsg << "Animation has " << anim->mNumMorphMeshChannels << " morph mesh channels" << std::endl;
     SkeletonAnimation* skelAnim = new SkeletonAnimation(animName);
     for (unsigned chanIdx = 0; chanIdx < anim->mNumChannels; ++chanIdx)
     {
       auto& animChan = anim->mChannels[chanIdx];
       auto chanName = ToString(animChan->mNodeName);
-      igndbg << "Node " << chanName << " has " << animChan->mNumPositionKeys << " position keys, " <<
+      gzdbg << "Node " << chanName << " has " << animChan->mNumPositionKeys << " position keys, " <<
         animChan->mNumRotationKeys << " rotation keys, " << animChan->mNumScalingKeys << " scaling keys" << std::endl;
       for (unsigned key_idx = 0; key_idx < animChan->mNumPositionKeys; ++key_idx)
       {
@@ -526,7 +526,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
         math::Pose3d pose(pos, quat);
         // Time is in ms after 5.0.1?
         skelAnim->AddKeyFrame(chanName, posKey.mTime / 1000.0, pose);
-        igndbg << "Adding animation at time " << posKey.mTime / 1000.0 << " with position (" << pos.X() << "," << pos.Y() << "," <<
+        gzdbg << "Adding animation at time " << posKey.mTime / 1000.0 << " with position (" << pos.X() << "," << pos.Y() << "," <<
           pos.Z() << ")" << std::endl;
       }
     }
@@ -555,9 +555,9 @@ void AssimpLoader::Implementation::ApplyInvBindTransform(SkeletonPtr _skeleton)
     if (node->HasInvBindTransform())
     {
       node->SetModelTransform(node->InverseBindTransform().Inverse(), false);
-      //igndbg << "Node " << node->Name() << " model transform is:" << std::endl << node->ModelTransform() << std::endl;
-      //igndbg << "Parent " << node->Parent()->Name() << " transform is:" << std::endl << node->Parent()->ModelTransform() << std::endl;
-      //igndbg << "Node " << node->Name() << " transform is:" << std::endl << node->Transform() << std::endl;
+      //gzdbg << "Node " << node->Name() << " model transform is:" << std::endl << node->ModelTransform() << std::endl;
+      //gzdbg << "Parent " << node->Parent()->Name() << " transform is:" << std::endl << node->Parent()->ModelTransform() << std::endl;
+      //gzdbg << "Node " << node->Name() << " transform is:" << std::endl << node->Transform() << std::endl;
     }
     for (unsigned int i = 0; i < node->ChildCount(); i++)
       queue.push_back(node->Child(i));
