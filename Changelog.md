@@ -77,7 +77,7 @@
 
 ## Gazebo Common 4.3.0 (2021-09-27)
 
-1. Remove ign-utils from TempDirectory
+1. Remove gz-utils from TempDirectory
     * [Pull request #248](https://github.com/gazebosim/gz-common/pull/248)
 
 1. Add functions and objects for Temporary Directories
@@ -163,7 +163,7 @@
 
 1. Add bazel buildsystem support
     * [Pull request #123](https://github.com/gazebosim/gz-common/pull/123)
->>>>>>> ign-common4
+>>>>>>> gz-common4
 
 ## Gazebo Common 4.0.0 (2021-03-30)
 
@@ -176,7 +176,7 @@
 1. Rotate capsule to Z-up
     * [Pull request #186](https://github.com/gazebosim/gz-common/pull/186)
 
-1. Add implementation pointer to ign-common classes
+1. Add implementation pointer to gz-common classes
     * [Pull request #163](https://github.com/gazebosim/gz-common/pull/163)
 
 1. Cleanup and add implementation pointer to Animation classes
@@ -535,7 +535,7 @@
 1. Filesystem functions to create unique paths
     * [BitBucket pull request 187](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/187)
 
-1. Battery additions for LinearBatteryPlugin port to ign-gazebo
+1. Battery additions for LinearBatteryPlugin port to gz-sim
     * [BitBucket pull request 186](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/186)
 
 1. Consolidate Console::log streams to reduce colored log size
@@ -548,7 +548,7 @@
 
 ## Gazebo Common 3.0.0 (2019-02-28)
 
-1. Use ign-cmake2 and support Ubuntu Bionic (18.04).
+1. Use gz-cmake2 and support Ubuntu Bionic (18.04).
     * [BitBucket pull request 131](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/131)
 
 1. WorkerPool: allow user to set minimum number of worker threads.
