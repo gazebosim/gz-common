@@ -367,12 +367,12 @@ TEST_F(AssimpLoader, LoadBoxNestedAnimation)
   common::SkeletonPtr skeleton = mesh->MeshSkeleton();
   ASSERT_EQ(1u, mesh->MeshSkeleton()->AnimationCount());
   common::SkeletonAnimation *anim = skeleton->Animation(0);
+  EXPECT_EQ(anim->Name(), "Armature");
   EXPECT_EQ(1u, anim->NodeCount());
   EXPECT_TRUE(anim->HasNode("Armature_Bone"));
   auto nodeAnimation = anim->NodeAnimationByName("Armature_Bone");
   ASSERT_NE(nullptr, nodeAnimation);
   EXPECT_EQ("Armature_Bone", nodeAnimation->Name());
-  // TODO this is failing
   auto poseStart = anim->PoseAt(0);
   math::Matrix4d expectedTrans = math::Matrix4d(
       1, 0, 0, 1,
@@ -439,17 +439,15 @@ TEST_F(AssimpLoader, LoadBoxWithHierarchicalNodes)
   // nested node with no name so it takes the parent's name instead
   EXPECT_EQ("StaticCubeParent", mesh->SubMeshByIndex(1).lock()->Name());
 
-  // TODO check logic of naming for nested models
-  /*
   // parent node containing child node with no name
-  EXPECT_EQ("StaticCubeParent", mesh->SubMeshByIndex(2).lock()->Name());
-
-  // nested node with name
-  EXPECT_EQ("StaticCubeNested", mesh->SubMeshByIndex(3).lock()->Name());
+  // CHANGE Assimp assigns the id to the name if the mesh has no name
+  EXPECT_EQ("StaticCubeNestedNoName", mesh->SubMeshByIndex(2).lock()->Name());
 
   // Parent of nested node with name
-  EXPECT_EQ("StaticCubeParent2", mesh->SubMeshByIndex(4).lock()->Name());
-  */
+  EXPECT_EQ("StaticCubeParent2", mesh->SubMeshByIndex(3).lock()->Name());
+
+  // nested node with name
+  EXPECT_EQ("StaticCubeNested", mesh->SubMeshByIndex(4).lock()->Name());
 }
 
 /////////////////////////////////////////////////
@@ -495,8 +493,7 @@ TEST_F(AssimpLoader, LoadCylinderAnimatedFrom3dsMax)
 
   auto anim = skeleton->Animation(0);
   ASSERT_NE(nullptr, anim);
-  // TODO check why name is empty
-  //EXPECT_EQ("Bone02", anim->Name());
+  EXPECT_EQ("Bone02", anim->Name());
   EXPECT_EQ(1u, anim->NodeCount());
   EXPECT_TRUE(anim->HasNode("Bone02"));
 }
