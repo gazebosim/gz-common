@@ -1,11 +1,11 @@
 load(
-    "//ign_bazel:cmake_configure_file.bzl",
+    "//gz_bazel:cmake_configure_file.bzl",
     "cmake_configure_file",
 )
 
-BINARY_DIR = "./ign_common"
+BINARY_DIR = "./gz_common"
 
-SOURCE_DIR = "./ign_common"
+SOURCE_DIR = "./gz_common"
 
 # Generates config.hh based on the version numbers in CMake code.
 cmake_configure_file(

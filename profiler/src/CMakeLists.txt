@@ -93,7 +93,7 @@ gz_build_tests(
   SOURCES ${PROFILER_TESTS}
   LIB_DEPS
     ${profiler_target}
-    ignition-common${IGN_COMMON_VER}-testing
+    gz-common${GZ_COMMON_VER}-testing
   TEST_LIST profiler_tests)
 
 if(TARGET UNIT_Profiler_Remotery_TEST)
@@ -102,7 +102,7 @@ if(TARGET UNIT_Profiler_Remotery_TEST)
 endif()
 
 if(GZ_PROFILER_REMOTERY)
-  set(GZ_PROFILER_SCRIPT_PATH ${CMAKE_INSTALL_LIBEXECDIR}/ignition/ignition-common${PROJECT_VERSION_MAJOR})
+  set(GZ_PROFILER_SCRIPT_PATH ${CMAKE_INSTALL_LIBEXECDIR}/gz/gz-common${PROJECT_VERSION_MAJOR})
   set(GZ_PROFILER_VIS_PATH ${IGN_DATA_INSTALL_DIR}/profiler_vis)
 
   configure_file(Remotery/ign_remotery_vis.in
