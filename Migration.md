@@ -46,12 +46,19 @@ release will remove the deprecated code.
 8. The `Image::Data(unsigned char**, unsigned int&)` functions that accept a pointer and a size and internally allocate memory are deprecated and will be removed in future versions.
    Use the new `Data` functions that return a `std::vector<unsigned char>` to have automatic memory management.
 
+### Breaking Changes
 
+1. The project name has been changed to use the `gz-` prefix, you **must** use the `gz` prefix!
+  * This also means that any generated code that use the project name (e.g. CMake variables, in-source macros) would have to be migrated.
+  * Some non-exhaustive examples of this include:
+    * `GZ_<PROJECT>_<VISIBLE/HIDDEN>`
+    * CMake `-config` files
+    * Paths that depend on the project name
 
 ### Additions
 
 1. **geospatial** component that loads heightmap images and DEMs
-    + Depends on the ign-common's `graphics` component and the `gdal` library
+    + Depends on the gz-common's `graphics` component and the `gdal` library
 
 ### Modifications
 
@@ -101,8 +108,8 @@ release will remove the deprecated code.
 
 ### Modifications
 
-1. Depends on **ignition-cmake2**
-    + Ignition-common now depends on ignition-cmake2.
+1. Depends on **gz-cmake2**
+    + gz-common now depends on gz-cmake2.
 
 1. Requires c++17.
 
@@ -112,12 +119,12 @@ release will remove the deprecated code.
 
 ### Modifications
 
-1. Depends on **ignition-cmake1**
-    + Ignition-common now depends on ignition-cmake1, which provides
+1. Depends on **gz-cmake1**
+    + gz-common now depends on gz-cmake1, which provides
       support for Component libraries.
 
 1. Component libraries
-    + Some classes have been moved from the main ignition-common library
+    + Some classes have been moved from the main gz-common library
       to component libraries. To use these features, you must
       list them in the `find_package` call and link against them.
       - av: audio and video playback and encoding
@@ -128,6 +135,6 @@ release will remove the deprecated code.
 
 ### Added dependencies
 
-1. **ignition-cmake**
-    + Ignition-math now has a build dependency on ignition-cmake, which
-      allows cmake scripts to be shared across all the ignition packages.
+1. **gz-cmake**
+    + gz-math now has a build dependency on gz-cmake, which
+      allows cmake scripts to be shared across all the Gazebo packages.
