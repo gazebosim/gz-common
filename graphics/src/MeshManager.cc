@@ -160,7 +160,6 @@ const Mesh *MeshManager::Load(const std::string &_filename)
       return nullptr;
     }
     */
-
     // This mutex prevents two threads from loading the same mesh at the
     // same time.
     std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
@@ -301,8 +300,8 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
   }
 
   int ring, seg;
-  float deltaSegAngle = (2.0 * IGN_PI / segments);
-  float deltaRingAngle = (IGN_PI / rings);
+  float deltaSegAngle = (2.0 * GZ_PI / segments);
+  float deltaRingAngle = (GZ_PI / rings);
   gz::math::Vector3d vert, norm;
   unsigned int verticeIndex = 0;
 
@@ -877,10 +876,10 @@ void MeshManager::CreateEllipsoid(const std::string &_name,
 
   SubMesh subMesh;
 
-  const double umin = -IGN_PI / 2.0;
-  const double umax = IGN_PI / 2.0;
+  const double umin = -GZ_PI / 2.0;
+  const double umax = GZ_PI / 2.0;
   const double vmin = 0.0;
-  const double vmax = 2.0 * IGN_PI;
+  const double vmax = 2.0 * GZ_PI;
 
   unsigned int i, j;
   double theta, phi;
@@ -974,16 +973,16 @@ void MeshManager::CreateCapsule(const std::string &_name,
     v = j;
 
     v /= (_rings + 1);
-    w = sin(0.5 * IGN_PI * v);
-    z = _radius * cos(0.5 * IGN_PI * v);
+    w = sin(0.5 * GZ_PI * v);
+    z = _radius * cos(0.5 * GZ_PI * v);
 
     for (unsigned int i = 0; i <= _segments; i++)
     {
       u = i;
       u /= _segments;
 
-      x = -sin(u * (IGN_PI * 2.0));
-      y = cos(u * (IGN_PI * 2.0));
+      x = -sin(u * (GZ_PI * 2.0));
+      y = cos(u * (GZ_PI * 2.0));
 
       gz::math::Vector3d p(x * _radius * w, y * _radius * w, z);
       // Compute vertex
@@ -1025,8 +1024,8 @@ void MeshManager::CreateCapsule(const std::string &_name,
       u = i;
       u /= _segments;
 
-      x = -sin(u * (IGN_PI * 2.0));
-      y = cos(u * (IGN_PI * 2.0));
+      x = -sin(u * (GZ_PI * 2.0));
+      y = cos(u * (GZ_PI * 2.0));
 
       gz::math::Vector3d p(x * _radius, y * _radius, z);
 
@@ -1060,16 +1059,16 @@ void MeshManager::CreateCapsule(const std::string &_name,
 
     v /= (_rings + 1);
     v += 1.0;
-    w = sin(0.5 * IGN_PI * v);
-    z = _radius * cos(0.5 * IGN_PI * v);
+    w = sin(0.5 * GZ_PI * v);
+    z = _radius * cos(0.5 * GZ_PI * v);
 
     for (unsigned int i = 0; i <= _segments; i++)
     {
       double u2 = static_cast<double>(i);
       u2 /= _segments;
 
-      x = -sin(u2 * (IGN_PI * 2.0));
-      y = cos(u2 * (IGN_PI * 2.0));
+      x = -sin(u2 * (GZ_PI * 2.0));
+      y = cos(u2 * (GZ_PI * 2.0));
 
       gz::math::Vector3d p(x * _radius * w, y * _radius * w, z);
       // Compute vertex
@@ -1105,7 +1104,7 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
   gz::math::Vector3d vert, norm;
   unsigned int verticeIndex = 0;
   int ring, seg;
-  float deltaSegAngle = (2.0 * IGN_PI / segments);
+  float deltaSegAngle = (2.0 * GZ_PI / segments);
 
   if (this->HasMesh(name))
   {
@@ -1238,7 +1237,7 @@ void MeshManager::CreateCone(const std::string &name, float radius,
   if (segments <3)
     segments = 3;
 
-  float deltaSegAngle = (2.0 * IGN_PI / segments);
+  float deltaSegAngle = (2.0 * GZ_PI / segments);
 
   // Generate the group of rings for the cone
   for (ring = 0; ring < rings; ring++)
@@ -1464,7 +1463,7 @@ void MeshManager::CreateTube(const std::string &_name, float _innerRadius,
   }
 
   // Close ends in case it's not a full circle
-  if (!gz::math::equal(_arc, 2.0 * IGN_PI))
+  if (!gz::math::equal(_arc, 2.0 * GZ_PI))
   {
     for (ring = 0; ring < rings; ++ring)
     {

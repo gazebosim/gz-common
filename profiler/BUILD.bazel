@@ -1,10 +1,10 @@
 load(
-    "//ign_bazel:build_defs.bzl",
+    "//gz_bazel:build_defs.bzl",
     "IGNITION_ROOT",
     "IGNITION_VISIBILITY",
     "cmake_configure_file",
     "generate_include_header",
-    "ign_export_header",
+    "gz_export_header",
 )
 
 package(
@@ -53,7 +53,7 @@ cmake_configure_file(
     visibility = ["//visibility:private"],
 )
 
-ign_export_header(
+gz_export_header(
     name = "include/gz/common/profiler/Export.hh",
     export_base = "IGNITION_COMMON_PROFILER",
     lib_name = "ignition-common-profiler",
@@ -89,12 +89,12 @@ cc_library(
     srcs = sources,
     hdrs = public_headers,
     defines = [
-        "IGN_PROFILER_ENABLE=1",
-        "IGN_PROFILER_REMOTERY=1",
+        "GZ_PROFILER_ENABLE=1",
+        "GZ_PROFILER_REMOTERY=1",
     ],
     includes = ["include"],
     deps = [
-        IGNITION_ROOT + "ign_common",
+        IGNITION_ROOT + "gz_common",
         ":remotery",
     ],
 )
@@ -111,8 +111,8 @@ cc_test(
     name = "Profiler_Disabled_TEST",
     srcs = ["src/Profiler_Disabled_TEST.cc"],
     defines = [
-        "IGN_PROFILER_ENABLE=0",
-        "IGN_PROFILER_REMOTERY=0",
+        "GZ_PROFILER_ENABLE=0",
+        "GZ_PROFILER_REMOTERY=0",
     ],
     deps = [
         ":profiler",

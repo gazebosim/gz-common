@@ -123,20 +123,31 @@ namespace gz
                    /// \brief Destructor.
                    public: virtual ~Buffer();
 
+                   /// \brief Writes _count characters to the string buffer
+                   /// \param[in] _char Input rharacter array.
+                   /// \param[in] _count Number of characters in array.
+                   /// \return The number of characters successfully written.
+                   public: std::streamsize xsputn(
+                        const char *_char, std::streamsize _count) override;
+
                    /// \brief Sync the stream (output the string buffer
                    /// contents).
                    /// \return Return 0 on success.
-                   public: virtual int sync();
+                   public: int sync() override;
 
                    /// \brief Stream to output information into.
                    public: std::ofstream *stream;
+
+                   /// \brief Mutex to synchronize writes to the string buffer
+                   /// and the output stream.
+                   public: std::mutex syncMutex;
                  };
 
-      IGN_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
+      GZ_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Stores the full path of the directory where all the log files
       /// are stored.
       private: std::string logDirectory;
-      IGN_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
+      GZ_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
 
       /// \brief True if initialized.
       private: bool initialized;
@@ -221,10 +232,10 @@ namespace gz
                    public: std::mutex syncMutex;
                  };
 
-      IGN_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
+      GZ_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Prefix to use when logging to file.
       private: std::string prefix;
-      IGN_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
+      GZ_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
     };
 
     /// \class Console Console.hh common/common.hh
@@ -284,10 +295,10 @@ namespace gz
       /// \brief The level of verbosity, the default level is 1.
       private: static int verbosity;
 
-      IGN_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
+      GZ_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief A custom prefix. See SetPrefix().
       private: static std::string customPrefix;
-      IGN_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
+      GZ_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
     };
   }
 }

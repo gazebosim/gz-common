@@ -23,11 +23,11 @@
 using namespace gz;
 using namespace common;
 
-IGN_ENUM(shadeModeIface, Material::ShadeMode,
+GZ_ENUM(shadeModeIface, Material::ShadeMode,
     Material::SHADE_MODE_BEGIN, Material::SHADE_MODE_END,
     "FLAT", "GOURAUD", "PHONG", "BLINN")
 
-IGN_ENUM(blendModeIface, Material::BlendMode,
+GZ_ENUM(blendModeIface, Material::BlendMode,
     Material::BLEND_MODE_BEGIN, Material::BLEND_MODE_END,
     "ADD", "MODULATE", "REPLACE")
 
@@ -39,6 +39,9 @@ class gz::common::Material::Implementation
 
   /// \brief the texture image file name
   public: std::string texImage;
+
+  /// \brief Texture raw data
+  public: std::shared_ptr<Image> texData;
 
   /// \brief the ambient light color
   public: math::Color ambient;
@@ -104,7 +107,7 @@ unsigned int Material::Implementation::counter = 0;
 Material::Material()
 : dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
 {
-  this->dataPtr->name = "ignition_material_" +
+  this->dataPtr->name = "gz_material_" +
     std::to_string(this->dataPtr->counter++);
   this->dataPtr->blendMode = REPLACE;
   this->dataPtr->shadeMode = GOURAUD;
@@ -118,7 +121,7 @@ Material::Material()
 Material::Material(const math::Color &_clr)
 : dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
 {
-  this->dataPtr->name = "ignition_material_" +
+  this->dataPtr->name = "gz_material_" +
     std::to_string(this->dataPtr->counter++);
   this->dataPtr->blendMode = REPLACE;
   this->dataPtr->shadeMode = GOURAUD;
@@ -138,9 +141,16 @@ std::string Material::Name() const
 }
 
 //////////////////////////////////////////////////
-void Material::SetTextureImage(const std::string &_tex)
+void Material::SetTextureImage(const std::string &_tex, const std::shared_ptr<Image> &_img)
 {
   this->dataPtr->texImage = _tex;
+  this->dataPtr->texData = _img;
+}
+
+//////////////////////////////////////////////////
+std::shared_ptr<Image> Material::TextureData() const
+{
+  return this->dataPtr->texData;
 }
 
 //////////////////////////////////////////////////

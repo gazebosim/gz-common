@@ -40,9 +40,9 @@ namespace gz
       /// \brief Constructor for SystemPaths
       public: SystemPaths();
 
-      /// \brief Get the log path. If IGN_LOG_PATH environment variable is set,
-      /// then this path is used. If not, the path is $HOME/.ignition, and in
-      /// case even HOME is not set, /tmp/ignition is used. If the directory
+      /// \brief Get the log path. If GZ_LOG_PATH environment variable is set,
+      /// then this path is used. If not, the path is $HOME/.gz, and in
+      /// case even HOME is not set, /tmp/gz is used. If the directory
       /// does not exist, it is created in the constructor of SystemPaths.
       /// \return the path
       public: std::string LogPath() const;
@@ -101,7 +101,7 @@ namespace gz
 
       /// \brief Set the file path environment variable to use, and clears
       /// any previously set file paths. The default
-      /// environment variable is IGN_FILE_PATH. The
+      /// environment variable is GZ_FILE_PATH. The
       /// environment variable should be a set of colon (semicolon on windows)
       /// delimited paths. These paths will be used with the FindFile function.
       /// \param [in] _env name of the environment variable
@@ -190,7 +190,7 @@ namespace gz
       public: static char Delimiter();
 
       /// \brief Pointer to private data.
-      IGN_UTILS_IMPL_PTR(dataPtr)
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

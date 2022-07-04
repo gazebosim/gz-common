@@ -1,14 +1,14 @@
-ign_get_sources(tests)
+gz_get_sources(tests)
 
 if (SKIP_av OR INTERNAL_SKIP_av)
   list(REMOVE_ITEM tests encoder_timing.cc)
   list(REMOVE_ITEM tests video_encoder.cc)
 endif()
 
-ign_build_tests(
+gz_build_tests(
   TYPE INTEGRATION
   SOURCES ${tests}
-  LIB_DEPS ignition-common${IGN_COMMON_VER}-testing
+  LIB_DEPS gz-common${GZ_COMMON_VER}-testing
 )
 
 if(TARGET INTEGRATION_plugin)

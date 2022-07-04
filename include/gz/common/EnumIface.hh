@@ -37,7 +37,7 @@ namespace gz
     /// \param[in] names A vector of strings, one for each enum value.
     /// \sa EnumIface
     /// \sa EnumIterator
-    #define IGN_ENUM(name, enumType, begin, end, ...) \
+    #define GZ_ENUM(name, enumType, begin, end, ...) \
     static gz::common::EnumIface<enumType> name( \
         begin, end, {__VA_ARGS__});
 

@@ -388,7 +388,7 @@ TEST_F(FilesystemTest, parentPath)
 }
 
 /////////////////////////////////////////////////
-TEST_F(FilesystemTest, IGN_UTILS_TEST_DISABLED_ON_WIN32(cwd_error))
+TEST_F(FilesystemTest, GZ_UTILS_TEST_DISABLED_ON_WIN32(cwd_error))
 {
   // This test intentionally creates a directory, switches to it, removes
   // the directory, and then tries to call cwd() on it to cause

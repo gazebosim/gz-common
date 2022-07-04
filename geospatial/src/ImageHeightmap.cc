@@ -49,7 +49,7 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
   int imgHeight = this->Height();
   int imgWidth = this->Width();
 
-  IGN_ASSERT(imgWidth == imgHeight, "Heightmap image must be square");
+  GZ_ASSERT(imgWidth == imgHeight, "Heightmap image must be square");
 
   // Bytes per row
   unsigned int pitch = this->img.Pitch();

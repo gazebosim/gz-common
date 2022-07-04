@@ -236,7 +236,7 @@ std::unique_ptr<Skeleton> BVHLoader::Load(const std::string &_filename,
             {
               if (channel == "Zrotation")
               {
-                zAngle = IGN_DTOR(value);
+                zAngle = GZ_DTOR(value);
                 mats.push_back(math::Matrix4d(
                       math::Quaterniond(zAxis, zAngle)));
               }
@@ -244,7 +244,7 @@ std::unique_ptr<Skeleton> BVHLoader::Load(const std::string &_filename,
               {
                 if (channel == "Xrotation")
                 {
-                  xAngle = IGN_DTOR(value);
+                  xAngle = GZ_DTOR(value);
                   mats.push_back(math::Matrix4d(
                     math::Quaterniond(xAxis, xAngle)));
                 }
@@ -252,7 +252,7 @@ std::unique_ptr<Skeleton> BVHLoader::Load(const std::string &_filename,
                 {
                   if (channel == "Yrotation")
                   {
-                    yAngle = IGN_DTOR(value);
+                    yAngle = GZ_DTOR(value);
                     mats.push_back(math::Matrix4d(
                       math::Quaterniond(yAxis, yAngle)));
                   }

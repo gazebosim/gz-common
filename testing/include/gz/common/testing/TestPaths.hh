@@ -102,7 +102,7 @@ std::shared_ptr<gz::common::TempDirectory>
 GZ_COMMON_TESTING_VISIBLE
 MakeTestTempDirectoryImpl(const std::string &_projectSourcePath,
                           const std::string &_prefix = "test",
-                          const std::string &_subDir = "ignition",
+                          const std::string &_subDir = "gz",
                           bool _cleanup = true);
 
 
@@ -119,7 +119,7 @@ MakeTestTempDirectoryImpl(const std::string &_projectSourcePath,
 /// \return Shared pointer to TempDirectory
 inline std::shared_ptr<gz::common::TempDirectory>
 MakeTestTempDirectory(const std::string &_prefix = "test",
-                      const std::string &_subDir = "ignition",
+                      const std::string &_subDir = "gz",
                       bool _cleanup = true)
 {
   return MakeTestTempDirectoryImpl(kTestingProjectSourceDir,
@@ -184,8 +184,8 @@ std::string TestFile(Args const &... args)
 //////////////////////////////////////////////////
 /// \brief Get the path to a file in a temporary directory
 ///
-/// Example: to get ${TMP}/.ignition/foo.log
-///  TempPath(".ignition", "foo.log");
+/// Example: to get ${TMP}/.gz/foo.log
+///  TempPath(".gz", "foo.log");
 ///
 /// \param[in] args Path to the file, relative to the temporary directory
 /// \return Full path to the temporary directory

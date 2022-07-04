@@ -207,7 +207,7 @@ RemoteryProfilerImpl::~RemoteryProfilerImpl()
 //////////////////////////////////////////////////
 std::string RemoteryProfilerImpl::Name() const
 {
-  return "ign_profiler_remotery";
+  return "gz_profiler_remotery";
 }
 
 //////////////////////////////////////////////////

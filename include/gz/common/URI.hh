@@ -130,7 +130,7 @@ namespace gz
                   bool _emptyHostValid = false);
 
       /// \brief Pointer to private data.
-      IGN_UTILS_IMPL_PTR(dataPtr)
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
 
     /// \brief A URI path contains a sequence of segments separated by `/`.
@@ -235,7 +235,7 @@ namespace gz
       public: bool Parse(const std::string &_str);
 
       /// \brief Pointer to private data.
-      IGN_UTILS_IMPL_PTR(dataPtr)
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
 
     /// \brief The query component of a URI
@@ -283,7 +283,7 @@ namespace gz
       public: bool Parse(const std::string &_string);
 
       /// \brief Pointer to private data.
-      IGN_UTILS_IMPL_PTR(dataPtr)
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
 
     /// \brief The fragment component of a URI
@@ -328,7 +328,7 @@ namespace gz
       public: bool Parse(const std::string &_string);
 
       /// \brief Pointer to private data.
-      IGN_UTILS_IMPL_PTR(dataPtr)
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
 
     /// \brief A complete URI which has the following components:
@@ -425,7 +425,7 @@ namespace gz
       public: bool Parse(const std::string &_str);
 
       /// \brief Pointer to private data.
-      IGN_UTILS_IMPL_PTR(dataPtr)
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

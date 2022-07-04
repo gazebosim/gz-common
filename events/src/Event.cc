@@ -48,13 +48,13 @@ void Event::SetSignaled(bool _sig)
 Connection::Connection(Event *_e, int _i)
 : event(_e), id(_i)
 {
-  this->creationTime = IGN_SYSTEM_TIME();
+  this->creationTime = GZ_SYSTEM_TIME();
 }
 
 //////////////////////////////////////////////////
 Connection::~Connection()
 {
-  auto diffTime = IGN_SYSTEM_TIME() - this->creationTime;
+  auto diffTime = GZ_SYSTEM_TIME() - this->creationTime;
   if ((this->event && !this->event->Signaled()) &&
       diffTime < std::chrono::nanoseconds(10000))
   {

@@ -114,7 +114,7 @@ namespace gz
       public: math::Matrix4d operator*(const math::Matrix4d &_m) const;
 
       /// \brief Private data pointer.
-      IGN_UTILS_IMPL_PTR(dataPtr)
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

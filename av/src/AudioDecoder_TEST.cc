@@ -84,7 +84,7 @@ TEST(AudioDecoder, NoCodec)
 }
 
 /////////////////////////////////////////////////
-TEST(AudioDecoder, IGN_UTILS_TEST_DISABLED_ON_WIN32(CheerFile))
+TEST(AudioDecoder, GZ_UTILS_TEST_DISABLED_ON_WIN32(CheerFile))
 {
   common::AudioDecoder audio;
 
