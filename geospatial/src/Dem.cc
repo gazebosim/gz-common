@@ -177,7 +177,6 @@ int Dem::Load(const std::string &_filename)
   else
   {
     gzwarn << "Failed to automatically compute DEM size. "
-            << "Assuming non-Earth DEM. "
             << std::endl;
 
     this->dataPtr->worldWidth = this->dataPtr->worldHeight = -1;
@@ -287,7 +286,7 @@ bool Dem::GeoReference(double _x, double _y,
 {
   if (this->dataPtr->isUnknownDem)
   {
-    gzerr << "Can not retrieve WGS84 coordinates from unknown DEM."
+    gzerr << "Can not retrieve coordinates from unknown DEM."
             << std::endl;
     return false;
   }
@@ -335,9 +334,9 @@ bool Dem::GeoReference(double _x, double _y,
       auto sourceCs = this->dataPtr->dataSet->GetSpatialRef();
       OGRSpatialReference targetCs = OGRSpatialReference();
 
-      int axisEquatorial =
+      double axisEquatorial =
         this->dataPtr->sphericalCoordinates.SurfaceAxisEquatorial();
-      int axisPolar =
+      double axisPolar =
         this->dataPtr->sphericalCoordinates.SurfaceAxisPolar();
 
       std::string CUSTOM_SURFACE_LAT_LON_PROJ_STR =
