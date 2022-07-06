@@ -127,6 +127,18 @@ TEST_F(DemTest, BasicAPI)
   EXPECT_TRUE(dem.GeoReferenceOrigin(latitude, longitude));
   EXPECT_FLOAT_EQ(38.001667f, latitude.Degree());
   EXPECT_FLOAT_EQ(-122.22278f, longitude.Degree());
+
+  // Emulate Earth as a custom surface.
+  common::Dem demCustomSurface;
+  auto earthSc = math::SphericalCoordinates();
+  auto customSc = math::SphericalCoordinates(
+      math::SphericalCoordinates::CUSTOM_SURFACE,
+      earthSc.SurfaceRadius(),
+      earthSc.SurfaceRadius());
+  demCustomSurface.SetSphericalCoordinates(customSc);
+  EXPECT_EQ(demCustomSurface.Load(path), 0);
+  EXPECT_FLOAT_EQ(3984.4849f, demCustomSurface.WorldHeight());
+  EXPECT_FLOAT_EQ(3139.7456f, demCustomSurface.WorldWidth());
 }
 
 /////////////////////////////////////////////////
@@ -226,7 +238,7 @@ TEST_F(DemTest, NaNNoData)
 }
 
 /////////////////////////////////////////////////
-TEST_F(DemTest, NonEarthDem)
+TEST_F(DemTest, UnknownDem)
 {
   // moon
   common::Dem dem;
@@ -247,17 +259,17 @@ TEST_F(DemTest, NonEarthDem)
   EXPECT_FALSE(dem.GeoReferenceOrigin(latitude, longitude));
 
   // The Load() method in Dem.cc should set the
-  // isNonEarthDEM flag.
-  EXPECT_TRUE(dem.GetNonEarthDEM());
+  // isUnknownDEM flag.
+  EXPECT_TRUE(dem.UnknownDEM());
 
   // This flag can be overridden externally.
-  dem.SetNonEarthDEM(false);
-  EXPECT_FALSE(dem.GetNonEarthDEM());
+  dem.SetUnknownDEM(false);
+  EXPECT_FALSE(dem.UnknownDEM());
 }
 
 TEST_F(DemTest, LunarDemLoad)
 {
-  // moon
+  // Load Moon DEM
   common::Dem dem;
   auto path = common::testing::TestFile("data", "dem_moon.tif");
   // Providing spherical coordinates object.
@@ -265,7 +277,16 @@ TEST_F(DemTest, LunarDemLoad)
       math::SphericalCoordinates::MOON_SCS);
   dem.SetSphericalCoordinates(moonSc);
   EXPECT_EQ(dem.Load(path), 0);
+  EXPECT_NEAR(dem.WorldWidth(), 80.0417, 1e-2);
+  EXPECT_NEAR(dem.WorldHeight(), 80.0417, 1e-2);
 
+  // Use custom spherical coordinates object with same axes as the moon.
+  auto customSc = math::SphericalCoordinates(
+      math::SphericalCoordinates::CUSTOM_SURFACE,
+      moonSc.SurfaceRadius(),
+      moonSc.SurfaceRadius());
+  dem.SetSphericalCoordinates(customSc);
+  EXPECT_EQ(dem.Load(path), 0);
   EXPECT_NEAR(dem.WorldWidth(), 80.0417, 1e-2);
   EXPECT_NEAR(dem.WorldHeight(), 80.0417, 1e-2);
 }

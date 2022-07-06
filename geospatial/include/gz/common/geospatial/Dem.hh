@@ -60,12 +60,12 @@ namespace gz
       /// \brief Indicate that this is a non Earth DEM.
       /// \param[in] _isNonEarthDem Should be true if this is a
       /// non earth DEM, otherwise false.
-      public: void SetNonEarthDEM(bool _isNonEarthDem);
+      public: void SetUnknownDEM(bool _isNonEarthDem);
 
       /// \brief Check if the loaded DEM is not from the Earth.
       /// \return True if the loaded DEM is from the Earth, otherwise
       /// returns False.
-      public: bool GetNonEarthDEM();
+      public: bool UnknownDEM();
 
       /// \brief Get the elevation of a terrain's point in meters.
       /// \param[in] _x X coordinate of the terrain.

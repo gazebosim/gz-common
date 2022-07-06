@@ -58,10 +58,10 @@ class gz::common::Dem::Implementation
   /// \brief Full filename used to load the dem.
   public: std::string filename;
 
-  /// \brief Whether the DEM will be handled as from non-Earth.
+  /// \brief Whether the DEM will be handled as unknown.
   /// If true, worldWidth & worldHeight = -1
   /// and GeoReference[Origin] can not be used (will return false)
-  public: bool isNonEarthDem = false;
+  public: bool isUnknownDem = false;
 
   /// \brief Holds the spherical coordinates object from the world.
   public : math::SphericalCoordinates sphericalCoordinates =
@@ -93,15 +93,15 @@ void Dem::SetSphericalCoordinates(
 }
 
 //////////////////////////////////////////////////
-void Dem::SetNonEarthDEM(bool _isNonEarthDem)
+void Dem::SetUnknownDEM(bool _isUnknownDem)
 {
-  this->dataPtr->isNonEarthDem = _isNonEarthDem;
+  this->dataPtr->isUnknownDem = _isUnknownDem;
 }
 
 //////////////////////////////////////////////////
-bool Dem::GetNonEarthDEM()
+bool Dem::UnknownDEM()
 {
-  return this->dataPtr->isNonEarthDem;
+  return this->dataPtr->isUnknownDem;
 }
 
 //////////////////////////////////////////////////
@@ -181,7 +181,7 @@ int Dem::Load(const std::string &_filename)
             << std::endl;
 
     this->dataPtr->worldWidth = this->dataPtr->worldHeight = -1;
-    this->dataPtr->isNonEarthDem = true;
+    this->dataPtr->isUnknownDem = true;
   }
 
   // Set the terrain's side (the terrain will be squared after the padding)
@@ -285,9 +285,9 @@ float Dem::MaxElevation() const
 bool Dem::GeoReference(double _x, double _y,
     gz::math::Angle &_latitude, gz::math::Angle &_longitude) const
 {
-  if (this->dataPtr->isNonEarthDem)
+  if (this->dataPtr->isUnknownDem)
   {
-    gzerr << "Can not retrieve WGS84 coordinates from non-Earth DEM."
+    gzerr << "Can not retrieve WGS84 coordinates from unknown DEM."
             << std::endl;
     return false;
   }
@@ -295,7 +295,7 @@ bool Dem::GeoReference(double _x, double _y,
   double geoTransf[6];
   if (this->dataPtr->dataSet->GetGeoTransform(geoTransf) == CE_None)
   {
-    OGRCoordinateTransformation *cT;
+    OGRCoordinateTransformation *cT = nullptr;
     double xGeoDeg, yGeoDeg;
 
     if (this->dataPtr->sphericalCoordinates.Surface() ==
@@ -325,6 +325,26 @@ bool Dem::GeoReference(double _x, double _y,
         "+proj=latlong +a=1737400 +b=1737400";
 
       targetCs.importFromProj4(MOON_LAT_LON_PROJ_STR);
+
+      cT = OGRCreateCoordinateTransformation(
+          sourceCs, &targetCs);
+    }
+    else if (this->dataPtr->sphericalCoordinates.Surface() ==
+        math::SphericalCoordinates::CUSTOM_SURFACE)
+    {
+      auto sourceCs = this->dataPtr->dataSet->GetSpatialRef();
+      OGRSpatialReference targetCs = OGRSpatialReference();
+
+      int axisEquatorial =
+        this->dataPtr->sphericalCoordinates.SurfaceAxisEquatorial();
+      int axisPolar =
+        this->dataPtr->sphericalCoordinates.SurfaceAxisPolar();
+
+      std::string CUSTOM_SURFACE_LAT_LON_PROJ_STR =
+        "+proj=latlong +a=" + std::to_string(axisEquatorial) +
+        " +b=" + std::to_string(axisPolar);
+
+      targetCs.importFromProj4(CUSTOM_SURFACE_LAT_LON_PROJ_STR.c_str());
 
       cT = OGRCreateCoordinateTransformation(
           sourceCs, &targetCs);
@@ -383,9 +403,9 @@ unsigned int Dem::Width() const
 //////////////////////////////////////////////////
 double Dem::WorldWidth() const
 {
-  if (this->dataPtr->isNonEarthDem)
+  if (this->dataPtr->isUnknownDem)
   {
-    gzwarn << "Unable to determine world width of non-Earth DEM."
+    gzwarn << "Unable to determine world width of unknown DEM."
             << std::endl;
   }
   return this->dataPtr->worldWidth;
@@ -394,9 +414,9 @@ double Dem::WorldWidth() const
 //////////////////////////////////////////////////
 double Dem::WorldHeight() const
 {
-  if (this->dataPtr->isNonEarthDem)
+  if (this->dataPtr->isUnknownDem)
   {
-    gzwarn << "Unable to determine world height of non-Earth DEM."
+    gzwarn << "Unable to determine world height of unknown DEM."
             << std::endl;
   }
   return this->dataPtr->worldHeight;
