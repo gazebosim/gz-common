@@ -527,6 +527,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     mesh->AddMaterial(mat);
   }
   // Create the skeleton
+  if (scene->HasAnimations())
   {
     auto rootSkelNode = new SkeletonNode(nullptr, rootName, rootName, SkeletonNode::NODE);
     rootSkelNode->SetTransform(rootTransform);
