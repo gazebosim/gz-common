@@ -400,38 +400,43 @@ std::string SystemPaths::FindFile(const std::string &_filename,
   if (filename.empty())
     return path;
 
-  // Handle as URI
-  if (ignition::common::URI::Valid(filename))
-  {
-    path = this->FindFileURI(ignition::common::URI(filename));
-  }
-  // Handle as local absolute path
-  else if (filename[0] == '/')
-  {
-    path = filename;
-  }
 #ifdef _WIN32
-  // Handle as Windows absolute path
-  else if (filename.length() >= 2 && filename[1] == ':')
+  // First of all, try if filename as a Windows absolute path exists
+  // The Windows absolute path is tried first as a Windows drive such as
+  // C:/ is also a valid URI scheme
+  if (filename.length() >= 2 && filename[1] == ':' && exists(filename))
   {
     path = filename;
   }
 #endif  // _WIN32
-  // Try appending to local paths
-  else
-  {
-    auto cwdPath = joinPaths(cwd(), filename);
-    if (_searchLocalPath && exists(cwdPath))
+  // If the filename is not an existing absolute Windows path, try others
+  if (path.empty()) {
+    // Handle as URI
+    if (ignition::common::URI::Valid(filename))
     {
-      path = cwdPath;
+      path = this->FindFileURI(ignition::common::URI(filename));
     }
-    else if ((filename[0] == '.' || _searchLocalPath) && exists(filename))
+    // Handle as local absolute path
+    else if (filename[0] == '/')
     {
       path = filename;
     }
-    else if (this->dataPtr->findFileCB)
+    // Try appending to local paths
+    else
     {
-      path = this->dataPtr->findFileCB(filename);
+      auto cwdPath = joinPaths(cwd(), filename);
+      if (_searchLocalPath && exists(cwdPath))
+      {
+        path = cwdPath;
+      }
+      else if ((filename[0] == '.' || _searchLocalPath) && exists(filename))
+      {
+        path = filename;
+      }
+      else if (this->dataPtr->findFileCB)
+      {
+        path = this->dataPtr->findFileCB(filename);
+      }
     }
   }
 
