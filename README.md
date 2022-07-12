@@ -52,7 +52,7 @@ callback system.
 * **Graphics**: Collada, SVG, STL, OBJ, and DEM loaders. In-memory mesh,
   image, and material representations. Animation processing and BVH loader.
 * **Profiler**: A common profiler abstraction that can be used to measure and
-  visualize run time of various pieces of ignition robotics software.
+  visualize run time of various pieces of Gazebo robotics software.
 
 # Install
 
@@ -71,7 +71,7 @@ Refer to the following table for information about important directories and fil
 +-- events                   Header and source files for the Event component.
 +-- examples                 Example programs.
 +-- graphics                 Header and source files for the Graphics component.
-+-- include/ignition/common  Header files for the core component.
++-- include/gz/common  Header files for the core component.
 +-- profiler                 Header and source files for the Profiler component.
 +-- src                      Core source files and unit tests.
 +-- test

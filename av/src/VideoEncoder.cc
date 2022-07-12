@@ -228,7 +228,7 @@ bool VideoEncoder::Start(const std::string &_format,
     if (allowedEncoders != HWEncoderType::NONE)
     {
       gzwarn << "Hardware encoding with encoders " << allowedEncodersStr
-              << " was requested, but ignition-common is built without HW "
+              << " was requested, but gz-common is built without HW "
               << "encoding support. A software encoder will be used instead."
               << std::endl;
     }

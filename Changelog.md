@@ -8,7 +8,7 @@
 1. Fix spelling in URI error message
     * [Pull request #333](https://github.com/gazebosim/gz-common/pull/333)
 
-1. `ignLogInit` fails if run after console output
+1. `gzLogInit` fails if run after console output
     * [Pull request #332](https://github.com/gazebosim/gz-common/pull/332)
 
 1. Fix compatibility with FFmpeg 5.0
@@ -201,7 +201,7 @@
     * [Pull request #58](https://github.com/gazebosim/gz-common/pull/58)
 
 1. Corrected `BAYER_RGGR8` to `BAYER_BGGR8` in `PixelFormatName` and
-   `PixelFormatType` located in `graphics/include/ignition/common/Image.hh`.
+   `PixelFormatType` located in `graphics/include/gz/common/Image.hh`.
     * [BitBucket pull request 191](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/191)
 
 1. Added URI Authority parsing to the URI class. Authority information can
@@ -366,7 +366,7 @@
 
 1. Windows
     * Do not hardcode USE_EXTERNAL_TINYXML2 to OFF: [Pull Request 116](https://github.com/gazebosim/gz-common/pull/116)
-    * Fix IGN_HOMEDIR on Windows: [Pull Request 127](https://github.com/gazebosim/gz-common/pull/127)
+    * Fix GZ_HOMEDIR on Windows: [Pull Request 127](https://github.com/gazebosim/gz-common/pull/127)
     * Improve Windows support: [Pull Request 128](https://github.com/gazebosim/gz-common/pull/128)
     * Fix Windows AV CI warnings and test failures: [Pull Request 135](https://github.com/gazebosim/gz-common/pull/135)
 
@@ -512,7 +512,7 @@
 
 ## Gazebo Common 3.2.0 (2019-08-07)
 
-1. Allow gzLogInit to use an absolute path. Added a timeToIso that converts a given time to an ISO string. Some console timestamps were using `IGN_SYSTEM_TIME_NS()` and others `gz::common::systemTimeISO()`. Switched all to use `gz::common::systemTimeISO()`.
+1. Allow gzLogInit to use an absolute path. Added a timeToIso that converts a given time to an ISO string. Some console timestamps were using `GZ_SYSTEM_TIME_NS()` and others `gz::common::systemTimeISO()`. Switched all to use `gz::common::systemTimeISO()`.
     * [BitBucket pull request 203](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/203)
 
 1. Port ColladaLoader fix: use default value of 1 for stride parameter when unset.
@@ -574,7 +574,7 @@
     * [BitBucket pull request 171](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/171)
     * [BitBucket pull request 172](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/172)
 
-1. SystemPaths: search paths in `IGN_FILE_PATH` environment variable when finding files
+1. SystemPaths: search paths in `GZ_FILE_PATH` environment variable when finding files
     * [BitBucket pull request 175](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/175)
 
 1. `Time::Sleep`: return amount of time actually slept
