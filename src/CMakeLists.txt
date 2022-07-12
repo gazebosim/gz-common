@@ -5,7 +5,7 @@ gz_get_libsources_and_unittests(sources gtest_sources)
 # Create the library target
 gz_create_core_library(
   SOURCES ${sources}
-  CXX_STANDARD 17)
+  CXX_STANDARD ${CMAKE_CXX_STANDARD})
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL GNU)
     set(CXX_FILESYSTEM_LIBRARIES stdc++fs)

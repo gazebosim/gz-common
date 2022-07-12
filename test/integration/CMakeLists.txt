@@ -16,6 +16,7 @@ if(TARGET INTEGRATION_plugin)
   # before INTEGRATION_plugin so that its auto-generated header is available.
   # We do not want to link INTEGRATION_plugin to the DummyPlugins library.
   add_dependencies(INTEGRATION_plugin GzDummyPlugins)
+  target_include_directories(INTEGRATION_plugin PRIVATE ${PROJECT_SOURCE_DIR}/test)
 endif()
 
 if(TARGET INTEGRATION_mesh)

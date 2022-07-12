@@ -15,6 +15,9 @@ set(GZ_CMAKE_VER ${gz-cmake3_VERSION_MAJOR})
 #============================================================================
 # Configure the project
 #============================================================================
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 gz_configure_project(
   REPLACE_IGNITION_INCLUDE_PATH gz/common
   VERSION_SUFFIX pre1)
@@ -22,9 +25,6 @@ gz_configure_project(
 #============================================================================
 # Set project-specific options
 #============================================================================
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 #--------------------------------------
 # Option: Should Windows test symlinking?
 if(WIN32)
