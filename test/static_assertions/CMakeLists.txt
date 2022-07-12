@@ -41,7 +41,7 @@ if (UNIX)
     PASS_REGULAR_EXPRESSION "is not a base class of")
 
   set_tests_properties(STATIC_ASSERT_plugin_not_global_ns PROPERTIES
-    PASS_REGULAR_EXPRESSION "IGN_macro_must_be_used_in_global_namespace")
+    PASS_REGULAR_EXPRESSION "GZ_macro_must_be_used_in_global_namespace")
 
   set_tests_properties(STATIC_ASSERT_plugin_wrong_base_class PROPERTIES
     PASS_REGULAR_EXPRESSION "is not a base class of")

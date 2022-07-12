@@ -103,14 +103,14 @@ endif()
 
 if(GZ_PROFILER_REMOTERY)
   set(GZ_PROFILER_SCRIPT_PATH ${CMAKE_INSTALL_LIBEXECDIR}/gz/gz-common${PROJECT_VERSION_MAJOR})
-  set(GZ_PROFILER_VIS_PATH ${IGN_DATA_INSTALL_DIR}/profiler_vis)
+  set(GZ_PROFILER_VIS_PATH ${GZ_DATA_INSTALL_DIR}/profiler_vis)
 
-  configure_file(Remotery/ign_remotery_vis.in
-    ${CMAKE_CURRENT_BINARY_DIR}/ign_remotery_vis
+  configure_file(Remotery/gz_remotery_vis.in
+    ${CMAKE_CURRENT_BINARY_DIR}/gz_remotery_vis
     @ONLY)
 
   install(PROGRAMS
-    ${CMAKE_CURRENT_BINARY_DIR}/ign_remotery_vis
+    ${CMAKE_CURRENT_BINARY_DIR}/gz_remotery_vis
     DESTINATION ${GZ_PROFILER_SCRIPT_PATH})
 
   install(DIRECTORY Remotery/vis/

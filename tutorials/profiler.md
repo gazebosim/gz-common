@@ -88,10 +88,10 @@ From terminal 2, open the visualizer using one of the following commands
 
 ```{.sh}
 # Find the launcher script and use it (Linux and macOS)
-find /usr | grep ign_remotery_vis
+find /usr | grep gz_remotery_vis
 ...
 
-/usr/<path_to>/ign_remotery_vis
+/usr/<path_to>/gz_remotery_vis
 
 # Use the source path (Linux)
 # Substitute the path to your gz-common source checkout
@@ -99,10 +99,10 @@ xdg-open $SOURCE_DIR/gz-common/profiler/src/Remotery/vis/index.html
 
 # Use the installation path (Linux)
 # This may vary depending on where you have choosen to install
-xdg-open /usr/share/ignition/ignition-common5/profiler_vis/index.html
+xdg-open /usr/share/gz/gz-common5/profiler_vis/index.html
 
 # Use the installation path (macOS)
-open /usr/share/ignition/ignition-common5/profiler_vis/index.html
+open /usr/share/gz/gz-common5/profiler_vis/index.html
 ```
 
 ### On Gazebo library
@@ -120,7 +120,7 @@ colcon build --cmake-args -DENABLE_PROFILER=1
 
 Run your Gazebo library then go to your ignition installation path and open the profiler browser using:
 ```
-libexec/gz/gz-common<N>/ign_remotery_vis
+libexec/gz/gz-common<N>/gz_remotery_vis
 ```
 
 If the profiler is run successfully, you should see output in a browser. Similar to this

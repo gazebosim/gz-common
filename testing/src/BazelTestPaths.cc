@@ -32,7 +32,7 @@ bool BazelTestPaths::ProjectSourcePath(std::string &_sourceDir)
   std::string test_srcdir, bazel_path;
 
   if (common::env("TEST_SRCDIR", test_srcdir) &&
-      common::env("IGN_BAZEL_PATH", bazel_path))
+      common::env("GZ_BAZEL_PATH", bazel_path))
   {
     _sourceDir = gz::common::joinPaths(test_srcdir,
                                              "ignition",
@@ -52,4 +52,3 @@ bool BazelTestPaths::TestTmpPath(std::string &_tmpDir)
 }
 
 }  // namespace gz::common::testing
-

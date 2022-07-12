@@ -35,7 +35,7 @@ class A : public Base
   double test2;
 };
 
-IGN_COMMON_REGISTER_SINGLE_PLUGIN(ns::A, ns::Base)
+GZ_COMMON_REGISTER_SINGLE_PLUGIN(ns::A, ns::Base)
 }
 
 GZ_UTILS_WARN_RESUME__DEPRECATED_DECLARATION

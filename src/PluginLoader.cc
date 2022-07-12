@@ -235,10 +235,10 @@ namespace gz
         return loadedPlugins;
       }
 
-      const std::string versionSymbol = "IGNCOMMONPluginAPIVersion";
-      const std::string sizeSymbol = "IGNCOMMONPluginInfoSize";
-      const std::string alignSymbol = "IGNCOMMONPluginInfoAlignment";
-      const std::string multiInfoSymbol = "IGNCOMMONMultiPluginInfo";
+      const std::string versionSymbol = "GZCOMMONPluginAPIVersion";
+      const std::string sizeSymbol = "GZCOMMONPluginInfoSize";
+      const std::string alignSymbol = "GZCOMMONPluginInfoAlignment";
+      const std::string multiInfoSymbol = "GZCOMMONMultiPluginInfo";
       void *versionPtr = dlsym(_dlHandle, versionSymbol.c_str());
       void *sizePtr = dlsym(_dlHandle, sizeSymbol.c_str());
       void *alignPtr = dlsym(_dlHandle, alignSymbol.c_str());

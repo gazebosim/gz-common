@@ -24,17 +24,17 @@
 GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
 
 extern "C" {
-  std::size_t DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONPluginInfoSize =
+  std::size_t DETAIL_IGN_PLUGIN_VISIBLE GZCOMMONPluginInfoSize =
     sizeof(gz::common::PluginInfo);
 
-  std::size_t DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONPluginInfoAlignment =
+  std::size_t DETAIL_IGN_PLUGIN_VISIBLE GZCOMMONPluginInfoAlignment =
     alignof(gz::common::PluginInfo);
 
-  int DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONPluginAPIVersion =
+  int DETAIL_IGN_PLUGIN_VISIBLE GZCOMMONPluginAPIVersion =
     std::numeric_limits<int>::max();
 }
 
-extern "C" std::size_t DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONMultiPluginInfo(
+extern "C" std::size_t DETAIL_IGN_PLUGIN_VISIBLE GZCOMMONMultiPluginInfo(
     void *, const std::size_t, const std::size_t)
 {
   return 0u;

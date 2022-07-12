@@ -15,7 +15,7 @@ The Source Installation instructions should be used if you need the very latest 
 
 On Ubuntu systems, `apt-get` can be used to install `gz-common`:
 ```
-sudo apt install libignition-common<#>-dev
+sudo apt install libgz-common<#>-dev
 ```
 
 Be sure to replace `<#>` with a number value, such as 2 or 3, depending on
@@ -31,7 +31,7 @@ On macOS, add OSRF packages:
 
 Install Gazebo Common:
   ```
-  brew install ignition-common<#>
+  brew install gz-common<#>
   ```
 
 Be sure to replace `<#>` with a number value, such as 3 or 4, depending on
@@ -50,7 +50,7 @@ conda activate gz-ws
 
 Install `gz-common`:
 ```
-conda install libignition-common<#> --channel conda-forge
+conda install libgz-common<#> --channel conda-forge
 ```
 
 Be sure to replace `<#>` with a number value, such as 2 or 3, depending on
@@ -101,12 +101,12 @@ Install Gazebo dependencies:
 
 You can view available versions and their dependencies:
 ```
-conda search libignition-common* --channel conda-forge --info
+conda search libgz-common* --channel conda-forge --info
 ```
 
 Install dependencies, replacing `<#>` with the desired versions:
 ```
-conda install libignition-cmake<#> libignition-math<#> --channel conda-forge
+conda install libgz-cmake<#> libgz-math<#> --channel conda-forge
 ```
 
 ## Build from Source
