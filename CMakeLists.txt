@@ -126,7 +126,7 @@ gz_find_package(AVUTIL REQUIRED_BY av PRETTY libavutil)
 
 #------------------------------------
 # Find assimp
-ign_find_package(ASSIMP VERSION 5.2.0 REQUIRED_BY graphics PRETTY assimp)
+gz_find_package(ASSIMP REQUIRED_BY graphics PRETTY assimp)
 
 
 message(STATUS "-------------------------------------------\n")
