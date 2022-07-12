@@ -35,13 +35,13 @@
  * Usage example:
  *
  * SomeClass* ptr = CreatePtr();
- * IGN_COMMON_WARN_IGNORE__DELETE_NON_VIRTUAL_DESTRUCTOR
+ * GZ_COMMON_WARN_IGNORE__DELETE_NON_VIRTUAL_DESTRUCTOR
  * delete ptr;
- * IGN_COMMON_WARN_RESUME__DELETE_NON_VIRTUAL_DESTRUCTOR
+ * GZ_COMMON_WARN_RESUME__DELETE_NON_VIRTUAL_DESTRUCTOR
  *
  */
 
-// Be sure to call the IGN_COMMON_WARN_RESUME__XXXXX macro at the end of the
+// Be sure to call the GZ_COMMON_WARN_RESUME__XXXXX macro at the end of the
 // block of code where the warning suppression is needed. Otherwise, you might
 // inadvertently suppress legitimate warnings.
 

@@ -61,20 +61,20 @@ endif()
 
 if(TARGET UNIT_PluginLoader_TEST)
   target_compile_definitions(UNIT_PluginLoader_TEST PRIVATE
-    "IGN_COMMON_LIB_PATH=\"$<TARGET_FILE_DIR:${PROJECT_LIBRARY_TARGET_NAME}>\"")
+  "GZ_COMMON_LIB_PATH=\"$<TARGET_FILE_DIR:${PROJECT_LIBRARY_TARGET_NAME}>\"")
 endif()
 
 # Produce warning on Windows if the user has decided to turn on the symlink
 # tests. In order for those tests to work, they will need to run the tests in
 # administrative mode, or use some other workaround.
 if(WIN32)
-  if(IGN_BUILD_SYMLINK_TESTS_ON_WINDOWS)
+  if(GZ_BUILD_SYMLINK_TESTS_ON_WINDOWS)
     message(STATUS "")
     message(STATUS "You have opted to enable symlink tests on a Windows platform.")
     message(STATUS "The test UNIT_Filesystem_TEST will require elevated privileges")
     message(STATUS "in order to succeed. For more information, see the issue")
     message(STATUS "https://github.com/gazebosim/gz-common/issues/21")
     message(STATUS "")
-    target_compile_definitions(UNIT_Filesystem_TEST PRIVATE IGN_BUILD_SYMLINK_TESTS_ON_WINDOWS)
+    target_compile_definitions(UNIT_Filesystem_TEST PRIVATE GZ_BUILD_SYMLINK_TESTS_ON_WINDOWS)
   endif()
 endif()

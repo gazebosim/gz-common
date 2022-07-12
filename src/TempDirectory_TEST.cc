@@ -68,7 +68,7 @@ TEST(TempDirectory, TempDirectory)
   std::string path;
   auto curDir = gz::common::cwd();
   {
-    gz::common::TempDirectory tmp("temp_dir", "ignition", true);
+    gz::common::TempDirectory tmp("temp_dir", "gz", true);
     EXPECT_TRUE(tmp.Valid());
     EXPECT_TRUE(tmp.DoCleanup());
     // Current directory changed to tempdir
@@ -90,7 +90,7 @@ TEST(TempDirectory, TempDirectoryRoot)
   auto curDir = gz::common::cwd();
   {
     auto p = gz::common::tempDirectoryPath();
-    gz::common::TempDirectory tmp(p, "temp_dir", "ignition", true);
+    gz::common::TempDirectory tmp(p, "temp_dir", "gz", true);
     EXPECT_TRUE(tmp.Valid());
     EXPECT_TRUE(tmp.DoCleanup());
     EXPECT_NE(curDir, gz::common::cwd());
@@ -110,7 +110,7 @@ TEST(TempDirectory, TempDirectoryEmptyRoot)
   std::string path;
   auto curDir = gz::common::cwd();
   {
-    gz::common::TempDirectory tmp("", "temp_dir", "ignition", true);
+    gz::common::TempDirectory tmp("", "temp_dir", "gz", true);
     EXPECT_FALSE(tmp.Valid());
     EXPECT_TRUE(tmp.DoCleanup());
     // Since not successfully created, no update
@@ -129,7 +129,7 @@ TEST(TempDirectory, TempDirectoryNoClean)
   std::string path;
   auto curDir = gz::common::cwd();
   {
-    gz::common::TempDirectory tmp("temp_dir", "ignition", false);
+    gz::common::TempDirectory tmp("temp_dir", "gz", false);
     EXPECT_TRUE(tmp.Valid());
     EXPECT_FALSE(tmp.DoCleanup());
     EXPECT_NE(curDir, gz::common::cwd());
@@ -150,7 +150,7 @@ TEST(TempDirectory, TempDirectoryNoCleanLater)
   std::string path;
   auto curDir = gz::common::cwd();
   {
-    gz::common::TempDirectory tmp("temp_dir", "ignition", true);
+    gz::common::TempDirectory tmp("temp_dir", "gz", true);
     EXPECT_TRUE(tmp.Valid());
     EXPECT_TRUE(tmp.DoCleanup());
     EXPECT_NE(curDir, gz::common::cwd());

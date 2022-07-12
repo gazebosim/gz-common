@@ -304,7 +304,7 @@ void FileLogger::Close()
 FileLogger &FileLogger::operator()()
 {
   if (!this->initialized)
-    this->Init(".ignition", "auto_default.log");
+    this->Init(".gz", "auto_default.log");
 
   (*this) << "(" << gz::common::systemTimeIso() << ") ";
   return (*this);
@@ -314,7 +314,7 @@ FileLogger &FileLogger::operator()()
 FileLogger &FileLogger::operator()(const std::string &_file, int _line)
 {
   if (!this->initialized)
-    this->Init(".ignition", "auto_default.log");
+    this->Init(".gz", "auto_default.log");
 
   int index = _file.find_last_of("/") + 1;
   (*this) << "(" << gz::common::systemTimeIso() << ") ["

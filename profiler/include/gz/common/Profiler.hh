@@ -42,7 +42,7 @@ namespace gz
     /// but instead use the profiling macros, which can be enabled/disabled
     /// at compile time, which eliminates any performance impact of profiling.
     ///
-    /// Profiler is enabled by setting IGN_ENABLE_PROFILER at compile time.
+    /// Profiler is enabled by setting GZ_ENABLE_PROFILER at compile time.
     ///
     /// The profiler header also exports several convenience macros to make
     /// adding inspection points easier.
