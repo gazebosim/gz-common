@@ -47,60 +47,99 @@ using ImagePtr = std::shared_ptr<Image>;
 /// \brief Private data for the AssimpLoader class
 class AssimpLoader::Implementation
 {
+  /// \brief the Assimp importer used to parse meshes
   public: Assimp::Importer importer;
-  /// Convert a color from assimp implementation to Ignition common
+
+  /// \brief Convert a color from assimp implementation to Ignition common
+  /// \param[in] _color the assimp color to convert
+  /// \return the matching math::Color
   public: math::Color ConvertColor(aiColor4D& _color);
 
-  /// Stores the loaded bone names
-  public: std::unordered_set<std::string> boneNames;
-
-  /// Convert a transformation from assimp implementation to Ignition math
+  /// \brief Convert a matrix from assimp implementation to gz::Math
+  /// \param[in] _matrix the assimp matrix to convert
+  /// \return the converted math::Matrix4d
   public: math::Matrix4d ConvertTransform(const aiMatrix4x4& _matrix);
 
-  /// Convert from assimp to gz::common::Material
+  /// \brief Convert from assimp to gz::common::Material
+  /// \param[in] _scene the assimp scene
+  /// \param[in] _matIdx index of the material in the scene
+  /// \param[in] _path path where the mesh is located
+  /// \return pointer to the converted common::Material
   public: MaterialPtr CreateMaterial(const aiScene* _scene, unsigned _matIdx,
                                      const std::string& _path);
 
-  /// Load a texture embedded in a mesh (i.e. for GLB format)
+  /// \brief Load a texture embedded in a mesh (i.e. for GLB format)
   /// into a gz::common::Image
+  /// \param[in] _texture the assimp texture object
+  /// \return Pointer to a common::Image containing the texture
   public: ImagePtr LoadEmbeddedTexture(const aiTexture* _texture);
 
-  /// Utility function to generate a texture name for both embedded
+  /// \brief Utility function to generate a texture name for both embedded
   /// and external textures
+  /// \param[in] _scene the assimp scene
+  /// \param[in] _material the assimp material
+  /// \param[in] _type the type of texture (i.e. Diffuse, Metal)
+  /// \return the generated texture name
   public: std::string GenerateTextureName(const aiScene* _scene,
                                           const aiMaterial*  _mat,
                                           const std::string& _type);
 
-  /// High level function to parse texture information and load it if embedded
+  /// \brief Function to parse texture information and load it if embedded
+  /// \param[in] _scene the assimp scene
+  /// \param[in] _texturePath the path where the texture is located
+  /// \param[in] _texturePath the name of the texture
+  /// \return a pair containing the name of the texture and a pointer to the
+  /// image data, if the texture was loaded in memory
   public: std::pair<std::string, ImagePtr>
           LoadTexture(const aiScene* _scene,
                       const aiString& _texturePath,
                       const std::string& _textureName);
 
-  /// Function to split a gltf metallicroughness map into
+  /// \brief Function to split a gltf metallicroughness map into
   /// a metalness and roughness map
+  /// \param[in] _img the image to split
+  /// \return a pair of image pointers with the first being the metalness
+  /// map and the second being the roughness map
   public: std::pair<ImagePtr, ImagePtr>
           SplitMetallicRoughnessMap(const common::Image& _img) const;
 
-  /// Convert an assimp mesh into a gz::common::SubMesh
+  /// \brief Convert an assimp mesh into a gz::common::SubMesh
+  /// \param[in] _assimpMesh the assimp mesh to load
+  /// \param[in] _transform the node transform for the mesh
+  /// \return the converted common::Submesh
   public: SubMesh CreateSubMesh(const aiMesh* _assimpMesh,
                                 const math::Matrix4d& _transform);
 
-  /// Recursively create submeshes scene starting from the root node
+  /// \brief Recursively create submeshes scene starting from the root node
+  /// \param[in] _scene the assimp scene
+  /// \param[in] _node the node being processed
+  /// \param[in] _node the transform of the node being processed
+  /// \param[out] _mesh the common::Mesh to edit
   public: void RecursiveCreate(const aiScene* _scene,
                                const aiNode* _node,
                                const math::Matrix4d& _transform,
                                Mesh* _mesh);
 
-  /// Recursively create the skeleton starting from the root node
-  public: void RecursiveSkeletonCreate(const aiNode* _node,
-                                       SkeletonNode* _parent,
-                                       const math::Matrix4d& _transform);
+  /// \brief Recursively create the skeleton starting from the root node
+  /// \param[in] _node the node being processed
+  /// \param[in] _parent the parent skeleton node
+  /// \param[in] _transform the transform of the current node
+  /// \param[in] _boneNames set of bone names, used to skip nodes without a bone
+  public: void RecursiveSkeletonCreate(
+          const aiNode* _node,
+          SkeletonNode* _parent,
+          const math::Matrix4d& _transform,
+          const std::unordered_set<std::string> &_boneNames);
 
-  /// Recursively store the bone names starting from the root node
+  /// \brief Recursively store the bone names starting from the root node
   /// to make sure that only nodes that map to a bone are added to the skeleton
-  public: void RecursiveStoreBoneNames(const aiScene *_scene,
-                                       const aiNode* _node);
+  /// \param[in] _scene the assimp scene
+  /// \param[in] _node the node being processed
+  /// \param[out] _boneNames set of bone names populated while recursing
+  public: void RecursiveStoreBoneNames(
+          const aiScene *_scene,
+          const aiNode* _node,
+          std::unordered_set<std::string>& _boneNames);
 
   /// \brief Apply the the inv bind transform to the skeleton pose.
   /// \remarks have to set the model transforms starting from the root in
@@ -203,7 +242,8 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene,
 }
 
 void AssimpLoader::Implementation::RecursiveStoreBoneNames(
-    const aiScene *_scene, const aiNode *_node)
+    const aiScene *_scene, const aiNode *_node,
+    std::unordered_set<std::string>& _boneNames)
 {
   if (!_node)
     return;
@@ -215,8 +255,7 @@ void AssimpLoader::Implementation::RecursiveStoreBoneNames(
     for (unsigned boneIdx = 0; boneIdx < assimpMesh->mNumBones; ++boneIdx)
     {
       auto bone = assimpMesh->mBones[boneIdx];
-      auto boneName = std::string(ToString(bone->mName));
-      this->boneNames.insert(boneName);
+      _boneNames.insert(ToString(bone->mName));
     }
   }
 
@@ -225,17 +264,18 @@ void AssimpLoader::Implementation::RecursiveStoreBoneNames(
   {
     auto child_node = _node->mChildren[childIdx];
     // Finally recursive call to explore subnode
-    this->RecursiveStoreBoneNames(_scene, child_node);
+    this->RecursiveStoreBoneNames(_scene, child_node, _boneNames);
   }
 }
 
 void AssimpLoader::Implementation::RecursiveSkeletonCreate(const aiNode* _node,
-    SkeletonNode* _parent, const math::Matrix4d& _transform)
+    SkeletonNode* _parent, const math::Matrix4d& _transform,
+    const std::unordered_set<std::string> &_boneNames)
 {
   // First explore this node
   auto nodeName = ToString(_node->mName);
   // TODO(luca) check if node or joint?
-  auto boneExist = this->boneNames.find(nodeName) != this->boneNames.end();
+  auto boneExist = _boneNames.find(nodeName) != _boneNames.end();
   auto nodeTrans = this->ConvertTransform(_node->mTransformation);
   auto skelNode = _parent;
 
@@ -251,7 +291,7 @@ void AssimpLoader::Implementation::RecursiveSkeletonCreate(const aiNode* _node,
   for (unsigned childIdx = 0; childIdx < _node->mNumChildren; ++childIdx)
   {
     this->RecursiveSkeletonCreate(
-        _node->mChildren[childIdx], skelNode, nodeTrans);
+        _node->mChildren[childIdx], skelNode, nodeTrans, _boneNames);
   }
 }
 
@@ -576,9 +616,11 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     mesh->AddMaterial(mat);
   }
   // Create the skeleton
-  if (scene->HasAnimations())
+  // TODO(luca) Check if we need to have the skeleton if mesh has no animation
+  // if (scene->HasAnimations())
   {
-    this->dataPtr->RecursiveStoreBoneNames(scene, rootNode);
+    std::unordered_set<std::string> boneNames;
+    this->dataPtr->RecursiveStoreBoneNames(scene, rootNode, boneNames);
     auto rootSkelNode = new SkeletonNode(
         nullptr, rootName, rootName, SkeletonNode::NODE);
     rootSkelNode->SetTransform(rootTransform);
@@ -587,10 +629,13 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     {
       // First populate the skeleton with the node transforms
       this->dataPtr->RecursiveSkeletonCreate(
-          rootNode->mChildren[childIdx], rootSkelNode, rootTransform);
+          rootNode->mChildren[childIdx], rootSkelNode,
+          rootTransform, boneNames);
     }
     // We dont need scene node and adding will create inverse model
-    rootSkelNode = rootSkelNode->Child(0);
+    // TODO(anyone) This causes segmentation faults in meshes made of
+    // a root node without any child
+    // rootSkelNode = rootSkelNode->Child(0);
     rootSkelNode->SetParent(nullptr);
 
     SkeletonPtr rootSkeleton = std::make_shared<Skeleton>(rootSkelNode);
