@@ -403,8 +403,8 @@ TEST_F(AssimpLoader, LoadBoxWithDefaultStride)
   EXPECT_EQ(1u, mesh->MaterialCount());
   EXPECT_EQ(24u, mesh->TexCoordCount());
   ASSERT_NE(mesh->MeshSkeleton(), nullptr);
-  // TODO not working, investigate
-  //ASSERT_EQ(1u, mesh->MeshSkeleton()->AnimationCount());
+  // TODO(luca) not working, investigate
+  // ASSERT_EQ(1u, mesh->MeshSkeleton()->AnimationCount());
 }
 
 /////////////////////////////////////////////////

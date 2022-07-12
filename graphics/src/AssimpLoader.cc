@@ -42,6 +42,8 @@ namespace gz
 namespace common
 {
 
+using ImagePtr = std::shared_ptr<Image>;
+
 /// \brief Private data for the AssimpLoader class
 class AssimpLoader::Implementation
 {
@@ -49,31 +51,56 @@ class AssimpLoader::Implementation
   /// Convert a color from assimp implementation to Ignition common
   public: math::Color ConvertColor(aiColor4D& _color);
 
-  // Stores the loaded bone names 
+  /// Stores the loaded bone names
   public: std::unordered_set<std::string> boneNames;
 
   /// Convert a transformation from assimp implementation to Ignition math
   public: math::Matrix4d ConvertTransform(const aiMatrix4x4& _matrix);
 
-  public: MaterialPtr CreateMaterial(const aiScene* _scene, unsigned _matIdx, const std::string& _path);
+  /// Convert from assimp to gz::common::Material
+  public: MaterialPtr CreateMaterial(const aiScene* _scene, unsigned _matIdx,
+                                     const std::string& _path);
 
-  public: std::shared_ptr<Image> LoadEmbeddedTexture(const aiTexture* _texture);
+  /// Load a texture embedded in a mesh (i.e. for GLB format)
+  /// into a gz::common::Image
+  public: ImagePtr LoadEmbeddedTexture(const aiTexture* _texture);
 
-  public: std::string GenerateTextureName(const aiScene* _scene, const aiMaterial*  _mat, const std::string& _type);
+  /// Utility function to generate a texture name for both embedded
+  /// and external textures
+  public: std::string GenerateTextureName(const aiScene* _scene,
+                                          const aiMaterial*  _mat,
+                                          const std::string& _type);
 
-  public: std::pair<std::string, std::shared_ptr<Image>> LoadTexture(const aiScene* _scene, const aiString& _texturePath, const std::string& _textureName);
+  /// High level function to parse texture information and load it if embedded
+  public: std::pair<std::string, ImagePtr>
+          LoadTexture(const aiScene* _scene,
+                      const aiString& _texturePath,
+                      const std::string& _textureName);
 
-  public: std::pair<std::shared_ptr<Image>, std::shared_ptr<Image>> SplitMetallicRoughnessMap(const common::Image& _img) const;
+  /// Function to split a gltf metallicroughness map into
+  /// a metalness and roughness map
+  public: std::pair<ImagePtr, ImagePtr>
+          SplitMetallicRoughnessMap(const common::Image& _img) const;
 
-  public: SubMesh CreateSubMesh(const aiMesh* _assimpMesh, const math::Matrix4d& _transform);
+  /// Convert an assimp mesh into a gz::common::SubMesh
+  public: SubMesh CreateSubMesh(const aiMesh* _assimpMesh,
+                                const math::Matrix4d& _transform);
 
-  public: std::unordered_map<std::string, math::Matrix4d> PopulateTransformMap(const aiScene* _scene);
+  /// Recursively create submeshes scene starting from the root node
+  public: void RecursiveCreate(const aiScene* _scene,
+                               const aiNode* _node,
+                               const math::Matrix4d& _transform,
+                               Mesh* _mesh);
 
-  public: void RecursiveCreate(const aiScene* _scene, const aiNode* _node, const math::Matrix4d& _transform, Mesh* _mesh);
+  /// Recursively create the skeleton starting from the root node
+  public: void RecursiveSkeletonCreate(const aiNode* _node,
+                                       SkeletonNode* _parent,
+                                       const math::Matrix4d& _transform);
 
-  public: void RecursiveSkeletonCreate(const aiNode* _node, SkeletonNode* _parent, const math::Matrix4d& _transform);
-
-  public: void RecursiveStoreBoneNames(const aiScene *_scene, const aiNode* _node);
+  /// Recursively store the bone names starting from the root node
+  /// to make sure that only nodes that map to a bone are added to the skeleton
+  public: void RecursiveStoreBoneNames(const aiScene *_scene,
+                                       const aiNode* _node);
 
   /// \brief Apply the the inv bind transform to the skeleton pose.
   /// \remarks have to set the model transforms starting from the root in
@@ -97,7 +124,8 @@ math::Color AssimpLoader::Implementation::ConvertColor(aiColor4D& _color)
   return col;
 }
 
-math::Matrix4d AssimpLoader::Implementation::ConvertTransform(const aiMatrix4x4& _sm)
+math::Matrix4d AssimpLoader::Implementation::ConvertTransform(
+    const aiMatrix4x4& _sm)
 {
   return math::Matrix4d(
       _sm.a1, _sm.a2, _sm.a3, _sm.a4,
@@ -106,7 +134,8 @@ math::Matrix4d AssimpLoader::Implementation::ConvertTransform(const aiMatrix4x4&
       _sm.d1, _sm.d2, _sm.d3, _sm.d4);
 }
 
-void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene, const aiNode* _node, const math::Matrix4d& _transform, Mesh* _mesh)
+void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene,
+    const aiNode* _node, const math::Matrix4d& _transform, Mesh* _mesh)
 {
   if (!_node)
     return;
@@ -121,9 +150,9 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene, const 
     // Now add the bones to the skeleton
     if (assimpMesh->HasBones() && _scene->HasAnimations())
     {
-      // TODO merging skeletons here
+      // TODO(luca) merging skeletons here
       auto skeleton = _mesh->MeshSkeleton();
-      // TODO Append to existing skeleton if multiple submeshes?
+      // TODO(luca) Append to existing skeleton if multiple submeshes?
       skeleton->SetNumVertAttached(subMesh.VertexCount());
       // Now add the bone weights
       for (unsigned boneIdx = 0; boneIdx < assimpMesh->mNumBones; ++boneIdx)
@@ -133,18 +162,20 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene, const 
         // Apply inverse bind transform to the matching node
         SkeletonNode *skelNode =
             skeleton->NodeByName(boneNodeName);
-        skelNode->SetInverseBindTransform(this->ConvertTransform(bone->mOffsetMatrix));
+        skelNode->SetInverseBindTransform(
+            this->ConvertTransform(bone->mOffsetMatrix));
         for (unsigned weightIdx = 0; weightIdx < bone->mNumWeights; ++weightIdx)
         {
           auto vertexWeight = bone->mWeights[weightIdx];
-          skeleton->AddVertNodeWeight(vertexWeight.mVertexId, boneNodeName, vertexWeight.mWeight);
+          skeleton->AddVertNodeWeight(
+              vertexWeight.mVertexId, boneNodeName, vertexWeight.mWeight);
         }
       }
       // Add node assignment to mesh
-      for (unsigned vertexIdx = 0; vertexIdx < subMesh.VertexCount(); ++vertexIdx)
+      for (unsigned vertexIdx = 0; vertexIdx < subMesh.VertexCount();
+          ++vertexIdx)
       {
-        for (unsigned int i = 0;
-            i < skeleton->VertNodeWeightCount(vertexIdx); ++i)
+        for (unsigned i = 0; i < skeleton->VertNodeWeightCount(vertexIdx); ++i)
         {
           std::pair<std::string, double> nodeWeight =
             skeleton->VertNodeWeight(vertexIdx, i);
@@ -171,7 +202,8 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene, const 
   }
 }
 
-void AssimpLoader::Implementation::RecursiveStoreBoneNames(const aiScene *_scene, const aiNode *_node)
+void AssimpLoader::Implementation::RecursiveStoreBoneNames(
+    const aiScene *_scene, const aiNode *_node)
 {
   if (!_node)
     return;
@@ -197,18 +229,20 @@ void AssimpLoader::Implementation::RecursiveStoreBoneNames(const aiScene *_scene
   }
 }
 
-void AssimpLoader::Implementation::RecursiveSkeletonCreate(const aiNode* _node, SkeletonNode* _parent, const math::Matrix4d& _transform)
+void AssimpLoader::Implementation::RecursiveSkeletonCreate(const aiNode* _node,
+    SkeletonNode* _parent, const math::Matrix4d& _transform)
 {
   // First explore this node
   auto nodeName = ToString(_node->mName);
-  // TODO check if node or joint?
+  // TODO(luca) check if node or joint?
   auto boneExist = this->boneNames.find(nodeName) != this->boneNames.end();
   auto nodeTrans = this->ConvertTransform(_node->mTransformation);
   auto skelNode = _parent;
 
   if (boneExist)
   {
-    skelNode = new SkeletonNode(_parent, nodeName, nodeName, SkeletonNode::JOINT);
+    skelNode = new SkeletonNode(
+        _parent, nodeName, nodeName, SkeletonNode::JOINT);
     skelNode->SetTransform(nodeTrans);
   }
 
@@ -216,12 +250,14 @@ void AssimpLoader::Implementation::RecursiveSkeletonCreate(const aiNode* _node, 
 
   for (unsigned childIdx = 0; childIdx < _node->mNumChildren; ++childIdx)
   {
-    this->RecursiveSkeletonCreate(_node->mChildren[childIdx], skelNode, nodeTrans);
+    this->RecursiveSkeletonCreate(
+        _node->mChildren[childIdx], skelNode, nodeTrans);
   }
 }
 
 //////////////////////////////////////////////////
-MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* _scene, unsigned _matIdx, const std::string& _path)
+MaterialPtr AssimpLoader::Implementation::CreateMaterial(
+    const aiScene* _scene, unsigned _matIdx, const std::string& _path)
 {
   MaterialPtr mat = std::make_shared<Material>();
   aiColor4D color;
@@ -256,15 +292,17 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* _scene, 
   ret = assimpMat->Get(AI_MATKEY_OPACITY, opacity);
   mat->SetTransparency(1.0 - opacity);
   mat->SetBlendFactors(opacity, 1.0 - opacity);
-  // TODO more than one texture, Gazebo assumes UV index 0
+  // TODO(luca) more than one texture, Gazebo assumes UV index 0
   Pbr pbr;
   aiString texturePath(_path.c_str());
   ret = assimpMat->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath);
-  // TODO check other arguments, type of mappings to be UV, uv index, blend mode
+  // TODO(luca) check other arguments,
+  // type of mappings to be UV, uv index, blend mode
   if (ret == AI_SUCCESS)
   {
     // Check if the texture is embedded or not
-    auto [texName, texData] = this->LoadTexture(_scene, texturePath, this->GenerateTextureName(_scene, assimpMat, "Diffuse"));
+    auto [texName, texData] = this->LoadTexture(_scene,
+        texturePath, this->GenerateTextureName(_scene, assimpMat, "Diffuse"));
     if (texData != nullptr)
       mat->SetTextureImage(texName, texData);
     else
@@ -289,15 +327,24 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* _scene, 
   // Edge case for GLTF, Metal and Rough texture are embedded in a
   // MetallicRoughness texture with metalness in B and roughness in G
   // Open, preprocess and split into metal and roughness map
-  ret = assimpMat->GetTexture(AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLICROUGHNESS_TEXTURE, &texturePath);
+  ret = assimpMat->GetTexture(
+      AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLICROUGHNESS_TEXTURE,
+      &texturePath);
   if (ret == AI_SUCCESS)
   {
-    auto [texName, texData] = this->LoadTexture(_scene, texturePath, this->GenerateTextureName(_scene, assimpMat, "MetallicRoughness"));
+    auto [texName, texData] = this->LoadTexture(_scene, texturePath,
+        this->GenerateTextureName(_scene, assimpMat, "MetallicRoughness"));
     // Load it into a common::Image then split it
-    auto texImg = texData != nullptr ? texData : std::make_shared<common::Image>(texName);
-    auto [metalTexture, roughTexture] = this->SplitMetallicRoughnessMap(*texImg);
-    pbr.SetMetalnessMap(this->GenerateTextureName(_scene, assimpMat, "Metalness"), metalTexture);
-    pbr.SetRoughnessMap(this->GenerateTextureName(_scene, assimpMat, "Roughness"), roughTexture);
+    auto texImg =
+      texData != nullptr ? texData : std::make_shared<common::Image>(texName);
+    auto [metalTexture, roughTexture] =
+      this->SplitMetallicRoughnessMap(*texImg);
+    pbr.SetMetalnessMap(
+        this->GenerateTextureName(_scene, assimpMat, "Metalness"),
+        metalTexture);
+    pbr.SetRoughnessMap(
+        this->GenerateTextureName(_scene, assimpMat, "Roughness"),
+        roughTexture);
   }
   else
   {
@@ -305,21 +352,25 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* _scene, 
     ret = assimpMat->GetTexture(aiTextureType_METALNESS, 0, &texturePath);
     if (ret == AI_SUCCESS)
     {
-      auto [texName, texData] = this->LoadTexture(_scene, texturePath, this->GenerateTextureName(_scene, assimpMat, "Metalness"));
+      auto [texName, texData] = this->LoadTexture(_scene, texturePath,
+          this->GenerateTextureName(_scene, assimpMat, "Metalness"));
       pbr.SetMetalnessMap(texName, texData);
     }
-    ret = assimpMat->GetTexture(aiTextureType_DIFFUSE_ROUGHNESS, 0, &texturePath);
+    ret = assimpMat->GetTexture(
+        aiTextureType_DIFFUSE_ROUGHNESS, 0, &texturePath);
     if (ret == AI_SUCCESS)
     {
-      auto [texName, texData] = this->LoadTexture(_scene, texturePath, this->GenerateTextureName(_scene, assimpMat, "Roughness"));
+      auto [texName, texData] = this->LoadTexture(_scene, texturePath,
+          this->GenerateTextureName(_scene, assimpMat, "Roughness"));
       pbr.SetRoughnessMap(texName, texData);
     }
   }
   ret = assimpMat->GetTexture(aiTextureType_NORMALS, 0, &texturePath);
   if (ret == AI_SUCCESS)
   {
-    auto [texName, texData] = this->LoadTexture(_scene, texturePath, this->GenerateTextureName(_scene, assimpMat, "Normal"));
-    // TODO different normal map spaces
+    auto [texName, texData] = this->LoadTexture(_scene, texturePath,
+        this->GenerateTextureName(_scene, assimpMat, "Normal"));
+    // TODO(luca) different normal map spaces
     pbr.SetNormalMap(texName, NormalMapSpace::TANGENT, texData);
   }
   double value;
@@ -337,9 +388,12 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(const aiScene* _scene, 
   return mat;
 }
 
-std::pair<std::string, std::shared_ptr<Image>> AssimpLoader::Implementation::LoadTexture(const aiScene* _scene, const aiString& _texturePath, const std::string& _textureName)
+std::pair<std::string, ImagePtr> AssimpLoader::Implementation::LoadTexture(
+    const aiScene* _scene,
+    const aiString& _texturePath,
+    const std::string& _textureName)
 {
-  std::pair<std::string, std::shared_ptr<Image>> ret;
+  std::pair<std::string, ImagePtr> ret;
   // Check if the texture is embedded or not
   auto embeddedTexture = _scene->GetEmbeddedTexture(_texturePath.C_Str());
   if (embeddedTexture)
@@ -355,9 +409,11 @@ std::pair<std::string, std::shared_ptr<Image>> AssimpLoader::Implementation::Loa
   return ret;
 }
 
-std::pair<std::shared_ptr<Image>, std::shared_ptr<Image>> AssimpLoader::Implementation::SplitMetallicRoughnessMap(const common::Image& _img) const
+std::pair<ImagePtr, ImagePtr>
+    AssimpLoader::Implementation::SplitMetallicRoughnessMap(
+    const common::Image& _img) const
 {
-  std::pair<std::shared_ptr<Image>, std::shared_ptr<Image>> ret;
+  std::pair<ImagePtr, ImagePtr> ret;
   // Metalness in B roughness in G
   const auto width = _img.Width();
   const auto height = _img.Height();
@@ -392,33 +448,39 @@ std::pair<std::shared_ptr<Image>, std::shared_ptr<Image>> AssimpLoader::Implemen
 }
 
 //////////////////////////////////////////////////
-std::shared_ptr<Image> AssimpLoader::Implementation::LoadEmbeddedTexture(const aiTexture* _texture)
+ImagePtr AssimpLoader::Implementation::LoadEmbeddedTexture(
+    const aiTexture* _texture)
 {
   auto img = std::make_shared<Image>();
   if (_texture->mHeight == 0)
   {
     if (_texture->CheckFormat("png"))
     {
-      img->SetFromCompressedData((unsigned char*)_texture->pcData, _texture->mWidth, Image::PixelFormatType::COMPRESSED_PNG);
+      img->SetFromCompressedData((unsigned char*)_texture->pcData,
+          _texture->mWidth, Image::PixelFormatType::COMPRESSED_PNG);
     }
-    // TODO other formats
+    // TODO(luca) other formats
   }
   return img;
 }
 
 //////////////////////////////////////////////////
-std::string AssimpLoader::Implementation::GenerateTextureName(const aiScene* _scene, const aiMaterial* _mat, const std::string& _type)
+std::string AssimpLoader::Implementation::GenerateTextureName(
+    const aiScene* _scene, const aiMaterial* _mat, const std::string& _type)
 {
-  return ToString(_scene->mName) + "_" + ToString(_mat->GetName()) + "_" + _type;
+  return ToString(_scene->mName) + "_" + ToString(_mat->GetName()) + "_" +
+    _type;
 }
 
-SubMesh AssimpLoader::Implementation::CreateSubMesh(const aiMesh* _assimpMesh, const math::Matrix4d& _transform)
+SubMesh AssimpLoader::Implementation::CreateSubMesh(
+    const aiMesh* _assimpMesh, const math::Matrix4d& _transform)
 {
   SubMesh subMesh;
   math::Matrix4d rot = _transform;
   rot.SetTranslation(math::Vector3d::Zero);
   // Now create the submesh
-  for (unsigned vertexIdx = 0; vertexIdx < _assimpMesh->mNumVertices; ++vertexIdx)
+  for (unsigned vertexIdx = 0; vertexIdx < _assimpMesh->mNumVertices;
+      ++vertexIdx)
   {
     // Add the vertex
     math::Vector3d vertex;
@@ -441,7 +503,7 @@ SubMesh AssimpLoader::Implementation::CreateSubMesh(const aiMesh* _assimpMesh, c
       math::Vector3d texcoords;
       texcoords.X(_assimpMesh->mTextureCoords[uvIdx][vertexIdx].x);
       texcoords.Y(_assimpMesh->mTextureCoords[uvIdx][vertexIdx].y);
-      // TODO why do we need 1.0 - Y?
+      // TODO(luca) why do we need 1.0 - Y?
       subMesh.AddTexCoordBySet(texcoords.X(), 1.0 - texcoords.Y(), uvIdx);
       ++uvIdx;
     }
@@ -461,10 +523,12 @@ SubMesh AssimpLoader::Implementation::CreateSubMesh(const aiMesh* _assimpMesh, c
 AssimpLoader::AssimpLoader()
 : MeshLoader(), dataPtr(utils::MakeUniqueImpl<Implementation>())
 {
-  // TODO: remove logger from stdout
-  Assimp::DefaultLogger::create("", Assimp::Logger::VERBOSE, aiDefaultLogStream_STDOUT);
+  // TODO(luca): remove logger from stdout
+  Assimp::DefaultLogger::create(
+      "", Assimp::Logger::VERBOSE, aiDefaultLogStream_STDOUT);
   this->dataPtr->importer.SetPropertyBool(AI_CONFIG_PP_FD_REMOVE, true);
-  this->dataPtr->importer.SetPropertyBool(AI_CONFIG_IMPORT_REMOVE_EMPTY_BONES, false);
+  this->dataPtr->importer.SetPropertyBool(
+      AI_CONFIG_IMPORT_REMOVE_EMPTY_BONES, false);
 }
 
 //////////////////////////////////////////////////
@@ -477,7 +541,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
 {
   Mesh *mesh = new Mesh();
   std::string path = common::parentPath(_filename);
-  // Load the asset, TODO check if we need to do preprocessing
+  // Load the asset, TODO(luca) check if we need to do preprocessing
   const aiScene* scene = this->dataPtr->importer.ReadFile(_filename,
       aiProcess_JoinIdenticalVertices |
       aiProcess_RemoveRedundantMaterials |
@@ -498,8 +562,9 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   float angle;
   transform.Decompose(rootScaling, rootAxis, angle, rootPos);
   // drop rotation, but keep scaling and position
-  // TODO remove workaround, it seems imported assets are rotated by 90 degrees
-  // as documented here https://github.com/assimp/assimp/issues/849, remove workaround when fixed
+  // TODO(luca) it seems imported assets are rotated by 90 degrees
+  // as documented here https://github.com/assimp/assimp/issues/849
+  // remove workaround when fixed
   transform = aiMatrix4x4(rootScaling, aiQuaternion(), rootPos);
 
   auto rootTransform = this->dataPtr->ConvertTransform(transform);
@@ -514,22 +579,26 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   if (scene->HasAnimations())
   {
     this->dataPtr->RecursiveStoreBoneNames(scene, rootNode);
-    auto rootSkelNode = new SkeletonNode(nullptr, rootName, rootName, SkeletonNode::NODE);
+    auto rootSkelNode = new SkeletonNode(
+        nullptr, rootName, rootName, SkeletonNode::NODE);
     rootSkelNode->SetTransform(rootTransform);
     rootSkelNode->SetModelTransform(rootTransform);
     for (unsigned childIdx = 0; childIdx < rootNode->mNumChildren; ++childIdx)
     {
       // First populate the skeleton with the node transforms
-      this->dataPtr->RecursiveSkeletonCreate(rootNode->mChildren[childIdx], rootSkelNode, rootTransform);
+      this->dataPtr->RecursiveSkeletonCreate(
+          rootNode->mChildren[childIdx], rootSkelNode, rootTransform);
     }
-    rootSkelNode = rootSkelNode->Child(0); //We dont need scene node and adding will create inverse model
+    // We dont need scene node and adding will create inverse model
+    rootSkelNode = rootSkelNode->Child(0);
     rootSkelNode->SetParent(nullptr);
 
     SkeletonPtr rootSkeleton = std::make_shared<Skeleton>(rootSkelNode);
     mesh->SetSkeleton(rootSkeleton);
   }
   // Now create the meshes
-  // Recursive call to keep track of transforms, mesh is passed by reference and edited throughout
+  // Recursive call to keep track of transforms,
+  // mesh is passed by reference and edited throughout
   this->dataPtr->RecursiveCreate(scene, rootNode, rootTransform, mesh);
   // Add the animations
   for (unsigned animIdx = 0; animIdx < scene->mNumAnimations; ++animIdx)
@@ -541,14 +610,15 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     {
       auto& animChan = anim->mChannels[chanIdx];
       auto chanName = ToString(animChan->mNodeName);
-      for (unsigned key_idx = 0; key_idx < animChan->mNumPositionKeys; ++key_idx)
+      for (unsigned keyIdx = 0; keyIdx < animChan->mNumPositionKeys; ++keyIdx)
       {
         // Note, Scaling keys are not supported right now
         // Compute the position into a math pose
-        auto& posKey = animChan->mPositionKeys[key_idx];
-        auto& quatKey = animChan->mRotationKeys[key_idx];
+        auto& posKey = animChan->mPositionKeys[keyIdx];
+        auto& quatKey = animChan->mRotationKeys[keyIdx];
         math::Vector3d pos(posKey.mValue.x, posKey.mValue.y, posKey.mValue.z);
-        math::Quaterniond quat(quatKey.mValue.w, quatKey.mValue.x, quatKey.mValue.y, quatKey.mValue.z);
+        math::Quaterniond quat(quatKey.mValue.w, quatKey.mValue.x,
+            quatKey.mValue.y, quatKey.mValue.z);
         math::Pose3d pose(pos, quat);
         // Time is in ms after 5.0.1?
         skelAnim->AddKeyFrame(chanName, posKey.mTime / 1000.0, pose);
