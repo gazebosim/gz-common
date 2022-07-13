@@ -118,6 +118,8 @@ message(STATUS "-------------------------------------------\n")
 #============================================================================
 configure_file("${PROJECT_SOURCE_DIR}/cppcheck.suppress.in"
                ${PROJECT_BINARY_DIR}/cppcheck.suppress)
+configure_file("${PROJECT_SOURCE_DIR}/coverage.ignore.in"
+               ${PROJECT_BINARY_DIR}/coverage.ignore)
 
 ign_configure_build(QUIT_IF_BUILD_ERRORS
   COMPONENTS av events graphics profiler)
