@@ -28,7 +28,6 @@ gz_build_tests(
     gz-common${GZ_COMMON_VER}-testing
 )
 
-message ("ASSIMP INCLUDE IS ${ASSIMP_INCLUDE_DIRS}")
 if(USE_EXTERNAL_TINYXML2)
 
   # If we are using an external copy of tinyxml2, add its imported target

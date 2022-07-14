@@ -19,10 +19,10 @@
 #include "gz/common/Console.hh"
 #include "gz/common/Image.hh"
 #include "gz/common/Material.hh"
-#include "gz/common/SubMesh.hh"
 #include "gz/common/Mesh.hh"
 #include "gz/common/Skeleton.hh"
 #include "gz/common/SkeletonAnimation.hh"
+#include "gz/common/SubMesh.hh"
 #include "gz/common/SystemPaths.hh"
 #include "gz/common/Util.hh"
 #include "gz/common/AssimpLoader.hh"
@@ -30,8 +30,8 @@
 #include <queue>
 #include <unordered_set>
 
-#include <assimp/Logger.hpp>
 #include <assimp/DefaultLogger.hpp>
+#include <assimp/Logger.hpp>
 #include <assimp/GltfMaterial.h>    // GLTF specific material properties
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/scene.h>           // Output data structure
@@ -65,7 +65,8 @@ class AssimpLoader::Implementation
   /// \param[in] _matIdx index of the material in the scene
   /// \param[in] _path path where the mesh is located
   /// \return pointer to the converted common::Material
-  public: MaterialPtr CreateMaterial(const aiScene* _scene, unsigned _matIdx,
+  public: MaterialPtr CreateMaterial(const aiScene* _scene,
+                                     unsigned _matIdx,
                                      const std::string& _path);
 
   /// \brief Load a texture embedded in a mesh (i.e. for GLB format)
@@ -77,7 +78,7 @@ class AssimpLoader::Implementation
   /// \brief Utility function to generate a texture name for both embedded
   /// and external textures
   /// \param[in] _scene the assimp scene
-  /// \param[in] _material the assimp material
+  /// \param[in] _mat the assimp material
   /// \param[in] _type the type of texture (i.e. Diffuse, Metal)
   /// \return the generated texture name
   public: std::string GenerateTextureName(const aiScene* _scene,
@@ -87,7 +88,7 @@ class AssimpLoader::Implementation
   /// \brief Function to parse texture information and load it if embedded
   /// \param[in] _scene the assimp scene
   /// \param[in] _texturePath the path where the texture is located
-  /// \param[in] _texturePath the name of the texture
+  /// \param[in] _textureName the name of the texture
   /// \return a pair containing the name of the texture and a pointer to the
   /// image data, if the texture was loaded in memory
   public: std::pair<std::string, ImagePtr>
@@ -113,7 +114,7 @@ class AssimpLoader::Implementation
   /// \brief Recursively create submeshes scene starting from the root node
   /// \param[in] _scene the assimp scene
   /// \param[in] _node the node being processed
-  /// \param[in] _node the transform of the node being processed
+  /// \param[in] _transform the transform of the node being processed
   /// \param[out] _mesh the common::Mesh to edit
   public: void RecursiveCreate(const aiScene* _scene,
                                const aiNode* _node,
@@ -151,18 +152,21 @@ class AssimpLoader::Implementation
   public: void ApplyInvBindTransform(SkeletonPtr _skeleton);
 };
 
+//////////////////////////////////////////////////
 // Utility function to convert to std::string from aiString
 static std::string ToString(const aiString& str)
 {
   return std::string(str.C_Str());
 }
 
+//////////////////////////////////////////////////
 math::Color AssimpLoader::Implementation::ConvertColor(aiColor4D& _color)
 {
   math::Color col(_color.r, _color.g, _color.b, _color.a);
   return col;
 }
 
+//////////////////////////////////////////////////
 math::Matrix4d AssimpLoader::Implementation::ConvertTransform(
     const aiMatrix4x4& _sm)
 {
@@ -173,6 +177,7 @@ math::Matrix4d AssimpLoader::Implementation::ConvertTransform(
       _sm.d1, _sm.d2, _sm.d3, _sm.d4);
 }
 
+//////////////////////////////////////////////////
 void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene,
     const aiNode* _node, const math::Matrix4d& _transform, Mesh* _mesh)
 {
@@ -268,10 +273,13 @@ void AssimpLoader::Implementation::RecursiveStoreBoneNames(
   }
 }
 
+//////////////////////////////////////////////////
 void AssimpLoader::Implementation::RecursiveSkeletonCreate(const aiNode* _node,
     SkeletonNode* _parent, const math::Matrix4d& _transform,
     const std::unordered_set<std::string> &_boneNames)
 {
+  if (_node == nullptr || _parent == nullptr)
+    return;
   // First explore this node
   auto nodeName = ToString(_node->mName);
   // TODO(luca) check if node or joint?
@@ -428,6 +436,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   return mat;
 }
 
+//////////////////////////////////////////////////
 std::pair<std::string, ImagePtr> AssimpLoader::Implementation::LoadTexture(
     const aiScene* _scene,
     const aiString& _texturePath,
@@ -681,13 +690,13 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
 /////////////////////////////////////////////////
 void AssimpLoader::Implementation::ApplyInvBindTransform(SkeletonPtr _skeleton)
 {
-  std::list<SkeletonNode *> queue;
-  queue.push_back(_skeleton->RootNode());
+  std::queue<SkeletonNode *> queue;
+  queue.push(_skeleton->RootNode());
 
   while (!queue.empty())
   {
     SkeletonNode *node = queue.front();
-    queue.pop_front();
+    queue.pop();
     if (nullptr == node)
       continue;
 
@@ -696,7 +705,7 @@ void AssimpLoader::Implementation::ApplyInvBindTransform(SkeletonPtr _skeleton)
       node->SetModelTransform(node->InverseBindTransform().Inverse(), false);
     }
     for (unsigned int i = 0; i < node->ChildCount(); i++)
-      queue.push_back(node->Child(i));
+      queue.push(node->Child(i));
   }
 }
 

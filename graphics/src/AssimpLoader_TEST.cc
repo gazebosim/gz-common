@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Open Source Robotics Foundation
+ * Copyright (C) 2022 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 */
 #include <gtest/gtest.h>
 
-#include "gz/common/Mesh.hh"
-#include "gz/common/SubMesh.hh"
 #include "gz/common/Material.hh"
+#include "gz/common/Mesh.hh"
 #include "gz/common/Skeleton.hh"
 #include "gz/common/SkeletonAnimation.hh"
+#include "gz/common/SubMesh.hh"
 #include "gz/common/AssimpLoader.hh"
 
 #include "gz/common/testing/AutoLogFixture.hh"
