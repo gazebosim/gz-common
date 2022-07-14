@@ -23,7 +23,7 @@
 
 #include <gz/math/Vector3.hh>
 #include <gz/math/Angle.hh>
-#include "gz/math/SphericalCoordinates.hh"
+#include <gz/math/SphericalCoordinates.hh>
 
 #include <gz/common/geospatial/Export.hh>
 #include <gz/common/geospatial/HeightmapData.hh>
@@ -50,21 +50,21 @@ namespace gz
       /// object contained in the world. This is used to compute accurate
       /// sizes of the DEM object.
       public: void SetSphericalCoordinates(
-                  const math::SphericalCoordinates _worldSphericalCoordinates);
+                  const math::SphericalCoordinates &_worldSphericalCoordinates);
 
       /// \brief Load a DEM file.
       /// \param[in] _filename the path to the terrain file.
       /// \return 0 when the operation succeeds to open a file.
       public: int Load(const std::string &_filename = "");
 
-      /// \brief Indicate that this is a non Earth DEM.
-      /// \param[in] _isNonEarthDem Should be true if this is a
-      /// non earth DEM, otherwise false.
-      public: void SetUnknownDEM(bool _isNonEarthDem);
+      /// \brief Indicate that the coordinate system of the DEM is unknown.
+      /// \param[in] _isUnknownDem True if the coordinate system
+      /// is unknown, otherwise false.
+      public: void SetUnknownDEM(bool _isUnknownDem);
 
-      /// \brief Check if the loaded DEM is not from the Earth.
-      /// \return True if the loaded DEM is from the Earth, otherwise
-      /// returns False.
+      /// \brief Check if the loaded DEM has an unknown coordinate system.
+      /// \return True if the loaded DEM has an unknown coordinate system,
+      /// otherwise false.
       public: bool UnknownDEM();
 
       /// \brief Get the elevation of a terrain's point in meters.

@@ -64,7 +64,7 @@ class gz::common::Dem::Implementation
   public: bool isUnknownDem = false;
 
   /// \brief Holds the spherical coordinates object from the world.
-  public : math::SphericalCoordinates sphericalCoordinates =
+  public: math::SphericalCoordinates sphericalCoordinates =
            math::SphericalCoordinates();
 };
 
@@ -87,7 +87,7 @@ Dem::~Dem()
 
 //////////////////////////////////////////////////
 void Dem::SetSphericalCoordinates(
-    const math::SphericalCoordinates _worldSphericalCoordinates)
+    const math::SphericalCoordinates &_worldSphericalCoordinates)
 {
   this->dataPtr->sphericalCoordinates =_worldSphericalCoordinates;
 }
@@ -320,10 +320,10 @@ bool Dem::GeoReference(double _x, double _y,
       auto sourceCs = this->dataPtr->dataSet->GetSpatialRef();
       OGRSpatialReference targetCs = OGRSpatialReference();
 
-      const char* MOON_LAT_LON_PROJ_STR =
+      std::string moonLatLongProjStr =
         "+proj=latlong +a=1737400 +b=1737400";
 
-      targetCs.importFromProj4(MOON_LAT_LON_PROJ_STR);
+      targetCs.importFromProj4(moonLatLongProjStr.c_str());
 
       cT = OGRCreateCoordinateTransformation(
           sourceCs, &targetCs);
@@ -339,18 +339,14 @@ bool Dem::GeoReference(double _x, double _y,
       double axisPolar =
         this->dataPtr->sphericalCoordinates.SurfaceAxisPolar();
 
-      std::string CUSTOM_SURFACE_LAT_LON_PROJ_STR =
+      std::string customSurfaceLatLongProjStr =
         "+proj=latlong +a=" + std::to_string(axisEquatorial) +
         " +b=" + std::to_string(axisPolar);
 
-      targetCs.importFromProj4(CUSTOM_SURFACE_LAT_LON_PROJ_STR.c_str());
+      targetCs.importFromProj4(customSurfaceLatLongProjStr.c_str());
 
       cT = OGRCreateCoordinateTransformation(
           sourceCs, &targetCs);
-    }
-    else
-    {
-      gzerr << "Unsupported spherical coordinates found" << std::endl;
     }
 
     if (nullptr == cT)
