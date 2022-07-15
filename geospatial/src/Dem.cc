@@ -284,12 +284,12 @@ bool Dem::GeoReference(double _x, double _y,
   {
     OGRCoordinateTransformation *cT = nullptr;
     double xGeoDeg, yGeoDeg;
+    OGRSpatialReference sourceCs;
+    OGRSpatialReference targetCs;
 
     if (this->dataPtr->sphericalCoordinates.Surface() ==
         math::SphericalCoordinates::EARTH_WGS84)
     {
-      OGRSpatialReference sourceCs;
-      OGRSpatialReference targetCs;
       // Transform the terrain's coordinate system to WGS84
       const char *importString
           = strdup(this->dataPtr->dataSet->GetProjectionRef());
@@ -302,27 +302,23 @@ bool Dem::GeoReference(double _x, double _y,
       }
       sourceCs.importFromWkt(&importString);
       targetCs.SetWellKnownGeogCS("WGS84");
-      cT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
     }
     else if (this->dataPtr->sphericalCoordinates.Surface() ==
         math::SphericalCoordinates::MOON_SCS)
     {
-      auto sourceCs = this->dataPtr->dataSet->GetSpatialRef();
-      OGRSpatialReference targetCs = OGRSpatialReference();
+      sourceCs = *(this->dataPtr->dataSet->GetSpatialRef());
+      targetCs = OGRSpatialReference();
 
       std::string moonLatLongProjStr =
         "+proj=latlong +a=1737400 +b=1737400";
 
       targetCs.importFromProj4(moonLatLongProjStr.c_str());
-
-      cT = OGRCreateCoordinateTransformation(
-          sourceCs, &targetCs);
     }
     else if (this->dataPtr->sphericalCoordinates.Surface() ==
         math::SphericalCoordinates::CUSTOM_SURFACE)
     {
-      auto sourceCs = this->dataPtr->dataSet->GetSpatialRef();
-      OGRSpatialReference targetCs = OGRSpatialReference();
+      sourceCs = *(this->dataPtr->dataSet->GetSpatialRef());
+      targetCs = OGRSpatialReference();
 
       double axisEquatorial =
         this->dataPtr->sphericalCoordinates.SurfaceAxisEquatorial();
@@ -334,10 +330,9 @@ bool Dem::GeoReference(double _x, double _y,
         " +b=" + std::to_string(axisPolar);
 
       targetCs.importFromProj4(customSurfaceLatLongProjStr.c_str());
-
-      cT = OGRCreateCoordinateTransformation(
-          sourceCs, &targetCs);
     }
+
+    cT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
 
     if (nullptr == cT)
     {
