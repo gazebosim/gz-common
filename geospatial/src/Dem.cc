@@ -93,18 +93,6 @@ void Dem::SetSphericalCoordinates(
 }
 
 //////////////////////////////////////////////////
-void Dem::SetUnknownDEM(bool _isUnknownDem)
-{
-  this->dataPtr->isUnknownDem = _isUnknownDem;
-}
-
-//////////////////////////////////////////////////
-bool Dem::UnknownDEM()
-{
-  return this->dataPtr->isUnknownDem;
-}
-
-//////////////////////////////////////////////////
 int Dem::Load(const std::string &_filename)
 {
   unsigned int width;
@@ -307,8 +295,10 @@ bool Dem::GeoReference(double _x, double _y,
           = strdup(this->dataPtr->dataSet->GetProjectionRef());
       if (importString == nullptr || importString[0] == '\0')
       {
+        // LCOV_EXCL_START
         gzdbg << "Projection coordinate system undefined." << std::endl;
         return false;
+        // LCOV_EXCL_STOP
       }
       sourceCs.importFromWkt(&importString);
       targetCs.SetWellKnownGeogCS("WGS84");

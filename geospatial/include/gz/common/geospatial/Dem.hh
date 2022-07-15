@@ -57,16 +57,6 @@ namespace gz
       /// \return 0 when the operation succeeds to open a file.
       public: int Load(const std::string &_filename = "");
 
-      /// \brief Indicate that the coordinate system of the DEM is unknown.
-      /// \param[in] _isUnknownDem True if the coordinate system
-      /// is unknown, otherwise false.
-      public: void SetUnknownDEM(bool _isUnknownDem);
-
-      /// \brief Check if the loaded DEM has an unknown coordinate system.
-      /// \return True if the loaded DEM has an unknown coordinate system,
-      /// otherwise false.
-      public: bool UnknownDEM();
-
       /// \brief Get the elevation of a terrain's point in meters.
       /// \param[in] _x X coordinate of the terrain.
       /// \param[in] _y Y coordinate of the terrain.
@@ -83,7 +73,7 @@ namespace gz
       public: float MaxElevation() const override;
 
       /// \brief Get the georeferenced coordinates (lat, long) of the terrain's
-      /// origin in WGS84.
+      /// origin.
       /// \param[out] _latitude Georeferenced latitude.
       /// \param[out] _longitude Georeferenced longitude.
       /// \return True if able to retrieve origin coordinates. False otherwise.
@@ -134,7 +124,7 @@ namespace gz
                   std::vector<float> &_heights) const override;
 
       /// \brief Get the georeferenced coordinates (lat, long) of a terrain's
-      /// pixel in WGS84.
+      /// pixel.
       /// \param[in] _x X coordinate of the terrain.
       /// \param[in] _y Y coordinate of the terrain.
       /// \param[out] _latitude Georeferenced latitude.

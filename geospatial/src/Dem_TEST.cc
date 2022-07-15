@@ -257,14 +257,6 @@ TEST_F(DemTest, UnknownDem)
   // unable to get coordinates in WGS84
   gz::math::Angle latitude, longitude;
   EXPECT_FALSE(dem.GeoReferenceOrigin(latitude, longitude));
-
-  // The Load() method in Dem.cc should set the
-  // isUnknownDEM flag.
-  EXPECT_TRUE(dem.UnknownDEM());
-
-  // This flag can be overridden externally.
-  dem.SetUnknownDEM(false);
-  EXPECT_FALSE(dem.UnknownDEM());
 }
 
 TEST_F(DemTest, LunarDemLoad)
