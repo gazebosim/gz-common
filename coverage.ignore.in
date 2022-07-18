@@ -1,3 +1,12 @@
 profiler/src/Remotery/lib/*
 profiler/src/Remotery/vis/*
 graphics/src/tiny_obj_loader.h
+av/include/ignition/common/HWVideo.hh
+av/include/ignition/common/HWEncoder.hh
+av/src/HWEncoder.cc
+include/ignition/common/FlagSet.hh
+src/FilesystemBoost.cc
+src/win_dirent.h
+examples/assert_example.cc
+graphics/src/tinyxml2/tinyxml2.h
+graphics/src/tinyxml2/tinyxml2.cpp
