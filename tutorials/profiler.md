@@ -102,7 +102,13 @@ xdg-open $SOURCE_DIR/ign-common/profiler/src/Remotery/vis/index.html
 xdg-open /usr/share/ignition/ignition-common4/profiler_vis/index.html
 
 # Use the installation path (macOS)
-open /usr/share/ignition/ignition-common4/profiler_vis/index.html
+open /usr/share/ignition/ignition-common3/profiler_vis/index.html
+
+# Inside a Docker container with port 8000 exposed
+# 1. Find your container's IP with `ifconfig`
+# 2. Start a basic web server:
+python3 -m http.server $SOURCE_DIR/ign-common/profiler/src/Remotery/vis/index.html
+# 3. Open URL "http://<container IP>:8000/" with a browser on the host.
 ```
 
 ### On Ignition library
