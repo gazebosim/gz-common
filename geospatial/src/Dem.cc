@@ -157,10 +157,10 @@ int Dem::Load(const std::string &_filename)
   {
     // If successful, set the world width and height
     this->dataPtr->worldWidth =
-       math::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
+       math::SphericalCoordinates::DistanceWGS84(upLeftLat, upLeftLong,
                                               upRightLat, upRightLong);
     this->dataPtr->worldHeight =
-       math::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
+       math::SphericalCoordinates::DistanceWGS84(upLeftLat, upLeftLong,
                                               lowLeftLat, lowLeftLong);
   }
   // Assume non-Earth DEM (e.g., moon)

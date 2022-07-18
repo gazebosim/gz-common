@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-SCRIPT_PATH=@GZ_PROFILER_SCRIPT_PATH@/ign_remotery_vis
+SCRIPT_PATH=@GZ_PROFILER_SCRIPT_PATH@/gz_remotery_vis
 VIS_PATH=@GZ_PROFILER_VIS_PATH@/index.html
 
 # Get the full path to this script
