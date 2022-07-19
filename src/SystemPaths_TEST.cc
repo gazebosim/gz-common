@@ -349,6 +349,21 @@ TEST_F(SystemPathsFixture, FindFile)
     EXPECT_EQ("", sp.FindFile(uriBadDir));
   }
 
+  // Windows path with only one forward slash
+#ifdef _WIN32
+  const auto tmpDirForwardSlash = "C:/Windows";
+  const auto homeDirForwardSlash = "C:/Users";
+  const auto badDirForwardSlash = "C:/bad";
+  {
+    // We do not expect equality as  sp.FindFile could normalize the
+    // path and return a different string
+    // The behaviour tested here is just that C:/Windows, C:/Users are found
+    EXPECT_NE("", sp.FindFile(tmpDirForwardSlash));
+    EXPECT_NE("", sp.FindFile(homeDirForwardSlash));
+    EXPECT_EQ("", sp.FindFile(badDirForwardSlash));
+  }
+#endif
+
   // Custom callback
   {
     auto homeCb = [homeDir](const std::string &_s)
