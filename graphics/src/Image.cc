@@ -145,7 +145,7 @@ int Image::Load(const std::string &_filename)
   }
 
   gzerr << "Unable to open image file[" << this->dataPtr->fullName
-        << "], check your IGNITION_RESOURCE_PATH settings.\n";
+        << "], check your GZ_RESOURCE_PATH settings.\n";
   return -1;
 }
 

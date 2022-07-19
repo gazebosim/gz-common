@@ -18,9 +18,7 @@ set(GZ_CMAKE_VER ${gz-cmake3_VERSION_MAJOR})
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-gz_configure_project(
-  REPLACE_IGNITION_INCLUDE_PATH gz/common
-  VERSION_SUFFIX pre1)
+gz_configure_project(VERSION_SUFFIX pre1)
 
 #============================================================================
 # Set project-specific options
@@ -29,7 +27,7 @@ gz_configure_project(
 # Option: Should Windows test symlinking?
 if(WIN32)
   option(
-    IGN_BUILD_SYMLINK_TESTS_ON_WINDOWS
+    GZ_BUILD_SYMLINK_TESTS_ON_WINDOWS
     "Creating symlinks requires special permissions on Windows, so those tests are disabled by default"
     false)
 endif()

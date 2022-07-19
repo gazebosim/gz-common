@@ -75,7 +75,7 @@ release will remove the deprecated code.
 ### Modifications
 
 1. Corrected `BAYER_RGGR8` to `BAYER_BGGR8` in `PixelFormatName` and
-   `PixelFormatType` located in `graphics/include/ignition/common/Image.hh`.
+   `PixelFormatType` located in `graphics/include/gz/common/Image.hh`.
 
 1. URI parsing has updated to follow the specification more closely when
    `URI::Authority` is set. Changes include:

@@ -41,7 +41,7 @@ Profiler::Profiler():
   }
   else
   {
-    gzdbg << "Ignition profiling with: " << impl->Name() << std::endl;
+    gzdbg << "Gazebo profiling with: " << impl->Name() << std::endl;
   }
 }
 
