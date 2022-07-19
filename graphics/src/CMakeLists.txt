@@ -11,14 +11,21 @@ endif()
 
 gz_add_component(graphics SOURCES ${sources} GET_TARGET_NAME graphics_target)
 
+# Assimp doesn't offer preprocessor version, use cmake to set a compatibility
+# mode for versions below 5.2.0
+if(${ASSIMP_VERSION} STRLESS "5.2.0")
+  message("Warning, assimp below 5.2.0 detected, setting compatibility mode")
+  target_compile_definitions(${graphics_target} PRIVATE ASSIMP_COMPATIBILITY)
+endif()
+
 target_link_libraries(${graphics_target}
   PUBLIC
     gz-math${GZ_MATH_VER}::gz-math${GZ_MATH_VER}
     gz-utils${GZ_UTILS_VER}::gz-utils${GZ_UTILS_VER}
+    ${ASSIMP_LIBRARIES}
   PRIVATE
     GTS::GTS
-    FreeImage::FreeImage
-    ${ASSIMP_LIBRARIES})
+    FreeImage::FreeImage)
 
 gz_build_tests(
   TYPE UNIT
@@ -35,9 +42,6 @@ if(USE_EXTERNAL_TINYXML2)
     PRIVATE
       TINYXML2::TINYXML2)
 
-  target_include_directories(${graphics_target}
-    PRIVATE ${ASSIMP_INCLUDE_DIRS})
-
     # The collada exporter test uses tinyxml2, so we must link it if we're using
     # an external copy. The graphics target considers tinyxml2 to be a private
     # dependency, so it will not automatically get linked to this test.
@@ -51,8 +55,7 @@ else()
   # directories. We do not want this to be visible to consumers of
   # gz-common.
   target_include_directories(${graphics_target}
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tinyxml2
-    ${ASSIMP_INCLUDE_DIRS})
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tinyxml2)
 
   if(TARGET UNIT_ColladaExporter_TEST)
 

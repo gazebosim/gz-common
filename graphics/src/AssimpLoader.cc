@@ -32,7 +32,9 @@
 
 #include <assimp/DefaultLogger.hpp>
 #include <assimp/Logger.hpp>
-#include <assimp/GltfMaterial.h>    // GLTF specific material properties
+#ifndef ASSIMP_COMPATIBILITY
+  #include <assimp/GltfMaterial.h>    // GLTF specific material properties
+#endif
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/scene.h>           // Output data structure
 #include <assimp/postprocess.h>     // Post processing flags
@@ -82,7 +84,7 @@ class AssimpLoader::Implementation
   /// \param[in] _type the type of texture (i.e. Diffuse, Metal)
   /// \return the generated texture name
   public: std::string GenerateTextureName(const aiScene* _scene,
-                                          const aiMaterial*  _mat,
+                                          aiMaterial*  _mat,
                                           const std::string& _type);
 
   /// \brief Function to parse texture information and load it if embedded
@@ -202,7 +204,7 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene,
       for (unsigned boneIdx = 0; boneIdx < assimpMesh->mNumBones; ++boneIdx)
       {
         auto& bone = assimpMesh->mBones[boneIdx];
-        auto boneNodeName = ToString(bone->mNode->mName);
+        auto boneNodeName = ToString(bone->mName);
         // Apply inverse bind transform to the matching node
         SkeletonNode *skelNode =
             skeleton->NodeByName(boneNodeName);
@@ -355,6 +357,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
       mat->SetTextureImage(texName, texData);
     else
       mat->SetTextureImage(texName, _path);
+#ifndef ASSIMP_COMPATIBILITY
     // Now set the alpha from texture, if enabled, only supported in GLTF
     aiString alphaMode;
     auto paramRet = assimpMat->Get(AI_MATKEY_GLTF_ALPHAMODE, alphaMode);
@@ -371,7 +374,9 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
         mat->SetAlphaFromTexture(true, alphaCutoff, twoSided);
       }
     }
+#endif
   }
+#ifndef ASSIMP_COMPATIBILITY
   // Edge case for GLTF, Metal and Rough texture are embedded in a
   // MetallicRoughness texture with metalness in B and roughness in G
   // Open, preprocess and split into metal and roughness map
@@ -413,6 +418,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
       pbr.SetRoughnessMap(texName, texData);
     }
   }
+#endif
   ret = assimpMat->GetTexture(aiTextureType_NORMALS, 0, &texturePath);
   if (ret == AI_SUCCESS)
   {
@@ -421,6 +427,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     // TODO(luca) different normal map spaces
     pbr.SetNormalMap(texName, NormalMapSpace::TANGENT, texData);
   }
+#ifndef ASSIMP_COMPATIBILITY
   double value;
   ret = assimpMat->Get(AI_MATKEY_METALLIC_FACTOR, value);
   if (ret == AI_SUCCESS)
@@ -432,6 +439,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   {
     pbr.SetRoughness(value);
   }
+#endif
   mat->SetPbrMaterial(pbr);
   return mat;
 }
@@ -515,9 +523,9 @@ ImagePtr AssimpLoader::Implementation::LoadEmbeddedTexture(
 
 //////////////////////////////////////////////////
 std::string AssimpLoader::Implementation::GenerateTextureName(
-    const aiScene* _scene, const aiMaterial* _mat, const std::string& _type)
+    const aiScene* _scene, aiMaterial* _mat, const std::string& _type)
 {
-  return ToString(_scene->mName) + "_" + ToString(_mat->GetName()) + "_" +
+  return ToString(_scene->mRootNode->mName) + "_" + ToString(_mat->GetName()) + "_" +
     _type;
 }
 
@@ -595,7 +603,9 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
       aiProcess_JoinIdenticalVertices |
       aiProcess_RemoveRedundantMaterials |
       aiProcess_SortByPType |
+#ifndef ASSIMP_COMPATIBILITY
       aiProcess_PopulateArmatureData |
+#endif
       aiProcess_Triangulate |
       aiProcess_GenNormals |
       0);
