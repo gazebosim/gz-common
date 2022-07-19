@@ -210,7 +210,31 @@
 
 ## Gazebo Common 3.x
 
-## Gazebo Common 3.X.X
+## Gazebo Common 3.14.1 (2022-06-01)
+
+1. Profiler tutorial: viewing from Docker container
+    * [Pull request #362](https://github.com/gazebosim/gz-common/pull/362)
+
+1. ignLogInit can be called after an ignerr, etc
+    * [Pull request #332](https://github.com/gazebosim/gz-common/pull/332)
+
+1. Fix compatibility with FFmpeg 5.0
+    * [Pull request #325](https://github.com/gazebosim/gz-common/pull/325)
+
+1. Fix out-of-bounds access in sanitizeSlashes
+    * [Pull request #303](https://github.com/gazebosim/gz-common/pull/303)
+
+1. Fix memory corruption & leaks in Image
+    * [Pull request #287](https://github.com/gazebosim/gz-common/pull/287)
+
+1. Normalize normal vectors from OBJ.
+    * [Pull request #269](https://github.com/gazebosim/gz-common/pull/269)
+
+1. Fixed macos symbol in `common::profiler`
+    * [Pull request #262](https://github.com/gazebosim/gz-common/pull/262)
+
+1. Fix skip logic for integration tests
+    * [Pull request #264](https://github.com/gazebosim/gz-common/pull/264)
 
 ## Gazebo Common 3.14.0 (2021-10-12)
 

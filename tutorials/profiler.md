@@ -103,6 +103,12 @@ xdg-open /usr/share/gz/gz-common5/profiler_vis/index.html
 
 # Use the installation path (macOS)
 open /usr/share/gz/gz-common5/profiler_vis/index.html
+
+# Inside a Docker container with port 8000 exposed
+# 1. Find your container's IP with `ifconfig`
+# 2. Start a basic web server:
+python3 -m http.server $SOURCE_DIR/gz-common/profiler/src/Remotery/vis/index.html
+# 3. Open URL "http://<container IP>:8000/" with a browser on the host.
 ```
 
 ### On Gazebo library
