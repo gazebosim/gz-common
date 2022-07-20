@@ -271,6 +271,8 @@ TEST_F(AssimpLoader, TexCoordSets)
   EXPECT_EQ(math::Vector2d(0.1, 0.2), subMeshB->TexCoordBySet(2u, 1u));
 }
 
+// Test fails for assimp below 5.2.0
+#ifndef ASSIMP_COMPATIBILITY
 /////////////////////////////////////////////////
 TEST_F(AssimpLoader, LoadBoxWithAnimationOutsideSkeleton)
 {
@@ -306,6 +308,7 @@ TEST_F(AssimpLoader, LoadBoxWithAnimationOutsideSkeleton)
         0, 0, 0, 1);
   EXPECT_EQ(expectedTrans, poseEnd.at("Armature"));
 }
+#endif
 
 /////////////////////////////////////////////////
 TEST_F(AssimpLoader, LoadBoxInstControllerWithoutSkeleton)
@@ -367,7 +370,10 @@ TEST_F(AssimpLoader, LoadBoxNestedAnimation)
   common::SkeletonPtr skeleton = mesh->MeshSkeleton();
   ASSERT_EQ(1u, mesh->MeshSkeleton()->AnimationCount());
   common::SkeletonAnimation *anim = skeleton->Animation(0);
+  // Depends on fix in assimp main branch for nested animation naming
+#ifndef ASSIMP_COMPATIBILITY
   EXPECT_EQ(anim->Name(), "Armature");
+#endif
   EXPECT_EQ(1u, anim->NodeCount());
   EXPECT_TRUE(anim->HasNode("Armature_Bone"));
   auto nodeAnimation = anim->NodeAnimationByName("Armature_Bone");
@@ -463,6 +469,9 @@ TEST_F(AssimpLoader, MergeBoxWithDoubleSkeleton)
   EXPECT_EQ(skeleton_ptr->RootNode()->Name(), std::string("Scene"));
 }
 
+// For assimp below 5.2.0 mesh loading fails because of
+// failing to parse the empty <author> tag
+#ifndef ASSIMP_COMPATIBILITY
 /////////////////////////////////////////////////
 TEST_F(AssimpLoader, LoadCylinderAnimatedFrom3dsMax)
 {
@@ -497,6 +506,7 @@ TEST_F(AssimpLoader, LoadCylinderAnimatedFrom3dsMax)
   EXPECT_EQ(1u, anim->NodeCount());
   EXPECT_TRUE(anim->HasNode("Bone02"));
 }
+#endif
 
 /////////////////////////////////////////////////
 TEST_F(AssimpLoader, LoadObjBox)
