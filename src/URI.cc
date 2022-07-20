@@ -578,7 +578,7 @@ bool URIPath::Valid(const std::string &_str)
 
   // TODO(anyone): the space should not be
   // there, but leaving it out breaks
-  // other stuff, e.g. ign-fuel-tools
+  // other stuff, e.g. gz-fuel-tools
   // now have URIs with unencoded spaces
   const std::string allowedChars = "qwertzuiopasdfghjklyxcvbnm"
                                    "QWERTZUIOPASDFGHJKLYXCVBNM"

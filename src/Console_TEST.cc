@@ -79,7 +79,7 @@ TEST_F(Console_TEST, NoInitAndLog)
   gzlog << logString << std::endl;
 
   // Get the absolute log file path
-  std::string logPath = ".ignition/auto_default.log";
+  std::string logPath = ".gz/auto_default.log";
 
   // Expect to find the string in the log file
   EXPECT_TRUE(GetLogContent(logPath).find(logString) != std::string::npos);

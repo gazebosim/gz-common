@@ -18,7 +18,8 @@
 #include <sys/stat.h>
 #include <string>
 #include <mutex>
-#include <map>
+#include <unordered_map>
+#include <unordered_set>
 #include <cctype>
 
 #ifndef _WIN32
@@ -63,10 +64,10 @@ class gz::common::MeshManager::Implementation
   public: AssimpLoader assimpLoader;
 
   /// \brief Dictionary of meshes, indexed by name
-  public: std::map<std::string, Mesh*> meshes;
+  public: std::unordered_map<std::string, Mesh*> meshes;
 
   /// \brief supported file extensions for meshes
-  public: std::vector<std::string> fileExtensions;
+  public: std::unordered_set<std::string> fileExtensions;
 
   /// \brief Mutex to protect the mesh map
   public: std::mutex mutex;
@@ -101,13 +102,13 @@ MeshManager::MeshManager()
 
   this->CreateTube("selection_tube", 1.0f, 1.2f, 0.01f, 1, 64);
 
-  this->dataPtr->fileExtensions.push_back("stl");
-  this->dataPtr->fileExtensions.push_back("dae");
-  this->dataPtr->fileExtensions.push_back("obj");
-  this->dataPtr->fileExtensions.push_back("gltf");
-  this->dataPtr->fileExtensions.push_back("glb");
-  this->dataPtr->fileExtensions.push_back("fbx");
-  
+  this->dataPtr->fileExtensions.insert("stl");
+  this->dataPtr->fileExtensions.insert("dae");
+  this->dataPtr->fileExtensions.insert("obj");
+  this->dataPtr->fileExtensions.insert("gltf");
+  this->dataPtr->fileExtensions.insert("glb");
+  this->dataPtr->fileExtensions.insert("fbx");
+
 }
 
 //////////////////////////////////////////////////
@@ -146,20 +147,19 @@ const Mesh *MeshManager::Load(const std::string &_filename)
         extension.begin(), ::tolower);
     MeshLoader *loader = nullptr;
 
-    loader = &this->dataPtr->assimpLoader;
-    /*
     if (extension == "stl" || extension == "stlb" || extension == "stla")
       loader = &this->dataPtr->stlLoader;
     else if (extension == "dae")
       loader = &this->dataPtr->colladaLoader;
     else if (extension == "obj")
       loader = &this->dataPtr->objLoader;
+    else if (extension == "gltf" || extension == "glb" || extension == "fbx")
+      loader = &this->dataPtr->assimpLoader;
     else
     {
       gzerr << "Unsupported mesh format for file[" << _filename << "]\n";
       return nullptr;
     }
-    */
     // This mutex prevents two threads from loading the same mesh at the
     // same time.
     std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
@@ -209,8 +209,7 @@ bool MeshManager::IsValidFilename(const std::string &_filename)
   std::transform(extension.begin(), extension.end(),
                  extension.begin(), ::tolower);
 
-  return std::find(this->dataPtr->fileExtensions.begin(),
-      this->dataPtr->fileExtensions.end(), extension) !=
+  return this->dataPtr->fileExtensions.find(extension) !=
       this->dataPtr->fileExtensions.end();
 }
 
@@ -241,9 +240,7 @@ void MeshManager::AddMesh(Mesh *_mesh)
 //////////////////////////////////////////////////
 const Mesh *MeshManager::MeshByName(const std::string &_name) const
 {
-  std::map<std::string, Mesh*>::const_iterator iter;
-
-  iter = this->dataPtr->meshes.find(_name);
+  auto iter = this->dataPtr->meshes.find(_name);
 
   if (iter != this->dataPtr->meshes.end())
     return iter->second;
@@ -284,8 +281,7 @@ bool MeshManager::HasMesh(const std::string &_name) const
   if (_name.empty())
     return false;
 
-  std::map<std::string, Mesh*>::const_iterator iter;
-  iter = this->dataPtr->meshes.find(_name);
+  auto iter = this->dataPtr->meshes.find(_name);
 
   return iter != this->dataPtr->meshes.end();
 }

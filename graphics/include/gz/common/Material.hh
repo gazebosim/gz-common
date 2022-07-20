@@ -107,7 +107,7 @@ namespace gz
       /// \param[in] _img The image containing the texture if image has been
       /// loaded in memory
       public: void SetTextureImage(const std::string &_tex,
-                                   const std::shared_ptr<Image> &_img = nullptr);
+                  const std::shared_ptr<Image> &_img = nullptr);
 
       /// \brief Set a texture image
       /// \param[in] _tex The name of the texture

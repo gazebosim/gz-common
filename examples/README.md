@@ -8,7 +8,7 @@ After installing Gazebo Common, from source or from binaries, build with:
 
 ```
 git clone https://github.com/gazebosim/gz-common/
-cd ign-common/examples
+cd gz-common/examples
 mkdir build
 cd build
 cmake ..

@@ -17,6 +17,7 @@
 #ifndef GZ_COMMON_PBR_HH_
 #define GZ_COMMON_PBR_HH_
 
+#include <memory>
 #include <string>
 
 #include <gz/utils/ImplPtr.hh>

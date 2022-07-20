@@ -1,13 +1,13 @@
 load(
     "//gz_bazel:build_defs.bzl",
-    "IGNITION_ROOT",
-    "IGNITION_VISIBILITY",
+    "GZ_ROOT",
+    "GZ_VISIBILITY",
     "generate_include_header",
     "gz_export_header",
 )
 
 package(
-    default_visibility = IGNITION_VISIBILITY,
+    default_visibility = GZ_VISIBILITY,
     features = [
         "-parse_headers",
         "-layering_check",
@@ -28,8 +28,8 @@ test_sources = glob(["src/*_TEST.cc"])
 
 gz_export_header(
     name = "include/gz/common/graphics/Export.hh",
-    export_base = "IGNITION_COMMON_GRAPHICS",
-    lib_name = "ignition-common-graphics",
+    export_base = "GZ_COMMON_GRAPHICS",
+    lib_name = "gz-common-graphics",
     visibility = ["//visibility:private"],
 )
 
@@ -57,15 +57,15 @@ cc_library(
         "@glib",
         "@gts",
         "@tinyxml2",
-        IGNITION_ROOT + "gz_common",
-        IGNITION_ROOT + "gz_utils",
+        GZ_ROOT + "gz_common",
+        GZ_ROOT + "gz_utils",
     ],
 )
 
 cc_binary(
-    name = "libignition-common5-graphics.so",
+    name = "libgz-common5-graphics.so",
     includes = ["include"],
-    linkopts = ["-Wl,-soname,libignition-common5-graphics.so"],
+    linkopts = ["-Wl,-soname,libgz-common5-graphics.so"],
     linkshared = True,
     deps = [":graphics"],
 )
@@ -74,11 +74,11 @@ cc_binary(
     name = src.replace("/", "_").replace(".cc", "").replace("src_", ""),
     srcs = [src],
     data = [
-        IGNITION_ROOT + "gz_common/test:data",
+        GZ_ROOT + "gz_common/test:data",
     ],
     deps = [
         ":graphics",
-        IGNITION_ROOT + "gz_common/test:test_utils",
+        GZ_ROOT + "gz_common/test:test_utils",
         "@gtest",
         "@gtest//:gtest_main",
     ],

@@ -14,8 +14,8 @@ Ubuntu Focal | [![Build Status](https://build.osrfoundation.org/buildStatus/icon
 Homebrew      | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-main-homebrew-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-main-homebrew-amd64)
 Windows       | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-main-windows7-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-main-windows7-amd64)
 
-Gazebo Common, a component of [Ignition
-Robotics](https://gazebosim.org), provides a set of libraries that
+Gazebo Common, a component of [Gazebo
+Sim](https://gazebosim.org), provides a set of libraries that
 cover many different use cases. An audio-visual library supports
 processing audio and video files, a graphics library can load a variety 3D
 mesh file formats into a generic in-memory representation, and the core
@@ -52,7 +52,7 @@ callback system.
 * **Graphics**: Collada, SVG, STL, OBJ, and DEM loaders. In-memory mesh,
   image, and material representations. Animation processing and BVH loader.
 * **Profiler**: A common profiler abstraction that can be used to measure and
-  visualize run time of various pieces of ignition robotics software.
+  visualize run time of various pieces of Gazebo robotics software.
 
 # Install
 
@@ -71,7 +71,7 @@ Refer to the following table for information about important directories and fil
 +-- events                   Header and source files for the Event component.
 +-- examples                 Example programs.
 +-- graphics                 Header and source files for the Graphics component.
-+-- include/ignition/common  Header files for the core component.
++-- include/gz/common  Header files for the core component.
 +-- profiler                 Header and source files for the Profiler component.
 +-- src                      Core source files and unit tests.
 +-- test
@@ -102,4 +102,3 @@ This library uses [Semantic Versioning](https://semver.org/). Additionally, this
 # License
 
 This library is licensed under [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0). See also the [LICENSE](https://github.com/gazebosim/gz-common/blob/main/LICENSE) file.
-

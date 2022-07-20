@@ -3,7 +3,7 @@
 Next Tutorial: \ref profiler
 
 These instructions are for installing only Gazebo Common.
-If you're interested in using all the Ignition libraries, check out this [Ignition installation](https://gazebosim.org/docs/latest/install).
+If you're interested in using all the Gazebo libraries, check out this [Gazebo installation](https://gazebosim.org/docs/latest/install).
 
 We recommend following the Binary Installation instructions to get up and running as quickly and painlessly as possible.
 
@@ -13,9 +13,9 @@ The Source Installation instructions should be used if you need the very latest 
 
 ## Ubuntu
 
-On Ubuntu systems, `apt-get` can be used to install `ignition-common`:
+On Ubuntu systems, `apt-get` can be used to install `gz-common`:
 ```
-sudo apt install libignition-common<#>-dev
+sudo apt install libgz-common<#>-dev
 ```
 
 Be sure to replace `<#>` with a number value, such as 2 or 3, depending on
@@ -31,7 +31,7 @@ On macOS, add OSRF packages:
 
 Install Gazebo Common:
   ```
-  brew install ignition-common<#>
+  brew install gz-common<#>
   ```
 
 Be sure to replace `<#>` with a number value, such as 3 or 4, depending on
@@ -44,13 +44,13 @@ Miniconda suffices.
 
 Create if necessary, and activate a Conda environment:
 ```
-conda create -n ign-ws
-conda activate ign-ws
+conda create -n gz-ws
+conda activate gz-ws
 ```
 
-Install `ignition-common`:
+Install `gz-common`:
 ```
-conda install libignition-common<#> --channel conda-forge
+conda install libgz-common<#> --channel conda-forge
 ```
 
 Be sure to replace `<#>` with a number value, such as 2 or 3, depending on
@@ -83,13 +83,13 @@ The AV component requires:
 
 ### Windows
 
-First, follow the [ign-cmake](https://github.com/gazebosim/gz-cmake) tutorial for installing Conda, Visual Studio, CMake, etc., prerequisites, and creating a Conda environment.
+First, follow the [gz-cmake](https://github.com/gazebosim/gz-cmake) tutorial for installing Conda, Visual Studio, CMake, etc., prerequisites, and creating a Conda environment.
 
 Navigate to `condabin` if necessary to use the `conda` command (i.e., if Conda is not in your `PATH` environment variable. You can find the location of `condabin` in Anaconda Prompt, `where conda`).
 
 Activate the Conda environment:
 ```
-conda activate ign-ws
+conda activate gz-ws
 ```
 
 Install prerequisites:
@@ -97,16 +97,16 @@ Install prerequisites:
 conda install freeimage gts glib dlfcn-win32 ffmpeg --channel conda-forge
 ```
 
-Install Ignition dependencies:
+Install Gazebo dependencies:
 
 You can view available versions and their dependencies:
 ```
-conda search libignition-common* --channel conda-forge --info
+conda search libgz-common* --channel conda-forge --info
 ```
 
 Install dependencies, replacing `<#>` with the desired versions:
 ```
-conda install libignition-cmake<#> libignition-math<#> --channel conda-forge
+conda install libgz-cmake<#> libgz-math<#> --channel conda-forge
 ```
 
 ## Build from Source
@@ -120,7 +120,7 @@ conda install libignition-cmake<#> libignition-math<#> --channel conda-forge
 
 2. Configure and build
   ```
-  cd ign-common
+  cd gz-common
   mkdir build
   cd build
   cmake ..
@@ -143,14 +143,14 @@ conda install libignition-cmake<#> libignition-math<#> --channel conda-forge
 
 2. Install dependencies
   ```
-  brew install --only-dependencies ignition-common<#>
+  brew install --only-dependencies gz-common<#>
   ```
   Be sure to replace `<#>` with a number value, such as 3 or 4, depending on
   which version you need.
 
 3. Configure and build
   ```
-  cd ign-common
+  cd gz-common
   mkdir build
   cd build
   cmake ..
@@ -174,7 +174,7 @@ This assumes you have created and activated a Conda environment while installing
 
 2. Configure and build
   ```
-  cd ign-common
+  cd gz-common
   mkdir build
   cd build
   cmake .. -DBUILD_TESTING=OFF  # Optionally, -DCMAKE_INSTALL_PREFIX=path\to\install
@@ -204,7 +204,7 @@ You can also generate the documentation from a clone of this repository by follo
 
 3. Configure and build the documentation.
   ```
-  cd ign-common
+  cd gz-common
   mkdir build
   cd build
   cmake ../

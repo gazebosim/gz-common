@@ -283,7 +283,7 @@ TEST_F(SystemPathsFixture, FindFileURI)
   EXPECT_EQ(file1, sp.FindFileURI("anything://test_f1"));
   EXPECT_NE(file2, sp.FindFileURI("anything://test_f2"));
 
-  std::string newEnv{"IGN_NEW_FILE_PATH"};
+  std::string newEnv{"GZ_NEW_FILE_PATH"};
   common::setenv(newEnv, dir2);
   sp.SetFilePathEnv(newEnv);
   EXPECT_EQ(newEnv, sp.FilePathEnv());

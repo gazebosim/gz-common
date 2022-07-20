@@ -41,7 +41,7 @@ TEST(Console_TEST, LogInitAfterConsoleOut)
 
   {
     auto defaultPath = gz::common::joinPaths(home,
-        ".ignition", "auto_default.log");
+        ".gz", "auto_default.log");
 
     std::ifstream t(defaultPath);
     std::string buffer((std::istreambuf_iterator<char>(t)),

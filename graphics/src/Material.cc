@@ -141,7 +141,8 @@ std::string Material::Name() const
 }
 
 //////////////////////////////////////////////////
-void Material::SetTextureImage(const std::string &_tex, const std::shared_ptr<Image> &_img)
+void Material::SetTextureImage(const std::string &_tex,
+    const std::shared_ptr<Image> &_img)
 {
   this->dataPtr->texImage = _tex;
   this->dataPtr->texData = _img;
