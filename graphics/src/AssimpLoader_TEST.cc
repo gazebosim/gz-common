@@ -523,6 +523,7 @@ TEST_F(AssimpLoader, LoadObjBox)
   EXPECT_DOUBLE_EQ(mat->Transparency(), 0.0);
 }
 
+
 /////////////////////////////////////////////////
 // This tests opening an OBJ file that has an invalid material reference
 TEST_F(AssimpLoader, ObjInvalidMaterial)
@@ -535,4 +536,72 @@ TEST_F(AssimpLoader, ObjInvalidMaterial)
   gz::common::Mesh *mesh = loader.Load(meshFilename);
 
   EXPECT_TRUE(mesh != nullptr);
+}
+
+/////////////////////////////////////////////////
+// This test opens a FBX file
+TEST_F(AssimpLoader, LoadFbxBox)
+{
+  common::AssimpLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "box.fbx"));
+
+  EXPECT_STREQ("unknown", mesh->Name().c_str());
+  EXPECT_EQ(math::Vector3d(100, 100, 100), mesh->Max());
+  EXPECT_EQ(math::Vector3d(-100, -100, -100), mesh->Min());
+
+  EXPECT_EQ(24u, mesh->VertexCount());
+  EXPECT_EQ(24u, mesh->NormalCount());
+  EXPECT_EQ(36u, mesh->IndexCount());
+  EXPECT_EQ(24u, mesh->TexCoordCount());
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(1u, mesh->MaterialCount());
+
+  // Make sure we can read the submesh name
+  EXPECT_STREQ("Cube", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+
+  EXPECT_EQ(mesh->MaterialCount(), 1u);
+
+  const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+  ASSERT_TRUE(mat.get());
+
+  // Make sure we read the material color values
+  EXPECT_EQ(mat->Ambient(), math::Color(0.0f, 0.0f, 0.0f, 1.0f));
+  EXPECT_EQ(mat->Diffuse(), math::Color(0.8f, 0.8f, 0.8f, 1.0f));
+  EXPECT_EQ(mat->Specular(), math::Color(0.8f, 0.8f, 0.8f, 1.0f));
+  EXPECT_DOUBLE_EQ(mat->Transparency(), 0.0);
+}
+
+/////////////////////////////////////////////////
+// This test opens a GLB file
+TEST_F(AssimpLoader, LoadGlTF2Box)
+{
+  common::AssimpLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "box.glb"));
+
+  EXPECT_STREQ("unknown", mesh->Name().c_str());
+  EXPECT_EQ(math::Vector3d(1, 1, 1), mesh->Max());
+  EXPECT_EQ(math::Vector3d(-1, -1, -1), mesh->Min());
+
+  EXPECT_EQ(24u, mesh->VertexCount());
+  EXPECT_EQ(24u, mesh->NormalCount());
+  EXPECT_EQ(36u, mesh->IndexCount());
+  EXPECT_EQ(24u, mesh->TexCoordCount());
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(1u, mesh->MaterialCount());
+
+  // Make sure we can read the submesh name
+  EXPECT_STREQ("Cube", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+
+  EXPECT_EQ(mesh->MaterialCount(), 1u);
+
+  const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+  ASSERT_TRUE(mat.get());
+
+  // Make sure we read the material color values
+  EXPECT_EQ(mat->Ambient(), math::Color(0.4f, 0.4f, 0.4f, 1.0f));
+  EXPECT_EQ(mat->Diffuse(), math::Color(0.8f, 0.8f, 0.8f, 1.0f));
+  EXPECT_EQ(mat->Specular(), math::Color(0.0f, 0.0f, 0.0f, 1.0f));
+  EXPECT_DOUBLE_EQ(mat->Transparency(), 0.0);
 }
