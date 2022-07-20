@@ -164,24 +164,6 @@ TEST_F(AssimpLoader, LoadZeroCount)
   common::Mesh *mesh = loader.Load(
       common::testing::TestFile("data", "zero_count.dae"));
   ASSERT_TRUE(mesh);
-  // This is custom logging messages, not implemented in Assimp
-  /*
-#ifndef _WIN32
-  std::string log = LogContent();
-
-  // Expect no errors about missing values
-  EXPECT_EQ(log.find("Loading what we can..."), std::string::npos);
-  EXPECT_EQ(log.find("Vertex source missing float_array"), std::string::npos);
-  EXPECT_EQ(log.find("Normal source missing float_array"), std::string::npos);
-
-  // Expect the logs to contain information
-  EXPECT_NE(log.find("Triangle input has a count of zero"), std::string::npos);
-  EXPECT_NE(log.find("Vertex source has a float_array with a count of zero"),
-      std::string::npos);
-  EXPECT_NE(log.find("Normal source has a float_array with a count of zero"),
-      std::string::npos);
-#endif
-  */
 }
 
 /////////////////////////////////////////////////
@@ -553,67 +535,4 @@ TEST_F(AssimpLoader, ObjInvalidMaterial)
   gz::common::Mesh *mesh = loader.Load(meshFilename);
 
   EXPECT_TRUE(mesh != nullptr);
-}
-
-/////////////////////////////////////////////////
-// This tests opening an OBJ file that has PBR fields
-TEST_F(AssimpLoader, ObjPBR)
-{
-  gz::common::AssimpLoader loader;
-
-  // This was custom behavior of OBJ Loader to fix blender OBJ PBR issue
-  // not implemented in assimp
-  /*
-  // load obj file exported by 3ds max that has pbr extension
-  {
-    std::string meshFilename =
-      common::testing::TestFile("data", "cube_pbr.obj");
-
-    gz::common::Mesh *mesh = loader.Load(meshFilename);
-    EXPECT_NE(nullptr, mesh);
-
-    const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
-    ASSERT_TRUE(mat.get());
-
-    EXPECT_EQ(math::Color(0.0f, 0.0f, 0.0f, 1.0f), mat->Ambient());
-    EXPECT_EQ(math::Color(0.5f, 0.5f, 0.5f, 1.0f), mat->Diffuse());
-    EXPECT_EQ(math::Color(1.0f, 1.0f, 1.0f, 1.0f), mat->Specular());
-    EXPECT_DOUBLE_EQ(0.0, mat->Transparency());
-    EXPECT_NE(std::string::npos,
-        mat->TextureImage().find("LightDome_Albedo.png"));
-    const common::Pbr *pbr = mat->PbrMaterial();
-    EXPECT_DOUBLE_EQ(0, pbr->Roughness());
-    EXPECT_DOUBLE_EQ(0, pbr->Metalness());
-    EXPECT_EQ("LightDome_Metalness.png", pbr->MetalnessMap());
-    EXPECT_EQ("LightDome_Roughness.png", pbr->RoughnessMap());
-    EXPECT_EQ("LightDome_Normal.png", pbr->NormalMap());
-  }
-
-  // load obj file exported by blender - it shoves pbr maps into
-  // existing fields
-  {
-    std::string meshFilename =
-      common::testing::TestFile("data", "blender_pbr.obj");
-
-    gz::common::Mesh *mesh = loader.Load(meshFilename);
-    EXPECT_NE(nullptr, mesh);
-
-    const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
-    ASSERT_TRUE(mat.get());
-
-    EXPECT_EQ(math::Color(1.0f, 1.0f, 1.0f, 1.0f), mat->Ambient());
-    EXPECT_EQ(math::Color(0.8f, 0.8f, 0.8f, 1.0f), mat->Diffuse());
-    EXPECT_EQ(math::Color(0.5f, 0.5f, 0.5f, 1.0f), mat->Specular());
-    EXPECT_EQ(math::Color(0.0f, 0.0f, 0.0f, 1.0f), mat->Emissive());
-    EXPECT_DOUBLE_EQ(0.0, mat->Transparency());
-    EXPECT_NE(std::string::npos,
-        mat->TextureImage().find("mesh_Diffuse.png"));
-    const common::Pbr *pbr = mat->PbrMaterial();
-    EXPECT_DOUBLE_EQ(0, pbr->Roughness());
-    EXPECT_DOUBLE_EQ(0, pbr->Metalness());
-    EXPECT_EQ("mesh_Metal.png", pbr->MetalnessMap());
-    EXPECT_EQ("mesh_Rough.png", pbr->RoughnessMap());
-    EXPECT_EQ("mesh_Normal.png", pbr->NormalMap());
-  }
-  */
 }
