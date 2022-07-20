@@ -40,7 +40,7 @@ const char kFilePath[] = "GZ_FILE_PATH";
 class TestTempDirectory : public gz::common::TempDirectory
 {
   public: TestTempDirectory():
-          gz::common::TempDirectory("systempaths", "ign_common", true)
+          gz::common::TempDirectory("systempaths", "gz_common", true)
   {
   }
 };

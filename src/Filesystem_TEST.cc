@@ -43,7 +43,7 @@ namespace fs = std::filesystem;
 class TestTempDirectory : public TempDirectory
 {
   public: TestTempDirectory():
-    TempDirectory("filesystem", "ign_common", true)
+    TempDirectory("filesystem", "gz_common", true)
   {
   }
 };

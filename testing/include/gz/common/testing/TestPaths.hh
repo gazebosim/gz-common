@@ -39,7 +39,7 @@ namespace gz::common::testing
 ///
 /// For CMake builds, it is expected that this is injected via a
 /// buildsystem define of TESTING_PROJECT_SOURCE_DIR.
-/// This is done automatically for tests using gz-cmake's ign_build_tests
+/// This is done automatically for tests using gz-cmake's gz_build_tests
 ///
 /// For Bazel builds, it is expected to be empty
 constexpr char kTestingProjectSourceDir[] = TESTING_PROJECT_SOURCE_DIR;
