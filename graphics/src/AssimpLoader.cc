@@ -205,9 +205,9 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene,
       {
         auto& bone = assimpMesh->mBones[boneIdx];
 #ifndef ASSIMP_COMPATIBILITY
-        auto boneNodeName = ToString(bone->mName);
-#else
         auto boneNodeName = ToString(bone->mNode->mName);
+#else
+        auto boneNodeName = ToString(bone->mName);
 #endif
         // Apply inverse bind transform to the matching node
         SkeletonNode *skelNode =
