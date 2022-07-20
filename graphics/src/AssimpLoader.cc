@@ -208,6 +208,8 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene,
         // Apply inverse bind transform to the matching node
         SkeletonNode *skelNode =
             skeleton->NodeByName(boneNodeName);
+        if (skelNode == nullptr)
+          continue;
         skelNode->SetInverseBindTransform(
             this->ConvertTransform(bone->mOffsetMatrix));
         for (unsigned weightIdx = 0; weightIdx < bone->mNumWeights; ++weightIdx)
