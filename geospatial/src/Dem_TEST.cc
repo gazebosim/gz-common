@@ -275,8 +275,8 @@ TEST_F(DemTest, LunarDemLoad)
   // Use custom spherical coordinates object with same axes as the moon.
   auto customSc = math::SphericalCoordinates(
       math::SphericalCoordinates::CUSTOM_SURFACE,
-      moonSc.SurfaceRadius(),
-      moonSc.SurfaceRadius());
+      moonSc.SurfaceAxisEquatorial(),
+      moonSc.SurfaceAxisPolar());
   dem.SetSphericalCoordinates(customSc);
   EXPECT_EQ(dem.Load(path), 0);
   EXPECT_NEAR(dem.WorldWidth(), 80.0417, 1e-2);

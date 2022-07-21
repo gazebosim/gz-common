@@ -310,7 +310,7 @@ bool Dem::GeoReference(double _x, double _y,
       targetCs = OGRSpatialReference();
 
       std::string moonLatLongProjStr =
-        "+proj=latlong +a=1737400 +b=1737400";
+        "+proj=latlong +a=1738100 +b=1736000";
 
       targetCs.importFromProj4(moonLatLongProjStr.c_str());
     }
