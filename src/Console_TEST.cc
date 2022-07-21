@@ -32,7 +32,7 @@ class Console_TEST : public ::testing::Test {
   protected: virtual void SetUp()
   {
     this->temp = std::make_unique<TempDirectory>(
-        "test", "ign_common", true);
+        "test", "gz_common", true);
     ASSERT_TRUE(this->temp->Valid());
     common::setenv(GZ_HOMEDIR, this->temp->Path());
   }
