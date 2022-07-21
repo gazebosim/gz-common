@@ -303,19 +303,10 @@ bool Dem::GeoReference(double _x, double _y,
       sourceCs.importFromWkt(&importString);
       targetCs.SetWellKnownGeogCS("WGS84");
     }
-    else if (this->dataPtr->sphericalCoordinates.Surface() ==
-        math::SphericalCoordinates::MOON_SCS)
-    {
-      sourceCs = *(this->dataPtr->dataSet->GetSpatialRef());
-      targetCs = OGRSpatialReference();
-
-      std::string moonLatLongProjStr =
-        "+proj=latlong +a=1738100 +b=1736000";
-
-      targetCs.importFromProj4(moonLatLongProjStr.c_str());
-    }
-    else if (this->dataPtr->sphericalCoordinates.Surface() ==
-        math::SphericalCoordinates::CUSTOM_SURFACE)
+    else if ((this->dataPtr->sphericalCoordinates.Surface() ==
+        math::SphericalCoordinates::CUSTOM_SURFACE) ||
+        (this->dataPtr->sphericalCoordinates.Surface() ==
+         math::SphericalCoordinates::MOON_SCS))
     {
       sourceCs = *(this->dataPtr->dataSet->GetSpatialRef());
       targetCs = OGRSpatialReference();
@@ -325,11 +316,11 @@ bool Dem::GeoReference(double _x, double _y,
       double axisPolar =
         this->dataPtr->sphericalCoordinates.SurfaceAxisPolar();
 
-      std::string customSurfaceLatLongProjStr =
+      std::string surfaceLatLongProjStr =
         "+proj=latlong +a=" + std::to_string(axisEquatorial) +
         " +b=" + std::to_string(axisPolar);
 
-      targetCs.importFromProj4(customSurfaceLatLongProjStr.c_str());
+      targetCs.importFromProj4(surfaceLatLongProjStr.c_str());
     }
 
     cT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
