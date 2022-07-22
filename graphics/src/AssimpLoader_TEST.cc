@@ -354,7 +354,7 @@ TEST_F(AssimpLoader, LoadBoxNestedAnimation)
   common::SkeletonAnimation *anim = skeleton->Animation(0);
   // Depends on fix in assimp main branch for nested animation naming
   // TODO(luca) Fix is merged in assimp main, add when it is re-released
-  //EXPECT_EQ(anim->Name(), "Armature");
+  // EXPECT_EQ(anim->Name(), "Armature");
   EXPECT_EQ(1u, anim->NodeCount());
   EXPECT_TRUE(anim->HasNode("Armature_Bone"));
   auto nodeAnimation = anim->NodeAnimationByName("Armature_Bone");
@@ -484,7 +484,7 @@ TEST_F(AssimpLoader, LoadCylinderAnimatedFrom3dsMax)
   auto anim = skeleton->Animation(0);
   ASSERT_NE(nullptr, anim);
   // TODO(luca) Fix is merged in assimp main, add when it is re-released
-  //EXPECT_EQ("Bone02", anim->Name());
+  // EXPECT_EQ("Bone02", anim->Name());
   EXPECT_EQ(1u, anim->NodeCount());
   EXPECT_TRUE(anim->HasNode("Bone02"));
 }
