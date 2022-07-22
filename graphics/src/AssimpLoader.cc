@@ -15,7 +15,11 @@
  *
  */
 
+#include <queue>
+#include <unordered_set>
+
 #include "gz/common/graphics/Types.hh"
+#include "gz/common/AssimpLoader.hh"
 #include "gz/common/Console.hh"
 #include "gz/common/Image.hh"
 #include "gz/common/Material.hh"
@@ -25,19 +29,13 @@
 #include "gz/common/SubMesh.hh"
 #include "gz/common/SystemPaths.hh"
 #include "gz/common/Util.hh"
-#include "gz/common/AssimpLoader.hh"
 
-#include <queue>
-#include <unordered_set>
-
-#include <assimp/DefaultLogger.hpp>
-#include <assimp/Logger.hpp>
 #ifndef ASSIMP_COMPATIBILITY
   #include <assimp/GltfMaterial.h>    // GLTF specific material properties
 #endif
 #include <assimp/Importer.hpp>      // C++ importer interface
-#include <assimp/scene.h>           // Output data structure
 #include <assimp/postprocess.h>     // Post processing flags
+#include <assimp/scene.h>           // Output data structure
 
 namespace gz
 {
@@ -55,12 +53,12 @@ class AssimpLoader::Implementation
   /// \brief Convert a color from assimp implementation to Ignition common
   /// \param[in] _color the assimp color to convert
   /// \return the matching math::Color
-  public: math::Color ConvertColor(aiColor4D& _color);
+  public: math::Color ConvertColor(aiColor4D& _color) const;
 
   /// \brief Convert a matrix from assimp implementation to gz::Math
   /// \param[in] _matrix the assimp matrix to convert
   /// \return the converted math::Matrix4d
-  public: math::Matrix4d ConvertTransform(const aiMatrix4x4& _matrix);
+  public: math::Matrix4d ConvertTransform(const aiMatrix4x4& _matrix) const;
 
   /// \brief Convert from assimp to gz::common::Material
   /// \param[in] _scene the assimp scene
@@ -69,13 +67,13 @@ class AssimpLoader::Implementation
   /// \return pointer to the converted common::Material
   public: MaterialPtr CreateMaterial(const aiScene* _scene,
                                      unsigned _matIdx,
-                                     const std::string& _path);
+                                     const std::string& _path) const;
 
   /// \brief Load a texture embedded in a mesh (i.e. for GLB format)
   /// into a gz::common::Image
   /// \param[in] _texture the assimp texture object
   /// \return Pointer to a common::Image containing the texture
-  public: ImagePtr LoadEmbeddedTexture(const aiTexture* _texture);
+  public: ImagePtr LoadEmbeddedTexture(const aiTexture* _texture) const;
 
   /// \brief Utility function to generate a texture name for both embedded
   /// and external textures
@@ -85,7 +83,7 @@ class AssimpLoader::Implementation
   /// \return the generated texture name
   public: std::string GenerateTextureName(const aiScene* _scene,
                                           aiMaterial*  _mat,
-                                          const std::string& _type);
+                                          const std::string& _type) const;
 
   /// \brief Function to parse texture information and load it if embedded
   /// \param[in] _scene the assimp scene
@@ -96,7 +94,7 @@ class AssimpLoader::Implementation
   public: std::pair<std::string, ImagePtr>
           LoadTexture(const aiScene* _scene,
                       const aiString& _texturePath,
-                      const std::string& _textureName);
+                      const std::string& _textureName) const;
 
   /// \brief Function to split a gltf metallicroughness map into
   /// a metalness and roughness map
@@ -111,7 +109,7 @@ class AssimpLoader::Implementation
   /// \param[in] _transform the node transform for the mesh
   /// \return the converted common::Submesh
   public: SubMesh CreateSubMesh(const aiMesh* _assimpMesh,
-                                const math::Matrix4d& _transform);
+                                const math::Matrix4d& _transform) const;
 
   /// \brief Recursively create submeshes scene starting from the root node
   /// \param[in] _scene the assimp scene
@@ -121,7 +119,7 @@ class AssimpLoader::Implementation
   public: void RecursiveCreate(const aiScene* _scene,
                                const aiNode* _node,
                                const math::Matrix4d& _transform,
-                               Mesh* _mesh);
+                               Mesh* _mesh) const;
 
   /// \brief Recursively create the skeleton starting from the root node
   /// \param[in] _node the node being processed
@@ -132,7 +130,7 @@ class AssimpLoader::Implementation
           const aiNode* _node,
           SkeletonNode* _parent,
           const math::Matrix4d& _transform,
-          const std::unordered_set<std::string> &_boneNames);
+          const std::unordered_set<std::string> &_boneNames) const;
 
   /// \brief Recursively store the bone names starting from the root node
   /// to make sure that only nodes that map to a bone are added to the skeleton
@@ -142,7 +140,7 @@ class AssimpLoader::Implementation
   public: void RecursiveStoreBoneNames(
           const aiScene *_scene,
           const aiNode* _node,
-          std::unordered_set<std::string>& _boneNames);
+          std::unordered_set<std::string>& _boneNames) const;
 
   /// \brief Apply the the inv bind transform to the skeleton pose.
   /// \remarks have to set the model transforms starting from the root in
@@ -151,7 +149,7 @@ class AssimpLoader::Implementation
   /// child before the parent results in the child's transform being
   /// calculated from the "old" parent model transform.
   /// \param[in] _skeleton the skeleton to work on
-  public: void ApplyInvBindTransform(SkeletonPtr _skeleton);
+  public: void ApplyInvBindTransform(SkeletonPtr _skeleton) const;
 };
 
 //////////////////////////////////////////////////
@@ -162,7 +160,7 @@ static std::string ToString(const aiString& str)
 }
 
 //////////////////////////////////////////////////
-math::Color AssimpLoader::Implementation::ConvertColor(aiColor4D& _color)
+math::Color AssimpLoader::Implementation::ConvertColor(aiColor4D& _color) const
 {
   math::Color col(_color.r, _color.g, _color.b, _color.a);
   return col;
@@ -170,7 +168,7 @@ math::Color AssimpLoader::Implementation::ConvertColor(aiColor4D& _color)
 
 //////////////////////////////////////////////////
 math::Matrix4d AssimpLoader::Implementation::ConvertTransform(
-    const aiMatrix4x4& _sm)
+    const aiMatrix4x4& _sm) const
 {
   return math::Matrix4d(
       _sm.a1, _sm.a2, _sm.a3, _sm.a4,
@@ -181,7 +179,7 @@ math::Matrix4d AssimpLoader::Implementation::ConvertTransform(
 
 //////////////////////////////////////////////////
 void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene,
-    const aiNode* _node, const math::Matrix4d& _transform, Mesh* _mesh)
+    const aiNode* _node, const math::Matrix4d& _transform, Mesh* _mesh) const
 {
   if (!_node)
     return;
@@ -252,7 +250,7 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene,
 
 void AssimpLoader::Implementation::RecursiveStoreBoneNames(
     const aiScene *_scene, const aiNode *_node,
-    std::unordered_set<std::string>& _boneNames)
+    std::unordered_set<std::string>& _boneNames) const
 {
   if (!_node)
     return;
@@ -280,13 +278,12 @@ void AssimpLoader::Implementation::RecursiveStoreBoneNames(
 //////////////////////////////////////////////////
 void AssimpLoader::Implementation::RecursiveSkeletonCreate(const aiNode* _node,
     SkeletonNode* _parent, const math::Matrix4d& _transform,
-    const std::unordered_set<std::string> &_boneNames)
+    const std::unordered_set<std::string> &_boneNames) const
 {
   if (_node == nullptr || _parent == nullptr)
     return;
   // First explore this node
   auto nodeName = ToString(_node->mName);
-  // TODO(luca) check if node or joint?
   auto boneExist = _boneNames.find(nodeName) != _boneNames.end();
   auto nodeTrans = this->ConvertTransform(_node->mTransformation);
   auto skelNode = _parent;
@@ -309,7 +306,7 @@ void AssimpLoader::Implementation::RecursiveSkeletonCreate(const aiNode* _node,
 
 //////////////////////////////////////////////////
 MaterialPtr AssimpLoader::Implementation::CreateMaterial(
-    const aiScene* _scene, unsigned _matIdx, const std::string& _path)
+    const aiScene* _scene, unsigned _matIdx, const std::string& _path) const
 {
   MaterialPtr mat = std::make_shared<Material>();
   aiColor4D color;
@@ -451,7 +448,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
 std::pair<std::string, ImagePtr> AssimpLoader::Implementation::LoadTexture(
     const aiScene* _scene,
     const aiString& _texturePath,
-    const std::string& _textureName)
+    const std::string& _textureName) const
 {
   std::pair<std::string, ImagePtr> ret;
   // Check if the texture is embedded or not
@@ -509,7 +506,7 @@ std::pair<ImagePtr, ImagePtr>
 
 //////////////////////////////////////////////////
 ImagePtr AssimpLoader::Implementation::LoadEmbeddedTexture(
-    const aiTexture* _texture)
+    const aiTexture* _texture) const
 {
   auto img = std::make_shared<Image>();
   if (_texture->mHeight == 0)
@@ -526,14 +523,14 @@ ImagePtr AssimpLoader::Implementation::LoadEmbeddedTexture(
 
 //////////////////////////////////////////////////
 std::string AssimpLoader::Implementation::GenerateTextureName(
-    const aiScene* _scene, aiMaterial* _mat, const std::string& _type)
+    const aiScene* _scene, aiMaterial* _mat, const std::string& _type) const
 {
   return ToString(_scene->mRootNode->mName) + "_" + ToString(_mat->GetName()) +
     "_" + _type;
 }
 
 SubMesh AssimpLoader::Implementation::CreateSubMesh(
-    const aiMesh* _assimpMesh, const math::Matrix4d& _transform)
+    const aiMesh* _assimpMesh, const math::Matrix4d& _transform) const
 {
   SubMesh subMesh;
   math::Matrix4d rot = _transform;
@@ -583,9 +580,6 @@ SubMesh AssimpLoader::Implementation::CreateSubMesh(
 AssimpLoader::AssimpLoader()
 : MeshLoader(), dataPtr(utils::MakeUniqueImpl<Implementation>())
 {
-  // TODO(luca): remove logger from stdout
-  Assimp::DefaultLogger::create(
-      "", Assimp::Logger::VERBOSE, aiDefaultLogStream_STDOUT);
   this->dataPtr->importer.SetPropertyBool(AI_CONFIG_PP_FD_REMOVE, true);
   this->dataPtr->importer.SetPropertyBool(
       AI_CONFIG_IMPORT_REMOVE_EMPTY_BONES, false);
@@ -701,7 +695,9 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
 }
 
 /////////////////////////////////////////////////
-void AssimpLoader::Implementation::ApplyInvBindTransform(SkeletonPtr _skeleton)
+void AssimpLoader::Implementation::ApplyInvBindTransform(
+    SkeletonPtr _skeleton) const
+
 {
   std::queue<SkeletonNode *> queue;
   queue.push(_skeleton->RootNode());
