@@ -16,6 +16,7 @@
 
 #include <gtest/gtest.h>
 
+#include "gz/common/Image.hh"
 #include "gz/common/Material.hh"
 #include "gz/common/Pbr.hh"
 
@@ -33,8 +34,10 @@ TEST_F(MaterialTest, Material)
   EXPECT_TRUE(mat.Diffuse() == math::Color(1.0f, 0.5f, 0.2f, 1.0f));
   EXPECT_STREQ("gz_material_0", mat.Name().c_str());
 
-  mat.SetTextureImage("texture_image");
+  auto texImg = std::make_shared<common::Image>();
+  mat.SetTextureImage("texture_image", texImg);
   EXPECT_STREQ("texture_image", mat.TextureImage().c_str());
+  EXPECT_EQ(texImg, mat.TextureData());
 
   mat.SetTextureImage("texture_image", "/path");
   std::string texturePath = common::joinPaths("/path", "..",
