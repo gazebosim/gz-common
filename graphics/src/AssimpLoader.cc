@@ -429,6 +429,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     // TODO(luca) different normal map spaces
     pbr.SetNormalMap(texName, NormalMapSpace::TANGENT, texData);
   }
+  // TODO(luca) Add support for emissive maps
 #ifndef ASSIMP_COMPATIBILITY
   double value;
   ret = assimpMat->Get(AI_MATKEY_METALLIC_FACTOR, value);

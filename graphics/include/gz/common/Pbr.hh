@@ -169,7 +169,13 @@ namespace common
 
     /// \brief Set the emissive map filename.
     /// \param[in] _map Filename of the emissive map.
-    public: void SetEmissiveMap(const std::string &_map);
+    public: void SetEmissiveMap(const std::string &_map,
+        const std::shared_ptr<Image> &_img = nullptr);
+
+    /// \brief Gets the emissive map data,
+    /// if the texture was loaded from memory, otherwise a nullptr
+    /// \return A pointer to the image that was loaded from memory
+    public: std::shared_ptr<Image> EmissiveMapData() const;
 
     /// \brief Get the light map filename. This will be an empty string
     /// if an light map has not been set.

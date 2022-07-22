@@ -61,6 +61,10 @@ class gz::common::Pbr::Implementation
   /// \brief Emissive map
   public: std::string emissiveMap = "";
 
+  /// \brief Pointer containing the emissive map data,
+  /// if loaded from memory
+  public: std::shared_ptr<Image> emissiveMapData = nullptr;
+
   /// \brief Light map
   public: std::string lightMap;
 
@@ -289,9 +293,17 @@ std::string Pbr::EmissiveMap() const
 }
 
 //////////////////////////////////////////////////
-void Pbr::SetEmissiveMap(const std::string &_map)
+std::shared_ptr<Image> Pbr::EmissiveMapData() const
+{
+  return this->dataPtr->emissiveMapData;
+}
+
+//////////////////////////////////////////////////
+void Pbr::SetEmissiveMap(const std::string &_map,
+                         const std::shared_ptr<Image> &_img)
 {
   this->dataPtr->emissiveMap = _map;
+  this->dataPtr->emissiveMapData = _img;
 }
 
 //////////////////////////////////////////////////
