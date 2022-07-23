@@ -23,6 +23,7 @@
 
 #include <gz/math/Vector3.hh>
 #include <gz/math/Angle.hh>
+#include <gz/math/SphericalCoordinates.hh>
 
 #include <gz/common/geospatial/Export.hh>
 #include <gz/common/geospatial/HeightmapData.hh>
@@ -44,20 +45,17 @@ namespace gz
       /// \brief Destructor.
       public: virtual ~Dem();
 
+      /// \brief Sets the spherical coordinates reference object.
+      /// \param[in] _worldSphericalCoordinates The spherical coordiantes
+      /// object contained in the world. This is used to compute accurate
+      /// sizes of the DEM object.
+      public: void SetSphericalCoordinates(
+                  const math::SphericalCoordinates &_worldSphericalCoordinates);
+
       /// \brief Load a DEM file.
       /// \param[in] _filename the path to the terrain file.
       /// \return 0 when the operation succeeds to open a file.
       public: int Load(const std::string &_filename = "");
-
-      /// \brief Indicate that this is a non Earth DEM.
-      /// \param[in] _isNonEarthDem Should be true if this is a
-      /// non earth DEM, otherwise false.
-      public: void SetNonEarthDEM(bool _isNonEarthDem);
-
-      /// \brief Check if the loaded DEM is not from the Earth.
-      /// \return True if the loaded DEM is from the Earth, otherwise
-      /// returns False.
-      public: bool GetNonEarthDEM();
 
       /// \brief Get the elevation of a terrain's point in meters.
       /// \param[in] _x X coordinate of the terrain.
@@ -75,7 +73,7 @@ namespace gz
       public: float MaxElevation() const override;
 
       /// \brief Get the georeferenced coordinates (lat, long) of the terrain's
-      /// origin in WGS84.
+      /// origin.
       /// \param[out] _latitude Georeferenced latitude.
       /// \param[out] _longitude Georeferenced longitude.
       /// \return True if able to retrieve origin coordinates. False otherwise.
@@ -126,7 +124,7 @@ namespace gz
                   std::vector<float> &_heights) const override;
 
       /// \brief Get the georeferenced coordinates (lat, long) of a terrain's
-      /// pixel in WGS84.
+      /// pixel.
       /// \param[in] _x X coordinate of the terrain.
       /// \param[in] _y Y coordinate of the terrain.
       /// \param[out] _latitude Georeferenced latitude.

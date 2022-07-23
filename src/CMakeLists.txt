@@ -22,11 +22,6 @@ target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
     gz-utils${GZ_UTILS_VER}::gz-utils${GZ_UTILS_VER}
 )
 
-# This is required by the WorkerPool::WaitForResults(const Time &_timeout)
-# TODO(anyone): GZ_DEPRECATED(4). Remove this part when the method is removed
-target_include_directories(${PROJECT_LIBRARY_TARGET_NAME} PRIVATE
-  ${gz-math${GZ_MATH_VER}_INCLUDE_DIRS})
-
 # Handle non-Windows configuration settings
 if(NOT WIN32)
   # Link the libraries that we don't expect to find on Windows
