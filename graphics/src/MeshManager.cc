@@ -148,6 +148,7 @@ const Mesh *MeshManager::Load(const std::string &_filename)
     std::transform(extension.begin(), extension.end(),
         extension.begin(), ::tolower);
     MeshLoader *loader = nullptr;
+
     if (extension == "stl" || extension == "stlb" || extension == "stla")
       if (this->dataPtr->useAssimp)
         loader = &this->dataPtr->assimpLoader;
