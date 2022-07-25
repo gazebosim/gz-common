@@ -70,6 +70,9 @@ class gz::common::MeshManager::Implementation
 
   /// \brief Mutex to protect the mesh map
   public: std::mutex mutex;
+
+  /// \brief True if assimp mode is enable, false otherwise.
+  public: bool useAssimp{false};
 #ifdef _WIN32
 #pragma warning(pop)
 #endif
@@ -146,20 +149,22 @@ const Mesh *MeshManager::Load(const std::string &_filename)
         extension.begin(), ::tolower);
     MeshLoader *loader = nullptr;
 
-    loader = &this->dataPtr->assimpLoader;
-    /*
     if (extension == "stl" || extension == "stlb" || extension == "stla")
-      loader = &this->dataPtr->stlLoader;
+      if (this->dataPtr->useAssimp)
+        loader = &this->dataPtr->assimpLoader;
+      else
+        loader = &this->dataPtr->stlLoader;
     else if (extension == "dae")
       loader = &this->dataPtr->colladaLoader;
     else if (extension == "obj")
       loader = &this->dataPtr->objLoader;
+    else if (extension == "gltf" || extension == "glb" || extension == "fbx")
+      loader = &this->dataPtr->assimpLoader;
     else
     {
       gzerr << "Unsupported mesh format for file[" << _filename << "]\n";
       return nullptr;
     }
-    */
     // This mutex prevents two threads from loading the same mesh at the
     // same time.
     std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
@@ -1622,4 +1627,10 @@ void MeshManager::ConvertPolylinesToVerticesAndEdges(
       edges.push_back(e);
     }
   }
+}
+
+//////////////////////////////////////////////////
+void MeshManager::SetUseAssimp(const bool _useAssimp)
+{
+  this->dataPtr->useAssimp = _useAssimp;
 }
