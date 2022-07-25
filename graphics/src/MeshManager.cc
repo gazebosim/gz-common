@@ -71,8 +71,8 @@ class gz::common::MeshManager::Implementation
   /// \brief Mutex to protect the mesh map
   public: std::mutex mutex;
 
-  /// \brief True if assimp mode is enable, false otherwise.
-  public: bool useAssimp{false};
+  /// \brief True if assimp mode is enabled, false otherwise.
+  public: bool useAssimp;
 #ifdef _WIN32
 #pragma warning(pop)
 #endif
