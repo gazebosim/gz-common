@@ -35,18 +35,18 @@ TestPaths::~TestPaths() = default;
 //////////////////////////////////////////////////
 BuildType TestBuildType(const std::string &_projectSourcePath)
 {
-  std::string ign_bazel;
-  bool ign_bazel_set = common::env("IGN_BAZEL", ign_bazel);
-  bool ign_cmake_set = !_projectSourcePath.empty();
+  std::string gz_bazel;
+  bool gz_bazel_set = common::env("GZ_BAZEL", gz_bazel);
+  bool gz_cmake_set = !_projectSourcePath.empty();
 
-  if (ign_bazel_set && ign_cmake_set)
+  if (gz_bazel_set && gz_cmake_set)
   {
     gzwarn << "Detected settings from Bazel and CMake, preferring CMake\n";
   }
 
-  if (ign_cmake_set)
+  if (gz_cmake_set)
     return BuildType::kCMake;
-  else if (ign_bazel_set)
+  else if (gz_bazel_set)
     return BuildType::kBazel;
   else
     return BuildType::kUnknown;

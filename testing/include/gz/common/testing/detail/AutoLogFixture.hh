@@ -75,7 +75,7 @@ void AutoLogFixture::SetUp()
                '/', '_');
 
   this->dataPtr->temp = std::make_unique<TempDirectory>(
-      "test", "ign_common", true);
+      "test", "gz_common", true);
   ASSERT_TRUE(this->dataPtr->temp->Valid());
   common::setenv(GZ_HOMEDIR, this->dataPtr->temp->Path());
 
@@ -121,4 +121,3 @@ std::string AutoLogFixture::LogContent() const
 }  // namespace gz::common::testing
 
 #endif  // GZ_COMMON_TESTING_DETAIL_AUTOLOGFIXTURE_HH_
-
