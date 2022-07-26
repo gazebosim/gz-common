@@ -132,21 +132,41 @@ namespace gz
                                          Image::PixelFormatType _format);
 
       /// \brief Get the image as a data array
+      /// \deprecated Use the function returning std::vector instead
       /// \param[out] _data Pointer to a NULL array of char.
       /// \param[out] _count The resulting data array size
-      public: void Data(unsigned char **_data, unsigned int &_count) const;
+      public: void GZ_DEPRECATED(5) Data(unsigned char **_data,
+                                         unsigned int &_count) const;
+
+      /// \brief Get the image as a data array
+      /// \return The image data
+      public: std::vector<unsigned char> Data() const;
 
       /// \brief Get only the RGB data from the image. This will drop the
       /// alpha channel if one is present.
+      /// \deprecated Use the function returning std::vector instead
       /// \param[out] _data Pointer to a NULL array of char.
       /// \param[out] _count The resulting data array size
-      public: void RGBData(unsigned char **_data, unsigned int &_count) const;
+      public: void GZ_DEPRECATED(5) RGBData(unsigned char **_data,
+                                            unsigned int &_count) const;
+
+      /// \brief Get only the RGB data from the image. This will drop the
+      /// alpha channel if one is present.
+      /// \return The image RGB data
+      public: std::vector<unsigned char> RGBData() const;
 
       /// \brief Get the RGBA data from the image. This will add an alpha
       /// channel if one is not present.
+      /// \deprecated Use the function returning std::vector instead
       /// \param[out] _data Pointer to a NULL array of char.
       /// \param[out] _count The resulting data array size
-      public: void RGBAData(unsigned char **_data, unsigned int &_count) const;
+      public: void GZ_DEPRECATED(5) RGBAData(unsigned char **_data,
+                                             unsigned int &_count) const;
+
+      /// \brief Get the RGBA data from the image. This will add an alpha
+      /// channel if one is not present.
+      /// \return The image RGBA data
+      public: std::vector<unsigned char> RGBAData() const;
 
       /// \brief Get the width
       /// \return The image width

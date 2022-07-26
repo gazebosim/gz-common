@@ -58,9 +58,7 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
   // Currently supported: 8-bit and 16-bit.
   auto imgFormat = this->img.PixelFormat();
 
-  unsigned char *data = nullptr;
-  unsigned int count;
-  this->img.Data(&data, count);
+  auto data = this->img.Data();
 
   if (imgFormat == gz::common::Image::PixelFormatType::L_INT8 ||
     imgFormat == gz::common::Image::PixelFormatType::RGB_INT8 ||
@@ -73,7 +71,7 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
     imgFormat == gz::common::Image::PixelFormatType::BGR_INT8 ||
     imgFormat == gz::common::Image::PixelFormatType::BGRA_INT8)
   {
-    this->FillHeights<unsigned char>(data, imgHeight, imgWidth, pitch,
+    this->FillHeights<unsigned char>(&data[0], imgHeight, imgWidth, pitch,
         _subSampling, _vertSize, _size, _scale, _flipY, _heights);
   }
   else if (imgFormat == gz::common::Image::PixelFormatType::BGR_INT16 ||
@@ -82,7 +80,7 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
     imgFormat == gz::common::Image::PixelFormatType::RGB_INT16 ||
     imgFormat == gz::common::Image::PixelFormatType::R_FLOAT16)
   {
-    uint16_t *dataShort = reinterpret_cast<uint16_t *>(data);
+    uint16_t *dataShort = reinterpret_cast<uint16_t *>(&data[0]);
     this->FillHeights<uint16_t>(dataShort, imgHeight, imgWidth, pitch,
         _subSampling, _vertSize, _size, _scale, _flipY, _heights);
   }
@@ -92,7 +90,6 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
       "heightmap will not be loaded" << std::endl;
     return;
   }
-  delete [] data;
 }
 
 //////////////////////////////////////////////////
