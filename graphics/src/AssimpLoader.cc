@@ -499,15 +499,15 @@ std::pair<ImagePtr, ImagePtr>
     for (unsigned int y = 0; y < height; ++y)
     {
       // RGBA so 4 bytes per pixel, alpha fully opaque
-      auto baseIndex = bytesPerPixel * (x * width + y);
+      auto baseIndex = bytesPerPixel * (x * height + y);
       auto color = _img.Pixel(x, y);
-      metalnessData[baseIndex] = color.B();
-      metalnessData[baseIndex + 1] = color.B();
-      metalnessData[baseIndex + 2] = color.B();
+      metalnessData[baseIndex] = color.B() * 255.0;
+      metalnessData[baseIndex + 1] = color.B() * 255.0;
+      metalnessData[baseIndex + 2] = color.B() * 255.0;
       metalnessData[baseIndex + 3] = 255;
-      roughnessData[baseIndex] = color.G();
-      roughnessData[baseIndex + 1] = color.G();
-      roughnessData[baseIndex + 2] = color.G();
+      roughnessData[baseIndex] = color.G() * 255.0;
+      roughnessData[baseIndex + 1] = color.G() * 255.0;
+      roughnessData[baseIndex + 2] = color.G() * 255.0;
       roughnessData[baseIndex + 3] = 255;
     }
   }

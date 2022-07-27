@@ -682,8 +682,8 @@ TEST_F(AssimpLoader, LoadGlbPbrAsset)
   EXPECT_NE(pbr->MetalnessMapData(), nullptr);
   EXPECT_NE(pbr->RoughnessMapData(), nullptr);
   // Check pixel values to test metallicroughness texture splitting
-  EXPECT_EQ(pbr->MetalnessMapData()->Pixel(270, 380).R(), 0);
-  EXPECT_EQ(pbr->RoughnessMapData()->Pixel(270, 380).R(), 124);
+  EXPECT_FLOAT_EQ(pbr->MetalnessMapData()->Pixel(256, 256).R(), 0.0);
+  EXPECT_FLOAT_EQ(pbr->RoughnessMapData()->Pixel(256, 256).R(), 124.0 / 255.0);
   // Bug in assimp 5.0.x that doesn't parse coordinate sets properly
   EXPECT_EQ(pbr->LightMapTexCoordSet(), 1);
 #endif
