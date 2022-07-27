@@ -662,9 +662,10 @@ TEST_F(AssimpLoader, LoadGlbPbrAsset)
   EXPECT_NE(pbr->MetalnessMapData(), nullptr);
   // TODO(luca) check pixel values to test texture splitting
   EXPECT_NE(pbr->RoughnessMapData(), nullptr);
+  // Bug in assimp 5.0.x that doesn't parse coordinate sets properly
+  EXPECT_EQ(pbr->LightMapTexCoordSet(), 1);
 #endif
   EXPECT_NE(pbr->LightMapData(), nullptr);
-  EXPECT_EQ(pbr->LightMapTexCoordSet(), 0);
 
   // Mesh has 3 animations
   auto skel = mesh->MeshSkeleton();
