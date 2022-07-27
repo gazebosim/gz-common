@@ -33,6 +33,7 @@ TEST_F(MaterialTest, Material)
   EXPECT_TRUE(mat.Ambient() == math::Color(1.0f, 0.5f, 0.2f, 1.0f));
   EXPECT_TRUE(mat.Diffuse() == math::Color(1.0f, 0.5f, 0.2f, 1.0f));
   EXPECT_STREQ("gz_material_0", mat.Name().c_str());
+  EXPECT_EQ(nullptr, mat.TextureData());
 
   auto texImg = std::make_shared<common::Image>();
   mat.SetTextureImage("texture_image", texImg);

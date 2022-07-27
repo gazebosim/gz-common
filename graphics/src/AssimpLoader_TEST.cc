@@ -142,8 +142,8 @@ TEST_F(AssimpLoader, ShareVertices)
       mesh->SubMeshByIndex(i).lock();
     for (unsigned int j = 0; j < subMesh->VertexCount(); ++j)
     {
-      gz::math::Vector3d v = subMesh->Vertex(j);
-      gz::math::Vector3d n = subMesh->Normal(j);
+      math::Vector3d v = subMesh->Vertex(j);
+      math::Vector3d n = subMesh->Normal(j);
 
       // Verify there is no other vertex with the same position AND normal
       for (unsigned int k = j+1; k < subMesh->VertexCount(); ++k)
@@ -254,7 +254,7 @@ TEST_F(AssimpLoader, TexCoordSets)
 }
 
 // Test fails for assimp below 5.2.0
-#ifndef ASSIMP_COMPATIBILITY
+#ifndef GZ_ASSIMP_PRE_5_2_0
 /////////////////////////////////////////////////
 TEST_F(AssimpLoader, LoadBoxWithAnimationOutsideSkeleton)
 {
@@ -452,7 +452,7 @@ TEST_F(AssimpLoader, MergeBoxWithDoubleSkeleton)
 
 // For assimp below 5.2.0 mesh loading fails because of
 // failing to parse the empty <author> tag
-#ifndef ASSIMP_COMPATIBILITY
+#ifndef GZ_ASSIMP_PRE_5_2_0
 /////////////////////////////////////////////////
 TEST_F(AssimpLoader, LoadCylinderAnimatedFrom3dsMax)
 {
@@ -528,12 +528,12 @@ TEST_F(AssimpLoader, LoadObjBox)
 // This tests opening an OBJ file that has an invalid material reference
 TEST_F(AssimpLoader, ObjInvalidMaterial)
 {
-  gz::common::AssimpLoader loader;
+  common::AssimpLoader loader;
 
   std::string meshFilename =
     common::testing::TestFile("data", "invalid_material.obj");
 
-  gz::common::Mesh *mesh = loader.Load(meshFilename);
+  common::Mesh *mesh = loader.Load(meshFilename);
 
   EXPECT_TRUE(mesh != nullptr);
 }

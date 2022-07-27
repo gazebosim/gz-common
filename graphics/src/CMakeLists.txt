@@ -32,9 +32,9 @@ gz_build_tests(
 # mode for versions below 5.2.0
 if(${GzAssimp_VERSION} STRLESS "5.2.0")
   message("Warning, assimp below 5.2.0 detected, setting compatibility mode")
-  target_compile_definitions(${graphics_target} PRIVATE ASSIMP_COMPATIBILITY)
+  target_compile_definitions(${graphics_target} PRIVATE GZ_ASSIMP_PRE_5_2_0)
   if(TARGET UNIT_AssimpLoader_TEST)
-    target_compile_definitions(UNIT_AssimpLoader_TEST PRIVATE ASSIMP_COMPATIBILITY)
+    target_compile_definitions(UNIT_AssimpLoader_TEST PRIVATE GZ_ASSIMP_PRE_5_2_0)
   endif()
 endif()
 

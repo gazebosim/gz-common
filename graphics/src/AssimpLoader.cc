@@ -30,7 +30,7 @@
 #include "gz/common/SystemPaths.hh"
 #include "gz/common/Util.hh"
 
-#ifndef ASSIMP_COMPATIBILITY
+#ifndef GZ_ASSIMP_PRE_5_2_0
   #include <assimp/GltfMaterial.h>    // GLTF specific material properties
 #endif
 #include <assimp/Importer.hpp>      // C++ importer interface
@@ -356,7 +356,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
       mat->SetTextureImage(texName, texData);
     else
       mat->SetTextureImage(texName, _path);
-#ifndef ASSIMP_COMPATIBILITY
+#ifndef GZ_ASSIMP_PRE_5_2_0
     // Now set the alpha from texture, if enabled, only supported in GLTF
     aiString alphaMode;
     auto paramRet = assimpMat->Get(AI_MATKEY_GLTF_ALPHAMODE, alphaMode);
@@ -375,7 +375,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     }
 #endif
   }
-#ifndef ASSIMP_COMPATIBILITY
+#ifndef GZ_ASSIMP_PRE_5_2_0
   // Edge case for GLTF, Metal and Rough texture are embedded in a
   // MetallicRoughness texture with metalness in B and roughness in G
   // Open, preprocess and split into metal and roughness map
@@ -427,7 +427,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     pbr.SetNormalMap(texName, NormalMapSpace::TANGENT, texData);
   }
   // TODO(luca) Add support for emissive maps
-#ifndef ASSIMP_COMPATIBILITY
+#ifndef GZ_ASSIMP_PRE_5_2_0
   double value;
   ret = assimpMat->Get(AI_MATKEY_METALLIC_FACTOR, value);
   if (ret == AI_SUCCESS)
@@ -600,7 +600,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
       aiProcess_JoinIdenticalVertices |
       aiProcess_RemoveRedundantMaterials |
       aiProcess_SortByPType |
-#ifndef ASSIMP_COMPATIBILITY
+#ifndef GZ_ASSIMP_PRE_5_2_0
       aiProcess_PopulateArmatureData |
 #endif
       aiProcess_Triangulate |
