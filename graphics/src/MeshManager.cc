@@ -1644,27 +1644,18 @@ void MeshManager::SetAssimpEnvs()
 {
   std::string useAssimpEnv;
   std::string forceAssimpEnv;
-
   common::env("GZ_MESH_USE_ASSIMP", useAssimpEnv);
   common::env("GZ_MESH_FORCE_ASSIMP", forceAssimpEnv);
-
+  this->dataPtr->useAssimp = false;
+  this->dataPtr->forceAssimp = false;
   if (useAssimpEnv == "true")
   {
     gzmsg << "Using assimp to load STL, GLTF and FBX formats"  << std::endl;
     this->dataPtr->useAssimp = true;
   }
-  else
-  {
-    this->dataPtr->useAssimp = false;
-  }
-
   if (forceAssimpEnv == "true")
   {
     gzmsg << "Using assimp to load all mesh formats"  << std::endl;
     this->dataPtr->forceAssimp = true;
-  }
-  else
-  {
-    this->dataPtr->forceAssimp = false;
   }
 }
