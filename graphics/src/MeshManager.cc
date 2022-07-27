@@ -71,11 +71,10 @@ class gz::common::MeshManager::Implementation
   /// \brief Mutex to protect the mesh map
   public: std::mutex mutex;
 
-  /// \brief True if Assimp is used for loading STL, GLTF and FBX.
+  /// \brief True if Assimp is used for loading STL, GLTF and FBX
   public: bool useAssimp;
 
   /// \brief True if assimp is used for loading all supported mesh formats
-  /// using Assimp.
   public: bool forceAssimp;
 #ifdef _WIN32
 #pragma warning(pop)
