@@ -426,7 +426,22 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     // TODO(luca) different normal map spaces
     pbr.SetNormalMap(texName, NormalMapSpace::TANGENT, texData);
   }
-  // TODO(luca) Add support for emissive maps
+  ret = assimpMat->GetTexture(aiTextureType_EMISSIVE, 0, &texturePath);
+  if (ret == AI_SUCCESS)
+  {
+    auto [texName, texData] = this->LoadTexture(_scene, texturePath,
+        this->GenerateTextureName(_scene, assimpMat, "Emissive"));
+    pbr.SetEmissiveMap(texName, texData);
+  }
+  unsigned int uvidx = 0;
+  ret = assimpMat->GetTexture(
+      aiTextureType_LIGHTMAP, 0, &texturePath, NULL, &uvidx);
+  if (ret == AI_SUCCESS)
+  {
+    auto [texName, texData] = this->LoadTexture(_scene, texturePath,
+        this->GenerateTextureName(_scene, assimpMat, "Lightmap"));
+    pbr.SetLightMap(texName, uvidx, texData);
+  }
 #ifndef GZ_ASSIMP_PRE_5_2_0
   double value;
   ret = assimpMat->Get(AI_MATKEY_METALLIC_FACTOR, value);

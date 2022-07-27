@@ -605,3 +605,72 @@ TEST_F(AssimpLoader, LoadGlTF2Box)
   EXPECT_EQ(mat->Specular(), math::Color(0.0f, 0.0f, 0.0f, 1.0f));
   EXPECT_DOUBLE_EQ(mat->Transparency(), 0.0);
 }
+
+/////////////////////////////////////////////////
+// Use a fully featured glb test asset, including PBR textures, emissive maps
+// embedded textures, lightmaps, animations to test advanced glb features
+TEST_F(AssimpLoader, LoadGlbPbrAsset)
+{
+  common::AssimpLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "fully_featured.glb"));
+
+  EXPECT_STREQ("unknown", mesh->Name().c_str());
+
+  EXPECT_EQ(mesh->SubMeshCount(), 7);
+  EXPECT_STREQ("Floor", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+  EXPECT_STREQ("SquareShelf", mesh->SubMeshByIndex(1).lock()->Name().c_str());
+  EXPECT_STREQ("OpenRoboticsLogo.002",
+      mesh->SubMeshByIndex(2).lock()->Name().c_str());
+  EXPECT_STREQ("OpenRoboticsLogo.001",
+      mesh->SubMeshByIndex(3).lock()->Name().c_str());
+  EXPECT_STREQ("EmissiveCube", mesh->SubMeshByIndex(4).lock()->Name().c_str());
+  EXPECT_STREQ("OpenCola", mesh->SubMeshByIndex(5).lock()->Name().c_str());
+  EXPECT_STREQ("OpenRoboticsLogo",
+      mesh->SubMeshByIndex(6).lock()->Name().c_str());
+
+  // Emissive cube has an embedded emissive texture
+  auto materialId = mesh->SubMeshByIndex(4).lock()->GetMaterialIndex();
+  ASSERT_TRUE(materialId.has_value());
+  auto material = mesh->MaterialByIndex(materialId.value());
+  ASSERT_NE(material, nullptr);
+  auto pbr = material->PbrMaterial();
+  ASSERT_NE(pbr, nullptr);
+  EXPECT_NE(pbr->EmissiveMapData(), nullptr);
+
+  // SquareShelf has full PBR textures, including metallicroughness
+  // and ambient occlusion
+  materialId = mesh->SubMeshByIndex(1).lock()->GetMaterialIndex();
+  ASSERT_TRUE(materialId.has_value());
+  material = mesh->MaterialByIndex(materialId.value());
+  ASSERT_NE(material, nullptr);
+  pbr = material->PbrMaterial();
+  ASSERT_NE(pbr, nullptr);
+
+  // Check the texture data itself
+  auto img = material->TextureData();
+  ASSERT_NE(img, nullptr);
+  EXPECT_EQ(img->Width(), 512);
+  EXPECT_EQ(img->Height(), 512);
+  // A black and a white pixel
+  EXPECT_EQ(img->Pixel(0, 0), math::Color(0.0f, 0.0f, 0.0f, 1.0f));
+  EXPECT_EQ(img->Pixel(100, 100), math::Color(1.0f, 1.0f, 1.0f, 1.0f));
+
+  EXPECT_NE(pbr->NormalMapData(), nullptr);
+  // Metallic roughness only works in assimp > 5.2.0
+#ifndef GZ_ASSIMP_PRE_5_2_0
+  EXPECT_NE(pbr->MetalnessMapData(), nullptr);
+  // TODO(luca) check pixel values to test texture splitting
+  EXPECT_NE(pbr->RoughnessMapData(), nullptr);
+#endif
+  EXPECT_NE(pbr->LightMapData(), nullptr);
+  EXPECT_EQ(pbr->LightMapTexCoordSet(), 0);
+
+  // Mesh has 3 animations
+  auto skel = mesh->MeshSkeleton();
+  ASSERT_NE(skel, nullptr);
+  ASSERT_EQ(skel->AnimationCount(), 3);
+  EXPECT_STREQ("Action1", skel->Animation(0)->Name().c_str());
+  EXPECT_STREQ("Action2", skel->Animation(1)->Name().c_str());
+  EXPECT_STREQ("Action3", skel->Animation(2)->Name().c_str());
+}

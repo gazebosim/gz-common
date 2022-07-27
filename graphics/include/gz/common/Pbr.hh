@@ -169,6 +169,8 @@ namespace common
 
     /// \brief Set the emissive map filename.
     /// \param[in] _map Filename of the emissive map.
+    /// \param[in] _img The image containing the texture if image has been
+    /// loaded in memory
     public: void SetEmissiveMap(const std::string &_map,
         const std::shared_ptr<const Image> &_img = nullptr);
 
@@ -183,10 +185,18 @@ namespace common
     /// map has not been specified.
     public: std::string LightMap() const;
 
+    /// \brief Gets the light map data,
+    /// if the texture was loaded from memory, otherwise a nullptr
+    /// \return A pointer to the image that was loaded from memory
+    public: std::shared_ptr<const Image> LightMapData() const;
+
     /// \brief Set the light map filename.
     /// \param[in] _map Filename of the light map.
     /// \param[in] _uvSet Index of the texture coordinate set
-    public: void SetLightMap(const std::string &_map, unsigned int _uvSet = 0u);
+    /// \param[in] _img The image containing the texture if image has been
+    /// loaded in memory
+    public: void SetLightMap(const std::string &_map, unsigned int _uvSet = 0u,
+        const std::shared_ptr<const Image> &_img = nullptr);
 
     /// \brief Get the light map texture coordinate set.
     /// \return Index of the light map texture coordinate set

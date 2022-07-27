@@ -68,6 +68,10 @@ class gz::common::Pbr::Implementation
   /// \brief Light map
   public: std::string lightMap;
 
+  /// \brief Pointer containing the light map data,
+  /// if loaded from memory
+  public: std::shared_ptr<const Image> lightMapData = nullptr;
+
   /// \brief Light map texture coordinate set
   public: unsigned int lightMapUvSet = 0u;
 
@@ -108,11 +112,17 @@ bool Pbr::operator==(const Pbr &_pbr) const
 {
   return (this->dataPtr->albedoMap == _pbr.dataPtr->albedoMap)
     && (this->dataPtr->normalMap == _pbr.dataPtr->normalMap)
+    && (this->dataPtr->normalMapData == _pbr.dataPtr->normalMapData)
     && (this->dataPtr->metalnessMap == _pbr.dataPtr->metalnessMap)
+    && (this->dataPtr->metalnessMapData == _pbr.dataPtr->metalnessMapData)
     && (this->dataPtr->roughnessMap == _pbr.dataPtr->roughnessMap)
+    && (this->dataPtr->roughnessMapData == _pbr.dataPtr->roughnessMapData)
     && (this->dataPtr->glossinessMap == _pbr.dataPtr->glossinessMap)
     && (this->dataPtr->environmentMap == _pbr.dataPtr->environmentMap)
     && (this->dataPtr->emissiveMap == _pbr.dataPtr->emissiveMap)
+    && (this->dataPtr->emissiveMapData == _pbr.dataPtr->emissiveMapData)
+    && (this->dataPtr->lightMap == _pbr.dataPtr->lightMap)
+    && (this->dataPtr->lightMapData == _pbr.dataPtr->lightMapData)
     && (this->dataPtr->ambientOcclusionMap ==
         _pbr.dataPtr->ambientOcclusionMap)
     && (gz::math::equal(
@@ -313,10 +323,18 @@ std::string Pbr::LightMap() const
 }
 
 //////////////////////////////////////////////////
-void Pbr::SetLightMap(const std::string &_map, unsigned int _uvSet)
+std::shared_ptr<const Image> Pbr::LightMapData() const
+{
+  return this->dataPtr->lightMapData;
+}
+
+//////////////////////////////////////////////////
+void Pbr::SetLightMap(const std::string &_map, unsigned int _uvSet,
+                      const std::shared_ptr<const Image> &_img)
 {
   this->dataPtr->lightMap = _map;
   this->dataPtr->lightMapUvSet = _uvSet;
+  this->dataPtr->lightMapData = _img;
 }
 
 //////////////////////////////////////////////////

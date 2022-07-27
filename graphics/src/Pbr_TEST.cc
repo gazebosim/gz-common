@@ -39,6 +39,7 @@ TEST(Pbr, BasicAPI)
   EXPECT_EQ(nullptr, pbr.EmissiveMapData());
   EXPECT_EQ(std::string(), pbr.LightMap());
   EXPECT_EQ(0u, pbr.LightMapTexCoordSet());
+  EXPECT_EQ(nullptr, pbr.LightMapData());
   EXPECT_DOUBLE_EQ(0.5, pbr.Roughness());
   EXPECT_DOUBLE_EQ(0.0, pbr.Metalness());
   EXPECT_EQ(std::string(), pbr.SpecularMap());
@@ -72,9 +73,11 @@ TEST(Pbr, BasicAPI)
   EXPECT_EQ("metal_emissive_map.png", pbr.EmissiveMap());
   EXPECT_EQ(emissiveImg, pbr.EmissiveMapData());
 
-  pbr.SetLightMap("metal_light_map.png", 1u);
+  auto lightImg = std::make_shared<gz::common::Image>();
+  pbr.SetLightMap("metal_light_map.png", 1u, lightImg);
   EXPECT_EQ("metal_light_map.png", pbr.LightMap());
   EXPECT_EQ(1u, pbr.LightMapTexCoordSet());
+  EXPECT_EQ(lightImg, pbr.LightMapData());
 
   auto roughnessImg = std::make_shared<gz::common::Image>();
   pbr.SetRoughnessMap("roughness_map.png", roughnessImg);
