@@ -539,6 +539,20 @@ TEST_F(AssimpLoader, ObjInvalidMaterial)
 }
 
 /////////////////////////////////////////////////
+// Open a non existing file
+TEST_F(AssimpLoader, NonExistingMesh)
+{
+  common::AssimpLoader loader;
+
+  std::string meshFilename =
+    common::testing::TestFile("data", "non_existing_mesh.glb");
+
+  common::Mesh *mesh = loader.Load(meshFilename);
+
+  EXPECT_EQ(mesh->SubMeshCount(), 0);
+}
+
+/////////////////////////////////////////////////
 // This test opens a FBX file
 TEST_F(AssimpLoader, LoadFbxBox)
 {
@@ -656,12 +670,20 @@ TEST_F(AssimpLoader, LoadGlbPbrAsset)
   EXPECT_EQ(img->Pixel(0, 0), math::Color(0.0f, 0.0f, 0.0f, 1.0f));
   EXPECT_EQ(img->Pixel(100, 100), math::Color(1.0f, 1.0f, 1.0f, 1.0f));
 
+
   EXPECT_NE(pbr->NormalMapData(), nullptr);
-  // Metallic roughness only works in assimp > 5.2.0
+  // Metallic roughness and alpha from textures only works in assimp > 5.2.0
 #ifndef GZ_ASSIMP_PRE_5_2_0
+  // Alpha from textures
+  EXPECT_TRUE(material->TextureAlphaEnabled());
+  EXPECT_TRUE(material->TwoSidedEnabled());
+  EXPECT_EQ(material->AlphaThreshold(), 0.5);
+  // Metallic and roughness maps
   EXPECT_NE(pbr->MetalnessMapData(), nullptr);
-  // TODO(luca) check pixel values to test texture splitting
   EXPECT_NE(pbr->RoughnessMapData(), nullptr);
+  // Check pixel values to test metallicroughness texture splitting
+  EXPECT_EQ(pbr->MetalnessMapData()->Pixel(270, 380), 0);
+  EXPECT_EQ(pbr->RoughnessMapData()->Pixel(270, 380), 124);
   // Bug in assimp 5.0.x that doesn't parse coordinate sets properly
   EXPECT_EQ(pbr->LightMapTexCoordSet(), 1);
 #endif

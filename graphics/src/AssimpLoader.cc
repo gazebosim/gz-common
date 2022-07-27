@@ -433,14 +433,14 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
         this->GenerateTextureName(_scene, assimpMat, "Emissive"));
     pbr.SetEmissiveMap(texName, texData);
   }
-  unsigned int uvidx = 0;
+  unsigned int uvIdx = 0;
   ret = assimpMat->GetTexture(
-      aiTextureType_LIGHTMAP, 0, &texturePath, NULL, &uvidx);
+      aiTextureType_LIGHTMAP, 0, &texturePath, NULL, &uvIdx);
   if (ret == AI_SUCCESS)
   {
     auto [texName, texData] = this->LoadTexture(_scene, texturePath,
         this->GenerateTextureName(_scene, assimpMat, "Lightmap"));
-    pbr.SetLightMap(texName, uvidx, texData);
+    pbr.SetLightMap(texName, uvIdx, texData);
   }
 #ifndef GZ_ASSIMP_PRE_5_2_0
   double value;
@@ -531,7 +531,6 @@ ImagePtr AssimpLoader::Implementation::LoadEmbeddedTexture(
       img->SetFromCompressedData((unsigned char*)_texture->pcData,
           _texture->mWidth, Image::PixelFormatType::COMPRESSED_PNG);
     }
-    // TODO(luca) other formats
   }
   return img;
 }
@@ -610,7 +609,6 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
 {
   Mesh *mesh = new Mesh();
   std::string path = common::parentPath(_filename);
-  // Load the asset, TODO(luca) check if we need to do preprocessing
   const aiScene* scene = this->dataPtr->importer.ReadFile(_filename,
       aiProcess_JoinIdenticalVertices |
       aiProcess_RemoveRedundantMaterials |
@@ -647,8 +645,6 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     mesh->AddMaterial(mat);
   }
   // Create the skeleton
-  // TODO(luca) Check if we need to have the skeleton if mesh has no animation
-  // if (scene->HasAnimations())
   {
     std::unordered_set<std::string> boneNames;
     this->dataPtr->RecursiveStoreBoneNames(scene, rootNode, boneNames);
@@ -663,10 +659,6 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
           rootNode->mChildren[childIdx], rootSkelNode,
           rootTransform, boneNames);
     }
-    // We dont need scene node and adding will create inverse model
-    // TODO(anyone) This causes segmentation faults in meshes made of
-    // a root node without any child
-    // rootSkelNode = rootSkelNode->Child(0);
     rootSkelNode->SetParent(nullptr);
 
     SkeletonPtr rootSkeleton = std::make_shared<Skeleton>(rootSkelNode);
@@ -696,15 +688,14 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
         math::Quaterniond quat(quatKey.mValue.w, quatKey.mValue.x,
             quatKey.mValue.y, quatKey.mValue.z);
         math::Pose3d pose(pos, quat);
-        // Time is in ms after 5.0.1?
+        // Time is in ms
         skelAnim->AddKeyFrame(chanName, posKey.mTime / 1000.0, pose);
       }
     }
     mesh->MeshSkeleton()->AddAnimation(skelAnim);
   }
 
-  if (mesh->HasSkeleton())
-    this->dataPtr->ApplyInvBindTransform(mesh->MeshSkeleton());
+  this->dataPtr->ApplyInvBindTransform(mesh->MeshSkeleton());
 
   return mesh;
 }
