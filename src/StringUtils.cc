@@ -23,6 +23,16 @@ namespace gz
   namespace common
   {
     //////////////////////////////////////////////////
+    std::string Trim(const std::string &_orig, char _char)
+    {
+      auto first = _orig.begin();
+      auto last = _orig.end();
+      while (first != last && *first == _char) ++first;
+      while (last != first && *(last - 1) == _char) --last;
+      return std::string(first, last);
+    }
+
+    //////////////////////////////////////////////////
     std::vector<std::string> Split(const std::string &_orig, char _delim)
     {
       std::vector<std::string> pieces;
