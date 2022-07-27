@@ -26,6 +26,12 @@ namespace gz
 {
   namespace common
   {
+    /// \brief trim a character at both ends of the given string
+    /// \param[in] _orig The string to trim
+    /// \param[in] _char a character to be trimmed, defaults to the empty space
+    /// \returns trimmed string
+    std::string GZ_COMMON_VISIBLE Trim(const std::string &_orig, char _char = ' ');
+
     /// \brief split at a one character delimiter to get a vector of something
     /// \param[in] _orig The string to split
     /// \param[in] _delim a character to split the string at
