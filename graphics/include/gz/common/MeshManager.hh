@@ -240,12 +240,10 @@ namespace gz
                                const gz::math::Vector2d &_segments,
                                const gz::math::Vector2d &_uvTile);
 
-      /// \brief Set the assimp mode
-      /// \param[in] _useAssimp Set to true to enable assimp mode.
-      public: void SetUseAssimp(const bool _useAssimp);
+      /// \brief Set assimp flags using environment variables.
+      public: void SetAssimpEnvs();
 
       /// \brief Tesselate a 2D mesh
-      ///
       /// Makes a zigzag pattern compatible with strips
       /// \param[in] _sm the mesh to tesselate
       /// \param[in] _meshWith mesh width
