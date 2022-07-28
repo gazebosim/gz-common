@@ -240,7 +240,9 @@ namespace gz
                                const gz::math::Vector2d &_segments,
                                const gz::math::Vector2d &_uvTile);
 
-      /// \brief Set assimp flags using environment variables.
+      /// \brief Sets the forceAssimp flag by reading the GZ_MESH_FORCE_ASSIMP
+      /// environment variable. If forceAssimp true, MeshManager uses Assimp
+      /// for loading all mesh formats, otherwise only for GLTF and FBX.
       public: void SetAssimpEnvs();
 
       /// \brief Tesselate a 2D mesh
