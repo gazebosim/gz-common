@@ -45,7 +45,11 @@ namespace gz
     class SubMesh;
 
     /// \class MeshManager MeshManager.hh gz/common/MeshManager.hh
-    /// \brief Maintains and manages all meshes
+    /// \brief Maintains and manages all meshes. Supported mesh formats are
+    /// STL (STLA, STLB), COLLADA, OBJ, GLTF (GLB) and FBX. By default only GLTF
+    /// and FBX are loaded using assimp loader, however if GZ_MESH_FORCE_ASSIMP
+    /// environment variable is set, then MeshManager will use assimp loader for
+    /// all supported mesh formats.
     class GZ_COMMON_GRAPHICS_VISIBLE MeshManager
         : public SingletonT<MeshManager>
     {
