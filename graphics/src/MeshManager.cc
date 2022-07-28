@@ -71,9 +71,6 @@ class gz::common::MeshManager::Implementation
   /// \brief Mutex to protect the mesh map
   public: std::mutex mutex;
 
-  /// \brief True if Assimp is used for loading STL, GLTF and FBX
-  public: bool useAssimp;
-
   /// \brief True if assimp is used for loading all supported mesh formats
   public: bool forceAssimp;
 #ifdef _WIN32
@@ -159,9 +156,6 @@ const Mesh *MeshManager::Load(const std::string &_filename)
     else
     {
       if (extension == "stl" || extension == "stlb" || extension == "stla")
-        if (this->dataPtr->useAssimp)
-          loader = &this->dataPtr->assimpLoader;
-        else
           loader = &this->dataPtr->stlLoader;
       else if (extension == "dae")
         loader = &this->dataPtr->colladaLoader;
@@ -1642,17 +1636,9 @@ void MeshManager::ConvertPolylinesToVerticesAndEdges(
 //////////////////////////////////////////////////
 void MeshManager::SetAssimpEnvs()
 {
-  std::string useAssimpEnv;
   std::string forceAssimpEnv;
-  common::env("GZ_MESH_USE_ASSIMP", useAssimpEnv);
   common::env("GZ_MESH_FORCE_ASSIMP", forceAssimpEnv);
-  this->dataPtr->useAssimp = false;
   this->dataPtr->forceAssimp = false;
-  if (useAssimpEnv == "true")
-  {
-    gzmsg << "Using assimp to load STL, GLTF and FBX formats"  << std::endl;
-    this->dataPtr->useAssimp = true;
-  }
   if (forceAssimpEnv == "true")
   {
     gzmsg << "Using assimp to load all mesh formats"  << std::endl;
