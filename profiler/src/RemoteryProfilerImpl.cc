@@ -184,7 +184,7 @@ RemoteryProfilerImpl::RemoteryProfilerImpl()
     static_cast<RemoteryProfilerImpl *>(_context)->HandleInput(_text);
   };
 
-  gzdbg << "Starting ign-common profiler impl: Remotery" <<
+  gzdbg << "Starting gz-common profiler impl: Remotery" <<
     " (port: " << this->settings->port << ")" << std::endl;
   rmtError error;
   error = rmt_CreateGlobalInstance(&this->rmt);

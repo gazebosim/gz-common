@@ -28,7 +28,7 @@ namespace gz
   namespace common
   {
     /// \class AssimpLoader AssimpLoader.hh gz/common/AssimpLoader.hh
-    /// \brief Class used to load Assimp mesh files
+    /// \brief Class used to load mesh files using the assimp lodaer
     class GZ_COMMON_GRAPHICS_VISIBLE AssimpLoader : public MeshLoader
     {
       /// \brief Constructor
@@ -38,9 +38,9 @@ namespace gz
       public: virtual ~AssimpLoader();
 
       /// \brief Load a mesh
-      /// \param[in] _filename Assimp file to load
+      /// \param[in] _filename Mesh file to load
       /// \return Pointer to a new Mesh
-      public: virtual Mesh *Load(const std::string &_filename);
+      public: virtual Mesh *Load(const std::string &_filename) override;
 
       /// \internal
       /// \brief Pointer to private data.

@@ -20,10 +20,10 @@
 
 #include <gz/utils/SuppressWarning.hh>
 
-#pragma message("ign-common SuppressWarning is deprecated, use ign-utils")
-// These macros have been moved to ign-utils so they may be more broadly used.
+#pragma message("gz-common SuppressWarning is deprecated, use gz-utils")
+// These macros have been moved to gz-utils so they may be more broadly used.
 // The implementations are aliases to those implementations and are deprecated
-// in ign-common5 and are to be removed in ign-common6
+// in gz-common5 and are to be removed in gz-common6
 
 // This header contains cross-platform macros for suppressing warnings. Please
 // only use these macros responsibly when you are certain that the compiler is
@@ -35,13 +35,13 @@
  * Usage example:
  *
  * SomeClass* ptr = CreatePtr();
- * IGN_COMMON_WARN_IGNORE__DELETE_NON_VIRTUAL_DESTRUCTOR
+ * GZ_COMMON_WARN_IGNORE__DELETE_NON_VIRTUAL_DESTRUCTOR
  * delete ptr;
- * IGN_COMMON_WARN_RESUME__DELETE_NON_VIRTUAL_DESTRUCTOR
+ * GZ_COMMON_WARN_RESUME__DELETE_NON_VIRTUAL_DESTRUCTOR
  *
  */
 
-// Be sure to call the IGN_COMMON_WARN_RESUME__XXXXX macro at the end of the
+// Be sure to call the GZ_COMMON_WARN_RESUME__XXXXX macro at the end of the
 // block of code where the warning suppression is needed. Otherwise, you might
 // inadvertently suppress legitimate warnings.
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Open Source Robotics Foundation
+ * Copyright (C) 2022 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 */
 #include <gtest/gtest.h>
 
-#include "gz/common/Mesh.hh"
-#include "gz/common/SubMesh.hh"
 #include "gz/common/Material.hh"
+#include "gz/common/Mesh.hh"
 #include "gz/common/Skeleton.hh"
 #include "gz/common/SkeletonAnimation.hh"
+#include "gz/common/SubMesh.hh"
 #include "gz/common/AssimpLoader.hh"
 
 #include "gz/common/testing/AutoLogFixture.hh"
@@ -142,8 +142,8 @@ TEST_F(AssimpLoader, ShareVertices)
       mesh->SubMeshByIndex(i).lock();
     for (unsigned int j = 0; j < subMesh->VertexCount(); ++j)
     {
-      gz::math::Vector3d v = subMesh->Vertex(j);
-      gz::math::Vector3d n = subMesh->Normal(j);
+      math::Vector3d v = subMesh->Vertex(j);
+      math::Vector3d n = subMesh->Normal(j);
 
       // Verify there is no other vertex with the same position AND normal
       for (unsigned int k = j+1; k < subMesh->VertexCount(); ++k)
@@ -164,24 +164,6 @@ TEST_F(AssimpLoader, LoadZeroCount)
   common::Mesh *mesh = loader.Load(
       common::testing::TestFile("data", "zero_count.dae"));
   ASSERT_TRUE(mesh);
-  // This is custom logging messages, not implemented in Assimp
-  /*
-#ifndef _WIN32
-  std::string log = LogContent();
-
-  // Expect no errors about missing values
-  EXPECT_EQ(log.find("Loading what we can..."), std::string::npos);
-  EXPECT_EQ(log.find("Vertex source missing float_array"), std::string::npos);
-  EXPECT_EQ(log.find("Normal source missing float_array"), std::string::npos);
-
-  // Expect the logs to contain information
-  EXPECT_NE(log.find("Triangle input has a count of zero"), std::string::npos);
-  EXPECT_NE(log.find("Vertex source has a float_array with a count of zero"),
-      std::string::npos);
-  EXPECT_NE(log.find("Normal source has a float_array with a count of zero"),
-      std::string::npos);
-#endif
-  */
 }
 
 /////////////////////////////////////////////////
@@ -271,6 +253,8 @@ TEST_F(AssimpLoader, TexCoordSets)
   EXPECT_EQ(math::Vector2d(0.1, 0.2), subMeshB->TexCoordBySet(2u, 1u));
 }
 
+// Test fails for assimp below 5.2.0
+#ifndef GZ_ASSIMP_PRE_5_2_0
 /////////////////////////////////////////////////
 TEST_F(AssimpLoader, LoadBoxWithAnimationOutsideSkeleton)
 {
@@ -306,6 +290,7 @@ TEST_F(AssimpLoader, LoadBoxWithAnimationOutsideSkeleton)
         0, 0, 0, 1);
   EXPECT_EQ(expectedTrans, poseEnd.at("Armature"));
 }
+#endif
 
 /////////////////////////////////////////////////
 TEST_F(AssimpLoader, LoadBoxInstControllerWithoutSkeleton)
@@ -367,7 +352,9 @@ TEST_F(AssimpLoader, LoadBoxNestedAnimation)
   common::SkeletonPtr skeleton = mesh->MeshSkeleton();
   ASSERT_EQ(1u, mesh->MeshSkeleton()->AnimationCount());
   common::SkeletonAnimation *anim = skeleton->Animation(0);
-  EXPECT_EQ(anim->Name(), "Armature");
+  // Depends on fix in assimp main branch for nested animation naming
+  // TODO(luca) Fix is merged in assimp main, add when it is re-released
+  // EXPECT_EQ(anim->Name(), "Armature");
   EXPECT_EQ(1u, anim->NodeCount());
   EXPECT_TRUE(anim->HasNode("Armature_Bone"));
   auto nodeAnimation = anim->NodeAnimationByName("Armature_Bone");
@@ -403,8 +390,8 @@ TEST_F(AssimpLoader, LoadBoxWithDefaultStride)
   EXPECT_EQ(1u, mesh->MaterialCount());
   EXPECT_EQ(24u, mesh->TexCoordCount());
   ASSERT_NE(mesh->MeshSkeleton(), nullptr);
-  // TODO not working, investigate
-  //ASSERT_EQ(1u, mesh->MeshSkeleton()->AnimationCount());
+  // TODO(luca) not working, investigate
+  // ASSERT_EQ(1u, mesh->MeshSkeleton()->AnimationCount());
 }
 
 /////////////////////////////////////////////////
@@ -456,13 +443,16 @@ TEST_F(AssimpLoader, MergeBoxWithDoubleSkeleton)
   common::AssimpLoader loader;
   common::Mesh *mesh = loader.Load(
       common::testing::TestFile("data", "box_with_double_skeleton.dae"));
-  EXPECT_TRUE(mesh->HasSkeleton());
+  ASSERT_TRUE(mesh->HasSkeleton());
   auto skeleton_ptr = mesh->MeshSkeleton();
   // The two skeletons have been joined and their root is the
   // animation root, called Scene
   EXPECT_EQ(skeleton_ptr->RootNode()->Name(), std::string("Scene"));
 }
 
+// For assimp below 5.2.0 mesh loading fails because of
+// failing to parse the empty <author> tag
+#ifndef GZ_ASSIMP_PRE_5_2_0
 /////////////////////////////////////////////////
 TEST_F(AssimpLoader, LoadCylinderAnimatedFrom3dsMax)
 {
@@ -493,10 +483,12 @@ TEST_F(AssimpLoader, LoadCylinderAnimatedFrom3dsMax)
 
   auto anim = skeleton->Animation(0);
   ASSERT_NE(nullptr, anim);
-  EXPECT_EQ("Bone02", anim->Name());
+  // TODO(luca) Fix is merged in assimp main, add when it is re-released
+  // EXPECT_EQ("Bone02", anim->Name());
   EXPECT_EQ(1u, anim->NodeCount());
   EXPECT_TRUE(anim->HasNode("Bone02"));
 }
+#endif
 
 /////////////////////////////////////////////////
 TEST_F(AssimpLoader, LoadObjBox)
@@ -531,79 +523,177 @@ TEST_F(AssimpLoader, LoadObjBox)
   EXPECT_DOUBLE_EQ(mat->Transparency(), 0.0);
 }
 
+
 /////////////////////////////////////////////////
 // This tests opening an OBJ file that has an invalid material reference
 TEST_F(AssimpLoader, ObjInvalidMaterial)
 {
-  gz::common::AssimpLoader loader;
+  common::AssimpLoader loader;
 
   std::string meshFilename =
     common::testing::TestFile("data", "invalid_material.obj");
 
-  gz::common::Mesh *mesh = loader.Load(meshFilename);
+  common::Mesh *mesh = loader.Load(meshFilename);
 
   EXPECT_TRUE(mesh != nullptr);
 }
 
 /////////////////////////////////////////////////
-// This tests opening an OBJ file that has PBR fields
-TEST_F(AssimpLoader, ObjPBR)
+// Open a non existing file
+TEST_F(AssimpLoader, NonExistingMesh)
 {
-  gz::common::AssimpLoader loader;
+  common::AssimpLoader loader;
 
-  // This was custom behavior of OBJ Loader to fix blender OBJ PBR issue
-  // not implemented in assimp
-  /*
-  // load obj file exported by 3ds max that has pbr extension
-  {
-    std::string meshFilename =
-      common::testing::TestFile("data", "cube_pbr.obj");
+  std::string meshFilename =
+    common::testing::TestFile("data", "non_existing_mesh.glb");
 
-    gz::common::Mesh *mesh = loader.Load(meshFilename);
-    EXPECT_NE(nullptr, mesh);
+  common::Mesh *mesh = loader.Load(meshFilename);
 
-    const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
-    ASSERT_TRUE(mat.get());
+  EXPECT_EQ(mesh->SubMeshCount(), 0);
+}
 
-    EXPECT_EQ(math::Color(0.0f, 0.0f, 0.0f, 1.0f), mat->Ambient());
-    EXPECT_EQ(math::Color(0.5f, 0.5f, 0.5f, 1.0f), mat->Diffuse());
-    EXPECT_EQ(math::Color(1.0f, 1.0f, 1.0f, 1.0f), mat->Specular());
-    EXPECT_DOUBLE_EQ(0.0, mat->Transparency());
-    EXPECT_NE(std::string::npos,
-        mat->TextureImage().find("LightDome_Albedo.png"));
-    const common::Pbr *pbr = mat->PbrMaterial();
-    EXPECT_DOUBLE_EQ(0, pbr->Roughness());
-    EXPECT_DOUBLE_EQ(0, pbr->Metalness());
-    EXPECT_EQ("LightDome_Metalness.png", pbr->MetalnessMap());
-    EXPECT_EQ("LightDome_Roughness.png", pbr->RoughnessMap());
-    EXPECT_EQ("LightDome_Normal.png", pbr->NormalMap());
-  }
+/////////////////////////////////////////////////
+// This test opens a FBX file
+TEST_F(AssimpLoader, LoadFbxBox)
+{
+  common::AssimpLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "box.fbx"));
 
-  // load obj file exported by blender - it shoves pbr maps into
-  // existing fields
-  {
-    std::string meshFilename =
-      common::testing::TestFile("data", "blender_pbr.obj");
+  EXPECT_STREQ("unknown", mesh->Name().c_str());
+  EXPECT_EQ(math::Vector3d(100, 100, 100), mesh->Max());
+  EXPECT_EQ(math::Vector3d(-100, -100, -100), mesh->Min());
 
-    gz::common::Mesh *mesh = loader.Load(meshFilename);
-    EXPECT_NE(nullptr, mesh);
+  EXPECT_EQ(24u, mesh->VertexCount());
+  EXPECT_EQ(24u, mesh->NormalCount());
+  EXPECT_EQ(36u, mesh->IndexCount());
+  EXPECT_EQ(24u, mesh->TexCoordCount());
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(1u, mesh->MaterialCount());
 
-    const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
-    ASSERT_TRUE(mat.get());
+  // Make sure we can read the submesh name
+  EXPECT_STREQ("Cube", mesh->SubMeshByIndex(0).lock()->Name().c_str());
 
-    EXPECT_EQ(math::Color(1.0f, 1.0f, 1.0f, 1.0f), mat->Ambient());
-    EXPECT_EQ(math::Color(0.8f, 0.8f, 0.8f, 1.0f), mat->Diffuse());
-    EXPECT_EQ(math::Color(0.5f, 0.5f, 0.5f, 1.0f), mat->Specular());
-    EXPECT_EQ(math::Color(0.0f, 0.0f, 0.0f, 1.0f), mat->Emissive());
-    EXPECT_DOUBLE_EQ(0.0, mat->Transparency());
-    EXPECT_NE(std::string::npos,
-        mat->TextureImage().find("mesh_Diffuse.png"));
-    const common::Pbr *pbr = mat->PbrMaterial();
-    EXPECT_DOUBLE_EQ(0, pbr->Roughness());
-    EXPECT_DOUBLE_EQ(0, pbr->Metalness());
-    EXPECT_EQ("mesh_Metal.png", pbr->MetalnessMap());
-    EXPECT_EQ("mesh_Rough.png", pbr->RoughnessMap());
-    EXPECT_EQ("mesh_Normal.png", pbr->NormalMap());
-  }
-  */
+  EXPECT_EQ(mesh->MaterialCount(), 1u);
+
+  const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+  ASSERT_TRUE(mat.get());
+
+  // Make sure we read the material color values
+  EXPECT_EQ(mat->Ambient(), math::Color(0.0f, 0.0f, 0.0f, 1.0f));
+  EXPECT_EQ(mat->Diffuse(), math::Color(0.8f, 0.8f, 0.8f, 1.0f));
+  EXPECT_EQ(mat->Specular(), math::Color(0.8f, 0.8f, 0.8f, 1.0f));
+  EXPECT_DOUBLE_EQ(mat->Transparency(), 0.0);
+}
+
+/////////////////////////////////////////////////
+// This test opens a GLB file
+TEST_F(AssimpLoader, LoadGlTF2Box)
+{
+  common::AssimpLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "box.glb"));
+
+  EXPECT_STREQ("unknown", mesh->Name().c_str());
+  EXPECT_EQ(math::Vector3d(1, 1, 1), mesh->Max());
+  EXPECT_EQ(math::Vector3d(-1, -1, -1), mesh->Min());
+
+  EXPECT_EQ(24u, mesh->VertexCount());
+  EXPECT_EQ(24u, mesh->NormalCount());
+  EXPECT_EQ(36u, mesh->IndexCount());
+  EXPECT_EQ(24u, mesh->TexCoordCount());
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(1u, mesh->MaterialCount());
+
+  // Make sure we can read the submesh name
+  EXPECT_STREQ("Cube", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+
+  EXPECT_EQ(mesh->MaterialCount(), 1u);
+
+  const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+  ASSERT_TRUE(mat.get());
+
+  // Make sure we read the material color values
+  EXPECT_EQ(mat->Ambient(), math::Color(0.4f, 0.4f, 0.4f, 1.0f));
+  EXPECT_EQ(mat->Diffuse(), math::Color(0.8f, 0.8f, 0.8f, 1.0f));
+  EXPECT_EQ(mat->Specular(), math::Color(0.0f, 0.0f, 0.0f, 1.0f));
+  EXPECT_DOUBLE_EQ(mat->Transparency(), 0.0);
+}
+
+/////////////////////////////////////////////////
+// Use a fully featured glb test asset, including PBR textures, emissive maps
+// embedded textures, lightmaps, animations to test advanced glb features
+TEST_F(AssimpLoader, LoadGlbPbrAsset)
+{
+  common::AssimpLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "fully_featured.glb"));
+
+  EXPECT_STREQ("unknown", mesh->Name().c_str());
+
+  EXPECT_EQ(mesh->SubMeshCount(), 7);
+  EXPECT_STREQ("Floor", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+  EXPECT_STREQ("SquareShelf", mesh->SubMeshByIndex(1).lock()->Name().c_str());
+  EXPECT_STREQ("OpenRoboticsLogo.002",
+      mesh->SubMeshByIndex(2).lock()->Name().c_str());
+  EXPECT_STREQ("OpenRoboticsLogo.001",
+      mesh->SubMeshByIndex(3).lock()->Name().c_str());
+  EXPECT_STREQ("EmissiveCube", mesh->SubMeshByIndex(4).lock()->Name().c_str());
+  EXPECT_STREQ("OpenCola", mesh->SubMeshByIndex(5).lock()->Name().c_str());
+  EXPECT_STREQ("OpenRoboticsLogo",
+      mesh->SubMeshByIndex(6).lock()->Name().c_str());
+
+  // Emissive cube has an embedded emissive texture
+  auto materialId = mesh->SubMeshByIndex(4).lock()->GetMaterialIndex();
+  ASSERT_TRUE(materialId.has_value());
+  auto material = mesh->MaterialByIndex(materialId.value());
+  ASSERT_NE(material, nullptr);
+  auto pbr = material->PbrMaterial();
+  ASSERT_NE(pbr, nullptr);
+  EXPECT_NE(pbr->EmissiveMapData(), nullptr);
+
+  // SquareShelf has full PBR textures, including metallicroughness
+  // and ambient occlusion
+  materialId = mesh->SubMeshByIndex(1).lock()->GetMaterialIndex();
+  ASSERT_TRUE(materialId.has_value());
+  material = mesh->MaterialByIndex(materialId.value());
+  ASSERT_NE(material, nullptr);
+  pbr = material->PbrMaterial();
+  ASSERT_NE(pbr, nullptr);
+
+  // Check the texture data itself
+  auto img = material->TextureData();
+  ASSERT_NE(img, nullptr);
+  EXPECT_EQ(img->Width(), 512);
+  EXPECT_EQ(img->Height(), 512);
+  // A black and a white pixel
+  EXPECT_EQ(img->Pixel(0, 0), math::Color(0.0f, 0.0f, 0.0f, 1.0f));
+  EXPECT_EQ(img->Pixel(100, 100), math::Color(1.0f, 1.0f, 1.0f, 1.0f));
+
+
+  EXPECT_NE(pbr->NormalMapData(), nullptr);
+  // Metallic roughness and alpha from textures only works in assimp > 5.2.0
+#ifndef GZ_ASSIMP_PRE_5_2_0
+  // Alpha from textures
+  EXPECT_TRUE(material->TextureAlphaEnabled());
+  EXPECT_TRUE(material->TwoSidedEnabled());
+  EXPECT_EQ(material->AlphaThreshold(), 0.5);
+  // Metallic and roughness maps
+  EXPECT_NE(pbr->MetalnessMapData(), nullptr);
+  EXPECT_NE(pbr->RoughnessMapData(), nullptr);
+  // Check pixel values to test metallicroughness texture splitting
+  EXPECT_FLOAT_EQ(pbr->MetalnessMapData()->Pixel(256, 256).R(), 0.0);
+  EXPECT_FLOAT_EQ(pbr->RoughnessMapData()->Pixel(256, 256).R(), 124.0 / 255.0);
+  // Bug in assimp 5.0.x that doesn't parse coordinate sets properly
+  EXPECT_EQ(pbr->LightMapTexCoordSet(), 1);
+#endif
+  EXPECT_NE(pbr->LightMapData(), nullptr);
+
+  // Mesh has 3 animations
+  auto skel = mesh->MeshSkeleton();
+  ASSERT_NE(skel, nullptr);
+  ASSERT_EQ(skel->AnimationCount(), 3);
+  EXPECT_STREQ("Action1", skel->Animation(0)->Name().c_str());
+  EXPECT_STREQ("Action2", skel->Animation(1)->Name().c_str());
+  EXPECT_STREQ("Action3", skel->Animation(2)->Name().c_str());
 }

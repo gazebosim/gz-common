@@ -39,7 +39,7 @@ namespace gz::common::testing
 ///
 /// For CMake builds, it is expected that this is injected via a
 /// buildsystem define of TESTING_PROJECT_SOURCE_DIR.
-/// This is done automatically for tests using ign-cmake's ign_build_tests
+/// This is done automatically for tests using gz-cmake's gz_build_tests
 ///
 /// For Bazel builds, it is expected to be empty
 constexpr char kTestingProjectSourceDir[] = TESTING_PROJECT_SOURCE_DIR;
@@ -151,7 +151,7 @@ TestPathFactory(
 //////////////////////////////////////////////////
 /// \brief Get the path to a file in the project source tree
 ///
-/// Example: to get ign-common/test/data/box.dae
+/// Example: to get gz-common/test/data/box.dae
 /// SourceFile("test", "data", "box.dae");
 ///
 /// \param[in] args Relative path to the source file
@@ -170,7 +170,7 @@ std::string SourceFile(Args const &... args)
 //////////////////////////////////////////////////
 /// \brief Get the path to a file in the project test directory tree
 ///
-/// Example: to get ign-common/test/data/box.dae
+/// Example: to get gz-common/test/data/box.dae
 /// TestFile("data", "box.dae");
 ///
 /// \param[in] args Path to the file, relative to the test directory

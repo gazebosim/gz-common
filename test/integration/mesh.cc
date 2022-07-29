@@ -134,10 +134,14 @@ TEST_F(MeshTest, Load)
   // Loading should be successful
   EXPECT_NE(nullptr, common::MeshManager::Instance()->Load("box.dae"));
   EXPECT_NE(nullptr, common::MeshManager::Instance()->Load("box.obj"));
+  EXPECT_NE(nullptr, common::MeshManager::Instance()->Load("box.fbx"));
+  EXPECT_NE(nullptr, common::MeshManager::Instance()->Load("box.glb"));
 
   // Reloading should not cause errors
   EXPECT_NE(nullptr, common::MeshManager::Instance()->Load("box.dae"));
   EXPECT_NE(nullptr, common::MeshManager::Instance()->Load("box.obj"));
+  EXPECT_NE(nullptr, common::MeshManager::Instance()->Load("box.fbx"));
+  EXPECT_NE(nullptr, common::MeshManager::Instance()->Load("box.glb"));
 }
 
 /////////////////////////////////////////////////

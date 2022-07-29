@@ -22,7 +22,6 @@
 
 #include "gz/common/Console.hh"
 #include "gz/common/geospatial/Dem.hh"
-#include "gz/math/SphericalCoordinates.hh"
 
 using namespace gz;
 using namespace common;
@@ -59,10 +58,14 @@ class gz::common::Dem::Implementation
   /// \brief Full filename used to load the dem.
   public: std::string filename;
 
-  /// \brief Whether the DEM will be handled as from non-Earth.
+  /// \brief Whether the DEM will be handled as unknown.
   /// If true, worldWidth & worldHeight = -1
   /// and GeoReference[Origin] can not be used (will return false)
-  public: bool isNonEarthDem = false;
+  public: bool isUnknownDem = false;
+
+  /// \brief Holds the spherical coordinates object from the world.
+  public: math::SphericalCoordinates sphericalCoordinates =
+           math::SphericalCoordinates();
 };
 
 //////////////////////////////////////////////////
@@ -83,15 +86,10 @@ Dem::~Dem()
 }
 
 //////////////////////////////////////////////////
-void Dem::SetNonEarthDEM(bool _isNonEarthDem)
+void Dem::SetSphericalCoordinates(
+    const math::SphericalCoordinates &_worldSphericalCoordinates)
 {
-  this->dataPtr->isNonEarthDem = _isNonEarthDem;
-}
-
-//////////////////////////////////////////////////
-bool Dem::GetNonEarthDEM()
-{
-  return this->dataPtr->isNonEarthDem;
+  this->dataPtr->sphericalCoordinates =_worldSphericalCoordinates;
 }
 
 //////////////////////////////////////////////////
@@ -157,21 +155,20 @@ int Dem::Load(const std::string &_filename)
   {
     // If successful, set the world width and height
     this->dataPtr->worldWidth =
-       math::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
-                                              upRightLat, upRightLong);
+       this->dataPtr->sphericalCoordinates.DistanceBetweenPoints(
+           upLeftLat, upLeftLong, upRightLat, upRightLong);
     this->dataPtr->worldHeight =
-       math::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
-                                              lowLeftLat, lowLeftLong);
+       this->dataPtr->sphericalCoordinates.DistanceBetweenPoints(
+           upLeftLat, upLeftLong, lowLeftLat, lowLeftLong);
   }
-  // Assume non-Earth DEM (e.g., moon)
+  // Assume unknown DEM.
   else
   {
     gzwarn << "Failed to automatically compute DEM size. "
-            << "Assuming non-Earth DEM. "
             << std::endl;
 
     this->dataPtr->worldWidth = this->dataPtr->worldHeight = -1;
-    this->dataPtr->isNonEarthDem = true;
+    this->dataPtr->isUnknownDem = true;
   }
 
   // Set the terrain's side (the terrain will be squared after the padding)
@@ -275,9 +272,9 @@ float Dem::MaxElevation() const
 bool Dem::GeoReference(double _x, double _y,
     gz::math::Angle &_latitude, gz::math::Angle &_longitude) const
 {
-  if (this->dataPtr->isNonEarthDem)
+  if (this->dataPtr->isUnknownDem)
   {
-    gzerr << "Can not retrieve WGS84 coordinates from non-Earth DEM."
+    gzerr << "Can not retrieve coordinates from unknown DEM."
             << std::endl;
     return false;
   }
@@ -285,25 +282,52 @@ bool Dem::GeoReference(double _x, double _y,
   double geoTransf[6];
   if (this->dataPtr->dataSet->GetGeoTransform(geoTransf) == CE_None)
   {
+    OGRCoordinateTransformation *cT = nullptr;
+    double xGeoDeg, yGeoDeg;
     OGRSpatialReference sourceCs;
     OGRSpatialReference targetCs;
-    OGRCoordinateTransformation *cT;
-    double xGeoDeg, yGeoDeg;
 
-    // Transform the terrain's coordinate system to WGS84
-    const char *importString
-        = strdup(this->dataPtr->dataSet->GetProjectionRef());
-    if (importString == nullptr || importString[0] == '\0')
+    if (this->dataPtr->sphericalCoordinates.Surface() ==
+        math::SphericalCoordinates::EARTH_WGS84)
     {
-      gzdbg << "Projection coordinate system undefined." << std::endl;
-      return false;
+      // Transform the terrain's coordinate system to WGS84
+      const char *importString
+          = strdup(this->dataPtr->dataSet->GetProjectionRef());
+      if (importString == nullptr || importString[0] == '\0')
+      {
+        // LCOV_EXCL_START
+        gzdbg << "Projection coordinate system undefined." << std::endl;
+        return false;
+        // LCOV_EXCL_STOP
+      }
+      sourceCs.importFromWkt(&importString);
+      targetCs.SetWellKnownGeogCS("WGS84");
     }
-    sourceCs.importFromWkt(&importString);
-    targetCs.SetWellKnownGeogCS("WGS84");
+    else if ((this->dataPtr->sphericalCoordinates.Surface() ==
+        math::SphericalCoordinates::CUSTOM_SURFACE) ||
+        (this->dataPtr->sphericalCoordinates.Surface() ==
+         math::SphericalCoordinates::MOON_SCS))
+    {
+      sourceCs = *(this->dataPtr->dataSet->GetSpatialRef());
+      targetCs = OGRSpatialReference();
+
+      double axisEquatorial =
+        this->dataPtr->sphericalCoordinates.SurfaceAxisEquatorial();
+      double axisPolar =
+        this->dataPtr->sphericalCoordinates.SurfaceAxisPolar();
+
+      std::string surfaceLatLongProjStr =
+        "+proj=latlong +a=" + std::to_string(axisEquatorial) +
+        " +b=" + std::to_string(axisPolar);
+
+      targetCs.importFromProj4(surfaceLatLongProjStr.c_str());
+    }
+
     cT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
+
     if (nullptr == cT)
     {
-      gzerr << "Unable to transform terrain coordinate system to WGS84 for "
+      gzerr << "Unable to transform terrain coordinate system for "
              << "coordinates (" << _x << "," << _y << ")" << std::endl;
       OCTDestroyCoordinateTransformation(cT);
       return false;
@@ -350,9 +374,9 @@ unsigned int Dem::Width() const
 //////////////////////////////////////////////////
 double Dem::WorldWidth() const
 {
-  if (this->dataPtr->isNonEarthDem)
+  if (this->dataPtr->isUnknownDem)
   {
-    gzwarn << "Unable to determine world width of non-Earth DEM."
+    gzwarn << "Unable to determine world width of unknown DEM."
             << std::endl;
   }
   return this->dataPtr->worldWidth;
@@ -361,9 +385,9 @@ double Dem::WorldWidth() const
 //////////////////////////////////////////////////
 double Dem::WorldHeight() const
 {
-  if (this->dataPtr->isNonEarthDem)
+  if (this->dataPtr->isUnknownDem)
   {
-    gzwarn << "Unable to determine world height of non-Earth DEM."
+    gzwarn << "Unable to determine world height of unknown DEM."
             << std::endl;
   }
   return this->dataPtr->worldHeight;

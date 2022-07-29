@@ -8,7 +8,7 @@
 1. Fix spelling in URI error message
     * [Pull request #333](https://github.com/gazebosim/gz-common/pull/333)
 
-1. `ignLogInit` fails if run after console output
+1. `gzLogInit` fails if run after console output
     * [Pull request #332](https://github.com/gazebosim/gz-common/pull/332)
 
 1. Fix compatibility with FFmpeg 5.0
@@ -77,7 +77,7 @@
 
 ## Gazebo Common 4.3.0 (2021-09-27)
 
-1. Remove ign-utils from TempDirectory
+1. Remove gz-utils from TempDirectory
     * [Pull request #248](https://github.com/gazebosim/gz-common/pull/248)
 
 1. Add functions and objects for Temporary Directories
@@ -163,7 +163,7 @@
 
 1. Add bazel buildsystem support
     * [Pull request #123](https://github.com/gazebosim/gz-common/pull/123)
->>>>>>> ign-common4
+>>>>>>> gz-common4
 
 ## Gazebo Common 4.0.0 (2021-03-30)
 
@@ -176,7 +176,7 @@
 1. Rotate capsule to Z-up
     * [Pull request #186](https://github.com/gazebosim/gz-common/pull/186)
 
-1. Add implementation pointer to ign-common classes
+1. Add implementation pointer to gz-common classes
     * [Pull request #163](https://github.com/gazebosim/gz-common/pull/163)
 
 1. Cleanup and add implementation pointer to Animation classes
@@ -201,7 +201,7 @@
     * [Pull request #58](https://github.com/gazebosim/gz-common/pull/58)
 
 1. Corrected `BAYER_RGGR8` to `BAYER_BGGR8` in `PixelFormatName` and
-   `PixelFormatType` located in `graphics/include/ignition/common/Image.hh`.
+   `PixelFormatType` located in `graphics/include/gz/common/Image.hh`.
     * [BitBucket pull request 191](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/191)
 
 1. Added URI Authority parsing to the URI class. Authority information can
@@ -210,7 +210,31 @@
 
 ## Gazebo Common 3.x
 
-## Gazebo Common 3.X.X
+## Gazebo Common 3.14.1 (2022-06-01)
+
+1. Profiler tutorial: viewing from Docker container
+    * [Pull request #362](https://github.com/gazebosim/gz-common/pull/362)
+
+1. ignLogInit can be called after an ignerr, etc
+    * [Pull request #332](https://github.com/gazebosim/gz-common/pull/332)
+
+1. Fix compatibility with FFmpeg 5.0
+    * [Pull request #325](https://github.com/gazebosim/gz-common/pull/325)
+
+1. Fix out-of-bounds access in sanitizeSlashes
+    * [Pull request #303](https://github.com/gazebosim/gz-common/pull/303)
+
+1. Fix memory corruption & leaks in Image
+    * [Pull request #287](https://github.com/gazebosim/gz-common/pull/287)
+
+1. Normalize normal vectors from OBJ.
+    * [Pull request #269](https://github.com/gazebosim/gz-common/pull/269)
+
+1. Fixed macos symbol in `common::profiler`
+    * [Pull request #262](https://github.com/gazebosim/gz-common/pull/262)
+
+1. Fix skip logic for integration tests
+    * [Pull request #264](https://github.com/gazebosim/gz-common/pull/264)
 
 ## Gazebo Common 3.14.0 (2021-10-12)
 
@@ -366,7 +390,7 @@
 
 1. Windows
     * Do not hardcode USE_EXTERNAL_TINYXML2 to OFF: [Pull Request 116](https://github.com/gazebosim/gz-common/pull/116)
-    * Fix IGN_HOMEDIR on Windows: [Pull Request 127](https://github.com/gazebosim/gz-common/pull/127)
+    * Fix GZ_HOMEDIR on Windows: [Pull Request 127](https://github.com/gazebosim/gz-common/pull/127)
     * Improve Windows support: [Pull Request 128](https://github.com/gazebosim/gz-common/pull/128)
     * Fix Windows AV CI warnings and test failures: [Pull Request 135](https://github.com/gazebosim/gz-common/pull/135)
 
@@ -512,7 +536,7 @@
 
 ## Gazebo Common 3.2.0 (2019-08-07)
 
-1. Allow gzLogInit to use an absolute path. Added a timeToIso that converts a given time to an ISO string. Some console timestamps were using `IGN_SYSTEM_TIME_NS()` and others `gz::common::systemTimeISO()`. Switched all to use `gz::common::systemTimeISO()`.
+1. Allow gzLogInit to use an absolute path. Added a timeToIso that converts a given time to an ISO string. Some console timestamps were using `GZ_SYSTEM_TIME_NS()` and others `gz::common::systemTimeISO()`. Switched all to use `gz::common::systemTimeISO()`.
     * [BitBucket pull request 203](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/203)
 
 1. Port ColladaLoader fix: use default value of 1 for stride parameter when unset.
@@ -535,7 +559,7 @@
 1. Filesystem functions to create unique paths
     * [BitBucket pull request 187](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/187)
 
-1. Battery additions for LinearBatteryPlugin port to ign-gazebo
+1. Battery additions for LinearBatteryPlugin port to gz-sim
     * [BitBucket pull request 186](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/186)
 
 1. Consolidate Console::log streams to reduce colored log size
@@ -548,7 +572,7 @@
 
 ## Gazebo Common 3.0.0 (2019-02-28)
 
-1. Use ign-cmake2 and support Ubuntu Bionic (18.04).
+1. Use gz-cmake2 and support Ubuntu Bionic (18.04).
     * [BitBucket pull request 131](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/131)
 
 1. WorkerPool: allow user to set minimum number of worker threads.
@@ -574,7 +598,7 @@
     * [BitBucket pull request 171](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/171)
     * [BitBucket pull request 172](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/172)
 
-1. SystemPaths: search paths in `IGN_FILE_PATH` environment variable when finding files
+1. SystemPaths: search paths in `GZ_FILE_PATH` environment variable when finding files
     * [BitBucket pull request 175](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/175)
 
 1. `Time::Sleep`: return amount of time actually slept

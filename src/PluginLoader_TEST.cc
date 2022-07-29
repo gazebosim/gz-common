@@ -34,7 +34,7 @@
 class TestTempDirectory : public gz::common::TempDirectory
 {
   public: TestTempDirectory():
-    gz::common::TempDirectory("plugin_loader", "ign_common", true)
+    gz::common::TempDirectory("plugin_loader", "gz_common", true)
   {
   }
 };

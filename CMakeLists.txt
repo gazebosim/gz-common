@@ -15,21 +15,19 @@ set(GZ_CMAKE_VER ${gz-cmake3_VERSION_MAJOR})
 #============================================================================
 # Configure the project
 #============================================================================
-gz_configure_project(
-  REPLACE_IGNITION_INCLUDE_PATH gz/common
-  VERSION_SUFFIX pre1)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+gz_configure_project(VERSION_SUFFIX pre1)
 
 #============================================================================
 # Set project-specific options
 #============================================================================
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 #--------------------------------------
 # Option: Should Windows test symlinking?
 if(WIN32)
   option(
-    IGN_BUILD_SYMLINK_TESTS_ON_WINDOWS
+    GZ_BUILD_SYMLINK_TESTS_ON_WINDOWS
     "Creating symlinks requires special permissions on Windows, so those tests are disabled by default"
     false)
 endif()
@@ -126,7 +124,7 @@ gz_find_package(AVUTIL REQUIRED_BY av PRETTY libavutil)
 
 #------------------------------------
 # Find assimp
-ign_find_package(ASSIMP VERSION 5.2.0 REQUIRED_BY graphics PRETTY assimp)
+gz_find_package(GzAssimp REQUIRED_BY graphics PRETTY assimp)
 
 
 message(STATUS "-------------------------------------------\n")

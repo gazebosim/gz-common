@@ -32,7 +32,7 @@ class Console_TEST : public ::testing::Test {
   protected: virtual void SetUp()
   {
     this->temp = std::make_unique<TempDirectory>(
-        "test", "ign_common", true);
+        "test", "gz_common", true);
     ASSERT_TRUE(this->temp->Valid());
     common::setenv(GZ_HOMEDIR, this->temp->Path());
   }
@@ -79,7 +79,7 @@ TEST_F(Console_TEST, NoInitAndLog)
   gzlog << logString << std::endl;
 
   // Get the absolute log file path
-  std::string logPath = ".ignition/auto_default.log";
+  std::string logPath = ".gz/auto_default.log";
 
   // Expect to find the string in the log file
   EXPECT_TRUE(GetLogContent(logPath).find(logString) != std::string::npos);
