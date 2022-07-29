@@ -122,6 +122,9 @@ gz_find_package(AVCODEC REQUIRED_BY av PRETTY libavcodec)
 # Find avutil
 gz_find_package(AVUTIL REQUIRED_BY av PRETTY libavutil)
 
+#------------------------------------
+# Find csv
+gz_find_package(CSV REQUIRED PRIVATE PRETTY libcsv PKGCONFIG_LIB csv)
 
 message(STATUS "-------------------------------------------\n")
 
