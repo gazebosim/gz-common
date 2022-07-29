@@ -119,6 +119,7 @@ TEST(CSVStreams, CanHandleInvalidCSV)
     EXPECT_THROW({
         const auto rows = std::vector<std::vector<std::string>>(
             common::CSVIStreamIterator(ss), common::CSVIStreamIterator());
+        (void)rows;
     }, std::stringstream::failure);
   }
 }
