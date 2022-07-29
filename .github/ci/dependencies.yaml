@@ -1,0 +1,5 @@
+repositories:
+  gz-cmake:
+    type: git
+    url: https://github.com/gazebosim/gz-cmake
+    version: luca/assimp_find_package
