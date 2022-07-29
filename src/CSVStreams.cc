@@ -26,7 +26,8 @@ class CSVIStreamIterator::Implementation
 {
   public: Implementation() = default;
 
-  public: Implementation(std::istream &_stream) : stream(&_stream)
+  public: explicit Implementation(std::istream &_stream)
+    : stream(&_stream)
   {
     csv_init(&this->parser, CSV_STRICT);
   }
@@ -146,7 +147,7 @@ bool CSVIStreamIterator::operator==(const CSVIStreamIterator &_other) const
 {
   return this->dataPtr->stream == _other.dataPtr->stream && (
       this->dataPtr->stream == nullptr ||
-      this->dataPtr->stream->tellg() == _other.dataPtr->stream->tellg());
+      this->dataPtr->stream == _other.dataPtr->stream);
 }
 
 bool CSVIStreamIterator::operator!=(const CSVIStreamIterator &_other) const
@@ -160,6 +161,7 @@ CSVIStreamIterator &CSVIStreamIterator::operator++()
   return *this;
 }
 
+// NOLINTNEXTLINE(readability/casting)
 CSVIStreamIterator CSVIStreamIterator::operator++(int)
 {
   CSVIStreamIterator it(*this);

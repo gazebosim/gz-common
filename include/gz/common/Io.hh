@@ -57,4 +57,4 @@ namespace gz
   }
 }
 
-#endif // GZ_COMMON_IO_HH_
+#endif

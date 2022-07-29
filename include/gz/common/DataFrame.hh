@@ -23,6 +23,7 @@
 #include <string>
 #include <stdexcept>
 #include <unordered_map>
+#include <vector>
 
 #include <gz/common/CSVStreams.hh>
 #include <gz/common/Io.hh>
@@ -33,35 +34,62 @@ namespace gz
 {
   namespace common
   {
+    /// \brief An abstract data frame.
+    ///
+    /// \tparam K Column key type
+    /// \tparam V Column value type
     template <typename K, typename V>
     class DataFrame
     {
+      /// \brief Check if column key is present.
       public: bool Has(const K &_key) const
       {
         return this->storage.count(_key) > 0;
       }
 
+      /// \brief Fetch mutable reference to column
       public: V &operator[](const K &_key)
       {
         return this->storage[_key];
       }
 
+      /// \brief Fetch immutable reference to column
       public: const V &operator[](const K &_key) const
       {
         return this->storage.at(_key);
       }
 
+      /// \brief Data frame storage
       private: std::unordered_map<K, V> storage;
     };
 
+    /// \brief Full IO specialization for data frames
+    /// comprised of time varying volumetric grids.
+    ///
+    /// \tparam K Data frame key type.
+    /// \tparam T Time coordinate type.
+    /// \tparam V Grid value type.
+    /// \tparam P Spatial dimensions type.
     template <typename K, typename T, typename V, typename P>
     struct IO<DataFrame<K, math::InMemoryTimeVaryingVolumetricGrid<T, V, P>>>
     {
+      /// \brief Read data frame from CSV data stream.
+      ///
+      /// \param[in] _begin Beginning-of-stream iterator to CSV data stream.
+      /// \param[in] _end End-of-stream iterator to CSV data stream.
+      /// \param[in] _timeColumnName CSV data column name to use as time
+      /// dimension.
+      /// \param[in] _spatialColumnNames CSV data columns' names to use
+      /// as spatial (x, y, z) dimensions, in that order.
+      /// \throws std::invalid_argument if the CSV data stream is empty, or
+      /// if the CSV data stream has no header, or if the given columns
+      /// cannot be found in the CSV data stream header.
+      /// \return data frame read.
       static DataFrame<K, math::InMemoryTimeVaryingVolumetricGrid<T, V, P>>
       ReadFrom(CSVIStreamIterator _begin,
                CSVIStreamIterator _end,
-               const std::string &_timeColumn,
-               const std::array<std::string, 3> &_coordinateColumns)
+               const std::string &_timeColumnName,
+               const std::array<std::string, 3> &_spatialColumnNames)
       {
         if (_begin == _end)
         {
@@ -73,50 +101,62 @@ namespace gz
           throw std::invalid_argument("CSV data stream has no header");
         }
 
-        auto it = std::find(header.begin(), header.end(), _timeColumn);
+        auto it = std::find(header.begin(), header.end(), _timeColumnName);
         if (it == header.end())
         {
           std::stringstream sstream;
           sstream << "CSV data stream has no '"
-                  << _timeColumn << "' column";
+                  << _timeColumnName << "' column";
           throw std::invalid_argument(sstream.str());
         }
         const size_t timeIndex = it - header.begin();
 
-        std::array<size_t, 3> coordinateIndices;
-        for (size_t i = 0; i < _coordinateColumns.size(); ++i)
+        std::array<size_t, 3> spatialColumnIndices;
+        for (size_t i = 0; i < _spatialColumnNames.size(); ++i)
         {
-          it = std::find(header.begin(), header.end(), _coordinateColumns[i]);
+          it = std::find(header.begin(), header.end(), _spatialColumnNames[i]);
           if (it == header.end())
           {
             std::stringstream sstream;
             sstream << "CSV data stream has no '"
-                    << _coordinateColumns[i] << "' column";
+                    << _spatialColumnNames[i] << "' column";
             throw std::invalid_argument(sstream.str());
           }
-          coordinateIndices[i] = it - header.begin();
+          spatialColumnIndices[i] = it - header.begin();
         }
 
-        return ReadFrom(_begin, _end, timeIndex, coordinateIndices);
+        return ReadFrom(_begin, _end, timeIndex, spatialColumnIndices);
       }
 
+      /// \brief Read data frame from CSV data stream.
+      ///
+      /// \param[in] _begin Beginning-of-stream iterator to CSV data stream.
+      /// \param[in] _end End-of-stream iterator to CSV data stream.
+      /// \param[in] _timeColumnIndex CSV data column index to use as
+      /// time dimension.
+      /// \param[in] _spatialColumnIndices CSV data columns indices
+      /// to use as spatial (x, y, z) dimensions, in that order.
+      /// \throws std::invalid_argument if the CSV data stream is empty, or
+      /// if the CSV data stream has no header, or if the given columns
+      /// cannot be found in the CSV data stream header.
+      /// \return data frame read.
       static DataFrame<K, math::InMemoryTimeVaryingVolumetricGrid<T, V, P>>
       ReadFrom(CSVIStreamIterator _begin,
                CSVIStreamIterator _end,
-               const size_t &_timeIndex = 0,
-               const std::array<size_t, 3> &_coordinateIndices = {1, 2, 3})
+               const size_t &_timeColumnIndex = 0,
+               const std::array<size_t, 3> &_spatialColumnIndices = {1, 2, 3})
       {
         if (_begin == _end)
         {
           throw std::invalid_argument("CSV data stream is empty");
         }
-        std::vector<size_t> dataIndices(_begin->size());
-        std::iota(dataIndices.begin(), dataIndices.end(), 0);
-        auto last = dataIndices.end();
-        for (size_t index : {_timeIndex, _coordinateIndices[0],
-            _coordinateIndices[1], _coordinateIndices[2]})
+        std::vector<size_t> dataColumnIndices(_begin->size());
+        std::iota(dataColumnIndices.begin(), dataColumnIndices.end(), 0);
+        auto last = dataColumnIndices.end();
+        for (size_t index : {_timeColumnIndex, _spatialColumnIndices[0],
+            _spatialColumnIndices[1], _spatialColumnIndices[2]})
         {
-          auto it = std::find(dataIndices.begin(), last, index);
+          auto it = std::find(dataColumnIndices.begin(), last, index);
           if (it == last)
           {
             std::stringstream sstream;
@@ -126,32 +166,32 @@ namespace gz
           }
           *it = *(--last);
         }
-        dataIndices.erase(last, dataIndices.end());
+        dataColumnIndices.erase(last, dataColumnIndices.end());
 
         using FactoryT =
             math::InMemoryTimeVaryingVolumetricGridFactory<T, V>;
-        std::vector<FactoryT> factories(dataIndices.size());
+        std::vector<FactoryT> factories(dataColumnIndices.size());
         for (auto it = _begin; it != _end; ++it)
         {
-          const T time = IO<T>::ReadFrom(it->at(_timeIndex));
+          const T time = IO<T>::ReadFrom(it->at(_timeColumnIndex));
           const math::Vector3<P> position{
-            IO<P>::ReadFrom(it->at(_coordinateIndices[0])),
-            IO<P>::ReadFrom(it->at(_coordinateIndices[1])),
-            IO<P>::ReadFrom(it->at(_coordinateIndices[2]))};
+            IO<P>::ReadFrom(it->at(_spatialColumnIndices[0])),
+            IO<P>::ReadFrom(it->at(_spatialColumnIndices[1])),
+            IO<P>::ReadFrom(it->at(_spatialColumnIndices[2]))};
 
-          for (size_t i = 0; i < dataIndices.size(); ++i)
+          for (size_t i = 0; i < dataColumnIndices.size(); ++i)
           {
-            const V value = IO<V>::ReadFrom(it->at(dataIndices[i]));
+            const V value = IO<V>::ReadFrom(it->at(dataColumnIndices[i]));
             factories[i].AddPoint(time, position, value);
           }
         }
 
         DataFrame<K, math::InMemoryTimeVaryingVolumetricGrid<T, V, P>> df;
-        for (size_t i = 0; i < dataIndices.size(); ++i)
+        for (size_t i = 0; i < dataColumnIndices.size(); ++i)
         {
           const std::string key = !_begin->empty() ?
-              _begin->at(dataIndices[i]) :
-              "var" + std::to_string(dataIndices[i]);
+              _begin->at(dataColumnIndices[i]) :
+              "var" + std::to_string(dataColumnIndices[i]);
           df[IO<K>::ReadFrom(key)] = factories[i].Build();
         }
         return df;
