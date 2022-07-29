@@ -142,6 +142,15 @@ TEST_F(MeshTest, Load)
   EXPECT_NE(nullptr, common::MeshManager::Instance()->Load("box.obj"));
   EXPECT_NE(nullptr, common::MeshManager::Instance()->Load("box.fbx"));
   EXPECT_NE(nullptr, common::MeshManager::Instance()->Load("box.glb"));
+
+  // When forcing assimp, loading should still be successful for all formats
+  common::setenv("GZ_MESH_FORCE_ASSIMP", "true");
+  common::MeshManager::Instance()->SetAssimpEnvs();
+  EXPECT_NE(nullptr, common::MeshManager::Instance()->Load("box.dae"));
+  EXPECT_NE(nullptr, common::MeshManager::Instance()->Load("box.obj"));
+  EXPECT_NE(nullptr, common::MeshManager::Instance()->Load("box.fbx"));
+  EXPECT_NE(nullptr, common::MeshManager::Instance()->Load("box.glb"));
+  common::unsetenv("GZ_MESH_FORCE_ASSIMP");
 }
 
 /////////////////////////////////////////////////
