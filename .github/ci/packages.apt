@@ -3,6 +3,7 @@ libavcodec-dev
 libavdevice-dev
 libavformat-dev
 libavutil-dev
+libcsv-dev
 libfreeimage-dev
 libgdal-dev
 libgts-dev

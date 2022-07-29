@@ -126,6 +126,9 @@ gz_find_package(AVUTIL REQUIRED_BY av PRETTY libavutil)
 # Find assimp
 gz_find_package(GzAssimp REQUIRED_BY graphics PRETTY assimp)
 
+#------------------------------------
+# Find csv
+gz_find_package(CSV REQUIRED PRIVATE PRETTY libcsv PKGCONFIG_LIB csv)
 
 message(STATUS "-------------------------------------------\n")
 

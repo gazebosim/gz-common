@@ -16,15 +16,13 @@
 */
 
 #include <gtest/gtest.h>
-#include <filesystem>
-#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
 
 #include <gz/math/TimeVaryingVolumetricGrid.hh>
 
-#include "gz/common/CSVFile.hh"
+#include "gz/common/CSVStreams.hh"
 #include "gz/common/DataFrame.hh"
 #include "gz/common/Filesystem.hh"
 
@@ -33,30 +31,30 @@ using namespace gz;
 /////////////////////////////////////////////////
 TEST(DataFrameTests, SimpleCSV)
 {
-  const std::string filePath = common::uniqueFilePath(
-      std::filesystem::temp_directory_path() / "simple", "csv");
-  std::fstream fs{filePath};
-  fs << "t,x,y,z,temperature" << std::endl
+  std::stringstream ss;
+  ss << "t,x,y,z,temperature" << std::endl
      << "0,0,0,0,25.2" << std::endl
-     << "0,1,0,0,25.2" << std::endl
-     << "0,0,1,0,25.2" << std::endl
-     << "0,1,1,0,25.2" << std::endl
+     << "0,10,0,0,25.2" << std::endl
+     << "0,0,10,0,25.2" << std::endl
+     << "0,10,10,0,25.2" << std::endl
      << "1,0,0,0,24.9" << std::endl
-     << "1,1,0,0,24.9" << std::endl
-     << "1,0,1,0,25.1" << std::endl
-     << "1,1,1,0,25.1" << std::endl;
-  fs.close();
+     << "1,10,0,0,24.9" << std::endl
+     << "1,0,10,0,25.1" << std::endl
+     << "1,10,10,0,25.1" << std::endl;
 
-  using DataT = math::InMemoryTimeVaryingVolumetricGrid<double, double>;
+  using DataT =
+      math::InMemoryTimeVaryingVolumetricGrid<double, double, double>;
   using DataFrameT = common::DataFrame<std::string, DataT>;
-  const auto df = common::IO<DataFrameT>::ReadFrom(common::CSVFile(filePath));
+  const auto df = common::IO<DataFrameT>::ReadFrom(
+      common::CSVIStreamIterator(ss),
+      common::CSVIStreamIterator());
 
   ASSERT_TRUE(df.Has("temperature"));
   const DataT &temperatureData = df["temperature"];
   auto temperatureSession = temperatureData.StepTo(
       temperatureData.CreateSession(), 0.5);
   ASSERT_TRUE(temperatureSession.has_value());
-  const math::Vector3d position{0.5, 0.5, 0.};
+  const math::Vector3d position{5., 5., 0.};
   auto temperature = temperatureData.LookUp(
       temperatureSession.value(), position);
   ASSERT_TRUE(temperature.has_value());
@@ -66,20 +64,19 @@ TEST(DataFrameTests, SimpleCSV)
 /////////////////////////////////////////////////
 TEST(DataFrameTests, ComplexCSV)
 {
-  const std::string filePath = common::uniqueFilePath(
-      std::filesystem::temp_directory_path() / "complex", "csv");
-  std::fstream fs{filePath};
-  fs << "timestamp,temperature,pressure,humidity,lat,lon,altitude" << std::endl
+  std::stringstream ss;
+  ss << "timestamp,temperature,pressure,humidity,lat,lon,altitude" << std::endl
      << "1658923062,13.1,101490,91,36.80029505,-121.788972517,0.8" << std::endl
      << "1658923062,13,101485,88,36.80129505,-121.788972517,0.8" << std::endl
      << "1658923062,13.1,101485,89,36.80029505,-121.789972517,0.8" << std::endl
      << "1658923062,13.05,101490,92,36.80129505,-121.789972517,0.8" << std::endl;
-  fs.close();
 
-  using DataT = math::InMemoryTimeVaryingVolumetricGrid<double, double>;
+  using DataT =
+      math::InMemoryTimeVaryingVolumetricGrid<double, double, double>;
   using DataFrameT = common::DataFrame<std::string, DataT>;
   const auto df = common::IO<DataFrameT>::ReadFrom(
-      common::CSVFile(filePath), "timestamp", {"lat", "lon", "altitude"});
+      common::CSVIStreamIterator(ss), common::CSVIStreamIterator(),
+      "timestamp", {"lat", "lon", "altitude"});
   EXPECT_TRUE(df.Has("temperature"));
   EXPECT_TRUE(df.Has("humidity"));
   ASSERT_TRUE(df.Has("pressure"));
