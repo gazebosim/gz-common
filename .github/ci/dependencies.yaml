@@ -2,4 +2,9 @@ repositories:
   gz-cmake:
     type: git
     url: https://github.com/gazebosim/gz-cmake
-    version: hidmic/libcsv-cmake-module
+    version: ci_matching_branch/hidmic/csv-data
+  gz-math:
+    type: git
+    url: https://github.com/gazebosim/gz-math
+    version: ci_matching_branch/hidmic/csv-data
+
