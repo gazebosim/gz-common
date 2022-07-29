@@ -45,7 +45,11 @@ namespace gz
     class SubMesh;
 
     /// \class MeshManager MeshManager.hh gz/common/MeshManager.hh
-    /// \brief Maintains and manages all meshes
+    /// \brief Maintains and manages all meshes. Supported mesh formats are
+    /// STL (STLA, STLB), COLLADA, OBJ, GLTF (GLB) and FBX. By default only GLTF
+    /// and FBX are loaded using assimp loader, however if GZ_MESH_FORCE_ASSIMP
+    /// environment variable is set, then MeshManager will use assimp loader for
+    /// all supported mesh formats.
     class GZ_COMMON_GRAPHICS_VISIBLE MeshManager
         : public SingletonT<MeshManager>
     {
@@ -240,8 +244,12 @@ namespace gz
                                const gz::math::Vector2d &_segments,
                                const gz::math::Vector2d &_uvTile);
 
+      /// \brief Sets the forceAssimp flag by reading the GZ_MESH_FORCE_ASSIMP
+      /// environment variable. If forceAssimp true, MeshManager uses Assimp
+      /// for loading all mesh formats, otherwise only for GLTF and FBX.
+      public: void SetAssimpEnvs();
+
       /// \brief Tesselate a 2D mesh
-      ///
       /// Makes a zigzag pattern compatible with strips
       /// \param[in] _sm the mesh to tesselate
       /// \param[in] _meshWith mesh width
