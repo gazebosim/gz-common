@@ -37,6 +37,9 @@
 #include <assimp/postprocess.h>     // Post processing flags
 #include <assimp/scene.h>           // Output data structure
 
+// Disable warning for converting double to unsigned char
+#pragma warning( disable : 4244 )
+
 namespace gz
 {
 namespace common
