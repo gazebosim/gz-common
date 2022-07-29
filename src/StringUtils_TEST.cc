@@ -24,18 +24,6 @@
 using namespace gz;
 
 /////////////////////////////////////////////////
-TEST(StringUtils, Trim)
-{
-  EXPECT_EQ("", common::Trim(""));
-  EXPECT_EQ("", common::Trim(" "));
-  EXPECT_EQ("foo", common::Trim(" foo"));
-  EXPECT_EQ("foo", common::Trim("foo "));
-  EXPECT_EQ("foo", common::Trim(" foo "));
-  EXPECT_EQ("foo bar", common::Trim(" foo bar "));
-  EXPECT_EQ("foo_bar", common::Trim("__foo_bar__", '_'));
-}
-
-/////////////////////////////////////////////////
 TEST(StringUtils, SplitNoDelimiterPresent)
 {
   char delim = ':';
