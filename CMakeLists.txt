@@ -122,6 +122,10 @@ gz_find_package(AVCODEC REQUIRED_BY av PRETTY libavcodec)
 # Find avutil
 gz_find_package(AVUTIL REQUIRED_BY av PRETTY libavutil)
 
+#------------------------------------
+# Find assimp
+gz_find_package(GzAssimp REQUIRED_BY graphics PRETTY assimp)
+
 
 message(STATUS "-------------------------------------------\n")
 

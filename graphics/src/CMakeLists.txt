@@ -16,6 +16,7 @@ target_link_libraries(${graphics_target}
     gz-math${GZ_MATH_VER}::gz-math${GZ_MATH_VER}
     gz-utils${GZ_UTILS_VER}::gz-utils${GZ_UTILS_VER}
   PRIVATE
+    ${GzAssimp_LIBRARIES}
     GTS::GTS
     FreeImage::FreeImage)
 
@@ -26,6 +27,17 @@ gz_build_tests(
     ${graphics_target}
     gz-common${GZ_COMMON_VER}-testing
 )
+
+# Assimp doesn't offer preprocessor version, use cmake to set a compatibility
+# mode for versions below 5.2.0
+if(${GzAssimp_VERSION} STRLESS "5.2.0")
+  message("Warning, assimp below 5.2.0 detected, setting compatibility mode")
+  target_compile_definitions(${graphics_target} PRIVATE GZ_ASSIMP_PRE_5_2_0)
+  if(TARGET UNIT_AssimpLoader_TEST)
+    target_compile_definitions(UNIT_AssimpLoader_TEST PRIVATE GZ_ASSIMP_PRE_5_2_0)
+  endif()
+endif()
+
 
 if(USE_EXTERNAL_TINYXML2)
 

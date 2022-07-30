@@ -32,6 +32,9 @@ class gz::common::Pbr::Implementation
   /// \brief Normal map
   public: std::string normalMap = "";
 
+  /// \brief Pointer containing the normal map data, if loaded from memory
+  public: std::shared_ptr<const Image> normalMapData = nullptr;
+
   /// \brief Normal map space
   public: NormalMapSpace normalMapSpace = NormalMapSpace::TANGENT;
 
@@ -44,14 +47,30 @@ class gz::common::Pbr::Implementation
   /// \brief Roughness map (metal workflow only)
   public: std::string roughnessMap = "";
 
+  /// \brief Pointer containing the roughness map data,
+  /// if loaded from memory
+  public: std::shared_ptr<const Image> roughnessMapData = nullptr;
+
   /// \brief Metalness map (metal workflow only)
   public: std::string metalnessMap = "";
+
+  /// \brief Pointer containing the metalness map data,
+  /// if loaded from memory
+  public: std::shared_ptr<const Image> metalnessMapData = nullptr;
 
   /// \brief Emissive map
   public: std::string emissiveMap = "";
 
+  /// \brief Pointer containing the emissive map data,
+  /// if loaded from memory
+  public: std::shared_ptr<const Image> emissiveMapData = nullptr;
+
   /// \brief Light map
   public: std::string lightMap;
+
+  /// \brief Pointer containing the light map data,
+  /// if loaded from memory
+  public: std::shared_ptr<const Image> lightMapData = nullptr;
 
   /// \brief Light map texture coordinate set
   public: unsigned int lightMapUvSet = 0u;
@@ -93,11 +112,17 @@ bool Pbr::operator==(const Pbr &_pbr) const
 {
   return (this->dataPtr->albedoMap == _pbr.dataPtr->albedoMap)
     && (this->dataPtr->normalMap == _pbr.dataPtr->normalMap)
+    && (this->dataPtr->normalMapData == _pbr.dataPtr->normalMapData)
     && (this->dataPtr->metalnessMap == _pbr.dataPtr->metalnessMap)
+    && (this->dataPtr->metalnessMapData == _pbr.dataPtr->metalnessMapData)
     && (this->dataPtr->roughnessMap == _pbr.dataPtr->roughnessMap)
+    && (this->dataPtr->roughnessMapData == _pbr.dataPtr->roughnessMapData)
     && (this->dataPtr->glossinessMap == _pbr.dataPtr->glossinessMap)
     && (this->dataPtr->environmentMap == _pbr.dataPtr->environmentMap)
     && (this->dataPtr->emissiveMap == _pbr.dataPtr->emissiveMap)
+    && (this->dataPtr->emissiveMapData == _pbr.dataPtr->emissiveMapData)
+    && (this->dataPtr->lightMap == _pbr.dataPtr->lightMap)
+    && (this->dataPtr->lightMapData == _pbr.dataPtr->lightMapData)
     && (this->dataPtr->ambientOcclusionMap ==
         _pbr.dataPtr->ambientOcclusionMap)
     && (gz::math::equal(
@@ -133,10 +158,18 @@ NormalMapSpace Pbr::NormalMapType() const
 }
 
 //////////////////////////////////////////////////
-void Pbr::SetNormalMap(const std::string &_map, NormalMapSpace _space)
+std::shared_ptr<const Image> Pbr::NormalMapData() const
+{
+  return this->dataPtr->normalMapData;
+}
+
+//////////////////////////////////////////////////
+void Pbr::SetNormalMap(const std::string &_map, NormalMapSpace _space,
+                       const std::shared_ptr<const Image> &_img)
 {
   this->dataPtr->normalMap = _map;
   this->dataPtr->normalMapSpace = _space;
+  this->dataPtr->normalMapData = _img;
 }
 
 //////////////////////////////////////////////////
@@ -170,9 +203,17 @@ std::string Pbr::RoughnessMap() const
 }
 
 //////////////////////////////////////////////////
-void Pbr::SetRoughnessMap(const std::string &_map)
+std::shared_ptr<const Image> Pbr::RoughnessMapData() const
+{
+  return this->dataPtr->roughnessMapData;
+}
+
+//////////////////////////////////////////////////
+void Pbr::SetRoughnessMap(const std::string &_map,
+                          const std::shared_ptr<const Image> &_img)
 {
   this->dataPtr->roughnessMap = _map;
+  this->dataPtr->roughnessMapData = _img;
 }
 
 //////////////////////////////////////////////////
@@ -182,9 +223,17 @@ std::string Pbr::MetalnessMap() const
 }
 
 //////////////////////////////////////////////////
-void Pbr::SetMetalnessMap(const std::string &_map)
+std::shared_ptr<const Image> Pbr::MetalnessMapData() const
+{
+  return this->dataPtr->metalnessMapData;
+}
+
+//////////////////////////////////////////////////
+void Pbr::SetMetalnessMap(const std::string &_map,
+                          const std::shared_ptr<const Image> &_img)
 {
   this->dataPtr->metalnessMap = _map;
+  this->dataPtr->metalnessMapData = _img;
 }
 
 //////////////////////////////////////////////////
@@ -254,9 +303,17 @@ std::string Pbr::EmissiveMap() const
 }
 
 //////////////////////////////////////////////////
-void Pbr::SetEmissiveMap(const std::string &_map)
+std::shared_ptr<const Image> Pbr::EmissiveMapData() const
+{
+  return this->dataPtr->emissiveMapData;
+}
+
+//////////////////////////////////////////////////
+void Pbr::SetEmissiveMap(const std::string &_map,
+                         const std::shared_ptr<const Image> &_img)
 {
   this->dataPtr->emissiveMap = _map;
+  this->dataPtr->emissiveMapData = _img;
 }
 
 //////////////////////////////////////////////////
@@ -266,10 +323,18 @@ std::string Pbr::LightMap() const
 }
 
 //////////////////////////////////////////////////
-void Pbr::SetLightMap(const std::string &_map, unsigned int _uvSet)
+std::shared_ptr<const Image> Pbr::LightMapData() const
+{
+  return this->dataPtr->lightMapData;
+}
+
+//////////////////////////////////////////////////
+void Pbr::SetLightMap(const std::string &_map, unsigned int _uvSet,
+                      const std::shared_ptr<const Image> &_img)
 {
   this->dataPtr->lightMap = _map;
   this->dataPtr->lightMapUvSet = _uvSet;
+  this->dataPtr->lightMapData = _img;
 }
 
 //////////////////////////////////////////////////
