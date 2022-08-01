@@ -136,7 +136,7 @@ configure_file("${PROJECT_SOURCE_DIR}/cppcheck.suppress.in"
                ${PROJECT_BINARY_DIR}/cppcheck.suppress)
 
 gz_configure_build(QUIT_IF_BUILD_ERRORS
-  COMPONENTS av events geospatial graphics profiler testing)
+  COMPONENTS av events geospatial graphics io profiler testing)
 
 #============================================================================
 # Create package information

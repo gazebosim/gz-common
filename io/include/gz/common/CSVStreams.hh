@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-#include <gz/common/Export.hh>
+#include <gz/common/io/Export.hh>
 
 #include <gz/utils/ImplPtr.hh>
 
@@ -49,8 +49,8 @@ namespace gz
     /// \param[in] _lhs Left-hand side CSV dialect.
     /// \param[in] _rhs Right-hand side CSV dialect.
     /// \return true if CSV dialects are equal, false otherwise.
-    bool GZ_COMMON_VISIBLE operator==(const CSVDialect &_lhs,
-                                      const CSVDialect &_rhs);
+    bool GZ_COMMON_IO_VISIBLE operator==(const CSVDialect &_lhs,
+                                         const CSVDialect &_rhs);
 
     /// \brief A token in CSV data.
     ///
@@ -79,7 +79,7 @@ namespace gz
     /// \return same CSV data stream.
     std::istream &ExtractCSVToken(
       std::istream &_stream, CSVToken &_token,
-      const CSVDialect &_dialect = CSVDialect::Unix) GZ_COMMON_VISIBLE;
+      const CSVDialect &_dialect = CSVDialect::Unix) GZ_COMMON_IO_VISIBLE;
 
     /// \brief Parse a single row from an input stream of CSV data.
     ///
@@ -91,13 +91,13 @@ namespace gz
     /// \returns same CSV data stream.
     std::istream &ParseCSVRow(
       std::istream &_stream, std::vector<std::string> &_row,
-      const CSVDialect &_dialect = CSVDialect::Unix) GZ_COMMON_VISIBLE;
+      const CSVDialect &_dialect = CSVDialect::Unix) GZ_COMMON_IO_VISIBLE;
 
     /// \brief A single-pass row iterator on an input stream of CSV data.
     ///
     /// Similar to std::istream_iterator, this iterator parses a stream of
-    /// CSV data, one row at a time. \see `ParseCSVRow`
-    class GZ_COMMON_VISIBLE CSVIStreamIterator
+    /// CSV data, one row at a time. \see `ParseCSVRow`.
+    class GZ_COMMON_IO_VISIBLE CSVIStreamIterator
     {
       public: using iterator_category = std::input_iterator_tag;
       public: using value_type = std::vector<std::string>;
