@@ -22,104 +22,171 @@
 #include "gz/common/CSVStreams.hh"
 
 using namespace gz;
+using namespace common;
+
+/////////////////////////////////////////////////
+TEST(CSVStreams, CanExtractCSVTokens)
+{
+  std::stringstream sstream;
+  sstream << "\"a,\n\"\"";
+
+  CSVToken token;
+  EXPECT_TRUE(ExtractCSVToken(sstream, token, CSVDialect::Unix));
+  EXPECT_EQ(token.type, CSVToken::QUOTE);
+  EXPECT_EQ(token.character, '"');
+
+  EXPECT_TRUE(ExtractCSVToken(sstream, token, CSVDialect::Unix));
+  EXPECT_EQ(token.type, CSVToken::TEXT);
+  EXPECT_EQ(token.character, 'a');
+
+  EXPECT_TRUE(ExtractCSVToken(sstream, token, CSVDialect::Unix));
+  EXPECT_EQ(token.type, CSVToken::DELIMITER);
+  EXPECT_EQ(token.character, ',');
+
+  EXPECT_TRUE(ExtractCSVToken(sstream, token, CSVDialect::Unix));
+  EXPECT_EQ(token.type, CSVToken::TERMINATOR);
+  EXPECT_EQ(token.character, '\n');
+
+  EXPECT_TRUE(ExtractCSVToken(sstream, token, CSVDialect::Unix));
+  EXPECT_EQ(token.type, CSVToken::TEXT);
+  EXPECT_EQ(token.character, '"');
+
+  EXPECT_TRUE(ExtractCSVToken(sstream, token, CSVDialect::Unix));
+  EXPECT_EQ(token.type, CSVToken::TERMINATOR);
+  EXPECT_EQ(token.character, EOF);
+}
+
+/////////////////////////////////////////////////
+TEST(CSVStreams, CanParseCSVRows)
+{
+  {
+    std::stringstream sstream;
+    sstream << ",";
+    std::vector<std::string> row;
+    EXPECT_TRUE(ParseCSVRow(sstream, row, CSVDialect::Unix));
+    const std::vector<std::string> expectedRow{"", ""};
+    EXPECT_EQ(row, expectedRow);
+  }
+
+  {
+    std::stringstream sstream;
+    sstream << "foo";
+    std::vector<std::string> row;
+    EXPECT_TRUE(ParseCSVRow(sstream, row, CSVDialect::Unix));
+    const std::vector<std::string> expectedRow{"foo"};
+    EXPECT_EQ(row, expectedRow);
+  }
+
+  {
+    std::stringstream sstream;
+    sstream << "foo" << std::endl;
+    std::vector<std::string> row;
+    EXPECT_TRUE(ParseCSVRow(sstream, row, CSVDialect::Unix));
+    const std::vector<std::string> expectedRow{"foo"};
+    EXPECT_EQ(row, expectedRow);
+  }
+
+  {
+    std::stringstream sstream;
+    sstream << ",foo";
+    std::vector<std::string> row;
+    EXPECT_TRUE(ParseCSVRow(sstream, row, CSVDialect::Unix));
+    const std::vector<std::string> expectedRow{"", "foo"};
+    EXPECT_EQ(row, expectedRow);
+  }
+
+  {
+    std::stringstream sstream;
+    sstream << ",\"foo,bar\nbaz\",";
+    std::vector<std::string> row;
+    EXPECT_TRUE(ParseCSVRow(sstream, row, CSVDialect::Unix));
+    const std::vector<std::string> expectedRow{"", "foo,bar\nbaz", ""};
+    EXPECT_EQ(row, expectedRow);
+  }
+}
+
+/////////////////////////////////////////////////
+TEST(CSVStreams, CanHandleInvalidCSVRows)
+{
+  {
+    std::stringstream sstream;
+    std::vector<std::string> row;
+    EXPECT_FALSE(ParseCSVRow(sstream, row, CSVDialect::Unix));
+  }
+
+  {
+    std::stringstream sstream;
+    sstream << "\"";
+    std::vector<std::string> row;
+    EXPECT_FALSE(ParseCSVRow(sstream, row, CSVDialect::Unix));
+  }
+
+  {
+    std::stringstream sstream;
+    sstream << "\"foo\"?";
+    std::vector<std::string> row;
+    EXPECT_FALSE(ParseCSVRow(sstream, row, CSVDialect::Unix));
+  }
+
+  {
+    std::stringstream sstream;
+    sstream << "foo\"bar\"";
+    std::vector<std::string> row;
+    EXPECT_FALSE(ParseCSVRow(sstream, row, CSVDialect::Unix));
+  }
+}
 
 /////////////////////////////////////////////////
 TEST(CSVStreams, CanIterateValidCSV)
 {
   {
-    std::stringstream ss;
-    EXPECT_EQ(common::CSVIStreamIterator(ss),
-              common::CSVIStreamIterator());
-    EXPECT_FALSE(ss.fail());
+    std::stringstream sstream;
+    EXPECT_EQ(CSVIStreamIterator(sstream),
+              CSVIStreamIterator());
   }
 
   {
     std::stringstream ss;
-    ss << "foo,bar,baz" << std::endl;
-    const std::vector<std::vector<std::string>>
-        expectedRows{{"foo", "bar", "baz"}};
+    ss << std::endl;
+    const std::vector<std::vector<std::string>> expectedRows{{""}};
     const auto rows = std::vector<std::vector<std::string>>(
-        common::CSVIStreamIterator(ss), common::CSVIStreamIterator());
+        CSVIStreamIterator(ss), CSVIStreamIterator());
     EXPECT_EQ(expectedRows, rows);
-    EXPECT_FALSE(ss.fail());
+    EXPECT_TRUE(ss.eof());
   }
 
   {
     std::stringstream ss;
-    ss << ",bar,baz" << std::endl;
-    const std::vector<std::vector<std::string>>
-        expectedRows{{"", "bar", "baz"}};
+    ss << "foo,bar" << std::endl
+       << "bar," << std::endl
+       << ",foo" << std::endl
+       << "," << std::endl
+       << "baz,baz";
+    const std::vector<std::vector<std::string>> expectedRows{
+      {"foo", "bar"}, {"bar", ""}, {"", "foo"}, {"", ""}, {"baz", "baz"}};
     const auto rows = std::vector<std::vector<std::string>>(
-        common::CSVIStreamIterator(ss), common::CSVIStreamIterator());
+        CSVIStreamIterator(ss), CSVIStreamIterator());
     EXPECT_EQ(expectedRows, rows);
-    EXPECT_FALSE(ss.fail());
-  }
-
-  {
-    std::stringstream ss;
-    ss << "foo,bar," << std::endl;
-    const std::vector<std::vector<std::string>>
-        expectedRows{{"foo", "bar", ""}};
-    const auto rows = std::vector<std::vector<std::string>>(
-        common::CSVIStreamIterator(ss), common::CSVIStreamIterator());
-    EXPECT_EQ(expectedRows, rows);
-    EXPECT_FALSE(ss.fail());
-  }
-
-  {
-    std::stringstream ss;
-    ss << "foo,,baz" << std::endl;
-    const std::vector<std::vector<std::string>>
-        expectedRows{{"foo", "", "baz"}};
-    const auto rows = std::vector<std::vector<std::string>>(
-        common::CSVIStreamIterator(ss), common::CSVIStreamIterator());
-    EXPECT_EQ(expectedRows, rows);
-    EXPECT_FALSE(ss.fail());
-  }
-
-  {
-    std::stringstream ss;
-    ss << ",\"foo,bar,baz\"," << std::endl;
-    const std::vector<std::vector<std::string>>
-        expectedRows{{"", "foo,bar,baz", ""}};
-    const auto rows = std::vector<std::vector<std::string>>(
-        common::CSVIStreamIterator(ss), common::CSVIStreamIterator());
-    EXPECT_EQ(expectedRows, rows);
-    EXPECT_FALSE(ss.fail());
-  }
-
-  {
-    std::stringstream ss;
-    ss << "foo,," << std::endl;
-    const std::vector<std::vector<std::string>>
-        expectedRows{{"foo", "", ""}};
-    const auto rows = std::vector<std::vector<std::string>>(
-        common::CSVIStreamIterator(ss), common::CSVIStreamIterator());
-    EXPECT_EQ(expectedRows, rows);
-    EXPECT_FALSE(ss.fail());
   }
 }
 
 /////////////////////////////////////////////////
-TEST(CSVStreams, CanHandleInvalidCSV)
+TEST(CSVStreams, CanIterateInvalidCSVSafely)
 {
   {
-    std::stringstream ss;
-    ss << "foo,bar,b\"az" << std::endl;
-    const auto rows = std::vector<std::vector<std::string>>(
-        common::CSVIStreamIterator(ss), common::CSVIStreamIterator());
-    EXPECT_TRUE(rows.empty());
-    EXPECT_TRUE(ss.fail());
+    std::stringstream sstream;
+    sstream << "\"" << std::endl;
+    auto it = CSVIStreamIterator(sstream, CSVDialect::Unix);
+    EXPECT_EQ(it, CSVIStreamIterator());
   }
 
   {
-    std::stringstream ss;
-    ss.exceptions(std::stringstream::failbit);
-    ss << "foo,bar,\"baz" << std::endl;
-    EXPECT_THROW({
-        const auto rows = std::vector<std::vector<std::string>>(
-            common::CSVIStreamIterator(ss), common::CSVIStreamIterator());
-        (void)rows;
-    }, std::stringstream::failure);
+    std::stringstream sstream;
+    sstream.exceptions(std::stringstream::failbit);
+    sstream << "foo" << std::endl
+            << "\"bar" << std::endl;
+    auto it = CSVIStreamIterator(sstream, CSVDialect::Unix);
+    EXPECT_THROW({ ++it; }, std::stringstream::failure);
+    EXPECT_EQ(it, CSVIStreamIterator());
   }
 }

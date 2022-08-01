@@ -17,117 +17,175 @@
 
 #include "gz/common/CSVStreams.hh"
 
-#include <csv.h>
+#include <sstream>
 
-using namespace gz;
-using namespace common;
+namespace gz
+{
+namespace common
+{
+
+const CSVDialect CSVDialect::Unix = {',', '\n', '"'};
+
+bool operator==(const CSVDialect &_lhs, const CSVDialect &_rhs)
+{
+  return (_lhs.delimiter == _rhs.delimiter &&
+          _lhs.terminator == _rhs.terminator &&
+          _lhs.quote == _rhs.quote);
+}
+
+std::istream &ExtractCSVToken(
+    std::istream &_stream, CSVToken &_token,
+    const CSVDialect &_dialect)
+{
+  char character;
+  if (_stream.peek(), !_stream.fail() && _stream.eof())
+  {
+    _token = {CSVToken::TERMINATOR, EOF};
+  }
+  else if (_stream.get(character))
+  {
+    if (character == _dialect.terminator)
+    {
+      _token = {CSVToken::TERMINATOR, character};
+    }
+    else if (character == _dialect.delimiter)
+    {
+      _token = {CSVToken::DELIMITER, character};
+    }
+    else if (character == _dialect.quote)
+    {
+      if (_stream.peek() == _dialect.quote)
+      {
+        _token = {CSVToken::TEXT, character};
+        _stream.ignore();
+      }
+      else
+      {
+        _token = {CSVToken::QUOTE, character};
+      }
+    }
+    else
+    {
+      _token = {CSVToken::TEXT, character};
+    }
+  }
+  return _stream;
+}
+
+std::istream &ParseCSVRow(
+    std::istream &_stream,
+    std::vector<std::string> &_row,
+    const CSVDialect &_dialect)
+{
+  std::stringstream text;
+  enum {
+    FIELD_START = 0,
+    ESCAPED_FIELD,
+    NONESCAPED_FIELD,
+    FIELD_END,
+    RECORD_END
+  } state = FIELD_START;
+
+  _row.clear();
+
+  CSVToken token;
+  while (state != RECORD_END && ExtractCSVToken(_stream, token, _dialect))
+  {
+    switch (state)
+    {
+      case FIELD_START:
+        if (token.type == CSVToken::QUOTE)
+        {
+          state = ESCAPED_FIELD;
+          break;
+        }
+        state = NONESCAPED_FIELD;
+        [[fallthrough]];
+      case NONESCAPED_FIELD:
+        if (token.type == CSVToken::TEXT)
+        {
+          text << token.character;
+          break;
+        }
+        state = FIELD_END;
+        [[fallthrough]];
+      case FIELD_END:
+        switch (token.type)
+        {
+          case CSVToken::DELIMITER:
+            _row.push_back(text.str());
+            state = FIELD_START;
+            break;
+          case CSVToken::TERMINATOR:
+            if (token.character != EOF || !_row.empty() || text.tellp() > 0)
+            {
+              _row.push_back(text.str());
+              state = RECORD_END;
+              break;
+            }
+            [[fallthrough]];
+          default:
+            _stream.setstate(std::istream::failbit);
+            break;
+        }
+        text.str(""), text.clear();
+        break;
+      case ESCAPED_FIELD:
+        if (token.type == CSVToken::QUOTE)
+        {
+          state = FIELD_END;
+          break;
+        }
+        if (token.type != CSVToken::TERMINATOR || token.character != EOF)
+        {
+          text << token.character;
+          break;
+        }
+        [[fallthrough]];
+      default:
+        _stream.setstate(std::istream::failbit);
+        break;
+    }
+  }
+  return _stream;
+}
 
 class CSVIStreamIterator::Implementation
 {
   public: Implementation() = default;
 
-  public: explicit Implementation(std::istream &_stream)
-    : stream(&_stream)
+  public: Implementation(std::istream &_stream, const CSVDialect &_dialect)
+    : stream(&_stream), dialect(_dialect)
   {
-    csv_init(&this->parser, CSV_STRICT);
   }
 
   public: Implementation(const Implementation &_other)
-    : stream(_other.stream), row(_other.row)
+    : stream(_other.stream), dialect(_other.dialect), row(_other.row)
   {
-    if (this->stream)
-    {
-      csv_init(&this->parser, CSV_STRICT);
-    }
-  }
-
-  public: ~Implementation()
-  {
-    csv_free(&this->parser);
   }
 
   public: void Next()
   {
-    bool parsingFailed = false;
-    this->row.clear();
-    do
-    {
-      this->stream->peek();
-      if (this->stream->eof())
-      {
-        if (this->parsing)
-        {
-          parsingFailed = csv_fini(
-              &this->parser, OnCSVFieldSubmit,
-              OnCSVRecordSubmit, this) != 0;
-          this->parsing = false;
-          break;
-        }
-        this->stream = nullptr;
-        break;
-      }
-      if (!this->stream->getline(this->buffer, sizeof(this->buffer)))
-      {
-        this->stream = nullptr;
-        break;
-      }
-      if (this->stream->good())
-      {
-        this->buffer[this->stream->gcount() - 1] = '\n';
-      }
-      this->parsing = true;
-      const size_t nbytes = csv_parse(
-          &this->parser, this->buffer, this->stream->gcount(),
-          OnCSVFieldSubmit, OnCSVRecordSubmit, this);
-      if (nbytes != static_cast<size_t>(this->stream->gcount()))
-      {
-        parsingFailed = true;
-        break;
-      }
-    } while (this->parsing);
-
-    if (parsingFailed)
+    if (this->stream)
     {
       try
       {
-        this->stream->setstate(std::istream::failbit);
+        if (!ParseCSVRow(*this->stream, this->row, this->dialect))
+        {
+          this->stream = nullptr;
+        }
       }
-      catch (const std::istream::failure &)
+      catch (...)
       {
-        const char * message =
-            csv_strerror(csv_error(&this->parser));
-        throw std::istream::failure(message);
+        this->stream = nullptr;
+        throw;
       }
-      this->stream = nullptr;
-      this->parsing = false;
     }
-
-    if (!this->stream)
-    {
-      this->row.clear();
-    }
-  }
-
-  public: static void OnCSVFieldSubmit(void * _data, size_t _size, void *_self)
-  {
-    auto data = reinterpret_cast<char *>(_data);
-    auto self = reinterpret_cast<Implementation *>(_self);
-    self->row.push_back(std::string(data, _size));
-  }
-
-  public: static void OnCSVRecordSubmit(int, void *_self)
-  {
-    auto self = reinterpret_cast<Implementation *>(_self);
-    self->parsing = false;
   }
 
   public: std::istream *stream{nullptr};
 
-  public: csv_parser parser{};
-
-  public: char buffer[1024];
-
-  public: bool parsing;
+  public: CSVDialect dialect{};
 
   public: std::vector<std::string> row;
 };
@@ -137,8 +195,9 @@ CSVIStreamIterator::CSVIStreamIterator()
 {
 }
 
-CSVIStreamIterator::CSVIStreamIterator(std::istream &_stream)
-  : dataPtr(gz::utils::MakeImpl<Implementation>(_stream))
+CSVIStreamIterator::CSVIStreamIterator(std::istream &_stream,
+                                       const CSVDialect &_dialect)
+  : dataPtr(gz::utils::MakeImpl<Implementation>(_stream, _dialect))
 {
   this->dataPtr->Next();
 }
@@ -147,7 +206,7 @@ bool CSVIStreamIterator::operator==(const CSVIStreamIterator &_other) const
 {
   return this->dataPtr->stream == _other.dataPtr->stream && (
       this->dataPtr->stream == nullptr ||
-      this->dataPtr->stream == _other.dataPtr->stream);
+      this->dataPtr->dialect == _other.dataPtr->dialect);
 }
 
 bool CSVIStreamIterator::operator!=(const CSVIStreamIterator &_other) const
@@ -177,4 +236,7 @@ const std::vector<std::string> &CSVIStreamIterator::operator*() const
 const std::vector<std::string> *CSVIStreamIterator::operator->() const
 {
   return &this->dataPtr->row;
+}
+
+}
 }
