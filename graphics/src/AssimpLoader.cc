@@ -671,7 +671,6 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   rootSkelNode->SetParent(nullptr);
   SkeletonPtr rootSkeleton = std::make_shared<Skeleton>(rootSkelNode);
   mesh->SetSkeleton(rootSkeleton);
-
   // Now create the meshes
   // Recursive call to keep track of transforms,
   // mesh is passed by reference and edited throughout
