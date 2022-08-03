@@ -650,9 +650,9 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     auto mat = this->dataPtr->CreateMaterial(scene, _matIdx, path);
     mesh->AddMaterial(mat);
   }
+  //Create the skeleton
   std::unordered_set<std::string> boneNames;
   this->dataPtr->RecursiveStoreBoneNames(scene, rootNode, boneNames);
-  std::cout << "BoneName size is: " << boneNames.size() << std::endl;
   auto rootSkelNode = new SkeletonNode(
       nullptr, rootName, rootName, SkeletonNode::NODE);
   rootSkelNode->SetTransform(rootTransform);
