@@ -65,14 +65,6 @@ unsigned int SkeletonAnimation::NodeCount() const
   return this->dataPtr->animations.size();
 }
 
-///////////////////////////////////////////////////
-void SkeletonAnimation::LogAnimations() const
-{
-    for (auto const &pair: this->dataPtr->animations) {
-        std::cout << "{" << pair.first << ": " << pair.second << "}\n";
-    }
-}
-
 //////////////////////////////////////////////////
 NodeAnimation *SkeletonAnimation::NodeAnimationByName(
     const std::string &_node) const
