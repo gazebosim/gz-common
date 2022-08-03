@@ -58,6 +58,8 @@ namespace gz
       /// \return the count
       public: unsigned int NodeCount() const;
 
+      public: void LogAnimations() const;
+
       /// \brief Returns the node animation for given node name
       /// \param[in] _name Name of node
       /// \return NodeAnimation object
