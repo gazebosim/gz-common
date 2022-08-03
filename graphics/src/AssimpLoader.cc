@@ -613,7 +613,6 @@ AssimpLoader::~AssimpLoader()
 Mesh *AssimpLoader::Load(const std::string &_filename)
 {
   Mesh *mesh = new Mesh();
-  std::cout << "filename is: " << _filename << std::endl;
   std::string path = common::parentPath(_filename);
   const aiScene* scene = this->dataPtr->importer.ReadFile(_filename,
       aiProcess_JoinIdenticalVertices |
