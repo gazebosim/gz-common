@@ -65,6 +65,14 @@ unsigned int SkeletonAnimation::NodeCount() const
   return this->dataPtr->animations.size();
 }
 
+///////////////////////////////////////////////////
+void SkeletonAnimation::LogAnimations() const
+{
+    for (auto const &pair: this->dataPtr->animations) {
+        std::cout << "{" << pair.first << ": " << pair.second << "}\n";
+    }
+}
+
 //////////////////////////////////////////////////
 NodeAnimation *SkeletonAnimation::NodeAnimationByName(
     const std::string &_node) const
@@ -73,6 +81,24 @@ NodeAnimation *SkeletonAnimation::NodeAnimationByName(
   if (it != this->dataPtr->animations.end())
     return it->second.get();
   return nullptr;
+}
+
+bool SkeletonAnimation::XDisplacement() const
+{
+  bool xDisplacement = false;
+  for (auto iter = this->dataPtr->animations.begin();
+      iter != this->dataPtr->animations.end(); ++iter)
+  {
+    auto node = iter->second;
+    math::Matrix4d lastPos = node->KeyFrame(node->FrameCount() - 1).second;
+    math::Matrix4d firstPos = node->KeyFrame(0).second;
+    xDisplacement = !math::equal(firstPos.Translation().X(), lastPos.Translation().X());
+    if (xDisplacement)
+    {
+      break;
+    }
+  }
+  return xDisplacement;
 }
 
 //////////////////////////////////////////////////

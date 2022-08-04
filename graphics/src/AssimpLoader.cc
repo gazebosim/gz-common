@@ -674,6 +674,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   // mesh is passed by reference and edited throughout
   this->dataPtr->RecursiveCreate(scene, rootNode, rootTransform, mesh);
   // Add the animations
+  //std::cout << "Number of animations are: " << scene->mNumAnimations << std::endl;
   for (unsigned animIdx = 0; animIdx < scene->mNumAnimations; ++animIdx)
   {
     auto& anim = scene->mAnimations[animIdx];
@@ -683,6 +684,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     {
       auto& animChan = anim->mChannels[chanIdx];
       auto chanName = ToString(animChan->mNodeName);
+      std::cout << chanIdx << " ChanName is: " << chanName << std::endl;
       for (unsigned keyIdx = 0; keyIdx < animChan->mNumPositionKeys; ++keyIdx)
       {
         // Note, Scaling keys are not supported right now

@@ -58,11 +58,15 @@ namespace gz
       /// \return the count
       public: unsigned int NodeCount() const;
 
+      public: void LogAnimations() const;
+
       /// \brief Returns the node animation for given node name
       /// \param[in] _name Name of node
       /// \return NodeAnimation object
       public: NodeAnimation *NodeAnimationByName(const std::string &_name)
           const;
+
+      public: bool XDisplacement() const;
 
       /// \brief Looks for a node with a specific name in the animations
       /// \param[in] _node the name of the node
