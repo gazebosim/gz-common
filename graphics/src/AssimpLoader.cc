@@ -683,7 +683,6 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     {
       animName = "animation" +
                  std::to_string(rootSkeleton->AnimationCount() + 1);
-      std::cout << "animName is: " << animName << std::endl;
     }
     SkeletonAnimation* skelAnim = new SkeletonAnimation(animName);
     for (unsigned chanIdx = 0; chanIdx < anim->mNumChannels; ++chanIdx)
