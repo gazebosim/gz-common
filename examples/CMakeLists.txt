@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
 # Find the gz-common library
-find_package(gz-common5 QUIET REQUIRED COMPONENTS events profiler)
-set(GZ_COMMON_VER ${gz-common5_VERSION_MAJOR})
+find_package(gz-common6 QUIET REQUIRED COMPONENTS events profiler)
+set(GZ_COMMON_VER ${gz-common6_VERSION_MAJOR})
 
 add_executable(assert_example assert_example.cc)
 target_link_libraries(assert_example gz-common${GZ_COMMON_VER}::core)

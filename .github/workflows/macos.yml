@@ -5,7 +5,7 @@ on: [push, pull_request]
 jobs:
   build:
     env:
-      PACKAGE: gz-common5
+      PACKAGE: gz-common6
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
