@@ -57,9 +57,9 @@ cc_library(
 )
 
 cc_binary(
-    name = "libgz-common5-events.so",
+    name = "libgz-common6-events.so",
     includes = ["include"],
-    linkopts = ["-Wl,-soname,libgz-common5-events.so"],
+    linkopts = ["-Wl,-soname,libgz-common6-events.so"],
     linkshared = True,
     deps = [":events"],
 )

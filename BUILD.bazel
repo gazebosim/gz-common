@@ -19,7 +19,7 @@ exports_files(["LICENSE"])
 
 PROJECT_NAME = "gz-common"
 
-PROJECT_MAJOR = 5
+PROJECT_MAJOR = 6
 
 PROJECT_MINOR = 0
 
@@ -84,9 +84,9 @@ cc_library(
 )
 
 cc_binary(
-    name = "libgz-common5.so",
+    name = "libgz-common6.so",
     includes = ["include"],
-    linkopts = ["-Wl,-soname,libgz-common5.so"],
+    linkopts = ["-Wl,-soname,libgz-common6.so"],
     linkshared = True,
     deps = [":gz_common"],
 )
@@ -99,7 +99,7 @@ test_srcs = glob(
 [cc_test(
     name = src.replace("/", "_").replace(".cc", "").replace("src_", ""),
     srcs = [src],
-    data = [":libgz-common5.so"],
+    data = [":libgz-common6.so"],
     deps = [
         ":gz_common",
         GZ_ROOT + "gz_bazel:utilities",
