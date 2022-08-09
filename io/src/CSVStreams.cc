@@ -24,8 +24,10 @@ namespace gz
 namespace common
 {
 
+/////////////////////////////////////////////////
 const CSVDialect CSVDialect::Unix = {',', '\n', '"'};
 
+/////////////////////////////////////////////////
 bool operator==(const CSVDialect &_lhs, const CSVDialect &_rhs)
 {
   return (_lhs.delimiter == _rhs.delimiter &&
@@ -33,6 +35,7 @@ bool operator==(const CSVDialect &_lhs, const CSVDialect &_rhs)
           _lhs.quote == _rhs.quote);
 }
 
+/////////////////////////////////////////////////
 std::istream &ExtractCSVToken(
     std::istream &_stream, CSVToken &_token,
     const CSVDialect &_dialect)
@@ -72,6 +75,7 @@ std::istream &ExtractCSVToken(
   return _stream;
 }
 
+/////////////////////////////////////////////////
 std::istream &ParseCSVRow(
     std::istream &_stream,
     std::vector<std::string> &_row,
@@ -150,20 +154,25 @@ std::istream &ParseCSVRow(
   return _stream;
 }
 
+/// \brief Private data for the CSVIStreamIterator class
 class CSVIStreamIterator::Implementation
 {
+  /// \brief Default constructor for end iterator.
   public: Implementation() = default;
 
+  /// \brief Constructor for begin iterator.
   public: Implementation(std::istream &_stream, const CSVDialect &_dialect)
     : stream(&_stream), dialect(_dialect)
   {
   }
 
+  /// \brief Copy constructor.
   public: Implementation(const Implementation &_other)
     : stream(_other.stream), dialect(_other.dialect), row(_other.row)
   {
   }
 
+  /// \brief Advance iterator to next row if possible.
   public: void Next()
   {
     if (this->stream)
@@ -183,18 +192,23 @@ class CSVIStreamIterator::Implementation
     }
   }
 
+  /// \brief CSV data stream to iterate, if any.
   public: std::istream *stream{nullptr};
 
+  /// \brief CSV dialect for data parsing.
   public: CSVDialect dialect{};
 
+  /// \brief Current CSV data row.
   public: std::vector<std::string> row;
 };
 
+/////////////////////////////////////////////////
 CSVIStreamIterator::CSVIStreamIterator()
   : dataPtr(gz::utils::MakeImpl<Implementation>())
 {
 }
 
+/////////////////////////////////////////////////
 CSVIStreamIterator::CSVIStreamIterator(std::istream &_stream,
                                        const CSVDialect &_dialect)
   : dataPtr(gz::utils::MakeImpl<Implementation>(_stream, _dialect))
@@ -202,6 +216,7 @@ CSVIStreamIterator::CSVIStreamIterator(std::istream &_stream,
   this->dataPtr->Next();
 }
 
+/////////////////////////////////////////////////
 bool CSVIStreamIterator::operator==(const CSVIStreamIterator &_other) const
 {
   return this->dataPtr->stream == _other.dataPtr->stream && (
@@ -209,17 +224,20 @@ bool CSVIStreamIterator::operator==(const CSVIStreamIterator &_other) const
       this->dataPtr->dialect == _other.dataPtr->dialect);
 }
 
+/////////////////////////////////////////////////
 bool CSVIStreamIterator::operator!=(const CSVIStreamIterator &_other) const
 {
   return !(*this == _other);
 }
 
+/////////////////////////////////////////////////
 CSVIStreamIterator &CSVIStreamIterator::operator++()
 {
   this->dataPtr->Next();
   return *this;
 }
 
+/////////////////////////////////////////////////
 // NOLINTNEXTLINE(readability/casting)
 CSVIStreamIterator CSVIStreamIterator::operator++(int)
 {
@@ -228,11 +246,13 @@ CSVIStreamIterator CSVIStreamIterator::operator++(int)
   return it;
 }
 
+/////////////////////////////////////////////////
 const std::vector<std::string> &CSVIStreamIterator::operator*() const
 {
   return this->dataPtr->row;
 }
 
+/////////////////////////////////////////////////
 const std::vector<std::string> *CSVIStreamIterator::operator->() const
 {
   return &this->dataPtr->row;

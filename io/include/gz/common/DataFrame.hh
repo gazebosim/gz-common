@@ -63,8 +63,7 @@ namespace gz
       private: std::unordered_map<K, V> storage;
     };
 
-    /// \brief Full IO specialization for data frames
-    /// comprised of time varying volumetric grids.
+    /// \brief Traits for IO of data frames comprised of time varying volumetric grids.
     ///
     /// \tparam K Data frame key type.
     /// \tparam T Time coordinate type.

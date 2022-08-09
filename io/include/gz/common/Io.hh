@@ -24,15 +24,31 @@ namespace gz
 {
   namespace common
   {
+    /// \brief Traits for type-specific object I/O.
+    ///
+    /// To be fully specialized as needed.
     template <typename T>
-    struct IO {
-      static T ReadFrom(std::istringstream &_istream)
+    struct IO
+    {
+      /// \brief Read object from stream.
+      ///
+      /// This default implementation relies on stream operator overloads.
+      ///
+      /// \param[in] _istream Stream to read object from.
+      /// \return object instance.
+      static T ReadFrom(std::istream &_istream)
       {
         T value;
         _istream >> value;
         return value;
       }
 
+      /// \brief Read object from string.
+      ///
+      /// This default implementation relies on stream operator overloads.
+      ///
+      /// \param[in] _string String to read object from.
+      /// \return object instance.
       static T ReadFrom(const std::string &_string)
       {
         std::istringstream stream{_string};
@@ -40,16 +56,25 @@ namespace gz
       }
     };
 
+    /// \brief Traits for string I/O.
     template<>
-    struct IO<std::string> {
-      static std::string ReadFrom(std::istringstream &_istream)
+    struct IO<std::string>
+    {
+      /// \brief Read object from stream.
+      ///
+      /// This default implementation relies on stream operator overloads.
+      ///
+      /// \param[in] _istream Stream to read object from.
+      /// \return object instance.
+      static std::string ReadFrom(std::istream &_istream)
       {
         std::string value;
         _istream >> value;
         return value;
       }
 
-      static std::string ReadFrom(const std::string &_string)
+      /// \brief Read string from string (copy as-is).
+      static std::string ReadFrom(std::string _string)
       {
         return _string;
       }
