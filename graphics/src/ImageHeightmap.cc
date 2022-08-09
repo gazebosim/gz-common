@@ -39,8 +39,8 @@ int ImageHeightmap::Load(const std::string &_filename)
 
 //////////////////////////////////////////////////
 void ImageHeightmap::FillHeightMap(int _subSampling,
-    unsigned int _vertSize, const ignition::math::Vector3d &_size,
-    const ignition::math::Vector3d &_scale, bool _flipY,
+    unsigned int _vertSize, const math::Vector3d &_size,
+    const math::Vector3d &_scale, bool _flipY,
     std::vector<float> &_heights)
 {
   // Resize the vector to match the size of the vertices.

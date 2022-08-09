@@ -35,8 +35,8 @@ TEST_F(ColladaLoader, LoadBox)
       common::testing::TestFile("data", "box.dae"));
 
   EXPECT_STREQ("unknown", mesh->Name().c_str());
-  EXPECT_EQ(ignition::math::Vector3d(1, 1, 1), mesh->Max());
-  EXPECT_EQ(ignition::math::Vector3d(-1, -1, -1), mesh->Min());
+  EXPECT_EQ(math::Vector3d(1, 1, 1), mesh->Max());
+  EXPECT_EQ(math::Vector3d(-1, -1, -1), mesh->Min());
   // 36 vertices, 24 unique, 12 shared.
   EXPECT_EQ(24u, mesh->VertexCount());
   EXPECT_EQ(24u, mesh->NormalCount());
@@ -85,8 +85,8 @@ TEST_F(ColladaLoader, ShareVertices)
       mesh->SubMeshByIndex(i).lock();
     for (unsigned int j = 0; j < subMesh->VertexCount(); ++j)
     {
-      ignition::math::Vector3d v = subMesh->Vertex(j);
-      ignition::math::Vector3d n = subMesh->Normal(j);
+      math::Vector3d v = subMesh->Vertex(j);
+      math::Vector3d n = subMesh->Normal(j);
 
       // Verify there is no other vertex with the same position AND normal
       for (unsigned int k = j+1; k < subMesh->VertexCount(); ++k)

@@ -87,20 +87,20 @@ std::string Mesh::Name() const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d Mesh::Max() const
+math::Vector3d Mesh::Max() const
 {
   if (this->dataPtr->submeshes.empty())
-    return ignition::math::Vector3d::Zero;
+    return math::Vector3d::Zero;
 
-  ignition::math::Vector3d max;
+  math::Vector3d max;
 
-  max.X(-ignition::math::MAX_F);
-  max.Y(-ignition::math::MAX_F);
-  max.Z(-ignition::math::MAX_F);
+  max.X(-math::MAX_F);
+  max.Y(-math::MAX_F);
+  max.Z(-math::MAX_F);
 
   for (const auto &submesh : this->dataPtr->submeshes)
   {
-    ignition::math::Vector3d smax = submesh->Max();
+    math::Vector3d smax = submesh->Max();
     max.X(std::max(max.X(), smax.X()));
     max.Y(std::max(max.Y(), smax.Y()));
     max.Z(std::max(max.Z(), smax.Z()));
@@ -110,20 +110,20 @@ ignition::math::Vector3d Mesh::Max() const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d Mesh::Min() const
+math::Vector3d Mesh::Min() const
 {
   if (this->dataPtr->submeshes.empty())
-    return ignition::math::Vector3d::Zero;
+    return math::Vector3d::Zero;
 
-  ignition::math::Vector3d min;
+  math::Vector3d min;
 
-  min.X(ignition::math::MAX_F);
-  min.Y(ignition::math::MAX_F);
-  min.Z(ignition::math::MAX_F);
+  min.X(math::MAX_F);
+  min.Y(math::MAX_F);
+  min.Z(math::MAX_F);
 
   for (const auto &submesh : this->dataPtr->submeshes)
   {
-    ignition::math::Vector3d smin = submesh->Min();
+    math::Vector3d smin = submesh->Min();
     min.X(std::min(min.X(), smin.X()));
     min.Y(std::min(min.Y(), smin.Y()));
     min.Z(std::min(min.Z(), smin.Z()));
@@ -340,30 +340,30 @@ bool Mesh::HasSkeleton() const
 }
 
 //////////////////////////////////////////////////
-void Mesh::Scale(const ignition::math::Vector3d &_factor)
+void Mesh::Scale(const math::Vector3d &_factor)
 {
   for (auto &submesh : this->dataPtr->submeshes)
     submesh->Scale(_factor);
 }
 
 //////////////////////////////////////////////////
-void Mesh::SetScale(const ignition::math::Vector3d &_factor)
+void Mesh::SetScale(const math::Vector3d &_factor)
 {
   for (auto &submesh : this->dataPtr->submeshes)
     submesh->Scale(_factor);
 }
 
 //////////////////////////////////////////////////
-void Mesh::GenSphericalTexCoord(const ignition::math::Vector3d &_center)
+void Mesh::GenSphericalTexCoord(const math::Vector3d &_center)
 {
   for (auto &submesh : this->dataPtr->submeshes)
     submesh->GenSphericalTexCoord(_center);
 }
 
 //////////////////////////////////////////////////
-void Mesh::Center(const ignition::math::Vector3d &_center)
+void Mesh::Center(const math::Vector3d &_center)
 {
-  ignition::math::Vector3d min, max, half;
+  math::Vector3d min, max, half;
   min = this->Min();
   max = this->Max();
   half = (max - min) * 0.5;
@@ -372,16 +372,16 @@ void Mesh::Center(const ignition::math::Vector3d &_center)
 }
 
 //////////////////////////////////////////////////
-void Mesh::Translate(const ignition::math::Vector3d &_vec)
+void Mesh::Translate(const math::Vector3d &_vec)
 {
   for (auto &submesh : this->dataPtr->submeshes)
     submesh->Translate(_vec);
 }
 
 //////////////////////////////////////////////////
-void Mesh::AABB(ignition::math::Vector3d &_center,
-                ignition::math::Vector3d &_minXYZ,
-                ignition::math::Vector3d &_maxXYZ) const
+void Mesh::AABB(math::Vector3d &_center,
+                math::Vector3d &_minXYZ,
+                math::Vector3d &_maxXYZ) const
 {
   // find aabb center
   _minXYZ.X(1e15);
@@ -396,8 +396,8 @@ void Mesh::AABB(ignition::math::Vector3d &_center,
 
   for (auto const &submesh : this->dataPtr->submeshes)
   {
-    ignition::math::Vector3d max = submesh->Max();
-    ignition::math::Vector3d min = submesh->Min();
+    math::Vector3d max = submesh->Max();
+    math::Vector3d min = submesh->Min();
 
     _minXYZ.X(std::min(_minXYZ.X(), min.X()));
     _maxXYZ.X(std::max(_maxXYZ.X(), max.X()));

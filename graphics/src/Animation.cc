@@ -101,7 +101,7 @@ class ignition::common::TrajectoryInfoPrivate
   /// \brief Waypoints in pose animation format.
   /// Times within the animation should be considered durations counted
   /// from start time.
-  public: std::shared_ptr<common::PoseAnimation> waypoints;
+  public: std::shared_ptr<PoseAnimation> waypoints;
 
   /// \brief Distance on the XY plane covered by each segment. The key is the
   /// duration from start time, the value is the distance in meters.
@@ -542,7 +542,7 @@ void TrajectoryInfo::SetTranslated(bool _translated)
 }
 
 /////////////////////////////////////////////////
-common::PoseAnimation *TrajectoryInfo::Waypoints() const
+PoseAnimation *TrajectoryInfo::Waypoints() const
 {
   return this->dataPtr->waypoints.get();
 }
@@ -561,8 +561,8 @@ void TrajectoryInfo::SetWaypoints(
 
   std::stringstream animName;
   animName << this->AnimIndex() << "_" << this->Id();
-  std::shared_ptr<common::PoseAnimation> anim =
-      std::make_shared<common::PoseAnimation>(animName.str(),
+  std::shared_ptr<PoseAnimation> anim =
+      std::make_shared<PoseAnimation>(animName.str(),
       std::chrono::duration<double>(this->Duration()).count(), false);
 
   auto prevPose = first->second.Pos();
