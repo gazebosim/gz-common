@@ -83,13 +83,13 @@ int Dem::Load(const std::string &_filename)
   unsigned int height;
   int xSize, ySize;
   double upLeftX, upLeftY, upRightX, upRightY, lowLeftX, lowLeftY;
-  ignition::math::Angle upLeftLat, upLeftLong, upRightLat, upRightLong;
-  ignition::math::Angle lowLeftLat, lowLeftLong;
+  math::Angle upLeftLat, upLeftLong, upRightLat, upRightLong;
+  math::Angle lowLeftLat, lowLeftLong;
 
   // Sanity check
   std::string fullName = _filename;
   if (!exists(findFilePath(fullName)))
-    fullName = common::find_file(_filename);
+    fullName = find_file(_filename);
 
   if (!exists(findFilePath(fullName)))
   {
@@ -145,15 +145,15 @@ int Dem::Load(const std::string &_filename)
                                             lowLeftLat, lowLeftLong);
 
   // Set the terrain's side (the terrain will be squared after the padding)
-  if (ignition::math::isPowerOfTwo(ySize - 1))
+  if (math::isPowerOfTwo(ySize - 1))
     height = ySize;
   else
-    height = ignition::math::roundUpPowerOfTwo(ySize) + 1;
+    height = math::roundUpPowerOfTwo(ySize) + 1;
 
-  if (ignition::math::isPowerOfTwo(xSize - 1))
+  if (math::isPowerOfTwo(xSize - 1))
     width = xSize;
   else
-    width = ignition::math::roundUpPowerOfTwo(xSize) + 1;
+    width = math::roundUpPowerOfTwo(xSize) + 1;
 
   this->dataPtr->side = std::max(width, height);
 
@@ -197,7 +197,7 @@ float Dem::MaxElevation() const
 
 //////////////////////////////////////////////////
 void Dem::GeoReference(double _x, double _y,
-    ignition::math::Angle &_latitude, ignition::math::Angle &_longitude) const
+    math::Angle &_latitude, math::Angle &_longitude) const
 {
   double geoTransf[6];
   if (this->dataPtr->dataSet->GeoTransform(geoTransf) == CE_None)
@@ -227,8 +227,8 @@ void Dem::GeoReference(double _x, double _y,
 }
 
 //////////////////////////////////////////////////
-void Dem::GeoReferenceOrigin(ignition::math::Angle &_latitude,
-    ignition::math::Angle &_longitude) const
+void Dem::GeoReferenceOrigin(math::Angle &_latitude,
+    math::Angle &_longitude) const
 {
   return this->GeoReference(0, 0, _latitude, _longitude);
 }
@@ -259,8 +259,8 @@ double Dem::WorldHeight() const
 
 //////////////////////////////////////////////////
 void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
-    const ignition::math::Vector3d &_size,
-    const ignition::math::Vector3d &_scale,
+    const math::Vector3d &_size,
+    const math::Vector3d &_scale,
     bool _flipY, std::vector<float> &_heights)
 {
   if (_subSampling <= 0)

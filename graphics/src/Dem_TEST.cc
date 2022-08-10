@@ -108,7 +108,7 @@ TEST_F(DemTest, BasicAPI)
   ASSERT_ANY_THROW(dem.GetElevation(width, height));
 
   // Check GetGeoReferenceOrigin()
-  ignition::math::Angle latitude, longitude;
+  math::Angle latitude, longitude;
   dem.GetGeoReferenceOrigin(latitude, longitude);
   EXPECT_FLOAT_EQ(38.001667, latitude.Degree());
   EXPECT_FLOAT_EQ(-122.22278, longitude.Degree());
@@ -124,8 +124,8 @@ TEST_F(DemTest, FillHeightmap)
   // Use FillHeightMap() to retrieve a vector<float> after some transformations
   int subsampling;
   unsigned vertSize;
-  ignition::math::Vector3d size;
-  ignition::math::Vector3d scale;
+  math::Vector3d size;
+  math::Vector3d scale;
   bool flipY;
   std::vector<float> elevations;
 
@@ -137,7 +137,7 @@ TEST_F(DemTest, FillHeightmap)
   scale.X(size.X() / vertSize);
   scale.Y(size.Y() / vertSize);
 
-  if (ignition::math::equal(dem.GetMaxElevation(), 0.0f))
+  if (math::equal(dem.GetMaxElevation(), 0.0f))
     scale.Z(fabs(size.Z()));
   else
     scale.Z(fabs(size.Z()) / dem.GetMaxElevation());

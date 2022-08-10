@@ -137,11 +137,11 @@ bool Pbr::operator==(const Pbr &_pbr) const
     && (this->dataPtr->emissiveMap == _pbr.dataPtr->emissiveMap)
     && (this->dataPtr->ambientOcclusionMap ==
         _pbr.dataPtr->ambientOcclusionMap)
-    && (ignition::math::equal(
+    && (math::equal(
         this->dataPtr->metalness, _pbr.dataPtr->metalness))
-    && (ignition::math::equal(
+    && (math::equal(
         this->dataPtr->roughness, _pbr.dataPtr->roughness))
-    && (ignition::math::equal(
+    && (math::equal(
         this->dataPtr->glossiness, _pbr.dataPtr->glossiness));
 }
 

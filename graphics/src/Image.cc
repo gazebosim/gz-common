@@ -79,7 +79,7 @@ Image::Image(const std::string &_filename)
   this->dataPtr->bitmap = NULL;
   if (!_filename.empty())
   {
-    std::string filename = ignition::common::findFile(_filename);
+    std::string filename = findFile(_filename);
     if (!filename.empty())
       this->Load(filename);
     else
@@ -107,7 +107,7 @@ int Image::Load(const std::string &_filename)
   this->dataPtr->fullName = _filename;
   if (!exists(this->dataPtr->fullName))
   {
-    this->dataPtr->fullName = common::findFile(_filename);
+    this->dataPtr->fullName = findFile(_filename);
   }
 
   if (exists(this->dataPtr->fullName))

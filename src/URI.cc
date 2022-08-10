@@ -165,7 +165,7 @@ void URIPath::PushFront(const std::string &_part)
     // all invalid characters should be
     // encoded, not just slashes.
     ignwarn << "Unencoded slashes in URI part, encoding them." << std::endl;
-    part = common::replaceAll(part, "/", "%2F");
+    part = replaceAll(part, "/", "%2F");
   }
 
   if (!part.empty())
@@ -202,7 +202,7 @@ void URIPath::PushBack(const std::string &_part)
     // all invalid characters should be
     // encoded, not just slashes.
     ignwarn << "Unencoded slashes in URI part, encoding them." << std::endl;
-    part = common::replaceAll(part, "/", "%2F");
+    part = replaceAll(part, "/", "%2F");
   }
 
   this->dataPtr->path.push_back(part);
@@ -333,7 +333,7 @@ bool URIPath::Parse(const std::string &_str)
 
   this->Clear();
 
-  for (auto part : common::split(_str, "/"))
+  for (auto part : split(_str, "/"))
     this->PushBack(part);
 
   // the initial / is removed from _str when splitting, so we need to
@@ -449,9 +449,9 @@ bool URIQuery::Valid(const std::string &_str)
   if (str.find_first_not_of(allowedChars, 1) != std::string::npos)
     return false;
 
-  for (auto const &query : common::split(str.substr(1), "&"))
+  for (auto const &query : split(str.substr(1), "&"))
   {
-    if (common::split(query, "=").size() != 2u)
+    if (split(query, "=").size() != 2u)
       return false;
   }
 
@@ -468,9 +468,9 @@ bool URIQuery::Parse(const std::string &_str)
 
   if (!_str.empty())
   {
-    for (auto query : common::split(_str.substr(1), "&"))
+    for (auto query : split(_str.substr(1), "&"))
     {
-      auto values = common::split(query, "=");
+      auto values = split(query, "=");
       this->Insert(values.at(0), values.at(1));
     }
   }

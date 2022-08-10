@@ -154,7 +154,7 @@ void Material::SetTextureImage(const std::string &_tex,
   {
     // Try to resolve this texture image to a locally cached path in a
     // separate directory
-    this->dataPtr->texImage = common::findFile(_tex);
+    this->dataPtr->texImage = findFile(_tex);
     if (!exists(this->dataPtr->texImage))
     {
       this->dataPtr->texImage = common::joinPaths(_resourcePath, "..",

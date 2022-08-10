@@ -253,12 +253,12 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
   // Save file
   if (this->dataPtr->exportTextures)
   {
-    const std::string directory = ignition::common::joinPaths(
+    const std::string directory = common::joinPaths(
       this->dataPtr->path, this->dataPtr->filename, "meshes");
 
     createDirectories(directory);
 
-    const std::string finalFilename = ignition::common::joinPaths(
+    const std::string finalFilename = common::joinPaths(
       this->dataPtr->path, this->dataPtr->filename, "meshes",
       this->dataPtr->filename + ".dae");
 
@@ -272,7 +272,7 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
   }
   else
   {
-    const std::string finalFilename = ignition::common::joinPaths(
+    const std::string finalFilename = common::joinPaths(
       this->dataPtr->path, this->dataPtr->filename + std::string(".dae"));
 
     const tinyxml2::XMLError error = xmlDoc.SaveFile(finalFilename.c_str());
@@ -300,7 +300,7 @@ void ColladaExporterPrivate::ExportAsset(tinyxml2::XMLElement *_assetXml)
 
 //////////////////////////////////////////////////
 void ColladaExporterPrivate::ExportGeometrySource(
-    const ignition::common::SubMesh *_subMesh,
+    const common::SubMesh *_subMesh,
     tinyxml2::XMLElement *_meshXml, GeometryType _type, const char *_meshID)
 {
   char sourceId[100], sourceArrayId[107];
@@ -315,7 +315,7 @@ void ColladaExporterPrivate::ExportGeometrySource(
     snprintf(sourceId, sizeof(sourceId), "%s-Positions", _meshID);
     count = _subMesh->VertexCount();
     stride = 3;
-    ignition::math::Vector3d vertex;
+    math::Vector3d vertex;
     for (unsigned int i = 0; i < count; ++i)
     {
       vertex = _subMesh->Vertex(i);
@@ -327,7 +327,7 @@ void ColladaExporterPrivate::ExportGeometrySource(
     snprintf(sourceId, sizeof(sourceId), "%s-Normals", _meshID);
     count = _subMesh->NormalCount();
     stride = 3;
-    ignition::math::Vector3d normal;
+    math::Vector3d normal;
     for (unsigned int i = 0; i < count; ++i)
     {
       normal = _subMesh->Normal(i);
@@ -339,7 +339,7 @@ void ColladaExporterPrivate::ExportGeometrySource(
     snprintf(sourceId, sizeof(sourceId), "%s-UVMap", _meshID);
     count = _subMesh->VertexCount();
     stride = 2;
-    ignition::math::Vector2d inTexCoord;
+    math::Vector2d inTexCoord;
     for (unsigned int i = 0; i < count; ++i)
     {
       inTexCoord = _subMesh->TexCoordBySet(i, 0);
@@ -512,7 +512,7 @@ int ColladaExporterPrivate::ExportImages(
   int imageCount = 0;
   for (unsigned int i = 0; i < this->materialCount; ++i)
   {
-    const ignition::common::MaterialPtr material =
+    const common::MaterialPtr material =
       this->mesh->MaterialByIndex(i);
     std::string imageString = material->TextureImage();
 
@@ -530,7 +530,7 @@ int ColladaExporterPrivate::ExportImages(
         _libraryImagesXml->GetDocument()->NewElement("init_from");
       const auto imageName = imageString.substr(
           imageString.rfind(pathSeparator));
-      const auto imagePath = ignition::common::joinPaths("..", "materials",
+      const auto imagePath = common::joinPaths("..", "materials",
         "textures", imageName);
       initFromXml->LinkEndChild(
         _libraryImagesXml->GetDocument()->NewText(imagePath.c_str()));
@@ -594,7 +594,7 @@ void ColladaExporterPrivate::ExportEffects(
     effectXml->LinkEndChild(profileCommonXml);
 
     // Image
-    const ignition::common::MaterialPtr material =
+    const common::MaterialPtr material =
         this->mesh->MaterialByIndex(i);
     std::string imageString = material->TextureImage();
 
@@ -810,7 +810,7 @@ void ColladaExporterPrivate::ExportVisualScenes(
     unsigned int materialIndex =
       this->mesh->SubMeshByIndex(i).lock()->MaterialIndex();
 
-    const ignition::common::MaterialPtr material =
+    const common::MaterialPtr material =
       this->mesh->MaterialByIndex(materialIndex);
 
     if (material)

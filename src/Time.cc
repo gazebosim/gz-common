@@ -62,7 +62,7 @@ using namespace common;
 Time Time::wallTime;
 
 struct timespec Time::clockResolution;
-const Time Time::Zero = common::Time(0, 0);
+const Time Time::Zero = Time(0, 0);
 const int32_t Time::nsInSec = 1000000000L;
 const int32_t Time::nsInMs = 1000000;
 
@@ -160,7 +160,7 @@ float Time::Float() const
 }
 
 /////////////////////////////////////////////////
-Time Time::Sleep(const common::Time &_time)
+Time Time::Sleep(const Time &_time)
 {
   Time result;
 
