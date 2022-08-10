@@ -1,4 +1,6 @@
-cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
+
+project(gz-math-examples)
 
 # Find the gz-common library
 find_package(gz-common5 QUIET REQUIRED COMPONENTS events profiler)
