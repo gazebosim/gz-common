@@ -30,7 +30,7 @@ namespace gz
   namespace common
   {
     /// \brief A CSV specification.
-    struct CSVDialect
+    struct GZ_COMMON_IO_VISIBLE CSVDialect
     {
       /// Field delimiter character.
       char delimiter;
