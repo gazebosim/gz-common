@@ -41,19 +41,28 @@ namespace gz
     template <typename K, typename V>
     class DataFrame
     {
-      /// \brief Check if column key is present.
+      /// \brief Check if column is present.
+      /// \param[in] _key Key to column to look up.
+      /// \return whether the given column is present
+      /// in the data frame.
       public: bool Has(const K &_key) const
       {
         return this->storage.count(_key) > 0;
       }
 
-      /// \brief Fetch mutable reference to column
+      /// \brief Fetch mutable reference to column.
+      /// \param[in] _key Key to column to look up.
+      /// \return Mutable reference to column in the
+      /// data frame.
       public: V &operator[](const K &_key)
       {
         return this->storage[_key];
       }
 
       /// \brief Fetch immutable reference to column
+      /// \param[in] _key Key to column to look up.
+      /// \return Immutable reference to column in the
+      /// data frame.
       public: const V &operator[](const K &_key) const
       {
         return this->storage.at(_key);
