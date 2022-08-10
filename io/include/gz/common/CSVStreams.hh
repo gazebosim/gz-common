@@ -77,9 +77,9 @@ namespace gz
     /// \param[out] _token Output CSV token to extract into.
     /// \param[in] _dialect CSV data dialect. Defaults to the Unix dialect.
     /// \return same CSV data stream.
-    std::istream &ExtractCSVToken(
+    GZ_COMMON_IO_VISIBLE std::istream &ExtractCSVToken(
       std::istream &_stream, CSVToken &_token,
-      const CSVDialect &_dialect = CSVDialect::Unix) GZ_COMMON_IO_VISIBLE;
+      const CSVDialect &_dialect = CSVDialect::Unix);
 
     /// \brief Parse a single row from an input stream of CSV data.
     ///
@@ -89,9 +89,9 @@ namespace gz
     /// \param[out] _row Output CSV row to parse into.
     /// \param[in] _dialect CSV data dialect. Defaults to the Unix dialect.
     /// \returns same CSV data stream.
-    std::istream &ParseCSVRow(
+    GZ_COMMON_IO_VISIBLE  std::istream &ParseCSVRow(
       std::istream &_stream, std::vector<std::string> &_row,
-      const CSVDialect &_dialect = CSVDialect::Unix) GZ_COMMON_IO_VISIBLE;
+      const CSVDialect &_dialect = CSVDialect::Unix);
 
     /// \brief A single-pass row iterator on an input stream of CSV data.
     ///
