@@ -1,4 +1,9 @@
+## Gazebo Common 6.x
+
+## Gazebo Common 6.0.0 (20XX-XX-XX)
+
 ## Gazebo Common 5.x
+
 ## Gazebo Common 5.0.0 (20XX-XX-XX)
 
 ## Gazebo Common 4.x

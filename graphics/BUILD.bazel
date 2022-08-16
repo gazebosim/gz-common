@@ -63,9 +63,9 @@ cc_library(
 )
 
 cc_binary(
-    name = "libgz-common5-graphics.so",
+    name = "libgz-common6-graphics.so",
     includes = ["include"],
-    linkopts = ["-Wl,-soname,libgz-common5-graphics.so"],
+    linkopts = ["-Wl,-soname,libgz-common6-graphics.so"],
     linkshared = True,
     deps = [":graphics"],
 )

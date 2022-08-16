@@ -65,9 +65,9 @@ cc_library(
 )
 
 cc_binary(
-    name = "libgz-common5-av.so",
+    name = "libgz-common6-av.so",
     includes = ["include"],
-    linkopts = ["-Wl,-soname,libgz-common5-av.so"],
+    linkopts = ["-Wl,-soname,libgz-common6-av.so"],
     linkshared = True,
     deps = [":av"],
 )
