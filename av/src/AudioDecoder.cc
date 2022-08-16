@@ -157,8 +157,7 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
         // decodedFrame->linesize[0].
         int size = decodedFrame->nb_samples *
           av_get_bytes_per_sample(this->data->codecCtx->sample_fmt) *
-          this->data->codecCtx->channels;
-
+          this->data->codecCtx->ch_layout.nb_channels;
         // Resize the audio buffer as necessary
         if (*_outBufferSize + size > maxBufferSize)
         {
