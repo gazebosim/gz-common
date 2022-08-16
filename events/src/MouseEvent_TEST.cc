@@ -28,10 +28,10 @@ class MouseEvent : public common::testing::AutoLogFixture { };
 /////////////////////////////////////////////////
 TEST_F(MouseEvent, CopyConstructor)
 {
-  ignition::math::Vector2i pos(1, 25);
-  ignition::math::Vector2i prevPos(2, 26);
-  ignition::math::Vector2i pressPos(3, 24);
-  ignition::math::Vector2i scroll(2, 3);
+  math::Vector2i pos(1, 25);
+  math::Vector2i prevPos(2, 26);
+  math::Vector2i pressPos(3, 24);
+  math::Vector2i scroll(2, 3);
   float moveScale = 0.3f;
   bool dragging = true;
   common::MouseEvent::EventType type = common::MouseEvent::PRESS;
@@ -95,10 +95,10 @@ TEST_F(MouseEvent, CopyConstructor)
   EXPECT_EQ(otherEvent2.Control(), control);
 
   // update the original mouse event values
-  ignition::math::Vector2i newPos(3, 18);
-  ignition::math::Vector2i newPrevPos(2, 17);
-  ignition::math::Vector2i newPressPos(3, 16);
-  ignition::math::Vector2i newScroll(1, 2);
+  math::Vector2i newPos(3, 18);
+  math::Vector2i newPrevPos(2, 17);
+  math::Vector2i newPressPos(3, 16);
+  math::Vector2i newScroll(1, 2);
   float newMoveScale = 0.4f;
   bool newDragging = false;
   common::MouseEvent::EventType newType = common::MouseEvent::RELEASE;
@@ -162,10 +162,10 @@ TEST_F(MouseEvent, CopyConstructor)
 /////////////////////////////////////////////////
 TEST_F(MouseEvent, Assignment)
 {
-  ignition::math::Vector2i pos(1, 25);
-  ignition::math::Vector2i prevPos(2, 26);
-  ignition::math::Vector2i pressPos(3, 24);
-  ignition::math::Vector2i scroll(2, 3);
+  math::Vector2i pos(1, 25);
+  math::Vector2i prevPos(2, 26);
+  math::Vector2i pressPos(3, 24);
+  math::Vector2i scroll(2, 3);
   float moveScale = 0.3f;
   bool dragging = true;
   common::MouseEvent::EventType type = common::MouseEvent::PRESS;
@@ -217,10 +217,10 @@ TEST_F(MouseEvent, Assignment)
   EXPECT_EQ(otherEvent.Control(), control);
 
   // update the original mouse event values
-  ignition::math::Vector2i newPos(3, 18);
-  ignition::math::Vector2i newPrevPos(2, 17);
-  ignition::math::Vector2i newPressPos(3, 16);
-  ignition::math::Vector2i newScroll(1, 2);
+  math::Vector2i newPos(3, 18);
+  math::Vector2i newPrevPos(2, 17);
+  math::Vector2i newPressPos(3, 16);
+  math::Vector2i newScroll(1, 2);
   float newMoveScale = 0.4f;
   bool newDragging = false;
   common::MouseEvent::EventType newType = common::MouseEvent::RELEASE;

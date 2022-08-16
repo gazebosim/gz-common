@@ -230,21 +230,21 @@ class FilesystemTest : public ::testing::Test
 /// \brief Test file operations
 TEST_F(FilesystemTest, fileOps)
 {
-  EXPECT_FALSE(common::cwd().empty());
-  EXPECT_TRUE(common::exists(common::cwd()));
-  EXPECT_TRUE(common::isDirectory(common::cwd()));
-  EXPECT_FALSE(common::isFile(common::cwd()));
+  EXPECT_FALSE(cwd().empty());
+  EXPECT_TRUE(exists(cwd()));
+  EXPECT_TRUE(common::isDirectory(cwd()));
+  EXPECT_FALSE(isFile(cwd()));
 
   std::ofstream tmpOut("test.tmp");
   tmpOut << "Output" << std::endl;
   tmpOut.close();
 
-  EXPECT_TRUE(common::isFile("test.tmp"));
+  EXPECT_TRUE(isFile("test.tmp"));
   EXPECT_FALSE(common::isDirectory("test.tmp"));
 
-  EXPECT_TRUE(common::copyFile("test.tmp", "test2.tmp"));
-  EXPECT_TRUE(common::exists("test.tmp"));
-  EXPECT_TRUE(common::exists("test2.tmp"));
+  EXPECT_TRUE(copyFile("test.tmp", "test2.tmp"));
+  EXPECT_TRUE(exists("test.tmp"));
+  EXPECT_TRUE(exists("test2.tmp"));
 
   std::ifstream testIn("test.tmp");
   std::string testInContent((std::istreambuf_iterator<char>(testIn)),
@@ -260,10 +260,10 @@ TEST_F(FilesystemTest, fileOps)
 
   EXPECT_EQ(testInContent, test2InContent);
 
-  EXPECT_TRUE(common::moveFile("test2.tmp", "test3.tmp"));
+  EXPECT_TRUE(moveFile("test2.tmp", "test3.tmp"));
 
-  EXPECT_FALSE(common::exists("test2.tmp"));
-  EXPECT_TRUE(common::exists("test3.tmp"));
+  EXPECT_FALSE(exists("test2.tmp"));
+  EXPECT_TRUE(exists("test3.tmp"));
 
   std::ifstream test3In("test3.tmp");
   std::string test3InContent((std::istreambuf_iterator<char>(test3In)),
@@ -275,33 +275,33 @@ TEST_F(FilesystemTest, fileOps)
 
   EXPECT_EQ(testInContent, test3InContent);
 
-  EXPECT_FALSE(common::copyFile("test3.tmp", "test3.tmp"));
-  EXPECT_FALSE(common::copyFile("test3.tmp", "./test3.tmp"));
+  EXPECT_FALSE(copyFile("test3.tmp", "test3.tmp"));
+  EXPECT_FALSE(copyFile("test3.tmp", "./test3.tmp"));
 
   std::remove("test.tmp");
 
   // This file shouldn't exist, but we'll try to remove just in case the
   // test failed.
-  EXPECT_FALSE(common::removeFile("test2.tmp"));
+  EXPECT_FALSE(removeFile("test2.tmp"));
 
-  EXPECT_TRUE(common::removeFile("test3.tmp"));
+  EXPECT_TRUE(removeFile("test3.tmp"));
 
-  EXPECT_FALSE(common::exists("test3.tmp"));
+  EXPECT_FALSE(exists("test3.tmp"));
 }
 
 /////////////////////////////////////////////////
 /// \brief Test file operations
 TEST_F(FilesystemTest, moreFileOps)
 {
-  EXPECT_FALSE(common::copyFile("__wrong__.tmp", "test2.tmp"));
-  EXPECT_TRUE(!common::exists("test2.tmp"));
-  EXPECT_FALSE(common::copyFile("test.tmp", "__wrong_dir__/__wrong__.tmp"));
-  EXPECT_TRUE(!common::exists("__wrong_dir__"));
+  EXPECT_FALSE(copyFile("__wrong__.tmp", "test2.tmp"));
+  EXPECT_TRUE(!exists("test2.tmp"));
+  EXPECT_FALSE(copyFile("test.tmp", "__wrong_dir__/__wrong__.tmp"));
+  EXPECT_TRUE(!exists("__wrong_dir__"));
 
-  EXPECT_FALSE(common::moveFile("__wrong__.tmp", "test3.tmp"));
-  EXPECT_TRUE(!common::exists("test3.tmp"));
-  EXPECT_FALSE(common::moveFile("test2.tmp", "__wrong_dir__/__wrong__.tmp"));
-  EXPECT_TRUE(!common::exists("__wrong_dir__"));
+  EXPECT_FALSE(moveFile("__wrong__.tmp", "test3.tmp"));
+  EXPECT_TRUE(!exists("test3.tmp"));
+  EXPECT_FALSE(moveFile("test2.tmp", "__wrong_dir__/__wrong__.tmp"));
+  EXPECT_TRUE(!exists("__wrong_dir__"));
 }
 
 /////////////////////////////////////////////////
@@ -391,7 +391,7 @@ TEST_F(FilesystemTest, cwd)
   std::string path = cwd();
   EXPECT_EQ(path, new_temp_dir);
 
-  EXPECT_TRUE(common::chdir(origCwd));
+  EXPECT_TRUE(chdir(origCwd));
   EXPECT_EQ(origCwd, cwd());
 }
 
@@ -637,7 +637,7 @@ TEST_F(FilesystemTest, createDirectories)
 /////////////////////////////////////////////////
 TEST_F(FilesystemTest, copyDirectories)
 {
-  const auto origCwd = ignition::common::cwd();
+  const auto origCwd = cwd();
   std::string newTempDir;
   ASSERT_TRUE(create_and_switch_to_temp_dir(newTempDir));
 
@@ -690,7 +690,7 @@ TEST_F(FilesystemTest, copyDirectories)
   EXPECT_FALSE(copyDirectory("fake_dir", dirCopied));
 
   // Cleanup
-  ignition::common::chdir(origCwd);
+  chdir(origCwd);
   EXPECT_TRUE(removeAll(newTempDir));
 }
 

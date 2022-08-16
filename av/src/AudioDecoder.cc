@@ -48,7 +48,7 @@ class ignition::common::AudioDecoderPrivate
 AudioDecoder::AudioDecoder()
   : data(new AudioDecoderPrivate)
 {
-  ignition::common::load();
+  load();
 
   this->data->formatCtx = nullptr;
   this->data->codecCtx = nullptr;
@@ -108,7 +108,7 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
 
   bool result = true;
 
-  if (!(decodedFrame = common::AVFrameAlloc()))
+  if (!(decodedFrame = AVFrameAlloc()))
   {
     ignerr << "Audio decoder out of memory\n";
     result = false;
@@ -157,8 +157,7 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
         // decodedFrame->linesize[0].
         int size = decodedFrame->nb_samples *
           av_get_bytes_per_sample(this->data->codecCtx->sample_fmt) *
-          this->data->codecCtx->channels;
-
+          this->data->codecCtx->ch_layout.nb_channels;
         // Resize the audio buffer as necessary
         if (*_outBufferSize + size > maxBufferSize)
         {

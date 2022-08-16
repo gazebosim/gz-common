@@ -96,9 +96,9 @@ HWEncoderType DetectHWEncoderType(const std::string& _codecName)
 
     bool matches;
     if (matchPrefix)
-      matches = common::StartsWith(_codecName, matchString);
+      matches = StartsWith(_codecName, matchString);
     else
-      matches = common::EndsWith(_codecName, matchString);
+      matches = EndsWith(_codecName, matchString);
 
     if (matches)
       return hwAccel;
@@ -232,7 +232,7 @@ AVCodec* HWEncoder::FindEncoder(AVCodecID _codecId)
         case HWEncoderType::NVENC:
         {
           std::string deviceName = "/dev/nvidia0";
-          if (common::StartsWith(initHwDevice, "/dev/nvidia"))
+          if (StartsWith(initHwDevice, "/dev/nvidia"))
             deviceName = initHwDevice;
           else if (!initHwDevice.empty())
             break;
@@ -272,14 +272,14 @@ AVCodec* HWEncoder::FindEncoder(AVCodecID _codecId)
             devices.push_back(display);
 
           // DRM device or local X display
-          if (common::StartsWith(initHwDevice, "/dev/dri/renderD") ||
-              common::StartsWith(initHwDevice, ":"))
+          if (StartsWith(initHwDevice, "/dev/dri/renderD") ||
+              StartsWith(initHwDevice, ":"))
           {
             devices = {initHwDevice};
           }
           else if (!initHwDevice.empty())
           {
-            const auto parts = common::Split(initHwDevice, ':');
+            const auto parts = Split(initHwDevice, ':');
             // check if device is of form <host>:<display>
             if (parts.size() != 2)
               break;

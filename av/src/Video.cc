@@ -64,7 +64,7 @@ Video::Video()
 : dataPtr(new VideoPrivate)
 {
   // Make sure libav is loaded.
-  ignition::common::load();
+  load();
 }
 
 /////////////////////////////////////////////////
@@ -100,7 +100,7 @@ bool Video::Load(const std::string &_filename)
     this->Cleanup();
   }
 
-  this->dataPtr->avFrame = common::AVFrameAlloc();
+  this->dataPtr->avFrame = AVFrameAlloc();
 
   // Open video file
   if (avformat_open_input(&this->dataPtr->formatCtx, _filename.c_str(),
@@ -212,7 +212,7 @@ bool Video::Load(const std::string &_filename)
   }
 
   // swscale needs 32-byte-aligned output frame on some systems
-  this->dataPtr->avFrameDst = common::AVFrameAlloc();
+  this->dataPtr->avFrameDst = AVFrameAlloc();
   this->dataPtr->avFrameDst->format = this->dataPtr->dstPixelFormat;
   this->dataPtr->avFrameDst->width = this->dataPtr->codecCtx->width;
   this->dataPtr->avFrameDst->height = this->dataPtr->codecCtx->height;

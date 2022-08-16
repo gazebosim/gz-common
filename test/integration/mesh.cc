@@ -126,8 +126,8 @@ TEST_F(MeshTest, Mesh)
 {
   // Cleanup test directory.
   common::SystemPaths *paths = common::SystemPaths::Instance();
-  ignition::common::removeAll(paths->DefaultTestPath());
-  ignition::common::createDirectories(paths->DefaultTestPath());
+  common::removeAll(paths->DefaultTestPath());
+  common::createDirectories(paths->DefaultTestPath());
 
   EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.mesh"));
   EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.3ds"));
@@ -141,11 +141,11 @@ TEST_F(MeshTest, Mesh)
   EXPECT_EQ(static_cast<unsigned int>(24), mesh->TexCoordCount());
   EXPECT_EQ(static_cast<unsigned int>(0), mesh->MaterialCount());
 
-  ignition::math::Vector3d center, min, max;
+  math::Vector3d center, min, max;
   mesh->AABB(center, min, max);
-  EXPECT_TRUE(center == ignition::math::Vector3d(0, 0, 0));
-  EXPECT_TRUE(min == ignition::math::Vector3d(-.5, -.5, -.5));
-  EXPECT_TRUE(max == ignition::math::Vector3d(.5, .5, .5));
+  EXPECT_TRUE(center == math::Vector3d(0, 0, 0));
+  EXPECT_TRUE(min == math::Vector3d(-.5, -.5, -.5));
+  EXPECT_TRUE(max == math::Vector3d(.5, .5, .5));
 
   float *vertArray = NULL;
   int *indArray = NULL;
@@ -189,8 +189,8 @@ TEST_F(MeshTest, Mesh)
   common::SubMesh *subMesh = new common::SubMesh();
   newMesh->AddSubMesh(subMesh);
 
-  std::vector<ignition::math::Vector3d> verts;
-  std::vector<ignition::math::Vector3d> norms;
+  std::vector<math::Vector3d> verts;
+  std::vector<math::Vector3d> norms;
 
   EXPECT_THROW(mesh->SubMesh(1), common::Exception);
 
@@ -202,13 +202,13 @@ TEST_F(MeshTest, Mesh)
 
   subMesh->CopyVertices(verts);
   subMesh->CopyNormals(norms);
-  EXPECT_TRUE(subMesh->HasVertex(ignition::math::Vector3d(-.5, -.5, -.5)));
-  EXPECT_FALSE(subMesh->HasVertex(ignition::math::Vector3d(0, 0, 0)));
+  EXPECT_TRUE(subMesh->HasVertex(math::Vector3d(-.5, -.5, -.5)));
+  EXPECT_FALSE(subMesh->HasVertex(math::Vector3d(0, 0, 0)));
 
   newMesh->AABB(center, min, max);
-  EXPECT_TRUE(center == ignition::math::Vector3d(0, 0, 0));
-  EXPECT_TRUE(min == ignition::math::Vector3d(-.5, -.5, -.5));
-  EXPECT_TRUE(max == ignition::math::Vector3d(.5, .5, .5));
+  EXPECT_TRUE(center == math::Vector3d(0, 0, 0));
+  EXPECT_TRUE(min == math::Vector3d(-.5, -.5, -.5));
+  EXPECT_TRUE(max == math::Vector3d(.5, .5, .5));
 
   subMesh->SetVertexCount(1);
   subMesh->SetIndexCount(1);
@@ -220,13 +220,13 @@ TEST_F(MeshTest, Mesh)
   EXPECT_EQ(static_cast<unsigned int>(1), subMesh->NormalCount());
   EXPECT_EQ(static_cast<unsigned int>(1), subMesh->TexCoordCount());
 
-  subMesh->SetVertex(0, ignition::math::Vector3d(1, 2, 3));
-  EXPECT_TRUE(subMesh->Vertex(0) == ignition::math::Vector3d(1, 2, 3));
+  subMesh->SetVertex(0, math::Vector3d(1, 2, 3));
+  EXPECT_TRUE(subMesh->Vertex(0) == math::Vector3d(1, 2, 3));
 
-  subMesh->SetTexCoord(0, ignition::math::Vector2d(.1, .2));
-  EXPECT_TRUE(subMesh->TexCoord(0) == ignition::math::Vector2d(.1, .2));
+  subMesh->SetTexCoord(0, math::Vector2d(.1, .2));
+  EXPECT_TRUE(subMesh->TexCoord(0) == math::Vector2d(.1, .2));
 
-  newMesh->GenSphericalTexCoord(ignition::math::Vector3d(0, 0, 0));
+  newMesh->GenSphericalTexCoord(math::Vector3d(0, 0, 0));
   delete newMesh;
 
   std::ofstream stlFile((paths->DefaultTestPath() +
@@ -241,9 +241,9 @@ TEST_F(MeshTest, Mesh)
   mesh = common::MeshManager::Instance()->Load(
       paths->DefaultTestPath() + "/ignition_stl_test.stl");
   mesh->AABB(center, min, max);
-  EXPECT_TRUE(center == ignition::math::Vector3d(0.5, 0.5, 0.5));
-  EXPECT_TRUE(min == ignition::math::Vector3d(0, 0, 0));
-  EXPECT_TRUE(max == ignition::math::Vector3d(1, 1, 1));
+  EXPECT_TRUE(center == math::Vector3d(0.5, 0.5, 0.5));
+  EXPECT_TRUE(min == math::Vector3d(0, 0, 0));
+  EXPECT_TRUE(max == math::Vector3d(1, 1, 1));
 
   // Cleanup test directory.
   igntion::common::removeAll(paths->DefaultTestPath());
@@ -257,17 +257,17 @@ TEST_F(MeshTest, MeshMove)
   common::Mesh *mesh = loader.Load(TestFile("data", "box_offset.dae"));
 
   // The default location of the box_offset is not centered
-  EXPECT_EQ(ignition::math::Vector3d(5.46554, 2.18039, 4.8431), mesh->Max());
-  EXPECT_EQ(ignition::math::Vector3d(3.46555, 0.180391, 2.8431), mesh->Min());
+  EXPECT_EQ(math::Vector3d(5.46554, 2.18039, 4.8431), mesh->Max());
+  EXPECT_EQ(math::Vector3d(3.46555, 0.180391, 2.8431), mesh->Min());
 
-  mesh->Center(ignition::math::Vector3d::Zero);
+  mesh->Center(math::Vector3d::Zero);
 
-  EXPECT_EQ(ignition::math::Vector3d(1.0, 1.0, 1.0), mesh->Max());
-  EXPECT_EQ(ignition::math::Vector3d(-1.0, -1.0, -1.0), mesh->Min());
+  EXPECT_EQ(math::Vector3d(1.0, 1.0, 1.0), mesh->Max());
+  EXPECT_EQ(math::Vector3d(-1.0, -1.0, -1.0), mesh->Min());
 
-  mesh->Translate(ignition::math::Vector3d(1, 2, 3));
-  EXPECT_EQ(ignition::math::Vector3d(2.0, 3.0, 4.0), mesh->Max());
-  EXPECT_EQ(ignition::math::Vector3d(0.0, 1.0, 2.0), mesh->Min());
+  mesh->Translate(math::Vector3d(1, 2, 3));
+  EXPECT_EQ(math::Vector3d(2.0, 3.0, 4.0), mesh->Max());
+  EXPECT_EQ(math::Vector3d(0.0, 1.0, 2.0), mesh->Min());
 }
 
 /////////////////////////////////////////////////
@@ -278,23 +278,23 @@ TEST_F(MeshTest, SubMeshCenter)
   common::Mesh *mesh = loader.Load(TestFile("data", "box_offset.dae"));
 
   // The default location of the box_offest is not centered
-  EXPECT_EQ(ignition::math::Vector3d(5.46554, 2.18039, 4.8431), mesh->Max());
-  EXPECT_EQ(ignition::math::Vector3d(3.46555, 0.180391, 2.8431), mesh->Min());
+  EXPECT_EQ(math::Vector3d(5.46554, 2.18039, 4.8431), mesh->Max());
+  EXPECT_EQ(math::Vector3d(3.46555, 0.180391, 2.8431), mesh->Min());
 
   // Get the Cube submesh
   common::SubMesh submesh(mesh->SubMesh("Cube"));
 
-  submesh.Center(ignition::math::Vector3d(1, 2, 3));
-  EXPECT_EQ(ignition::math::Vector3d(0, 1, 2), submesh.Min());
-  EXPECT_EQ(ignition::math::Vector3d(2, 3, 4), submesh.Max());
+  submesh.Center(math::Vector3d(1, 2, 3));
+  EXPECT_EQ(math::Vector3d(0, 1, 2), submesh.Min());
+  EXPECT_EQ(math::Vector3d(2, 3, 4), submesh.Max());
 
-  submesh.Translate(ignition::math::Vector3d(1, 2, 3));
-  EXPECT_EQ(ignition::math::Vector3d(1, 3, 5), submesh.Min());
-  EXPECT_EQ(ignition::math::Vector3d(3, 5, 7), submesh.Max());
+  submesh.Translate(math::Vector3d(1, 2, 3));
+  EXPECT_EQ(math::Vector3d(1, 3, 5), submesh.Min());
+  EXPECT_EQ(math::Vector3d(3, 5, 7), submesh.Max());
 
   // The original mesh should not change
-  EXPECT_EQ(ignition::math::Vector3d(5.46554, 2.18039, 4.8431), mesh->Max());
-  EXPECT_EQ(ignition::math::Vector3d(3.46555, 0.180391, 2.8431), mesh->Min());
+  EXPECT_EQ(math::Vector3d(5.46554, 2.18039, 4.8431), mesh->Max());
+  EXPECT_EQ(math::Vector3d(3.46555, 0.180391, 2.8431), mesh->Min());
 }
 
 /////////////////////////////////////////////////

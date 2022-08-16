@@ -131,8 +131,8 @@ int TriangleIsHole(GtsTriangle *_t, GtsFifo *_edgeList)
 
 //////////////////////////////////////////////////
 GtsSurface *GTSMeshUtils::DelaunayTriangulation(
-    const std::vector<ignition::math::Vector2d> &_vertices,
-    const std::vector<ignition::math::Vector2i> &_edges)
+    const std::vector<math::Vector2d> &_vertices,
+    const std::vector<math::Vector2i> &_edges)
 {
   GSList *l, *verticesList = nullptr;
 
@@ -208,8 +208,8 @@ GtsSurface *GTSMeshUtils::DelaunayTriangulation(
 
 //////////////////////////////////////////////////
 bool GTSMeshUtils::DelaunayTriangulation(
-    const std::vector<ignition::math::Vector2d> &_vertices,
-    const std::vector<ignition::math::Vector2i> &_edges,
+    const std::vector<math::Vector2d> &_vertices,
+    const std::vector<math::Vector2i> &_edges,
     SubMesh *_subMesh)
 {
   if (_edges.empty() || _vertices.empty())
