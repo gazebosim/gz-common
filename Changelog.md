@@ -1,6 +1,9 @@
 ## Gazebo Common 3.x
 
-## Gazebo Common 3.14.2 (2022-08-15)
+## Gazebo Common 3.14.2 (2022-08-16)
+
+1. Fix deprecation warning from new `ffmpeg`
+    * [Pull request #414](https://github.com/gazebosim/gz-common/pull/421)
 
 1. Remove redundant namespace references
     * [Pull request #414](https://github.com/gazebosim/gz-common/pull/414)
