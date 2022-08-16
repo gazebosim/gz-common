@@ -32,13 +32,13 @@ using namespace common;
 class ignition::common::SubMesh::Implementation
 {
   /// \brief the vertex array
-  public: std::vector<ignition::math::Vector3d> vertices;
+  public: std::vector<math::Vector3d> vertices;
 
   /// \brief the normal array
-  public: std::vector<ignition::math::Vector3d> normals;
+  public: std::vector<math::Vector3d> normals;
 
   /// \brief A map of texcoord set index to texture coordinate array
-  public: std::map<unsigned int, std::vector<ignition::math::Vector2d>>
+  public: std::map<unsigned int, std::vector<math::Vector2d>>
       texCoords;
 
   /// \brief the vertex index array
@@ -95,7 +95,7 @@ void SubMesh::AddIndex(const unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-void SubMesh::AddVertex(const ignition::math::Vector3d &_v)
+void SubMesh::AddVertex(const math::Vector3d &_v)
 {
   this->dataPtr->vertices.push_back(_v);
 }
@@ -103,11 +103,11 @@ void SubMesh::AddVertex(const ignition::math::Vector3d &_v)
 //////////////////////////////////////////////////
 void SubMesh::AddVertex(const double _x, const double _y, const double _z)
 {
-  this->AddVertex(ignition::math::Vector3d(_x, _y, _z));
+  this->AddVertex(math::Vector3d(_x, _y, _z));
 }
 
 //////////////////////////////////////////////////
-void SubMesh::AddNormal(const ignition::math::Vector3d &_n)
+void SubMesh::AddNormal(const math::Vector3d &_n)
 {
   this->dataPtr->normals.push_back(_n);
 }
@@ -115,7 +115,7 @@ void SubMesh::AddNormal(const ignition::math::Vector3d &_n)
 //////////////////////////////////////////////////
 void SubMesh::AddNormal(const double _x, const double _y, const double _z)
 {
-  this->AddNormal(ignition::math::Vector3d(_x, _y, _z));
+  this->AddNormal(math::Vector3d(_x, _y, _z));
 }
 
 //////////////////////////////////////////////////
@@ -128,7 +128,7 @@ void SubMesh::AddTexCoord(const double _u, const double _v)
 }
 
 //////////////////////////////////////////////////
-void SubMesh::AddTexCoord(const ignition::math::Vector2d &_uv)
+void SubMesh::AddTexCoord(const math::Vector2d &_uv)
 {
   this->AddTexCoord(_uv.X(), _uv.Y());
 }
@@ -137,11 +137,11 @@ void SubMesh::AddTexCoord(const ignition::math::Vector2d &_uv)
 void SubMesh::AddTexCoordBySet(double _u, double _v, unsigned int _setIndex)
 {
   this->dataPtr->texCoords[_setIndex].push_back(
-      ignition::math::Vector2d(_u, _v));
+      math::Vector2d(_u, _v));
 }
 
 //////////////////////////////////////////////////
-void SubMesh::AddTexCoordBySet(const ignition::math::Vector2d &_uv,
+void SubMesh::AddTexCoordBySet(const math::Vector2d &_uv,
     unsigned int _setIndex)
 {
   this->AddTexCoordBySet(_uv.X(), _uv.Y(), _setIndex);
@@ -160,7 +160,7 @@ void SubMesh::AddNodeAssignment(const unsigned int _vertex,
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d SubMesh::Vertex(const unsigned int _index) const
+math::Vector3d SubMesh::Vertex(const unsigned int _index) const
 {
   if (_index >= this->dataPtr->vertices.size())
   {
@@ -179,7 +179,7 @@ bool SubMesh::HasVertex(const unsigned int _index) const
 
 //////////////////////////////////////////////////
 void SubMesh::SetVertex(const unsigned int _index,
-    const ignition::math::Vector3d &_v)
+    const math::Vector3d &_v)
 {
   if (_index >= this->dataPtr->vertices.size())
   {
@@ -191,7 +191,7 @@ void SubMesh::SetVertex(const unsigned int _index,
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d SubMesh::Normal(const unsigned int _index) const
+math::Vector3d SubMesh::Normal(const unsigned int _index) const
 {
   if (_index >= this->dataPtr->normals.size())
   {
@@ -244,7 +244,7 @@ bool SubMesh::HasNodeAssignment(const unsigned int _index) const
 
 //////////////////////////////////////////////////
 void SubMesh::SetNormal(const unsigned int _index,
-    const ignition::math::Vector3d &_n)
+    const math::Vector3d &_n)
 {
   if (_index >= this->dataPtr->normals.size())
   {
@@ -256,7 +256,7 @@ void SubMesh::SetNormal(const unsigned int _index,
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector2d SubMesh::TexCoord(const unsigned int _index) const
+math::Vector2d SubMesh::TexCoord(const unsigned int _index) const
 {
   if (this->dataPtr->texCoords.empty())
   {
@@ -276,7 +276,7 @@ ignition::math::Vector2d SubMesh::TexCoord(const unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector2d SubMesh::TexCoordBySet(unsigned int _index,
+math::Vector2d SubMesh::TexCoordBySet(unsigned int _index,
     unsigned int _setIndex) const
 {
   auto it = this->dataPtr->texCoords.find(_setIndex);
@@ -298,7 +298,7 @@ ignition::math::Vector2d SubMesh::TexCoordBySet(unsigned int _index,
 
 //////////////////////////////////////////////////
 void SubMesh::SetTexCoord(const unsigned int _index,
-    const ignition::math::Vector2d &_t)
+    const math::Vector2d &_t)
 {
   unsigned firstSetIndex = 0u;
   if (!this->dataPtr->texCoords.empty())
@@ -316,7 +316,7 @@ void SubMesh::SetTexCoord(const unsigned int _index,
 
 //////////////////////////////////////////////////
 void SubMesh::SetTexCoordBySet(unsigned int _index,
-    const ignition::math::Vector2d &_t, unsigned int _setIndex)
+    const math::Vector2d &_t, unsigned int _setIndex)
 {
   auto it = this->dataPtr->texCoords.find(_setIndex);
   if (it == this->dataPtr->texCoords.end())
@@ -373,16 +373,16 @@ NodeAssignment SubMesh::NodeAssignmentByIndex(
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d SubMesh::Max() const
+math::Vector3d SubMesh::Max() const
 {
   if (this->dataPtr->vertices.empty())
-    return ignition::math::Vector3d::Zero;
+    return math::Vector3d::Zero;
 
-  ignition::math::Vector3d max;
+  math::Vector3d max;
 
-  max.X(-ignition::math::MAX_F);
-  max.Y(-ignition::math::MAX_F);
-  max.Z(-ignition::math::MAX_F);
+  max.X(-math::MAX_F);
+  max.Y(-math::MAX_F);
+  max.Z(-math::MAX_F);
 
   for (const auto &v : this->dataPtr->vertices)
   {
@@ -395,16 +395,16 @@ ignition::math::Vector3d SubMesh::Max() const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d SubMesh::Min() const
+math::Vector3d SubMesh::Min() const
 {
   if (this->dataPtr->vertices.empty())
-    return ignition::math::Vector3d::Zero;
+    return math::Vector3d::Zero;
 
-  ignition::math::Vector3d min;
+  math::Vector3d min;
 
-  min.X(ignition::math::MAX_F);
-  min.Y(ignition::math::MAX_F);
-  min.Z(ignition::math::MAX_F);
+  min.X(math::MAX_F);
+  min.Y(math::MAX_F);
+  min.Z(math::MAX_F);
 
   for (const auto &v : this->dataPtr->vertices)
   {
@@ -498,7 +498,7 @@ unsigned int SubMesh::MaterialIndex() const
 }
 
 //////////////////////////////////////////////////
-bool SubMesh::HasVertex(const ignition::math::Vector3d &_v) const
+bool SubMesh::HasVertex(const math::Vector3d &_v) const
 {
   for (const auto &v : this->dataPtr->vertices)
     if (_v.Equal(v))
@@ -508,7 +508,7 @@ bool SubMesh::HasVertex(const ignition::math::Vector3d &_v) const
 }
 
 //////////////////////////////////////////////////
-int SubMesh::IndexOfVertex(const ignition::math::Vector3d &_v) const
+int SubMesh::IndexOfVertex(const math::Vector3d &_v) const
 {
   for (auto iter = this->dataPtr->vertices.begin();
       iter != this->dataPtr->vertices.end(); ++iter)
@@ -568,17 +568,17 @@ void SubMesh::RecalculateNormals()
   // For each face, which is defined by three indices, calculate the normals
   for (unsigned int i = 0; i < this->dataPtr->indices.size(); i+= 3)
   {
-    ignition::math::Vector3d v1 =
+    math::Vector3d v1 =
         this->dataPtr->vertices[this->dataPtr->indices[i]];
-    ignition::math::Vector3d v2 =
+    math::Vector3d v2 =
         this->dataPtr->vertices[this->dataPtr->indices[i+1]];
-    ignition::math::Vector3d v3 =
+    math::Vector3d v3 =
         this->dataPtr->vertices[this->dataPtr->indices[i+2]];
-    ignition::math::Vector3d n = ignition::math::Vector3d::Normal(v1, v2, v3);
+    math::Vector3d n = math::Vector3d::Normal(v1, v2, v3);
 
     for (unsigned int j = 0; j < this->dataPtr->vertices.size(); ++j)
     {
-      ignition::math::Vector3d v = this->dataPtr->vertices[j];
+      math::Vector3d v = this->dataPtr->vertices[j];
       if (v == v1 || v == v2 || v == v3)
       {
         this->dataPtr->normals[j] += n;
@@ -594,7 +594,7 @@ void SubMesh::RecalculateNormals()
 }
 
 //////////////////////////////////////////////////
-void SubMesh::GenSphericalTexCoord(const ignition::math::Vector3d &_center)
+void SubMesh::GenSphericalTexCoord(const math::Vector3d &_center)
 {
   if (this->dataPtr->texCoords.empty())
     return;
@@ -604,7 +604,7 @@ void SubMesh::GenSphericalTexCoord(const ignition::math::Vector3d &_center)
 }
 
 //////////////////////////////////////////////////
-void SubMesh::GenSphericalTexCoordBySet(const ignition::math::Vector3d &_center,
+void SubMesh::GenSphericalTexCoordBySet(const math::Vector3d &_center,
     unsigned int _setIndex)
 {
   this->dataPtr->texCoords[_setIndex].clear();
@@ -627,7 +627,7 @@ void SubMesh::GenSphericalTexCoordBySet(const ignition::math::Vector3d &_center,
 }
 
 //////////////////////////////////////////////////
-void SubMesh::Scale(const ignition::math::Vector3d &_factor)
+void SubMesh::Scale(const math::Vector3d &_factor)
 {
   for (auto &v : this->dataPtr->vertices)
     v *= _factor;
@@ -641,9 +641,9 @@ void SubMesh::Scale(const double &_factor)
 }
 
 //////////////////////////////////////////////////
-void SubMesh::Center(const ignition::math::Vector3d &_center)
+void SubMesh::Center(const math::Vector3d &_center)
 {
-  ignition::math::Vector3d min, max, half;
+  math::Vector3d min, max, half;
   min = this->Min();
   max = this->Max();
   half = (max - min) * 0.5;
@@ -652,7 +652,7 @@ void SubMesh::Center(const ignition::math::Vector3d &_center)
 }
 
 //////////////////////////////////////////////////
-void SubMesh::Translate(const ignition::math::Vector3d &_vec)
+void SubMesh::Translate(const math::Vector3d &_vec)
 {
   for (auto &v : this->dataPtr->vertices)
     v += _vec;
@@ -680,11 +680,11 @@ double SubMesh::Volume() const
     {
       for (unsigned int idx = 0; idx < this->dataPtr->indices.size(); idx += 3)
       {
-        ignition::math::Vector3d v1 =
+        math::Vector3d v1 =
           this->dataPtr->vertices[this->dataPtr->indices[idx]];
-        ignition::math::Vector3d v2 =
+        math::Vector3d v2 =
           this->dataPtr->vertices[this->dataPtr->indices[idx+1]];
-        ignition::math::Vector3d v3 =
+        math::Vector3d v3 =
           this->dataPtr->vertices[this->dataPtr->indices[idx+2]];
 
         volume += std::abs(v1.Cross(v2).Dot(v3) / 6.0);

@@ -73,7 +73,7 @@ struct timespec Time::clockResolution;
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-const Time Time::Zero = common::Time(0, 0);
+const Time Time::Zero = Time(0, 0);
 #ifndef _WIN32
 # pragma GCC diagnostic pop
 #endif
@@ -181,7 +181,7 @@ float Time::Float() const
 }
 
 /////////////////////////////////////////////////
-Time Time::Sleep(const common::Time &_time)
+Time Time::Sleep(const Time &_time)
 {
 #ifndef _WIN32
 # pragma GCC diagnostic push

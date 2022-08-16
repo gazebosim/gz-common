@@ -471,7 +471,7 @@ void URIPath::PushFront(const std::string &_part)
     // all invalid characters should be
     // encoded, not just slashes.
     ignwarn << "Unencoded slashes in URI part, encoding them." << std::endl;
-    part = common::replaceAll(part, "/", "%2F");
+    part = replaceAll(part, "/", "%2F");
   }
 
   if (!part.empty())
@@ -508,7 +508,7 @@ void URIPath::PushBack(const std::string &_part)
     // all invalid characters should be
     // encoded, not just slashes.
     ignwarn << "Unencoded slashes in URI part, encoding them." << std::endl;
-    part = common::replaceAll(part, "/", "%2F");
+    part = replaceAll(part, "/", "%2F");
   }
 
   this->dataPtr->path.push_back(part);
@@ -660,7 +660,7 @@ bool URIPath::Parse(const std::string &_str)
 
   this->Clear();
 
-  for (auto part : common::split(_str, "/"))
+  for (auto part : split(_str, "/"))
     this->PushBack(part);
 
   // the initial / is removed from _str when splitting, so we need to
@@ -794,9 +794,9 @@ bool URIQuery::Parse(const std::string &_str)
 
   if (!_str.empty())
   {
-    for (const std::string &query : common::split(_str.substr(1), "&"))
+    for (const std::string &query : split(_str.substr(1), "&"))
     {
-      std::vector<std::string> values = common::split(query, "=");
+      std::vector<std::string> values = split(query, "=");
       if (values.size() == 2)
         this->Insert(values.at(0), values.at(1));
       else

@@ -72,7 +72,7 @@ class ignition::common::SystemPathsPrivate
 
   /// \brief Callbacks to be called in order in case a file can't be found.
   public: std::vector <std::function <std::string(
-              const ignition::common::URI &)> > findFileURICbs;
+              const URI &)> > findFileURICbs;
 
   /// \brief generates paths to try searching for the named library
   public: std::vector<std::string> GenerateLibraryPaths(
@@ -304,19 +304,19 @@ std::vector<std::string> SystemPathsPrivate::GenerateLibraryPaths(
 //////////////////////////////////////////////////
 std::string SystemPaths::FindFileURI(const std::string &_uri) const
 {
-  if (!ignition::common::URI::Valid(_uri))
+  if (!URI::Valid(_uri))
   {
     ignerr << "The passed value [" << _uri << "] is not a valid URI, "
               "trying as a file" << std::endl;
     return this->FindFile(_uri);
   }
 
-  const auto uri = ignition::common::URI(_uri);
+  const auto uri = URI(_uri);
   return this->FindFileURI(uri);
 }
 
 //////////////////////////////////////////////////
-std::string SystemPaths::FindFileURI(const ignition::common::URI &_uri) const
+std::string SystemPaths::FindFileURI(const URI &_uri) const
 {
   std::string prefix = _uri.Scheme();
   std::string suffix;
@@ -356,7 +356,7 @@ std::string SystemPaths::FindFileURI(const ignition::common::URI &_uri) const
       auto withSuffix = NormalizeDirectoryPath(filePath) + suffix;
       if (exists(withSuffix))
       {
-        filename = ignition::common::copyFromUnixPath(withSuffix);
+        filename = copyFromUnixPath(withSuffix);
         break;
       }
     }
@@ -449,7 +449,7 @@ std::string SystemPaths::FindFile(const std::string &_filename,
       auto withSuffix = NormalizeDirectoryPath(filePath) + filename;
       if (exists(withSuffix))
       {
-        path = ignition::common::copyFromUnixPath(withSuffix);
+        path = copyFromUnixPath(withSuffix);
         break;
       }
     }
@@ -564,7 +564,7 @@ void SystemPaths::AddFindFileCallback(
 
 /////////////////////////////////////////////////
 void SystemPaths::AddFindFileURICallback(
-    std::function<std::string(const ignition::common::URI &)> _cb)
+    std::function<std::string(const URI &)> _cb)
 {
   this->dataPtr->findFileURICbs.push_back(_cb);
 }
@@ -581,7 +581,7 @@ std::list<std::string> SystemPaths::PathsFromEnv(const std::string &_env)
   if (envPathsStr.empty())
     return paths;
 
-  auto ps = ignition::common::Split(envPathsStr, Delimiter());
+  auto ps = Split(envPathsStr, Delimiter());
   for (auto const &path : ps)
   {
     std::string normalPath = NormalizeDirectoryPath(path);

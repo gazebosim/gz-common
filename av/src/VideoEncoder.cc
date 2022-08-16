@@ -34,7 +34,7 @@ using namespace std;
 
 // Private data class
 // hidden visibility specifier has to be explicitly set to silent a gcc warning
-class IGNITION_COMMON_AV_HIDDEN ignition::common::VideoEncoderPrivate
+class IGNITION_COMMON_AV_HIDDEN common::VideoEncoderPrivate
 {
   /// \brief Name of the file which stores the video while it is being
   ///        recorded.
@@ -147,7 +147,7 @@ VideoEncoder::VideoEncoder()
 : dataPtr(new VideoEncoderPrivate)
 {
   // Make sure libav is loaded.
-  ignition::common::load();
+  load();
 }
 
 /////////////////////////////////////////////////
@@ -265,7 +265,7 @@ bool VideoEncoder::Start(
   }
 
   // Remove old temp file, if it exists.
-  if (common::exists(this->dataPtr->filename))
+  if (exists(this->dataPtr->filename))
   {
     auto success = removeFile(this->dataPtr->filename.c_str());
     if (!success)
@@ -323,7 +323,7 @@ bool VideoEncoder::Start(
     }
     else
     {
-      this->dataPtr->filename = joinPaths(common::cwd(), "TMP_RECORDING." +
+      this->dataPtr->filename = joinPaths(cwd(), "TMP_RECORDING." +
                                 this->dataPtr->format);
     }
   }
@@ -961,7 +961,7 @@ bool VideoEncoder::SaveToFile(const std::string &_filename)
 
   if (this->dataPtr->format != "v4l2")
   {
-    result = common::moveFile(this->dataPtr->filename, _filename);
+    result = moveFile(this->dataPtr->filename, _filename);
 
     if (!result)
     {
@@ -984,7 +984,7 @@ void VideoEncoder::Reset()
   this->Stop();
 
   // Remove old temp file, if it exists.
-  if (common::exists(this->dataPtr->filename))
+  if (exists(this->dataPtr->filename))
   {
     auto success = removeFile(this->dataPtr->filename.c_str());
     if (!success)
