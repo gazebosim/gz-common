@@ -111,7 +111,6 @@ MeshManager::MeshManager()
   this->dataPtr->fileExtensions.insert("gltf");
   this->dataPtr->fileExtensions.insert("glb");
   this->dataPtr->fileExtensions.insert("fbx");
-
 }
 
 //////////////////////////////////////////////////
