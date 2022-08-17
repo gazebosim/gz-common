@@ -1,4 +1,36 @@
-## Ignition Common 4.x
+## Gazebo Common 4.x
+
+## Gazebo Common 4.5.2 (2022-08-16)
+
+1. Fix deprecation warning from new `ffmpeg`
+    * [Pull request #421](https://github.com/gazebosim/gz-common/pull/421)
+
+1. Remove redundant namespace references
+    * [Pull request #414](https://github.com/gazebosim/gz-common/pull/414)
+
+1. Add code coverage ignore file
+    * [Pull request #394](https://github.com/gazebosim/gz-common/pull/394)
+
+1. Change `IGN_DESIGNATION` to `GZ_DESIGNATION`
+    * [Pull request #399](https://github.com/gazebosim/gz-common/pull/399)
+
+1. Ignition -> Gazebo
+    * [Pull request #396](https://github.com/gazebosim/gz-common/pull/396)
+
+1. Support absolute Win paths with forward slashes in `common::FindFile`
+    * [Pull request #389](https://github.com/gazebosim/gz-common/pull/389)
+
+1. Fix `FindSharedLibrary` for relative plugin paths
+    * [Pull request #382](https://github.com/gazebosim/gz-common/pull/382)
+
+1. Fix race condition in `FileLogger`
+    * [Pull request #378](https://github.com/gazebosim/gz-common/pull/378)
+
+1. Synchronize console writes
+    * [Pull request #227](https://github.com/gazebosim/gz-common/pull/227)
+
+1. Profiler tutorial: viewing from Docker container
+    * [Pull request #362](https://github.com/gazebosim/gz-common/pull/362)
 
 ## Ignition Common 4.5.1 (2022-06-21)
 
