@@ -15,7 +15,9 @@
  *
  */
 #include <list>
+#include "gz/common/AssimpLoader.hh"
 #include <gz/common/Console.hh>
+#include "gz/common/Mesh.hh"
 #include <gz/common/SkeletonAnimation.hh>
 #include <gz/common/Skeleton.hh>
 #include <gz/common/BVHLoader.hh>
@@ -62,6 +64,10 @@ class gz::common::Skeleton::Implementation
   ///     * Skeleton node names from animation
   ///     * Transformations to rotate
   public: std::vector<std::map<std::string, math::Matrix4d>> alignRotate;
+
+  /// \brief 3D mesh loader for Assimp assets (others)
+  public: AssimpLoader assimpLoader;
+
 };
 
 //////////////////////////////////////////////////
@@ -339,8 +345,14 @@ void Skeleton::AddAnimation(SkeletonAnimation *_anim)
 //////////////////////////////////////////////////
 bool Skeleton::AddBvhAnimation(const std::string &_bvhFile, double _scale)
 {
-  BVHLoader loader;
-  auto skel = loader.Load(_bvhFile, _scale);
+
+  Mesh *mesh = this->dataPtr->assimpLoader.Load(_bvhFile);
+
+  if (mesh == nullptr)
+    return false;
+
+  auto skel = mesh->MeshSkeleton();
+
   if (nullptr == skel)
     return false;
 
