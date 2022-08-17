@@ -156,8 +156,12 @@ class AssimpLoader::Implementation
   /// \param[in] _skeleton the skeleton to work on
   public: void ApplyInvBindTransform(SkeletonPtr _skeleton) const;
 
+  /// \brief Sets the removeScene flag by reading the GZ_MESH_REMOVE_SCENE
+  /// environment variable. If removeScene true, Assimp loader
+  /// removes scene node from skeleton.
   public: void SetRemoveSceneEnv();
 
+  /// \brief True if scene node is removed from the skeleton
   public: bool removeScene;
 };
 
