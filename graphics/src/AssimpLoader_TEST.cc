@@ -440,6 +440,7 @@ TEST_F(AssimpLoader, LoadBoxWithHierarchicalNodes)
 /////////////////////////////////////////////////
 TEST_F(AssimpLoader, MergeBoxWithDoubleSkeleton)
 {
+  common::setenv("GZ_MESH_REMOVE_SCENE", "false");
   common::AssimpLoader loader;
   common::Mesh *mesh = loader.Load(
       common::testing::TestFile("data", "box_with_double_skeleton.dae"));

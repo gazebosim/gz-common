@@ -149,7 +149,7 @@ const Mesh *MeshManager::Load(const std::string &_filename)
     std::transform(extension.begin(), extension.end(),
         extension.begin(), ::tolower);
     MeshLoader *loader = nullptr;
-    this->SetAssimpEnvs();
+    this->SetAssimpEnv();
     if (this->dataPtr->forceAssimp)
     {
       loader = &this->dataPtr->assimpLoader;
@@ -1631,7 +1631,7 @@ void MeshManager::ConvertPolylinesToVerticesAndEdges(
 }
 
 //////////////////////////////////////////////////
-void MeshManager::SetAssimpEnvs()
+void MeshManager::SetAssimpEnv()
 {
   std::string forceAssimpEnv;
   common::env("GZ_MESH_FORCE_ASSIMP", forceAssimpEnv);

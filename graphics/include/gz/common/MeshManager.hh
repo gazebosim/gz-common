@@ -247,7 +247,7 @@ namespace gz
       /// \brief Sets the forceAssimp flag by reading the GZ_MESH_FORCE_ASSIMP
       /// environment variable. If forceAssimp true, MeshManager uses Assimp
       /// for loading all mesh formats, otherwise only for GLTF and FBX.
-      public: void SetAssimpEnvs();
+      public: void SetAssimpEnv();
 
       /// \brief Tesselate a 2D mesh
       /// Makes a zigzag pattern compatible with strips
