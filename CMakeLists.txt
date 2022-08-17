@@ -127,7 +127,6 @@ gz_find_package(AVUTIL REQUIRED_BY av PRETTY libavutil)
 # Find assimp
 gz_find_package(GzAssimp REQUIRED_BY graphics PRETTY assimp)
 
-
 message(STATUS "-------------------------------------------\n")
 
 
@@ -138,7 +137,7 @@ configure_file("${PROJECT_SOURCE_DIR}/cppcheck.suppress.in"
                ${PROJECT_BINARY_DIR}/cppcheck.suppress)
 
 gz_configure_build(QUIT_IF_BUILD_ERRORS
-  COMPONENTS av events geospatial graphics profiler testing)
+  COMPONENTS av events geospatial graphics io profiler testing)
 
 #============================================================================
 # Create package information
