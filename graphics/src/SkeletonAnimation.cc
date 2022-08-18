@@ -85,7 +85,8 @@ bool SkeletonAnimation::XDisplacement() const
     auto node = iter->second;
     math::Matrix4d lastPos = node->KeyFrame(node->FrameCount() - 1).second;
     math::Matrix4d firstPos = node->KeyFrame(0).second;
-    xDisplacement = !math::equal(firstPos.Translation().X(), lastPos.Translation().X());
+    xDisplacement = !math::equal(firstPos.Translation().X(),
+                                 lastPos.Translation().X());
     if (xDisplacement)
     {
       break;
