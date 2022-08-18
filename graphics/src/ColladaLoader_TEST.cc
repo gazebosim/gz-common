@@ -489,3 +489,16 @@ TEST_F(ColladaLoader, LoadCylinderAnimatedFrom3dsMax)
   EXPECT_EQ(1u, anim->NodeCount());
   EXPECT_TRUE(anim->HasNode("Bone02"));
 }
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadBvhAnimation)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(common::testing::TestFile("data",
+        "walk.dae"));
+  auto meshSkel =  mesh->MeshSkeleton();
+  auto success = meshSkel->AddBvhAnimation(common::testing::TestFile("data",
+        "gesture.bvh"), 0.055);
+  ASSERT_TRUE(success);
+  return;
+}

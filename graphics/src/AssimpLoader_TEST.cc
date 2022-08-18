@@ -697,3 +697,16 @@ TEST_F(AssimpLoader, LoadGlbPbrAsset)
   EXPECT_STREQ("Action2", skel->Animation(1)->Name().c_str());
   EXPECT_STREQ("Action3", skel->Animation(2)->Name().c_str());
 }
+
+/////////////////////////////////////////////////
+TEST_F(AssimpLoader, LoadBvhAnimation)
+{
+  common::AssimpLoader loader;
+  common::Mesh *mesh = loader.Load(common::testing::TestFile("data",
+        "walk.dae"));
+  auto meshSkel =  mesh->MeshSkeleton();
+  auto success = meshSkel->AddBvhAnimation(common::testing::TestFile("data",
+        "gesture.bvh"), 0.055);
+  ASSERT_TRUE(success);
+  return;
+}
