@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_SUBMESH_HH_
-#define IGNITION_COMMON_SUBMESH_HH_
+#ifndef GZ_COMMON_SUBMESH_HH_
+#define GZ_COMMON_SUBMESH_HH_
 
 #include <memory>
 #include <string>
@@ -28,7 +28,7 @@
 #include <ignition/common/graphics/Export.hh>
 #include <ignition/common/SuppressWarning.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -97,7 +97,7 @@ namespace ignition
 
       /// \brief Add a vertex to the mesh
       /// \param[in] _v The new position
-      public: void AddVertex(const ignition::math::Vector3d &_v);
+      public: void AddVertex(const gz::math::Vector3d &_v);
 
       /// \brief Add a vertex to the mesh
       /// \param[in] _x Position along x
@@ -107,7 +107,7 @@ namespace ignition
 
       /// \brief Add a normal to the mesh
       /// \param[in] _n The normal
-      public: void AddNormal(const ignition::math::Vector3d &_n);
+      public: void AddNormal(const gz::math::Vector3d &_n);
 
       /// \brief Add a normal to the mesh
       /// \param[in] _x Position along x
@@ -130,7 +130,7 @@ namespace ignition
       /// exist, it is added to set 0.
       /// \param[in] _uv The texture coordinate
       /// \sa AddTexCoordBySet
-      public: void AddTexCoord(const ignition::math::Vector2d &_uv);
+      public: void AddTexCoord(const gz::math::Vector2d &_uv);
 
       /// \brief Add a texture coord to a texture coordinate set of the mesh
       /// \param[in] _u Position along u
@@ -143,7 +143,7 @@ namespace ignition
       /// \param[in] _u Position along u
       /// \param[in] _v Position along v
       /// \param[in] _setIndex Texture coordinate set index
-      public: void AddTexCoordBySet(const ignition::math::Vector2d &_uv,
+      public: void AddTexCoordBySet(const gz::math::Vector2d &_uv,
           unsigned int _setIndex);
 
       /// \brief Add a vertex - skeleton node assignment
@@ -155,46 +155,46 @@ namespace ignition
                                      const float _weight);
       /// \brief Get a vertex
       /// \param[in] _index Index of the vertex
-      /// \return Coordinates of the vertex or ignition::math::Vector3d::Zero
+      /// \return Coordinates of the vertex or gz::math::Vector3d::Zero
       /// if the index is out of bounds.
       /// \sa bool HasVertex(const unsigned int) const
-      public: ignition::math::Vector3d Vertex(const unsigned int _index) const;
+      public: gz::math::Vector3d Vertex(const unsigned int _index) const;
 
       /// \brief Set a vertex
       /// \param[in] _index Index of the vertex
       /// \param[in] _v The new vertex coordinate
       public: void SetVertex(const unsigned int _index,
-                             const ignition::math::Vector3d &_v);
+                             const gz::math::Vector3d &_v);
 
       /// \brief Get a normal
       /// \param[in] _index The normal index
-      /// \return The normal direction or ignition::math::Vector3d::Zero
+      /// \return The normal direction or gz::math::Vector3d::Zero
       ///  if index is out of bounds.
       /// \sa bool HasNormal(const unsigned int _index);
-      public: ignition::math::Vector3d Normal(const unsigned int _index) const;
+      public: gz::math::Vector3d Normal(const unsigned int _index) const;
 
       /// \brief Set a normal
       /// \param[in] _index Index of the normal that will be set.
       /// \param[in] _n The new normal direction
       public: void SetNormal(const unsigned int _index,
-                  const ignition::math::Vector3d &_n);
+                  const gz::math::Vector3d &_n);
 
       /// \brief Get a texture coordinate
       /// \param[in] _index the texture index
-      /// \return The texture coordinate or ignition::math::Vector2d::Zero
+      /// \return The texture coordinate or gz::math::Vector2d::Zero
       /// if index is out of bounds.
       /// \sa bool HasTexCoord(const unsigned int _index) const
-      public: ignition::math::Vector2d TexCoord(
+      public: gz::math::Vector2d TexCoord(
                   const unsigned int _index) const;
 
       /// \brief Get a texture coordinate for a texture coordinate set
       /// \param[in] _index the texture index
-      /// \return The texture coordinate or ignition::math::Vector2d::Zero
+      /// \return The texture coordinate or gz::math::Vector2d::Zero
       /// if index is out of bounds.
       /// \param[in] _setIndex Texture coordinate set index
       /// \sa bool HasTexCoordBySet(unsigned int _index, unsigned int _setIndex)
       /// const
-      public: ignition::math::Vector2d TexCoordBySet(
+      public: gz::math::Vector2d TexCoordBySet(
                   unsigned int _index,
                   unsigned int _setIndex) const;
 
@@ -205,14 +205,14 @@ namespace ignition
       /// \param[in] _uv The new texture coordinate
       /// \sa SetTexCoordBySet
       public: void SetTexCoord(const unsigned int _index,
-                               const ignition::math::Vector2d &_uv);
+                               const gz::math::Vector2d &_uv);
 
       /// \brief Set a texture coordinate for a texture coordinate set
       /// \param[in] _index Index of the texture coordinate that will be set.
       /// \param[in] _uv The new texture coordinate
       /// \param[in] _setIndex Texture coordinate set index
       public: void SetTexCoordBySet(unsigned int _index,
-                               const ignition::math::Vector2d &_uv,
+                               const gz::math::Vector2d &_uv,
                                unsigned int _setIdex);
 
       /// \brief Get an index value from the index array
@@ -237,11 +237,11 @@ namespace ignition
 
       /// \brief Get the maximum X, Y, Z values from all the vertices
       /// \return Max X,Y,Z values from all vertices in submesh
-      public: ignition::math::Vector3d Max() const;
+      public: gz::math::Vector3d Max() const;
 
       /// \brief Get the minimum X, Y, Z values from all the vertices
       /// \return Min X,Y,Z values from all vertices in submesh
-      public: ignition::math::Vector3d Min() const;
+      public: gz::math::Vector3d Min() const;
 
       /// \brief Get the number of vertices
       /// \return The number of vertices.
@@ -294,7 +294,7 @@ namespace ignition
       /// \brief Return true if this submesh has the vertex
       /// \param[in] _v Vertex coordinate
       /// \return Return true if this submesh has the vertex
-      public: bool HasVertex(const ignition::math::Vector3d &_v) const;
+      public: bool HasVertex(const gz::math::Vector3d &_v) const;
 
       /// \brief Return true if this submesh has the vertex with the given
       /// index
@@ -341,7 +341,7 @@ namespace ignition
       /// \brief Get the index of the vertex
       /// \param[in] _v Vertex to check
       /// \return Index of the vertex that matches _v.
-      public: int IndexOfVertex(const ignition::math::Vector3d &_v) const;
+      public: int IndexOfVertex(const gz::math::Vector3d &_v) const;
 
       /// \brief Put all the data into flat arrays
       /// \param[in] _verArr The vertex array to be filled.
@@ -355,19 +355,19 @@ namespace ignition
       /// from center
       /// \param[in] _center Center of the projection.
       public: void GenSphericalTexCoord(
-                  const ignition::math::Vector3d &_center);
+                  const gz::math::Vector3d &_center);
 
       /// \brief Generate texture coordinates for a texture coordinate set
       ///  using spherical projection from center
       /// \param[in] _center Center of the projection.
       /// \param[in] _setIndex Texture coordinate set index
       public: void GenSphericalTexCoordBySet(
-                  const ignition::math::Vector3d &_center,
+                  const gz::math::Vector3d &_center,
                   unsigned int _setIndex);
 
       /// \brief Scale all vertices by _factor
       /// \param[in] _factor Scaling factor
-      public: void Scale(const ignition::math::Vector3d &_factor);
+      public: void Scale(const gz::math::Vector3d &_factor);
 
       /// \brief Scale all vertices by _factor
       /// \param[in] _factor Scaling factor
@@ -376,12 +376,12 @@ namespace ignition
       /// \brief Move the center of the submesh to the given coordinate. This
       /// will move all the vertices.
       /// \param[in] _center Location of the mesh center.
-      public: void Center(const ignition::math::Vector3d &_center =
-                          ignition::math::Vector3d::Zero);
+      public: void Center(const gz::math::Vector3d &_center =
+                          gz::math::Vector3d::Zero);
 
       /// \brief Move all vertices by _vec.
       /// \param[in] _vec Amount to translate vertices.
-      public: void Translate(const ignition::math::Vector3d &_vec);
+      public: void Translate(const gz::math::Vector3d &_vec);
 
       /// \brief Compute the volume of this submesh. The primitive type
       /// must be TRIANGLES.

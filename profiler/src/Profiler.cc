@@ -23,7 +23,7 @@
 #include "RemoteryProfilerImpl.hh"
 #endif  // IGN_PROFILER_REMOTERY
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 //////////////////////////////////////////////////

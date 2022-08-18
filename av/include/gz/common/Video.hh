@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_VIDEO_HH_
-#define IGNITION_COMMON_VIDEO_HH_
+#ifndef GZ_COMMON_VIDEO_HH_
+#define GZ_COMMON_VIDEO_HH_
 
 #include <string>
 #include <memory>
@@ -29,7 +29,7 @@ struct AVFrame;
 struct AVPicture;
 struct SwsContext;
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

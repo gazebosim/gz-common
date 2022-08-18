@@ -19,7 +19,7 @@
 #include "ignition/common/VideoEncoder.hh"
 #include "test_config.h"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 class VideoEncoderTest : public common::testing::AutoLogFixture

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_TIME_HH_
-#define IGNITION_COMMON_TIME_HH_
+#ifndef GZ_COMMON_TIME_HH_
+#define GZ_COMMON_TIME_HH_
 
 #include <string>
 #include <iostream>
@@ -23,7 +23,7 @@
 #include <ignition/common/Export.hh>
 #include <ignition/common/Util.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -259,7 +259,7 @@ namespace ignition
       /// \param[in] _time time to write to the stream
       /// \return the output stream
       public: friend std::ostream &operator<<(std::ostream &_out,
-                  const ignition::common::Time &_time)
+                  const gz::common::Time &_time)
               {
                 _out << _time.sec << " " << _time.nsec;
                 return _out;
@@ -270,7 +270,7 @@ namespace ignition
       /// \param[in] _time time to read from to the stream
       /// \return the input stream
       public: friend std::istream &operator>>(std::istream &_in,
-                                              ignition::common::Time &_time)
+                                              gz::common::Time &_time)
               {
                 // Skip white spaces
                 _in.setf(std::ios_base::skipws);

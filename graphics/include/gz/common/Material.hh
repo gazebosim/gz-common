@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_MATERIAL_HH_
-#define IGNITION_COMMON_MATERIAL_HH_
+#ifndef GZ_COMMON_MATERIAL_HH_
+#define GZ_COMMON_MATERIAL_HH_
 
 #include <iostream>
 #include <memory>
@@ -27,7 +27,7 @@
 #include <ignition/common/Pbr.hh>
 #include <ignition/common/SuppressWarning.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -265,7 +265,7 @@ namespace ignition
       /// param[in] _out the output stream to extract from
       /// param[out] _m the material information
       public: friend std::ostream &operator<<(std::ostream &_out,
-                  const ignition::common::Material &_m)
+                  const gz::common::Material &_m)
               {
                 _out << "Material:\n";
                 _out << "  Name: " << _m.Name() << "\n";

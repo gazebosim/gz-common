@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_BVHLOADER_HH_
-#define IGNITION_COMMON_BVHLOADER_HH_
+#ifndef GZ_COMMON_BVHLOADER_HH_
+#define GZ_COMMON_BVHLOADER_HH_
 
 #include <memory>
 #include <string>
@@ -23,7 +23,7 @@
 #include <ignition/math/Pose3.hh>
 #include <ignition/common/graphics/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

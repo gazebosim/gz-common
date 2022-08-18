@@ -16,8 +16,8 @@
  */
 
 
-#ifndef IGNITION_COMMON_PLUGINLOADER_HH_
-#define IGNITION_COMMON_PLUGINLOADER_HH_
+#ifndef GZ_COMMON_PLUGINLOADER_HH_
+#define GZ_COMMON_PLUGINLOADER_HH_
 
 #include <memory>
 #include <string>
@@ -28,7 +28,7 @@
 #include <ignition/common/SuppressWarning.hh>
 #include <ignition/common/PluginPtr.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -99,6 +99,6 @@ namespace ignition
   }
 }
 
-#include "ignition/common/detail/PluginLoader.hh"
+#include "gz/common/detail/PluginLoader.hh"
 
 #endif

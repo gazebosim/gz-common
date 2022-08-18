@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_MATERIALDENSITY_HH_
-#define IGNITION_COMMON_MATERIALDENSITY_HH_
+#ifndef GZ_COMMON_MATERIALDENSITY_HH_
+#define GZ_COMMON_MATERIALDENSITY_HH_
 
 #include <string>
 #include <limits>
@@ -23,7 +23,7 @@
 #include <tuple>
 #include "ignition/common/Export.hh"
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

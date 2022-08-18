@@ -14,15 +14,15 @@
  * limitations under the License.
  *
  */
-#ifndef IGNITION_COMMON_STRINGUTILS_HH_
-#define IGNITION_COMMON_STRINGUTILS_HH_
+#ifndef GZ_COMMON_STRINGUTILS_HH_
+#define GZ_COMMON_STRINGUTILS_HH_
 
 #include <string>
 #include <vector>
 
 #include <ignition/common/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

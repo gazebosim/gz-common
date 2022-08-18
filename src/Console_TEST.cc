@@ -25,8 +25,8 @@
 
 #include "test_config.h"
 
-using namespace ignition;
-using namespace ignition::common;
+using namespace gz;
+using namespace gz::common;
 
 const int g_messageRepeat = 4;
 

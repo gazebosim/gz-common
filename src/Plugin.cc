@@ -21,7 +21,7 @@
 #include "ignition/common/Console.hh"
 #include "PluginUtils.hh"
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

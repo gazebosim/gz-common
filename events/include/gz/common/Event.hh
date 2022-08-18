@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_EVENT_HH_
-#define IGNITION_COMMON_EVENT_HH_
+#ifndef GZ_COMMON_EVENT_HH_
+#define GZ_COMMON_EVENT_HH_
 
 #include <atomic>
 #include <functional>
@@ -29,7 +29,7 @@
 #include <ignition/common/events/Export.hh>
 #include <ignition/common/events/Types.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

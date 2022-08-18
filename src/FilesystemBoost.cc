@@ -58,7 +58,7 @@
 #include "ignition/common/Console.hh"
 #include "ignition/common/Filesystem.hh"
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

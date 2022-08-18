@@ -14,14 +14,14 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_MESHLOADER_HH_
-#define IGNITION_COMMON_MESHLOADER_HH_
+#ifndef GZ_COMMON_MESHLOADER_HH_
+#define GZ_COMMON_MESHLOADER_HH_
 
 #include <string>
 
 #include <ignition/common/graphics/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

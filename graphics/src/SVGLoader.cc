@@ -34,10 +34,10 @@
 
 #include "ignition/common/SVGLoader.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
-class ignition::common::SVGLoaderPrivate
+class gz::common::SVGLoaderPrivate
 {
   /// \brief Generates polylines for each SVG subpath
   /// \param[in] _subpath The subpath commands

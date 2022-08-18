@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_DEM_HH_
-#define IGNITION_COMMON_DEM_HH_
+#ifndef GZ_COMMON_DEM_HH_
+#define GZ_COMMON_DEM_HH_
 
 #include <memory>
 #include <ignition/math/Vector3.hh>
@@ -30,7 +30,7 @@
 
 # include <ignition/common/HeightmapData.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -69,8 +69,8 @@ namespace ignition
       /// origin in WGS84.
       /// \param[out] _latitude Georeferenced latitude.
       /// \param[out] _longitude Georeferenced longitude.
-      public: void GeoReferenceOrigin(ignition::math::Angle &_latitude,
-                  ignition::math::Angle &_longitude) const;
+      public: void GeoReferenceOrigin(gz::math::Angle &_latitude,
+                  gz::math::Angle &_longitude) const;
 
       /// \brief Get the terrain's height. Due to the Ogre constrains, this
       /// value will be a power of two plus one. The value returned might be
@@ -110,8 +110,8 @@ namespace ignition
       /// \param[out] _heights Vector containing the terrain heights.
       public: void FillHeightMap(const int _subSampling,
                   const unsigned int _vertSize,
-                  const ignition::math::Vector3d &_size,
-                  const ignition::math::Vector3d &_scale,
+                  const gz::math::Vector3d &_size,
+                  const gz::math::Vector3d &_scale,
                   const bool _flipY,
                   std::vector<float> &_heights);
 
@@ -122,8 +122,8 @@ namespace ignition
       /// \param[out] _latitude Georeferenced latitude.
       /// \param[out] _longitude Georeferenced longitude.
       private: void GeoReference(double _x, double _y,
-                                 ignition::math::Angle &_latitude,
-                                 ignition::math::Angle &_longitude) const;
+                                 gz::math::Angle &_latitude,
+                                 gz::math::Angle &_longitude) const;
 
       /// \brief Get the terrain file as a data array. Due to the Ogre
       /// constrains, the data might be stored in a bigger vector representing

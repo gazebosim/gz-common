@@ -1,6 +1,6 @@
 \page hw-encoding Hardware-accelerated Video Encoding
 
-When recording video using the `ignition::common::VideoEncoder` class, you can
+When recording video using the `gz::common::VideoEncoder` class, you can
 opt-in to use hardware (HW) acceleration for the encoding process. By default, only software
 encoders are used. This tutorial will show how to configure the encoder for HW
 acceleration and will present ready-made commandlines for some typical use-cases.
@@ -191,7 +191,7 @@ no effect then). This would be useful if you want to e.g. implement a GUI choose
 for the acceleration.
 
 The `FlagSet<HWEncoderType>` captures a set of allowed encoders. Its value may be
-e.g. `ignition::Common::HWEncoderType::QSV | ignition::common::HWEncoderType::NVENC`.
+e.g. `gz::Common::HWEncoderType::QSV | gz::common::HWEncoderType::NVENC`.
 
 ## How do I know it's working
 

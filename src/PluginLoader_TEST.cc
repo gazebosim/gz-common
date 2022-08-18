@@ -31,14 +31,14 @@
 /////////////////////////////////////////////////
 TEST(PluginLoader, InitialNoInterfacesImplemented)
 {
-  ignition::common::PluginLoader pm;
+  gz::common::PluginLoader pm;
   EXPECT_EQ(0u, pm.InterfacesImplemented().size());
 }
 
 /////////////////////////////////////////////////
 TEST(PluginLoader, LoadNonexistantLibrary)
 {
-  ignition::common::PluginLoader pm;
+  gz::common::PluginLoader pm;
   EXPECT_TRUE(pm.LoadLibrary("/path/to/libDoesNotExist.so").empty());
 }
 
@@ -46,7 +46,7 @@ TEST(PluginLoader, LoadNonexistantLibrary)
 TEST(PluginLoader, LoadNonLibrary)
 {
   std::string projectPath(IGN_COMMON_LIB_PATH);
-  ignition::common::PluginLoader pm;
+  gz::common::PluginLoader pm;
   EXPECT_TRUE(pm.LoadLibrary(projectPath + "/test_config.h").empty());
 }
 
@@ -56,20 +56,20 @@ TEST(PluginLoader, LoadNonPluginLibrary)
   std::string libraryName("ignition-common");
   libraryName += std::to_string(IGNITION_COMMON_MAJOR_VERSION);
 
-  ignition::common::SystemPaths sp;
+  gz::common::SystemPaths sp;
   sp.AddPluginPaths(IGN_COMMON_LIB_PATH);
   std::string path = sp.FindSharedLibrary(libraryName);
   ASSERT_FALSE(path.empty());
 
-  ignition::common::PluginLoader pm;
+  gz::common::PluginLoader pm;
   EXPECT_TRUE(pm.LoadLibrary(path).empty());
 }
 
 /////////////////////////////////////////////////
 TEST(PluginLoader, InstantiateUnloadedPlugin)
 {
-  ignition::common::PluginLoader pm;
-  ignition::common::PluginPtr plugin =
+  gz::common::PluginLoader pm;
+  gz::common::PluginPtr plugin =
       pm.Instantiate("plugin::that::is::not::loaded");
   EXPECT_FALSE(plugin);
 }

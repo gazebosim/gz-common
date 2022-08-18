@@ -36,11 +36,11 @@
 #include "ignition/common/SystemPaths.hh"
 #include "ignition/common/Util.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 // Private data class
-class ignition::common::SystemPathsPrivate
+class gz::common::SystemPathsPrivate
 {
   /// \brief Name of the environment variable to check for plugin paths
   public: std::string pluginPathEnv = "IGN_PLUGIN_PATH";

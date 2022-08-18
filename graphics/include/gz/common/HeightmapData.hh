@@ -14,14 +14,14 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_HEIGHTMAPDATA_HH_
-#define IGNITION_COMMON_HEIGHTMAPDATA_HH_
+#ifndef GZ_COMMON_HEIGHTMAPDATA_HH_
+#define GZ_COMMON_HEIGHTMAPDATA_HH_
 
 #include <vector>
 #include <ignition/math/Vector3.hh>
 #include <ignition/common/graphics/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -42,8 +42,8 @@ namespace ignition
       /// is filled.
       /// \param[out] _heights Vector containing the terrain heights.
       public: virtual void FillHeightMap(int _subSampling,
-          unsigned int _vertSize, const ignition::math::Vector3d &_size,
-          const ignition::math::Vector3d &_scale, bool _flipY,
+          unsigned int _vertSize, const gz::math::Vector3d &_size,
+          const gz::math::Vector3d &_scale, bool _flipY,
           std::vector<float> &_heights) = 0;
 
       /// \brief Get the terrain's height.

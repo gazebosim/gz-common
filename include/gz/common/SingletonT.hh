@@ -14,10 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_SINGLETONT_HH_
-#define IGNITION_COMMON_SINGLETONT_HH_
+#ifndef GZ_COMMON_SINGLETONT_HH_
+#define GZ_COMMON_SINGLETONT_HH_
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

@@ -23,10 +23,10 @@
 #define AUDIO_INBUF_SIZE (20480 * 2)
 #define AUDIO_REFILL_THRESH 4096
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
-class ignition::common::AudioDecoderPrivate
+class gz::common::AudioDecoderPrivate
 {
   /// \brief libav Format I/O context.
   public: AVFormatContext *formatCtx;

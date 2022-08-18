@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_COLLADAEXPORTER_HH_
-#define IGNITION_COMMON_COLLADAEXPORTER_HH_
+#ifndef GZ_COMMON_COLLADAEXPORTER_HH_
+#define GZ_COMMON_COLLADAEXPORTER_HH_
 
 #include <memory>
 #include <string>
@@ -27,7 +27,7 @@
 
 #include <ignition/math/Matrix4.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

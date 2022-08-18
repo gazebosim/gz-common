@@ -14,14 +14,14 @@
  * limitations under the License.
  *
  */
-#ifndef IGNITION_COMMON_SPECIALIZEDPLUGIN_HH_
-#define IGNITION_COMMON_SPECIALIZEDPLUGIN_HH_
+#ifndef GZ_COMMON_SPECIALIZEDPLUGIN_HH_
+#define GZ_COMMON_SPECIALIZEDPLUGIN_HH_
 
 #include <memory>
 
 #include "ignition/common/Plugin.hh"
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -165,6 +165,6 @@ namespace ignition
   }
 }
 
-#include "ignition/common/detail/SpecializedPlugin.hh"
+#include "gz/common/detail/SpecializedPlugin.hh"
 
 #endif

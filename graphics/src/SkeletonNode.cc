@@ -20,11 +20,11 @@
 #include "ignition/common/Console.hh"
 #include "ignition/common/SkeletonNode.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 /// \brief SkeletonNode private data
-class ignition::common::SkeletonNodePrivate
+class gz::common::SkeletonNodePrivate
 {
   /// \brief the name of the skeletal node
   public: std::string name;

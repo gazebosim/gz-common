@@ -21,7 +21,7 @@
 #include "ignition/common/Pbr.hh"
 
 /// \brief Private data for Pbr class
-class ignition::common::PbrPrivate
+class gz::common::PbrPrivate
 {
   /// \brief Workflow type
   public: PbrType type = PbrType::NONE;
@@ -73,7 +73,7 @@ class ignition::common::PbrPrivate
 };
 
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 /////////////////////////////////////////////////

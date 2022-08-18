@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_UUID_HH_INCLUDED_
-#define IGNITION_COMMON_UUID_HH_INCLUDED_
+#ifndef GZ_COMMON_UUID_HH_INCLUDED_
+#define GZ_COMMON_UUID_HH_INCLUDED_
 
 #include <iostream>
 #include <string>
@@ -32,7 +32,7 @@
   using portable_uuid_t = uuid_t;
 #endif
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -53,7 +53,7 @@ namespace ignition
       /// \param[out] _out The output stream.
       /// \param[in] _msg AdvMsg to write to the stream.
       public: friend std::ostream &operator<<(std::ostream &_out,
-                  const ignition::common::Uuid &_uuid)
+                  const gz::common::Uuid &_uuid)
       {
         _out << _uuid.String();
         return _out;

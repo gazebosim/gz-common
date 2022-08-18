@@ -15,13 +15,13 @@
  *
 */
 
-#ifndef IGNITION_COMMON_EVENTS_TYPES_HH_
-#define IGNITION_COMMON_EVENTS_TYPES_HH_
+#ifndef GZ_COMMON_EVENTS_TYPES_HH_
+#define GZ_COMMON_EVENTS_TYPES_HH_
 
 #include <memory>
 
 // This header contains forward declarations for some event types
-namespace ignition
+namespace gz
 {
   namespace common
   {

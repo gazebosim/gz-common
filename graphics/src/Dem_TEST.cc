@@ -22,7 +22,7 @@
 #include "ignition/common/Dem.hh"
 #include "test_config.h"
 
-using namespace ignition;
+using namespace gz;
 
 class DemTest : public common::testing::AutoLogFixture { };
 

@@ -24,7 +24,7 @@
 #include <ignition/common/KeyFrame.hh>
 #include <ignition/common/Animation.hh>
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 namespace
@@ -40,14 +40,14 @@ namespace
 }
 
 /////////////////////////////////////////////////
-namespace ignition {
+namespace gz {
 namespace common {
 class AnimationPrivate
 {
   /// \brief true if the animation is interpolated in x
   public: bool interpolateX = false;
 };
-}  // namespace ignition
+}  // namespace gz
 }  // namespace common
 
 // TODO(luca) Make Animation class follow PIMPL and remove global static map
@@ -80,7 +80,7 @@ static void DeleteAnimationDataPtr(Animation *_animation)
 }
 
 /////////////////////////////////////////////////
-class ignition::common::TrajectoryInfoPrivate
+class gz::common::TrajectoryInfoPrivate
 {
   /// \brief ID of the trajectory
   public: unsigned int id{0};

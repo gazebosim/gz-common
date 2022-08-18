@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_BATTERY_HH_
-#define IGNITION_COMMON_BATTERY_HH_
+#ifndef GZ_COMMON_BATTERY_HH_
+#define GZ_COMMON_BATTERY_HH_
 
 #include <map>
 #include <string>
@@ -24,7 +24,7 @@
 #include <ignition/common/Export.hh>
 #include <ignition/common/SuppressWarning.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

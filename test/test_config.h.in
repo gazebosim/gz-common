@@ -5,8 +5,8 @@
  * repo for the original source of this header.
 */
 
-#ifndef IGNITION_TESTING__TEST_CONFIG_H_
-#define IGNITION_TESTING__TEST_CONFIG_H_
+#ifndef GZ_TESTING__TEST_CONFIG_H_
+#define GZ_TESTING__TEST_CONFIG_H_
 
 #include <gtest/gtest.h>
 
@@ -18,7 +18,7 @@
 #define PROJECT_BINARY_PATH "${PROJECT_BINARY_DIR}"
 #define PROJECT_SOURCE_PATH "${PROJECT_SOURCE_DIR}"
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -77,14 +77,14 @@ namespace ignition
       {
         if (common::env("TEST_UNDECLARED_OUTPUTS_DIR", _homeDir))
         {
-          return ignition::common::setenv(IGN_HOMEDIR, _homeDir);
+          return gz::common::setenv(IGN_HOMEDIR, _homeDir);
         }
         else
         {
           if (TestTmpPath(_homeDir))
           {
             // Set both for linux and windows
-            return ignition::common::setenv(IGN_HOMEDIR, _homeDir);
+            return gz::common::setenv(IGN_HOMEDIR, _homeDir);
           }
           else
           {
@@ -149,7 +149,7 @@ namespace ignition
           ignLogInit(common::joinPaths(this->logBasePath, "test_logs"), 
                      this->logFilename);
 
-          ignition::common::Console::SetVerbosity(4);
+          gz::common::Console::SetVerbosity(4);
 
           // Read the full path to the log directory.
           this->logDirectory = ignLogDirectory();
@@ -159,7 +159,7 @@ namespace ignition
         /// \return The full log file path as a string.
         protected: std::string FullLogPath() const
         {
-          return ignition::common::joinPaths(
+          return gz::common::joinPaths(
             this->logDirectory, this->logFilename);
         }
 
@@ -184,7 +184,7 @@ namespace ignition
         public: virtual ~AutoLogFixture()
         {
           ignLogClose();
-          ignition::common::removeAll(this->logBasePath);
+          gz::common::removeAll(this->logBasePath);
         }
 
         /// \brief String with the full path of the logfile
@@ -198,8 +198,8 @@ namespace ignition
       };
     }  // namespace testing
   }  // namespace common
-}  // namespace ignition
+}  // namespace gz
 
 
 
-#endif  // IGNITION_TESTING__TEST_CONFIG_H_
+#endif  // GZ_TESTING__TEST_CONFIG_H_

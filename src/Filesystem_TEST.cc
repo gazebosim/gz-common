@@ -35,7 +35,7 @@ bool create_and_switch_to_temp_dir(std::string &_new_temp_path)
 {
   std::string tmppath;
 
-  if (!ignition::common::env("TMPDIR", tmppath))
+  if (!gz::common::env("TMPDIR", tmppath))
   {
     tmppath = std::string("/tmp");
   }
@@ -176,7 +176,7 @@ bool create_new_file_symlink(const std::string &_symlink,
 
   if (!linked)
   {
-    ignition::common::PrintWindowsSystemWarning(
+    gz::common::PrintWindowsSystemWarning(
           "Failed to create file symlink from [" + _target
           + "] to [" + _symlink + "]");
   }
@@ -192,7 +192,7 @@ bool create_new_dir_symlink(const std::string &_symlink,
                                             SYMBOLIC_LINK_FLAG_DIRECTORY);
   if (!linked)
   {
-    ignition::common::PrintWindowsSystemWarning(
+    gz::common::PrintWindowsSystemWarning(
           "Failed to create directory symlink from [" + _target
           + "] to [" + _symlink + "]");
   }
@@ -213,7 +213,7 @@ bool create_new_file_hardlink(const std::string &_hardlink,
 #include "ignition/common/Console.hh"
 #include "ignition/common/Filesystem.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 /// \brief Test Filesystem

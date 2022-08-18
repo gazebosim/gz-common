@@ -27,12 +27,12 @@
 #include "ignition/common/Dem.hh"
 #include "ignition/math/SphericalCoordinates.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 #ifdef HAVE_GDAL
 
-class ignition::common::DemPrivate
+class gz::common::DemPrivate
 {
   /// \brief A set of associated raster bands.
   public: GDALDataset *dataSet;

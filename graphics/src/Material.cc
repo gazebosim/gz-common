@@ -20,7 +20,7 @@
 #include "ignition/common/Material.hh"
 #include "ignition/common/Console.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 IGN_ENUM(shadeModeIface, Material::ShadeMode,
@@ -32,7 +32,7 @@ IGN_ENUM(blendModeIface, Material::BlendMode,
     "ADD", "MODULATE", "REPLACE")
 
 /// \brief Private data for Material
-class ignition::common::MaterialPrivate
+class gz::common::MaterialPrivate
 {
   /// \brief the name of the material
   public: std::string name;

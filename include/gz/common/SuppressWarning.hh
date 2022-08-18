@@ -16,10 +16,10 @@
  */
 
 
-#ifndef IGNITION_COMMON_SUPPRESSWARNING_HH_
-#define IGNITION_COMMON_SUPPRESSWARNING_HH_
+#ifndef GZ_COMMON_SUPPRESSWARNING_HH_
+#define GZ_COMMON_SUPPRESSWARNING_HH_
 
-#include <ignition/common/detail/SuppressWarning.hh>
+#include <gz/common/detail/SuppressWarning.hh>
 
 // This header contains cross-platform macros for suppressing warnings. Please
 // only use these macros responsibly when you are certain that the compiler is

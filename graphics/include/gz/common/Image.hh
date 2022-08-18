@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_IMAGE_HH_
-#define IGNITION_COMMON_IMAGE_HH_
+#ifndef GZ_COMMON_IMAGE_HH_
+#define GZ_COMMON_IMAGE_HH_
 
 #include <limits>
 #include <memory>
@@ -25,7 +25,7 @@
 #include <ignition/common/graphics/Export.hh>
 #include <ignition/common/SuppressWarning.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -239,7 +239,7 @@ namespace ignition
         // convert to rgb image
         // color is grayscale, i.e. r == b == g
         double range = static_cast<double>(max - min);
-        if (ignition::math::equal(range, 0.0))
+        if (gz::math::equal(range, 0.0))
           range = 1.0;
         unsigned int idx = 0;
         for (unsigned int j = 0; j < _height; ++j)

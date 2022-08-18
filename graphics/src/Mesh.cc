@@ -26,11 +26,11 @@
 #include "ignition/common/SubMesh.hh"
 #include "ignition/common/Mesh.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 /// \brief Private data for Mesh
-class ignition::common::MeshPrivate
+class gz::common::MeshPrivate
 {
   /// \brief The name of the mesh
   public: std::string name;

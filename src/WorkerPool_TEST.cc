@@ -23,7 +23,7 @@
 #include "ignition/common/WorkerPool.hh"
 #include "ignition/utilities/ExtraTestMacros.hh"
 
-namespace igncmn = ignition::common;
+namespace igncmn = gz::common;
 using namespace igncmn;
 
 //////////////////////////////////////////////////

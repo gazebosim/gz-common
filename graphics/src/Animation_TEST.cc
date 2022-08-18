@@ -24,7 +24,7 @@
 #include <ignition/common/KeyFrame.hh>
 #include <ignition/common/Animation.hh>
 
-using namespace ignition;
+using namespace gz;
 
 class AnimationTest : public common::testing::AutoLogFixture { };
 

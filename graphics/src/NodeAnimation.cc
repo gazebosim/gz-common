@@ -18,11 +18,11 @@
 #include "ignition/common/Console.hh"
 #include "ignition/common/NodeAnimation.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 /// \brief NodeAnimation private data
-class ignition::common::NodeAnimationPrivate
+class gz::common::NodeAnimationPrivate
 {
   /// \brief the name of the animation
   public: std::string name;

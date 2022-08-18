@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef IGNITION_COMMON_GTSMESHUTILS_HH_
-#define IGNITION_COMMON_GTSMESHUTILS_HH_
+#ifndef GZ_COMMON_GTSMESHUTILS_HH_
+#define GZ_COMMON_GTSMESHUTILS_HH_
 
 #include <vector>
 
@@ -27,7 +27,7 @@
 struct _GtsSurface;
 typedef _GtsSurface GtsSurface;
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -45,8 +45,8 @@ namespace ignition
       /// resulting triangles.
       /// \return True on success.
       public: static bool DelaunayTriangulation(
-                  const std::vector<ignition::math::Vector2d> &_vertices,
-                  const std::vector<ignition::math::Vector2i> &_edges,
+                  const std::vector<gz::math::Vector2d> &_vertices,
+                  const std::vector<gz::math::Vector2i> &_edges,
                   SubMesh *_submesh);
 
       /// \brief Perform delaunay triangulation on input vertices.
@@ -55,8 +55,8 @@ namespace ignition
       /// indices from _vertices
       /// \return Triangulated GTS surface.
       private: static GtsSurface *DelaunayTriangulation(
-                   const std::vector<ignition::math::Vector2d> &_vertices,
-                   const std::vector<ignition::math::Vector2i> &_edges);
+                   const std::vector<gz::math::Vector2d> &_vertices,
+                   const std::vector<gz::math::Vector2i> &_edges);
     };
   }
 }

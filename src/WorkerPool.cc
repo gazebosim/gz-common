@@ -22,10 +22,10 @@
 
 #include "ignition/common/WorkerPool.hh"
 
-namespace igncmn = ignition::common;
+namespace igncmn = gz::common;
 using namespace igncmn;
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

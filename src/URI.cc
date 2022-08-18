@@ -25,13 +25,13 @@
 #include "ignition/common/Console.hh"
 #include "ignition/common/URI.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 static const char kSchemeDelim[] = "://";
 
 /// \brief URIPath private data.
-class ignition::common::URIPathPrivate
+class gz::common::URIPathPrivate
 {
   /// \brief The parts of the path.
   public: std::list<std::string> path;
@@ -49,21 +49,21 @@ class ignition::common::URIPathPrivate
 };
 
 /// \brief URIQuery private data.
-class ignition::common::URIQueryPrivate
+class gz::common::URIQueryPrivate
 {
   /// \brief The key/value tuples that compose the query.
   public: std::map<std::string, std::string> values;
 };
 
 /// \brief URIFragment private data.
-class ignition::common::URIFragmentPrivate
+class gz::common::URIFragmentPrivate
 {
   /// \brief The value of the fragment.
   public: std::string value;
 };
 
 /// \brief URI private data.
-class ignition::common::URIPrivate
+class gz::common::URIPrivate
 {
   /// \brief The URI scheme.
   public: std::string scheme;

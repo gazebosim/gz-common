@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_VIDEOENCODER_HH_
-#define IGNITION_COMMON_VIDEOENCODER_HH_
+#ifndef GZ_COMMON_VIDEOENCODER_HH_
+#define GZ_COMMON_VIDEOENCODER_HH_
 
 #include <chrono>
 #include <string>
@@ -35,7 +35,7 @@
 #define VIDEO_ENCODER_FPS_DEFAULT 25
 #define VIDEO_ENCODER_FORMAT_DEFAULT "mp4"
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

@@ -23,7 +23,7 @@
 #include "ignition/common/MeshManager.hh"
 #include "ignition/common/config.hh"
 
-using namespace ignition;
+using namespace gz;
 
 #ifndef _WIN32
 class MeshManager : public common::testing::AutoLogFixture { };

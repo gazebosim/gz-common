@@ -28,7 +28,7 @@
 
 /// This is an internal-use only class encapsulating HW video encoding. All
 /// symbols defined here are hidden from the public API.
-namespace ignition::common
+namespace gz::common
 {
   // Forward declare private data class
   class HWVideoPrivate;

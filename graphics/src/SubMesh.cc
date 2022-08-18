@@ -25,11 +25,11 @@
 #include "ignition/common/Material.hh"
 #include "ignition/common/SubMesh.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 /// \brief Private data for SubMesh
-class ignition::common::SubMeshPrivate
+class gz::common::SubMeshPrivate
 {
   /// \brief the vertex array
   public: std::vector<math::Vector3d> vertices;

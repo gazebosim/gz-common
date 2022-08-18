@@ -16,14 +16,14 @@
  */
 
 
-#ifndef IGNITION_COMMON_PLUGININFO_HH_
-#define IGNITION_COMMON_PLUGININFO_HH_
+#ifndef GZ_COMMON_PLUGININFO_HH_
+#define GZ_COMMON_PLUGININFO_HH_
 
 #include <functional>
 #include <string>
 #include <unordered_map>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

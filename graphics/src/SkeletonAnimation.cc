@@ -19,11 +19,11 @@
 #include "ignition/common/NodeAnimation.hh"
 #include "ignition/common/SkeletonAnimation.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 /// Prvate data class
-class ignition::common::SkeletonAnimationPrivate
+class gz::common::SkeletonAnimationPrivate
 {
   /// \brief the node name
   public: std::string name;

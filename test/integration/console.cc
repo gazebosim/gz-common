@@ -20,7 +20,7 @@
 #include "ignition/common/Console.hh"
 #include "test_config.h"
 
-using namespace ignition;
+using namespace gz;
 
 TEST(Console_TEST, LogInitAfterConsoleOut)
 {

@@ -20,11 +20,11 @@
 #include <ignition/common/Console.hh>
 #include <ignition/common/Battery.hh>
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 /// \brief Private data for the Battery class
-class ignition::common::BatteryPrivate
+class gz::common::BatteryPrivate
 {
   /// \brief Initial voltage in volts.
   public: double initVoltage = 0.0;

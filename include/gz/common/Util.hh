@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_UTIL_HH_
-#define IGNITION_COMMON_UTIL_HH_
+#ifndef GZ_COMMON_UTIL_HH_
+#define GZ_COMMON_UTIL_HH_
 
 #include <cassert>
 #include <chrono>
@@ -97,7 +97,7 @@
 #define IGN_ASSERT(_expr, _msg) assert((_msg, _expr))
 
 /// \brief Forward declarations for the common classes
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -322,13 +322,13 @@ namespace ignition
 ///////////////////////////////////////////////
 // Implementation of get_sha1
 template<typename T>
-std::string ignition::common::sha1(const T &_buffer)
+std::string gz::common::sha1(const T &_buffer)
 {
   if (_buffer.size() == 0)
-    return ignition::common::sha1(NULL, 0);
+    return gz::common::sha1(NULL, 0);
   else
   {
-    return ignition::common::sha1(
+    return gz::common::sha1(
         &(_buffer[0]), _buffer.size() * sizeof(_buffer[0]));
   }
 }

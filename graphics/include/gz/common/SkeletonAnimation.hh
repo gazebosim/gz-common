@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_SKELETONANIMATION_HH_
-#define IGNITION_COMMON_SKELETONANIMATION_HH_
+#ifndef GZ_COMMON_SKELETONANIMATION_HH_
+#define GZ_COMMON_SKELETONANIMATION_HH_
 
 #include <map>
 #include <utility>
@@ -27,7 +27,7 @@
 #include <ignition/common/NodeAnimation.hh>
 #include <ignition/common/graphics/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

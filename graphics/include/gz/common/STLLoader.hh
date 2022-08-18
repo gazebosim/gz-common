@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_STLLOADER_HH_
-#define IGNITION_COMMON_STLLOADER_HH_
+#ifndef GZ_COMMON_STLLOADER_HH_
+#define GZ_COMMON_STLLOADER_HH_
 
 #include <stdint.h>
 #include <string>
@@ -28,7 +28,7 @@
 #define ORDER_MAX 10
 #define FACE_MAX 200000
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

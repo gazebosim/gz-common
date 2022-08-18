@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_MESHCSG_HH_
-#define IGNITION_COMMON_MESHCSG_HH_
+#ifndef GZ_COMMON_MESHCSG_HH_
+#define GZ_COMMON_MESHCSG_HH_
 
 #include <ignition/math/Pose3.hh>
 
@@ -26,7 +26,7 @@ typedef _GtsSurface GtsSurface;
 struct _GPtrArray;
 typedef _GPtrArray GPtrArray;
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -53,7 +53,7 @@ namespace ignition
       /// \return a pointer to the created mesh
       public: Mesh *CreateBoolean(const Mesh *_m1, const Mesh *_m2,
           const int _operation,
-          const ignition::math::Pose3d &_offset = ignition::math::Pose3d::Zero);
+          const gz::math::Pose3d &_offset = gz::math::Pose3d::Zero);
 
       /// \brief Helper method for converting Mesh to GTS Surface
       private: void ConvertMeshToGTS(const Mesh *mesh, GtsSurface *surface);

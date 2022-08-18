@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_ENUMITERATOR_HH_
-#define IGNITION_COMMON_ENUMITERATOR_HH_
+#ifndef GZ_COMMON_ENUMITERATOR_HH_
+#define GZ_COMMON_ENUMITERATOR_HH_
 
 #include <string>
 #include <vector>
@@ -23,7 +23,7 @@
 #include <ignition/common/Util.hh>
 #include <ignition/common/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -38,7 +38,7 @@ namespace ignition
     /// \sa EnumIface
     /// \sa EnumIterator
     #define IGN_ENUM(name, enumType, begin, end, ...) \
-    static ignition::common::EnumIface<enumType> name( \
+    static gz::common::EnumIface<enumType> name( \
         begin, end, {__VA_ARGS__});
 
     /// \brief Enum interface. Use this interface to convert an enum to

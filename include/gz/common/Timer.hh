@@ -14,13 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_TIMER_HH_
-#define IGNITION_COMMON_TIMER_HH_
+#ifndef GZ_COMMON_TIMER_HH_
+#define GZ_COMMON_TIMER_HH_
 
 #include <ignition/common/Time.hh>
 #include <ignition/common/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -50,7 +50,7 @@ namespace ignition
 
       /// \brief Stream operator friendly
       public: friend std::ostream &operator<<(std::ostream &out,
-                                              const ignition::common::Timer &t)
+                                              const gz::common::Timer &t)
               {
                 out << t.Elapsed();
                 return out;

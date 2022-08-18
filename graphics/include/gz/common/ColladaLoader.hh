@@ -14,14 +14,14 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_COLLADALOADER_HH_
-#define IGNITION_COMMON_COLLADALOADER_HH_
+#ifndef GZ_COMMON_COLLADALOADER_HH_
+#define GZ_COMMON_COLLADALOADER_HH_
 
 #include <string>
 #include <ignition/common/graphics/Export.hh>
 #include <ignition/common/MeshLoader.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

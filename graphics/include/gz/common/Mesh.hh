@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_MESH_HH_
-#define IGNITION_COMMON_MESH_HH_
+#ifndef GZ_COMMON_MESH_HH_
+#define GZ_COMMON_MESH_HH_
 
 #include <memory>
 #include <string>
@@ -28,7 +28,7 @@
 #include <ignition/common/graphics/Export.hh>
 #include <ignition/common/SuppressWarning.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -64,11 +64,11 @@ namespace ignition
 
       /// \brief Get the maximun X, Y, Z values
       /// \return The upper bounds of the bounding box
-      public: ignition::math::Vector3d Max() const;
+      public: gz::math::Vector3d Max() const;
 
       /// \brief Get the minimum X, Y, Z values
       /// \return The lower bounds of the bounding box
-      public: ignition::math::Vector3d Min() const;
+      public: gz::math::Vector3d Min() const;
 
       /// \brief Get the number of vertices
       /// \return The number of vertices
@@ -149,15 +149,15 @@ namespace ignition
       /// \param[out] _center Center of the bounding box
       /// \param[out] _minXYZ Bounding box minimum values
       /// \param[out] _maxXYZ Bounding box maximum values
-      public: void AABB(ignition::math::Vector3d &_center,
-                        ignition::math::Vector3d &_minXYZ,
-                        ignition::math::Vector3d &_maxXYZ) const;
+      public: void AABB(gz::math::Vector3d &_center,
+                        gz::math::Vector3d &_minXYZ,
+                        gz::math::Vector3d &_maxXYZ) const;
 
       /// \brief Generate texture coordinates using spherical projection
       /// from center
       /// \param[in] _center Center of the projection
       public: void GenSphericalTexCoord(
-                  const ignition::math::Vector3d &_center);
+                  const gz::math::Vector3d &_center);
 
       /// \brief Get the skeleton to which this mesh is attached.
       /// \return Pointer to skeleton or nullptr if none is present.
@@ -173,21 +173,21 @@ namespace ignition
 
       /// \brief Scale all vertices by _factor
       /// \param _factor Scaling factor
-      public: void Scale(const ignition::math::Vector3d &_factor);
+      public: void Scale(const gz::math::Vector3d &_factor);
 
       /// \brief Set the scale all vertices
       /// \param[in] _factor Scaling vector
-      public: void SetScale(const ignition::math::Vector3d &_factor);
+      public: void SetScale(const gz::math::Vector3d &_factor);
 
       /// \brief Move the center of the mesh to the given coordinate in the
       /// mesh frame. This will move all the vertices in all submeshes.
       /// \param[in] _center Location of the mesh center.
-      public: void Center(const ignition::math::Vector3d &_center =
-                          ignition::math::Vector3d::Zero);
+      public: void Center(const gz::math::Vector3d &_center =
+                          gz::math::Vector3d::Zero);
 
       /// \brief Move all vertices in all submeshes by _vec.
       /// \param[in] _vec Amount to translate vertices.
-      public: void Translate(const ignition::math::Vector3d &_vec);
+      public: void Translate(const gz::math::Vector3d &_vec);
 
       /// \brief Compute the volume of this mesh. The primitive type
       /// must be TRIANGLES.

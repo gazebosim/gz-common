@@ -26,7 +26,7 @@
 #include <vector> // NOLINT(*)
 #include "ignition/common/Console.hh" // NOLINT(*)
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 // A wrapper for the sigaction sa_handler.
@@ -47,7 +47,7 @@ void onSignal(int _value)
 }
 
 /////////////////////////////////////////////////
-class ignition::common::SignalHandlerPrivate
+class gz::common::SignalHandlerPrivate
 {
   /// \brief Handle a signal.
   /// \param[in] _sig Signal number

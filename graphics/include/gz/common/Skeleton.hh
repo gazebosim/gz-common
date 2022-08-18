@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_SKELETON_HH_
-#define IGNITION_COMMON_SKELETON_HH_
+#ifndef GZ_COMMON_SKELETON_HH_
+#define GZ_COMMON_SKELETON_HH_
 
 #include <vector>
 #include <string>
@@ -26,7 +26,7 @@
 #include <ignition/common/SkeletonNode.hh>
 #include <ignition/common/graphics/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

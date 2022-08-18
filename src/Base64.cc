@@ -44,7 +44,7 @@
 #include <cstring>
 #include <iostream>
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 static const char base64Chars[] =

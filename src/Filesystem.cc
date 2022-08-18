@@ -60,8 +60,8 @@
 # define IGN_PATH_MAX _POSIX_PATH_MAX
 #endif
 
-namespace igncmn = ignition::common;
-using namespace ignition;
+namespace igncmn = gz::common;
+using namespace gz;
 using namespace igncmn;
 
 /////////////////////////////////////////////////

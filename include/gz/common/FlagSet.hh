@@ -35,7 +35,7 @@
 #include <cassert>
 #include <string>
 
-namespace ignition::common
+namespace gz::common
 {
 
 /// \brief Set of flags defined by a C++11 enum class.
@@ -371,12 +371,12 @@ struct IsEnumThatContainsSentinel<T, decltype(static_cast<void>(T::_))>
 // enumeration contains the sentinel `_`.
 template<typename T>
 std::enable_if_t<
-    ignition::common::IsEnumThatContainsSentinel<T>::value,
-    ignition::common::FlagSet<T>
+    gz::common::IsEnumThatContainsSentinel<T>::value,
+    gz::common::FlagSet<T>
 >
 operator|(const T& _lhs, const T& _rhs)
 {
-  ignition::common::FlagSet<T> fs;
+  gz::common::FlagSet<T> fs;
   fs |= _lhs;
   fs |= _rhs;
 
@@ -386,10 +386,10 @@ operator|(const T& _lhs, const T& _rhs)
 namespace std
 {
 template<typename T, T LastElement, bool ExcludeLast>
-struct hash<ignition::common::FlagSet<T, LastElement, ExcludeLast>>
+struct hash<gz::common::FlagSet<T, LastElement, ExcludeLast>>
 {
   std::size_t operator()(
-    const ignition::common::FlagSet<T, LastElement, ExcludeLast>& _s)
+    const gz::common::FlagSet<T, LastElement, ExcludeLast>& _s)
     const noexcept
   {
     return _s.Hash();

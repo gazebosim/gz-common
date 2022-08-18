@@ -21,15 +21,15 @@
 #include <utility>
 
 #include "ignition/common/ffmpeg_inc.hh"
-#include "ignition/common/HWEncoder.hh"
+#include "gz/common/HWEncoder.hh"
 #include "ignition/common/StringUtils.hh"
 #include "ignition/common/Console.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 using namespace std;
 
-class ignition::common::HWVideoPrivate
+class gz::common::HWVideoPrivate
 {
   /// \brief Device reference for HW-accelerated encoding.
   public: AVBufferRef* hwDevice = nullptr;

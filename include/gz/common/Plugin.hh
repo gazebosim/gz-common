@@ -16,8 +16,8 @@
  */
 
 
-#ifndef IGNITION_COMMON_PLUGIN_HH_
-#define IGNITION_COMMON_PLUGIN_HH_
+#ifndef GZ_COMMON_PLUGIN_HH_
+#define GZ_COMMON_PLUGIN_HH_
 
 #include <memory>
 #include <map>
@@ -26,7 +26,7 @@
 #include <ignition/common/Export.hh>
 #include <ignition/common/SuppressWarning.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -191,6 +191,6 @@ namespace ignition
   }
 }
 
-#include "ignition/common/detail/Plugin.hh"
+#include "gz/common/detail/Plugin.hh"
 
 #endif

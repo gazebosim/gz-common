@@ -38,7 +38,7 @@
   static const char pathSeparator = '/';
 #endif
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 static void LogTinyXml2DocumentError(
@@ -78,7 +78,7 @@ static void LogTinyXml2DocumentError(
 }
 
 /// Private data for the ColladaExporter class
-class ignition::common::ColladaExporterPrivate
+class gz::common::ColladaExporterPrivate
 {
   /// \brief Geometry types
   public: enum GeometryType {POSITION, NORMAL, UVMAP};

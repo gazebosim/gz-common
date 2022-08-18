@@ -25,10 +25,10 @@
 #include "ignition/common/StringUtils.hh"
 
 #ifdef IGN_COMMON_BUILD_HW_VIDEO
-#include "ignition/common/HWEncoder.hh"
+#include "gz/common/HWEncoder.hh"
 #endif
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 using namespace std;
 

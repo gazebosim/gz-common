@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_FFMPEG_INC_HH_
-#define IGNITION_COMMON_FFMPEG_INC_HH_
+#ifndef GZ_COMMON_FFMPEG_INC_HH_
+#define GZ_COMMON_FFMPEG_INC_HH_
 
 #include <string>
 
@@ -51,7 +51,7 @@ extern "C" {
 
 #include <ignition/common/av/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

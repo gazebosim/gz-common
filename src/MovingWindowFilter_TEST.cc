@@ -20,7 +20,7 @@
 
 #include "ignition/common/MovingWindowFilter.hh"
 
-using namespace ignition;
+using namespace gz;
 
 /////////////////////////////////////////////////
 TEST(MovingWindowFilterTest, SetWindowSize)

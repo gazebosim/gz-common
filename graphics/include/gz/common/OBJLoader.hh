@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef IGNITION_COMMON_OBJLOADER_HH_
-#define IGNITION_COMMON_OBJLOADER_HH_
+#ifndef GZ_COMMON_OBJLOADER_HH_
+#define GZ_COMMON_OBJLOADER_HH_
 
 #include <string>
 #include <memory>
@@ -25,7 +25,7 @@
 #include <ignition/common/graphics/Export.hh>
 #include <ignition/common/SuppressWarning.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

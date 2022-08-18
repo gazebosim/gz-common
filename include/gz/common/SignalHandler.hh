@@ -14,14 +14,14 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_SIGNALHANDLER_HH_
-#define IGNITION_COMMON_SIGNALHANDLER_HH_
+#ifndef GZ_COMMON_SIGNALHANDLER_HH_
+#define GZ_COMMON_SIGNALHANDLER_HH_
 
 #include <functional>
 
 #include <ignition/common/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -38,7 +38,7 @@ namespace ignition
     /// Example using a lambda callback:
     ///
     /// ~~~
-    /// ignition::common::SignalHandler handler;
+    /// gz::common::SignalHandler handler;
     /// handler.AddCallback([] (int _sig)
     /// {
     ///   printf("Signal[%d] received\n", _sig);

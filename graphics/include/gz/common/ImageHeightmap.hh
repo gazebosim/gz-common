@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef IGNITION_COMMON_IMAGEHEIGHTMAPDATA_HH_
-#define IGNITION_COMMON_IMAGEHEIGHTMAPDATA_HH_
+#ifndef GZ_COMMON_IMAGEHEIGHTMAPDATA_HH_
+#define GZ_COMMON_IMAGEHEIGHTMAPDATA_HH_
 
 #include <string>
 #include <vector>
@@ -25,13 +25,13 @@
 #include <ignition/common/HeightmapData.hh>
 #include <ignition/common/Image.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
     /// \brief Encapsulates an image that will be interpreted as a heightmap.
     class IGNITION_COMMON_GRAPHICS_VISIBLE ImageHeightmap
-      : public ignition::common::HeightmapData
+      : public gz::common::HeightmapData
     {
       /// \brief Constructor
       /// \param[in] _filename the path to the image
@@ -44,8 +44,8 @@ namespace ignition
 
       // Documentation inherited.
       public: void FillHeightMap(int _subSampling, unsigned int _vertSize,
-          const ignition::math::Vector3d &_size,
-          const ignition::math::Vector3d &_scale, bool _flipY,
+          const gz::math::Vector3d &_size,
+          const gz::math::Vector3d &_scale, bool _flipY,
           std::vector<float> &_heights);
 
       /// \brief Get the full filename of the image
@@ -62,7 +62,7 @@ namespace ignition
       public: float MaxElevation() const;
 
       /// \brief Image containing the heightmap data.
-      private: ignition::common::Image img;
+      private: gz::common::Image img;
     };
   }
 }
