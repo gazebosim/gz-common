@@ -19,7 +19,7 @@
 
 #include "test_config.h"
 
-#include "ignition/common/SVGLoader.hh"
+#include "gz/common/SVGLoader.hh"
 
 using namespace gz;
 using namespace common;

@@ -21,12 +21,12 @@
 #include <string>
 #include <vector>
 
-#include <ignition/math/Vector2.hh>
-#include <ignition/math/Matrix3.hh>
+#include <gz/math/Vector2.hh>
+#include <gz/math/Matrix3.hh>
 
-#include <ignition/common/graphics/Export.hh>
-#include <ignition/common/Console.hh>
-#include <ignition/common/SuppressWarning.hh>
+#include <gz/common/graphics/Export.hh>
+#include <gz/common/Console.hh>
+#include <gz/common/SuppressWarning.hh>
 
 namespace gz
 {

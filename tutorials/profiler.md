@@ -31,7 +31,7 @@ The relevant corresponding C++ would be as follows:
 
 ```{.cpp}
 // Add the profiler header
-#include <ignition/common/Profiler.hh>
+#include <gz/common/Profiler.hh>
 
 ...
 void thread(const char *_thread_name)

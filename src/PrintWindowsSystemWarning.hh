@@ -23,7 +23,7 @@
 #include <winnt.h>
 #include <string>
 #include <cstdint>
-#include <ignition/common/Console.hh>
+#include <gz/common/Console.hh>
 
 namespace gz
 {

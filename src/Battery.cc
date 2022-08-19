@@ -17,8 +17,8 @@
 
 #include <cmath>
 
-#include <ignition/common/Console.hh>
-#include <ignition/common/Battery.hh>
+#include <gz/common/Console.hh>
+#include <gz/common/Battery.hh>
 
 using namespace gz;
 using namespace common;

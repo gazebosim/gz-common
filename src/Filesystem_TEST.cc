@@ -25,7 +25,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "ignition/common/Util.hh"
+#include "gz/common/Util.hh"
 
 // The symlink tests should always work on UNIX systems
 #define BUILD_SYMLINK_TESTS
@@ -210,8 +210,8 @@ bool create_new_file_hardlink(const std::string &_hardlink,
 #endif  // _WIN32
 
 #include <fstream> // NOLINT
-#include "ignition/common/Console.hh"
-#include "ignition/common/Filesystem.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/Filesystem.hh"
 
 using namespace gz;
 using namespace common;

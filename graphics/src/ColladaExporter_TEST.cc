@@ -18,11 +18,11 @@
 #include "tinyxml2.h"
 
 #include "test_config.h"
-#include "ignition/common/ColladaLoader.hh"
-#include "ignition/common/ColladaExporter.hh"
-#include "ignition/common/Filesystem.hh"
-#include "ignition/common/Mesh.hh"
-#include "ignition/common/SubMesh.hh"
+#include "gz/common/ColladaLoader.hh"
+#include "gz/common/ColladaExporter.hh"
+#include "gz/common/Filesystem.hh"
+#include "gz/common/Mesh.hh"
+#include "gz/common/SubMesh.hh"
 
 #ifdef _WIN32
   #define snprintf _snprintf

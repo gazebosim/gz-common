@@ -19,9 +19,9 @@
 #include <memory>
 
 #include "test_config.h"
-#include "ignition/common/GTSMeshUtils.hh"
-#include "ignition/common/Mesh.hh"
-#include "ignition/common/SubMesh.hh"
+#include "gz/common/GTSMeshUtils.hh"
+#include "gz/common/Mesh.hh"
+#include "gz/common/SubMesh.hh"
 
 using namespace gz;
 

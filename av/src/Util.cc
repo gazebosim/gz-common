@@ -17,9 +17,9 @@
 
 #include <string>
 
-#include <ignition/common/Console.hh>
-#include <ignition/common/av/Util.hh>
-#include <ignition/common/ffmpeg_inc.hh>
+#include <gz/common/Console.hh>
+#include <gz/common/av/Util.hh>
+#include <gz/common/ffmpeg_inc.hh>
 
 /////////////////////////////////////////////////
 // avcodec log callback. We use this to redirect message to gazebo's console

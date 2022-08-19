@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-#include <ignition/common/NodeTransform.hh>
+#include <gz/common/NodeTransform.hh>
 
 using namespace gz;
 using namespace common;

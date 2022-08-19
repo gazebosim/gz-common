@@ -23,7 +23,7 @@
 #include <string>
 #include <memory>
 
-#include "ignition/common/Plugin.hh"
+#include "gz/common/Plugin.hh"
 
 namespace gz
 {

@@ -22,9 +22,9 @@
 #include <sstream>
 #include <string>
 
-#include <ignition/common/Util.hh>
-#include <ignition/common/Export.hh>
-#include <ignition/common/SuppressWarning.hh>
+#include <gz/common/Util.hh>
+#include <gz/common/Export.hh>
+#include <gz/common/SuppressWarning.hh>
 
 namespace gz
 {

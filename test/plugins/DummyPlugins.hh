@@ -22,7 +22,7 @@
 #include <string>
 #include <memory>
 
-#include <ignition/common/PluginMacros.hh>
+#include <gz/common/PluginMacros.hh>
 
 namespace test
 {

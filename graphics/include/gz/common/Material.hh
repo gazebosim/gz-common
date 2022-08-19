@@ -21,11 +21,11 @@
 #include <memory>
 #include <string>
 
-#include <ignition/math/Color.hh>
-#include <ignition/common/graphics/Export.hh>
-#include <ignition/common/EnumIface.hh>
-#include <ignition/common/Pbr.hh>
-#include <ignition/common/SuppressWarning.hh>
+#include <gz/math/Color.hh>
+#include <gz/common/graphics/Export.hh>
+#include <gz/common/EnumIface.hh>
+#include <gz/common/Pbr.hh>
+#include <gz/common/SuppressWarning.hh>
 
 namespace gz
 {

@@ -14,11 +14,11 @@
  * limitations under the License.
  *
 */
-#include "ignition/common/config.hh"
-#include "ignition/common/Console.hh"
-#include "ignition/common/ffmpeg_inc.hh"
-#include "ignition/common/Video.hh"
-#include "ignition/common/av/Util.hh"
+#include "gz/common/config.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/ffmpeg_inc.hh"
+#include "gz/common/Video.hh"
+#include "gz/common/av/Util.hh"
 
 using namespace gz;
 using namespace common;

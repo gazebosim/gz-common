@@ -20,10 +20,10 @@
 #include <map>
 #include <utility>
 
-#include "ignition/common/ffmpeg_inc.hh"
+#include "gz/common/ffmpeg_inc.hh"
 #include "gz/common/HWEncoder.hh"
-#include "ignition/common/StringUtils.hh"
-#include "ignition/common/Console.hh"
+#include "gz/common/StringUtils.hh"
+#include "gz/common/Console.hh"
 
 using namespace gz;
 using namespace common;

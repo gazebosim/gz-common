@@ -17,14 +17,14 @@
 
 // Suppressing cpplint.py because tools/cpplint.py is old. Remove the NOLINT
 // comments when upgrading to ign-cmake's "make codecheck"
-#include "ignition/common/SignalHandler.hh" // NOLINT(*)
+#include "gz/common/SignalHandler.hh" // NOLINT(*)
 #include <csignal> // NOLINT(*)
 #include <functional> // NOLINT(*)
 #include <map> // NOLINT(*)
 #include <mutex> // NOLINT(*)
 #include <utility> // NOLINT(*)
 #include <vector> // NOLINT(*)
-#include "ignition/common/Console.hh" // NOLINT(*)
+#include "gz/common/Console.hh" // NOLINT(*)
 
 using namespace gz;
 using namespace common;

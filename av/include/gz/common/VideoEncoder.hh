@@ -22,10 +22,10 @@
 #include <memory>
 #include <optional>
 
-#include <ignition/common/FlagSet.hh>
-#include <ignition/common/av/Export.hh>
-#include <ignition/common/SuppressWarning.hh>
-#include <ignition/common/HWVideo.hh>
+#include <gz/common/FlagSet.hh>
+#include <gz/common/av/Export.hh>
+#include <gz/common/SuppressWarning.hh>
+#include <gz/common/HWVideo.hh>
 
 // Default bitrate (0) indicates that a bitrate should be calculated when
 // Start is called.

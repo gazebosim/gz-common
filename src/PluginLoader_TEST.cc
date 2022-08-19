@@ -18,10 +18,10 @@
 #include <gtest/gtest.h>
 
 #include <algorithm>
-#include "ignition/common/PluginLoader.hh"
-#include "ignition/common/SystemPaths.hh"
+#include "gz/common/PluginLoader.hh"
+#include "gz/common/SystemPaths.hh"
 
-#include "ignition/common/config.hh"
+#include "gz/common/config.hh"
 #include "test_config.h"
 
 #ifndef IGN_COMMON_LIB_PATH

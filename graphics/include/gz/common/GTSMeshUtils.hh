@@ -20,8 +20,8 @@
 
 #include <vector>
 
-#include <ignition/math/Vector2.hh>
-#include <ignition/common/graphics/Export.hh>
+#include <gz/math/Vector2.hh>
+#include <gz/common/graphics/Export.hh>
 
 
 struct _GtsSurface;

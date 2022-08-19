@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include <ignition/common/config.hh>
+#include <gz/common/config.hh>
 
 #ifndef _WIN32
 #pragma GCC system_header
@@ -49,7 +49,7 @@ extern "C" {
 #endif
 }
 
-#include <ignition/common/av/Export.hh>
+#include <gz/common/av/Export.hh>
 
 namespace gz
 {

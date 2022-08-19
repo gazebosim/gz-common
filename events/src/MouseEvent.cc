@@ -15,8 +15,8 @@
  *
 */
 
-#include <ignition/math/Vector2.hh>
-#include "ignition/common/MouseEvent.hh"
+#include <gz/math/Vector2.hh>
+#include "gz/common/MouseEvent.hh"
 
 using namespace gz;
 using namespace common;

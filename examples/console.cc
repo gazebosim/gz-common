@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include <ignition/common.hh>
+#include <gz/common.hh>
 
 int main(int argc, char **argv)
 {

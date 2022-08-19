@@ -17,8 +17,8 @@
 #ifndef GZ_COMMON_TIMER_HH_
 #define GZ_COMMON_TIMER_HH_
 
-#include <ignition/common/Time.hh>
-#include <ignition/common/Export.hh>
+#include <gz/common/Time.hh>
+#include <gz/common/Export.hh>
 
 namespace gz
 {

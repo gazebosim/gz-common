@@ -20,8 +20,8 @@
 #include <string>
 #include <memory>
 
-#include <ignition/common/av/Export.hh>
-#include <ignition/common/SuppressWarning.hh>
+#include <gz/common/av/Export.hh>
+#include <gz/common/SuppressWarning.hh>
 
 struct AVFormatContext;
 struct AVCodecContext;

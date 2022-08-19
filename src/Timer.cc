@@ -15,7 +15,7 @@
  *
  */
 
-#include <ignition/common/Timer.hh>
+#include <gz/common/Timer.hh>
 
 using namespace gz;
 using namespace common;

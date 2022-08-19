@@ -21,11 +21,11 @@
 #include <string>
 #include <vector>
 
-#include <ignition/math/Pose3.hh>
-#include <ignition/math/Spline.hh>
-#include <ignition/math/RotationSpline.hh>
+#include <gz/math/Pose3.hh>
+#include <gz/math/Spline.hh>
+#include <gz/math/RotationSpline.hh>
 
-#include <ignition/common/graphics/Export.hh>
+#include <gz/common/graphics/Export.hh>
 
 namespace gz
 {

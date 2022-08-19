@@ -21,8 +21,8 @@
 #include <string>
 #include <vector>
 
-#include <ignition/common/NodeTransform.hh>
-#include <ignition/common/graphics/Export.hh>
+#include <gz/common/NodeTransform.hh>
+#include <gz/common/graphics/Export.hh>
 
 namespace gz
 {

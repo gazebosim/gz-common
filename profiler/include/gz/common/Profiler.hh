@@ -21,9 +21,9 @@
 #include <memory>
 #include <string>
 
-#include <ignition/common/profiler/Export.hh>
-#include <ignition/common/SingletonT.hh>
-#include <ignition/common/config.hh>
+#include <gz/common/profiler/Export.hh>
+#include <gz/common/SingletonT.hh>
+#include <gz/common/config.hh>
 
 namespace gz
 {

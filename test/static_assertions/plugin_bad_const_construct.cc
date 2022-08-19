@@ -15,7 +15,7 @@
  *
 */
 
-#include "ignition/common/PluginPtr.hh"
+#include "gz/common/PluginPtr.hh"
 
 int main()
 {

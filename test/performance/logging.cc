@@ -20,7 +20,7 @@
 #include <map>
 #include <thread>
 
-#include <ignition/common/Console.hh>
+#include <gz/common/Console.hh>
 
 namespace {
 // Lower value than spdlog to keep CI from flaking

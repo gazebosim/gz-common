@@ -16,7 +16,7 @@
 */
 
 #include <limits>
-#include "ignition/common/PluginMacros.hh"
+#include "gz/common/PluginMacros.hh"
 
 extern "C" {
   std::size_t DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONPluginInfoSize =

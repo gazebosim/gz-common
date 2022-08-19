@@ -17,8 +17,8 @@
 
 #include <list>
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/SkeletonNode.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/SkeletonNode.hh"
 
 using namespace gz;
 using namespace common;

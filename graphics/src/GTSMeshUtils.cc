@@ -18,10 +18,10 @@
 
 #include <vector>
 
-#include <ignition/common/Mesh.hh>
-#include <ignition/common/SubMesh.hh>
-#include <ignition/common/Console.hh>
-#include <ignition/common/GTSMeshUtils.hh>
+#include <gz/common/Mesh.hh>
+#include <gz/common/SubMesh.hh>
+#include <gz/common/Console.hh>
+#include <gz/common/GTSMeshUtils.hh>
 
 using namespace gz;
 using namespace common;

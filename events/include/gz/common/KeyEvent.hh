@@ -20,8 +20,8 @@
 #include <memory>
 #include <string>
 
-#include <ignition/common/events/Export.hh>
-#include <ignition/common/SuppressWarning.hh>
+#include <gz/common/events/Export.hh>
+#include <gz/common/SuppressWarning.hh>
 
 namespace gz
 {

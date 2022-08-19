@@ -22,8 +22,8 @@
 #include <regex>
 #include <string>
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/URI.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/URI.hh"
 
 using namespace gz;
 using namespace common;

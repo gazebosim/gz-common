@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 
-#include <ignition/common/Image.hh>
+#include <gz/common/Image.hh>
 #include "test_config.h"
 
 using namespace gz;

@@ -22,9 +22,9 @@
 #include <map>
 #include <utility>
 
-#include <ignition/math/Matrix4.hh>
-#include <ignition/common/SkeletonNode.hh>
-#include <ignition/common/graphics/Export.hh>
+#include <gz/math/Matrix4.hh>
+#include <gz/common/SkeletonNode.hh>
+#include <gz/common/graphics/Export.hh>
 
 namespace gz
 {

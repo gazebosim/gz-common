@@ -20,8 +20,8 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-#include <ignition/common/Util.hh>
-#include <ignition/common/Export.hh>
+#include <gz/common/Util.hh>
+#include <gz/common/Export.hh>
 
 namespace gz
 {

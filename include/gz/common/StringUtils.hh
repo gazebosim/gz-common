@@ -20,7 +20,7 @@
 #include <string>
 #include <vector>
 
-#include <ignition/common/Export.hh>
+#include <gz/common/Export.hh>
 
 namespace gz
 {

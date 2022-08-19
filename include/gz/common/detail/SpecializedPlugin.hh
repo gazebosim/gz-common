@@ -19,7 +19,7 @@
 #ifndef GZ_COMMON_DETAIL_SPECIALIZEDPLUGIN_HH_
 #define GZ_COMMON_DETAIL_SPECIALIZEDPLUGIN_HH_
 
-#include "ignition/common/SpecializedPlugin.hh"
+#include "gz/common/SpecializedPlugin.hh"
 #include <memory>
 
 // This preprocessor token should only be used by the unittest that is

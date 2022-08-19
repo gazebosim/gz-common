@@ -21,9 +21,9 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <ignition/math/Color.hh>
-#include <ignition/common/graphics/Export.hh>
-#include <ignition/common/SuppressWarning.hh>
+#include <gz/math/Color.hh>
+#include <gz/common/graphics/Export.hh>
+#include <gz/common/SuppressWarning.hh>
 
 namespace gz
 {

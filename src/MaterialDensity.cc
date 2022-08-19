@@ -16,8 +16,8 @@
 */
 #include <cmath>
 #include <limits>
-#include "ignition/common/EnumIface.hh"
-#include "ignition/common/MaterialDensity.hh"
+#include "gz/common/EnumIface.hh"
+#include "gz/common/MaterialDensity.hh"
 
 using namespace gz;
 using namespace common;

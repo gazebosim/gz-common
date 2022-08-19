@@ -22,20 +22,20 @@
 #include <cctype>
 
 #ifndef _WIN32
-  #include "ignition/common/GTSMeshUtils.hh"
-  #include "ignition/common/MeshCSG.hh"
+  #include "gz/common/GTSMeshUtils.hh"
+  #include "gz/common/MeshCSG.hh"
 #endif
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/Mesh.hh"
-#include "ignition/common/SubMesh.hh"
-#include "ignition/common/ColladaLoader.hh"
-#include "ignition/common/ColladaExporter.hh"
-#include "ignition/common/OBJLoader.hh"
-#include "ignition/common/STLLoader.hh"
-#include "ignition/common/config.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/Mesh.hh"
+#include "gz/common/SubMesh.hh"
+#include "gz/common/ColladaLoader.hh"
+#include "gz/common/ColladaExporter.hh"
+#include "gz/common/OBJLoader.hh"
+#include "gz/common/STLLoader.hh"
+#include "gz/common/config.hh"
 
-#include "ignition/common/MeshManager.hh"
+#include "gz/common/MeshManager.hh"
 
 using namespace gz::common;
 

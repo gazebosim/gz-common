@@ -31,10 +31,10 @@
 #include "win_dirent.h"
 #endif
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/StringUtils.hh"
-#include "ignition/common/SystemPaths.hh"
-#include "ignition/common/Util.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/StringUtils.hh"
+#include "gz/common/SystemPaths.hh"
+#include "gz/common/Util.hh"
 
 using namespace gz;
 using namespace common;

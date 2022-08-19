@@ -18,7 +18,7 @@
 #define GZ_COMMON_PBR_HH_
 
 #include <string>
-#include <ignition/common/graphics/Export.hh>
+#include <gz/common/graphics/Export.hh>
 
 namespace gz
 {

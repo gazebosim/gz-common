@@ -21,11 +21,11 @@
 #include <string>
 #include <vector>
 
-#include <ignition/common/MeshExporter.hh>
-#include <ignition/common/graphics/Export.hh>
-#include <ignition/common/SuppressWarning.hh>
+#include <gz/common/MeshExporter.hh>
+#include <gz/common/graphics/Export.hh>
+#include <gz/common/SuppressWarning.hh>
 
-#include <ignition/math/Matrix4.hh>
+#include <gz/math/Matrix4.hh>
 
 namespace gz
 {

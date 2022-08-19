@@ -18,10 +18,10 @@
 #include <gtest/gtest.h>
 
 #include "test_config.h"
-#include "ignition/common/Mesh.hh"
-#include "ignition/common/SubMesh.hh"
-#include "ignition/common/MeshManager.hh"
-#include "ignition/common/config.hh"
+#include "gz/common/Mesh.hh"
+#include "gz/common/SubMesh.hh"
+#include "gz/common/MeshManager.hh"
+#include "gz/common/config.hh"
 
 using namespace gz;
 

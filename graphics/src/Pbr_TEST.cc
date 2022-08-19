@@ -17,8 +17,8 @@
 
 #include <gtest/gtest.h>
 
-#include <ignition/math/Color.hh>
-#include "ignition/common/Pbr.hh"
+#include <gz/math/Color.hh>
+#include "gz/common/Pbr.hh"
 
 /////////////////////////////////////////////////
 TEST(Pbr, BasicAPI)

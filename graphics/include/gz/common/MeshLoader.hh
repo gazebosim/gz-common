@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include <ignition/common/graphics/Export.hh>
+#include <gz/common/graphics/Export.hh>
 
 namespace gz
 {

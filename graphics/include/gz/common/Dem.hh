@@ -18,11 +18,11 @@
 #define GZ_COMMON_DEM_HH_
 
 #include <memory>
-#include <ignition/math/Vector3.hh>
-#include <ignition/math/Angle.hh>
+#include <gz/math/Vector3.hh>
+#include <gz/math/Angle.hh>
 
-#include <ignition/common/graphics/Export.hh>
-#include <ignition/common/SuppressWarning.hh>
+#include <gz/common/graphics/Export.hh>
+#include <gz/common/SuppressWarning.hh>
 
 #ifdef HAVE_GDAL
 # include <string>

@@ -19,7 +19,7 @@
 #define GZ_COMMON_PLUGINUTILS_HH_
 
 #include <string>
-#include "ignition/common/StringUtils.hh"
+#include "gz/common/StringUtils.hh"
 
 namespace gz
 {

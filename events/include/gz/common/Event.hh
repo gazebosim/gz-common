@@ -25,9 +25,9 @@
 #include <mutex>
 #include <utility>
 
-#include <ignition/common/config.hh>
-#include <ignition/common/events/Export.hh>
-#include <ignition/common/events/Types.hh>
+#include <gz/common/config.hh>
+#include <gz/common/events/Export.hh>
+#include <gz/common/events/Types.hh>
 
 namespace gz
 {

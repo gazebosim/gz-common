@@ -20,8 +20,8 @@
 #include <stdint.h>
 #include <string>
 
-#include "ignition/common/MeshLoader.hh"
-#include "ignition/common/graphics/Export.hh"
+#include "gz/common/MeshLoader.hh"
+#include "gz/common/graphics/Export.hh"
 
 #define LINE_MAX_LEN 256
 #define COR3_MAX 200000

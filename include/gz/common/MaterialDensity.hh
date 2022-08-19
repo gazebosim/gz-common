@@ -21,7 +21,7 @@
 #include <limits>
 #include <map>
 #include <tuple>
-#include "ignition/common/Export.hh"
+#include "gz/common/Export.hh"
 
 namespace gz
 {

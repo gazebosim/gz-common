@@ -18,10 +18,10 @@
 #define GZ_COMMON_MOUSEEVENT_HH_
 
 #include <memory>
-#include <ignition/math/Vector2.hh>
+#include <gz/math/Vector2.hh>
 
-#include <ignition/common/events/Export.hh>
-#include <ignition/common/SuppressWarning.hh>
+#include <gz/common/events/Export.hh>
+#include <gz/common/SuppressWarning.hh>
 
 namespace gz
 {

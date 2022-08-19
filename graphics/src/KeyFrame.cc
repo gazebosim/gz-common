@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include <ignition/common/KeyFrame.hh>
+#include <gz/common/KeyFrame.hh>
 
 using namespace gz;
 using namespace common;

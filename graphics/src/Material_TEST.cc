@@ -17,8 +17,8 @@
 #include <gtest/gtest.h>
 
 #include "test_config.h"
-#include "ignition/common/Material.hh"
-#include "ignition/common/Pbr.hh"
+#include "gz/common/Material.hh"
+#include "gz/common/Pbr.hh"
 
 using namespace gz;
 

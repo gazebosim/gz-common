@@ -15,7 +15,7 @@
  *
 */
 #include <memory>
-#include "ignition/common/Battery.hh"
+#include "gz/common/Battery.hh"
 #include "test_config.h"
 
 using namespace gz;

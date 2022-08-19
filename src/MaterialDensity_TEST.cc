@@ -16,7 +16,7 @@
 */
 
 #include <gtest/gtest.h>
-#include "ignition/common/MaterialDensity.hh"
+#include "gz/common/MaterialDensity.hh"
 #include "test_config.h"
 
 using namespace gz;

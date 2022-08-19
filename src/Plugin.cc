@@ -16,9 +16,9 @@
  */
 
 
-#include "ignition/common/Plugin.hh"
-#include "ignition/common/PluginInfo.hh"
-#include "ignition/common/Console.hh"
+#include "gz/common/Plugin.hh"
+#include "gz/common/PluginInfo.hh"
+#include "gz/common/Console.hh"
 #include "PluginUtils.hh"
 
 namespace gz

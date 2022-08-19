@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "ignition/common/KeyEvent.hh"
+#include "gz/common/KeyEvent.hh"
 
 using namespace gz;
 using namespace common;

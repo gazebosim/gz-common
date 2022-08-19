@@ -21,9 +21,9 @@
 #include <string>
 #include <memory>
 
-#include <ignition/common/MeshLoader.hh>
-#include <ignition/common/graphics/Export.hh>
-#include <ignition/common/SuppressWarning.hh>
+#include <gz/common/MeshLoader.hh>
+#include <gz/common/graphics/Export.hh>
+#include <gz/common/SuppressWarning.hh>
 
 namespace gz
 {

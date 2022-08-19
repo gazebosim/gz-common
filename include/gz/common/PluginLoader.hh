@@ -24,9 +24,9 @@
 #include <typeinfo>
 #include <unordered_set>
 
-#include <ignition/common/Export.hh>
-#include <ignition/common/SuppressWarning.hh>
-#include <ignition/common/PluginPtr.hh>
+#include <gz/common/Export.hh>
+#include <gz/common/SuppressWarning.hh>
+#include <gz/common/PluginPtr.hh>
 
 namespace gz
 {

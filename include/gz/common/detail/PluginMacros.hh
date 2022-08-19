@@ -24,8 +24,8 @@
 #include <type_traits>
 #include <unordered_set>
 #include <utility>
-#include "ignition/common/PluginInfo.hh"
-#include "ignition/common/SuppressWarning.hh"
+#include "gz/common/PluginInfo.hh"
+#include "gz/common/SuppressWarning.hh"
 
 
 #if defined _WIN32 || defined __CYGWIN__

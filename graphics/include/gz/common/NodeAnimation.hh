@@ -20,10 +20,10 @@
 #include <string>
 #include <utility>
 
-#include <ignition/math/Matrix4.hh>
-#include <ignition/math/Pose3.hh>
+#include <gz/math/Matrix4.hh>
+#include <gz/math/Pose3.hh>
 
-#include <ignition/common/graphics/Export.hh>
+#include <gz/common/graphics/Export.hh>
 
 namespace gz
 {

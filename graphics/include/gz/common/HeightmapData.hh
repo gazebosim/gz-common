@@ -18,8 +18,8 @@
 #define GZ_COMMON_HEIGHTMAPDATA_HH_
 
 #include <vector>
-#include <ignition/math/Vector3.hh>
-#include <ignition/common/graphics/Export.hh>
+#include <gz/math/Vector3.hh>
+#include <gz/common/graphics/Export.hh>
 
 namespace gz
 {

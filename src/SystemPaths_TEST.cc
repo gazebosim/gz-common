@@ -23,9 +23,9 @@
 #include <vector>
 #include <cstdio>
 
-#include "ignition/common/Util.hh"
-#include "ignition/common/StringUtils.hh"
-#include "ignition/common/SystemPaths.hh"
+#include "gz/common/Util.hh"
+#include "gz/common/StringUtils.hh"
+#include "gz/common/SystemPaths.hh"
 
 #ifdef _WIN32
   #define snprintf _snprintf

@@ -19,8 +19,8 @@
 #ifndef GZ_COMMON_SPECIALIZEDPLUGINPTR_HH_
 #define GZ_COMMON_SPECIALIZEDPLUGINPTR_HH_
 
-#include "ignition/common/PluginPtr.hh"
-#include "ignition/common/SpecializedPlugin.hh"
+#include "gz/common/PluginPtr.hh"
+#include "gz/common/SpecializedPlugin.hh"
 
 namespace gz
 {

@@ -23,9 +23,9 @@
 # pragma GCC diagnostic pop
 #endif
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/Dem.hh"
-#include "ignition/math/SphericalCoordinates.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/Dem.hh"
+#include "gz/math/SphericalCoordinates.hh"
 
 using namespace gz;
 using namespace common;

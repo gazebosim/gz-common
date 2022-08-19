@@ -20,10 +20,10 @@
 #include <iomanip>
 #include <cmath>
 
-#include "ignition/common/PluginLoader.hh"
-#include "ignition/common/SystemPaths.hh"
-#include "ignition/common/SpecializedPluginPtr.hh"
-#include "ignition/common/Console.hh"
+#include "gz/common/PluginLoader.hh"
+#include "gz/common/SystemPaths.hh"
+#include "gz/common/SpecializedPluginPtr.hh"
+#include "gz/common/Console.hh"
 
 #include "test_config.h"
 #include "DummyPluginsPath.h"

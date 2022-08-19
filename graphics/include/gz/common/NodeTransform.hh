@@ -19,10 +19,10 @@
 #include <memory>
 #include <string>
 
-#include <ignition/math/Matrix4.hh>
-#include <ignition/math/Vector3.hh>
-#include <ignition/common/graphics/Export.hh>
-#include <ignition/common/Util.hh>
+#include <gz/math/Matrix4.hh>
+#include <gz/math/Vector3.hh>
+#include <gz/common/graphics/Export.hh>
+#include <gz/common/Util.hh>
 
 namespace gz
 {
