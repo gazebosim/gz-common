@@ -147,6 +147,12 @@ class AssimpLoader::Implementation
           const aiNode* _node,
           std::unordered_set<std::string>& _boneNames) const;
 
+  /// \brief Adds animation at time 0, with default translation and
+  /// quaternion values for the given node.
+  /// \param[in] _skeleton Skeleton for the animation.
+  /// \param[in] _nodeName Node name for the animation.
+  public: void AddDumyAnimation(SkeletonPtr _skeleton, const char *_nodeName);
+
   /// \brief Apply the the inv bind transform to the skeleton pose.
   /// \remarks have to set the model transforms starting from the root in
   /// breadth first order. Because setting the model transform also updates
@@ -349,6 +355,9 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   // TODO(luca) more than one texture, Gazebo assumes UV index 0
   Pbr pbr;
   aiString texturePath(_path.c_str());
+  auto print = false;
+  if (assimpMat->GetTextureCount(aiTextureType_DIFFUSE) > 0)
+    print = true;
   ret = assimpMat->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath);
   // TODO(luca) check other arguments,
   // type of mappings to be UV, uv index, blend mode
@@ -357,6 +366,8 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     // Check if the texture is embedded or not
     auto [texName, texData] = this->LoadTexture(_scene,
         texturePath, this->GenerateTextureName(_scene, assimpMat, "Diffuse"));
+    if (print)
+      //std::cout << "texName is: " << texName << std::endl;
     if (texData != nullptr)
       mat->SetTextureImage(texName, texData);
     else
@@ -609,10 +620,27 @@ AssimpLoader::~AssimpLoader()
 {
 }
 
+void AssimpLoader::Implementation::AddDumyAnimation(SkeletonPtr _skeleton,
+  const char *_nodeName)
+{
+  SkeletonAnimation* skelAnim = new SkeletonAnimation("dummyAnimation");
+  math::Vector3d pos(0, 0, 0);
+  math::Quaterniond quat(0, 0, 0, 0);
+  math::Pose3d pose(pos, quat);
+  skelAnim->AddKeyFrame(_nodeName, 0, pose);
+  _skeleton->AddAnimation(skelAnim);
+  return;
+}
+
 //////////////////////////////////////////////////
 Mesh *AssimpLoader::Load(const std::string &_filename)
 {
+
   Mesh *mesh = new Mesh();
+  auto deneme = mesh->MeshSkeleton();
+  deneme = nullptr;
+  deneme->RootNode();
+  //std::cout << "Mesh name is: " << _filename << std::endl;
   std::string path = common::parentPath(_filename);
   const aiScene* scene = this->dataPtr->importer.ReadFile(_filename,
       aiProcess_JoinIdenticalVertices |
@@ -673,6 +701,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   // Recursive call to keep track of transforms,
   // mesh is passed by reference and edited throughout
   this->dataPtr->RecursiveCreate(scene, rootNode, rootTransform, mesh);
+  this->dataPtr->AddDumyAnimation(mesh->MeshSkeleton(), "scene");
   // Add the animations
   for (unsigned animIdx = 0; animIdx < scene->mNumAnimations; ++animIdx)
   {
