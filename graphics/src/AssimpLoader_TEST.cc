@@ -626,7 +626,7 @@ TEST_F(AssimpLoader, LoadGlTF2BoxExternalTexture)
 {
   common::AssimpLoader loader;
   common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data/gltf", "PurpleCube.gltf"));
+      common::testing::TestFile("data", "gltf", "PurpleCube.gltf"));
 
   EXPECT_STREQ("unknown", mesh->Name().c_str());
 
