@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2022 Open Source Robotics Foundation
+* Copyright (C) 2022 Open Source Robotics FoundationO
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -17,7 +17,8 @@
 #ifndef GZ_COMMON_TESTING_AUTOLOGFIXTURE_HH_
 #define GZ_COMMON_TESTING_AUTOLOGFIXTURE_HH_
 
-#include <gtest/gtest.h>
+/// Protect to guarantee that gtest is included before this header.
+#ifdef GTEST_API_
 
 #include <memory>
 #include <string>
@@ -55,5 +56,9 @@ class AutoLogFixture : public ::testing::Test
 }  // namespace gz::common::testing
 
 #include <gz/common/testing/detail/AutoLogFixture.hh>
+
+#else
+#warning "AutoLogFixture needs <gtest/gtest.h> to be included in order to work"
+#endif  // GTEST_API_
 
 #endif  // GZ_COMMON_TESTING_AUTOLOGFIXTURE_HH_
