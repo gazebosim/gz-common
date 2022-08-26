@@ -181,7 +181,7 @@ TEST(FlagSet, TestAnyAllNone)
 
 TEST(FlagSet, TestConstructors)
 {
-  using namespace gz::common;
+  using namespace ignition::common;
 
   ASSERT_EQ(5u, FlagSet<Options>::numElements);
 
@@ -216,7 +216,7 @@ TEST(FlagSet, TestStaticConstructors)
 
 TEST(FlagSet, TestHash)
 {
-  using namespace gz::common;
+  using namespace ignition::common;
 
   const auto options1 = FlagSet<Options>::AllSet();
   const auto options2 = FlagSet<Options>::NoneSet();
@@ -366,7 +366,7 @@ TEST(FlagSet, TestUnderlyingTypes)
     _
   };
 
-  using namespace gz::common;
+  using namespace ignition::common;
 
   EXPECT_TRUE(FlagSet<CharEnum>(CharEnum::A).All());
   EXPECT_TRUE(FlagSet<UCharEnum>(UCharEnum::A).All());

@@ -20,7 +20,7 @@
 #include "gz/common/Material.hh"
 #include "gz/common/Console.hh"
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 IGN_ENUM(shadeModeIface, Material::ShadeMode,

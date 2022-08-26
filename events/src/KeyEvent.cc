@@ -16,7 +16,7 @@
 */
 #include "gz/common/KeyEvent.hh"
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 class gz::common::KeyEventPrivate

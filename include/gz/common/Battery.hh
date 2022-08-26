@@ -24,7 +24,7 @@
 #include <gz/common/Export.hh>
 #include <gz/common/SuppressWarning.hh>
 
-namespace gz
+namespace ignition
 {
   namespace common
   {

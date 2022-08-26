@@ -21,7 +21,7 @@
 
 #define ELEVATION_TOL 1e-8
 
-using namespace gz;
+using namespace ignition;
 
 class ImageHeightmapTest : public common::testing::AutoLogFixture { };
 

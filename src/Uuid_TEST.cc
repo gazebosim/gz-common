@@ -22,7 +22,7 @@
 #include "gz/common/Uuid.hh"
 #include "gtest/gtest.h"
 
-using namespace gz;
+using namespace ignition;
 
 //////////////////////////////////////////////////
 /// \brief Check the Uuid helper class.

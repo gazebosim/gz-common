@@ -37,7 +37,7 @@ TEST(TemplateHelpers, ConstCompatible)
 
   // The extra pair of parentheses are so the comma between the template
   // arguments don't confuse the macro.
-  using namespace gz::common;
+  using namespace ignition::common;
   EXPECT_TRUE((ConstCompatible<const int, const double>::value));
   EXPECT_FALSE((ConstCompatible<double, const int>::value));
   EXPECT_TRUE((ConstCompatible<const float, std::string>::value));

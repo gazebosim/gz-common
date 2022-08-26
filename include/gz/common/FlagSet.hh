@@ -11,7 +11,7 @@
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in 
+ * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -35,7 +35,9 @@
 #include <cassert>
 #include <string>
 
-namespace gz::common
+#include <gz/common/config.hh>
+
+namespace ignition::common
 {
 
 /// \brief Set of flags defined by a C++11 enum class.
@@ -371,12 +373,12 @@ struct IsEnumThatContainsSentinel<T, decltype(static_cast<void>(T::_))>
 // enumeration contains the sentinel `_`.
 template<typename T>
 std::enable_if_t<
-    gz::common::IsEnumThatContainsSentinel<T>::value,
-    gz::common::FlagSet<T>
+    ignition::common::IsEnumThatContainsSentinel<T>::value,
+    ignition::common::FlagSet<T>
 >
 operator|(const T& _lhs, const T& _rhs)
 {
-  gz::common::FlagSet<T> fs;
+  ignition::common::FlagSet<T> fs;
   fs |= _lhs;
   fs |= _rhs;
 
@@ -386,10 +388,10 @@ operator|(const T& _lhs, const T& _rhs)
 namespace std
 {
 template<typename T, T LastElement, bool ExcludeLast>
-struct hash<gz::common::FlagSet<T, LastElement, ExcludeLast>>
+struct hash<ignition::common::FlagSet<T, LastElement, ExcludeLast>>
 {
   std::size_t operator()(
-    const gz::common::FlagSet<T, LastElement, ExcludeLast>& _s)
+    const ignition::common::FlagSet<T, LastElement, ExcludeLast>& _s)
     const noexcept
   {
     return _s.Hash();

@@ -16,7 +16,7 @@
 */
 #include "gz/common/ffmpeg_inc.hh"
 
-using namespace gz;
+using namespace ignition;
 
 //////////////////////////////////////////////////
 AVFrame *common::AVFrameAlloc(void)

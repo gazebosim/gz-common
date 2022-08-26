@@ -31,7 +31,7 @@
   #define snprintf _snprintf
 #endif
 
-using namespace gz;
+using namespace ignition;
 
 const char kPluginPath[] = "IGN_PLUGIN_PATH";
 const char kFilePath[] = "IGN_FILE_PATH";

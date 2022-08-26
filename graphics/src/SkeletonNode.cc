@@ -20,7 +20,7 @@
 #include "gz/common/Console.hh"
 #include "gz/common/SkeletonNode.hh"
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 /// \brief SkeletonNode private data

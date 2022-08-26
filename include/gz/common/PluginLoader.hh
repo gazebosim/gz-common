@@ -28,7 +28,7 @@
 #include <gz/common/SuppressWarning.hh>
 #include <gz/common/PluginPtr.hh>
 
-namespace gz
+namespace ignition
 {
   namespace common
   {

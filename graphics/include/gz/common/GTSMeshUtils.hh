@@ -27,7 +27,7 @@
 struct _GtsSurface;
 typedef _GtsSurface GtsSurface;
 
-namespace gz
+namespace ignition
 {
   namespace common
   {

@@ -35,7 +35,7 @@
 #define VIDEO_ENCODER_FPS_DEFAULT 25
 #define VIDEO_ENCODER_FORMAT_DEFAULT "mp4"
 
-namespace gz
+namespace ignition
 {
   namespace common
   {

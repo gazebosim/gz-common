@@ -27,7 +27,7 @@
 #define IGNITION_COMMON_TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
 
-namespace gz
+namespace ignition
 {
   namespace common
   {
@@ -39,7 +39,7 @@ namespace gz
   }
 }
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 //////////////////////////////////////////////////

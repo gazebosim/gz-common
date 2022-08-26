@@ -18,7 +18,7 @@
 #define PROJECT_BINARY_PATH "${PROJECT_BINARY_DIR}"
 #define PROJECT_SOURCE_PATH "${PROJECT_SOURCE_DIR}"
 
-namespace gz
+namespace ignition
 {
   namespace common
   {
@@ -77,14 +77,14 @@ namespace gz
       {
         if (common::env("TEST_UNDECLARED_OUTPUTS_DIR", _homeDir))
         {
-          return gz::common::setenv(IGN_HOMEDIR, _homeDir);
+          return ignition::common::setenv(IGN_HOMEDIR, _homeDir);
         }
         else
         {
           if (TestTmpPath(_homeDir))
           {
             // Set both for linux and windows
-            return gz::common::setenv(IGN_HOMEDIR, _homeDir);
+            return ignition::common::setenv(IGN_HOMEDIR, _homeDir);
           }
           else
           {
@@ -149,7 +149,7 @@ namespace gz
           ignLogInit(common::joinPaths(this->logBasePath, "test_logs"), 
                      this->logFilename);
 
-          gz::common::Console::SetVerbosity(4);
+          ignition::common::Console::SetVerbosity(4);
 
           // Read the full path to the log directory.
           this->logDirectory = ignLogDirectory();
@@ -159,7 +159,7 @@ namespace gz
         /// \return The full log file path as a string.
         protected: std::string FullLogPath() const
         {
-          return gz::common::joinPaths(
+          return ignition::common::joinPaths(
             this->logDirectory, this->logFilename);
         }
 
@@ -184,7 +184,7 @@ namespace gz
         public: virtual ~AutoLogFixture()
         {
           ignLogClose();
-          gz::common::removeAll(this->logBasePath);
+          ignition::common::removeAll(this->logBasePath);
         }
 
         /// \brief String with the full path of the logfile
@@ -198,7 +198,7 @@ namespace gz
       };
     }  // namespace testing
   }  // namespace common
-}  // namespace gz
+}  // namespace ignition
 
 
 

@@ -23,7 +23,7 @@
 #include "gz/common/Util.hh" // NOLINT(*)
 #include "gz/common/Time.hh" // NOLINT(*)
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 /////////////////////////////////////////////////

@@ -56,7 +56,7 @@
 #include <gz/common/Console.hh>
 #include <gz/common/Time.hh>
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 Time Time::wallTime;

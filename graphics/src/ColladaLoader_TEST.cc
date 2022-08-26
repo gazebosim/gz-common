@@ -24,7 +24,7 @@
 #include "gz/common/Skeleton.hh"
 #include "gz/common/SkeletonAnimation.hh"
 
-using namespace gz;
+using namespace ignition;
 class ColladaLoader : public common::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////

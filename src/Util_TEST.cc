@@ -22,7 +22,7 @@
 #include <gz/common/Util.hh>
 #include "test_config.h"
 
-using namespace gz;
+using namespace ignition;
 
 /////////////////////////////////////////////////
 /// \brief Test Util::SHA1

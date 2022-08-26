@@ -34,7 +34,7 @@
 
 #include "gz/common/SVGLoader.hh"
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 class gz::common::SVGLoaderPrivate

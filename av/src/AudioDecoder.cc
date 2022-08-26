@@ -23,7 +23,7 @@
 #define AUDIO_INBUF_SIZE (20480 * 2)
 #define AUDIO_REFILL_THRESH 4096
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 class gz::common::AudioDecoderPrivate

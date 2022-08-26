@@ -25,7 +25,7 @@
 #include "gz/common/StringUtils.hh"
 #include "gz/common/Console.hh"
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 using namespace std;
 

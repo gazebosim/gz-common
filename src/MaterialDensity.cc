@@ -19,7 +19,7 @@
 #include "gz/common/EnumIface.hh"
 #include "gz/common/MaterialDensity.hh"
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 // Initialize enum iterator, and string converter

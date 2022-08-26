@@ -18,7 +18,7 @@
 #ifndef GZ_COMMON_AV_UTIL_HH_
 #define GZ_COMMON_AV_UTIL_HH_
 
-namespace gz
+namespace ignition
 {
   namespace common
   {

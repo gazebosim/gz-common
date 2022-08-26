@@ -20,7 +20,7 @@
 #include <gz/common/Image.hh>
 #include "test_config.h"
 
-using namespace gz;
+using namespace ignition;
 
 class ImageTest : public common::testing::AutoLogFixture { };
 

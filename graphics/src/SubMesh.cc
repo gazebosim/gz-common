@@ -25,7 +25,7 @@
 #include "gz/common/Material.hh"
 #include "gz/common/SubMesh.hh"
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 /// \brief Private data for SubMesh

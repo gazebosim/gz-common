@@ -20,7 +20,7 @@
 #include <gz/common/Timer.hh>
 #include <gz/common/Time.hh>
 
-using namespace gz;
+using namespace ignition;
 
 /////////////////////////////////////////////////
 TEST(TimeTest, Time)

@@ -23,7 +23,7 @@
 #include <gz/common/Export.hh>
 #include <gz/common/Util.hh>
 
-namespace gz
+namespace ignition
 {
   namespace common
   {
@@ -259,7 +259,7 @@ namespace gz
       /// \param[in] _time time to write to the stream
       /// \return the output stream
       public: friend std::ostream &operator<<(std::ostream &_out,
-                  const gz::common::Time &_time)
+                  const ignition::common::Time &_time)
               {
                 _out << _time.sec << " " << _time.nsec;
                 return _out;
@@ -270,7 +270,7 @@ namespace gz
       /// \param[in] _time time to read from to the stream
       /// \return the input stream
       public: friend std::istream &operator>>(std::istream &_in,
-                                              gz::common::Time &_time)
+                                              ignition::common::Time &_time)
               {
                 // Skip white spaces
                 _in.setf(std::ios_base::skipws);

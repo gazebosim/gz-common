@@ -25,10 +25,10 @@
 #include <gz/common/Util.hh>
 #include <gz/common/Image.hh>
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
-namespace gz
+namespace ignition
 {
   namespace common
   {

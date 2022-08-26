@@ -38,12 +38,12 @@
 #include "gz/common/Util.hh"
 #include "gz/common/ColladaLoader.hh"
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 using RawNodeAnim = std::map<double, std::vector<NodeTransform> >;
 using RawSkeletonAnim = std::map<std::string, RawNodeAnim>;
 
-namespace gz
+namespace ignition
 {
   namespace common
   {

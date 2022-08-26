@@ -32,7 +32,7 @@
   using portable_uuid_t = uuid_t;
 #endif
 
-namespace gz
+namespace ignition
 {
   namespace common
   {
@@ -53,7 +53,7 @@ namespace gz
       /// \param[out] _out The output stream.
       /// \param[in] _msg AdvMsg to write to the stream.
       public: friend std::ostream &operator<<(std::ostream &_out,
-                  const gz::common::Uuid &_uuid)
+                  const ignition::common::Uuid &_uuid)
       {
         _out << _uuid.String();
         return _out;

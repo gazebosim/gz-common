@@ -16,7 +16,7 @@
  */
 #include <gz/common/NodeTransform.hh>
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 /// \brief Private data for NodeTransform

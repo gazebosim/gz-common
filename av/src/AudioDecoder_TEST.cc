@@ -21,7 +21,7 @@
 
 #include "test_config.h"
 
-using namespace gz;
+using namespace ignition;
 
 /////////////////////////////////////////////////
 TEST(AudioDecoder, FileNotSet)

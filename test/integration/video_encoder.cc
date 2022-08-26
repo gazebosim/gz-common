@@ -24,7 +24,7 @@
 
 #include "test_config.h"
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 using namespace std::chrono;
 auto Now = steady_clock::now;

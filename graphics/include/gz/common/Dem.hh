@@ -30,7 +30,7 @@
 
 # include <ignition/common/HeightmapData.hh>
 
-namespace gz
+namespace ignition
 {
   namespace common
   {

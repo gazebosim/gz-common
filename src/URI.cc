@@ -25,7 +25,7 @@
 #include "gz/common/Console.hh"
 #include "gz/common/URI.hh"
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 static const char kSchemeDelim[] = "://";

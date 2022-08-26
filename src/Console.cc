@@ -25,7 +25,7 @@
 #include <Windows.h>
 #endif
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 

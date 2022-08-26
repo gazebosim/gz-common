@@ -32,13 +32,4 @@
 
 /* #undef HAVE_AVDEVICE */
 
-namespace gz
-{
-}
-
-namespace ignition
-{
-  using namespace gz;
-}
-
 #endif

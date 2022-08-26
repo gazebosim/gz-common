@@ -73,7 +73,7 @@ class gz::common::PbrPrivate
 };
 
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 /////////////////////////////////////////////////

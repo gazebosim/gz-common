@@ -20,7 +20,7 @@
 
 #include "test_config.h"
 
-using namespace gz;
+using namespace ignition;
 
 class Base64 : public common::testing::AutoLogFixture { };
 

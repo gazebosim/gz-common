@@ -22,7 +22,7 @@
 #include <string>
 #include "gz/common/PluginLoader.hh"
 
-namespace gz
+namespace ignition
 {
   namespace common
   {

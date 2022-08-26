@@ -27,7 +27,7 @@
 
 #include <gz/math/Matrix4.hh>
 
-namespace gz
+namespace ignition
 {
   namespace common
   {

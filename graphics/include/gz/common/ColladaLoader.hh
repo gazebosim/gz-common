@@ -21,7 +21,7 @@
 #include <gz/common/graphics/Export.hh>
 #include <gz/common/MeshLoader.hh>
 
-namespace gz
+namespace ignition
 {
   namespace common
   {

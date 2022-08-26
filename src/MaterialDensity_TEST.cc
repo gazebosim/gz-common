@@ -19,7 +19,7 @@
 #include "gz/common/MaterialDensity.hh"
 #include "test_config.h"
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 class MaterialDensityTest : public common::testing::AutoLogFixture { };

@@ -37,7 +37,7 @@
 #include <gz/common/SuppressWarning.hh>
 #include <gz/common/URI.hh>
 
-namespace gz
+namespace ignition
 {
   namespace common
   {
@@ -77,7 +77,7 @@ namespace gz
       /// \param[in] _uri the uniform resource identifier
       /// \return Returns full path name to file with platform-specific
       /// directory separators, or an empty string if URI couldn't be found.
-      public: std::string FindFileURI(const gz::common::URI &_uri) const;
+      public: std::string FindFileURI(const ignition::common::URI &_uri) const;
 
       /// \brief Set the plugin path environment variable to use
       /// \param [in] _env name of the environment variable
@@ -175,7 +175,7 @@ namespace gz
       /// \param[in] _cb The callback function, which takes a file path or URI
       /// and returns the full local path.
       public: void AddFindFileURICallback(
-          std::function<std::string(const gz::common::URI &)> _cb);
+          std::function<std::string(const ignition::common::URI &)> _cb);
 
       /// \brief Set the callback to use when ignition can't find a file uri.
       /// The callback should return a complete path to the requested file, or

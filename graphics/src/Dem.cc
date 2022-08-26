@@ -27,7 +27,7 @@
 #include "gz/common/Dem.hh"
 #include "gz/math/SphericalCoordinates.hh"
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 #ifdef HAVE_GDAL

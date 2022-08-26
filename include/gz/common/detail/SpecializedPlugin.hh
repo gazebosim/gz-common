@@ -30,7 +30,7 @@ bool usedSpecializedInterfaceAccess;
 #endif
 
 
-namespace gz
+namespace ignition
 {
   namespace common
   {
@@ -253,7 +253,7 @@ namespace gz
 
 
         // Declare friendship
-        template <class...> friend class gz::common::SpecializedPlugin;
+        template <class...> friend class ignition::common::SpecializedPlugin;
         template <class, class> friend class ComposePlugin;
 
         private: ComposePlugin() = default;

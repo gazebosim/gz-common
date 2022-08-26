@@ -20,7 +20,7 @@
 #include "gz/common/Material.hh"
 #include "gz/common/Pbr.hh"
 
-using namespace gz;
+using namespace ignition;
 
 class MaterialTest : public common::testing::AutoLogFixture { };
 

@@ -18,7 +18,7 @@
 
 #include <gz/common/EnumIface.hh>
 
-namespace gz::common
+namespace ignition::common
 {
   enum class IGNITION_COMMON_AV_VISIBLE HWEncoderType
   {

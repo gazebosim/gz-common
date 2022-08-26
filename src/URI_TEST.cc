@@ -18,7 +18,7 @@
 #include <gtest/gtest.h>
 #include "gz/common/URI.hh"
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 /////////////////////////////////////////////////

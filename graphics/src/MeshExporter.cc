@@ -16,7 +16,7 @@
 */
 #include "gz/common/MeshExporter.hh"
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 //////////////////////////////////////////////////

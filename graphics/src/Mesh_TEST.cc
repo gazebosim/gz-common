@@ -24,7 +24,7 @@
 #include "gz/common/SubMesh.hh"
 #include "gz/math/Vector3.hh"
 
-using namespace gz;
+using namespace ignition;
 
 class MeshTest : public common::testing::AutoLogFixture { };
 

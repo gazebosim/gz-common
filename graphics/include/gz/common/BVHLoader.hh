@@ -23,7 +23,7 @@
 #include <gz/math/Pose3.hh>
 #include <gz/common/graphics/Export.hh>
 
-namespace gz
+namespace ignition
 {
   namespace common
   {

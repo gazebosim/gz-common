@@ -53,7 +53,7 @@ THE SOFTWARE.
 #include <string>
 #include <vector>
 
-namespace gz
+namespace ignition
 {
 namespace tinyobj {
 
@@ -397,7 +397,7 @@ void LoadMtl(std::map<std::string, int> *material_map,
 bool ParseTextureNameAndOption(std::string *texname, texture_option_t *texopt,
                                const char *linebuf);
 }  // namespace tinyobj
-}  // namespace gz
+}  // namespace ignition
 
 #endif  // GZ_COMMON_TINY_OBJ_LOADER_H_
 
@@ -414,7 +414,7 @@ bool ParseTextureNameAndOption(std::string *texname, texture_option_t *texopt,
 #include <fstream>
 #include <sstream>
 
-namespace gz
+namespace ignition
 {
 namespace tinyobj {
 MaterialReader::~MaterialReader() {}
@@ -2578,6 +2578,6 @@ bool LoadObjWithCallback(std::istream &inStream, const callback_t &callback,
 #pragma clang diagnostic pop
 #endif
 }  // namespace tinyobj
-}  // namespace gz
+}  // namespace ignition
 
 #endif

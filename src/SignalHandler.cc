@@ -26,7 +26,7 @@
 #include <vector> // NOLINT(*)
 #include "gz/common/Console.hh" // NOLINT(*)
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 // A wrapper for the sigaction sa_handler.

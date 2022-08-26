@@ -27,7 +27,7 @@
 #include "gz/common/SystemPaths.hh"
 #include "gz/math/Vector3.hh"
 
-using namespace gz;
+using namespace ignition;
 using TestFile = common::testing::TestFile;
 
 class MeshTest : public common::testing::AutoLogFixture { };

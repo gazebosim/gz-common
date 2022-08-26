@@ -19,7 +19,7 @@
 #include "gz/common/NodeAnimation.hh"
 #include "gz/common/SkeletonAnimation.hh"
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 /// Prvate data class

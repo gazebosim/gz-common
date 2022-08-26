@@ -24,7 +24,7 @@
 #include <gz/common/KeyFrame.hh>
 #include <gz/common/Animation.hh>
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 namespace
@@ -40,14 +40,14 @@ namespace
 }
 
 /////////////////////////////////////////////////
-namespace gz {
+namespace ignition {
 namespace common {
 class AnimationPrivate
 {
   /// \brief true if the animation is interpolated in x
   public: bool interpolateX = false;
 };
-}  // namespace gz
+}  // namespace ignition
 }  // namespace common
 
 // TODO(luca) Make Animation class follow PIMPL and remove global static map

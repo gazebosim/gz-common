@@ -18,7 +18,7 @@
 #include "gz/common/Battery.hh"
 #include "test_config.h"
 
-using namespace gz;
+using namespace ignition;
 
 class BatteryTest : public common::testing::AutoLogFixture { };
 

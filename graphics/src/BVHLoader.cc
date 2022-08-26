@@ -24,7 +24,7 @@
 #include <gz/common/Console.hh>
 #include <gz/common/BVHLoader.hh>
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 /////////////////////////////////////////////////

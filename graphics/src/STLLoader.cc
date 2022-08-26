@@ -25,7 +25,7 @@
 #include "gz/common/SubMesh.hh"
 #include "gz/common/STLLoader.hh"
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 //////////////////////////////////////////////////

@@ -20,7 +20,7 @@
 #include <memory>
 #include <vector>
 
-namespace gz
+namespace ignition
 {
   namespace common
   {

@@ -23,7 +23,7 @@
 #include <string>
 #include <unordered_map>
 
-namespace gz
+namespace ignition
 {
   namespace common
   {

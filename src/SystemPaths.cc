@@ -36,7 +36,7 @@
 #include "gz/common/SystemPaths.hh"
 #include "gz/common/Util.hh"
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 // Private data class

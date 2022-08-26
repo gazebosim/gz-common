@@ -32,7 +32,7 @@
 
 #include "PluginUtils.hh"
 
-namespace gz
+namespace ignition
 {
   namespace common
   {

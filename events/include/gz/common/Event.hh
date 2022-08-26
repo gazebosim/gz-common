@@ -29,7 +29,7 @@
 #include <gz/common/events/Export.hh>
 #include <gz/common/events/Types.hh>
 
-namespace gz
+namespace ignition
 {
   namespace common
   {

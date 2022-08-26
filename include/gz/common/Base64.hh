@@ -20,7 +20,7 @@
 #include <string>
 #include <gz/common/Export.hh>
 
-namespace gz
+namespace ignition
 {
   namespace common
   {

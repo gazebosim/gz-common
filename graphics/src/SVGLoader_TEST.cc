@@ -21,7 +21,7 @@
 
 #include "gz/common/SVGLoader.hh"
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 

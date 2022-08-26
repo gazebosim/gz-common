@@ -24,7 +24,7 @@
 #include "gz/common/PluginPtr.hh"
 #include "gz/common/TemplateHelpers.hh"
 
-namespace gz
+namespace ignition
 {
   namespace common
   {
@@ -185,10 +185,10 @@ namespace std
   /// so that it can easily be used in STL objects like std::unordered_set and
   /// std::unordered_map
   template <typename PluginType>
-  struct hash<gz::common::TemplatePluginPtr<PluginType>>
+  struct hash<ignition::common::TemplatePluginPtr<PluginType>>
   {
     size_t operator()(
-        const gz::common::TemplatePluginPtr<PluginType> &ptr) const
+        const ignition::common::TemplatePluginPtr<PluginType> &ptr) const
     {
       return ptr.Hash();
     }

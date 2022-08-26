@@ -26,24 +26,24 @@
 #include <gz/common/Export.hh>
 #include <gz/common/SuppressWarning.hh>
 
-namespace gz
+namespace ignition
 {
   namespace common
   {
     /// \brief Output an error message, if the verbose level is >= 1
-    #define ignerr (gz::common::Console::err(__FILE__, __LINE__))
+    #define ignerr (ignition::common::Console::err(__FILE__, __LINE__))
 
     /// \brief Output a warning message, if the verbose level is >= 2
-    #define ignwarn (gz::common::Console::warn(__FILE__, __LINE__))
+    #define ignwarn (ignition::common::Console::warn(__FILE__, __LINE__))
 
     /// \brief Output a message, if the verbose level is >= 3
-    #define ignmsg (gz::common::Console::msg())
+    #define ignmsg (ignition::common::Console::msg())
 
     /// \brief Output a debug message, if the verbose level is >= 4
-    #define igndbg (gz::common::Console::dbg(__FILE__, __LINE__))
+    #define igndbg (ignition::common::Console::dbg(__FILE__, __LINE__))
 
     /// \brief Output a message to a log file, regardless of verbosity level
-    #define ignlog (gz::common::Console::log())
+    #define ignlog (ignition::common::Console::log())
 
     /// \brief Initialize log file with filename given by _dir/_file.
     /// If called twice, it will close the file currently in use and open a new
@@ -53,16 +53,16 @@ namespace gz
     /// be relative to your home directory.
     /// \param[in] _file Name of log file for ignlog messages.
     #define ignLogInit(_dir, _file)\
-        gz::common::Console::log.Init(_dir, _file)
+        ignition::common::Console::log.Init(_dir, _file)
 
     /// \brief Close the file used for logging.
     #define ignLogClose()\
-        gz::common::Console::log.Close()
+        ignition::common::Console::log.Close()
 
     /// \brief Get the full path of the directory where the log files are stored
     /// \return Full path of the directory
     #define ignLogDirectory()\
-        (gz::common::Console::log.LogDirectory())
+        (ignition::common::Console::log.LogDirectory())
 
     /// \class FileLogger FileLogger.hh common/common.hh
     /// \brief A logger that outputs messages to a file.

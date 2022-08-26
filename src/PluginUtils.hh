@@ -21,7 +21,7 @@
 #include <string>
 #include "gz/common/StringUtils.hh"
 
-namespace gz
+namespace ignition
 {
   namespace common
   {

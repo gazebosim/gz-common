@@ -23,7 +23,7 @@
 #include "gz/common/SubMesh.hh"
 #include "gz/common/MeshManager.hh"
 
-using namespace gz;
+using namespace ignition;
 
 class SubMeshTest : public common::testing::AutoLogFixture { };
 

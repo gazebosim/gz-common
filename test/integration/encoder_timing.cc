@@ -19,7 +19,7 @@
 #include "gz/common/Video.hh"
 #include "test_config.h"
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 const unsigned int kSize = 10;

@@ -51,7 +51,7 @@ extern "C" {
 
 #include <gz/common/av/Export.hh>
 
-namespace gz
+namespace ignition
 {
   namespace common
   {

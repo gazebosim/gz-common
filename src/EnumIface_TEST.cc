@@ -20,7 +20,7 @@
 #include "gz/common/EnumIface.hh"
 #include "test_config.h"
 
-using namespace gz;
+using namespace ignition;
 
 class EnumIfaceTest : public common::testing::AutoLogFixture { };
 

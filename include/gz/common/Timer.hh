@@ -20,7 +20,7 @@
 #include <gz/common/Time.hh>
 #include <gz/common/Export.hh>
 
-namespace gz
+namespace ignition
 {
   namespace common
   {
@@ -50,7 +50,7 @@ namespace gz
 
       /// \brief Stream operator friendly
       public: friend std::ostream &operator<<(std::ostream &out,
-                                              const gz::common::Timer &t)
+                                              const ignition::common::Timer &t)
               {
                 out << t.Elapsed();
                 return out;

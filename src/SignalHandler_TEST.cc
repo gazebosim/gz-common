@@ -26,7 +26,7 @@
 #include <thread> // NOLINT(*)
 #include "gz/common/Util.hh" // NOLINT(*)
 
-using namespace gz;
+using namespace ignition;
 
 // Capture the gOnSignalWrappers map from SignalHandlers.cc
 #ifndef _WIN32

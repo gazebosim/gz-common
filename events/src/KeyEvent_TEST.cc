@@ -18,7 +18,7 @@
 #include <gtest/gtest.h>
 #include "gz/common/KeyEvent.hh"
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 /////////////////////////////////////////////////

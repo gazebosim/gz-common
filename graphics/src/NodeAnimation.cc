@@ -18,7 +18,7 @@
 #include "gz/common/Console.hh"
 #include "gz/common/NodeAnimation.hh"
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 /// \brief NodeAnimation private data
@@ -222,5 +222,3 @@ double NodeAnimation::TimeAtX(const double _x) const
 
   return t1 + ((t2 - t1) * (_x - x1) / (x2 - x1));
 }
-
-

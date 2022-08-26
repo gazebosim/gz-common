@@ -16,7 +16,7 @@
 */
 #include <gz/common/KeyFrame.hh>
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 /////////////////////////////////////////////////

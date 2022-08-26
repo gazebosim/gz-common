@@ -28,7 +28,7 @@
 #include "gz/common/HWEncoder.hh"
 #endif
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 using namespace std;
 

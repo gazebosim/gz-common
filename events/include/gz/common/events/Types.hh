@@ -21,7 +21,7 @@
 #include <memory>
 
 // This header contains forward declarations for some event types
-namespace gz
+namespace ignition
 {
   namespace common
   {

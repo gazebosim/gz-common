@@ -21,7 +21,7 @@
 #include "gz/common/MouseEvent.hh"
 #include "gz/common/config.hh"
 
-using namespace gz;
+using namespace ignition;
 
 class MouseEvent : public common::testing::AutoLogFixture { };
 

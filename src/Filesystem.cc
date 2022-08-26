@@ -61,7 +61,7 @@
 #endif
 
 namespace igncmn = gz::common;
-using namespace gz;
+using namespace ignition;
 using namespace igncmn;
 
 /////////////////////////////////////////////////

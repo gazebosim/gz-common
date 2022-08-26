@@ -51,13 +51,13 @@
 #define DETAIL_IGN_COMMON_REGISTER_PLUGININFO_META_DATA \
   extern "C" { \
     std::size_t DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONPluginInfoSize = \
-      sizeof(gz::common::PluginInfo); \
+      sizeof(ignition::common::PluginInfo); \
     \
     std::size_t DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONPluginInfoAlignment = \
-      alignof(gz::common::PluginInfo); \
+      alignof(ignition::common::PluginInfo); \
     \
     int DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONPluginAPIVersion = \
-      gz::common::PLUGIN_API_VERSION; \
+      ignition::common::PLUGIN_API_VERSION; \
   }
 
 
@@ -92,18 +92,18 @@ IGN_COMMON_WARN_IGNORE__DELETE_NON_VIRTUAL_DESTRUCTOR \
       const std::size_t _pluginId, \
       const std::size_t _size) \
   { \
-    if (_size != sizeof(gz::common::PluginInfo)) \
+    if (_size != sizeof(ignition::common::PluginInfo)) \
     { \
       return 0u; \
     } \
     std::unordered_set<std::string> visitedPlugins; \
-    gz::common::PluginInfo * * const ptrToPlugin = \
-        reinterpret_cast<gz::common::PluginInfo * *>(_outputInfo); \
+    ignition::common::PluginInfo * * const ptrToPlugin = \
+        reinterpret_cast<ignition::common::PluginInfo * *>(_outputInfo); \
     if ( !(*ptrToPlugin) ) \
     { \
-       *ptrToPlugin = new gz::common::PluginInfo; \
+       *ptrToPlugin = new ignition::common::PluginInfo; \
     } \
-    gz::common::PluginInfo *plugin = *ptrToPlugin; \
+    ignition::common::PluginInfo *plugin = *ptrToPlugin; \
     plugin->name.clear(); \
     plugin->interfaces.clear(); \
     plugin->factory = nullptr; \

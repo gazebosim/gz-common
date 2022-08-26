@@ -22,7 +22,7 @@
 
 #include "gz/common/detail/TemplateHelpers.hh"
 
-namespace gz
+namespace ignition
 {
   namespace common
   {

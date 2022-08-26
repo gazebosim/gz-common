@@ -26,7 +26,7 @@ typedef _GtsSurface GtsSurface;
 struct _GPtrArray;
 typedef _GPtrArray GPtrArray;
 
-namespace gz
+namespace ignition
 {
   namespace common
   {

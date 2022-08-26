@@ -20,7 +20,7 @@
 
 #include <string>
 
-namespace gz
+namespace ignition
 {
   namespace common
   {

@@ -25,7 +25,7 @@
 #include <gz/common/HeightmapData.hh>
 #include <gz/common/Image.hh>
 
-namespace gz
+namespace ignition
 {
   namespace common
   {

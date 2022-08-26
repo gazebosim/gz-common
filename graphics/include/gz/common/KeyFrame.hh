@@ -21,7 +21,7 @@
 #include <gz/math/Quaternion.hh>
 #include <gz/common/graphics/Export.hh>
 
-namespace gz
+namespace ignition
 {
   namespace common
   {

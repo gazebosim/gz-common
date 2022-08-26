@@ -21,7 +21,7 @@
 
 #include <gz/common/Export.hh>
 
-namespace gz
+namespace ignition
 {
   namespace common
   {
@@ -38,7 +38,7 @@ namespace gz
     /// Example using a lambda callback:
     ///
     /// ~~~
-    /// gz::common::SignalHandler handler;
+    /// ignition::common::SignalHandler handler;
     /// handler.AddCallback([] (int _sig)
     /// {
     ///   printf("Signal[%d] received\n", _sig);

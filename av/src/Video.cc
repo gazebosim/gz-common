@@ -20,7 +20,7 @@
 #include "gz/common/Video.hh"
 #include "gz/common/av/Util.hh"
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 // Private data structure for the Video class

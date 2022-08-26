@@ -38,7 +38,7 @@
   static const char pathSeparator = '/';
 #endif
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 static void LogTinyXml2DocumentError(

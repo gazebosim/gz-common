@@ -25,7 +25,7 @@
 
 #include "ProfilerImpl.hh"
 
-namespace gz
+namespace ignition
 {
   namespace common
   {

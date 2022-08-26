@@ -213,7 +213,7 @@ bool create_new_file_hardlink(const std::string &_hardlink,
 #include "gz/common/Console.hh"
 #include "gz/common/Filesystem.hh"
 
-using namespace gz;
+using namespace ignition;
 using namespace common;
 
 /// \brief Test Filesystem

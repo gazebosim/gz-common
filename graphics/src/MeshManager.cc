@@ -37,7 +37,7 @@
 
 #include "gz/common/MeshManager.hh"
 
-using namespace gz::common;
+using namespace ignition::common;
 
 class gz::common::MeshManagerPrivate
 {

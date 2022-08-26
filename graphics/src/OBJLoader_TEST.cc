@@ -22,7 +22,7 @@
 #include "gz/common/Material.hh"
 #include "gz/common/OBJLoader.hh"
 
-using namespace gz;
+using namespace ignition;
 
 class OBJLoaderTest : public common::testing::AutoLogFixture { };
 

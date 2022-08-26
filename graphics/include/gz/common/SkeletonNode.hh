@@ -24,7 +24,7 @@
 #include <gz/common/NodeTransform.hh>
 #include <gz/common/graphics/Export.hh>
 
-namespace gz
+namespace ignition
 {
   namespace common
   {
