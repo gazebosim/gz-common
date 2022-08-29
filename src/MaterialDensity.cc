@@ -16,14 +16,14 @@
 */
 #include <cmath>
 #include <limits>
-#include "ignition/common/EnumIface.hh"
-#include "ignition/common/MaterialDensity.hh"
+#include "gz/common/EnumIface.hh"
+#include "gz/common/MaterialDensity.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 // Initialize enum iterator, and string converter
-IGN_ENUM(materialDensityIface, MaterialDensity::Type,
+GZ_ENUM(materialDensityIface, MaterialDensity::Type,
   MaterialDensity::Type::BEGIN,
   MaterialDensity::Type::END,
   "Styrofoam",

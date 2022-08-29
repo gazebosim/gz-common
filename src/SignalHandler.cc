@@ -16,17 +16,17 @@
 */
 
 // Suppressing cpplint.py because tools/cpplint.py is old. Remove the NOLINT
-// comments when upgrading to ign-cmake's "make codecheck"
-#include "ignition/common/SignalHandler.hh" // NOLINT(*)
+// comments when upgrading to gz-cmake's "make codecheck"
+#include "gz/common/SignalHandler.hh" // NOLINT(*)
 #include <csignal> // NOLINT(*)
 #include <functional> // NOLINT(*)
 #include <map> // NOLINT(*)
 #include <mutex> // NOLINT(*)
 #include <utility> // NOLINT(*)
 #include <vector> // NOLINT(*)
-#include "ignition/common/Console.hh" // NOLINT(*)
+#include "gz/common/Console.hh" // NOLINT(*)
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 // A wrapper for the sigaction sa_handler.
@@ -47,7 +47,7 @@ void onSignal(int _value)
 }
 
 /////////////////////////////////////////////////
-class ignition::common::SignalHandlerPrivate
+class gz::common::SignalHandlerPrivate
 {
   /// \brief Handle a signal.
   /// \param[in] _sig Signal number
@@ -75,14 +75,14 @@ SignalHandler::SignalHandler()
 
   if (std::signal(SIGINT, onSignal) == SIG_ERR)
   {
-    ignerr << "Unable to catch SIGINT.\n"
+    gzerr << "Unable to catch SIGINT.\n"
            << " Please visit http://community.gazebosim.org for help.\n";
     return;
   }
 
   if (std::signal(SIGTERM, onSignal) == SIG_ERR)
   {
-    ignerr << "Unable to catch SIGTERM.\n"
+    gzerr << "Unable to catch SIGTERM.\n"
            << " Please visit http://community.gazebosim.org for help.\n";
     return;
   }
@@ -128,7 +128,7 @@ bool SignalHandler::AddCallback(std::function<void(int)> _cb)
   }
   else
   {
-    ignerr << "The SignalHandler was not initialized. Adding a callback will "
+    gzerr << "The SignalHandler was not initialized. Adding a callback will "
       << "have no effect.\n";
   }
   return result;
@@ -138,7 +138,7 @@ bool SignalHandler::AddCallback(std::function<void(int)> _cb)
 void SignalHandlerPrivate::OnSignal(int _sig)
 {
   std::lock_guard<std::mutex> lock(this->cbMutex);
-  igndbg << "Received signal[" << _sig << "].\n";
+  gzdbg << "Received signal[" << _sig << "].\n";
   for (std::function<void(int)> cb : this->callbacks)
     cb(_sig);
 }

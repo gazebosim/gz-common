@@ -14,10 +14,10 @@
  * limitations under the License.
  *
  */
-#include "ignition/common/Console.hh"
-#include "ignition/common/geospatial/ImageHeightmap.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/geospatial/ImageHeightmap.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 //////////////////////////////////////////////////
@@ -30,7 +30,7 @@ int ImageHeightmap::Load(const std::string &_filename)
 {
   if (this->img.Load(_filename) != 0)
   {
-    ignerr << "Unable to load image file as a terrain [" << _filename << "]\n";
+    gzerr << "Unable to load image file as a terrain [" << _filename << "]\n";
     return -1;
   }
 
@@ -39,8 +39,8 @@ int ImageHeightmap::Load(const std::string &_filename)
 
 //////////////////////////////////////////////////
 void ImageHeightmap::FillHeightMap(int _subSampling,
-    unsigned int _vertSize, const ignition::math::Vector3d &_size,
-    const ignition::math::Vector3d &_scale, bool _flipY,
+    unsigned int _vertSize, const gz::math::Vector3d &_size,
+    const gz::math::Vector3d &_scale, bool _flipY,
     std::vector<float> &_heights) const
 {
   // Resize the vector to match the size of the vertices.
@@ -49,7 +49,7 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
   int imgHeight = this->Height();
   int imgWidth = this->Width();
 
-  IGN_ASSERT(imgWidth == imgHeight, "Heightmap image must be square");
+  GZ_ASSERT(imgWidth == imgHeight, "Heightmap image must be square");
 
   // Bytes per row
   unsigned int pitch = this->img.Pitch();
@@ -58,41 +58,38 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
   // Currently supported: 8-bit and 16-bit.
   auto imgFormat = this->img.PixelFormat();
 
-  unsigned char *data = nullptr;
-  unsigned int count;
-  this->img.Data(&data, count);
+  auto data = this->img.Data();
 
-  if (imgFormat == ignition::common::Image::PixelFormatType::L_INT8 ||
-    imgFormat == ignition::common::Image::PixelFormatType::RGB_INT8 ||
-    imgFormat == ignition::common::Image::PixelFormatType::RGBA_INT8 ||
-    imgFormat == ignition::common::Image::PixelFormatType::BAYER_BGGR8 ||
-    imgFormat == ignition::common::Image::PixelFormatType::BAYER_GBRG8 ||
-    imgFormat == ignition::common::Image::PixelFormatType::BAYER_GRBG8 ||
-    imgFormat == ignition::common::Image::PixelFormatType::BAYER_GRBG8 ||
-    imgFormat == ignition::common::Image::PixelFormatType::BAYER_RGGB8 ||
-    imgFormat == ignition::common::Image::PixelFormatType::BGR_INT8 ||
-    imgFormat == ignition::common::Image::PixelFormatType::BGRA_INT8)
+  if (imgFormat == gz::common::Image::PixelFormatType::L_INT8 ||
+    imgFormat == gz::common::Image::PixelFormatType::RGB_INT8 ||
+    imgFormat == gz::common::Image::PixelFormatType::RGBA_INT8 ||
+    imgFormat == gz::common::Image::PixelFormatType::BAYER_BGGR8 ||
+    imgFormat == gz::common::Image::PixelFormatType::BAYER_GBRG8 ||
+    imgFormat == gz::common::Image::PixelFormatType::BAYER_GRBG8 ||
+    imgFormat == gz::common::Image::PixelFormatType::BAYER_GRBG8 ||
+    imgFormat == gz::common::Image::PixelFormatType::BAYER_RGGB8 ||
+    imgFormat == gz::common::Image::PixelFormatType::BGR_INT8 ||
+    imgFormat == gz::common::Image::PixelFormatType::BGRA_INT8)
   {
-    this->FillHeights<unsigned char>(data, imgHeight, imgWidth, pitch,
+    this->FillHeights<unsigned char>(&data[0], imgHeight, imgWidth, pitch,
         _subSampling, _vertSize, _size, _scale, _flipY, _heights);
   }
-  else if (imgFormat == ignition::common::Image::PixelFormatType::BGR_INT16 ||
-    imgFormat == ignition::common::Image::PixelFormatType::L_INT16 ||
-    imgFormat == ignition::common::Image::PixelFormatType::RGB_FLOAT16 ||
-    imgFormat == ignition::common::Image::PixelFormatType::RGB_INT16 ||
-    imgFormat == ignition::common::Image::PixelFormatType::R_FLOAT16)
+  else if (imgFormat == gz::common::Image::PixelFormatType::BGR_INT16 ||
+    imgFormat == gz::common::Image::PixelFormatType::L_INT16 ||
+    imgFormat == gz::common::Image::PixelFormatType::RGB_FLOAT16 ||
+    imgFormat == gz::common::Image::PixelFormatType::RGB_INT16 ||
+    imgFormat == gz::common::Image::PixelFormatType::R_FLOAT16)
   {
-    uint16_t *dataShort = reinterpret_cast<uint16_t *>(data);
+    uint16_t *dataShort = reinterpret_cast<uint16_t *>(&data[0]);
     this->FillHeights<uint16_t>(dataShort, imgHeight, imgWidth, pitch,
         _subSampling, _vertSize, _size, _scale, _flipY, _heights);
   }
   else
   {
-    ignerr << "Unsupported image format, "
+    gzerr << "Unsupported image format, "
       "heightmap will not be loaded" << std::endl;
     return;
   }
-  delete [] data;
 }
 
 //////////////////////////////////////////////////

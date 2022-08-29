@@ -18,9 +18,9 @@
 
 #include <gz/common/EnumIface.hh>
 
-namespace ignition::common
+namespace gz::common
 {
-  enum class IGNITION_COMMON_AV_VISIBLE HWEncoderType
+  enum class GZ_COMMON_AV_VISIBLE HWEncoderType
   {
     NONE,
     NVENC,  // Linux device is /dev/nvidia*
@@ -37,7 +37,7 @@ namespace ignition::common
     _  // For FlagSet to work.
   };
 
-  IGN_ENUM(HWEncoderTypeParser, HWEncoderType,
+  GZ_ENUM(HWEncoderTypeParser, HWEncoderType,
     HWEncoderType::NONE, HWEncoderType::_,
     "NONE",
     "NVENC",

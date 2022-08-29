@@ -29,12 +29,12 @@
 #include <gz/common/graphics/Export.hh>
 #include <gz/common/Console.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
     /// \brief SVG command data structure
-    class IGNITION_COMMON_GRAPHICS_VISIBLE SVGCommand
+    class GZ_COMMON_GRAPHICS_VISIBLE SVGCommand
     {
       /// \brief Constructor
       public: SVGCommand() : cmd(' ') {}
@@ -58,7 +58,7 @@ namespace ignition
     };
 
     /// \brief An SVG path element data structure
-    struct IGNITION_COMMON_GRAPHICS_VISIBLE SVGPath
+    struct GZ_COMMON_GRAPHICS_VISIBLE SVGPath
     {
 #ifdef _WIN32
 // Disable warning C4251
@@ -73,20 +73,20 @@ namespace ignition
       std::string style;
 
       /// \brief A 2D transform (or a list of transforms)
-      ignition::math::Matrix3d transform;
+      gz::math::Matrix3d transform;
 
       /// \brief A list of subpaths (as lists of commands)
       std::vector< std::vector<SVGCommand> > subpaths;
 
       /// \brief The polylines described by the commands
-      std::vector< std::vector<ignition::math::Vector2d> > polylines;
+      std::vector< std::vector<gz::math::Vector2d> > polylines;
 #ifdef _WIN32
 #pragma warning(pop)
 #endif
     };
 
     /// \brief A loader for SVG files
-    class IGNITION_COMMON_GRAPHICS_VISIBLE SVGLoader
+    class GZ_COMMON_GRAPHICS_VISIBLE SVGLoader
     {
       /// \brief Constructor
       /// \param[in] _samples The number of points for cubic spline segments
@@ -112,8 +112,8 @@ namespace ignition
       public: static void PathsToClosedPolylines(
           const std::vector<common::SVGPath> &_paths,
           const double _tol,
-          std::vector< std::vector<ignition::math::Vector2d> > &_closedPolys,
-          std::vector< std::vector<ignition::math::Vector2d> > &_openPolys);
+          std::vector< std::vector<gz::math::Vector2d> > &_closedPolys,
+          std::vector< std::vector<gz::math::Vector2d> > &_openPolys);
 
       /// \brief Outputs the content of the paths to file (or console)
       /// \param[in] _paths The paths
@@ -123,7 +123,7 @@ namespace ignition
 
       /// \internal
       /// \brief Private data pointer.
-      IGN_UTILS_IMPL_PTR(dataPtr)
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

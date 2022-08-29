@@ -27,13 +27,13 @@
 #include <gz/common/graphics/Export.hh>
 #include <gz/common/Util.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
     /// \class NodeTransform NodeTransform.hh gz/common/NodeTransform.hh
     /// \brief A transformation node
-    class IGNITION_COMMON_GRAPHICS_VISIBLE NodeTransform
+    class GZ_COMMON_GRAPHICS_VISIBLE NodeTransform
     {
       /// \brief Constructor
       /// \param[in] _type the type of transform
@@ -114,7 +114,7 @@ namespace ignition
       public: math::Matrix4d operator*(const math::Matrix4d &_m) const;
 
       /// \brief Private data pointer.
-      IGN_UTILS_IMPL_PTR(dataPtr)
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

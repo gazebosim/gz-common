@@ -17,13 +17,13 @@
 
 #include <gtest/gtest.h>
 
-#include "ignition/common/testing/AutoLogFixture.hh"
+#include "gz/common/testing/AutoLogFixture.hh"
 
 #include <functional>
-#include <ignition/common/Event.hh>
-#include <ignition/common/Util.hh>
+#include <gz/common/Event.hh>
+#include <gz/common/Util.hh>
 
-using namespace ignition;
+using namespace gz;
 
 class EventTest : public common::testing::AutoLogFixture { };
 
@@ -292,7 +292,7 @@ TEST_F(EventTest, DestructionOrder)
   evt->Signal();
   evt.reset();
   // Sleep to avoid warning about deleting a connection right after creation.
-  IGN_SLEEP_MS(1);
+  GZ_SLEEP_MS(1);
 
   // Check that this doesn't segfault.
   conn.reset();

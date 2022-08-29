@@ -17,12 +17,12 @@
 
 #include <gtest/gtest.h>
 
-#include <ignition/common/Image.hh>
+#include <gz/common/Image.hh>
 
-#include "ignition/common/testing/AutoLogFixture.hh"
-#include "ignition/common/testing/TestPaths.hh"
+#include "gz/common/testing/AutoLogFixture.hh"
+#include "gz/common/testing/TestPaths.hh"
 
-using namespace ignition;
+using namespace gz;
 
 class ImageTest : public common::testing::AutoLogFixture { };
 
@@ -104,11 +104,8 @@ TEST_F(ImageTest, RGBData)
   CheckImageRGBA(img);
 
   // Check RGB data
-  unsigned char *data = nullptr;
-  unsigned int size = 0;
-  img.RGBData(&data, size);
-  ASSERT_EQ(kSize_RGB, size);
-  ASSERT_NE(nullptr, data);
+  auto data = img.RGBData();
+  ASSERT_EQ(kSize_RGB, data.size());
 
   auto channels = 3u;
   auto step = img.Width() * channels;
@@ -147,11 +144,8 @@ TEST_F(ImageTest, Data)
   CheckImageRGBA(img);
 
   // Check RGBA data
-  unsigned char *data = nullptr;
-  unsigned int size = 0;
-  img.Data(&data, size);
-  ASSERT_EQ(kSize_RGBA, size);
-  ASSERT_NE(nullptr, data);
+  auto data = img.Data();
+  ASSERT_EQ(kSize_RGBA, data.size());
 
   auto channels = 4u;
   auto step = img.Width() * channels;
@@ -189,15 +183,11 @@ TEST_F(ImageTest, SetFromData)
   ASSERT_EQ(0, img.Load(kTestData));
   ASSERT_TRUE(img.Valid());
 
-  unsigned char *data = nullptr;
-  unsigned int size = 0;
-  img.Data(&data, size);
-  ASSERT_EQ(39204u, size);
-  ASSERT_NE(nullptr, data);
-
+  auto data = img.Data();
+  ASSERT_EQ(39204u, data.size());
 
   common::Image img2;
-  img2.SetFromData(data, img.Width(), img.Height(), img.PixelFormat());
+  img2.SetFromData(&data[0], img.Width(), img.Height(), img.PixelFormat());
   ASSERT_TRUE(img2.Valid());
   ASSERT_EQ(common::Image::PixelFormatType::RGBA_INT8, img2.PixelFormat());
   ASSERT_EQ(121u, img2.Width());
@@ -208,6 +198,99 @@ TEST_F(ImageTest, SetFromData)
   ASSERT_EQ(img2.Pixel(85, 0), math::Color::Blue);
   ASSERT_EQ(img2.AvgColor(), math::Color(0.661157f, 0, 0.338843f, 1));
   ASSERT_EQ(img2.MaxColor(), math::Color::Red);
+}
+
+TEST_F(ImageTest, SetFromCompressedData)
+{
+  // Open file and move to end
+  std::ifstream ifs(kTestData, std::ios::binary | std::ios::ate);
+  std::ifstream::pos_type fileEnd = ifs.tellg();
+  std::vector<unsigned char> fileData(fileEnd);
+
+  // Rewind to beginning of file and read data
+  ifs.seekg(0);
+  ifs.read(reinterpret_cast<char *>(&fileData[0]), fileEnd);
+
+  common::Image img;
+  img.SetFromCompressedData(&fileData[0], fileEnd,
+      common::Image::PixelFormatType::COMPRESSED_PNG);
+  ASSERT_TRUE(img.Valid());
+
+  auto data = img.RGBAData();
+  ASSERT_EQ(39204u, data.size());
+
+  ASSERT_EQ(common::Image::PixelFormatType::RGBA_INT8, img.PixelFormat());
+  ASSERT_EQ(121u, img.Width());
+  ASSERT_EQ(81u, img.Height());
+  ASSERT_EQ(32u, img.BPP());
+  ASSERT_EQ(484, img.Pitch());
+  ASSERT_EQ(img.Pixel(0, 0), math::Color::Red);
+  ASSERT_EQ(img.Pixel(85, 0), math::Color::Blue);
+  ASSERT_EQ(img.AvgColor(), math::Color(0.661157f, 0, 0.338843f, 1));
+  ASSERT_EQ(img.MaxColor(), math::Color::Red);
+
+  // Reloading the image should not cause any leaks.
+  img.SetFromCompressedData(&fileData[0], fileEnd,
+      common::Image::PixelFormatType::COMPRESSED_PNG);
+  ASSERT_TRUE(img.Valid());
+
+  // Loading from unsupported pixel format fails.
+  img.SetFromCompressedData(&fileData[0], fileEnd,
+      common::Image::PixelFormatType::UNKNOWN_PIXEL_FORMAT);
+  ASSERT_FALSE(img.Valid());
+}
+
+TEST_F(ImageTest, DeprecatedDataFunctions)
+{
+  common::Image img;
+  ASSERT_EQ(0, img.Load(kTestData));
+  ASSERT_TRUE(img.Valid());
+
+  auto data = img.Data();
+  ASSERT_EQ(39204u, data.size());
+
+  unsigned char *dataRaw = nullptr;
+  unsigned int rawSize;
+  GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
+  img.Data(&dataRaw, rawSize);
+  GZ_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
+
+  ASSERT_EQ(data.size(), rawSize);
+
+  for (unsigned int i = 0; i < rawSize; ++i)
+  {
+    ASSERT_EQ(data[i], dataRaw[i]);
+  }
+
+  // RGBData
+  data = img.RGBData();
+  ASSERT_EQ(kSize_RGB, data.size());
+
+  GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
+  img.RGBData(&dataRaw, rawSize);
+  GZ_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
+
+  ASSERT_EQ(data.size(), rawSize);
+
+  for (unsigned int i = 0; i < rawSize; ++i)
+  {
+    ASSERT_EQ(data[i], dataRaw[i]);
+  }
+
+  // RGBAData
+  data = img.RGBAData();
+  ASSERT_EQ(39204u, data.size());
+
+  GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
+  img.RGBAData(&dataRaw, rawSize);
+  GZ_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
+
+  ASSERT_EQ(data.size(), rawSize);
+
+  for (unsigned int i = 0; i < rawSize; ++i)
+  {
+    ASSERT_EQ(data[i], dataRaw[i]);
+  }
 }
 
 /*
@@ -280,7 +363,7 @@ TEST_F(ImageTest, SetFromData)
 /////////////////////////////////////////////////
 TEST_F(ImageTest, ConvertPixelFormat)
 {
-  using Image = ignition::common::Image;
+  using Image = gz::common::Image;
   EXPECT_EQ(Image::PixelFormatType::UNKNOWN_PIXEL_FORMAT,
          Image::ConvertPixelFormat("fake"));
   EXPECT_EQ(Image::PixelFormatType::UNKNOWN_PIXEL_FORMAT,
@@ -352,11 +435,8 @@ TEST_F(ImageTest, ConvertToRGBImage)
         buffer.data(), width, height, output);
 
     // Check RGBA data
-    unsigned char *data = nullptr;
-    unsigned int outputSize = 0;
-    output.Data(&data, outputSize);
-    EXPECT_EQ(size * 3, outputSize);
-    ASSERT_NE(nullptr, data);
+    auto data = output.Data();
+    EXPECT_EQ(size * 3, data.size());
 
     for (unsigned int i = 0u; i < height; ++i)
     {
@@ -399,11 +479,8 @@ TEST_F(ImageTest, ConvertToRGBImage)
         buffer.data(), width, height, output);
 
     // Check RGB data
-    unsigned char *data = nullptr;
-    unsigned int outputSize = 0;
-    output.Data(&data, outputSize);
-    EXPECT_EQ(size * 3, outputSize);
-    ASSERT_NE(nullptr, data);
+    auto data = output.Data();
+    EXPECT_EQ(size * 3, data.size());
 
     for (unsigned int i = 0u; i < height; ++i)
     {
@@ -447,11 +524,8 @@ TEST_F(ImageTest, ConvertToRGBImage)
         buffer.data(), width, height, output);
 
     // Check RGB data
-    unsigned char *data = nullptr;
-    unsigned int outputSize = 0;
-    output.Data(&data, outputSize);
-    EXPECT_EQ(size * 3, outputSize);
-    ASSERT_NE(nullptr, data);
+    auto data = output.Data();
+    EXPECT_EQ(size * 3, data.size());
 
     for (unsigned int i = 0u; i < height; ++i)
     {
@@ -497,11 +571,8 @@ TEST_F(ImageTest, ConvertToRGBImage)
         buffer.data(), width, height, output, min, max, true);
 
     // Check RGB data
-    unsigned char *data = nullptr;
-    unsigned int outputSize = 0;
-    output.Data(&data, outputSize);
-    EXPECT_EQ(size * 3, outputSize);
-    ASSERT_NE(nullptr, data);
+    auto data = output.Data();
+    EXPECT_EQ(size * 3, data.size());
 
     for (unsigned int i = 0u; i < height; ++i)
     {
@@ -553,7 +624,7 @@ void ImagePerformanceTest::MaxColor(const std::string &_filePath,
   EXPECT_EQ(0, img.Load(fileName));
   EXPECT_EQ(_width, img.Width());
   EXPECT_EQ(_height, img.Height());
-  EXPECT_EQ(ignition::math::Color(0., 0., 0., 0), img.MaxColor());
+  EXPECT_EQ(gz::math::Color(0., 0., 0., 0), img.MaxColor());
   EXPECT_TRUE(img.Valid());
 }
 

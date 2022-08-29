@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/testing/TestPaths.hh>
+#include <ignition/common/config.hh>

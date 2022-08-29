@@ -15,13 +15,17 @@
  *
  */
 
+#define SUPPRESS_IGNITION_HEADER_DEPRECATION
 
+#include "gz/utils/SuppressWarning.hh"
+#include "ignition/common/Console.hh"
+
+GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
 #include "ignition/common/Plugin.hh"
 #include "ignition/common/PluginInfo.hh"
-#include "ignition/common/Console.hh"
 #include "PluginUtils.hh"
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -77,7 +81,7 @@ namespace ignition
 
         if (!_other)
         {
-          ignerr << "Received a nullptr _other in the constructor "
+          gzerr << "Received a nullptr _other in the constructor "
                  << "which uses `const PluginPrivate*`. This should "
                  << "not be possible! Please report this bug."
                  << std::endl;
@@ -184,3 +188,6 @@ namespace ignition
     }
   }
 }
+GZ_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
+
+#undef SUPPRESS_IGNITION_HEADER_DEPRECATION

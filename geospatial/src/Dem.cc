@@ -20,14 +20,13 @@
 #include <gdal_priv.h>
 #include <ogr_spatialref.h>
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/geospatial/Dem.hh"
-#include "ignition/math/SphericalCoordinates.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/geospatial/Dem.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
-class ignition::common::Dem::Implementation
+class gz::common::Dem::Implementation
 {
   /// \brief A set of associated raster bands.
   public: GDALDataset *dataSet;
@@ -59,15 +58,19 @@ class ignition::common::Dem::Implementation
   /// \brief Full filename used to load the dem.
   public: std::string filename;
 
-  /// \brief Whether the DEM will be handled as from non-Earth.
+  /// \brief Whether the DEM will be handled as unknown.
   /// If true, worldWidth & worldHeight = -1
   /// and GeoReference[Origin] can not be used (will return false)
-  public: bool isNonEarthDem = false;
+  public: bool isUnknownDem = false;
+
+  /// \brief Holds the spherical coordinates object from the world.
+  public: math::SphericalCoordinates sphericalCoordinates =
+           math::SphericalCoordinates();
 };
 
 //////////////////////////////////////////////////
 Dem::Dem()
-: dataPtr(ignition::utils::MakeImpl<Implementation>())
+: dataPtr(gz::utils::MakeImpl<Implementation>())
 {
   this->dataPtr->dataSet = nullptr;
   GDALAllRegister();
@@ -83,15 +86,10 @@ Dem::~Dem()
 }
 
 //////////////////////////////////////////////////
-void Dem::SetNonEarthDEM(bool _isNonEarthDem)
+void Dem::SetSphericalCoordinates(
+    const math::SphericalCoordinates &_worldSphericalCoordinates)
 {
-  this->dataPtr->isNonEarthDem = _isNonEarthDem;
-}
-
-//////////////////////////////////////////////////
-bool Dem::GetNonEarthDEM()
-{
-  return this->dataPtr->isNonEarthDem;
+  this->dataPtr->sphericalCoordinates =_worldSphericalCoordinates;
 }
 
 //////////////////////////////////////////////////
@@ -101,8 +99,8 @@ int Dem::Load(const std::string &_filename)
   unsigned int height;
   int xSize, ySize;
   double upLeftX, upLeftY, upRightX, upRightY, lowLeftX, lowLeftY;
-  ignition::math::Angle upLeftLat, upLeftLong, upRightLat, upRightLong;
-  ignition::math::Angle lowLeftLat, lowLeftLong;
+  gz::math::Angle upLeftLat, upLeftLong, upRightLat, upRightLong;
+  gz::math::Angle lowLeftLat, lowLeftLong;
 
   // Sanity check
   std::string fullName = _filename;
@@ -113,7 +111,7 @@ int Dem::Load(const std::string &_filename)
 
   if (!exists(findFilePath(fullName)))
   {
-    ignerr << "Unable to find DEM file[" << _filename << "]." << std::endl;
+    gzerr << "Unable to find DEM file[" << _filename << "]." << std::endl;
     return -1;
   }
 
@@ -122,7 +120,7 @@ int Dem::Load(const std::string &_filename)
 
   if (this->dataPtr->dataSet == nullptr)
   {
-    ignerr << "Unable to open DEM file[" << fullName
+    gzerr << "Unable to open DEM file[" << fullName
            << "]. Format not recognized as a supported dataset." << std::endl;
     return -1;
   }
@@ -130,7 +128,7 @@ int Dem::Load(const std::string &_filename)
   int nBands = this->dataPtr->dataSet->GetRasterCount();
   if (nBands != 1)
   {
-    ignerr << "Unsupported number of bands in file [" << fullName + "]. Found "
+    gzerr << "Unsupported number of bands in file [" << fullName + "]. Found "
           << nBands << " but only 1 is a valid value." << std::endl;
     return -1;
   }
@@ -157,33 +155,32 @@ int Dem::Load(const std::string &_filename)
   {
     // If successful, set the world width and height
     this->dataPtr->worldWidth =
-       math::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
-                                              upRightLat, upRightLong);
+       this->dataPtr->sphericalCoordinates.DistanceBetweenPoints(
+           upLeftLat, upLeftLong, upRightLat, upRightLong);
     this->dataPtr->worldHeight =
-       math::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
-                                              lowLeftLat, lowLeftLong);
+       this->dataPtr->sphericalCoordinates.DistanceBetweenPoints(
+           upLeftLat, upLeftLong, lowLeftLat, lowLeftLong);
   }
-  // Assume non-Earth DEM (e.g., moon)
+  // Assume unknown DEM.
   else
   {
-    ignwarn << "Failed to automatically compute DEM size. "
-            << "Assuming non-Earth DEM. "
+    gzwarn << "Failed to automatically compute DEM size. "
             << std::endl;
 
     this->dataPtr->worldWidth = this->dataPtr->worldHeight = -1;
-    this->dataPtr->isNonEarthDem = true;
+    this->dataPtr->isUnknownDem = true;
   }
 
   // Set the terrain's side (the terrain will be squared after the padding)
-  if (ignition::math::isPowerOfTwo(ySize - 1))
+  if (gz::math::isPowerOfTwo(ySize - 1))
     height = ySize;
   else
-    height = ignition::math::roundUpPowerOfTwo(ySize) + 1;
+    height = gz::math::roundUpPowerOfTwo(ySize) + 1;
 
-  if (ignition::math::isPowerOfTwo(xSize - 1))
+  if (gz::math::isPowerOfTwo(xSize - 1))
     width = xSize;
   else
-    width = ignition::math::roundUpPowerOfTwo(xSize) + 1;
+    width = gz::math::roundUpPowerOfTwo(xSize) + 1;
 
   this->dataPtr->side = std::max(width, height);
 
@@ -204,8 +201,8 @@ int Dem::Load(const std::string &_filename)
   if (validNoData <= 0)
     noDataValue = defaultNoDataValue;
 
-  double min = ignition::math::MAX_D;
-  double max = -ignition::math::MAX_D;
+  double min = gz::math::MAX_D;
+  double max = -gz::math::MAX_D;
   for (const auto &d : this->dataPtr->demData)
   {
     if (math::equal(d, this->dataPtr->bufferVal))
@@ -225,10 +222,10 @@ int Dem::Load(const std::string &_filename)
     if (d > max)
       max = d;
   }
-  if (ignition::math::equal(min, ignition::math::MAX_D) ||
-      ignition::math::equal(max, -ignition::math::MAX_D))
+  if (gz::math::equal(min, gz::math::MAX_D) ||
+      gz::math::equal(max, -gz::math::MAX_D))
   {
-    ignwarn << "DEM is composed of 'nodata' values!" << std::endl;
+    gzwarn << "DEM is composed of 'nodata' values!" << std::endl;
   }
 
   this->dataPtr->minElevation = min;
@@ -248,7 +245,7 @@ double Dem::Elevation(double _x, double _y)
 {
   if (_x >= this->Width() || _y >= this->Height())
   {
-    ignerr << "Illegal coordinates. You are asking for the elevation in ("
+    gzerr << "Illegal coordinates. You are asking for the elevation in ("
            << _x << "," << _y << ") but the terrain is ["
            << this->Width() << " x " << this->Height() << "]" << std::endl;
     return std::numeric_limits<double>::infinity();
@@ -273,11 +270,11 @@ float Dem::MaxElevation() const
 
 //////////////////////////////////////////////////
 bool Dem::GeoReference(double _x, double _y,
-    ignition::math::Angle &_latitude, ignition::math::Angle &_longitude) const
+    gz::math::Angle &_latitude, gz::math::Angle &_longitude) const
 {
-  if (this->dataPtr->isNonEarthDem)
+  if (this->dataPtr->isUnknownDem)
   {
-    ignerr << "Can not retrieve WGS84 coordinates from non-Earth DEM."
+    gzerr << "Can not retrieve coordinates from unknown DEM."
             << std::endl;
     return false;
   }
@@ -285,25 +282,52 @@ bool Dem::GeoReference(double _x, double _y,
   double geoTransf[6];
   if (this->dataPtr->dataSet->GetGeoTransform(geoTransf) == CE_None)
   {
+    OGRCoordinateTransformation *cT = nullptr;
+    double xGeoDeg, yGeoDeg;
     OGRSpatialReference sourceCs;
     OGRSpatialReference targetCs;
-    OGRCoordinateTransformation *cT;
-    double xGeoDeg, yGeoDeg;
 
-    // Transform the terrain's coordinate system to WGS84
-    const char *importString
-        = strdup(this->dataPtr->dataSet->GetProjectionRef());
-    if (importString == nullptr || importString[0] == '\0')
+    if (this->dataPtr->sphericalCoordinates.Surface() ==
+        math::SphericalCoordinates::EARTH_WGS84)
     {
-      igndbg << "Projection coordinate system undefined." << std::endl;
-      return false;
+      // Transform the terrain's coordinate system to WGS84
+      const char *importString
+          = strdup(this->dataPtr->dataSet->GetProjectionRef());
+      if (importString == nullptr || importString[0] == '\0')
+      {
+        // LCOV_EXCL_START
+        gzdbg << "Projection coordinate system undefined." << std::endl;
+        return false;
+        // LCOV_EXCL_STOP
+      }
+      sourceCs.importFromWkt(&importString);
+      targetCs.SetWellKnownGeogCS("WGS84");
     }
-    sourceCs.importFromWkt(&importString);
-    targetCs.SetWellKnownGeogCS("WGS84");
+    else if ((this->dataPtr->sphericalCoordinates.Surface() ==
+        math::SphericalCoordinates::CUSTOM_SURFACE) ||
+        (this->dataPtr->sphericalCoordinates.Surface() ==
+         math::SphericalCoordinates::MOON_SCS))
+    {
+      sourceCs = *(this->dataPtr->dataSet->GetSpatialRef());
+      targetCs = OGRSpatialReference();
+
+      double axisEquatorial =
+        this->dataPtr->sphericalCoordinates.SurfaceAxisEquatorial();
+      double axisPolar =
+        this->dataPtr->sphericalCoordinates.SurfaceAxisPolar();
+
+      std::string surfaceLatLongProjStr =
+        "+proj=latlong +a=" + std::to_string(axisEquatorial) +
+        " +b=" + std::to_string(axisPolar);
+
+      targetCs.importFromProj4(surfaceLatLongProjStr.c_str());
+    }
+
     cT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
+
     if (nullptr == cT)
     {
-      ignerr << "Unable to transform terrain coordinate system to WGS84 for "
+      gzerr << "Unable to transform terrain coordinate system for "
              << "coordinates (" << _x << "," << _y << ")" << std::endl;
       OCTDestroyCoordinateTransformation(cT);
       return false;
@@ -321,7 +345,7 @@ bool Dem::GeoReference(double _x, double _y,
   }
   else
   {
-    igndbg << "Unable to obtain the georeferenced values for coordinates ("
+    gzdbg << "Unable to obtain the georeferenced values for coordinates ("
            << _x << "," << _y << ")" << std::endl;
     return false;
   }
@@ -329,8 +353,8 @@ bool Dem::GeoReference(double _x, double _y,
 }
 
 //////////////////////////////////////////////////
-bool Dem::GeoReferenceOrigin(ignition::math::Angle &_latitude,
-    ignition::math::Angle &_longitude) const
+bool Dem::GeoReferenceOrigin(gz::math::Angle &_latitude,
+    gz::math::Angle &_longitude) const
 {
   return this->GeoReference(0, 0, _latitude, _longitude);
 }
@@ -350,9 +374,9 @@ unsigned int Dem::Width() const
 //////////////////////////////////////////////////
 double Dem::WorldWidth() const
 {
-  if (this->dataPtr->isNonEarthDem)
+  if (this->dataPtr->isUnknownDem)
   {
-    ignwarn << "Unable to determine world width of non-Earth DEM."
+    gzwarn << "Unable to determine world width of unknown DEM."
             << std::endl;
   }
   return this->dataPtr->worldWidth;
@@ -361,9 +385,9 @@ double Dem::WorldWidth() const
 //////////////////////////////////////////////////
 double Dem::WorldHeight() const
 {
-  if (this->dataPtr->isNonEarthDem)
+  if (this->dataPtr->isUnknownDem)
   {
-    ignwarn << "Unable to determine world height of non-Earth DEM."
+    gzwarn << "Unable to determine world height of unknown DEM."
             << std::endl;
   }
   return this->dataPtr->worldHeight;
@@ -371,13 +395,13 @@ double Dem::WorldHeight() const
 
 //////////////////////////////////////////////////
 void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
-    const ignition::math::Vector3d &_size,
-    const ignition::math::Vector3d &_scale,
+    const gz::math::Vector3d &_size,
+    const gz::math::Vector3d &_scale,
     bool _flipY, std::vector<float> &_heights) const
 {
   if (_subSampling <= 0)
   {
-    ignerr << "Illegal subsampling value (" << _subSampling << ")\n";
+    gzerr << "Illegal subsampling value (" << _subSampling << ")\n";
     return;
   }
 
@@ -440,7 +464,7 @@ int Dem::LoadData()
   unsigned int nYSize = this->dataPtr->dataSet->GetRasterYSize();
   if (nXSize == 0 || nYSize == 0)
   {
-    ignerr << "Illegal size loading a DEM file (" << nXSize << ","
+    gzerr << "Illegal size loading a DEM file (" << nXSize << ","
           << nYSize << ")\n";
     return -1;
   }
@@ -473,7 +497,7 @@ int Dem::LoadData()
   if (this->dataPtr->band->RasterIO(GF_Read, 0, 0, nXSize, nYSize, &buffer[0],
                        destWidth, destHeight, GDT_Float32, 0, 0) != CE_None)
   {
-    ignerr << "Failure calling RasterIO while loading a DEM file\n";
+    gzerr << "Failure calling RasterIO while loading a DEM file\n";
     return -1;
   }
 

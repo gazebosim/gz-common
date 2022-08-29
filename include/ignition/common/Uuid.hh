@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/Uuid.hh>
+#include <ignition/common/config.hh>

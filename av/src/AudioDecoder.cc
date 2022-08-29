@@ -15,18 +15,18 @@
 *
 */
 
-#include <ignition/common/av/Util.hh>
-#include <ignition/common/ffmpeg_inc.hh>
-#include <ignition/common/AudioDecoder.hh>
-#include <ignition/common/Console.hh>
+#include <gz/common/av/Util.hh>
+#include <gz/common/ffmpeg_inc.hh>
+#include <gz/common/AudioDecoder.hh>
+#include <gz/common/Console.hh>
 
 #define AUDIO_INBUF_SIZE (20480 * 2)
 #define AUDIO_REFILL_THRESH 4096
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
-class ignition::common::AudioDecoder::Implementation
+class gz::common::AudioDecoder::Implementation
 {
   /// \brief Destructor
   public: ~Implementation();
@@ -48,7 +48,7 @@ class ignition::common::AudioDecoder::Implementation
 };
 
 /////////////////////////////////////////////////
-ignition::common::AudioDecoder::Implementation::~Implementation()
+gz::common::AudioDecoder::Implementation::~Implementation()
 {
   // Close the codec
   if (this->codecCtx)
@@ -61,9 +61,9 @@ ignition::common::AudioDecoder::Implementation::~Implementation()
 
 /////////////////////////////////////////////////
 AudioDecoder::AudioDecoder()
-  : dataPtr(ignition::utils::MakeUniqueImpl<Implementation>())
+  : dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
 {
-  ignition::common::load();
+  gz::common::load();
 }
 
 /////////////////////////////////////////////////
@@ -75,13 +75,13 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
 
   if (this->dataPtr->codec == nullptr)
   {
-    ignerr << "Set an audio file before decoding.\n";
+    gzerr << "Set an audio file before decoding.\n";
     return false;
   }
 
   if (_outBufferSize == nullptr)
   {
-    ignerr << "outBufferSize is null!!\n";
+    gzerr << "outBufferSize is null!!\n";
     return false;
   }
 
@@ -97,14 +97,14 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
 
   if (!(decodedFrame = av_frame_alloc()))
   {
-    ignerr << "Audio decoder out of memory\n";
+    gzerr << "Audio decoder out of memory\n";
     result = false;
   }
 
   packet = av_packet_alloc();
   if (!packet)
   {
-    ignerr << "Failed to allocate AVPacket" << std::endl;
+    gzerr << "Failed to allocate AVPacket" << std::endl;
     return false;
   }
 
@@ -119,7 +119,7 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
       int ret = avcodec_send_packet(this->dataPtr->codecCtx, packet);
       if (ret < 0)
       {
-        ignerr << "Error submitting the packet to the decoder" << std::endl;
+        gzerr << "Error submitting the packet to the decoder" << std::endl;
         return false;
       }
 
@@ -134,7 +134,7 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
         }
         else if (ret < 0)
         {
-            ignerr << "Error during decoding" << std::endl;
+            gzerr << "Error during decoding" << std::endl;
             return false;
         }
 
@@ -143,7 +143,7 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
         // decodedFrame->linesize[0].
         int size = decodedFrame->nb_samples *
           av_get_bytes_per_sample(this->dataPtr->codecCtx->sample_fmt) *
-          this->dataPtr->codecCtx->channels;
+          this->dataPtr->codecCtx->ch_layout.nb_channels;
 
         // Resize the audio buffer as necessary
         if (*_outBufferSize + size > maxBufferSize)
@@ -189,7 +189,7 @@ bool AudioDecoder::SetFile(const std::string &_filename)
   if (avformat_open_input(&this->dataPtr->formatCtx,
         _filename.c_str(), nullptr, nullptr) < 0)
   {
-    ignerr << "Unable to open audio file[" << _filename << "]\n";
+    gzerr << "Unable to open audio file[" << _filename << "]\n";
     this->dataPtr->formatCtx = nullptr;
     return false;
   }
@@ -200,7 +200,7 @@ bool AudioDecoder::SetFile(const std::string &_filename)
   // Retrieve some information
   if (avformat_find_stream_info(this->dataPtr->formatCtx, nullptr) < 0)
   {
-    ignerr << "Unable to find stream info.\n";
+    gzerr << "Unable to find stream info.\n";
     avformat_close_input(&this->dataPtr->formatCtx);
     this->dataPtr->formatCtx = nullptr;
 
@@ -224,7 +224,7 @@ bool AudioDecoder::SetFile(const std::string &_filename)
 
   if (this->dataPtr->audioStream == -1)
   {
-    ignerr << "Couldn't find audio stream.\n";
+    gzerr << "Couldn't find audio stream.\n";
     avformat_close_input(&this->dataPtr->formatCtx);
     this->dataPtr->formatCtx = nullptr;
 
@@ -236,13 +236,13 @@ bool AudioDecoder::SetFile(const std::string &_filename)
     this->dataPtr->audioStream]->codecpar->codec_id);
   if (!this->dataPtr->codec)
   {
-    ignerr << "Failed to find the codec" << std::endl;
+    gzerr << "Failed to find the codec" << std::endl;
     return false;
   }
   this->dataPtr->codecCtx = avcodec_alloc_context3(this->dataPtr->codec);
   if (!this->dataPtr->codecCtx)
   {
-    ignerr << "Failed to allocate the codec context" << std::endl;
+    gzerr << "Failed to allocate the codec context" << std::endl;
     return false;
   }
   // Copy all relevant parameters from codepar to codecCtx
@@ -251,7 +251,7 @@ bool AudioDecoder::SetFile(const std::string &_filename)
 
   if (this->dataPtr->codec == nullptr)
   {
-    ignerr << "Couldn't find codec for audio stream.\n";
+    gzerr << "Couldn't find codec for audio stream.\n";
     avformat_close_input(&this->dataPtr->formatCtx);
     this->dataPtr->formatCtx = nullptr;
 
@@ -265,7 +265,7 @@ bool AudioDecoder::SetFile(const std::string &_filename)
   if (avcodec_open2(this->dataPtr->codecCtx,
         this->dataPtr->codec, nullptr) < 0)
   {
-    ignerr << "Couldn't open audio codec.\n";
+    gzerr << "Couldn't open audio codec.\n";
     avformat_close_input(&this->dataPtr->formatCtx);
     this->dataPtr->formatCtx = nullptr;
 

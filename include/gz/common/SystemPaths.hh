@@ -27,7 +27,7 @@
 
 #include <gz/utils/ImplPtr.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -35,14 +35,14 @@ namespace ignition
     /// \brief Functions to handle getting system paths, keeps track of:
     ///        \li SystemPaths#pluginPaths - plugin library paths
     ///            for common::WorldPlugin
-    class IGNITION_COMMON_VISIBLE  SystemPaths
+    class GZ_COMMON_VISIBLE  SystemPaths
     {
       /// \brief Constructor for SystemPaths
       public: SystemPaths();
 
-      /// \brief Get the log path. If IGN_LOG_PATH environment variable is set,
-      /// then this path is used. If not, the path is $HOME/.ignition, and in
-      /// case even HOME is not set, /tmp/ignition is used. If the directory
+      /// \brief Get the log path. If GZ_LOG_PATH environment variable is set,
+      /// then this path is used. If not, the path is $HOME/.gz, and in
+      /// case even HOME is not set, /tmp/gz is used. If the directory
       /// does not exist, it is created in the constructor of SystemPaths.
       /// \return the path
       public: std::string LogPath() const;
@@ -55,7 +55,7 @@ namespace ignition
       /// \param[in] _uri the uniform resource identifier
       /// \return Returns full path name to file with platform-specific
       /// directory separators, or an empty string if URI couldn't be found.
-      /// \sa FindFileURI(const ignition::common::URI &_uri)
+      /// \sa FindFileURI(const gz::common::URI &_uri)
       public: std::string FindFileURI(const std::string &_uri) const;
 
       /// \brief Find a file or path using a URI.
@@ -65,7 +65,7 @@ namespace ignition
       /// \param[in] _uri the uniform resource identifier
       /// \return Returns full path name to file with platform-specific
       /// directory separators, or an empty string if URI couldn't be found.
-      public: std::string FindFileURI(const ignition::common::URI &_uri) const;
+      public: std::string FindFileURI(const gz::common::URI &_uri) const;
 
       /// \brief Set the plugin path environment variable to use
       /// \param [in] _env name of the environment variable
@@ -101,7 +101,7 @@ namespace ignition
 
       /// \brief Set the file path environment variable to use, and clears
       /// any previously set file paths. The default
-      /// environment variable is IGN_FILE_PATH. The
+      /// environment variable is GZ_FILE_PATH. The
       /// environment variable should be a set of colon (semicolon on windows)
       /// delimited paths. These paths will be used with the FindFile function.
       /// \param [in] _env name of the environment variable
@@ -156,7 +156,7 @@ namespace ignition
       /// \param[in] _cb The callback function, which takes a file path or URI
       /// and returns the full local path.
       public: void AddFindFileURICallback(
-          std::function<std::string(const ignition::common::URI &)> _cb);
+          std::function<std::string(const gz::common::URI &)> _cb);
 
       /// \brief look for a file in a set of search paths (not recursive)
       /// \description This method checks if a file exists in given directories.
@@ -190,7 +190,7 @@ namespace ignition
       public: static char Delimiter();
 
       /// \brief Pointer to private data.
-      IGN_UTILS_IMPL_PTR(dataPtr)
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/STLLoader.hh>
+#include <ignition/common/config.hh>

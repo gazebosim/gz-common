@@ -34,13 +34,13 @@
 #define VIDEO_ENCODER_FPS_DEFAULT 25
 #define VIDEO_ENCODER_FORMAT_DEFAULT "mp4"
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
     /// \brief The VideoEncoder class supports encoding a series of images
     /// to a video format, and then writing the video to disk.
-    class IGNITION_COMMON_AV_VISIBLE VideoEncoder
+    class GZ_COMMON_AV_VISIBLE VideoEncoder
     {
       /// \brief Constructor
       public: VideoEncoder();
@@ -70,19 +70,19 @@ namespace ignition
       /// failure isn't a result of faulty HW encoding (e.g. when NVENC sessions
       /// are exhausted).
       /// \note This will automatically select a HW-accelerated encoder based
-      /// on the values of environment variables IGN_VIDEO_ALLOWED_ENCODERS,
-      /// IGN_VIDEO_ENCODER_DEVICE and IGN_VIDEO_ENCODER_USE_HW_SURFACE.
+      /// on the values of environment variables GZ_VIDEO_ALLOWED_ENCODERS,
+      /// GZ_VIDEO_ENCODER_DEVICE and GZ_VIDEO_ENCODER_USE_HW_SURFACE.
       /// To completely avoid trying to set up HW accelerated encoding,
-      /// set IGN_VIDEO_ALLOWED_ENCODERS to value NONE or leave it empty or
+      /// set GZ_VIDEO_ALLOWED_ENCODERS to value NONE or leave it empty or
       /// unset.
       /// The meaning of these variables is the following:
-      /// - IGN_VIDEO_ALLOWED_ENCODERS is a colon-separated list of values of
+      /// - GZ_VIDEO_ALLOWED_ENCODERS is a colon-separated list of values of
       /// HWEncoderType enum, or ALL to allow all encoders. Default is NONE.
-      /// - IGN_VIDEO_ENCODER_DEVICE optionally specifies the HW device
+      /// - GZ_VIDEO_ENCODER_DEVICE optionally specifies the HW device
       /// to use for encoding (used only when a matching encoder is found
       /// first). By default, an empty string is used, which means to use
       /// whatever device is found to work first.
-      /// - IGN_VIDEO_USE_HW_SURFACE specifies whether the encoder should use
+      /// - GZ_VIDEO_USE_HW_SURFACE specifies whether the encoder should use
       /// an explicit GPU buffer for video frames. Some codecs do this
       /// implicitly, and then this setting has no meaning (setting it to 1 can
       /// actually decrease performance). For codecs that need to set this
@@ -218,7 +218,7 @@ namespace ignition
       public: void Reset();
 
       /// \brief Private data pointer
-      IGN_UTILS_UNIQUE_IMPL_PTR(dataPtr)
+      GZ_UTILS_UNIQUE_IMPL_PTR(dataPtr)
     };
   }
 }

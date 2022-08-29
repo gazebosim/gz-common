@@ -27,13 +27,13 @@
 
 #include <gz/common/graphics/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
     /// \class NodeAnimation NodeAnimation.hh gz/common/NodeAnimation.hh
     /// \brief Node animation
-    class IGNITION_COMMON_GRAPHICS_VISIBLE NodeAnimation
+    class GZ_COMMON_GRAPHICS_VISIBLE NodeAnimation
     {
       /// \brief constructor
       /// \param[in] _name the name of the node
@@ -92,7 +92,7 @@ namespace ignition
       /// \param[in] _time the time
       /// \param[in] _loop when true, the time is divided by the duration
       /// (see GetLength)
-      public: ignition::math::Matrix4d FrameAt(const double _time,
+      public: gz::math::Matrix4d FrameAt(const double _time,
                   const bool _loop = true) const;
 
       /// \brief Scales each transformation in the key frames. This only affects
@@ -109,7 +109,7 @@ namespace ignition
       public: double TimeAtX(const double _x) const;
 
       /// \brief Private data pointer.
-      IGN_UTILS_IMPL_PTR(dataPtr)
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

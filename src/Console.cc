@@ -17,18 +17,18 @@
 #include <string>
 #include <sstream>
 
-#include <ignition/common/Console.hh>
-#include <ignition/common/config.hh>
+#include <gz/common/Console.hh>
+#include <gz/common/config.hh>
 
 #ifdef _WIN32
 #include <Windows.h>
 #endif
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 
-FileLogger ignition::common::Console::log("");
+FileLogger gz::common::Console::log("");
 
 // On UNIX, these are ANSI-based color codes. On Windows, these are colors from
 // docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences .
@@ -87,7 +87,7 @@ Logger::~Logger()
 /////////////////////////////////////////////////
 Logger &Logger::operator()()
 {
-  Console::log() << "(" << ignition::common::systemTimeIso() << ") ";
+  Console::log() << "(" << gz::common::systemTimeIso() << ") ";
   (*this) << Console::Prefix() << this->prefix;
 
   return (*this);
@@ -98,7 +98,7 @@ Logger &Logger::operator()(const std::string &_file, int _line)
 {
   int index = _file.find_last_of("/") + 1;
 
-  Console::log() << "(" << ignition::common::systemTimeIso() << ") ";
+  Console::log() << "(" << gz::common::systemTimeIso() << ") ";
   std::stringstream prefixString;
   prefixString << Console::Prefix() << this->prefix
     << "[" << _file.substr(index , _file.size() - index) << ":"
@@ -241,7 +241,7 @@ void FileLogger::Init(const std::string &_directory,
 #endif
     )
   {
-    if (!env(IGN_HOMEDIR, logPath))
+    if (!env(GZ_HOMEDIR, logPath))
     {
       // Use stderr here to prevent infinite recursion
       // trying to get the log initialized
@@ -304,9 +304,9 @@ void FileLogger::Close()
 FileLogger &FileLogger::operator()()
 {
   if (!this->initialized)
-    this->Init(".ignition", "auto_default.log");
+    this->Init(".gz", "auto_default.log");
 
-  (*this) << "(" << ignition::common::systemTimeIso() << ") ";
+  (*this) << "(" << gz::common::systemTimeIso() << ") ";
   return (*this);
 }
 
@@ -314,10 +314,10 @@ FileLogger &FileLogger::operator()()
 FileLogger &FileLogger::operator()(const std::string &_file, int _line)
 {
   if (!this->initialized)
-    this->Init(".ignition", "auto_default.log");
+    this->Init(".gz", "auto_default.log");
 
   int index = _file.find_last_of("/") + 1;
-  (*this) << "(" << ignition::common::systemTimeIso() << ") ["
+  (*this) << "(" << gz::common::systemTimeIso() << ") ["
     << _file.substr(index , _file.size() - index) << ":" << _line << "]";
 
   return (*this);
@@ -347,15 +347,31 @@ FileLogger::Buffer::~Buffer()
 }
 
 /////////////////////////////////////////////////
+std::streamsize FileLogger::Buffer::xsputn(const char *_char,
+                                           std::streamsize _count)
+{
+  std::lock_guard<std::mutex> lk(this->syncMutex);
+  return std::stringbuf::xsputn(_char, _count);
+}
+
+/////////////////////////////////////////////////
 int FileLogger::Buffer::sync()
 {
   if (!this->stream)
     return -1;
 
-  *this->stream << this->str();
+  {
+    std::lock_guard<std::mutex> lk(this->syncMutex);
+    *this->stream << this->str();
+  }
 
-  this->stream->flush();
-
-  this->str("");
+  {
+    std::lock_guard<std::mutex> lk(this->syncMutex);
+    this->stream->flush();
+  }
+  {
+    std::lock_guard<std::mutex> lk(this->syncMutex);
+    this->str("");
+  }
   return !(*this->stream);
 }

@@ -1,14 +1,14 @@
 # Examples
 
-These examples demonstrate various Ignition Common features.
+These examples demonstrate various Gazebo Common features.
 
 ## Build
 
-After installing Ignition Common, from source or from binaries, build with:
+After installing Gazebo Common, from source or from binaries, build with:
 
 ```
-git clone https://github.com/ignitionrobotics/ign-common/
-cd ign-common/examples
+git clone https://github.com/gazebosim/gz-common/
+cd gz-common/examples
 mkdir build
 cd build
 cmake ..

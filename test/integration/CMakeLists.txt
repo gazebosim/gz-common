@@ -1,21 +1,22 @@
-ign_get_sources(tests)
+gz_get_sources(tests)
 
 if (SKIP_av OR INTERNAL_SKIP_av)
   list(REMOVE_ITEM tests encoder_timing.cc)
   list(REMOVE_ITEM tests video_encoder.cc)
 endif()
 
-ign_build_tests(
+gz_build_tests(
   TYPE INTEGRATION
   SOURCES ${tests}
-  LIB_DEPS ignition-common${IGN_COMMON_VER}-testing
+  LIB_DEPS gz-common${GZ_COMMON_VER}-testing
 )
 
 if(TARGET INTEGRATION_plugin)
   # We add this dependency to make sure that DummyPlugins gets generated
   # before INTEGRATION_plugin so that its auto-generated header is available.
   # We do not want to link INTEGRATION_plugin to the DummyPlugins library.
-  add_dependencies(INTEGRATION_plugin IGNDummyPlugins)
+  add_dependencies(INTEGRATION_plugin GzDummyPlugins)
+  target_include_directories(INTEGRATION_plugin PRIVATE ${PROJECT_SOURCE_DIR}/test)
 endif()
 
 if(TARGET INTEGRATION_mesh)

@@ -17,14 +17,14 @@
 
 #include <gtest/gtest.h>
 
-#include <ignition/utils/ExtraTestMacros.hh>
+#include <gz/utils/ExtraTestMacros.hh>
 
-#include <ignition/common/Console.hh>
-#include <ignition/common/Filesystem.hh>
-#include <ignition/common/TempDirectory.hh>
-#include <ignition/common/Util.hh>
+#include <gz/common/Console.hh>
+#include <gz/common/Filesystem.hh>
+#include <gz/common/TempDirectory.hh>
+#include <gz/common/Util.hh>
 
-#include <ignition/common/testing/Utils.hh>
+#include <gz/common/testing/Utils.hh>
 
 #include <filesystem>
 #include <fstream>
@@ -34,7 +34,7 @@
 #define BUILD_SYMLINK_TESTS
 #endif  // _WIN32
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 namespace fs = std::filesystem;
@@ -43,7 +43,7 @@ namespace fs = std::filesystem;
 class TestTempDirectory : public TempDirectory
 {
   public: TestTempDirectory():
-    TempDirectory("filesystem", "ign_common", true)
+    TempDirectory("filesystem", "gz_common", true)
   {
   }
 };
@@ -58,7 +58,7 @@ bool create_new_file_symlink(const std::string &_symlink,
   }
   catch(const std::exception& e)
   {
-    ignerr << "Failed to create link: " << e.what() << '\n';
+    gzerr << "Failed to create link: " << e.what() << '\n';
     return false;
   }
   return true;
@@ -74,7 +74,7 @@ bool create_new_dir_symlink(const std::string &_symlink,
   }
   catch(const std::exception& e)
   {
-    ignerr << "Failed to create link: " << e.what() << '\n';
+    gzerr << "Failed to create link: " << e.what() << '\n';
     return false;
   }
   return true;
@@ -90,7 +90,7 @@ bool create_new_file_hardlink(const std::string &_hardlink,
   }
   catch(const std::exception& e)
   {
-    ignerr << "Failed to create link: " << e.what() << '\n';
+    gzerr << "Failed to create link: " << e.what() << '\n';
     return false;
   }
   return true;
@@ -249,7 +249,7 @@ TEST_F(FilesystemTest, relative)
 
 // The symlink tests require special permissions to work on Windows,
 // so they will be disabled by default. For more information, see:
-// https://github.com/ignitionrobotics/ign-common/issues/21
+// https://github.com/gazebosim/gz-common/issues/21
 #ifdef BUILD_SYMLINK_TESTS
 /////////////////////////////////////////////////
 TEST_F(FilesystemTest, symlink_exists)
@@ -388,7 +388,7 @@ TEST_F(FilesystemTest, parentPath)
 }
 
 /////////////////////////////////////////////////
-TEST_F(FilesystemTest, IGN_UTILS_TEST_DISABLED_ON_WIN32(cwd_error))
+TEST_F(FilesystemTest, GZ_UTILS_TEST_DISABLED_ON_WIN32(cwd_error))
 {
   // This test intentionally creates a directory, switches to it, removes
   // the directory, and then tries to call cwd() on it to cause
@@ -636,8 +636,8 @@ TEST_F(FilesystemTest, uniquePaths)
 TEST_F(FilesystemTest, separator)
 {
 #ifndef _WIN32
-  EXPECT_EQ("/", ignition::common::separator(""));
+  EXPECT_EQ("/", gz::common::separator(""));
 #else
-  EXPECT_EQ("\\", ignition::common::separator(""));
+  EXPECT_EQ("\\", gz::common::separator(""));
 #endif
 }

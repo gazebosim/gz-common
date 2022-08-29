@@ -23,6 +23,7 @@
 
 #include <gz/math/Vector3.hh>
 #include <gz/math/Angle.hh>
+#include <gz/math/SphericalCoordinates.hh>
 
 #include <gz/common/geospatial/Export.hh>
 #include <gz/common/geospatial/HeightmapData.hh>
@@ -30,13 +31,13 @@
 #include <gz/utils/ImplPtr.hh>
 
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
     /// \class DEM DEM.hh common/common.hh
     /// \brief Encapsulates a DEM (Digital Elevation Model) file.
-    class IGNITION_COMMON_GEOSPATIAL_VISIBLE Dem : public HeightmapData
+    class GZ_COMMON_GEOSPATIAL_VISIBLE Dem : public HeightmapData
     {
       /// \brief Constructor.
       public: Dem();
@@ -44,20 +45,17 @@ namespace ignition
       /// \brief Destructor.
       public: virtual ~Dem();
 
+      /// \brief Sets the spherical coordinates reference object.
+      /// \param[in] _worldSphericalCoordinates The spherical coordiantes
+      /// object contained in the world. This is used to compute accurate
+      /// sizes of the DEM object.
+      public: void SetSphericalCoordinates(
+                  const math::SphericalCoordinates &_worldSphericalCoordinates);
+
       /// \brief Load a DEM file.
       /// \param[in] _filename the path to the terrain file.
       /// \return 0 when the operation succeeds to open a file.
       public: int Load(const std::string &_filename = "");
-
-      /// \brief Indicate that this is a non Earth DEM.
-      /// \param[in] _isNonEarthDem Should be true if this is a
-      /// non earth DEM, otherwise false.
-      public: void SetNonEarthDEM(bool _isNonEarthDem);
-
-      /// \brief Check if the loaded DEM is not from the Earth.
-      /// \return True if the loaded DEM is from the Earth, otherwise
-      /// returns False.
-      public: bool GetNonEarthDEM();
 
       /// \brief Get the elevation of a terrain's point in meters.
       /// \param[in] _x X coordinate of the terrain.
@@ -75,12 +73,12 @@ namespace ignition
       public: float MaxElevation() const override;
 
       /// \brief Get the georeferenced coordinates (lat, long) of the terrain's
-      /// origin in WGS84.
+      /// origin.
       /// \param[out] _latitude Georeferenced latitude.
       /// \param[out] _longitude Georeferenced longitude.
       /// \return True if able to retrieve origin coordinates. False otherwise.
-      public: bool GeoReferenceOrigin(ignition::math::Angle &_latitude,
-                  ignition::math::Angle &_longitude) const;
+      public: bool GeoReferenceOrigin(gz::math::Angle &_latitude,
+                  gz::math::Angle &_longitude) const;
 
       /// \brief Get the terrain's height. Due to the Ogre constrains, this
       /// value will be a power of two plus one. The value returned might be
@@ -120,21 +118,21 @@ namespace ignition
       /// \param[out] _heights Vector containing the terrain heights.
       public: void FillHeightMap(const int _subSampling,
                   const unsigned int _vertSize,
-                  const ignition::math::Vector3d &_size,
-                  const ignition::math::Vector3d &_scale,
+                  const gz::math::Vector3d &_size,
+                  const gz::math::Vector3d &_scale,
                   const bool _flipY,
                   std::vector<float> &_heights) const override;
 
       /// \brief Get the georeferenced coordinates (lat, long) of a terrain's
-      /// pixel in WGS84.
+      /// pixel.
       /// \param[in] _x X coordinate of the terrain.
       /// \param[in] _y Y coordinate of the terrain.
       /// \param[out] _latitude Georeferenced latitude.
       /// \param[out] _longitude Georeferenced longitude.
       /// \return True if able to retrieve coordinates. False otherwise.
       private: bool GeoReference(double _x, double _y,
-                                 ignition::math::Angle &_latitude,
-                                 ignition::math::Angle &_longitude) const;
+                                 gz::math::Angle &_latitude,
+                                 gz::math::Angle &_longitude) const;
 
       /// \brief Get the terrain file as a data array. Due to the Ogre
       /// constrains, the data might be stored in a bigger vector representing
@@ -147,7 +145,7 @@ namespace ignition
 
       /// internal
       /// \brief Pointer to the private data.
-      IGN_UTILS_IMPL_PTR(dataPtr)
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

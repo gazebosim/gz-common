@@ -30,7 +30,7 @@
 #define TESTING_PROJECT_SOURCE_DIR ""
 #endif
 
-namespace ignition::common::testing
+namespace gz::common::testing
 {
 
 //////////////////////////////////////////////////
@@ -39,14 +39,14 @@ namespace ignition::common::testing
 ///
 /// For CMake builds, it is expected that this is injected via a
 /// buildsystem define of TESTING_PROJECT_SOURCE_DIR.
-/// This is done automatically for tests using ign-cmake's ign_build_tests
+/// This is done automatically for tests using gz-cmake's gz_build_tests
 ///
 /// For Bazel builds, it is expected to be empty
 constexpr char kTestingProjectSourceDir[] = TESTING_PROJECT_SOURCE_DIR;
 
 //////////////////////////////////////////////////
 /// \brief List of buildsystem types
-enum class IGNITION_COMMON_TESTING_VISIBLE BuildType
+enum class GZ_COMMON_TESTING_VISIBLE BuildType
 {
   kUnknown,
   kCMake,
@@ -63,24 +63,24 @@ class TestPaths
 {
   /// \brief Constructor
   /// \param[in] _projectSourcePath Path to the root of the project source
-  public: IGNITION_COMMON_TESTING_VISIBLE
+  public: GZ_COMMON_TESTING_VISIBLE
           explicit TestPaths(const std::string &_projectSourcePath =
               kTestingProjectSourceDir);
 
   /// \brief Destructor
-  public: IGNITION_COMMON_TESTING_VISIBLE
+  public: GZ_COMMON_TESTING_VISIBLE
           virtual ~TestPaths() = 0;
 
   /// brief Populate the path to the root project source directory
   /// \param[out] _sourceDir path to the root project source directory
   /// \return True if path successfully found and set, false otherwise
-  public: virtual bool IGNITION_COMMON_TESTING_VISIBLE
+  public: virtual bool GZ_COMMON_TESTING_VISIBLE
           ProjectSourcePath(std::string &_sourceDir) = 0;
 
   /// \brief Populate the path to a temporary directory
   /// \param[out] _tmpDir path to the root temporary directory
   /// \return True if path successfully found and set, false otherwise
-  public: virtual bool IGNITION_COMMON_TESTING_VISIBLE
+  public: virtual bool GZ_COMMON_TESTING_VISIBLE
           TestTmpPath(std::string &_tmpDir) = 0;
 
   /// \brief Path to the root of the project source
@@ -98,11 +98,11 @@ class TestPaths
 /// \param[in] _cleanup True to indicate that the filesystem should
 ///   be cleaned as part of the destructor
 /// \return Shared pointer to TempDirectory
-std::shared_ptr<ignition::common::TempDirectory>
-IGNITION_COMMON_TESTING_VISIBLE
+std::shared_ptr<gz::common::TempDirectory>
+GZ_COMMON_TESTING_VISIBLE
 MakeTestTempDirectoryImpl(const std::string &_projectSourcePath,
                           const std::string &_prefix = "test",
-                          const std::string &_subDir = "ignition",
+                          const std::string &_subDir = "gz",
                           bool _cleanup = true);
 
 
@@ -117,9 +117,9 @@ MakeTestTempDirectoryImpl(const std::string &_projectSourcePath,
 /// \param[in] _cleanup True to indicate that the filesystem should
 ///   be cleaned as part of the destructor
 /// \return Shared pointer to TempDirectory
-inline std::shared_ptr<ignition::common::TempDirectory>
+inline std::shared_ptr<gz::common::TempDirectory>
 MakeTestTempDirectory(const std::string &_prefix = "test",
-                      const std::string &_subDir = "ignition",
+                      const std::string &_subDir = "gz",
                       bool _cleanup = true)
 {
   return MakeTestTempDirectoryImpl(kTestingProjectSourceDir,
@@ -134,7 +134,7 @@ MakeTestTempDirectory(const std::string &_prefix = "test",
 /// \param[in] _projectSourcePath Root of project source or empty
 /// \return The current build type
 BuildType
-IGNITION_COMMON_TESTING_VISIBLE
+GZ_COMMON_TESTING_VISIBLE
 TestBuildType(
     const std::string &_projectSourcePath = kTestingProjectSourceDir);
 
@@ -144,14 +144,14 @@ TestBuildType(
 /// \param[in] _projectSourcePath Root of project source or empty
 /// \return TestPaths implementation for the current build type
 std::unique_ptr<TestPaths>
-IGNITION_COMMON_TESTING_VISIBLE
+GZ_COMMON_TESTING_VISIBLE
 TestPathFactory(
     const std::string &_projectSourcePath = kTestingProjectSourceDir);
 
 //////////////////////////////////////////////////
 /// \brief Get the path to a file in the project source tree
 ///
-/// Example: to get ign-common/test/data/box.dae
+/// Example: to get gz-common/test/data/box.dae
 /// SourceFile("test", "data", "box.dae");
 ///
 /// \param[in] args Relative path to the source file
@@ -170,7 +170,7 @@ std::string SourceFile(Args const &... args)
 //////////////////////////////////////////////////
 /// \brief Get the path to a file in the project test directory tree
 ///
-/// Example: to get ign-common/test/data/box.dae
+/// Example: to get gz-common/test/data/box.dae
 /// TestFile("data", "box.dae");
 ///
 /// \param[in] args Path to the file, relative to the test directory
@@ -184,8 +184,8 @@ std::string TestFile(Args const &... args)
 //////////////////////////////////////////////////
 /// \brief Get the path to a file in a temporary directory
 ///
-/// Example: to get ${TMP}/.ignition/foo.log
-///  TempPath(".ignition", "foo.log");
+/// Example: to get ${TMP}/.gz/foo.log
+///  TempPath(".gz", "foo.log");
 ///
 /// \param[in] args Path to the file, relative to the temporary directory
 /// \return Full path to the temporary directory
@@ -197,5 +197,5 @@ std::string TempPath(Args const &... args)
   testPaths->TestTmpPath(dataDir);
   return common::joinPaths(dataDir, args...);
 }
-}  // namespace ignition::common::testing
+}  // namespace gz::common::testing
 #endif  // GZ_COMMON_TESTING_TESTPATHS_HH_

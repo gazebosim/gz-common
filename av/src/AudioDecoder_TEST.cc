@@ -16,11 +16,11 @@
 */
 #include <gtest/gtest.h>
 
-#include <ignition/common/AudioDecoder.hh>
-#include <ignition/utils/ExtraTestMacros.hh>
-#include <ignition/common/testing/TestPaths.hh>
+#include <gz/common/AudioDecoder.hh>
+#include <gz/utils/ExtraTestMacros.hh>
+#include <gz/common/testing/TestPaths.hh>
 
-using namespace ignition;
+using namespace gz;
 
 /////////////////////////////////////////////////
 TEST(AudioDecoder, FileNotSet)
@@ -84,7 +84,7 @@ TEST(AudioDecoder, NoCodec)
 }
 
 /////////////////////////////////////////////////
-TEST(AudioDecoder, IGN_UTILS_TEST_DISABLED_ON_WIN32(CheerFile))
+TEST(AudioDecoder, GZ_UTILS_TEST_DISABLED_ON_WIN32(CheerFile))
 {
   common::AudioDecoder audio;
 

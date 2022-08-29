@@ -19,11 +19,11 @@
 
 #include <atomic>
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/WorkerPool.hh"
-#include "ignition/utils/ExtraTestMacros.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/WorkerPool.hh"
+#include "gz/utils/ExtraTestMacros.hh"
 
-namespace igncmn = ignition::common;
+namespace igncmn = gz::common;
 using namespace igncmn;
 
 //////////////////////////////////////////////////
@@ -98,9 +98,9 @@ TEST(WorkerPool, WaitWithTimeout)
 
 //////////////////////////////////////////////////
 // /TODO(anyone) Deflake this test
-// ref: https://github.com/ignitionrobotics/ign-common/issues/52
+// ref: https://github.com/gazebosim/gz-common/issues/52
 TEST(WorkerPool,
-     IGN_UTILS_TEST_ENABLED_ONLY_ON_LINUX(WaitWithTimeoutThatTimesOut))
+     GZ_UTILS_TEST_ENABLED_ONLY_ON_LINUX(WaitWithTimeoutThatTimesOut))
 {
   WorkerPool pool;
   pool.AddWork([] ()
@@ -112,14 +112,14 @@ TEST(WorkerPool,
 
 //////////////////////////////////////////////////
 // /TODO(anyone) Deflake this test
-// ref: https://github.com/ignitionrobotics/ign-common/issues/53
+// ref: https://github.com/gazebosim/gz-common/issues/53
 TEST(WorkerPool,
-     IGN_UTILS_TEST_ENABLED_ONLY_ON_LINUX(ThingsRunInParallel))
+     GZ_UTILS_TEST_ENABLED_ONLY_ON_LINUX(ThingsRunInParallel))
 {
   const unsigned int hc = std::thread::hardware_concurrency();
   if (2 > hc)
   {
-    igndbg << "Skipping the ThingsRunInParallel test because hardware "
+    gzdbg << "Skipping the ThingsRunInParallel test because hardware "
            << "concurrency (" << hc << ") is too low (min: 2), making the test "
            << "less likely to succeed.\n";
     return;
@@ -142,7 +142,7 @@ TEST(WorkerPool,
   EXPECT_TRUE(result);
   if (!result)
   {
-    igndbg << "WaitForResults failed" << std::endl;
+    gzdbg << "WaitForResults failed" << std::endl;
   }
   EXPECT_EQ(2, sentinel);
 }

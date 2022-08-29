@@ -27,7 +27,7 @@
 
 #include <gz/utils/ImplPtr.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -58,7 +58,7 @@ namespace ignition
 
     /// \class Image Image.hh gz/common/common.hh
     /// \brief Encapsulates an image
-    class IGNITION_COMMON_GRAPHICS_VISIBLE Image
+    class GZ_COMMON_GRAPHICS_VISIBLE Image
     {
       /// \brief Pixel formats enumeration
       public: enum PixelFormatType
@@ -82,6 +82,7 @@ namespace ignition
                 BAYER_BGGR8,
                 BAYER_GBRG8,
                 BAYER_GRBG8,
+                COMPRESSED_PNG,
                 PIXEL_FORMAT_COUNT
               };
 
@@ -122,16 +123,50 @@ namespace ignition
                                unsigned int _height,
                                Image::PixelFormatType _format);
 
+      /// \brief Set the image from compressed (i.e. png) data
+      /// \param[in] _data Pointer to the raw image data
+      /// \param[in] _size Size of the buffer
+      /// \param[in] _format Pixel format of the provided data
+      public: void SetFromCompressedData(unsigned char *_data,
+                                         unsigned int _size,
+                                         Image::PixelFormatType _format);
+
       /// \brief Get the image as a data array
+      /// \deprecated Use the function returning std::vector instead
       /// \param[out] _data Pointer to a NULL array of char.
       /// \param[out] _count The resulting data array size
-      public: void Data(unsigned char **_data, unsigned int &_count) const;
+      public: void GZ_DEPRECATED(5) Data(unsigned char **_data,
+                                         unsigned int &_count) const;
+
+      /// \brief Get the image as a data array
+      /// \return The image data
+      public: std::vector<unsigned char> Data() const;
 
       /// \brief Get only the RGB data from the image. This will drop the
       /// alpha channel if one is present.
+      /// \deprecated Use the function returning std::vector instead
       /// \param[out] _data Pointer to a NULL array of char.
       /// \param[out] _count The resulting data array size
-      public: void RGBData(unsigned char **_data, unsigned int &_count) const;
+      public: void GZ_DEPRECATED(5) RGBData(unsigned char **_data,
+                                            unsigned int &_count) const;
+
+      /// \brief Get only the RGB data from the image. This will drop the
+      /// alpha channel if one is present.
+      /// \return The image RGB data
+      public: std::vector<unsigned char> RGBData() const;
+
+      /// \brief Get the RGBA data from the image. This will add an alpha
+      /// channel if one is not present.
+      /// \deprecated Use the function returning std::vector instead
+      /// \param[out] _data Pointer to a NULL array of char.
+      /// \param[out] _count The resulting data array size
+      public: void GZ_DEPRECATED(5) RGBAData(unsigned char **_data,
+                                             unsigned int &_count) const;
+
+      /// \brief Get the RGBA data from the image. This will add an alpha
+      /// channel if one is not present.
+      /// \return The image RGBA data
+      public: std::vector<unsigned char> RGBAData() const;
 
       /// \brief Get the width
       /// \return The image width
@@ -234,7 +269,7 @@ namespace ignition
         // convert to rgb image
         // color is grayscale, i.e. r == b == g
         double range = static_cast<double>(max - min);
-        if (ignition::math::equal(range, 0.0))
+        if (gz::math::equal(range, 0.0))
           range = 1.0;
         unsigned int idx = 0;
         for (unsigned int j = 0; j < _height; ++j)
@@ -256,7 +291,7 @@ namespace ignition
       }
 
       /// \brief Private data pointer
-      IGN_UTILS_IMPL_PTR(dataPtr)
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

@@ -18,15 +18,15 @@
 // needed on MacOS
 #include <cmath>
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/VideoEncoder.hh"
-#include "ignition/common/Video.hh"
-#include "ignition/common/ffmpeg_inc.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/VideoEncoder.hh"
+#include "gz/common/Video.hh"
+#include "gz/common/ffmpeg_inc.hh"
 
-#include <ignition/common/testing/AutoLogFixture.hh>
-#include <ignition/common/testing/TestPaths.hh>
+#include <gz/common/testing/AutoLogFixture.hh>
+#include <gz/common/testing/TestPaths.hh>
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 using namespace std::chrono;
 auto Now = steady_clock::now;
@@ -92,7 +92,7 @@ TEST_F(EncoderDecoderTest, DecodeEncodeDecode)
     if ((Now() - fps_start) > seconds(1)) {
       double dur = duration<double>(Now() - fps_start).count();
       double currentFps = fps_frames / dur;
-      ignmsg << "FPS: " << currentFps << std::endl;
+      gzmsg << "FPS: " << currentFps << std::endl;
       fps_start = Now();
       fps_frames = 0;
     }

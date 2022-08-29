@@ -19,13 +19,13 @@
 
 #include <thread>
 
-#include <ignition/common/Console.hh>
-#include <ignition/common/Timer.hh>
+#include <gz/common/Console.hh>
+#include <gz/common/Timer.hh>
 
 /////////////////////////////////////////////////
 TEST(Timer_TEST, Sequence)
 {
-  ignition::common::Timer t;
+  gz::common::Timer t;
   EXPECT_FALSE(t.Running());
   EXPECT_DOUBLE_EQ(0.0, t.ElapsedTime().count());
 
@@ -48,24 +48,24 @@ TEST(Timer_TEST, Sequence)
 /////////////////////////////////////////////////
 TEST(Timer_TEST, Elapsed)
 {
-  ignition::common::Timer t;
+  gz::common::Timer t;
   t.Start();
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   t.Stop();
 
   // Loose margin just to make sure it is close without being flaky
   EXPECT_LT(0.0, t.ElapsedTime().count());
-  igndbg << "Actual Elapsed: " << t.ElapsedTime().count() << std::endl;
+  gzdbg << "Actual Elapsed: " << t.ElapsedTime().count() << std::endl;
 }
 
 /////////////////////////////////////////////////
 TEST(Timer_TEST, Copy)
 {
-  ignition::common::Timer t1;
+  gz::common::Timer t1;
   t1.Start();
   EXPECT_TRUE(t1.Running());
 
-  ignition::common::Timer t2 = t1;
+  gz::common::Timer t2 = t1;
   EXPECT_TRUE(t2.Running());
 
   // Stop the original

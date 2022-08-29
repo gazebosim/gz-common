@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/SystemPaths.hh>
+#include <ignition/common/config.hh>

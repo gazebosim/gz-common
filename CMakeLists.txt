@@ -3,33 +3,31 @@ cmake_minimum_required(VERSION 3.10.2 FATAL_ERROR)
 #============================================================================
 # Initialize the project
 #============================================================================
-project(ignition-common5 VERSION 5.0.0)
-set(IGN_COMMON_VER ${PROJECT_VERSION_MAJOR})
+project(gz-common5 VERSION 5.0.0)
+set(GZ_COMMON_VER ${PROJECT_VERSION_MAJOR})
 
 #============================================================================
-# Find ignition-cmake
+# Find gz-cmake
 #============================================================================
-find_package(ignition-cmake3 REQUIRED)
-set(IGN_CMAKE_VER ${ignition-cmake3_VERSION_MAJOR})
+find_package(gz-cmake3 REQUIRED)
+set(GZ_CMAKE_VER ${gz-cmake3_VERSION_MAJOR})
 
 #============================================================================
 # Configure the project
 #============================================================================
-ign_configure_project(
-  REPLACE_IGNITION_INCLUDE_PATH gz/common
-  VERSION_SUFFIX pre1)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+gz_configure_project(VERSION_SUFFIX pre1)
 
 #============================================================================
 # Set project-specific options
 #============================================================================
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 #--------------------------------------
 # Option: Should Windows test symlinking?
 if(WIN32)
   option(
-    IGN_BUILD_SYMLINK_TESTS_ON_WINDOWS
+    GZ_BUILD_SYMLINK_TESTS_ON_WINDOWS
     "Creating symlinks requires special permissions on Windows, so those tests are disabled by default"
     false)
 endif()
@@ -50,19 +48,19 @@ endif()
 message(STATUS "\n\n-- ====== Finding Dependencies ======")
 
 #--------------------------------------
-# Find ignition-math
-ign_find_package(ignition-math7 REQUIRED_BY geospatial graphics events)
-set(IGN_MATH_VER ${ignition-math7_VERSION_MAJOR})
+# Find gz-math
+gz_find_package(gz-math7 REQUIRED_BY geospatial graphics events)
+set(GZ_MATH_VER ${gz-math7_VERSION_MAJOR})
 
 #--------------------------------------
-# Find ignition-utils
-ign_find_package(ignition-utils2 REQUIRED)
-set(IGN_UTILS_VER ${ignition-utils2_VERSION_MAJOR})
+# Find gz-utils
+gz_find_package(gz-utils2 REQUIRED)
+set(GZ_UTILS_VER ${gz-utils2_VERSION_MAJOR})
 
 #--------------------------------------
 # Find Tinyxml2
 if(USE_EXTERNAL_TINYXML2)
-  ign_find_package(TINYXML2 PRETTY tinyxml2
+  gz_find_package(TINYXML2 PRETTY tinyxml2
     REQUIRED_BY graphics
     PRIVATE_FOR graphics)
 else()
@@ -71,7 +69,7 @@ endif()
 
 #--------------------------------------
 # Find libdl
-ign_find_package(
+gz_find_package(
   DL REQUIRED PRIVATE PRETTY libdl PURPOSE "Required for plugins")
 
 #--------------------------------------
@@ -80,33 +78,33 @@ if(NOT MSVC)
 
   #------------------------------------
   # Find uuid
-  ign_find_package(UUID REQUIRED PRETTY uuid)
+  gz_find_package(UUID REQUIRED PRETTY uuid)
 
 endif()
 
 #------------------------------------
 # Find Freeimage
-ign_find_package(FreeImage VERSION 3.9
+gz_find_package(FreeImage VERSION 3.9
   REQUIRED_BY graphics
   PRIVATE_FOR graphics)
 
 #------------------------------------
 # Find GNU Triangulation Surface Library
-ign_find_package(
+gz_find_package(
   GTS PRETTY gts PURPOSE "GNU Triangulation Surface library"
   REQUIRED_BY graphics
   PRIVATE_FOR graphics)
 
 #------------------------------------
 # Find GDAL
-ign_find_package(GDAL VERSION 3.0
+gz_find_package(GDAL VERSION 3.0
   PKGCONFIG gdal
   PRIVATE_FOR geospatial
   REQUIRED_BY geospatial)
 
 #------------------------------------
 # Find libswscale
-ign_find_package(SWSCALE REQUIRED_BY av PRETTY libswscale)
+gz_find_package(SWSCALE REQUIRED_BY av PRETTY libswscale)
 
 #------------------------------------
 # Find avdevice
@@ -115,15 +113,19 @@ set(HAVE_AVDEVICE ${AVDEVICE_FOUND})
 
 #------------------------------------
 # Find avformat
-ign_find_package(AVFORMAT REQUIRED_BY av PRETTY libavformat)
+gz_find_package(AVFORMAT REQUIRED_BY av PRETTY libavformat)
 
 #------------------------------------
 # Find avcodec
-ign_find_package(AVCODEC REQUIRED_BY av PRETTY libavcodec)
+gz_find_package(AVCODEC REQUIRED_BY av PRETTY libavcodec)
 
 #------------------------------------
 # Find avutil
-ign_find_package(AVUTIL REQUIRED_BY av PRETTY libavutil)
+gz_find_package(AVUTIL REQUIRED_BY av PRETTY libavutil)
+
+#------------------------------------
+# Find assimp
+gz_find_package(GzAssimp REQUIRED_BY graphics PRETTY assimp)
 
 
 message(STATUS "-------------------------------------------\n")
@@ -135,13 +137,13 @@ message(STATUS "-------------------------------------------\n")
 configure_file("${PROJECT_SOURCE_DIR}/cppcheck.suppress.in"
                ${PROJECT_BINARY_DIR}/cppcheck.suppress)
 
-ign_configure_build(QUIT_IF_BUILD_ERRORS
+gz_configure_build(QUIT_IF_BUILD_ERRORS
   COMPONENTS av events geospatial graphics profiler testing)
 
 #============================================================================
 # Create package information
 #============================================================================
-ign_create_packages()
+gz_create_packages()
 
 
 #============================================================================
@@ -150,9 +152,9 @@ ign_create_packages()
 configure_file(${CMAKE_SOURCE_DIR}/api.md.in ${CMAKE_BINARY_DIR}/api.md)
 configure_file(${CMAKE_SOURCE_DIR}/tutorials.md.in ${CMAKE_BINARY_DIR}/tutorials.md)
 
-ign_create_docs(
+gz_create_docs(
   API_MAINPAGE_MD "${CMAKE_BINARY_DIR}/api.md"
   TUTORIALS_MAINPAGE_MD "${CMAKE_BINARY_DIR}/tutorials.md"
   TAGFILES
-    "${IGNITION-MATH_DOXYGEN_TAGFILE} = ${IGNITION-MATH_API_URL}"
+    "${GZ-MATH_DOXYGEN_TAGFILE} = ${GZ-MATH_API_URL}"
   )

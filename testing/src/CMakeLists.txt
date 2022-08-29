@@ -11,7 +11,7 @@ set(test_sources
   Utils_TEST.cc
 )
 
-ign_add_component(testing SOURCES ${sources} GET_TARGET_NAME testing_target)
+gz_add_component(testing SOURCES ${sources} GET_TARGET_NAME testing_target)
 
-ign_build_tests(TYPE UNIT SOURCES ${test_sources}
+gz_build_tests(TYPE UNIT SOURCES ${test_sources}
   LIB_DEPS ${testing_target})

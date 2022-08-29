@@ -34,70 +34,70 @@
 // Defines
 
 #ifdef _WIN32
-# define IGN_HOMEDIR "USERPROFILE"
+# define GZ_HOMEDIR "USERPROFILE"
 #else
-# define IGN_HOMEDIR "HOME"
+# define GZ_HOMEDIR "HOME"
 #endif
 
 /// \brief Seconds in one nano second.
-#define IGN_NANO_TO_SEC 1e-9
+#define GZ_NANO_TO_SEC 1e-9
 
 /// \brief Nano seconds in one second.
-#define IGN_SEC_TO_NANO 1000000000
+#define GZ_SEC_TO_NANO 1000000000
 
 /// \brief Nano seconds in one millisecond.
-#define IGN_MS_TO_NANO 1000000
+#define GZ_MS_TO_NANO 1000000
 
 /// \brief Nano seconds in one microsecond.
-#define IGN_US_TO_NANO 1000
+#define GZ_US_TO_NANO 1000
 
 /// \brief Speed of light.
-#define IGN_SPEED_OF_LIGHT = 299792458.0
+#define GZ_SPEED_OF_LIGHT = 299792458.0
 
 /// \brief Sleep for the specifed number of seconds
-#define IGN_SLEEP_S(_s) (std::this_thread::sleep_for(\
+#define GZ_SLEEP_S(_s) (std::this_thread::sleep_for(\
                          std::chrono::seconds(_s)))
 
 /// \brief Sleep for the specifed number of microseconds
-#define IGN_SLEEP_US(_us) (std::this_thread::sleep_for(\
+#define GZ_SLEEP_US(_us) (std::this_thread::sleep_for(\
                            std::chrono::microseconds(_us)))
 
 /// \brief Sleep for the specifed number of milliseconds
-#define IGN_SLEEP_MS(_ms) (std::this_thread::sleep_for(\
+#define GZ_SLEEP_MS(_ms) (std::this_thread::sleep_for(\
                            std::chrono::milliseconds(_ms)))
 
 /// \brief Sleep for the specifed number of nanoseconds
-#define IGN_SLEEP_NS(_ns) (std::this_thread::sleep_for(\
+#define GZ_SLEEP_NS(_ns) (std::this_thread::sleep_for(\
                            std::chrono::nanoseconds(_ns)))
 
 /// \brief Get the system time.
-#define IGN_SYSTEM_TIME() (std::chrono::system_clock::now())
+#define GZ_SYSTEM_TIME() (std::chrono::system_clock::now())
 
 /// \brief Get the system time in seconds since epoch.
-#define IGN_SYSTEM_TIME_S() (std::chrono::duration_cast<std::chrono::seconds>(\
+#define GZ_SYSTEM_TIME_S() (std::chrono::duration_cast<std::chrono::seconds>(\
       std::chrono::system_clock::now().time_since_epoch()).count())
 
 /// \brief Get the system time in microseconds since epoch.
-#define IGN_SYSTEM_TIME_US() (\
+#define GZ_SYSTEM_TIME_US() (\
     std::chrono::duration_cast<std::chrono::microseconds>(\
       std::chrono::system_clock::now().time_since_epoch()).count())
 
 /// \brief Get the system time in milliseconds since epoch.
-#define IGN_SYSTEM_TIME_MS() (\
+#define GZ_SYSTEM_TIME_MS() (\
     std::chrono::duration_cast<std::chrono::milliseconds>(\
       std::chrono::system_clock::now().time_since_epoch()).count())
 
 /// \brief Get the system time in nanoseconds since epoch.
-#define IGN_SYSTEM_TIME_NS() (\
+#define GZ_SYSTEM_TIME_NS() (\
     std::chrono::duration_cast<std::chrono::nanoseconds>(\
       std::chrono::system_clock::now().time_since_epoch()).count())
 
 /// \brief This macro defines the standard way of launching an exception
-/// inside ignition.
-#define IGN_ASSERT(_expr, _msg) assert((_msg, _expr))
+/// inside Gazebo.
+#define GZ_ASSERT(_expr, _msg) assert((_msg, _expr))
 
 /// \brief Forward declarations for the common classes
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -108,49 +108,49 @@ namespace ignition
     typedef std::runtime_error exception;
 
     /// \brief Please use systemTimeIso() as this function will be deprecated
-    /// in Ignition Common 4.
+    /// in Gazebo Common 4.
     /// Get the wall time as an ISO string: YYYY-MM-DDTHH:MM:SS.NS
     /// \return The current wall time as an ISO string.
     /// \sa systemTimeIso();
-    std::string IGNITION_COMMON_VISIBLE systemTimeISO();
+    std::string GZ_COMMON_VISIBLE systemTimeISO();
 
     /// \brief Get the wall time as an ISO string: YYYY-MM-DDTHH:MM:SS.NS
     /// \return The current wall time as an ISO string.
-    std::string IGNITION_COMMON_VISIBLE systemTimeIso();
+    std::string GZ_COMMON_VISIBLE systemTimeIso();
 
     /// \brief Converts a time point to an ISO string: YYYY-MM-DDTHH:MM:SS.NS
     /// \param[in] _time A time point, such as one created by
-    /// IGN_SYSTEM_TIME().
+    /// GZ_SYSTEM_TIME().
     /// \return An ISO string that represents the given _time.
-    std::string IGNITION_COMMON_VISIBLE timeToIso(
+    std::string GZ_COMMON_VISIBLE timeToIso(
         const std::chrono::time_point<std::chrono::system_clock> &_time);
 
     /// \brief Get the log path
     /// \return the log path
-    std::string IGNITION_COMMON_VISIBLE logPath();
+    std::string GZ_COMMON_VISIBLE logPath();
 
     /// \brief add path suffix to common::SystemPaths
     /// \param[in] _suffix The suffix to add.
-    void IGNITION_COMMON_VISIBLE addSearchPathSuffix(
+    void GZ_COMMON_VISIBLE addSearchPathSuffix(
         const std::string &_suffix);
 
     /// \brief search for file in common::SystemPaths
     /// \param[in] _file Name of the file to find.
     /// \return The path containing the file.
-    std::string IGNITION_COMMON_VISIBLE findFile(const std::string &_file);
+    std::string GZ_COMMON_VISIBLE findFile(const std::string &_file);
 
     /// \brief search for file in common::SystemPaths
     /// \param[in] _file Name of the file to find.
     /// \param[in] _searchLocalPath True to search in the current working
     /// directory.
     /// \return The path containing the file.
-    std::string IGNITION_COMMON_VISIBLE findFile(const std::string &_file,
+    std::string GZ_COMMON_VISIBLE findFile(const std::string &_file,
                          bool _searchLocalPath);
 
     /// \brief search for a file in common::SystemPaths
     /// \param[in] _file the file name to look for.
     /// \return The path containing the file.
-    std::string IGNITION_COMMON_VISIBLE findFilePath(const std::string &_file);
+    std::string GZ_COMMON_VISIBLE findFilePath(const std::string &_file);
 
     /// \brief Add a callback to use when findFile() can't find a file that is
     /// a valid URI.
@@ -160,7 +160,7 @@ namespace ignition
     /// found.
     /// \param[in] _cb The callback function, which takes a file path or URI
     /// and returns the full local path.
-    void IGNITION_COMMON_VISIBLE addFindFileURICallback(
+    void GZ_COMMON_VISIBLE addFindFileURICallback(
         std::function<std::string(const URI &)> _cb);
 
     /// \brief Get a pointer to the global system paths that is used by all
@@ -169,7 +169,7 @@ namespace ignition
     /// Care should be taken when manipulating global system paths
     /// Caller should not assume ownership of the pointer.
     /// \return A mutable reference to the system paths object.
-    common::SystemPaths IGNITION_COMMON_VISIBLE *systemPaths();
+    common::SystemPaths GZ_COMMON_VISIBLE *systemPaths();
 
     /// \brief Compute the SHA1 hash of an array of bytes.
     /// \param[in] _buffer Input sequence. The permitted data types for this
@@ -184,14 +184,14 @@ namespace ignition
     /// function are std::string and any STL container.
     /// \return The string representation (40 character) of the SHA1 hash.
     /// \sa sha1(const T &_buffer)
-    std::string IGNITION_COMMON_VISIBLE sha1(
+    std::string GZ_COMMON_VISIBLE sha1(
         void const *_buffer, std::size_t _byteCount);
 
     /// \brief fnv1a algorithm for 64-bit platforms.
     /// \param[in] _key The input string.
     /// \return A 64-bit unsigned hash value.
     /// \ref https://notes.underscorediscovery.com/constexpr-fnv1a/
-    constexpr uint64_t IGNITION_COMMON_VISIBLE hash64(std::string_view _key)
+    constexpr uint64_t GZ_COMMON_VISIBLE hash64(std::string_view _key)
     {
       const char *data = _key.data();
       const auto len = _key.size();
@@ -215,7 +215,7 @@ namespace ignition
     /// \param[in] _name Name of the environment variable.
     /// \param[out] _value Value if the variable was found.
     /// \return True if the variable was found or false otherwise.
-    bool IGNITION_COMMON_VISIBLE env(
+    bool GZ_COMMON_VISIBLE env(
         const std::string &_name, std::string &_value);
 
     /// \brief Find the environment variable '_name' and return its value.
@@ -224,7 +224,7 @@ namespace ignition
     /// \param[in] _allowEmpty Allow set-but-empty variables.
     ///           (Unsupported on Windows)
     /// \return True if the variable was found or false otherwise.
-    bool IGNITION_COMMON_VISIBLE env(
+    bool GZ_COMMON_VISIBLE env(
         const std::string &_name, std::string &_value,
         bool _allowEmpty);
 
@@ -236,61 +236,61 @@ namespace ignition
     /// \param[in] _name Name of the environment variable.
     /// \param[in] _value Value of the variable to be set.
     /// \return True if the variable was set or false otherwise.
-    bool IGNITION_COMMON_VISIBLE setenv(
+    bool GZ_COMMON_VISIBLE setenv(
         const std::string &_name, const std::string &_value);
 
     /// \brief Unset the environment variable '_name'.
     /// \param[in] _name Name of the environment variable.
     /// \return True if the variable was unset or false otherwise.
-    bool IGNITION_COMMON_VISIBLE unsetenv(const std::string &_name);
+    bool GZ_COMMON_VISIBLE unsetenv(const std::string &_name);
 
     /// \brief Get a UUID
     /// \return A UUID string
-    std::string IGNITION_COMMON_VISIBLE uuid();
+    std::string GZ_COMMON_VISIBLE uuid();
 
     /// \brief Splits a string into tokens.
     /// \param[in] _str Input string.
     /// \param[in] _delim Token delimiter.
     /// \return Vector of tokens.
-    std::vector<std::string> IGNITION_COMMON_VISIBLE split(
+    std::vector<std::string> GZ_COMMON_VISIBLE split(
         const std::string &_str, const std::string &_delim);
 
     /// \brief In place left trim
     /// \param[in,out] _s String to trim
-    void IGNITION_COMMON_VISIBLE ltrim(std::string &_s);
+    void GZ_COMMON_VISIBLE ltrim(std::string &_s);
 
     /// \brief In place right trim
     /// \param[in,out] _s String to trim
-    void IGNITION_COMMON_VISIBLE rtrim(std::string &_s);
+    void GZ_COMMON_VISIBLE rtrim(std::string &_s);
 
     /// \brief In place trim from both ends
     /// \param[in,out] _s String to trim
-    void IGNITION_COMMON_VISIBLE trim(std::string &_s);
+    void GZ_COMMON_VISIBLE trim(std::string &_s);
 
     /// \brief Copying left trim
     /// \param[in] _s String to trim
     /// \return Trimmed string
-    std::string IGNITION_COMMON_VISIBLE ltrimmed(std::string _s);
+    std::string GZ_COMMON_VISIBLE ltrimmed(std::string _s);
 
     /// \brief Copying right trim
     /// \param[in] _s String to trim
     /// \return Trimmed string
-    std::string IGNITION_COMMON_VISIBLE rtrimmed(std::string _s);
+    std::string GZ_COMMON_VISIBLE rtrimmed(std::string _s);
 
     /// \brief Copying trim from both ends
     /// \param[in] _s String to trim
     /// \return Trimmed string
-    std::string IGNITION_COMMON_VISIBLE trimmed(std::string _s);
+    std::string GZ_COMMON_VISIBLE trimmed(std::string _s);
 
     /// \brief Transforms a string to its lowercase equivalent
     /// \param[in] _in String to convert to lowercase
     /// \return Lowercase equilvalent of _in.
-    std::string IGNITION_COMMON_VISIBLE lowercase(const std::string &_in);
+    std::string GZ_COMMON_VISIBLE lowercase(const std::string &_in);
 
     /// \brief Transforms a string to its lowercase equivalent
     /// \param[in] _in String to convert to lowercase
     /// \return Lowercase equilvalent of _in.
-    std::string IGNITION_COMMON_VISIBLE lowercase(const char *_in);
+    std::string GZ_COMMON_VISIBLE lowercase(const char *_in);
 
     /// \brief Replace all occurances of _key with _replacement.
     /// \param[out] _result The new string that has had _key replaced
@@ -300,7 +300,7 @@ namespace ignition
     /// \param[in] _replacement The string that replaces _key.
     /// \sa  std::string replaceAll(const std::string &_orig,
     /// const std::string &_key, const std::string &_replacement)
-    void IGNITION_COMMON_VISIBLE replaceAll(std::string &_result,
+    void GZ_COMMON_VISIBLE replaceAll(std::string &_result,
         const std::string &_orig,
         const std::string &_key,
         const std::string &_replacement);
@@ -313,7 +313,7 @@ namespace ignition
     /// \sa void common::replaceAll(std::string &_result,
     /// const std::string &_orig, const std::string &_key,
     /// const std::string &_replacement)
-    std::string IGNITION_COMMON_VISIBLE replaceAll(const std::string &_orig,
+    std::string GZ_COMMON_VISIBLE replaceAll(const std::string &_orig,
         const std::string &_key,
         const std::string &_replacement);
   }
@@ -322,13 +322,13 @@ namespace ignition
 ///////////////////////////////////////////////
 // Implementation of get_sha1
 template<typename T>
-std::string ignition::common::sha1(const T &_buffer)
+std::string gz::common::sha1(const T &_buffer)
 {
   if (_buffer.size() == 0)
-    return ignition::common::sha1(NULL, 0);
+    return gz::common::sha1(NULL, 0);
   else
   {
-    return ignition::common::sha1(
+    return gz::common::sha1(
         &(_buffer[0]), _buffer.size() * sizeof(_buffer[0]));
   }
 }

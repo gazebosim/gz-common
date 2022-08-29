@@ -24,16 +24,17 @@
 #include <gz/math/Color.hh>
 #include <gz/common/graphics/Export.hh>
 #include <gz/common/EnumIface.hh>
+#include <gz/common/Image.hh>
 #include <gz/common/Pbr.hh>
 
 #include <gz/utils/ImplPtr.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
     /// \brief Encapsulates description of a material
-    class IGNITION_COMMON_GRAPHICS_VISIBLE Material
+    class GZ_COMMON_GRAPHICS_VISIBLE Material
     {
       /// \def Shade modes
       /// \brief Enumeration of shade mode types
@@ -102,14 +103,21 @@ namespace ignition
 
       /// \brief Set a texture image
       /// \param[in] _tex The name of the texture, which must be in the
-      /// resource path
-      public: void SetTextureImage(const std::string &_tex);
+      /// resource path or its name if _img is provided
+      /// \param[in] _img The image containing the texture if image has been
+      /// loaded in memory
+      public: void SetTextureImage(const std::string &_tex,
+                  const std::shared_ptr<const Image> &_img = nullptr);
 
       /// \brief Set a texture image
       /// \param[in] _tex The name of the texture
       /// \param[in] _resourcePath Path which contains _tex
       public: void SetTextureImage(const std::string &_tex,
                                    const std::string &_resourcePath);
+
+      /// \brief Gets the texture image, if the texture was loaded from memory
+      /// \return A pointer to the image that was loaded from memory
+      public: std::shared_ptr<const Image> TextureData() const;
 
       /// \brief Get a texture image
       /// \return The name of the texture image (if one exists) or an empty
@@ -263,7 +271,7 @@ namespace ignition
       /// param[in] _out the output stream to extract from
       /// param[out] _m the material information
       public: friend std::ostream &operator<<(std::ostream &_out,
-                  const ignition::common::Material &_m)
+                  const gz::common::Material &_m)
               {
                 _out << "Material:\n";
                 _out << "  Name: " << _m.Name() << "\n";
@@ -282,7 +290,7 @@ namespace ignition
               }
 
       /// \brief Private data pointer.
-      IGN_UTILS_UNIQUE_IMPL_PTR(dataPtr)
+      GZ_UTILS_UNIQUE_IMPL_PTR(dataPtr)
     };
   }
 }

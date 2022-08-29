@@ -15,9 +15,13 @@
  *
 */
 
+#define SUPPRESS_IGNITION_HEADER_DEPRECATION
+
 #include "ignition/common/PluginMacros.hh"
+#include "gz/utils/SuppressWarning.hh"
 #include "DummyPlugins.hh"
 
+GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
 
 namespace test
 {
@@ -87,3 +91,7 @@ IGN_COMMON_BEGIN_ADDING_PLUGINS
   IGN_COMMON_ADD_PLUGIN(test::util::DummyMultiPlugin, test::util::DummySetterBase)
   IGN_COMMON_ADD_PLUGIN(test::util::DummyMultiPlugin, test::util::DummyGetSomeObjectBase)
 IGN_COMMON_FINISH_ADDING_PLUGINS
+
+GZ_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
+
+#undef SUPPRESS_IGNITION_HEADER_DEPRECATION

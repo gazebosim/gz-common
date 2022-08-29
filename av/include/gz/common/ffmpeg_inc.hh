@@ -51,23 +51,23 @@ extern "C" {
 
 #include <gz/common/av/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
     /// \brief Helper function to avoid deprecation warnings.
-    IGNITION_COMMON_AV_VISIBLE
+    GZ_COMMON_AV_VISIBLE
     GZ_DEPRECATED(5)
     AVFrame *AVFrameAlloc(void);
 
     /// \brief Helper function to avoid deprecation warnings.
-    IGNITION_COMMON_AV_VISIBLE
+    GZ_COMMON_AV_VISIBLE
     GZ_DEPRECATED(5)
     void AVFrameUnref(AVFrame *_frame);
 
     /// \brief Helper function to avoid deprecation warnings.
     /// \param[in] _packet AVPacket structure that stores compressed data
-    IGNITION_COMMON_AV_VISIBLE
+    GZ_COMMON_AV_VISIBLE
     GZ_DEPRECATED(5)
     void AVPacketUnref(AVPacket *_packet);
 
@@ -82,7 +82,7 @@ namespace ignition
     /// the number of bytes used.
     /// \note If the codec is in draining mode, _packet can be null. The return
     /// value on success will then be 0, but _gotFrame will be non-zero.
-    IGNITION_COMMON_AV_VISIBLE
+    GZ_COMMON_AV_VISIBLE
     GZ_DEPRECATED(5)
     int AVCodecDecode(AVCodecContext *_codecCtx,
         AVFrame *_frame, int *_gotFrame, AVPacket *_packet);

@@ -25,13 +25,13 @@
 #include <gz/common/graphics/Export.hh>
 
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
     /// \class KeyFrame KeyFrame.hh gz/common/KeyFrame.hh
     /// \brief A key frame in an animation
-    class IGNITION_COMMON_GRAPHICS_VISIBLE KeyFrame
+    class GZ_COMMON_GRAPHICS_VISIBLE KeyFrame
     {
       /// \brief Constructor
       /// \param[in] _time Time of the keyframe in seconds
@@ -45,11 +45,11 @@ namespace ignition
       public: double Time() const;
 
       /// \brief Private data pointer.
-      IGN_UTILS_IMPL_PTR(dataPtr)
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
 
     /// \brief A keyframe for a PoseAnimation
-    class IGNITION_COMMON_GRAPHICS_VISIBLE PoseKeyFrame : public KeyFrame
+    class GZ_COMMON_GRAPHICS_VISIBLE PoseKeyFrame : public KeyFrame
     {
       /// \brief Constructor
       /// \param[in] _time of the keyframe
@@ -75,11 +75,11 @@ namespace ignition
       public: const math::Quaterniond &Rotation() const;
 
       /// \brief Private data pointer.
-      IGN_UTILS_IMPL_PTR(dataPtr)
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
 
     /// \brief A keyframe for a NumericAnimation
-    class IGNITION_COMMON_GRAPHICS_VISIBLE NumericKeyFrame : public KeyFrame
+    class GZ_COMMON_GRAPHICS_VISIBLE NumericKeyFrame : public KeyFrame
     {
       /// \brief Constructor
       /// \param[in] _time Time of the keyframe
@@ -97,7 +97,7 @@ namespace ignition
       public: const double &Value() const;
 
       /// \brief Private data pointer.
-      IGN_UTILS_IMPL_PTR(dataPtr)
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

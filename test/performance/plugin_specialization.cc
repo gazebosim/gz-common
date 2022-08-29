@@ -16,64 +16,71 @@
 */
 #include <gtest/gtest.h>
 
+#define SUPPRESS_IGNITION_HEADER_DEPRECATION
+
 #include <chrono>
 #include <iomanip>
 #include <cmath>
 
-#include "ignition/common/PluginLoader.hh"
+#include "gz/utils/SuppressWarning.hh"
+
 #include "ignition/common/SystemPaths.hh"
-#include "ignition/common/SpecializedPluginPtr.hh"
 #include "ignition/common/Console.hh"
 
 #include "DummyPluginsPath.h"
 #include "plugins/DummyPlugins.hh"
 
 
-#define IGN_CREATE_SPEC_INTERFACE(name)\
+GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
+#include "ignition/common/PluginLoader.hh"
+#include "ignition/common/SpecializedPluginPtr.hh"
+
+
+#define GZ_CREATE_SPEC_INTERFACE(name)\
   class name { public: IGN_COMMON_SPECIALIZE_INTERFACE(name) };
 
-IGN_CREATE_SPEC_INTERFACE(Interface1)
-IGN_CREATE_SPEC_INTERFACE(Interface2)
-IGN_CREATE_SPEC_INTERFACE(Interface3)
-IGN_CREATE_SPEC_INTERFACE(Interface4)
-IGN_CREATE_SPEC_INTERFACE(Interface5)
-IGN_CREATE_SPEC_INTERFACE(Interface6)
-IGN_CREATE_SPEC_INTERFACE(Interface7)
-IGN_CREATE_SPEC_INTERFACE(Interface8)
-IGN_CREATE_SPEC_INTERFACE(Interface9)
-IGN_CREATE_SPEC_INTERFACE(Interface10)
-IGN_CREATE_SPEC_INTERFACE(Interface11)
-IGN_CREATE_SPEC_INTERFACE(Interface12)
-IGN_CREATE_SPEC_INTERFACE(Interface13)
-IGN_CREATE_SPEC_INTERFACE(Interface14)
-IGN_CREATE_SPEC_INTERFACE(Interface15)
-IGN_CREATE_SPEC_INTERFACE(Interface16)
-IGN_CREATE_SPEC_INTERFACE(Interface17)
-IGN_CREATE_SPEC_INTERFACE(Interface18)
-IGN_CREATE_SPEC_INTERFACE(Interface19)
+GZ_CREATE_SPEC_INTERFACE(Interface1)
+GZ_CREATE_SPEC_INTERFACE(Interface2)
+GZ_CREATE_SPEC_INTERFACE(Interface3)
+GZ_CREATE_SPEC_INTERFACE(Interface4)
+GZ_CREATE_SPEC_INTERFACE(Interface5)
+GZ_CREATE_SPEC_INTERFACE(Interface6)
+GZ_CREATE_SPEC_INTERFACE(Interface7)
+GZ_CREATE_SPEC_INTERFACE(Interface8)
+GZ_CREATE_SPEC_INTERFACE(Interface9)
+GZ_CREATE_SPEC_INTERFACE(Interface10)
+GZ_CREATE_SPEC_INTERFACE(Interface11)
+GZ_CREATE_SPEC_INTERFACE(Interface12)
+GZ_CREATE_SPEC_INTERFACE(Interface13)
+GZ_CREATE_SPEC_INTERFACE(Interface14)
+GZ_CREATE_SPEC_INTERFACE(Interface15)
+GZ_CREATE_SPEC_INTERFACE(Interface16)
+GZ_CREATE_SPEC_INTERFACE(Interface17)
+GZ_CREATE_SPEC_INTERFACE(Interface18)
+GZ_CREATE_SPEC_INTERFACE(Interface19)
 
 // Specialize for only 1 type
 using Specialize1Type =
-    ignition::common::SpecializedPluginPtr<test::util::DummySetterBase>;
+    gz::common::SpecializedPluginPtr<test::util::DummySetterBase>;
 
 // Specialize for 3 different types, and put the type we care about first in
 // the list.
 using Specialize3Types_Leading =
-    ignition::common::SpecializedPluginPtr<
+    gz::common::SpecializedPluginPtr<
         test::util::DummySetterBase,
         Interface1, Interface2>;
 
 // Specialize for 3 different types, and put the type we care about last in
 // the list.
 using Specialize3Types_Trailing =
-    ignition::common::SpecializedPluginPtr<
+    gz::common::SpecializedPluginPtr<
         Interface1, Interface2,
         test::util::DummySetterBase>;
 
 // Specialize for 10 different types, and put the type we care about first in
 // the list.
 using Specialize10Types_Leading =
-    ignition::common::SpecializedPluginPtr<
+    gz::common::SpecializedPluginPtr<
         test::util::DummySetterBase,
         Interface1, Interface2, Interface3, Interface4, Interface5,
         Interface6, Interface7, Interface8, Interface9>;
@@ -81,7 +88,7 @@ using Specialize10Types_Leading =
 // Specialize for 10 different types, and put the type we care about last in
 // the list.
 using Specialize10Types_Trailing =
-    ignition::common::SpecializedPluginPtr<
+    gz::common::SpecializedPluginPtr<
         Interface1, Interface2, Interface3, Interface4, Interface5,
         Interface6, Interface7, Interface8, Interface9,
         test::util::DummySetterBase>;
@@ -89,7 +96,7 @@ using Specialize10Types_Trailing =
 // Specialize for 20 different types, and put the type we care about first in
 // the list.
 using Specialize20Types_Leading =
-    ignition::common::SpecializedPluginPtr<
+    gz::common::SpecializedPluginPtr<
         test::util::DummySetterBase,
         Interface1, Interface2, Interface3, Interface4, Interface5,
         Interface6, Interface7, Interface8, Interface9, Interface10,
@@ -99,7 +106,7 @@ using Specialize20Types_Leading =
 // Specialize for 20 different types, and put the type we care about last in
 // the list.
 using Specialize20Types_Trailing =
-    ignition::common::SpecializedPluginPtr<
+    gz::common::SpecializedPluginPtr<
         Interface1, Interface2, Interface3, Interface4, Interface5,
         Interface6, Interface7, Interface8, Interface9, Interface10,
         Interface11, Interface12, Interface13, Interface14, Interface15,
@@ -129,16 +136,16 @@ double RunPerformanceTest(const PluginType &plugin)
 /////////////////////////////////////////////////
 TEST(PluginSpecialization, AccessTime)
 {
-  ignition::common::SystemPaths sp;
-  sp.AddPluginPaths(IGN_DUMMY_PLUGIN_PATH);
-  std::string path = sp.FindSharedLibrary("IGNDummyPlugins");
+  gz::common::SystemPaths sp;
+  sp.AddPluginPaths(GZ_DUMMY_PLUGIN_PATH);
+  std::string path = sp.FindSharedLibrary("GzDummyPlugins");
   ASSERT_FALSE(path.empty());
 
-  ignition::common::PluginLoader pl;
+  gz::common::PluginLoader pl;
   pl.LoadLibrary(path);
 
   // Load up the generic plugin
-  ignition::common::PluginPtr plugin =
+  gz::common::PluginPtr plugin =
       pl.Instantiate("::test::util::DummyMultiPlugin");
 
   // Create specialized versions
@@ -227,3 +234,7 @@ TEST(PluginSpecialization, AccessTime)
               << "ns\n" << std::endl;
   }
 }
+
+GZ_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
+
+#undef SUPPRESS_IGNITION_HEADER_DEPRECATION

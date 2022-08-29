@@ -25,22 +25,28 @@
 #include <string>
 #include <vector>
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/StringUtils.hh"
-#include "ignition/common/SystemPaths.hh"
-#include "ignition/common/Util.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/StringUtils.hh"
+#include "gz/common/SystemPaths.hh"
+#include "gz/common/Util.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 // Private data class
-class ignition::common::SystemPaths::Implementation
+class gz::common::SystemPaths::Implementation
 {
   /// \brief Name of the environment variable to check for plugin paths
-  public: std::string pluginPathEnv = "IGN_PLUGIN_PATH";
+  public: std::string pluginPathEnv = "GZ_PLUGIN_PATH";
+
+  // TODO(CH3): Deprecated. Remove on tock.
+  public: std::string pluginPathEnvDeprecated = "IGN_PLUGIN_PATH";
 
   /// \brief Name of the environment variable to check for file paths
-  public: std::string filePathEnv = "IGN_FILE_PATH";
+  public: std::string filePathEnv = "GZ_FILE_PATH";
+
+  // TODO(CH3): Deprecated. Remove on tock.
+  public: std::string filePathEnvDeprecated = "IGN_FILE_PATH";
 
   /// \brief Paths to plugins
   public: std::list<std::string> pluginPaths;
@@ -60,7 +66,7 @@ class ignition::common::SystemPaths::Implementation
 
   /// \brief Callbacks to be called in order in case a file can't be found.
   public: std::vector <std::function <std::string(
-              const ignition::common::URI &)> > findFileURICbs;
+              const gz::common::URI &)> > findFileURICbs;
 
   /// \brief generates paths to try searching for the named library
   public: std::vector<std::string> GenerateLibraryPaths(
@@ -79,16 +85,27 @@ void insertUnique(const std::string &_path, std::list<std::string> &_list)
 
 //////////////////////////////////////////////////
 SystemPaths::SystemPaths()
-: dataPtr(ignition::utils::MakeImpl<Implementation>())
+: dataPtr(gz::utils::MakeImpl<Implementation>())
 {
   std::string home, path, fullPath;
-  if (!env(IGN_HOMEDIR, home))
-    home = "/tmp/ignition";
+  if (!env(GZ_HOMEDIR, home))
+    home = "/tmp/gz";
 
-  if (!env("IGN_LOG_PATH", path))
+  if (!env("GZ_LOG_PATH", path))
   {
-    if (home != "/tmp/ignition")
-      fullPath = joinPaths(home, ".ignition");
+    // TODO(CH3): Deprecated. Remove on tock.
+    if (env("IGN_LOG_PATH", path))
+    {
+      gzwarn << "Setting log path to [" << path << "] using deprecated "
+             << "environment variable [IGN_LOG_PATH]. Please use "
+             << "[GZ_LOG_PATH] instead." << std::endl;
+    }
+  }
+
+  if (path.empty())
+  {
+    if (home != "/tmp/gz")
+      fullPath = joinPaths(home, ".gz");
     else
       fullPath = home;
   }
@@ -100,11 +117,23 @@ SystemPaths::SystemPaths()
     createDirectories(fullPath);
   }
 
-
   this->dataPtr->logPath = fullPath;
   // Populate this->dataPtr->filePaths with values from the default
   // environment variable.
-  this->SetFilePathEnv(this->dataPtr->filePathEnv);
+
+  if (this->dataPtr->filePathEnv.empty() &&
+      !this->dataPtr->filePathEnvDeprecated.empty())
+  {
+    gzwarn << "Setting file path using deprecated environment variable ["
+           <<  this->dataPtr->filePathEnvDeprecated
+           << "]. Please use " <<  this->dataPtr->filePathEnv
+           << " instead." << std::endl;
+   this->SetFilePathEnv(this->dataPtr->filePathEnvDeprecated);
+  }
+  else
+  {
+    this->SetFilePathEnv(this->dataPtr->filePathEnv);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -117,6 +146,26 @@ std::string SystemPaths::LogPath() const
 void SystemPaths::SetPluginPathEnv(const std::string &_env)
 {
   this->dataPtr->pluginPathEnv = _env;
+
+  // TODO(CH3): Deprecated. Remove on tock.
+  std::string result;
+  if (!this->dataPtr->pluginPathEnv.empty())
+  {
+    if (env(this->dataPtr->pluginPathEnv, result))
+    {
+      // TODO(CH3): Deprecated. Remove on tock.
+      std::string ignPrefix = "IGN_";
+
+      // Emit warning if env starts with IGN_
+      if (_env.compare(0, ignPrefix.length(), ignPrefix) == 0)
+      {
+        gzwarn << "Finding plugins using deprecated IGN_ prefixed environment "
+               << "variable ["
+               << _env << "]. Please use the GZ_ prefix instead."
+               << std::endl;
+      }
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -129,6 +178,15 @@ const std::list<std::string> &SystemPaths::PluginPaths()
     {
       this->AddPluginPaths(result);
     }
+    // TODO(CH3): Deprecated. Remove on tock.
+    if (env(this->dataPtr->pluginPathEnvDeprecated, result))
+    {
+      this->AddPluginPaths(result);
+      gzwarn << "Finding plugins using deprecated environment variable "
+             << "[" << this->dataPtr->pluginPathEnvDeprecated
+             << "]. Please use [" << this->dataPtr->pluginPathEnv
+             << "] instead." << std::endl;
+    }
   }
   return this->dataPtr->pluginPaths;
 }
@@ -136,8 +194,9 @@ const std::list<std::string> &SystemPaths::PluginPaths()
 /////////////////////////////////////////////////
 std::string SystemPaths::FindSharedLibrary(const std::string &_libName)
 {
+  URIPath libname(_libName);
   // Short circuit if the given library name is an absolute path to a file.
-  if (exists(_libName))
+  if (libname.IsAbsolute() && exists(_libName))
     return _libName;
 
   // Trigger loading paths from env
@@ -165,12 +224,25 @@ std::string SystemPaths::FindSharedLibrary(const std::string &_libName)
 void SystemPaths::SetFilePathEnv(const std::string &_env)
 {
   this->dataPtr->filePathEnv = _env;
+  std::string result;
+
   if (!this->dataPtr->filePathEnv.empty())
   {
     this->ClearFilePaths();
-    std::string result;
     if (env(this->dataPtr->filePathEnv, result))
     {
+      // TODO(CH3): Deprecated. Remove on tock.
+      std::string ignPrefix = "IGN_";
+
+      // Emit warning if env starts with IGN_
+      if (_env.compare(0, ignPrefix.length(), ignPrefix) == 0)
+      {
+        gzwarn << "Finding files using deprecated IGN_ prefixed environment "
+               << "variable ["
+               << _env << "]. Please use the GZ_ prefix instead"
+               << std::endl;
+      }
+
       this->AddFilePaths(result);
     }
   }
@@ -279,19 +351,19 @@ std::vector<std::string> SystemPaths::Implementation::GenerateLibraryPaths(
 //////////////////////////////////////////////////
 std::string SystemPaths::FindFileURI(const std::string &_uri) const
 {
-  if (!ignition::common::URI::Valid(_uri))
+  if (!gz::common::URI::Valid(_uri))
   {
-    ignerr << "The passed value [" << _uri << "] is not a valid URI, "
+    gzerr << "The passed value [" << _uri << "] is not a valid URI, "
               "trying as a file" << std::endl;
     return this->FindFile(_uri);
   }
 
-  const auto uri = ignition::common::URI(_uri);
+  const auto uri = gz::common::URI(_uri);
   return this->FindFileURI(uri);
 }
 
 //////////////////////////////////////////////////
-std::string SystemPaths::FindFileURI(const ignition::common::URI &_uri) const
+std::string SystemPaths::FindFileURI(const gz::common::URI &_uri) const
 {
   std::string prefix = _uri.Scheme();
   std::string suffix;
@@ -313,7 +385,7 @@ std::string SystemPaths::FindFileURI(const ignition::common::URI &_uri) const
   std::string filename;
 
   // First try to find the file on the current system
-  filename = this->FindFile(ignition::common::copyFromUnixPath(suffix),
+  filename = this->FindFile(gz::common::copyFromUnixPath(suffix),
       true, false);
 
   // Look in custom paths.
@@ -325,7 +397,7 @@ std::string SystemPaths::FindFileURI(const ignition::common::URI &_uri) const
       auto withSuffix = NormalizeDirectoryPath(filePath) + suffix;
       if (exists(withSuffix))
       {
-        filename = ignition::common::copyFromUnixPath(withSuffix);
+        filename = gz::common::copyFromUnixPath(withSuffix);
         break;
       }
     }
@@ -344,14 +416,14 @@ std::string SystemPaths::FindFileURI(const ignition::common::URI &_uri) const
 
   if (filename.empty())
   {
-    ignerr << "Unable to find file with URI [" << _uri.Str() << "]" <<
+    gzerr << "Unable to find file with URI [" << _uri.Str() << "]" <<
            std::endl;
     return std::string();
   }
 
   if (!exists(filename))
   {
-    ignerr << "URI [" << _uri.Str() << "] resolved to path [" << filename <<
+    gzerr << "URI [" << _uri.Str() << "] resolved to path [" << filename <<
            "] but the path does not exist" << std::endl;
     return std::string();
   }
@@ -370,34 +442,48 @@ std::string SystemPaths::FindFile(const std::string &_filename,
   if (filename.empty())
     return path;
 
-  // Handle as URI
-  if (ignition::common::URI::Valid(filename))
-  {
-    path = this->FindFileURI(ignition::common::URI(filename));
-  }
-  // Handle as local absolute path
-  else if (filename[0] == '/')
-  {
-    path = filename;
-  }
 #ifdef _WIN32
-  // Handle as Windows absolute path
-  else if (filename.length() >= 2 && filename[1] == ':')
+  // First of all, try if filename as a Windows absolute path exists
+  // The Windows absolute path is tried first as a Windows drive such as
+  // C:/ is also a valid URI scheme
+  if (filename.length() >= 2 && filename[1] == ':' && exists(filename))
   {
     path = filename;
   }
 #endif  // _WIN32
-  // Try appending to local paths
-  else
-  {
-    auto cwdPath = joinPaths(cwd(), filename);
-    if (_searchLocalPath && exists(cwdPath))
+  // If the filename is not an existing absolute Windows path, try others
+  if (path.empty()) {
+    // Handle as URI
+    if (gz::common::URI::Valid(filename))
     {
-      path = cwdPath;
+      path = this->FindFileURI(gz::common::URI(filename));
     }
-    else if ((filename[0] == '.' || _searchLocalPath) && exists(filename))
+    // Handle as local absolute path
+    else if (filename[0] == '/')
     {
       path = filename;
+    }
+    // Try appending to local paths
+    else
+    {
+      auto cwdPath = joinPaths(cwd(), filename);
+      if (_searchLocalPath && exists(cwdPath))
+      {
+        path = cwdPath;
+      }
+      else if ((filename[0] == '.' || _searchLocalPath) && exists(filename))
+      {
+        path = filename;
+      }
+      else
+      {
+        for (const auto &cb : this->dataPtr->findFileCbs)
+        {
+          path = cb(filename);
+          if (!path.empty())
+            break;
+        }
+      }
     }
   }
 
@@ -409,7 +495,7 @@ std::string SystemPaths::FindFile(const std::string &_filename,
       auto withSuffix = NormalizeDirectoryPath(filePath) + filename;
       if (exists(withSuffix))
       {
-        path = ignition::common::copyFromUnixPath(withSuffix);
+        path = gz::common::copyFromUnixPath(withSuffix);
         break;
       }
     }
@@ -430,7 +516,7 @@ std::string SystemPaths::FindFile(const std::string &_filename,
   {
     if (_verbose)
     {
-      ignerr << "Could not resolve file [" << _filename << "]" << std::endl;
+      gzerr << "Could not resolve file [" << _filename << "]" << std::endl;
     }
     return std::string();
   }
@@ -439,7 +525,7 @@ std::string SystemPaths::FindFile(const std::string &_filename,
   {
     if (_verbose)
     {
-      ignerr << "File [" << _filename << "] resolved to path [" << path <<
+      gzerr << "File [" << _filename << "] resolved to path [" << path <<
                 "] but the path does not exist" << std::endl;
     }
     return std::string();
@@ -510,7 +596,7 @@ void SystemPaths::AddFindFileCallback(
 
 /////////////////////////////////////////////////
 void SystemPaths::AddFindFileURICallback(
-    std::function<std::string(const ignition::common::URI &)> _cb)
+    std::function<std::string(const gz::common::URI &)> _cb)
 {
   this->dataPtr->findFileURICbs.push_back(_cb);
 }
@@ -527,7 +613,7 @@ std::list<std::string> SystemPaths::PathsFromEnv(const std::string &_env)
   if (envPathsStr.empty())
     return paths;
 
-  auto ps = ignition::common::Split(envPathsStr, Delimiter());
+  auto ps = gz::common::Split(envPathsStr, Delimiter());
   for (auto const &path : ps)
   {
     std::string normalPath = NormalizeDirectoryPath(path);

@@ -16,10 +16,10 @@
 */
 
 #include <gtest/gtest.h>
-#include "ignition/common/Console.hh"
-#include "ignition/common/URI.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/URI.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 /////////////////////////////////////////////////
@@ -866,7 +866,7 @@ TEST(URITEST, File)
 TEST(URITEST, WinPath)
 {
   // Windows path requires authority
-  const auto uri = ignition::common::URI("file://D:/my/test/dir/world.sdf",
+  const auto uri = gz::common::URI("file://D:/my/test/dir/world.sdf",
       true);
   ASSERT_TRUE(uri.Authority());
   EXPECT_EQ("file", uri.Scheme());
@@ -927,7 +927,7 @@ TEST(URITEST, HasAuthority)
 //////////////////////////////////////////////////
 TEST(URITEST, Resource)
 {
-  // Test URIs that are commonly used for resources in Ignition
+  // Test URIs that are commonly used for resources in Gazebo
   {
     URI uri;
     EXPECT_TRUE(uri.Parse("model://model_name/meshes/mesh.dae"));

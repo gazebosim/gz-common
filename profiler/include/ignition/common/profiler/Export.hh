@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/profiler/Export.hh>
+#include <ignition/common/config.hh>

@@ -16,3 +16,7 @@
  */
 
 #include <gz/common/EnumIface.hh>
+#include <ignition/common/config.hh>
+
+#define IGN_ENUM(name, enumType, begin, end, ...) \
+  GZ_ENUM(name, enumType, begin, end, __VA_ARGS__)

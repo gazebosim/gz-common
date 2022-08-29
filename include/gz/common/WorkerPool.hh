@@ -24,7 +24,7 @@
 
 #include <gz/utils/ImplPtr.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -32,7 +32,7 @@ namespace ignition
     class WorkerPoolPrivate;
 
     /// \brief A pool of worker threads that do stuff in parallel
-    class IGNITION_COMMON_VISIBLE WorkerPool
+    class GZ_COMMON_VISIBLE WorkerPool
     {
       /// \brief Creates worker threads. The number of worker threads is
       /// determined by max(std::thread::hardware_concurrency, _minThreadCount).
@@ -62,7 +62,7 @@ namespace ignition
         const std::chrono::steady_clock::duration &_timeout =
           std::chrono::steady_clock::duration::zero());
 
-      IGN_UTILS_UNIQUE_IMPL_PTR(dataPtr)
+      GZ_UTILS_UNIQUE_IMPL_PTR(dataPtr)
     };
   }
 }

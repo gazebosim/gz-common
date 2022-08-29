@@ -26,13 +26,13 @@
 #include <gz/common/NodeTransform.hh>
 #include <gz/common/graphics/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
     /// \class SkeletonNode Skeleton.hh gz/common/SkeletonNode.hh
     /// \brief A skeleton node
-    class IGNITION_COMMON_GRAPHICS_VISIBLE SkeletonNode
+    class GZ_COMMON_GRAPHICS_VISIBLE SkeletonNode
     {
       /// \brief enumeration of node types
       public: enum SkeletonNodeType {NODE, JOINT};
@@ -190,7 +190,7 @@ namespace ignition
       public: std::vector<NodeTransform> Transforms() const;
 
       /// \brief Private data pointer.
-      IGN_UTILS_IMPL_PTR(dataPtr)
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
 
     typedef std::map<unsigned int, SkeletonNode*> SkeletonNodeMap;

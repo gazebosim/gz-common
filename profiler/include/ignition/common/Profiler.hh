@@ -16,3 +16,15 @@
  */
 
 #include <gz/common/Profiler.hh>
+#include <ignition/common/config.hh>
+
+#define IGN_PROFILER_ENABLE GZ_PROFILER_ENABLE
+
+#define IGN_PROFILE_THREAD_NAME(name)  GZ_PROFILE_THREAD_NAME(name)
+#define IGN_PROFILE_LOG_TEXT(name)     GZ_PROFILE_LOG_TEXT(name)
+#define IGN_PROFILE_BEGIN(name)        GZ_PROFILE_BEGIN(name)
+#define IGN_PROFILE_END()              GZ_PROFILE_END()
+#define IGN_PROFILE_L(name, line)      GZ_PROFILE_L(name, line)
+#define IGN_PROFILE(name)              GZ_PROFILE(name)
+
+#define IGN_PROFILER_VALID GZ_PROFILER_VALID

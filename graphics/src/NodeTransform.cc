@@ -15,15 +15,15 @@
  *
  */
 
-#include <ignition/common/NodeTransform.hh>
+#include <gz/common/NodeTransform.hh>
 
 #include <iostream>
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 /// \brief Private data for NodeTransform
-class ignition::common::NodeTransform::Implementation
+class gz::common::NodeTransform::Implementation
 {
   /// \brief the sid
   public: std::string sid;
@@ -40,7 +40,7 @@ class ignition::common::NodeTransform::Implementation
 
 //////////////////////////////////////////////////
 NodeTransform::NodeTransform(const NodeTransformType _type)
-: dataPtr(ignition::utils::MakeImpl<Implementation>())
+: dataPtr(gz::utils::MakeImpl<Implementation>())
 {
   this->dataPtr->sid = "_default_";
   this->dataPtr->type = _type;
@@ -50,7 +50,7 @@ NodeTransform::NodeTransform(const NodeTransformType _type)
 //////////////////////////////////////////////////
 NodeTransform::NodeTransform(const math::Matrix4d &_mat,
     const std::string &_sid, const NodeTransformType _type)
-: dataPtr(ignition::utils::MakeImpl<Implementation>())
+: dataPtr(gz::utils::MakeImpl<Implementation>())
 {
   this->dataPtr->sid = _sid;
   this->dataPtr->type = _type;
@@ -167,7 +167,7 @@ void NodeTransform::RecalculateMatrix()
         mat.SetFromAxisAngle(math::Vector3d(this->dataPtr->source[0],
                                             this->dataPtr->source[1],
                                             this->dataPtr->source[2]),
-                             IGN_DTOR(this->dataPtr->source[3]));
+                             GZ_DTOR(this->dataPtr->source[3]));
         this->dataPtr->transform = mat;
       }
       else

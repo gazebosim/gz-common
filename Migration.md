@@ -5,18 +5,60 @@ Deprecated code produces compile-time warnings. These warning serve as
 notification to users that their code should be upgraded. The next major
 release will remove the deprecated code.
 
-## Ignition Common 4.X to 5.X
+## Gazebo Common 4.X to 5.X
 
 ### Deprecations
 
 1. `Submesh::MaterialIndex` is deprecated. `SubMesh::GetMaterialIndex` should
    be used instead, which properly handles submeshes having no material index
    applied to them.
+2. The `ignition` namespace is deprecated and will be removed in future versions.  Use `gz` instead.
+3. Header files under `ignition/...` are deprecated and will be removed in future versions.
+   Use `gz/...` instead.
+4. The logging macros (`ignmsg`, `ignwarn`, `ignerr`, etc.) and logging function macros
+   (`ignLogInit()`, etc.) are deprecated and will be removed in future versions. Use `gz` instead
+   (e.g. `gzmsg`, `gzwarn`, `gzLogInit()`)
+5. All the plugin APIs are deprecated, use the gz-plugin library instead. See
+   the [migration guide](https://github.com/ignitionrobotics/ign-plugin/blob/ign-plugin1/MIGRATION.md).
+6. The following `IGN_` prefixed environment variables are deprecated and will be removed.
+   Please use the `GZ_` prefixed versions instead!
+   1. `IGN_VIDEO_ALLOWED_ENCODERS` -> `GZ_VIDEO_ALLOWED_ENCODERS`
+   2. `IGN_VIDEO_ENCODER_DEVICE` -> `GZ_VIDEO_ENCODER_DEVICE`
+   3. `IGN_VIDEO_USE_HW_SURFACE` -> `GZ_VIDEO_USE_HW_SURFACE`
+   4. `IGN_FILE_PATH` -> `GZ_FILE_PATH`
+   5. `IGN_LOG_PATH` -> `GZ_LOG_PATH`
+   6. `IGN_PLUGIN_PATH` -> `GZ_PLUGIN_PATH`
+7. The following `IGN_` / `IGNITION_` prefixed macros are deprecated and will be removed in future versions.
+   Additionally, they will only be available when including the corresponding `ignition/...` header.
+   Use the `GZ_` prefix instead.
+   1. `IGN_ENUM`
+   2. `IGN_HOMEDIR`
+   3. `IGN_NANO_TO_SEC`, `IGN_SEC_TO_NANO`, `IGN_MS_TO_NANO`, `IGN_US_TO_NANO`
+   4. `IGN_SPEED_OF_LIGHT`
+   5. `IGN_SLEEP_S`, `IGN_SLEEP_US`, `IGN_SLEEP_MS`, `IGN_SLEEP_NS`
+   6. `IGN_SYSTEM_TIME`, `IGN_SYSTEM_TIME_S`, `IGN_SYSTEM_TIME_US`, `IGN_SYSTEM_TIME_MS`, `IGN_SYSTEM_TIME_NS`
+   7. `IGN_ASSERT`
+   8. `IGNITION_COMMON_TINYOBJLOADER_IMPLEMENTATION` (`src` local, hard-tocked)
+   9. `IGN_PROFILER_ENABLE`, `IGN_PROFILE_THREAD_NAME`, `IGN_PROFILE_LOG_TEXT`, `IGN_PROFILE_BEGIN`, `IGN_PROFILE_END`, `IGN_PROFILE_L`, `IGN_PROFILE`, `IGN_PROFILE_VALID`
+   10. `IGN_CREATE_SPEC_INTERFACE`
+   11. `IGN_DUMMY_PLUGIN_PATH`
+   12. `IGNITION_UNITTEST_SPECIALIZED_PLUGIN_ACCESS`
+8. The `Image::Data(unsigned char**, unsigned int&)` functions that accept a pointer and a size and internally allocate memory are deprecated and will be removed in future versions.
+   Use the new `Data` functions that return a `std::vector<unsigned char>` to have automatic memory management.
+
+### Breaking Changes
+
+1. The project name has been changed to use the `gz-` prefix, you **must** use the `gz` prefix!
+  * This also means that any generated code that use the project name (e.g. CMake variables, in-source macros) would have to be migrated.
+  * Some non-exhaustive examples of this include:
+    * `GZ_<PROJECT>_<VISIBLE/HIDDEN>`
+    * CMake `-config` files
+    * Paths that depend on the project name
 
 ### Additions
 
 1. **geospatial** component that loads heightmap images and DEMs
-    + Depends on the ign-common's `graphics` component and the `gdal` library
+    + Depends on the gz-common's `graphics` component and the `gdal` library
 
 ### Modifications
 
@@ -30,12 +72,12 @@ release will remove the deprecated code.
 
 1. `Image::AvgColor`, `Image::Data` and `Image::RGBData` methods are now `const`.
 
-## Ignition Common 3.X to 4.X
+## Gazebo Common 3.X to 4.X
 
 ### Modifications
 
 1. Corrected `BAYER_RGGR8` to `BAYER_BGGR8` in `PixelFormatName` and
-   `PixelFormatType` located in `graphics/include/ignition/common/Image.hh`.
+   `PixelFormatType` located in `graphics/include/gz/common/Image.hh`.
 
 1. URI parsing has updated to follow the specification more closely when
    `URI::Authority` is set. Changes include:
@@ -44,10 +86,9 @@ release will remove the deprecated code.
     * A URI Query does not require a `key=value` format. For example
     a valid query can be "?aquery", "?aquery?", and `??`.
     * A URI authority is optional. If present, then a URI authority begins
-    with two forward slashes and immediately follows the URI scheme. A host
-    must be present if an authority is present and the scheme != 'file'.
+    with two forward slashes and immediately follows the URI scheme. A host must be present if an authority is present and the scheme != 'file'.
 
-## Ignition Common 2.X to 3.X
+## Gazebo Common 2.X to 3.X
 
 ### Additions
 
@@ -58,7 +99,7 @@ release will remove the deprecated code.
 1. **profiler** component that helps measure software performance.
 
 1. **SystemPaths.hh**
-    + Search paths specified in `IGN_FILE_PATH` environment variable when
+    + Search paths specified in `GZ_FILE_PATH` environment variable when
       finding files.
 
 1. **Util.hh**
@@ -67,34 +108,33 @@ release will remove the deprecated code.
 
 ### Modifications
 
-1. Depends on **ignition-cmake2**
-    + Ignition-common now depends on ignition-cmake2.
+1. Depends on **gz-cmake2**
+    + gz-common now depends on gz-cmake2.
 
 1. Requires c++17.
 
-1. (New in 3.8.0) On Windows, the value of C++ macro `IGN_HOMEDIR` changed from `HOMEPATH` to `USERPROFILE`. It is usually used to read the path to the user's home from environment. The old value pointed to a path relative to the (a) current drive letter as reported by `pwd`, not the system drive letter. The new value correctly points to an environment variable that contains the full absolute path to the user's profile. If the code did not use the macro in some unexpected way, the new behavior should work either the same or even better (it would work even when the current directory is on a non-system drive). If the code relied on this value to be relative to the current drive letter, it needs to be changed to use `HOMEPATH` directly.
+1. (New in 3.8.0) On Windows, the value of C++ macro `GZ_HOMEDIR` changed from `HOMEPATH` to `USERPROFILE`. It is usually used to read the path to the user's home from environment. The old value pointed to a path relative to the (a) current drive letter as reported by `pwd`, not the system drive letter. The new value correctly points to an environment variable that contains the full absolute path to the user's profile. If the code did not use the macro in some unexpected way, the new behavior should work either the same or even better (it would work even when the current directory is on a non-system drive). If the code relied on this value to be relative to the current drive letter, it needs to be changed to use `HOMEPATH` directly.
 
-## Ignition Common 1.X to 2.X
+## Gazebo Common 1.X to 2.X
 
 ### Modifications
 
-1. Depends on **ignition-cmake1**
-    + Ignition-common now depends on ignition-cmake1, which provides
+1. Depends on **gz-cmake1**
+    + gz-common now depends on gz-cmake1, which provides
       support for Component libraries.
 
 1. Component libraries
-    + Some classes have been moved from the main ignition-common library
+    + Some classes have been moved from the main gz-common library
       to component libraries. To use these features, you must
       list them in the `find_package` call and link against them.
       - av: audio and video playback and encoding
       - events: registering and handling event callbacks
       - graphics: animation, images, and triangle meshes
 
-## Ignition Common 0.X to 1.X
+## Gazebo Common 0.X to 1.X
 
 ### Added dependencies
 
-1. **ignition-cmake**
-    + Ignition-math now has a build dependency on ignition-cmake, which
-      allows cmake scripts to be shared across all the ignition packages.
-
+1. **gz-cmake**
+    + gz-math now has a build dependency on gz-cmake, which
+      allows cmake scripts to be shared across all the Gazebo packages.

@@ -29,25 +29,25 @@
 #endif
 #endif
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/Util.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/Util.hh"
 
-#include "ignition/common/SVGLoader.hh"
+#include "gz/common/SVGLoader.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
-class ignition::common::SVGLoader::Implementation
+class gz::common::SVGLoader::Implementation
 {
   /// \brief Generates polylines for each SVG subpath
   /// \param[in] _subpath The subpath commands
   /// \param[in] _last The previous position (for relative path commands)
   /// \param[out] _polyline The polyline that receives the data
   /// \return The last point of the subpath
-  public: ignition::math::Vector2d SubpathToPolyline(
+  public: gz::math::Vector2d SubpathToPolyline(
               const std::vector<SVGCommand> &_subpath,
-              ignition::math::Vector2d _last,
-              std::vector<ignition::math::Vector2d> &_polyline);
+              gz::math::Vector2d _last,
+              std::vector<gz::math::Vector2d> &_polyline);
 
   /// \brief Splits a list of commands into subpaths
   /// \param[in] _cmds The flat list of commands for all the subpaths.
@@ -94,14 +94,14 @@ class ignition::common::SVGLoader::Implementation
 /////////////////////////////////////////////////
 // This local helper function takes in a SVG transformation string
 // and returns the corresponding transformation matrix
-ignition::math::Matrix3d ParseTransformMatrixStr(
+gz::math::Matrix3d ParseTransformMatrixStr(
     const std::string &_transformStr)
 {
   // check for transformation
   if (_transformStr.empty())
   {
-    ignerr << "no data for ParseTransformMatrixStr";
-    return ignition::math::Matrix3d::Identity;
+    gzerr << "no data for ParseTransformMatrixStr";
+    return gz::math::Matrix3d::Identity;
   }
 
   // _transfromStr should not have a closing paren and look like this
@@ -111,9 +111,9 @@ ignition::math::Matrix3d ParseTransformMatrixStr(
 
   if (tx.size() < 2)
   {
-    ignerr << "Invalid path transform: '" << &_transformStr << "'"
+    gzerr << "Invalid path transform: '" << &_transformStr << "'"
           << std::endl;
-    return ignition::math::Matrix3d::Identity;
+    return gz::math::Matrix3d::Identity;
   }
   std::string transform = tx[0];
   std::vector<std::string> numbers = split(tx[1], ",");
@@ -124,10 +124,10 @@ ignition::math::Matrix3d ParseTransformMatrixStr(
   {
     if (numbers.size() != 6)
     {
-      ignerr << "Unsupported matrix transform with "
+      gzerr << "Unsupported matrix transform with "
             << numbers.size() << " parameters. Should be 6."
             << std::endl;
-      return ignition::math::Matrix3d::Identity;
+      return gz::math::Matrix3d::Identity;
     }
     double a = stod(numbers[0]);  // 00
     double b = stod(numbers[1]);  // 10
@@ -135,7 +135,7 @@ ignition::math::Matrix3d ParseTransformMatrixStr(
     double d = stod(numbers[3]);  // 11
     double e = stod(numbers[4]);  // 02
     double f = stod(numbers[5]);  // 12
-    ignition::math::Matrix3d m(a, c, e, b, d, f, 0, 0, 1);
+    gz::math::Matrix3d m(a, c, e, b, d, f, 0, 0, 1);
     return m;
   }
 
@@ -143,16 +143,16 @@ ignition::math::Matrix3d ParseTransformMatrixStr(
   {
     if (numbers.size() != 1)
     {
-      ignerr << "Unsupported skewX transform. Needs 1 parameter only"
+      gzerr << "Unsupported skewX transform. Needs 1 parameter only"
             << std::endl;
-      return ignition::math::Matrix3d::Identity;
+      return gz::math::Matrix3d::Identity;
     }
     double deg = stod(numbers[0]);
-    ignition::math::Angle angle;
+    gz::math::Angle angle;
     angle.SetDegree(deg);
     // get the tangent of the angle
     double t = tan(angle.Radian());
-    ignition::math::Matrix3d m(1, t, 0, 0, 1, 0, 0, 0, 1);
+    gz::math::Matrix3d m(1, t, 0, 0, 1, 0, 0, 0, 1);
     return m;
   }
 
@@ -160,16 +160,16 @@ ignition::math::Matrix3d ParseTransformMatrixStr(
   {
     if (numbers.size() != 1)
     {
-      ignerr << "Unsupported skewY transform. Needs 1 parameter only"
+      gzerr << "Unsupported skewY transform. Needs 1 parameter only"
             << std::endl;
-      return ignition::math::Matrix3d::Identity;
+      return gz::math::Matrix3d::Identity;
     }
     double deg = stod(numbers[0]);
-    ignition::math::Angle angle;
+    gz::math::Angle angle;
     angle.SetDegree(deg);
     // get the tangent of the angle
     double t = tan(angle.Radian());
-    ignition::math::Matrix3d m(1, 0, 0, t, 1, 0, 0, 0, 1);
+    gz::math::Matrix3d m(1, 0, 0, t, 1, 0, 0, 0, 1);
     return m;
   }
 
@@ -179,9 +179,9 @@ ignition::math::Matrix3d ParseTransformMatrixStr(
   {
     if (numbers.size() == 0 || numbers.size() > 2)
     {
-      ignerr << "Unsupported scale transform with more than 2 parameters"
+      gzerr << "Unsupported scale transform with more than 2 parameters"
             << std::endl;
-      return ignition::math::Matrix3d::Identity;
+      return gz::math::Matrix3d::Identity;
     }
     double x = stod(numbers[0]);
     double y = x;
@@ -189,7 +189,7 @@ ignition::math::Matrix3d ParseTransformMatrixStr(
     {
       y = stod(numbers[1]);
     }
-    ignition::math::Matrix3d m(x, 0, 0, 0, y, 0, 0, 0, 1);
+    gz::math::Matrix3d m(x, 0, 0, 0, y, 0, 0, 0, 1);
     return m;
   }
   // translate(<x> [<y>])
@@ -198,9 +198,9 @@ ignition::math::Matrix3d ParseTransformMatrixStr(
   {
     if (numbers.size() == 0 || numbers.size() > 2)
     {
-      ignerr << "Unsupported translate transform with more than 2 parameters"
+      gzerr << "Unsupported translate transform with more than 2 parameters"
             << std::endl;
-      return ignition::math::Matrix3d::Identity;
+      return gz::math::Matrix3d::Identity;
     }
     double x = stod(numbers[0]);
     double y = 0;
@@ -208,7 +208,7 @@ ignition::math::Matrix3d ParseTransformMatrixStr(
     {
       y = stod(numbers[1]);
     }
-    ignition::math::Matrix3d m(1, 0, x, 0, 1, y, 0, 0, 1);
+    gz::math::Matrix3d m(1, 0, x, 0, 1, y, 0, 0, 1);
     return m;
   }
   // rotate(<a> [<x> <y>]) angle in degrees, center x and y
@@ -217,12 +217,12 @@ ignition::math::Matrix3d ParseTransformMatrixStr(
   {
     if (numbers.size() ==0 || numbers.size() == 2 || numbers.size() > 3 )
     {
-      ignerr << "Unsupported rotate transform. Only angle and optional x y"
+      gzerr << "Unsupported rotate transform. Only angle and optional x y"
             << " are supported" << std::endl;
-      return ignition::math::Matrix3d::Identity;
+      return gz::math::Matrix3d::Identity;
     }
     double deg = stod(numbers[0]);
-    ignition::math::Angle angle;
+    gz::math::Angle angle;
     angle.SetDegree(deg);
     double a = angle.Radian();
     double sina = sin(a);
@@ -235,25 +235,25 @@ ignition::math::Matrix3d ParseTransformMatrixStr(
       y = stod(numbers[2]);
     }
     // we apply a translation to x, y, the rotation and the translation -x,-y
-    ignition::math::Matrix3d transToXy(1, 0, x, 0, 1, y, 0, 0, 1);
-    ignition::math::Matrix3d transFromXy(1, 0, -x, 0, 1, -y, 0, 0, 1);
-    ignition::math::Matrix3d rotate(cosa, -sina, 0, sina, cosa, 0, 0, 0, 1);
-    ignition::math::Matrix3d m = transToXy * rotate * transFromXy;
+    gz::math::Matrix3d transToXy(1, 0, x, 0, 1, y, 0, 0, 1);
+    gz::math::Matrix3d transFromXy(1, 0, -x, 0, 1, -y, 0, 0, 1);
+    gz::math::Matrix3d rotate(cosa, -sina, 0, sina, cosa, 0, 0, 0, 1);
+    gz::math::Matrix3d m = transToXy * rotate * transFromXy;
     return m;
   }
   // we have no business being here
-  ignerr << "Unknown transformation: " << transform << std::endl;
-  ignition::math::Matrix3d m = ignition::math::Matrix3d::Identity;
+  gzerr << "Unknown transformation: " << transform << std::endl;
+  gz::math::Matrix3d m = gz::math::Matrix3d::Identity;
   return m;
 }
 
 /////////////////////////////////////////////////
 // This local helper function interpolates a bezier curve at t (between 0 and 1)
-ignition::math::Vector2d bezierInterpolate(double _t,
-                                           const ignition::math::Vector2d &_p0,
-                                           const ignition::math::Vector2d &_p1,
-                                           const ignition::math::Vector2d &_p2,
-                                           const ignition::math::Vector2d &_p3)
+gz::math::Vector2d bezierInterpolate(double _t,
+                                           const gz::math::Vector2d &_p0,
+                                           const gz::math::Vector2d &_p1,
+                                           const gz::math::Vector2d &_p2,
+                                           const gz::math::Vector2d &_p3)
 {
   double t_1 = 1.0 - _t;
   double t_1_2 = t_1 * t_1;
@@ -261,7 +261,7 @@ ignition::math::Vector2d bezierInterpolate(double _t,
   double t2 = _t * _t;
   double t3 = t2 * _t;
 
-  ignition::math::Vector2d p;
+  gz::math::Vector2d p;
   p.X(t_1_3 * _p0.X() + 3 * _t *  t_1_2 * _p1.X() + 3 * t2 * t_1 * _p2.X() +
       t3 * _p3.X());
   p.Y(t_1_3 * _p0.Y() + 3 * _t *  t_1_2 * _p1.Y() + 3 * t2 * t_1 * _p2.Y() +
@@ -271,12 +271,12 @@ ignition::math::Vector2d bezierInterpolate(double _t,
 
 /////////////////////////////////////////////////
 // This helper function adds bezier interpolations to a list of points
-void cubicBezier(const ignition::math::Vector2d &_p0,
-                 const ignition::math::Vector2d &_p1,
-                 const ignition::math::Vector2d &_p2,
-                 const ignition::math::Vector2d &_p3,
+void cubicBezier(const gz::math::Vector2d &_p0,
+                 const gz::math::Vector2d &_p1,
+                 const gz::math::Vector2d &_p2,
+                 const gz::math::Vector2d &_p3,
                  double _step,
-                 std::vector<ignition::math::Vector2d> &_points)
+                 std::vector<gz::math::Vector2d> &_points)
 {
   // we don't start at t = 0, but t = step...
   // so we assume that the first point is there (from the last move)
@@ -334,20 +334,20 @@ static float VecAng(float _ux, float _uy, float _vx, float _vy)
 
 /////////////////////////////////////////////////
 // This helper function adds arc interpolations to a list of points
-void arcPath(const ignition::math::Vector2d &_p0,
+void arcPath(const gz::math::Vector2d &_p0,
              const double _rx,
              const double _ry,
              const double _rotxDeg,
              const size_t _largeArc,
              const size_t _sweepDirection,
-             const ignition::math::Vector2d &_pEnd,
+             const gz::math::Vector2d &_pEnd,
              const double _step,
-             std::vector<ignition::math::Vector2d> &_points)
+             std::vector<gz::math::Vector2d> &_points)
 {
   // Ported from canvg (https://code.google.com/p/canvg/)
   double rx = _rx;
   double ry = _ry;
-  double rotx = _rotxDeg / 180.0 * IGN_PI;
+  double rotx = _rotxDeg / 180.0 * GZ_PI;
 
   double x1, y1, x2, y2, cx, cy, dx, dy, d;
   double x1p, y1p, cxp, cyp, s, sa, sb;
@@ -421,18 +421,18 @@ void arcPath(const ignition::math::Vector2d &_p0,
   {
     // Choose large arc
     if (da > 0.0)
-      da = da - 2 * IGN_PI;
+      da = da - 2 * GZ_PI;
     else
-      da = 2 * IGN_PI + da;
+      da = 2 * GZ_PI + da;
   }
 
   // rounding errors for half circles
-  if (IGN_PI - fabs(da) < 0.001)
+  if (GZ_PI - fabs(da) < 0.001)
   {
     if (_sweepDirection)
-      da = IGN_PI;
+      da = GZ_PI;
     else
-      da = -IGN_PI;
+      da = -GZ_PI;
   }
 
   // Approximate the arc using cubic spline segments.
@@ -446,7 +446,7 @@ void arcPath(const ignition::math::Vector2d &_p0,
   // Split arc into max 90 degree segments.
   // The loop assumes an iteration per end point
   // (including start and end), this +1.
-  size_t ndivs = static_cast<int>(fabs(da) / (IGN_PI * 0.5) + 1.0);
+  size_t ndivs = static_cast<int>(fabs(da) / (GZ_PI * 0.5) + 1.0);
   hda = (da / ndivs) / 2.0;
   kappa = fabs(4.0 / 3.0 * (1.0 - cos(hda)) / sin(hda));
   if (da < 0.0)
@@ -471,10 +471,10 @@ void arcPath(const ignition::math::Vector2d &_p0,
 
     if (i > 0)
     {
-      ignition::math::Vector2d p0(px, py);
-      ignition::math::Vector2d p1(px + ptanx, py + ptany);
-      ignition::math::Vector2d p2(x - tanx, y - tany);
-      ignition::math::Vector2d p3(x, y);
+      gz::math::Vector2d p0(px, py);
+      gz::math::Vector2d p1(px + ptanx, py + ptany);
+      gz::math::Vector2d p2(x - tanx, y - tany);
+      gz::math::Vector2d p3(x, y);
       cubicBezier(p0, p1, p2, p3, _step, _points);
     }
     px = x;
@@ -485,15 +485,15 @@ void arcPath(const ignition::math::Vector2d &_p0,
 }
 
 /////////////////////////////////////////////////
-ignition::math::Vector2d SVGLoader::Implementation::SubpathToPolyline(
+gz::math::Vector2d SVGLoader::Implementation::SubpathToPolyline(
     const std::vector<SVGCommand> &_subpath,
-    ignition::math::Vector2d _last,
-    std::vector<ignition::math::Vector2d> &_polyline)
+    gz::math::Vector2d _last,
+    std::vector<gz::math::Vector2d> &_polyline)
 {
   if (!_polyline.empty())
   {
-    ignerr << "polyline not empty";
-    return ignition::math::Vector2d::Zero;
+    gzerr << "polyline not empty";
+    return gz::math::Vector2d::Zero;
   }
 
   for (SVGCommand cmd : _subpath)
@@ -507,7 +507,7 @@ ignition::math::Vector2d SVGLoader::Implementation::SubpathToPolyline(
       case 'l':
         while (i < count)
         {
-          ignition::math::Vector2d p;
+          gz::math::Vector2d p;
           p.X(cmd.numbers[i+0]);
           p.Y(cmd.numbers[i+1]);
           // m and l cmds are relative to the last point
@@ -522,7 +522,7 @@ ignition::math::Vector2d SVGLoader::Implementation::SubpathToPolyline(
       case 'L':
         while (i < count)
         {
-          ignition::math::Vector2d p;
+          gz::math::Vector2d p;
           p.X(cmd.numbers[i+0]);
           p.Y(cmd.numbers[i+1]);
           _polyline.push_back(p);
@@ -533,8 +533,8 @@ ignition::math::Vector2d SVGLoader::Implementation::SubpathToPolyline(
       case 'C':
         while (i < count)
         {
-          ignition::math::Vector2d p0 = _last;
-          ignition::math::Vector2d p1, p2, p3;
+          gz::math::Vector2d p0 = _last;
+          gz::math::Vector2d p1, p2, p3;
           p1.X(cmd.numbers[i+0]);
           p1.Y(cmd.numbers[i+1]);
           p2.X(cmd.numbers[i+2]);
@@ -549,8 +549,8 @@ ignition::math::Vector2d SVGLoader::Implementation::SubpathToPolyline(
       case 'c':
         while (i < count)
         {
-          ignition::math::Vector2d p0 = _last;
-          ignition::math::Vector2d p1, p2, p3;
+          gz::math::Vector2d p0 = _last;
+          gz::math::Vector2d p1, p2, p3;
           p1.X(cmd.numbers[i+0] + _last.X());
           p1.Y(cmd.numbers[i+1] + _last.Y());
           p2.X(cmd.numbers[i+2] + _last.X());
@@ -565,13 +565,13 @@ ignition::math::Vector2d SVGLoader::Implementation::SubpathToPolyline(
       case 'A':
         while (i < count)
         {
-          ignition::math::Vector2d p0 = _last;
+          gz::math::Vector2d p0 = _last;
           double rx = cmd.numbers[i+0];
           double ry = cmd.numbers[i+1];
           double xRot = cmd.numbers[i+2];
           unsigned int arc(static_cast<unsigned int>(cmd.numbers[i+3]));
           unsigned int sweep(static_cast<unsigned int>(cmd.numbers[i+4]));
-          ignition::math::Vector2d pEnd;
+          gz::math::Vector2d pEnd;
           pEnd.X(cmd.numbers[i+5]);
           pEnd.Y(cmd.numbers[i+6]);
           arcPath(p0, rx, ry, xRot, arc, sweep, pEnd,
@@ -583,13 +583,13 @@ ignition::math::Vector2d SVGLoader::Implementation::SubpathToPolyline(
       case 'a':
         while (i < count)
         {
-          ignition::math::Vector2d p0 = _last;
+          gz::math::Vector2d p0 = _last;
           double rx = cmd.numbers[i+0];
           double ry = cmd.numbers[i+1];
           double xRot = cmd.numbers[i+2];
           unsigned int arc(static_cast<unsigned int>(cmd.numbers[i+3]));
           unsigned int sweep(static_cast<unsigned int>(cmd.numbers[i+4]));
-          ignition::math::Vector2d pEnd;
+          gz::math::Vector2d pEnd;
           pEnd.X(cmd.numbers[i+5] + _last.X());
           pEnd.Y(cmd.numbers[i+6] + _last.Y());
           arcPath(p0, rx, ry, xRot, arc, sweep, pEnd,
@@ -606,13 +606,13 @@ ignition::math::Vector2d SVGLoader::Implementation::SubpathToPolyline(
           auto &p = _polyline.front();
           if (_polyline.back().Distance(p) > 1e-5)
           {
-            ignerr << "Zz" << _polyline.back().Distance(p) << std::endl;
+            gzerr << "Zz" << _polyline.back().Distance(p) << std::endl;
             _polyline.push_back(p);
           }
           break;
         }
       default:
-        ignerr << "Unexpected SVGCommand value: " << cmd.cmd << std::endl;
+        gzerr << "Unexpected SVGCommand value: " << cmd.cmd << std::endl;
     }
   }
   return _last;
@@ -620,7 +620,7 @@ ignition::math::Vector2d SVGLoader::Implementation::SubpathToPolyline(
 
 /////////////////////////////////////////////////
 SVGLoader::SVGLoader(const unsigned int _samples)
-: dataPtr(ignition::utils::MakeImpl<Implementation>())
+: dataPtr(gz::utils::MakeImpl<Implementation>())
 {
   this->dataPtr->resolution = 1.0/std::max(1u, _samples);
 }
@@ -637,7 +637,7 @@ bool SVGLoader::Implementation::SplitSubpaths(
 {
   if (_cmds.empty())
   {
-    ignerr << "SVGPath has no commands";
+    gzerr << "SVGPath has no commands";
     return false;
   }
 
@@ -760,17 +760,17 @@ bool SVGLoader::Implementation::PathCommands(
 
   // the starting point for the subpath
   // it is the end point of the previous one
-  ignition::math::Vector2d p;
+  gz::math::Vector2d p;
 
   for (std::vector<SVGCommand> subpath : subpaths)
   {
-    _path.polylines.push_back(std::vector<ignition::math::Vector2d>());
-    std::vector<ignition::math::Vector2d> &polyline = _path.polylines.back();
+    _path.polylines.push_back(std::vector<gz::math::Vector2d>());
+    std::vector<gz::math::Vector2d> &polyline = _path.polylines.back();
     p = this->SubpathToPolyline(subpath, p, polyline);
   }
 
   // if necessary, apply transform to p and polyline
-  if (_path.transform != ignition::math::Matrix3d::Identity)
+  if (_path.transform != gz::math::Matrix3d::Identity)
   {
     // we need to transform all the points in the path
     for (auto &polyline : _path.polylines)
@@ -778,7 +778,7 @@ bool SVGLoader::Implementation::PathCommands(
       for (auto  &polyPoint : polyline)
       {
         // make a 3d vector form the 2d point
-        ignition::math::Vector3d point3(polyPoint.X(), polyPoint.Y(), 1);
+        gz::math::Vector3d point3(polyPoint.X(), polyPoint.Y(), 1);
         // matrix multiply to get the new point, then save new coords in place
         auto transformed = _path.transform * point3;
         polyPoint.X(transformed.X());
@@ -796,11 +796,11 @@ bool SVGLoader::Implementation::PathAttribs(tinyxml2::XMLElement *_pElement,
 {
   if (!_pElement)
   {
-    ignerr << "empty XML element where a path was expected.\n";
+    gzerr << "empty XML element where a path was expected.\n";
     return false;
   }
 
-  _path.transform = ignition::math::Matrix3d::Identity;
+  _path.transform = gz::math::Matrix3d::Identity;
   const tinyxml2::XMLAttribute *pAttrib = _pElement->FirstAttribute();
 
   // this attribute contains a list of coordinates
@@ -828,7 +828,7 @@ bool SVGLoader::Implementation::PathAttribs(tinyxml2::XMLElement *_pElement,
     }
     else
     {
-      ignwarn << "Ignoring attribute \"" << name  << "\" in path"  << std::endl;
+      gzwarn << "Ignoring attribute \"" << name  << "\" in path"  << std::endl;
     }
     pAttrib = pAttrib->Next();
   }
@@ -895,7 +895,7 @@ bool SVGLoader::Parse(const std::string &_filename,
     std::string err1 = str1 ? str1 : "n/a";
     std::string err2 = str2 ? str2 : "n/a";
 
-    ignerr << "Failed to load file " <<  _filename << std::endl
+    gzerr << "Failed to load file " <<  _filename << std::endl
            << "XML error type " << doc.ErrorName() << "\n"
            << "XML error info 1 " << err1 << "\n"
            << "XML error info 2 " << err2 << "\n";
@@ -1072,11 +1072,11 @@ function draw(showCtrlPoints)
 
     for (unsigned int i = 0; i < path.polylines.size(); ++i)
     {
-      std::vector<ignition::math::Vector2d> poly = path.polylines[i];
+      std::vector<gz::math::Vector2d> poly = path.polylines[i];
       _out << psep <<  "[" << std::endl;
       psep = ',';
       char sep = ' ';
-      for (ignition::math::Vector2d p : poly)
+      for (gz::math::Vector2d p : poly)
       {
         _out << " " << sep << " [" <<  p.X() << ", "
              << p.Y() << "]" <<std::endl;
@@ -1091,8 +1091,8 @@ function draw(showCtrlPoints)
 }
 
 /////////////////////////////////////////////////
-bool Vector2dCompare(const ignition::math::Vector2d &_a,
-                     const ignition::math::Vector2d &_b,
+bool Vector2dCompare(const gz::math::Vector2d &_a,
+                     const gz::math::Vector2d &_b,
                      double _tol)
 {
   double x = _a.X() - _b.X();
@@ -1105,25 +1105,25 @@ bool Vector2dCompare(const ignition::math::Vector2d &_a,
 void SVGLoader::PathsToClosedPolylines(
     const std::vector<common::SVGPath> &_paths,
     const double _tol,
-    std::vector< std::vector<ignition::math::Vector2d> > &_closedPolys,
-    std::vector< std::vector<ignition::math::Vector2d> > &_openPolys)
+    std::vector< std::vector<gz::math::Vector2d> > &_closedPolys,
+    std::vector< std::vector<gz::math::Vector2d> > &_openPolys)
 {
   // first we extract all polyline into a vector of line segments
-  std::list<std::pair<ignition::math::Vector2d,
-    ignition::math::Vector2d>> segments;
+  std::list<std::pair<gz::math::Vector2d,
+    gz::math::Vector2d>> segments;
 
   for (auto const &path : _paths)
   {
     for (auto const &poly : path.polylines)
     {
-      ignition::math::Vector2d startPoint = poly[0];
+      gz::math::Vector2d startPoint = poly[0];
       for (unsigned int i =1; i < poly.size(); ++i)
       {
-        const ignition::math::Vector2d &endPoint = poly[i];
+        const gz::math::Vector2d &endPoint = poly[i];
         double length = endPoint.Distance(startPoint);
         if (length < _tol)
         {
-          ignmsg << "Ignoring short segment (length: "
+          gzmsg << "Ignoring short segment (length: "
                  << length << ")" <<std::endl;
         }
         else
@@ -1140,7 +1140,7 @@ void SVGLoader::PathsToClosedPolylines(
   {
     // start a new polyline, made from the 2 points of
     // the next available segment.
-    std::vector<ignition::math::Vector2d> polyline;
+    std::vector<gz::math::Vector2d> polyline;
     auto &s = segments.front();
     polyline.push_back(s.first);
     polyline.push_back(s.second);
@@ -1158,7 +1158,7 @@ void SVGLoader::PathsToClosedPolylines(
       for (auto it = segments.begin(); it != segments.end(); ++it)
       {
         auto seg = *it;
-        ignition::math::Vector2d nextPoint;
+        gz::math::Vector2d nextPoint;
         if (Vector2dCompare(polyline.back(), seg.first, _tol))
         {
           nextPoint = seg.second;
@@ -1194,7 +1194,7 @@ void SVGLoader::PathsToClosedPolylines(
     }
     else
     {
-      ignmsg << "Line segments that are not part of a closed paths have"
+      gzmsg << "Line segments that are not part of a closed paths have"
          << " been found with the current minimum distance of " << _tol
          << " between 2 points."  << std::endl << std::endl;
       _openPolys.push_back(polyline);

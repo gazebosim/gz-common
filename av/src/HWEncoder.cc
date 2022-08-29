@@ -20,16 +20,16 @@
 #include <map>
 #include <utility>
 
-#include "ignition/common/ffmpeg_inc.hh"
-#include "ignition/common/HWEncoder.hh"
-#include "ignition/common/StringUtils.hh"
-#include "ignition/common/Console.hh"
+#include "gz/common/ffmpeg_inc.hh"
+#include "gz/common/HWEncoder.hh"
+#include "gz/common/StringUtils.hh"
+#include "gz/common/Console.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 using namespace std;
 
-class ignition::common::HWEncoder::Implementation
+class gz::common::HWEncoder::Implementation
 {
   /// \brief Device reference for HW-accelerated encoding.
   public: AVBufferRef* hwDevice = nullptr;
@@ -142,7 +142,7 @@ bool ProbeDevice(const std::string& _deviceName,
     else
     {
       if (_warnIfNotFile)
-        ignwarn << "Device " << _deviceName << " can't be used with "
+        gzwarn << "Device " << _deviceName << " can't be used with "
                 << HWEncoderTypeParser.Str(_encoderType) <<" (aren't write "
                 << "permissions for the device missing?)" << std::endl;
       return false;
@@ -159,14 +159,14 @@ bool ProbeDevice(const std::string& _deviceName,
 
   if (ret < 0)
   {
-    ignerr << "Could not initialize " << deviceStr << " for "
+    gzerr << "Could not initialize " << deviceStr << " for "
            << HWEncoderTypeParser.Str(_encoderType) << ", skipping.\n";
     return false;
   }
 
   av_buffer_unref(&tmpHwDevice);
 
-  ignmsg << "Initialized " << HWEncoderTypeParser.Str(_encoderType)
+  gzmsg << "Initialized " << HWEncoderTypeParser.Str(_encoderType)
          << " on " << deviceStr << std::endl;
 
   return true;
@@ -211,7 +211,7 @@ AVCodec* HWEncoder::FindEncoder(AVCodecID _codecId)
       // if we only search for software encoders, happily return the first one
       if (this->dataPtr->initHwEncoders == HWEncoderType::NONE)
       {
-        ignmsg << "Compatible SW encoder: " << codec->name << std::endl;
+        gzmsg << "Compatible SW encoder: " << codec->name << std::endl;
         foundEncoder = const_cast<AVCodec*>(codec);
         break;
       }
@@ -221,11 +221,11 @@ AVCodec* HWEncoder::FindEncoder(AVCodecID _codecId)
     }
     else
     {
-      ignmsg << "Found known HW encoder: " << codec->name << std::endl;
+      gzmsg << "Found known HW encoder: " << codec->name << std::endl;
 
       if (!this->dataPtr->initHwEncoders[hwEncoderType])
       {
-        ignmsg << "Encoder " << codec->name << " is not allowed, skipping.\n";
+        gzmsg << "Encoder " << codec->name << " is not allowed, skipping.\n";
         continue;
       }
 
@@ -375,7 +375,7 @@ AVCodec* HWEncoder::FindEncoder(AVCodecID _codecId)
         {
           // This is an encoder that is compiled into libavcodec, but we do
           // not (yet) support it.
-          ignmsg << "Encoder " << codec->name << " is not yet supported.\n";
+          gzmsg << "Encoder " << codec->name << " is not yet supported.\n";
           break;
         }
       }
@@ -386,7 +386,7 @@ AVCodec* HWEncoder::FindEncoder(AVCodecID _codecId)
   if (foundEncoder == nullptr &&
     this->dataPtr->initHwEncoders != HWEncoderType::NONE)
   {
-    ignwarn << "No hardware-accelerated encoder found, falling back to "
+    gzwarn << "No hardware-accelerated encoder found, falling back to "
                "software encoders" << std::endl;
     this->dataPtr->initHwEncoders = HWEncoderType::NONE;
     return this->FindEncoder(_codecId);
@@ -456,7 +456,7 @@ void HWEncoder::ConfigHWAccel(AVCodecContext* _encoderContext)
 
       if (ret < 0)
       {
-        ignerr << "Could not initialize HW encoding device using "
+        gzerr << "Could not initialize HW encoding device using "
                << HWEncoderTypeParser.Str(this->dataPtr->hwEncoderType) << ". "
                << av_err2str_cpp(ret)
                << ". Video encoding will use a software encoder instead.\n";
@@ -468,12 +468,12 @@ void HWEncoder::ConfigHWAccel(AVCodecContext* _encoderContext)
       ret = av_opt_set(_encoderContext->priv_data, "rc", "vbr",
                        AV_OPT_SEARCH_CHILDREN);
       if (ret == AVERROR_OPTION_NOT_FOUND)
-        ignerr << "Codec " << _encoderContext->codec->name << " does not "
+        gzerr << "Codec " << _encoderContext->codec->name << " does not "
                << "support option 'rc' which is required for setting bitrate "
                << "of the encoded video. The video will have some default "
                << "bitrate.\n";
       else if (ret == AVERROR(EINVAL))
-        ignerr << "Codec " << _encoderContext->codec->name << " does not "
+        gzerr << "Codec " << _encoderContext->codec->name << " does not "
                << "support 'vbr' mode for option 'rc' which is required for "
                << "setting bitrate of the encoded video. The video will have "
                << "some default bitrate.\n";
@@ -502,7 +502,7 @@ void HWEncoder::ConfigHWAccel(AVCodecContext* _encoderContext)
         this->dataPtr->hwDeviceName.c_str(), nullptr, 0);
       if (ret < 0)
       {
-        ignerr << "Could not initialize HW encoding device using "
+        gzerr << "Could not initialize HW encoding device using "
                << HWEncoderTypeParser.Str(this->dataPtr->hwEncoderType) << ". "
                << av_err2str_cpp(ret)
                << ". Video encoding will use a software encoder instead.\n";
@@ -546,7 +546,7 @@ void HWEncoder::ConfigHWAccel(AVCodecContext* _encoderContext)
 
       if (ret < 0)
       {
-        ignerr << "Could not initialize HW encoding device using "
+        gzerr << "Could not initialize HW encoding device using "
                << HWEncoderTypeParser.Str(this->dataPtr->hwEncoderType) << ". "
                << av_err2str_cpp(ret)
                << ". Video encoding will use a software encoder instead.\n";
@@ -601,7 +601,7 @@ bool HWEncoder::Implementation::ConfigHWSurface(AVCodecContext* _encoderContext)
   auto* hw_frames_ref = av_hwframe_ctx_alloc(this->hwDevice);  // lavu 55.6.0
   if (hw_frames_ref == nullptr)
   {
-    ignerr << "Could not allocate hardware surface for format "
+    gzerr << "Could not allocate hardware surface for format "
            << av_get_pix_fmt_name(_encoderContext->pix_fmt)  // lavu 51.3.0
            << " and HW encoder " << HWEncoderTypeParser.Str(this->hwEncoderType)
            << ". Encoder will use a software surface.\n";
@@ -619,7 +619,7 @@ bool HWEncoder::Implementation::ConfigHWSurface(AVCodecContext* _encoderContext)
   if (ret < 0)
   {
     av_buffer_unref(&hw_frames_ref);
-    ignerr << "Could not initialize hardware surface for format "
+    gzerr << "Could not initialize hardware surface for format "
            << av_get_pix_fmt_name(_encoderContext->pix_fmt)  // lavu 51.3.0
            << " and HW encoder "
            << HWEncoderTypeParser.Str(this->hwEncoderType)
@@ -637,7 +637,7 @@ bool HWEncoder::Implementation::ConfigHWSurface(AVCodecContext* _encoderContext)
   {
     av_buffer_unref(&_encoderContext->hw_frames_ctx);
 
-    ignerr << "Could not allocate frame for format "
+    gzerr << "Could not allocate frame for format "
            << av_get_pix_fmt_name(_encoderContext->pix_fmt)  // lavu 51.3.0
            << " and HW encoder " << HWEncoderTypeParser.Str(this->hwEncoderType)
            << ". Encoder will use a software surface.\n";
@@ -651,7 +651,7 @@ bool HWEncoder::Implementation::ConfigHWSurface(AVCodecContext* _encoderContext)
     av_frame_free(&this->avOutHwFrame);  // lavc 55.45.101
     av_buffer_unref(&_encoderContext->hw_frames_ctx);
 
-    ignerr << "Could not initialize hardware frame for format "
+    gzerr << "Could not initialize hardware frame for format "
            << av_get_pix_fmt_name(_encoderContext->pix_fmt)  // lavu 51.3.0
            << " and HW encoder " << HWEncoderTypeParser.Str(this->hwEncoderType)
            << ". Encoder will use a software surface. The reason is: "
@@ -659,7 +659,7 @@ bool HWEncoder::Implementation::ConfigHWSurface(AVCodecContext* _encoderContext)
     return false;
   }
 
-  ignmsg << "Using HW surface for the encoder." << std::endl;
+  gzmsg << "Using HW surface for the encoder." << std::endl;
   return true;
 }
 
@@ -679,7 +679,7 @@ AVFrame* HWEncoder::GetFrameForEncoder(AVFrame* _inFrame)
 HWEncoder::HWEncoder(const FlagSet<HWEncoderType> _allowedHwEncoders,
                      const std::string& _hwAccelDevice,
                      std::optional<bool> _useHwSurface)
-  : dataPtr(ignition::utils::MakeUniqueImpl<Implementation>())
+  : dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
 {
   this->dataPtr->initHwEncoders = _allowedHwEncoders;
   this->dataPtr->initHwDevice = _hwAccelDevice;

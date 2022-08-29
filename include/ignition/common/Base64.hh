@@ -16,3 +16,4 @@
  */
 
 #include <gz/common/Base64.hh>
+#include <ignition/common/config.hh>

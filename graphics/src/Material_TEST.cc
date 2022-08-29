@@ -16,13 +16,14 @@
 
 #include <gtest/gtest.h>
 
-#include "ignition/common/Material.hh"
-#include "ignition/common/Pbr.hh"
+#include "gz/common/Image.hh"
+#include "gz/common/Material.hh"
+#include "gz/common/Pbr.hh"
 
-#include "ignition/common/testing/AutoLogFixture.hh"
-#include "ignition/common/testing/TestPaths.hh"
+#include "gz/common/testing/AutoLogFixture.hh"
+#include "gz/common/testing/TestPaths.hh"
 
-using namespace ignition;
+using namespace gz;
 
 class MaterialTest : public common::testing::AutoLogFixture { };
 
@@ -31,10 +32,13 @@ TEST_F(MaterialTest, Material)
   common::Material mat(math::Color(1.0f, 0.5f, 0.2f, 1.0f));
   EXPECT_TRUE(mat.Ambient() == math::Color(1.0f, 0.5f, 0.2f, 1.0f));
   EXPECT_TRUE(mat.Diffuse() == math::Color(1.0f, 0.5f, 0.2f, 1.0f));
-  EXPECT_STREQ("ignition_material_0", mat.Name().c_str());
+  EXPECT_STREQ("gz_material_0", mat.Name().c_str());
+  EXPECT_EQ(nullptr, mat.TextureData());
 
-  mat.SetTextureImage("texture_image");
+  auto texImg = std::make_shared<common::Image>();
+  mat.SetTextureImage("texture_image", texImg);
   EXPECT_STREQ("texture_image", mat.TextureImage().c_str());
+  EXPECT_EQ(texImg, mat.TextureData());
 
   mat.SetTextureImage("texture_image", "/path");
   std::string texturePath = common::joinPaths("/path", "..",

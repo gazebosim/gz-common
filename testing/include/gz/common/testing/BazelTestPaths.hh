@@ -22,7 +22,7 @@
 #include "gz/common/testing/TestPaths.hh"
 #include "gz/common/testing/Export.hh"
 
-namespace ignition::common::testing
+namespace gz::common::testing
 {
 
 /// \brief Implementation of TestPaths interface for Bazel
@@ -32,7 +32,7 @@ namespace ignition::common::testing
 ///
 /// The main mechanism for detecting a bazel build is via the presence of the
 /// TEST_SRCDIR and TEST_UNDECLARED_OUTPUTS_DIR environment variables.
-/// Additionally, tests built via ign-bazel should set IGN_BAZEL_DIR.
+/// Additionally, tests built via gz-bazel should set GZ_BAZEL_DIR.
 ///
 /// For source files to be available for bazel builds, they need to be set in
 /// the "data" section of the relevant cc_library or cc_test call.
@@ -42,17 +42,17 @@ class BazelTestPaths: public TestPaths
   public: using TestPaths::TestPaths;
 
   /// \brief Destructor
-  public: IGNITION_COMMON_TESTING_VISIBLE ~BazelTestPaths() override;
+  public: GZ_COMMON_TESTING_VISIBLE ~BazelTestPaths() override;
 
   /// Documentation inherited
-  public: bool IGNITION_COMMON_TESTING_VISIBLE
+  public: bool GZ_COMMON_TESTING_VISIBLE
           ProjectSourcePath(std::string &_sourceDir) override;
 
   /// Documentation inherited
-  public: bool IGNITION_COMMON_TESTING_VISIBLE
+  public: bool GZ_COMMON_TESTING_VISIBLE
           TestTmpPath(std::string &_tmpDir) override;
 };
 
-}  // namespace ignition::common::testing
+}  // namespace gz::common::testing
 
 #endif  // GZ_COMMON_TESTING_AUTOLOGFIXTURE_HH_

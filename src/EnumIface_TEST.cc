@@ -17,11 +17,11 @@
 
 #include <gtest/gtest.h>
 
-#include "ignition/common/EnumIface.hh"
+#include "gz/common/EnumIface.hh"
 
-#include "ignition/common/testing/AutoLogFixture.hh"
+#include "gz/common/testing/AutoLogFixture.hh"
 
-using namespace ignition;
+using namespace gz;
 
 class EnumIfaceTest : public common::testing::AutoLogFixture { };
 
@@ -33,7 +33,7 @@ enum MyType
   MY_TYPE_END
 };
 
-IGN_ENUM(myTypeIface, MyType, MY_TYPE_BEGIN, MY_TYPE_END,
+GZ_ENUM(myTypeIface, MyType, MY_TYPE_BEGIN, MY_TYPE_END,
   "TYPE1",
   "TYPE2",
   "MY_TYPE_END"

@@ -36,7 +36,7 @@
 #include <gz/common/SingletonT.hh>
 #include <gz/common/graphics/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -45,8 +45,12 @@ namespace ignition
     class SubMesh;
 
     /// \class MeshManager MeshManager.hh gz/common/MeshManager.hh
-    /// \brief Maintains and manages all meshes
-    class IGNITION_COMMON_GRAPHICS_VISIBLE MeshManager
+    /// \brief Maintains and manages all meshes. Supported mesh formats are
+    /// STL (STLA, STLB), COLLADA, OBJ, GLTF (GLB) and FBX. By default only GLTF
+    /// and FBX are loaded using assimp loader, however if GZ_MESH_FORCE_ASSIMP
+    /// environment variable is set, then MeshManager will use assimp loader for
+    /// all supported mesh formats.
+    class GZ_COMMON_GRAPHICS_VISIBLE MeshManager
         : public SingletonT<MeshManager>
     {
       /// \brief Constructor
@@ -83,15 +87,15 @@ namespace ignition
       /// \param[out] _min_xyz the bounding box minimum
       /// \param[out] _max_xyz the bounding box maximum
       public: void MeshAABB(const Mesh *_mesh,
-                  ignition::math::Vector3d &_center,
-                  ignition::math::Vector3d &_min_xyz,
-                  ignition::math::Vector3d &_max_xyz);
+                  gz::math::Vector3d &_center,
+                  gz::math::Vector3d &_min_xyz,
+                  gz::math::Vector3d &_max_xyz);
 
       /// \brief generate spherical texture coordinates
       /// \param[in] _mesh Pointer to the mesh
       /// \param[in] _center Center of the mesh
       public: void GenSphericalTexCoord(const Mesh *_mesh,
-                  const ignition::math::Vector3d &_center);
+                  const gz::math::Vector3d &_center);
 
       /// \brief Add a mesh to the manager.
       ///
@@ -112,7 +116,7 @@ namespace ignition
       /// \brief Get a mesh by name.
       /// \param[in] _name the name of the mesh to look for
       /// \return the mesh or nullptr if not found
-      public: const ignition::common::Mesh *MeshByName(
+      public: const gz::common::Mesh *MeshByName(
                   const std::string &_name) const;
 
       /// \brief Return true if the mesh exists.
@@ -132,8 +136,8 @@ namespace ignition
       /// \param[in] _sides the x y x dimentions of eah side in meter
       /// \param[in] _uvCoords the texture coordinates
       public: void CreateBox(const std::string &_name,
-                             const ignition::math::Vector3d &_sides,
-                             const ignition::math::Vector2d &_uvCoords);
+                             const gz::math::Vector3d &_sides,
+                             const gz::math::Vector2d &_uvCoords);
 
       /// \brief Create an extruded mesh from polylines. The polylines are
       /// assumed to be closed and non-intersecting. Delaunay triangulation is
@@ -148,7 +152,7 @@ namespace ignition
       /// edges and remove the holes in the shape.
       /// \param[in] _height the height of extrusion
       public: void CreateExtrudedPolyline(const std::string &_name,
-                  const std::vector<std::vector<ignition::math::Vector2d> >
+                  const std::vector<std::vector<gz::math::Vector2d> >
                   &_vertices, const double _height);
 
       /// \brief Create a cylinder mesh
@@ -169,7 +173,7 @@ namespace ignition
       /// \param[in] _rings the number of circles along the height
       /// \param[in] _segments the number of segment per circle
       public: void CreateEllipsoid(const std::string &_name,
-                                   const ignition::math::Vector3d &_radii,
+                                   const gz::math::Vector3d &_radii,
                                    const unsigned int _rings,
                                    const unsigned int _segments);
 
@@ -214,7 +218,7 @@ namespace ignition
                               const float _height,
                               const int _rings,
                               const int _segments,
-                              const double _arc = 2.0 * IGN_PI);
+                              const double _arc = 2.0 * GZ_PI);
 
       /// \brief Create mesh for a plane
       /// \param[in] _name
@@ -222,9 +226,9 @@ namespace ignition
       /// \param[in] _segments number of segments in x and y
       /// \param[in] _uvTile the texture tile size in x and y
       public: void CreatePlane(const std::string &_name,
-                               const ignition::math::Planed &_plane,
-                               const ignition::math::Vector2d &_segments,
-                               const ignition::math::Vector2d &_uvTile);
+                               const gz::math::Planed &_plane,
+                               const gz::math::Vector2d &_segments,
+                               const gz::math::Vector2d &_uvTile);
 
       /// \brief Create mesh for a plane
       /// \param[in] _name the name of the new mesh
@@ -234,14 +238,18 @@ namespace ignition
       /// \param[in] _segments the number of segments in x and y
       /// \param[in] _uvTile the texture tile size in x and y
       public: void CreatePlane(const std::string &_name,
-                               const ignition::math::Vector3d &_normal,
+                               const gz::math::Vector3d &_normal,
                                const double _d,
-                               const ignition::math::Vector2d &_size,
-                               const ignition::math::Vector2d &_segments,
-                               const ignition::math::Vector2d &_uvTile);
+                               const gz::math::Vector2d &_size,
+                               const gz::math::Vector2d &_segments,
+                               const gz::math::Vector2d &_uvTile);
+
+      /// \brief Sets the forceAssimp flag by reading the GZ_MESH_FORCE_ASSIMP
+      /// environment variable. If forceAssimp true, MeshManager uses Assimp
+      /// for loading all mesh formats, otherwise only for GLTF and FBX.
+      public: void SetAssimpEnvs();
 
       /// \brief Tesselate a 2D mesh
-      ///
       /// Makes a zigzag pattern compatible with strips
       /// \param[in] _sm the mesh to tesselate
       /// \param[in] _meshWith mesh width
@@ -265,7 +273,7 @@ namespace ignition
       /// \param[in] _offset _m2's pose offset from _m1
       public: void CreateBoolean(const std::string &_name, const Mesh *_m1,
           const Mesh *_m2, const int _operation,
-          const ignition::math::Pose3d &_offset = ignition::math::Pose3d::Zero);
+          const gz::math::Pose3d &_offset = gz::math::Pose3d::Zero);
 
       /// \brief Converts a vector of polylines into a table of vertices and
       /// a list of edges (each made of 2 points from the table of vertices.
@@ -275,11 +283,11 @@ namespace ignition
       /// \param[out] _edges a list of edges (made of start/end point indices
       /// from the vertex table)
       private: static void ConvertPolylinesToVerticesAndEdges(
-                   const std::vector<std::vector<ignition::math::Vector2d> >
+                   const std::vector<std::vector<gz::math::Vector2d> >
                    &_polys,
                    const double _tol,
-                   std::vector<ignition::math::Vector2d> &_vertices,
-                   std::vector<ignition::math::Vector2i> &_edges);
+                   std::vector<gz::math::Vector2d> &_vertices,
+                   std::vector<gz::math::Vector2i> &_edges);
 
       /// \brief Check a point againts a list, and only adds it to the list
       /// if it is not there already.
@@ -289,12 +297,12 @@ namespace ignition
       /// considered to be the same point.
       /// \return the index of the point.
       private: static size_t AddUniquePointToVerticesTable(
-                      std::vector<ignition::math::Vector2d> &_vertices,
-                      const ignition::math::Vector2d &_p,
+                      std::vector<gz::math::Vector2d> &_vertices,
+                      const gz::math::Vector2d &_p,
                       const double _tol);
 
       /// \brief Private data pointer.
-      IGN_UTILS_UNIQUE_IMPL_PTR(dataPtr)
+      GZ_UTILS_UNIQUE_IMPL_PTR(dataPtr)
 
       /// \brief Singleton implementation
       private: friend class SingletonT<MeshManager>;

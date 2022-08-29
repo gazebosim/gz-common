@@ -26,7 +26,7 @@
 #include <gz/common/MeshLoader.hh>
 #include <gz/common/graphics/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -34,7 +34,7 @@ namespace ignition
     class OBJLoaderPrivate;
 
     /// \brief Class used to load obj mesh files
-    class IGNITION_COMMON_GRAPHICS_VISIBLE OBJLoader : public MeshLoader
+    class GZ_COMMON_GRAPHICS_VISIBLE OBJLoader : public MeshLoader
     {
       /// \brief Constructor
       public: OBJLoader();
@@ -49,7 +49,7 @@ namespace ignition
 
       /// \internal
       /// \brief Private data pointer.
-      IGN_UTILS_IMPL_PTR(dataPtr)
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

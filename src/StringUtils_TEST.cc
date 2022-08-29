@@ -19,9 +19,9 @@
 #include <vector>
 
 
-#include "ignition/common/StringUtils.hh"
+#include "gz/common/StringUtils.hh"
 
-using namespace ignition;
+using namespace gz;
 
 /////////////////////////////////////////////////
 TEST(StringUtils, SplitNoDelimiterPresent)

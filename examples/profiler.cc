@@ -27,17 +27,17 @@ std::atomic<bool> running;
 void task1()
 {
   // An example of using scope-based profiling.
-  IGN_PROFILE("task1");
+  GZ_PROFILE("task1");
   {
-    IGN_PROFILE("this");
+    GZ_PROFILE("this");
     {
-      IGN_PROFILE("is");
+      GZ_PROFILE("is");
       {
-        IGN_PROFILE("a");
+        GZ_PROFILE("a");
         {
-          IGN_PROFILE("deep");
+          GZ_PROFILE("deep");
           {
-            IGN_PROFILE("stack");
+            GZ_PROFILE("stack");
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
           }
         }
@@ -49,54 +49,54 @@ void task1()
 void task2()
 {
   // An example of using scope-based profiling.
-  IGN_PROFILE("task2");
+  GZ_PROFILE("task2");
   {
-    IGN_PROFILE("a");
+    GZ_PROFILE("a");
     std::this_thread::sleep_for(std::chrono::milliseconds(2));
   }
   {
-    IGN_PROFILE("b");
+    GZ_PROFILE("b");
     std::this_thread::sleep_for(std::chrono::milliseconds(2));
   }
   {
-    IGN_PROFILE("c");
+    GZ_PROFILE("c");
     std::this_thread::sleep_for(std::chrono::milliseconds(2));
   }
   {
-    IGN_PROFILE("d");
+    GZ_PROFILE("d");
     std::this_thread::sleep_for(std::chrono::milliseconds(2));
   }
 }
 
 void task3()
 {
-  IGN_PROFILE("task3");
+  GZ_PROFILE("task3");
 
   // An example of using start/stop profiling.
-  IGN_PROFILE_BEGIN("a");
+  GZ_PROFILE_BEGIN("a");
   std::this_thread::sleep_for(std::chrono::milliseconds(2));
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 
-  IGN_PROFILE_BEGIN("b");
+  GZ_PROFILE_BEGIN("b");
   std::this_thread::sleep_for(std::chrono::milliseconds(2));
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 
-  IGN_PROFILE_BEGIN("c");
+  GZ_PROFILE_BEGIN("c");
   std::this_thread::sleep_for(std::chrono::milliseconds(2));
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 
-  IGN_PROFILE_BEGIN("d");
+  GZ_PROFILE_BEGIN("d");
   std::this_thread::sleep_for(std::chrono::milliseconds(2));
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 }
 
 void thread(const char *_thread_name)
 {
   // Sets the name of the thread to appear in the UI
-  IGN_PROFILE_THREAD_NAME(_thread_name);
+  GZ_PROFILE_THREAD_NAME(_thread_name);
   while (running)
   {
-    IGN_PROFILE("Loop");
+    GZ_PROFILE("Loop");
     // Execute some arbitrary tasks
     for (size_t ii = 0; ii < 10; ++ii)
     {
@@ -109,19 +109,19 @@ void thread(const char *_thread_name)
 
 void sigHandler(int _signal)
 {
-  ignmsg << "Received signal: " << _signal << std::endl;
+  gzmsg << "Received signal: " << _signal << std::endl;
   running = false;
 }
 
 int main(int argc, char** argv)
 {
-  ignition::common::Console::SetVerbosity(4);
+  gz::common::Console::SetVerbosity(4);
 
-  IGN_PROFILE_THREAD_NAME("main");
+  GZ_PROFILE_THREAD_NAME("main");
   running = true;
 
   // Connect signal handler
-  ignition::common::SignalHandler handler;
+  gz::common::SignalHandler handler;
   handler.AddCallback(sigHandler);
 
   // Spin up a couple threads with interesting content.
@@ -129,19 +129,19 @@ int main(int argc, char** argv)
   auto t2 = std::thread([](){thread("thread2");});
   auto t3 = std::thread([](){thread("thread3");});
 
-  ignmsg << "All threads started, now connect with visualizer" << std::endl;
+  gzmsg << "All threads started, now connect with visualizer" << std::endl;
 
   size_t ii = 0;
   while(running)
   {
-    IGN_PROFILE("main loop");
+    GZ_PROFILE("main loop");
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     // Throttle to once per second
     if (ii++ % 10 == 0)
     {
       // Example of logging text to the remotery console.
-      IGN_PROFILE_LOG_TEXT("main loop done");
+      GZ_PROFILE_LOG_TEXT("main loop done");
     }
   }
 
