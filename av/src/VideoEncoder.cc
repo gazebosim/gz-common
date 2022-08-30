@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include <libavdevice/avdevice.h>
+
 #include <stdio.h>
 
 #include <mutex>
