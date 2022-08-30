@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <libavdevice/avdevice.h>
 #include <stdio.h>
 
 #include <mutex>
@@ -365,13 +366,15 @@ bool VideoEncoder::Start(
   // This 'if' and 'free' are just for safety. We chech the value of formatCtx
   // below.
   if (this->dataPtr->formatCtx)
+  {
     avformat_free_context(this->dataPtr->formatCtx);
+  }
   this->dataPtr->formatCtx = nullptr;
 
   // Special case for video4linux2. Here we attempt to find the v4l2 device
   if (this->dataPtr->format.compare("v4l2") == 0)
   {
-    AVOutputFormat *outputFormat = nullptr;
+    const AVOutputFormat *outputFormat = nullptr;
     while ((outputFormat = av_output_video_device_next(outputFormat))
            != nullptr)
     {
