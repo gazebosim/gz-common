@@ -374,6 +374,7 @@ bool VideoEncoder::Start(
   // Special case for video4linux2. Here we attempt to find the v4l2 device
   if (this->dataPtr->format.compare("v4l2") == 0)
   {
+#if defined(HAVE_AVDEVICE)
     const AVOutputFormat *outputFormat = nullptr;
     while ((outputFormat = av_output_video_device_next(outputFormat))
            != nullptr)
@@ -392,6 +393,7 @@ bool VideoEncoder::Start(
         break;
       }
     }
+#endif
   }
   else
   {
