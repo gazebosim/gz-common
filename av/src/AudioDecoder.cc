@@ -138,12 +138,18 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
             return false;
         }
 
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(59, 24, 100)
+        int numChannels = this->dataPtr->codecCtx->ch_layout.nb_channels;
+#else
+        int numChannels = this->dataPtr->codecCtx->channels;
+#endif
+
         // Total size of the data. Some padding can be added to
         // decodedFrame->data[0], which is why we can't use
         // decodedFrame->linesize[0].
         int size = decodedFrame->nb_samples *
           av_get_bytes_per_sample(this->dataPtr->codecCtx->sample_fmt) *
-          this->dataPtr->codecCtx->channels;
+          numChannels;
 
         // Resize the audio buffer as necessary
         if (*_outBufferSize + size > maxBufferSize)
