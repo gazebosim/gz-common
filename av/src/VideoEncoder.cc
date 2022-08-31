@@ -384,7 +384,8 @@ bool VideoEncoder::Start(
   {
 #if defined(HAVE_AVDEVICE)
     OutputFormat outputFormat = nullptr;
-    do {
+    do
+    {
       outputFormat = av_output_video_device_next(outputFormat);
       
       if (outputFormat)
@@ -403,7 +404,8 @@ bool VideoEncoder::Start(
           break;
         }
       }
-    } while (outputFormat);
+    }
+    while (outputFormat);
 
 
 #endif
@@ -447,7 +449,7 @@ bool VideoEncoder::Start(
   auto* encoder = this->dataPtr->FindEncoder(codecId);
   if (!encoder)
   {
-    ignerr << "Codec for["
+    gzerr << "Codec for["
           << avcodec_get_name(codecId)
           << "] not found. Video encoding is not started.\n";
     this->Reset();
