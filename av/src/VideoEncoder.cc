@@ -33,6 +33,14 @@ using namespace gz;
 using namespace common;
 using namespace std;
 
+// After AVDevice 59.0.100, const pointers are used.
+#if LIBAVDEVICE_VERSION_INT >= AV_VERSION_INT(59, 0, 100)
+using OutputFormat = const AVOutputFormat*;
+#else
+using OutputFormat = AVOutputFormat*;
+#endif
+
+
 // Private data class
 // hidden visibility specifier has to be explicitly set to silent a gcc warning
 class GZ_COMMON_AV_HIDDEN gz::common::VideoEncoder::Implementation
@@ -375,29 +383,34 @@ bool VideoEncoder::Start(
   if (this->dataPtr->format.compare("v4l2") == 0)
   {
 #if defined(HAVE_AVDEVICE)
-    const AVOutputFormat *outputFormat = nullptr;
-    while ((outputFormat = av_output_video_device_next(outputFormat))
-           != nullptr)
-    {
-      // Break when the output device name matches 'v4l2'
-      if (this->dataPtr->format.compare(outputFormat->name) == 0)
+    OutputFormat outputFormat = nullptr;
+    do {
+      outputFormat = av_output_video_device_next(outputFormat);
+      
+      if (outputFormat)
       {
-        // Allocate the context using the correct outputFormat
-        auto result = avformat_alloc_output_context2(&this->dataPtr->formatCtx,
-            outputFormat, nullptr, this->dataPtr->filename.c_str());
-        if (result < 0)
+        // Break when the output device name matches 'v4l2'
+        if (this->dataPtr->format.compare(outputFormat->name) == 0)
         {
-          gzerr << "Failed to allocate AV context [" << av_err2str_cpp(result)
-                 << "]" << std::endl;
+          // Allocate the context using the correct outputFormat
+          auto result = avformat_alloc_output_context2(&this->dataPtr->formatCtx,
+              outputFormat, nullptr, this->dataPtr->filename.c_str());
+          if (result < 0)
+          {
+            gzerr << "Failed to allocate AV context [" << av_err2str_cpp(result)
+                   << "]" << std::endl;
+          }
+          break;
         }
-        break;
       }
-    }
+    } while (outputFormat);
+
+
 #endif
   }
   else
   {
-    const AVOutputFormat *outputFormat = av_guess_format(nullptr,
+    auto* outputFormat = av_guess_format(nullptr,
                                    this->dataPtr->filename.c_str(), nullptr);
 
     if (!outputFormat)
