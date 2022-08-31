@@ -621,6 +621,30 @@ TEST_F(AssimpLoader, LoadGlTF2Box)
 }
 
 /////////////////////////////////////////////////
+// Open a gltf mesh with an external texture
+TEST_F(AssimpLoader, LoadGlTF2BoxExternalTexture)
+{
+  common::AssimpLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "gltf", "PurpleCube.gltf"));
+
+  EXPECT_STREQ("unknown", mesh->Name().c_str());
+
+  // Make sure we can read the submesh name
+  EXPECT_STREQ("PurpleCube", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+
+  EXPECT_EQ(mesh->MaterialCount(), 1u);
+
+  const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+  ASSERT_TRUE(mat.get());
+  // No data (it is a file), but a populated filename
+  EXPECT_EQ(nullptr, mat->TextureData());
+  auto testTextureFile =
+    common::testing::TestFile("data/gltf", "PurpleCube_Diffuse.png");
+  EXPECT_EQ(testTextureFile, mat->TextureImage());
+}
+
+/////////////////////////////////////////////////
 // Use a fully featured glb test asset, including PBR textures, emissive maps
 // embedded textures, lightmaps, animations to test advanced glb features
 TEST_F(AssimpLoader, LoadGlbPbrAsset)
@@ -696,4 +720,21 @@ TEST_F(AssimpLoader, LoadGlbPbrAsset)
   EXPECT_STREQ("Action1", skel->Animation(0)->Name().c_str());
   EXPECT_STREQ("Action2", skel->Animation(1)->Name().c_str());
   EXPECT_STREQ("Action3", skel->Animation(2)->Name().c_str());
+}
+
+/////////////////////////////////////////////////
+// Checks for null root node animation and valid
+// x displacement in non root node's animation.
+TEST_F(AssimpLoader, CheckNonRootDisplacement)
+{
+  common::AssimpLoader loader;
+  common::Mesh *mesh = loader.Load(common::testing::TestFile("data",
+        "walk.dae"));
+  auto meshSkel =  mesh->MeshSkeleton();
+  std::string rootNodeName = meshSkel->RootNode()->Name();
+  common::SkeletonAnimation *skelAnim = meshSkel->Animation(0);
+  common::NodeAnimation *rootNode = skelAnim->NodeAnimationByName(rootNodeName);
+  EXPECT_EQ(nullptr, rootNode);
+  auto xDisplacement = skelAnim->XDisplacement();
+  ASSERT_TRUE(xDisplacement);
 }
