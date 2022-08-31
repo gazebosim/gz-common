@@ -44,7 +44,7 @@ extern "C" {
 #include <libavutil/imgutils.h>
 #include <libavutil/hwcontext.h>
 
-#if defined(__linux__) && defined(HAVE_AVDEVICE)
+#if defined(HAVE_AVDEVICE)
 #include <libavdevice/avdevice.h>
 #endif
 }
