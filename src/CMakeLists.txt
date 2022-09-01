@@ -16,7 +16,6 @@ endif()
 # Link the libraries that we always need
 target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
   PRIVATE
-    ${DL_TARGET}
     ${CXX_FILESYSTEM_LIBRARIES}
   PUBLIC
     gz-utils${GZ_UTILS_VER}::gz-utils${GZ_UTILS_VER}
@@ -57,11 +56,6 @@ endif()
 if(TARGET UNIT_MovingWindowFilter_TEST)
   target_include_directories(UNIT_MovingWindowFilter_TEST PRIVATE
     ${gz-math${GZ_MATH_VER}_INCLUDE_DIRS})
-endif()
-
-if(TARGET UNIT_PluginLoader_TEST)
-  target_compile_definitions(UNIT_PluginLoader_TEST PRIVATE
-  "GZ_COMMON_LIB_PATH=\"$<TARGET_FILE_DIR:${PROJECT_LIBRARY_TARGET_NAME}>\"")
 endif()
 
 # Produce warning on Windows if the user has decided to turn on the symlink
