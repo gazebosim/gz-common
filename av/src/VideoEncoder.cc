@@ -203,17 +203,6 @@ bool VideoEncoder::Start(const std::string &_format,
     std::string allowedEncodersStr;
     env("GZ_VIDEO_ALLOWED_ENCODERS", allowedEncodersStr);
 
-    // TODO(CH3): Deprecated. Remove on tock.
-    if (allowedEncodersStr.empty())
-    {
-      env("IGN_VIDEO_ALLOWED_ENCODERS", allowedEncodersStr);
-      if (!allowedEncodersStr.empty())
-      {
-        gzwarn << "IGN_VIDEO_ALLOWED_ENCODERS is deprecated! "
-               << "Use GZ_VIDEO_ALLOWED_ENCODERS instead!" << std::endl;
-      }
-    }
-
     if (allowedEncodersStr == "ALL")
     {
       allowedEncoders = FlagSet<HWEncoderType>::AllSet();
@@ -241,32 +230,8 @@ bool VideoEncoder::Start(const std::string &_format,
 
     env("GZ_VIDEO_ENCODER_DEVICE", device);
 
-    // TODO(CH3): Deprecated. Remove on tock.
-    if (device.empty())
-    {
-      env("IGN_VIDEO_ENCODER_DEVICE", device);
-
-      if (!device.empty())
-      {
-        gzwarn << "IGN_VIDEO_ENCODER_DEVICE is deprecated! "
-               << "Use GZ_VIDEO_ENCODER_DEVICE instead!" << std::endl;
-      }
-    }
-
     std::string hwSurfaceStr;
     env("GZ_VIDEO_USE_HW_SURFACE", hwSurfaceStr);
-
-    // TODO(CH3): Deprecated. Remove on tock.
-    if (hwSurfaceStr.empty())
-    {
-      env("IGN_VIDEO_USE_HW_SURFACE", hwSurfaceStr);
-
-      if (!hwSurfaceStr.empty())
-      {
-        gzwarn << "IGN_VIDEO_USE_HW_SURFACE is deprecated! "
-               << "Use GZ_VIDEO_USE_HW_SURFACE instead!" << std::endl;
-      }
-    }
 
     if (!hwSurfaceStr.empty())
     {
