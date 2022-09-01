@@ -626,7 +626,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
       0);
   if (scene == nullptr)
   {
-    ignerr << "Unable to import mesh [" << _filename << "]" << std::endl;
+    gzerr << "Unable to import mesh [" << _filename << "]" << std::endl;
     return mesh;
   }
   auto& rootNode = scene->mRootNode;

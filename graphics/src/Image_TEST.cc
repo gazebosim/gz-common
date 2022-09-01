@@ -240,59 +240,6 @@ TEST_F(ImageTest, SetFromCompressedData)
   ASSERT_FALSE(img.Valid());
 }
 
-TEST_F(ImageTest, DeprecatedDataFunctions)
-{
-  common::Image img;
-  ASSERT_EQ(0, img.Load(kTestData));
-  ASSERT_TRUE(img.Valid());
-
-  auto data = img.Data();
-  ASSERT_EQ(39204u, data.size());
-
-  unsigned char *dataRaw = nullptr;
-  unsigned int rawSize;
-  GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
-  img.Data(&dataRaw, rawSize);
-  GZ_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
-
-  ASSERT_EQ(data.size(), rawSize);
-
-  for (unsigned int i = 0; i < rawSize; ++i)
-  {
-    ASSERT_EQ(data[i], dataRaw[i]);
-  }
-
-  // RGBData
-  data = img.RGBData();
-  ASSERT_EQ(kSize_RGB, data.size());
-
-  GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
-  img.RGBData(&dataRaw, rawSize);
-  GZ_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
-
-  ASSERT_EQ(data.size(), rawSize);
-
-  for (unsigned int i = 0; i < rawSize; ++i)
-  {
-    ASSERT_EQ(data[i], dataRaw[i]);
-  }
-
-  // RGBAData
-  data = img.RGBAData();
-  ASSERT_EQ(39204u, data.size());
-
-  GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
-  img.RGBAData(&dataRaw, rawSize);
-  GZ_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
-
-  ASSERT_EQ(data.size(), rawSize);
-
-  for (unsigned int i = 0; i < rawSize; ++i)
-  {
-    ASSERT_EQ(data[i], dataRaw[i]);
-  }
-}
-
 /*
   // save image then reload and test colors
   std::string testSaveImage =
