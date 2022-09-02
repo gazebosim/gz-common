@@ -179,7 +179,8 @@ namespace gz
         using FactoryT =
             math::InMemoryTimeVaryingVolumetricGridFactory<T, V>;
         std::vector<FactoryT> factories(dataColumnIndices.size());
-        for (auto it = _begin; it != _end; ++it)
+        auto it = _begin;
+        while (++it != _end)
         {
           const T time = IO<T>::ReadFrom(it->at(_timeColumnIndex));
           const math::Vector3<P> position{
