@@ -52,10 +52,17 @@ TEST(DataFrameTests, SimpleCSV)
   ASSERT_TRUE(df.Has("temperature"));
   const DataT &temperatureData = df["temperature"];
   auto temperatureSession = temperatureData.StepTo(
-      temperatureData.CreateSession(), 0.5);
+      temperatureData.CreateSession(), 0.);
   ASSERT_TRUE(temperatureSession.has_value());
   const math::Vector3d position{5., 5., 0.};
   auto temperature = temperatureData.LookUp(
+      temperatureSession.value(), position);
+  ASSERT_TRUE(temperature.has_value());
+  EXPECT_DOUBLE_EQ(25.2, temperature.value());
+  temperatureSession = temperatureData.StepTo(
+      temperatureData.CreateSession(), 0.5);
+  ASSERT_TRUE(temperatureSession.has_value());
+  temperature = temperatureData.LookUp(
       temperatureSession.value(), position);
   ASSERT_TRUE(temperature.has_value());
   EXPECT_DOUBLE_EQ(25.1, temperature.value());
