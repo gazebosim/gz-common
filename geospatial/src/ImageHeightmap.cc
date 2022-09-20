@@ -113,5 +113,6 @@ unsigned int ImageHeightmap::Width() const
 //////////////////////////////////////////////////
 float ImageHeightmap::MaxElevation() const
 {
+  std::cerr << "max elevation " << std::endl;
   return this->img.MaxColor().R();
 }
