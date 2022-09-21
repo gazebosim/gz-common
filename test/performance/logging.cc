@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include "gtest/gtest.h"
 #include <gtest/gtest.h>
 
 #include <atomic>
@@ -38,7 +39,6 @@ void WriteToFile(std::string result_filename, std::string content)
     std::cerr << "Error writing to " << result_filename << std::endl;
   }
   out << content << std::flush;
-  std::cout << content;
 }
 
 void MeasurePeakDuringLogWrites(const size_t id, std::vector<uint64_t> &result)
@@ -162,6 +162,8 @@ void run(size_t number_of_threads)
       << filename_result << std::endl;
   WriteToFile(filename_result, oss.str());
 
+  ::testing::internal::CaptureStdout();
+
   auto start_time_application_total =
   std::chrono::high_resolution_clock::now();
   for (uint64_t idx = 0; idx < number_of_threads; ++idx)
@@ -174,6 +176,8 @@ void run(size_t number_of_threads)
     threads[idx].join();
   }
   auto stop_time_application_total = std::chrono::high_resolution_clock::now();
+
+  ::testing::internal::GetCapturedStdout();
 
   uint64_t total_time_in_us =
       std::chrono::duration_cast<std::chrono::microseconds>(
