@@ -25,7 +25,7 @@ which version you need.
 
 On macOS, add OSRF packages:
   ```
-  ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+  /bin/bash", "-c", '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   brew tap osrf/simulation
   ```
 
@@ -136,10 +136,11 @@ conda install libgz-cmake<#> libgz-math<#> --channel conda-forge
 
 1. Clone the repository
   ```
-  git clone https://github.com/gazebosim/gz-common -b ign-common<#>
+  git clone https://github.com/gazebosim/gz-common -b gz-common<#>
   ```
   Be sure to replace `<#>` with a number value, such as 3 or 4, depending on
-  which version you need.
+  which version you need. From version 5 use `gz-common<#>` for lower versions
+  use `ign-common<#>`.
 
 2. Install dependencies
   ```
@@ -168,7 +169,8 @@ This assumes you have created and activated a Conda environment while installing
 
 1. Navigate to where you would like to build the library, and clone the repository.
   ```
-  # Optionally, append `-b ign-common#` (replace # with a number) to check out a specific version
+  # Optionally, append `-b gz-common#` (replace # with a number) to check out a specific version.
+  # From version 5 use `gz-common<#>` for lower versions use `ign-common<#>`.
   git clone https://github.com/gazebosim/gz-common.git
   ```
 
