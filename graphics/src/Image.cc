@@ -73,6 +73,8 @@ namespace gz
       /// \param[in] _x Pixel index in horizontal direction
       /// \param[in] _y Pixel index in vertical direction
       /// \param[out] _color Pixel value at specified index
+      /// \return TRUE value if the pixel index was found and the color
+      /// value set, FALSE otherwise.
       public: BOOL PixelIndex(FIBITMAP *_dib, unsigned _x, unsigned _y,
             math::Color &_color) const;
     };
@@ -636,12 +638,13 @@ BOOL Image::Implementation::PixelIndex(
     // FreeImage_GetPixelIndex should also work with 1 and 4 bit images
     if (FreeImage_GetPixelIndex(
         _dib, _x, _y, &byteValue) == FALSE)
+    {
       return FALSE;
+    }
 
     unsigned int bpp = FreeImage_GetBPP(_dib);
     // convert to float value between 0-1
-    float value = byteValue /
-      static_cast<float>(((1 << (bpp)) - 1));
+    float value = byteValue / static_cast<float>(((1 << (bpp)) - 1));
     _color.Set(value, value, value);
   }
   // 16 bit images
