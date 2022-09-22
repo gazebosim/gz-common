@@ -611,7 +611,7 @@ TEST_F(ImageTest, Grayscale)
     EXPECT_EQ(bits, img.BPP());
     EXPECT_EQ(width * bits / 8u, img.Pitch());
     EXPECT_EQ(common::Image::PixelFormatType::L_INT8, img.PixelFormat());
-    math::Color maxColor(0.847, 0.847, 0.847);
+    math::Color maxColor(0.847f, 0.847f, 0.847f);
     EXPECT_NEAR(maxColor.R(), img.MaxColor().R(), 1e-3);
     EXPECT_NEAR(maxColor.G(), img.MaxColor().G(), 1e-3);
     EXPECT_NEAR(maxColor.B(), img.MaxColor().B(), 1e-3);
@@ -631,7 +631,7 @@ TEST_F(ImageTest, Grayscale)
     EXPECT_EQ(bits, img.BPP());
     EXPECT_EQ(width * bits / 8u, img.Pitch());
     EXPECT_EQ(common::Image::PixelFormatType::L_INT16, img.PixelFormat());
-    math::Color maxColor(0.847, 0.847, 0.847);
+    math::Color maxColor(0.847f, 0.847f, 0.847f);
     EXPECT_NEAR(maxColor.R(), img.MaxColor().R(), 1e-3);
     EXPECT_NEAR(maxColor.G(), img.MaxColor().G(), 1e-3);
     EXPECT_NEAR(maxColor.B(), img.MaxColor().B(), 1e-3);
