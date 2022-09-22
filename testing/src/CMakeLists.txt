@@ -1,6 +1,7 @@
 set(sources
   BazelTestPaths.cc
   CMakeTestPaths.cc
+  RedirectConsoleStream.cc
   TestPaths.cc
   Utils.cc
 )

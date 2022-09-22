@@ -193,6 +193,8 @@ template <typename... Args>
 std::string TempPath(Args const &... args)
 {
   auto testPaths = TestPathFactory(kTestingProjectSourceDir);
+  assert(nullptr != testPaths);
+
   std::string dataDir;
   testPaths->TestTmpPath(dataDir);
   return common::joinPaths(dataDir, args...);

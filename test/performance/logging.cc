@@ -21,6 +21,10 @@
 #include <thread>
 
 #include <gz/common/Console.hh>
+#include <gz/common/testing/RedirectConsoleStream.hh>
+
+using RedirectConsoleStream = gz::common::testing::RedirectConsoleStream;
+using StreamSource = gz::common::testing::StreamSource;
 
 namespace {
 // Lower value than spdlog to keep CI from flaking
@@ -161,7 +165,7 @@ void run(size_t number_of_threads)
       << filename_result << std::endl;
   WriteToFile(filename_result, oss.str());
 
-  ::testing::internal::CaptureStdout();
+  auto stream = gz::common::testing::RedirectStdout();
 
   auto start_time_application_total =
   std::chrono::high_resolution_clock::now();
@@ -176,7 +180,7 @@ void run(size_t number_of_threads)
   }
   auto stop_time_application_total = std::chrono::high_resolution_clock::now();
 
-  ::testing::internal::GetCapturedStdout();
+  auto output = stream.GetString();
 
   uint64_t total_time_in_us =
       std::chrono::duration_cast<std::chrono::microseconds>(
