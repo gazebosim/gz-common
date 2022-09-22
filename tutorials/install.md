@@ -81,6 +81,10 @@ The AV component requires:
   * [libavcodec](https://www.ffmpeg.org/libavcodec.html)
   * [libavutil](https://www.ffmpeg.org/libavutil.html)
 
+The Geospatial component requires:
+
+  * [gdal](https://gdal.org/)
+
 ### Windows
 
 First, follow the [gz-cmake](https://github.com/gazebosim/gz-cmake) tutorial for installing Conda, Visual Studio, CMake, etc., prerequisites, and creating a Conda environment.
@@ -94,7 +98,7 @@ conda activate gz-ws
 
 Install prerequisites:
 ```
-conda install freeimage gts glib dlfcn-win32 ffmpeg --channel conda-forge
+conda install freeimage gdal gts glib dlfcn-win32 ffmpeg --channel conda-forge
 ```
 
 Install Gazebo dependencies:
