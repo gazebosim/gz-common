@@ -15,16 +15,26 @@
 *
 */
 
+#include <stdlib.h>
+
 #include "gz/common/testing/RedirectConsoleStream.hh"
 #include "gz/common/Console.hh"
 #include <cstring>
 #include <gz/common/testing/TestPaths.hh>
 
 #include <fstream>
+#include <gz/utils/SuppressWarning.hh>
 #include <sstream>
 
-#include <fcntl.h>
+#ifdef _WIN32
+#include <io.h>
+#include <windows.h>
+#else
 #include <unistd.h>
+#endif
+
+#include <fcntl.h>
+#include <sys/stat.h>
 
 namespace gz::common::testing
 {
@@ -53,14 +63,18 @@ class RedirectConsoleStream::Implementation
 //////////////////////////////////////////////////
 void RedirectConsoleStream::Implementation::RemoveRedirection()
 {
+    // MSVC treats dup and dup2 as deprecated, preferring _dup and _dup2
+    // We can safely ignore that here.
+    GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION;
+    /// Restore the orignal source file descriptor
     if (this->originalFd != -1)
     {
       fflush(nullptr);
-      /// Restore the orignal source file descriptor
       dup2(this->originalFd, this->fd);
       close(this->originalFd);
       this->originalFd = -1;
     }
+    GZ_UTILS_WARN_RESUME__DEPRECATED_DECLARATION;
 }
 
 //////////////////////////////////////////////////
@@ -95,6 +109,9 @@ RedirectConsoleStream::RedirectConsoleStream(const StreamSource &_source,
     const std::string &_destination):
   dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
 {
+  // MSVC treats dup and dup2 as deprecated, preferring _dup and _dup2
+  // We can safely ignore that here.
+  GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION;
   this->dataPtr->sink = _destination;
 
   if (this->dataPtr->sink.empty())
@@ -132,6 +149,7 @@ RedirectConsoleStream::RedirectConsoleStream(const StreamSource &_source,
   dup2(sinkFd, this->dataPtr->fd);
   // Close the file handle;
   close(sinkFd);
+  GZ_UTILS_WARN_RESUME__DEPRECATED_DECLARATION;
 }
 
 //////////////////////////////////////////////////
