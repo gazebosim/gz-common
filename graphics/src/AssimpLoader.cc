@@ -392,8 +392,8 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     auto [texName, texData] = this->LoadTexture(_scene, texturePath,
         this->GenerateTextureName(_scene, assimpMat, "MetallicRoughness"));
     // Load it into a common::Image then split it
-    auto texImg =
-      texData != nullptr ? texData : std::make_shared<common::Image>(texName);
+    auto texImg = texData != nullptr ? texData :
+      std::make_shared<common::Image>(joinPaths(_path, texName));
     auto [metalTexture, roughTexture] =
       this->SplitMetallicRoughnessMap(*texImg);
     pbr.SetMetalnessMap(
