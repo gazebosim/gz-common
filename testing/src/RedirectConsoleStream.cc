@@ -15,11 +15,12 @@
 *
 */
 
-#include <stdlib.h>
+#include <cstring>
+#include <cstdio>
+#include <cstdlib>
 
 #include "gz/common/testing/RedirectConsoleStream.hh"
 #include "gz/common/Console.hh"
-#include <cstring>
 #include <gz/common/testing/TestPaths.hh>
 
 #include <fstream>
@@ -94,10 +95,10 @@ int GetSourceFd(const StreamSource &_source)
   switch(_source)
   {
     case StreamSource::STDOUT:
-      return STDOUT_FILENO;
+      return fileno(stdout);
       break;
     case StreamSource::STDERR:
-      return STDERR_FILENO;
+      return fileno(stderr);
       break;
     default:
       return -1;
