@@ -236,7 +236,12 @@
    be found [here](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Generic_syntax). This update also caused some formally valid syntax to become invalid, and some formally invalid syntax to become valid. See the migration guide.
     * [BitBucket pull request xxx](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/213)
 
-## Ignition Common 3.x
+## Gazebo Common 3.x
+
+## Gazebo Common 3.14.2 (2022-08-16)
+
+1. Fix deprecation warning from new `ffmpeg`
+    * [Pull request #414](https://github.com/gazebosim/gz-common/pull/421)
 
 ## Ignition Common 3.14.1 (2022-06-01)
 
