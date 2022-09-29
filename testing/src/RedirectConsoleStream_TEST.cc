@@ -16,6 +16,7 @@
 */
 #include <gtest/gtest.h>
 
+#include "gz/common/Console.hh"
 #include "gz/common/testing/RedirectConsoleStream.hh"
 #include "gz/common/testing/TestPaths.hh"
 
@@ -133,3 +134,56 @@ TEST(RedirectConsoleStream, RedirectStderr)
     EXPECT_NE(output.find("Baz"), std::string::npos);
   }
 }
+
+/////////////////////////////////////////////////
+TEST(RedirectConsoleStream, InlineHelpers)
+{
+  auto redirOut = RedirectStdout();
+  auto redirErr = RedirectStderr();
+
+  std::cout << "Foo" << std::endl;
+  std::cerr << "Bar" << std::endl;
+
+  auto out = redirOut.GetString();
+  auto err = redirErr.GetString();
+
+  EXPECT_FALSE(out.empty());
+  EXPECT_FALSE(err.empty());
+
+  EXPECT_NE(out.find("Foo"), std::string::npos);
+  EXPECT_EQ(err.find("Foo"), std::string::npos);
+
+  EXPECT_EQ(out.find("Bar"), std::string::npos);
+  EXPECT_NE(err.find("Bar"), std::string::npos);
+}
+
+/////////////////////////////////////////////////
+TEST(RedirectConsoleStream, Console)
+{
+  auto redirOut = RedirectStdout();
+  auto redirErr = RedirectStderr();
+
+  gz::common::Console::SetVerbosity(4);
+
+  gzerr << "error" << std::endl;
+  gzwarn << "warning" << std::endl;
+  gzmsg << "message" << std::endl;
+  gzdbg << "debug" << std::endl;
+
+  auto out = redirOut.GetString();
+  auto err = redirErr.GetString();
+
+  EXPECT_FALSE(out.empty());
+  EXPECT_FALSE(err.empty());
+
+  EXPECT_EQ(out.find("error"), std::string::npos);
+  EXPECT_EQ(out.find("warning"), std::string::npos);
+  EXPECT_NE(out.find("message"), std::string::npos);
+  EXPECT_NE(out.find("debug"), std::string::npos);
+
+  EXPECT_NE(err.find("error"), std::string::npos);
+  EXPECT_NE(err.find("warning"), std::string::npos);
+  EXPECT_EQ(err.find("message"), std::string::npos);
+  EXPECT_EQ(err.find("debug"), std::string::npos);
+}
+
