@@ -165,4 +165,10 @@ std::string RedirectConsoleStream::GetString()
   return buffer.str();
 }
 
+//////////////////////////////////////////////////
+bool RedirectConsoleStream::Active() const
+{
+  return !this->dataPtr->sink.empty() && this->dataPtr->originalFd != -1;
+}
+
 }  // namespace gz::common::testing

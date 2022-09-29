@@ -22,6 +22,8 @@
 #include <gz/utils/ImplPtr.hh>
 #include <gz/common/testing/TestPaths.hh>
 
+#include "gz/common/testing/Export.hh"
+
 namespace gz::common::testing
 {
 
@@ -31,7 +33,7 @@ enum class StreamSource
   STDERR,
 };
 
-class RedirectConsoleStream
+class GZ_COMMON_TESTING_VISIBLE RedirectConsoleStream
 {
   /// \brief Constructor 
   ///
@@ -48,6 +50,10 @@ class RedirectConsoleStream
   /// \brief Get the contents of the redirected console output
   /// This will additionally remove any redirection
   public: std::string GetString();
+
+  /// \brief Get if the redirection is valid and enabled
+  /// \return bool True if the redirection is valid
+  public: bool Active() const;
 
   /// \brief Implementation pointer
   GZ_UTILS_UNIQUE_IMPL_PTR(dataPtr)

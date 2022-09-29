@@ -9,6 +9,7 @@ set(sources
 set(test_sources
   AutoLogFixture_TEST.cc
   CMakeTestPaths_TEST.cc
+  RedirectConsoleStream_TEST.cc
   Utils_TEST.cc
 )
 
