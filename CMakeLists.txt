@@ -18,7 +18,7 @@ set(GZ_CMAKE_VER ${gz-cmake3_VERSION_MAJOR})
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-gz_configure_project(VERSION_SUFFIX pre1)
+gz_configure_project(VERSION_SUFFIX)
 
 #============================================================================
 # Set project-specific options
@@ -109,6 +109,7 @@ gz_find_package(SWSCALE REQUIRED_BY av PRETTY libswscale)
 #------------------------------------
 # Find avdevice
 gz_find_package(AVDEVICE VERSION 56.4.100 REQUIRED_BY av PRETTY libavdevice)
+set(HAVE_AVDEVICE ${AVDEVICE_FOUND})
 
 #------------------------------------
 # Find avformat
