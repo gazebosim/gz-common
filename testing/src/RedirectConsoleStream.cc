@@ -15,17 +15,16 @@
 *
 */
 
-#include <cstring>
 #include <cstdio>
 #include <cstdlib>
-
-#include "gz/common/testing/RedirectConsoleStream.hh"
-#include "gz/common/Console.hh"
-#include <gz/common/testing/TestPaths.hh>
-
+#include <cstring>
 #include <fstream>
-#include <gz/utils/SuppressWarning.hh>
 #include <sstream>
+
+#include <gz/common/testing/RedirectConsoleStream.hh>
+#include <gz/common/Console.hh>
+#include <gz/common/testing/TestPaths.hh>
+#include <gz/utils/SuppressWarning.hh>
 
 #ifdef _WIN32
 #include <io.h>
@@ -64,18 +63,18 @@ class RedirectConsoleStream::Implementation
 //////////////////////////////////////////////////
 void RedirectConsoleStream::Implementation::RemoveRedirection()
 {
-    // MSVC treats dup and dup2 as deprecated, preferring _dup and _dup2
-    // We can safely ignore that here.
-    GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION;
-    /// Restore the orignal source file descriptor
-    if (this->originalFd != -1)
-    {
-      fflush(nullptr);
-      dup2(this->originalFd, this->fd);
-      close(this->originalFd);
-      this->originalFd = -1;
-    }
-    GZ_UTILS_WARN_RESUME__DEPRECATED_DECLARATION;
+  // MSVC treats dup and dup2 as deprecated, preferring _dup and _dup2
+  // We can safely ignore that here.
+  GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION;
+  /// Restore the orignal source file descriptor
+  if (this->originalFd != -1)
+  {
+    fflush(nullptr);
+    dup2(this->originalFd, this->fd);
+    close(this->originalFd);
+    this->originalFd = -1;
+  }
+  GZ_UTILS_WARN_RESUME__DEPRECATED_DECLARATION;
 }
 
 //////////////////////////////////////////////////

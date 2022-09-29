@@ -72,8 +72,5 @@ inline RedirectConsoleStream RedirectStderr()
   auto path = gz::common::testing::TempPath("stderr.out");
   return RedirectConsoleStream(StreamSource::STDERR, path);
 }
-
-
 }  // namespace gz::common::testing
-
 #endif  // GZ_COMMON_TESTING_REDIRECTCONSOLE_STREAM_HH
