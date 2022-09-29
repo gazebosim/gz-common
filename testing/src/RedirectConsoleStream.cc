@@ -138,7 +138,7 @@ RedirectConsoleStream::RedirectConsoleStream(const StreamSource &_source,
   // Create a file with read/write permissions and exclusive access
   if ((sinkFd = open(this->dataPtr->sink.c_str(), 
           O_EXCL | O_RDWR | O_CREAT, 
-          S_IRUSR | S_IWUSR)) < 0)
+          S_IREAD | S_IWRITE)) < 0)
   {
     gzerr << "Failed to open sink file, console redirection disabled"
       << "(" << strerror(sinkFd) << ")" << std::endl;
