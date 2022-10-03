@@ -16,7 +16,6 @@ endif()
 # Link the libraries that we always need
 target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
   PRIVATE
-    ${DL_TARGET}
     ${CXX_FILESYSTEM_LIBRARIES}
   PUBLIC
     gz-utils${GZ_UTILS_VER}::gz-utils${GZ_UTILS_VER}
@@ -49,14 +48,14 @@ gz_build_tests(
     # Used to make internal source file headers visible to the unit tests
     ${CMAKE_CURRENT_SOURCE_DIR})
 
-if(TARGET UNIT_MovingWindowFilter_TEST)
-  target_include_directories(UNIT_MovingWindowFilter_TEST PRIVATE
+if(TARGET UNIT_DataFrame_TEST)
+  target_include_directories(UNIT_DataFrame_TEST PRIVATE
     ${gz-math${GZ_MATH_VER}_INCLUDE_DIRS})
 endif()
 
-if(TARGET UNIT_PluginLoader_TEST)
-  target_compile_definitions(UNIT_PluginLoader_TEST PRIVATE
-  "GZ_COMMON_LIB_PATH=\"$<TARGET_FILE_DIR:${PROJECT_LIBRARY_TARGET_NAME}>\"")
+if(TARGET UNIT_MovingWindowFilter_TEST)
+  target_include_directories(UNIT_MovingWindowFilter_TEST PRIVATE
+    ${gz-math${GZ_MATH_VER}_INCLUDE_DIRS})
 endif()
 
 # Produce warning on Windows if the user has decided to turn on the symlink

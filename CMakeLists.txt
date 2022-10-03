@@ -68,11 +68,6 @@ else()
 endif()
 
 #--------------------------------------
-# Find libdl
-gz_find_package(
-  DL REQUIRED PRIVATE PRETTY libdl PURPOSE "Required for plugins")
-
-#--------------------------------------
 # Find dependencies that we ignore for Visual Studio
 if(NOT MSVC)
 
@@ -109,6 +104,7 @@ gz_find_package(SWSCALE REQUIRED_BY av PRETTY libswscale)
 #------------------------------------
 # Find avdevice
 gz_find_package(AVDEVICE VERSION 56.4.100 REQUIRED_BY av PRETTY libavdevice)
+set(HAVE_AVDEVICE ${AVDEVICE_FOUND})
 
 #------------------------------------
 # Find avformat
@@ -126,7 +122,6 @@ gz_find_package(AVUTIL REQUIRED_BY av PRETTY libavutil)
 # Find assimp
 gz_find_package(GzAssimp REQUIRED_BY graphics PRETTY assimp)
 
-
 message(STATUS "-------------------------------------------\n")
 
 
@@ -137,7 +132,7 @@ configure_file("${PROJECT_SOURCE_DIR}/cppcheck.suppress.in"
                ${PROJECT_BINARY_DIR}/cppcheck.suppress)
 
 gz_configure_build(QUIT_IF_BUILD_ERRORS
-  COMPONENTS av events geospatial graphics profiler testing)
+  COMPONENTS av events geospatial graphics io profiler testing)
 
 #============================================================================
 # Create package information

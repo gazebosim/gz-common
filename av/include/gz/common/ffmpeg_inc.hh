@@ -17,6 +17,60 @@
 #ifndef GZ_COMMON_FFMPEG_INC_HH_
 #define GZ_COMMON_FFMPEG_INC_HH_
 
+/// Versions of FFMPEG on Gazebo supported platforms
+// v4.2.7 (Ubuntu Focal)
+// libavutil      56. 31.100 / 56. 31.100
+// libavcodec     58. 54.100 / 58. 54.100
+// libavformat    58. 29.100 / 58. 29.100
+// libavdevice    58.  8.100 / 58.  8.100
+// libavfilter     7. 57.100 /  7. 57.100
+// libavresample   4.  0.  0 /  4.  0.  0
+// libswscale      5.  5.100 /  5.  5.100
+// libswresample   3.  5.100 /  3.  5.100
+// libpostproc    55.  5.100 / 55.  5.100
+
+// v4.4.1 (Windows CI vcpkg)
+// libavutil      56. 70.100 / 56. 70.100
+// libavcodec     58.134.100 / 58.134.100
+// libavformat    58. 76.100 / 58. 76.100
+// libavdevice    58. 13.100 / 58. 13.100
+// libavfilter     7.110.100 /  7.110.100
+// libswscale      5.  9.100 /  5.  9.100
+// libswresample   3.  9.100 /  3.  9.100
+// libpostproc    55.  9.100 / 55.  9.100
+
+// v4.4.2 (Ubuntu Jammy)
+// libavutil      56. 70.100 / 56. 70.100
+// libavcodec     58.134.100 / 58.134.100
+// libavformat    58. 76.100 / 58. 76.100
+// libavdevice    58. 13.100 / 58. 13.100
+// libavfilter     7.110.100 /  7.110.100
+// libswscale      5.  9.100 /  5.  9.100
+// libswresample   3.  9.100 /  3.  9.100
+// libpostproc    55.  9.100 / 55.  9.100
+
+// v5.1 (homebrew)
+//  libavutil      57. 28.100 / 57. 28.100
+//  libavcodec     59. 37.100 / 59. 37.100
+//  libavformat    59. 27.100 / 59. 27.100
+//  libavdevice    59.  7.100 / 59.  7.100
+//  libavfilter     8. 44.100 /  8. 44.100
+//  libswscale      6.  7.100 /  6.  7.100
+//  libswresample   4.  7.100 /  4.  7.100
+//  libpostproc    56.  6.100 / 56.  6.100
+
+/// Additional versions of FFMPEG not officially supported
+// v5.0.1 (conda-forge)
+// libavutil      57. 17.100 / 57. 17.100
+// libavcodec     59. 18.100 / 59. 18.100
+// libavformat    59. 16.100 / 59. 16.100
+// libavdevice    59.  4.100 / 59.  4.100
+// libavfilter     8. 24.100 /  8. 24.100
+// libswscale      6.  4.100 /  6.  4.100
+// libswresample   4.  3.100 /  4.  3.100
+// libpostproc    56.  3.100 / 56.  3.100
+
+
 #include <string>
 
 #include <gz/common/config.hh>
@@ -44,7 +98,7 @@ extern "C" {
 #include <libavutil/imgutils.h>
 #include <libavutil/hwcontext.h>
 
-#if defined(__linux__) && defined(HAVE_AVDEVICE)
+#if defined(HAVE_AVDEVICE)
 #include <libavdevice/avdevice.h>
 #endif
 }
@@ -55,34 +109,6 @@ namespace gz
 {
   namespace common
   {
-    /// \brief Helper function to avoid deprecation warnings.
-    GZ_COMMON_AV_VISIBLE
-    AVFrame *AVFrameAlloc(void);
-
-    /// \brief Helper function to avoid deprecation warnings.
-    GZ_COMMON_AV_VISIBLE
-    void AVFrameUnref(AVFrame *_frame);
-
-    /// \brief Helper function to avoid deprecation warnings.
-    /// \param[in] _packet AVPacket structure that stores compressed data
-    GZ_COMMON_AV_VISIBLE
-    void AVPacketUnref(AVPacket *_packet);
-
-    /// \brief Helper function to avoid deprecation warnings
-    /// from av_codec_decode_video2.
-    /// \param[in] _codecCtx Codec context.
-    /// \param[out] _frame AVFrame in which decoded video frame is stored.
-    /// \param[out] _gotFrame Zero if no frame could be decompressed,
-    /// otherwise nonzero.
-    /// \param[in] _packet AVPacket structure that stores compressed data.
-    /// \return On error or eof, a negative value is returned, otherwise
-    /// the number of bytes used.
-    /// \note If the codec is in draining mode, _packet can be null. The return
-    /// value on success will then be 0, but _gotFrame will be non-zero.
-    GZ_COMMON_AV_VISIBLE
-    int AVCodecDecode(AVCodecContext *_codecCtx,
-        AVFrame *_frame, int *_gotFrame, AVPacket *_packet);
-
     // av_err2str only works in C99, this is a version that works in C++;
     // https://github.com/joncampbell123/composite-video-simulator/issues/5#issuecomment-611885908
     inline std::string av_err2str_cpp(int errnum)

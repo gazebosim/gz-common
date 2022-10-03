@@ -31,26 +31,20 @@ namespace gz
 {
   namespace common
   {
-    // TODO(CH3): Deprecated. Remove all the ign macros on tock.
     /// \brief Output an error message, if the verbose level is >= 1
     #define gzerr  (gz::common::Console::err(__FILE__, __LINE__))
-    #define ignerr gzerr
 
     /// \brief Output a warning message, if the verbose level is >= 2
     #define gzwarn  (gz::common::Console::warn(__FILE__, __LINE__))
-    #define ignwarn gzwarn
 
     /// \brief Output a message, if the verbose level is >= 3
     #define gzmsg  (gz::common::Console::msg())
-    #define ignmsg gzmsg
 
     /// \brief Output a debug message, if the verbose level is >= 4
     #define gzdbg  (gz::common::Console::dbg(__FILE__, __LINE__))
-    #define igndbg gzdbg
 
     /// \brief Output a message to a log file, regardless of verbosity level
     #define gzlog  (gz::common::Console::log())
-    #define ignlog gzlog
 
     /// \brief Initialize log file with filename given by _dir/_file.
     /// If called twice, it will close the file currently in use and open a new
@@ -61,18 +55,15 @@ namespace gz
     /// \param[in] _file Name of log file for ignlog messages.
     #define gzLogInit(_dir, _file)\
         gz::common::Console::log.Init(_dir, _file)
-    #define ignLogInit(_dir, _file) gzLogInit(_dir, _file)
 
     /// \brief Close the file used for logging.
     #define gzLogClose()\
         gz::common::Console::log.Close()
-    #define ignLogClose() gzLogClose()
 
     /// \brief Get the full path of the directory where the log files are stored
     /// \return Full path of the directory
     #define gzLogDirectory()\
         (gz::common::Console::log.LogDirectory())
-    #define ignLogDirectory() gzLogDirectory()
 
     /// \class FileLogger FileLogger.hh common/common.hh
     /// \brief A logger that outputs messages to a file.
