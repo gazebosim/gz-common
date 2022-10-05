@@ -70,14 +70,13 @@ Refer to the following table for information about important directories and fil
 +-- events                   Header and source files for the Event component.
 +-- examples                 Example programs.
 +-- graphics                 Header and source files for the Graphics component.
-+-- include/gz/common  Header files for the core component.
++-- include/gz/common        Header files for the core component.
 +-- profiler                 Header and source files for the Profiler component.
 +-- src                      Core source files and unit tests.
 +-- test
 |    +-- integration         Integration tests.
 |    +-- performance         Performance tests.
-|    +-- plugins             Plugin tests.
-|    +-- static_assertions   Plugin static assertion tests.
+|    +-- static_assertions   Static assertion tests.
 |    +-- regression          Regression tests.
 +-- tutorials                Tutorials, written in markdown.
 +-- Changelog.md             Changelog.

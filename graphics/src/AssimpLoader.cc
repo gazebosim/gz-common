@@ -587,8 +587,7 @@ SubMesh AssimpLoader::Implementation::CreateSubMesh(
       math::Vector3d texcoords;
       texcoords.X(_assimpMesh->mTextureCoords[uvIdx][vertexIdx].x);
       texcoords.Y(_assimpMesh->mTextureCoords[uvIdx][vertexIdx].y);
-      // TODO(luca) why do we need 1.0 - Y?
-      subMesh.AddTexCoordBySet(texcoords.X(), 1.0 - texcoords.Y(), uvIdx);
+      subMesh.AddTexCoordBySet(texcoords.X(), texcoords.Y(), uvIdx);
       ++uvIdx;
     }
   }
@@ -626,6 +625,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
       aiProcess_JoinIdenticalVertices |
       aiProcess_RemoveRedundantMaterials |
       aiProcess_SortByPType |
+      aiProcess_FlipUVs |
 #ifndef GZ_ASSIMP_PRE_5_2_0
       aiProcess_PopulateArmatureData |
 #endif
@@ -634,7 +634,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
       0);
   if (scene == nullptr)
   {
-    ignerr << "Unable to import mesh [" << _filename << "]" << std::endl;
+    gzerr << "Unable to import mesh [" << _filename << "]" << std::endl;
     return mesh;
   }
   auto& rootNode = scene->mRootNode;
