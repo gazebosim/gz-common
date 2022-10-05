@@ -16,7 +16,7 @@
 */
 #include <gtest/gtest.h>
 #include <string>
-#include <ignition/common/Base64.hh>
+#include <gz/common/Base64.hh>
 
 #include "test_config.h"
 

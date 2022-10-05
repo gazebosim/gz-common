@@ -18,9 +18,9 @@
 // needed on MacOS
 #include <cmath>
 
-#include "ignition/common/VideoEncoder.hh"
-#include "ignition/common/Video.hh"
-#include "ignition/common/ffmpeg_inc.hh"
+#include "gz/common/VideoEncoder.hh"
+#include "gz/common/Video.hh"
+#include "gz/common/ffmpeg_inc.hh"
 
 #include "test_config.h"
 

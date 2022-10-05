@@ -14,13 +14,13 @@
  * limitations under the License.
  *
  */
-#include <ignition/common/NodeTransform.hh>
+#include <gz/common/NodeTransform.hh>
 
 using namespace ignition;
 using namespace common;
 
 /// \brief Private data for NodeTransform
-class ignition::common::NodeTransformPrivate
+class gz::common::NodeTransformPrivate
 {
   /// \brief the sid
   public: std::string sid;

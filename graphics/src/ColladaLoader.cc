@@ -20,23 +20,23 @@
 #include <vector>
 #include <set>
 
-#include <ignition/math/Helpers.hh>
-#include <ignition/math/Matrix4.hh>
-#include <ignition/math/Vector2.hh>
-#include <ignition/math/Vector3.hh>
+#include <gz/math/Helpers.hh>
+#include <gz/math/Matrix4.hh>
+#include <gz/math/Vector2.hh>
+#include <gz/math/Vector3.hh>
 
 #include "tinyxml2.h"
 
-#include "ignition/common/graphics/Types.hh"
-#include "ignition/common/Console.hh"
-#include "ignition/common/Material.hh"
-#include "ignition/common/SubMesh.hh"
-#include "ignition/common/Mesh.hh"
-#include "ignition/common/Skeleton.hh"
-#include "ignition/common/SkeletonAnimation.hh"
-#include "ignition/common/SystemPaths.hh"
-#include "ignition/common/Util.hh"
-#include "ignition/common/ColladaLoader.hh"
+#include "gz/common/graphics/Types.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/Material.hh"
+#include "gz/common/SubMesh.hh"
+#include "gz/common/Mesh.hh"
+#include "gz/common/Skeleton.hh"
+#include "gz/common/SkeletonAnimation.hh"
+#include "gz/common/SystemPaths.hh"
+#include "gz/common/Util.hh"
+#include "gz/common/ColladaLoader.hh"
 
 using namespace ignition;
 using namespace common;

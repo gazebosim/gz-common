@@ -31,16 +31,16 @@
 #include "win_dirent.h"
 #endif
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/StringUtils.hh"
-#include "ignition/common/SystemPaths.hh"
-#include "ignition/common/Util.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/StringUtils.hh"
+#include "gz/common/SystemPaths.hh"
+#include "gz/common/Util.hh"
 
 using namespace ignition;
 using namespace common;
 
 // Private data class
-class ignition::common::SystemPathsPrivate
+class gz::common::SystemPathsPrivate
 {
   /// \brief Name of the environment variable to check for plugin paths
   public: std::string pluginPathEnv = "IGN_PLUGIN_PATH";

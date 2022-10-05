@@ -15,17 +15,17 @@
  *
 */
 
-#include "ignition/common/PluginMacros.hh"
+#include "gz/common/PluginMacros.hh"
 
 extern "C" {
   std::size_t DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONPluginInfoSize =
-    1 + sizeof(ignition::common::PluginInfo);
+    1 + sizeof(gz::common::PluginInfo);
 
   std::size_t DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONPluginInfoAlignment =
-    alignof(ignition::common::PluginInfo);
+    alignof(gz::common::PluginInfo);
 
   int DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONPluginAPIVersion =
-    ignition::common::PLUGIN_API_VERSION;
+    gz::common::PLUGIN_API_VERSION;
 }
 
 extern "C" std::size_t DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONMultiPluginInfo(

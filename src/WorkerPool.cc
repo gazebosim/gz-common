@@ -20,9 +20,9 @@
 #include <thread>
 #include <utility>
 
-#include "ignition/common/WorkerPool.hh"
+#include "gz/common/WorkerPool.hh"
 
-namespace igncmn = ignition::common;
+namespace igncmn = gz::common;
 using namespace igncmn;
 
 namespace ignition

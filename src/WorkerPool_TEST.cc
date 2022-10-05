@@ -19,11 +19,11 @@
 
 #include <atomic>
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/WorkerPool.hh"
-#include "ignition/utilities/ExtraTestMacros.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/WorkerPool.hh"
+#include "gz/utilities/ExtraTestMacros.hh"
 
-namespace igncmn = ignition::common;
+namespace igncmn = gz::common;
 using namespace igncmn;
 
 //////////////////////////////////////////////////

@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 
-#include "ignition/common/EnumIface.hh"
+#include "gz/common/EnumIface.hh"
 #include "test_config.h"
 
 using namespace ignition;

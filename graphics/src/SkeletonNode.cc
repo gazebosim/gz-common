@@ -17,14 +17,14 @@
 
 #include <list>
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/SkeletonNode.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/SkeletonNode.hh"
 
 using namespace ignition;
 using namespace common;
 
 /// \brief SkeletonNode private data
-class ignition::common::SkeletonNodePrivate
+class gz::common::SkeletonNodePrivate
 {
   /// \brief the name of the skeletal node
   public: std::string name;

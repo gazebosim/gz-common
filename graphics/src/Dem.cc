@@ -23,16 +23,16 @@
 # pragma GCC diagnostic pop
 #endif
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/Dem.hh"
-#include "ignition/math/SphericalCoordinates.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/Dem.hh"
+#include "gz/math/SphericalCoordinates.hh"
 
 using namespace ignition;
 using namespace common;
 
 #ifdef HAVE_GDAL
 
-class ignition::common::DemPrivate
+class gz::common::DemPrivate
 {
   /// \brief A set of associated raster bands.
   public: GDALDataset *dataSet;

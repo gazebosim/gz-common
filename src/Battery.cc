@@ -17,14 +17,14 @@
 
 #include <cmath>
 
-#include <ignition/common/Console.hh>
-#include <ignition/common/Battery.hh>
+#include <gz/common/Console.hh>
+#include <gz/common/Battery.hh>
 
 using namespace ignition;
 using namespace common;
 
 /// \brief Private data for the Battery class
-class ignition::common::BatteryPrivate
+class gz::common::BatteryPrivate
 {
   /// \brief Initial voltage in volts.
   public: double initVoltage = 0.0;

@@ -15,15 +15,15 @@
  *
 */
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/NodeAnimation.hh"
-#include "ignition/common/SkeletonAnimation.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/NodeAnimation.hh"
+#include "gz/common/SkeletonAnimation.hh"
 
 using namespace ignition;
 using namespace common;
 
 /// Prvate data class
-class ignition::common::SkeletonAnimationPrivate
+class gz::common::SkeletonAnimationPrivate
 {
   /// \brief the node name
   public: std::string name;

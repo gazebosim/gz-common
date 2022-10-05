@@ -19,7 +19,7 @@
 #include <gtest/gtest.h>
 #include <string>
 
-#include <ignition/common/Util.hh>
+#include <gz/common/Util.hh>
 #include "test_config.h"
 
 using namespace ignition;

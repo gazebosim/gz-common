@@ -21,9 +21,9 @@
 
 #include <string>
 
-#include <ignition/common/Console.hh>
-#include <ignition/common/Util.hh>
-#include <ignition/common/Image.hh>
+#include <gz/common/Console.hh>
+#include <gz/common/Util.hh>
+#include <gz/common/Image.hh>
 
 using namespace ignition;
 using namespace common;

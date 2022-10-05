@@ -18,10 +18,10 @@
 #include <atomic>
 #include <thread>
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/Profiler.hh"
-#include "ignition/common/SignalHandler.hh"
-#include "ignition/common/Time.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/Profiler.hh"
+#include "gz/common/SignalHandler.hh"
+#include "gz/common/Time.hh"
 
 std::atomic<bool> running;
 
@@ -116,13 +116,13 @@ void sigHandler(int _signal)
 
 int main(int argc, char** argv)
 {
-  ignition::common::Console::SetVerbosity(4);
+  gz::common::Console::SetVerbosity(4);
 
   IGN_PROFILE_THREAD_NAME("main");
   running = true;
 
   // Connect signal handler
-  ignition::common::SignalHandler handler;
+  gz::common::SignalHandler handler;
   handler.AddCallback(sigHandler);
 
   // Spin up a couple threads with interesting content.

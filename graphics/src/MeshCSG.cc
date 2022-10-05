@@ -19,10 +19,10 @@
 
 #include <string>
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/Mesh.hh"
-#include "ignition/common/SubMesh.hh"
-#include "ignition/common/MeshCSG.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/Mesh.hh"
+#include "gz/common/SubMesh.hh"
+#include "gz/common/MeshCSG.hh"
 
 using namespace ignition;
 using namespace common;

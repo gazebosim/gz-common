@@ -17,8 +17,8 @@
 
 #include <gtest/gtest.h>
 
-#include <ignition/common/Timer.hh>
-#include <ignition/common/Time.hh>
+#include <gz/common/Timer.hh>
+#include <gz/common/Time.hh>
 
 using namespace ignition;
 

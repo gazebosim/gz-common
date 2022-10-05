@@ -16,7 +16,7 @@
 */
 
 #include <gtest/gtest.h>
-#include "ignition/common/URI.hh"
+#include "gz/common/URI.hh"
 
 using namespace ignition;
 using namespace common;

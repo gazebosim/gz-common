@@ -15,7 +15,7 @@
  *
 */
 
-#include "ignition/common/PluginMacros.hh"
+#include "gz/common/PluginMacros.hh"
 #include "DummyPlugins.hh"
 
 

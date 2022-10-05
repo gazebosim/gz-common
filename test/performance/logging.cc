@@ -20,7 +20,7 @@
 #include <map>
 #include <thread>
 
-#include <ignition/common/Console.hh>
+#include <gz/common/Console.hh>
 
 namespace {
 // Lower value than spdlog to keep CI from flaking
@@ -141,7 +141,7 @@ void SaveResultToBucketFile(
 void run(size_t number_of_threads)
 {
   g_counter = 0;
-  ignition::common::Console::SetVerbosity(4);
+  gz::common::Console::SetVerbosity(4);
   std::vector<std::thread> threads(number_of_threads);
   std::map<size_t, std::vector<uint64_t>> threads_result;
 

@@ -19,10 +19,10 @@
 
 #include "test_config.h"
 
-#include <ignition/math/Vector3.hh>
-#include <ignition/math/Quaternion.hh>
-#include <ignition/common/KeyFrame.hh>
-#include <ignition/common/Animation.hh>
+#include <gz/math/Vector3.hh>
+#include <gz/math/Quaternion.hh>
+#include <gz/common/KeyFrame.hh>
+#include <gz/common/Animation.hh>
 
 using namespace ignition;
 
