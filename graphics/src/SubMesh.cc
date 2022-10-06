@@ -19,17 +19,17 @@
 #include <map>
 #include <string>
 
-#include "ignition/math/Helpers.hh"
+#include "gz/math/Helpers.hh"
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/Material.hh"
-#include "ignition/common/SubMesh.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/Material.hh"
+#include "gz/common/SubMesh.hh"
 
 using namespace ignition;
 using namespace common;
 
 /// \brief Private data for SubMesh
-class ignition::common::SubMesh::Implementation
+class common::SubMesh::Implementation
 {
   /// \brief the vertex array
   public: std::vector<math::Vector3d> vertices;
@@ -60,13 +60,13 @@ class ignition::common::SubMesh::Implementation
 
 //////////////////////////////////////////////////
 SubMesh::SubMesh()
-: dataPtr(ignition::utils::MakeImpl<Implementation>())
+: dataPtr(utils::MakeImpl<Implementation>())
 {
 }
 
 //////////////////////////////////////////////////
 SubMesh::SubMesh(const std::string &_name)
-: dataPtr(ignition::utils::MakeImpl<Implementation>())
+: dataPtr(utils::MakeImpl<Implementation>())
 {
   this->dataPtr->name = _name;
 }

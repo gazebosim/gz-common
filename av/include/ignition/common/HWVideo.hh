@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Martin Pecka
+ * Copyright (C) 2022 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,45 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
-#ifndef IGNITION_COMMON_HWVIDEO_HH
-#define IGNITION_COMMON_HWVIDEO_HH
+ *
+ */
 
-#include <ignition/common/EnumIface.hh>
-
-namespace ignition::common
-{
-  enum class IGNITION_COMMON_AV_VISIBLE HWEncoderType
-  {
-    NONE,
-    NVENC,  // Linux device is /dev/nvidia*
-    // Windows is the same (even though such file doesn't exist)
-    VAAPI,  // Linux device /dev/dri/renderD* or display number (e.g. :0)
-    VDPAU,  // Not supported (probably only for decoding?)
-    QSV,  // Win device is 0-based GPU index,
-    // Linux uses /dev/dri/renderD* or display number (e.g. :0)
-    VIDEOTOOLBOX,  // Not yet suported
-    AMF,  // Not yet suported
-    OMX,  // Not yet suported
-    V4L2M2M,  // Not yet suported
-    DXVA2,  // Not yet suported
-    _  // For FlagSet to work.
-  };
-
-  IGN_ENUM(HWEncoderTypeParser, HWEncoderType,
-    HWEncoderType::NONE, HWEncoderType::_,
-    "NONE",
-    "NVENC",
-    "VAAPI",
-    "VDPAU",
-    "QSV",
-    "VIDEOTOOLBOX",
-    "AMF",
-    "OMX",
-    "V4L2M2M",
-    "DXVA2",
-    "INVALID"
-  )
-}
-
-#endif
+#include <gz/common/HWVideo.hh>
+#include <ignition/common/config.hh>

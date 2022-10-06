@@ -15,8 +15,8 @@
  *
  */
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/Event.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/Event.hh"
 
 using namespace ignition;
 using namespace common;

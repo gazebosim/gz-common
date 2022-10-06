@@ -30,11 +30,11 @@
 #include <locale>
 #include <sstream>
 
-#include <ignition/common/config.hh>
-#include <ignition/common/Console.hh>
-#include <ignition/common/SystemPaths.hh>
-#include <ignition/common/Util.hh>
-#include <ignition/common/Uuid.hh>
+#include <gz/common/config.hh>
+#include <gz/common/Console.hh>
+#include <gz/common/SystemPaths.hh>
+#include <gz/common/Util.hh>
+#include <gz/common/Uuid.hh>
 
 #ifndef _WIN32
 #include <dirent.h>
@@ -55,8 +55,10 @@
   static const auto &ignstrtok = strtok_r;
 #endif
 
-static std::unique_ptr<ignition::common::SystemPaths> gSystemPaths(
-    new ignition::common::SystemPaths);
+using namespace ignition;
+
+static std::unique_ptr<common::SystemPaths> gSystemPaths(
+    new common::SystemPaths);
 
 /////////////////////////////////////////////////
 // Internal class for SHA1 computation
@@ -238,13 +240,13 @@ bool Sha1::Digest(void const *_buffer, std::size_t _byteCount,
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::systemTimeISO()
+std::string common::systemTimeISO()
 {
   return timeToIso(IGN_SYSTEM_TIME());
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::systemTimeIso()
+std::string common::systemTimeIso()
 {
   return timeToIso(IGN_SYSTEM_TIME());
 }
@@ -266,7 +268,7 @@ static bool PortableLocaltime(time_t seconds, struct tm* out) {
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::timeToIso(
+std::string common::timeToIso(
     const std::chrono::time_point<std::chrono::system_clock> &_time)
 {
   char isoStr[25];
@@ -284,32 +286,32 @@ std::string ignition::common::timeToIso(
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::logPath()
+std::string common::logPath()
 {
   return gSystemPaths->LogPath();
 }
 
 /////////////////////////////////////////////////
-void ignition::common::addSearchPathSuffix(const std::string &_suffix)
+void common::addSearchPathSuffix(const std::string &_suffix)
 {
   gSystemPaths->AddSearchPathSuffix(_suffix);
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::findFile(const std::string &_file)
+std::string common::findFile(const std::string &_file)
 {
   return gSystemPaths->FindFile(_file, true);
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::findFile(const std::string &_file,
+std::string common::findFile(const std::string &_file,
                                        const bool _searchLocalPath)
 {
   return gSystemPaths->FindFile(_file, _searchLocalPath);
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::findFilePath(const std::string &_file)
+std::string common::findFilePath(const std::string &_file)
 {
   std::string filepath = findFile(_file);
 
@@ -325,26 +327,26 @@ std::string ignition::common::findFilePath(const std::string &_file)
 }
 
 /////////////////////////////////////////////////
-void ignition::common::addFindFileURICallback(
-    std::function<std::string(const ignition::common::URI &)> _cb)
+void common::addFindFileURICallback(
+    std::function<std::string(const common::URI &)> _cb)
 {
   gSystemPaths->AddFindFileURICallback(_cb);
 }
 
 /////////////////////////////////////////////////
-ignition::common::SystemPaths *ignition::common::systemPaths()
+common::SystemPaths *common::systemPaths()
 {
   return gSystemPaths.get();
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::env(const std::string &_name, std::string &_value)
+bool common::env(const std::string &_name, std::string &_value)
 {
   return env(_name, _value, false);
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::env(const std::string &_name,
+bool common::env(const std::string &_name,
                            std::string &_value,
                            bool _allowEmpty)
 {
@@ -391,7 +393,7 @@ bool ignition::common::env(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-bool ignition::common::setenv(const std::string &_name,
+bool common::setenv(const std::string &_name,
                               const std::string &_value)
 {
 #ifdef _WIN32
@@ -414,7 +416,7 @@ bool ignition::common::setenv(const std::string &_name,
   return true;
 }
 /////////////////////////////////////////////////
-bool ignition::common::unsetenv(const std::string &_name)
+bool common::unsetenv(const std::string &_name)
 {
 #ifdef _WIN32
   if (0 != _putenv_s(_name.c_str(), ""))
@@ -437,7 +439,7 @@ bool ignition::common::unsetenv(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::sha1(void const *_buffer, std::size_t _byteCount)
+std::string common::sha1(void const *_buffer, std::size_t _byteCount)
 {
   Sha1 sha1;
   std::stringstream stream;
@@ -453,14 +455,14 @@ std::string ignition::common::sha1(void const *_buffer, std::size_t _byteCount)
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::uuid()
+std::string common::uuid()
 {
-  ignition::common::Uuid uuid;
+  common::Uuid uuid;
   return uuid.String();
 }
 
 /////////////////////////////////////////////////
-std::vector<std::string> ignition::common::split(const std::string &_str,
+std::vector<std::string> common::split(const std::string &_str,
     const std::string &_delim)
 {
   std::vector<std::string> tokens;
@@ -480,14 +482,14 @@ std::vector<std::string> ignition::common::split(const std::string &_str,
 }
 
 /////////////////////////////////////////////////
-void ignition::common::ltrim(std::string &_s)
+void common::ltrim(std::string &_s)
 {
   _s.erase(_s.begin(), std::find_if(_s.begin(), _s.end(),
         [](int c) {return !std::isspace(c);}));
 }
 
 /////////////////////////////////////////////////
-void ignition::common::rtrim(std::string &_s)
+void common::rtrim(std::string &_s)
 {
   _s.erase(std::find_if(_s.rbegin(), _s.rend(),
         [](int c) {return !std::isspace(c);}).base(),
@@ -495,35 +497,35 @@ void ignition::common::rtrim(std::string &_s)
 }
 
 /////////////////////////////////////////////////
-void ignition::common::trim(std::string &_s)
+void common::trim(std::string &_s)
 {
-  ignition::common::ltrim(_s);
-  ignition::common::rtrim(_s);
+  common::ltrim(_s);
+  common::rtrim(_s);
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::ltrimmed(std::string _s)
+std::string common::ltrimmed(std::string _s)
 {
-  ignition::common::ltrim(_s);
+  common::ltrim(_s);
   return _s;
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::rtrimmed(std::string _s)
+std::string common::rtrimmed(std::string _s)
 {
-  ignition::common::rtrim(_s);
+  common::rtrim(_s);
   return _s;
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::trimmed(std::string _s)
+std::string common::trimmed(std::string _s)
 {
-  ignition::common::trim(_s);
+  common::trim(_s);
   return _s;
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::lowercase(const std::string &_in)
+std::string common::lowercase(const std::string &_in)
 {
   std::string out = _in;
   for (size_t i = 0; i < out.size(); ++i)
@@ -532,14 +534,14 @@ std::string ignition::common::lowercase(const std::string &_in)
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::lowercase(const char *_in)
+std::string common::lowercase(const char *_in)
 {
   std::string ins = _in;
   return lowercase(ins);
 }
 
 /////////////////////////////////////////////////
-void ignition::common::replaceAll(std::string &_result,
+void common::replaceAll(std::string &_result,
                                   const std::string &_orig,
                                   const std::string &_key,
                                   const std::string &_replacement)
@@ -554,7 +556,7 @@ void ignition::common::replaceAll(std::string &_result,
 }
 
 /////////////////////////////////////////////////
-std::string ignition::common::replaceAll(const std::string &_orig,
+std::string common::replaceAll(const std::string &_orig,
                                         const std::string &_key,
                                         const std::string &_replacement)
 {

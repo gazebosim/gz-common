@@ -18,11 +18,11 @@
 #include <fstream>
 #include <sstream>
 
-#include <ignition/common/SystemPaths.hh>
-#include <ignition/common/Skeleton.hh>
-#include <ignition/common/SkeletonAnimation.hh>
-#include <ignition/common/Console.hh>
-#include <ignition/common/BVHLoader.hh>
+#include <gz/common/SystemPaths.hh>
+#include <gz/common/Skeleton.hh>
+#include <gz/common/SkeletonAnimation.hh>
+#include <gz/common/Console.hh>
+#include <gz/common/BVHLoader.hh>
 
 using namespace ignition;
 using namespace common;

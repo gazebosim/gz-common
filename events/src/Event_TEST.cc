@@ -20,7 +20,7 @@
 #include "test_config.h"
 
 #include <functional>
-#include <ignition/common/Event.hh>
+#include <gz/common/Event.hh>
 
 using namespace ignition;
 

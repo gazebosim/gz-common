@@ -20,11 +20,11 @@
 #include <thread>
 #include <utility>
 
-#include "ignition/common/WorkerPool.hh"
-#include "ignition/math/Helpers.hh"
+#include "gz/common/WorkerPool.hh"
+#include "gz/math/Helpers.hh"
 
-namespace igncmn = ignition::common;
-using namespace igncmn;
+using namespace ignition;
+using namespace common;
 
 namespace ignition
 {

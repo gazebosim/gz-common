@@ -15,11 +15,13 @@
  *
 */
 
-#include "ignition/common/PluginPtr.hh"
+#include "gz/common/PluginPtr.hh"
+
+using namespace ignition;
 
 int main()
 {
-  ignition::common::ConstPluginPtr const_ptr;
-  ignition::common::PluginPtr ptr;
+  common::ConstPluginPtr const_ptr;
+  common::PluginPtr ptr;
   ptr = const_ptr;
 }

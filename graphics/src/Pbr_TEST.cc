@@ -17,18 +17,20 @@
 
 #include <gtest/gtest.h>
 
-#include <ignition/math/Color.hh>
-#include "ignition/common/Pbr.hh"
+#include <gz/math/Color.hh>
+#include <gz/common/Pbr.hh>
+
+using namespace ignition;
 
 /////////////////////////////////////////////////
 TEST(Pbr, BasicAPI)
 {
   // initial state
-  ignition::common::Pbr pbr;
-  EXPECT_EQ(ignition::common::PbrType::NONE, pbr.Type());
+  common::Pbr pbr;
+  EXPECT_EQ(common::PbrType::NONE, pbr.Type());
   EXPECT_EQ(std::string(), pbr.AlbedoMap());
   EXPECT_EQ(std::string(), pbr.NormalMap());
-  EXPECT_EQ(ignition::common::NormalMapSpace::TANGENT, pbr.NormalMapType());
+  EXPECT_EQ(common::NormalMapSpace::TANGENT, pbr.NormalMapType());
   EXPECT_EQ(std::string(), pbr.RoughnessMap());
   EXPECT_EQ(std::string(), pbr.MetalnessMap());
   EXPECT_EQ(std::string(), pbr.EmissiveMap());
@@ -43,8 +45,8 @@ TEST(Pbr, BasicAPI)
   EXPECT_EQ(std::string(), pbr.AmbientOcclusionMap());
 
   // set / get
-  pbr.SetType(ignition::common::PbrType::METAL);
-  EXPECT_EQ(ignition::common::PbrType::METAL, pbr.Type());
+  pbr.SetType(common::PbrType::METAL);
+  EXPECT_EQ(common::PbrType::METAL, pbr.Type());
 
   pbr.SetAlbedoMap("metal_albedo_map.png");
   EXPECT_EQ("metal_albedo_map.png", pbr.AlbedoMap());
@@ -88,8 +90,8 @@ TEST(Pbr, MoveCopy)
 {
   // copy constructor
   {
-    ignition::common::Pbr pbr;
-    pbr.SetType(ignition::common::PbrType::SPECULAR);
+    common::Pbr pbr;
+    pbr.SetType(common::PbrType::SPECULAR);
     pbr.SetAlbedoMap("specular_albedo_map.png");
     pbr.SetNormalMap("specular_normal_map.png");
     pbr.SetEnvironmentMap("specular_env_map.png");
@@ -100,11 +102,11 @@ TEST(Pbr, MoveCopy)
     pbr.SetSpecularMap("specular_map.png");
     pbr.SetGlossiness(0.1);
 
-    ignition::common::Pbr pbr2(pbr);
-    EXPECT_EQ(ignition::common::PbrType::SPECULAR, pbr2.Type());
+    common::Pbr pbr2(pbr);
+    EXPECT_EQ(common::PbrType::SPECULAR, pbr2.Type());
     EXPECT_EQ("specular_albedo_map.png", pbr2.AlbedoMap());
     EXPECT_EQ("specular_normal_map.png", pbr2.NormalMap());
-    EXPECT_EQ(ignition::common::NormalMapSpace::TANGENT, pbr2.NormalMapType());
+    EXPECT_EQ(common::NormalMapSpace::TANGENT, pbr2.NormalMapType());
     EXPECT_EQ("specular_env_map.png", pbr2.EnvironmentMap());
     EXPECT_EQ("specular_ambient_occlusion_map.png",
         pbr2.AmbientOcclusionMap());
@@ -123,11 +125,11 @@ TEST(Pbr, MoveCopy)
 
   // move
   {
-    ignition::common::Pbr pbr;
-    pbr.SetType(ignition::common::PbrType::METAL);
+    common::Pbr pbr;
+    pbr.SetType(common::PbrType::METAL);
     pbr.SetAlbedoMap("metal_albedo_map.png");
     pbr.SetNormalMap("metal_normal_map.png",
-        ignition::common::NormalMapSpace::TANGENT);
+        common::NormalMapSpace::TANGENT);
     pbr.SetEnvironmentMap("metal_env_map.png");
     pbr.SetAmbientOcclusionMap("metal_ambient_occlusion_map.png");
     pbr.SetEmissiveMap("metal_emissive_map.png");
@@ -137,11 +139,11 @@ TEST(Pbr, MoveCopy)
     pbr.SetRoughness(0.8);
     pbr.SetMetalness(0.3);
 
-    ignition::common::Pbr pbr2(std::move(pbr));
-    EXPECT_EQ(ignition::common::PbrType::METAL, pbr2.Type());
+    common::Pbr pbr2(std::move(pbr));
+    EXPECT_EQ(common::PbrType::METAL, pbr2.Type());
     EXPECT_EQ("metal_albedo_map.png", pbr2.AlbedoMap());
     EXPECT_EQ("metal_normal_map.png", pbr2.NormalMap());
-    EXPECT_EQ(ignition::common::NormalMapSpace::TANGENT, pbr2.NormalMapType());
+    EXPECT_EQ(common::NormalMapSpace::TANGENT, pbr2.NormalMapType());
     EXPECT_EQ("metal_env_map.png", pbr2.EnvironmentMap());
     EXPECT_EQ("metal_ambient_occlusion_map.png",
         pbr2.AmbientOcclusionMap());
@@ -160,11 +162,11 @@ TEST(Pbr, MoveCopy)
 
   // move assignment
   {
-    ignition::common::Pbr pbr;
-    pbr.SetType(ignition::common::PbrType::METAL);
+    common::Pbr pbr;
+    pbr.SetType(common::PbrType::METAL);
     pbr.SetAlbedoMap("metal_albedo_map.png");
     pbr.SetNormalMap("metal_normal_map.png",
-        ignition::common::NormalMapSpace::TANGENT);
+        common::NormalMapSpace::TANGENT);
     pbr.SetEnvironmentMap("metal_env_map.png");
     pbr.SetAmbientOcclusionMap("metal_ambient_occlusion_map.png");
     pbr.SetEmissiveMap("metal_emissive_map.png");
@@ -174,12 +176,12 @@ TEST(Pbr, MoveCopy)
     pbr.SetRoughness(0.8);
     pbr.SetMetalness(0.3);
 
-    ignition::common::Pbr pbr2;
+    common::Pbr pbr2;
     pbr2 = std::move(pbr);
-    EXPECT_EQ(ignition::common::PbrType::METAL, pbr2.Type());
+    EXPECT_EQ(common::PbrType::METAL, pbr2.Type());
     EXPECT_EQ("metal_albedo_map.png", pbr2.AlbedoMap());
     EXPECT_EQ("metal_normal_map.png", pbr2.NormalMap());
-    EXPECT_EQ(ignition::common::NormalMapSpace::TANGENT, pbr2.NormalMapType());
+    EXPECT_EQ(common::NormalMapSpace::TANGENT, pbr2.NormalMapType());
     EXPECT_EQ("metal_env_map.png", pbr2.EnvironmentMap());
     EXPECT_EQ("metal_ambient_occlusion_map.png",
         pbr2.AmbientOcclusionMap());
@@ -199,8 +201,8 @@ TEST(Pbr, MoveCopy)
 
   // assignment
   {
-    ignition::common::Pbr pbr;
-    pbr.SetType(ignition::common::PbrType::METAL);
+    common::Pbr pbr;
+    pbr.SetType(common::PbrType::METAL);
     pbr.SetAlbedoMap("metal_albedo_map.png");
     pbr.SetNormalMap("metal_normal_map.png");
     pbr.SetEnvironmentMap("metal_env_map.png");
@@ -212,9 +214,9 @@ TEST(Pbr, MoveCopy)
     pbr.SetRoughness(0.18);
     pbr.SetMetalness(0.13);
 
-    ignition::common::Pbr pbr2;
+    common::Pbr pbr2;
     pbr2 = pbr;
-    EXPECT_EQ(ignition::common::PbrType::METAL, pbr2.Type());
+    EXPECT_EQ(common::PbrType::METAL, pbr2.Type());
     EXPECT_EQ("metal_albedo_map.png", pbr2.AlbedoMap());
     EXPECT_EQ("metal_normal_map.png", pbr2.NormalMap());
     EXPECT_EQ("metal_env_map.png", pbr2.EnvironmentMap());
@@ -235,19 +237,19 @@ TEST(Pbr, MoveCopy)
 
   // copy assignment after move
   {
-    ignition::common::Pbr pbr1;
-    pbr1.SetType(ignition::common::PbrType::METAL);
+    common::Pbr pbr1;
+    pbr1.SetType(common::PbrType::METAL);
 
-    ignition::common::Pbr pbr2;
-    pbr2.SetType(ignition::common::PbrType::SPECULAR);
+    common::Pbr pbr2;
+    pbr2.SetType(common::PbrType::SPECULAR);
 
     // This is similar to what std::swap does except it uses std::move for each
     // assignment
-    ignition::common::Pbr tmp = std::move(pbr1);
+    common::Pbr tmp = std::move(pbr1);
     pbr1 = pbr2;
     pbr2 = tmp;
 
-    EXPECT_EQ(ignition::common::PbrType::SPECULAR, pbr1.Type());
-    EXPECT_EQ(ignition::common::PbrType::METAL, pbr2.Type());
+    EXPECT_EQ(common::PbrType::SPECULAR, pbr1.Type());
+    EXPECT_EQ(common::PbrType::METAL, pbr2.Type());
   }
 }

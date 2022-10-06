@@ -39,7 +39,7 @@
 
    René Nyffenegger rene.nyffenegger@adp-gmbh.ch
 */
-#include "ignition/common/Base64.hh"
+#include "gz/common/Base64.hh"
 #include <algorithm>
 #include <cstring>
 #include <iostream>

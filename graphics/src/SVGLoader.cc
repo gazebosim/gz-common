@@ -29,15 +29,15 @@
 #endif
 #endif
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/Util.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/Util.hh"
 
-#include "ignition/common/SVGLoader.hh"
+#include "gz/common/SVGLoader.hh"
 
 using namespace ignition;
 using namespace common;
 
-class ignition::common::SVGLoader::Implementation
+class common::SVGLoader::Implementation
 {
   /// \brief Generates polylines for each SVG subpath
   /// \param[in] _subpath The subpath commands
@@ -619,7 +619,7 @@ math::Vector2d SVGLoader::Implementation::SubpathToPolyline(
 
 /////////////////////////////////////////////////
 SVGLoader::SVGLoader(const unsigned int _samples)
-: dataPtr(ignition::utils::MakeImpl<Implementation>())
+: dataPtr(utils::MakeImpl<Implementation>())
 {
   this->dataPtr->resolution = 1.0/std::max(1u, _samples);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Open Source Robotics Foundation
+ * Copyright (C) 2022 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,39 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 
-#ifndef IGNITION_COMMON_GRAPHICS_TYPES_HH_
-#define IGNITION_COMMON_GRAPHICS_TYPES_HH_
-
-#include <memory>
-
-// This header contains forward declarations for some graphics types
-namespace ignition
-{
-  namespace common
-  {
-    class Material;
-    class Mesh;
-    class Skeleton;
-    class SubMesh;
-
-    /// \def MaterialPtr
-    /// \brief Shared pointer to a Material object
-    using MaterialPtr = std::shared_ptr<Material>;
-
-    /// \def MeshPtr
-    /// \brief Standrd shared pointer to a Mesh object
-    using MeshPtr = std::shared_ptr<Mesh>;
-
-    /// \def SubMeshPtr
-    /// \brief Shared pointer to a SubMesh object
-    using SubMeshPtr = std::shared_ptr<SubMesh>;
-
-    /// \def SkeletonPtr
-    /// \brief Shared pointer to a Skeleton object
-    using SkeletonPtr = std::shared_ptr<Skeleton>;
-  }
-}
-
-#endif
+#include <gz/common/graphics/Types.hh>
+#include <ignition/common/config.hh>

@@ -15,13 +15,13 @@
  *
 */
 
-#include "ignition/common/Profiler.hh" // NOLINT(*)
+#include "gz/common/Profiler.hh" // NOLINT(*)
 #include <gtest/gtest.h> // NOLINT(*)
 
 #include <atomic> // NOLINT(*)
 #include <thread> // NOLINT(*)
-#include "ignition/common/Util.hh" // NOLINT(*)
-#include "ignition/common/Time.hh" // NOLINT(*)
+#include "gz/common/Util.hh" // NOLINT(*)
+#include "gz/common/Time.hh" // NOLINT(*)
 
 using namespace ignition;
 using namespace common;

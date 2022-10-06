@@ -17,12 +17,12 @@
 #include <algorithm>
 #include <memory>
 
-#include <ignition/math/Spline.hh>
-#include <ignition/math/Vector2.hh>
-#include <ignition/math/RotationSpline.hh>
-#include <ignition/common/Console.hh>
-#include <ignition/common/KeyFrame.hh>
-#include <ignition/common/Animation.hh>
+#include <gz/math/Spline.hh>
+#include <gz/math/Vector2.hh>
+#include <gz/math/RotationSpline.hh>
+#include <gz/common/Console.hh>
+#include <gz/common/KeyFrame.hh>
+#include <gz/common/Animation.hh>
 
 using namespace ignition;
 using namespace common;

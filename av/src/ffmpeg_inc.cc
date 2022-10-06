@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "ignition/common/ffmpeg_inc.hh"
+#include "gz/common/ffmpeg_inc.hh"
 
 using namespace ignition;
 

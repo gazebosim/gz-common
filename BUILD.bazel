@@ -43,7 +43,7 @@ ign_export_header(
 
 public_headers_no_gen = glob([
     "include/ignition/common/*.hh",
-    "include/ignition/common/detail/*.hh",
+    "include/gz/common/detail/*.hh"
 ])
 
 private_headers = [

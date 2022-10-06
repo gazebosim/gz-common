@@ -18,19 +18,19 @@
 #include <string>
 #include <algorithm>
 
-#include "ignition/math/Helpers.hh"
+#include "gz/math/Helpers.hh"
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/Material.hh"
-#include "ignition/common/Skeleton.hh"
-#include "ignition/common/SubMesh.hh"
-#include "ignition/common/Mesh.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/Material.hh"
+#include "gz/common/Skeleton.hh"
+#include "gz/common/SubMesh.hh"
+#include "gz/common/Mesh.hh"
 
 using namespace ignition;
 using namespace common;
 
 /// \brief Private data for Mesh
-class ignition::common::Mesh::Implementation
+class common::Mesh::Implementation
 {
   /// \brief The name of the mesh
   public: std::string name;

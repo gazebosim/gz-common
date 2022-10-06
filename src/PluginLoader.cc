@@ -23,12 +23,12 @@
 #include <sstream>
 #include <unordered_map>
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/PluginInfo.hh"
-#include "ignition/common/PluginLoader.hh"
-#include "ignition/common/PluginPtr.hh"
-#include "ignition/common/StringUtils.hh"
-#include "ignition/common/Util.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/PluginInfo.hh"
+#include "gz/common/PluginLoader.hh"
+#include "gz/common/PluginPtr.hh"
+#include "gz/common/StringUtils.hh"
+#include "gz/common/Util.hh"
 
 #include "PluginUtils.hh"
 
@@ -261,7 +261,7 @@ namespace ignition
       if (version < PLUGIN_API_VERSION)
       {
         ignwarn << "The library [" << _pathToLibrary <<"] is using an outdated "
-                << "version [" << version << "] of the ignition::common Plugin "
+                << "version [" << version << "] of the common Plugin "
                 << "API. The version in this library is [" << PLUGIN_API_VERSION
                 << "].\n";
       }
@@ -269,7 +269,7 @@ namespace ignition
       if (version > PLUGIN_API_VERSION)
       {
         ignerr << "The library [" << _pathToLibrary << "] is using a newer "
-               << "version [" << version << "] of the ignition::common Plugin "
+               << "version [" << version << "] of the common Plugin "
                << "API. The version in this library is [" << PLUGIN_API_VERSION
                << "].\n";
         return loadedPlugins;

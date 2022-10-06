@@ -15,10 +15,10 @@
  *
  */
 #include <algorithm>
-#include <ignition/math/Color.hh>
+#include <gz/math/Color.hh>
 
-#include "ignition/common/Material.hh"
-#include "ignition/common/Console.hh"
+#include "gz/common/Material.hh"
+#include "gz/common/Console.hh"
 
 using namespace ignition;
 using namespace common;
@@ -32,7 +32,7 @@ IGN_ENUM(blendModeIface, Material::BlendMode,
     "ADD", "MODULATE", "REPLACE")
 
 /// \brief Private data for Material
-class ignition::common::Material::Implementation
+class common::Material::Implementation
 {
   /// \brief the name of the material
   public: std::string name;
@@ -102,7 +102,7 @@ unsigned int Material::Implementation::counter = 0;
 
 //////////////////////////////////////////////////
 Material::Material()
-: dataPtr(ignition::utils::MakeUniqueImpl<Implementation>())
+: dataPtr(utils::MakeUniqueImpl<Implementation>())
 {
   this->dataPtr->name = "ignition_material_" +
     std::to_string(this->dataPtr->counter++);
@@ -116,7 +116,7 @@ Material::Material()
 
 //////////////////////////////////////////////////
 Material::Material(const math::Color &_clr)
-: dataPtr(ignition::utils::MakeUniqueImpl<Implementation>())
+: dataPtr(utils::MakeUniqueImpl<Implementation>())
 {
   this->dataPtr->name = "ignition_material_" +
     std::to_string(this->dataPtr->counter++);

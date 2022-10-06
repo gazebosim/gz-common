@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#include "ignition/common/Profiler.hh" // NOLINT(*)
-#include "ignition/common/Console.hh"
+#include "gz/common/Profiler.hh" // NOLINT(*)
+#include "gz/common/Console.hh"
 
 #include "ProfilerImpl.hh"
 
