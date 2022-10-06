@@ -58,6 +58,9 @@ TEST(DataFrameTests, SimpleCSV)
   auto temperature = temperatureData.LookUp(
       temperatureSession.value(), position);
   ASSERT_TRUE(temperature.has_value());
+  auto keys = df.Keys();
+  ASSERT_EQ(keys.size(), 1);
+  ASSERT_EQ(keys[0], "temperature");
   EXPECT_DOUBLE_EQ(25.1, temperature.value());
 }
 
@@ -80,7 +83,7 @@ TEST(DataFrameTests, ComplexCSV)
   EXPECT_TRUE(df.Has("temperature"));
   EXPECT_TRUE(df.Has("humidity"));
   ASSERT_TRUE(df.Has("pressure"));
-
+  ASSERT_EQ(keys.size(), 3);
   const DataT &pressureData = df["pressure"];
   auto pressureSession = pressureData.CreateSession();
   const math::Vector3d position{36.80079505, -121.789472517, 0.8};
