@@ -58,11 +58,17 @@ TEST(DataFrameTests, SimpleCSV)
   auto temperature = temperatureData.LookUp(
       temperatureSession.value(), position);
   ASSERT_TRUE(temperature.has_value());
+  EXPECT_DOUBLE_EQ(25.2, temperature.value());
+  temperatureSession = temperatureData.StepTo(
+      temperatureData.CreateSession(), 0.5);
+  ASSERT_TRUE(temperatureSession.has_value());
+  temperature = temperatureData.LookUp(
+      temperatureSession.value(), position);
+  ASSERT_TRUE(temperature.has_value());
+  EXPECT_DOUBLE_EQ(25.1, temperature.value());
   auto keys = df.Keys();
   ASSERT_EQ(keys.size(), 1);
   ASSERT_EQ(keys[0], "temperature");
-
-  EXPECT_DOUBLE_EQ(25.1, temperature.value());
 }
 
 /////////////////////////////////////////////////
