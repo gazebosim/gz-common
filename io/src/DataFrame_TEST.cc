@@ -83,6 +83,7 @@ TEST(DataFrameTests, ComplexCSV)
   EXPECT_TRUE(df.Has("temperature"));
   EXPECT_TRUE(df.Has("humidity"));
   ASSERT_TRUE(df.Has("pressure"));
+  auto keys = df.Keys();
   ASSERT_EQ(keys.size(), 3);
   const DataT &pressureData = df["pressure"];
   auto pressureSession = pressureData.CreateSession();
