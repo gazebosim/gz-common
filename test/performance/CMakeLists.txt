@@ -9,7 +9,9 @@ endif()
 
 gz_build_tests(
   TYPE PERFORMANCE
-  SOURCES ${tests})
+  SOURCES ${tests}
+  LIB_DEPS gz-common${GZ_COMMON_VER}-testing
+)
 
 if(TARGET PERFORMANCE_plugin_specialization)
   # We add this dependency to make sure that DummyPlugins gets generated

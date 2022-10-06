@@ -21,6 +21,10 @@
 #include <thread>
 
 #include <gz/common/Console.hh>
+#include <gz/common/testing/RedirectConsoleStream.hh>
+
+using RedirectConsoleStream = gz::common::testing::RedirectConsoleStream;
+using StreamSource = gz::common::testing::StreamSource;
 
 namespace {
 // Lower value than spdlog to keep CI from flaking
@@ -38,7 +42,6 @@ void WriteToFile(std::string result_filename, std::string content)
     std::cerr << "Error writing to " << result_filename << std::endl;
   }
   out << content << std::flush;
-  std::cout << content;
 }
 
 void MeasurePeakDuringLogWrites(const size_t id, std::vector<uint64_t> &result)
@@ -162,6 +165,8 @@ void run(size_t number_of_threads)
       << filename_result << std::endl;
   WriteToFile(filename_result, oss.str());
 
+  auto stream = gz::common::testing::RedirectStdout();
+
   auto start_time_application_total =
   std::chrono::high_resolution_clock::now();
   for (uint64_t idx = 0; idx < number_of_threads; ++idx)
@@ -174,6 +179,8 @@ void run(size_t number_of_threads)
     threads[idx].join();
   }
   auto stop_time_application_total = std::chrono::high_resolution_clock::now();
+
+  auto output = stream.GetString();
 
   uint64_t total_time_in_us =
       std::chrono::duration_cast<std::chrono::microseconds>(
