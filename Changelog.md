@@ -1,5 +1,10 @@
 ## Gazebo Common 3.x
 
+## Gazebo Common 3.15.0 (2022-10-06)
+
+1. ign -> gz Migrate Ignition Headers
+    * [Pull request #418](https://github.com/gazebosim/gz-common/pull/418)
+
 ## Gazebo Common 3.14.2 (2022-08-16)
 
 1. Fix deprecation warning from new `ffmpeg`
