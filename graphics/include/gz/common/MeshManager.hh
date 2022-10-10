@@ -51,6 +51,7 @@ namespace gz
     /// environment variable is set, then MeshManager will use assimp loader for
     /// all supported mesh formats.
     class GZ_COMMON_GRAPHICS_VISIBLE MeshManager
+        : public SingletonT<MeshManager>
     {
       /// \brief Constructor
       private: MeshManager();
