@@ -51,7 +51,6 @@ namespace gz
     /// environment variable is set, then MeshManager will use assimp loader for
     /// all supported mesh formats.
     class GZ_COMMON_GRAPHICS_VISIBLE MeshManager
-        : public SingletonT<MeshManager>
     {
       /// \brief Constructor
       private: MeshManager();
@@ -60,6 +59,9 @@ namespace gz
       ///
       /// Destroys the collada loader, the stl loader and all the meshes
       private: virtual ~MeshManager();
+
+      /// Return a pointer to the Mesh Manager
+      public: static MeshManager* Instance();
 
       /// \brief Load a mesh from a file.
       /// The mesh will be searched on the global SystemPaths instance provided
