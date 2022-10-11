@@ -17,6 +17,8 @@
 
 #include <gtest/gtest.h>
 
+#include "gz/common/Util.hh"
+using namespace ignition;
 
 #ifndef _WIN32
 #include <fcntl.h>
@@ -26,12 +28,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "gz/common/Util.hh"
-
 // The symlink tests should always work on UNIX systems
 #define BUILD_SYMLINK_TESTS
-
-using namespace ignition;
 
 /////////////////////////////////////////////////
 bool create_and_switch_to_temp_dir(std::string &_new_temp_path)
