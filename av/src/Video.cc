@@ -14,17 +14,17 @@
  * limitations under the License.
  *
 */
-#include "ignition/common/config.hh"
-#include "ignition/common/Console.hh"
-#include "ignition/common/ffmpeg_inc.hh"
-#include "ignition/common/Video.hh"
-#include "ignition/common/av/Util.hh"
+#include "gz/common/config.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/ffmpeg_inc.hh"
+#include "gz/common/Video.hh"
+#include "gz/common/av/Util.hh"
 
 using namespace ignition;
 using namespace common;
 
 // Private data structure for the Video class
-class ignition::common::VideoPrivate
+class common::VideoPrivate
 {
   /// \brief libav Format I/O context
   public: AVFormatContext *formatCtx = nullptr;

@@ -16,8 +16,8 @@
 */
 #include <gtest/gtest.h>
 
-#include <ignition/common/AudioDecoder.hh>
-#include <ignition/utilities/ExtraTestMacros.hh>
+#include <gz/common/AudioDecoder.hh>
+#include <gz/utilities/ExtraTestMacros.hh>
 
 #include "test_config.h"
 

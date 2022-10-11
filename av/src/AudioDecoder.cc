@@ -15,10 +15,10 @@
 *
 */
 
-#include <ignition/common/av/Util.hh>
-#include <ignition/common/ffmpeg_inc.hh>
-#include <ignition/common/AudioDecoder.hh>
-#include <ignition/common/Console.hh>
+#include <gz/common/av/Util.hh>
+#include <gz/common/ffmpeg_inc.hh>
+#include <gz/common/AudioDecoder.hh>
+#include <gz/common/Console.hh>
 
 #define AUDIO_INBUF_SIZE (20480 * 2)
 #define AUDIO_REFILL_THRESH 4096
@@ -26,7 +26,7 @@
 using namespace ignition;
 using namespace common;
 
-class ignition::common::AudioDecoderPrivate
+class common::AudioDecoderPrivate
 {
   /// \brief libav Format I/O context.
   public: AVFormatContext *formatCtx;

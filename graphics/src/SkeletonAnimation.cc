@@ -15,15 +15,15 @@
  *
 */
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/NodeAnimation.hh"
-#include "ignition/common/SkeletonAnimation.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/NodeAnimation.hh"
+#include "gz/common/SkeletonAnimation.hh"
 
 using namespace ignition;
 using namespace common;
 
 /// Prvate data class
-class ignition::common::SkeletonAnimation::Implementation
+class common::SkeletonAnimation::Implementation
 {
   /// \brief the node name
   public: std::string name;
@@ -37,7 +37,7 @@ class ignition::common::SkeletonAnimation::Implementation
 
 //////////////////////////////////////////////////
 SkeletonAnimation::SkeletonAnimation(const std::string &_name)
-: dataPtr(ignition::utils::MakeImpl<Implementation>())
+: dataPtr(utils::MakeImpl<Implementation>())
 {
   this->dataPtr->name = _name;
 }

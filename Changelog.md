@@ -238,6 +238,11 @@
 
 ## Gazebo Common 3.x
 
+## Gazebo Common 3.15.0 (2022-10-06)
+
+1. ign -> gz Migrate Ignition Headers
+    * [Pull request #418](https://github.com/gazebosim/gz-common/pull/418)
+
 ## Gazebo Common 3.14.2 (2022-08-16)
 
 1. Fix deprecation warning from new `ffmpeg`
@@ -412,7 +417,7 @@
 
 ## Ignition Common 3.8.0 (2020-12-08)
 
-1. Call ignition::common::load() from Video constructor
+1. Call gz::common::load() from Video constructor
     * [Pull Request 111](https://github.com/ignitionrobotics/ign-common/pull/111)
 
 1. Cleanup
@@ -569,7 +574,7 @@
 
 ## Ignition Common 3.2.0 (2019-08-07)
 
-1. Allow ignLogInit to use an absolute path. Added a timeToIso that converts a given time to an ISO string. Some console timestamps were using `IGN_SYSTEM_TIME_NS()` and others `ignition::common::systemTimeISO()`. Switched all to use `ignition::common::systemTimeISO()`.
+1. Allow ignLogInit to use an absolute path. Added a timeToIso that converts a given time to an ISO string. Some console timestamps were using `IGN_SYSTEM_TIME_NS()` and others `gz::common::systemTimeISO()`. Switched all to use `gz::common::systemTimeISO()`.
     * [BitBucket pull request 203](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/203)
 
 1. Port ColladaLoader fix: use default value of 1 for stride parameter when unset.

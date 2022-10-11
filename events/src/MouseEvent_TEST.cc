@@ -18,8 +18,8 @@
 #include <gtest/gtest.h>
 
 #include "test_config.h"
-#include "ignition/common/MouseEvent.hh"
-#include "ignition/common/config.hh"
+#include "gz/common/MouseEvent.hh"
+#include "gz/common/config.hh"
 
 using namespace ignition;
 

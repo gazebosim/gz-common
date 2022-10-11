@@ -16,13 +16,13 @@
 */
 
 
-#ifndef IGNITION_COMMON_TEST_PLUGINS_DUMMY_PLUGINS_HH_
-#define IGNITION_COMMON_TEST_PLUGINS_DUMMY_PLUGINS_HH_
+#ifndef GZ_COMMON_TEST_PLUGINS_DUMMY_PLUGINS_HH_
+#define GZ_COMMON_TEST_PLUGINS_DUMMY_PLUGINS_HH_
 
 #include <string>
 #include <memory>
 
-#include <ignition/common/PluginMacros.hh>
+#include <gz/common/PluginMacros.hh>
 
 namespace test
 {

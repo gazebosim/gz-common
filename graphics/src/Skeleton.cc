@@ -15,16 +15,16 @@
  *
  */
 #include <list>
-#include <ignition/common/Console.hh>
-#include <ignition/common/SkeletonAnimation.hh>
-#include <ignition/common/Skeleton.hh>
-#include <ignition/common/BVHLoader.hh>
+#include <gz/common/Console.hh>
+#include <gz/common/SkeletonAnimation.hh>
+#include <gz/common/Skeleton.hh>
+#include <gz/common/BVHLoader.hh>
 
 using namespace ignition;
 using namespace common;
 
 /// Private data class
-class ignition::common::Skeleton::Implementation
+class common::Skeleton::Implementation
 {
   typedef std::vector<std::vector<std::pair<std::string, double> > >
     RawNodeWeights;
@@ -66,13 +66,13 @@ class ignition::common::Skeleton::Implementation
 
 //////////////////////////////////////////////////
 Skeleton::Skeleton()
-: dataPtr(ignition::utils::MakeUniqueImpl<Implementation>())
+: dataPtr(utils::MakeUniqueImpl<Implementation>())
 {
 }
 
 //////////////////////////////////////////////////
 Skeleton::Skeleton(SkeletonNode *_root)
-: dataPtr(ignition::utils::MakeUniqueImpl<Implementation>())
+: dataPtr(utils::MakeUniqueImpl<Implementation>())
 {
   this->dataPtr->root = _root;
   this->BuildNodeMap();

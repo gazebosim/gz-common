@@ -52,9 +52,9 @@
 
 #include <math.h>
 
-#include <ignition/common/Util.hh>
-#include <ignition/common/Console.hh>
-#include <ignition/common/Time.hh>
+#include <gz/common/Util.hh>
+#include <gz/common/Console.hh>
+#include <gz/common/Time.hh>
 
 using namespace ignition;
 using namespace common;

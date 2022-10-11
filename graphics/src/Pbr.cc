@@ -16,12 +16,15 @@
 */
 #include <string>
 #include <vector>
-#include <ignition/math/Vector3.hh>
+#include <gz/math/Vector3.hh>
 
-#include "ignition/common/Pbr.hh"
+#include "gz/common/Pbr.hh"
+
+using namespace ignition;
+using namespace common;
 
 /// \brief Private data for Pbr class
-class ignition::common::Pbr::Implementation
+class common::Pbr::Implementation
 {
   /// \brief Workflow type
   public: PbrType type = PbrType::NONE;
@@ -72,13 +75,9 @@ class ignition::common::Pbr::Implementation
   public: double glossiness = 0.0;
 };
 
-
-using namespace ignition;
-using namespace common;
-
 /////////////////////////////////////////////////
 Pbr::Pbr()
-  : dataPtr(ignition::utils::MakeImpl<Implementation>())
+  : dataPtr(utils::MakeImpl<Implementation>())
 {
 }
 

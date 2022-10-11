@@ -15,14 +15,14 @@
  *
 */
 
-#include <ignition/math/Vector2.hh>
-#include "ignition/common/MouseEvent.hh"
+#include <gz/math/Vector2.hh>
+#include "gz/common/MouseEvent.hh"
 
 using namespace ignition;
 using namespace common;
 
 /// \brief Mouse event private data
-class ignition::common::MouseEventPrivate
+class common::MouseEventPrivate
 {
   /// \brief Constructor.
   public: MouseEventPrivate()

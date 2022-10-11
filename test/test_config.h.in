@@ -5,16 +5,16 @@
  * repo for the original source of this header.
 */
 
-#ifndef IGNITION_TESTING__TEST_CONFIG_H_
-#define IGNITION_TESTING__TEST_CONFIG_H_
+#ifndef GZ_TESTING__TEST_CONFIG_H_
+#define GZ_TESTING__TEST_CONFIG_H_
 
 #include <gtest/gtest.h>
 
 #include <string>
-#include "ignition/common/Console.hh"
-#include "ignition/common/Filesystem.hh"
-#include "ignition/common/TempDirectory.hh"
-#include "ignition/common/Util.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/Filesystem.hh"
+#include "gz/common/TempDirectory.hh"
+#include "gz/common/Util.hh"
 
 #define PROJECT_BINARY_PATH "${PROJECT_BINARY_DIR}"
 #define PROJECT_SOURCE_PATH "${PROJECT_SOURCE_DIR}"
@@ -181,4 +181,4 @@ namespace ignition
 
 
 
-#endif  // IGNITION_TESTING__TEST_CONFIG_H_
+#endif  // GZ_TESTING__TEST_CONFIG_H_

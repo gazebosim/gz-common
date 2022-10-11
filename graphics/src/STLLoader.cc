@@ -19,11 +19,11 @@
 #include <stdio.h>
 #include <memory>
 
-#include "ignition/math/Helpers.hh"
-#include "ignition/common/Console.hh"
-#include "ignition/common/Mesh.hh"
-#include "ignition/common/SubMesh.hh"
-#include "ignition/common/STLLoader.hh"
+#include "gz/math/Helpers.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/Mesh.hh"
+#include "gz/common/SubMesh.hh"
+#include "gz/common/STLLoader.hh"
 
 using namespace ignition;
 using namespace common;

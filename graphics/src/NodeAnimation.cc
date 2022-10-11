@@ -15,14 +15,14 @@
  *
 */
 #include <map>
-#include "ignition/common/Console.hh"
-#include "ignition/common/NodeAnimation.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/NodeAnimation.hh"
 
 using namespace ignition;
 using namespace common;
 
 /// \brief NodeAnimation private data
-class ignition::common::NodeAnimation::Implementation
+class common::NodeAnimation::Implementation
 {
   /// \brief the name of the animation
   public: std::string name;
@@ -36,7 +36,7 @@ class ignition::common::NodeAnimation::Implementation
 
 //////////////////////////////////////////////////
 NodeAnimation::NodeAnimation(const std::string &_name)
-: dataPtr(ignition::utils::MakeImpl<Implementation>())
+: dataPtr(utils::MakeImpl<Implementation>())
 {
   this->dataPtr->name = _name;
 }
@@ -218,5 +218,3 @@ double NodeAnimation::TimeAtX(const double _x) const
 
   return t1 + ((t2 - t1) * (_x - x1) / (x2 - x1));
 }
-
-

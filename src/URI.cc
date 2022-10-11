@@ -22,8 +22,8 @@
 #include <regex>
 #include <string>
 
-#include "ignition/common/Console.hh"
-#include "ignition/common/URI.hh"
+#include "gz/common/Console.hh"
+#include "gz/common/URI.hh"
 
 using namespace ignition;
 using namespace common;
@@ -52,7 +52,7 @@ class ignition::common::URIAuthorityPrivate
 };
 
 /// \brief URIPath private data.
-class ignition::common::URIPathPrivate
+class common::URIPathPrivate
 {
   /// \brief A helper method to determine if the given string represents
   ///        an absolute path starting segment or not.
@@ -73,21 +73,21 @@ class ignition::common::URIPathPrivate
 };
 
 /// \brief URIQuery private data.
-class ignition::common::URIQueryPrivate
+class common::URIQueryPrivate
 {
   /// \brief The key/value tuples that compose the query.
   public: std::vector<std::pair<std::string, std::string>> values;
 };
 
 /// \brief URIFragment private data.
-class ignition::common::URIFragmentPrivate
+class common::URIFragmentPrivate
 {
   /// \brief The value of the fragment.
   public: std::string value;
 };
 
 /// \brief URI private data.
-class ignition::common::URIPrivate
+class common::URIPrivate
 {
   /// \brief The URI scheme.
   public: std::string scheme;
