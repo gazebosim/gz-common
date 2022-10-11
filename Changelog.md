@@ -1,5 +1,12 @@
 ## Gazebo Common 4.x
 
+## Gazebo Common 4.6.0 (2022-10-11)
+
+1. All common3 changes up to 3.15.0 release 
+
+1. Include cstring for memcpy  
+    * [Pull request #437](https://github.com/gazebosim/gz-common/pull/437)
+
 ## Gazebo Common 4.5.2 (2022-08-16)
 
 1. Fix deprecation warning from new `ffmpeg`
