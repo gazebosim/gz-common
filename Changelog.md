@@ -1,5 +1,13 @@
 ## Gazebo Common 3.x
 
+## Gazebo Common 3.15.1 (2022-10-11)
+
+1. Fix build on case-insensitive filesystems
+    * [Pull request #453](https://github.com/gazebosim/gz-common/pull/453)
+
+1. Don't install CMakeLists.txt 
+    * [Pull request #449](https://github.com/gazebosim/gz-common/pull/449)
+
 ## Gazebo Common 3.15.0 (2022-10-06)
 
 1. ign -> gz Migrate Ignition Headers
