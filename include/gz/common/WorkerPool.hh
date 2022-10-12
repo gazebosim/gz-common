@@ -18,6 +18,7 @@
 #ifndef GZ_COMMON_WORKER_POOL_HH_
 #define GZ_COMMON_WORKER_POOL_HH_
 
+#include <chrono>
 #include <functional>
 
 #include <gz/common/Export.hh>

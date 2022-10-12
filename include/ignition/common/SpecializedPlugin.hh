@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Open Source Robotics Foundation
+ * Copyright (C) 2022 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,6 @@
  * limitations under the License.
  *
  */
-#ifndef IGNITION_COMMON_SPECIALIZEDPLUGIN_HH_
-#define IGNITION_COMMON_SPECIALIZEDPLUGIN_HH_
 
 #include <ignition/common/config.hh>
 #include "ignition/common/Plugin.hh"
@@ -165,5 +163,3 @@ namespace gz
 }
 
 #include "ignition/common/detail/SpecializedPlugin.hh"
-
-#endif

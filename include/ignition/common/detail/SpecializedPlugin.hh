@@ -19,7 +19,6 @@
 #define IGNITION_COMMON_DETAIL_SPECIALIZEDPLUGIN_HH_
 
 #include <ignition/common/config.hh>
-#include "ignition/common/SpecializedPlugin.hh"
 #include <memory>
 
 // This preprocessor token should only be used by the unittest that is

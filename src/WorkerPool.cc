@@ -23,9 +23,6 @@
 
 #include "gz/common/WorkerPool.hh"
 
-namespace igncmn = gz::common;
-using namespace igncmn;
-
 namespace gz
 {
   namespace common
@@ -77,8 +74,6 @@ namespace gz
       /// \brief used to signal when the pool is being shut down
       public: bool done = false;
     };
-  }
-}
 
 //////////////////////////////////////////////////
 void WorkerPool::Implementation::Worker()
@@ -194,4 +189,7 @@ bool WorkerPool::WaitForResults(
     }
   }
   return signaled && !this->dataPtr->done;
+}
+
+}
 }

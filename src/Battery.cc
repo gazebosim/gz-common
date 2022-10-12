@@ -24,7 +24,7 @@ using namespace gz;
 using namespace common;
 
 /// \brief Private data for the Battery class
-class gz::common::Battery::Implementation
+class common::Battery::Implementation
 {
   /// \brief Initial voltage in volts.
   public: double initVoltage = 0.0;

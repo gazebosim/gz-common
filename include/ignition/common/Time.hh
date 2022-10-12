@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Martin Pecka
+ * Copyright (C) 2022 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,5 +15,5 @@
  *
  */
 
-#include <gz/common/HWEncoder.hh>
+#include <gz/common/Time.hh>
 #include <ignition/common/config.hh>

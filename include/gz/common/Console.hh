@@ -31,8 +31,6 @@ namespace gz
 {
   namespace common
   {
-    // TODO(CH3): Deprecated. Remove all the ign macros on tock.
-    /// \brief Output an error message, if the verbose level is >= 1
     #define gzerr  (gz::common::Console::err(__FILE__, __LINE__))
     #define ignerr gzerr
 
