@@ -1,5 +1,9 @@
 ## Gazebo Common 4.x
 
+## Gazebo Common 4.6.1 (2022-10-11)
+
+1. All common3 changes up to 3.15.1 release 
+
 ## Gazebo Common 4.6.0 (2022-10-11)
 
 1. All common3 changes up to 3.15.0 release 
