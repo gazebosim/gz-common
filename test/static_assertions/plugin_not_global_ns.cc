@@ -14,12 +14,7 @@
  * limitations under the License.
  *
 */
-#include <gz/utils/SuppressWarning.hh>
-
-GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
-#define SUPPRESS_IGNITION_HEADER_DEPRECATION
-
-#include "gz/common/PluginMacros.hh"
+#include "ignition/common/PluginMacros.hh"
 
 namespace ns
 {

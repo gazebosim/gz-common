@@ -15,7 +15,7 @@
  *
 */
 
-#include "gz/common/PluginMacros.hh"
+#include "ignition/common/PluginMacros.hh"
 
 namespace ns
 {
