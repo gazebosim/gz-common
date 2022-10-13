@@ -1,14 +1,5 @@
-option(IGN_PROFILER_REMOTERY "Deprecated. Enable the Remotery profiler"
-  TRUE)
-
-# TODO(CH3): Remove the IGN_PROFILER_REMOTERY on deprecation
-#            and set the option to TRUE instead
 option(GZ_PROFILER_REMOTERY "Enable the Remotery profiler"
   ${IGN_PROFILER_REMOTERY})
-
-if(NOT IGN_PROFILER_REMOTERY)
-  message(DEPRECATION "The IGN_PROFILER_REMOTERY option is deprecated! Please use GZ_PROFILER_REMOTERY instead.")
-endif()
 
 set(
   PROFILER_SRCS
@@ -117,14 +108,14 @@ endif()
 
 if(GZ_PROFILER_REMOTERY)
   set(GZ_PROFILER_SCRIPT_PATH ${CMAKE_INSTALL_LIBEXECDIR}/gz/gz-common${PROJECT_VERSION_MAJOR})
-  set(GZ_PROFILER_VIS_PATH ${IGN_DATA_INSTALL_DIR}/profiler_vis)
+  set(GZ_PROFILER_VIS_PATH ${GZ_DATA_INSTALL_DIR}/profiler_vis)
 
-  configure_file(Remotery/ign_remotery_vis.in
-    ${CMAKE_CURRENT_BINARY_DIR}/ign_remotery_vis
+  configure_file(Remotery/gz_remotery_vis.in
+    ${CMAKE_CURRENT_BINARY_DIR}/gz_remotery_vis
     @ONLY)
 
   install(PROGRAMS
-    ${CMAKE_CURRENT_BINARY_DIR}/ign_remotery_vis
+    ${CMAKE_CURRENT_BINARY_DIR}/gz_remotery_vis
     DESTINATION ${GZ_PROFILER_SCRIPT_PATH})
 
   install(DIRECTORY Remotery/vis/

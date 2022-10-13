@@ -1,25 +1,25 @@
 load(
     "//gz_bazel:build_defs.bzl",
-    "IGNITION_FEATURES",
-    "IGNITION_ROOT",
-    "IGNITION_VISIBILITY",
+    "GZ_FEATURES",
+    "GZ_ROOT",
+    "GZ_VISIBILITY",
     "generate_include_header",
     "gz_config_header",
     "gz_export_header",
 )
 
 package(
-    default_visibility = IGNITION_VISIBILITY,
-    features = IGNITION_FEATURES,
+    default_visibility = GZ_VISIBILITY,
+    features = GZ_FEATURES,
 )
 
 licenses(["notice"])
 
 exports_files(["LICENSE"])
 
-PROJECT_NAME = "ignition-common"
+PROJECT_NAME = "gz-common"
 
-PROJECT_MAJOR = 5
+PROJECT_MAJOR = 6
 
 PROJECT_MINOR = 0
 
@@ -36,8 +36,8 @@ gz_config_header(
 
 gz_export_header(
     name = "include/gz/common/Export.hh",
-    export_base = "IGNITION_COMMON",
-    lib_name = "ignition-common",
+    export_base = "GZ_COMMON",
+    lib_name = "gz-common",
     visibility = ["//visibility:private"],
 )
 
@@ -79,14 +79,14 @@ cc_library(
     linkopts = ["-ldl"],
     deps = [
         "@uuid",
-        IGNITION_ROOT + "gz_math",
+        GZ_ROOT + "gz_math",
     ],
 )
 
 cc_binary(
-    name = "libignition-common5.so",
+    name = "libgz-common6.so",
     includes = ["include"],
-    linkopts = ["-Wl,-soname,libignition-common5.so"],
+    linkopts = ["-Wl,-soname,libgz-common6.so"],
     linkshared = True,
     deps = [":gz_common"],
 )
@@ -99,11 +99,11 @@ test_srcs = glob(
 [cc_test(
     name = src.replace("/", "_").replace(".cc", "").replace("src_", ""),
     srcs = [src],
-    data = [":libignition-common5.so"],
+    data = [":libgz-common6.so"],
     deps = [
         ":gz_common",
-        IGNITION_ROOT + "gz_bazel:utilities",
-        IGNITION_ROOT + "gz_common/test:test_utils",
+        GZ_ROOT + "gz_bazel:utilities",
+        GZ_ROOT + "gz_common/test:test_utils",
         "@gtest",
         "@gtest//:gtest_main",
     ],

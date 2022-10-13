@@ -12,10 +12,9 @@ Build | Status
 Test coverage | [![codecov](https://codecov.io/gh/gazebosim/gz-common/branch/main/graph/badge.svg)](https://codecov.io/gh/gazebosim/gz-common)
 Ubuntu Focal | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-main-focal-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-main-focal-amd64)
 Homebrew      | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-main-homebrew-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-main-homebrew-amd64)
-Windows       | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-main-windows7-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-main-windows7-amd64)
+Windows       | [![Build Status](https://build.osrfoundation.org/job/ign_common-ci-win/badge/icon)](https://build.osrfoundation.org/job/ign_common-ci-win/)
 
-Gazebo Common, a component of [Gazebo
-Sim](https://gazebosim.org), provides a set of libraries that
+Gazebo Common, a component of [Gazebo](https://gazebosim.org), provides a set of libraries that
 cover many different use cases. An audio-visual library supports
 processing audio and video files, a graphics library can load a variety 3D
 mesh file formats into a generic in-memory representation, and the core
@@ -52,15 +51,15 @@ callback system.
 * **Graphics**: Collada, SVG, STL, OBJ, and DEM loaders. In-memory mesh,
   image, and material representations. Animation processing and BVH loader.
 * **Profiler**: A common profiler abstraction that can be used to measure and
-  visualize run time of various pieces of ignition robotics software.
+  visualize run time of various pieces of Gazebo software.
 
 # Install
 
-See the [installation tutorial](https://gazebosim.org/api/common/4.0/tutorials.html).
+See the [installation tutorial](https://gazebosim.org/api/common/4.0/install.html).
 
 # Usage
 
-Please refer to the [examples directory](https://github.com/gazebosim/gz-common/raw/main/examples/).
+Please refer to the [examples directory](https://github.com/gazebosim/gz-common/tree/main/examples).
 
 # Folder Structure
 
@@ -71,14 +70,13 @@ Refer to the following table for information about important directories and fil
 +-- events                   Header and source files for the Event component.
 +-- examples                 Example programs.
 +-- graphics                 Header and source files for the Graphics component.
-+-- include/ignition/common  Header files for the core component.
++-- include/gz/common        Header files for the core component.
 +-- profiler                 Header and source files for the Profiler component.
 +-- src                      Core source files and unit tests.
 +-- test
 |    +-- integration         Integration tests.
 |    +-- performance         Performance tests.
-|    +-- plugins             Plugin tests.
-|    +-- static_assertions   Plugin static assertion tests.
+|    +-- static_assertions   Static assertion tests.
 |    +-- regression          Regression tests.
 +-- tutorials                Tutorials, written in markdown.
 +-- Changelog.md             Changelog.
@@ -87,8 +85,8 @@ Refer to the following table for information about important directories and fil
 ```
 # Contributing
 
-Please see
-[CONTRIBUTING.md](https://gazebosim.org/docs/all/contributing).
+Please see the
+[contributing guide](https://gazebosim.org/docs/all/contributing).
 
 # Code of Conduct
 

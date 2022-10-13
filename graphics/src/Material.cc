@@ -40,6 +40,9 @@ class gz::common::Material::Implementation
   /// \brief the texture image file name
   public: std::string texImage;
 
+  /// \brief Texture raw data
+  public: std::shared_ptr<const Image> texData;
+
   /// \brief the ambient light color
   public: math::Color ambient;
 
@@ -138,9 +141,17 @@ std::string Material::Name() const
 }
 
 //////////////////////////////////////////////////
-void Material::SetTextureImage(const std::string &_tex)
+void Material::SetTextureImage(const std::string &_tex,
+    const std::shared_ptr<const Image> &_img)
 {
   this->dataPtr->texImage = _tex;
+  this->dataPtr->texData = _img;
+}
+
+//////////////////////////////////////////////////
+std::shared_ptr<const Image> Material::TextureData() const
+{
+  return this->dataPtr->texData;
 }
 
 //////////////////////////////////////////////////
@@ -148,6 +159,7 @@ void Material::SetTextureImage(const std::string &_tex,
                                const std::string &_resourcePath)
 {
   this->dataPtr->texImage = common::joinPaths(_resourcePath, _tex);
+  this->dataPtr->texData = nullptr;
 
   // If the texture image doesn't exist then try the next most likely path.
   if (!exists(this->dataPtr->texImage))

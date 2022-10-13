@@ -1,14 +1,6 @@
 option(GZ_COMMON_BUILD_HW_VIDEO
   "Build support for HW-accelerated video encoding" ON)
 
-# TODO(CH3): Deprecated. Remove on tock.
-option(IGN_COMMON_BUILD_HW_VIDEO
-  "Deprecated option for building support for HW-accelerated video encoding" ON)
-
-if(NOT IGN_COMMON_BUILD_HW_VIDEO)
-  set(GZ_COMMON_BUILD_HW_VIDEO IGN_COMMON_BUILD_HW_VIDEO)
-endif()
-
 gz_get_libsources_and_unittests(sources gtest_sources)
 
 if(NOT GZ_COMMON_BUILD_HW_VIDEO)

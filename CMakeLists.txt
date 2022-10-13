@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10.2 FATAL_ERROR)
 #============================================================================
 # Initialize the project
 #============================================================================
-project(gz-common5 VERSION 5.0.0)
+project(gz-common6 VERSION 6.0.0)
 set(GZ_COMMON_VER ${PROJECT_VERSION_MAJOR})
 
 #============================================================================
@@ -18,9 +18,7 @@ set(GZ_CMAKE_VER ${gz-cmake3_VERSION_MAJOR})
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-gz_configure_project(
-  REPLACE_IGNITION_INCLUDE_PATH gz/common
-  VERSION_SUFFIX pre1)
+gz_configure_project(VERSION_SUFFIX pre1)
 
 #============================================================================
 # Set project-specific options
@@ -29,7 +27,7 @@ gz_configure_project(
 # Option: Should Windows test symlinking?
 if(WIN32)
   option(
-    IGN_BUILD_SYMLINK_TESTS_ON_WINDOWS
+    GZ_BUILD_SYMLINK_TESTS_ON_WINDOWS
     "Creating symlinks requires special permissions on Windows, so those tests are disabled by default"
     false)
 endif()
@@ -70,11 +68,6 @@ else()
 endif()
 
 #--------------------------------------
-# Find libdl
-gz_find_package(
-  DL REQUIRED PRIVATE PRETTY libdl PURPOSE "Required for plugins")
-
-#--------------------------------------
 # Find dependencies that we ignore for Visual Studio
 if(NOT MSVC)
 
@@ -111,6 +104,7 @@ gz_find_package(SWSCALE REQUIRED_BY av PRETTY libswscale)
 #------------------------------------
 # Find avdevice
 gz_find_package(AVDEVICE VERSION 56.4.100 REQUIRED_BY av PRETTY libavdevice)
+set(HAVE_AVDEVICE ${AVDEVICE_FOUND})
 
 #------------------------------------
 # Find avformat
@@ -124,6 +118,9 @@ gz_find_package(AVCODEC REQUIRED_BY av PRETTY libavcodec)
 # Find avutil
 gz_find_package(AVUTIL REQUIRED_BY av PRETTY libavutil)
 
+#------------------------------------
+# Find assimp
+gz_find_package(GzAssimp REQUIRED_BY graphics PRETTY assimp)
 
 message(STATUS "-------------------------------------------\n")
 
@@ -135,7 +132,7 @@ configure_file("${PROJECT_SOURCE_DIR}/cppcheck.suppress.in"
                ${PROJECT_BINARY_DIR}/cppcheck.suppress)
 
 gz_configure_build(QUIT_IF_BUILD_ERRORS
-  COMPONENTS av events geospatial graphics profiler testing)
+  COMPONENTS av events geospatial graphics io profiler testing)
 
 #============================================================================
 # Create package information

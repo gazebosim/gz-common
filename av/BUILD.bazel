@@ -1,13 +1,13 @@
 load(
     "//gz_bazel:build_defs.bzl",
-    "IGNITION_ROOT",
-    "IGNITION_VISIBILITY",
+    "GZ_ROOT",
+    "GZ_VISIBILITY",
     "generate_include_header",
     "gz_export_header",
 )
 
 package(
-    default_visibility = IGNITION_VISIBILITY,
+    default_visibility = GZ_VISIBILITY,
     features = [
         "-parse_headers",
         "-layering_check",
@@ -31,8 +31,8 @@ test_sources = glob(["src/*_TEST.cc"])
 
 gz_export_header(
     name = "include/gz/common/av/Export.hh",
-    export_base = "IGNITION_COMMON_AV",
-    lib_name = "ignition-common-av",
+    export_base = "GZ_COMMON_AV",
+    lib_name = "gz-common-av",
     visibility = ["//visibility:private"],
 )
 
@@ -55,7 +55,7 @@ cc_library(
     hdrs = public_headers,
     includes = ["include"],
     deps = [
-        IGNITION_ROOT + "gz_common",
+        GZ_ROOT + "gz_common",
         "@ffmpeg//:avcodec",
         "@ffmpeg//:avdevice",
         "@ffmpeg//:avformat",
@@ -65,9 +65,9 @@ cc_library(
 )
 
 cc_binary(
-    name = "libignition-common5-av.so",
+    name = "libgz-common6-av.so",
     includes = ["include"],
-    linkopts = ["-Wl,-soname,libignition-common5-av.so"],
+    linkopts = ["-Wl,-soname,libgz-common6-av.so"],
     linkshared = True,
     deps = [":av"],
 )
@@ -76,12 +76,12 @@ cc_binary(
     name = src.replace("/", "_").replace(".cc", "").replace("src_", ""),
     srcs = [src],
     data = [
-        IGNITION_ROOT + "gz_common/test:data",
+        GZ_ROOT + "gz_common/test:data",
     ],
     deps = [
         ":av",
-        IGNITION_ROOT + "gz_common/test:test_utils",
-        IGNITION_ROOT + "gz_bazel:utilities",
+        GZ_ROOT + "gz_common/test:test_utils",
+        GZ_ROOT + "gz_bazel:utilities",
         "@gtest",
         "@gtest//:gtest_main",
     ],

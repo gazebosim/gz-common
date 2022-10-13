@@ -42,9 +42,8 @@ namespace gz
       /// \brief path name of the image file
       public: std::string fullName;
 
-      /// \brief Implementation of GetData
-      public: void DataImpl(unsigned char **_data, unsigned int &_count,
-          FIBITMAP *_img) const;
+      /// \brief Implementation of Data, returns vector of bytes
+      public: std::vector<unsigned char> DataImpl(FIBITMAP *_img) const;
 
       /// \brief Returns true if SwapRedBlue can and should be called
       /// If it returns false, it may not be safe to call SwapRedBlue
@@ -145,7 +144,7 @@ int Image::Load(const std::string &_filename)
   }
 
   gzerr << "Unable to open image file[" << this->dataPtr->fullName
-        << "], check your IGNITION_RESOURCE_PATH settings.\n";
+        << "], check your GZ_RESOURCE_PATH settings.\n";
   return -1;
 }
 
@@ -271,8 +270,10 @@ int Image::Pitch() const
 }
 
 //////////////////////////////////////////////////
-void Image::RGBData(unsigned char **_data, unsigned int &_count) const
+std::vector<unsigned char> Image::RGBData() const
 {
+  std::vector<unsigned char> data;
+
   FIBITMAP *tmp = this->dataPtr->bitmap;
   FIBITMAP *tmp2 = nullptr;
   if (this->dataPtr->ShouldSwapRedBlue())
@@ -281,15 +282,19 @@ void Image::RGBData(unsigned char **_data, unsigned int &_count) const
     tmp2 = tmp;
   }
   tmp = FreeImage_ConvertTo24Bits(tmp);
-  this->dataPtr->DataImpl(_data, _count, tmp);
+  data = this->dataPtr->DataImpl(tmp);
   FreeImage_Unload(tmp);
   if (tmp2)
     FreeImage_Unload(tmp2);
+
+  return data;
 }
 
 //////////////////////////////////////////////////
-void Image::RGBAData(unsigned char **_data, unsigned int &_count) const
+std::vector<unsigned char> Image::RGBAData() const
 {
+  std::vector<unsigned char> data;
+
   FIBITMAP *tmp = this->dataPtr->bitmap;
   FIBITMAP *tmp2 = nullptr;
   if (this->dataPtr->ShouldSwapRedBlue())
@@ -298,30 +303,33 @@ void Image::RGBAData(unsigned char **_data, unsigned int &_count) const
     tmp2 = tmp;
   }
   tmp = FreeImage_ConvertTo32Bits(tmp);
-  this->dataPtr->DataImpl(_data, _count, tmp);
+  data = this->dataPtr->DataImpl(tmp);
   FreeImage_Unload(tmp);
   if (tmp2)
     FreeImage_Unload(tmp2);
+
+  return data;
 }
 
 //////////////////////////////////////////////////
-void Image::Data(unsigned char **_data, unsigned int &_count) const
+std::vector<unsigned char> Image::Data() const
 {
+  std::vector<unsigned char> data;
   if (this->dataPtr->ShouldSwapRedBlue())
   {
     FIBITMAP *tmp = this->dataPtr->SwapRedBlue(this->Width(), this->Height());
-    this->dataPtr->DataImpl(_data, _count, tmp);
+    data = this->dataPtr->DataImpl(tmp);
     FreeImage_Unload(tmp);
   }
   else
   {
-    this->dataPtr->DataImpl(_data, _count, this->dataPtr->bitmap);
+    data = this->dataPtr->DataImpl(this->dataPtr->bitmap);
   }
+  return data;
 }
 
 //////////////////////////////////////////////////
-void Image::Implementation::DataImpl(
-    unsigned char **_data, unsigned int &_count, FIBITMAP *_img) const
+std::vector<unsigned char> Image::Implementation::DataImpl(FIBITMAP *_img) const
 {
   int redmask = FI_RGBA_RED_MASK;
   // int bluemask = 0x00ff0000;
@@ -334,40 +342,12 @@ void Image::Implementation::DataImpl(
 
   int scanWidth = FreeImage_GetLine(_img);
 
-  if (*_data)
-    delete [] *_data;
+  std::vector<unsigned char> data(scanWidth * FreeImage_GetHeight(_img));
 
-  _count = scanWidth * FreeImage_GetHeight(_img);
-  *_data = new unsigned char[_count];
-
-  FreeImage_ConvertToRawBits(reinterpret_cast<BYTE*>(*_data), _img,
+  FreeImage_ConvertToRawBits(reinterpret_cast<BYTE*>(&data[0]), _img,
       scanWidth, FreeImage_GetBPP(_img), redmask, greenmask, bluemask, true);
 
-#ifdef FREEIMAGE_COLORORDER
-  // cppcheck-suppress ConfigurationNotChecked
-  if (FREEIMAGE_COLORORDER != FREEIMAGE_COLORORDER_RGB)
-  {
-#else
-#ifdef FREEIMAGE_BIGENDIAN
-  if (false)
-  {
-#else
-  {
-#endif
-#endif
-//  FIXME:  why shift by 2 pixels?
-//  this breaks heighmaps by wrapping artificially
-//    int i = 0;
-//    for (unsigned int y = 0; y < this->Height(); ++y)
-//    {
-//      for (unsigned int x = 0; x < this->Width(); ++x)
-//      {
-//        std::swap((*_data)[i], (*_data)[i+2]);
-//        unsigned int d = FreeImage_GetBPP(this->dataPtr->bitmap)/8;
-//        i += d;
-//      }
-//    }
-  }
+  return data;
 }
 
 //////////////////////////////////////////////////

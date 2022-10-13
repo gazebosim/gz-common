@@ -4,7 +4,8 @@ gz_get_libsources_and_unittests(sources gtest_sources)
 
 # Create the library target
 gz_create_core_library(
-  SOURCES ${sources})
+  SOURCES ${sources}
+  CXX_STANDARD ${CMAKE_CXX_STANDARD})
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL GNU)
     set(CXX_FILESYSTEM_LIBRARIES stdc++fs)
@@ -15,16 +16,10 @@ endif()
 # Link the libraries that we always need
 target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
   PRIVATE
-    ${DL_TARGET}
     ${CXX_FILESYSTEM_LIBRARIES}
   PUBLIC
     gz-utils${GZ_UTILS_VER}::gz-utils${GZ_UTILS_VER}
 )
-
-# This is required by the WorkerPool::WaitForResults(const Time &_timeout)
-# TODO(anyone): GZ_DEPRECATED(4). Remove this part when the method is removed
-target_include_directories(${PROJECT_LIBRARY_TARGET_NAME} PRIVATE
-  ${gz-math${GZ_MATH_VER}_INCLUDE_DIRS})
 
 # Handle non-Windows configuration settings
 if(NOT WIN32)
@@ -53,27 +48,27 @@ gz_build_tests(
     # Used to make internal source file headers visible to the unit tests
     ${CMAKE_CURRENT_SOURCE_DIR})
 
-if(TARGET UNIT_MovingWindowFilter_TEST)
-  target_include_directories(UNIT_MovingWindowFilter_TEST PRIVATE
+if(TARGET UNIT_DataFrame_TEST)
+  target_include_directories(UNIT_DataFrame_TEST PRIVATE
     ${gz-math${GZ_MATH_VER}_INCLUDE_DIRS})
 endif()
 
-if(TARGET UNIT_PluginLoader_TEST)
-  target_compile_definitions(UNIT_PluginLoader_TEST PRIVATE
-    "IGN_COMMON_LIB_PATH=\"$<TARGET_FILE_DIR:${PROJECT_LIBRARY_TARGET_NAME}>\"")
+if(TARGET UNIT_MovingWindowFilter_TEST)
+  target_include_directories(UNIT_MovingWindowFilter_TEST PRIVATE
+    ${gz-math${GZ_MATH_VER}_INCLUDE_DIRS})
 endif()
 
 # Produce warning on Windows if the user has decided to turn on the symlink
 # tests. In order for those tests to work, they will need to run the tests in
 # administrative mode, or use some other workaround.
 if(WIN32)
-  if(IGN_BUILD_SYMLINK_TESTS_ON_WINDOWS)
+  if(GZ_BUILD_SYMLINK_TESTS_ON_WINDOWS)
     message(STATUS "")
     message(STATUS "You have opted to enable symlink tests on a Windows platform.")
     message(STATUS "The test UNIT_Filesystem_TEST will require elevated privileges")
     message(STATUS "in order to succeed. For more information, see the issue")
     message(STATUS "https://github.com/gazebosim/gz-common/issues/21")
     message(STATUS "")
-    target_compile_definitions(UNIT_Filesystem_TEST PRIVATE IGN_BUILD_SYMLINK_TESTS_ON_WINDOWS)
+    target_compile_definitions(UNIT_Filesystem_TEST PRIVATE GZ_BUILD_SYMLINK_TESTS_ON_WINDOWS)
   endif()
 endif()

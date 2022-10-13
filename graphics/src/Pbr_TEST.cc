@@ -18,6 +18,7 @@
 #include <gtest/gtest.h>
 
 #include <gz/math/Color.hh>
+#include "gz/common/Image.hh"
 #include "gz/common/Pbr.hh"
 
 /////////////////////////////////////////////////
@@ -28,12 +29,17 @@ TEST(Pbr, BasicAPI)
   EXPECT_EQ(gz::common::PbrType::NONE, pbr.Type());
   EXPECT_EQ(std::string(), pbr.AlbedoMap());
   EXPECT_EQ(std::string(), pbr.NormalMap());
+  EXPECT_EQ(nullptr, pbr.NormalMapData());
   EXPECT_EQ(gz::common::NormalMapSpace::TANGENT, pbr.NormalMapType());
   EXPECT_EQ(std::string(), pbr.RoughnessMap());
+  EXPECT_EQ(nullptr, pbr.RoughnessMapData());
   EXPECT_EQ(std::string(), pbr.MetalnessMap());
+  EXPECT_EQ(nullptr, pbr.MetalnessMapData());
   EXPECT_EQ(std::string(), pbr.EmissiveMap());
+  EXPECT_EQ(nullptr, pbr.EmissiveMapData());
   EXPECT_EQ(std::string(), pbr.LightMap());
   EXPECT_EQ(0u, pbr.LightMapTexCoordSet());
+  EXPECT_EQ(nullptr, pbr.LightMapData());
   EXPECT_DOUBLE_EQ(0.5, pbr.Roughness());
   EXPECT_DOUBLE_EQ(0.0, pbr.Metalness());
   EXPECT_EQ(std::string(), pbr.SpecularMap());
@@ -49,8 +55,11 @@ TEST(Pbr, BasicAPI)
   pbr.SetAlbedoMap("metal_albedo_map.png");
   EXPECT_EQ("metal_albedo_map.png", pbr.AlbedoMap());
 
-  pbr.SetNormalMap("metal_normal_map.png");
+  auto normalImg = std::make_shared<gz::common::Image>();
+  pbr.SetNormalMap("metal_normal_map.png", gz::common::NormalMapSpace::TANGENT,
+      normalImg);
   EXPECT_EQ("metal_normal_map.png", pbr.NormalMap());
+  EXPECT_EQ(normalImg, pbr.NormalMapData());
 
   pbr.SetEnvironmentMap("metal_env_map.png");
   EXPECT_EQ("metal_env_map.png", pbr.EnvironmentMap());
@@ -59,18 +68,26 @@ TEST(Pbr, BasicAPI)
   EXPECT_EQ("metal_ambient_occlusion_map.png",
       pbr.AmbientOcclusionMap());
 
-  pbr.SetEmissiveMap("metal_emissive_map.png");
+  auto emissiveImg = std::make_shared<gz::common::Image>();
+  pbr.SetEmissiveMap("metal_emissive_map.png", emissiveImg);
   EXPECT_EQ("metal_emissive_map.png", pbr.EmissiveMap());
+  EXPECT_EQ(emissiveImg, pbr.EmissiveMapData());
 
-  pbr.SetLightMap("metal_light_map.png", 1u);
+  auto lightImg = std::make_shared<gz::common::Image>();
+  pbr.SetLightMap("metal_light_map.png", 1u, lightImg);
   EXPECT_EQ("metal_light_map.png", pbr.LightMap());
   EXPECT_EQ(1u, pbr.LightMapTexCoordSet());
+  EXPECT_EQ(lightImg, pbr.LightMapData());
 
-  pbr.SetRoughnessMap("roughness_map.png");
+  auto roughnessImg = std::make_shared<gz::common::Image>();
+  pbr.SetRoughnessMap("roughness_map.png", roughnessImg);
   EXPECT_EQ("roughness_map.png", pbr.RoughnessMap());
+  EXPECT_EQ(roughnessImg, pbr.RoughnessMapData());
 
-  pbr.SetMetalnessMap("metalness_map.png");
+  auto metalnessImg = std::make_shared<gz::common::Image>();
+  pbr.SetMetalnessMap("metalness_map.png", metalnessImg);
   EXPECT_EQ("metalness_map.png", pbr.MetalnessMap());
+  EXPECT_EQ(metalnessImg, pbr.MetalnessMapData());
 
   pbr.SetRoughness(0.8);
   EXPECT_DOUBLE_EQ(0.8, pbr.Roughness());

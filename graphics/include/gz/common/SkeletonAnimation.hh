@@ -64,6 +64,10 @@ namespace gz
       public: NodeAnimation *NodeAnimationByName(const std::string &_name)
           const;
 
+      /// \brief Check all nodes for x displacement
+      /// \return True if x displacement found
+      public: bool XDisplacement() const;
+
       /// \brief Looks for a node with a specific name in the animations
       /// \param[in] _node the name of the node
       /// \return true if the node exits

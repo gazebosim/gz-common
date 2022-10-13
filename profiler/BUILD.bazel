@@ -1,14 +1,14 @@
 load(
     "//gz_bazel:build_defs.bzl",
-    "IGNITION_ROOT",
-    "IGNITION_VISIBILITY",
+    "GZ_ROOT",
+    "GZ_VISIBILITY",
     "cmake_configure_file",
     "generate_include_header",
     "gz_export_header",
 )
 
 package(
-    default_visibility = IGNITION_VISIBILITY,
+    default_visibility = GZ_VISIBILITY,
     features = [
         "-parse_headers",
         "-layering_check",
@@ -55,8 +55,8 @@ cmake_configure_file(
 
 gz_export_header(
     name = "include/gz/common/profiler/Export.hh",
-    export_base = "IGNITION_COMMON_PROFILER",
-    lib_name = "ignition-common-profiler",
+    export_base = "GZ_COMMON_PROFILER",
+    lib_name = "gz-common-profiler",
     visibility = ["//visibility:private"],
 )
 
@@ -94,15 +94,15 @@ cc_library(
     ],
     includes = ["include"],
     deps = [
-        IGNITION_ROOT + "gz_common",
+        GZ_ROOT + "gz_common",
         ":remotery",
     ],
 )
 
 cc_binary(
-    name = "libignition-common5-profiler.so",
+    name = "libgz-common6-profiler.so",
     includes = ["include"],
-    linkopts = ["-Wl,-soname,libignition-common5-profiler.so"],
+    linkopts = ["-Wl,-soname,libgz-common6-profiler.so"],
     linkshared = True,
     deps = [":profiler"],
 )
