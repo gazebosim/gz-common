@@ -14,6 +14,8 @@
  * limitations under the License.
  *
  */
+#ifndef IGNITION_COMMON_SPECIALIZEDPLUGIN_HH_
+#define IGNITION_COMMON_SPECIALIZEDPLUGIN_HH_
 
 #include <ignition/common/config.hh>
 #include "ignition/common/Plugin.hh"
@@ -163,3 +165,4 @@ namespace gz
 }
 
 #include "ignition/common/detail/SpecializedPlugin.hh"
+#endif  // IGNITION_COMMON_SPECIALIZEDPLUGIN_HH_
