@@ -278,13 +278,13 @@ TEST(Util_TEST, envSetEmpty)
 /////////////////////////////////////////////////
 TEST(Util_TEST, findFile)
 {
-  EXPECT_EQ("", gz::common::findFile("no_such_file"));
+  EXPECT_EQ("", common::findFile("no_such_file"));
 
   // Create file to find
-  auto dir1 = gz::common::absPath("test_dir1");
-  gz::common::createDirectories(dir1);
-  auto file1 = gz::common::absPath(
-      gz::common::joinPaths(dir1, "test_f1"));
+  auto dir1 = common::absPath("test_dir1");
+  common::createDirectories(dir1);
+  auto file1 = common::absPath(
+      common::joinPaths(dir1, "test_f1"));
 
   std::ofstream fout;
   fout.open(file1, std::ofstream::out);
@@ -292,13 +292,13 @@ TEST(Util_TEST, findFile)
   fout.close();
 
   // Relative path
-  auto systemPaths = gz::common::systemPaths();
+  auto systemPaths = common::systemPaths();
   ASSERT_NE(nullptr, systemPaths);
   EXPECT_EQ(file1, systemPaths->FindFile(common::joinPaths("test_dir1",
       "test_f1"), true));
 
   // Relative prefixed by file:
-  EXPECT_EQ(file1, gz::common::findFile("file:test_dir1/test_f1"));
+  EXPECT_EQ(file1, common::findFile("file:test_dir1/test_f1"));
 
   // Custom callback
 #ifndef _WIN32
@@ -306,11 +306,18 @@ TEST(Util_TEST, findFile)
 #else
   const auto tmpDir = "C:\\Windows";
 #endif
-  auto fileCb = [&tmpDir](const gz::common::URI &)
+  auto fileCb = [&tmpDir](const common::URI &)
   {
     return tmpDir;
   };
 
-  gz::common::addFindFileURICallback(fileCb);
-  EXPECT_EQ(tmpDir, gz::common::findFile("model://banana"));
+  common::addFindFileURICallback(fileCb);
+  EXPECT_EQ(tmpDir, common::findFile("model://banana"));
+}
+
+/////////////////////////////////////////////////
+int main(int argc, char **argv)
+{
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }

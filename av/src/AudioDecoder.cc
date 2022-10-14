@@ -26,7 +26,7 @@
 using namespace gz;
 using namespace common;
 
-class gz::common::AudioDecoder::Implementation
+class common::AudioDecoder::Implementation
 {
   /// \brief Destructor
   public: ~Implementation();
@@ -48,7 +48,7 @@ class gz::common::AudioDecoder::Implementation
 };
 
 /////////////////////////////////////////////////
-gz::common::AudioDecoder::Implementation::~Implementation()
+common::AudioDecoder::Implementation::~Implementation()
 {
   // Close the codec
   if (this->codecCtx)
@@ -61,9 +61,9 @@ gz::common::AudioDecoder::Implementation::~Implementation()
 
 /////////////////////////////////////////////////
 AudioDecoder::AudioDecoder()
-  : dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
+  : dataPtr(utils::MakeUniqueImpl<Implementation>())
 {
-  gz::common::load();
+  common::load();
 }
 
 /////////////////////////////////////////////////

@@ -47,7 +47,7 @@ void onSignal(int _value)
 }
 
 /////////////////////////////////////////////////
-class gz::common::SignalHandlerPrivate
+class common::SignalHandlerPrivate
 {
   /// \brief Handle a signal.
   /// \param[in] _sig Signal number

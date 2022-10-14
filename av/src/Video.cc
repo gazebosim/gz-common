@@ -24,7 +24,7 @@ using namespace gz;
 using namespace common;
 
 // Private data structure for the Video class
-class gz::common::Video::Implementation
+class common::Video::Implementation
 {
   /// \brief libav Format I/O context
   public: AVFormatContext *formatCtx = nullptr;
@@ -92,10 +92,10 @@ int AVCodecDecode(AVCodecContext *_codecCtx,
 
 /////////////////////////////////////////////////
 Video::Video()
-  : dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
+  : dataPtr(utils::MakeUniqueImpl<Implementation>())
 {
   // Make sure libav is loaded.
-  gz::common::load();
+  common::load();
 }
 
 /////////////////////////////////////////////////
