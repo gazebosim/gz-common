@@ -30,6 +30,7 @@
 #include "DummyPluginsPath.h"
 #include "plugins/DummyPlugins.hh"
 
+using namespace gz;
 
 GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
 #include "ignition/common/PluginLoader.hh"
@@ -61,26 +62,26 @@ GZ_CREATE_SPEC_INTERFACE(Interface19)
 
 // Specialize for only 1 type
 using Specialize1Type =
-    gz::common::SpecializedPluginPtr<test::util::DummySetterBase>;
+    common::SpecializedPluginPtr<test::util::DummySetterBase>;
 
 // Specialize for 3 different types, and put the type we care about first in
 // the list.
 using Specialize3Types_Leading =
-    gz::common::SpecializedPluginPtr<
+    common::SpecializedPluginPtr<
         test::util::DummySetterBase,
         Interface1, Interface2>;
 
 // Specialize for 3 different types, and put the type we care about last in
 // the list.
 using Specialize3Types_Trailing =
-    gz::common::SpecializedPluginPtr<
+    common::SpecializedPluginPtr<
         Interface1, Interface2,
         test::util::DummySetterBase>;
 
 // Specialize for 10 different types, and put the type we care about first in
 // the list.
 using Specialize10Types_Leading =
-    gz::common::SpecializedPluginPtr<
+    common::SpecializedPluginPtr<
         test::util::DummySetterBase,
         Interface1, Interface2, Interface3, Interface4, Interface5,
         Interface6, Interface7, Interface8, Interface9>;
@@ -88,7 +89,7 @@ using Specialize10Types_Leading =
 // Specialize for 10 different types, and put the type we care about last in
 // the list.
 using Specialize10Types_Trailing =
-    gz::common::SpecializedPluginPtr<
+    common::SpecializedPluginPtr<
         Interface1, Interface2, Interface3, Interface4, Interface5,
         Interface6, Interface7, Interface8, Interface9,
         test::util::DummySetterBase>;
@@ -96,7 +97,7 @@ using Specialize10Types_Trailing =
 // Specialize for 20 different types, and put the type we care about first in
 // the list.
 using Specialize20Types_Leading =
-    gz::common::SpecializedPluginPtr<
+    common::SpecializedPluginPtr<
         test::util::DummySetterBase,
         Interface1, Interface2, Interface3, Interface4, Interface5,
         Interface6, Interface7, Interface8, Interface9, Interface10,
@@ -106,7 +107,7 @@ using Specialize20Types_Leading =
 // Specialize for 20 different types, and put the type we care about last in
 // the list.
 using Specialize20Types_Trailing =
-    gz::common::SpecializedPluginPtr<
+    common::SpecializedPluginPtr<
         Interface1, Interface2, Interface3, Interface4, Interface5,
         Interface6, Interface7, Interface8, Interface9, Interface10,
         Interface11, Interface12, Interface13, Interface14, Interface15,
@@ -136,16 +137,16 @@ double RunPerformanceTest(const PluginType &plugin)
 /////////////////////////////////////////////////
 TEST(PluginSpecialization, AccessTime)
 {
-  gz::common::SystemPaths sp;
+  common::SystemPaths sp;
   sp.AddPluginPaths(GZ_DUMMY_PLUGIN_PATH);
   std::string path = sp.FindSharedLibrary("GzDummyPlugins");
   ASSERT_FALSE(path.empty());
 
-  gz::common::PluginLoader pl;
+  common::PluginLoader pl;
   pl.LoadLibrary(path);
 
   // Load up the generic plugin
-  gz::common::PluginPtr plugin =
+  common::PluginPtr plugin =
       pl.Instantiate("::test::util::DummyMultiPlugin");
 
   // Create specialized versions

@@ -43,7 +43,7 @@ using OutputFormat = AVOutputFormat*;
 
 // Private data class
 // hidden visibility specifier has to be explicitly set to silent a gcc warning
-class GZ_COMMON_AV_HIDDEN gz::common::VideoEncoder::Implementation
+class GZ_COMMON_AV_HIDDEN common::VideoEncoder::Implementation
 {
   /// \brief Name of the file which stores the video while it is being
   ///        recorded.
@@ -149,10 +149,10 @@ AVFrame* VideoEncoder::Implementation::GetFrameForEncoder(AVFrame* _inFrame)
 
 /////////////////////////////////////////////////
 VideoEncoder::VideoEncoder()
-  : dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
+  : dataPtr(utils::MakeUniqueImpl<Implementation>())
 {
   // Make sure libav is loaded.
-  gz::common::load();
+  common::load();
 }
 
 /////////////////////////////////////////////////
@@ -305,7 +305,7 @@ bool VideoEncoder::Start(
   }
 
   // Remove old temp file, if it exists.
-  if (common::exists(this->dataPtr->filename))
+  if (exists(this->dataPtr->filename))
   {
     auto success = removeFile(this->dataPtr->filename.c_str());
     if (!success)
@@ -363,7 +363,7 @@ bool VideoEncoder::Start(
     }
     else
     {
-      this->dataPtr->filename = joinPaths(common::cwd(), "TMP_RECORDING." +
+      this->dataPtr->filename = joinPaths(cwd(), "TMP_RECORDING." +
                                 this->dataPtr->format);
     }
   }
@@ -387,7 +387,7 @@ bool VideoEncoder::Start(
     do
     {
       outputFormat = av_output_video_device_next(outputFormat);
-      
+
       if (outputFormat)
       {
         // Break when the output device name matches 'v4l2'
@@ -885,7 +885,7 @@ bool VideoEncoder::SaveToFile(const std::string &_filename)
 
   if (this->dataPtr->format != "v4l2")
   {
-    result = common::moveFile(this->dataPtr->filename, _filename);
+    result = moveFile(this->dataPtr->filename, _filename);
 
     if (!result)
     {
@@ -908,7 +908,7 @@ void VideoEncoder::Reset()
   this->Stop();
 
   // Remove old temp file, if it exists.
-  if (common::exists(this->dataPtr->filename))
+  if (exists(this->dataPtr->filename))
   {
     auto success = removeFile(this->dataPtr->filename.c_str());
     if (!success)

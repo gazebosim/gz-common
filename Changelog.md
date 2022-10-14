@@ -190,6 +190,49 @@
 
 ## Gazebo Common 4.x
 
+## Gazebo Common 4.6.1 (2022-10-11)
+
+1. All common3 changes up to 3.15.1 release 
+
+## Gazebo Common 4.6.0 (2022-10-11)
+
+1. All common3 changes up to 3.15.0 release 
+
+1. Include cstring for memcpy  
+    * [Pull request #437](https://github.com/gazebosim/gz-common/pull/437)
+
+## Gazebo Common 4.5.2 (2022-08-16)
+
+1. Fix deprecation warning from new `ffmpeg`
+    * [Pull request #421](https://github.com/gazebosim/gz-common/pull/421)
+
+1. Remove redundant namespace references
+    * [Pull request #414](https://github.com/gazebosim/gz-common/pull/414)
+
+1. Add code coverage ignore file
+    * [Pull request #394](https://github.com/gazebosim/gz-common/pull/394)
+
+1. Change `IGN_DESIGNATION` to `GZ_DESIGNATION`
+    * [Pull request #399](https://github.com/gazebosim/gz-common/pull/399)
+
+1. Ignition -> Gazebo
+    * [Pull request #396](https://github.com/gazebosim/gz-common/pull/396)
+
+1. Support absolute Win paths with forward slashes in `common::FindFile`
+    * [Pull request #389](https://github.com/gazebosim/gz-common/pull/389)
+
+1. Fix `FindSharedLibrary` for relative plugin paths
+    * [Pull request #382](https://github.com/gazebosim/gz-common/pull/382)
+
+1. Fix race condition in `FileLogger`
+    * [Pull request #378](https://github.com/gazebosim/gz-common/pull/378)
+
+1. Synchronize console writes
+    * [Pull request #227](https://github.com/gazebosim/gz-common/pull/227)
+
+1. Profiler tutorial: viewing from Docker container
+    * [Pull request #362](https://github.com/gazebosim/gz-common/pull/362)
+
 ## Gazebo Common 4.5.1 (2022-06-21)
 
 1. Fix spelling in URI error message
@@ -395,6 +438,24 @@
     * [BitBucket pull request xxx](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/213)
 
 ## Gazebo Common 3.x
+
+## Gazebo Common 3.15.1 (2022-10-11)
+
+1. Fix build on case-insensitive filesystems
+    * [Pull request #453](https://github.com/gazebosim/gz-common/pull/453)
+
+1. Don't install CMakeLists.txt 
+    * [Pull request #449](https://github.com/gazebosim/gz-common/pull/449)
+
+## Gazebo Common 3.15.0 (2022-10-06)
+
+1. ign -> gz Migrate Ignition Headers
+    * [Pull request #418](https://github.com/gazebosim/gz-common/pull/418)
+
+## Gazebo Common 3.14.2 (2022-08-16)
+
+1. Fix deprecation warning from new `ffmpeg`
+    * [Pull request #414](https://github.com/gazebosim/gz-common/pull/421)
 
 ## Gazebo Common 3.14.1 (2022-06-01)
 

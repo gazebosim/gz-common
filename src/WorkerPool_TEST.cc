@@ -23,13 +23,12 @@
 #include "gz/common/WorkerPool.hh"
 #include "gz/utils/ExtraTestMacros.hh"
 
-namespace igncmn = gz::common;
-using namespace igncmn;
+using namespace gz;
 
 //////////////////////////////////////////////////
 TEST(WorkerPool, OneWorkNoCallback)
 {
-  WorkerPool pool;
+  common::WorkerPool pool;
   int workSentinel = 0;
 
   pool.AddWork([&workSentinel] ()
@@ -43,7 +42,7 @@ TEST(WorkerPool, OneWorkNoCallback)
 //////////////////////////////////////////////////
 TEST(WorkerPool, OneWorkWithCallback)
 {
-  WorkerPool pool;
+  common::WorkerPool pool;
   int workSentinel = 0;
   int cbSentinel = 0;
 
@@ -63,7 +62,7 @@ TEST(WorkerPool, OneWorkWithCallback)
 //////////////////////////////////////////////////
 TEST(WorkerPool, LotsOfWork)
 {
-  WorkerPool pool;
+  common::WorkerPool pool;
   std::atomic<int> workSentinel(0);
   std::atomic<int> cbSentinel(0);
 
@@ -86,7 +85,7 @@ TEST(WorkerPool, LotsOfWork)
 //////////////////////////////////////////////////
 TEST(WorkerPool, WaitWithTimeout)
 {
-  WorkerPool pool;
+  common::WorkerPool pool;
   int workSentinel = 0;
   pool.AddWork([&workSentinel] ()
       {
@@ -102,7 +101,7 @@ TEST(WorkerPool, WaitWithTimeout)
 TEST(WorkerPool,
      GZ_UTILS_TEST_ENABLED_ONLY_ON_LINUX(WaitWithTimeoutThatTimesOut))
 {
-  WorkerPool pool;
+  common::WorkerPool pool;
   pool.AddWork([] ()
       {
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
@@ -125,7 +124,7 @@ TEST(WorkerPool,
     return;
   }
 
-  WorkerPool pool;
+  common::WorkerPool pool;
   std::atomic<int> sentinel(0);
   pool.AddWork([&sentinel] ()
       {
