@@ -4,7 +4,61 @@
 
 ## Gazebo Common 5.x
 
-## Gazebo Common 5.0.0 (20XX-XX-XX)
+## Gazebo Common 5.1.0 (2022-10-13)
+
+1. 4 ➡️  5
+    * [Pull request #457](https://github.com/gazebosim/gz-common/pull/457)
+
+1. 🎈 4.6.1
+    * [Pull request #456](https://github.com/gazebosim/gz-common/pull/456)
+
+1. 🎈 4.6.0
+    * [Pull request #452](https://github.com/gazebosim/gz-common/pull/452)
+
+1. 🎈 4.5.2
+    * [Pull request #423](https://github.com/gazebosim/gz-common/pull/423)
+
+1. 3 ➡️  4
+    * [Pull request #448](https://github.com/gazebosim/gz-common/pull/448)
+    * [Pull request #445](https://github.com/gazebosim/gz-common/pull/445)
+
+1. 🎈 3.15.1
+    * [Pull request #454](https://github.com/gazebosim/gz-common/pull/454)
+
+1. 🎈 3.15.0
+    * [Pull request #447](https://github.com/gazebosim/gz-common/pull/447)
+
+1. 🎈 3.14.2
+    * [Pull request #419](https://github.com/gazebosim/gz-common/pull/419)
+
+1. Don't install auto-generated profiler.hh
+    * [Pull request #453](https://github.com/gazebosim/gz-common/pull/453)
+
+1. Fixed MeshManager Singleton
+    * [Pull request #451](https://github.com/gazebosim/gz-common/pull/451)
+
+1. Don't install CMakeLists.txt
+    * [Pull request #449](https://github.com/gazebosim/gz-common/pull/449)
+
+1. ign -> gz Migrate Ignition Headers : gz-common
+    * [Pull request #418](https://github.com/gazebosim/gz-common/pull/418)
+
+1. Suppress a bunch of unnecessary test output
+    * [Pull request #442](https://github.com/gazebosim/gz-common/pull/442)
+
+1. Fix metallic roughness file path for gltf assets
+    * [Pull request #436](https://github.com/gazebosim/gz-common/pull/436)
+
+1. Include cstring for memcpy
+    * [Pull request #437](https://github.com/gazebosim/gz-common/pull/437)
+
+1. Backport from 5 to 3 - Fix deprecation warning from new ffmpeg
+    * [Pull request #421](https://github.com/gazebosim/gz-common/pull/421)
+
+1. Remove redundant namespace references
+    * [Pull request #414](https://github.com/gazebosim/gz-common/pull/414)
+
+## Gazebo Common 5.0.0 (2022-09-22)
 
 1. Improved visualization hw encoding tutorial gz-common5
     * [Pull request #441](https://github.com/gazebosim/gz-common/pull/441)
