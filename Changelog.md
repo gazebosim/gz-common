@@ -1,5 +1,16 @@
 ## Gazebo Common 5.x
 
+## Gazebo Common 5.2.0 (2022-10-18)
+
+1. Add CSV data parsing
+    * [Pull request #402](https://github.com/gazebosim/gz-common/pull/402)
+
+1. Skip CSV header when reading DataFrame.
+    * [Pull request #435](https://github.com/gazebosim/gz-common/pull/435)
+
+1. Adds an API to retrieve keys.
+    * [Pull request #446](https://github.com/gazebosim/gz-common/pull/446)
+
 ## Gazebo Common 5.1.0 (2022-10-13)
 
 1. 4 ➡️  5
