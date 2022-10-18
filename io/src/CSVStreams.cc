@@ -43,7 +43,7 @@ std::istream &ExtractCSVToken(
   char character;
   if (_stream.peek(), !_stream.fail() && _stream.eof())
   {
-    _token = {CSVToken::TERMINATOR, EOF};
+    _token = {CSVToken::TERMINATOR, static_cast<char>(EOF)};
   }
   else if (_stream.get(character))
   {
@@ -121,7 +121,8 @@ std::istream &ParseCSVRow(
             state = FIELD_START;
             break;
           case CSVToken::TERMINATOR:
-            if (token.character != EOF || !_row.empty() || text.tellp() > 0)
+            if (token.character != static_cast<char>(EOF) || !_row.empty() ||
+                text.tellp() > 0)
             {
               _row.push_back(text.str());
               state = RECORD_END;
@@ -140,7 +141,8 @@ std::istream &ParseCSVRow(
           state = FIELD_END;
           break;
         }
-        if (token.type != CSVToken::TERMINATOR || token.character != EOF)
+        if (token.type != CSVToken::TERMINATOR ||
+            token.character != static_cast<char>(EOF))
         {
           text << token.character;
           break;
