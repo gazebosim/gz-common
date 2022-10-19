@@ -1,5 +1,11 @@
 ## Gazebo Common 5.x
 
+## Gazebo Common 5.2.1 (2022-10-19)
+
+1. Fix arm builds and tests
+    * [Pull request #462](https://github.com/gazebosim/gz-common/pull/462)
+    * [Pull request #463](https://github.com/gazebosim/gz-common/pull/463)
+
 ## Gazebo Common 5.2.0 (2022-10-18)
 
 1. Add CSV data parsing
