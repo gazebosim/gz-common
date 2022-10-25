@@ -107,7 +107,7 @@ class AssimpLoader::Implementation
   /// \return a pair of image pointers with the first being the metalness
   /// map and the second being the roughness map
   public: std::pair<ImagePtr, ImagePtr>
-          SplitMetallicRoughnessMap(const common::Image& _img) const;
+          SplitMetallicRoughnessMap(const Image& _img) const;
 
   /// \brief Convert an assimp mesh into a gz::common::SubMesh
   /// \param[in] _assimpMesh the assimp mesh to load
@@ -392,8 +392,8 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     auto [texName, texData] = this->LoadTexture(_scene, texturePath,
         this->GenerateTextureName(_scene, assimpMat, "MetallicRoughness"));
     // Load it into a common::Image then split it
-    auto texImg =
-      texData != nullptr ? texData : std::make_shared<common::Image>(texName);
+    auto texImg = texData != nullptr ? texData :
+      std::make_shared<Image>(joinPaths(_path, texName));
     auto [metalTexture, roughTexture] =
       this->SplitMetallicRoughnessMap(*texImg);
     pbr.SetMetalnessMap(
@@ -488,7 +488,7 @@ std::pair<std::string, ImagePtr> AssimpLoader::Implementation::LoadTexture(
 
 std::pair<ImagePtr, ImagePtr>
     AssimpLoader::Implementation::SplitMetallicRoughnessMap(
-    const common::Image& _img) const
+    const Image& _img) const
 {
   std::pair<ImagePtr, ImagePtr> ret;
   // Metalness in B roughness in G

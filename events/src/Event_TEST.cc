@@ -22,7 +22,6 @@
 #include <functional>
 #include <gz/common/Event.hh>
 #include <gz/common/Util.hh>
-
 using namespace gz;
 
 class EventTest : public common::testing::AutoLogFixture { };

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Martin Pecka
+ * Copyright (C) 2020 Martin Pecka
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 #ifndef GZ_COMMON_HWENCODER_HH
 #define GZ_COMMON_HWENCODER_HH
 
+#include <memory>
 #include <string>
 #include <optional>
 
