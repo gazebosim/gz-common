@@ -1,5 +1,10 @@
 ## Gazebo Common 5.x
 
+## Gazebo Common 5.2.2 (2022-10-26)
+
+1. [Backport] Avoid Io.hh header name clash (#471) 
+    * [Pull request #472](https://github.com/gazebosim/gz-common/pull/472)
+
 ## Gazebo Common 5.2.1 (2022-10-19)
 
 1. Fix arm builds and tests
