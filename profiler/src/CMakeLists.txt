@@ -8,7 +8,6 @@ set(
 set(
   PROFILER_TESTS
   Profiler_Disabled_TEST.cc
-  Profiler_Error_TEST.cc
 )
 
 if(NOT WIN32)
