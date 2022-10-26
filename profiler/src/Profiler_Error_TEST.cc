@@ -23,7 +23,7 @@
 
 /// Return the string error message
 /// param[in] error the remotery error
-std::string IGNITION_COMMON_VISIBLE rmtErrorToString(rmtError error);
+std::string rmtErrorToString(rmtError error);
 
 /////////////////////////////////////////////////
 TEST(Profiler, ProfilerErrorCodes)

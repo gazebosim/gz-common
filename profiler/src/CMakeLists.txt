@@ -11,6 +11,10 @@ set(
   Profiler_Error_TEST.cc
 )
 
+if(NOT WIN32)
+  list(APPEND PROFILER_TESTS Profiler_Error_TEST.cc)
+endif()
+
 if(IGN_PROFILER_REMOTERY)
   set(
     Remotery_SRC
