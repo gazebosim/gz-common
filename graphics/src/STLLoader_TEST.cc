@@ -26,10 +26,10 @@
 
 using namespace ignition;
 
-class STLLoader : public common::testing::AutoLogFixture { };
+class STLLoaderTest : public common::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
-TEST_F(STLLoader, LoadSTL)
+TEST_F(STLLoaderTest, LoadSTL)
 {
   common::STLLoader loader;
   auto mesh = loader.Load("");

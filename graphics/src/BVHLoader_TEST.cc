@@ -25,10 +25,10 @@
 
 using namespace ignition;
 
-class BHVLoader : public common::testing::AutoLogFixture { };
+class BHVLoaderTest : public common::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
-TEST_F(BHVLoader, LoadBVH)
+TEST_F(BHVLoaderTest, LoadBVH)
 {
   common::BVHLoader loader;
   auto skel = loader.Load("", 1);
