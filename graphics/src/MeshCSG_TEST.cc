@@ -32,6 +32,11 @@ class MeshCSGTest : public common::testing::AutoLogFixture { };
 /////////////////////////////////////////////////
 TEST_F(MeshCSGTest, MeshCSG)
 {
+  #ifdef _WIN32
+  std::cerr << "Skipping test on windows due to issue #468" << std::endl;
+  SKIP();
+  #endif
+
   common::STLLoader loader;
 
   auto mesh1 = loader.Load(
