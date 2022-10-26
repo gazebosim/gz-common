@@ -34,7 +34,7 @@ TEST_F(MeshCSGTest, MeshCSG)
 {
   #ifdef _WIN32
   std::cerr << "Skipping test on windows due to issue #468" << std::endl;
-  SKIP();
+  SKIP_TEST();
   #endif
 
   common::STLLoader loader;
