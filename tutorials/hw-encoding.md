@@ -120,7 +120,7 @@ on implementing the recording procedure itself, and completely ignore any HW
 acceleration of the recording process. Users of the code can then enable the HW
 acceleration just using these 3 environment variables:
 
-### `GZ_VIDEO_ALLOWED_ENCODERS`
+### GZ_VIDEO_ALLOWED_ENCODERS
 
 This is the main variable that allows the `VideoEncoder` to probe for supported
 HW-accelerated encoders. It is a colon-separated list of names described in the
@@ -140,14 +140,14 @@ encoder is considered working. Sometimes, something can go wrong in a later stag
 (e.g. insufficient GPU memory), and that is a kind of thing you have to
 handle yourself.
 
-### `GZ_VIDEO_ENCODER_DEVICE`
+### GZ_VIDEO_ENCODER_DEVICE
 
 This is a name of the encoder device as specified in the "Device Names" section.
 If empty, first working device will be used. This auto detection should suffice on
 single-GPU systems or if you don't care which GPU will be used. If a device is
 specified, only encoders accepting this device name as an argument will be probed.
 
-### `GZ_VIDEO_USE_HW_SURFACE`
+### GZ_VIDEO_USE_HW_SURFACE
 
 This variable has three possible values:
 

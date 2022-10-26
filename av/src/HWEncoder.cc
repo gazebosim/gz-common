@@ -29,7 +29,7 @@ using namespace gz;
 using namespace common;
 using namespace std;
 
-class gz::common::HWEncoder::Implementation
+class common::HWEncoder::Implementation
 {
   /// \brief Device reference for HW-accelerated encoding.
   public: AVBufferRef* hwDevice = nullptr;
@@ -97,9 +97,9 @@ HWEncoderType DetectHWEncoderType(const std::string& _codecName)
 
     bool matches;
     if (matchPrefix)
-      matches = common::StartsWith(_codecName, matchString);
+      matches = StartsWith(_codecName, matchString);
     else
-      matches = common::EndsWith(_codecName, matchString);
+      matches = EndsWith(_codecName, matchString);
 
     if (matches)
       return hwAccel;
@@ -236,7 +236,7 @@ AVCodec* HWEncoder::FindEncoder(AVCodecID _codecId)
         case HWEncoderType::NVENC:
         {
           std::string deviceName = "/dev/nvidia0";
-          if (common::StartsWith(initHwDevice, "/dev/nvidia"))
+          if (StartsWith(initHwDevice, "/dev/nvidia"))
             deviceName = initHwDevice;
           else if (!initHwDevice.empty())
             break;
@@ -276,14 +276,14 @@ AVCodec* HWEncoder::FindEncoder(AVCodecID _codecId)
             devices.push_back(display);
 
           // DRM device or local X display
-          if (common::StartsWith(initHwDevice, "/dev/dri/renderD") ||
-              common::StartsWith(initHwDevice, ":"))
+          if (StartsWith(initHwDevice, "/dev/dri/renderD") ||
+              StartsWith(initHwDevice, ":"))
           {
             devices = {initHwDevice};
           }
           else if (!initHwDevice.empty())
           {
-            const auto parts = common::Split(initHwDevice, ':');
+            const auto parts = Split(initHwDevice, ':');
             // check if device is of form <host>:<display>
             if (parts.size() != 2)
               break;
@@ -679,7 +679,7 @@ AVFrame* HWEncoder::GetFrameForEncoder(AVFrame* _inFrame)
 HWEncoder::HWEncoder(const FlagSet<HWEncoderType> _allowedHwEncoders,
                      const std::string& _hwAccelDevice,
                      std::optional<bool> _useHwSurface)
-  : dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
+  : dataPtr(utils::MakeUniqueImpl<Implementation>())
 {
   this->dataPtr->initHwEncoders = _allowedHwEncoders;
   this->dataPtr->initHwDevice = _hwAccelDevice;

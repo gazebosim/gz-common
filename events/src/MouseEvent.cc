@@ -22,7 +22,7 @@ using namespace gz;
 using namespace common;
 
 /// \brief Mouse event private data
-class gz::common::MouseEventPrivate
+class common::MouseEventPrivate
 {
   /// \brief Constructor.
   public: MouseEventPrivate()
@@ -33,16 +33,16 @@ class gz::common::MouseEventPrivate
           {}
 
   /// \brief Mouse pointer position on the screen.
-  public: gz::math::Vector2i pos;
+  public: math::Vector2i pos;
 
   /// \brief Previous position.
-  public: gz::math::Vector2i prevPos;
+  public: math::Vector2i prevPos;
 
   /// \brief Position of button press.
-  public: gz::math::Vector2i pressPos;
+  public: math::Vector2i pressPos;
 
   /// \brief Scroll position.
-  public: gz::math::Vector2i scroll;
+  public: math::Vector2i scroll;
 
   /// \brief Scaling factor.
   public: float moveScale;
@@ -88,13 +88,13 @@ MouseEvent::~MouseEvent()
 }
 
 /////////////////////////////////////////////////
-gz::math::Vector2i MouseEvent::Pos() const
+math::Vector2i MouseEvent::Pos() const
 {
   return this->dataPtr->pos;
 }
 
 /////////////////////////////////////////////////
-void MouseEvent::SetPos(const gz::math::Vector2i &_pos)
+void MouseEvent::SetPos(const math::Vector2i &_pos)
 {
   this->dataPtr->pos = _pos;
 }
@@ -106,13 +106,13 @@ void MouseEvent::SetPos(int _x, int _y)
 }
 
 /////////////////////////////////////////////////
-gz::math::Vector2i MouseEvent::PrevPos() const
+math::Vector2i MouseEvent::PrevPos() const
 {
   return this->dataPtr->prevPos;
 }
 
 /////////////////////////////////////////////////
-void MouseEvent::SetPrevPos(const gz::math::Vector2i &_pos)
+void MouseEvent::SetPrevPos(const math::Vector2i &_pos)
 {
   this->dataPtr->prevPos = _pos;
 }
@@ -124,13 +124,13 @@ void MouseEvent::SetPrevPos(int _x, int _y)
 }
 
 /////////////////////////////////////////////////
-gz::math::Vector2i MouseEvent::PressPos() const
+math::Vector2i MouseEvent::PressPos() const
 {
   return this->dataPtr->pressPos;
 }
 
 /////////////////////////////////////////////////
-void MouseEvent::SetPressPos(const gz::math::Vector2i &_pos)
+void MouseEvent::SetPressPos(const math::Vector2i &_pos)
 {
   this->dataPtr->pressPos = _pos;
 }
@@ -142,13 +142,13 @@ void MouseEvent::SetPressPos(int _x, int _y)
 }
 
 /////////////////////////////////////////////////
-gz::math::Vector2i MouseEvent::Scroll() const
+math::Vector2i MouseEvent::Scroll() const
 {
   return this->dataPtr->scroll;
 }
 
 /////////////////////////////////////////////////
-void MouseEvent::SetScroll(const gz::math::Vector2i &_scroll)
+void MouseEvent::SetScroll(const math::Vector2i &_scroll)
 {
   this->dataPtr->scroll = _scroll;
 }

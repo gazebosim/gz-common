@@ -4,9 +4,292 @@
 
 ## Gazebo Common 5.x
 
-## Gazebo Common 5.0.0 (20XX-XX-XX)
+## Gazebo Common 5.1.0 (2022-10-13)
+
+1. 4 ➡️  5
+    * [Pull request #457](https://github.com/gazebosim/gz-common/pull/457)
+
+1. 🎈 4.6.1
+    * [Pull request #456](https://github.com/gazebosim/gz-common/pull/456)
+
+1. 🎈 4.6.0
+    * [Pull request #452](https://github.com/gazebosim/gz-common/pull/452)
+
+1. 🎈 4.5.2
+    * [Pull request #423](https://github.com/gazebosim/gz-common/pull/423)
+
+1. 3 ➡️  4
+    * [Pull request #448](https://github.com/gazebosim/gz-common/pull/448)
+    * [Pull request #445](https://github.com/gazebosim/gz-common/pull/445)
+
+1. 🎈 3.15.1
+    * [Pull request #454](https://github.com/gazebosim/gz-common/pull/454)
+
+1. 🎈 3.15.0
+    * [Pull request #447](https://github.com/gazebosim/gz-common/pull/447)
+
+1. 🎈 3.14.2
+    * [Pull request #419](https://github.com/gazebosim/gz-common/pull/419)
+
+1. Don't install auto-generated profiler.hh
+    * [Pull request #453](https://github.com/gazebosim/gz-common/pull/453)
+
+1. Fixed MeshManager Singleton
+    * [Pull request #451](https://github.com/gazebosim/gz-common/pull/451)
+
+1. Don't install CMakeLists.txt
+    * [Pull request #449](https://github.com/gazebosim/gz-common/pull/449)
+
+1. ign -> gz Migrate Ignition Headers : gz-common
+    * [Pull request #418](https://github.com/gazebosim/gz-common/pull/418)
+
+1. Suppress a bunch of unnecessary test output
+    * [Pull request #442](https://github.com/gazebosim/gz-common/pull/442)
+
+1. Fix metallic roughness file path for gltf assets
+    * [Pull request #436](https://github.com/gazebosim/gz-common/pull/436)
+
+1. Include cstring for memcpy
+    * [Pull request #437](https://github.com/gazebosim/gz-common/pull/437)
+
+1. Backport from 5 to 3 - Fix deprecation warning from new ffmpeg
+    * [Pull request #421](https://github.com/gazebosim/gz-common/pull/421)
+
+1. Remove redundant namespace references
+    * [Pull request #414](https://github.com/gazebosim/gz-common/pull/414)
+
+## Gazebo Common 5.0.0 (2022-09-22)
+
+1. Improved visualization hw encoding tutorial gz-common5
+    * [Pull request #441](https://github.com/gazebosim/gz-common/pull/441)
+
+1. Updated install instructions gz-common5
+    * [Pull request #440](https://github.com/gazebosim/gz-common/pull/440)
+
+1. Fix reading pixel values from single channel 16 bit image
+    * [Pull request #439](https://github.com/gazebosim/gz-common/pull/439)
+
+1. Add gdal to prerequisites
+    * [Pull request #438](https://github.com/gazebosim/gz-common/pull/438)
+
+1. Cleanup long-deprecated ifdefs
+    * [Pull request #329](https://github.com/gazebosim/gz-common/pull/329)
+
+1. Add a test for loading gltf with external textures
+    * [Pull request #409](https://github.com/gazebosim/gz-common/pull/409)
+
+1. Fix ABI checker with testing module
+    * [Pull request #427](https://github.com/gazebosim/gz-common/pull/427)
+
+1. Implement XDisplacement function for checking x displacement for all nodes
+    * [Pull request #411](https://github.com/gazebosim/gz-common/pull/411)
+
+1. Fix deprecation warning from new ffmpeg
+    * [Pull request #416](https://github.com/gazebosim/gz-common/pull/416)
+
+1. Use assimp for loading meshes
+    * [Pull request #393](https://github.com/gazebosim/gz-common/pull/393)
+
+1. Add API for getting Image bytes as std::vector
+    * [Pull request #372](https://github.com/gazebosim/gz-common/pull/372)
+
+1. Support lunar coordinate transformations 
+    * [Pull request #377](https://github.com/gazebosim/gz-common/pull/377)
+
+1. Remove configure.bat, export CXX_STANDARD
+    * [Pull request #387](https://github.com/gazebosim/gz-common/pull/387)
+
+1. Update GoogleTest to latest version
+    * [Pull request #361](https://github.com/gazebosim/gz-common/pull/361)
+
+1. Support compressed images and RGBA data in Image class
+    * [Pull request #368](https://github.com/gazebosim/gz-common/pull/368)
+
+1. Expose API to set non earth DEMs flag
+    * [Pull request #353](https://github.com/gazebosim/gz-common/pull/353)
+
+1. Fix console bug when IGN_HOMEDIR is unset
+    * [Pull request #346](https://github.com/gazebosim/gz-common/pull/346)
+
+1. Test updates for common::testing module.
+    * [Pull request #315](https://github.com/gazebosim/gz-common/pull/315)
+
+1. Ignition -> Gz Renaming 
+    * Move header files with git mv 
+    * Create redirection aliases
+    * Migrate sources in src, test, examples, and include
+    * Remove ignition redirection headers for Plugin [Pull request #350](https://github.com/gazebosim/gz-common/pull/350)
+    * Move Plugin headers back from gz to ignition [Pull request #350](https://github.com/gazebosim/gz-common/pull/350)
+    * ign -> gz: namespaces and logging functions [Pull request #356](https://github.com/gazebosim/gz-common/pull/356)
+    * Deprecation warnings for Plugin [Pull request #350](https://github.com/gazebosim/gz-common/pull/350)
+    * Use ignition headers for plugin [Pull request #350](https://github.com/gazebosim/gz-common/pull/350)
+    * Fix profiler option [Pull request #371](https://github.com/gazebosim/gz-common/pull/371)
+    * ign -> gz Macro Migration : gz-common [Pull request #366](https://github.com/gazebosim/gz-common/pull/366)
+    * [ign -> gz] CMake functions [Pull request #370](https://github.com/gazebosim/gz-common/pull/370)
+    * ign -> gz Environment Variable Migration [Pull request #365](https://github.com/gazebosim/gz-common/pull/365)
+    * Migrate IGNITION- CMake variables [Pull request #381](https://github.com/gazebosim/gz-common/pull/381)
+    * Rename CMake project to gz [Pull request #352](https://github.com/gazebosim/gz-common/pull/352)
+    * ign -> gz Partial Docs Migration and Project Name Followups : gz-common [Pull request #383](https://github.com/gazebosim/gz-common/pull/383)
+    * Partial cmake and source migrations [Pull request #392](https://github.com/gazebosim/gz-common/pull/392)
+    * Migrate ign_remotery_vis [Pull request #392](https://github.com/gazebosim/gz-common/pull/392)
+    * Finale: Source hard-tocks [Pull request #395](https://github.com/gazebosim/gz-common/pull/395)
+    * Remove deprecated include [Pull request #400](https://github.com/gazebosim/gz-common/pull/400)
+
+1. [DOCUMENTATION] Adds full path for the profiler
+    * [Pull request #347](https://github.com/gazebosim/gz-common/pull/347)
+
+1. prevent switch case statement fall through.
+    * [Pull request #345](https://github.com/gazebosim/gz-common/pull/345)
+
+1. Make Timer_TEST more robust
+    * [Pull request #343](https://github.com/gazebosim/gz-common/pull/343)
+
+1. Bumps in garden : ign-common5
+    * [Pull request #342](https://github.com/gazebosim/gz-common/pull/342)
+
+1. Use ign-utils instead of ign-cmake utilities
+    * [Pull request #341](https://github.com/gazebosim/gz-common/pull/341)
+
+1. Bumps in garden : ign-common5
+    * [Pull request #340](https://github.com/gazebosim/gz-common/pull/340)
+
+1. examples/CMakeLists.txt: fix find version variable
+    * [Pull request #339](https://github.com/gazebosim/gz-common/pull/339)
+
+1. Add common::testing module
+    * [Pull request #314](https://github.com/gazebosim/gz-common/pull/314)
+
+1. Fix typo bug in MaterialIndex
+    * [Pull request #338](https://github.com/gazebosim/gz-common/pull/338)
+
+1. Fix edge case handling for SubMesh::MaterialIndex
+    * [Pull request #319](https://github.com/gazebosim/gz-common/pull/319)
+
+1. DEM improvements to nodata, buffer and other corner cases
+    * [Pull request #321](https://github.com/gazebosim/gz-common/pull/321)
+
+1. 🧹 Drop all test main functions from gtest files
+    * [Pull request #322](https://github.com/gazebosim/gz-common/pull/322)
+
+1. Class with final destructor should be final
+    * [Pull request #323](https://github.com/gazebosim/gz-common/pull/323)
+
+1. Geospatial component for heightmaps and DEM support
+    * [Pull request #292](https://github.com/gazebosim/gz-common/pull/292)
+
+1. Fix filesystem::separator, parentPath and basename behavior
+    * [Pull request #308](https://github.com/gazebosim/gz-common/pull/308)
+
+1. Miscellaneous cleanup of Events API
+    * [Pull request #297](https://github.com/gazebosim/gz-common/pull/297)
+
+1. Adds an `isRelativePath` to determine if path is relative
+    * [Pull request #312](https://github.com/gazebosim/gz-common/pull/312)
+
+1. Image: make several methods const
+    * [Pull request #310](https://github.com/gazebosim/gz-common/pull/310)
+
+1. Utilize ImplPtr in AV component
+    * [Pull request #296](https://github.com/gazebosim/gz-common/pull/296)
+
+1. Update tests to use more STL functionality
+    * [Pull request #282](https://github.com/gazebosim/gz-common/pull/282)
+
+1. Fixed parentPath() return when input has no parent
+    * [Pull request #307](https://github.com/gazebosim/gz-common/pull/307)
+
+1. Utilize ImplPtr for Timer
+    * [Pull request #299](https://github.com/gazebosim/gz-common/pull/299)
+
+1. Update to use std::filesystem rather than Boost
+    * [Pull request #238](https://github.com/gazebosim/gz-common/pull/238)
+
+1. Use SuppressWarning from ign-utils
+    * [Pull request #295](https://github.com/gazebosim/gz-common/pull/295)
+
+1. README: update badge
+    * [Pull request #290](https://github.com/gazebosim/gz-common/pull/290)
+
+1. Revert geospatial component for now
+    * [Pull request #291](https://github.com/gazebosim/gz-common/pull/291)
+
+1. Move geospatial headers to subfolder
+    * [Pull request #289](https://github.com/gazebosim/gz-common/pull/289)
+
+1. Geospatial component for heightmap & DEMs
+    * [Pull request #267](https://github.com/gazebosim/gz-common/pull/267)
+
+1. Upload coverage for Focal builds
+    * [Pull request #284](https://github.com/gazebosim/gz-common/pull/284)
+
+1. Try to checkout matching branch in macos workflow
+    * [Pull request #286](https://github.com/gazebosim/gz-common/pull/286)
+
+1. Bumps in garden: use ignition-math7
+    * [Pull request #285](https://github.com/gazebosim/gz-common/pull/285)
+
+1. Add macOS 11 workflow
+    * [Pull request #276](https://github.com/gazebosim/gz-common/pull/276)
+
+1. Use ImplPtr where relevant
+    * [Pull request #274](https://github.com/gazebosim/gz-common/pull/274)
+
+1. Remove all deprecated functionality from main
+    * [Pull request #273](https://github.com/gazebosim/gz-common/pull/273)
+
+1. ign-common5: drop Bionic
+    * [Pull request #270](https://github.com/gazebosim/gz-common/pull/270)
+
+1. Update tension for common5
+    * [Pull request #260](https://github.com/gazebosim/gz-common/pull/260)
+
+1. Bump main to 5.0.0~pre1
+    * [Pull request #193](https://github.com/gazebosim/gz-common/pull/193)
 
 ## Gazebo Common 4.x
+
+## Gazebo Common 4.6.1 (2022-10-11)
+
+1. All common3 changes up to 3.15.1 release 
+
+## Gazebo Common 4.6.0 (2022-10-11)
+
+1. All common3 changes up to 3.15.0 release 
+
+1. Include cstring for memcpy  
+    * [Pull request #437](https://github.com/gazebosim/gz-common/pull/437)
+
+## Gazebo Common 4.5.2 (2022-08-16)
+
+1. Fix deprecation warning from new `ffmpeg`
+    * [Pull request #421](https://github.com/gazebosim/gz-common/pull/421)
+
+1. Remove redundant namespace references
+    * [Pull request #414](https://github.com/gazebosim/gz-common/pull/414)
+
+1. Add code coverage ignore file
+    * [Pull request #394](https://github.com/gazebosim/gz-common/pull/394)
+
+1. Change `IGN_DESIGNATION` to `GZ_DESIGNATION`
+    * [Pull request #399](https://github.com/gazebosim/gz-common/pull/399)
+
+1. Ignition -> Gazebo
+    * [Pull request #396](https://github.com/gazebosim/gz-common/pull/396)
+
+1. Support absolute Win paths with forward slashes in `common::FindFile`
+    * [Pull request #389](https://github.com/gazebosim/gz-common/pull/389)
+
+1. Fix `FindSharedLibrary` for relative plugin paths
+    * [Pull request #382](https://github.com/gazebosim/gz-common/pull/382)
+
+1. Fix race condition in `FileLogger`
+    * [Pull request #378](https://github.com/gazebosim/gz-common/pull/378)
+
+1. Synchronize console writes
+    * [Pull request #227](https://github.com/gazebosim/gz-common/pull/227)
+
+1. Profiler tutorial: viewing from Docker container
+    * [Pull request #362](https://github.com/gazebosim/gz-common/pull/362)
 
 ## Gazebo Common 4.5.1 (2022-06-21)
 
@@ -168,7 +451,6 @@
 
 1. Add bazel buildsystem support
     * [Pull request #123](https://github.com/gazebosim/gz-common/pull/123)
->>>>>>> gz-common4
 
 ## Gazebo Common 4.0.0 (2021-03-30)
 
@@ -214,6 +496,24 @@
     * [BitBucket pull request xxx](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/213)
 
 ## Gazebo Common 3.x
+
+## Gazebo Common 3.15.1 (2022-10-11)
+
+1. Fix build on case-insensitive filesystems
+    * [Pull request #453](https://github.com/gazebosim/gz-common/pull/453)
+
+1. Don't install CMakeLists.txt 
+    * [Pull request #449](https://github.com/gazebosim/gz-common/pull/449)
+
+## Gazebo Common 3.15.0 (2022-10-06)
+
+1. ign -> gz Migrate Ignition Headers
+    * [Pull request #418](https://github.com/gazebosim/gz-common/pull/418)
+
+## Gazebo Common 3.14.2 (2022-08-16)
+
+1. Fix deprecation warning from new `ffmpeg`
+    * [Pull request #414](https://github.com/gazebosim/gz-common/pull/421)
 
 ## Gazebo Common 3.14.1 (2022-06-01)
 

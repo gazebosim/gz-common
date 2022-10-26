@@ -17,6 +17,7 @@
 
 #include <gtest/gtest.h>
 
+#include "gz/common/ColladaLoader.hh"
 #include "gz/common/Material.hh"
 #include "gz/common/Mesh.hh"
 #include "gz/common/Skeleton.hh"
@@ -268,4 +269,3 @@ TEST_F(MeshTest, Export)
   EXPECT_FALSE(common::exists("gz_stl_test2.stl"));
   EXPECT_TRUE(common::exists("gz_stl_test2.dae"));
 }
-
