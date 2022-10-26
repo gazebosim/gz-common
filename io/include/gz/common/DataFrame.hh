@@ -26,7 +26,7 @@
 #include <vector>
 
 #include <gz/common/CSVStreams.hh>
-#include <gz/common/Io.hh>
+#include <gz/common/IOBase.hh>
 
 #include <gz/math/TimeVaryingVolumetricGrid.hh>
 
