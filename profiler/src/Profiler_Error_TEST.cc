@@ -19,9 +19,11 @@
 #include <gtest/gtest.h> // NOLINT(*)
 #include "Remotery/lib/Remotery.h"
 
+#include <gz/common/Export.hh>
+
 /// Return the string error message
 /// param[in] error the remotery error
-std::string rmtErrorToString(rmtError error);
+std::string IGNITION_COMMON_VISIBLE rmtErrorToString(rmtError error);
 
 /////////////////////////////////////////////////
 TEST(Profiler, ProfilerErrorCodes)
