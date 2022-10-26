@@ -673,11 +673,17 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   // Recursive call to keep track of transforms,
   // mesh is passed by reference and edited throughout
   this->dataPtr->RecursiveCreate(scene, rootNode, rootTransform, mesh);
+  auto rootSkeleton = mesh->MeshSkeleton();
   // Add the animations
   for (unsigned animIdx = 0; animIdx < scene->mNumAnimations; ++animIdx)
   {
     auto& anim = scene->mAnimations[animIdx];
     auto animName = ToString(anim->mName);
+    if (animName.empty())
+    {
+      animName = "animation" +
+                 std::to_string(rootSkeleton->AnimationCount() + 1);
+    }
     SkeletonAnimation* skelAnim = new SkeletonAnimation(animName);
     for (unsigned chanIdx = 0; chanIdx < anim->mNumChannels; ++chanIdx)
     {
