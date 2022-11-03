@@ -975,11 +975,10 @@ void MeshManager::CreateCapsule(const std::string &_name,
       x = -sin(u * (IGN_PI * 2.0));
       y = cos(u * (IGN_PI * 2.0));
 
-      math::Vector3d p(
-      x * _radius * w, y, -z * _radius * w);
+      math::Vector3d p(x * _radius * w, y * _radius * w, z);
       // Compute vertex
       subMesh.AddVertex(math::Vector3d(
-        p + math::Vector3d(0.0, 0.5 * _length, 0.0)));
+        p + math::Vector3d(0.0, 0.0, 0.5 * _length)));
       subMesh.AddTexCoord({u, v * oneThird});
       subMesh.AddNormal(p.Normalize());
 
