@@ -489,3 +489,20 @@ TEST_F(ColladaLoader, LoadCylinderAnimatedFrom3dsMax)
   EXPECT_EQ(1u, anim->NodeCount());
   EXPECT_TRUE(anim->HasNode("Bone02"));
 }
+
+/////////////////////////////////////////////////
+// Load animation without a name
+TEST_F(ColladaLoader, NoAnimName)
+{
+  common::ColladaLoader loader;
+
+  std::string meshFilename =
+    common::testing::TestFile("data", "box_with_no_animation_name.dae");
+
+  common::Mesh *mesh = loader.Load(meshFilename);
+  common::SkeletonPtr skeleton = mesh->MeshSkeleton();
+  ASSERT_EQ(1u, skeleton->AnimationCount());
+  common::SkeletonAnimation *anim = skeleton->Animation(0);
+  auto animName = anim->Name();
+  EXPECT_EQ(animName, "animation1");
+}
