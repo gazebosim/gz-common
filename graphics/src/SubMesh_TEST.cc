@@ -179,9 +179,12 @@ TEST_F(SubMeshTest, SubMesh)
   submesh->SetVertex(2u, v2);
   EXPECT_EQ(submesh->Vertex(2u), v2);
   EXPECT_EQ(submesh->VertexPtr()[2u], v2);
+
+  // Failure case: write out of bounds should be ignored
   submesh->SetVertex(3u, math::Vector3d(0.9, 2, 4));
   EXPECT_EQ(submesh->Vertex(3u), math::Vector3d::Zero);
-  EXPECT_EQ(submesh->VertexPtr()[3u], math::Vector3d::Zero);
+  // Out-of-bounds read of a raw pointer is UB. We can't test it.
+  // EXPECT_EQ(submesh->VertexPtr()[3u], math::Vector3d::Zero);
   EXPECT_FALSE(submesh->HasVertex(math::Vector3d(0.9, 2, 4)));
   EXPECT_EQ(submesh->IndexOfVertex(math::Vector3d(0.9, 2, 4)), -1);
 
