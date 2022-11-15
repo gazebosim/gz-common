@@ -689,6 +689,11 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
         // Compute the position into a math pose
         auto& posKey = animChan->mPositionKeys[keyIdx];
         auto& quatKey = animChan->mRotationKeys[keyIdx];
+        if ((keyIdx != 0) &&
+            (std::abs(animChan->mRotationKeys[keyIdx - 1].mTime - quatKey.mTime) < 1.0))
+        {
+          continue;
+        }
         math::Vector3d pos(posKey.mValue.x, posKey.mValue.y, posKey.mValue.z);
         math::Quaterniond quat(quatKey.mValue.w, quatKey.mValue.x,
             quatKey.mValue.y, quatKey.mValue.z);
