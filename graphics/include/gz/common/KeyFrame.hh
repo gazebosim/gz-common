@@ -19,15 +19,19 @@
 
 #include <gz/math/Vector3.hh>
 #include <gz/math/Quaternion.hh>
+
+#include <gz/utils/ImplPtr.hh>
+
 #include <gz/common/graphics/Export.hh>
 
-namespace ignition
+
+namespace gz
 {
   namespace common
   {
-    /// \class KeyFrame KeyFrame.hh ignition/common/KeyFrame.hh
+    /// \class KeyFrame KeyFrame.hh gz/common/KeyFrame.hh
     /// \brief A key frame in an animation
-    class IGNITION_COMMON_GRAPHICS_VISIBLE KeyFrame
+    class GZ_COMMON_GRAPHICS_VISIBLE KeyFrame
     {
       /// \brief Constructor
       /// \param[in] _time Time of the keyframe in seconds
@@ -40,12 +44,12 @@ namespace ignition
       /// \return the time
       public: double Time() const;
 
-      /// \brief time of key frame
-      protected: double time;
+      /// \brief Private data pointer.
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
 
     /// \brief A keyframe for a PoseAnimation
-    class IGNITION_COMMON_GRAPHICS_VISIBLE PoseKeyFrame : public KeyFrame
+    class GZ_COMMON_GRAPHICS_VISIBLE PoseKeyFrame : public KeyFrame
     {
       /// \brief Constructor
       /// \param[in] _time of the keyframe
@@ -70,24 +74,12 @@ namespace ignition
       /// \return The rotation amount
       public: const math::Quaterniond &Rotation() const;
 
-#ifdef _WIN32
-// Disable warning C4251 which is triggered by
-// std::unique_ptr
-#pragma warning(push)
-#pragma warning(disable: 4251)
-#endif
-      /// \brief the translation vector
-      protected: math::Vector3d translate;
-
-      /// \brief the rotation quaternion
-      protected: math::Quaterniond rotate;
-#ifdef _WIN32
-#pragma warning(pop)
-#endif
+      /// \brief Private data pointer.
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
 
     /// \brief A keyframe for a NumericAnimation
-    class IGNITION_COMMON_GRAPHICS_VISIBLE NumericKeyFrame : public KeyFrame
+    class GZ_COMMON_GRAPHICS_VISIBLE NumericKeyFrame : public KeyFrame
     {
       /// \brief Constructor
       /// \param[in] _time Time of the keyframe
@@ -104,8 +96,8 @@ namespace ignition
       /// \return the value of the keyframe
       public: const double &Value() const;
 
-      /// \brief numeric value
-      protected: double value;
+      /// \brief Private data pointer.
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

@@ -17,11 +17,11 @@
 
 #include <gtest/gtest.h>
 
-#include "test_config.h"
+#include "gz/common/testing/AutoLogFixture.hh"
 #include "gz/common/MouseEvent.hh"
 #include "gz/common/config.hh"
 
-using namespace ignition;
+using namespace gz;
 
 class MouseEvent : public common::testing::AutoLogFixture { };
 
@@ -267,11 +267,4 @@ TEST_F(MouseEvent, Assignment)
   EXPECT_EQ(otherEvent.Shift(), shift);
   EXPECT_EQ(otherEvent.Alt(), alt);
   EXPECT_EQ(otherEvent.Control(), control);
-}
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
 }

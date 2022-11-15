@@ -17,16 +17,18 @@
 #ifndef GZ_COMMON_PBR_HH_
 #define GZ_COMMON_PBR_HH_
 
+#include <memory>
 #include <string>
-#include <gz/common/graphics/Export.hh>
 
-namespace ignition
+#include <gz/utils/ImplPtr.hh>
+
+#include <gz/common/graphics/Export.hh>
+#include <gz/common/Image.hh>
+
+namespace gz
 {
 namespace common
 {
-  // Forward declarations.
-  class PbrPrivate;
-
   /// \brief Type of PBR workflow.
   enum class PbrType : int
   {
@@ -52,31 +54,10 @@ namespace common
 
   /// \brief This class contains Physically-Based-Rendering (PBR) workflow
   /// properties.
-  class IGNITION_COMMON_GRAPHICS_VISIBLE Pbr
+  class GZ_COMMON_GRAPHICS_VISIBLE Pbr
   {
     /// \brief Default constructor
     public: Pbr();
-
-    /// \brief Copy constructor
-    /// \param[in] _pbr Pbr to copy.
-    public: Pbr(const Pbr &_pbr);
-
-    /// \brief Move constructor
-    /// \param[in] _pbr to move.
-    public: Pbr(Pbr &&_pbr) noexcept;
-
-    /// \brief Destructor
-    public: ~Pbr();
-
-    /// \brief Assignment operator.
-    /// \param[in] _pbr The pbr material to set values from.
-    /// \return *this
-    public: Pbr &operator=(const Pbr &_pbr);
-
-    /// \brief Move assignment operator.
-    /// \param[in] _pbr The pbr material to move from.
-    /// \return *this
-    public: Pbr &operator=(Pbr &&_pbr);
 
     /// \brief Return true if both Pbr objects contain the same values.
     /// \param[_in] _pbr Pbr value to compare.
@@ -105,12 +86,20 @@ namespace common
     /// has not been specified.
     public: std::string NormalMap() const;
 
+    /// \brief Gets the normal map data,
+    /// if the texture was loaded from memory, otherwise a nullptr
+    /// \return A pointer to the image that was loaded from memory
+    public: std::shared_ptr<const Image> NormalMapData() const;
+
     /// \brief Set the normal map filename.
     /// \param[in] _map Filename of the normal map.
     /// \param[in] _space Space that the normal map is defined in.
     /// Defaults to tangent space.
+    /// \param[in] _img The image containing the texture if image has been
+    /// loaded in memory
     public: void SetNormalMap(const std::string &_map,
-        NormalMapSpace _space = NormalMapSpace::TANGENT);
+        NormalMapSpace _space = NormalMapSpace::TANGENT,
+        const std::shared_ptr<const Image> &_img = nullptr);
 
     /// \brief Get the normal map type, either tangent or object space
     /// \return Space that the normal map is defined in
@@ -144,7 +133,15 @@ namespace common
 
     /// \brief Set the roughness map filename for metal workflow.
     /// \param[in] _map Filename of the roughness map.
-    public: void SetRoughnessMap(const std::string &_map);
+    /// \param[in] _img The image containing the texture if image has been
+    /// loaded in memory
+    public: void SetRoughnessMap(const std::string &_map,
+        const std::shared_ptr<const Image> &_img = nullptr);
+
+    /// \brief Gets the roughness map data,
+    /// if the texture was loaded from memory, otherwise a nullptr
+    /// \return A pointer to the image that was loaded from memory
+    public: std::shared_ptr<const Image> RoughnessMapData() const;
 
     /// \brief Get the metalness map filename for metal workflow. This will be
     /// an empty string if a metalness map has not been set.
@@ -154,7 +151,15 @@ namespace common
 
     /// \brief Set the metalness map filename for metal workflow.
     /// \param[in] _map Filename of the metalness map.
-    public: void SetMetalnessMap(const std::string &_map);
+    /// \param[in] _img The image containing the texture if image has been
+    /// loaded in memory
+    public: void SetMetalnessMap(const std::string &_map,
+        const std::shared_ptr<const Image> &_img = nullptr);
+
+    /// \brief Gets the metalness map data,
+    /// if the texture was loaded from memory, otherwise a nullptr
+    /// \return A pointer to the image that was loaded from memory
+    public: std::shared_ptr<const Image> MetalnessMapData() const;
 
     /// \brief Get the emissive map filename. This will be an empty string
     /// if an emissive map has not been set.
@@ -164,7 +169,15 @@ namespace common
 
     /// \brief Set the emissive map filename.
     /// \param[in] _map Filename of the emissive map.
-    public: void SetEmissiveMap(const std::string &_map);
+    /// \param[in] _img The image containing the texture if image has been
+    /// loaded in memory
+    public: void SetEmissiveMap(const std::string &_map,
+        const std::shared_ptr<const Image> &_img = nullptr);
+
+    /// \brief Gets the emissive map data,
+    /// if the texture was loaded from memory, otherwise a nullptr
+    /// \return A pointer to the image that was loaded from memory
+    public: std::shared_ptr<const Image> EmissiveMapData() const;
 
     /// \brief Get the light map filename. This will be an empty string
     /// if an light map has not been set.
@@ -172,10 +185,18 @@ namespace common
     /// map has not been specified.
     public: std::string LightMap() const;
 
+    /// \brief Gets the light map data,
+    /// if the texture was loaded from memory, otherwise a nullptr
+    /// \return A pointer to the image that was loaded from memory
+    public: std::shared_ptr<const Image> LightMapData() const;
+
     /// \brief Set the light map filename.
     /// \param[in] _map Filename of the light map.
     /// \param[in] _uvSet Index of the texture coordinate set
-    public: void SetLightMap(const std::string &_map, unsigned int _uvSet = 0u);
+    /// \param[in] _img The image containing the texture if image has been
+    /// loaded in memory
+    public: void SetLightMap(const std::string &_map, unsigned int _uvSet = 0u,
+        const std::shared_ptr<const Image> &_img = nullptr);
 
     /// \brief Get the light map texture coordinate set.
     /// \return Index of the light map texture coordinate set
@@ -234,7 +255,7 @@ namespace common
     public: void SetType(PbrType _type);
 
     /// \brief Private data pointer.
-    private: PbrPrivate *dataPtr = nullptr;
+    GZ_UTILS_IMPL_PTR(dataPtr)
   };
 }
 }

@@ -26,21 +26,33 @@
 #include "gz/common/Util.hh"
 #include "gz/common/StringUtils.hh"
 #include "gz/common/SystemPaths.hh"
+#include "gz/common/TempDirectory.hh"
 
 #ifdef _WIN32
   #define snprintf _snprintf
 #endif
 
-using namespace ignition;
+using namespace gz;
 
-const char kPluginPath[] = "IGN_PLUGIN_PATH";
-const char kFilePath[] = "IGN_FILE_PATH";
+const char kPluginPath[] = "GZ_PLUGIN_PATH";
+const char kFilePath[] = "GZ_FILE_PATH";
+
+class TestTempDirectory : public common::TempDirectory
+{
+  public: TestTempDirectory():
+          common::TempDirectory("systempaths", "gz_common", true)
+  {
+  }
+};
 
 class SystemPathsFixture : public ::testing::Test
 {
   // Documentation inherited
   public: virtual void SetUp()
     {
+      this->temp = std::make_unique<TestTempDirectory>();
+      ASSERT_TRUE(this->temp->Valid());
+
       common::env(kPluginPath, this->backupPluginPath);
       common::unsetenv(kPluginPath);
 
@@ -59,6 +71,7 @@ class SystemPathsFixture : public ::testing::Test
     {
       common::setenv(kPluginPath, this->backupPluginPath);
       common::setenv(kFilePath, this->backupFilePath);
+      this->temp.reset();
     }
 
   /// \brief Backup of plugin paths to be restored after the test
@@ -69,6 +82,9 @@ class SystemPathsFixture : public ::testing::Test
 
   /// \brief Root of filesystem according to each platform
   public: std::string filesystemRoot;
+
+  /// \brief Temporary directory to execute test in
+  public: std::unique_ptr<TestTempDirectory> temp;
 };
 
 std::string SystemPathsJoin(const std::vector<std::string> &_paths)
@@ -126,7 +142,7 @@ TEST_F(SystemPathsFixture, FileSystemPaths)
   filePaths.push_back("test_dir1");
   common::setenv(kFilePath, SystemPathsJoin(filePaths));
   paths.SetFilePathEnv(kFilePath);
-  EXPECT_EQ(file1, paths.FindFile("test_f1")) << paths.FindFile("test_f1");
+  EXPECT_EQ(file1, paths.FindFile("test_f1"));
   EXPECT_EQ(file1, paths.FindFile("model://test_f1"));
 }
 
@@ -206,7 +222,7 @@ TEST_F(SystemPathsFixture, FindFileURI)
           this->filesystemRoot);
 
   EXPECT_EQ("", sp.FindFileURI("file://no_such_file"));
-  EXPECT_EQ(file1, sp.FindFileURI("file://test_dir1/test_f1"));
+  EXPECT_EQ(file1, sp.FindFileURI("file:test_dir1/test_f1"));
   EXPECT_EQ(file1, sp.FindFileURI("file://" +
                                   common::copyToUnixPath(file1)));
   EXPECT_EQ("", sp.FindFileURI("osrf://unknown.protocol"));
@@ -226,15 +242,16 @@ TEST_F(SystemPathsFixture, FindFileURI)
   //     sp.FindFileURI("file://" + this->filesystemRoot + "Windows"));
 #endif
 
-  auto robotCb = [dir1](const std::string &_s)
+  auto robotCb = [dir1](const common::URI &_uri)
   {
-    return _s.find("robot://", 0) != std::string::npos ?
-           common::joinPaths(dir1, _s.substr(8)) : "";
+    return _uri.Scheme() == "robot" ?
+           common::joinPaths(dir1, _uri.Path().Str()) : "";
   };
   auto osrfCb = [dir2](const common::URI &_uri)
   {
     return _uri.Scheme() == "osrf" ?
-           common::joinPaths(dir2, _uri.Path().Str()) : "";
+           common::joinPaths(dir2, gz::common::copyFromUnixPath(
+           _uri.Path().Str())) : "";
   };
   auto robot2Cb = [dir2](const common::URI &_uri)
   {
@@ -245,16 +262,7 @@ TEST_F(SystemPathsFixture, FindFileURI)
   EXPECT_EQ("", sp.FindFileURI("robot://test_f1"));
   EXPECT_EQ("", sp.FindFileURI("osrf://test_f2"));
 
-  // We still want to test the deprecated function until it is removed.
-#ifndef _WIN32
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  sp.SetFindFileURICallback(robotCb);
-#ifndef _WIN32
-# pragma GCC diagnostic pop
-#endif
-
+  sp.AddFindFileURICallback(robotCb);
   EXPECT_EQ(file1, sp.FindFileURI("robot://test_f1"));
   EXPECT_EQ("", sp.FindFileURI("osrf://test_f2"));
 
@@ -275,7 +283,7 @@ TEST_F(SystemPathsFixture, FindFileURI)
   EXPECT_EQ(file1, sp.FindFileURI("anything://test_f1"));
   EXPECT_NE(file2, sp.FindFileURI("anything://test_f2"));
 
-  std::string newEnv{"IGN_NEW_FILE_PATH"};
+  std::string newEnv{"GZ_NEW_FILE_PATH"};
   common::setenv(newEnv, dir2);
   sp.SetFilePathEnv(newEnv);
   EXPECT_EQ(newEnv, sp.FilePathEnv());
@@ -317,7 +325,8 @@ TEST_F(SystemPathsFixture, FindFile)
   EXPECT_EQ("", sp.FindFile(this->filesystemRoot + "no_such_file"));
   EXPECT_EQ("", sp.FindFile("no_such_file"));
   EXPECT_EQ(file1, sp.FindFile(common::joinPaths("test_dir1", "test_f1")));
-  EXPECT_EQ(file1, sp.FindFile("file://test_dir1/test_f1"));
+
+  EXPECT_EQ(file1, sp.FindFile("file:test_dir1/test_f1"));
 
   // Existing absolute paths
 #ifndef _WIN32
@@ -334,19 +343,29 @@ TEST_F(SystemPathsFixture, FindFile)
   const auto uriBadDir = "file://C:/bad";
 #endif
   {
-    EXPECT_EQ(tmpDir, sp.FindFile(tmpDir));
     EXPECT_EQ(tmpDir, sp.FindFile(uriTmpDir));
     EXPECT_EQ(homeDir, sp.FindFile(homeDir));
     EXPECT_EQ("", sp.FindFile(badDir));
     EXPECT_EQ("", sp.FindFile(uriBadDir));
   }
 
+  // Windows path with only one forward slash
+#ifdef _WIN32
+  const auto tmpDirForwardSlash = "C:/Windows";
+  const auto homeDirForwardSlash = "C:/Users";
+  const auto badDirForwardSlash = "C:/bad";
+  {
+    // We do not expect equality as  sp.FindFile could normalize the
+    // path and return a different string
+    // The behaviour tested here is just that C:/Windows, C:/Users are found
+    EXPECT_NE("", sp.FindFile(tmpDirForwardSlash));
+    EXPECT_NE("", sp.FindFile(homeDirForwardSlash));
+    EXPECT_EQ("", sp.FindFile(badDirForwardSlash));
+  }
+#endif
+
   // Custom callback
   {
-    auto tmpCb = [tmpDir](const std::string &_s)
-    {
-      return _s == "tmp" ? tmpDir : "";
-    };
     auto homeCb = [homeDir](const std::string &_s)
     {
       return _s == "home" ? homeDir : "";
@@ -356,31 +375,18 @@ TEST_F(SystemPathsFixture, FindFile)
       return _s == "bad" ? badDir : "";
     };
 
-    // We still want to test the deprecated function until it is removed.
-#ifndef _WIN32
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-    sp.SetFindFileCallback(tmpCb);
-#ifndef _WIN32
-# pragma GCC diagnostic pop
-#endif
-
-    EXPECT_EQ(tmpDir, sp.FindFile("tmp"));
     EXPECT_EQ("", sp.FindFile("home"));
     EXPECT_EQ("", sp.FindFile("bad"));
     EXPECT_EQ("", sp.FindFile("banana"));
 
     sp.AddFindFileCallback(homeCb);
 
-    EXPECT_EQ(tmpDir, sp.FindFile("tmp"));
     EXPECT_EQ(homeDir, sp.FindFile("home"));
     EXPECT_EQ("", sp.FindFile("bad"));
     EXPECT_EQ("", sp.FindFile("banana"));
 
     sp.AddFindFileCallback(badCb);
 
-    EXPECT_EQ(tmpDir, sp.FindFile("tmp"));
     EXPECT_EQ(homeDir, sp.FindFile("home"));
     EXPECT_EQ("", sp.FindFile("bad"));
     EXPECT_EQ("", sp.FindFile("banana"));
@@ -432,11 +438,4 @@ TEST_F(SystemPathsFixture, PathsFromEnv)
 
     ++count;
   }
-}
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
 }

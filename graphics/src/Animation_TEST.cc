@@ -17,14 +17,14 @@
 
 #include <gtest/gtest.h>
 
-#include "test_config.h"
-
 #include <gz/math/Vector3.hh>
 #include <gz/math/Quaternion.hh>
 #include <gz/common/KeyFrame.hh>
 #include <gz/common/Animation.hh>
 
-using namespace ignition;
+#include "gz/common/testing/AutoLogFixture.hh"
+
+using namespace gz;
 
 class AnimationTest : public common::testing::AutoLogFixture { };
 
@@ -85,6 +85,30 @@ TEST_F(AnimationTest, PoseAnimation)
       math::Vector3d(3.76, 7.52, 11.28));
   EXPECT_TRUE(interpolatedKey.Rotation() ==
       math::Quaterniond(0.0302776, 0.0785971, 0.109824));
+}
+
+/////////////////////////////////////////////////
+TEST_F(AnimationTest, PoseAnimationTension)
+{
+  // Test using a tension value of 1.0, which should cause the pose
+  // animation to hit the key frames.
+
+  common::PoseAnimation animTension("test-tension", 10.0, false, 1.0);
+  common::PoseKeyFrame *keyTension = animTension.CreateKeyFrame(0.0);
+  keyTension->Translation(math::Vector3d(0, 0, 0));
+  keyTension->Rotation(math::Quaterniond(0, 0, 0));
+
+  animTension.AddTime(5.0);
+  keyTension->Translation(math::Vector3d(10, 20, 30));
+  keyTension->Rotation(math::Quaterniond(0.1, 0.2, 0.3));
+  animTension.Time(4.0);
+
+  common::PoseKeyFrame interpolatedKeyTension(-1.0);
+  animTension.InterpolatedKeyFrame(interpolatedKeyTension);
+  EXPECT_TRUE(interpolatedKeyTension.Translation() ==
+      math::Vector3d(10, 20, 30));
+  EXPECT_TRUE(interpolatedKeyTension.Rotation() ==
+      math::Quaterniond(0.1, 0.2, 0.3));
 }
 
 /////////////////////////////////////////////////
@@ -247,11 +271,4 @@ TEST_F(AnimationTest, TrajectoryInfo)
   EXPECT_DOUBLE_EQ(0.0, trajInfo4.DistanceSoFar(1000ms));
   EXPECT_DOUBLE_EQ(0.0, trajInfo4.DistanceSoFar(2000ms));
   EXPECT_DOUBLE_EQ(0.0, trajInfo4.DistanceSoFar(3000ms));
-}
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
 }

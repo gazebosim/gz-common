@@ -18,7 +18,7 @@
 #include "gz/common/Console.hh"
 #include "gz/common/Event.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 //////////////////////////////////////////////////
@@ -39,26 +39,26 @@ bool Event::Signaled() const
 }
 
 //////////////////////////////////////////////////
-void Event::SetSignaled(const bool _sig)
+void Event::SetSignaled(bool _sig)
 {
   this->signaled = _sig;
 }
 
 //////////////////////////////////////////////////
-Connection::Connection(Event *_e, const int _i)
+Connection::Connection(Event *_e, int _i)
 : event(_e), id(_i)
 {
-  this->creationTime = IGN_SYSTEM_TIME();
+  this->creationTime = GZ_SYSTEM_TIME();
 }
 
 //////////////////////////////////////////////////
 Connection::~Connection()
 {
-  auto diffTime = IGN_SYSTEM_TIME() - this->creationTime;
+  auto diffTime = GZ_SYSTEM_TIME() - this->creationTime;
   if ((this->event && !this->event->Signaled()) &&
       diffTime < std::chrono::nanoseconds(10000))
   {
-    ignwarn << "Warning: Deleting a connection right after creation. "
+    gzwarn << "Warning: Deleting a connection right after creation. "
           << "Make sure to save the ConnectionPtr from a Connect call\n";
   }
 

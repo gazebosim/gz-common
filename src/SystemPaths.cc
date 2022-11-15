@@ -25,28 +25,28 @@
 #include <string>
 #include <vector>
 
-#ifndef _WIN32
-#include <dirent.h>
-#else
-#include "win_dirent.h"
-#endif
-
 #include "gz/common/Console.hh"
 #include "gz/common/StringUtils.hh"
 #include "gz/common/SystemPaths.hh"
 #include "gz/common/Util.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 // Private data class
-class gz::common::SystemPathsPrivate
+class gz::common::SystemPaths::Implementation
 {
   /// \brief Name of the environment variable to check for plugin paths
-  public: std::string pluginPathEnv = "IGN_PLUGIN_PATH";
+  public: std::string pluginPathEnv = "GZ_PLUGIN_PATH";
+
+  // TODO(CH3): Deprecated. Remove on tock.
+  public: std::string pluginPathEnvDeprecated = "IGN_PLUGIN_PATH";
 
   /// \brief Name of the environment variable to check for file paths
-  public: std::string filePathEnv = "IGN_FILE_PATH";
+  public: std::string filePathEnv = "GZ_FILE_PATH";
+
+  // TODO(CH3): Deprecated. Remove on tock.
+  public: std::string filePathEnvDeprecated = "IGN_FILE_PATH";
 
   /// \brief Paths to plugins
   public: std::list<std::string> pluginPaths;
@@ -60,19 +60,19 @@ class gz::common::SystemPathsPrivate
   /// \brief Log path
   public: std::string logPath;
 
-  /// \brief Find file callback.
-  public: std::function<std::string(const std::string &)> findFileCB;
+  /// \brief Function type for finding files
+  public: using FindFileFunction =
+          std::function<std::string(const std::string &)>;
 
-  /// \brief Find file URI callback.
-  public: std::function<std::string(const std::string &)> findFileURICB;
-
-  /// \brief Callbacks to be called in order in case a file can't be found.
-  public: std::vector <std::function <std::string(
-              const std::string &)> > findFileCbs;
+  /// \brief Function type for finding URIs
+  public: using FindURIFunction =
+          std::function<std::string(const URI &)>;
 
   /// \brief Callbacks to be called in order in case a file can't be found.
-  public: std::vector <std::function <std::string(
-              const URI &)> > findFileURICbs;
+  public: std::vector<FindFileFunction> findFileCbs;
+
+  /// \brief Callbacks to be called in order in case a file can't be found.
+  public: std::vector<FindURIFunction> findFileURICbs;
 
   /// \brief generates paths to try searching for the named library
   public: std::vector<std::string> GenerateLibraryPaths(
@@ -91,44 +91,55 @@ void insertUnique(const std::string &_path, std::list<std::string> &_list)
 
 //////////////////////////////////////////////////
 SystemPaths::SystemPaths()
-: dataPtr(new SystemPathsPrivate)
+: dataPtr(gz::utils::MakeImpl<Implementation>())
 {
   std::string home, path, fullPath;
-  if (!env(IGN_HOMEDIR, home))
-    home = "/tmp/ignition";
+  if (!env(GZ_HOMEDIR, home))
+    home = "/tmp/gz";
 
-  if (!env("IGN_LOG_PATH", path))
+  if (!env("GZ_LOG_PATH", path))
   {
-    if (home != "/tmp/ignition")
-      fullPath = joinPaths(home, ".ignition");
+    // TODO(CH3): Deprecated. Remove on tock.
+    if (env("IGN_LOG_PATH", path))
+    {
+      gzwarn << "Setting log path to [" << path << "] using deprecated "
+             << "environment variable [IGN_LOG_PATH]. Please use "
+             << "[GZ_LOG_PATH] instead." << std::endl;
+    }
+  }
+
+  if (path.empty())
+  {
+    if (home != "/tmp/gz")
+      fullPath = joinPaths(home, ".gz");
     else
       fullPath = home;
   }
   else
     fullPath = path;
 
-  DIR *dir = opendir(fullPath.c_str());
-  if (!dir)
+  if (!exists(fullPath))
   {
-#ifdef _WIN32
-    mkdir(fullPath.c_str());
-#else
-    // cppcheck-suppress ConfigurationNotChecked
-    mkdir(fullPath.c_str(), S_IRWXU | S_IRGRP | S_IROTH);
-#endif
+    createDirectories(fullPath);
   }
-  else
-    closedir(dir);
 
   this->dataPtr->logPath = fullPath;
   // Populate this->dataPtr->filePaths with values from the default
   // environment variable.
-  this->SetFilePathEnv(this->dataPtr->filePathEnv);
-}
 
-/////////////////////////////////////////////////
-SystemPaths::~SystemPaths()
-{
+  if (this->dataPtr->filePathEnv.empty() &&
+      !this->dataPtr->filePathEnvDeprecated.empty())
+  {
+    gzwarn << "Setting file path using deprecated environment variable ["
+           <<  this->dataPtr->filePathEnvDeprecated
+           << "]. Please use " <<  this->dataPtr->filePathEnv
+           << " instead." << std::endl;
+   this->SetFilePathEnv(this->dataPtr->filePathEnvDeprecated);
+  }
+  else
+  {
+    this->SetFilePathEnv(this->dataPtr->filePathEnv);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -141,6 +152,26 @@ std::string SystemPaths::LogPath() const
 void SystemPaths::SetPluginPathEnv(const std::string &_env)
 {
   this->dataPtr->pluginPathEnv = _env;
+
+  // TODO(CH3): Deprecated. Remove on tock.
+  std::string result;
+  if (!this->dataPtr->pluginPathEnv.empty())
+  {
+    if (env(this->dataPtr->pluginPathEnv, result))
+    {
+      // TODO(CH3): Deprecated. Remove on tock.
+      std::string ignPrefix = "IGN_";
+
+      // Emit warning if env starts with IGN_
+      if (_env.compare(0, ignPrefix.length(), ignPrefix) == 0)
+      {
+        gzwarn << "Finding plugins using deprecated IGN_ prefixed environment "
+               << "variable ["
+               << _env << "]. Please use the GZ_ prefix instead."
+               << std::endl;
+      }
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -152,6 +183,15 @@ const std::list<std::string> &SystemPaths::PluginPaths()
     if (env(this->dataPtr->pluginPathEnv, result))
     {
       this->AddPluginPaths(result);
+    }
+    // TODO(CH3): Deprecated. Remove on tock.
+    if (env(this->dataPtr->pluginPathEnvDeprecated, result))
+    {
+      this->AddPluginPaths(result);
+      gzwarn << "Finding plugins using deprecated environment variable "
+             << "[" << this->dataPtr->pluginPathEnvDeprecated
+             << "]. Please use [" << this->dataPtr->pluginPathEnv
+             << "] instead." << std::endl;
     }
   }
   return this->dataPtr->pluginPaths;
@@ -190,12 +230,25 @@ std::string SystemPaths::FindSharedLibrary(const std::string &_libName)
 void SystemPaths::SetFilePathEnv(const std::string &_env)
 {
   this->dataPtr->filePathEnv = _env;
+  std::string result;
+
   if (!this->dataPtr->filePathEnv.empty())
   {
     this->ClearFilePaths();
-    std::string result;
     if (env(this->dataPtr->filePathEnv, result))
     {
+      // TODO(CH3): Deprecated. Remove on tock.
+      std::string ignPrefix = "IGN_";
+
+      // Emit warning if env starts with IGN_
+      if (_env.compare(0, ignPrefix.length(), ignPrefix) == 0)
+      {
+        gzwarn << "Finding files using deprecated IGN_ prefixed environment "
+               << "variable ["
+               << _env << "]. Please use the GZ_ prefix instead"
+               << std::endl;
+      }
+
       this->AddFilePaths(result);
     }
   }
@@ -247,7 +300,7 @@ std::string SystemPaths::NormalizeDirectoryPath(const std::string &_path)
 }
 
 /////////////////////////////////////////////////
-std::vector<std::string> SystemPathsPrivate::GenerateLibraryPaths(
+std::vector<std::string> SystemPaths::Implementation::GenerateLibraryPaths(
     const std::string &_libName) const
 {
   std::string lowercaseLibName = lowercase(_libName);
@@ -306,7 +359,7 @@ std::string SystemPaths::FindFileURI(const std::string &_uri) const
 {
   if (!URI::Valid(_uri))
   {
-    ignerr << "The passed value [" << _uri << "] is not a valid URI, "
+    gzerr << "The passed value [" << _uri << "] is not a valid URI, "
               "trying as a file" << std::endl;
     return this->FindFile(_uri);
   }
@@ -319,18 +372,27 @@ std::string SystemPaths::FindFileURI(const std::string &_uri) const
 std::string SystemPaths::FindFileURI(const URI &_uri) const
 {
   std::string prefix = _uri.Scheme();
-  std::string suffix = _uri.Path().Str() + _uri.Query().Str();
+  std::string suffix;
+  if (_uri.Authority())
+  {
+    // Strip //
+    suffix = _uri.Authority()->Str().substr(2) + _uri.Path().Str();
+  }
+  else
+  {
+    // Strip /
+    if (_uri.Path().IsAbsolute() && prefix != "file")
+      suffix += _uri.Path().Str().substr(1);
+    else
+      suffix += _uri.Path().Str();
+  }
+  suffix += _uri.Query().Str();
+
   std::string filename;
 
-  if (prefix == "file")
-  {
-    // First try to find the file on the current system
-    filename = this->FindFile(copyFromUnixPath(suffix));
-  }
-  else if (this->dataPtr->findFileURICB)
-  {
-    filename = this->dataPtr->findFileURICB(_uri.Str());
-  }
+  // First try to find the file on the current system
+  filename = this->FindFile(gz::common::copyFromUnixPath(suffix),
+      true, false);
 
   // Look in custom paths.
   // Tries the suffix against all paths, regardless of the scheme
@@ -360,14 +422,14 @@ std::string SystemPaths::FindFileURI(const URI &_uri) const
 
   if (filename.empty())
   {
-    ignerr << "Unable to find file with URI [" << _uri.Str() << "]" <<
+    gzerr << "Unable to find file with URI [" << _uri.Str() << "]" <<
            std::endl;
     return std::string();
   }
 
   if (!exists(filename))
   {
-    ignerr << "URI [" << _uri.Str() << "] resolved to path [" << filename <<
+    gzerr << "URI [" << _uri.Str() << "] resolved to path [" << filename <<
            "] but the path does not exist" << std::endl;
     return std::string();
   }
@@ -377,7 +439,8 @@ std::string SystemPaths::FindFileURI(const URI &_uri) const
 
 //////////////////////////////////////////////////
 std::string SystemPaths::FindFile(const std::string &_filename,
-                                  const bool _searchLocalPath) const
+                                  const bool _searchLocalPath,
+                                  const bool _verbose) const
 {
   std::string path;
   std::string filename = _filename;
@@ -385,38 +448,48 @@ std::string SystemPaths::FindFile(const std::string &_filename,
   if (filename.empty())
     return path;
 
-  // Handle as URI
-  if (URI::Valid(filename))
-  {
-    path = this->FindFileURI(URI(filename));
-  }
-  // Handle as local absolute path
-  else if (filename[0] == '/')
-  {
-    path = filename;
-  }
 #ifdef _WIN32
-  // Handle as Windows absolute path
-  else if (filename.length() >= 2 && filename[1] == ':')
+  // First of all, try if filename as a Windows absolute path exists
+  // The Windows absolute path is tried first as a Windows drive such as
+  // C:/ is also a valid URI scheme
+  if (filename.length() >= 2 && filename[1] == ':' && exists(filename))
   {
     path = filename;
   }
 #endif  // _WIN32
-  // Try appending to local paths
-  else
-  {
-    auto cwdPath = joinPaths(cwd(), filename);
-    if (_searchLocalPath && exists(cwdPath))
+  // If the filename is not an existing absolute Windows path, try others
+  if (path.empty()) {
+    // Handle as URI
+    if (gz::common::URI::Valid(filename))
     {
-      path = cwdPath;
+      path = this->FindFileURI(gz::common::URI(filename));
     }
-    else if ((filename[0] == '.' || _searchLocalPath) && exists(filename))
+    // Handle as local absolute path
+    else if (filename[0] == '/')
     {
       path = filename;
     }
-    else if (this->dataPtr->findFileCB)
+    // Try appending to local paths
+    else
     {
-      path = this->dataPtr->findFileCB(filename);
+      auto cwdPath = joinPaths(cwd(), filename);
+      if (_searchLocalPath && exists(cwdPath))
+      {
+        path = cwdPath;
+      }
+      else if ((filename[0] == '.' || _searchLocalPath) && exists(filename))
+      {
+        path = filename;
+      }
+      else
+      {
+        for (const auto &cb : this->dataPtr->findFileCbs)
+        {
+          path = cb(filename);
+          if (!path.empty())
+            break;
+        }
+      }
     }
   }
 
@@ -447,14 +520,20 @@ std::string SystemPaths::FindFile(const std::string &_filename,
 
   if (path.empty())
   {
-    ignerr << "Could not resolve file [" << _filename << "]" << std::endl;
+    if (_verbose)
+    {
+      gzerr << "Could not resolve file [" << _filename << "]" << std::endl;
+    }
     return std::string();
   }
 
   if (!exists(path))
   {
-    ignerr << "File [" << _filename << "] resolved to path [" << path <<
-              "] but the path does not exist" << std::endl;
+    if (_verbose)
+    {
+      gzerr << "File [" << _filename << "] resolved to path [" << path <<
+                "] but the path does not exist" << std::endl;
+    }
     return std::string();
   }
 
@@ -515,29 +594,15 @@ void SystemPaths::AddSearchPathSuffix(const std::string &_suffix)
 }
 
 /////////////////////////////////////////////////
-void SystemPaths::SetFindFileCallback(
-    std::function<std::string(const std::string &)> _cb)
-{
-  this->dataPtr->findFileCB = _cb;
-}
-
-/////////////////////////////////////////////////
-void SystemPaths::SetFindFileURICallback(
-    std::function<std::string(const std::string &)> _cb)
-{
-  this->dataPtr->findFileURICB = _cb;
-}
-
-/////////////////////////////////////////////////
 void SystemPaths::AddFindFileCallback(
-    std::function<std::string(const std::string &)> _cb)
+    SystemPaths::Implementation::FindFileFunction _cb)
 {
   this->dataPtr->findFileCbs.push_back(_cb);
 }
 
 /////////////////////////////////////////////////
 void SystemPaths::AddFindFileURICallback(
-    std::function<std::string(const URI &)> _cb)
+    SystemPaths::Implementation::FindURIFunction _cb)
 {
   this->dataPtr->findFileURICbs.push_back(_cb);
 }

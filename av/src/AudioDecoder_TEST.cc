@@ -17,11 +17,10 @@
 #include <gtest/gtest.h>
 
 #include <gz/common/AudioDecoder.hh>
-#include <gz/utilities/ExtraTestMacros.hh>
+#include <gz/utils/ExtraTestMacros.hh>
+#include <gz/common/testing/TestPaths.hh>
 
-#include "test_config.h"
-
-using namespace ignition;
+using namespace gz;
 
 /////////////////////////////////////////////////
 TEST(AudioDecoder, FileNotSet)
@@ -85,7 +84,7 @@ TEST(AudioDecoder, NoCodec)
 }
 
 /////////////////////////////////////////////////
-TEST(AudioDecoder, IGN_UTILS_TEST_DISABLED_ON_WIN32(CheerFile))
+TEST(AudioDecoder, GZ_UTILS_TEST_DISABLED_ON_WIN32(CheerFile))
 {
   common::AudioDecoder audio;
 
@@ -151,11 +150,4 @@ TEST(AudioDecoder, IGN_UTILS_TEST_DISABLED_ON_WIN32(CheerFile))
                 dataBufferSize == 4987612u ||
                 dataBufferSize == 4987612u * 2);
   }
-}
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
 }

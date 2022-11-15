@@ -18,14 +18,14 @@
 #ifndef GZ_COMMON_WORKER_POOL_HH_
 #define GZ_COMMON_WORKER_POOL_HH_
 
+#include <chrono>
 #include <functional>
-#include <memory>
 
 #include <gz/common/Export.hh>
-#include <gz/common/Time.hh>
-#include <gz/common/SuppressWarning.hh>
 
-namespace ignition
+#include <gz/utils/ImplPtr.hh>
+
+namespace gz
 {
   namespace common
   {
@@ -33,7 +33,7 @@ namespace ignition
     class WorkerPoolPrivate;
 
     /// \brief A pool of worker threads that do stuff in parallel
-    class IGNITION_COMMON_VISIBLE WorkerPool
+    class GZ_COMMON_VISIBLE WorkerPool
     {
       /// \brief Creates worker threads. The number of worker threads is
       /// determined by max(std::thread::hardware_concurrency, _minThreadCount).
@@ -59,12 +59,11 @@ namespace ignition
       /// \returns true if all work was finished
       /// \remarks The return value can be false even when waiting forever if
       //           the WorkerPool is destructed before all work is completed
-      public: bool WaitForResults(const Time &_timeout = Time::Zero);
+      public: bool WaitForResults(
+        const std::chrono::steady_clock::duration &_timeout =
+          std::chrono::steady_clock::duration::zero());
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
-      /// \brief private implementation pointer
-      private: std::unique_ptr<WorkerPoolPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      GZ_UTILS_UNIQUE_IMPL_PTR(dataPtr)
     };
   }
 }

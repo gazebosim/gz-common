@@ -17,50 +17,62 @@
 
 #include <gz/common/Timer.hh>
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
+
+/// \brief Private data for the Timer class
+class gz::common::Timer::Implementation
+{
+  /// \brief The time of the last call to Start
+  public: std::chrono::steady_clock::time_point start;
+
+  /// \brief The time when Stop was called.
+  public: std::chrono::steady_clock::time_point stop;
+
+  /// \brief True if the timer is running.
+  public: bool running {false};
+};
 
 //////////////////////////////////////////////////
 Timer::Timer()
-  : running(false)
-{
-}
-
-//////////////////////////////////////////////////
-Timer::~Timer()
+  : dataPtr(gz::utils::MakeImpl<Implementation>())
 {
 }
 
 //////////////////////////////////////////////////
 void Timer::Start()
 {
-  this->start = Time::SystemTime();
-  this->running = true;
+  this->dataPtr->start = std::chrono::steady_clock::now();
+  this->dataPtr->running = true;
 }
 
 //////////////////////////////////////////////////
 void Timer::Stop()
 {
-  this->stop = Time::SystemTime();
-  this->running = false;
+  this->dataPtr->stop = std::chrono::steady_clock::now();
+  this->dataPtr->running = false;
 }
 
 //////////////////////////////////////////////////
 bool Timer::Running() const
 {
-  return this->running;
+  return this->dataPtr->running;
 }
 
 //////////////////////////////////////////////////
-Time Timer::Elapsed() const
+std::chrono::duration<double> Timer::ElapsedTime() const
 {
-  if (this->running)
+  if (this->dataPtr->running)
   {
-    Time currentTime;
-    currentTime = Time::SystemTime();
-
-    return currentTime - this->start;
+    std::chrono::steady_clock::time_point currentTime;
+    currentTime = std::chrono::steady_clock::now();
+    std::chrono::duration<double> diff = currentTime - this->dataPtr->start;
+    return diff;
   }
   else
-    return this->stop - this->start;
+  {
+    std::chrono::duration<double> diff =
+      this->dataPtr->stop - this->dataPtr->start;
+    return diff;
+  }
 }

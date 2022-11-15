@@ -18,9 +18,9 @@
 #include <string>
 #include <gz/common/Base64.hh>
 
-#include "test_config.h"
+#include "gz/common/testing/AutoLogFixture.hh"
 
-using namespace ignition;
+using namespace gz;
 
 class Base64 : public common::testing::AutoLogFixture { };
 
@@ -48,11 +48,4 @@ TEST_F(Base64, EncodeDecode)
     EXPECT_TRUE(isalnum(c) || (c == '+') || (c == '/')) << c;
   }
   EXPECT_EQ(original, common::Base64::Decode(encoded));
-}
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
 }

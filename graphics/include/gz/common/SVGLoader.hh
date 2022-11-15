@@ -24,19 +24,17 @@
 #include <gz/math/Vector2.hh>
 #include <gz/math/Matrix3.hh>
 
+#include <gz/utils/ImplPtr.hh>
+
 #include <gz/common/graphics/Export.hh>
 #include <gz/common/Console.hh>
-#include <gz/common/SuppressWarning.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
-    // Forward declare private data class
-    class SVGLoaderPrivate;
-
     /// \brief SVG command data structure
-    class IGNITION_COMMON_GRAPHICS_VISIBLE SVGCommand
+    class GZ_COMMON_GRAPHICS_VISIBLE SVGCommand
     {
       /// \brief Constructor
       public: SVGCommand() : cmd(' ') {}
@@ -60,7 +58,7 @@ namespace ignition
     };
 
     /// \brief An SVG path element data structure
-    struct IGNITION_COMMON_GRAPHICS_VISIBLE SVGPath
+    struct GZ_COMMON_GRAPHICS_VISIBLE SVGPath
     {
 #ifdef _WIN32
 // Disable warning C4251
@@ -88,7 +86,7 @@ namespace ignition
     };
 
     /// \brief A loader for SVG files
-    class IGNITION_COMMON_GRAPHICS_VISIBLE SVGLoader
+    class GZ_COMMON_GRAPHICS_VISIBLE SVGLoader
     {
       /// \brief Constructor
       /// \param[in] _samples The number of points for cubic spline segments
@@ -123,11 +121,9 @@ namespace ignition
       public: void DumpPaths(const std::vector<SVGPath> &_paths,
                              std::ostream &_out) const;
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \internal
-      /// \brief Pointer to private data
-      private: std::unique_ptr<SVGLoaderPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      /// \brief Private data pointer.
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

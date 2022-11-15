@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef IGNITION_COMMON_FLAGSET_HH
-#define IGNITION_COMMON_FLAGSET_HH
+#ifndef GZ_COMMON_FLAGSET_HH
+#define GZ_COMMON_FLAGSET_HH
 
 // FlagSet is a type-safe class for using enums as flags in C++14 with an
 // underlying std::bitset.
@@ -35,9 +35,7 @@
 #include <cassert>
 #include <string>
 
-#include <gz/common/config.hh>
-
-namespace ignition::common
+namespace gz::common
 {
 
 /// \brief Set of flags defined by a C++11 enum class.
@@ -373,12 +371,12 @@ struct IsEnumThatContainsSentinel<T, decltype(static_cast<void>(T::_))>
 // enumeration contains the sentinel `_`.
 template<typename T>
 std::enable_if_t<
-    ignition::common::IsEnumThatContainsSentinel<T>::value,
-    ignition::common::FlagSet<T>
+    gz::common::IsEnumThatContainsSentinel<T>::value,
+    gz::common::FlagSet<T>
 >
 operator|(const T& _lhs, const T& _rhs)
 {
-  ignition::common::FlagSet<T> fs;
+  gz::common::FlagSet<T> fs;
   fs |= _lhs;
   fs |= _rhs;
 
@@ -388,10 +386,10 @@ operator|(const T& _lhs, const T& _rhs)
 namespace std
 {
 template<typename T, T LastElement, bool ExcludeLast>
-struct hash<ignition::common::FlagSet<T, LastElement, ExcludeLast>>
+struct hash<gz::common::FlagSet<T, LastElement, ExcludeLast>>
 {
   std::size_t operator()(
-    const ignition::common::FlagSet<T, LastElement, ExcludeLast>& _s)
+    const gz::common::FlagSet<T, LastElement, ExcludeLast>& _s)
     const noexcept
   {
     return _s.Hash();

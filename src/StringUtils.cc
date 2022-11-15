@@ -18,7 +18,7 @@
 #include <cstdlib>
 #include "gz/common/StringUtils.hh"
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

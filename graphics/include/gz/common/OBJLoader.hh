@@ -21,11 +21,12 @@
 #include <string>
 #include <memory>
 
+#include <gz/utils/ImplPtr.hh>
+
 #include <gz/common/MeshLoader.hh>
 #include <gz/common/graphics/Export.hh>
-#include <gz/common/SuppressWarning.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -33,7 +34,7 @@ namespace ignition
     class OBJLoaderPrivate;
 
     /// \brief Class used to load obj mesh files
-    class IGNITION_COMMON_GRAPHICS_VISIBLE OBJLoader : public MeshLoader
+    class GZ_COMMON_GRAPHICS_VISIBLE OBJLoader : public MeshLoader
     {
       /// \brief Constructor
       public: OBJLoader();
@@ -46,11 +47,9 @@ namespace ignition
       /// \return Pointer to a new Mesh
       public: virtual Mesh *Load(const std::string &_filename);
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \internal
-      /// \brief Pointer to private data.
-      private: std::unique_ptr<OBJLoaderPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      /// \brief Private data pointer.
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

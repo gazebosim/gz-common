@@ -21,7 +21,7 @@
 #include "gz/common/Console.hh"
 #include "gz/common/Util.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 std::string rmtErrorToString(rmtError error) {
@@ -184,14 +184,14 @@ RemoteryProfilerImpl::RemoteryProfilerImpl()
     static_cast<RemoteryProfilerImpl *>(_context)->HandleInput(_text);
   };
 
-  igndbg << "Starting ign-common profiler impl: Remotery" <<
+  gzdbg << "Starting gz-common profiler impl: Remotery" <<
     " (port: " << this->settings->port << ")" << std::endl;
   rmtError error;
   error = rmt_CreateGlobalInstance(&this->rmt);
 
   if (RMT_ERROR_NONE != error)
   {
-    ignerr << "Error launching Remotery: " <<
+    gzerr << "Error launching Remotery: " <<
       rmtErrorToString(error) << std::endl;
     this->rmt = nullptr;
   }
@@ -207,7 +207,7 @@ RemoteryProfilerImpl::~RemoteryProfilerImpl()
 //////////////////////////////////////////////////
 std::string RemoteryProfilerImpl::Name() const
 {
-  return "ign_profiler_remotery";
+  return "gz_profiler_remotery";
 }
 
 //////////////////////////////////////////////////

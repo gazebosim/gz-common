@@ -21,6 +21,12 @@
 #include <thread>
 
 #include <gz/common/Console.hh>
+#include <gz/common/testing/RedirectConsoleStream.hh>
+
+using namespace gz;
+
+using RedirectConsoleStream = common::testing::RedirectConsoleStream;
+using StreamSource = common::testing::StreamSource;
 
 namespace {
 // Lower value than spdlog to keep CI from flaking
@@ -38,7 +44,6 @@ void WriteToFile(std::string result_filename, std::string content)
     std::cerr << "Error writing to " << result_filename << std::endl;
   }
   out << content << std::flush;
-  std::cout << content;
 }
 
 void MeasurePeakDuringLogWrites(const size_t id, std::vector<uint64_t> &result)
@@ -141,7 +146,7 @@ void SaveResultToBucketFile(
 void run(size_t number_of_threads)
 {
   g_counter = 0;
-  gz::common::Console::SetVerbosity(4);
+  common::Console::SetVerbosity(4);
   std::vector<std::thread> threads(number_of_threads);
   std::map<size_t, std::vector<uint64_t>> threads_result;
 
@@ -162,6 +167,8 @@ void run(size_t number_of_threads)
       << filename_result << std::endl;
   WriteToFile(filename_result, oss.str());
 
+  auto stream = common::testing::RedirectStdout();
+
   auto start_time_application_total =
   std::chrono::high_resolution_clock::now();
   for (uint64_t idx = 0; idx < number_of_threads; ++idx)
@@ -174,6 +181,8 @@ void run(size_t number_of_threads)
     threads[idx].join();
   }
   auto stop_time_application_total = std::chrono::high_resolution_clock::now();
+
+  auto output = stream.GetString();
 
   uint64_t total_time_in_us =
       std::chrono::duration_cast<std::chrono::microseconds>(

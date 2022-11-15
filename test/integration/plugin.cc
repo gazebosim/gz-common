@@ -22,34 +22,38 @@
 
 #include <gtest/gtest.h>
 
+#define SUPPRESS_IGNITION_HEADER_DEPRECATION
+
 #include <string>
 #include <vector>
 #include <iostream>
-#include "gz/common/Console.hh"
-#include "gz/common/Filesystem.hh"
-#include "gz/common/PluginLoader.hh"
-#include "gz/common/SystemPaths.hh"
-#include "gz/common/PluginPtr.hh"
-#include "gz/common/SpecializedPluginPtr.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/Filesystem.hh"
+#include "ignition/common/SystemPaths.hh"
+#include "gz/utils/SuppressWarning.hh"
 
-#include "test_config.h"
 #include "DummyPluginsPath.h"
 #include "plugins/DummyPlugins.hh"
+
+GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
+#include "ignition/common/PluginLoader.hh"
+#include "ignition/common/PluginPtr.hh"
+#include "ignition/common/SpecializedPluginPtr.hh"
 
 /////////////////////////////////////////////////
 TEST(PluginLoader, LoadBadPlugins)
 {
   std::string dummyPath =
-    gz::common::copyFromUnixPath(IGN_DUMMY_PLUGIN_PATH);
+    gz::common::copyFromUnixPath(GZ_DUMMY_PLUGIN_PATH);
 
   gz::common::SystemPaths sp;
   sp.AddPluginPaths(dummyPath);
 
   std::vector<std::string> libraryNames = {
-    "IGNBadPluginAPIVersionOld",
-    "IGNBadPluginAPIVersionNew",
-    "IGNBadPluginAlign",
-    "IGNBadPluginSize"};
+    "GzBadPluginAPIVersionOld",
+    "GzBadPluginAPIVersionNew",
+    "GzBadPluginAlign",
+    "GzBadPluginSize"};
   for (auto const & libraryName : libraryNames)
   {
     std::string path = sp.FindSharedLibrary(libraryName);
@@ -68,12 +72,12 @@ TEST(PluginLoader, LoadBadPlugins)
 TEST(PluginLoader, LoadExistingLibrary)
 {
   std::string dummyPath =
-    gz::common::copyFromUnixPath(IGN_DUMMY_PLUGIN_PATH);
+    gz::common::copyFromUnixPath(GZ_DUMMY_PLUGIN_PATH);
 
   gz::common::SystemPaths sp;
   sp.AddPluginPaths(dummyPath);
 
-  std::string path = sp.FindSharedLibrary("IGNDummyPlugins");
+  std::string path = sp.FindSharedLibrary("GzDummyPlugins");
   ASSERT_FALSE(path.empty());
 
   gz::common::PluginLoader pl;
@@ -164,8 +168,8 @@ using SomeSpecializedPluginPtr =
 TEST(SpecializedPluginPtr, Construction)
 {
   gz::common::SystemPaths sp;
-  sp.AddPluginPaths(IGN_DUMMY_PLUGIN_PATH);
-  std::string path = sp.FindSharedLibrary("IGNDummyPlugins");
+  sp.AddPluginPaths(GZ_DUMMY_PLUGIN_PATH);
+  std::string path = sp.FindSharedLibrary("GzDummyPlugins");
   ASSERT_FALSE(path.empty());
 
   gz::common::PluginLoader pl;
@@ -291,8 +295,8 @@ TEST(PluginPtr, CopyMoveSemantics)
   EXPECT_TRUE(plugin.IsEmpty());
 
   gz::common::SystemPaths sp;
-  sp.AddPluginPaths(IGN_DUMMY_PLUGIN_PATH);
-  std::string path = sp.FindSharedLibrary("IGNDummyPlugins");
+  sp.AddPluginPaths(GZ_DUMMY_PLUGIN_PATH);
+  std::string path = sp.FindSharedLibrary("GzDummyPlugins");
   ASSERT_FALSE(path.empty());
 
   gz::common::PluginLoader pl;
@@ -312,27 +316,27 @@ TEST(PluginPtr, CopyMoveSemantics)
   EXPECT_TRUE(plugin == otherPlugin);
   EXPECT_FALSE(plugin != otherPlugin);
 
-  igndbg << "Testing sets and maps with PluginPtr and PluginPtr\n";
+  gzdbg << "Testing sets and maps with PluginPtr and PluginPtr\n";
   TestSetAndMapUsage<
       gz::common::PluginPtr,
       gz::common::PluginPtr>(
         pl, plugin);
 
-  igndbg << "Testing sets and maps with PluginPtr and "
+  gzdbg << "Testing sets and maps with PluginPtr and "
          << "SomeSpecializedPluginPtr\n";
   TestSetAndMapUsage<
       gz::common::PluginPtr,
       SomeSpecializedPluginPtr>(
         pl, plugin);
 
-  igndbg << "Testing sets and maps with SomeSpecializedPluginPtr and "
+  gzdbg << "Testing sets and maps with SomeSpecializedPluginPtr and "
          << "AnotherSpecializedPluginPtr\n";
   TestSetAndMapUsage<
       SomeSpecializedPluginPtr,
       AnotherSpecializedPluginPtr>(
         pl, plugin);
 
-  igndbg << "Testing sets and maps with AnotherSpecializedPluginPtr and "
+  gzdbg << "Testing sets and maps with AnotherSpecializedPluginPtr and "
          << "SingleSpecializedPluginPtr\n";
   TestSetAndMapUsage<
       AnotherSpecializedPluginPtr,
@@ -371,8 +375,8 @@ void CheckSomeValues(
 TEST(PluginPtr, QueryInterfaceSharedPtr)
 {
   gz::common::SystemPaths sp;
-  sp.AddPluginPaths(IGN_DUMMY_PLUGIN_PATH);
-  std::string path = sp.FindSharedLibrary("IGNDummyPlugins");
+  sp.AddPluginPaths(GZ_DUMMY_PLUGIN_PATH);
+  std::string path = sp.FindSharedLibrary("GzDummyPlugins");
   ASSERT_FALSE(path.empty());
 
   gz::common::PluginLoader pl;
@@ -435,10 +439,6 @@ TEST(PluginPtr, QueryInterfaceSharedPtr)
   SetSomeValues(setter);
   CheckSomeValues(getInt, getDouble, getName);
 }
+GZ_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
 
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}
+#undef SUPPRESS_IGNITION_HEADER_DEPRECATION

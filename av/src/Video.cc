@@ -20,11 +20,11 @@
 #include "gz/common/Video.hh"
 #include "gz/common/av/Util.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 // Private data structure for the Video class
-class gz::common::VideoPrivate
+class common::Video::Implementation
 {
   /// \brief libav Format I/O context
   public: AVFormatContext *formatCtx = nullptr;
@@ -59,12 +59,43 @@ class gz::common::VideoPrivate
   public: bool drainingMode = false;
 };
 
+int AVCodecDecode(AVCodecContext *_codecCtx,
+    AVFrame *_frame, int *_gotFrame, AVPacket *_packet)
+{
+  // from https://blogs.gentoo.org/lu_zero/2016/03/29/new-avcodec-api/
+  int ret;
+
+  *_gotFrame = 0;
+
+  if (_packet)
+  {
+    ret = avcodec_send_packet(_codecCtx, _packet);
+    if (ret < 0)
+    {
+      return ret == AVERROR_EOF ? 0 : ret;
+    }
+  }
+
+  ret = avcodec_receive_frame(_codecCtx, _frame);
+  if (ret < 0 && ret != AVERROR(EAGAIN))
+  {
+    return ret;
+  }
+  if (ret >= 0)
+  {
+    *_gotFrame = 1;
+  }
+
+  // new API always consumes the whole packet
+  return _packet ? _packet->size : 0;
+}
+
 /////////////////////////////////////////////////
 Video::Video()
-: dataPtr(new VideoPrivate)
+  : dataPtr(utils::MakeUniqueImpl<Implementation>())
 {
   // Make sure libav is loaded.
-  load();
+  common::load();
 }
 
 /////////////////////////////////////////////////
@@ -100,20 +131,20 @@ bool Video::Load(const std::string &_filename)
     this->Cleanup();
   }
 
-  this->dataPtr->avFrame = AVFrameAlloc();
+  this->dataPtr->avFrame = av_frame_alloc();
 
   // Open video file
   if (avformat_open_input(&this->dataPtr->formatCtx, _filename.c_str(),
         nullptr, nullptr) < 0)
   {
-    ignerr << "Unable to read video file[" << _filename << "]\n";
+    gzerr << "Unable to read video file[" << _filename << "]\n";
     return false;
   }
 
   // Retrieve stream information
   if (avformat_find_stream_info(this->dataPtr->formatCtx, nullptr) < 0)
   {
-    ignerr << "Couldn't find stream information\n";
+    gzerr << "Couldn't find stream information\n";
     return false;
   }
 
@@ -121,13 +152,7 @@ bool Video::Load(const std::string &_filename)
   for (unsigned int i = 0; i < this->dataPtr->formatCtx->nb_streams; ++i)
   {
     enum AVMediaType codec_type;
-    // codec parameter deprecated in ffmpeg version 3.1
-    // github.com/FFmpeg/FFmpeg/commit/9200514ad8717c
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 48, 101)
     codec_type = this->dataPtr->formatCtx->streams[i]->codecpar->codec_type;
-#else
-    codec_type = this->dataPtr->formatCtx->streams[i]->codec->codec_type;
-#endif
     if (codec_type == AVMEDIA_TYPE_VIDEO)
     {
       this->dataPtr->videoStream = static_cast<int>(i);
@@ -137,31 +162,26 @@ bool Video::Load(const std::string &_filename)
 
   if (this->dataPtr->videoStream == -1)
   {
-    ignerr << "Unable to find a video stream\n";
+    gzerr << "Unable to find a video stream\n";
     return false;
   }
 
   // Find the decoder for the video stream
   auto stream = this->dataPtr->formatCtx->streams[this->dataPtr->videoStream];
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 48, 101)
   codec = avcodec_find_decoder(stream->codecpar->codec_id);
-#else
-  codec = avcodec_find_decoder(stream->codec->codec_id);
-#endif
   if (codec == nullptr)
   {
-    ignerr << "Codec not found\n";
+    gzerr << "Codec not found\n";
     return false;
   }
 
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 48, 101)
   // AVCodecContext is not included in an AVStream as of ffmpeg 3.1
   // allocate a codec context based on updated example
   // github.com/FFmpeg/FFmpeg/commit/bba6a03b2816d805d44bce4f9701a71f7d3f8dad
   this->dataPtr->codecCtx = avcodec_alloc_context3(codec);
   if (!this->dataPtr->codecCtx)
   {
-    ignerr << "Failed to allocate the codec context" << std::endl;
+    gzerr << "Failed to allocate the codec context" << std::endl;
     return false;
   }
 
@@ -169,30 +189,20 @@ bool Video::Load(const std::string &_filename)
   if (avcodec_parameters_to_context(this->dataPtr->codecCtx,
                                     stream->codecpar) < 0)
   {
-    ignerr << "Failed to copy codec parameters to decoder context"
+    gzerr << "Failed to copy codec parameters to decoder context"
            << std::endl;
     return false;
   }
-#else
-  // Get a pointer to the codec context for the video stream
-  this->dataPtr->codecCtx = this->dataPtr->formatCtx->streams[
-    this->dataPtr->videoStream]->codec;
-#endif
 
   // Inform the codec that we can handle truncated bitstreams -- i.e.,
   // bitstreams where frame boundaries can fall in the middle of packets
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(56, 60, 100)
   if (codec->capabilities & AV_CODEC_CAP_TRUNCATED)
     this->dataPtr->codecCtx->flags |= AV_CODEC_FLAG_TRUNCATED;
-#else
-  if (codec->capabilities & CODEC_CAP_TRUNCATED)
-    this->dataPtr->codecCtx->flags |= CODEC_FLAG_TRUNCATED;
-#endif
 
   // Open codec
   if (avcodec_open2(this->dataPtr->codecCtx, codec, nullptr) < 0)
   {
-    ignerr << "Could not open codec\n";
+    gzerr << "Could not open codec\n";
     return false;
   }
 
@@ -207,12 +217,12 @@ bool Video::Load(const std::string &_filename)
 
   if (this->dataPtr->swsCtx == nullptr)
   {
-    ignerr << "Error while calling sws_getContext\n";
+    gzerr << "Error while calling sws_getContext\n";
     return false;
   }
 
   // swscale needs 32-byte-aligned output frame on some systems
-  this->dataPtr->avFrameDst = AVFrameAlloc();
+  this->dataPtr->avFrameDst = av_frame_alloc();
   this->dataPtr->avFrameDst->format = this->dataPtr->dstPixelFormat;
   this->dataPtr->avFrameDst->width = this->dataPtr->codecCtx->width;
   this->dataPtr->avFrameDst->height = this->dataPtr->codecCtx->height;
@@ -254,7 +264,7 @@ bool Video::NextFrame(unsigned char **_buffer)
     packet = av_packet_alloc();
     if (!packet)
     {
-      ignerr << "Failed to allocate AVPacket" << std::endl;
+      gzerr << "Failed to allocate AVPacket" << std::endl;
       return false;
     }
 
@@ -277,7 +287,7 @@ bool Video::NextFrame(unsigned char **_buffer)
         }
         else
         {
-          ignerr << "Error reading packet: " << av_err2str_cpp(ret)
+          gzerr << "Error reading packet: " << av_err2str_cpp(ret)
                  << ". Stopped reading the file." << std::endl;
           return false;
         }
@@ -291,7 +301,7 @@ bool Video::NextFrame(unsigned char **_buffer)
     }
 
     // Process all the data in the frame
-    ret = AVCodecDecode(
+    ret = ::AVCodecDecode(
       this->dataPtr->codecCtx, this->dataPtr->avFrame, &frameAvailable,
       this->dataPtr->drainingMode ? nullptr : packet);
 
@@ -303,7 +313,7 @@ bool Video::NextFrame(unsigned char **_buffer)
     }
     else if (ret < 0)
     {
-      ignerr << "Error while processing packet data: "
+      gzerr << "Error while processing packet data: "
              << av_err2str_cpp(ret) << std::endl;
       // continue processing data
     }

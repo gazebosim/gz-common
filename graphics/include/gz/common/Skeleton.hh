@@ -23,20 +23,21 @@
 #include <utility>
 
 #include <gz/math/Matrix4.hh>
+
+#include <gz/utils/ImplPtr.hh>
+
 #include <gz/common/SkeletonNode.hh>
 #include <gz/common/graphics/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
-    /// Forward declarations
-    class SkeletonPrivate;
     class SkeletonAnimation;
 
-    /// \class Skeleton Skeleton.hh ignition/common/Skeleton.hh
+    /// \class Skeleton Skeleton.hh gz/common/Skeleton.hh
     /// \brief A skeleton, usually used for animation purposes.
-    class IGNITION_COMMON_GRAPHICS_VISIBLE Skeleton
+    class GZ_COMMON_GRAPHICS_VISIBLE Skeleton
     {
       /// \brief Constructor
       public: Skeleton();
@@ -170,8 +171,8 @@ namespace ignition
       /// using breadth first traversal
       private: void BuildNodeMap();
 
-      /// \brief Private data pointer
-      private: SkeletonPrivate *data;
+      /// \brief Private data pointer.
+      GZ_UTILS_UNIQUE_IMPL_PTR(dataPtr)
     };
   }
 }

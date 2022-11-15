@@ -27,15 +27,15 @@
 struct _GtsSurface;
 typedef _GtsSurface GtsSurface;
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
     class SubMesh;
 
-    /// \class GTSMeshUtils GTSMeshUtils.hh ignition/common/GTSMeshUtils.hh
+    /// \class GTSMeshUtils GTSMeshUtils.hh gz/common/GTSMeshUtils.hh
     /// \brief Creates GTS utilities for meshes
-    class IGNITION_COMMON_GRAPHICS_VISIBLE GTSMeshUtils
+    class GZ_COMMON_GRAPHICS_VISIBLE GTSMeshUtils
     {
       /// \brief Perform delaunay triangulation on input vertices.
       /// \param[in] _vertices A list of all vertices

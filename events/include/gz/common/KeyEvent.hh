@@ -21,18 +21,18 @@
 #include <string>
 
 #include <gz/common/events/Export.hh>
-#include <gz/common/SuppressWarning.hh>
+#include <gz/utils/SuppressWarning.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
     // Forward declare private data class
     class KeyEventPrivate;
 
-    /// \class KeyEvent KeyEvent.hh ignition/common/KeyEvent.hh
+    /// \class KeyEvent KeyEvent.hh gz/common/KeyEvent.hh
     /// \brief Generic description of a keyboard event.
-    class IGNITION_COMMON_EVENTS_VISIBLE KeyEvent
+    class GZ_COMMON_EVENTS_VISIBLE KeyEvent
     {
       /// \brief Key event types enumeration.
       public: enum EventType {NO_EVENT, PRESS, RELEASE};
@@ -57,7 +57,7 @@ namespace ignition
 
       /// \brief Set the event type
       /// \param[in] _type Event type
-      public: void SetType(const EventType _type);
+      public: void SetType(EventType _type);
 
       /// \brief Get the key number
       /// \return The key number
@@ -65,7 +65,7 @@ namespace ignition
 
       /// \brief Set the key
       /// \param[in] _key The key number
-      public: void SetKey(const int _key);
+      public: void SetKey(int _key);
 
       /// \brief Get the formatted string of the key pressed (could be
       /// uppercase).
@@ -82,7 +82,7 @@ namespace ignition
 
       /// \brief Set whether the control key was held during this key event
       /// \param[in] _control Status of the control key
-      public: void SetControl(const bool _control);
+      public: void SetControl(bool _control);
 
       /// \brief Get whether the shift key was held during this key event
       /// \return True if the shift key was pressed
@@ -90,7 +90,7 @@ namespace ignition
 
       /// \brief Set whether the shift key was held during this key event
       /// \param[in] _shift Status of the shift key
-      public: void SetShift(const bool _shift);
+      public: void SetShift(bool _shift);
 
       /// \brief Get whether the alt key was held during this key event
       /// \return True if the alt key was pressed
@@ -98,7 +98,7 @@ namespace ignition
 
       /// \brief Set whether the alt key was held during this key event
       /// \param[in] _alt Status of the alt key
-      public: void SetAlt(const bool _alt);
+      public: void SetAlt(bool _alt);
 
       /// \brief Assignment operator
       /// \param[in] _other Other key event
@@ -110,10 +110,10 @@ namespace ignition
       /// \return this
       public: KeyEvent& operator=(KeyEvent&& other);
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
+      GZ_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Private data pointer
       private: std::unique_ptr<KeyEventPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      GZ_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
     };
   }
 }

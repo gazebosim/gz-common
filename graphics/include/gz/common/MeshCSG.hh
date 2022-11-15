@@ -26,15 +26,15 @@ typedef _GtsSurface GtsSurface;
 struct _GPtrArray;
 typedef _GPtrArray GPtrArray;
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
     class Mesh;
 
-    /// \class MeshCSG MeshCSG.hh ignition/common/MeshCSG.hh
+    /// \class MeshCSG MeshCSG.hh gz/common/MeshCSG.hh
     /// \brief Creates CSG meshes
-    class IGNITION_COMMON_GRAPHICS_VISIBLE MeshCSG
+    class GZ_COMMON_GRAPHICS_VISIBLE MeshCSG
     {
       /// \brief An enumeration of the boolean operations
       public: enum BooleanOperation {UNION, INTERSECTION, DIFFERENCE};

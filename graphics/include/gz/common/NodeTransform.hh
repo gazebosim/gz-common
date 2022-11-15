@@ -21,31 +21,23 @@
 
 #include <gz/math/Matrix4.hh>
 #include <gz/math/Vector3.hh>
+
+#include <gz/utils/ImplPtr.hh>
+
 #include <gz/common/graphics/Export.hh>
 #include <gz/common/Util.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
-    /// Forward declare private data structure.
-    class NodeTransformPrivate;
-
-    /// \class NodeTransform NodeTransform.hh ignition/common/NodeTransform.hh
+    /// \class NodeTransform NodeTransform.hh gz/common/NodeTransform.hh
     /// \brief A transformation node
-    class IGNITION_COMMON_GRAPHICS_VISIBLE NodeTransform
+    class GZ_COMMON_GRAPHICS_VISIBLE NodeTransform
     {
       /// \brief Constructor
       /// \param[in] _type the type of transform
       public: explicit NodeTransform(const NodeTransformType _type = MATRIX);
-
-      /// \brief Copy constructor
-      /// \param[in] _other NodeTransform to copy
-      public: NodeTransform(const NodeTransform &_other);
-
-      /// \brief Copy assignment
-      /// \param[in] _ther NodeTransform to copy
-      public: NodeTransform &operator=(const NodeTransform &_other);
 
       /// \brief Constructor
       /// \param[in] _mat the matrix
@@ -121,10 +113,8 @@ namespace ignition
       /// \return transform matrix multiplied by _m
       public: math::Matrix4d operator*(const math::Matrix4d &_m) const;
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
-      /// \brief Data pointer
-      private: std::unique_ptr<NodeTransformPrivate> data;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      /// \brief Private data pointer.
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

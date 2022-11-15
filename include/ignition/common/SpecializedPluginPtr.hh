@@ -15,5 +15,69 @@
  *
  */
 
-#include <gz/common/SpecializedPluginPtr.hh>
+#ifndef IGNITION_COMMON_SPECIALIZEDPLUGINPTR_HH_
+#define IGNITION_COMMON_SPECIALIZEDPLUGINPTR_HH_
+
 #include <ignition/common/config.hh>
+#include "ignition/common/PluginPtr.hh"
+#include "ignition/common/SpecializedPlugin.hh"
+
+namespace gz
+{
+  namespace common
+  {
+    /// \brief This alias allows PluginPtr instances to have high-speed access
+    /// to interfaces that can be anticipated at compile time. The plugin does
+    /// not have to actually offer the specialized interface in order to get
+    /// this performance improvement. This template is variadic, so it can
+    /// support arbitrarily many interfaces.
+    ///
+    /// Usage example:
+    ///
+    /// Suppose you want to instantiate a plugin that might (or might not) have
+    /// some combination of four interfaces which are known at compile time:
+    /// `MyInterface1`, `FooInterface`, `MyInterface2`, and `BarInterface`. You
+    /// can use SpecializedPluginPtr as shown here:
+    ///
+    /// \code
+    ///     using MySpecialPluginPtr = SpecializedPluginPtr<
+    ///         MyInterface1, FooInterface, MyInterface2, BarInterface>;
+    ///
+    ///     MySpecialPluginPtr plugin = loader->Instantiate(pluginName);
+    /// \endcode
+    ///
+    /// Then, calling the function
+    ///
+    /// \code
+    ///     plugin->QueryInterface<FooInterface>();
+    /// \endcode
+    ///
+    /// will have extremely high speed associated with it. It will provide
+    /// direct access to the the `FooInterface*` of `plugin`. If `plugin` does
+    /// not actually offer `FooInterface`, then it will return a nullptr, still
+    /// at extremely high speed.
+    ///
+    /// This same rule also applies to `MyInterface1`, `MyInterface2`, and
+    /// `BarInterface`, because those interfaces were also provided to
+    /// SpecializedPluginPtr<...> at compile time.
+    ///
+    /// Only interfaces that have been "specialized" can be passed as arguments
+    /// to the SpecializedPluginPtr template. To specialize an interface, simply
+    /// put the macro IGN_COMMON_SPECIALIZE_INTERFACE(~) from
+    /// ignition/common/PluginMacros.hh into a public location of its class
+    /// definition.
+    /// \deprecated Use gz-plugin
+    template <typename... SpecInterfaces>
+    using SpecializedPluginPtr =
+              TemplatePluginPtr< SpecializedPlugin<SpecInterfaces...> >;
+
+    /// \brief This alias creates a specialized PluginPtr whose interfaces are
+    /// all const-qualified.
+    /// \deprecated Use gz-plugin
+    template <typename... SpecInterfaces>
+    using ConstSpecializedPluginPtr =
+              TemplatePluginPtr< const SpecializedPlugin<SpecInterfaces...> >;
+  }
+}
+
+#endif

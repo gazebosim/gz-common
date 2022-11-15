@@ -15,29 +15,29 @@
  *
 */
 #include <gtest/gtest.h>
+
+#define SUPPRESS_IGNITION_HEADER_DEPRECATION
+
 #include <string>
+#include "gz/utils/SuppressWarning.hh"
 
 #include "PluginUtils.hh"
 
-using namespace ignition;
+using namespace gz;
 
+GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
 /////////////////////////////////////////////////
 TEST(PluginUtils, NormalizeName)
 {
   EXPECT_EQ("::", common::NormalizeName(""));
   EXPECT_EQ("::", common::NormalizeName("::"));
 
-  EXPECT_EQ("::ignition", common::NormalizeName("ignition"));
-  EXPECT_EQ("::ignition", common::NormalizeName("::ignition"));
+  EXPECT_EQ("::gz", common::NormalizeName("gz"));
+  EXPECT_EQ("::gz", common::NormalizeName("::gz"));
 
   EXPECT_EQ("::gz::math", common::NormalizeName("gz::math"));
   EXPECT_EQ("::gz::math", common::NormalizeName("::gz::math"));
 }
+GZ_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
 
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}
-
+#undef SUPPRESS_IGNITION_HEADER_DEPRECATION

@@ -17,3 +17,24 @@
 
 #include <gz/common/Util.hh>
 #include <ignition/common/config.hh>
+
+#define IGN_HOMEDIR GZ_HOMEDIR
+
+#define IGN_NANO_TO_SEC GZ_NANO_TO_SEC
+#define IGN_SEC_TO_NANO GZ_SEC_TO_NANO
+#define IGN_MS_TO_NANO GZ_MS_TO_NANO
+#define IGN_US_TO_NANO GZ_US_TO_NANO
+#define IGN_SPEED_OF_LIGHT GZ_SPEED_OF_LIGHT
+
+#define IGN_SLEEP_S(_s) GZ_SLEEP_S(_s)
+#define IGN_SLEEP_US(_us) GZ_SLEEP_US(_us)
+#define IGN_SLEEP_MS(_ms) GZ_SLEEP_MS(_ms)
+#define IGN_SLEEP_NS(_ns) GZ_SLEEP_NS(_ns)
+
+#define IGN_SYSTEM_TIME() GZ_SYSTEM_TIME()
+#define IGN_SYSTEM_TIME_S() GZ_SYSTEM_TIME_S()
+#define IGN_SYSTEM_TIME_US() GZ_SYSTEM_TIME_US()
+#define IGN_SYSTEM_TIME_MS() GZ_SYSTEM_TIME_MS()
+#define IGN_SYSTEM_TIME_NS() GZ_SYSTEM_TIME_NS()
+
+#define IGN_ASSERT(_expr, _msg) GZ_ASSERT(_expr, _msg)

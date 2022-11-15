@@ -15,12 +15,15 @@
  *
  */
 
-
 #ifndef GZ_COMMON_SUPPRESSWARNING_HH_
 #define GZ_COMMON_SUPPRESSWARNING_HH_
 
-#include <gz/common/detail/SuppressWarning.hh>
-#include <gz/common/config.hh>
+#include <gz/utils/SuppressWarning.hh>
+
+#pragma message("gz-common SuppressWarning is deprecated, use gz-utils")
+// These macros have been moved to gz-utils so they may be more broadly used.
+// The implementations are aliases to those implementations and are deprecated
+// in gz-common5 and are to be removed in gz-common6
 
 // This header contains cross-platform macros for suppressing warnings. Please
 // only use these macros responsibly when you are certain that the compiler is
@@ -32,13 +35,13 @@
  * Usage example:
  *
  * SomeClass* ptr = CreatePtr();
- * IGN_COMMON_WARN_IGNORE__DELETE_NON_VIRTUAL_DESTRUCTOR
+ * GZ_COMMON_WARN_IGNORE__DELETE_NON_VIRTUAL_DESTRUCTOR
  * delete ptr;
- * IGN_COMMON_WARN_RESUME__DELETE_NON_VIRTUAL_DESTRUCTOR
+ * GZ_COMMON_WARN_RESUME__DELETE_NON_VIRTUAL_DESTRUCTOR
  *
  */
 
-// Be sure to call the IGN_COMMON_WARN_RESUME__XXXXX macro at the end of the
+// Be sure to call the GZ_COMMON_WARN_RESUME__XXXXX macro at the end of the
 // block of code where the warning suppression is needed. Otherwise, you might
 // inadvertently suppress legitimate warnings.
 
@@ -51,10 +54,10 @@
 /// of our implementation) that the pointer is definitely not pointing to a more
 /// derived type.
 #define IGN_COMMON_WARN_IGNORE__DELETE_NON_VIRTUAL_DESTRUCTOR \
-  DETAIL_IGN_COMMON_WARN_IGNORE__DELETE_NON_VIRTUAL_DESTRUCTOR
+  GZ_UTILS_WARN_IGNORE__NON_VIRTUAL_DESTRUCTOR
 
 #define IGN_COMMON_WARN_RESUME__DELETE_NON_VIRTUAL_DESTRUCTOR \
-  DETAIL_IGN_COMMON_WARN_RESUME__DELETE_NON_VIRTUAL_DESTRUCTOR
+  GZ_UTILS_WARN_RESUME__NON_VIRTUAL_DESTRUCTOR
 
 
 /// \brief Microsoft Visual Studio does not automatically export the interface
@@ -63,14 +66,9 @@
 /// choose to suppress the warning instead of needlessly adding the class
 /// information to the DLL interface.
 #define IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING \
-  DETAIL_IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
+  GZ_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
 
 #define IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING \
-  DETAIL_IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
-
-
-// TODO(anyone): Add more warning types as they become relevant.
-// Do not add warning
-// types to suppress unless they are genuinely necessary.
+  GZ_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
 
 #endif

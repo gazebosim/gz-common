@@ -16,7 +16,11 @@
 */
 
 #include <gtest/gtest.h>
+
+#define SUPPRESS_IGNITION_HEADER_DEPRECATION
+
 #include <ignition/common/Battery.hh>
+#include <ignition/utils/SuppressWarning.hh>
 
 /////////////////////////////////////////////////
 // Make sure the ignition namespace still works
@@ -24,3 +28,5 @@ TEST(Deprecated, IgnitionNamespace)
 {
   ignition::common::Battery battery;
 }
+
+#undef SUPPRESS_IGNITION_HEADER_DEPRECATION

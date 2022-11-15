@@ -9,10 +9,10 @@
 
 Build | Status
 -- | --
-Test coverage | [![codecov](https://codecov.io/gh/gazebosim/gz-common/branch/ign-common3/graph/badge.svg)](https://codecov.io/gh/gazebosim/gz-common/branch/ign-common3)
-Ubuntu Bionic | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-ign-common3-bionic-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-ign-common3-bionic-amd64)
-Homebrew      | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-ign-common3-homebrew-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-ign-common3-homebrew-amd64)
-Windows       | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-ign-common3-windows7-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-ign-common3-windows7-amd64)
+Test coverage | [![codecov](https://codecov.io/gh/gazebosim/gz-common/branch/main/graph/badge.svg)](https://codecov.io/gh/gazebosim/gz-common)
+Ubuntu Focal | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-main-focal-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-main-focal-amd64)
+Homebrew      | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-main-homebrew-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-main-homebrew-amd64)
+Windows       | [![Build Status](https://build.osrfoundation.org/job/ign_common-ci-win/badge/icon)](https://build.osrfoundation.org/job/ign_common-ci-win/)
 
 Gazebo Common, a component of [Gazebo](https://gazebosim.org), provides a set of libraries that
 cover many different use cases. An audio-visual library supports
@@ -55,11 +55,11 @@ callback system.
 
 # Install
 
-See the [installation tutorial](https://gazebosim.org/api/common/3.11/tutorials.html).
+See the [installation tutorial](https://gazebosim.org/api/common/4.0/install.html).
 
 # Usage
 
-Please refer to the [examples directory](https://github.com/gazebosim/gz-common/tree/ign-common3/examples).
+Please refer to the [examples directory](https://github.com/gazebosim/gz-common/tree/main/examples).
 
 # Folder Structure
 
@@ -70,7 +70,7 @@ Refer to the following table for information about important directories and fil
 +-- events                   Header and source files for the Event component.
 +-- examples                 Example programs.
 +-- graphics                 Header and source files for the Graphics component.
-+-- include/ignition/common  Header files for the core component.
++-- include/gz/common  Header files for the core component.
 +-- profiler                 Header and source files for the Profiler component.
 +-- src                      Core source files and unit tests.
 +-- test
@@ -86,8 +86,8 @@ Refer to the following table for information about important directories and fil
 ```
 # Contributing
 
-Please see
-[CONTRIBUTING.md](https://github.com/gazebosim/gz-sim/blob/main/CONTRIBUTING.md).
+Please see the
+[contributing guide](https://gazebosim.org/docs/all/contributing).
 
 # Code of Conduct
 

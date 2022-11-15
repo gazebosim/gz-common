@@ -16,7 +16,6 @@
  */
 #include <string>
 #include <sstream>
-#include <unordered_map>
 
 #include <gz/common/Console.hh>
 #include <gz/common/config.hh>
@@ -25,11 +24,11 @@
 #include <Windows.h>
 #endif
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 
-FileLogger Console::log("");
+FileLogger common::Console::log("");
 
 // On UNIX, these are ANSI-based color codes. On Windows, these are colors from
 // docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences .
@@ -88,7 +87,7 @@ Logger::~Logger()
 /////////////////////////////////////////////////
 Logger &Logger::operator()()
 {
-  Console::log() << "(" << systemTimeIso() << ") ";
+  Console::log() << "(" << common::systemTimeIso() << ") ";
   (*this) << Console::Prefix() << this->prefix;
 
   return (*this);
@@ -99,7 +98,7 @@ Logger &Logger::operator()(const std::string &_file, int _line)
 {
   int index = _file.find_last_of("/") + 1;
 
-  Console::log() << "(" << systemTimeIso() << ") ";
+  Console::log() << "(" << common::systemTimeIso() << ") ";
   std::stringstream prefixString;
   prefixString << Console::Prefix() << this->prefix
     << "[" << _file.substr(index , _file.size() - index) << ":"
@@ -107,23 +106,6 @@ Logger &Logger::operator()(const std::string &_file, int _line)
   (*this) << prefixString.str();
 
   return (*this);
-}
-
-
-/////////////////////////////////////////////////
-/// \brief Provide a lock_guard for a given buffer
-/// This is workaround to keep us from breaking ABI, and can be removed
-/// in future versions
-/// \param[in] _bufferId a unique id of the requesting buffer
-///     Acquired via reinterpret_cast<uintptr_t>(this)
-/// \returns A RAII lock guard
-std::lock_guard<std::mutex> BufferLock(std::uintptr_t _bufferId)
-{
-  static std::unordered_map<uintptr_t, std::mutex> *kSyncMutex{nullptr};
-  if(nullptr == kSyncMutex)
-    kSyncMutex = new std::unordered_map<uintptr_t, std::mutex>();
-
-  return std::lock_guard<std::mutex>(kSyncMutex->operator[](_bufferId));
 }
 
 /////////////////////////////////////////////////
@@ -142,7 +124,7 @@ Logger::Buffer::~Buffer()
 std::streamsize Logger::Buffer::xsputn(const char *_char,
                                        std::streamsize _count)
 {
-  auto lk = BufferLock(reinterpret_cast<std::uintptr_t>(this));
+  std::lock_guard<std::mutex> lk(this->syncMutex);
   return std::stringbuf::xsputn(_char, _count);
 }
 
@@ -151,13 +133,13 @@ int Logger::Buffer::sync()
 {
   std::string outstr;
   {
-    auto lk = BufferLock(reinterpret_cast<std::uintptr_t>(this));
+    std::lock_guard<std::mutex> lk(this->syncMutex);
     outstr = this->str();
   }
 
   // Log messages to disk
   {
-    auto lk = BufferLock(reinterpret_cast<std::uintptr_t>(this));
+    std::lock_guard<std::mutex> lk(this->syncMutex);
     Console::log << outstr;
     Console::log.flush();
   }
@@ -178,7 +160,7 @@ int Logger::Buffer::sync()
       ss << std::endl;
 
     {
-      auto lk = BufferLock(reinterpret_cast<std::uintptr_t>(this));
+      std::lock_guard<std::mutex> lk(this->syncMutex);
       fprintf(outstream, "%s", ss.str().c_str());
     }
 #else
@@ -206,7 +188,7 @@ int Logger::Buffer::sync()
         this->type == Logger::STDOUT ? std::cout : std::cerr;
 
     {
-      auto lk = BufferLock(reinterpret_cast<std::uintptr_t>(this));
+      std::lock_guard<std::mutex> lk(this->syncMutex);
       if (vtProcessing)
         outStream << "\x1b[" << this->color << "m" << outstr << "\x1b[m";
       else
@@ -216,7 +198,7 @@ int Logger::Buffer::sync()
   }
 
   {
-    auto lk = BufferLock(reinterpret_cast<std::uintptr_t>(this));
+    std::lock_guard<std::mutex> lk(this->syncMutex);
     this->str("");
   }
   return 0;
@@ -259,10 +241,12 @@ void FileLogger::Init(const std::string &_directory,
 #endif
     )
   {
-    if (!env(IGN_HOMEDIR, logPath))
+    if (!env(GZ_HOMEDIR, logPath))
     {
-      ignerr << "Missing HOME environment variable."
-        << "No log file will be generated.";
+      // Use stderr here to prevent infinite recursion
+      // trying to get the log initialized
+      std::cerr << "Missing HOME environment variable."
+        << "No log file will be generated." << std::endl;
       return;
     }
     logPath = joinPaths(logPath, _directory);
@@ -295,7 +279,7 @@ void FileLogger::Init(const std::string &_directory,
   if (isDirectory(logPath))
     this->logDirectory = logPath;
   else
-    this->logDirectory = logPath.substr(0, logPath.rfind(separator("")));
+    this->logDirectory = common::parentPath(logPath);
 
   this->initialized = true;
 
@@ -320,9 +304,9 @@ void FileLogger::Close()
 FileLogger &FileLogger::operator()()
 {
   if (!this->initialized)
-    this->Init(".ignition", "auto_default.log");
+    this->Init(".gz", "auto_default.log");
 
-  (*this) << "(" << systemTimeIso() << ") ";
+  (*this) << "(" << common::systemTimeIso() << ") ";
   return (*this);
 }
 
@@ -330,10 +314,10 @@ FileLogger &FileLogger::operator()()
 FileLogger &FileLogger::operator()(const std::string &_file, int _line)
 {
   if (!this->initialized)
-    this->Init(".ignition", "auto_default.log");
+    this->Init(".gz", "auto_default.log");
 
   int index = _file.find_last_of("/") + 1;
-  (*this) << "(" << systemTimeIso() << ") ["
+  (*this) << "(" << common::systemTimeIso() << ") ["
     << _file.substr(index , _file.size() - index) << ":" << _line << "]";
 
   return (*this);
@@ -366,7 +350,7 @@ FileLogger::Buffer::~Buffer()
 std::streamsize FileLogger::Buffer::xsputn(const char *_char,
                                            std::streamsize _count)
 {
-  auto lk = BufferLock(reinterpret_cast<std::uintptr_t>(this));
+  std::lock_guard<std::mutex> lk(this->syncMutex);
   return std::stringbuf::xsputn(_char, _count);
 }
 
@@ -377,16 +361,16 @@ int FileLogger::Buffer::sync()
     return -1;
 
   {
-    auto lk = BufferLock(reinterpret_cast<std::uintptr_t>(this));
+    std::lock_guard<std::mutex> lk(this->syncMutex);
     *this->stream << this->str();
   }
 
   {
-    auto lk = BufferLock(reinterpret_cast<std::uintptr_t>(this));
+    std::lock_guard<std::mutex> lk(this->syncMutex);
     this->stream->flush();
   }
   {
-    auto lk = BufferLock(reinterpret_cast<std::uintptr_t>(this));
+    std::lock_guard<std::mutex> lk(this->syncMutex);
     this->str("");
   }
   return !(*this->stream);

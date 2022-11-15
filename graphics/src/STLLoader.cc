@@ -25,12 +25,19 @@
 #include "gz/common/SubMesh.hh"
 #include "gz/common/STLLoader.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
+
+
+//////////////////////////////////////////////////
+class gz::common::STLLoader::Implementation
+{
+};
 
 //////////////////////////////////////////////////
 STLLoader::STLLoader()
-: MeshLoader()
+: MeshLoader(),
+  dataPtr(gz::utils::MakeImpl<Implementation>())
 {
 }
 
@@ -46,7 +53,7 @@ Mesh *STLLoader::Load(const std::string &_filename)
 
   if (!file)
   {
-    ignerr << "Unable to open file[" << _filename << "]\n";
+    gzerr << "Unable to open file[" << _filename << "]\n";
     return nullptr;
   }
 
@@ -58,7 +65,7 @@ Mesh *STLLoader::Load(const std::string &_filename)
     fclose(file);
     file = fopen(_filename.c_str(), "rb");
     if (!this->ReadBinary(file, mesh))
-      ignerr << "Unable to read STL[" << _filename << "]\n";
+      gzerr << "Unable to read STL[" << _filename << "]\n";
   }
 
   fclose(file);
@@ -103,7 +110,7 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
     // FACET
     if (this->Leqi(token, const_cast<char*>("facet")))
     {
-      math::Vector3d normal;
+      gz::math::Vector3d normal;
 
       // Get the XYZ coordinates of the normal vector to the face.
       sscanf(next, "%*s %e %e %e", &r1, &r2, &r3);
@@ -120,7 +127,7 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
 
       for (; result; )
       {
-        math::Vector3d vertex;
+        gz::math::Vector3d vertex;
         if (fgets (input, LINE_MAX_LEN, _filein) == nullptr)
         {
           result = false;
@@ -196,8 +203,8 @@ bool STLLoader::ReadBinary(FILE *_filein, Mesh *_mesh)
   // Number of faces.
   face_num = this->LongIntRead(_filein);
 
-  math::Vector3d normal;
-  math::Vector3d vertex;
+  gz::math::Vector3d normal;
+  gz::math::Vector3d vertex;
 
   // For each (triangular) face,
   // components of normal vector,
@@ -303,7 +310,7 @@ int STLLoader::RcolFind(float _a[][COR3_MAX], int _m, int _n, float _r[])
   {
     for (i = 0; i < _m; ++i)
     {
-      if (!math::equal(_a[i][j], _r[i]))
+      if (!gz::math::equal(_a[i][j], _r[i]))
         break;
       if (i == _m-1)
         return j;

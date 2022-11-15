@@ -18,26 +18,27 @@
 #define GZ_COMMON_SUBMESH_HH_
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
 #include <gz/math/Vector3.hh>
 #include <gz/math/Vector2.hh>
 
+#include <gz/utils/ImplPtr.hh>
+
 #include <gz/common/graphics/Types.hh>
 #include <gz/common/graphics/Export.hh>
-#include <gz/common/SuppressWarning.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
-    class SubMeshPrivate;
     class Material;
     class NodeAssignment;
 
     /// \brief A child mesh
-    class IGNITION_COMMON_GRAPHICS_VISIBLE SubMesh
+    class GZ_COMMON_GRAPHICS_VISIBLE SubMesh
     {
       /// \brief An enumeration of the geometric mesh primitives
       public: enum PrimitiveType
@@ -67,10 +68,6 @@ namespace ignition
       /// \brief Constructor
       /// \param _name Name of the submesh.
       public: explicit SubMesh(const std::string &_name);
-
-      /// \brief Copy Constructor
-      /// \brief _other Other mesh object
-      public: SubMesh(const SubMesh &_other);
 
       /// \brief Destructor
       public: virtual ~SubMesh();
@@ -160,6 +157,12 @@ namespace ignition
       /// \sa bool HasVertex(const unsigned int) const
       public: gz::math::Vector3d Vertex(const unsigned int _index) const;
 
+      /// \brief Get the raw vertex pointer. This is unsafe, it is the
+      /// caller's responsability to ensure it's not indexed out of bounds.
+      /// The valid range is [0; VertexCount())
+      /// \return Raw vertices
+      public: const gz::math::Vector3d* VertexPtr() const;
+
       /// \brief Set a vertex
       /// \param[in] _index Index of the vertex
       /// \param[in] _v The new vertex coordinate
@@ -219,6 +222,12 @@ namespace ignition
       /// \param[in] _index Array index.
       /// \return The index, or -1 if the _index is out of bounds.
       public: int Index(const unsigned int _index) const;
+
+      /// \brief Get the raw index pointer. This is unsafe, it is the
+      /// caller's responsability to ensure it's not indexed out of bounds.
+      /// The valid range is [0; IndexCount())
+      /// \return Raw indices
+      public: const unsigned int* IndexPtr() const;
 
       /// \brief Set an index
       /// \param[in] _index Index of the indices
@@ -288,8 +297,15 @@ namespace ignition
       public: void SetMaterialIndex(const unsigned int _index);
 
       /// \brief Get the material index
-      /// \return The assigned material index.
-      public: unsigned int MaterialIndex() const;
+      /// \return The assigned material index. If no material index is assigned
+      /// to this submesh, std::numeric_limits<unsigned int>::max() is returned.
+      /// \note This method is deprecated, use GetMaterialIndex instead
+      public: unsigned int GZ_DEPRECATED(5) MaterialIndex() const;
+
+      /// \brief Get the material index
+      /// \return The assigned material index. Nullopt is returned if the
+      /// submesh has no assigned material index
+      public: std::optional<unsigned int> GetMaterialIndex() const;
 
       /// \brief Return true if this submesh has the vertex
       /// \param[in] _v Vertex coordinate
@@ -396,15 +412,13 @@ namespace ignition
       /// the primitive type is not TRIANGLES, or there are no triangles.
       public: double Volume() const;
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Private data pointer.
-      private: std::unique_ptr<SubMeshPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
 
     /// \brief Vertex to node weighted assignement for skeleton animation
     /// visualization
-    class IGNITION_COMMON_GRAPHICS_VISIBLE NodeAssignment
+    class GZ_COMMON_GRAPHICS_VISIBLE NodeAssignment
     {
       /// \brief Constructor.
       public: NodeAssignment();

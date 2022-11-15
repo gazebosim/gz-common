@@ -30,23 +30,27 @@
 #include <gz/math/Vector3.hh>
 #include <gz/math/Pose3.hh>
 
+#include <gz/utils/ImplPtr.hh>
+
 #include <gz/common/graphics/Types.hh>
 #include <gz/common/SingletonT.hh>
 #include <gz/common/graphics/Export.hh>
-#include <gz/common/SuppressWarning.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
     /// \brief forward declaration
     class Mesh;
     class SubMesh;
-    class MeshManagerPrivate;
 
-    /// \class MeshManager MeshManager.hh ignition/common/MeshManager.hh
-    /// \brief Maintains and manages all meshes
-    class IGNITION_COMMON_GRAPHICS_VISIBLE MeshManager
+    /// \class MeshManager MeshManager.hh gz/common/MeshManager.hh
+    /// \brief Maintains and manages all meshes. Supported mesh formats are
+    /// STL (STLA, STLB), COLLADA, OBJ, GLTF (GLB) and FBX. By default only GLTF
+    /// and FBX are loaded using assimp loader, however if GZ_MESH_FORCE_ASSIMP
+    /// environment variable is set, then MeshManager will use assimp loader for
+    /// all supported mesh formats.
+    class GZ_COMMON_GRAPHICS_VISIBLE MeshManager
         : public SingletonT<MeshManager>
     {
       /// \brief Constructor
@@ -56,6 +60,11 @@ namespace ignition
       ///
       /// Destroys the collada loader, the stl loader and all the meshes
       private: virtual ~MeshManager();
+
+      /// Return a pointer to the mesh manager
+      /// \todo(ahcorde) Remove inheritance from Singleton base class
+      /// \return a pointer to the mesh manager
+      public: static MeshManager* Instance();
 
       /// \brief Load a mesh from a file.
       /// The mesh will be searched on the global SystemPaths instance provided
@@ -99,6 +108,15 @@ namespace ignition
       /// See ~MeshManager.
       /// \param[in] the mesh to add.
       public: void AddMesh(Mesh *_mesh);
+
+      /// \brief Remove a mesh based on a name.
+      /// \param[in] _name Name of the mesh to remove.
+      /// \return True if the mesh was removed, false if the mesh with the
+      /// provided name could not be found.
+      public: bool RemoveMesh(const std::string &_name);
+
+      /// \brief Remove all meshes.
+      public: void RemoveAll();
 
       /// \brief Get a mesh by name.
       /// \param[in] _name the name of the mesh to look for
@@ -167,9 +185,9 @@ namespace ignition
      /// \brief Create a capsule mesh
      /// \param[in] _name the name of the new mesh
      /// \param[in] _radius the radius of the capsule in the x y plane
-     /// \param[in] _length length of the body
+     /// \param[in] _length length of the capsule along z
      /// \param[in] _rings the number of circles along the height
-     /// \param[in] _segments the number of segment per circle
+     /// \param[in] _segments the number of segments per circle
      public: void CreateCapsule(const std::string &_name,
                                 const double radius,
                                 const double length,
@@ -205,7 +223,7 @@ namespace ignition
                               const float _height,
                               const int _rings,
                               const int _segments,
-                              const double _arc = 2.0 * IGN_PI);
+                              const double _arc = 2.0 * GZ_PI);
 
       /// \brief Create mesh for a plane
       /// \param[in] _name
@@ -231,8 +249,12 @@ namespace ignition
                                const gz::math::Vector2d &_segments,
                                const gz::math::Vector2d &_uvTile);
 
+      /// \brief Sets the forceAssimp flag by reading the GZ_MESH_FORCE_ASSIMP
+      /// environment variable. If forceAssimp true, MeshManager uses Assimp
+      /// for loading all mesh formats, otherwise only for GLTF and FBX.
+      public: void SetAssimpEnvs();
+
       /// \brief Tesselate a 2D mesh
-      ///
       /// Makes a zigzag pattern compatible with strips
       /// \param[in] _sm the mesh to tesselate
       /// \param[in] _meshWith mesh width
@@ -284,10 +306,8 @@ namespace ignition
                       const gz::math::Vector2d &_p,
                       const double _tol);
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
-      /// \brief Pointer to private data
-      private: std::unique_ptr<MeshManagerPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      /// \brief Private data pointer.
+      GZ_UTILS_UNIQUE_IMPL_PTR(dataPtr)
 
       /// \brief Singleton implementation
       private: friend class SingletonT<MeshManager>;

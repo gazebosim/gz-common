@@ -17,11 +17,12 @@
 
 #include <gtest/gtest.h>
 
-#include "test_config.h"
-
 #include "gz/common/SVGLoader.hh"
 
-using namespace ignition;
+#include "gz/common/testing/AutoLogFixture.hh"
+#include "gz/common/testing/TestPaths.hh"
+
+using namespace gz;
 using namespace common;
 
 
@@ -36,7 +37,9 @@ double tol = 0.05;
 /// \brief return path to svg file in test/data/svg
 std::string testSvg(const std::string &_filename)
 {
-  return common::testing::TestFile("data", "svg", _filename);
+  std::string file = common::testing::TestFile("data", "svg", _filename);
+  EXPECT_TRUE(exists(file));
+  return file;
 }
 
 /////////////////////////////////////////////////
@@ -204,8 +207,8 @@ TEST_F(SVGLoaderTest, ClosedLoops)
   out.close();
 
 
-  std::vector< std::vector<math::Vector2d> > closedPolys;
-  std::vector< std::vector<math::Vector2d> > openPolys;
+  std::vector< std::vector<gz::math::Vector2d> > closedPolys;
+  std::vector< std::vector<gz::math::Vector2d> > openPolys;
 
   loader.PathsToClosedPolylines(paths, tol, closedPolys, openPolys);
   EXPECT_EQ(0u, openPolys.size());
@@ -228,8 +231,8 @@ TEST_F(SVGLoaderTest, Transforms)
   out.close();
 
 
-  std::vector< std::vector<math::Vector2d> > closedPolys;
-  std::vector< std::vector<math::Vector2d> > openPolys;
+  std::vector< std::vector<gz::math::Vector2d> > closedPolys;
+  std::vector< std::vector<gz::math::Vector2d> > openPolys;
 
   loader.PathsToClosedPolylines(paths, tol, closedPolys, openPolys);
 
@@ -264,8 +267,8 @@ TEST_F(SVGLoaderTest, Transforms2)
   out.close();
 
 
-  std::vector< std::vector<math::Vector2d> > closedPolys;
-  std::vector< std::vector<math::Vector2d> > openPolys;
+  std::vector< std::vector<gz::math::Vector2d> > closedPolys;
+  std::vector< std::vector<gz::math::Vector2d> > openPolys;
 
   loader.PathsToClosedPolylines(paths, tol, closedPolys, openPolys);
 
@@ -275,32 +278,32 @@ TEST_F(SVGLoaderTest, Transforms2)
   EXPECT_EQ("original", paths[0].id);
   double dxOriginal = fabs(closedPolys[0][0].X() - closedPolys[0][1].X() );
   double dyOriginal = fabs(closedPolys[0][0].Y() - closedPolys[0][1].Y() );
-  ignmsg << dxOriginal << " X original 0-1\n";
-  ignmsg << dyOriginal << " Y original 0-1\n";
+  gzmsg << dxOriginal << " X original 0-1\n";
+  gzmsg << dyOriginal << " Y original 0-1\n";
   // the sgment is vertical (dx = 0)
   EXPECT_DOUBLE_EQ(dxOriginal, 0);
 
   EXPECT_EQ("skewx", paths[1].id);
   double dxSkewX = fabs(closedPolys[1][0].X() - closedPolys[1][1].X() );
   double dySkewX = fabs(closedPolys[1][0].Y() - closedPolys[1][1].Y() );
-  ignmsg << dxSkewX << " X skewX 0-1\n";
-  ignmsg << dySkewX << " Y skewX 0-1\n";
+  gzmsg << dxSkewX << " X skewX 0-1\n";
+  gzmsg << dySkewX << " Y skewX 0-1\n";
   // the segment is 45 degree, hence dx = dy
   EXPECT_DOUBLE_EQ(dxSkewX, dySkewX);
 
   EXPECT_EQ("skewy", paths[2].id);
   double dxSkewY = fabs(closedPolys[2][0].X() - closedPolys[2][1].X() );
   double dySkewY = fabs(closedPolys[2][0].Y() - closedPolys[2][1].Y() );
-  ignmsg << dxSkewY << " X skewY 0-1\n";
-  ignmsg << dySkewY << " Y skewY 0-1\n";
+  gzmsg << dxSkewY << " X skewY 0-1\n";
+  gzmsg << dySkewY << " Y skewY 0-1\n";
   // the segment is vertical (dx = 0)
   EXPECT_DOUBLE_EQ(dxOriginal, dxSkewY);
 
   // segment is skewed 30 degrees
   double dxSkewYb = fabs(closedPolys[2][5].X() - closedPolys[2][4].X() );
   double dySkewYb = fabs(closedPolys[2][5].Y() - closedPolys[2][4].Y() );
-  ignmsg << dxSkewYb << " X skewY b\n";
-  ignmsg << dySkewYb << " Y skewY b\n";
+  gzmsg << dxSkewYb << " X skewY b\n";
+  gzmsg << dySkewYb << " Y skewY b\n";
   EXPECT_GT(dxSkewYb, 131.0);
   EXPECT_GT(dySkewYb, 35.0);
 }
@@ -320,17 +323,17 @@ TEST_F(SVGLoaderTest, Transforms3)
   EXPECT_EQ("path_no_tx", paths[1].id);
   EXPECT_EQ("path_tx", paths[2].id);
 
-  ignerr << paths[0].id << " tx: " << paths[0].transform << std::endl;
-  ignerr << paths[1].id << " tx: " << paths[1].transform << std::endl;
-  ignerr << paths[2].id << " tx: " << paths[2].transform << std::endl;
+  gzerr << paths[0].id << " tx: " << paths[0].transform << std::endl;
+  gzerr << paths[1].id << " tx: " << paths[1].transform << std::endl;
+  gzerr << paths[2].id << " tx: " << paths[2].transform << std::endl;
 
   // save for inspection
   std::ofstream out("transform3.html");
   loader.DumpPaths(paths, out);
   out.close();
 
-  std::vector< std::vector<math::Vector2d> > closedPolys;
-  std::vector< std::vector<math::Vector2d> > openPolys;
+  std::vector< std::vector<gz::math::Vector2d> > closedPolys;
+  std::vector< std::vector<gz::math::Vector2d> > openPolys;
   loader.PathsToClosedPolylines(paths, tol, closedPolys, openPolys);
 
   EXPECT_EQ(0u, openPolys.size());
@@ -358,11 +361,4 @@ TEST_F(SVGLoaderTest, MultipleFiles)
     loader.DumpPaths(paths, out);
     out.close();
   }
-}
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
 }

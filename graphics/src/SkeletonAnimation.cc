@@ -19,11 +19,11 @@
 #include "gz/common/NodeAnimation.hh"
 #include "gz/common/SkeletonAnimation.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 /// Prvate data class
-class gz::common::SkeletonAnimationPrivate
+class gz::common::SkeletonAnimation::Implementation
 {
   /// \brief the node name
   public: std::string name;
@@ -37,90 +37,95 @@ class gz::common::SkeletonAnimationPrivate
 
 //////////////////////////////////////////////////
 SkeletonAnimation::SkeletonAnimation(const std::string &_name)
-  : data(new SkeletonAnimationPrivate)
+: dataPtr(gz::utils::MakeImpl<Implementation>())
 {
-  this->data->name = _name;
+  this->dataPtr->name = _name;
 }
 
 //////////////////////////////////////////////////
 SkeletonAnimation::~SkeletonAnimation()
 {
-  this->data->animations.clear();
-  delete this->data;
-  this->data = NULL;
-}
-
-//////////////////////////////////////////////////
-SkeletonAnimation &SkeletonAnimation::operator=(const SkeletonAnimation &_other)
-{
-  if (this == &_other)
-    return *this;
-
-  this->data->name = _other.data->name;
-  this->data->length = _other.data->length;
-  this->data->animations = _other.data->animations;
-
-  return *this;
 }
 
 //////////////////////////////////////////////////
 void SkeletonAnimation::SetName(const std::string &_name)
 {
-  this->data->name = _name;
+  this->dataPtr->name = _name;
 }
 
 //////////////////////////////////////////////////
 std::string SkeletonAnimation::Name() const
 {
-  return this->data->name;
+  return this->dataPtr->name;
 }
 
 //////////////////////////////////////////////////
 unsigned int SkeletonAnimation::NodeCount() const
 {
-  return this->data->animations.size();
+  return this->dataPtr->animations.size();
 }
 
 //////////////////////////////////////////////////
 NodeAnimation *SkeletonAnimation::NodeAnimationByName(
     const std::string &_node) const
 {
-  auto it = this->data->animations.find(_node);
-  if (it != this->data->animations.end())
+  auto it = this->dataPtr->animations.find(_node);
+  if (it != this->dataPtr->animations.end())
     return it->second.get();
   return nullptr;
 }
 
 //////////////////////////////////////////////////
+bool SkeletonAnimation::XDisplacement() const
+{
+  bool xDisplacement = false;
+  for (auto iter = this->dataPtr->animations.begin();
+      iter != this->dataPtr->animations.end(); ++iter)
+  {
+    auto node = iter->second;
+    math::Matrix4d lastPos = node->KeyFrame(node->FrameCount() - 1).second;
+    math::Matrix4d firstPos = node->KeyFrame(0).second;
+    xDisplacement = !math::equal(firstPos.Translation().X(),
+                                 lastPos.Translation().X());
+    if (xDisplacement)
+    {
+      break;
+    }
+  }
+  return xDisplacement;
+}
+
+//////////////////////////////////////////////////
 bool SkeletonAnimation::HasNode(const std::string &_node) const
 {
-  return (this->data->animations.find(_node) != this->data->animations.end());
+  return (this->dataPtr->animations.find(_node) !=
+      this->dataPtr->animations.end());
 }
 
 //////////////////////////////////////////////////
 void SkeletonAnimation::AddKeyFrame(const std::string &_node,
     const double _time, const math::Matrix4d &_mat)
 {
-  if (this->data->animations.find(_node) == this->data->animations.end())
-    this->data->animations[_node] = std::make_shared<NodeAnimation>(_node);
+  if (this->dataPtr->animations.find(_node) == this->dataPtr->animations.end())
+    this->dataPtr->animations[_node] = std::make_shared<NodeAnimation>(_node);
 
-  if (_time > this->data->length)
-    this->data->length = _time;
+  if (_time > this->dataPtr->length)
+    this->dataPtr->length = _time;
 
-  this->data->animations[_node]->AddKeyFrame(_time, _mat);
+  this->dataPtr->animations[_node]->AddKeyFrame(_time, _mat);
 }
 
 //////////////////////////////////////////////////
 void SkeletonAnimation::AddKeyFrame(const std::string &_node,
       const double _time, const math::Pose3d &_pose)
 {
-  if (this->data->animations.find(_node) == this->data->animations.end())
-    this->data->animations[_node] = std::make_shared<NodeAnimation>(_node);
+  if (this->dataPtr->animations.find(_node) == this->dataPtr->animations.end())
+    this->dataPtr->animations[_node] = std::make_shared<NodeAnimation>(_node);
 
-  if (_time > this->data->length)
-    this->data->length = _time;
+  if (_time > this->dataPtr->length)
+    this->dataPtr->length = _time;
 
-  this->data->animations[_node]->AddKeyFrame(_time, _pose);
+  this->dataPtr->animations[_node]->AddKeyFrame(_time, _pose);
 }
 
 //////////////////////////////////////////////////
@@ -129,8 +134,9 @@ math::Matrix4d SkeletonAnimation::NodePoseAt(const std::string &_node,
 {
   math::Matrix4d mat;
 
-  if (this->data->animations[_node])
-    mat = this->data->animations[_node]->FrameAt(_time, _loop);
+  auto nodeAnim = this->dataPtr->animations.find(_node);
+  if (nodeAnim != this->dataPtr->animations.end())
+    mat = nodeAnim->second->FrameAt(_time, _loop);
 
   return mat;
 }
@@ -146,8 +152,8 @@ std::map<std::string, math::Matrix4d> SkeletonAnimation::PoseAt(
   ///  prev and next keyframe for each node at each time step, but rather
   ///  doing it only once per time step.
   std::map<std::string, math::Matrix4d> pose;
-  for (auto iter = this->data->animations.begin();
-      iter != this->data->animations.end(); ++iter)
+  for (auto iter = this->dataPtr->animations.begin();
+      iter != this->dataPtr->animations.end(); ++iter)
   {
     pose[iter->first] = iter->second->FrameAt(_time, _loop);
   }
@@ -159,10 +165,10 @@ std::map<std::string, math::Matrix4d> SkeletonAnimation::PoseAt(
 std::map<std::string, math::Matrix4d> SkeletonAnimation::PoseAtX(
              const double _x, const std::string &_node, const bool _loop) const
 {
-  auto nodeAnim = this->data->animations.find(_node);
-  if (nodeAnim == this->data->animations.end())
+  auto nodeAnim = this->dataPtr->animations.find(_node);
+  if (nodeAnim == this->dataPtr->animations.end())
   {
-    ignerr << "Can't find animation named [" << _node << "]" << std::endl;
+    gzerr << "Can't find animation named [" << _node << "]" << std::endl;
     return {};
   }
 
@@ -189,8 +195,8 @@ std::map<std::string, math::Matrix4d> SkeletonAnimation::PoseAtX(
 //////////////////////////////////////////////////
 void SkeletonAnimation::Scale(const double _scale)
 {
-  for (auto iter = this->data->animations.begin();
-       iter != this->data->animations.end(); ++iter)
+  for (auto iter = this->dataPtr->animations.begin();
+       iter != this->dataPtr->animations.end(); ++iter)
   {
     iter->second->Scale(_scale);
   }
@@ -199,5 +205,5 @@ void SkeletonAnimation::Scale(const double _scale)
 //////////////////////////////////////////////////
 double SkeletonAnimation::Length() const
 {
-  return this->data->length;
+  return this->dataPtr->length;
 }

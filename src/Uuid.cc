@@ -20,7 +20,7 @@
 
 #include "gz/common/Uuid.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 #ifdef _WIN32

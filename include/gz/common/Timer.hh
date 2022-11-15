@@ -17,22 +17,22 @@
 #ifndef GZ_COMMON_TIMER_HH_
 #define GZ_COMMON_TIMER_HH_
 
-#include <gz/common/Time.hh>
 #include <gz/common/Export.hh>
+#include <gz/utils/ImplPtr.hh>
 
-namespace ignition
+#include <chrono>
+#include <iostream>
+
+namespace gz
 {
   namespace common
   {
     /// \class Timer Timer.hh common/common.hh
     /// \brief A timer class, used to time things in real world walltime
-    class IGNITION_COMMON_VISIBLE Timer
+    class GZ_COMMON_VISIBLE Timer
     {
       /// \brief Constructor
       public: Timer();
-
-      /// \brief Destructor
-      public: virtual ~Timer();
 
       /// \brief Start the timer
       public: virtual void Start();
@@ -45,25 +45,19 @@ namespace ignition
       public: bool Running() const;
 
       /// \brief Get the elapsed time
-      /// \return The time
-      public: Time Elapsed() const;
+      /// \return The elapsed time
+      public: std::chrono::duration<double> ElapsedTime() const;
 
       /// \brief Stream operator friendly
       public: friend std::ostream &operator<<(std::ostream &out,
-                                              const ignition::common::Timer &t)
+                                              const common::Timer &t)
               {
-                out << t.Elapsed();
+                out << t.ElapsedTime().count();
                 return out;
               }
 
-      /// \brief The time of the last call to Start
-      private: Time start;
-
-      /// \brief The time when Stop was called.
-      private: Time stop;
-
-      /// \brief True if the timer is running.
-      private: bool running;
+      /// \brief Private data pointer
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

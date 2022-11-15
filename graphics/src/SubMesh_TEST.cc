@@ -17,13 +17,14 @@
 
 #include <gtest/gtest.h>
 
-#include "test_config.h"
 #include "gz/math/Vector3.hh"
 #include "gz/common/Mesh.hh"
 #include "gz/common/SubMesh.hh"
 #include "gz/common/MeshManager.hh"
 
-using namespace ignition;
+#include "gz/common/testing/AutoLogFixture.hh"
+
+using namespace gz;
 
 class SubMeshTest : public common::testing::AutoLogFixture { };
 
@@ -31,7 +32,7 @@ class SubMeshTest : public common::testing::AutoLogFixture { };
 TEST_F(SubMeshTest, SubMesh)
 {
   common::SubMeshPtr submesh(new common::SubMesh());
-  EXPECT_TRUE(submesh != NULL);
+  ASSERT_NE(nullptr, submesh);
 
   submesh->SetName("new_submesh");
   EXPECT_EQ(submesh->Name(), "new_submesh");
@@ -39,8 +40,26 @@ TEST_F(SubMeshTest, SubMesh)
   submesh->SetPrimitiveType(common::SubMesh::TRIANGLES);
   EXPECT_EQ(submesh->SubMeshPrimitiveType(), common::SubMesh::TRIANGLES);
 
+  {
+    // Test deprecated API
+    // TODO(azeey) Remove this scope block when MaterialIndex is removed
+    GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
+    EXPECT_EQ(submesh->MaterialIndex(),
+              std::numeric_limits<unsigned int>::max());
+    submesh->SetMaterialIndex(3u);
+    EXPECT_EQ(submesh->MaterialIndex(), 3u);
+    // Recreate submesh to so test expectations following this block won't
+    // break.
+    submesh = std::make_shared<common::SubMesh>();
+    ASSERT_NE(nullptr, submesh);
+    GZ_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
+  }
+
+  // Use new API
+  EXPECT_FALSE(submesh->GetMaterialIndex().has_value());
   submesh->SetMaterialIndex(3u);
-  EXPECT_EQ(submesh->MaterialIndex(), 3u);
+  ASSERT_TRUE(submesh->GetMaterialIndex().has_value());
+  EXPECT_EQ(submesh->GetMaterialIndex(), 3u);
 
   // verify empty submesh
   EXPECT_EQ(submesh->Min(), math::Vector3d::Zero);
@@ -69,18 +88,21 @@ TEST_F(SubMeshTest, SubMesh)
   EXPECT_EQ(submesh->Vertex(0u), v0);
   EXPECT_TRUE(submesh->HasVertex(v0));
   EXPECT_EQ(submesh->IndexOfVertex(v0), 0);
+  EXPECT_EQ(submesh->VertexPtr()[0], v0);
 
   submesh->AddVertex(v1);
   EXPECT_EQ(submesh->VertexCount(), 2u);
   EXPECT_EQ(submesh->Vertex(1u), v1);
   EXPECT_TRUE(submesh->HasVertex(v1));
   EXPECT_EQ(submesh->IndexOfVertex(v1), 1);
+  EXPECT_EQ(submesh->VertexPtr()[1], v1);
 
   submesh->AddVertex(v2.X(), v2.Y(), v2.Z());
   EXPECT_EQ(submesh->VertexCount(), 3u);
   EXPECT_EQ(submesh->Vertex(2u), v2);
   EXPECT_TRUE(submesh->HasVertex(v2));
   EXPECT_EQ(submesh->IndexOfVertex(v2), 2);
+  EXPECT_EQ(submesh->VertexPtr()[2], v2);
 
   // max / min
   math::Vector3d max(2, 3, 3);
@@ -124,14 +146,17 @@ TEST_F(SubMeshTest, SubMesh)
   submesh->AddIndex(0u);
   EXPECT_EQ(submesh->IndexCount(), 1u);
   EXPECT_EQ(submesh->Index(0), 0);
+  EXPECT_EQ(submesh->IndexPtr()[0], 0u);
 
   submesh->AddIndex(2u);
   EXPECT_EQ(submesh->IndexCount(), 2u);
   EXPECT_EQ(submesh->Index(1u), 2);
+  EXPECT_EQ(submesh->IndexPtr()[1], 2u);
 
   submesh->AddIndex(1u);
   EXPECT_EQ(submesh->IndexCount(), 3u);
   EXPECT_EQ(submesh->Index(2u), 1);
+  EXPECT_EQ(submesh->IndexPtr()[2], 1u);
 
   // add node assignment
   submesh->AddNodeAssignment(1u, 0u, 0.5f);
@@ -150,10 +175,16 @@ TEST_F(SubMeshTest, SubMesh)
   // test directly setting values and failure cases
   submesh->SetVertex(2u, v0);
   EXPECT_EQ(submesh->Vertex(2u), v0);
+  EXPECT_EQ(submesh->VertexPtr()[2u], v0);
   submesh->SetVertex(2u, v2);
   EXPECT_EQ(submesh->Vertex(2u), v2);
+  EXPECT_EQ(submesh->VertexPtr()[2u], v2);
+
+  // Failure case: write out of bounds should be ignored
   submesh->SetVertex(3u, math::Vector3d(0.9, 2, 4));
   EXPECT_EQ(submesh->Vertex(3u), math::Vector3d::Zero);
+  // Out-of-bounds read of a raw pointer is UB. We can't test it.
+  // EXPECT_EQ(submesh->VertexPtr()[3u], math::Vector3d::Zero);
   EXPECT_FALSE(submesh->HasVertex(math::Vector3d(0.9, 2, 4)));
   EXPECT_EQ(submesh->IndexOfVertex(math::Vector3d(0.9, 2, 4)), -1);
 
@@ -188,6 +219,10 @@ TEST_F(SubMeshTest, SubMesh)
   EXPECT_EQ(submesh->Vertex(1), v1 * scale);
   EXPECT_EQ(submesh->Vertex(2), v2 * scale);
 
+  EXPECT_EQ(submesh->VertexPtr()[0], v0 * scale);
+  EXPECT_EQ(submesh->VertexPtr()[1], v1 * scale);
+  EXPECT_EQ(submesh->VertexPtr()[2], v2 * scale);
+
   EXPECT_EQ(submesh->Normal(0), n0);
   EXPECT_EQ(submesh->Normal(1), n1);
   EXPECT_EQ(submesh->Normal(2), n2);
@@ -202,6 +237,10 @@ TEST_F(SubMeshTest, SubMesh)
   EXPECT_EQ(submesh->Vertex(0), v0);
   EXPECT_EQ(submesh->Vertex(1), v1);
   EXPECT_EQ(submesh->Vertex(2), v2);
+
+  EXPECT_EQ(submesh->VertexPtr()[0], v0);
+  EXPECT_EQ(submesh->VertexPtr()[1], v1);
+  EXPECT_EQ(submesh->VertexPtr()[2], v2);
 
   EXPECT_EQ(submesh->Normal(0), n0);
   EXPECT_EQ(submesh->Normal(1), n1);
@@ -218,6 +257,10 @@ TEST_F(SubMeshTest, SubMesh)
   EXPECT_EQ(submesh->Vertex(0), v0 + t0);
   EXPECT_EQ(submesh->Vertex(1), v1 + t0);
   EXPECT_EQ(submesh->Vertex(2), v2 + t0);
+
+  EXPECT_EQ(submesh->VertexPtr()[0], v0 + t0);
+  EXPECT_EQ(submesh->VertexPtr()[1], v1 + t0);
+  EXPECT_EQ(submesh->VertexPtr()[2], v2 + t0);
 
   EXPECT_EQ(submesh->Normal(0), n0);
   EXPECT_EQ(submesh->Normal(1), n1);
@@ -236,11 +279,15 @@ TEST_F(SubMeshTest, SubMesh)
   EXPECT_EQ(submesh->Vertex(1), v1 + t0 + t);
   EXPECT_EQ(submesh->Vertex(2), v2 + t0 + t);
 
+  EXPECT_EQ(submesh->VertexPtr()[0], v0 + t0 + t);
+  EXPECT_EQ(submesh->VertexPtr()[1], v1 + t0 + t);
+  EXPECT_EQ(submesh->VertexPtr()[2], v2 + t0 + t);
+
   // copy constructor
   common::SubMeshPtr submeshCopy(new common::SubMesh(*(submesh.get())));
-  EXPECT_TRUE(submeshCopy != NULL);
+  ASSERT_NE(nullptr, submeshCopy);
   EXPECT_EQ(submeshCopy->Name(), submesh->Name());
-  EXPECT_EQ(submeshCopy->MaterialIndex(), submesh->MaterialIndex());
+  EXPECT_EQ(submeshCopy->GetMaterialIndex(), submesh->GetMaterialIndex());
   EXPECT_EQ(submeshCopy->SubMeshPrimitiveType(),
       submesh->SubMeshPrimitiveType());
   EXPECT_EQ(submeshCopy->VertexCount(), submesh->VertexCount());
@@ -251,13 +298,19 @@ TEST_F(SubMeshTest, SubMesh)
       submesh->NodeAssignmentsCount());
 
   for (unsigned int i = 0; i < submeshCopy->VertexCount(); ++i)
+  {
     EXPECT_EQ(submeshCopy->Vertex(i), submesh->Vertex(i));
+    EXPECT_EQ(submeshCopy->VertexPtr()[i], submesh->VertexPtr()[i]);
+  }
   for (unsigned int i = 0; i < submeshCopy->NormalCount(); ++i)
     EXPECT_EQ(submeshCopy->Normal(i), submesh->Normal(i));
   for (unsigned int i = 0; i < submeshCopy->TexCoordCount(); ++i)
     EXPECT_EQ(submeshCopy->TexCoord(i), submesh->TexCoord(i));
   for (unsigned int i = 0; i < submeshCopy->IndexCount(); ++i)
+  {
     EXPECT_EQ(submeshCopy->Index(i), submesh->Index(i));
+    EXPECT_EQ(submeshCopy->IndexPtr()[i], submesh->IndexPtr()[i]);
+  }
   for (unsigned int i = 0; i < submeshCopy->NodeAssignmentsCount(); ++i)
   {
     common::NodeAssignment nodeCopy =
@@ -283,21 +336,37 @@ TEST_F(SubMeshTest, SubMesh)
     EXPECT_DOUBLE_EQ(vertices[i*3], submesh->Vertex(i).X());
     EXPECT_DOUBLE_EQ(vertices[i*3+1], submesh->Vertex(i).Y());
     EXPECT_DOUBLE_EQ(vertices[i*3+2], submesh->Vertex(i).Z());
+
+    EXPECT_DOUBLE_EQ(vertices[i*3], submesh->VertexPtr()[i].X());
+    EXPECT_DOUBLE_EQ(vertices[i*3+1], submesh->VertexPtr()[i].Y());
+    EXPECT_DOUBLE_EQ(vertices[i*3+2], submesh->VertexPtr()[i].Z());
   }
   for (unsigned int i = 0; i < submeshCopy->IndexCount(); ++i)
+  {
     EXPECT_EQ(indices[i], submesh->Index(i));
-
+    EXPECT_EQ(indices[i], submesh->IndexPtr()[i]);
+  }
 
   // recalculate normal and verify they are different
   submesh->RecalculateNormals();
+
+  EXPECT_NE(submeshCopy->VertexPtr(), submesh->VertexPtr());
+  EXPECT_NE(submeshCopy->IndexPtr(), submesh->IndexPtr());
+
   for (unsigned int i = 0; i < submeshCopy->NormalCount(); ++i)
     EXPECT_NE(submeshCopy->Normal(i), submesh->Normal(i));
   for (unsigned int i = 0; i < submeshCopy->VertexCount(); ++i)
+  {
     EXPECT_EQ(submeshCopy->Vertex(i), submesh->Vertex(i));
+    EXPECT_EQ(submeshCopy->VertexPtr()[i], submesh->VertexPtr()[i]);
+  }
   for (unsigned int i = 0; i < submeshCopy->TexCoordCount(); ++i)
     EXPECT_EQ(submeshCopy->TexCoord(i), submesh->TexCoord(i));
   for (unsigned int i = 0; i < submeshCopy->IndexCount(); ++i)
+  {
     EXPECT_EQ(submeshCopy->Index(i), submesh->Index(i));
+    EXPECT_EQ(submeshCopy->IndexPtr()[i], submesh->IndexPtr()[i]);
+  }
   for (unsigned int i = 0; i < submeshCopy->NodeAssignmentsCount(); ++i)
   {
     common::NodeAssignment nodeCopy =
@@ -311,11 +380,17 @@ TEST_F(SubMeshTest, SubMesh)
   for (unsigned int i = 0; i < submeshCopy->NormalCount(); ++i)
     EXPECT_EQ(submeshCopy->Normal(i), submesh->Normal(i));
   for (unsigned int i = 0; i < submeshCopy->VertexCount(); ++i)
+  {
     EXPECT_EQ(submeshCopy->Vertex(i), submesh->Vertex(i));
+    EXPECT_EQ(submeshCopy->VertexPtr()[i], submesh->VertexPtr()[i]);
+  }
   for (unsigned int i = 0; i < submeshCopy->TexCoordCount(); ++i)
     EXPECT_EQ(submeshCopy->TexCoord(i), submesh->TexCoord(i));
   for (unsigned int i = 0; i < submeshCopy->IndexCount(); ++i)
+  {
     EXPECT_EQ(submeshCopy->Index(i), submesh->Index(i));
+    EXPECT_EQ(submeshCopy->IndexPtr()[i], submesh->IndexPtr()[i]);
+  }
   for (unsigned int i = 0; i < submeshCopy->NodeAssignmentsCount(); ++i)
   {
     common::NodeAssignment nodeCopy =
@@ -332,9 +407,15 @@ TEST_F(SubMeshTest, SubMesh)
   for (unsigned int i = 0; i < submeshCopy->NormalCount(); ++i)
     EXPECT_EQ(submeshCopy->Normal(i), submesh->Normal(i));
   for (unsigned int i = 0; i < submeshCopy->VertexCount(); ++i)
+  {
     EXPECT_EQ(submeshCopy->Vertex(i), submesh->Vertex(i));
+    EXPECT_EQ(submeshCopy->VertexPtr()[i], submesh->VertexPtr()[i]);
+  }
   for (unsigned int i = 0; i < submeshCopy->IndexCount(); ++i)
+  {
     EXPECT_EQ(submeshCopy->Index(i), submesh->Index(i));
+    EXPECT_EQ(submeshCopy->IndexPtr()[i], submesh->IndexPtr()[i]);
+  }
   for (unsigned int i = 0; i < submeshCopy->NodeAssignmentsCount(); ++i)
   {
     common::NodeAssignment nodeCopy =
@@ -364,7 +445,7 @@ TEST_F(SubMeshTest, Volume)
   // Box mesh tests
   {
     common::MeshManager::Instance()->CreateBox("unit_box",
-        math::Vector3d::One, math::Vector2d::One);
+        gz::math::Vector3d::One, gz::math::Vector2d::One);
 
     const common::Mesh *unitBox =
       common::MeshManager::Instance()->MeshByName("unit_box");
@@ -372,7 +453,7 @@ TEST_F(SubMeshTest, Volume)
     EXPECT_DOUBLE_EQ(1.0, unitBox->Volume());
 
     common::MeshManager::Instance()->CreateBox("other_box",
-        math::Vector3d(2, 3, 4), math::Vector2d::One);
+        gz::math::Vector3d(2, 3, 4), gz::math::Vector2d::One);
     const common::Mesh *otherBox =
       common::MeshManager::Instance()->MeshByName("other_box");
     ASSERT_TRUE(otherBox != nullptr);
@@ -386,7 +467,7 @@ TEST_F(SubMeshTest, Volume)
     const common::Mesh *unitSphere =
       common::MeshManager::Instance()->MeshByName("unit_sphere");
     ASSERT_TRUE(unitSphere != nullptr);
-    EXPECT_NEAR(4.0/3.0 * IGN_PI * std::pow(0.5, 3), unitSphere->Volume(),
+    EXPECT_NEAR(4.0/3.0 * GZ_PI * std::pow(0.5, 3), unitSphere->Volume(),
         1e-2);
 
     // A larger sphere needs to have higher resolution in order to get the
@@ -397,14 +478,14 @@ TEST_F(SubMeshTest, Volume)
     const common::Mesh *otherSphere =
       common::MeshManager::Instance()->MeshByName("other_sphere");
     ASSERT_TRUE(otherSphere != nullptr);
-    EXPECT_NEAR(4.0/3.0 * IGN_PI * std::pow(2.5, 3), otherSphere->Volume(),
+    EXPECT_NEAR(4.0/3.0 * GZ_PI * std::pow(2.5, 3), otherSphere->Volume(),
         1e-2);
   }
 
   // Ellipsoid mesh tests
   {
     common::MeshManager::Instance()->CreateEllipsoid("ellipsoid",
-        math::Vector3d(2, 1.4, 7), 10, 10);
+        gz::math::Vector3d(2, 1.4, 7), 10, 10);
 
     const common::Mesh *unitEllipsoid =
       common::MeshManager::Instance()->MeshByName("ellipsoid");
@@ -414,20 +495,20 @@ TEST_F(SubMeshTest, Volume)
 
     // Checking that we can not add or modify a new mesh with the name
     common::MeshManager::Instance()->CreateEllipsoid("ellipsoid",
-        math::Vector3d(2, 1.4, 7), 100, 100);
+        gz::math::Vector3d(2, 1.4, 7), 100, 100);
     const common::Mesh *unitEllipsoid2 =
       common::MeshManager::Instance()->MeshByName("ellipsoid");
 
     checkIndexes(unitEllipsoid2);
 
     // The new mesh should have more vertex, but it should be introduced in the
-    // meshmanager. It should be the same number becuase it was not modified.
+    // meshmanager. It should be the same number because it was not modified.
     EXPECT_EQ(unitEllipsoid->VertexCount(), unitEllipsoid2->VertexCount());
 
     // A larger cylinder needs to have higher resolution in order to get the
     // volume close to Pi * r^2 * h.
     common::MeshManager::Instance()->CreateEllipsoid("other_ellipsoid",
-        math::Vector3d(0.8, 2.4, 7.5), 10, 10);
+        gz::math::Vector3d(0.8, 2.4, 7.5), 10, 10);
 
     const common::Mesh *otherEllipsoid =
       common::MeshManager::Instance()->MeshByName("other_ellipsoid");
@@ -452,7 +533,7 @@ TEST_F(SubMeshTest, Volume)
       common::MeshManager::Instance()->MeshByName("capsule");
 
     // the new mesh should have more vertex, but it should be introduced in the
-    // meshmanager. It should be the same number becuase it was not modified.
+    // meshmanager. It should be the same number because it was not modified.
     EXPECT_EQ(unitCapsule->VertexCount(), unitCapsule2->VertexCount());
 
     common::MeshManager::Instance()->CreateCapsule("other_capsule",
@@ -471,7 +552,7 @@ TEST_F(SubMeshTest, Volume)
     const common::Mesh *unitCylinder =
       common::MeshManager::Instance()->MeshByName("unit_cylinder");
     ASSERT_TRUE(unitCylinder != nullptr);
-    EXPECT_NEAR(IGN_PI * std::pow(0.5, 2) * 1.0, unitCylinder->Volume(),
+    EXPECT_NEAR(GZ_PI * std::pow(0.5, 2) * 1.0, unitCylinder->Volume(),
         1e-2);
 
     // A larger cylinder needs to have higher resolution in order to get the
@@ -482,7 +563,7 @@ TEST_F(SubMeshTest, Volume)
     const common::Mesh *otherCylinder =
       common::MeshManager::Instance()->MeshByName("other_cylinder");
     ASSERT_TRUE(otherCylinder != nullptr);
-    EXPECT_NEAR(IGN_PI * std::pow(2.5, 2) * 12, otherCylinder->Volume(),
+    EXPECT_NEAR(GZ_PI * std::pow(2.5, 2) * 12, otherCylinder->Volume(),
         1e-2);
   }
 
@@ -500,11 +581,4 @@ TEST_F(SubMeshTest, Volume)
   EXPECT_DOUBLE_EQ(1.0, boxSub.Volume());
   boxSub.AddIndex(1);
   EXPECT_DOUBLE_EQ(0.0, boxSub.Volume());
-}
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
 }

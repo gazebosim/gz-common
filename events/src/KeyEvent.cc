@@ -16,16 +16,16 @@
 */
 #include "gz/common/KeyEvent.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
-class gz::common::KeyEventPrivate
+class common::KeyEventPrivate
 {
   /// \brief Event type.
   public: KeyEvent::EventType type = KeyEvent::NO_EVENT;
 
   /// \brief The raw value of the key pressed.
-  public:  int key = 0;
+  public: int key = 0;
 
   /// \brief Formatted string of the key pressed (could be uppercase).
   public: std::string text = "";
@@ -72,7 +72,7 @@ KeyEvent::EventType KeyEvent::Type() const
 }
 
 /////////////////////////////////////////////////
-void KeyEvent::SetType(const KeyEvent::EventType _type)
+void KeyEvent::SetType(KeyEvent::EventType _type)
 {
   this->dataPtr->type = _type;
 }
@@ -84,7 +84,7 @@ int KeyEvent::Key() const
 }
 
 /////////////////////////////////////////////////
-void KeyEvent::SetKey(const int _key)
+void KeyEvent::SetKey(int _key)
 {
   this->dataPtr->key = _key;
 }
@@ -108,7 +108,7 @@ bool KeyEvent::Control() const
 }
 
 /////////////////////////////////////////////////
-void KeyEvent::SetControl(const bool _control)
+void KeyEvent::SetControl(bool _control)
 {
   this->dataPtr->control = _control;
 }
@@ -120,7 +120,7 @@ bool KeyEvent::Shift() const
 }
 
 /////////////////////////////////////////////////
-void KeyEvent::SetShift(const bool _shift)
+void KeyEvent::SetShift(bool _shift)
 {
   this->dataPtr->shift = _shift;
 }
@@ -132,7 +132,7 @@ bool KeyEvent::Alt() const
 }
 
 /////////////////////////////////////////////////
-void KeyEvent::SetAlt(const bool _alt)
+void KeyEvent::SetAlt(bool _alt)
 {
   this->dataPtr->alt = _alt;
 }

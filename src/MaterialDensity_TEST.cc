@@ -14,12 +14,12 @@
  * limitations under the License.
  *
 */
-
 #include <gtest/gtest.h>
-#include "gz/common/MaterialDensity.hh"
-#include "test_config.h"
 
-using namespace ignition;
+#include "gz/common/MaterialDensity.hh"
+#include "gz/common/testing/AutoLogFixture.hh"
+
+using namespace gz;
 using namespace common;
 
 class MaterialDensityTest : public common::testing::AutoLogFixture { };
@@ -66,11 +66,4 @@ TEST_F(MaterialDensityTest, Accessors)
     EXPECT_EQ(material, MaterialDensity::Type::TUNGSTEN);
     EXPECT_DOUBLE_EQ(density, 19300);
   }
-}
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
 }

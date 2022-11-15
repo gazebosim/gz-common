@@ -29,13 +29,13 @@
 #include <gz/common/events/Export.hh>
 #include <gz/common/events/Types.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
-    /// \class Event Event.hh ignition/common/Event.hh
+    /// \class Event Event.hh gz/common/Event.hh
     /// \brief Base class for all events
-    class IGNITION_COMMON_EVENTS_VISIBLE Event
+    class GZ_COMMON_EVENTS_VISIBLE Event
     {
       /// \brief Constructor
       public: Event();
@@ -53,19 +53,19 @@ namespace ignition
 
       /// \brief Set whether this event has been signaled.
       /// \param[in] _sig True if the event has been signaled.
-      public: void SetSignaled(const bool _sig);
+      public: void SetSignaled(bool _sig);
 
       /// \brief True if the event has been signaled.
       private: bool signaled;
     };
 
     /// \brief A class that encapsulates a connection.
-    class IGNITION_COMMON_EVENTS_VISIBLE Connection
+    class GZ_COMMON_EVENTS_VISIBLE Connection
     {
       /// \brief Constructor.
       /// \param[in] _e Event pointer to connect with.
       /// \param[in] _i Unique id.
-      public: Connection(Event *_e, const int _i);
+      public: Connection(Event *_e, int _i);
 
       /// \brief Destructor.
       public: ~Connection();
@@ -156,7 +156,7 @@ namespace ignition
       private: class EventConnection
       {
         /// \brief Constructor
-        public: EventConnection(const bool _on, const std::function<T> &_cb,
+        public: EventConnection(bool _on, const std::function<T> &_cb,
                         const ConnectionPtr &_publicConn)
             : callback(_cb), publicConnection(_publicConn)
         {

@@ -38,7 +38,7 @@
   static const char pathSeparator = '/';
 #endif
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 static void LogTinyXml2DocumentError(
@@ -74,11 +74,11 @@ static void LogTinyXml2DocumentError(
     warning += "none)";
   }
 
-  ignwarn << warning << "\n";
+  gzwarn << warning << "\n";
 }
 
 /// Private data for the ColladaExporter class
-class gz::common::ColladaExporterPrivate
+class gz::common::ColladaExporter::Implementation
 {
   /// \brief Geometry types
   public: enum GeometryType {POSITION, NORMAL, UVMAP};
@@ -122,7 +122,8 @@ class gz::common::ColladaExporterPrivate
   /// scenes XML instance
   public: void ExportVisualScenes(
               tinyxml2::XMLElement *_libraryVisualScenesXml,
-              const std::vector<math::Matrix4d> &_submeshToMatrix);
+              const std::vector<math::Matrix4d> &_submeshToMatrix,
+              const std::vector<ColladaLight> &_lights);
 
   /// \brief Export scene element
   /// \param[in] _sceneXml Pointer to the scene XML instance
@@ -150,7 +151,7 @@ class gz::common::ColladaExporterPrivate
 
 //////////////////////////////////////////////////
 ColladaExporter::ColladaExporter()
-: MeshExporter(), dataPtr(new ColladaExporterPrivate)
+: MeshExporter(), dataPtr(gz::utils::MakeImpl<Implementation>())
 {
 }
 
@@ -164,17 +165,29 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
     bool _exportTextures)
 {
   std::vector<math::Matrix4d> empty;
-  this->Export(_mesh, _filename, _exportTextures, empty);
+  std::vector<ColladaLight> empty_lights;
+  this->Export(_mesh, _filename, _exportTextures, empty, empty_lights);
+}
+
+//////////////////////////////////////////////////
+void ColladaExporter::Export(const Mesh *_mesh,
+        const std::string &_filename, bool _exportTextures,
+        const std::vector<math::Matrix4d> &_submeshToMatrix)
+{
+  std::vector<ColladaLight> empty_lights;
+  this->Export(_mesh, _filename, _exportTextures,
+    _submeshToMatrix, empty_lights);
 }
 
 //////////////////////////////////////////////////
 void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
-    bool _exportTextures, const std::vector<math::Matrix4d> &_submeshToMatrix)
+    bool _exportTextures, const std::vector<math::Matrix4d> &_submeshToMatrix,
+    const std::vector<ColladaLight> &_lights)
 {
   if ( _submeshToMatrix.size() > 0 &&
     (_mesh->SubMeshCount() != _submeshToMatrix.size()) )
   {
-    ignerr << "_submeshToMatrix.size() : " << _mesh->SubMeshCount()
+    gzerr << "_submeshToMatrix.size() : " << _mesh->SubMeshCount()
         << " , must be equal to SubMeshCount() : " << _mesh->SubMeshCount()
         << std::endl;
     return;
@@ -239,10 +252,75 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
     colladaXml->LinkEndChild(libraryEffectsXml);
   }
 
+  tinyxml2::XMLElement *libraryLightsXml =
+      xmlDoc.NewElement("library_lights");
+  for (const auto& light : _lights)
+  {
+    tinyxml2::XMLElement *lightXml =
+      xmlDoc.NewElement("light");
+    lightXml->SetAttribute("name", light.name.c_str());
+    lightXml->SetAttribute("id", light.name.c_str());
+    libraryLightsXml->LinkEndChild(lightXml);
+
+    tinyxml2::XMLElement *techniqueCommonXml =
+      xmlDoc.NewElement("technique_common");
+    lightXml->LinkEndChild(techniqueCommonXml);
+
+    tinyxml2::XMLElement *lightTypeXml =
+      xmlDoc.NewElement(light.type.c_str());
+    techniqueCommonXml->LinkEndChild(lightTypeXml);
+
+    // color
+    tinyxml2::XMLElement *colorXml =
+      xmlDoc.NewElement("color");
+    char color_str[100] = { 0 };
+    snprintf(color_str, sizeof(color_str), "%g %g %g",
+      light.diffuse.R(), light.diffuse.G(), light.diffuse.B());
+    colorXml->SetText(color_str);
+    lightTypeXml->LinkEndChild(colorXml);
+
+    // attenuations
+    if (light.type == "point" || light.type == "spot")
+    {
+      auto attenuation_tag = [&](const char* tagname, double value)
+      {
+        tinyxml2::XMLElement *attenXml =
+          xmlDoc.NewElement(tagname);
+
+        char str[100] = { 0 };
+        snprintf(str, sizeof(str), "%g", value);
+        attenXml->SetText(str);
+        lightTypeXml->LinkEndChild(attenXml);
+      };
+      attenuation_tag("constant_attenuation", light.constantAttenuation);
+      attenuation_tag("linear_attenuation", light.linearAttenuation);
+      attenuation_tag("quadratic_attenuation", light.quadraticAttenuation);
+    }
+
+    // falloff
+    if (light.type == "spot")
+    {
+      tinyxml2::XMLElement *falloffAngleXml =
+        xmlDoc.NewElement("falloff_angle");
+      char str[100] = { 0 };
+      snprintf(str, sizeof(str), "%g", light.falloffAngleDeg);
+      falloffAngleXml->SetText(str);
+      lightTypeXml->LinkEndChild(falloffAngleXml);
+
+      tinyxml2::XMLElement *falloffExpoXml =
+        xmlDoc.NewElement("falloff_exponent");
+      snprintf(str, sizeof(str), "%g", light.falloffExponent);
+      falloffExpoXml->SetText(str);
+      lightTypeXml->LinkEndChild(falloffExpoXml);
+    }
+  }
+  colladaXml->LinkEndChild(libraryLightsXml);
+
   // Library visual scenes element
   tinyxml2::XMLElement *libraryVisualScenesXml =
       xmlDoc.NewElement("library_visual_scenes");
-  this->dataPtr->ExportVisualScenes(libraryVisualScenesXml, _submeshToMatrix);
+  this->dataPtr->ExportVisualScenes(libraryVisualScenesXml,
+    _submeshToMatrix, _lights);
   colladaXml->LinkEndChild(libraryVisualScenesXml);
 
   // Scene element
@@ -253,12 +331,12 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
   // Save file
   if (this->dataPtr->exportTextures)
   {
-    const std::string directory = common::joinPaths(
+    const std::string directory = gz::common::joinPaths(
       this->dataPtr->path, this->dataPtr->filename, "meshes");
 
     createDirectories(directory);
 
-    const std::string finalFilename = common::joinPaths(
+    const std::string finalFilename = gz::common::joinPaths(
       this->dataPtr->path, this->dataPtr->filename, "meshes",
       this->dataPtr->filename + ".dae");
 
@@ -272,7 +350,7 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
   }
   else
   {
-    const std::string finalFilename = common::joinPaths(
+    const std::string finalFilename = gz::common::joinPaths(
       this->dataPtr->path, this->dataPtr->filename + std::string(".dae"));
 
     const tinyxml2::XMLError error = xmlDoc.SaveFile(finalFilename.c_str());
@@ -285,7 +363,8 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
 }
 
 //////////////////////////////////////////////////
-void ColladaExporterPrivate::ExportAsset(tinyxml2::XMLElement *_assetXml)
+void ColladaExporter::Implementation::ExportAsset(
+    tinyxml2::XMLElement *_assetXml)
 {
   tinyxml2::XMLElement *unitXml = _assetXml->GetDocument()->NewElement("unit");
   unitXml->SetAttribute("meter", "1");
@@ -299,8 +378,8 @@ void ColladaExporterPrivate::ExportAsset(tinyxml2::XMLElement *_assetXml)
 }
 
 //////////////////////////////////////////////////
-void ColladaExporterPrivate::ExportGeometrySource(
-    const common::SubMesh *_subMesh,
+void ColladaExporter::Implementation::ExportGeometrySource(
+    const gz::common::SubMesh *_subMesh,
     tinyxml2::XMLElement *_meshXml, GeometryType _type, const char *_meshID)
 {
   char sourceId[100], sourceArrayId[107];
@@ -315,7 +394,7 @@ void ColladaExporterPrivate::ExportGeometrySource(
     snprintf(sourceId, sizeof(sourceId), "%s-Positions", _meshID);
     count = _subMesh->VertexCount();
     stride = 3;
-    math::Vector3d vertex;
+    gz::math::Vector3d vertex;
     for (unsigned int i = 0; i < count; ++i)
     {
       vertex = _subMesh->Vertex(i);
@@ -327,7 +406,7 @@ void ColladaExporterPrivate::ExportGeometrySource(
     snprintf(sourceId, sizeof(sourceId), "%s-Normals", _meshID);
     count = _subMesh->NormalCount();
     stride = 3;
-    math::Vector3d normal;
+    gz::math::Vector3d normal;
     for (unsigned int i = 0; i < count; ++i)
     {
       normal = _subMesh->Normal(i);
@@ -339,7 +418,7 @@ void ColladaExporterPrivate::ExportGeometrySource(
     snprintf(sourceId, sizeof(sourceId), "%s-UVMap", _meshID);
     count = _subMesh->VertexCount();
     stride = 2;
-    math::Vector2d inTexCoord;
+    gz::math::Vector2d inTexCoord;
     for (unsigned int i = 0; i < count; ++i)
     {
       inTexCoord = _subMesh->TexCoordBySet(i, 0);
@@ -404,17 +483,22 @@ void ColladaExporterPrivate::ExportGeometrySource(
 }
 
 //////////////////////////////////////////////////
-void ColladaExporterPrivate::ExportGeometries(
+void ColladaExporter::Implementation::ExportGeometries(
     tinyxml2::XMLElement *_libraryGeometriesXml)
 {
   for (unsigned int i = 0; i < this->subMeshCount; ++i)
   {
-    unsigned int materialIndex =
-      this->mesh->SubMeshByIndex(i).lock()->MaterialIndex();
+    std::shared_ptr<SubMesh> subMesh = this->mesh->SubMeshByIndex(i).lock();
+    if (!subMesh)
+      continue;
 
     char meshId[100], materialId[100];
     snprintf(meshId, sizeof(meshId), "mesh_%u", i);
-    snprintf(materialId, sizeof(materialId), "material_%u", materialIndex);
+    if (subMesh->GetMaterialIndex())
+    {
+      snprintf(materialId, sizeof(materialId), "material_%u",
+          subMesh->GetMaterialIndex().value());
+    }
 
     tinyxml2::XMLElement *geometryXml =
       _libraryGeometriesXml->GetDocument()->NewElement("geometry");
@@ -424,10 +508,6 @@ void ColladaExporterPrivate::ExportGeometries(
     tinyxml2::XMLElement *meshXml =
       _libraryGeometriesXml->GetDocument()->NewElement("mesh");
     geometryXml->LinkEndChild(meshXml);
-
-    std::shared_ptr<SubMesh> subMesh = this->mesh->SubMeshByIndex(i).lock();
-    if (!subMesh)
-      continue;
 
     this->ExportGeometrySource(subMesh.get(), meshXml, POSITION, meshId);
     this->ExportGeometrySource(subMesh.get(), meshXml, NORMAL, meshId);
@@ -506,13 +586,13 @@ void ColladaExporterPrivate::ExportGeometries(
 }
 
 //////////////////////////////////////////////////
-int ColladaExporterPrivate::ExportImages(
+int ColladaExporter::Implementation::ExportImages(
     tinyxml2::XMLElement *_libraryImagesXml)
 {
   int imageCount = 0;
   for (unsigned int i = 0; i < this->materialCount; ++i)
   {
-    const common::MaterialPtr material =
+    const gz::common::MaterialPtr material =
       this->mesh->MaterialByIndex(i);
     std::string imageString = material->TextureImage();
 
@@ -530,7 +610,7 @@ int ColladaExporterPrivate::ExportImages(
         _libraryImagesXml->GetDocument()->NewElement("init_from");
       const auto imageName = imageString.substr(
           imageString.rfind(pathSeparator));
-      const auto imagePath = common::joinPaths("..", "materials",
+      const auto imagePath = gz::common::joinPaths("..", "materials",
         "textures", imageName);
       initFromXml->LinkEndChild(
         _libraryImagesXml->GetDocument()->NewText(imagePath.c_str()));
@@ -554,7 +634,7 @@ int ColladaExporterPrivate::ExportImages(
 }
 
 //////////////////////////////////////////////////
-void ColladaExporterPrivate::ExportMaterials(
+void ColladaExporter::Implementation::ExportMaterials(
     tinyxml2::XMLElement *_libraryMaterialsXml)
 {
   for (unsigned int i = 0; i < this->materialCount; ++i)
@@ -576,7 +656,7 @@ void ColladaExporterPrivate::ExportMaterials(
 }
 
 //////////////////////////////////////////////////
-void ColladaExporterPrivate::ExportEffects(
+void ColladaExporter::Implementation::ExportEffects(
     tinyxml2::XMLElement *_libraryEffectsXml)
 {
   for (unsigned int i = 0; i < this->materialCount; ++i)
@@ -594,7 +674,7 @@ void ColladaExporterPrivate::ExportEffects(
     effectXml->LinkEndChild(profileCommonXml);
 
     // Image
-    const common::MaterialPtr material =
+    const gz::common::MaterialPtr material =
         this->mesh->MaterialByIndex(i);
     std::string imageString = material->TextureImage();
 
@@ -762,9 +842,10 @@ void ColladaExporterPrivate::ExportEffects(
 }
 
 //////////////////////////////////////////////////
-void ColladaExporterPrivate::ExportVisualScenes(
+void ColladaExporter::Implementation::ExportVisualScenes(
     tinyxml2::XMLElement *_libraryVisualScenesXml,
-    const std::vector<math::Matrix4d> &_submeshToMatrix)
+    const std::vector<math::Matrix4d> &_submeshToMatrix,
+    const std::vector<ColladaLight> &_lights)
 {
   tinyxml2::XMLElement *visualSceneXml =
     _libraryVisualScenesXml->GetDocument()->NewElement("visual_scene");
@@ -807,10 +888,11 @@ void ColladaExporterPrivate::ExportVisualScenes(
     snprintf(attributeValue, sizeof(attributeValue), "#%s", meshId);
     instanceGeometryXml->SetAttribute("url", attributeValue);
 
-    unsigned int materialIndex =
-      this->mesh->SubMeshByIndex(i).lock()->MaterialIndex();
-
-    const common::MaterialPtr material =
+    const auto subMesh = this->mesh->SubMeshByIndex(i).lock();
+    if (!subMesh->GetMaterialIndex())
+      continue;
+    const auto materialIndex = subMesh->GetMaterialIndex().value();
+    const gz::common::MaterialPtr material =
       this->mesh->MaterialByIndex(materialIndex);
 
     if (material)
@@ -847,10 +929,63 @@ void ColladaExporterPrivate::ExportVisualScenes(
       }
     }
   }
+
+  for (const auto& light : _lights)
+  {
+    tinyxml2::XMLElement *nodeXml =
+      _libraryVisualScenesXml->GetDocument()->NewElement("node");
+    visualSceneXml->LinkEndChild(nodeXml);
+
+    nodeXml->SetAttribute("name", light.name.c_str());
+
+    tinyxml2::XMLElement *lightInstXml =
+      _libraryVisualScenesXml->GetDocument()->NewElement("instance_light");
+    char lightId[100] = { 0 };
+    snprintf(lightId, sizeof(lightId), "#%s", light.name.c_str());
+    lightInstXml->SetAttribute("url", lightId);
+    nodeXml->LinkEndChild(lightInstXml);
+
+    const auto& position = light.position;
+    // translation
+    {
+      tinyxml2::XMLElement *translateXml =
+        _libraryVisualScenesXml->GetDocument()->NewElement("translate");
+      translateXml->SetAttribute("sid", "translate");
+
+      char tx_value[100] = { 0 };
+      snprintf(tx_value, sizeof(tx_value), "%f %f %f",
+        position.X(), position.Y(), position.Z());
+      translateXml->SetText(tx_value);
+      nodeXml->LinkEndChild(translateXml);
+    }
+
+    // rotation; blender starts off with light direction (0,0,-1),
+    // we output an axis-angle rotation to our desired direction
+    {
+      auto lightdir_norm = light.direction.Normalized();
+      math::Vector3d initial_dir(0, 0, -1);
+      math::Quaterniond q;
+      q.SetFrom2Axes(initial_dir, lightdir_norm);
+
+      math::Vector3d axis;
+      double angle = 0.0;
+      q.AxisAngle(axis, angle);
+
+      tinyxml2::XMLElement *rotateXml =
+        _libraryVisualScenesXml->GetDocument()->NewElement("rotate");
+
+      char str[100] = { 0 };
+      snprintf(str, sizeof(str), "%g %g %g %g",
+        axis.X(), axis.Y(), axis.Z(), angle / GZ_PI * 180.0);
+      rotateXml->SetText(str);
+      nodeXml->LinkEndChild(rotateXml);
+    }
+  }
 }
 
 //////////////////////////////////////////////////
-void ColladaExporterPrivate::ExportScene(tinyxml2::XMLElement *_sceneXml)
+void ColladaExporter::Implementation::ExportScene(
+    tinyxml2::XMLElement *_sceneXml)
 {
   tinyxml2::XMLElement *instanceVisualSceneXml =
       _sceneXml->GetDocument()->NewElement("instance_visual_scene");

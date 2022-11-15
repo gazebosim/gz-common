@@ -14,11 +14,14 @@
  * limitations under the License.
  *
 */
-#include <memory>
-#include "gz/common/Battery.hh"
-#include "test_config.h"
+#include <gtest/gtest.h>
 
-using namespace ignition;
+#include <memory>
+
+#include "gz/common/Battery.hh"
+#include "gz/common/testing/AutoLogFixture.hh"
+
+using namespace gz;
 
 class BatteryTest : public common::testing::AutoLogFixture { };
 
@@ -253,10 +256,4 @@ TEST_F(BatteryTest, SetUpdateFunc)
     battery->Update();
 
   EXPECT_DOUBLE_EQ(battery->Voltage(), origVolt);
-}
-
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
 }

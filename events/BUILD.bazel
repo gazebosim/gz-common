@@ -1,13 +1,13 @@
 load(
-    "//ign_bazel:build_defs.bzl",
-    "IGNITION_ROOT",
-    "IGNITION_VISIBILITY",
+    "//gz_bazel:build_defs.bzl",
+    "GZ_ROOT",
+    "GZ_VISIBILITY",
     "generate_include_header",
-    "ign_export_header",
+    "gz_export_header",
 )
 
 package(
-    default_visibility = IGNITION_VISIBILITY,
+    default_visibility = GZ_VISIBILITY,
     features = [
         "-parse_headers",
         "-layering_check",
@@ -15,32 +15,35 @@ package(
 )
 
 public_headers_no_gen = glob([
-    "include/ignition/common/*.hh",
-    "include/ignition/common/events/*.hh"
+    "include/gz/common/*.hh",
+    "include/gz/common/events/*.hh",
 ])
 
-sources = glob(["src/*.cc"], exclude=["src/*_TEST.cc"])
+sources = glob(
+    ["src/*.cc"],
+    exclude = ["src/*_TEST.cc"],
+)
 
 test_sources = glob(["src/*_TEST.cc"])
 
-ign_export_header(
-    name = "include/ignition/common/events/Export.hh",
-    export_base = "IGNITION_COMMON_EVENTS",
-    lib_name = "ignition-common-events",
+gz_export_header(
+    name = "include/gz/common/events/Export.hh",
+    export_base = "GZ_COMMON_EVENTS",
+    lib_name = "gz-common-events",
     visibility = ["//visibility:private"],
 )
 
 generate_include_header(
     name = "eventshh_genrule",
-    out = "include/ignition/common/events.hh",
+    out = "include/gz/common/events.hh",
     hdrs = public_headers_no_gen + [
-        "include/ignition/common/events/Export.hh",
+        "include/gz/common/events/Export.hh",
     ],
 )
 
 public_headers = public_headers_no_gen + [
-    "include/ignition/common/events/Export.hh",
-    "include/ignition/common/events.hh",
+    "include/gz/common/events/Export.hh",
+    "include/gz/common/events.hh",
 ]
 
 cc_library(
@@ -49,14 +52,14 @@ cc_library(
     hdrs = public_headers,
     includes = ["include"],
     deps = [
-        IGNITION_ROOT + "ign_common",
+        GZ_ROOT + "gz_common",
     ],
 )
 
 cc_binary(
-    name = "libignition-common3-events.so",
+    name = "libgz-common5-events.so",
     includes = ["include"],
-    linkopts = ["-Wl,-soname,libignition-common3-events.so"],
+    linkopts = ["-Wl,-soname,libgz-common5-events.so"],
     linkshared = True,
     deps = [":events"],
 )
@@ -66,7 +69,7 @@ cc_binary(
     srcs = [src],
     deps = [
         ":events",
-        IGNITION_ROOT + "ign_common/test:test_utils",
+        GZ_ROOT + "gz_common/test:test_utils",
         "@gtest",
         "@gtest//:gtest_main",
     ],

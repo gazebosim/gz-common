@@ -16,7 +16,6 @@
 */
 #include <gtest/gtest.h>
 
-#include "test_config.h"
 #include "gz/common/Mesh.hh"
 #include "gz/common/SubMesh.hh"
 #include "gz/common/Material.hh"
@@ -24,7 +23,10 @@
 #include "gz/common/Skeleton.hh"
 #include "gz/common/SkeletonAnimation.hh"
 
-using namespace ignition;
+#include "gz/common/testing/AutoLogFixture.hh"
+#include "gz/common/testing/TestPaths.hh"
+
+using namespace gz;
 class ColladaLoader : public common::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
@@ -35,8 +37,8 @@ TEST_F(ColladaLoader, LoadBox)
       common::testing::TestFile("data", "box.dae"));
 
   EXPECT_STREQ("unknown", mesh->Name().c_str());
-  EXPECT_EQ(math::Vector3d(1, 1, 1), mesh->Max());
-  EXPECT_EQ(math::Vector3d(-1, -1, -1), mesh->Min());
+  EXPECT_EQ(gz::math::Vector3d(1, 1, 1), mesh->Max());
+  EXPECT_EQ(gz::math::Vector3d(-1, -1, -1), mesh->Min());
   // 36 vertices, 24 unique, 12 shared.
   EXPECT_EQ(24u, mesh->VertexCount());
   EXPECT_EQ(24u, mesh->NormalCount());
@@ -85,8 +87,8 @@ TEST_F(ColladaLoader, ShareVertices)
       mesh->SubMeshByIndex(i).lock();
     for (unsigned int j = 0; j < subMesh->VertexCount(); ++j)
     {
-      math::Vector3d v = subMesh->Vertex(j);
-      math::Vector3d n = subMesh->Normal(j);
+      gz::math::Vector3d v = subMesh->Vertex(j);
+      gz::math::Vector3d n = subMesh->Normal(j);
 
       // Verify there is no other vertex with the same position AND normal
       for (unsigned int k = j+1; k < subMesh->VertexCount(); ++k)
@@ -486,11 +488,4 @@ TEST_F(ColladaLoader, LoadCylinderAnimatedFrom3dsMax)
   EXPECT_EQ("Bone02", anim->Name());
   EXPECT_EQ(1u, anim->NodeCount());
   EXPECT_TRUE(anim->HasNode("Bone02"));
-}
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
 }

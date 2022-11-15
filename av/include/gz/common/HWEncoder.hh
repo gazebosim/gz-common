@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Martin Pecka
+ * Copyright (C) 2020 Martin Pecka
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-#ifndef IGNITION_COMMON_HWENCODER_HH
-#define IGNITION_COMMON_HWENCODER_HH
+#ifndef GZ_COMMON_HWENCODER_HH
+#define GZ_COMMON_HWENCODER_HH
 
 #include <memory>
 #include <string>
@@ -22,21 +22,18 @@
 
 #include <gz/common/FlagSet.hh>
 #include <gz/common/av/Export.hh>
-#include <gz/common/SuppressWarning.hh>
 #include <gz/common/HWVideo.hh>
 #include <gz/common/ffmpeg_inc.hh>
+#include <gz/utils/ImplPtr.hh>
 
 /// This is an internal-use only class encapsulating HW video encoding. All
 /// symbols defined here are hidden from the public API.
-namespace ignition::common
+namespace gz::common
 {
-  // Forward declare private data class
-  class HWVideoPrivate;
-
   /// \brief Representation of a GPU video encoder and its configuration.
   /// \note This class is intentionally hidden as it provides highly customized
   /// behavior tailored just for the use with VideoEncoder.
-  class IGNITION_COMMON_AV_HIDDEN HWEncoder
+  class GZ_COMMON_AV_HIDDEN HWEncoder
   {
     /// \brief Set up the HW encoder configurator.
     /// \param[in] _allowedHwEncoders HW encoders to try.
@@ -66,7 +63,7 @@ namespace ignition::common
     /// \param[in] _encoderContext Context of the encoder for which hardware
     /// acceleration should be set up.
     /// \note If the configuration fails, the codec will be left configured for
-    /// software encoding and an error will be written to ignerr describing what
+    /// software encoding and an error will be written to gzerr describing what
     /// failed.
     public: void ConfigHWAccel(AVCodecContext* _encoderContext);
 
@@ -82,7 +79,8 @@ namespace ignition::common
     /// The value will be NONE until ConfigHWAccel() successfully finishes.
     public: HWEncoderType GetEncoderType() const;
 
-    private: std::unique_ptr<HWVideoPrivate> dataPtr;
+    /// \brief Private data pointer
+    GZ_UTILS_UNIQUE_IMPL_PTR(dataPtr)
   };
 }
 

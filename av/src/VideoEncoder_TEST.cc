@@ -17,9 +17,11 @@
 
 #include "gz/common/Console.hh"
 #include "gz/common/VideoEncoder.hh"
-#include "test_config.h"
 
-using namespace ignition;
+#include "gz/common/testing/AutoLogFixture.hh"
+#include "gz/common/testing/TestPaths.hh"
+
+using namespace gz;
 using namespace common;
 
 class VideoEncoderTest : public common::testing::AutoLogFixture
@@ -28,7 +30,11 @@ class VideoEncoderTest : public common::testing::AutoLogFixture
   protected: void SetUp() override
   {
     Console::SetVerbosity(4);
+    tempDir = common::testing::MakeTestTempDirectory();
+    ASSERT_TRUE(tempDir->Valid()) << tempDir->Path();
   }
+
+  public: std::shared_ptr<gz::common::TempDirectory> tempDir;
 };
 
 /////////////////////////////////////////////////

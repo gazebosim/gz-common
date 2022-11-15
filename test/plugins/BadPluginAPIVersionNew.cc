@@ -15,8 +15,13 @@
  *
 */
 
+#define SUPPRESS_IGNITION_HEADER_DEPRECATION
+
 #include <limits>
-#include "gz/common/PluginMacros.hh"
+#include "ignition/common/PluginMacros.hh"
+#include "gz/utils/SuppressWarning.hh"
+
+GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
 
 extern "C" {
   std::size_t DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONPluginInfoSize =
@@ -35,3 +40,6 @@ extern "C" std::size_t DETAIL_IGN_PLUGIN_VISIBLE IGNCOMMONMultiPluginInfo(
   return 0u;
 }
 
+GZ_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
+
+#undef SUPPRESS_IGNITION_HEADER_DEPRECATION

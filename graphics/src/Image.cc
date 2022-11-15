@@ -19,21 +19,22 @@
 #endif
 #include <FreeImage.h>
 
+#include <cstring>
 #include <string>
 
 #include <gz/common/Console.hh>
 #include <gz/common/Util.hh>
 #include <gz/common/Image.hh>
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
     /// \brief Private data class
-    class ImagePrivate
+    class Image::Implementation
     {
       /// \brief bitmap data
       public: FIBITMAP *bitmap;
@@ -42,8 +43,13 @@ namespace ignition
       public: std::string fullName;
 
       /// \brief Implementation of GetData
+      /// \deprecated remove once the Data functions using raw pointers
+      /// are removed, in favor of returning vectors of bytes
       public: void DataImpl(unsigned char **_data, unsigned int &_count,
           FIBITMAP *_img) const;
+
+      /// \brief Implementation of Data, returns vector of bytes
+      public: std::vector<unsigned char> DataImpl(FIBITMAP *_img) const;
 
       /// \brief Returns true if SwapRedBlue can and should be called
       /// If it returns false, it may not be safe to call SwapRedBlue
@@ -60,7 +66,17 @@ namespace ignition
       /// \param[in] _height Height of the image
       /// \return bitmap data with red and blue pixels swapped
       public: FIBITMAP* SwapRedBlue(const unsigned int &_width,
-                                    const unsigned int &_height);
+                                    const unsigned int &_height) const;
+
+      /// \brief Get pixel value at specified index.
+      /// \param[in] _dib Pointer to Freeimage bitmap
+      /// \param[in] _x Pixel index in horizontal direction
+      /// \param[in] _y Pixel index in vertical direction
+      /// \param[out] _color Pixel value at specified index
+      /// \return TRUE value if the pixel index was found and the color
+      /// value set, FALSE otherwise.
+      public: BOOL PixelIndex(FIBITMAP *_dib, unsigned _x, unsigned _y,
+            math::Color &_color) const;
     };
   }
 }
@@ -69,7 +85,7 @@ static int count = 0;
 
 //////////////////////////////////////////////////
 Image::Image(const std::string &_filename)
-  : dataPtr(new ImagePrivate)
+: dataPtr(gz::utils::MakeImpl<Implementation>())
 {
   if (count == 0)
     FreeImage_Initialise();
@@ -79,11 +95,11 @@ Image::Image(const std::string &_filename)
   this->dataPtr->bitmap = NULL;
   if (!_filename.empty())
   {
-    std::string filename = findFile(_filename);
+    std::string filename = gz::common::findFile(_filename);
     if (!filename.empty())
       this->Load(filename);
     else
-      ignerr << "Unable to find image[" << _filename << "]\n";
+      gzerr << "Unable to find image[" << _filename << "]\n";
   }
 }
 
@@ -107,7 +123,7 @@ int Image::Load(const std::string &_filename)
   this->dataPtr->fullName = _filename;
   if (!exists(this->dataPtr->fullName))
   {
-    this->dataPtr->fullName = findFile(_filename);
+    this->dataPtr->fullName = common::findFile(_filename);
   }
 
   if (exists(this->dataPtr->fullName))
@@ -136,15 +152,15 @@ int Image::Load(const std::string &_filename)
     }
     else
     {
-      ignerr << "Unknown image format[" << this->dataPtr->fullName << "]\n";
+      gzerr << "Unknown image format[" << this->dataPtr->fullName << "]\n";
       return -1;
     }
 
     return 0;
   }
 
-  ignerr << "Unable to open image file[" << this->dataPtr->fullName
-        << "], check your IGNITION_RESOURCE_PATH settings.\n";
+  gzerr << "Unable to open image file[" << this->dataPtr->fullName
+        << "], check your GZ_RESOURCE_PATH settings.\n";
   return -1;
 }
 
@@ -225,7 +241,7 @@ void Image::SetFromData(const unsigned char *_data,
   }
   else
   {
-    ignerr << "Unable to handle format[" << _format << "]\n";
+    gzerr << "Unable to handle format[" << _format << "]\n";
     return;
   }
 
@@ -236,8 +252,30 @@ void Image::SetFromData(const unsigned char *_data,
   {
     FIBITMAP *toDelete = this->dataPtr->bitmap;
     this->dataPtr->bitmap = this->dataPtr->SwapRedBlue(this->Width(),
-        this->Height());
+                                                       this->Height());
     FreeImage_Unload(toDelete);
+  }
+}
+
+//////////////////////////////////////////////////
+void Image::SetFromCompressedData(unsigned char *_data,
+                                  unsigned int _size,
+                                  Image::PixelFormatType _format)
+{
+  if (this->dataPtr->bitmap)
+    FreeImage_Unload(this->dataPtr->bitmap);
+  this->dataPtr->bitmap = nullptr;
+
+  if (_format == COMPRESSED_PNG)
+  {
+    FIMEMORY *fiMem = FreeImage_OpenMemory(_data, _size);
+    this->dataPtr->bitmap = FreeImage_LoadFromMemory(FIF_PNG, fiMem);
+    FreeImage_CloseMemory(fiMem);
+  }
+  else
+  {
+    gzerr << "Unable to handle format[" << _format << "]\n";
+    return;
   }
 }
 
@@ -265,6 +303,65 @@ void Image::RGBData(unsigned char **_data, unsigned int &_count) const
 }
 
 //////////////////////////////////////////////////
+std::vector<unsigned char> Image::RGBData() const
+{
+  std::vector<unsigned char> data;
+
+  FIBITMAP *tmp = this->dataPtr->bitmap;
+  FIBITMAP *tmp2 = nullptr;
+  if (this->dataPtr->ShouldSwapRedBlue())
+  {
+    tmp = this->dataPtr->SwapRedBlue(this->Width(), this->Height());
+    tmp2 = tmp;
+  }
+  tmp = FreeImage_ConvertTo24Bits(tmp);
+  data = this->dataPtr->DataImpl(tmp);
+  FreeImage_Unload(tmp);
+  if (tmp2)
+    FreeImage_Unload(tmp2);
+
+  return data;
+}
+
+//////////////////////////////////////////////////
+void Image::RGBAData(unsigned char **_data, unsigned int &_count) const
+{
+  FIBITMAP *tmp = this->dataPtr->bitmap;
+  FIBITMAP *tmp2 = nullptr;
+  if (this->dataPtr->ShouldSwapRedBlue())
+  {
+    tmp = this->dataPtr->SwapRedBlue(this->Width(), this->Height());
+    tmp2 = tmp;
+  }
+  tmp = FreeImage_ConvertTo32Bits(tmp);
+  this->dataPtr->DataImpl(_data, _count, tmp);
+  FreeImage_Unload(tmp);
+  if (tmp2)
+    FreeImage_Unload(tmp2);
+}
+
+//////////////////////////////////////////////////
+std::vector<unsigned char> Image::RGBAData() const
+{
+  std::vector<unsigned char> data;
+
+  FIBITMAP *tmp = this->dataPtr->bitmap;
+  FIBITMAP *tmp2 = nullptr;
+  if (this->dataPtr->ShouldSwapRedBlue())
+  {
+    tmp = this->dataPtr->SwapRedBlue(this->Width(), this->Height());
+    tmp2 = tmp;
+  }
+  tmp = FreeImage_ConvertTo32Bits(tmp);
+  data = this->dataPtr->DataImpl(tmp);
+  FreeImage_Unload(tmp);
+  if (tmp2)
+    FreeImage_Unload(tmp2);
+
+  return data;
+}
+
+//////////////////////////////////////////////////
 void Image::Data(unsigned char **_data, unsigned int &_count) const
 {
   if (this->dataPtr->ShouldSwapRedBlue())
@@ -280,8 +377,47 @@ void Image::Data(unsigned char **_data, unsigned int &_count) const
 }
 
 //////////////////////////////////////////////////
-void ImagePrivate::DataImpl(unsigned char **_data, unsigned int &_count,
-                        FIBITMAP *_img) const
+std::vector<unsigned char> Image::Data() const
+{
+  std::vector<unsigned char> data;
+  if (this->dataPtr->ShouldSwapRedBlue())
+  {
+    FIBITMAP *tmp = this->dataPtr->SwapRedBlue(this->Width(), this->Height());
+    data = this->dataPtr->DataImpl(tmp);
+    FreeImage_Unload(tmp);
+  }
+  else
+  {
+    data = this->dataPtr->DataImpl(this->dataPtr->bitmap);
+  }
+  return data;
+}
+
+//////////////////////////////////////////////////
+std::vector<unsigned char> Image::Implementation::DataImpl(FIBITMAP *_img) const
+{
+  int redmask = FI_RGBA_RED_MASK;
+  // int bluemask = 0x00ff0000;
+
+  int greenmask = FI_RGBA_GREEN_MASK;
+  // int greenmask = 0x0000ff00;
+
+  int bluemask = FI_RGBA_BLUE_MASK;
+  // int redmask = 0x000000ff;
+
+  int scanWidth = FreeImage_GetLine(_img);
+
+  std::vector<unsigned char> data(scanWidth * FreeImage_GetHeight(_img));
+
+  FreeImage_ConvertToRawBits(reinterpret_cast<BYTE*>(&data[0]), _img,
+      scanWidth, FreeImage_GetBPP(_img), redmask, greenmask, bluemask, true);
+
+  return data;
+}
+
+//////////////////////////////////////////////////
+void Image::Implementation::DataImpl(
+    unsigned char **_data, unsigned int &_count, FIBITMAP *_img) const
 {
   int redmask = FI_RGBA_RED_MASK;
   // int bluemask = 0x00ff0000;
@@ -373,7 +509,7 @@ math::Color Image::Pixel(unsigned int _x, unsigned int _y) const
 
     if (FreeImage_GetPixelColor(this->dataPtr->bitmap, _x, _y, &firgb) == FALSE)
     {
-      ignerr << "Image: Coordinates out of range["
+      gzerr << "Image: Coordinates out of range["
         << _x << " " << _y << "] \n";
       return clr;
     }
@@ -381,23 +517,20 @@ math::Color Image::Pixel(unsigned int _x, unsigned int _y) const
   }
   else
   {
-    BYTE byteValue;
-    if (FreeImage_GetPixelIndex(
-          this->dataPtr->bitmap, _x, _y, &byteValue) == FALSE)
+    if (this->dataPtr->PixelIndex(
+           this->dataPtr->bitmap, _x, _y, clr) == FALSE)
     {
-      ignerr << "Image: Coordinates out of range ["
+      gzerr << "Image: Coordinates out of range ["
         << _x << " " << _y << "] \n";
       return clr;
     }
-
-    clr.Set(byteValue, byteValue, byteValue);
   }
 
   return clr;
 }
 
 //////////////////////////////////////////////////
-math::Color Image::AvgColor()
+math::Color Image::AvgColor() const
 {
   unsigned int x, y;
   double rsum, gsum, bsum;
@@ -449,7 +582,7 @@ math::Color Image::MaxColor() const
         if (FALSE ==
               FreeImage_GetPixelColor(this->dataPtr->bitmap, x, y, &firgb))
         {
-          ignerr << "Image: Coordinates out of range["
+          gzerr << "Image: Coordinates out of range["
             << x << " " << y << "] \n";
           continue;
         }
@@ -464,22 +597,20 @@ math::Color Image::MaxColor() const
   }
   else
   {
-    BYTE byteValue;
     for (y = 0; y < this->Height(); y++)
     {
       for (x = 0; x < this->Width(); x++)
       {
         clr.Set(0, 0, 0, 0);
 
-        if (FreeImage_GetPixelIndex(
-              this->dataPtr->bitmap, x, y, &byteValue) == FALSE)
+        if (this->dataPtr->PixelIndex(
+               this->dataPtr->bitmap, x, y, clr) == FALSE)
+
         {
-          ignerr << "Image: Coordinates out of range ["
+          gzerr << "Image: Coordinates out of range ["
             << x << " " << y << "] \n";
           continue;
         }
-
-        clr.Set(byteValue, byteValue, byteValue);
 
         if (clr.R() + clr.G() + clr.B() > maxClr.R() + maxClr.G() + maxClr.B())
         {
@@ -490,6 +621,49 @@ math::Color Image::MaxColor() const
   }
 
   return maxClr;
+}
+
+//////////////////////////////////////////////////
+BOOL Image::Implementation::PixelIndex(
+    FIBITMAP *_dib, unsigned _x, unsigned _y, math::Color &_color) const
+{
+  if (!_dib)
+    return FALSE;
+
+  FREE_IMAGE_TYPE imageType = FreeImage_GetImageType(_dib);
+  // 8 bit images
+  if (imageType == FIT_BITMAP)
+  {
+    BYTE byteValue;
+    // FreeImage_GetPixelIndex should also work with 1 and 4 bit images
+    if (FreeImage_GetPixelIndex(
+        _dib, _x, _y, &byteValue) == FALSE)
+    {
+      return FALSE;
+    }
+
+    unsigned int bpp = FreeImage_GetBPP(_dib);
+    // convert to float value between 0-1
+    float value = byteValue / static_cast<float>(((1 << (bpp)) - 1));
+    _color.Set(value, value, value);
+  }
+  // 16 bit images
+  else if (imageType == FIT_UINT16)
+  {
+    if ((_x < FreeImage_GetWidth(_dib)) && (_y < FreeImage_GetHeight(_dib)))
+    {
+      WORD *bits = reinterpret_cast<WORD *>(FreeImage_GetScanLine(_dib, _y));
+      uint16_t word = static_cast<uint16_t>(bits[_x]);
+      // convert to float value between 0-1
+      float value = word / static_cast<float>(math::MAX_UI16);
+      _color.Set(value, value, value);
+    }
+    else
+    {
+      return FALSE;
+    }
+  }
+  return TRUE;
 }
 
 //////////////////////////////////////////////////
@@ -567,21 +741,21 @@ Image::PixelFormatType Image::ConvertPixelFormat(const std::string &_format)
 }
 
 //////////////////////////////////////////////////
-bool ImagePrivate::ShouldSwapRedBlue() const
+bool Image::Implementation::ShouldSwapRedBlue() const
 {
   return CanSwapRedBlue() && FREEIMAGE_COLORORDER != FREEIMAGE_COLORORDER_RGB;
 }
 
 //////////////////////////////////////////////////
-bool ImagePrivate::CanSwapRedBlue() const
+bool Image::Implementation::CanSwapRedBlue() const
 {
   const unsigned bpp = FreeImage_GetBPP(this->bitmap);
   return bpp == 24u || bpp == 32u;
 }
 
 //////////////////////////////////////////////////
-FIBITMAP* ImagePrivate::SwapRedBlue(const unsigned int &_width,
-                                    const unsigned int &_height)
+FIBITMAP* Image::Implementation::SwapRedBlue(const unsigned int &_width,
+                                    const unsigned int &_height) const
 {
   FIBITMAP *copy = FreeImage_Copy(this->bitmap, 0, 0, _width, _height);
 

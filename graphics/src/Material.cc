@@ -20,25 +20,28 @@
 #include "gz/common/Material.hh"
 #include "gz/common/Console.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
-IGN_ENUM(shadeModeIface, Material::ShadeMode,
+GZ_ENUM(shadeModeIface, Material::ShadeMode,
     Material::SHADE_MODE_BEGIN, Material::SHADE_MODE_END,
     "FLAT", "GOURAUD", "PHONG", "BLINN")
 
-IGN_ENUM(blendModeIface, Material::BlendMode,
+GZ_ENUM(blendModeIface, Material::BlendMode,
     Material::BLEND_MODE_BEGIN, Material::BLEND_MODE_END,
     "ADD", "MODULATE", "REPLACE")
 
 /// \brief Private data for Material
-class gz::common::MaterialPrivate
+class gz::common::Material::Implementation
 {
   /// \brief the name of the material
   public: std::string name;
 
   /// \brief the texture image file name
   public: std::string texImage;
+
+  /// \brief Texture raw data
+  public: std::shared_ptr<const Image> texData;
 
   /// \brief the ambient light color
   public: math::Color ambient;
@@ -98,13 +101,13 @@ class gz::common::MaterialPrivate
   public: std::unique_ptr<Pbr> pbr;
 };
 
-unsigned int MaterialPrivate::counter = 0;
+unsigned int Material::Implementation::counter = 0;
 
 //////////////////////////////////////////////////
 Material::Material()
-: dataPtr(new MaterialPrivate)
+: dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
 {
-  this->dataPtr->name = "ignition_material_" +
+  this->dataPtr->name = "gz_material_" +
     std::to_string(this->dataPtr->counter++);
   this->dataPtr->blendMode = REPLACE;
   this->dataPtr->shadeMode = GOURAUD;
@@ -116,9 +119,9 @@ Material::Material()
 
 //////////////////////////////////////////////////
 Material::Material(const math::Color &_clr)
-: dataPtr(new MaterialPrivate)
+: dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
 {
-  this->dataPtr->name = "ignition_material_" +
+  this->dataPtr->name = "gz_material_" +
     std::to_string(this->dataPtr->counter++);
   this->dataPtr->blendMode = REPLACE;
   this->dataPtr->shadeMode = GOURAUD;
@@ -138,9 +141,17 @@ std::string Material::Name() const
 }
 
 //////////////////////////////////////////////////
-void Material::SetTextureImage(const std::string &_tex)
+void Material::SetTextureImage(const std::string &_tex,
+    const std::shared_ptr<const Image> &_img)
 {
   this->dataPtr->texImage = _tex;
+  this->dataPtr->texData = _img;
+}
+
+//////////////////////////////////////////////////
+std::shared_ptr<const Image> Material::TextureData() const
+{
+  return this->dataPtr->texData;
 }
 
 //////////////////////////////////////////////////
@@ -148,20 +159,21 @@ void Material::SetTextureImage(const std::string &_tex,
                                const std::string &_resourcePath)
 {
   this->dataPtr->texImage = common::joinPaths(_resourcePath, _tex);
+  this->dataPtr->texData = nullptr;
 
   // If the texture image doesn't exist then try the next most likely path.
   if (!exists(this->dataPtr->texImage))
   {
     // Try to resolve this texture image to a locally cached path in a
     // separate directory
-    this->dataPtr->texImage = findFile(_tex);
+    this->dataPtr->texImage = common::findFile(_tex);
     if (!exists(this->dataPtr->texImage))
     {
       this->dataPtr->texImage = common::joinPaths(_resourcePath, "..",
           "materials", "textures", _tex);
       if (!exists(this->dataPtr->texImage))
       {
-        ignerr << "Unable to find texture [" << _tex << "] as a locally"
+        gzerr << "Unable to find texture [" << _tex << "] as a locally"
               " cached texture or in path ["<< _resourcePath << "]\n";
       }
     }

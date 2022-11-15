@@ -16,7 +16,7 @@
 */
 
 // Suppressing cpplint.py because tools/cpplint.py is old. Remove the NOLINT
-// comments when upgrading to ign-cmake's "make codecheck"
+// comments when upgrading to gz-cmake's "make codecheck"
 #include "gz/common/SignalHandler.hh" // NOLINT(*)
 #include <gtest/gtest.h> // NOLINT(*)
 #include <csignal> // NOLINT(*)
@@ -26,7 +26,7 @@
 #include <thread> // NOLINT(*)
 #include "gz/common/Util.hh" // NOLINT(*)
 
-using namespace ignition;
+using namespace gz;
 
 // Capture the gOnSignalWrappers map from SignalHandlers.cc
 #ifndef _WIN32

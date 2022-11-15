@@ -24,7 +24,7 @@
 #include <gz/common/Console.hh>
 #include <gz/common/BVHLoader.hh>
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 /////////////////////////////////////////////////
@@ -192,7 +192,7 @@ std::unique_ptr<Skeleton> BVHLoader::Load(const std::string &_filename,
     words = split(line, " ");
     if (words.size() < totalChannels)
     {
-      ignwarn << "Frame " << frameNo << " invalid.\n";
+      gzwarn << "Frame " << frameNo << " invalid.\n";
       frameNo++;
       time += frameTime;
       continue;
@@ -236,7 +236,7 @@ std::unique_ptr<Skeleton> BVHLoader::Load(const std::string &_filename,
             {
               if (channel == "Zrotation")
               {
-                zAngle = IGN_DTOR(value);
+                zAngle = GZ_DTOR(value);
                 mats.push_back(math::Matrix4d(
                       math::Quaterniond(zAxis, zAngle)));
               }
@@ -244,7 +244,7 @@ std::unique_ptr<Skeleton> BVHLoader::Load(const std::string &_filename,
               {
                 if (channel == "Xrotation")
                 {
-                  xAngle = IGN_DTOR(value);
+                  xAngle = GZ_DTOR(value);
                   mats.push_back(math::Matrix4d(
                     math::Quaterniond(xAxis, xAngle)));
                 }
@@ -252,7 +252,7 @@ std::unique_ptr<Skeleton> BVHLoader::Load(const std::string &_filename,
                 {
                   if (channel == "Yrotation")
                   {
-                    yAngle = IGN_DTOR(value);
+                    yAngle = GZ_DTOR(value);
                     mats.push_back(math::Matrix4d(
                       math::Quaterniond(yAxis, yAngle)));
                   }
@@ -279,7 +279,7 @@ std::unique_ptr<Skeleton> BVHLoader::Load(const std::string &_filename,
       break;
   }
   if (frameNo < frameCount - 1)
-    ignwarn << "BVH file ended unexpectedly.\n";
+    gzwarn << "BVH file ended unexpectedly.\n";
 
   skeleton->AddAnimation(animation);
 

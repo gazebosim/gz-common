@@ -17,66 +17,91 @@
 
 #include <gtest/gtest.h>
 
+#define SUPPRESS_IGNITION_HEADER_DEPRECATION
+
 #include <algorithm>
-#include "gz/common/PluginLoader.hh"
-#include "gz/common/SystemPaths.hh"
+#include <fstream>
 
-#include "gz/common/config.hh"
-#include "test_config.h"
+#include <gz/utils/SuppressWarning.hh>
 
-#ifndef IGN_COMMON_LIB_PATH
-#define IGN_COMMON_LIB_PATH "./ign_common"
-#endif
+#include "ignition/common/config.hh"
+#include "ignition/common/SystemPaths.hh"
+#include "ignition/common/TempDirectory.hh"
+
+#include "gz/common/testing/Utils.hh"
+
+using namespace gz;
+
+/////////////////////////////////////////////////
+class TestTempDirectory : public common::TempDirectory
+{
+  public: TestTempDirectory():
+    common::TempDirectory("plugin_loader", "gz_common", true)
+  {
+  }
+};
+
+GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
+#include "ignition/common/PluginLoader.hh"
 
 /////////////////////////////////////////////////
 TEST(PluginLoader, InitialNoInterfacesImplemented)
 {
-  gz::common::PluginLoader pm;
+  common::PluginLoader pm;
   EXPECT_EQ(0u, pm.InterfacesImplemented().size());
 }
 
 /////////////////////////////////////////////////
 TEST(PluginLoader, LoadNonexistantLibrary)
 {
-  gz::common::PluginLoader pm;
+  common::PluginLoader pm;
   EXPECT_TRUE(pm.LoadLibrary("/path/to/libDoesNotExist.so").empty());
 }
 
 /////////////////////////////////////////////////
 TEST(PluginLoader, LoadNonLibrary)
 {
-  std::string projectPath(IGN_COMMON_LIB_PATH);
-  gz::common::PluginLoader pm;
-  EXPECT_TRUE(pm.LoadLibrary(projectPath + "/test_config.h").empty());
+  TestTempDirectory tempDir;
+  common::testing::createNewEmptyFile("not_a_library.txt");
+
+  common::PluginLoader pm;
+  EXPECT_TRUE(pm.LoadLibrary("not_a_library.txt").empty());
 }
 
 /////////////////////////////////////////////////
 TEST(PluginLoader, LoadNonPluginLibrary)
 {
-  std::string libraryName("ignition-common");
-  libraryName += std::to_string(IGNITION_COMMON_MAJOR_VERSION);
+  std::string libDir = "lib_dir";
+  std::string libName = "foobar";
 
-  gz::common::SystemPaths sp;
-  sp.AddPluginPaths(IGN_COMMON_LIB_PATH);
-  std::string path = sp.FindSharedLibrary(libraryName);
+  TestTempDirectory tempDir;
+  common::createDirectory(libDir);
+  common::testing::createNewEmptyFile(
+      common::joinPaths(libDir, "lib" + libName + ".so"));
+
+  common::SystemPaths sp;
+
+  // Fails without plugin dirs setup
+  std::string path = sp.FindSharedLibrary("foo");
+  ASSERT_TRUE(path.empty());
+
+  sp.AddPluginPaths(
+      common::joinPaths(common::cwd(), libDir));
+  path = sp.FindSharedLibrary(libName);
   ASSERT_FALSE(path.empty());
 
-  gz::common::PluginLoader pm;
+  common::PluginLoader pm;
   EXPECT_TRUE(pm.LoadLibrary(path).empty());
 }
 
 /////////////////////////////////////////////////
 TEST(PluginLoader, InstantiateUnloadedPlugin)
 {
-  gz::common::PluginLoader pm;
-  gz::common::PluginPtr plugin =
+  common::PluginLoader pm;
+  common::PluginPtr plugin =
       pm.Instantiate("plugin::that::is::not::loaded");
   EXPECT_FALSE(plugin);
 }
+GZ_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
 
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}
+#undef SUPPRESS_IGNITION_HEADER_DEPRECATION

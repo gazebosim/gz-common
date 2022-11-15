@@ -1,4 +1,14 @@
-option(IGN_PROFILER_REMOTERY "Enable the Remotery profiler" TRUE)
+option(IGN_PROFILER_REMOTERY "Deprecated. Enable the Remotery profiler"
+  TRUE)
+
+# TODO(CH3): Remove the IGN_PROFILER_REMOTERY on deprecation
+#            and set the option to TRUE instead
+option(GZ_PROFILER_REMOTERY "Enable the Remotery profiler"
+  ${IGN_PROFILER_REMOTERY})
+
+if(NOT IGN_PROFILER_REMOTERY)
+  message(DEPRECATION "The IGN_PROFILER_REMOTERY option is deprecated! Please use GZ_PROFILER_REMOTERY instead.")
+endif()
 
 set(
   PROFILER_SRCS
@@ -10,7 +20,7 @@ set(
   Profiler_Disabled_TEST.cc
 )
 
-if(IGN_PROFILER_REMOTERY)
+if(GZ_PROFILER_REMOTERY)
   set(
     Remotery_SRC
     ./Remotery/lib/Remotery.c
@@ -53,16 +63,15 @@ if(IGN_PROFILER_REMOTERY)
   list(APPEND PROFILER_TESTS Profiler_Remotery_TEST.cc)
 endif()
 
-ign_add_component(profiler SOURCES ${PROFILER_SRCS} GET_TARGET_NAME profiler_target)
+gz_add_component(profiler SOURCES ${PROFILER_SRCS} GET_TARGET_NAME profiler_target)
 
 # Always enable profiler so that it's built, but make it
 # private so that downstream users can still disable profiling
-target_compile_definitions(${profiler_target} PRIVATE "IGN_PROFILER_ENABLE=1")
+target_compile_definitions(${profiler_target} PRIVATE "GZ_PROFILER_ENABLE=1")
 target_compile_definitions(${profiler_target} PRIVATE "RMT_USE_METAL=${RMT_USE_METAL}")
 
-if(IGN_PROFILER_REMOTERY)
-  target_compile_definitions(${profiler_target} PRIVATE "IGN_PROFILER_REMOTERY=1")
-
+if(GZ_PROFILER_REMOTERY)
+  target_compile_definitions(${profiler_target} PRIVATE "GZ_PROFILER_REMOTERY=1")
   target_include_directories(
     ${profiler_target}
     PRIVATE
@@ -79,25 +88,31 @@ if(IGN_PROFILER_REMOTERY)
   endif()
 endif()
 
-ign_build_tests(TYPE UNIT SOURCES ${PROFILER_TESTS}
-  LIB_DEPS ${profiler_target}
+gz_build_tests(
+  TYPE UNIT
+  SOURCES ${PROFILER_TESTS}
+  LIB_DEPS
+    ${profiler_target}
+    gz-common${GZ_COMMON_VER}-testing
   TEST_LIST profiler_tests)
 
 if(TARGET UNIT_Profiler_Remotery_TEST)
   target_compile_definitions(UNIT_Profiler_Remotery_TEST
-    PUBLIC "IGN_PROFILER_ENABLE=1")
+    PUBLIC "GZ_PROFILER_ENABLE=1")
 endif()
 
-if(IGN_PROFILER_REMOTERY)
-  set(IGN_PROFILER_VIS_PATH ${IGN_DATA_INSTALL_DIR}/profiler_vis)
+if(GZ_PROFILER_REMOTERY)
+  set(GZ_PROFILER_SCRIPT_PATH ${CMAKE_INSTALL_LIBEXECDIR}/gz/gz-common${PROJECT_VERSION_MAJOR})
+  set(GZ_PROFILER_VIS_PATH ${GZ_DATA_INSTALL_DIR}/profiler_vis)
 
-  configure_file(Remotery/ign_remotery_vis.in
-    ${CMAKE_CURRENT_BINARY_DIR}/ign_remotery_vis)
+  configure_file(Remotery/gz_remotery_vis.in
+    ${CMAKE_CURRENT_BINARY_DIR}/gz_remotery_vis
+    @ONLY)
 
   install(PROGRAMS
-    ${CMAKE_CURRENT_BINARY_DIR}/ign_remotery_vis
-    DESTINATION bin)
+    ${CMAKE_CURRENT_BINARY_DIR}/gz_remotery_vis
+    DESTINATION ${GZ_PROFILER_SCRIPT_PATH})
 
   install(DIRECTORY Remotery/vis/
-          DESTINATION ${IGN_DATA_INSTALL_DIR}/profiler_vis)
+          DESTINATION ${GZ_PROFILER_VIS_PATH})
 endif()

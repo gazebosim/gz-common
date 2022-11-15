@@ -16,13 +16,38 @@
 */
 #include <gz/common/KeyFrame.hh>
 
-using namespace ignition;
-using namespace common;
+namespace gz {
+namespace common {
+
+/////////////////////////////////////////////////
+class KeyFrame::Implementation
+{
+  /// \brief time of key frame
+  public: double time;
+};
+
+/////////////////////////////////////////////////
+class PoseKeyFrame::Implementation
+{
+  /// \brief the translation vector
+  public: math::Vector3d translate;
+
+  /// \brief the rotation quaternion
+  public: math::Quaterniond rotate;
+};
+
+/////////////////////////////////////////////////
+class NumericKeyFrame::Implementation
+{
+  /// \brief numeric value
+  public: double value;
+};
 
 /////////////////////////////////////////////////
 KeyFrame::KeyFrame(const double _time)
-: time(_time)
+: dataPtr(gz::utils::MakeImpl<Implementation>())
 {
+  this->dataPtr->time = _time;
 }
 
 /////////////////////////////////////////////////
@@ -33,13 +58,14 @@ KeyFrame::~KeyFrame()
 /////////////////////////////////////////////////
 double KeyFrame::Time() const
 {
-  return this->time;
+  return this->dataPtr->time;
 }
 
 
 /////////////////////////////////////////////////
 PoseKeyFrame::PoseKeyFrame(const double _time)
-: KeyFrame(_time)
+: KeyFrame(_time),
+  dataPtr(gz::utils::MakeImpl<Implementation>())
 {
 }
 
@@ -51,30 +77,31 @@ PoseKeyFrame::~PoseKeyFrame()
 /////////////////////////////////////////////////
 void PoseKeyFrame::Translation(const math::Vector3d &_trans)
 {
-  this->translate = _trans;
+  this->dataPtr->translate = _trans;
 }
 
 /////////////////////////////////////////////////
 const math::Vector3d &PoseKeyFrame::Translation() const
 {
-  return this->translate;
+  return this->dataPtr->translate;
 }
 
 /////////////////////////////////////////////////
 void PoseKeyFrame::Rotation(const math::Quaterniond &_rot)
 {
-  this->rotate = _rot;
+  this->dataPtr->rotate = _rot;
 }
 
 /////////////////////////////////////////////////
 const math::Quaterniond &PoseKeyFrame::Rotation() const
 {
-  return this->rotate;
+  return this->dataPtr->rotate;
 }
 
 /////////////////////////////////////////////////
 NumericKeyFrame::NumericKeyFrame(const double _time)
-: KeyFrame(_time)
+: KeyFrame(_time),
+  dataPtr(gz::utils::MakeImpl<Implementation>())
 {
 }
 
@@ -86,11 +113,13 @@ NumericKeyFrame::~NumericKeyFrame()
 /////////////////////////////////////////////////
 void NumericKeyFrame::Value(const double &_value)
 {
-  this->value = _value;
+  this->dataPtr->value = _value;
 }
 
 /////////////////////////////////////////////////
 const double &NumericKeyFrame::Value() const
 {
-  return this->value;
+  return this->dataPtr->value;
 }
+}  // namespace gz
+}  // namespace common

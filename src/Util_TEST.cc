@@ -14,15 +14,15 @@
  * limitations under the License.
  *
 */
-
-#include <stdlib.h>
 #include <gtest/gtest.h>
+
+#include <fstream>
+#include <stdlib.h>
 #include <string>
 
 #include <gz/common/Util.hh>
-#include "test_config.h"
 
-using namespace ignition;
+using namespace gz;
 
 /////////////////////////////////////////////////
 /// \brief Test Util::SHA1
@@ -175,7 +175,7 @@ TEST(Util_TEST, emptyENV)
 /////////////////////////////////////////////////
 TEST(Util_TEST, envSet)
 {
-  const auto key = "IGN_ENV_SET";
+  const auto key = "GZ_ENV_SET";
   ASSERT_TRUE(common::setenv(key, "VALUE"));
 
   // Check set var
@@ -208,7 +208,7 @@ TEST(Util_TEST, envSet)
 /////////////////////////////////////////////////
 TEST(Util_TEST, envUnset)
 {
-  const auto key = "IGN_ENV_UNSET";
+  const auto key = "GZ_ENV_UNSET";
   ASSERT_TRUE(common::unsetenv(key));
 
   // Check unset var (default)
@@ -237,7 +237,7 @@ TEST(Util_TEST, envUnset)
 /////////////////////////////////////////////////
 TEST(Util_TEST, envSetEmpty)
 {
-  const auto key = "IGN_ENV_SET_EMPTY";
+  const auto key = "GZ_ENV_SET_EMPTY";
 
   ASSERT_TRUE(common::setenv(key, ""));
   ASSERT_FALSE(common::setenv("", ""));
@@ -297,8 +297,8 @@ TEST(Util_TEST, findFile)
   EXPECT_EQ(file1, systemPaths->FindFile(common::joinPaths("test_dir1",
       "test_f1"), true));
 
-  // Relative prefixed by file://
-  EXPECT_EQ(file1, common::findFile("file://test_dir1/test_f1"));
+  // Relative prefixed by file:
+  EXPECT_EQ(file1, common::findFile("file:test_dir1/test_f1"));
 
   // Custom callback
 #ifndef _WIN32

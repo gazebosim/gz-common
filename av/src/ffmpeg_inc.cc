@@ -16,43 +16,30 @@
 */
 #include "gz/common/ffmpeg_inc.hh"
 
-using namespace ignition;
+using namespace gz;
 
 //////////////////////////////////////////////////
 AVFrame *common::AVFrameAlloc(void)
 {
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(55, 28, 1)
   return av_frame_alloc();
-#else
-  return avcodec_alloc_frame();
-#endif
 }
 
 //////////////////////////////////////////////////
 void common::AVFrameUnref(AVFrame *_frame)
 {
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(55, 28, 1)
   av_frame_unref(_frame);
-#else
-  avcodec_get_frame_defaults(_frame);
-#endif
 }
 
 //////////////////////////////////////////////////
 void common::AVPacketUnref(AVPacket *_packet)
 {
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 24, 102)
   av_packet_unref(_packet);
-#else
-  av_free_packet(_packet);
-#endif
 }
 
 //////////////////////////////////////////////////
 int common::AVCodecDecode(AVCodecContext *_codecCtx,
     AVFrame *_frame, int *_gotFrame, AVPacket *_packet)
 {
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 48, 101)
   // from https://blogs.gentoo.org/lu_zero/2016/03/29/new-avcodec-api/
   int ret;
 
@@ -79,16 +66,4 @@ int common::AVCodecDecode(AVCodecContext *_codecCtx,
 
   // new API always consumes the whole packet
   return _packet ? _packet->size : 0;
-#else
-  // this was deprecated in ffmpeg version 3.1
-  // github.com/FFmpeg/FFmpeg/commit/7fc329e2dd6226dfecaa4a1d7adf353bf2773726
-# ifndef _WIN32
-#  pragma GCC diagnostic push
-#  pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-# endif
-  return avcodec_decode_video2(_codecCtx, _frame, _gotFrame, _packet);
-# ifndef _WIN32
-#  pragma GCC diagnostic pop
-# endif
-#endif
 }

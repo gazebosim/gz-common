@@ -16,7 +16,9 @@
  */
 
 #include <algorithm>
+#include <limits>
 #include <map>
+#include <optional>
 #include <string>
 
 #include "gz/math/Helpers.hh"
@@ -25,20 +27,20 @@
 #include "gz/common/Material.hh"
 #include "gz/common/SubMesh.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 /// \brief Private data for SubMesh
-class gz::common::SubMeshPrivate
+class gz::common::SubMesh::Implementation
 {
   /// \brief the vertex array
-  public: std::vector<math::Vector3d> vertices;
+  public: std::vector<gz::math::Vector3d> vertices;
 
   /// \brief the normal array
-  public: std::vector<math::Vector3d> normals;
+  public: std::vector<gz::math::Vector3d> normals;
 
   /// \brief A map of texcoord set index to texture coordinate array
-  public: std::map<unsigned int, std::vector<math::Vector2d>>
+  public: std::map<unsigned int, std::vector<gz::math::Vector2d>>
       texCoords;
 
   /// \brief the vertex index array
@@ -52,7 +54,7 @@ class gz::common::SubMeshPrivate
 
   /// \brief The material index for this mesh. Relates to the parent
   /// mesh material list.
-  public: int materialIndex = -1;
+  public: std::optional<unsigned int> materialIndex = std::nullopt;
 
   /// \brief The name of the sub-mesh
   public: std::string name;
@@ -60,52 +62,20 @@ class gz::common::SubMeshPrivate
 
 //////////////////////////////////////////////////
 SubMesh::SubMesh()
-: dataPtr(new SubMeshPrivate)
+: dataPtr(gz::utils::MakeImpl<Implementation>())
 {
 }
 
 //////////////////////////////////////////////////
 SubMesh::SubMesh(const std::string &_name)
-: dataPtr(new SubMeshPrivate)
+: dataPtr(gz::utils::MakeImpl<Implementation>())
 {
   this->dataPtr->name = _name;
 }
 
 //////////////////////////////////////////////////
-SubMesh::SubMesh(const SubMesh &_submesh)
-: dataPtr(new SubMeshPrivate)
-{
-  this->dataPtr->name = _submesh.dataPtr->name;
-  this->dataPtr->materialIndex = _submesh.dataPtr->materialIndex;
-  this->dataPtr->primitiveType = _submesh.dataPtr->primitiveType;
-
-  std::copy(_submesh.dataPtr->nodeAssignments.begin(),
-      _submesh.dataPtr->nodeAssignments.end(),
-      std::back_inserter(this->dataPtr->nodeAssignments));
-
-  std::copy(_submesh.dataPtr->indices.begin(),
-      _submesh.dataPtr->indices.end(),
-      std::back_inserter(this->dataPtr->indices));
-  std::copy(_submesh.dataPtr->normals.begin(),
-      _submesh.dataPtr->normals.end(),
-      std::back_inserter(this->dataPtr->normals));
-
-  for (const auto &set : _submesh.dataPtr->texCoords)
-  {
-    std::copy(set.second.begin(), set.second.end(),
-        std::back_inserter(this->dataPtr->texCoords[set.first]));
-  }
-  std::copy(_submesh.dataPtr->vertices.begin(),
-      _submesh.dataPtr->vertices.end(),
-      std::back_inserter(this->dataPtr->vertices));
-}
-
-//////////////////////////////////////////////////
 SubMesh::~SubMesh()
 {
-  this->dataPtr->vertices.clear();
-  this->dataPtr->indices.clear();
-  this->dataPtr->nodeAssignments.clear();
 }
 
 //////////////////////////////////////////////////
@@ -127,7 +97,7 @@ void SubMesh::AddIndex(const unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-void SubMesh::AddVertex(const math::Vector3d &_v)
+void SubMesh::AddVertex(const gz::math::Vector3d &_v)
 {
   this->dataPtr->vertices.push_back(_v);
 }
@@ -135,11 +105,11 @@ void SubMesh::AddVertex(const math::Vector3d &_v)
 //////////////////////////////////////////////////
 void SubMesh::AddVertex(const double _x, const double _y, const double _z)
 {
-  this->AddVertex(math::Vector3d(_x, _y, _z));
+  this->AddVertex(gz::math::Vector3d(_x, _y, _z));
 }
 
 //////////////////////////////////////////////////
-void SubMesh::AddNormal(const math::Vector3d &_n)
+void SubMesh::AddNormal(const gz::math::Vector3d &_n)
 {
   this->dataPtr->normals.push_back(_n);
 }
@@ -147,7 +117,7 @@ void SubMesh::AddNormal(const math::Vector3d &_n)
 //////////////////////////////////////////////////
 void SubMesh::AddNormal(const double _x, const double _y, const double _z)
 {
-  this->AddNormal(math::Vector3d(_x, _y, _z));
+  this->AddNormal(gz::math::Vector3d(_x, _y, _z));
 }
 
 //////////////////////////////////////////////////
@@ -160,7 +130,7 @@ void SubMesh::AddTexCoord(const double _u, const double _v)
 }
 
 //////////////////////////////////////////////////
-void SubMesh::AddTexCoord(const math::Vector2d &_uv)
+void SubMesh::AddTexCoord(const gz::math::Vector2d &_uv)
 {
   this->AddTexCoord(_uv.X(), _uv.Y());
 }
@@ -169,11 +139,11 @@ void SubMesh::AddTexCoord(const math::Vector2d &_uv)
 void SubMesh::AddTexCoordBySet(double _u, double _v, unsigned int _setIndex)
 {
   this->dataPtr->texCoords[_setIndex].push_back(
-      math::Vector2d(_u, _v));
+      gz::math::Vector2d(_u, _v));
 }
 
 //////////////////////////////////////////////////
-void SubMesh::AddTexCoordBySet(const math::Vector2d &_uv,
+void SubMesh::AddTexCoordBySet(const gz::math::Vector2d &_uv,
     unsigned int _setIndex)
 {
   this->AddTexCoordBySet(_uv.X(), _uv.Y(), _setIndex);
@@ -192,15 +162,21 @@ void SubMesh::AddNodeAssignment(const unsigned int _vertex,
 }
 
 //////////////////////////////////////////////////
-math::Vector3d SubMesh::Vertex(const unsigned int _index) const
+gz::math::Vector3d SubMesh::Vertex(const unsigned int _index) const
 {
   if (_index >= this->dataPtr->vertices.size())
   {
-    ignerr << "Index too large" << std::endl;
+    gzerr << "Index too large" << std::endl;
     return math::Vector3d::Zero;
   }
 
   return this->dataPtr->vertices[_index];
+}
+
+//////////////////////////////////////////////////
+const gz::math::Vector3d* SubMesh::VertexPtr() const
+{
+  return this->dataPtr->vertices.data();
 }
 
 //////////////////////////////////////////////////
@@ -211,11 +187,11 @@ bool SubMesh::HasVertex(const unsigned int _index) const
 
 //////////////////////////////////////////////////
 void SubMesh::SetVertex(const unsigned int _index,
-    const math::Vector3d &_v)
+    const gz::math::Vector3d &_v)
 {
   if (_index >= this->dataPtr->vertices.size())
   {
-    ignerr << "Index too large" << std::endl;
+    gzerr << "Index too large" << std::endl;
     return;
   }
 
@@ -223,11 +199,11 @@ void SubMesh::SetVertex(const unsigned int _index,
 }
 
 //////////////////////////////////////////////////
-math::Vector3d SubMesh::Normal(const unsigned int _index) const
+gz::math::Vector3d SubMesh::Normal(const unsigned int _index) const
 {
   if (_index >= this->dataPtr->normals.size())
   {
-    ignerr << "Index too large" << std::endl;
+    gzerr << "Index too large" << std::endl;
     return math::Vector3d::Zero;
   }
 
@@ -250,7 +226,7 @@ bool SubMesh::HasTexCoord(const unsigned int _index) const
 
   if (this->dataPtr->texCoords.size() > 1u)
   {
-    ignwarn << "Multiple texture coordinate sets exist in submesh: "
+    gzwarn << "Multiple texture coordinate sets exist in submesh: "
             << this->dataPtr->name << ". Checking first set with index: "
             << firstSetIndex << std::endl;
   }
@@ -276,11 +252,11 @@ bool SubMesh::HasNodeAssignment(const unsigned int _index) const
 
 //////////////////////////////////////////////////
 void SubMesh::SetNormal(const unsigned int _index,
-    const math::Vector3d &_n)
+    const gz::math::Vector3d &_n)
 {
   if (_index >= this->dataPtr->normals.size())
   {
-    ignerr << "Index too large" << std::endl;
+    gzerr << "Index too large" << std::endl;
     return;
   }
 
@@ -288,18 +264,18 @@ void SubMesh::SetNormal(const unsigned int _index,
 }
 
 //////////////////////////////////////////////////
-math::Vector2d SubMesh::TexCoord(const unsigned int _index) const
+gz::math::Vector2d SubMesh::TexCoord(const unsigned int _index) const
 {
   if (this->dataPtr->texCoords.empty())
   {
-    ignerr << "Texture coordinate sets are empty" << std::endl;
+    gzerr << "Texture coordinate sets are empty" << std::endl;
     return math::Vector2d::Zero;
   }
   unsigned firstSetIndex = this->dataPtr->texCoords.begin()->first;
 
   if (this->dataPtr->texCoords.size() > 1u)
   {
-    ignwarn << "Multiple texture coordinate sets exist in submesh: "
+    gzwarn << "Multiple texture coordinate sets exist in submesh: "
             << this->dataPtr->name << ". Checking first set with index: "
             << firstSetIndex << std::endl;
   }
@@ -308,20 +284,20 @@ math::Vector2d SubMesh::TexCoord(const unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-math::Vector2d SubMesh::TexCoordBySet(unsigned int _index,
+gz::math::Vector2d SubMesh::TexCoordBySet(unsigned int _index,
     unsigned int _setIndex) const
 {
   auto it = this->dataPtr->texCoords.find(_setIndex);
   if (it == this->dataPtr->texCoords.end())
   {
-    ignerr << "Texture coordinate set does not exist: " << _setIndex
+    gzerr << "Texture coordinate set does not exist: " << _setIndex
            << std::endl;
     return math::Vector2d::Zero;
   }
 
   if (_index >= it->second.size())
   {
-    ignerr << "Index too large" << std::endl;
+    gzerr << "Index too large" << std::endl;
     return math::Vector2d::Zero;
   }
 
@@ -330,7 +306,7 @@ math::Vector2d SubMesh::TexCoordBySet(unsigned int _index,
 
 //////////////////////////////////////////////////
 void SubMesh::SetTexCoord(const unsigned int _index,
-    const math::Vector2d &_t)
+    const gz::math::Vector2d &_t)
 {
   unsigned firstSetIndex = 0u;
   if (!this->dataPtr->texCoords.empty())
@@ -338,7 +314,7 @@ void SubMesh::SetTexCoord(const unsigned int _index,
 
   if (this->dataPtr->texCoords.size() > 1u)
   {
-    ignwarn << "Multiple texture coordinate sets exist in submesh: "
+    gzwarn << "Multiple texture coordinate sets exist in submesh: "
             << this->dataPtr->name << ". Checking first set with index: "
             << firstSetIndex << std::endl;
   }
@@ -348,19 +324,19 @@ void SubMesh::SetTexCoord(const unsigned int _index,
 
 //////////////////////////////////////////////////
 void SubMesh::SetTexCoordBySet(unsigned int _index,
-    const math::Vector2d &_t, unsigned int _setIndex)
+    const gz::math::Vector2d &_t, unsigned int _setIndex)
 {
   auto it = this->dataPtr->texCoords.find(_setIndex);
   if (it == this->dataPtr->texCoords.end())
   {
-    ignerr << "Texture coordinate set does not exist: " << _setIndex
+    gzerr << "Texture coordinate set does not exist: " << _setIndex
            << std::endl;
     return;
   }
 
   if (_index >= it->second.size())
   {
-    ignerr << "Index too large" << std::endl;
+    gzerr << "Index too large" << std::endl;
     return;
   }
 
@@ -372,7 +348,7 @@ int SubMesh::Index(const unsigned int _index) const
 {
   if (_index >= this->dataPtr->indices.size())
   {
-    ignerr << "Index too large" << std::endl;
+    gzerr << "Index too large" << std::endl;
     return -1;
   }
 
@@ -380,11 +356,17 @@ int SubMesh::Index(const unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
+const unsigned int* SubMesh::IndexPtr() const
+{
+  return this->dataPtr->indices.data();
+}
+
+//////////////////////////////////////////////////
 void SubMesh::SetIndex(const unsigned int _index, const unsigned int _i)
 {
   if (_index >= this->dataPtr->indices.size())
   {
-    ignerr << "Index too large" << std::endl;
+    gzerr << "Index too large" << std::endl;
     return;
   }
 
@@ -397,7 +379,7 @@ NodeAssignment SubMesh::NodeAssignmentByIndex(
 {
   if (_index >= this->dataPtr->nodeAssignments.size())
   {
-    ignerr << "Index too large" << std::endl;
+    gzerr << "Index too large" << std::endl;
     return NodeAssignment();
   }
 
@@ -405,16 +387,16 @@ NodeAssignment SubMesh::NodeAssignmentByIndex(
 }
 
 //////////////////////////////////////////////////
-math::Vector3d SubMesh::Max() const
+gz::math::Vector3d SubMesh::Max() const
 {
   if (this->dataPtr->vertices.empty())
-    return math::Vector3d::Zero;
+    return gz::math::Vector3d::Zero;
 
-  math::Vector3d max;
+  gz::math::Vector3d max;
 
-  max.X(-math::MAX_F);
-  max.Y(-math::MAX_F);
-  max.Z(-math::MAX_F);
+  max.X(-gz::math::MAX_F);
+  max.Y(-gz::math::MAX_F);
+  max.Z(-gz::math::MAX_F);
 
   for (const auto &v : this->dataPtr->vertices)
   {
@@ -427,16 +409,16 @@ math::Vector3d SubMesh::Max() const
 }
 
 //////////////////////////////////////////////////
-math::Vector3d SubMesh::Min() const
+gz::math::Vector3d SubMesh::Min() const
 {
   if (this->dataPtr->vertices.empty())
-    return math::Vector3d::Zero;
+    return gz::math::Vector3d::Zero;
 
-  math::Vector3d min;
+  gz::math::Vector3d min;
 
-  min.X(math::MAX_F);
-  min.Y(math::MAX_F);
-  min.Z(math::MAX_F);
+  min.X(gz::math::MAX_F);
+  min.Y(gz::math::MAX_F);
+  min.Z(gz::math::MAX_F);
 
   for (const auto &v : this->dataPtr->vertices)
   {
@@ -475,7 +457,7 @@ unsigned int SubMesh::TexCoordCount() const
 
   if (this->dataPtr->texCoords.size() > 1u)
   {
-    ignwarn << "Multiple texture coordinate sets exist in submesh: "
+    gzwarn << "Multiple texture coordinate sets exist in submesh: "
             << this->dataPtr->name << ". Checking first set with index: "
             << firstSetIndex << std::endl;
   }
@@ -490,7 +472,7 @@ unsigned int SubMesh::TexCoordCountBySet(unsigned int _setIndex) const
   if (it == this->dataPtr->texCoords.end())
     return 0u;
 
-  return this->dataPtr->texCoords[_setIndex].size();
+  return it->second.size();
 }
 
 //////////////////////////////////////////////////
@@ -526,11 +508,18 @@ void SubMesh::SetMaterialIndex(const unsigned int _index)
 //////////////////////////////////////////////////
 unsigned int SubMesh::MaterialIndex() const
 {
+  return this->dataPtr->materialIndex.value_or(
+      std::numeric_limits<unsigned int>::max());
+}
+
+//////////////////////////////////////////////////
+std::optional<unsigned int> SubMesh::GetMaterialIndex() const
+{
   return this->dataPtr->materialIndex;
 }
 
 //////////////////////////////////////////////////
-bool SubMesh::HasVertex(const math::Vector3d &_v) const
+bool SubMesh::HasVertex(const gz::math::Vector3d &_v) const
 {
   for (const auto &v : this->dataPtr->vertices)
     if (_v.Equal(v))
@@ -540,7 +529,7 @@ bool SubMesh::HasVertex(const math::Vector3d &_v) const
 }
 
 //////////////////////////////////////////////////
-int SubMesh::IndexOfVertex(const math::Vector3d &_v) const
+int SubMesh::IndexOfVertex(const gz::math::Vector3d &_v) const
 {
   for (auto iter = this->dataPtr->vertices.begin();
       iter != this->dataPtr->vertices.end(); ++iter)
@@ -556,7 +545,7 @@ void SubMesh::FillArrays(double **_vertArr, int **_indArr) const
 {
   if (this->dataPtr->vertices.empty() || this->dataPtr->indices.empty())
   {
-    ignerr << "No vertices or indices\n";
+    gzerr << "No vertices or indices\n";
     return;
   }
 
@@ -600,17 +589,17 @@ void SubMesh::RecalculateNormals()
   // For each face, which is defined by three indices, calculate the normals
   for (unsigned int i = 0; i < this->dataPtr->indices.size(); i+= 3)
   {
-    math::Vector3d v1 =
+    gz::math::Vector3d v1 =
         this->dataPtr->vertices[this->dataPtr->indices[i]];
-    math::Vector3d v2 =
+    gz::math::Vector3d v2 =
         this->dataPtr->vertices[this->dataPtr->indices[i+1]];
-    math::Vector3d v3 =
+    gz::math::Vector3d v3 =
         this->dataPtr->vertices[this->dataPtr->indices[i+2]];
-    math::Vector3d n = math::Vector3d::Normal(v1, v2, v3);
+    gz::math::Vector3d n = gz::math::Vector3d::Normal(v1, v2, v3);
 
     for (unsigned int j = 0; j < this->dataPtr->vertices.size(); ++j)
     {
-      math::Vector3d v = this->dataPtr->vertices[j];
+      gz::math::Vector3d v = this->dataPtr->vertices[j];
       if (v == v1 || v == v2 || v == v3)
       {
         this->dataPtr->normals[j] += n;
@@ -626,7 +615,7 @@ void SubMesh::RecalculateNormals()
 }
 
 //////////////////////////////////////////////////
-void SubMesh::GenSphericalTexCoord(const math::Vector3d &_center)
+void SubMesh::GenSphericalTexCoord(const gz::math::Vector3d &_center)
 {
   if (this->dataPtr->texCoords.empty())
     return;
@@ -636,7 +625,7 @@ void SubMesh::GenSphericalTexCoord(const math::Vector3d &_center)
 }
 
 //////////////////////////////////////////////////
-void SubMesh::GenSphericalTexCoordBySet(const math::Vector3d &_center,
+void SubMesh::GenSphericalTexCoordBySet(const gz::math::Vector3d &_center,
     unsigned int _setIndex)
 {
   this->dataPtr->texCoords[_setIndex].clear();
@@ -652,14 +641,14 @@ void SubMesh::GenSphericalTexCoordBySet(const math::Vector3d &_center,
     double r = std::max(0.000001, sqrt(x*x+y*y+z*z));
     double s = std::min(1.0, std::max(-1.0, z/r));
     double t = std::min(1.0, std::max(-1.0, y/r));
-    double u = acos(s) / IGN_PI;
-    double v = acos(t) / IGN_PI;
+    double u = acos(s) / GZ_PI;
+    double v = acos(t) / GZ_PI;
     this->AddTexCoordBySet(u, v, _setIndex);
   }
 }
 
 //////////////////////////////////////////////////
-void SubMesh::Scale(const math::Vector3d &_factor)
+void SubMesh::Scale(const gz::math::Vector3d &_factor)
 {
   for (auto &v : this->dataPtr->vertices)
     v *= _factor;
@@ -673,9 +662,9 @@ void SubMesh::Scale(const double &_factor)
 }
 
 //////////////////////////////////////////////////
-void SubMesh::Center(const math::Vector3d &_center)
+void SubMesh::Center(const gz::math::Vector3d &_center)
 {
-  math::Vector3d min, max, half;
+  gz::math::Vector3d min, max, half;
   min = this->Min();
   max = this->Max();
   half = (max - min) * 0.5;
@@ -684,7 +673,7 @@ void SubMesh::Center(const math::Vector3d &_center)
 }
 
 //////////////////////////////////////////////////
-void SubMesh::Translate(const math::Vector3d &_vec)
+void SubMesh::Translate(const gz::math::Vector3d &_vec)
 {
   for (auto &v : this->dataPtr->vertices)
     v += _vec;
@@ -712,11 +701,11 @@ double SubMesh::Volume() const
     {
       for (unsigned int idx = 0; idx < this->dataPtr->indices.size(); idx += 3)
       {
-        math::Vector3d v1 =
+        gz::math::Vector3d v1 =
           this->dataPtr->vertices[this->dataPtr->indices[idx]];
-        math::Vector3d v2 =
+        gz::math::Vector3d v2 =
           this->dataPtr->vertices[this->dataPtr->indices[idx+1]];
-        math::Vector3d v3 =
+        gz::math::Vector3d v3 =
           this->dataPtr->vertices[this->dataPtr->indices[idx+2]];
 
         volume += std::abs(v1.Cross(v2).Dot(v3) / 6.0);
@@ -724,12 +713,12 @@ double SubMesh::Volume() const
     }
     else
     {
-      ignerr << "The number of indices is not a multiple of three.\n";
+      gzerr << "The number of indices is not a multiple of three.\n";
     }
   }
   else
   {
-    ignerr << "Volume calculation can only be accomplished on a triangulated "
+    gzerr << "Volume calculation can only be accomplished on a triangulated "
       << " mesh.\n";
   }
 

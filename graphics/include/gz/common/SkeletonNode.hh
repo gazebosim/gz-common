@@ -21,19 +21,18 @@
 #include <string>
 #include <vector>
 
+#include <gz/utils/ImplPtr.hh>
+
 #include <gz/common/NodeTransform.hh>
 #include <gz/common/graphics/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
-    /// Forward declare private data class
-    class SkeletonNodePrivate;
-
-    /// \class SkeletonNode Skeleton.hh ignition/common/SkeletonNode.hh
+    /// \class SkeletonNode Skeleton.hh gz/common/SkeletonNode.hh
     /// \brief A skeleton node
-    class IGNITION_COMMON_GRAPHICS_VISIBLE SkeletonNode
+    class GZ_COMMON_GRAPHICS_VISIBLE SkeletonNode
     {
       /// \brief enumeration of node types
       public: enum SkeletonNodeType {NODE, JOINT};
@@ -190,8 +189,8 @@ namespace ignition
       /// \return the array of transform (These are the same as the raw trans)
       public: std::vector<NodeTransform> Transforms() const;
 
-      /// \brief Private data pointer
-      private: SkeletonNodePrivate *data;
+      /// \brief Private data pointer.
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
 
     typedef std::map<unsigned int, SkeletonNode*> SkeletonNodeMap;

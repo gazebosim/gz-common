@@ -19,7 +19,7 @@
 #include <iostream>
 #include <gz/common/Event.hh>
 
-using namespace ignition;
+using namespace gz;
 
 int g_callback = 0;
 common::EventT<void ()> g_event;

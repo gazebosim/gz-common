@@ -21,16 +21,15 @@
 #include <gz/common/graphics/Export.hh>
 #include <gz/common/MeshLoader.hh>
 
-namespace ignition
+#include <gz/utils/ImplPtr.hh>
+
+namespace gz
 {
   namespace common
   {
-    // Forward declare private data class
-    class ColladaLoaderPrivate;
-
-    /// \class ColladaLoader ColladaLoader.hh ignition/common/ColladaLoader.hh
+    /// \class ColladaLoader ColladaLoader.hh gz/common/ColladaLoader.hh
     /// \brief Class used to load Collada mesh files
-    class IGNITION_COMMON_GRAPHICS_VISIBLE ColladaLoader : public MeshLoader
+    class GZ_COMMON_GRAPHICS_VISIBLE ColladaLoader : public MeshLoader
     {
       /// \brief Constructor
       public: ColladaLoader();
@@ -45,7 +44,7 @@ namespace ignition
 
       /// \internal
       /// \brief Pointer to private data.
-      private: ColladaLoaderPrivate *dataPtr;
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

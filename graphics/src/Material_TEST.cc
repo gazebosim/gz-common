@@ -16,11 +16,14 @@
 
 #include <gtest/gtest.h>
 
-#include "test_config.h"
+#include "gz/common/Image.hh"
 #include "gz/common/Material.hh"
 #include "gz/common/Pbr.hh"
 
-using namespace ignition;
+#include "gz/common/testing/AutoLogFixture.hh"
+#include "gz/common/testing/TestPaths.hh"
+
+using namespace gz;
 
 class MaterialTest : public common::testing::AutoLogFixture { };
 
@@ -29,10 +32,13 @@ TEST_F(MaterialTest, Material)
   common::Material mat(math::Color(1.0f, 0.5f, 0.2f, 1.0f));
   EXPECT_TRUE(mat.Ambient() == math::Color(1.0f, 0.5f, 0.2f, 1.0f));
   EXPECT_TRUE(mat.Diffuse() == math::Color(1.0f, 0.5f, 0.2f, 1.0f));
-  EXPECT_STREQ("ignition_material_0", mat.Name().c_str());
+  EXPECT_STREQ("gz_material_0", mat.Name().c_str());
+  EXPECT_EQ(nullptr, mat.TextureData());
 
-  mat.SetTextureImage("texture_image");
+  auto texImg = std::make_shared<common::Image>();
+  mat.SetTextureImage("texture_image", texImg);
   EXPECT_STREQ("texture_image", mat.TextureImage().c_str());
+  EXPECT_EQ(texImg, mat.TextureData());
 
   mat.SetTextureImage("texture_image", "/path");
   std::string texturePath = common::joinPaths("/path", "..",
@@ -96,11 +102,4 @@ TEST_F(MaterialTest, Material)
   mat.SetPbrMaterial(pbr);
   EXPECT_NE(nullptr, mat.PbrMaterial());
   EXPECT_EQ(pbr, *mat.PbrMaterial());
-}
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
 }

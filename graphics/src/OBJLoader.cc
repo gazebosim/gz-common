@@ -24,27 +24,27 @@
 #include "gz/common/SubMesh.hh"
 #include "gz/common/OBJLoader.hh"
 
-#define IGNITION_COMMON_TINYOBJLOADER_IMPLEMENTATION
+#define GZ_COMMON_TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
     /// \internal
     /// \brief OBJLoader private data
-    class OBJLoaderPrivate
+    class OBJLoader::Implementation
     {
     };
   }
 }
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 //////////////////////////////////////////////////
 OBJLoader::OBJLoader()
-: MeshLoader(), dataPtr(new OBJLoaderPrivate)
+: dataPtr(gz::utils::MakeImpl<Implementation>())
 {
 }
 
@@ -57,7 +57,7 @@ OBJLoader::~OBJLoader()
 Mesh *OBJLoader::Load(const std::string &_filename)
 {
   std::map<std::string, Material *> materialIds;
-  std::string path = parentPath(_filename);
+  std::string path = common::parentPath(_filename);
 
   // check if obj is exported by blender
   // blender shoves BR fields in standard textures
@@ -88,17 +88,17 @@ Mesh *OBJLoader::Load(const std::string &_filename)
 
   if (!warn.empty())
   {
-    ignwarn << warn << std::endl;
+    gzwarn << warn << std::endl;
   }
 
   if (!err.empty())
   {
-    ignerr << err << std::endl;
+    gzerr << err << std::endl;
   }
 
   if (!ret)
   {
-    ignerr << "Failed to load/parse " << _filename << std::endl;
+    gzerr << "Failed to load/parse " << _filename << std::endl;
     return nullptr;
   }
 
@@ -107,7 +107,7 @@ Mesh *OBJLoader::Load(const std::string &_filename)
 
   for (auto const &s : shapes)
   {
-    // obj mesh assigns a material id to each 'face' but ignition assigns a
+    // obj mesh assigns a material id to each 'face' but Gazebo assigns a
     // single material to each 'submesh'. The strategy here is to identify
     // the number of unique material ids in each obj shape and create a new
     // submesh per unique material id
@@ -199,7 +199,7 @@ Mesh *OBJLoader::Load(const std::string &_filename)
         }
         else
         {
-          ignwarn << "Missing material for shape[" << s.name << "] "
+          gzwarn << "Missing material for shape[" << s.name << "] "
               << "in OBJ file[" << _filename << "]" << std::endl;
         }
         mesh->AddSubMesh(std::move(subMesh));
@@ -222,7 +222,7 @@ Mesh *OBJLoader::Load(const std::string &_filename)
 
         // vertices
         int vIdx = i.vertex_index;
-        math::Vector3d vertex(attrib.vertices[3 * vIdx],
+        gz::math::Vector3d vertex(attrib.vertices[3 * vIdx],
                                         attrib.vertices[3 * vIdx + 1],
                                         attrib.vertices[3 * vIdx + 2]);
         subMesh->AddVertex(vertex);
@@ -231,7 +231,7 @@ Mesh *OBJLoader::Load(const std::string &_filename)
         if (attrib.normals.size() > 0)
         {
           int nIdx = i.normal_index;
-          math::Vector3d normal(attrib.normals[3 * nIdx],
+          gz::math::Vector3d normal(attrib.normals[3 * nIdx],
                                           attrib.normals[3 * nIdx + 1],
                                           attrib.normals[3 * nIdx + 2]);
           normal.Normalize();
@@ -241,7 +241,7 @@ Mesh *OBJLoader::Load(const std::string &_filename)
         if (attrib.texcoords.size() > 0)
         {
           int tIdx = i.texcoord_index;
-          math::Vector2d uv(attrib.texcoords[2 * tIdx],
+          gz::math::Vector2d uv(attrib.texcoords[2 * tIdx],
                                       attrib.texcoords[2 * tIdx + 1]);
           subMesh->AddTexCoord(uv.X(), 1.0-uv.Y());
         }

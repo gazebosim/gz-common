@@ -15,14 +15,13 @@
  *
  */
 
-
 #ifndef GZ_COMMON_DETAIL_TEMPLATEHELPERS_HH_
 #define GZ_COMMON_DETAIL_TEMPLATEHELPERS_HH_
 
 
 #include <type_traits>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {

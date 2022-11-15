@@ -21,7 +21,7 @@
 
 #include "gz/common/StringUtils.hh"
 
-using namespace ignition;
+using namespace gz;
 
 /////////////////////////////////////////////////
 TEST(StringUtils, SplitNoDelimiterPresent)
@@ -210,11 +210,3 @@ TEST(EndsWith, PluralCast)
   EXPECT_EQ("oxen", common::PluralCast("ox", "oxen", -3));
   EXPECT_EQ("oxen", common::PluralCast("ox", "oxen", -4));
 }
-
-/////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}
-

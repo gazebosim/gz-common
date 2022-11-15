@@ -24,20 +24,19 @@
 #include <gz/math/Matrix4.hh>
 #include <gz/math/Pose3.hh>
 
+#include <gz/utils/ImplPtr.hh>
+
 #include <gz/common/NodeAnimation.hh>
 #include <gz/common/graphics/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
-    /// Forward declare private data class
-    class SkeletonAnimationPrivate;
-
     /// \class SkeletonAnimation SkeletonAnimation.hh
-    /// ignition/common/SkeletonAnimation.hh
+    /// gz/common/SkeletonAnimation.hh
     /// \brief Skeleton animation
-    class IGNITION_COMMON_GRAPHICS_VISIBLE SkeletonAnimation
+    class GZ_COMMON_GRAPHICS_VISIBLE SkeletonAnimation
     {
       /// \brief The Constructor
       /// \param[in] _name the name of the animation
@@ -46,15 +45,6 @@ namespace ignition
       /// \brief The destructor. Clears the list without destroying
       /// the animations
       public: ~SkeletonAnimation();
-
-      // NOTE: this is not needed starting in ign-common4 since ign-common4 uses
-      // the IGN_UTILS_IMPL_PTR instead of a raw impl pointer. So, this
-      // method should not be included in forward ports from ign-common3 to
-      // ign-common4
-      /// \brief Assignment operator
-      /// \param[in] _other The new SkeletonAnimation
-      /// \return A reference to this instance
-      public: SkeletonAnimation &operator=(const SkeletonAnimation &_other);
 
       /// \brief Changes the name
       /// \param[in] _name the new name
@@ -73,6 +63,10 @@ namespace ignition
       /// \return NodeAnimation object
       public: NodeAnimation *NodeAnimationByName(const std::string &_name)
           const;
+
+      /// \brief Check all nodes for x displacement
+      /// \return True if x displacement found
+      public: bool XDisplacement() const;
 
       /// \brief Looks for a node with a specific name in the animations
       /// \param[in] _node the name of the node
@@ -135,8 +129,8 @@ namespace ignition
       /// \return the duration in seconds
       public: double Length() const;
 
-      /// \brief Private data pointer
-      private: SkeletonAnimationPrivate *data;
+      /// \brief Private data pointer.
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

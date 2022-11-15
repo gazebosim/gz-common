@@ -17,38 +17,139 @@
 #ifndef GZ_COMMON_URI_HH_
 #define GZ_COMMON_URI_HH_
 
-#include <memory>
+#include <optional>
 #include <string>
 
 #include <gz/common/Export.hh>
-#include <gz/common/SuppressWarning.hh>
 
-namespace ignition
+#include <gz/utils/ImplPtr.hh>
+
+namespace gz
 {
   namespace common
   {
-    // Forward declare private data classes.
-    class URIPathPrivate;
-    class URIQueryPrivate;
-    class URIFragmentPrivate;
-    class URIPrivate;
+    /// A URI authority contains userinfo, host, and port data. The format
+    /// of a URI authority is `//userinfo@host:port`. The `userinfo` and
+    /// `port` components are optional.
+    ///
+    /// A URI Authority requires the existence of host information,
+    /// except when a Scheme is `file`.  When a scheme is `file`, then the
+    /// following are considered valid URIs and equivalent:
+    ///
+    ///   * file:/abs/path
+    ///   * file:///abs/path
+    ///
+    /// Keep in mind that a URI path must start with a forward slash when an
+    /// authority, as indicated by two forward slashes, is present. This
+    /// means relative file paths cannot be specified with an empty
+    /// authority. For example, `file://abs/path` will result in a host
+    /// value of `abs` and the URI path will be `/path`. You can specify
+    /// a relative path using `file:abs/path`.
+    ///
+    /// URIs that are set not to have an authority
+    /// (i.e. `Authority() == false`) preserve the legacy behaviour, which
+    /// is:
+    /// * `file:/abs/path` has the path `/abs/path`
+    /// * `file://abs/path` has the path `abs/path`
+    /// * `file:///abs/path` has the path `/abs/path`
+    class GZ_COMMON_VISIBLE URIAuthority
+    {
+      /// \brief Constructor
+      public: URIAuthority();
 
-    /// \brief The path component of a URI
-    class IGNITION_COMMON_VISIBLE URIPath
+      /// \brief Construct a URIAuthority object from a string.
+      /// \param[in] _str A string.
+      public: explicit URIAuthority(const std::string &_str);
+
+      /// \brief Remove all parts of the authority
+      public: void Clear();
+
+      /// \brief Get the user information.
+      /// \return User information, or an empty string if the user
+      /// information is not set.
+      public: std::string UserInfo() const;
+
+      /// \brief Set the user information.
+      /// \param[in] _userInfo The user information string.
+      public: void SetUserInfo(const std::string &_userInfo);
+
+      /// \brief Get the host.
+      /// \return The host.
+      public: std::string Host() const;
+
+      /// \brief Set the host.
+      /// \param[in] _host The host.
+      public: void SetHost(const std::string &_host);
+
+      /// \brief True if an empty host is considered valid.
+      /// \return True if an empty host is valid.
+      public: bool EmptyHostValid() const;
+
+      /// \brief Set whether an empty host is considered valid.
+      /// This should only be set to true if the corresponding URIScheme
+      /// is "file".
+      /// \param[in] _valid True if an empty host is valid.
+      public: void SetEmptyHostValid(bool _valid);
+
+      /// \brief Get the port.
+      /// \return The port number, which is optional.
+      public: std::optional<int> Port() const;
+
+      /// \brief Set the port number.
+      public: void SetPort(int _port);
+
+      /// \brief Return true if the two authorities match.
+      /// \param[in] _auth Authority.
+      /// return True of the authorities match.
+      public: bool operator==(const URIAuthority &_auth) const;
+
+      /// \brief Get the complete authoriy as a string.
+      /// \return The authority as a string.
+      public: std::string Str() const;
+
+      /// \brief Return true if the string is a valid path.
+      /// \param[in] _str String to check.
+      /// \param[in] _emptyHostValid Set this to true if an empty host is
+      /// valid. This should only be set to true if the corresponding URIScheme
+      /// is "file".
+      /// \return True if _str is a valid URI path.
+      public: static bool Valid(const std::string &_str,
+                  bool _emptyHostValid = false);
+
+      /// \brief Return true if this is a valid authority.
+      /// \return True if this is a valid URI authority.
+      public: bool Valid() const;
+
+      /// \brief Parse a string as URIAuthority.
+      /// \param[in] _str A string.
+      /// \param[in] _emptyHostValid Set this to true if an empty host is
+      /// valid. This should only be set to true if the corresponding URIScheme
+      /// is "file".
+      /// \return True if the string could be parsed as a URIAuthority.
+      public: bool Parse(const std::string &_str,
+                  bool _emptyHostValid = false);
+
+      /// \brief Pointer to private data.
+      GZ_UTILS_IMPL_PTR(dataPtr)
+    };
+
+    /// \brief A URI path contains a sequence of segments separated by `/`.
+    /// The path may be empty in a valid URI.
+    /// When an authority is present, the path must start with a `/`.
+    ///
+    /// In the following URI:
+    ///
+    /// scheme://authority.com/seg1/seg2?query
+    ///
+    /// The path is `/seg1/seg2`
+    class GZ_COMMON_VISIBLE URIPath
     {
       /// \brief Constructor
       public: URIPath();
 
-      /// \brief Copy constructor.
-      /// \param[in] _path Another URIPath.
-      public: URIPath(const URIPath &_path);
-
       /// \brief Construct a URIPath object from a string.
       /// \param[in] _str A string.
       public: explicit URIPath(const std::string &_str);
-
-      /// \brief Destructor
-      public: virtual ~URIPath();
 
       /// \brief Remove all parts of the path
       public: void Clear();
@@ -88,6 +189,16 @@ namespace ignition
       /// and a Windows drive specifier (e.g. 'C:') is pushed to it.
       public: void PushBack(const std::string &_part);
 
+      /// \brief Remove the part that's in the front of this path and return it.
+      /// \return Popped part.
+      /// Returns empty string if path doesn't have parts to be popped.
+      public: std::string PopFront();
+
+      /// \brief Remove the part that's in the back of this path and return it.
+      /// \return Popped part.
+      /// Returns empty string if path doesn't have parts to be popped.
+      public: std::string PopBack();
+
       /// \brief Compound assignment operator.
       /// \param[in] _part A new path to append.
       /// \return A new Path that consists of "this / _part"
@@ -109,11 +220,6 @@ namespace ignition
       /// \return The path as a string, with each path part separated by _delim.
       public: std::string Str(const std::string &_delim = "/") const;
 
-      /// \brief Assignment operator.
-      /// \param[in] _path Another URIPath.
-      /// \return Itself.
-      public: URIPath &operator=(const URIPath &_path);
-
       /// \brief Return true if the string is a valid path.
       /// \param[in] _str String to check.
       /// \return True if _str is a valid URI path.
@@ -128,15 +234,12 @@ namespace ignition
       /// \return True if the string could be parsed as a URIPath.
       public: bool Parse(const std::string &_str);
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
-      /// \internal
       /// \brief Pointer to private data.
-      private: std::unique_ptr<URIPathPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
 
     /// \brief The query component of a URI
-    class IGNITION_COMMON_VISIBLE URIQuery
+    class GZ_COMMON_VISIBLE URIQuery
     {
       /// \brief Constructor
       public: URIQuery();
@@ -144,13 +247,6 @@ namespace ignition
       /// \brief Construct a URIQuery object from a string.
       /// \param[in] _str A string.
       public: explicit URIQuery(const std::string &_str);
-
-      /// \brief Copy constructor
-      /// \param[in] _query Another query component
-      public: URIQuery(const URIQuery &_query);
-
-      /// \brief Destructor
-      public: virtual ~URIQuery();
 
       /// \brief Remove all values of the query
       public: void Clear();
@@ -160,11 +256,6 @@ namespace ignition
       /// \param[in] _value Value of the query.
       public: void Insert(const std::string &_key,
                           const std::string &_value);
-
-      /// \brief Assignment operator.
-      /// \param[in] _query another URIQuery.
-      /// \return Itself.
-      public: URIQuery &operator=(const URIQuery &_query);
 
       /// \brief Return true if the two queries contain the same values.
       /// \param[in] _query A URI query to compare.
@@ -191,15 +282,12 @@ namespace ignition
       /// \return True if the string can be parsed as a URIQuery.
       public: bool Parse(const std::string &_string);
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
-      /// \internal
       /// \brief Pointer to private data.
-      private: std::unique_ptr<URIQueryPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
 
     /// \brief The fragment component of a URI
-    class IGNITION_COMMON_VISIBLE URIFragment
+    class GZ_COMMON_VISIBLE URIFragment
     {
       /// \brief Constructor
       public: URIFragment();
@@ -208,20 +296,8 @@ namespace ignition
       /// \param[in] _str A string.
       public: explicit URIFragment(const std::string &_str);
 
-      /// \brief Copy constructor
-      /// \param[in] _fragment Another fragment component
-      public: URIFragment(const URIFragment &_fragment);
-
-      /// \brief Destructor
-      public: virtual ~URIFragment();
-
       /// \brief Remove all values of the fragment
       public: void Clear();
-
-      /// \brief Assignment operator.
-      /// \param[in] _fragment another URIFragment.
-      /// \return Itself.
-      public: URIFragment &operator=(const URIFragment &_fragment);
 
       /// \brief Assignment operator.
       /// \param[in] _fragment another URIFragment.
@@ -251,34 +327,30 @@ namespace ignition
       /// \return True if the string can be parsed as a URIFragment.
       public: bool Parse(const std::string &_string);
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
-      /// \internal
       /// \brief Pointer to private data.
-      private: std::unique_ptr<URIFragmentPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
 
-    /// \brief A complete URI
+    /// \brief A complete URI which has the following components:
+    ///
+    /// scheme:[//authority]path[?query][#fragment]
+    ///
     // cppcheck-suppress class_X_Y
-    class IGNITION_COMMON_VISIBLE URI
+    class GZ_COMMON_VISIBLE URI
     {
       /// \brief Default constructor
       public: URI();
 
-      /// \brief Construct a URI object from a string.
-      /// \param[in] _str A string.
-      public: explicit URI(const std::string &_str);
-
-      /// \brief Copy constructor
-      /// \param[in] _uri Another URI.
-      public: URI(const URI &_uri);
-
-      /// \brief Destructor.
-      public: ~URI();
+      /// \brief Default constructor
+      /// \param[in] _hasAuthority False if the URI doesn't have an authority.
+      /// Defaults to false. If true, an authority will be created and will be
+      /// empty.
+      public: explicit URI(const std::string &_str,
+          bool _hasAuthority = false);
 
       /// \brief Get the URI as a string, which has the form:
       ///
-      /// scheme://path?query
+      /// scheme:[//authority]path[?query][#fragment]
       ///
       /// \return The full URI as a string
       public: std::string Str() const;
@@ -293,6 +365,17 @@ namespace ignition
       /// \brief Set the URI's scheme
       /// \param[in] _scheme New scheme.
       public: void SetScheme(const std::string &_scheme);
+
+      /// \brief Set the URI's authority.
+      /// \return The authority
+      public: void SetAuthority(const URIAuthority &_authority);
+
+      /// \brief Get a copy of the URI's authority.
+      /// If the authority has no value (as opposed to being empty), it means
+      /// that it isn't present, and the authority value may be contained in
+      /// the path instead.
+      /// \return The authority
+      public: std::optional<URIAuthority> Authority() const;
 
       /// \brief Get a mutable version of the path component
       /// \return A reference to the path
@@ -318,11 +401,6 @@ namespace ignition
       /// \return A const reference of the fragment.
       public: const URIFragment &Fragment() const;
 
-      /// \brief Assignment operator.
-      /// \param[in] _uri Another URI.
-      /// \return Itself.
-      public: URI &operator=(const URI &_uri);
-
       /// \brief Return true if the two URIs match.
       /// \param[in] _uri Another URI to compare.
       /// \return True if the two URIs match.
@@ -338,15 +416,16 @@ namespace ignition
       public: static bool Valid(const std::string &_str);
 
       /// \brief Parse a string as URI.
+      /// If there's no authority (i.e. `Authority().has_value() == false`),
+      /// authority information will be contained within the path.
+      /// In order to populate the `Authority`, either set `hasAuthority` to
+      /// true on the constructor or set an empty authority before parsing.
       /// \param[in] _str A string.
       /// \return True if the string can be parsed as a URI.
       public: bool Parse(const std::string &_str);
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
-      /// \internal
       /// \brief Pointer to private data.
-      private: std::unique_ptr<URIPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

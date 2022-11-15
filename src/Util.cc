@@ -36,6 +36,8 @@
 #include <gz/common/Util.hh>
 #include <gz/common/Uuid.hh>
 
+#include <gz/utils/NeverDestroyed.hh>
+
 #ifndef _WIN32
 #include <dirent.h>
 #include <limits.h>
@@ -45,6 +47,7 @@
 #include "win_dirent.h"
 #endif
 
+using namespace gz;
 
 #define LEFT_ROTATE(x, n) (((x) << (n)) ^ ((x) >> (32-(n))))
 
@@ -55,8 +58,17 @@
   static const auto &ignstrtok = strtok_r;
 #endif
 
-static std::unique_ptr<gz::common::SystemPaths> gSystemPaths(
-    new gz::common::SystemPaths);
+/////////////////////////////////////////////////
+/// \brief Global instance of system paths for helper functions below
+///
+/// This uses the NeverDestroyed pattern to prevent static initialization and
+/// destruction order fiasco issues.
+common::SystemPaths& GetSystemPaths()
+{
+  static
+    utils::NeverDestroyed<gz::common::SystemPaths> paths;
+  return paths.Access();
+}
 
 /////////////////////////////////////////////////
 // Internal class for SHA1 computation
@@ -238,15 +250,15 @@ bool Sha1::Digest(void const *_buffer, std::size_t _byteCount,
 }
 
 /////////////////////////////////////////////////
-std::string gz::common::systemTimeISO()
+std::string common::systemTimeISO()
 {
-  return timeToIso(IGN_SYSTEM_TIME());
+  return timeToIso(GZ_SYSTEM_TIME());
 }
 
 /////////////////////////////////////////////////
-std::string gz::common::systemTimeIso()
+std::string common::systemTimeIso()
 {
-  return timeToIso(IGN_SYSTEM_TIME());
+  return timeToIso(GZ_SYSTEM_TIME());
 }
 
 // Taken from gtest.cc
@@ -266,14 +278,14 @@ static bool PortableLocaltime(time_t seconds, struct tm* out) {
 }
 
 /////////////////////////////////////////////////
-std::string gz::common::timeToIso(
+std::string common::timeToIso(
     const std::chrono::time_point<std::chrono::system_clock> &_time)
 {
   char isoStr[25];
   auto epoch = _time.time_since_epoch();
   auto sec = std::chrono::duration_cast<std::chrono::seconds>(epoch).count();
   auto nano = std::chrono::duration_cast<std::chrono::nanoseconds>(
-      epoch).count() - sec * IGN_SEC_TO_NANO;
+      epoch).count() - sec * GZ_SEC_TO_NANO;
 
   time_t tmSec = static_cast<time_t>(sec);
   struct tm localTime;
@@ -284,32 +296,32 @@ std::string gz::common::timeToIso(
 }
 
 /////////////////////////////////////////////////
-std::string gz::common::logPath()
+std::string common::logPath()
 {
-  return gSystemPaths->LogPath();
+  return GetSystemPaths().LogPath();
 }
 
 /////////////////////////////////////////////////
-void gz::common::addSearchPathSuffix(const std::string &_suffix)
+void common::addSearchPathSuffix(const std::string &_suffix)
 {
-  gSystemPaths->AddSearchPathSuffix(_suffix);
+  GetSystemPaths().AddSearchPathSuffix(_suffix);
 }
 
 /////////////////////////////////////////////////
-std::string gz::common::findFile(const std::string &_file)
+std::string common::findFile(const std::string &_file)
 {
-  return gSystemPaths->FindFile(_file, true);
+  return GetSystemPaths().FindFile(_file, true);
 }
 
 /////////////////////////////////////////////////
-std::string gz::common::findFile(const std::string &_file,
+std::string common::findFile(const std::string &_file,
                                        const bool _searchLocalPath)
 {
-  return gSystemPaths->FindFile(_file, _searchLocalPath);
+  return GetSystemPaths().FindFile(_file, _searchLocalPath);
 }
 
 /////////////////////////////////////////////////
-std::string gz::common::findFilePath(const std::string &_file)
+std::string common::findFilePath(const std::string &_file)
 {
   std::string filepath = findFile(_file);
 
@@ -325,26 +337,26 @@ std::string gz::common::findFilePath(const std::string &_file)
 }
 
 /////////////////////////////////////////////////
-void gz::common::addFindFileURICallback(
-    std::function<std::string(const gz::common::URI &)> _cb)
+void common::addFindFileURICallback(
+    std::function<std::string(const common::URI &)> _cb)
 {
-  gSystemPaths->AddFindFileURICallback(_cb);
+  GetSystemPaths().AddFindFileURICallback(_cb);
 }
 
 /////////////////////////////////////////////////
-gz::common::SystemPaths *gz::common::systemPaths()
+common::SystemPaths *common::systemPaths()
 {
-  return gSystemPaths.get();
+  return &GetSystemPaths();
 }
 
 /////////////////////////////////////////////////
-bool gz::common::env(const std::string &_name, std::string &_value)
+bool common::env(const std::string &_name, std::string &_value)
 {
   return env(_name, _value, false);
 }
 
 /////////////////////////////////////////////////
-bool gz::common::env(const std::string &_name,
+bool common::env(const std::string &_name,
                            std::string &_value,
                            bool _allowEmpty)
 {
@@ -365,7 +377,7 @@ bool gz::common::env(const std::string &_name,
 
   if (_allowEmpty)
   {
-    ignwarn << "Reading environment variable with _allowEmpty==true"
+    gzwarn << "Reading environment variable with _allowEmpty==true"
             << " is unsupported on Windows.\n";
   }
 
@@ -391,13 +403,13 @@ bool gz::common::env(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-bool gz::common::setenv(const std::string &_name,
+bool common::setenv(const std::string &_name,
                               const std::string &_value)
 {
 #ifdef _WIN32
   if (0 != _putenv_s(_name.c_str(), _value.c_str()))
   {
-    ignwarn << "Failed to set environment variable: "
+    gzwarn << "Failed to set environment variable: "
             << "[" << _name << "]"
             << strerror(errno) << std::endl;
     return false;
@@ -405,7 +417,7 @@ bool gz::common::setenv(const std::string &_name,
 #else
   if (0 != ::setenv(_name.c_str(), _value.c_str(), true))
   {
-    ignwarn << "Failed to set environment variable: "
+    gzwarn << "Failed to set environment variable: "
             << "[" << _name << "]"
             << strerror(errno) << std::endl;
     return false;
@@ -414,12 +426,12 @@ bool gz::common::setenv(const std::string &_name,
   return true;
 }
 /////////////////////////////////////////////////
-bool gz::common::unsetenv(const std::string &_name)
+bool common::unsetenv(const std::string &_name)
 {
 #ifdef _WIN32
   if (0 != _putenv_s(_name.c_str(), ""))
   {
-    ignwarn << "Failed to unset environment variable: "
+    gzwarn << "Failed to unset environment variable: "
             << "[" << _name << "]"
             << strerror(errno) << std::endl;
     return false;
@@ -427,7 +439,7 @@ bool gz::common::unsetenv(const std::string &_name)
 #else
   if (0 != ::unsetenv(_name.c_str()))
   {
-    ignwarn << "Failed to unset environment variable: "
+    gzwarn << "Failed to unset environment variable: "
             << "[" << _name << "]"
             << strerror(errno) << std::endl;
     return false;
@@ -437,7 +449,7 @@ bool gz::common::unsetenv(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-std::string gz::common::sha1(void const *_buffer, std::size_t _byteCount)
+std::string common::sha1(void const *_buffer, std::size_t _byteCount)
 {
   Sha1 sha1;
   std::stringstream stream;
@@ -453,14 +465,14 @@ std::string gz::common::sha1(void const *_buffer, std::size_t _byteCount)
 }
 
 /////////////////////////////////////////////////
-std::string gz::common::uuid()
+std::string common::uuid()
 {
-  gz::common::Uuid uuid;
+  common::Uuid uuid;
   return uuid.String();
 }
 
 /////////////////////////////////////////////////
-std::vector<std::string> gz::common::split(const std::string &_str,
+std::vector<std::string> common::split(const std::string &_str,
     const std::string &_delim)
 {
   std::vector<std::string> tokens;
@@ -480,14 +492,14 @@ std::vector<std::string> gz::common::split(const std::string &_str,
 }
 
 /////////////////////////////////////////////////
-void gz::common::ltrim(std::string &_s)
+void common::ltrim(std::string &_s)
 {
   _s.erase(_s.begin(), std::find_if(_s.begin(), _s.end(),
         [](int c) {return !std::isspace(c);}));
 }
 
 /////////////////////////////////////////////////
-void gz::common::rtrim(std::string &_s)
+void common::rtrim(std::string &_s)
 {
   _s.erase(std::find_if(_s.rbegin(), _s.rend(),
         [](int c) {return !std::isspace(c);}).base(),
@@ -495,35 +507,35 @@ void gz::common::rtrim(std::string &_s)
 }
 
 /////////////////////////////////////////////////
-void gz::common::trim(std::string &_s)
+void common::trim(std::string &_s)
 {
-  gz::common::ltrim(_s);
-  gz::common::rtrim(_s);
+  common::ltrim(_s);
+  common::rtrim(_s);
 }
 
 /////////////////////////////////////////////////
-std::string gz::common::ltrimmed(std::string _s)
+std::string common::ltrimmed(std::string _s)
 {
-  gz::common::ltrim(_s);
+  common::ltrim(_s);
   return _s;
 }
 
 /////////////////////////////////////////////////
-std::string gz::common::rtrimmed(std::string _s)
+std::string common::rtrimmed(std::string _s)
 {
-  gz::common::rtrim(_s);
+  common::rtrim(_s);
   return _s;
 }
 
 /////////////////////////////////////////////////
-std::string gz::common::trimmed(std::string _s)
+std::string common::trimmed(std::string _s)
 {
-  gz::common::trim(_s);
+  common::trim(_s);
   return _s;
 }
 
 /////////////////////////////////////////////////
-std::string gz::common::lowercase(const std::string &_in)
+std::string common::lowercase(const std::string &_in)
 {
   std::string out = _in;
   for (size_t i = 0; i < out.size(); ++i)
@@ -532,14 +544,14 @@ std::string gz::common::lowercase(const std::string &_in)
 }
 
 /////////////////////////////////////////////////
-std::string gz::common::lowercase(const char *_in)
+std::string common::lowercase(const char *_in)
 {
   std::string ins = _in;
   return lowercase(ins);
 }
 
 /////////////////////////////////////////////////
-void gz::common::replaceAll(std::string &_result,
+void common::replaceAll(std::string &_result,
                                   const std::string &_orig,
                                   const std::string &_key,
                                   const std::string &_replacement)
@@ -554,7 +566,7 @@ void gz::common::replaceAll(std::string &_result,
 }
 
 /////////////////////////////////////////////////
-std::string gz::common::replaceAll(const std::string &_orig,
+std::string common::replaceAll(const std::string &_orig,
                                         const std::string &_key,
                                         const std::string &_replacement)
 {

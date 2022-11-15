@@ -23,7 +23,7 @@
 #include <gz/common/Console.hh>
 #include <gz/common/GTSMeshUtils.hh>
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 //////////////////////////////////////////////////
@@ -131,8 +131,8 @@ int TriangleIsHole(GtsTriangle *_t, GtsFifo *_edgeList)
 
 //////////////////////////////////////////////////
 GtsSurface *GTSMeshUtils::DelaunayTriangulation(
-    const std::vector<math::Vector2d> &_vertices,
-    const std::vector<math::Vector2i> &_edges)
+    const std::vector<gz::math::Vector2d> &_vertices,
+    const std::vector<gz::math::Vector2i> &_edges)
 {
   GSList *l, *verticesList = nullptr;
 
@@ -208,13 +208,13 @@ GtsSurface *GTSMeshUtils::DelaunayTriangulation(
 
 //////////////////////////////////////////////////
 bool GTSMeshUtils::DelaunayTriangulation(
-    const std::vector<math::Vector2d> &_vertices,
-    const std::vector<math::Vector2i> &_edges,
+    const std::vector<gz::math::Vector2d> &_vertices,
+    const std::vector<gz::math::Vector2i> &_edges,
     SubMesh *_subMesh)
 {
   if (_edges.empty() || _vertices.empty())
   {
-    ignerr << "Unable to create an extruded outline mesh with "
+    gzerr << "Unable to create an extruded outline mesh with "
       << "no paths\n";
     return false;
   }

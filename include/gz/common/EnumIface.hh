@@ -23,7 +23,7 @@
 #include <gz/common/Util.hh>
 #include <gz/common/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -37,8 +37,8 @@ namespace ignition
     /// \param[in] names A vector of strings, one for each enum value.
     /// \sa EnumIface
     /// \sa EnumIterator
-    #define IGN_ENUM(name, enumType, begin, end, ...) \
-    static ignition::common::EnumIface<enumType> name( \
+    #define GZ_ENUM(name, enumType, begin, end, ...) \
+    static gz::common::EnumIface<enumType> name( \
         begin, end, {__VA_ARGS__});
 
     /// \brief Enum interface. Use this interface to convert an enum to

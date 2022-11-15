@@ -17,204 +17,84 @@
 
 #include <gtest/gtest.h>
 
-#ifndef _WIN32
-#include <fcntl.h>
-#include <limits.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
+#include <gz/utils/ExtraTestMacros.hh>
 
-#include "gz/common/Util.hh"
+#include <gz/common/Console.hh>
+#include <gz/common/Filesystem.hh>
+#include <gz/common/TempDirectory.hh>
+#include <gz/common/Util.hh>
+
+#include <gz/common/testing/Utils.hh>
+
+#include <filesystem>
+#include <fstream>
 
 // The symlink tests should always work on UNIX systems
+#ifndef _WIN32
 #define BUILD_SYMLINK_TESTS
-
-/////////////////////////////////////////////////
-bool create_and_switch_to_temp_dir(std::string &_new_temp_path)
-{
-  std::string tmppath;
-
-  if (!gz::common::env("TMPDIR", tmppath))
-  {
-    tmppath = std::string("/tmp");
-  }
-
-  tmppath += "/XXXXXX";
-
-  char *dtemp = mkdtemp(const_cast<char *>(tmppath.c_str()));
-  if (dtemp == nullptr)
-  {
-    return false;
-  }
-  if (chdir(dtemp) < 0)
-  {
-    return false;
-  }
-
-  char resolved[PATH_MAX];
-  if (realpath(dtemp, resolved) == nullptr)
-  {
-    return false;
-  }
-
-  _new_temp_path = std::string(resolved);
-
-  return true;
-}
-
-/////////////////////////////////////////////////
-bool create_new_empty_file(const std::string &_filename)
-{
-  int fd = open(_filename.c_str(), O_RDWR | O_CREAT, 0644);
-  if (fd < 0)
-  {
-    return false;
-  }
-
-  close(fd);
-
-  return true;
-}
-
-/////////////////////////////////////////////////
-bool create_new_file_symlink(const std::string &_symlink,
-                             const std::string &_target)
-{
-  return symlink(_target.c_str(), _symlink.c_str()) == 0;
-}
-
-/////////////////////////////////////////////////
-bool create_new_dir_symlink(const std::string &_symlink,
-                            const std::string &_target)
-{
-  return symlink(_target.c_str(), _symlink.c_str()) == 0;
-}
-
-/////////////////////////////////////////////////
-bool create_new_file_hardlink(const std::string &_hardlink,
-                              const std::string &_target)
-{
-  return link(_target.c_str(), _hardlink.c_str()) == 0;
-}
-
-#else
-#include <windows.h>
-#include <winnt.h>
-#include <cstdint>
-#include "PrintWindowsSystemWarning.hh"
-
-#ifdef IGN_BUILD_SYMLINK_TESTS_ON_WINDOWS
-// The symlink tests require special permissions to work on Windows,
-// so they will be disabled by default. For more information, see:
-// https://github.com/ignitionrobotics/ign-common/issues/21
-#define BUILD_SYMLINK_TESTS
-#endif
-
-/////////////////////////////////////////////////
-bool create_and_switch_to_temp_dir(std::string &_new_temp_path)
-{
-  char temp_path[MAX_PATH + 1];
-  DWORD path_len = ::GetTempPathA(MAX_PATH, temp_path);
-  if (path_len >= MAX_PATH || path_len <= 0)
-  {
-    return false;
-  }
-  std::string path_to_create(temp_path);
-  srand(static_cast<uint32_t>(time(nullptr)));
-
-  for (int count = 0; count < 50; ++count)
-  {
-    // Try creating a new temporary directory with a randomly generated name.
-    // If the one we chose exists, keep trying another path name until we reach
-    // some limit.
-    std::string new_dir_name;
-    new_dir_name.append(std::to_string(::GetCurrentProcessId()));
-    new_dir_name.push_back('_');
-    // On Windows, rand_r() doesn't exist as an alternative to rand(), so the
-    // cpplint warning is spurious.  This program is not multi-threaded, so
-    // it is safe to suppress the threadsafe_fn warning here.
-    new_dir_name.append(
-       std::to_string(rand()    // NOLINT(runtime/threadsafe_fn)
-                      % ((int16_t)0x7fff)));
-
-    path_to_create += new_dir_name;
-    if (::CreateDirectoryA(path_to_create.c_str(), nullptr))
-    {
-      _new_temp_path = path_to_create;
-      return ::SetCurrentDirectoryA(_new_temp_path.c_str()) != 0;
-    }
-  }
-
-  return false;
-}
-
-/////////////////////////////////////////////////
-bool create_new_empty_file(const std::string &_filename)
-{
-  const auto handle = ::CreateFileA(_filename.c_str(),
-                                    FILE_READ_DATA,
-                                    FILE_SHARE_READ,
-                                    nullptr,
-                                    OPEN_ALWAYS,
-                                    0,
-                                    nullptr);
-  if (handle != INVALID_HANDLE_VALUE)
-  {
-    ::CloseHandle(handle);
-    return true;
-  }
-  return false;
-}
-
-/////////////////////////////////////////////////
-bool create_new_file_symlink(const std::string &_symlink,
-                             const std::string &_target)
-{
-  const bool linked = ::CreateSymbolicLinkA(
-        _symlink.c_str(), _target.c_str(), 0);
-
-  if (!linked)
-  {
-    gz::common::PrintWindowsSystemWarning(
-          "Failed to create file symlink from [" + _target
-          + "] to [" + _symlink + "]");
-  }
-
-  return linked;
-}
-
-/////////////////////////////////////////////////
-bool create_new_dir_symlink(const std::string &_symlink,
-                            const std::string &_target)
-{
-  const bool linked = ::CreateSymbolicLinkA(_symlink.c_str(), _target.c_str(),
-                                            SYMBOLIC_LINK_FLAG_DIRECTORY);
-  if (!linked)
-  {
-    gz::common::PrintWindowsSystemWarning(
-          "Failed to create directory symlink from [" + _target
-          + "] to [" + _symlink + "]");
-  }
-
-  return linked;
-}
-
-/////////////////////////////////////////////////
-bool create_new_file_hardlink(const std::string &_hardlink,
-                              const std::string &_target)
-{
-  return ::CreateHardLinkA(_hardlink.c_str(), _target.c_str(), nullptr) == TRUE;
-}
-
 #endif  // _WIN32
 
-#include <fstream> // NOLINT
-#include "gz/common/Console.hh"
-#include "gz/common/Filesystem.hh"
-
-using namespace ignition;
+using namespace gz;
 using namespace common;
+
+namespace fs = std::filesystem;
+
+/////////////////////////////////////////////////
+class TestTempDirectory : public TempDirectory
+{
+  public: TestTempDirectory():
+    TempDirectory("filesystem", "gz_common", true)
+  {
+  }
+};
+
+/////////////////////////////////////////////////
+bool create_new_file_symlink(const std::string &_symlink,
+                             const std::string &_target)
+{
+  try
+  {
+    fs::create_symlink(_target, _symlink);
+  }
+  catch(const std::exception& e)
+  {
+    gzerr << "Failed to create link: " << e.what() << '\n';
+    return false;
+  }
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool create_new_dir_symlink(const std::string &_symlink,
+                            const std::string &_target)
+{
+  try
+  {
+    fs::create_directory_symlink(_target, _symlink);
+  }
+  catch(const std::exception& e)
+  {
+    gzerr << "Failed to create link: " << e.what() << '\n';
+    return false;
+  }
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool create_new_file_hardlink(const std::string &_hardlink,
+                              const std::string &_target)
+{
+  try
+  {
+    fs::create_hard_link(_target, _hardlink);
+  }
+  catch(const std::exception& e)
+  {
+    gzerr << "Failed to create link: " << e.what() << '\n';
+    return false;
+  }
+  return true;
+}
 
 /// \brief Test Filesystem
 class FilesystemTest : public ::testing::Test
@@ -223,7 +103,16 @@ class FilesystemTest : public ::testing::Test
   protected: void SetUp() override
   {
     Console::SetVerbosity(4);
+    this->temp = std::make_unique<TestTempDirectory>();
+    ASSERT_TRUE(this->temp->Valid());
   }
+
+  protected: void TearDown() override
+  {
+    this->temp.reset();
+  }
+
+  protected: std::unique_ptr<TestTempDirectory> temp;
 };
 
 /////////////////////////////////////////////////
@@ -275,14 +164,17 @@ TEST_F(FilesystemTest, fileOps)
 
   EXPECT_EQ(testInContent, test3InContent);
 
-  EXPECT_FALSE(copyFile("test3.tmp", "test3.tmp"));
-  EXPECT_FALSE(copyFile("test3.tmp", "./test3.tmp"));
+  // Suppress warnings on the next two, as they are expected to warn when
+  // trying to copy from/to the same file
+  EXPECT_FALSE(copyFile("test3.tmp", "test3.tmp", FSWO_SUPPRESS_WARNINGS));
+  EXPECT_FALSE(copyFile("test3.tmp", "./test3.tmp", FSWO_SUPPRESS_WARNINGS));
 
   std::remove("test.tmp");
 
   // This file shouldn't exist, but we'll try to remove just in case the
   // test failed.
-  EXPECT_FALSE(removeFile("test2.tmp"));
+  // Suppress warnings since we expect this to be false
+  EXPECT_FALSE(removeFile("test2.tmp", FSWO_SUPPRESS_WARNINGS));
 
   EXPECT_TRUE(removeFile("test3.tmp"));
 
@@ -293,28 +185,28 @@ TEST_F(FilesystemTest, fileOps)
 /// \brief Test file operations
 TEST_F(FilesystemTest, moreFileOps)
 {
-  EXPECT_FALSE(copyFile("__wrong__.tmp", "test2.tmp"));
-  EXPECT_TRUE(!exists("test2.tmp"));
-  EXPECT_FALSE(copyFile("test.tmp", "__wrong_dir__/__wrong__.tmp"));
-  EXPECT_TRUE(!exists("__wrong_dir__"));
+  EXPECT_FALSE(copyFile("__wrong__.tmp", "test2.tmp", FSWO_SUPPRESS_WARNINGS));
+  EXPECT_FALSE(exists("test2.tmp"));
+  EXPECT_FALSE(copyFile("test.tmp", "__wrong_dir__/__wrong__.tmp",
+        FSWO_SUPPRESS_WARNINGS));
+  EXPECT_FALSE(exists("__wrong_dir__"));
 
-  EXPECT_FALSE(moveFile("__wrong__.tmp", "test3.tmp"));
-  EXPECT_TRUE(!exists("test3.tmp"));
-  EXPECT_FALSE(moveFile("test2.tmp", "__wrong_dir__/__wrong__.tmp"));
-  EXPECT_TRUE(!exists("__wrong_dir__"));
+  EXPECT_FALSE(moveFile("__wrong__.tmp", "test3.tmp", FSWO_SUPPRESS_WARNINGS));
+  EXPECT_FALSE(exists("test3.tmp"));
+  EXPECT_FALSE(moveFile("test2.tmp", "__wrong_dir__/__wrong__.tmp",
+        FSWO_SUPPRESS_WARNINGS));
+  EXPECT_FALSE(exists("__wrong_dir__"));
 }
 
 /////////////////////////////////////////////////
 TEST_F(FilesystemTest, exists)
 {
-  std::string new_temp_dir;
-  ASSERT_TRUE(create_and_switch_to_temp_dir(new_temp_dir));
-  ASSERT_TRUE(create_new_empty_file("newfile"));
+  ASSERT_TRUE(common::testing::createNewEmptyFile("newfile"));
   ASSERT_TRUE(createDirectory("fstestexists"));
 
   const auto &relativeSubdir = joinPaths("fstestexists", "newfile2");
-  const auto &absoluteSubdir = joinPaths(new_temp_dir, relativeSubdir);
-  ASSERT_TRUE(create_new_empty_file(relativeSubdir));
+  const auto &absoluteSubdir = joinPaths(cwd(), relativeSubdir);
+  ASSERT_TRUE(common::testing::createNewEmptyFile(relativeSubdir));
 
   EXPECT_TRUE(exists("fstestexists"));
   EXPECT_TRUE(isDirectory("fstestexists"));
@@ -336,9 +228,23 @@ TEST_F(FilesystemTest, exists)
   EXPECT_FALSE(isDirectory(absoluteSubdir));
 }
 
+/////////////////////////////////////////////////
+TEST_F(FilesystemTest, relative)
+{
+  #ifndef _WIN32
+    std::string absPath {"/tmp/fstest"};
+    std::string relPath {"../fstest"};
+  #else
+    std::string absPath {"C:\\Users\\user\\Desktop\\test.txt"};
+    std::string relPath {"user\\Desktop\\test.txt"};
+  #endif
+  EXPECT_FALSE(isRelativePath(absPath));
+  EXPECT_TRUE(isRelativePath(relPath));
+}
+
 // The symlink tests require special permissions to work on Windows,
 // so they will be disabled by default. For more information, see:
-// https://github.com/ignitionrobotics/ign-common/issues/21
+// https://github.com/gazebosim/gz-common/issues/21
 #ifdef BUILD_SYMLINK_TESTS
 /////////////////////////////////////////////////
 TEST_F(FilesystemTest, symlink_exists)
@@ -350,9 +256,7 @@ TEST_F(FilesystemTest, symlink_exists)
   // 3. symbolic link to existing directory
   // 4. symbolic link to non-existent directory
   // 5. hard link to existing file
-  std::string new_temp_dir;
-  ASSERT_TRUE(create_and_switch_to_temp_dir(new_temp_dir));
-  ASSERT_TRUE(create_new_empty_file("newfile"));
+  ASSERT_TRUE(common::testing::createNewEmptyFile("newfile"));
   ASSERT_TRUE(createDirectory("newdir"));
 
   // Case 1
@@ -385,11 +289,11 @@ TEST_F(FilesystemTest, cwd)
 {
   const auto origCwd = cwd();
 
-  std::string new_temp_dir;
-  ASSERT_TRUE(create_and_switch_to_temp_dir(new_temp_dir));
+  TestTempDirectory new_temp_dir;
+  ASSERT_TRUE(new_temp_dir.Valid());
 
   std::string path = cwd();
-  EXPECT_EQ(path, new_temp_dir);
+  EXPECT_EQ(path, new_temp_dir.Path());
 
   EXPECT_TRUE(chdir(origCwd));
   EXPECT_EQ(origCwd, cwd());
@@ -473,66 +377,96 @@ TEST_F(FilesystemTest, parentPath)
   child_with_slash = separator(child_with_slash);
   std::string parent2 = parentPath(child_with_slash);
   EXPECT_EQ(parent, parent2);
+
+  std::string childOnly = "child";
+  EXPECT_EQ(childOnly, parentPath(childOnly));
 }
 
 /////////////////////////////////////////////////
-TEST_F(FilesystemTest, cwd_error)
+TEST_F(FilesystemTest, GZ_UTILS_TEST_DISABLED_ON_WIN32(cwd_error))
 {
   // This test intentionally creates a directory, switches to it, removes
   // the directory, and then tries to call cwd() on it to cause
   // cwd() to fail.  Windows does not allow you to remove an
   // in-use directory, so this test is restricted to Unix.
-#ifndef _WIN32
-  std::string new_temp_dir;
-  ASSERT_TRUE(create_and_switch_to_temp_dir(new_temp_dir));
-
-  ASSERT_EQ(rmdir(new_temp_dir.c_str()), 0);
-
+  TestTempDirectory new_temp_dir;
+  ASSERT_TRUE(new_temp_dir.Valid());
+  ASSERT_EQ(rmdir(new_temp_dir.Path().c_str()), 0);
   EXPECT_EQ(cwd(), "");
-#endif
 }
 
 /////////////////////////////////////////////////
-TEST_F(FilesystemTest, basename)
+TEST_F(FilesystemTest, decomposition)
 {
   std::string absolute = joinPaths("", "home", "bob", "foo");
   EXPECT_EQ(basename(absolute), "foo");
+#ifndef _WIN32
+  EXPECT_EQ(parentPath(absolute), "/home/bob");
+#else
+  EXPECT_EQ(parentPath(absolute), "\\home\\bob");
+#endif
 
   std::string relative = joinPaths("baz", "foobar");
   EXPECT_EQ(basename(relative), "foobar");
+  EXPECT_EQ(parentPath(relative), "baz");
 
   std::string bname = "bzzz";
   EXPECT_EQ(basename(bname), "bzzz");
+  EXPECT_EQ(parentPath(bname), "bzzz");
 
   std::string nobase = joinPaths("baz", "");
   EXPECT_EQ(basename(nobase), "baz");
+#ifndef _WIN32
+  EXPECT_EQ(parentPath(nobase), "baz/");
+#else
+  EXPECT_EQ(parentPath(nobase), "baz\\");
+#endif
 
   std::string multiple_slash = separator("baz") + separator("") + separator("")
     + separator("");
   EXPECT_EQ(basename(multiple_slash), "baz");
+#ifndef _WIN32
+  EXPECT_EQ(parentPath(multiple_slash), "baz//");
+#else
+  EXPECT_EQ(parentPath(multiple_slash), "baz\\\\");
+#endif
 
   std::string multiple_slash_middle = separator("") + separator("home")
     + separator("") + separator("") + separator("bob") + separator("foo");
   EXPECT_EQ(basename(multiple_slash_middle), "foo");
+#ifndef _WIN32
+  EXPECT_EQ(parentPath(multiple_slash_middle), "/home///bob");
+#else
+  EXPECT_EQ(parentPath(multiple_slash_middle), "\\home\\\\\\bob");
+#endif
 
   std::string multiple_slash_start = separator("") + separator("")
     + separator("") + separator("home") + separator("bob") + separator("foo");
   EXPECT_EQ(basename(multiple_slash_start), "foo");
+#ifndef _WIN32
+  EXPECT_EQ(parentPath(multiple_slash_start), "///home/bob");
+#else
+  EXPECT_EQ(parentPath(multiple_slash_start), "\\\\\\home\\bob");
+#endif
 
   std::string slash_only = separator("") + separator("");
   EXPECT_EQ(basename(slash_only), separator(""));
+  EXPECT_EQ(parentPath(slash_only), "");
 
   std::string multiple_slash_only = separator("") + separator("")
     + separator("") + separator("");
   EXPECT_EQ(basename(multiple_slash_only), separator(""));
+#ifndef _WIN32
+  EXPECT_EQ(parentPath(multiple_slash_only), "//");
+#else
+  EXPECT_EQ(parentPath(multiple_slash_only), "\\\\");
+#endif
 }
 
 /////////////////////////////////////////////////
 TEST_F(FilesystemTest, directory_iterator)
 {
-  std::string new_temp_dir;
-  ASSERT_TRUE(create_and_switch_to_temp_dir(new_temp_dir));
-  ASSERT_TRUE(create_new_empty_file("newfile"));
+  ASSERT_TRUE(common::testing::createNewEmptyFile("newfile"));
   ASSERT_TRUE(createDirectory("newdir"));
 #ifdef BUILD_SYMLINK_TESTS
   ASSERT_TRUE(create_new_file_symlink("symlink-file", "newfile"));
@@ -582,9 +516,6 @@ TEST_F(FilesystemTest, directory_iterator)
 /////////////////////////////////////////////////
 TEST_F(FilesystemTest, createDirectories)
 {
-  std::string new_temp_dir;
-  ASSERT_TRUE(create_and_switch_to_temp_dir(new_temp_dir));
-
   // test creating directories using relative path
   std::string rel_dir = separator("rel_dir") + "subdir";
   ASSERT_TRUE(createDirectories(rel_dir));
@@ -593,7 +524,7 @@ TEST_F(FilesystemTest, createDirectories)
 
   // test creating directories using abs path
   std::string path = cwd();
-  EXPECT_EQ(path, new_temp_dir);
+  EXPECT_EQ(path, this->temp->Path());
 
   std::string abs_dir = separator(cwd()) + separator("abs_dir") + "subdir";
   ASSERT_TRUE(createDirectories(abs_dir));
@@ -604,10 +535,6 @@ TEST_F(FilesystemTest, createDirectories)
 /////////////////////////////////////////////////
 TEST_F(FilesystemTest, copyDirectories)
 {
-  const auto origCwd = cwd();
-  std::string newTempDir;
-  ASSERT_TRUE(create_and_switch_to_temp_dir(newTempDir));
-
   // Create an empty directory
   std::string dirToBeCopied = "dir_to_be_copied";
   EXPECT_FALSE(exists(dirToBeCopied));
@@ -645,7 +572,7 @@ TEST_F(FilesystemTest, copyDirectories)
 
   std::string subFile = joinPaths(subDir, "sub_file");
   EXPECT_FALSE(exists(subFile));
-  EXPECT_TRUE(create_new_empty_file(subFile));
+  EXPECT_TRUE(common::testing::createNewEmptyFile(subFile));
   EXPECT_TRUE(exists(subFile));
 
   std::string recDirCopied = "rec_dir_copied";
@@ -654,19 +581,12 @@ TEST_F(FilesystemTest, copyDirectories)
   EXPECT_TRUE(isDirectory(recDirCopied));
 
   // Non-existent source directory
-  EXPECT_FALSE(copyDirectory("fake_dir", dirCopied));
-
-  // Cleanup
-  chdir(origCwd);
-  EXPECT_TRUE(removeAll(newTempDir));
+  EXPECT_FALSE(copyDirectory("fake_dir", dirCopied, FSWO_SUPPRESS_WARNINGS));
 }
 
 /////////////////////////////////////////////////
 TEST_F(FilesystemTest, uniquePaths)
 {
-  std::string newTempDir;
-  ASSERT_TRUE(create_and_switch_to_temp_dir(newTempDir));
-
   // Directory
   std::string dir = "uniqueDirectory";
   EXPECT_FALSE(exists(dir));
@@ -690,12 +610,12 @@ TEST_F(FilesystemTest, uniquePaths)
   std::string fileRt = uniqueFilePath(newFile, "txt");
   EXPECT_EQ(newFileWithExt, fileRt);
 
-  ASSERT_TRUE(create_new_empty_file(newFileWithExt));
+  ASSERT_TRUE(common::testing::createNewEmptyFile(newFileWithExt));
   EXPECT_TRUE(exists(newFileWithExt));
   std::string fileExistingRt = uniqueFilePath(newFile, "txt");
   EXPECT_EQ(fileExistingRt, newFile + "(1).txt");
 
-  ASSERT_TRUE(create_new_empty_file(fileExistingRt));
+  ASSERT_TRUE(common::testing::createNewEmptyFile(fileExistingRt));
   EXPECT_TRUE(exists(fileExistingRt));
   std::string fileExistingRt2 = uniqueFilePath(newFile, "txt");
   EXPECT_EQ(fileExistingRt2, newFile + "(2).txt");
@@ -708,9 +628,11 @@ TEST_F(FilesystemTest, uniquePaths)
 }
 
 /////////////////////////////////////////////////
-/// Main
-int main(int argc, char **argv)
+TEST_F(FilesystemTest, separator)
 {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+#ifndef _WIN32
+  EXPECT_EQ("/", gz::common::separator(""));
+#else
+  EXPECT_EQ("\\", gz::common::separator(""));
+#endif
 }

@@ -18,10 +18,9 @@
 #define GZ_COMMON_VIDEO_HH_
 
 #include <string>
-#include <memory>
 
 #include <gz/common/av/Export.hh>
-#include <gz/common/SuppressWarning.hh>
+#include <gz/utils/ImplPtr.hh>
 
 struct AVFormatContext;
 struct AVCodecContext;
@@ -29,15 +28,12 @@ struct AVFrame;
 struct AVPicture;
 struct SwsContext;
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
-    // Forward declare private data class
-    class VideoPrivate;
-
     /// \brief Handle video encoding and decoding using libavcodec
-    class IGNITION_COMMON_AV_VISIBLE Video
+    class GZ_COMMON_AV_VISIBLE Video
     {
       /// \brief Constructor
       public: Video();
@@ -76,10 +72,8 @@ namespace ignition
       /// \brief free up open Video object, close files, streams
       private: void Cleanup();
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Private data pointer
-      private: std::unique_ptr<VideoPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      GZ_UTILS_UNIQUE_IMPL_PTR(dataPtr)
     };
   }
 }

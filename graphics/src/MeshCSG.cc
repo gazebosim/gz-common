@@ -24,7 +24,7 @@
 #include "gz/common/SubMesh.hh"
 #include "gz/common/MeshCSG.hh"
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 //////////////////////////////////////////////////
@@ -144,7 +144,7 @@ static int TriangleRevert(GtsTriangle *_t, void *)
 
 //////////////////////////////////////////////////
 Mesh *MeshCSG::CreateBoolean(const Mesh *_m1, const Mesh *_m2, int _operation,
-    const math::Pose3d &_offset)
+    const gz::math::Pose3d &_offset)
 {
   GtsSurface *s1, *s2, *s3;
   GtsSurfaceInter *si;
@@ -163,7 +163,7 @@ Mesh *MeshCSG::CreateBoolean(const Mesh *_m1, const Mesh *_m2, int _operation,
 
   this->ConvertMeshToGTS(_m1, s1);
 
-  if (_offset != math::Pose3d::Zero)
+  if (_offset != gz::math::Pose3d::Zero)
   {
     Mesh *m2 = new Mesh();
     for (unsigned int i = 0; i < _m2->SubMeshCount(); ++i)
@@ -205,13 +205,13 @@ Mesh *MeshCSG::CreateBoolean(const Mesh *_m1, const Mesh *_m2, int _operation,
       isOpen1, isOpen2);
   if (!gts_surface_inter_check(si, &closed))
   {
-    ignerr << "si is not an orientable manifold\n";
+    gzerr << "si is not an orientable manifold\n";
     return nullptr;
   }
 
   if (!closed)
   {
-    ignerr << "the intersection of " << _m1->Name() << " and "
+    gzerr << "the intersection of " << _m1->Name() << " and "
         << _m2->Name() << " is not a closed curve\n";
     return nullptr;
   }
@@ -284,7 +284,7 @@ void MeshCSG::ConvertMeshToGTS(const Mesh *_mesh, GtsSurface *_surface)
 {
   if (!_surface)
   {
-    ignerr << _mesh->Name() << ": Surface is null\n";
+    gzerr << _mesh->Name() << ": Surface is null\n";
 //    _surface = gts_surface_new(gts_surface_class(), gts_face_class(),
 //        gts_edge_class(), gts_vertex_class());
     return;
@@ -301,7 +301,7 @@ void MeshCSG::ConvertMeshToGTS(const Mesh *_mesh, GtsSurface *_surface)
 
     for (unsigned int j = 0; j < subMesh->VertexCount(); ++j)
     {
-      math::Vector3d vertex = subMesh->Vertex(j);
+      gz::math::Vector3d vertex = subMesh->Vertex(j);
       g_ptr_array_add(vertices, gts_vertex_new(gts_vertex_class(), vertex.X(),
           vertex.Y(), vertex.Z()));
     }
@@ -350,7 +350,7 @@ void MeshCSG::ConvertMeshToGTS(const Mesh *_mesh, GtsSurface *_surface)
       }
       else
       {
-        ignwarn << _mesh->Name() << ": Ignoring degenerate facet!";
+        gzwarn << _mesh->Name() << ": Ignoring degenerate facet!";
       }
     }
   }

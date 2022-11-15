@@ -18,7 +18,8 @@
 #include <sys/stat.h>
 #include <string>
 #include <mutex>
-#include <map>
+#include <unordered_map>
+#include <unordered_set>
 #include <cctype>
 
 #ifndef _WIN32
@@ -29,6 +30,7 @@
 #include "gz/common/Console.hh"
 #include "gz/common/Mesh.hh"
 #include "gz/common/SubMesh.hh"
+#include "gz/common/AssimpLoader.hh"
 #include "gz/common/ColladaLoader.hh"
 #include "gz/common/ColladaExporter.hh"
 #include "gz/common/OBJLoader.hh"
@@ -37,9 +39,9 @@
 
 #include "gz/common/MeshManager.hh"
 
-using namespace ignition::common;
+using namespace gz::common;
 
-class gz::common::MeshManagerPrivate
+class gz::common::MeshManager::Implementation
 {
 #ifdef _WIN32
 // Disable warning C4251
@@ -58,14 +60,20 @@ class gz::common::MeshManagerPrivate
   /// \brief 3D mesh loader for OBJ files
   public: OBJLoader objLoader;
 
+  /// \brief 3D mesh loader for Assimp assets (others)
+  public: AssimpLoader assimpLoader;
+
   /// \brief Dictionary of meshes, indexed by name
-  public: std::map<std::string, Mesh*> meshes;
+  public: std::unordered_map<std::string, Mesh*> meshes;
 
   /// \brief supported file extensions for meshes
-  public: std::vector<std::string> fileExtensions;
+  public: std::unordered_set<std::string> fileExtensions;
 
   /// \brief Mutex to protect the mesh map
   public: std::mutex mutex;
+
+  /// \brief True if assimp is used for loading all supported mesh formats
+  public: bool forceAssimp;
 #ifdef _WIN32
 #pragma warning(pop)
 #endif
@@ -73,7 +81,7 @@ class gz::common::MeshManagerPrivate
 
 //////////////////////////////////////////////////
 MeshManager::MeshManager()
-    : dataPtr(new MeshManagerPrivate)
+: dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
 {
   // Create some basic shapes
   this->CreatePlane("unit_plane",
@@ -97,9 +105,13 @@ MeshManager::MeshManager()
 
   this->CreateTube("selection_tube", 1.0f, 1.2f, 0.01f, 1, 64);
 
-  this->dataPtr->fileExtensions.push_back("stl");
-  this->dataPtr->fileExtensions.push_back("dae");
-  this->dataPtr->fileExtensions.push_back("obj");
+  this->dataPtr->fileExtensions.insert("stl");
+  this->dataPtr->fileExtensions.insert("dae");
+  this->dataPtr->fileExtensions.insert("obj");
+  this->dataPtr->fileExtensions.insert("gltf");
+  this->dataPtr->fileExtensions.insert("glb");
+  this->dataPtr->fileExtensions.insert("fbx");
+
 }
 
 //////////////////////////////////////////////////
@@ -116,7 +128,7 @@ const Mesh *MeshManager::Load(const std::string &_filename)
 {
   if (!this->IsValidFilename(_filename))
   {
-    ignerr << "Invalid mesh filename extension[" << _filename << "]\n";
+    gzerr << "Invalid mesh filename extension[" << _filename << "]\n";
     return nullptr;
   }
 
@@ -137,19 +149,27 @@ const Mesh *MeshManager::Load(const std::string &_filename)
     std::transform(extension.begin(), extension.end(),
         extension.begin(), ::tolower);
     MeshLoader *loader = nullptr;
-
-    if (extension == "stl" || extension == "stlb" || extension == "stla")
-      loader = &this->dataPtr->stlLoader;
-    else if (extension == "dae")
-      loader = &this->dataPtr->colladaLoader;
-    else if (extension == "obj")
-      loader = &this->dataPtr->objLoader;
+    this->SetAssimpEnvs();
+    if (this->dataPtr->forceAssimp)
+    {
+      loader = &this->dataPtr->assimpLoader;
+    }
     else
     {
-      ignerr << "Unsupported mesh format for file[" << _filename << "]\n";
-      return nullptr;
+      if (extension == "stl" || extension == "stlb" || extension == "stla")
+          loader = &this->dataPtr->stlLoader;
+      else if (extension == "dae")
+        loader = &this->dataPtr->colladaLoader;
+      else if (extension == "obj")
+        loader = &this->dataPtr->objLoader;
+      else if (extension == "gltf" || extension == "glb" || extension == "fbx")
+        loader = &this->dataPtr->assimpLoader;
+      else
+      {
+        gzerr << "Unsupported mesh format for file[" << _filename << "]\n";
+        return nullptr;
+      }
     }
-
     // This mutex prevents two threads from loading the same mesh at the
     // same time.
     std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
@@ -161,7 +181,7 @@ const Mesh *MeshManager::Load(const std::string &_filename)
         this->dataPtr->meshes.insert(std::make_pair(_filename, mesh));
       }
       else
-        ignerr << "Unable to load mesh[" << fullname << "]\n";
+        gzerr << "Unable to load mesh[" << fullname << "]\n";
     }
     else
     {
@@ -169,7 +189,7 @@ const Mesh *MeshManager::Load(const std::string &_filename)
     }
   }
   else
-    ignerr << "Unable to find file[" << _filename << "]\n";
+    gzerr << "Unable to find file[" << _filename << "]\n";
 
   return mesh;
 }
@@ -184,7 +204,7 @@ void MeshManager::Export(const Mesh *_mesh, const std::string &_filename,
   }
   else
   {
-    ignerr << "Unsupported mesh format for file[" << _filename << "]\n";
+    gzerr << "Unsupported mesh format for file[" << _filename << "]\n";
   }
 }
 
@@ -199,8 +219,7 @@ bool MeshManager::IsValidFilename(const std::string &_filename)
   std::transform(extension.begin(), extension.end(),
                  extension.begin(), ::tolower);
 
-  return std::find(this->dataPtr->fileExtensions.begin(),
-      this->dataPtr->fileExtensions.end(), extension) !=
+  return this->dataPtr->fileExtensions.find(extension) !=
       this->dataPtr->fileExtensions.end();
 }
 
@@ -231,9 +250,7 @@ void MeshManager::AddMesh(Mesh *_mesh)
 //////////////////////////////////////////////////
 const Mesh *MeshManager::MeshByName(const std::string &_name) const
 {
-  std::map<std::string, Mesh*>::const_iterator iter;
-
-  iter = this->dataPtr->meshes.find(_name);
+  auto iter = this->dataPtr->meshes.find(_name);
 
   if (iter != this->dataPtr->meshes.end())
     return iter->second;
@@ -242,13 +259,39 @@ const Mesh *MeshManager::MeshByName(const std::string &_name) const
 }
 
 //////////////////////////////////////////////////
+void MeshManager::RemoveAll()
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  for (auto m : this->dataPtr->meshes)
+  {
+    delete m.second;
+  }
+  this->dataPtr->meshes.clear();
+}
+
+//////////////////////////////////////////////////
+bool MeshManager::RemoveMesh(const std::string &_name)
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+
+  auto iter = this->dataPtr->meshes.find(_name);
+  if (iter != this->dataPtr->meshes.end())
+  {
+    delete iter->second;
+    this->dataPtr->meshes.erase(iter);
+    return true;
+  }
+
+  return false;
+}
+
+//////////////////////////////////////////////////
 bool MeshManager::HasMesh(const std::string &_name) const
 {
   if (_name.empty())
     return false;
 
-  std::map<std::string, Mesh*>::const_iterator iter;
-  iter = this->dataPtr->meshes.find(_name);
+  auto iter = this->dataPtr->meshes.find(_name);
 
   return iter != this->dataPtr->meshes.end();
 }
@@ -263,8 +306,8 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
   }
 
   int ring, seg;
-  float deltaSegAngle = (2.0 * IGN_PI / segments);
-  float deltaRingAngle = (IGN_PI / rings);
+  float deltaSegAngle = (2.0 * GZ_PI / segments);
+  float deltaRingAngle = (GZ_PI / rings);
   gz::math::Vector3d vert, norm;
   unsigned int verticeIndex = 0;
 
@@ -352,7 +395,7 @@ void MeshManager::CreatePlane(const std::string &_name,
   xlate = rot = gz::math::Matrix4d::Identity;
 
   gz::math::Matrix3d rot3;
-  rot3.Axes(xAxis, yAxis, zAxis);
+  rot3.SetAxes(xAxis, yAxis, zAxis);
 
   rot = rot3;
 
@@ -384,7 +427,7 @@ void MeshManager::CreatePlane(const std::string &_name,
         vec.Z() = -z;
         if (!xform.TransformAffine(vec, vec))
         {
-          ignerr << "Unable tor transform matrix4d\n";
+          gzerr << "Unable tor transform matrix4d\n";
           continue;
         }
         subMesh.AddVertex(vec);
@@ -392,7 +435,7 @@ void MeshManager::CreatePlane(const std::string &_name,
         // Compute the normal
         if (!xform.TransformAffine(norm, vec))
         {
-          ignerr << "Unable to tranform matrix4d\n";
+          gzerr << "Unable to tranform matrix4d\n";
           continue;
         }
 
@@ -557,7 +600,7 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
                                                   edges);
   if (!GTSMeshUtils::DelaunayTriangulation(vertices, edges, &subMesh))
   {
-    ignerr << "Unable to triangulate polyline." << std::endl;
+    gzerr << "Unable to triangulate polyline." << std::endl;
     delete mesh;
     return;
   }
@@ -646,7 +689,7 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
   // exterior edges
   if (normals.size() != edges.size())
   {
-    ignerr << "Unable to extrude mesh. Triangulation failed" << std::endl;
+    gzerr << "Unable to extrude mesh. Triangulation failed" << std::endl;
     delete mesh;
     return;
   }
@@ -839,10 +882,10 @@ void MeshManager::CreateEllipsoid(const std::string &_name,
 
   SubMesh subMesh;
 
-  const double umin = -IGN_PI / 2.0;
-  const double umax = IGN_PI / 2.0;
+  const double umin = -GZ_PI / 2.0;
+  const double umax = GZ_PI / 2.0;
   const double vmin = 0.0;
-  const double vmax = 2.0 * IGN_PI;
+  const double vmax = 2.0 * GZ_PI;
 
   unsigned int i, j;
   double theta, phi;
@@ -919,7 +962,8 @@ void MeshManager::CreateCapsule(const std::string &_name,
 
   SubMesh subMesh;
 
-  // Based on https://github.com/godotengine/godot primitive_meshes.cpp
+  // Based on https://github.com/godotengine/godot/blob/3.2.3-stable/scene/resources/primitive_meshes.cpp
+  // Rotated to be Z-up
   int prevRow, thisRow, point;
   double x, y, z, u, v, w;
   const double oneThird = 1.0 / 3.0;
@@ -930,31 +974,33 @@ void MeshManager::CreateCapsule(const std::string &_name,
   /* top hemisphere */
   thisRow = 0;
   prevRow = 0;
-  for (unsigned int j = 0; j <= (_rings + 1); j++) {
+  for (unsigned int j = 0; j <= (_rings + 1); j++)
+  {
     v = j;
 
     v /= (_rings + 1);
-    w = sin(0.5 * IGN_PI * v);
-    y = _radius * cos(0.5 * IGN_PI * v);
+    w = sin(0.5 * GZ_PI * v);
+    z = _radius * cos(0.5 * GZ_PI * v);
 
-    for (unsigned int i = 0; i <= _segments; i++) {
+    for (unsigned int i = 0; i <= _segments; i++)
+    {
       u = i;
       u /= _segments;
 
-      x = -sin(u * (IGN_PI * 2.0));
-      z = cos(u * (IGN_PI * 2.0));
+      x = -sin(u * (GZ_PI * 2.0));
+      y = cos(u * (GZ_PI * 2.0));
 
-      gz::math::Vector3d p(
-      x * _radius * w, y, -z * _radius * w);
+      gz::math::Vector3d p(x * _radius * w, y * _radius * w, z);
       // Compute vertex
       subMesh.AddVertex(gz::math::Vector3d(
-        p + gz::math::Vector3d(0.0, 0.5 * _length, 0.0)));
+        p + gz::math::Vector3d(0.0, 0.0, 0.5 * _length)));
       subMesh.AddTexCoord({u, v * oneThird});
       subMesh.AddNormal(p.Normalize());
 
       point++;
 
-      if (i > 0 && j > 0) {
+      if (i > 0 && j > 0)
+      {
         subMesh.AddIndex(thisRow + i - 1);
         subMesh.AddIndex(prevRow + i);
         subMesh.AddIndex(prevRow + i - 1);
@@ -971,30 +1017,32 @@ void MeshManager::CreateCapsule(const std::string &_name,
   /* cylinder */
   thisRow = point;
   prevRow = 0;
-  for (unsigned int j = 0; j <= (_rings + 1); j++) {
+  for (unsigned int j = 0; j <= (_rings + 1); j++)
+  {
     v = j;
     v /= (_rings + 1);
 
-    y = _length * v;
-    y = (_length * 0.5) - y;
+    z = _length * v;
+    z = (_length * 0.5) - z;
 
-    for (unsigned int i = 0; i <= _segments; i++) {
+    for (unsigned int i = 0; i <= _segments; i++)
+    {
       u = i;
       u /= _segments;
 
-      x = -sin(u * (IGN_PI * 2.0));
-      z = cos(u * (IGN_PI * 2.0));
+      x = -sin(u * (GZ_PI * 2.0));
+      y = cos(u * (GZ_PI * 2.0));
 
-      gz::math::Vector3d p(
-      x * _radius, y, -z * _radius);
+      gz::math::Vector3d p(x * _radius, y * _radius, z);
 
       // Compute vertex
       subMesh.AddVertex(p);
       subMesh.AddTexCoord({u, oneThird + (v * oneThird)});
-      subMesh.AddNormal(gz::math::Vector3d(x, 0.0, -z));
+      subMesh.AddNormal(gz::math::Vector3d(x, y, 0.0));
       point++;
 
-      if (i > 0 && j > 0) {
+      if (i > 0 && j > 0)
+      {
         subMesh.AddIndex(thisRow + i - 1);
         subMesh.AddIndex(prevRow + i);
         subMesh.AddIndex(prevRow + i - 1);
@@ -1011,31 +1059,33 @@ void MeshManager::CreateCapsule(const std::string &_name,
   /* bottom hemisphere */
   thisRow = point;
   prevRow = 0;
-  for (unsigned int j = 0; j <= (_rings + 1); j++) {
+  for (unsigned int j = 0; j <= (_rings + 1); j++)
+  {
     v = j;
 
     v /= (_rings + 1);
     v += 1.0;
-    w = sin(0.5 * IGN_PI * v);
-    y = _radius * cos(0.5 * IGN_PI * v);
+    w = sin(0.5 * GZ_PI * v);
+    z = _radius * cos(0.5 * GZ_PI * v);
 
-    for (unsigned int i = 0; i <= _segments; i++) {
+    for (unsigned int i = 0; i <= _segments; i++)
+    {
       double u2 = static_cast<double>(i);
       u2 /= _segments;
 
-      x = -sin(u2 * (IGN_PI * 2.0));
-      z = cos(u2 * (IGN_PI * 2.0));
+      x = -sin(u2 * (GZ_PI * 2.0));
+      y = cos(u2 * (GZ_PI * 2.0));
 
-      gz::math::Vector3d p(
-      x * _radius * w, y, -z * _radius * w);
+      gz::math::Vector3d p(x * _radius * w, y * _radius * w, z);
       // Compute vertex
       subMesh.AddVertex(gz::math::Vector3d(
-        p + gz::math::Vector3d(0.0, -0.5 * _length, 0.0)));
+        p + gz::math::Vector3d(0.0, 0.0, -0.5 * _length)));
       subMesh.AddTexCoord({u2, twoThirds + ((v - 1.0) * oneThird)});
       subMesh.AddNormal(p.Normalize());
       point++;
 
-      if (i > 0 && j > 0) {
+      if (i > 0 && j > 0)
+      {
         subMesh.AddIndex(thisRow + i - 1);
         subMesh.AddIndex(prevRow + i);
         subMesh.AddIndex(prevRow + i - 1);
@@ -1060,7 +1110,7 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
   gz::math::Vector3d vert, norm;
   unsigned int verticeIndex = 0;
   int ring, seg;
-  float deltaSegAngle = (2.0 * IGN_PI / segments);
+  float deltaSegAngle = (2.0 * GZ_PI / segments);
 
   if (this->HasMesh(name))
   {
@@ -1193,7 +1243,7 @@ void MeshManager::CreateCone(const std::string &name, float radius,
   if (segments <3)
     segments = 3;
 
-  float deltaSegAngle = (2.0 * IGN_PI / segments);
+  float deltaSegAngle = (2.0 * GZ_PI / segments);
 
   // Generate the group of rings for the cone
   for (ring = 0; ring < rings; ring++)
@@ -1419,7 +1469,7 @@ void MeshManager::CreateTube(const std::string &_name, float _innerRadius,
   }
 
   // Close ends in case it's not a full circle
-  if (!gz::math::equal(_arc, 2.0 * IGN_PI))
+  if (!gz::math::equal(_arc, 2.0 * GZ_PI))
   {
     for (ring = 0; ring < rings; ++ring)
     {
@@ -1570,12 +1620,31 @@ void MeshManager::ConvertPolylinesToVerticesAndEdges(
       previous = p;
       if (startPointIndex == endPointIndex)
       {
-        ignwarn << "Ignoring edge without 2 distinct vertices" << std::endl;
+        gzwarn << "Ignoring edge without 2 distinct vertices" << std::endl;
         continue;
       }
       // add the new edge
       gz::math::Vector2i e(startPointIndex, endPointIndex);
       edges.push_back(e);
     }
+  }
+}
+
+//////////////////////////////////////////////////
+MeshManager* MeshManager::Instance()
+{
+  return SingletonT<MeshManager>::Instance();
+}
+
+//////////////////////////////////////////////////
+void MeshManager::SetAssimpEnvs()
+{
+  std::string forceAssimpEnv;
+  common::env("GZ_MESH_FORCE_ASSIMP", forceAssimpEnv);
+  this->dataPtr->forceAssimp = false;
+  if (forceAssimpEnv == "true")
+  {
+    gzmsg << "Using assimp to load all mesh formats"  << std::endl;
+    this->dataPtr->forceAssimp = true;
   }
 }

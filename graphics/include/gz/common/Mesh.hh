@@ -24,21 +24,21 @@
 #include <gz/math/Vector3.hh>
 #include <gz/math/Vector2.hh>
 
+#include <gz/utils/ImplPtr.hh>
+
 #include <gz/common/graphics/Types.hh>
 #include <gz/common/graphics/Export.hh>
-#include <gz/common/SuppressWarning.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
     class Material;
     class Skeleton;
-    class MeshPrivate;
 
-    /// \class Mesh Mesh.hh ignition/common/Mesh.hh
+    /// \class Mesh Mesh.hh gz/common/Mesh.hh
     /// \brief A 3D mesh
-    class IGNITION_COMMON_GRAPHICS_VISIBLE Mesh
+    class GZ_COMMON_GRAPHICS_VISIBLE Mesh
     {
       /// \brief Constructor
       public: Mesh();
@@ -203,10 +203,8 @@ namespace ignition
       /// or there are no submeshes.
       public: double Volume() const;
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Private data pointer.
-      private: std::unique_ptr<MeshPrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      GZ_UTILS_UNIQUE_IMPL_PTR(dataPtr)
     };
   }
 }

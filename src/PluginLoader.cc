@@ -23,16 +23,21 @@
 #include <sstream>
 #include <unordered_map>
 
-#include "gz/common/Console.hh"
-#include "gz/common/PluginInfo.hh"
-#include "gz/common/PluginLoader.hh"
-#include "gz/common/PluginPtr.hh"
-#include "gz/common/StringUtils.hh"
-#include "gz/common/Util.hh"
+#define SUPPRESS_IGNITION_HEADER_DEPRECATION
+
+#include "gz/utils/SuppressWarning.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/StringUtils.hh"
+#include "ignition/common/Util.hh"
+
+GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
+#include "ignition/common/PluginInfo.hh"
+#include "ignition/common/PluginLoader.hh"
+#include "ignition/common/PluginPtr.hh"
 
 #include "PluginUtils.hh"
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -107,7 +112,7 @@ namespace ignition
 
       if (!exists(_pathToLibrary))
       {
-        ignerr << "Library [" << _pathToLibrary << "] does not exist!\n";
+        gzerr << "Library [" << _pathToLibrary << "] does not exist!\n";
         return newPlugins;
       }
 
@@ -142,13 +147,13 @@ namespace ignition
 
         if (loadedPlugins.empty())
         {
-          ignerr << "Failed to load plugins from library [" << _pathToLibrary <<
+          gzerr << "Failed to load plugins from library [" << _pathToLibrary <<
                     "].\n";
         }
       }
       else
       {
-        ignerr << "Library[" << _pathToLibrary << "] error: " << dlerror()
+        gzerr << "Library[" << _pathToLibrary << "] error: " << dlerror()
                << std::endl;
       }
       return newPlugins;
@@ -200,7 +205,7 @@ namespace ignition
 
       if (this->dataPtr->plugins.end() == it)
       {
-        ignerr << "Failed to get info for plugin ["
+        gzerr << "Failed to get info for plugin ["
                << plugin
                << "] since it has not been loaded."
                << std::endl;
@@ -226,7 +231,7 @@ namespace ignition
 
       if (nullptr == _dlHandle)
       {
-        ignerr << "Passed NULL handle.\n";
+        gzerr << "Passed NULL handle.\n";
         return loadedPlugins;
       }
 
@@ -243,7 +248,7 @@ namespace ignition
       if (nullptr == versionPtr || nullptr == sizePtr
           || nullptr == multiInfoPtr || nullptr == alignPtr)
       {
-        ignerr << "Library [" << _pathToLibrary
+        gzerr << "Library [" << _pathToLibrary
                << "] doesn't have the right symbols:"
                << "\n -- version symbol   -- " << versionPtr
                << "\n -- size symbol      -- " << sizePtr
@@ -260,7 +265,7 @@ namespace ignition
 
       if (version < PLUGIN_API_VERSION)
       {
-        ignwarn << "The library [" << _pathToLibrary <<"] is using an outdated "
+        gzwarn << "The library [" << _pathToLibrary <<"] is using an outdated "
                 << "version [" << version << "] of the gz::common Plugin "
                 << "API. The version in this library is [" << PLUGIN_API_VERSION
                 << "].\n";
@@ -268,7 +273,7 @@ namespace ignition
 
       if (version > PLUGIN_API_VERSION)
       {
-        ignerr << "The library [" << _pathToLibrary << "] is using a newer "
+        gzerr << "The library [" << _pathToLibrary << "] is using a newer "
                << "version [" << version << "] of the gz::common Plugin "
                << "API. The version in this library is [" << PLUGIN_API_VERSION
                << "].\n";
@@ -302,7 +307,7 @@ namespace ignition
         const size_t expectedSize = sizeof(PluginInfo);
         const size_t expectedAlignment = alignof(PluginInfo);
 
-        ignerr << "The library [" << _pathToLibrary << "] has the wrong plugin "
+        gzerr << "The library [" << _pathToLibrary << "] has the wrong plugin "
                << "size or alignment for API version [" << PLUGIN_API_VERSION
                << "]. Expected size [" << expectedSize << "], got ["
                << size << "]. Expected alignment [" << expectedAlignment
@@ -315,3 +320,6 @@ namespace ignition
     }
   }
 }
+GZ_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
+
+#undef SUPPRESS_IGNITION_HEADER_DEPRECATION

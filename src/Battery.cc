@@ -20,11 +20,11 @@
 #include <gz/common/Console.hh>
 #include <gz/common/Battery.hh>
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 /// \brief Private data for the Battery class
-class gz::common::BatteryPrivate
+class common::Battery::Implementation
 {
   /// \brief Initial voltage in volts.
   public: double initVoltage = 0.0;
@@ -51,7 +51,7 @@ class gz::common::BatteryPrivate
 
 /////////////////////////////////////////////////
 Battery::Battery()
-: dataPtr(new BatteryPrivate)
+  : dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
 {
   this->SetUpdateFunc(std::bind(&Battery::UpdateDefault, this,
         std::placeholders::_1));
@@ -59,7 +59,7 @@ Battery::Battery()
 
 /////////////////////////////////////////////////
 Battery::Battery(const std::string &_name, const double _voltage)
-: dataPtr(new BatteryPrivate)
+  : Battery()
 {
   this->dataPtr->name = _name;
   this->dataPtr->initVoltage = _voltage;
@@ -67,7 +67,7 @@ Battery::Battery(const std::string &_name, const double _voltage)
 
 /////////////////////////////////////////////////
 Battery::Battery(const Battery &_battery)
-  : dataPtr(new BatteryPrivate)
+  : Battery()
 {
   this->dataPtr->initVoltage = _battery.dataPtr->initVoltage;
   this->dataPtr->realVoltage = _battery.dataPtr->realVoltage;
@@ -84,6 +84,12 @@ Battery::Battery(const Battery &_battery)
 
   this->dataPtr->name = _battery.dataPtr->name;
   // Mutex neither copyable nor movable.
+}
+
+/////////////////////////////////////////////////
+Battery::Battery(Battery &&_battery)
+  : dataPtr(std::exchange(_battery.dataPtr, nullptr))
+{
 }
 
 /////////////////////////////////////////////////
@@ -108,8 +114,10 @@ Battery &Battery::operator=(const Battery &_battery)
 }
 
 /////////////////////////////////////////////////
-Battery::~Battery()
+Battery &Battery::operator=(Battery &&_battery)
 {
+  std::swap(this->dataPtr, _battery.dataPtr);
+  return *this;
 }
 
 /////////////////////////////////////////////////
@@ -191,7 +199,7 @@ bool Battery::RemoveConsumer(uint32_t _consumerId)
   }
   else
   {
-    ignerr << "Invalid battery consumer id[" << _consumerId << "]\n";
+    gzerr << "Invalid battery consumer id[" << _consumerId << "]\n";
     return false;
   }
 }
@@ -203,7 +211,7 @@ bool Battery::SetPowerLoad(const uint32_t _consumerId, const double _powerLoad)
   auto iter = this->dataPtr->powerLoads.find(_consumerId);
   if (iter == this->dataPtr->powerLoads.end())
   {
-    ignerr << "Invalid param value[_consumerId] : " << _consumerId << "\n";
+    gzerr << "Invalid param value[_consumerId] : " << _consumerId << "\n";
     return false;
   }
 
@@ -218,7 +226,7 @@ bool Battery::PowerLoad(const uint32_t _consumerId, double &_powerLoad) const
   auto iter = this->dataPtr->powerLoads.find(_consumerId);
   if (iter == this->dataPtr->powerLoads.end())
   {
-    ignerr << "Invalid param value[_consumerId] : " << _consumerId << "\n";
+    gzerr << "Invalid param value[_consumerId] : " << _consumerId << "\n";
     return false;
   }
 

@@ -21,16 +21,15 @@
 #include <atomic> // NOLINT(*)
 #include <thread> // NOLINT(*)
 #include "gz/common/Util.hh" // NOLINT(*)
-#include "gz/common/Time.hh" // NOLINT(*)
 
-using namespace ignition;
+using namespace gz;
 using namespace common;
 
 /////////////////////////////////////////////////
 TEST(Profiler, ProfilerDisabled)
 {
-  EXPECT_TRUE(IGN_PROFILER_ENABLE);
-  EXPECT_TRUE(IGN_PROFILER_VALID);
+  EXPECT_TRUE(GZ_PROFILER_ENABLE);
+  EXPECT_TRUE(GZ_PROFILER_VALID);
   EXPECT_EQ(Profiler::Instance()->ImplementationName(),
-            "ign_profiler_remotery");
+            "gz_profiler_remotery");
 }

@@ -23,17 +23,17 @@
 #include <gz/math/Matrix4.hh>
 #include <gz/math/Pose3.hh>
 
+#include <gz/utils/ImplPtr.hh>
+
 #include <gz/common/graphics/Export.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
-    class NodeAnimationPrivate;
-
-    /// \class NodeAnimation NodeAnimation.hh ignition/common/NodeAnimation.hh
+    /// \class NodeAnimation NodeAnimation.hh gz/common/NodeAnimation.hh
     /// \brief Node animation
-    class IGNITION_COMMON_GRAPHICS_VISIBLE NodeAnimation
+    class GZ_COMMON_GRAPHICS_VISIBLE NodeAnimation
     {
       /// \brief constructor
       /// \param[in] _name the name of the node
@@ -109,7 +109,7 @@ namespace ignition
       public: double TimeAtX(const double _x) const;
 
       /// \brief Private data pointer.
-      private: NodeAnimationPrivate *data;
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

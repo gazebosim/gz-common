@@ -17,21 +17,20 @@
 #ifndef GZ_COMMON_IMAGE_HH_
 #define GZ_COMMON_IMAGE_HH_
 
+#include <cstring>
 #include <limits>
 #include <memory>
 #include <string>
 #include <vector>
 #include <gz/math/Color.hh>
 #include <gz/common/graphics/Export.hh>
-#include <gz/common/SuppressWarning.hh>
 
-namespace ignition
+#include <gz/utils/ImplPtr.hh>
+
+namespace gz
 {
   namespace common
   {
-    /// \brief Forward declaration of private data class
-    class ImagePrivate;
-
     /// \brief String names for the pixel formats.
     /// \sa Image::PixelFormat.
     static std::string PixelFormatNames[] =
@@ -52,15 +51,14 @@ namespace ignition
       "R_FLOAT32",
       "RGB_FLOAT32",
       "BAYER_RGGB8",
-      "BAYER_RGGR8",
+      "BAYER_BGGR8",
       "BAYER_GBRG8",
-      "BAYER_GRBG8",
-      "BAYER_BGGR8"
+      "BAYER_GRBG8"
     };
 
-    /// \class Image Image.hh ignition/common/common.hh
+    /// \class Image Image.hh gz/common/common.hh
     /// \brief Encapsulates an image
-    class IGNITION_COMMON_GRAPHICS_VISIBLE Image
+    class GZ_COMMON_GRAPHICS_VISIBLE Image
     {
       /// \brief Pixel formats enumeration
       public: enum PixelFormatType
@@ -81,11 +79,11 @@ namespace ignition
                 R_FLOAT32,
                 RGB_FLOAT32,
                 BAYER_RGGB8,
-                BAYER_RGGR8,
+                BAYER_BGGR8,
                 BAYER_GBRG8,
                 BAYER_GRBG8,
-                PIXEL_FORMAT_COUNT,
-                BAYER_BGGR8
+                COMPRESSED_PNG,
+                PIXEL_FORMAT_COUNT
               };
 
 
@@ -125,18 +123,50 @@ namespace ignition
                                unsigned int _height,
                                Image::PixelFormatType _format);
 
+      /// \brief Set the image from compressed (i.e. png) data
+      /// \param[in] _data Pointer to the raw image data
+      /// \param[in] _size Size of the buffer
+      /// \param[in] _format Pixel format of the provided data
+      public: void SetFromCompressedData(unsigned char *_data,
+                                         unsigned int _size,
+                                         Image::PixelFormatType _format);
+
       /// \brief Get the image as a data array
+      /// \deprecated Use the function returning std::vector instead
       /// \param[out] _data Pointer to a NULL array of char.
       /// \param[out] _count The resulting data array size
-      public: void Data(unsigned char **_data,
-                        unsigned int &_count) const;
+      public: void GZ_DEPRECATED(5) Data(unsigned char **_data,
+                                         unsigned int &_count) const;
+
+      /// \brief Get the image as a data array
+      /// \return The image data
+      public: std::vector<unsigned char> Data() const;
 
       /// \brief Get only the RGB data from the image. This will drop the
       /// alpha channel if one is present.
+      /// \deprecated Use the function returning std::vector instead
       /// \param[out] _data Pointer to a NULL array of char.
       /// \param[out] _count The resulting data array size
-      public: void RGBData(unsigned char **_data,
-                           unsigned int &_count) const;
+      public: void GZ_DEPRECATED(5) RGBData(unsigned char **_data,
+                                            unsigned int &_count) const;
+
+      /// \brief Get only the RGB data from the image. This will drop the
+      /// alpha channel if one is present.
+      /// \return The image RGB data
+      public: std::vector<unsigned char> RGBData() const;
+
+      /// \brief Get the RGBA data from the image. This will add an alpha
+      /// channel if one is not present.
+      /// \deprecated Use the function returning std::vector instead
+      /// \param[out] _data Pointer to a NULL array of char.
+      /// \param[out] _count The resulting data array size
+      public: void GZ_DEPRECATED(5) RGBAData(unsigned char **_data,
+                                             unsigned int &_count) const;
+
+      /// \brief Get the RGBA data from the image. This will add an alpha
+      /// channel if one is not present.
+      /// \return The image RGBA data
+      public: std::vector<unsigned char> RGBAData() const;
 
       /// \brief Get the width
       /// \return The image width
@@ -171,7 +201,7 @@ namespace ignition
 
       /// \brief Get the average color
       /// \return The average color
-      public: math::Color AvgColor();
+      public: math::Color AvgColor() const;
 
       /// \brief Get the max color
       /// \return The max color
@@ -260,10 +290,8 @@ namespace ignition
         _output.SetFromData(outputRgbBuffer.data(), _width, _height, RGB_INT8);
       }
 
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Private data pointer
-      private: std::unique_ptr<ImagePrivate> dataPtr;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      GZ_UTILS_IMPL_PTR(dataPtr)
     };
   }
 }

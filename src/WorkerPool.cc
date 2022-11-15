@@ -15,17 +15,15 @@
  *
 */
 
-
+#include <condition_variable>
+#include <mutex>
 #include <queue>
 #include <thread>
 #include <utility>
 
 #include "gz/common/WorkerPool.hh"
 
-namespace igncmn = gz::common;
-using namespace igncmn;
-
-namespace ignition
+namespace gz
 {
   namespace common
   {
@@ -50,7 +48,7 @@ namespace ignition
     };
 
     /// \brief Private implementation
-    class WorkerPoolPrivate
+    class WorkerPool::Implementation
     {
       /// \brief Does work until signaled to shut down
       public: void Worker();
@@ -76,11 +74,9 @@ namespace ignition
       /// \brief used to signal when the pool is being shut down
       public: bool done = false;
     };
-  }
-}
 
 //////////////////////////////////////////////////
-void WorkerPoolPrivate::Worker()
+void WorkerPool::Implementation::Worker()
 {
   WorkOrder order;
 
@@ -123,7 +119,7 @@ void WorkerPoolPrivate::Worker()
 
 //////////////////////////////////////////////////
 WorkerPool::WorkerPool(const unsigned int _minThreadCount)
-  : dataPtr(new WorkerPoolPrivate)
+  : dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
 {
   unsigned int numWorkers = std::max(std::thread::hardware_concurrency(),
       std::max(_minThreadCount, 1u));
@@ -132,7 +128,7 @@ WorkerPool::WorkerPool(const unsigned int _minThreadCount)
   for (unsigned int w = 0; w < numWorkers; ++w)
   {
     this->dataPtr->workers.push_back(
-        std::thread(&WorkerPoolPrivate::Worker, this->dataPtr.get()));
+        std::thread(&WorkerPool::Implementation::Worker, this->dataPtr.get()));
   }
 }
 
@@ -164,7 +160,8 @@ void WorkerPool::AddWork(std::function<void()> _work, std::function<void()> _cb)
 }
 
 //////////////////////////////////////////////////
-bool WorkerPool::WaitForResults(const Time &_timeout)
+bool WorkerPool::WaitForResults(
+  const std::chrono::steady_clock::duration &_timeout)
 {
   bool signaled = true;
   std::unique_lock<std::mutex> queueLock(this->dataPtr->queueMtx);
@@ -178,7 +175,7 @@ bool WorkerPool::WaitForResults(const Time &_timeout)
 
   if (!haveResults())
   {
-    if (Time::Zero == _timeout)
+    if (std::chrono::steady_clock::duration::zero() == _timeout)
     {
       // Wait forever
       this->dataPtr->signalWorkDone.wait(queueLock);
@@ -187,10 +184,12 @@ bool WorkerPool::WaitForResults(const Time &_timeout)
     {
       // Wait for timeout
       signaled = this->dataPtr->signalWorkDone.wait_for(queueLock,
-          std::chrono::seconds(_timeout.sec) +
-          std::chrono::nanoseconds(_timeout.nsec),
+          _timeout,
           haveResults);
     }
   }
   return signaled && !this->dataPtr->done;
+}
+
+}
 }

@@ -20,44 +20,41 @@
 
 #include "gz/common/Console.hh"
 #include "gz/common/Filesystem.hh"
-#include "gz/common/Time.hh"
+#include "gz/common/TempDirectory.hh"
 #include "gz/common/Util.hh"
 
-#include "test_config.h"
-
-using namespace ignition;
-using namespace ignition::common;
+using namespace gz;
+using namespace common;
 
 const int g_messageRepeat = 4;
 
 class Console_TEST : public ::testing::Test {
   protected: virtual void SetUp()
   {
-    // Set IGN_HOMEDIR and store it
-    common::testing::TestSetHomePath(this->logBasePath);
+    this->temp = std::make_unique<TempDirectory>(
+        "test", "gz_common", true);
+    ASSERT_TRUE(this->temp->Valid());
+    common::setenv(GZ_HOMEDIR, this->temp->Path());
   }
 
   /// \brief Clear out all the directories we produced during this test.
-  public: virtual ~Console_TEST()
+  public: virtual void TearDown()
   {
-    EXPECT_TRUE(common::unsetenv(IGN_HOMEDIR));
-
-    if (common::isDirectory(this->logBasePath))
-    {
-      ignLogClose();
-      EXPECT_TRUE(common::removeAll(this->logBasePath));
-    }
+    gzLogClose();
+    EXPECT_TRUE(common::unsetenv(GZ_HOMEDIR));
   }
 
-  private: std::string logBasePath;
+  /// \brief Temporary directory to run test in
+  private: std::unique_ptr<common::TempDirectory> temp;
 };
 
 std::string GetLogContent(const std::string &_filename)
 {
   // Get the absolute path
   std::string path;
-  EXPECT_TRUE(common::env(IGN_HOMEDIR, path));
+  EXPECT_TRUE(common::env(GZ_HOMEDIR, path));
   path = common::joinPaths(path, _filename);
+  EXPECT_TRUE(common::exists(path));
 
   // Open the log file, and read back the string
   std::ifstream ifs(path.c_str(), std::ios::in);
@@ -79,18 +76,18 @@ TEST_F(Console_TEST, NoInitAndLog)
 {
   // Log the string
   std::string logString = "this is a test";
-  ignlog << logString << std::endl;
+  gzlog << logString << std::endl;
 
   // Get the absolute log file path
-  std::string logPath = ".ignition/auto_default.log";
+  std::string logPath = ".gz/auto_default.log";
 
   // Expect to find the string in the log file
   EXPECT_TRUE(GetLogContent(logPath).find(logString) != std::string::npos);
 
   // Cleanup
-  ignLogClose();
+  gzLogClose();
   std::string path;
-  EXPECT_TRUE(common::env(IGN_HOMEDIR, path));
+  EXPECT_TRUE(common::env(GZ_HOMEDIR, path));
   path = common::joinPaths(path, logPath);
   EXPECT_TRUE(common::removeAll(path));
 }
@@ -103,15 +100,15 @@ TEST_F(Console_TEST, InitAndLog)
   auto path = common::uuid();
 
   // Initialize logging
-  ignLogInit(path, "test.log");
+  gzLogInit(path, "test.log");
 
   // Log the string
   std::string logString = "this is a test";
-  ignlog << logString << std::endl;
+  gzlog << logString << std::endl;
 
   // Get the absolute path
   std::string basePath;
-  EXPECT_TRUE(common::env(IGN_HOMEDIR, basePath));
+  EXPECT_TRUE(common::env(GZ_HOMEDIR, basePath));
   basePath = common::joinPaths(basePath, path);
 
   // Get the absolute log file path
@@ -121,7 +118,7 @@ TEST_F(Console_TEST, InitAndLog)
   EXPECT_TRUE(GetLogContent(logPath).find(logString) != std::string::npos);
 
   // Cleanup
-  ignLogClose();
+  gzLogClose();
   EXPECT_TRUE(common::removeAll(basePath));
 }
 
@@ -133,7 +130,7 @@ TEST_F(Console_TEST, LogSlashN)
   auto path = common::uuid();
 
   // Initialize logging
-  ignLogInit(path, "test.log");
+  gzLogInit(path, "test.log");
 
   // Get the absolute log file path
   std::string logPath = common::joinPaths(path, "test.log");
@@ -142,7 +139,7 @@ TEST_F(Console_TEST, LogSlashN)
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
-    ignlog << logString << " _n__ " << i << '\n';
+    gzlog << logString << " _n__ " << i << '\n';
   }
 
   std::string logContent = GetLogContent(logPath);
@@ -163,7 +160,7 @@ TEST_F(Console_TEST, LogStdEndl)
   auto path = common::uuid();
 
   // Initialize logging
-  ignLogInit(path, "test.log");
+  gzLogInit(path, "test.log");
 
   // Get the absolute log file path
   std::string logPath = common::joinPaths(path, "test.log");
@@ -172,7 +169,7 @@ TEST_F(Console_TEST, LogStdEndl)
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
-    ignlog << logString << " endl " << i << std::endl;
+    gzlog << logString << " endl " << i << std::endl;
   }
 
   std::string logContent = GetLogContent(logPath);
@@ -193,7 +190,7 @@ TEST_F(Console_TEST, ColorWarnSlashN)
   auto path = common::uuid();
 
   // Initialize logging
-  ignLogInit(path, "test.log");
+  gzLogInit(path, "test.log");
 
   // Get the absolute log file path
   std::string logPath = common::joinPaths(path, "test.log");
@@ -202,7 +199,7 @@ TEST_F(Console_TEST, ColorWarnSlashN)
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
-    ignwarn << logString << " _n__ " << i << '\n';
+    gzwarn << logString << " _n__ " << i << '\n';
   }
 
   std::string logContent = GetLogContent(logPath);
@@ -223,7 +220,7 @@ TEST_F(Console_TEST, ColorWarnStdEndl)
   auto path = common::uuid();
 
   // Initialize logging
-  ignLogInit(path, "test.log");
+  gzLogInit(path, "test.log");
 
   // Get the absolute log file path
   std::string logPath = common::joinPaths(path, "test.log");
@@ -232,7 +229,7 @@ TEST_F(Console_TEST, ColorWarnStdEndl)
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
-    ignwarn << logString << " endl " << i << std::endl;
+    gzwarn << logString << " endl " << i << std::endl;
   }
 
   std::string logContent = GetLogContent(logPath);
@@ -253,7 +250,7 @@ TEST_F(Console_TEST, ColorDbgSlashN)
   auto path = common::uuid();
 
   // Initialize logging
-  ignLogInit(path, "test.log");
+  gzLogInit(path, "test.log");
 
   // Get the absolute log file path
   std::string logPath = common::joinPaths(path, "test.log");
@@ -262,7 +259,7 @@ TEST_F(Console_TEST, ColorDbgSlashN)
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
-    igndbg << logString << " _n__ " << i << '\n';
+    gzdbg << logString << " _n__ " << i << '\n';
   }
 
   std::string logContent = GetLogContent(logPath);
@@ -283,7 +280,7 @@ TEST_F(Console_TEST, ColorDbgStdEndl)
   auto path = common::uuid();
 
   // Initialize logging
-  ignLogInit(path, "test.log");
+  gzLogInit(path, "test.log");
 
   // Get the absolute log file path
   std::string logPath = common::joinPaths(path, "test.log");
@@ -292,7 +289,7 @@ TEST_F(Console_TEST, ColorDbgStdEndl)
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
-    igndbg << logString << " endl " << i << std::endl;
+    gzdbg << logString << " endl " << i << std::endl;
   }
 
   std::string logContent = GetLogContent(logPath);
@@ -313,7 +310,7 @@ TEST_F(Console_TEST, ColorMsgSlashN)
   auto path = common::uuid();
 
   // Initialize logging
-  ignLogInit(path, "test.log");
+  gzLogInit(path, "test.log");
 
   // Get the absolute log file path
   std::string logPath = common::joinPaths(path, "test.log");
@@ -322,7 +319,7 @@ TEST_F(Console_TEST, ColorMsgSlashN)
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
-    ignmsg << logString << " _n__ " << i << '\n';
+    gzmsg << logString << " _n__ " << i << '\n';
   }
 
   std::string logContent = GetLogContent(logPath);
@@ -343,7 +340,7 @@ TEST_F(Console_TEST, ColorMsgStdEndl)
   auto path = common::uuid();
 
   // Initialize logging
-  ignLogInit(path, "test.log");
+  gzLogInit(path, "test.log");
 
   // Get the absolute log file path
   std::string logPath = common::joinPaths(path, "test.log");
@@ -352,7 +349,7 @@ TEST_F(Console_TEST, ColorMsgStdEndl)
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
-    ignmsg << logString << " endl " << i << std::endl;
+    gzmsg << logString << " endl " << i << std::endl;
   }
 
   std::string logContent = GetLogContent(logPath);
@@ -373,7 +370,7 @@ TEST_F(Console_TEST, ColorErrSlashN)
   auto path = common::uuid();
 
   // Initialize logging
-  ignLogInit(path, "test.log");
+  gzLogInit(path, "test.log");
 
   // Get the absolute log file path
   std::string logPath = common::joinPaths(path, "test.log");
@@ -382,7 +379,7 @@ TEST_F(Console_TEST, ColorErrSlashN)
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
-    ignerr << logString << " _n__ " << i << '\n';
+    gzerr << logString << " _n__ " << i << '\n';
   }
 
   std::string logContent = GetLogContent(logPath);
@@ -403,7 +400,7 @@ TEST_F(Console_TEST, ColorErrStdEndl)
   auto path = common::uuid();
 
   // Initialize logging
-  ignLogInit(path, "test.log");
+  gzLogInit(path, "test.log");
 
   // Get the absolute log file path
   std::string logPath = common::joinPaths(path, "test.log");
@@ -412,7 +409,7 @@ TEST_F(Console_TEST, ColorErrStdEndl)
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
-    ignerr << logString << " endl " << i << std::endl;
+    gzerr << logString << " endl " << i << std::endl;
   }
 
   std::string logContent = GetLogContent(logPath);
@@ -433,14 +430,14 @@ TEST_F(Console_TEST, ColorMsg)
   auto path = common::uuid();
 
   // Initialize logging
-  ignLogInit(path, "test.log");
+  gzLogInit(path, "test.log");
 
   // Get the absolute log file path
   std::string logPath = common::joinPaths(path, "test.log");
 
   std::string logString = "this is a msg test";
 
-  ignmsg << logString << std::endl;
+  gzmsg << logString << std::endl;
 
   std::string logContent = GetLogContent(logPath);
 
@@ -455,14 +452,14 @@ TEST_F(Console_TEST, ColorErr)
   auto path = common::uuid();
 
   // Initialize logging
-  ignLogInit(path, "test.log");
+  gzLogInit(path, "test.log");
 
   // Get the absolute log file path
   std::string logPath = common::joinPaths(path, "test.log");
 
   std::string logString = "this is an error test";
 
-  ignerr << logString << std::endl;
+  gzerr << logString << std::endl;
 
   std::string logContent = GetLogContent(logPath);
 
@@ -473,13 +470,13 @@ TEST_F(Console_TEST, ColorErr)
 /// \brief Test Console::Verbosity
 TEST_F(Console_TEST, Verbosity)
 {
-  EXPECT_EQ(Console::Verbosity(), 1);
+  EXPECT_EQ(common::Console::Verbosity(), 1);
 
-  Console::SetVerbosity(2);
-  EXPECT_EQ(Console::Verbosity(), 2);
+  common::Console::SetVerbosity(2);
+  EXPECT_EQ(common::Console::Verbosity(), 2);
 
-  Console::SetVerbosity(-1);
-  EXPECT_EQ(Console::Verbosity(), -1);
+  common::Console::SetVerbosity(-1);
+  EXPECT_EQ(common::Console::Verbosity(), -1);
 }
 
 /////////////////////////////////////////////////
@@ -487,26 +484,26 @@ TEST_F(Console_TEST, Verbosity)
 TEST_F(Console_TEST, Prefix)
 {
   // Max verbosity
-  Console::SetVerbosity(4);
+  common::Console::SetVerbosity(4);
 
   // Path to log file
   auto path = common::uuid();
 
-  ignLogInit(path, "test.log");
+  gzLogInit(path, "test.log");
   std::string logPath = common::joinPaths(path, "test.log");
 
   // Check default prefix
-  EXPECT_EQ(Console::Prefix(), "");
+  EXPECT_EQ(common::Console::Prefix(), "");
 
   // Set new prefix
-  Console::SetPrefix("**test** ");
-  EXPECT_EQ(Console::Prefix(), "**test** ");
+  common::Console::SetPrefix("**test** ");
+  EXPECT_EQ(common::Console::Prefix(), "**test** ");
 
   // Use the console
-  ignerr << "error" << std::endl;
-  ignwarn << "warning" << std::endl;
-  ignmsg << "message" << std::endl;
-  igndbg << "debug" << std::endl;
+  gzerr << "error" << std::endl;
+  gzwarn << "warning" << std::endl;
+  gzmsg << "message" << std::endl;
+  gzdbg << "debug" << std::endl;
 
   // Get the logged content
   std::string logContent = GetLogContent(logPath);
@@ -518,8 +515,8 @@ TEST_F(Console_TEST, Prefix)
   EXPECT_TRUE(logContent.find("**test** [Dbg]") != std::string::npos);
 
   // Reset
-  Console::SetPrefix("");
-  EXPECT_EQ(Console::Prefix(), "");
+  common::Console::SetPrefix("");
+  EXPECT_EQ(common::Console::Prefix(), "");
 }
 
 /////////////////////////////////////////////////
@@ -530,21 +527,25 @@ TEST_F(Console_TEST, LogDirectory)
   auto path = common::uuid();
 
   // Initialize logging
-  ignLogInit(path, "test.log");
+  gzLogInit(path, "test.log");
 
-  std::string logDir = ignLogDirectory();
+  std::string logDir = gzLogDirectory();
 
   // Get the absolute path
   std::string absPath;
-  EXPECT_TRUE(common::env(IGN_HOMEDIR, absPath));
+  EXPECT_TRUE(common::env(GZ_HOMEDIR, absPath));
   absPath = common::joinPaths(absPath, path);
 
   EXPECT_EQ(logDir, absPath);
 }
 
 /////////////////////////////////////////////////
-int main(int argc, char **argv)
+/// \brief Test Console::Init and Console::Log
+/// This specifically tests with an unset HOME variable
+TEST_F(Console_TEST, NoInitAndLogNoHome)
 {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+  gzLogClose();
+  EXPECT_TRUE(common::unsetenv(GZ_HOMEDIR));
+  // This should not throw
+  gzlog << "this is a test" << std::endl;
 }

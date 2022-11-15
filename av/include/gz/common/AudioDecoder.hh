@@ -19,27 +19,20 @@
 
 #include <stdint.h>
 #include <string>
-#include <memory>
 
 #include <gz/common/av/Export.hh>
-#include <gz/common/SuppressWarning.hh>
+#include <gz/utils/ImplPtr.hh>
 
-namespace ignition
+namespace gz
 {
   namespace common
   {
-    /// \brief Forward declaration of private data class
-    class AudioDecoderPrivate;
-
-    /// \class AudioDecoder AudioDecoder.hh ignition/common/common.hh
+    /// \class AudioDecoder AudioDecoder.hh gz/common/common.hh
     /// \brief An audio decoder based on FFMPEG.
-    class IGNITION_COMMON_AV_VISIBLE AudioDecoder
+    class GZ_COMMON_AV_VISIBLE AudioDecoder
     {
       /// \brief Constructor.
       public: AudioDecoder();
-
-      /// \brief Destructor.
-      public: virtual ~AudioDecoder();
 
       /// \brief Set the file to decode.
       /// \param[in] _filename Path to an audio file.
@@ -63,13 +56,8 @@ namespace ignition
       /// If no file is decoded, -1 is returned.
       public: int SampleRate();
 
-      /// \brief Free audio object, close files, streams.
-      private: void Cleanup();
-
-      IGN_COMMON_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Private data pointer
-      private: std::unique_ptr<AudioDecoderPrivate> data;
-      IGN_COMMON_WARN_RESUME__DLL_INTERFACE_MISSING
+      GZ_UTILS_UNIQUE_IMPL_PTR(dataPtr)
     };
   }
 }
