@@ -541,6 +541,50 @@ TEST_F(ImageTest, ConvertToRGBImage)
   }
 }
 
+/////////////////////////////////////////////////
+TEST_F(ImageTest, Grayscale)
+{
+  {
+    common::Image img;
+    std::string fileName = common::testing::TestFile("data",
+        "grayscale_8bit.png");
+    EXPECT_EQ(0, img.Load(fileName));
+    unsigned int width = 4u;
+    unsigned int height = 4u;
+    unsigned int bits = 8u;
+    EXPECT_TRUE(img.Valid());
+    EXPECT_EQ(width, img.Width());
+    EXPECT_EQ(height, img.Height());
+    EXPECT_EQ(bits, img.BPP());
+    EXPECT_EQ(width * bits / 8u, img.Pitch());
+    EXPECT_EQ(common::Image::PixelFormatType::L_INT8, img.PixelFormat());
+    math::Color maxColor(0.847f, 0.847f, 0.847f);
+    EXPECT_NEAR(maxColor.R(), img.MaxColor().R(), 1e-3);
+    EXPECT_NEAR(maxColor.G(), img.MaxColor().G(), 1e-3);
+    EXPECT_NEAR(maxColor.B(), img.MaxColor().B(), 1e-3);
+  }
+
+  {
+    common::Image img;
+    std::string fileName = common::testing::TestFile("data",
+        "grayscale_16bit.png");
+    EXPECT_EQ(0, img.Load(fileName));
+    unsigned int width = 4u;
+    unsigned int height = 4u;
+    unsigned int bits = 16u;
+    EXPECT_TRUE(img.Valid());
+    EXPECT_EQ(width, img.Width());
+    EXPECT_EQ(height, img.Height());
+    EXPECT_EQ(bits, img.BPP());
+    EXPECT_EQ(width * bits / 8u, img.Pitch());
+    EXPECT_EQ(common::Image::PixelFormatType::L_INT16, img.PixelFormat());
+    math::Color maxColor(0.847f, 0.847f, 0.847f);
+    EXPECT_NEAR(maxColor.R(), img.MaxColor().R(), 1e-3);
+    EXPECT_NEAR(maxColor.G(), img.MaxColor().G(), 1e-3);
+    EXPECT_NEAR(maxColor.B(), img.MaxColor().B(), 1e-3);
+  }
+}
+
 using string_int2 = std::tuple<const char *, unsigned int, unsigned int>;
 
 class ImagePerformanceTest : public ImageTest,

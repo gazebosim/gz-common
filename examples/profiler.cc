@@ -22,6 +22,8 @@
 #include "gz/common/Profiler.hh"
 #include "gz/common/SignalHandler.hh"
 
+using namespace gz;
+
 std::atomic<bool> running;
 
 void task1()
@@ -115,13 +117,13 @@ void sigHandler(int _signal)
 
 int main(int argc, char** argv)
 {
-  gz::common::Console::SetVerbosity(4);
+  common::Console::SetVerbosity(4);
 
   GZ_PROFILE_THREAD_NAME("main");
   running = true;
 
   // Connect signal handler
-  gz::common::SignalHandler handler;
+  common::SignalHandler handler;
   handler.AddCallback(sigHandler);
 
   // Spin up a couple threads with interesting content.

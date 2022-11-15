@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Open Source Robotics Foundation
+ * Copyright (C) 2022 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,8 +43,8 @@ namespace gz
       /// is filled.
       /// \param[out] _heights Vector containing the terrain heights.
       public: virtual void FillHeightMap(int _subSampling,
-          unsigned int _vertSize, const gz::math::Vector3d &_size,
-          const gz::math::Vector3d &_scale, bool _flipY,
+          unsigned int _vertSize, const math::Vector3d &_size,
+          const math::Vector3d &_scale, bool _flipY,
           std::vector<float> &_heights) const = 0;
 
       /// \brief Get the terrain's height.

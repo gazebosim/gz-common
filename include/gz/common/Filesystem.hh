@@ -134,7 +134,7 @@ namespace gz
     /// elimination of ../ and removal of duplicate // (but is not guaranteed to
     /// do so).
     std::string GZ_COMMON_VISIBLE joinPaths(const std::string &_path1,
-                                                  const std::string &_path2);
+                                            const std::string &_path2);
 
     /// \brief base case for joinPaths(...) below
     inline std::string joinPaths(const std::string &_path)
