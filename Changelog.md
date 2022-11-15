@@ -1,5 +1,10 @@
 ## Gazebo Common 5.x
 
+## Gazebo Common 5.3.0 (2022-11-14)
+
+1. Expose Vertex & Index raw ptrs for efficient reading
+    * [Pull request #474](https://github.com/gazebosim/ign-common/pull/474)
+
 ## Gazebo Common 5.2.2 (2022-10-26)
 
 1. [Backport] Avoid Io.hh header name clash (#471) 
