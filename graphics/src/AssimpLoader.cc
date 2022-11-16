@@ -689,12 +689,19 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     {
       auto& animChan = anim->mChannels[chanIdx];
       auto chanName = ToString(animChan->mNodeName);
-      for (unsigned keyIdx = 0; keyIdx < animChan->mNumPositionKeys; ++keyIdx)
+      auto numKeys = std::max(
+          animChan->mNumPositionKeys, animChan->mNumRotationKeys);
+      // Position and rotation arrays might be different lengths,
+      // iterate over the maximum of the two, safely access by checking
+      // number of keys
+      for (unsigned keyIdx = 0; keyIdx < numKeys; ++keyIdx)
       {
         // Note, Scaling keys are not supported right now
         // Compute the position into a math pose
-        auto& posKey = animChan->mPositionKeys[keyIdx];
-        auto& quatKey = animChan->mRotationKeys[keyIdx];
+        auto& posKey = animChan->mPositionKeys[
+          std::min(keyIdx, animChan->mNumPositionKeys - 1)];
+        auto& quatKey = animChan->mRotationKeys[
+          std::min(keyIdx, animChan->mNumRotationKeys - 1)];
         math::Vector3d pos(posKey.mValue.x, posKey.mValue.y, posKey.mValue.z);
         math::Quaterniond quat(quatKey.mValue.w, quatKey.mValue.x,
             quatKey.mValue.y, quatKey.mValue.z);

@@ -72,18 +72,21 @@ TEST_F(SubMeshTest, SubMesh)
   EXPECT_EQ(submesh->Vertex(0u), v0);
   EXPECT_TRUE(submesh->HasVertex(v0));
   EXPECT_EQ(submesh->IndexOfVertex(v0), 0);
+  EXPECT_EQ(submesh->VertexPtr()[0], v0);
 
   submesh->AddVertex(v1);
   EXPECT_EQ(submesh->VertexCount(), 2u);
   EXPECT_EQ(submesh->Vertex(1u), v1);
   EXPECT_TRUE(submesh->HasVertex(v1));
   EXPECT_EQ(submesh->IndexOfVertex(v1), 1);
+  EXPECT_EQ(submesh->VertexPtr()[1], v1);
 
   submesh->AddVertex(v2.X(), v2.Y(), v2.Z());
   EXPECT_EQ(submesh->VertexCount(), 3u);
   EXPECT_EQ(submesh->Vertex(2u), v2);
   EXPECT_TRUE(submesh->HasVertex(v2));
   EXPECT_EQ(submesh->IndexOfVertex(v2), 2);
+  EXPECT_EQ(submesh->VertexPtr()[2], v2);
 
   // max / min
   math::Vector3d max(2, 3, 3);
@@ -127,14 +130,17 @@ TEST_F(SubMeshTest, SubMesh)
   submesh->AddIndex(0u);
   EXPECT_EQ(submesh->IndexCount(), 1u);
   EXPECT_EQ(submesh->Index(0), 0);
+  EXPECT_EQ(submesh->IndexPtr()[0], 0u);
 
   submesh->AddIndex(2u);
   EXPECT_EQ(submesh->IndexCount(), 2u);
   EXPECT_EQ(submesh->Index(1u), 2);
+  EXPECT_EQ(submesh->IndexPtr()[1], 2u);
 
   submesh->AddIndex(1u);
   EXPECT_EQ(submesh->IndexCount(), 3u);
   EXPECT_EQ(submesh->Index(2u), 1);
+  EXPECT_EQ(submesh->IndexPtr()[2], 1u);
 
   // add node assignment
   submesh->AddNodeAssignment(1u, 0u, 0.5f);
@@ -153,10 +159,16 @@ TEST_F(SubMeshTest, SubMesh)
   // test directly setting values and failure cases
   submesh->SetVertex(2u, v0);
   EXPECT_EQ(submesh->Vertex(2u), v0);
+  EXPECT_EQ(submesh->VertexPtr()[2u], v0);
   submesh->SetVertex(2u, v2);
   EXPECT_EQ(submesh->Vertex(2u), v2);
+  EXPECT_EQ(submesh->VertexPtr()[2u], v2);
+
+  // Failure case: write out of bounds should be ignored
   submesh->SetVertex(3u, math::Vector3d(0.9, 2, 4));
   EXPECT_EQ(submesh->Vertex(3u), math::Vector3d::Zero);
+  // Out-of-bounds read of a raw pointer is UB. We can't test it.
+  // EXPECT_EQ(submesh->VertexPtr()[3u], math::Vector3d::Zero);
   EXPECT_FALSE(submesh->HasVertex(math::Vector3d(0.9, 2, 4)));
   EXPECT_EQ(submesh->IndexOfVertex(math::Vector3d(0.9, 2, 4)), -1);
 
@@ -191,6 +203,10 @@ TEST_F(SubMeshTest, SubMesh)
   EXPECT_EQ(submesh->Vertex(1), v1 * scale);
   EXPECT_EQ(submesh->Vertex(2), v2 * scale);
 
+  EXPECT_EQ(submesh->VertexPtr()[0], v0 * scale);
+  EXPECT_EQ(submesh->VertexPtr()[1], v1 * scale);
+  EXPECT_EQ(submesh->VertexPtr()[2], v2 * scale);
+
   EXPECT_EQ(submesh->Normal(0), n0);
   EXPECT_EQ(submesh->Normal(1), n1);
   EXPECT_EQ(submesh->Normal(2), n2);
@@ -205,6 +221,10 @@ TEST_F(SubMeshTest, SubMesh)
   EXPECT_EQ(submesh->Vertex(0), v0);
   EXPECT_EQ(submesh->Vertex(1), v1);
   EXPECT_EQ(submesh->Vertex(2), v2);
+
+  EXPECT_EQ(submesh->VertexPtr()[0], v0);
+  EXPECT_EQ(submesh->VertexPtr()[1], v1);
+  EXPECT_EQ(submesh->VertexPtr()[2], v2);
 
   EXPECT_EQ(submesh->Normal(0), n0);
   EXPECT_EQ(submesh->Normal(1), n1);
@@ -221,6 +241,10 @@ TEST_F(SubMeshTest, SubMesh)
   EXPECT_EQ(submesh->Vertex(0), v0 + t0);
   EXPECT_EQ(submesh->Vertex(1), v1 + t0);
   EXPECT_EQ(submesh->Vertex(2), v2 + t0);
+
+  EXPECT_EQ(submesh->VertexPtr()[0], v0 + t0);
+  EXPECT_EQ(submesh->VertexPtr()[1], v1 + t0);
+  EXPECT_EQ(submesh->VertexPtr()[2], v2 + t0);
 
   EXPECT_EQ(submesh->Normal(0), n0);
   EXPECT_EQ(submesh->Normal(1), n1);
@@ -239,6 +263,10 @@ TEST_F(SubMeshTest, SubMesh)
   EXPECT_EQ(submesh->Vertex(1), v1 + t0 + t);
   EXPECT_EQ(submesh->Vertex(2), v2 + t0 + t);
 
+  EXPECT_EQ(submesh->VertexPtr()[0], v0 + t0 + t);
+  EXPECT_EQ(submesh->VertexPtr()[1], v1 + t0 + t);
+  EXPECT_EQ(submesh->VertexPtr()[2], v2 + t0 + t);
+
   // copy constructor
   common::SubMeshPtr submeshCopy(new common::SubMesh(*(submesh.get())));
   ASSERT_NE(nullptr, submeshCopy);
@@ -254,13 +282,19 @@ TEST_F(SubMeshTest, SubMesh)
       submesh->NodeAssignmentsCount());
 
   for (unsigned int i = 0; i < submeshCopy->VertexCount(); ++i)
+  {
     EXPECT_EQ(submeshCopy->Vertex(i), submesh->Vertex(i));
+    EXPECT_EQ(submeshCopy->VertexPtr()[i], submesh->VertexPtr()[i]);
+  }
   for (unsigned int i = 0; i < submeshCopy->NormalCount(); ++i)
     EXPECT_EQ(submeshCopy->Normal(i), submesh->Normal(i));
   for (unsigned int i = 0; i < submeshCopy->TexCoordCount(); ++i)
     EXPECT_EQ(submeshCopy->TexCoord(i), submesh->TexCoord(i));
   for (unsigned int i = 0; i < submeshCopy->IndexCount(); ++i)
+  {
     EXPECT_EQ(submeshCopy->Index(i), submesh->Index(i));
+    EXPECT_EQ(submeshCopy->IndexPtr()[i], submesh->IndexPtr()[i]);
+  }
   for (unsigned int i = 0; i < submeshCopy->NodeAssignmentsCount(); ++i)
   {
     common::NodeAssignment nodeCopy =
@@ -286,21 +320,37 @@ TEST_F(SubMeshTest, SubMesh)
     EXPECT_DOUBLE_EQ(vertices[i*3], submesh->Vertex(i).X());
     EXPECT_DOUBLE_EQ(vertices[i*3+1], submesh->Vertex(i).Y());
     EXPECT_DOUBLE_EQ(vertices[i*3+2], submesh->Vertex(i).Z());
+
+    EXPECT_DOUBLE_EQ(vertices[i*3], submesh->VertexPtr()[i].X());
+    EXPECT_DOUBLE_EQ(vertices[i*3+1], submesh->VertexPtr()[i].Y());
+    EXPECT_DOUBLE_EQ(vertices[i*3+2], submesh->VertexPtr()[i].Z());
   }
   for (unsigned int i = 0; i < submeshCopy->IndexCount(); ++i)
+  {
     EXPECT_EQ(indices[i], submesh->Index(i));
-
+    EXPECT_EQ(indices[i], submesh->IndexPtr()[i]);
+  }
 
   // recalculate normal and verify they are different
   submesh->RecalculateNormals();
+
+  EXPECT_NE(submeshCopy->VertexPtr(), submesh->VertexPtr());
+  EXPECT_NE(submeshCopy->IndexPtr(), submesh->IndexPtr());
+
   for (unsigned int i = 0; i < submeshCopy->NormalCount(); ++i)
     EXPECT_NE(submeshCopy->Normal(i), submesh->Normal(i));
   for (unsigned int i = 0; i < submeshCopy->VertexCount(); ++i)
+  {
     EXPECT_EQ(submeshCopy->Vertex(i), submesh->Vertex(i));
+    EXPECT_EQ(submeshCopy->VertexPtr()[i], submesh->VertexPtr()[i]);
+  }
   for (unsigned int i = 0; i < submeshCopy->TexCoordCount(); ++i)
     EXPECT_EQ(submeshCopy->TexCoord(i), submesh->TexCoord(i));
   for (unsigned int i = 0; i < submeshCopy->IndexCount(); ++i)
+  {
     EXPECT_EQ(submeshCopy->Index(i), submesh->Index(i));
+    EXPECT_EQ(submeshCopy->IndexPtr()[i], submesh->IndexPtr()[i]);
+  }
   for (unsigned int i = 0; i < submeshCopy->NodeAssignmentsCount(); ++i)
   {
     common::NodeAssignment nodeCopy =
@@ -314,11 +364,17 @@ TEST_F(SubMeshTest, SubMesh)
   for (unsigned int i = 0; i < submeshCopy->NormalCount(); ++i)
     EXPECT_EQ(submeshCopy->Normal(i), submesh->Normal(i));
   for (unsigned int i = 0; i < submeshCopy->VertexCount(); ++i)
+  {
     EXPECT_EQ(submeshCopy->Vertex(i), submesh->Vertex(i));
+    EXPECT_EQ(submeshCopy->VertexPtr()[i], submesh->VertexPtr()[i]);
+  }
   for (unsigned int i = 0; i < submeshCopy->TexCoordCount(); ++i)
     EXPECT_EQ(submeshCopy->TexCoord(i), submesh->TexCoord(i));
   for (unsigned int i = 0; i < submeshCopy->IndexCount(); ++i)
+  {
     EXPECT_EQ(submeshCopy->Index(i), submesh->Index(i));
+    EXPECT_EQ(submeshCopy->IndexPtr()[i], submesh->IndexPtr()[i]);
+  }
   for (unsigned int i = 0; i < submeshCopy->NodeAssignmentsCount(); ++i)
   {
     common::NodeAssignment nodeCopy =
@@ -335,9 +391,15 @@ TEST_F(SubMeshTest, SubMesh)
   for (unsigned int i = 0; i < submeshCopy->NormalCount(); ++i)
     EXPECT_EQ(submeshCopy->Normal(i), submesh->Normal(i));
   for (unsigned int i = 0; i < submeshCopy->VertexCount(); ++i)
+  {
     EXPECT_EQ(submeshCopy->Vertex(i), submesh->Vertex(i));
+    EXPECT_EQ(submeshCopy->VertexPtr()[i], submesh->VertexPtr()[i]);
+  }
   for (unsigned int i = 0; i < submeshCopy->IndexCount(); ++i)
+  {
     EXPECT_EQ(submeshCopy->Index(i), submesh->Index(i));
+    EXPECT_EQ(submeshCopy->IndexPtr()[i], submesh->IndexPtr()[i]);
+  }
   for (unsigned int i = 0; i < submeshCopy->NodeAssignmentsCount(); ++i)
   {
     common::NodeAssignment nodeCopy =
