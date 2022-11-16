@@ -738,3 +738,20 @@ TEST_F(AssimpLoader, CheckNonRootDisplacement)
   auto xDisplacement = skelAnim->XDisplacement();
   ASSERT_TRUE(xDisplacement);
 }
+
+/////////////////////////////////////////////////
+// Load animation without a name
+TEST_F(AssimpLoader, NoAnimName)
+{
+  common::AssimpLoader loader;
+
+  std::string meshFilename =
+    common::testing::TestFile("data", "box_with_no_animation_name.dae");
+
+  common::Mesh *mesh = loader.Load(meshFilename);
+  common::SkeletonPtr skeleton = mesh->MeshSkeleton();
+  ASSERT_EQ(1u, skeleton->AnimationCount());
+  common::SkeletonAnimation *anim = skeleton->Animation(0);
+  auto animName = anim->Name();
+  EXPECT_EQ(animName, "animation1");
+}
