@@ -53,7 +53,7 @@ TEST(CSVStreams, CanExtractCSVTokens)
 
   EXPECT_TRUE(ExtractCSVToken(sstream, token, CSVDialect::Unix));
   EXPECT_EQ(token.type, CSVToken::TERMINATOR);
-  EXPECT_EQ(token.character, EOF);
+  EXPECT_EQ(token.character, static_cast<char>(EOF));
 }
 
 /////////////////////////////////////////////////

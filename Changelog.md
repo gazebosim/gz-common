@@ -4,6 +4,33 @@
 
 ## Gazebo Common 5.x
 
+## Gazebo Common 5.3.0 (2022-11-14)
+
+1. Expose Vertex & Index raw ptrs for efficient reading
+    * [Pull request #474](https://github.com/gazebosim/ign-common/pull/474)
+
+## Gazebo Common 5.2.2 (2022-10-26)
+
+1. [Backport] Avoid Io.hh header name clash (#471) 
+    * [Pull request #472](https://github.com/gazebosim/gz-common/pull/472)
+
+## Gazebo Common 5.2.1 (2022-10-19)
+
+1. Fix arm builds and tests
+    * [Pull request #462](https://github.com/gazebosim/gz-common/pull/462)
+    * [Pull request #463](https://github.com/gazebosim/gz-common/pull/463)
+
+## Gazebo Common 5.2.0 (2022-10-18)
+
+1. Add CSV data parsing
+    * [Pull request #402](https://github.com/gazebosim/gz-common/pull/402)
+
+1. Skip CSV header when reading DataFrame.
+    * [Pull request #435](https://github.com/gazebosim/gz-common/pull/435)
+
+1. Adds an API to retrieve keys.
+    * [Pull request #446](https://github.com/gazebosim/gz-common/pull/446)
+
 ## Gazebo Common 5.1.0 (2022-10-13)
 
 1. 4 ➡️  5

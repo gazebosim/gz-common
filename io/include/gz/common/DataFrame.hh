@@ -68,6 +68,18 @@ namespace gz
         return this->storage.at(_key);
       }
 
+      /// \brief Retrieve all keys
+      /// \return A vector with keys
+      public: const std::vector<K> Keys() const
+      {
+        std::vector<K> keyList;
+        for (auto &[k, _]: this->storage)
+        {
+          keyList.push_back(k);
+        }
+        return keyList;
+      }
+
       /// \brief Data frame storage
       private: std::unordered_map<K, V> storage;
     };

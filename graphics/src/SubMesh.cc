@@ -174,6 +174,12 @@ gz::math::Vector3d SubMesh::Vertex(const unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
+const gz::math::Vector3d* SubMesh::VertexPtr() const
+{
+  return this->dataPtr->vertices.data();
+}
+
+//////////////////////////////////////////////////
 bool SubMesh::HasVertex(const unsigned int _index) const
 {
   return _index < this->dataPtr->vertices.size();
@@ -347,6 +353,12 @@ int SubMesh::Index(const unsigned int _index) const
   }
 
   return this->dataPtr->indices[_index];
+}
+
+//////////////////////////////////////////////////
+const unsigned int* SubMesh::IndexPtr() const
+{
+  return this->dataPtr->indices.data();
 }
 
 //////////////////////////////////////////////////

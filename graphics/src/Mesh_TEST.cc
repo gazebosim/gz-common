@@ -95,11 +95,13 @@ TEST_F(MeshTest, Mesh)
   EXPECT_EQ(submesh.lock()->Vertex(0), v0 * scale);
   EXPECT_EQ(submesh.lock()->Normal(0), n0);
   EXPECT_EQ(submesh.lock()->TexCoord(0), uv0);
+  EXPECT_EQ(submesh.lock()->VertexPtr()[0], v0 * scale);
 
   mesh->Scale(scale);
   EXPECT_EQ(submesh.lock()->Vertex(0), v0 * scale * scale);
   EXPECT_EQ(submesh.lock()->Normal(0), n0);
   EXPECT_EQ(submesh.lock()->TexCoord(0), uv0);
+  EXPECT_EQ(submesh.lock()->VertexPtr()[0], v0 * scale * scale);
 
   // translate
   math::Vector3d t0(2, 3, -12);
@@ -107,6 +109,7 @@ TEST_F(MeshTest, Mesh)
   EXPECT_EQ(submesh.lock()->Vertex(0), v0 * scale * scale + t0);
   EXPECT_EQ(submesh.lock()->Normal(0), n0);
   EXPECT_EQ(submesh.lock()->TexCoord(0), uv0);
+  EXPECT_EQ(submesh.lock()->VertexPtr()[0], v0 * scale * scale + t0);
 
   // center
   math::Vector3d c0(0.1, 3, 1);
@@ -151,4 +154,5 @@ TEST_F(MeshTest, Mesh)
   EXPECT_TRUE(math::equal(vertices[1], submesh.lock()->Vertex(0).Y()));
   EXPECT_TRUE(math::equal(vertices[2], submesh.lock()->Vertex(0).Z()));
   EXPECT_EQ(indices[0], submesh.lock()->Index(0));
+  EXPECT_EQ(indices[0], submesh.lock()->IndexPtr()[0]);
 }
