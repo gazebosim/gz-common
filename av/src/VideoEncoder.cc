@@ -839,7 +839,7 @@ bool VideoEncoder::Stop()
         if (ret >= 0)
           ret = this->dataPtr->ProcessPacket(avPacket);
       }
-      av_packet_unref(avPacket);
+      av_packet_free(&avPacket);
     }
   }
 
