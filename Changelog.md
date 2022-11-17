@@ -1,5 +1,13 @@
 ## Gazebo Common 5.x
 
+## Gazebo Common 5.3.1 (2022-11-17)
+
+1. Fix out of bounds access to rotation array in assimp loader
+    * [Pull request #479](https://github.com/gazebosim/ign-common/pull/479)
+
+1. Fix issues detected by ASAN
+    * [Pull request #480](https://github.com/gazebosim/ign-common/pull/480)
+
 ## Gazebo Common 5.3.0 (2022-11-14)
 
 1. Expose Vertex & Index raw ptrs for efficient reading
