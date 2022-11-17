@@ -291,6 +291,8 @@ TEST_F(ImageTest, DeprecatedDataFunctions)
   {
     ASSERT_EQ(data[i], dataRaw[i]);
   }
+
+  delete[] dataRaw;
 }
 
 /*
@@ -406,6 +408,8 @@ TEST_F(ImageTest, ConvertPixelFormat)
          Image::ConvertPixelFormat("BAYER_GRBG8"));
   EXPECT_EQ(Image::PixelFormatType::BAYER_BGGR8,
          Image::ConvertPixelFormat("BAYER_BGGR8"));
+  EXPECT_EQ(Image::PixelFormatType::COMPRESSED_PNG,
+         Image::ConvertPixelFormat("COMPRESSED_PNG"));
 }
 
 /////////////////////////////////////////////////
