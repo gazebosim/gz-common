@@ -53,7 +53,8 @@ namespace gz
       "BAYER_RGGB8",
       "BAYER_BGGR8",
       "BAYER_GBRG8",
-      "BAYER_GRBG8"
+      "BAYER_GRBG8",
+      "COMPRESSED_PNG"
     };
 
     /// \class Image Image.hh gz/common/common.hh

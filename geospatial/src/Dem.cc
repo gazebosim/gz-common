@@ -290,17 +290,7 @@ bool Dem::GeoReference(double _x, double _y,
     if (this->dataPtr->sphericalCoordinates.Surface() ==
         math::SphericalCoordinates::EARTH_WGS84)
     {
-      // Transform the terrain's coordinate system to WGS84
-      const char *importString
-          = strdup(this->dataPtr->dataSet->GetProjectionRef());
-      if (importString == nullptr || importString[0] == '\0')
-      {
-        // LCOV_EXCL_START
-        gzdbg << "Projection coordinate system undefined." << std::endl;
-        return false;
-        // LCOV_EXCL_STOP
-      }
-      sourceCs.importFromWkt(&importString);
+      sourceCs.importFromWkt(this->dataPtr->dataSet->GetProjectionRef());
       targetCs.SetWellKnownGeogCS("WGS84");
     }
     else if ((this->dataPtr->sphericalCoordinates.Surface() ==
