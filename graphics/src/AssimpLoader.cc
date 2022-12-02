@@ -316,6 +316,8 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   MaterialPtr mat = std::make_shared<Material>();
   aiColor4D color;
   bool specularDefine = false;
+  // gcc is complaining about this variable not being used.
+  (void) specularDefine;
   auto& assimpMat = _scene->mMaterials[_matIdx];
   auto ret = assimpMat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
   if (ret == AI_SUCCESS)
