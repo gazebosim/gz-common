@@ -1,6 +1,6 @@
 ## Gazebo Common 4.x
 
-## Gazebo Common 4.6.1 (2022-11-17)
+## Gazebo Common 4.6.2 (2022-11-17)
 
 1. Fix Capsule mesh generation.
     * [Pull request #475](https://github.com/gazebosim/gz-common/pull/475)
