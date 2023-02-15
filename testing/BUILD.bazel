@@ -1,0 +1,69 @@
+load(
+    "@gz//bazel/skylark:build_defs.bzl",
+    "GZ_ROOT",
+    "gz_export_header",
+)
+
+gz_export_header(
+    name = "include/gz/common/testing/Export.hh",
+    export_base = "GZ_COMMON_TESTING",
+    lib_name = "gz-common-testing",
+    visibility = ["//visibility:private"],
+)
+
+public_headers = glob([
+    "include/gz/common/testing/*.hh",
+    "include/gz/common/testing/detail/*.hh",
+]) + ["include/gz/common/testing/Export.hh"]
+
+cc_library(
+    name = "testing",
+    srcs = [
+        "src/BazelTestPaths.cc",
+        "src/CMakeTestPaths.cc",
+        "src/TestPaths.cc",
+        "src/Utils.cc",
+    ],
+    hdrs = public_headers,
+    includes = ["include"],
+    visibility = ["//visibility:public"],
+    deps = [
+        GZ_ROOT + "common",
+    ],
+)
+
+cc_test(
+    name = "AutoLogFixture_TEST",
+    srcs = ["src/AutoLogFixture_TEST.cc"],
+    deps = [
+        ":testing",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "BazelTestPaths_TEST",
+    srcs = ["src/BazelTestPaths_TEST.cc"],
+    data = glob(["test_files/**"]),
+    env = {
+        "GZ_BAZEL": "1",
+        "GZ_BAZEL_PATH": "common",
+    },
+    deps = [
+        ":testing",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "Utils_TEST",
+    srcs = ["src/Utils_TEST.cc"],
+    env = {
+        "GZ_BAZEL": "1",
+        "GZ_BAZEL_PATH": "common",
+    },
+    deps = [
+        ":testing",
+        "@gtest//:gtest_main",
+    ],
+)
