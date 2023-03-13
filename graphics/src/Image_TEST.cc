@@ -26,7 +26,10 @@ using namespace gz;
 
 class ImageTest : public common::testing::AutoLogFixture { };
 
-
+const std::string kTestDataGazeboJpeg =  // NOLINT(*)
+    common::testing::TestFile("data", "gazebo_logo.jpeg");
+const std::string kTestDataGazeboBmp =  // NOLINT(*)
+    common::testing::TestFile("data", "gazebo_logo.bmp");
 const std::string kTestData =  // NOLINT(*)
     common::testing::TestFile("data", "red_blue_colors.png");
 
@@ -74,6 +77,50 @@ TEST_F(ImageTest, InvalidImage)
 }
 
 /////////////////////////////////////////////////
+TEST_F(ImageTest, ImageConstructorProperties)
+{
+  common::Image imgInvalid("invalid");
+  ASSERT_FALSE(imgInvalid.Valid());
+
+  common::Image img(kTestData);
+  CheckImageRGBA(img);
+
+  ASSERT_EQ(img.Pixel(0, 0), math::Color::Red);
+  ASSERT_EQ(img.Pixel(85, 0), math::Color::Blue);
+  ASSERT_EQ(kAvgColor, img.AvgColor());
+  ASSERT_EQ(kMaxColor, img.MaxColor());
+
+  ASSERT_TRUE(img.Filename().find("red_blue_colors.png") !=
+      std::string::npos);
+}
+
+/////////////////////////////////////////////////
+TEST_F(ImageTest, ImageConstructorPropertiesDifferentFormats)
+{
+  common::Image imgBmp(kTestDataGazeboBmp);
+
+  ASSERT_EQ(554u, imgBmp.Width());
+  ASSERT_EQ(234u, imgBmp.Height());
+  ASSERT_EQ(24u, imgBmp.BPP());
+  ASSERT_EQ(1662, imgBmp.Pitch());
+  ASSERT_EQ(common::Image::PixelFormatType::RGB_INT8, imgBmp.PixelFormat());
+
+  ASSERT_TRUE(imgBmp.Filename().find("gazebo_logo.bmp") !=
+      std::string::npos);
+
+  common::Image imgJpeg(kTestDataGazeboJpeg);
+
+  ASSERT_EQ(554u, imgJpeg.Width());
+  ASSERT_EQ(234u, imgJpeg.Height());
+  ASSERT_EQ(24u, imgJpeg.BPP());
+  ASSERT_EQ(1662, imgJpeg.Pitch());
+  ASSERT_EQ(common::Image::PixelFormatType::RGB_INT8, imgJpeg.PixelFormat());
+
+  ASSERT_TRUE(imgJpeg.Filename().find("gazebo_logo.jpeg") !=
+      std::string::npos);
+}
+
+/////////////////////////////////////////////////
 TEST_F(ImageTest, ImageProperties)
 {
   common::Image img;
@@ -91,6 +138,43 @@ TEST_F(ImageTest, ImageProperties)
 
   ASSERT_TRUE(img.Filename().find("red_blue_colors.png") !=
       std::string::npos);
+}
+
+TEST_F(ImageTest, ImageSavePng)
+{
+  std::string pathOut = common::testing::TempPath();
+  common::createDirectories(pathOut);
+
+  std::string imagePath = common::joinPaths(pathOut, "image.png");
+
+  common::Image imgJpeg(kTestDataGazeboJpeg);
+  imgJpeg.SavePNG(imagePath);
+  common::Image img(imagePath);
+  ASSERT_TRUE(img.Valid());
+
+  std::vector<unsigned char> values;
+  img.SavePNGToBuffer(values);
+  EXPECT_LT(0u, values.size());
+}
+
+TEST_F(ImageTest, ImageGetterInvalid)
+{
+  common::Image img;
+  EXPECT_EQ(0u, img.Width());
+  EXPECT_EQ(0u, img.Height());
+  EXPECT_EQ(0u, img.BPP());
+  EXPECT_EQ(math::Color(), img.Pixel(0, 0));
+  EXPECT_EQ(math::Color(), img.MaxColor());
+
+  common::Image imgBmp(kTestDataGazeboBmp);
+  EXPECT_EQ(math::Color(), imgBmp.Pixel(2000, 0));
+
+  unsigned int width = imgBmp.Width();
+  unsigned int height = imgBmp.Height();
+  imgBmp.Rescale(static_cast<int>(width / 2), static_cast<int>(height / 2));
+
+  EXPECT_EQ(static_cast<unsigned int>(width / 2), imgBmp.Width());
+  EXPECT_EQ(static_cast<unsigned int>(height / 2), imgBmp.Height());
 }
 
 /////////////////////////////////////////////////
@@ -301,7 +385,8 @@ TEST_F(ImageTest, DeprecatedDataFunctions)
     common::testing::TempPath("test_red_blue_save.png");
   img.SavePNG(testSaveImage);
 
-  common::Image img2;
+  common::Image img2;  common::Image img;
+
   img2.Load(testSaveImage);
   ASSERT_TRUE(img2.Valid());
   ASSERT_EQ(common::Image::PixelFormatType::RGB_INT8, img2.PixelFormat());
