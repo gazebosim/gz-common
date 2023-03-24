@@ -241,13 +241,13 @@ void Image::SetFromData(const unsigned char *_data,
     bluemask = 0xff0000;
     scanlineBytes = _width * 3;
   }
-  else if (_format == BAYER_RGGB8)
+  else if ((_format == BAYER_RGGB8) ||
+            (_format == BAYER_BGGR8) ||
+            (_format == BAYER_GBRG8) ||
+            (_format == BAYER_GRBG8))
   {
     std::cout << "teju to save\n";
     bpp = 8;
-    // redmask = 0xff000000;
-    // greenmask = 0x00ff0000;
-    // bluemask = 0x0000ff00;
     scanlineBytes = _width;
   }  
   else
