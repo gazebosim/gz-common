@@ -26,6 +26,8 @@
 #include <gz/common/Util.hh>
 #include <gz/common/Image.hh>
 
+#include <iostream>
+
 using namespace gz;
 using namespace common;
 
@@ -239,6 +241,15 @@ void Image::SetFromData(const unsigned char *_data,
     bluemask = 0xff0000;
     scanlineBytes = _width * 3;
   }
+  else if (_format == BAYER_RGGB8)
+  {
+    std::cout << "teju to save\n";
+    bpp = 8;
+    // redmask = 0xff000000;
+    // greenmask = 0x00ff0000;
+    // bluemask = 0x0000ff00;
+    scanlineBytes = _width;
+  }  
   else
   {
     gzerr << "Unable to handle format[" << _format << "]\n";
