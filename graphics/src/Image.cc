@@ -26,7 +26,6 @@
 #include <gz/common/Util.hh>
 #include <gz/common/Image.hh>
 
-#include <iostream>
 
 using namespace gz;
 using namespace common;
@@ -246,7 +245,6 @@ void Image::SetFromData(const unsigned char *_data,
             (_format == BAYER_GBRG8) ||
             (_format == BAYER_GRBG8))
   {
-    std::cout << "teju to save\n";
     bpp = 8;
     scanlineBytes = _width;
   }  
