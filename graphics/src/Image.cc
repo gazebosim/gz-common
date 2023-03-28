@@ -26,7 +26,6 @@
 #include <gz/common/Util.hh>
 #include <gz/common/Image.hh>
 
-
 using namespace gz;
 using namespace common;
 
@@ -241,9 +240,9 @@ void Image::SetFromData(const unsigned char *_data,
     scanlineBytes = _width * 3;
   }
   else if ((_format == BAYER_RGGB8) ||
-            (_format == BAYER_BGGR8) ||
-            (_format == BAYER_GBRG8) ||
-            (_format == BAYER_GRBG8))
+           (_format == BAYER_BGGR8) ||
+           (_format == BAYER_GBRG8) ||
+           (_format == BAYER_GRBG8))
   {
     bpp = 8;
     scanlineBytes = _width;
