@@ -1614,3 +1614,9 @@ void MeshManager::ConvertPolylinesToVerticesAndEdges(
     }
   }
 }
+
+//////////////////////////////////////////////////
+MeshManager* MeshManager::Instance()
+{
+  return SingletonT<MeshManager>::Instance();
+}
