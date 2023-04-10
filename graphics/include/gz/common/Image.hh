@@ -17,6 +17,7 @@
 #ifndef GZ_COMMON_IMAGE_HH_
 #define GZ_COMMON_IMAGE_HH_
 
+#include <cstring>
 #include <limits>
 #include <memory>
 #include <string>
