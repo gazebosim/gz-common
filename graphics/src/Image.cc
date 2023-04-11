@@ -67,6 +67,16 @@ namespace gz
       /// \return bitmap data with red and blue pixels swapped
       public: FIBITMAP* SwapRedBlue(const unsigned int &_width,
                                     const unsigned int &_height) const;
+
+      /// \brief Get pixel value at specified index.
+      /// \param[in] _dib Pointer to Freeimage bitmap
+      /// \param[in] _x Pixel index in horizontal direction
+      /// \param[in] _y Pixel index in vertical direction
+      /// \param[out] _color Pixel value at specified index
+      /// \return TRUE value if the pixel index was found and the color
+      /// value set, FALSE otherwise.
+      public: BOOL PixelIndex(FIBITMAP *_dib, unsigned _x, unsigned _y,
+            math::Color &_color) const;
     };
   }
 }
@@ -507,16 +517,13 @@ math::Color Image::Pixel(unsigned int _x, unsigned int _y) const
   }
   else
   {
-    BYTE byteValue;
-    if (FreeImage_GetPixelIndex(
-          this->dataPtr->bitmap, _x, _y, &byteValue) == FALSE)
+    if (this->dataPtr->PixelIndex(
+           this->dataPtr->bitmap, _x, _y, clr) == FALSE)
     {
       gzerr << "Image: Coordinates out of range ["
         << _x << " " << _y << "] \n";
       return clr;
     }
-
-    clr.Set(byteValue, byteValue, byteValue);
   }
 
   return clr;
@@ -590,22 +597,20 @@ math::Color Image::MaxColor() const
   }
   else
   {
-    BYTE byteValue;
     for (y = 0; y < this->Height(); y++)
     {
       for (x = 0; x < this->Width(); x++)
       {
         clr.Set(0, 0, 0, 0);
 
-        if (FreeImage_GetPixelIndex(
-              this->dataPtr->bitmap, x, y, &byteValue) == FALSE)
+        if (this->dataPtr->PixelIndex(
+               this->dataPtr->bitmap, x, y, clr) == FALSE)
+
         {
           gzerr << "Image: Coordinates out of range ["
             << x << " " << y << "] \n";
           continue;
         }
-
-        clr.Set(byteValue, byteValue, byteValue);
 
         if (clr.R() + clr.G() + clr.B() > maxClr.R() + maxClr.G() + maxClr.B())
         {
@@ -616,6 +621,49 @@ math::Color Image::MaxColor() const
   }
 
   return maxClr;
+}
+
+//////////////////////////////////////////////////
+BOOL Image::Implementation::PixelIndex(
+    FIBITMAP *_dib, unsigned _x, unsigned _y, math::Color &_color) const
+{
+  if (!_dib)
+    return FALSE;
+
+  FREE_IMAGE_TYPE imageType = FreeImage_GetImageType(_dib);
+  // 8 bit images
+  if (imageType == FIT_BITMAP)
+  {
+    BYTE byteValue;
+    // FreeImage_GetPixelIndex should also work with 1 and 4 bit images
+    if (FreeImage_GetPixelIndex(
+        _dib, _x, _y, &byteValue) == FALSE)
+    {
+      return FALSE;
+    }
+
+    unsigned int bpp = FreeImage_GetBPP(_dib);
+    // convert to float value between 0-1
+    float value = byteValue / static_cast<float>(((1 << (bpp)) - 1));
+    _color.Set(value, value, value);
+  }
+  // 16 bit images
+  else if (imageType == FIT_UINT16)
+  {
+    if ((_x < FreeImage_GetWidth(_dib)) && (_y < FreeImage_GetHeight(_dib)))
+    {
+      WORD *bits = reinterpret_cast<WORD *>(FreeImage_GetScanLine(_dib, _y));
+      uint16_t word = static_cast<uint16_t>(bits[_x]);
+      // convert to float value between 0-1
+      float value = word / static_cast<float>(math::MAX_UI16);
+      _color.Set(value, value, value);
+    }
+    else
+    {
+      return FALSE;
+    }
+  }
+  return TRUE;
 }
 
 //////////////////////////////////////////////////
@@ -674,16 +722,10 @@ Image::PixelFormatType Image::PixelFormat() const
 Image::PixelFormatType Image::ConvertPixelFormat(const std::string &_format)
 {
   // Handle old format strings
-  if (_format == "L8" || _format == "L_INT8")
+  if (_format == "L8")
     return L_INT8;
-  else if (_format == "R8G8B8" || _format == "RGB_INT8")
+  else if (_format == "R8G8B8")
     return RGB_INT8;
-
-  // Handle BAYER_BGGR8 since it is after PIXEL_FORMAT_COUNT in the enum
-  if (_format == "BAYER_BGGR8")
-  {
-    return BAYER_BGGR8;
-  }
 
   for (unsigned int i = 0; i < PIXEL_FORMAT_COUNT; ++i)
     if (PixelFormatNames[i] == _format)

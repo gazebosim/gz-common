@@ -1,17 +1,9 @@
 load(
-    "//gz_bazel:build_defs.bzl",
+    "@gz//bazel/skylark:build_defs.bzl",
     "GZ_ROOT",
     "GZ_VISIBILITY",
-    "generate_include_header",
     "gz_export_header",
-)
-
-package(
-    default_visibility = GZ_VISIBILITY,
-    features = [
-        "-parse_headers",
-        "-layering_check",
-    ],
+    "gz_include_header",
 )
 
 public_headers_no_gen = glob([
@@ -21,10 +13,7 @@ public_headers_no_gen = glob([
 
 sources = glob(
     ["src/*.cc"],
-    exclude = [
-        "src/*_TEST.cc",
-        "src/HWEncoder.cc",
-    ],
+    exclude = ["src/*_TEST.cc"],
 )
 
 test_sources = glob(["src/*_TEST.cc"])
@@ -36,8 +25,8 @@ gz_export_header(
     visibility = ["//visibility:private"],
 )
 
-generate_include_header(
-    name = "eventshh_genrule",
+gz_include_header(
+    name = "av_hh_genrule",
     out = "include/gz/common/av.hh",
     hdrs = public_headers_no_gen + [
         "include/gz/common/av/Export.hh",
@@ -54,35 +43,28 @@ cc_library(
     srcs = sources,
     hdrs = public_headers,
     includes = ["include"],
+    visibility = GZ_VISIBILITY,
     deps = [
-        GZ_ROOT + "gz_common",
-        "@ffmpeg//:avcodec",
-        "@ffmpeg//:avdevice",
-        "@ffmpeg//:avformat",
-        "@ffmpeg//:avutil",
-        "@ffmpeg//:swscale",
+        GZ_ROOT + "common",
+        GZ_ROOT + "utils",
+        "@ffmpeg//:libavcodec",
+        "@ffmpeg//:libavformat",
+        "@ffmpeg//:libavutil",
+        "@ffmpeg//:libswscale",
     ],
-)
-
-cc_binary(
-    name = "libgz-common5-av.so",
-    includes = ["include"],
-    linkopts = ["-Wl,-soname,libgz-common5-av.so"],
-    linkshared = True,
-    deps = [":av"],
 )
 
 [cc_test(
     name = src.replace("/", "_").replace(".cc", "").replace("src_", ""),
     srcs = [src],
-    data = [
-        GZ_ROOT + "gz_common/test:data",
-    ],
+    data = [GZ_ROOT + "common/test:data"],
+    env = {
+        "GZ_BAZEL": "1",
+        "GZ_BAZEL_PATH": "common",
+    },
     deps = [
         ":av",
-        GZ_ROOT + "gz_common/test:test_utils",
-        GZ_ROOT + "gz_bazel:utilities",
-        "@gtest",
+        GZ_ROOT + "common/testing",
         "@gtest//:gtest_main",
     ],
 ) for src in test_sources]

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10.2 FATAL_ERROR)
 #============================================================================
 # Initialize the project
 #============================================================================
-project(gz-common5 VERSION 5.0.0)
+project(gz-common5 VERSION 5.3.1)
 set(GZ_COMMON_VER ${PROJECT_VERSION_MAJOR})
 
 #============================================================================
@@ -18,7 +18,7 @@ set(GZ_CMAKE_VER ${gz-cmake3_VERSION_MAJOR})
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-gz_configure_project(VERSION_SUFFIX pre1)
+gz_configure_project(VERSION_SUFFIX)
 
 #============================================================================
 # Set project-specific options
@@ -109,6 +109,7 @@ gz_find_package(SWSCALE REQUIRED_BY av PRETTY libswscale)
 #------------------------------------
 # Find avdevice
 gz_find_package(AVDEVICE VERSION 56.4.100 REQUIRED_BY av PRETTY libavdevice)
+set(HAVE_AVDEVICE ${AVDEVICE_FOUND})
 
 #------------------------------------
 # Find avformat
@@ -126,7 +127,6 @@ gz_find_package(AVUTIL REQUIRED_BY av PRETTY libavutil)
 # Find assimp
 gz_find_package(GzAssimp REQUIRED_BY graphics PRETTY assimp)
 
-
 message(STATUS "-------------------------------------------\n")
 
 
@@ -137,7 +137,7 @@ configure_file("${PROJECT_SOURCE_DIR}/cppcheck.suppress.in"
                ${PROJECT_BINARY_DIR}/cppcheck.suppress)
 
 gz_configure_build(QUIT_IF_BUILD_ERRORS
-  COMPONENTS av events geospatial graphics profiler testing)
+  COMPONENTS av events geospatial graphics io profiler testing)
 
 #============================================================================
 # Create package information

@@ -1,0 +1,65 @@
+load(
+    "@gz//bazel/skylark:build_defs.bzl",
+    "GZ_ROOT",
+    "GZ_VISIBILITY",
+    "gz_export_header",
+    "gz_include_header",
+)
+
+public_headers_no_gen = glob([
+    "include/gz/common/*.hh",
+    "include/gz/common/**/*.hh",
+])
+
+sources = glob(
+    ["src/*.cc"],
+    exclude = ["src/*_TEST.cc"],
+)
+
+test_sources = glob(["src/*_TEST.cc"])
+
+gz_export_header(
+    name = "include/gz/common/io/Export.hh",
+    export_base = "GZ_COMMON_IO",
+    lib_name = "gz-common-io",
+    visibility = ["//visibility:private"],
+)
+
+gz_include_header(
+    name = "io_hh_genrule",
+    out = "include/gz/common/io.hh",
+    hdrs = public_headers_no_gen + [
+        "include/gz/common/io/Export.hh",
+    ],
+)
+
+public_headers = public_headers_no_gen + [
+    "include/gz/common/io/Export.hh",
+    "include/gz/common/io.hh",
+]
+
+cc_library(
+    name = "io",
+    srcs = sources,
+    hdrs = public_headers,
+    includes = ["include"],
+    visibility = GZ_VISIBILITY,
+    deps = [
+        GZ_ROOT + "common",
+        GZ_ROOT + "utils",
+    ],
+)
+
+[cc_test(
+    name = src.replace("/", "_").replace(".cc", "").replace("src_", ""),
+    srcs = [src],
+    env = {
+        "GZ_BAZEL": "1",
+        "GZ_BAZEL_PATH": "common",
+    },
+    deps = [
+        ":io",
+        GZ_ROOT + "common/testing",
+        "@gtest//:gtest_main",
+    ],
+) for src in test_sources]

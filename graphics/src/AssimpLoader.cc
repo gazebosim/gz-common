@@ -315,6 +315,9 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
 {
   MaterialPtr mat = std::make_shared<Material>();
   aiColor4D color;
+  bool specularDefine = false;
+  // gcc is complaining about this variable not being used.
+  (void) specularDefine;
   auto& assimpMat = _scene->mMaterials[_matIdx];
   auto ret = assimpMat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
   if (ret == AI_SUCCESS)
@@ -324,6 +327,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   ret = assimpMat->Get(AI_MATKEY_COLOR_AMBIENT, color);
   if (ret == AI_SUCCESS)
   {
+    specularDefine = true;
     mat->SetAmbient(this->ConvertColor(color));
   }
   ret = assimpMat->Get(AI_MATKEY_COLOR_SPECULAR, color);
@@ -392,8 +396,8 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     auto [texName, texData] = this->LoadTexture(_scene, texturePath,
         this->GenerateTextureName(_scene, assimpMat, "MetallicRoughness"));
     // Load it into a common::Image then split it
-    auto texImg =
-      texData != nullptr ? texData : std::make_shared<common::Image>(texName);
+    auto texImg = texData != nullptr ? texData :
+      std::make_shared<common::Image>(joinPaths(_path, texName));
     auto [metalTexture, roughTexture] =
       this->SplitMetallicRoughnessMap(*texImg);
     pbr.SetMetalnessMap(
@@ -448,10 +452,14 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     pbr.SetLightMap(texName, uvIdx, texData);
   }
 #ifndef GZ_ASSIMP_PRE_5_2_0
-  double value;
+  float value;
   ret = assimpMat->Get(AI_MATKEY_METALLIC_FACTOR, value);
   if (ret == AI_SUCCESS)
   {
+    if (!specularDefine)
+    {
+      mat->SetSpecular(math::Color(value, value, value));
+    }
     pbr.SetMetalness(value);
   }
   ret = assimpMat->Get(AI_MATKEY_ROUGHNESS_FACTOR, value);
@@ -683,12 +691,19 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     {
       auto& animChan = anim->mChannels[chanIdx];
       auto chanName = ToString(animChan->mNodeName);
-      for (unsigned keyIdx = 0; keyIdx < animChan->mNumPositionKeys; ++keyIdx)
+      auto numKeys = std::max(
+          animChan->mNumPositionKeys, animChan->mNumRotationKeys);
+      // Position and rotation arrays might be different lengths,
+      // iterate over the maximum of the two, safely access by checking
+      // number of keys
+      for (unsigned keyIdx = 0; keyIdx < numKeys; ++keyIdx)
       {
         // Note, Scaling keys are not supported right now
         // Compute the position into a math pose
-        auto& posKey = animChan->mPositionKeys[keyIdx];
-        auto& quatKey = animChan->mRotationKeys[keyIdx];
+        auto& posKey = animChan->mPositionKeys[
+          std::min(keyIdx, animChan->mNumPositionKeys - 1)];
+        auto& quatKey = animChan->mRotationKeys[
+          std::min(keyIdx, animChan->mNumRotationKeys - 1)];
         math::Vector3d pos(posKey.mValue.x, posKey.mValue.y, posKey.mValue.z);
         math::Quaterniond quat(quatKey.mValue.w, quatKey.mValue.x,
             quatKey.mValue.y, quatKey.mValue.z);

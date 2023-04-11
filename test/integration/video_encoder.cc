@@ -108,7 +108,7 @@ TEST_F(EncoderDecoderTest, DecodeEncodeDecode)
   EXPECT_LT(avgIntensity, 255.0 - 1e-6);
 
   encoder.SaveToFile(testVideoOutPath);
-  ASSERT_TRUE(common::exists(testVideoOutPath));
+  ASSERT_TRUE(exists(testVideoOutPath));
 
   Video decoder2;
   decoder2.Load(testVideoOutPath);
