@@ -239,6 +239,14 @@ void Image::SetFromData(const unsigned char *_data,
     bluemask = 0xff0000;
     scanlineBytes = _width * 3;
   }
+  else if ((_format == BAYER_RGGB8) ||
+           (_format == BAYER_BGGR8) ||
+           (_format == BAYER_GBRG8) ||
+           (_format == BAYER_GRBG8))
+  {
+    bpp = 8;
+    scanlineBytes = _width;
+  }  
   else
   {
     gzerr << "Unable to handle format[" << _format << "]\n";
