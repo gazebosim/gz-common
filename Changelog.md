@@ -1,5 +1,49 @@
 ## Gazebo Common 4.x
 
+## Gazebo Common 4.7.0 (2023-05-17)
+
+1. Port: 3 -> 4 (#506)
+    * [Pull request #506](https://github.com/gazebosim/gz-common/pull/506)
+
+1. Fix for ffmpeg v6
+    * [Pull request #497](https://github.com/gazebosim/gz-common/pull/497)
+
+1. Include cstring for memcpy
+    * [Pull request #501](https://github.com/gazebosim/gz-common/pull/501)
+
+1. Port: 3 -> 4 (#500) 
+    * [Pull request #500](https://github.com/gazebosim/gz-common/pull/500)
+
+1. Fixed MeshManager Singleton
+    * [Pull request #451](https://github.com/gazebosim/gz-common/pull/451)
+
+1. port: 3->4
+    * [Pull request #495](https://github.com/gazebosim/gz-common/pull/495)
+
+1. Rename COPYING to LICENSE
+    * [Pull request #494](https://github.com/gazebosim/gz-common/pull/494)
+
+1. Add marcoag as codeowner
+    * [Pull request #493](https://github.com/gazebosim/gz-common/pull/493)
+
+1. port: 3->4
+    * [Pull request #491](https://github.com/gazebosim/gz-common/pull/491)
+
+1. CI workflow: use checkout v3
+    * [Pull request #490](https://github.com/gazebosim/gz-common/pull/490)
+
+1. Update version in Changelog
+    * [Pull request #486](https://github.com/gazebosim/gz-common/pull/486)
+
+1. Improved coverage remotery
+    * [Pull request #467](https://github.com/gazebosim/gz-common/pull/467)
+
+1. Added BVH and STL loader tests
+    * [Pull request #466](https://github.com/gazebosim/gz-common/pull/466)
+
+1. Increased Image coverage
+    * [Pull request #465](https://github.com/gazebosim/gz-common/pull/465)
+
 ## Gazebo Common 4.6.2 (2022-11-17)
 
 1. Fix Capsule mesh generation.
