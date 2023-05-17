@@ -22,6 +22,8 @@
 #include <string>
 
 #include <gz/math/Color.hh>
+
+#include <gz/common/config.hh>
 #include <gz/common/graphics/Export.hh>
 #include <gz/common/EnumIface.hh>
 #include <gz/common/Pbr.hh>

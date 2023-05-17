@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 
+#include <gz/common/config.hh>
 #include <gz/common/MeshExporter.hh>
 #include <gz/common/graphics/Export.hh>
 

@@ -21,6 +21,7 @@
 #include <gz/math/Vector3.hh>
 #include <gz/math/Angle.hh>
 
+#include <gz/common/config.hh>
 #include <gz/common/graphics/Export.hh>
 
 #include <ignition/utils/ImplPtr.hh>

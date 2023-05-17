@@ -20,6 +20,7 @@
 
 #include <gz/math/Pose3.hh>
 
+#include <gz/common/config.hh>
 #include <gz/common/graphics/Export.hh>
 
 struct _GtsSurface;

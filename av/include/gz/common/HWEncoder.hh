@@ -20,6 +20,7 @@
 #include <string>
 #include <optional>
 
+#include <gz/common/config.hh>
 #include <gz/common/FlagSet.hh>
 #include <gz/common/av/Export.hh>
 #include <gz/common/SuppressWarning.hh>

@@ -20,6 +20,8 @@
 
 #include <memory>
 
+#include <gz/common/config.hh>
+
 // This header contains forward declarations for some event types
 namespace ignition
 {

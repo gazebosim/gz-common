@@ -16,6 +16,7 @@
 #ifndef IGNITION_COMMON_HWVIDEO_HH
 #define IGNITION_COMMON_HWVIDEO_HH
 
+#include <gz/common/config.hh>
 #include <gz/common/EnumIface.hh>
 
 namespace ignition::common

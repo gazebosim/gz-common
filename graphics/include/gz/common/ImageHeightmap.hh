@@ -22,6 +22,7 @@
 #include <vector>
 #include <gz/math/Vector3.hh>
 
+#include <gz/common/config.hh>
 #include <gz/common/graphics/Export.hh>
 #include <gz/common/HeightmapData.hh>
 #include <gz/common/Image.hh>
