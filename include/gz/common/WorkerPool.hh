@@ -21,6 +21,7 @@
 #include <functional>
 #include <memory>
 
+#include <gz/common/config.hh>
 #include <gz/common/Export.hh>
 #include <gz/common/Time.hh>
 #include <gz/common/SuppressWarning.hh>

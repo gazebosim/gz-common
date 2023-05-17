@@ -18,6 +18,8 @@
 #define IGNITION_COMMON_MESHEXPORTER_HH_
 
 #include <string>
+
+#include <gz/common/config.hh>
 #include <gz/common/graphics/Export.hh>
 
 namespace ignition

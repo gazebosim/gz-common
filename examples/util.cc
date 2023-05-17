@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Open Source Robotics Foundation
+ * Copyright (C) 2023 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,25 +14,10 @@
  * limitations under the License.
  *
 */
+#include <gz/common/Util.hh>
 
-#ifndef GZ_COMMON_EVENTS_TYPES_HH_
-#define GZ_COMMON_EVENTS_TYPES_HH_
-
-#include <memory>
-
-#include <gz/common/config.hh>
-
-// This header contains forward declarations for some event types
-namespace ignition
+int main(int argc, char **argv)
 {
-  namespace common
-  {
-    class Connection;
-
-    /// \def ConnectionPtr
-    /// \brief Shared pointer to a Connection object
-    using ConnectionPtr = std::shared_ptr<Connection>;
-  }
+  gz::common::setenv("TEST", "0");
+  return 0;
 }
-
-#endif

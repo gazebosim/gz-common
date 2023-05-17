@@ -19,7 +19,7 @@
 #ifndef IGNITION_COMMON_TEMPLATEHELPERS_HH_
 #define IGNITION_COMMON_TEMPLATEHELPERS_HH_
 
-
+#include <gz/common/config.hh>
 #include "gz/common/detail/TemplateHelpers.hh"
 
 namespace ignition

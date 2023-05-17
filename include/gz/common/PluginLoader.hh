@@ -24,6 +24,7 @@
 #include <typeinfo>
 #include <unordered_set>
 
+#include <gz/common/config.hh>
 #include <gz/common/Export.hh>
 #include <gz/common/SuppressWarning.hh>
 #include <gz/common/PluginPtr.hh>

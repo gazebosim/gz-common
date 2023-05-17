@@ -18,6 +18,8 @@
 #ifndef GZ_COMMON_AV_UTIL_HH_
 #define GZ_COMMON_AV_UTIL_HH_
 
+#include <gz/common/config.hh>
+
 namespace ignition
 {
   namespace common

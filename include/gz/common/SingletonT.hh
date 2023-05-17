@@ -17,6 +17,8 @@
 #ifndef IGNITION_COMMON_SINGLETONT_HH_
 #define IGNITION_COMMON_SINGLETONT_HH_
 
+#include <gz/common/config.hh>
+
 namespace ignition
 {
   namespace common

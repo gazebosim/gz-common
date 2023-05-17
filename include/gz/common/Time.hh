@@ -20,6 +20,7 @@
 #include <string>
 #include <iostream>
 
+#include <gz/common/config.hh>
 #include <gz/common/Export.hh>
 #include <gz/common/Util.hh>
 

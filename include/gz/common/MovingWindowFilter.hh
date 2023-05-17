@@ -20,6 +20,8 @@
 #include <memory>
 #include <vector>
 
+#include <gz/common/config.hh>
+
 namespace ignition
 {
   namespace common

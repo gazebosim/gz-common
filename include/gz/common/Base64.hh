@@ -18,6 +18,8 @@
 #define IGNITION_COMMON_BASE64_HH_
 
 #include <string>
+
+#include <gz/common/config.hh>
 #include <gz/common/Export.hh>
 
 namespace ignition

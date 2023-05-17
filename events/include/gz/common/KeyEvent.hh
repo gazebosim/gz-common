@@ -20,6 +20,7 @@
 #include <memory>
 #include <string>
 
+#include <gz/common/config.hh>
 #include <gz/common/events/Export.hh>
 #include <gz/common/SuppressWarning.hh>
 

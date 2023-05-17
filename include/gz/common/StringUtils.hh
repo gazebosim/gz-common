@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 
+#include <gz/common/config.hh>
 #include <gz/common/Export.hh>
 
 namespace ignition

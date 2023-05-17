@@ -18,6 +18,8 @@
 #define IGNITION_COMMON_COLLADALOADER_HH_
 
 #include <string>
+
+#include <gz/common/config.hh>
 #include <gz/common/graphics/Export.hh>
 #include <gz/common/MeshLoader.hh>
 

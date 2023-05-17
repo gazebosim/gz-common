@@ -26,6 +26,7 @@
 
 #include <ignition/utils/ImplPtr.hh>
 
+#include <gz/common/config.hh>
 #include <gz/common/SkeletonNode.hh>
 #include <gz/common/graphics/Export.hh>
 

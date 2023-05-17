@@ -19,6 +19,7 @@
 #ifndef IGNITION_COMMON_SPECIALIZEDPLUGINPTR_HH_
 #define IGNITION_COMMON_SPECIALIZEDPLUGINPTR_HH_
 
+#include <gz/common/config.hh>
 #include "ignition/common/PluginPtr.hh"
 #include "ignition/common/SpecializedPlugin.hh"
 
