@@ -20,6 +20,7 @@
 #include <iostream>
 #include <string>
 
+#include <gz/common/config.hh>
 #include <gz/common/Export.hh>
 
 #ifdef _WIN32

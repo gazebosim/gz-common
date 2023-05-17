@@ -19,6 +19,7 @@
 
 #include <functional>
 
+#include <gz/common/config.hh>
 #include <gz/common/Export.hh>
 
 namespace ignition

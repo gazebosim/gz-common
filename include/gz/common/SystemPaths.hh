@@ -33,6 +33,7 @@
 #include <string>
 #include <vector>
 
+#include <gz/common/config.hh>
 #include <gz/common/Export.hh>
 #include <gz/common/SuppressWarning.hh>
 #include <gz/common/URI.hh>

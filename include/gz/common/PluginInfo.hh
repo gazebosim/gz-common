@@ -23,6 +23,8 @@
 #include <string>
 #include <unordered_map>
 
+#include <gz/common/config.hh>
+
 namespace ignition
 {
   namespace common

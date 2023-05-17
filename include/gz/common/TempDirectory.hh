@@ -21,6 +21,7 @@
 #include <memory>
 #include <string>
 
+#include <gz/common/config.hh>
 #include <gz/common/Export.hh>
 #include <gz/common/Filesystem.hh>
 
@@ -108,4 +109,3 @@ namespace ignition
   }  // namespace common
 }  // namespace ignition
 #endif  // IGNITION_COMMON_TEMPDIRECTORY_HH_
-

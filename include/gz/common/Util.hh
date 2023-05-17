@@ -25,6 +25,7 @@
 #include <thread>
 #include <vector>
 
+#include <gz/common/config.hh>
 #include <gz/common/Export.hh>
 #include <gz/common/Filesystem.hh>
 #include <gz/common/SystemPaths.hh>

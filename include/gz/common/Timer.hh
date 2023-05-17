@@ -17,6 +17,7 @@
 #ifndef IGNITION_COMMON_TIMER_HH_
 #define IGNITION_COMMON_TIMER_HH_
 
+#include <gz/common/config.hh>
 #include <gz/common/Time.hh>
 #include <gz/common/Export.hh>
 

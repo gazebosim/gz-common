@@ -21,6 +21,7 @@
 #include <memory>
 #include <string>
 
+#include <gz/common/config.hh>
 #include <gz/common/Export.hh>
 #include <gz/common/SuppressWarning.hh>
 
