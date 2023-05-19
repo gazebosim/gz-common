@@ -22,6 +22,7 @@
 
 #include "gz/common/Console.hh"
 #include "gz/common/geospatial/Dem.hh"
+#include "gz/common/Util.hh"
 
 using namespace gz;
 using namespace common;
