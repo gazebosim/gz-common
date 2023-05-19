@@ -21,4 +21,4 @@ add_executable(logging_performance logging_performance.cc)
 target_link_libraries(logging_performance gz-common${GZ_COMMON_VER}::core)
 
 add_executable(util_example util.cc)
-target_link_libraries(util_example ignition-common${GZ_COMMON_VER}::core)
+target_link_libraries(util_example gz-common${GZ_COMMON_VER}::core)

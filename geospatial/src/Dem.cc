@@ -90,7 +90,7 @@ Dem::~Dem()
 void Dem::SetSphericalCoordinates(
     const math::SphericalCoordinates &_worldSphericalCoordinates)
 {
-  this->dataPtr->sphericalCoordinates =_worldSphericalCoordinates;
+  this->dataPtr->sphericalCoordinates = _worldSphericalCoordinates;
 }
 
 //////////////////////////////////////////////////
