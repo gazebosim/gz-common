@@ -19,6 +19,7 @@
 #define GZ_COMMON_REMOTERYPROFILERIMPL_HH_
 
 #include <string>
+#include <cstdint>
 
 #include "RemoteryConfig.h"
 #include "Remotery.h"
