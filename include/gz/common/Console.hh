@@ -26,6 +26,7 @@
 
 #include <gz/common/Export.hh>
 #include <gz/utils/SuppressWarning.hh>
+#include <gz/common/Util.hh>
 
 namespace gz
 {
