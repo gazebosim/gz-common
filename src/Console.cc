@@ -19,6 +19,7 @@
 
 #include <gz/common/Console.hh>
 #include <gz/common/config.hh>
+#include <gz/common/Util.hh>
 
 #ifdef _WIN32
 #include <Windows.h>
