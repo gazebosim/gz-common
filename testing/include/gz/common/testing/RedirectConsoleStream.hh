@@ -35,7 +35,7 @@ enum class StreamSource
 
 class GZ_COMMON_TESTING_VISIBLE RedirectConsoleStream
 {
-  /// \brief Constructor
+  /// \brief Constructor 
   ///
   /// Redirect a choosen stream to a temporary file that can be read back.
   /// Upon destruction, any redirection will be removed.
@@ -43,8 +43,8 @@ class GZ_COMMON_TESTING_VISIBLE RedirectConsoleStream
   /// Access contents before destruction using GetString
   ///
   /// \param[in] _source Console source to redirect (eg stdout or stderr)
-  /// \param[in] _destination Destination filename
-  public: RedirectConsoleStream(const StreamSource &_source,
+  /// \param[in] _destination Destination filename 
+  public: RedirectConsoleStream(const StreamSource &_source, 
                                 const std::string &_destination);
 
   /// \brief Get the contents of the redirected console output
@@ -60,14 +60,14 @@ class GZ_COMMON_TESTING_VISIBLE RedirectConsoleStream
 };
 
 /// \brief Redirect standard out to a test-specific temporary path
-inline RedirectConsoleStream RedirectStdout()
+inline RedirectConsoleStream RedirectStdout() 
 {
   auto path = gz::common::testing::TempPath("stdout.out");
   return RedirectConsoleStream(StreamSource::STDOUT, path);
 }
 
 /// \brief Redirect standard error to a test-specific temporary path
-inline RedirectConsoleStream RedirectStderr()
+inline RedirectConsoleStream RedirectStderr() 
 {
   auto path = gz::common::testing::TempPath("stderr.out");
   return RedirectConsoleStream(StreamSource::STDERR, path);

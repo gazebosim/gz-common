@@ -17,8 +17,6 @@
 
 #define SUPPRESS_IGNITION_HEADER_DEPRECATION
 
-#include <cassert>
-
 #include "gz/utils/SuppressWarning.hh"
 #include "ignition/common/Console.hh"
 

@@ -21,9 +21,9 @@
 #include <memory>
 #include <string>
 
-#include <gz/common/config.hh>
 #include <gz/common/profiler/Export.hh>
 #include <gz/common/SingletonT.hh>
+#include <gz/common/config.hh>
 
 namespace gz
 {

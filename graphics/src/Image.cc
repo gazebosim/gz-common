@@ -246,7 +246,7 @@ void Image::SetFromData(const unsigned char *_data,
   {
     bpp = 8;
     scanlineBytes = _width;
-  }
+  }  
   else
   {
     gzerr << "Unable to handle format[" << _format << "]\n";
@@ -613,6 +613,7 @@ math::Color Image::MaxColor() const
 
         if (this->dataPtr->PixelIndex(
                this->dataPtr->bitmap, x, y, clr) == FALSE)
+
         {
           gzerr << "Image: Coordinates out of range ["
             << x << " " << y << "] \n";

@@ -18,7 +18,6 @@
 #include <gtest/gtest.h>
 
 #include <atomic>
-#include <thread>
 
 #include "gz/common/Console.hh"
 #include "gz/common/WorkerPool.hh"

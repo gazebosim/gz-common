@@ -21,7 +21,6 @@
 #include <vector>
 
 #include <gz/math/Vector2.hh>
-
 #include <gz/common/graphics/Export.hh>
 
 

@@ -17,9 +17,6 @@
 #ifndef GZ_COMMON_TESTING_DETAIL_AUTOLOGFIXTURE_HH_
 #define GZ_COMMON_TESTING_DETAIL_AUTOLOGFIXTURE_HH_
 
-#include <memory>
-#include <string>
-
 /// Protect to guarantee that gtest is included before this header.
 ///
 /// While downstream users should never directly include the detail
@@ -27,6 +24,9 @@
 #ifdef GTEST_API_
 
 #include "gz/common/testing/AutoLogFixture.hh"
+
+#include <memory>
+#include <string>
 
 #include <gz/common/Console.hh>
 #include <gz/common/Filesystem.hh>

@@ -17,11 +17,11 @@
 #ifndef GZ_COMMON_TESTING_AUTOLOGFIXTURE_HH_
 #define GZ_COMMON_TESTING_AUTOLOGFIXTURE_HH_
 
-#include <memory>
-#include <string>
-
 /// Protect to guarantee that gtest is included before this header.
 #ifdef GTEST_API_
+
+#include <memory>
+#include <string>
 
 #include <gz/utils/ImplPtr.hh>
 

@@ -35,7 +35,6 @@
 #include "gz/common/ColladaExporter.hh"
 #include "gz/common/OBJLoader.hh"
 #include "gz/common/STLLoader.hh"
-#include "gz/common/Util.hh"
 #include "gz/common/config.hh"
 
 #include "gz/common/MeshManager.hh"

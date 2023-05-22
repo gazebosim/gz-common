@@ -24,7 +24,6 @@
 
 #include "gz/common/Console.hh"
 #include "gz/common/URI.hh"
-#include "gz/common/Util.hh"
 
 using namespace gz;
 using namespace common;
