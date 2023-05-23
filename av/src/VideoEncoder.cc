@@ -394,20 +394,19 @@ bool VideoEncoder::Start(
         if (this->dataPtr->format.compare(outputFormat->name) == 0)
         {
           // Allocate the context using the correct outputFormat
-          auto result = avformat_alloc_output_context2(&this->dataPtr->formatCtx,
+          auto result = avformat_alloc_output_context2(
+              &this->dataPtr->formatCtx,
               outputFormat, nullptr, this->dataPtr->filename.c_str());
           if (result < 0)
           {
-            gzerr << "Failed to allocate AV context [" << av_err2str_cpp(result)
-                   << "]" << std::endl;
+            gzerr << "Failed to allocate AV context ["
+                  << av_err2str_cpp(result)
+                  << "]" << std::endl;
           }
           break;
         }
       }
-    }
-    while (outputFormat);
-
-
+    } while (outputFormat);
 #endif
   }
   else

@@ -17,6 +17,7 @@
 
 #include "gz/common/Console.hh"
 #include "gz/common/Event.hh"
+#include "gz/common/Util.hh"
 
 using namespace gz;
 using namespace common;

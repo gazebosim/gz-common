@@ -22,6 +22,7 @@
 
 #include "gz/common/Console.hh"
 #include "gz/common/geospatial/Dem.hh"
+#include "gz/common/Util.hh"
 
 using namespace gz;
 using namespace common;
@@ -89,7 +90,7 @@ Dem::~Dem()
 void Dem::SetSphericalCoordinates(
     const math::SphericalCoordinates &_worldSphericalCoordinates)
 {
-  this->dataPtr->sphericalCoordinates =_worldSphericalCoordinates;
+  this->dataPtr->sphericalCoordinates = _worldSphericalCoordinates;
 }
 
 //////////////////////////////////////////////////
