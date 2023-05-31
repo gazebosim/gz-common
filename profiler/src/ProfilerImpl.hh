@@ -19,6 +19,7 @@
 #define GZ_COMMON_PROFILERIMPL_HH_
 
 #include <string>
+#include <cstdint>
 
 namespace ignition
 {
