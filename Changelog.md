@@ -1,5 +1,40 @@
 ## Gazebo Common 3.x
 
+## Gazebo Common 3.16.0 (2023-06-05)
+
+1. Include cstdint to build with GCC 13
+    * [Pull request #517](https://github.com/gazebosim/gz-common/pull/517)
+
+1. Fix missing cstdint header in latest gcc build
+    * [Pull request #513](https://github.com/gazebosim/gz-common/pull/513)
+
+1. Fix for ffmpeg v6
+    * [Pull request #497](https://github.com/gazebosim/gz-common/pull/497)
+
+1. Include cstring for memcpy
+    * [Pull request #501](https://github.com/gazebosim/gz-common/pull/501)
+
+1. Fixed MeshManager Singleton
+    * [Pull request #451](https://github.com/gazebosim/gz-common/pull/451)
+
+1. Rename COPYING to LICENSE
+    * [Pull request #494](https://github.com/gazebosim/gz-common/pull/494)
+
+1. Add marcoag as codeowner
+    * [Pull request #493](https://github.com/gazebosim/gz-common/pull/493)
+
+1. CI workflow: use checkout v3
+    * [Pull request #490](https://github.com/gazebosim/gz-common/pull/490)
+
+1. Improved coverage remotery
+    * [Pull request #467](https://github.com/gazebosim/gz-common/pull/467)
+
+1. Added BVH and STL loader tests
+    * [Pull request #466](https://github.com/gazebosim/gz-common/pull/466)
+
+1. Increased Image coverage
+    * [Pull request #465](https://github.com/gazebosim/gz-common/pull/465)
+
 ## Gazebo Common 3.15.1 (2022-10-11)
 
 1. Fix build on case-insensitive filesystems
