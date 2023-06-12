@@ -27,6 +27,8 @@
 #include <gz/common/Export.hh>
 #include <gz/utils/SuppressWarning.hh>
 
+#include "backward.hpp"
+
 namespace gz
 {
   namespace common
@@ -73,6 +75,13 @@ namespace gz
     #define gzLogDirectory()\
         (gz::common::Console::log.LogDirectory())
     #define ignLogDirectory() gzLogDirectory()
+
+    #define gzStackTrace() \
+      { \
+        using namespace backward; \
+        StackTrace st; st.load_here(32); \
+        Printer p; p.print(st); \
+      }
 
     /// \class FileLogger FileLogger.hh common/common.hh
     /// \brief A logger that outputs messages to a file.

@@ -74,7 +74,8 @@ std::string Console::Prefix()
 /////////////////////////////////////////////////
 Logger::Logger(const std::string &_prefix, const int _color,
                const LogType _type, const int _verbosity)
-: std::ostream(new Buffer(_type, _color, _verbosity)), prefix(_prefix)
+: std::ostream(new Buffer(_type, _color, _verbosity)),
+  prefix(_prefix)
 {
   this->setf(std::ios_base::unitbuf);
 }

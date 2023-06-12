@@ -71,6 +71,7 @@ cc_library(
     deps = [
         GZ_ROOT + "utils",
         GZ_ROOT + "math",
+        "@backward",
         "@uuid",
     ],
 )
