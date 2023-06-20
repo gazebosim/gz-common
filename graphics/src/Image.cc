@@ -233,6 +233,14 @@ void Image::SetFromData(const unsigned char *_data,
     bluemask = 0xff0000;
     scanlineBytes = _width * 3;
   }
+  else if ((_format == BAYER_RGGB8) ||
+           (_format == BAYER_BGGR8) ||
+           (_format == BAYER_GBRG8) ||
+           (_format == BAYER_GRBG8))
+  {
+    bpp = 8;
+    scanlineBytes = _width;
+  }
   else
   {
     gzerr << "Unable to handle format[" << _format << "]\n";
@@ -499,7 +507,6 @@ math::Color Image::MaxColor() const
 
         if (this->dataPtr->PixelIndex(
                this->dataPtr->bitmap, x, y, clr) == FALSE)
-
         {
           gzerr << "Image: Coordinates out of range ["
             << x << " " << y << "] \n";
@@ -616,16 +623,10 @@ Image::PixelFormatType Image::PixelFormat() const
 Image::PixelFormatType Image::ConvertPixelFormat(const std::string &_format)
 {
   // Handle old format strings
-  if (_format == "L8" || _format == "L_INT8")
+  if (_format == "L8")
     return L_INT8;
-  else if (_format == "R8G8B8" || _format == "RGB_INT8")
+  else if (_format == "R8G8B8")
     return RGB_INT8;
-
-  // Handle BAYER_BGGR8 since it is after PIXEL_FORMAT_COUNT in the enum
-  if (_format == "BAYER_BGGR8")
-  {
-    return BAYER_BGGR8;
-  }
 
   for (unsigned int i = 0; i < PIXEL_FORMAT_COUNT; ++i)
     if (PixelFormatNames[i] == _format)

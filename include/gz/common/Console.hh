@@ -20,12 +20,13 @@
 #include <iostream>
 #include <fstream>
 #include <memory>
+#include <mutex>
 #include <sstream>
 #include <string>
 
-#include <gz/common/Util.hh>
 #include <gz/common/Export.hh>
 #include <gz/utils/SuppressWarning.hh>
+#include <gz/common/Util.hh>
 
 namespace gz
 {

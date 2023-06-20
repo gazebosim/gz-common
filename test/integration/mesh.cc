@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <fstream>
 
 #include <gtest/gtest.h>
 
@@ -215,8 +216,8 @@ TEST_F(MeshTest, Access)
   EXPECT_FLOAT_EQ(.5, vertArray[i++]);
   EXPECT_FLOAT_EQ(-.5, vertArray[i++]);
 
-  delete vertArray;
-  delete indArray;
+  delete [] indArray;
+  delete [] vertArray;
 
   EXPECT_FALSE(common::MeshManager::Instance()->HasMesh(""));
   EXPECT_TRUE(common::MeshManager::Instance()->HasMesh("unit_box"));
@@ -259,8 +260,8 @@ TEST_F(MeshTest, Export)
 
   common::systemPaths()->AddFilePaths(common::cwd());
   auto mesh = common::MeshManager::Instance()->Load("gz_stl_test.stl");
-
   ASSERT_NE(nullptr, mesh);
+
   common::MeshManager::Instance()->Export(mesh,
       common::joinPaths(common::cwd(), "gz_stl_test2"), "stl", false);
   common::MeshManager::Instance()->Export(mesh,

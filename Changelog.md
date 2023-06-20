@@ -4,6 +4,64 @@
 
 ## Gazebo Common 5.x
 
+## Gazebo Common 5.4.0 (2023-04-28)
+
+1. Add support for bayer images to be saved in a directory
+    * [Pull request #498](https://github.com/gazebosim/gz-common/pull/498)
+
+1. Fix for ffmpeg v6
+    * [Pull request #497](https://github.com/gazebosim/gz-common/pull/497)
+
+1. Include cstring for memcpy
+    * [Pull request #501](https://github.com/gazebosim/gz-common/pull/501)
+
+1. Fixed MeshManager Singleton
+    * [Pull request #451](https://github.com/gazebosim/gz-common/pull/451)
+
+1. Fix for ffmpeg v6
+    * [Pull request #497](https://github.com/gazebosim/gz-common/pull/497)
+
+1. Rename COPYING to LICENSE
+    * [Pull request #494](https://github.com/gazebosim/gz-common/pull/494)
+
+1. Add marcoag as codeowner
+    * [Pull request #493](https://github.com/gazebosim/gz-common/pull/493)
+
+1. CI workflow: use checkout v3
+    * [Pull request #490](https://github.com/gazebosim/gz-common/pull/490)
+
+1. Update common5 for bazel builds
+    * [Pull request #488](https://github.com/gazebosim/gz-common/pull/488)
+
+1. Fix profile tutorial
+    * [Pull request #487](https://github.com/gazebosim/gz-common/pull/487)
+
+1. Update version in Changelog
+    * [Pull request #486](https://github.com/gazebosim/gz-common/pull/486)
+
+1. Fixed metalness/roughness in ASSIMP loader
+    * [Pull request #485](https://github.com/gazebosim/gz-common/pull/485)
+
+1. Fix Capsule mesh generation
+    * [Pull request #475](https://github.com/gazebosim/gz-common/pull/475)
+
+1. Improved coverage remotery
+    * [Pull request #467](https://github.com/gazebosim/gz-common/pull/467)
+
+1. Added BVH and STL loader tests
+    * [Pull request #466](https://github.com/gazebosim/gz-common/pull/466)
+
+1. Increased Image coverage
+    * [Pull request #465](https://github.com/gazebosim/gz-common/pull/465)
+
+## Gazebo Common 5.3.1 (2022-11-17)
+
+1. Fix out of bounds access to rotation array in assimp loader
+    * [Pull request #479](https://github.com/gazebosim/ign-common/pull/479)
+
+1. Fix issues detected by ASAN
+    * [Pull request #480](https://github.com/gazebosim/ign-common/pull/480)
+
 ## Gazebo Common 5.3.0 (2022-11-14)
 
 1. Expose Vertex & Index raw ptrs for efficient reading
@@ -11,7 +69,7 @@
 
 ## Gazebo Common 5.2.2 (2022-10-26)
 
-1. [Backport] Avoid Io.hh header name clash (#471) 
+1. [Backport] Avoid Io.hh header name clash (#471)
     * [Pull request #472](https://github.com/gazebosim/gz-common/pull/472)
 
 ## Gazebo Common 5.2.1 (2022-10-19)
@@ -120,7 +178,7 @@
 1. Add API for getting Image bytes as std::vector
     * [Pull request #372](https://github.com/gazebosim/gz-common/pull/372)
 
-1. Support lunar coordinate transformations 
+1. Support lunar coordinate transformations
     * [Pull request #377](https://github.com/gazebosim/gz-common/pull/377)
 
 1. Remove configure.bat, export CXX_STANDARD
@@ -141,8 +199,8 @@
 1. Test updates for common::testing module.
     * [Pull request #315](https://github.com/gazebosim/gz-common/pull/315)
 
-1. Ignition -> Gz Renaming 
-    * Move header files with git mv 
+1. Ignition -> Gz Renaming
+    * Move header files with git mv
     * Create redirection aliases
     * Migrate sources in src, test, examples, and include
     * Remove ignition redirection headers for Plugin [Pull request #350](https://github.com/gazebosim/gz-common/pull/350)
@@ -275,15 +333,58 @@
 
 ## Gazebo Common 4.x
 
+## Gazebo Common 4.7.0 (2023-05-17)
+
+1. Forward Ports: 3 -> 4 (#506)
+    * [Pull request #506](https://github.com/gazebosim/gz-common/pull/506)
+    * [Pull request #500](https://github.com/gazebosim/gz-common/pull/500)
+    * [Pull request #495](https://github.com/gazebosim/gz-common/pull/495)
+    * [Pull request #491](https://github.com/gazebosim/gz-common/pull/491)
+
+1. Fix build error when using gz:: with ign-common4
+    * [Pull request #489](https://github.com/gazebosim/gz-common/pull/489)
+
+1. Fix for ffmpeg v6
+    * [Pull request #497](https://github.com/gazebosim/gz-common/pull/497)
+
+1. Include cstring for memcpy
+    * [Pull request #501](https://github.com/gazebosim/gz-common/pull/501)
+
+1. Fixed MeshManager Singleton
+    * [Pull request #451](https://github.com/gazebosim/gz-common/pull/451)
+
+1. Rename COPYING to LICENSE
+    * [Pull request #494](https://github.com/gazebosim/gz-common/pull/494)
+
+1. Add marcoag as codeowner
+    * [Pull request #493](https://github.com/gazebosim/gz-common/pull/493)
+
+1. CI workflow: use checkout v3
+    * [Pull request #490](https://github.com/gazebosim/gz-common/pull/490)
+
+1. Improved coverage remotery
+    * [Pull request #467](https://github.com/gazebosim/gz-common/pull/467)
+
+1. Added BVH and STL loader tests
+    * [Pull request #466](https://github.com/gazebosim/gz-common/pull/466)
+
+1. Increased Image coverage
+    * [Pull request #465](https://github.com/gazebosim/gz-common/pull/465)
+
+## Gazebo Common 4.6.2 (2022-11-17)
+
+1. Fix Capsule mesh generation.
+    * [Pull request #475](https://github.com/gazebosim/gz-common/pull/475)
+
 ## Gazebo Common 4.6.1 (2022-10-11)
 
-1. All common3 changes up to 3.15.1 release 
+1. All common3 changes up to 3.15.1 release
 
 ## Gazebo Common 4.6.0 (2022-10-11)
 
-1. All common3 changes up to 3.15.0 release 
+1. All common3 changes up to 3.15.0 release
 
-1. Include cstring for memcpy  
+1. Include cstring for memcpy
     * [Pull request #437](https://github.com/gazebosim/gz-common/pull/437)
 
 ## Gazebo Common 4.5.2 (2022-08-16)
@@ -529,7 +630,7 @@
 1. Fix build on case-insensitive filesystems
     * [Pull request #453](https://github.com/gazebosim/gz-common/pull/453)
 
-1. Don't install CMakeLists.txt 
+1. Don't install CMakeLists.txt
     * [Pull request #449](https://github.com/gazebosim/gz-common/pull/449)
 
 ## Gazebo Common 3.15.0 (2022-10-06)

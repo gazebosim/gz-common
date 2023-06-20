@@ -31,7 +31,7 @@ class SubMeshTest : public common::testing::AutoLogFixture { };
 /////////////////////////////////////////////////
 TEST_F(SubMeshTest, SubMesh)
 {
-  common::SubMeshPtr submesh(new common::SubMesh());
+  auto submesh = std::make_shared<common::SubMesh>();
   ASSERT_NE(nullptr, submesh);
 
   submesh->SetName("new_submesh");
@@ -268,7 +268,7 @@ TEST_F(SubMeshTest, SubMesh)
   EXPECT_EQ(submesh->VertexPtr()[2], v2 + t0 + t);
 
   // copy constructor
-  common::SubMeshPtr submeshCopy(new common::SubMesh(*(submesh.get())));
+  auto submeshCopy = std::make_shared<common::SubMesh>(*submesh.get());
   ASSERT_NE(nullptr, submeshCopy);
   EXPECT_EQ(submeshCopy->Name(), submesh->Name());
   EXPECT_EQ(submeshCopy->GetMaterialIndex(), submesh->GetMaterialIndex());
@@ -307,7 +307,7 @@ TEST_F(SubMeshTest, SubMesh)
   // fill array
   double *vertices = NULL;
   int *indices = NULL;
-  common::SubMeshPtr submeshEmpty(new common::SubMesh());
+  auto submeshEmpty = std::make_shared<common::SubMesh>();
   submeshEmpty->FillArrays(&vertices, &indices);
   EXPECT_TRUE(vertices == NULL);
   EXPECT_TRUE(indices == NULL);
@@ -330,6 +330,9 @@ TEST_F(SubMeshTest, SubMesh)
     EXPECT_EQ(indices[i], submesh->Index(i));
     EXPECT_EQ(indices[i], submesh->IndexPtr()[i]);
   }
+
+  delete[] vertices;
+  delete[] indices;
 
   // recalculate normal and verify they are different
   submesh->RecalculateNormals();
