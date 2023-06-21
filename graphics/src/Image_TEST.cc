@@ -102,9 +102,9 @@ TEST_F(ImageTest, ImageConstructorPropertiesDifferentFormats)
 
   ASSERT_EQ(554u, imgBmp.Width());
   ASSERT_EQ(234u, imgBmp.Height());
-  ASSERT_EQ(24u, imgBmp.BPP());
-  ASSERT_EQ(1662, imgBmp.Pitch());
-  ASSERT_EQ(common::Image::PixelFormatType::RGB_INT8, imgBmp.PixelFormat());
+  ASSERT_EQ(32u, imgBmp.BPP());
+  ASSERT_EQ(2216, imgBmp.Pitch());
+  ASSERT_EQ(common::Image::PixelFormatType::RGBA_INT8, imgBmp.PixelFormat());
 
   ASSERT_TRUE(imgBmp.Filename().find("gazebo_logo.bmp") !=
       std::string::npos);
@@ -113,9 +113,9 @@ TEST_F(ImageTest, ImageConstructorPropertiesDifferentFormats)
 
   ASSERT_EQ(554u, imgJpeg.Width());
   ASSERT_EQ(234u, imgJpeg.Height());
-  ASSERT_EQ(24u, imgJpeg.BPP());
-  ASSERT_EQ(1662, imgJpeg.Pitch());
-  ASSERT_EQ(common::Image::PixelFormatType::RGB_INT8, imgJpeg.PixelFormat());
+  ASSERT_EQ(32u, imgJpeg.BPP());
+  ASSERT_EQ(2216, imgJpeg.Pitch());
+  ASSERT_EQ(common::Image::PixelFormatType::RGBA_INT8, imgJpeg.PixelFormat());
 
   ASSERT_TRUE(imgJpeg.Filename().find("gazebo_logo.jpeg") !=
       std::string::npos);
@@ -141,6 +141,7 @@ TEST_F(ImageTest, ImageProperties)
       std::string::npos);
 }
 
+/////////////////////////////////////////////////
 TEST_F(ImageTest, ImageSavePng)
 {
   std::string pathOut = common::testing::TempPath();
@@ -158,6 +159,7 @@ TEST_F(ImageTest, ImageSavePng)
   EXPECT_LT(0u, values.size());
 }
 
+/////////////////////////////////////////////////
 TEST_F(ImageTest, ImageGetterInvalid)
 {
   common::Image img;

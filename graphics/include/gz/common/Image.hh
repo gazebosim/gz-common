@@ -159,6 +159,14 @@ namespace gz
       /// \return The BPP of the image
       public: unsigned int BPP() const;
 
+      /// \brief Get the size of one pixel in bits
+      /// \return The BPP of the image
+      public: unsigned int BitsPerPixel() const;
+
+      /// \brief Get the size of one pixel in bytes
+      /// \return The BPP of the image
+      public: unsigned int BytesPerPixel() const;
+
       // \brief Get the size of a row of pixel
       /// \return The pitch of the image
       public: int Pitch() const;
