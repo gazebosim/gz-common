@@ -41,7 +41,7 @@ namespace gz::common::testing
 
 class RedirectConsoleStream::Implementation
 {
-  /// \brief Console source being redirected 
+  /// \brief Console source being redirected
   public: StreamSource source;
 
   /// \brief Filename to write console output to
@@ -129,14 +129,14 @@ RedirectConsoleStream::RedirectConsoleStream(const StreamSource &_source,
   }
 
   this->dataPtr->fd = GetSourceFd(_source);
-  
+
   // Store the fd so that it can be restored upon destruction
   this->dataPtr->originalFd = dup(this->dataPtr->fd);
 
   int sinkFd;
   // Create a file with read/write permissions and exclusive access
-  if ((sinkFd = open(this->dataPtr->sink.c_str(), 
-          O_EXCL | O_RDWR | O_CREAT, 
+  if ((sinkFd = open(this->dataPtr->sink.c_str(),
+          O_EXCL | O_RDWR | O_CREAT,
           S_IREAD | S_IWRITE)) < 0)
   {
     gzerr << "Failed to open sink file, console redirection disabled"
@@ -153,7 +153,7 @@ RedirectConsoleStream::RedirectConsoleStream(const StreamSource &_source,
 }
 
 //////////////////////////////////////////////////
-std::string RedirectConsoleStream::GetString() 
+std::string RedirectConsoleStream::GetString()
 {
   this->dataPtr->RemoveRedirection();
 

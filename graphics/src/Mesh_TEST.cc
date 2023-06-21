@@ -32,8 +32,8 @@ class MeshTest : public common::testing::AutoLogFixture { };
 /////////////////////////////////////////////////
 TEST_F(MeshTest, Mesh)
 {
-  common::MeshPtr mesh(new common::Mesh());
-  EXPECT_TRUE(mesh != NULL);
+  auto mesh = std::make_shared<common::Mesh>();
+  EXPECT_TRUE(mesh != nullptr);
 
   mesh->SetName("new_mesh");
   EXPECT_EQ(mesh->Name(), "new_mesh");
@@ -155,4 +155,7 @@ TEST_F(MeshTest, Mesh)
   EXPECT_TRUE(math::equal(vertices[2], submesh.lock()->Vertex(0).Z()));
   EXPECT_EQ(indices[0], submesh.lock()->Index(0));
   EXPECT_EQ(indices[0], submesh.lock()->IndexPtr()[0]);
+
+  delete [] vertices;
+  delete [] indices;
 }

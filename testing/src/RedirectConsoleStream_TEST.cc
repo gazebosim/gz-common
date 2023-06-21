@@ -186,4 +186,3 @@ TEST(RedirectConsoleStream, Console)
   EXPECT_EQ(err.find("message"), std::string::npos);
   EXPECT_EQ(err.find("debug"), std::string::npos);
 }
-

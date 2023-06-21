@@ -19,7 +19,6 @@
 #ifndef GZ_COMMON_TEMPLATEHELPERS_HH_
 #define GZ_COMMON_TEMPLATEHELPERS_HH_
 
-
 #include "gz/common/detail/TemplateHelpers.hh"
 
 namespace gz

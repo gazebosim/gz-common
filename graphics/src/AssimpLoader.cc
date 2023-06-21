@@ -315,6 +315,9 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
 {
   MaterialPtr mat = std::make_shared<Material>();
   aiColor4D color;
+  bool specularDefine = false;
+  // gcc is complaining about this variable not being used.
+  (void) specularDefine;
   auto& assimpMat = _scene->mMaterials[_matIdx];
   auto ret = assimpMat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
   if (ret == AI_SUCCESS)
@@ -324,6 +327,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   ret = assimpMat->Get(AI_MATKEY_COLOR_AMBIENT, color);
   if (ret == AI_SUCCESS)
   {
+    specularDefine = true;
     mat->SetAmbient(this->ConvertColor(color));
   }
   ret = assimpMat->Get(AI_MATKEY_COLOR_SPECULAR, color);
@@ -448,10 +452,14 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     pbr.SetLightMap(texName, uvIdx, texData);
   }
 #ifndef GZ_ASSIMP_PRE_5_2_0
-  double value;
+  float value;
   ret = assimpMat->Get(AI_MATKEY_METALLIC_FACTOR, value);
   if (ret == AI_SUCCESS)
   {
+    if (!specularDefine)
+    {
+      mat->SetSpecular(math::Color(value, value, value));
+    }
     pbr.SetMetalness(value);
   }
   ret = assimpMat->Get(AI_MATKEY_ROUGHNESS_FACTOR, value);

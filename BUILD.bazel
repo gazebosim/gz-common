@@ -1,11 +1,11 @@
 load(
-    "//gz_bazel:build_defs.bzl",
+    "@gz//bazel/skylark:build_defs.bzl",
     "GZ_FEATURES",
     "GZ_ROOT",
     "GZ_VISIBILITY",
-    "generate_include_header",
-    "gz_config_header",
+    "gz_configure_header",
     "gz_export_header",
+    "gz_include_header",
 )
 
 package(
@@ -13,25 +13,15 @@ package(
     features = GZ_FEATURES,
 )
 
-licenses(["notice"])
+licenses(["notice"])  # Apache-2.0
 
 exports_files(["LICENSE"])
 
-PROJECT_NAME = "gz-common"
-
-PROJECT_MAJOR = 6
-
-PROJECT_MINOR = 0
-
-PROJECT_PATCH = 0
-
-# Generates config.hh based on the version numbers in CMake code.
-gz_config_header(
+gz_configure_header(
     name = "config",
     src = "include/gz/common/config.hh.in",
     cmakelists = ["CMakeLists.txt"],
-    project_name = PROJECT_NAME,
-    project_version = (PROJECT_MAJOR, PROJECT_MINOR, PROJECT_PATCH),
+    package = "common",
 )
 
 gz_export_header(
@@ -44,19 +34,21 @@ gz_export_header(
 public_headers_no_gen = glob([
     "include/gz/common/*.hh",
     "include/gz/common/detail/*.hh",
+    "include/gz/common/graph/*.hh",
 ])
 
-private_headers = [
-    "src/PluginUtils.hh",
-    "src/PrintWindowsSystemWarning.hh",
-]
+private_headers = glob(["src/*.hh"])
 
 sources = glob(
     ["src/*.cc"],
-    exclude = ["src/*_TEST.cc"],
+    exclude = [
+        "src/Plugin.cc",
+        "src/PluginLoader.cc",
+        "src/*_TEST.cc",
+    ],
 )
 
-generate_include_header(
+gz_include_header(
     name = "commonhh_genrule",
     out = "include/gz/common.hh",
     hdrs = public_headers_no_gen + [
@@ -72,39 +64,32 @@ public_headers = public_headers_no_gen + [
 ]
 
 cc_library(
-    name = "gz_common",
+    name = "common",
     srcs = sources + private_headers,
     hdrs = public_headers,
     includes = ["include"],
-    linkopts = ["-ldl"],
     deps = [
+        GZ_ROOT + "utils",
+        GZ_ROOT + "math",
         "@uuid",
-        GZ_ROOT + "gz_math",
     ],
 )
 
-cc_binary(
-    name = "libgz-common6.so",
-    includes = ["include"],
-    linkopts = ["-Wl,-soname,libgz-common6.so"],
-    linkshared = True,
-    deps = [":gz_common"],
-)
-
-test_srcs = glob(
-    ["src/*_TEST.cc"],
-    exclude = ["src/PluginLoader_TEST.cc"],
+test_sources = glob(
+    include = ["src/*_TEST.cc"],
+    exclude = [
+        "src/PluginUtils_TEST.cc",
+        "src/PluginLoader_TEST.cc",
+    ],
 )
 
 [cc_test(
     name = src.replace("/", "_").replace(".cc", "").replace("src_", ""),
     srcs = [src],
-    data = [":libgz-common6.so"],
     deps = [
-        ":gz_common",
-        GZ_ROOT + "gz_bazel:utilities",
-        GZ_ROOT + "gz_common/test:test_utils",
+        ":common",
+        GZ_ROOT + "common/testing",
         "@gtest",
         "@gtest//:gtest_main",
     ],
-) for src in test_srcs]
+) for src in test_sources]

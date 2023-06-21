@@ -1,5 +1,4 @@
-option(GZ_PROFILER_REMOTERY "Enable the Remotery profiler"
-  ${IGN_PROFILER_REMOTERY})
+option(GZ_PROFILER_REMOTERY "Enable the Remotery profiler" TRUE)
 
 set(
   PROFILER_SRCS
@@ -17,6 +16,7 @@ if(GZ_PROFILER_REMOTERY)
     ./Remotery/lib/Remotery.c
     ./Remotery/lib/Remotery.h
   )
+
 
   if(APPLE)
     set(
@@ -52,6 +52,10 @@ if(GZ_PROFILER_REMOTERY)
 
   list(APPEND PROFILER_SRCS ${Remotery_SRC} RemoteryProfilerImpl.cc)
   list(APPEND PROFILER_TESTS Profiler_Remotery_TEST.cc)
+
+  if(NOT WIN32)
+    list(APPEND PROFILER_TESTS Profiler_Error_TEST.cc)
+  endif()
 endif()
 
 gz_add_component(profiler SOURCES ${PROFILER_SRCS} GET_TARGET_NAME profiler_target)
