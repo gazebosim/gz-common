@@ -48,12 +48,14 @@ jobs:
       run: cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local/Cellar/${PACKAGE}/HEAD
     - run: make
       working-directory: build
-    - run: make test
-      working-directory: build
-      env:
-        CTEST_OUTPUT_ON_FAILURE: 1
+    # Run make install before make test so that the package will be available to
+    # build examples as part of the test
     - name: make install
       working-directory: build
       run: |
         make install;
         brew link ${PACKAGE};
+    - run: make test
+      working-directory: build
+      env:
+        CTEST_OUTPUT_ON_FAILURE: 1
