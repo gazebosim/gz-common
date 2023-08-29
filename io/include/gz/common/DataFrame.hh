@@ -73,7 +73,7 @@ namespace gz
       public: const std::vector<K> Keys() const
       {
         std::vector<K> keyList;
-        for (auto &[k, _]: this->storage)
+        for (auto &[k, _] : this->storage)
         {
           keyList.push_back(k);
         }
@@ -84,7 +84,8 @@ namespace gz
       private: std::unordered_map<K, V> storage;
     };
 
-    /// \brief Traits for IO of data frames comprised of time varying volumetric grids.
+    /// \brief Traits for IO of data frames comprised of time varying
+    /// volumetric grids.
     ///
     /// \tparam K Data frame key type.
     /// \tparam T Time coordinate type.

@@ -16,6 +16,7 @@
  */
 #include "gz/common/Console.hh"
 #include "gz/common/geospatial/ImageHeightmap.hh"
+#include "gz/common/Util.hh"
 
 using namespace gz;
 using namespace common;

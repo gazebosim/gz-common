@@ -23,6 +23,7 @@
 #include <string>
 #include <vector>
 #include <gz/math/Color.hh>
+
 #include <gz/common/graphics/Export.hh>
 
 #include <gz/utils/ImplPtr.hh>

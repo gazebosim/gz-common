@@ -18,6 +18,7 @@
 #define GZ_COMMON_BASE64_HH_
 
 #include <string>
+
 #include <gz/common/Export.hh>
 
 namespace gz
