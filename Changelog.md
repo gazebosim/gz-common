@@ -1,5 +1,18 @@
 ## Gazebo Common 5.x
 
+## Gazebo Common 5.4.2 (2023-09-26)
+
+1. Documentation fixes
+    * [Pull request #534](https://github.com/gazebosim/gz-common/pull/534)
+    * [Pull request #535](https://github.com/gazebosim/gz-common/pull/535)
+
+1. Fix glTF metalness and roughness map orientation
+    * [Pull request #532](https://github.com/gazebosim/gz-common/pull/532)
+
+1. Build examples from CMake rather than executable
+    * [Pull request #502](https://github.com/gazebosim/gz-common/pull/502)
+
+
 ## Gazebo Common 5.4.1 (2023-08-21)
 
 1. Use `pull_request_target`  for triage workflow
