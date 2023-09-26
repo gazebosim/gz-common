@@ -55,7 +55,7 @@ callback system.
 
 # Install
 
-See the [installation tutorial](https://gazebosim.org/api/common/5/install.html).
+See the [installation tutorial](https://gazebosim.org/api/common/6/install.html).
 
 # Usage
 
