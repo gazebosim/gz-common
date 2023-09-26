@@ -139,7 +139,6 @@ gz_configure_build(QUIT_IF_BUILD_ERRORS
 #============================================================================
 gz_create_packages()
 
-
 #============================================================================
 # Create documentation
 #============================================================================
@@ -152,3 +151,13 @@ gz_create_docs(
   TAGFILES
     "${GZ-MATH_DOXYGEN_TAGFILE} = ${GZ-MATH_API_URL}"
   )
+
+#============================================================================
+# Build examples
+#============================================================================
+if (BUILD_TESTING)
+  gz_build_examples(
+    SOURCE_DIR ${PROJECT_SOURCE_DIR}/examples
+    BINARY_DIR ${PROJECT_BINARY_DIR}/examples
+  )
+endif()
