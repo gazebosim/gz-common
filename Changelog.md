@@ -4,6 +4,54 @@
 
 ## Gazebo Common 5.x
 
+## Gazebo Common 5.4.2 (2023-09-26)
+
+1. Documentation fixes
+    * [Pull request #534](https://github.com/gazebosim/gz-common/pull/534)
+    * [Pull request #535](https://github.com/gazebosim/gz-common/pull/535)
+
+1. Fix glTF metalness and roughness map orientation
+    * [Pull request #532](https://github.com/gazebosim/gz-common/pull/532)
+
+1. Build examples from CMake rather than executable
+    * [Pull request #502](https://github.com/gazebosim/gz-common/pull/502)
+
+
+## Gazebo Common 5.4.1 (2023-08-21)
+
+1. Use `pull_request_target`  for triage workflow
+    * [Pull request #527](https://github.com/gazebosim/gz-common/pull/527)
+
+1. Fix Github project automation for new project board
+    * [Pull request #526](https://github.com/gazebosim/gz-common/pull/526)
+
+1. Fix Github Actions on macOS
+    * [Pull request #524](https://github.com/gazebosim/gz-common/pull/524)
+
+1. Only build integration tests if libraries exist
+    * [Pull request #523](https://github.com/gazebosim/gz-common/pull/523)
+
+1. Fix compiling under linux
+    * [Pull request #521](https://github.com/gazebosim/gz-common/pull/521)
+
+1. Add missing <fstream> header includes
+    * [Pull request #518](https://github.com/gazebosim/gz-common/pull/518)
+
+1. Header was dropped in the forward port and breaks downstream
+    * [Pull request #515](https://github.com/gazebosim/gz-common/pull/515)
+
+1. Port: 4 to 5
+    * [Pull request #511](https://github.com/gazebosim/gz-common/pull/511)
+
+1. Lint
+    * [Pull request #Lint](https://github.com/gazebosim/gz-common/pull/Lint)
+
+1. 🎈 4.7.0
+    * [Pull request #510](https://github.com/gazebosim/gz-common/pull/510)
+
+1. Fix build error when using gz:: with ign-common4
+    * [Pull request #489](https://github.com/gazebosim/gz-common/pull/489)
+
 ## Gazebo Common 5.4.0 (2023-04-28)
 
 1. Add support for bayer images to be saved in a directory

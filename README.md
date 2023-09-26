@@ -55,7 +55,7 @@ callback system.
 
 # Install
 
-See the [installation tutorial](https://gazebosim.org/api/common/4.0/install.html).
+See the [installation tutorial](https://gazebosim.org/api/common/6/install.html).
 
 # Usage
 
@@ -69,8 +69,10 @@ Refer to the following table for information about important directories and fil
 +-- av                       Header and source files for the AV component.
 +-- events                   Header and source files for the Event component.
 +-- examples                 Example programs.
++-- geospatial               Geospatial component for heightmap & DEMs
 +-- graphics                 Header and source files for the Graphics component.
 +-- include/gz/common        Header files for the core component.
++-- io                       IO component. Read object from stream.
 +-- profiler                 Header and source files for the Profiler component.
 +-- src                      Core source files and unit tests.
 +-- test
