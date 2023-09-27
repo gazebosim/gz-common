@@ -507,13 +507,13 @@ std::pair<ImagePtr, ImagePtr>
   std::vector<unsigned char> metalnessData(width * height * bytesPerPixel);
   std::vector<unsigned char> roughnessData(width * height * bytesPerPixel);
 
-  for (unsigned int x = 0; x < width; ++x)
+  for (unsigned int y = 0; y < height; ++y)
   {
-    for (unsigned int y = 0; y < height; ++y)
+    for (unsigned int x = 0; x < width; ++x)
     {
       // RGBA so 4 bytes per pixel, alpha fully opaque
-      auto baseIndex = bytesPerPixel * (x * height + y);
-      auto color = _img.Pixel(x, y);
+      auto baseIndex = bytesPerPixel * (y * width + x);
+      auto color = _img.Pixel(x, (height - y - 1));
       metalnessData[baseIndex] = color.B() * 255.0;
       metalnessData[baseIndex + 1] = color.B() * 255.0;
       metalnessData[baseIndex + 2] = color.B() * 255.0;
