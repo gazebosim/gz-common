@@ -226,22 +226,23 @@ namespace gz::common
   {
     return !(_e1 == _e2);
   }
+
+  /// \brief A template that allows an enum to have an iterator and string
+  /// conversion.
+  /// \param[in] begin Enum value that marks the beginning of the enum
+  /// values.
+  /// \param[in] end Enum value that marks the end of the enum values.
+  /// \param[in] names A vector of strings, one for each enum value.
+  /// \sa EnumIface
+  /// \sa EnumIterator
+  template<typename T>
+  static constexpr gz::common::EnumIface<T> gzEnum(
+    T _enumBegin, T _enumEnd, const std::vector<std::string> &_enumVals)
+  {
+    return gz::common::EnumIface<T>(_enumBegin, _enumEnd, _enumVals);
+  }
 }  // namespace gz::common
 
-/// \brief A template that allows an enum to have an iterator and string
-/// conversion.
-/// \param[in] begin Enum value that marks the beginning of the enum
-/// values.
-/// \param[in] end Enum value that marks the end of the enum values.
-/// \param[in] names A vector of strings, one for each enum value.
-/// \sa EnumIface
-/// \sa EnumIterator
-template<typename T>
-static constexpr gz::common::EnumIface<T> gzEnum(
-  T _enumBegin, T _enumEnd, const std::vector<std::string> &_enumVals)
-{
-  return gz::common::EnumIface<T>(_enumBegin, _enumEnd, _enumVals);
-}
 
 /// \brief A macro that allows an enum to have an iterator and string
 /// conversion.
@@ -254,6 +255,6 @@ static constexpr gz::common::EnumIface<T> gzEnum(
 /// \sa EnumIface
 /// \sa EnumIterator
 #define GZ_ENUM(name, enumType, begin, end, ...)  \
-static auto name = gzEnum(begin, end, {__VA_ARGS__});
+static auto name = gz::common::gzEnum(begin, end, {__VA_ARGS__});
 
 #endif  // GZ_COMMON_ENUMITERATOR_HH_
