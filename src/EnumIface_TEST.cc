@@ -21,7 +21,9 @@
 
 #include "gz/common/testing/AutoLogFixture.hh"
 
-class EnumIfaceTest : public gz::common::testing::AutoLogFixture { };
+using namespace gz;
+
+class EnumIfaceTest : public common::testing::AutoLogFixture { };
 
 enum MyType
 {
