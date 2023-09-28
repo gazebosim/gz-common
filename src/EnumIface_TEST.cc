@@ -33,11 +33,12 @@ enum MyType
   MY_TYPE_END
 };
 
-GZ_ENUM(myTypeIface, MyType, MY_TYPE_BEGIN, MY_TYPE_END,
-  "TYPE1",
-  "TYPE2",
-  "MY_TYPE_END"
-)
+auto myTypeIface = gz::common::gzEnum(
+  MY_TYPE_BEGIN, MY_TYPE_END, {
+    "TYPE1",
+    "TYPE2",
+    "MY_TYPE_END"
+});
 
 /////////////////////////////////////////////////
 TEST_F(EnumIfaceTest, StringCoversion)
@@ -58,16 +59,16 @@ TEST_F(EnumIfaceTest, StringCoversion)
 /////////////////////////////////////////////////
 TEST_F(EnumIfaceTest, Iterator)
 {
-  common::EnumIterator<MyType> end = MY_TYPE_END;
+  common::EnumIterator<MyType> end {MY_TYPE_END};
   ASSERT_EQ(end.Value(), MY_TYPE_END);
 
-  common::EnumIterator<MyType> begin = MY_TYPE_BEGIN;
+  common::EnumIterator<MyType> begin {MY_TYPE_BEGIN};
   ASSERT_EQ(*begin, MY_TYPE_BEGIN);
 
   int i = 0;
 
   // Prefix ++ operator
-  for (common::EnumIterator<MyType> typeIter = MY_TYPE_BEGIN;
+  for (common::EnumIterator<MyType> typeIter {MY_TYPE_BEGIN};
        typeIter != end; ++typeIter, ++i)
   {
     ASSERT_EQ(*typeIter, i);
@@ -79,7 +80,7 @@ TEST_F(EnumIfaceTest, Iterator)
 
   // Postfix ++ operator
   i = 0;
-  for (common::EnumIterator<MyType> typeIter = MY_TYPE_BEGIN;
+  for (common::EnumIterator<MyType> typeIter {MY_TYPE_BEGIN};
        typeIter != end; ++typeIter, ++i)
   {
     ASSERT_EQ(typeIter.Value(), i);
@@ -103,7 +104,7 @@ TEST_F(EnumIfaceTest, Iterator)
 
   // Postfix -- operator
   i = MY_TYPE_END - 1;
-  common::EnumIterator<MyType> end2 = MY_TYPE_END;
+  common::EnumIterator<MyType> end2{MY_TYPE_END};
   for (common::EnumIterator<MyType> typeIter = --end2;
        typeIter != begin; --typeIter, --i)
   {
