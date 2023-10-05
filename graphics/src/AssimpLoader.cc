@@ -425,6 +425,21 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
           this->GenerateTextureName(_scene, assimpMat, "Roughness"));
       pbr.SetRoughnessMap(texName, texData);
     }
+    // Load lightmap only if it is not a glb/glTF mesh that contains a
+    // MetallicRoughness texture
+    // It was found that lightmap field just stores the entire MetallicRoughness
+    // texture. Issues were also reported in assimp:
+    // https://github.com/assimp/assimp/issues/3120
+    // https://github.com/assimp/assimp/issues/4637
+    unsigned int uvIdx = 0;
+    ret = assimpMat->GetTexture(
+        aiTextureType_LIGHTMAP, 0, &texturePath, NULL, &uvIdx);
+    if (ret == AI_SUCCESS)
+    {
+      auto [texName, texData] = this->LoadTexture(_scene, texturePath,
+          this->GenerateTextureName(_scene, assimpMat, "Lightmap"));
+      pbr.SetLightMap(texName, uvIdx, texData);
+    }
   }
 #endif
   ret = assimpMat->GetTexture(aiTextureType_NORMALS, 0, &texturePath);
@@ -441,15 +456,6 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     auto [texName, texData] = this->LoadTexture(_scene, texturePath,
         this->GenerateTextureName(_scene, assimpMat, "Emissive"));
     pbr.SetEmissiveMap(texName, texData);
-  }
-  unsigned int uvIdx = 0;
-  ret = assimpMat->GetTexture(
-      aiTextureType_LIGHTMAP, 0, &texturePath, NULL, &uvIdx);
-  if (ret == AI_SUCCESS)
-  {
-    auto [texName, texData] = this->LoadTexture(_scene, texturePath,
-        this->GenerateTextureName(_scene, assimpMat, "Lightmap"));
-    pbr.SetLightMap(texName, uvIdx, texData);
   }
 #ifndef GZ_ASSIMP_PRE_5_2_0
   float value;

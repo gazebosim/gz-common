@@ -708,10 +708,16 @@ TEST_F(AssimpLoader, LoadGlbPbrAsset)
   // Check pixel values to test metallicroughness texture splitting
   EXPECT_FLOAT_EQ(pbr->MetalnessMapData()->Pixel(256, 256).R(), 0.0);
   EXPECT_FLOAT_EQ(pbr->RoughnessMapData()->Pixel(256, 256).R(), 124.0 / 255.0);
+
   // Bug in assimp 5.0.x that doesn't parse coordinate sets properly
-  EXPECT_EQ(pbr->LightMapTexCoordSet(), 1);
+  // \todo(iche033) Lightmaps are disabled for glb meshes
+  // due to upstream bug
+  // EXPECT_EQ(pbr->LightMapTexCoordSet(), 1);
 #endif
-  EXPECT_NE(pbr->LightMapData(), nullptr);
+
+  // \todo(iche033) Lightmaps are disabled for glb meshes
+  // due to upstream bug
+  // EXPECT_NE(pbr->LightMapData(), nullptr);
 
   // Mesh has 3 animations
   auto skel = mesh->MeshSkeleton();
