@@ -142,6 +142,7 @@ namespace ignition
     ///   std::cout << "Type++ Name[" << myTypeIface.Str(*i) << "]\n";
     /// }
     /// \verbatim
+    GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
     template<typename Enum>
     class EnumIterator
     : std::iterator<std::bidirectional_iterator_tag, Enum>
@@ -219,6 +220,7 @@ namespace ignition
       /// member value ever used.
       private: Enum c;
     };
+    GZ_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
 
     /// \brief Equality operator
     /// \param[in] _e1 First iterator
