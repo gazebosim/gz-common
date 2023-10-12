@@ -32,16 +32,6 @@ if(WIN32)
     false)
 endif()
 
-#--------------------------------------
-# Option: Should we use our internal copy of tinyxml2?
-if(UNIX OR APPLE)
-  option(USE_EXTERNAL_TINYXML2 "Use a system-installed version of tinyxml2" ON)
-elseif(WIN32)
-  # For backward compatibility, this option on Windows by default is OFF
-  option(USE_EXTERNAL_TINYXML2 "Use a system-installed version of tinyxml2" OFF)
-endif()
-
-
 #============================================================================
 # Search for project-specific dependencies
 #============================================================================
@@ -59,13 +49,9 @@ set(GZ_UTILS_VER ${gz-utils2_VERSION_MAJOR})
 
 #--------------------------------------
 # Find Tinyxml2
-if(USE_EXTERNAL_TINYXML2)
-  gz_find_package(TINYXML2 PRETTY tinyxml2
-    REQUIRED_BY graphics
-    PRIVATE_FOR graphics)
-else()
-  message(STATUS "Skipping search for tinyxml2 and using an internal version\n")
-endif()
+gz_find_package(TINYXML2 PRETTY tinyxml2
+  REQUIRED_BY graphics
+  PRIVATE_FOR graphics)
 
 #--------------------------------------
 # Find dependencies that we ignore for Visual Studio
