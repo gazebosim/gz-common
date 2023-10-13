@@ -3,17 +3,6 @@ name: Ubuntu CI
 on: [push, pull_request]
 
 jobs:
-  focal-ci:
-    runs-on: ubuntu-latest
-    name: Ubuntu Focal CI
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Compile and test
-        id: ci
-        uses: gazebo-tooling/action-gz-ci@focal
-        with:
-          codecov-enabled: true
   jammy-ci:
     runs-on: ubuntu-latest
     name: Ubuntu Jammy CI
@@ -23,3 +12,5 @@ jobs:
       - name: Compile and test
         id: ci
         uses: gazebo-tooling/action-gz-ci@jammy
+        with:
+          codecov-enabled: true
