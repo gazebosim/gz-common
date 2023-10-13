@@ -1,14 +1,6 @@
 gz_get_libsources_and_unittests(sources gtest_sources)
 
 
-if(NOT USE_EXTERNAL_TINYXML2)
-  # If we are using our internal copy of tinyxml2, then add its
-  # source file.
-  message(STATUS "Adding tinyxml2 source files")
-  list(APPEND sources ${CMAKE_CURRENT_SOURCE_DIR}/tinyxml2/tinyxml2.cpp)
-endif()
-
-
 gz_add_component(graphics SOURCES ${sources} GET_TARGET_NAME graphics_target)
 
 target_link_libraries(${graphics_target}
