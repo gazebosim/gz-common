@@ -155,6 +155,12 @@ class AssimpLoader::Implementation
   /// calculated from the "old" parent model transform.
   /// \param[in] _skeleton the skeleton to work on
   public: void ApplyInvBindTransform(SkeletonPtr _skeleton) const;
+
+  /// Get the updated root node transform that takes into account axes info
+  /// in global settings
+  /// \param[in] _scene Scene with axes info stored in meta data
+  /// \return Updated transform
+  public: aiMatrix4x4 UpdatedRootNodeTransform(const aiScene *_scene);
 };
 
 //////////////////////////////////////////////////
@@ -645,16 +651,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   }
   auto& rootNode = scene->mRootNode;
   auto rootName = ToString(rootNode->mName);
-  auto transform = scene->mRootNode->mTransformation;
-  aiVector3D rootScaling, rootAxis, rootPos;
-  float angle;
-  transform.Decompose(rootScaling, rootAxis, angle, rootPos);
-  // drop rotation, but keep scaling and position
-  // TODO(luca) it seems imported assets are rotated by 90 degrees
-  // as documented here https://github.com/assimp/assimp/issues/849
-  // remove workaround when fixed
-  transform = aiMatrix4x4(rootScaling, aiQuaternion(), rootPos);
-
+  auto transform = this->dataPtr->UpdatedRootNodeTransform(scene);
   auto rootTransform = this->dataPtr->ConvertTransform(transform);
 
   // Add the materials first
@@ -748,6 +745,71 @@ void AssimpLoader::Implementation::ApplyInvBindTransform(
     for (unsigned int i = 0; i < node->ChildCount(); i++)
       queue.push(node->Child(i));
   }
+}
+
+/////////////////////////////////////////////////
+aiMatrix4x4 AssimpLoader::Implementation::UpdatedRootNodeTransform(
+    const aiScene *_scene)
+{
+  // Some assets apear to be rotated by 90 degrees as documented here
+  // https://github.com/assimp/assimp/issues/849.
+  // Adapted code posted in the issue to solve the problem.
+  // Correct rotation by forming a matrix based on the right, up, and front
+  // axes and multiplying the root node trasform by this matrix
+  auto transform = _scene->mRootNode->mTransformation;
+
+  if (_scene->mMetaData)
+  {
+    int32_t upAxis = 1;
+    int32_t upAxisSign = 1;
+    int32_t frontAxis = 2;
+    int32_t frontAxisSign = 1;
+    int32_t coordAxis = 0;
+    int32_t coordAxisSign = 1;
+    double unitScaleFactor = 1.0;
+    for (unsigned metadataIndex = 0; metadataIndex < _scene->mMetaData->mNumProperties; ++metadataIndex)
+    {
+      auto meta = _scene->mMetaData->mKeys[metadataIndex].C_Str();
+      if (strcmp(meta, "UpAxis") == 0)
+      {
+        _scene->mMetaData->Get<int32_t>(metadataIndex, upAxis);
+      }
+      else if (strcmp(meta, "UpAxisSign") == 0)
+      {
+        _scene->mMetaData->Get<int32_t>(metadataIndex, upAxisSign);
+      }
+      else if (strcmp(meta, "FrontAxis") == 0)
+      {
+        _scene->mMetaData->Get<int32_t>(metadataIndex, frontAxis);
+      }
+      else if (strcmp(meta, "FrontAxisSign") == 0)
+      {
+        _scene->mMetaData->Get<int32_t>(metadataIndex, frontAxisSign);
+      }
+      else if (strcmp(meta, "CoordAxis") == 0)
+      {
+        _scene->mMetaData->Get<int32_t>(metadataIndex, coordAxis);
+      }
+      else if (strcmp(meta, "CoordAxisSign") == 0)
+      {
+        _scene->mMetaData->Get<int32_t>(metadataIndex, coordAxisSign);
+      }
+      else if (strcmp(meta, "UnitScaleFactor") == 0)
+      {
+        _scene->mMetaData->Get<double>(metadataIndex, unitScaleFactor);
+      }
+    }
+    aiVector3D upVec, forwardVec, rightVec;
+    upVec[upAxis] = upAxisSign * unitScaleFactor;
+    forwardVec[frontAxis] = frontAxisSign * unitScaleFactor;
+    rightVec[coordAxis] = coordAxisSign * unitScaleFactor;
+    aiMatrix4x4 mat(rightVec.x, rightVec.y, rightVec.z, 0.0f,
+        upVec.x, upVec.y, upVec.z, 0.0f,
+        forwardVec.x, forwardVec.y, forwardVec.z, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f);
+    transform = mat * _scene->mRootNode->mTransformation;
+  }
+  return transform;
 }
 
 }
