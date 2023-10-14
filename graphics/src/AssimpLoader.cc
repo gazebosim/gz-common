@@ -156,11 +156,15 @@ class AssimpLoader::Implementation
   /// \param[in] _skeleton the skeleton to work on
   public: void ApplyInvBindTransform(SkeletonPtr _skeleton) const;
 
-  /// Get the updated root node transform that takes into account axes info
-  /// in global settings
+  /// Get the updated root node transform. The funciton updates the original transform
+  /// by either setting the rotation to identity or computes a new transform by taking
+  //  into account axes info in global settings
   /// \param[in] _scene Scene with axes info stored in meta data
+  /// \param[in] _useIdentityRotation Whether to set rotation to identity. Currently
+  /// set to false for glTF / glb meshes.
   /// \return Updated transform
-  public: aiMatrix4x4 UpdatedRootNodeTransform(const aiScene *_scene);
+  public: aiMatrix4x4 UpdatedRootNodeTransform(const aiScene *_scene,
+      bool _useIdentityRotation = true);
 };
 
 //////////////////////////////////////////////////
@@ -651,7 +655,15 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   }
   auto& rootNode = scene->mRootNode;
   auto rootName = ToString(rootNode->mName);
-  auto transform = this->dataPtr->UpdatedRootNodeTransform(scene);
+
+  // compute assimp root node transform
+  std::string extension = _filename.substr(_filename.rfind(".") + 1,
+      _filename.size());
+  std::transform(extension.begin(), extension.end(),
+      extension.begin(), ::tolower);
+  bool useIdentityRotation = (extension != "glb" && extension != "glTF");
+  auto transform = this->dataPtr->UpdatedRootNodeTransform(scene,
+    useIdentityRotation);
   auto rootTransform = this->dataPtr->ConvertTransform(transform);
 
   // Add the materials first
@@ -749,17 +761,26 @@ void AssimpLoader::Implementation::ApplyInvBindTransform(
 
 /////////////////////////////////////////////////
 aiMatrix4x4 AssimpLoader::Implementation::UpdatedRootNodeTransform(
-    const aiScene *_scene)
+    const aiScene *_scene, bool _useIdentityRotation)
 {
   // Some assets apear to be rotated by 90 degrees as documented here
   // https://github.com/assimp/assimp/issues/849.
-  // Adapted code posted in the issue to solve the problem.
-  // Correct rotation by forming a matrix based on the right, up, and front
-  // axes and multiplying the root node trasform by this matrix
   auto transform = _scene->mRootNode->mTransformation;
-
-  if (_scene->mMetaData)
+  if (_useIdentityRotation)
   {
+    // drop rotation, but keep scaling and position
+    aiVector3D rootScaling, rootAxis, rootPos;
+    float angle;
+    transform.Decompose(rootScaling, rootAxis, angle, rootPos);
+    transform = aiMatrix4x4(rootScaling, aiQuaternion(), rootPos);
+  }
+  // for glTF / glb meshes, it was found that the transform is needed to
+  // produce a result that is consistent with other engines / glTF viewers.
+  else if (_scene->mMetaData)
+  {
+    // Adapted code posted in the assimp issue to solve the problem.
+    // Correct rotation by forming a matrix based on the right, up, and front
+    // axes and multiplying the root node trasform by this matrix
     int32_t upAxis = 1;
     int32_t upAxisSign = 1;
     int32_t frontAxis = 2;
@@ -767,7 +788,8 @@ aiMatrix4x4 AssimpLoader::Implementation::UpdatedRootNodeTransform(
     int32_t coordAxis = 0;
     int32_t coordAxisSign = 1;
     double unitScaleFactor = 1.0;
-    for (unsigned metadataIndex = 0; metadataIndex < _scene->mMetaData->mNumProperties; ++metadataIndex)
+    for (unsigned int metadataIndex = 0;
+         metadataIndex < _scene->mMetaData->mNumProperties; ++metadataIndex)
     {
       auto meta = _scene->mMetaData->mKeys[metadataIndex].C_Str();
       if (strcmp(meta, "UpAxis") == 0)
