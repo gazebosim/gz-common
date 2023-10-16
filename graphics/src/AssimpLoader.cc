@@ -156,12 +156,11 @@ class AssimpLoader::Implementation
   /// \param[in] _skeleton the skeleton to work on
   public: void ApplyInvBindTransform(SkeletonPtr _skeleton) const;
 
-  /// Get the updated root node transform. The funciton updates the original transform
-  /// by either setting the rotation to identity or computes a new transform by taking
-  //  into account axes info in global settings
+  /// Get the updated root node transform. The function updates the original
+  /// transform by setting the rotation to identity if requested.
   /// \param[in] _scene Scene with axes info stored in meta data
-  /// \param[in] _useIdentityRotation Whether to set rotation to identity. Currently
-  /// set to false for glTF / glb meshes.
+  /// \param[in] _useIdentityRotation Whether to set rotation to identity.
+  /// Note: This is currently set to false for glTF / glb meshes.
   /// \return Updated transform
   public: aiMatrix4x4 UpdatedRootNodeTransform(const aiScene *_scene,
       bool _useIdentityRotation = true);
@@ -776,60 +775,9 @@ aiMatrix4x4 AssimpLoader::Implementation::UpdatedRootNodeTransform(
   }
   // for glTF / glb meshes, it was found that the transform is needed to
   // produce a result that is consistent with other engines / glTF viewers.
-  else if (_scene->mMetaData)
+  else
   {
-    // Adapted code posted in the assimp issue to solve the problem.
-    // Correct rotation by forming a matrix based on the right, up, and front
-    // axes and multiplying the root node trasform by this matrix
-    int32_t upAxis = 1;
-    int32_t upAxisSign = 1;
-    int32_t frontAxis = 2;
-    int32_t frontAxisSign = 1;
-    int32_t coordAxis = 0;
-    int32_t coordAxisSign = 1;
-    double unitScaleFactor = 1.0;
-    for (unsigned int metadataIndex = 0;
-         metadataIndex < _scene->mMetaData->mNumProperties; ++metadataIndex)
-    {
-      auto meta = _scene->mMetaData->mKeys[metadataIndex].C_Str();
-      if (strcmp(meta, "UpAxis") == 0)
-      {
-        _scene->mMetaData->Get<int32_t>(metadataIndex, upAxis);
-      }
-      else if (strcmp(meta, "UpAxisSign") == 0)
-      {
-        _scene->mMetaData->Get<int32_t>(metadataIndex, upAxisSign);
-      }
-      else if (strcmp(meta, "FrontAxis") == 0)
-      {
-        _scene->mMetaData->Get<int32_t>(metadataIndex, frontAxis);
-      }
-      else if (strcmp(meta, "FrontAxisSign") == 0)
-      {
-        _scene->mMetaData->Get<int32_t>(metadataIndex, frontAxisSign);
-      }
-      else if (strcmp(meta, "CoordAxis") == 0)
-      {
-        _scene->mMetaData->Get<int32_t>(metadataIndex, coordAxis);
-      }
-      else if (strcmp(meta, "CoordAxisSign") == 0)
-      {
-        _scene->mMetaData->Get<int32_t>(metadataIndex, coordAxisSign);
-      }
-      else if (strcmp(meta, "UnitScaleFactor") == 0)
-      {
-        _scene->mMetaData->Get<double>(metadataIndex, unitScaleFactor);
-      }
-    }
-    aiVector3D upVec, forwardVec, rightVec;
-    upVec[upAxis] = upAxisSign * unitScaleFactor;
-    forwardVec[frontAxis] = frontAxisSign * unitScaleFactor;
-    rightVec[coordAxis] = coordAxisSign * unitScaleFactor;
-    aiMatrix4x4 mat(rightVec.x, rightVec.y, rightVec.z, 0.0f,
-        upVec.x, upVec.y, upVec.z, 0.0f,
-        forwardVec.x, forwardVec.y, forwardVec.z, 0.0f,
-        0.0f, 0.0f, 0.0f, 1.0f);
-    transform = mat * _scene->mRootNode->mTransformation;
+    transform = _scene->mRootNode->mTransformation;
   }
   return transform;
 }
