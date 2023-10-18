@@ -274,10 +274,22 @@ void Image::SetFromCompressedData(unsigned char *_data,
     FreeImage_Unload(this->dataPtr->bitmap);
   this->dataPtr->bitmap = nullptr;
 
-  if (_format == COMPRESSED_PNG)
+  FREE_IMAGE_FORMAT format = FIF_UNKNOWN;
+  switch (_format)
+  {
+    case COMPRESSED_PNG:
+      format = FIF_PNG;
+      break;
+    case COMPRESSED_JPEG:
+      format = FIF_JPEG;
+      break;
+    default:
+      break;
+  }
+  if (format != FIF_UNKNOWN)
   {
     FIMEMORY *fiMem = FreeImage_OpenMemory(_data, _size);
-    this->dataPtr->bitmap = FreeImage_LoadFromMemory(FIF_PNG, fiMem);
+    this->dataPtr->bitmap = FreeImage_LoadFromMemory(format, fiMem);
     FreeImage_CloseMemory(fiMem);
   }
   else

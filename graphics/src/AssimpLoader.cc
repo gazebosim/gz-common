@@ -542,16 +542,33 @@ std::pair<ImagePtr, ImagePtr>
 ImagePtr AssimpLoader::Implementation::LoadEmbeddedTexture(
     const aiTexture* _texture) const
 {
-  auto img = std::make_shared<Image>();
   if (_texture->mHeight == 0)
   {
+    Image::PixelFormatType format = Image::PixelFormatType::UNKNOWN_PIXEL_FORMAT;
     if (_texture->CheckFormat("png"))
     {
-      img->SetFromCompressedData((unsigned char*)_texture->pcData,
-          _texture->mWidth, Image::PixelFormatType::COMPRESSED_PNG);
+      format = Image::PixelFormatType::COMPRESSED_PNG;
+    }
+    else if (_texture->CheckFormat("jpg"))
+    {
+      format = Image::PixelFormatType::COMPRESSED_JPEG;
+    }
+    if (format != Image::PixelFormatType::UNKNOWN_PIXEL_FORMAT)
+    {
+      auto img = std::make_shared<Image>();
+      img->SetFromCompressedData(
+          reinterpret_cast<unsigned char *>(_texture->pcData),
+          _texture->mWidth, format);
+      return img;
+    }
+    else
+    {
+      gzerr << "Unable to load embedded texture. "
+            << "Unsupported compressed image format"
+            << std::endl;
     }
   }
-  return img;
+  return ImagePtr();
 }
 
 //////////////////////////////////////////////////
