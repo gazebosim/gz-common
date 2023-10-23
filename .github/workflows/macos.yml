@@ -14,6 +14,15 @@ jobs:
       uses: Homebrew/actions/setup-homebrew@master
     - run: brew config
 
+    # Workaround for https://github.com/actions/setup-python/issues/577
+    - name: Clean up python binaries
+      run: |
+        rm -f /usr/local/bin/2to3*;
+        rm -f /usr/local/bin/idle3*;
+        rm -f /usr/local/bin/pydoc3*;
+        rm -f /usr/local/bin/python3*;
+        rm -f /usr/local/bin/python3*-config;
+
     - name: Install base dependencies
       run: |
         brew tap osrf/simulation;
@@ -30,7 +39,7 @@ jobs:
           popd
           echo '# END SECTION'
         fi
-        # gz-math7 has problems with swig, remove it for now
+        # gz-math8 has problems with swig, remove it for now
         brew remove swig || true
         brew install --only-dependencies ${PACKAGE};
     - run: mkdir build
@@ -39,12 +48,14 @@ jobs:
       run: cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local/Cellar/${PACKAGE}/HEAD
     - run: make
       working-directory: build
-    - run: make test
-      working-directory: build
-      env:
-        CTEST_OUTPUT_ON_FAILURE: 1
+    # Run make install before make test so that the package will be available to
+    # build examples as part of the test
     - name: make install
       working-directory: build
       run: |
         make install;
         brew link ${PACKAGE};
+    - run: make test
+      working-directory: build
+      env:
+        CTEST_OUTPUT_ON_FAILURE: 1

@@ -125,8 +125,8 @@ colcon build --cmake-args -DENABLE_PROFILER=1
 ```
 
 Run your Gazebo library then go to your Gazebo installation path and open the profiler browser using:
-```
-libexec/gz/gz-common<N>/gz_remotery_vis
+```{.sh}
+<workspace>/install/libexec/gz/gz-common<N>/gz_remotery_vis
 ```
 
 If the profiler is run successfully, you should see output in a browser. Similar to this
