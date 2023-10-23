@@ -777,3 +777,46 @@ TEST_F(AssimpLoader, CheckNonRootDisplacement)
   auto xDisplacement = skelAnim->XDisplacement();
   ASSERT_TRUE(xDisplacement);
 }
+
+/////////////////////////////////////////////////
+TEST_F(AssimpLoader, LoadGLTF2Triangle)
+{
+  common::AssimpLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data",
+        "multiple_texture_coordinates_triangle.glb"));
+  ASSERT_TRUE(mesh);
+
+  EXPECT_EQ(6u, mesh->VertexCount());
+  EXPECT_EQ(6u, mesh->NormalCount());
+  EXPECT_EQ(6u, mesh->IndexCount());
+  EXPECT_EQ(6u, mesh->TexCoordCount());
+  EXPECT_EQ(2u, mesh->SubMeshCount());
+  EXPECT_EQ(1u, mesh->MaterialCount());
+
+  auto sm = mesh->SubMeshByIndex(0u);
+  auto subMesh = sm.lock();
+  EXPECT_NE(nullptr, subMesh);
+  EXPECT_EQ(math::Vector3d(0, 0, 0), subMesh->Vertex(0u));
+  EXPECT_EQ(math::Vector3d(10, 0, 0), subMesh->Vertex(1u));
+  EXPECT_EQ(math::Vector3d(10, 10, 0), subMesh->Vertex(2u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), subMesh->Normal(0u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), subMesh->Normal(1u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), subMesh->Normal(2u));
+  EXPECT_EQ(math::Vector2d(0, 1), subMesh->TexCoord(0u));
+  EXPECT_EQ(math::Vector2d(0, 1), subMesh->TexCoord(1u));
+  EXPECT_EQ(math::Vector2d(0, 1), subMesh->TexCoord(2u));
+
+  auto smb = mesh->SubMeshByIndex(1u);
+  auto subMeshB = smb.lock();
+  EXPECT_NE(nullptr, subMeshB);
+  EXPECT_EQ(math::Vector3d(10, 0, 0), subMeshB->Vertex(0u));
+  EXPECT_EQ(math::Vector3d(20, 0, 0), subMeshB->Vertex(1u));
+  EXPECT_EQ(math::Vector3d(20, 10, 0), subMeshB->Vertex(2u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), subMeshB->Normal(0u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), subMeshB->Normal(1u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), subMeshB->Normal(2u));
+  EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoord(0u));
+  EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoord(1u));
+  EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoord(2u));
+}
