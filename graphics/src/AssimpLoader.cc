@@ -155,6 +155,15 @@ class AssimpLoader::Implementation
   /// calculated from the "old" parent model transform.
   /// \param[in] _skeleton the skeleton to work on
   public: void ApplyInvBindTransform(SkeletonPtr _skeleton) const;
+
+  /// Get the updated root node transform. The function updates the original
+  /// transform by setting the rotation to identity if requested.
+  /// \param[in] _scene Scene with axes info stored in meta data
+  /// \param[in] _useIdentityRotation Whether to set rotation to identity.
+  /// Note: This is currently set to false for glTF / glb meshes.
+  /// \return Updated transform
+  public: aiMatrix4x4 UpdatedRootNodeTransform(const aiScene *_scene,
+      bool _useIdentityRotation = true);
 };
 
 //////////////////////////////////////////////////
@@ -645,16 +654,15 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   }
   auto& rootNode = scene->mRootNode;
   auto rootName = ToString(rootNode->mName);
-  auto transform = scene->mRootNode->mTransformation;
-  aiVector3D rootScaling, rootAxis, rootPos;
-  float angle;
-  transform.Decompose(rootScaling, rootAxis, angle, rootPos);
-  // drop rotation, but keep scaling and position
-  // TODO(luca) it seems imported assets are rotated by 90 degrees
-  // as documented here https://github.com/assimp/assimp/issues/849
-  // remove workaround when fixed
-  transform = aiMatrix4x4(rootScaling, aiQuaternion(), rootPos);
 
+  // compute assimp root node transform
+  std::string extension = _filename.substr(_filename.rfind(".") + 1,
+      _filename.size());
+  std::transform(extension.begin(), extension.end(),
+      extension.begin(), ::tolower);
+  bool useIdentityRotation = (extension != "glb" && extension != "glTF");
+  auto transform = this->dataPtr->UpdatedRootNodeTransform(scene,
+    useIdentityRotation);
   auto rootTransform = this->dataPtr->ConvertTransform(transform);
 
   // Add the materials first
@@ -748,6 +756,30 @@ void AssimpLoader::Implementation::ApplyInvBindTransform(
     for (unsigned int i = 0; i < node->ChildCount(); i++)
       queue.push(node->Child(i));
   }
+}
+
+/////////////////////////////////////////////////
+aiMatrix4x4 AssimpLoader::Implementation::UpdatedRootNodeTransform(
+    const aiScene *_scene, bool _useIdentityRotation)
+{
+  // Some assets apear to be rotated by 90 degrees as documented here
+  // https://github.com/assimp/assimp/issues/849.
+  auto transform = _scene->mRootNode->mTransformation;
+  if (_useIdentityRotation)
+  {
+    // drop rotation, but keep scaling and position
+    aiVector3D rootScaling, rootAxis, rootPos;
+    float angle;
+    transform.Decompose(rootScaling, rootAxis, angle, rootPos);
+    transform = aiMatrix4x4(rootScaling, aiQuaternion(), rootPos);
+  }
+  // for glTF / glb meshes, it was found that the transform is needed to
+  // produce a result that is consistent with other engines / glTF viewers.
+  else
+  {
+    transform = _scene->mRootNode->mTransformation;
+  }
+  return transform;
 }
 
 }
