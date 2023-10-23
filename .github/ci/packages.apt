@@ -6,9 +6,9 @@ libavutil-dev
 libfreeimage-dev
 libgdal-dev
 libgts-dev
-libgz-cmake3-dev
-libgz-math7-dev
-libgz-utils2-dev
+libgz-cmake4-dev
+libgz-math8-dev
+libgz-utils3-dev
 libswscale-dev
 libtinyxml2-dev
 pkg-config
