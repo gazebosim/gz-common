@@ -673,7 +673,6 @@ TEST_F(AssimpLoader, LoadGlTF2BoxWithJPEGTexture)
   EXPECT_EQ(math::Color(0.4f, 0.4f, 0.4f, 1.0f), mat->Ambient());
   EXPECT_EQ(math::Color(1.0f, 1.0f, 1.0f, 1.0f), mat->Diffuse());
   EXPECT_EQ(math::Color(0.0f, 0.0f, 0.0f, 1.0f), mat->Specular());
-  EXPECT_EQ(math::Color(0.0f, 0.0f, 0.0f, 1.0f), mat->Specular());
   EXPECT_EQ("Cube_Material_Diffuse", mat->TextureImage());
   EXPECT_NE(nullptr, mat->TextureData());
 }
