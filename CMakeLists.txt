@@ -50,6 +50,7 @@ set(GZ_UTILS_VER ${gz-utils2_VERSION_MAJOR})
 #--------------------------------------
 # Find Tinyxml2
 gz_find_package(TINYXML2 PRETTY tinyxml2
+  VERSION 6.0
   REQUIRED_BY graphics
   PRIVATE_FOR graphics)
 
