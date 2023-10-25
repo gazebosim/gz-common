@@ -55,7 +55,7 @@ class AssimpLoader::Implementation
   /// \brief the Assimp importer used to parse meshes
   public: Assimp::Importer importer;
 
-  /// \brief Convert a color from assimp implementation to Ignition common
+  /// \brief Convert a color from assimp implementation to Gazebo common
   /// \param[in] _color the assimp color to convert
   /// \return the matching math::Color
   public: math::Color ConvertColor(aiColor4D& _color) const;
