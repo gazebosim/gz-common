@@ -85,7 +85,11 @@ namespace gz
                 BAYER_GBRG8,
                 BAYER_GRBG8,
                 COMPRESSED_PNG,
-                PIXEL_FORMAT_COUNT
+                PIXEL_FORMAT_COUNT,
+                // \todo(iche033) COMPRESSED_JPEG is added at the end to
+                // preserve ABI compatibility. Move this enum up when merging
+                // forward to main
+                COMPRESSED_JPEG
               };
 
 
