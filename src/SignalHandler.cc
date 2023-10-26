@@ -31,7 +31,7 @@ using namespace gz;
 using namespace common;
 
 // A wrapper for the sigaction sa_handler.
-std::map<int, std::function<void(int)>> gOnSignalWrappers;
+GZ_COMMON_VISIBLE std::map<int, std::function<void(int)>> gOnSignalWrappers;
 std::mutex gWrapperMutex;
 
 /////////////////////////////////////////////////

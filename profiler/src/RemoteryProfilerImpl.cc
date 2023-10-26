@@ -16,6 +16,7 @@
  */
 
 #include "gz/common/config.hh"
+#include <gz/common/profiler/Export.hh>
 
 #include "RemoteryProfilerImpl.hh"
 #include "gz/common/Console.hh"
@@ -24,6 +25,7 @@
 using namespace gz;
 using namespace common;
 
+GZ_COMMON_PROFILER_VISIBLE
 std::string rmtErrorToString(rmtError error) {
   switch (error) {
     case RMT_ERROR_NONE:
