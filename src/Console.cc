@@ -277,7 +277,7 @@ void FileLogger::Init(const std::string &_directory,
   // Create the directory if it doesn't exist.
   if(!createDirectories(logPath, std::cerr))
   {
-      std::cerr << "Failed to generate log directories."
+      std::cerr << "Failed to generate log directories. "
                 << "No log file will be generated.";
       return;
   }
