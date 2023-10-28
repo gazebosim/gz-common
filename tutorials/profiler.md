@@ -63,7 +63,7 @@ cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 find_package(gz-common6 QUIET REQUIRED COMPONENTS profiler)
 
 add_executable(profiler_example profiler.cc)
-target_link_libraries(profiler_example ignition-common6::profiler)
+target_link_libraries(profiler_example gz-common6::profiler)
 # Enable the profiler for the example
 target_compile_definitions(profiler_example PUBLIC "GZ_PROFILER_ENABLE=1")
 ```
