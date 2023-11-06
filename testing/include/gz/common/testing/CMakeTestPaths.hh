@@ -34,15 +34,13 @@ class GZ_COMMON_TESTING_VISIBLE CMakeTestPaths: public TestPaths
   public: using TestPaths::TestPaths;
 
   /// \brief Destructor
-  public: GZ_COMMON_TESTING_VISIBLE ~CMakeTestPaths() override;
+  public: ~CMakeTestPaths() override;
 
   /// Documentation inherited
-  public: bool GZ_COMMON_TESTING_VISIBLE
-          ProjectSourcePath(std::string &_sourceDir) override;
+  public: bool ProjectSourcePath(std::string &_sourceDir) override;
 
   /// Documentation inherited
-  public: bool GZ_COMMON_TESTING_VISIBLE
-          TestTmpPath(std::string &_tmpDir) override;
+  public: bool TestTmpPath(std::string &_tmpDir) override;
 };
 }  // namespace gz::common::testing
 #endif  // GZ_COMMON_TESTING_CMAKETESTPATHS_HH_
