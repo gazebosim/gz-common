@@ -63,8 +63,8 @@ class TestPaths
 {
   /// \brief Constructor
   /// \param[in] _projectSourcePath Path to the root of the project source
-  public: explicit GZ_COMMON_TESTING_VISIBLE TestPaths(const std::string &_projectSourcePath =
-              kTestingProjectSourceDir);
+  public: explicit GZ_COMMON_TESTING_VISIBLE TestPaths(
+      const std::string &_projectSourcePath = kTestingProjectSourceDir);
 
   /// \brief Destructor
   public: virtual ~TestPaths() = 0;
