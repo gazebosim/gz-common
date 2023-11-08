@@ -57,5 +57,5 @@ class GZ_COMMON_TESTING_VISIBLE CMakeTestPaths: public TestPaths
   public: bool TestTmpPath(std::string &_tmpDir) override;
 };
 }  // namespace gz::common::testing
-# pragma warning( popd )
+# pragma warning( pop )
 #endif  // GZ_COMMON_TESTING_CMAKETESTPATHS_HH_
