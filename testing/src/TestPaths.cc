@@ -27,6 +27,8 @@ namespace gz::common::testing
 TestPaths::TestPaths(const std::string &_projectSourcePath)
   : projectSourcePath(_projectSourcePath)
 {
+  std::cout << "TestPaths::TestPaths: ("
+            << _projectSourcePath << ")" << std::endl;
 }
 
 //////////////////////////////////////////////////

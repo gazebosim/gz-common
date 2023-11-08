@@ -31,7 +31,7 @@ namespace gz::common::testing
 class GZ_COMMON_TESTING_VISIBLE CMakeTestPaths: public TestPaths
 {
   /// \brief Constructor from TestPaths
-  public: using TestPaths::TestPaths;
+  public: CMakeTestPaths() = default;
 
   /// \brief Destructor
   public: ~CMakeTestPaths() override;
