@@ -28,24 +28,12 @@ namespace gz::common::testing
 ///
 /// It is not intended that users will directly construct this, but rather
 /// utilize the TestPathFactory.
-
-/// TODO(jrivero) Remove warning disable when bumping MSVC on CI
-/// MSVC v16.11.25 complains about the TestPaths class not having a DLL although
-/// relevant members of it have visiblity defined:
-///   "non dll-interface class 'gz::common::testing::TestPaths' used as base for
-///   dll-interface class 'gz::common::testing::CMakeTestPaths'"
-///
-/// Workaround on this problems triggers new warnings and suffering and
-/// more recent versions of MSVC do not trigger that warning anymore.
-/// Conclusion: disable the warning.
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 4275)
-#endif
 class GZ_COMMON_TESTING_VISIBLE CMakeTestPaths: public TestPaths
 {
-  /// \brief Constructor from TestPaths
-  public: using TestPaths::TestPaths;
+  /// \brief Constructor
+  /// \param[in] _projectSourcePath Path to the root of the project source
+  public: explicit CMakeTestPaths(
+      const std::string &_projectSourcePath = kTestingProjectSourceDir);
 
   /// \brief Destructor
   public: ~CMakeTestPaths() override;
@@ -57,7 +45,4 @@ class GZ_COMMON_TESTING_VISIBLE CMakeTestPaths: public TestPaths
   public: bool TestTmpPath(std::string &_tmpDir) override;
 };
 }  // namespace gz::common::testing
-#ifdef _MSC_VER
-# pragma warning( pop )
-#endif
 #endif  // GZ_COMMON_TESTING_CMAKETESTPATHS_HH_
