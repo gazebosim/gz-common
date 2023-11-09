@@ -28,7 +28,7 @@ namespace gz::common::testing
 ///
 /// It is not intended that users will directly construct this, but rather
 /// utilize the TestPathFactory.
-class GZ_COMMON_TESTING_VISIBLE CMakeTestPaths: public TestPaths
+class CMakeTestPaths: public TestPaths
 {
   /// \brief Constructor
   /// \param[in] _projectSourcePath Path to the root of the project source
