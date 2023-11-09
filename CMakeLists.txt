@@ -56,12 +56,10 @@ gz_find_package(TINYXML2 PRETTY tinyxml2
 
 #--------------------------------------
 # Find dependencies that we ignore for Visual Studio
-if(NOT MSVC)
-
+if(NOT WIN32)
   #------------------------------------
   # Find uuid
   gz_find_package(UUID REQUIRED PRETTY uuid)
-
 endif()
 
 #------------------------------------
