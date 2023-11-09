@@ -55,7 +55,6 @@ enum class GZ_COMMON_TESTING_VISIBLE BuildType
   kBazel
 };
 
-
 //////////////////////////////////////////////////
 /// \brief Helper interface to generate path information to support
 /// test access to source/data files
@@ -83,6 +82,7 @@ class GZ_COMMON_TESTING_VISIBLE TestPaths
   public: virtual bool TestTmpPath(std::string &_tmpDir) = 0;
 
 GZ_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
+  /// \brief Path to the root of the project source
   protected: std::string projectSourcePath;
 GZ_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
 };
