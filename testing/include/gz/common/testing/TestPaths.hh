@@ -26,6 +26,8 @@
 
 #include "gz/common/testing/Export.hh"
 
+#include <gz/utils/SuppressWarning.hh>
+
 #ifndef TESTING_PROJECT_SOURCE_DIR
 #define TESTING_PROJECT_SOURCE_DIR ""
 #endif
@@ -53,6 +55,7 @@ enum class GZ_COMMON_TESTING_VISIBLE BuildType
   kBazel
 };
 
+
 //////////////////////////////////////////////////
 /// \brief Helper interface to generate path information to support
 /// test access to source/data files
@@ -79,7 +82,9 @@ class GZ_COMMON_TESTING_VISIBLE TestPaths
   /// \return True if path successfully found and set, false otherwise
   public: virtual bool TestTmpPath(std::string &_tmpDir) = 0;
 
+GZ_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
   protected: std::string projectSourcePath;
+GZ_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
 };
 
 //////////////////////////////////////////////////
