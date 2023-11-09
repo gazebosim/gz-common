@@ -59,11 +59,11 @@ enum class GZ_COMMON_TESTING_VISIBLE BuildType
 ///
 /// It is intended that there is an implementation of this interface for
 /// each relevant buildsystem.
-class TestPaths
+class GZ_COMMON_TESTING_VISIBLE TestPaths
 {
   /// \brief Constructor
   /// \param[in] _projectSourcePath Path to the root of the project source
-  public: explicit GZ_COMMON_TESTING_VISIBLE TestPaths(
+  public: explicit TestPaths(
       const std::string &_projectSourcePath = kTestingProjectSourceDir);
 
   /// \brief Destructor
