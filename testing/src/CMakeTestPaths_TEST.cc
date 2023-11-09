@@ -61,10 +61,10 @@ TEST(CMakeTestPaths, TestBuildType)
 /////////////////////////////////////////////////
 TEST(CMakeTestPaths, ProjectSourcePath)
 {
-  gz::common::testing::CMakeTestPaths testPaths;
+  auto testPaths = TestPathFactory(kTestingProjectSourceDir);
 
   std::string sourceDir;
-  ASSERT_TRUE(testPaths.ProjectSourcePath(sourceDir));
+  ASSERT_TRUE(testPaths->ProjectSourcePath(sourceDir));
   ASSERT_FALSE(sourceDir.empty());
   ASSERT_TRUE(exists(sourceDir)) << sourceDir;
   ASSERT_TRUE(isDirectory(sourceDir));
@@ -81,10 +81,10 @@ TEST(CMakeTestPaths, ProjectSourcePath)
 /////////////////////////////////////////////////
 TEST(CMakeTestPaths, TestTmpPath)
 {
-  gz::common::testing::CMakeTestPaths testPaths;
+  auto testPaths = TestPathFactory(kTestingProjectSourceDir);
 
   std::string tmpDir;
-  ASSERT_TRUE(testPaths.TestTmpPath(tmpDir));
+  ASSERT_TRUE(testPaths->TestTmpPath(tmpDir));
   ASSERT_FALSE(tmpDir.empty());
   ASSERT_TRUE(exists(tmpDir)) << tmpDir;
   ASSERT_TRUE(isDirectory(tmpDir));
