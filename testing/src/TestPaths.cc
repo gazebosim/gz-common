@@ -30,6 +30,9 @@ TestPaths::TestPaths(const std::string &_projectSourcePath)
 }
 
 //////////////////////////////////////////////////
+TestPaths::~TestPaths() = default;
+
+//////////////////////////////////////////////////
 BuildType TestBuildType(const std::string &_projectSourcePath)
 {
   std::string gz_bazel;
