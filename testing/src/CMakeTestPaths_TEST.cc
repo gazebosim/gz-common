@@ -24,16 +24,6 @@ using namespace gz::common;
 using namespace gz::common::testing;
 
 constexpr char kFakeTestPaths[] = "";
-//////////////////////////////////////////////////
-/// \brief Constant referring to the project source dir of the current
-/// project.
-///
-/// For CMake builds, it is expected that this is injected via a
-/// buildsystem define of TESTING_PROJECT_SOURCE_DIR.
-/// This is done automatically for tests using gz-cmake's gz_build_tests
-///
-/// For Bazel builds, it is expected to be empty
-/// constexpr char kTestingProjectSourceDir[] = TESTING_PROJECT_SOURCE_DIR;
 
 /////////////////////////////////////////////////
 TEST(TestPaths, ProjectSourcePathUnset)
@@ -71,10 +61,10 @@ TEST(CMakeTestPaths, TestBuildType)
 /////////////////////////////////////////////////
 TEST(CMakeTestPaths, ProjectSourcePath)
 {
-  auto testPaths = TestPathFactory(kTestingProjectSourceDir);
+  gz::common::testing::CMakeTestPaths testPaths;
 
   std::string sourceDir;
-  ASSERT_TRUE(testPaths->ProjectSourcePath(sourceDir));
+  ASSERT_TRUE(testPaths.ProjectSourcePath(sourceDir));
   ASSERT_FALSE(sourceDir.empty());
   ASSERT_TRUE(exists(sourceDir)) << sourceDir;
   ASSERT_TRUE(isDirectory(sourceDir));
@@ -91,10 +81,10 @@ TEST(CMakeTestPaths, ProjectSourcePath)
 /////////////////////////////////////////////////
 TEST(CMakeTestPaths, TestTmpPath)
 {
-  auto testPaths = TestPathFactory(kTestingProjectSourceDir);
+  gz::common::testing::CMakeTestPaths testPaths;
 
   std::string tmpDir;
-  ASSERT_TRUE(testPaths->TestTmpPath(tmpDir));
+  ASSERT_TRUE(testPaths.TestTmpPath(tmpDir));
   ASSERT_FALSE(tmpDir.empty());
   ASSERT_TRUE(exists(tmpDir)) << tmpDir;
   ASSERT_TRUE(isDirectory(tmpDir));
