@@ -69,7 +69,7 @@ class GZ_COMMON_TESTING_VISIBLE TestPaths
       const std::string &_projectSourcePath = kTestingProjectSourceDir);
 
   /// \brief Destructor
-  public: virtual ~TestPaths() = 0;
+  public: virtual ~TestPaths();
 
   /// brief Populate the path to the root project source directory
   /// \param[out] _sourceDir path to the root project source directory
