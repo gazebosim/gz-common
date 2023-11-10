@@ -23,12 +23,6 @@
 
 #include "tinyxml2.h"
 
-#ifndef TINYXML2_MAJOR_VERSION_GE_6
-#if TINYXML2_MAJOR_VERSION >= 6
-  #define TINYXML2_MAJOR_VERSION_GE_6
-#endif
-#endif
-
 #include "gz/common/Console.hh"
 #include "gz/common/Util.hh"
 
@@ -885,20 +879,12 @@ bool SVGLoader::Parse(const std::string &_filename,
   tinyxml2::XMLDocument doc;
   if (doc.LoadFile(_filename.c_str()) != tinyxml2::XML_SUCCESS)
   {
-#ifdef TINYXML2_MAJOR_VERSION_GE_6
     const char *str1 = doc.ErrorStr();
-    const char *str2 = nullptr;
-#else
-    const char *str1 = doc.GetErrorStr1();
-    const char *str2 = doc.GetErrorStr2();
-#endif
-    std::string err1 = str1 ? str1 : "n/a";
-    std::string err2 = str2 ? str2 : "n/a";
+    std::string err1 = str1 != nullptr ? str1 : "n/a";
 
     gzerr << "Failed to load file " <<  _filename << std::endl
            << "XML error type " << doc.ErrorName() << "\n"
-           << "XML error info 1 " << err1 << "\n"
-           << "XML error info 2 " << err2 << "\n";
+           << "XML error info 1 " << err1 << "\n";
     return false;
   }
 

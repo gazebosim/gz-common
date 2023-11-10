@@ -25,12 +25,6 @@
 
 #include "tinyxml2.h"
 
-#ifndef TINYXML2_MAJOR_VERSION_GE_6
-#if TINYXML2_MAJOR_VERSION >= 6
-  #define TINYXML2_MAJOR_VERSION_GE_6
-#endif
-#endif
-
 #ifdef _WIN32
   static const char pathSeparator = '\\';
   #define snprintf _snprintf
@@ -50,24 +44,10 @@ static void LogTinyXml2DocumentError(
   {
     warning += std::to_string(_doc.ErrorID()) + "): ";
 
-#ifdef TINYXML2_MAJOR_VERSION_GE_6
     const char * error1 = _doc.ErrorStr();
-#else
-    const char * error1 = _doc.GetErrorStr1();
-#endif
 
     if (error1)
       warning += "str1=" + std::string(error1);
-
-#ifndef TINYXML2_MAJOR_VERSION_GE_6
-    const char * error2 = _doc.GetErrorStr2();
-
-    if (error1 && error2)
-      warning += ", ";
-
-    if (error2)
-      warning += "str2=" + std::string(error2);
-#endif
   }
   else
   {
