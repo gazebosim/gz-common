@@ -9,7 +9,9 @@ target_link_libraries(${graphics_target}
   PRIVATE
     ${GzAssimp_LIBRARIES}
     GTS::GTS
-    FreeImage::FreeImage)
+    FreeImage::FreeImage
+    TINYXML2::TINYXML2
+)
 
 gz_build_tests(
   TYPE UNIT
@@ -17,6 +19,7 @@ gz_build_tests(
   LIB_DEPS
     ${graphics_target}
     gz-common${GZ_COMMON_VER}-testing
+    TINYXML2::TINYXML2
 )
 
 # Assimp doesn't offer preprocessor version, use cmake to set a compatibility
@@ -27,17 +30,4 @@ if(${GzAssimp_VERSION} STRLESS "5.2.0")
   if(TARGET UNIT_AssimpLoader_TEST)
     target_compile_definitions(UNIT_AssimpLoader_TEST PRIVATE GZ_ASSIMP_PRE_5_2_0)
   endif()
-endif()
-
-
-# If we are using an external copy of tinyxml2, add its imported target
-target_link_libraries(${graphics_target}
-  PRIVATE
-    TINYXML2::TINYXML2)
-
-# The collada exporter test uses tinyxml2, so we must link it if we're using
-# an external copy. The graphics target considers tinyxml2 to be a private
-# dependency, so it will not automatically get linked to this test.
-if(TARGET UNIT_ColladaExporter_TEST)
-  target_link_libraries(UNIT_ColladaExporter_TEST TINYXML2::TINYXML2)
 endif()
