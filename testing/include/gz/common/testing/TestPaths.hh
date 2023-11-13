@@ -26,6 +26,8 @@
 
 #include "gz/common/testing/Export.hh"
 
+#include <gz/utils/SuppressWarning.hh>
+
 #ifndef TESTING_PROJECT_SOURCE_DIR
 #define TESTING_PROJECT_SOURCE_DIR ""
 #endif
@@ -59,32 +61,30 @@ enum class GZ_COMMON_TESTING_VISIBLE BuildType
 ///
 /// It is intended that there is an implementation of this interface for
 /// each relevant buildsystem.
-class TestPaths
+class GZ_COMMON_TESTING_VISIBLE TestPaths
 {
   /// \brief Constructor
   /// \param[in] _projectSourcePath Path to the root of the project source
-  public: GZ_COMMON_TESTING_VISIBLE
-          explicit TestPaths(const std::string &_projectSourcePath =
-              kTestingProjectSourceDir);
+  public: explicit TestPaths(
+      const std::string &_projectSourcePath = kTestingProjectSourceDir);
 
   /// \brief Destructor
-  public: GZ_COMMON_TESTING_VISIBLE
-          virtual ~TestPaths() = 0;
+  public: virtual ~TestPaths();
 
   /// brief Populate the path to the root project source directory
   /// \param[out] _sourceDir path to the root project source directory
   /// \return True if path successfully found and set, false otherwise
-  public: virtual bool GZ_COMMON_TESTING_VISIBLE
-          ProjectSourcePath(std::string &_sourceDir) = 0;
+  public: virtual bool ProjectSourcePath(std::string &_sourceDir) = 0;
 
   /// \brief Populate the path to a temporary directory
   /// \param[out] _tmpDir path to the root temporary directory
   /// \return True if path successfully found and set, false otherwise
-  public: virtual bool GZ_COMMON_TESTING_VISIBLE
-          TestTmpPath(std::string &_tmpDir) = 0;
+  public: virtual bool TestTmpPath(std::string &_tmpDir) = 0;
 
+GZ_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
   /// \brief Path to the root of the project source
   protected: std::string projectSourcePath;
+GZ_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
 };
 
 //////////////////////////////////////////////////
