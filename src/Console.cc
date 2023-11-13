@@ -261,8 +261,8 @@ void FileLogger::Init(const std::string &_directory,
   {
     if (!env(IGN_HOMEDIR, logPath))
     {
-      ignerr << "Missing HOME environment variable."
-        << "No log file will be generated.";
+      std::cerr << "Missing HOME environment variable. "
+                << "No log file will be generated.";
       return;
     }
     logPath = joinPaths(logPath, _directory);
@@ -275,7 +275,12 @@ void FileLogger::Init(const std::string &_directory,
   auto* buf = dynamic_cast<FileLogger::Buffer*>(this->rdbuf());
 
   // Create the directory if it doesn't exist.
-  createDirectories(logPath);
+  if(!createDirectories(logPath, std::cerr))
+  {
+      std::cerr << "Failed to generate log directories. "
+                << "No log file will be generated.";
+      return;
+  }
 
   logPath = joinPaths(logPath, _filename);
 
