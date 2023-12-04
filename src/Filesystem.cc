@@ -466,11 +466,16 @@ bool common::copyDirectory(const std::string &_existingDirname,
 /////////////////////////////////////////////////
 bool common::createDirectories(const std::string &_path)
 {
-  return createDirectories(_path, ignerr);
+  std::ostringstream ss;
+  auto ret = createDirectories(_path, ss);
+  if (!ret)
+    ignerr << ss.str();
+  return ret;
 }
 
 /////////////////////////////////////////////////
-bool common::createDirectories(const std::string &_path, std::ostream &_errorOut)
+bool common::createDirectories(
+  const std::string &_path, std::ostream &_errorOut)
 {
   size_t index = 0;
   while (index < _path.size())
