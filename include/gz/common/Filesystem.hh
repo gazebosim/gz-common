@@ -64,7 +64,13 @@ namespace ignition
     /// \return True if directory creation was successful, false otherwise.
     bool IGNITION_COMMON_VISIBLE createDirectory(const std::string &_path);
 
-    /// \brief Create directories for the given path
+    /// \brief Create directories for the given path errors are printed to the given stream
+    /// \param[in] _path Path to create directories from
+    /// \param[in] _errorOut Stream for error output
+    /// \return true on success
+    bool IGNITION_COMMON_VISIBLE createDirectories(const std::string &_path, std::ostream &_errorOut);
+
+    /// \brief Create directories for the given path errors are printed on ignerr
     /// \param[in] _path Path to create directories from
     /// \return true on success
     bool IGNITION_COMMON_VISIBLE createDirectories(const std::string &_path);
