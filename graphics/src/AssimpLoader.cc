@@ -584,7 +584,12 @@ ImagePtr AssimpLoader::Implementation::LoadEmbeddedTexture(
 std::string AssimpLoader::Implementation::GenerateTextureName(
     const aiScene* _scene, aiMaterial* _mat, const std::string& _type) const
 {
-  return ToString(_scene->mRootNode->mName) + "_" + ToString(_mat->GetName()) +
+#ifdef GZ_ASSIMP_PRE_5_2_0
+  auto rootName = _scene->mRootNode->mName;
+#else
+  auto rootName = _scene->mName;
+#endif
+  return ToString(rootName) + "_" + ToString(_mat->GetName()) +
     "_" + _type;
 }
 
