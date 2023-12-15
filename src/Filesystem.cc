@@ -465,6 +465,17 @@ bool common::copyDirectory(const std::string &_existingDirname,
 /////////////////////////////////////////////////
 bool common::createDirectories(const std::string &_path)
 {
+  std::ostringstream ss;
+  auto ret = createDirectories(_path, ss);
+  if (!ret)
+    ignerr << ss.str();
+  return ret;
+}
+
+/////////////////////////////////////////////////
+bool common::createDirectories(
+  const std::string &_path, std::ostream &_errorOut)
+{
   size_t index = 0;
   while (index < _path.size())
   {
@@ -481,8 +492,8 @@ bool common::createDirectories(const std::string &_path)
       if (mkdir(dir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != 0)
       {
 #endif
-        ignerr << "Failed to create directory [" + dir + "]: "
-               << std::strerror(errno) << std::endl;
+        _errorOut << "Failed to create directory [" + dir + "]: "
+                  << std::strerror(errno) << std::endl;
         return false;
       }
     }

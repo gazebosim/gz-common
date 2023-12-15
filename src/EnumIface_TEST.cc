@@ -41,7 +41,7 @@ IGN_ENUM(myTypeIface, MyType, MY_TYPE_BEGIN, MY_TYPE_END,
 /////////////////////////////////////////////////
 TEST_F(EnumIfaceTest, StringCoversion)
 {
-  MyType type;
+  MyType type = MyType::TYPE2;
 
   // Set value from string
   myTypeIface.Set(type, "TYPE1");
