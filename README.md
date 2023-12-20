@@ -10,9 +10,9 @@
 Build | Status
 -- | --
 Test coverage | [![codecov](https://codecov.io/gh/gazebosim/gz-common/branch/main/graph/badge.svg)](https://codecov.io/gh/gazebosim/gz-common)
-Ubuntu Focal | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-main-focal-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-main-focal-amd64)
-Homebrew      | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=ignition_common-ci-main-homebrew-amd64)](https://build.osrfoundation.org/job/ignition_common-ci-main-homebrew-amd64)
-Windows       | [![Build Status](https://build.osrfoundation.org/job/ign_common-ci-win/badge/icon)](https://build.osrfoundation.org/job/ign_common-ci-win/)
+Ubuntu Jammy  | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=gz_common-ci-main-jammy-amd64)](https://build.osrfoundation.org/job/gz_common-ci-main-jammy-amd64)
+Homebrew      | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=gz_common-ci-main-homebrew-amd64)](https://build.osrfoundation.org/job/gz_common-ci-main-homebrew-amd64)
+Windows       | [![Build Status](https://build.osrfoundation.org/job/gz_common-main-win/badge/icon)](https://build.osrfoundation.org/job/gz_common-main-win/)
 
 Gazebo Common, a component of [Gazebo](https://gazebosim.org), provides a set of libraries that
 cover many different use cases. An audio-visual library supports
