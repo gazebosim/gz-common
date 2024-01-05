@@ -1,22 +1,14 @@
 load(
-    "//gz_bazel:build_defs.bzl",
+    "@gz//bazel/skylark:build_defs.bzl",
     "GZ_ROOT",
     "GZ_VISIBILITY",
-    "generate_include_header",
     "gz_export_header",
-)
-
-package(
-    default_visibility = GZ_VISIBILITY,
-    features = [
-        "-parse_headers",
-        "-layering_check",
-    ],
+    "gz_include_header",
 )
 
 public_headers_no_gen = glob([
     "include/gz/common/*.hh",
-    "include/gz/common/events/*.hh",
+    "include/gz/common/**/*.hh",
 ])
 
 sources = glob(
@@ -33,8 +25,8 @@ gz_export_header(
     visibility = ["//visibility:private"],
 )
 
-generate_include_header(
-    name = "eventshh_genrule",
+gz_include_header(
+    name = "events_hh_genrule",
     out = "include/gz/common/events.hh",
     hdrs = public_headers_no_gen + [
         "include/gz/common/events/Export.hh",
@@ -51,17 +43,11 @@ cc_library(
     srcs = sources,
     hdrs = public_headers,
     includes = ["include"],
+    visibility = GZ_VISIBILITY,
     deps = [
-        GZ_ROOT + "gz_common",
+        GZ_ROOT + "common",
+        GZ_ROOT + "utils",
     ],
-)
-
-cc_binary(
-    name = "libgz-common5-events.so",
-    includes = ["include"],
-    linkopts = ["-Wl,-soname,libgz-common5-events.so"],
-    linkshared = True,
-    deps = [":events"],
 )
 
 [cc_test(
@@ -69,8 +55,7 @@ cc_binary(
     srcs = [src],
     deps = [
         ":events",
-        GZ_ROOT + "gz_common/test:test_utils",
-        "@gtest",
+        GZ_ROOT + "common/testing",
         "@gtest//:gtest_main",
     ],
 ) for src in test_sources]

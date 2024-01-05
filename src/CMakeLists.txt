@@ -49,6 +49,11 @@ gz_build_tests(
     # Used to make internal source file headers visible to the unit tests
     ${CMAKE_CURRENT_SOURCE_DIR})
 
+if(TARGET UNIT_DataFrame_TEST)
+  target_include_directories(UNIT_DataFrame_TEST PRIVATE
+    ${gz-math${GZ_MATH_VER}_INCLUDE_DIRS})
+endif()
+
 if(TARGET UNIT_MovingWindowFilter_TEST)
   target_include_directories(UNIT_MovingWindowFilter_TEST PRIVATE
     ${gz-math${GZ_MATH_VER}_INCLUDE_DIRS})

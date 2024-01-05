@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Martin Pecka
+ * Copyright (C) 2023 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- */
+*/
+#include <gz/common/Util.hh>
 
-#include <gz/common/HWEncoder.hh>
-#include <ignition/common/config.hh>
+int main(int argc, char **argv)
+{
+  gz::common::setenv("TEST", "0");
+  return 0;
+}

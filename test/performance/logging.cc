@@ -23,8 +23,10 @@
 #include <gz/common/Console.hh>
 #include <gz/common/testing/RedirectConsoleStream.hh>
 
-using RedirectConsoleStream = gz::common::testing::RedirectConsoleStream;
-using StreamSource = gz::common::testing::StreamSource;
+using namespace gz;
+
+using RedirectConsoleStream = common::testing::RedirectConsoleStream;
+using StreamSource = common::testing::StreamSource;
 
 namespace {
 // Lower value than spdlog to keep CI from flaking
@@ -144,7 +146,7 @@ void SaveResultToBucketFile(
 void run(size_t number_of_threads)
 {
   g_counter = 0;
-  gz::common::Console::SetVerbosity(4);
+  common::Console::SetVerbosity(4);
   std::vector<std::thread> threads(number_of_threads);
   std::map<size_t, std::vector<uint64_t>> threads_result;
 
@@ -165,7 +167,7 @@ void run(size_t number_of_threads)
       << filename_result << std::endl;
   WriteToFile(filename_result, oss.str());
 
-  auto stream = gz::common::testing::RedirectStdout();
+  auto stream = common::testing::RedirectStdout();
 
   auto start_time_application_total =
   std::chrono::high_resolution_clock::now();

@@ -18,6 +18,7 @@
 // Suppressing cpplint.py because tools/cpplint.py is old. Remove the NOLINT
 // comments when upgrading to gz-cmake's "make codecheck"
 #include "gz/common/SignalHandler.hh" // NOLINT(*)
+#include <atomic>
 #include <csignal> // NOLINT(*)
 #include <functional> // NOLINT(*)
 #include <map> // NOLINT(*)
@@ -47,7 +48,7 @@ void onSignal(int _value)
 }
 
 /////////////////////////////////////////////////
-class gz::common::SignalHandlerPrivate
+class common::SignalHandlerPrivate
 {
   /// \brief Handle a signal.
   /// \param[in] _sig Signal number

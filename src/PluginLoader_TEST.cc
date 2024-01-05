@@ -30,11 +30,13 @@
 
 #include "gz/common/testing/Utils.hh"
 
+using namespace gz;
+
 /////////////////////////////////////////////////
-class TestTempDirectory : public gz::common::TempDirectory
+class TestTempDirectory : public common::TempDirectory
 {
   public: TestTempDirectory():
-    gz::common::TempDirectory("plugin_loader", "gz_common", true)
+    common::TempDirectory("plugin_loader", "gz_common", true)
   {
   }
 };
@@ -45,14 +47,14 @@ GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
 /////////////////////////////////////////////////
 TEST(PluginLoader, InitialNoInterfacesImplemented)
 {
-  gz::common::PluginLoader pm;
+  common::PluginLoader pm;
   EXPECT_EQ(0u, pm.InterfacesImplemented().size());
 }
 
 /////////////////////////////////////////////////
 TEST(PluginLoader, LoadNonexistantLibrary)
 {
-  gz::common::PluginLoader pm;
+  common::PluginLoader pm;
   EXPECT_TRUE(pm.LoadLibrary("/path/to/libDoesNotExist.so").empty());
 }
 
@@ -60,9 +62,9 @@ TEST(PluginLoader, LoadNonexistantLibrary)
 TEST(PluginLoader, LoadNonLibrary)
 {
   TestTempDirectory tempDir;
-  gz::common::testing::createNewEmptyFile("not_a_library.txt");
+  common::testing::createNewEmptyFile("not_a_library.txt");
 
-  gz::common::PluginLoader pm;
+  common::PluginLoader pm;
   EXPECT_TRUE(pm.LoadLibrary("not_a_library.txt").empty());
 }
 
@@ -73,30 +75,30 @@ TEST(PluginLoader, LoadNonPluginLibrary)
   std::string libName = "foobar";
 
   TestTempDirectory tempDir;
-  gz::common::createDirectory(libDir);
-  gz::common::testing::createNewEmptyFile(
-      gz::common::joinPaths(libDir, "lib" + libName + ".so"));
+  common::createDirectory(libDir);
+  common::testing::createNewEmptyFile(
+      common::joinPaths(libDir, "lib" + libName + ".so"));
 
-  gz::common::SystemPaths sp;
+  common::SystemPaths sp;
 
   // Fails without plugin dirs setup
   std::string path = sp.FindSharedLibrary("foo");
   ASSERT_TRUE(path.empty());
 
   sp.AddPluginPaths(
-      gz::common::joinPaths(gz::common::cwd(), libDir));
+      common::joinPaths(common::cwd(), libDir));
   path = sp.FindSharedLibrary(libName);
   ASSERT_FALSE(path.empty());
 
-  gz::common::PluginLoader pm;
+  common::PluginLoader pm;
   EXPECT_TRUE(pm.LoadLibrary(path).empty());
 }
 
 /////////////////////////////////////////////////
 TEST(PluginLoader, InstantiateUnloadedPlugin)
 {
-  gz::common::PluginLoader pm;
-  gz::common::PluginPtr plugin =
+  common::PluginLoader pm;
+  common::PluginPtr plugin =
       pm.Instantiate("plugin::that::is::not::loaded");
   EXPECT_FALSE(plugin);
 }

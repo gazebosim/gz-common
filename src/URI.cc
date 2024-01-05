@@ -24,6 +24,7 @@
 
 #include "gz/common/Console.hh"
 #include "gz/common/URI.hh"
+#include "gz/common/Util.hh"
 
 using namespace gz;
 using namespace common;
@@ -32,7 +33,7 @@ static const char kSchemeDelim[] = ":";
 static const char kAuthDelim[] = "//";
 
 /// \brief URIAuthority private data.
-class gz::common::URIAuthority::Implementation
+class common::URIAuthority::Implementation
 {
   /// \brief The user information.
   public: std::string userInfo;
@@ -52,7 +53,7 @@ class gz::common::URIAuthority::Implementation
 };
 
 /// \brief URIPath private data.
-class gz::common::URIPath::Implementation
+class common::URIPath::Implementation
 {
   /// \brief A helper method to determine if the given string represents
   ///        an absolute path starting segment or not.
@@ -73,21 +74,21 @@ class gz::common::URIPath::Implementation
 };
 
 /// \brief URIQuery private data.
-class gz::common::URIQuery::Implementation
+class common::URIQuery::Implementation
 {
   /// \brief The key/value tuples that compose the query.
   public: std::vector<std::pair<std::string, std::string>> values;
 };
 
 /// \brief URIFragment private data.
-class gz::common::URIFragment::Implementation
+class common::URIFragment::Implementation
 {
   /// \brief The value of the fragment.
   public: std::string value;
 };
 
 /// \brief URI private data.
-class gz::common::URI::Implementation
+class common::URI::Implementation
 {
   /// \brief The URI scheme.
   public: std::string scheme;
@@ -615,7 +616,7 @@ bool URIPath::Parse(const std::string &_str)
 
   this->Clear();
 
-  for (auto part : common::split(_str, "/"))
+  for (auto part : split(_str, "/"))
     this->PushBack(part);
 
   // the initial / is removed from _str when splitting, so we need to
@@ -730,9 +731,9 @@ bool URIQuery::Parse(const std::string &_str)
 
   if (!_str.empty())
   {
-    for (const std::string &query : common::split(_str.substr(1), "&"))
+    for (const std::string &query : split(_str.substr(1), "&"))
     {
-      std::vector<std::string> values = common::split(query, "=");
+      std::vector<std::string> values = split(query, "=");
       if (values.size() == 2)
         this->Insert(values.at(0), values.at(1));
       else

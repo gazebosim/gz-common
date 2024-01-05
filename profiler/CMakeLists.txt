@@ -1,5 +1,4 @@
 add_subdirectory(src)
-# add_subdirectory(include)
 
 install(
   DIRECTORY include/ignition

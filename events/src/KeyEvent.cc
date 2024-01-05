@@ -19,7 +19,7 @@
 using namespace gz;
 using namespace common;
 
-class gz::common::KeyEventPrivate
+class common::KeyEventPrivate
 {
   /// \brief Event type.
   public: KeyEvent::EventType type = KeyEvent::NO_EVENT;

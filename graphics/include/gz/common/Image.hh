@@ -23,6 +23,7 @@
 #include <string>
 #include <vector>
 #include <gz/math/Color.hh>
+
 #include <gz/common/graphics/Export.hh>
 
 #include <gz/utils/ImplPtr.hh>
@@ -53,7 +54,8 @@ namespace gz
       "BAYER_RGGB8",
       "BAYER_BGGR8",
       "BAYER_GBRG8",
-      "BAYER_GRBG8"
+      "BAYER_GRBG8",
+      "COMPRESSED_PNG"
     };
 
     /// \class Image Image.hh gz/common/common.hh
@@ -83,7 +85,11 @@ namespace gz
                 BAYER_GBRG8,
                 BAYER_GRBG8,
                 COMPRESSED_PNG,
-                PIXEL_FORMAT_COUNT
+                PIXEL_FORMAT_COUNT,
+                // \todo(iche033) COMPRESSED_JPEG is added at the end to
+                // preserve ABI compatibility. Move this enum up when merging
+                // forward to main
+                COMPRESSED_JPEG
               };
 
 
@@ -109,8 +115,8 @@ namespace gz
       /// \param[in] _filename The name of the saved image
       public: void SavePNG(const std::string &_filename);
 
-      /// \brief Save the image in PNG format
-      /// \param[in] _filename The name of the saved image
+      /// \brief Get the PNG image in a buffer
+      /// \param[out] _buffer Buffer with the data
       public: void SavePNGToBuffer(std::vector<unsigned char> &_buffer);
 
       /// \brief Set the image from raw data

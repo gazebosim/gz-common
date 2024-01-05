@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+
 #include <gz/utils/SuppressWarning.hh>
 
 GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
@@ -37,6 +38,7 @@ class A : public Base
 
 IGN_COMMON_REGISTER_SINGLE_PLUGIN(ns::A, ns::Base)
 }
+
 
 GZ_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
 #undef SUPPRESS_IGNITION_HEADER_DEPRECATION
