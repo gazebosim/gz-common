@@ -61,6 +61,11 @@ namespace gz
       /// Destroys the collada loader, the stl loader and all the meshes
       private: virtual ~MeshManager();
 
+      /// Return a pointer to the mesh manager
+      /// \todo(ahcorde) Remove inheritance from Singleton base class
+      /// \return a pointer to the mesh manager
+      public: static MeshManager* Instance();
+
       /// \brief Load a mesh from a file.
       /// The mesh will be searched on the global SystemPaths instance provided
       /// by Util.hh.

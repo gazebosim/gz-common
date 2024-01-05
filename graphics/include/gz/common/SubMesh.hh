@@ -157,6 +157,12 @@ namespace gz
       /// \sa bool HasVertex(const unsigned int) const
       public: gz::math::Vector3d Vertex(const unsigned int _index) const;
 
+      /// \brief Get the raw vertex pointer. This is unsafe, it is the
+      /// caller's responsability to ensure it's not indexed out of bounds.
+      /// The valid range is [0; VertexCount())
+      /// \return Raw vertices
+      public: const gz::math::Vector3d* VertexPtr() const;
+
       /// \brief Set a vertex
       /// \param[in] _index Index of the vertex
       /// \param[in] _v The new vertex coordinate
@@ -216,6 +222,12 @@ namespace gz
       /// \param[in] _index Array index.
       /// \return The index, or -1 if the _index is out of bounds.
       public: int Index(const unsigned int _index) const;
+
+      /// \brief Get the raw index pointer. This is unsafe, it is the
+      /// caller's responsability to ensure it's not indexed out of bounds.
+      /// The valid range is [0; IndexCount())
+      /// \return Raw indices
+      public: const unsigned int* IndexPtr() const;
 
       /// \brief Set an index
       /// \param[in] _index Index of the indices

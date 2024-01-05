@@ -18,6 +18,7 @@
 #define GZ_COMMON_COLLADALOADER_HH_
 
 #include <string>
+
 #include <gz/common/graphics/Export.hh>
 #include <gz/common/MeshLoader.hh>
 

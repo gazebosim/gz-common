@@ -24,7 +24,7 @@ using namespace gz;
 using namespace common;
 
 // Private data structure for the Video class
-class gz::common::Video::Implementation
+class common::Video::Implementation
 {
   /// \brief libav Format I/O context
   public: AVFormatContext *formatCtx = nullptr;
@@ -92,10 +92,10 @@ int AVCodecDecode(AVCodecContext *_codecCtx,
 
 /////////////////////////////////////////////////
 Video::Video()
-  : dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
+  : dataPtr(utils::MakeUniqueImpl<Implementation>())
 {
   // Make sure libav is loaded.
-  gz::common::load();
+  common::load();
 }
 
 /////////////////////////////////////////////////
@@ -196,8 +196,10 @@ bool Video::Load(const std::string &_filename)
 
   // Inform the codec that we can handle truncated bitstreams -- i.e.,
   // bitstreams where frame boundaries can fall in the middle of packets
+#if LIBAVCODEC_VERSION_MAJOR < 60
   if (codec->capabilities & AV_CODEC_CAP_TRUNCATED)
     this->dataPtr->codecCtx->flags |= AV_CODEC_FLAG_TRUNCATED;
+#endif
 
   // Open codec
   if (avcodec_open2(this->dataPtr->codecCtx, codec, nullptr) < 0)

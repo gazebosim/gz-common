@@ -35,6 +35,7 @@
 #include "gz/common/ColladaExporter.hh"
 #include "gz/common/OBJLoader.hh"
 #include "gz/common/STLLoader.hh"
+#include "gz/common/Util.hh"
 #include "gz/common/config.hh"
 
 #include "gz/common/MeshManager.hh"
@@ -1628,6 +1629,12 @@ void MeshManager::ConvertPolylinesToVerticesAndEdges(
       edges.push_back(e);
     }
   }
+}
+
+//////////////////////////////////////////////////
+MeshManager* MeshManager::Instance()
+{
+  return SingletonT<MeshManager>::Instance();
 }
 
 //////////////////////////////////////////////////

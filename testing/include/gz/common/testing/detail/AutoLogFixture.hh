@@ -17,10 +17,16 @@
 #ifndef GZ_COMMON_TESTING_DETAIL_AUTOLOGFIXTURE_HH_
 #define GZ_COMMON_TESTING_DETAIL_AUTOLOGFIXTURE_HH_
 
-#include "gz/common/testing/AutoLogFixture.hh"
-
 #include <memory>
 #include <string>
+
+/// Protect to guarantee that gtest is included before this header.
+///
+/// While downstream users should never directly include the detail
+/// header, this is to primarily protect the ABI checker, which does.
+#ifdef GTEST_API_
+
+#include "gz/common/testing/AutoLogFixture.hh"
 
 #include <gz/common/Console.hh>
 #include <gz/common/Filesystem.hh>
@@ -119,5 +125,9 @@ std::string AutoLogFixture::LogContent() const
 }
 
 }  // namespace gz::common::testing
+
+#else
+#warning "AutoLogFixture needs <gtest/gtest.h> to be included in order to work"
+#endif  // GTEST_API_
 
 #endif  // GZ_COMMON_TESTING_DETAIL_AUTOLOGFIXTURE_HH_

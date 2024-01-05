@@ -17,13 +17,15 @@
 
 /* This code is originally from:
  * https://gist.github.com/KjellKod/0fde0d2564e2eb1b3560
- * For testing worst-case console logging latency with a variable number of 
+ * For testing worst-case console logging latency with a variable number of
  * threads.
  */
 
+#include <algorithm>
 #include <atomic>
 #include <map>
 #include <thread>
+#include <vector>
 
 #include <gz/common/Console.hh>
 

@@ -155,6 +155,15 @@ class AssimpLoader::Implementation
   /// calculated from the "old" parent model transform.
   /// \param[in] _skeleton the skeleton to work on
   public: void ApplyInvBindTransform(SkeletonPtr _skeleton) const;
+
+  /// Get the updated root node transform. The function updates the original
+  /// transform by setting the rotation to identity if requested.
+  /// \param[in] _scene Scene with axes info stored in meta data
+  /// \param[in] _useIdentityRotation Whether to set rotation to identity.
+  /// Note: This is currently set to false for glTF / glb meshes.
+  /// \return Updated transform
+  public: aiMatrix4x4 UpdatedRootNodeTransform(const aiScene *_scene,
+      bool _useIdentityRotation = true);
 };
 
 //////////////////////////////////////////////////
@@ -315,6 +324,9 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
 {
   MaterialPtr mat = std::make_shared<Material>();
   aiColor4D color;
+  bool specularDefine = false;
+  // gcc is complaining about this variable not being used.
+  (void) specularDefine;
   auto& assimpMat = _scene->mMaterials[_matIdx];
   auto ret = assimpMat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
   if (ret == AI_SUCCESS)
@@ -324,6 +336,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   ret = assimpMat->Get(AI_MATKEY_COLOR_AMBIENT, color);
   if (ret == AI_SUCCESS)
   {
+    specularDefine = true;
     mat->SetAmbient(this->ConvertColor(color));
   }
   ret = assimpMat->Get(AI_MATKEY_COLOR_SPECULAR, color);
@@ -421,6 +434,21 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
           this->GenerateTextureName(_scene, assimpMat, "Roughness"));
       pbr.SetRoughnessMap(texName, texData);
     }
+    // Load lightmap only if it is not a glb/glTF mesh that contains a
+    // MetallicRoughness texture
+    // It was found that lightmap field just stores the entire MetallicRoughness
+    // texture. Issues were also reported in assimp:
+    // https://github.com/assimp/assimp/issues/3120
+    // https://github.com/assimp/assimp/issues/4637
+    unsigned int uvIdx = 0;
+    ret = assimpMat->GetTexture(
+        aiTextureType_LIGHTMAP, 0, &texturePath, NULL, &uvIdx);
+    if (ret == AI_SUCCESS)
+    {
+      auto [texName, texData] = this->LoadTexture(_scene, texturePath,
+          this->GenerateTextureName(_scene, assimpMat, "Lightmap"));
+      pbr.SetLightMap(texName, uvIdx, texData);
+    }
   }
 #endif
   ret = assimpMat->GetTexture(aiTextureType_NORMALS, 0, &texturePath);
@@ -438,20 +466,15 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
         this->GenerateTextureName(_scene, assimpMat, "Emissive"));
     pbr.SetEmissiveMap(texName, texData);
   }
-  unsigned int uvIdx = 0;
-  ret = assimpMat->GetTexture(
-      aiTextureType_LIGHTMAP, 0, &texturePath, NULL, &uvIdx);
-  if (ret == AI_SUCCESS)
-  {
-    auto [texName, texData] = this->LoadTexture(_scene, texturePath,
-        this->GenerateTextureName(_scene, assimpMat, "Lightmap"));
-    pbr.SetLightMap(texName, uvIdx, texData);
-  }
 #ifndef GZ_ASSIMP_PRE_5_2_0
-  double value;
+  float value;
   ret = assimpMat->Get(AI_MATKEY_METALLIC_FACTOR, value);
   if (ret == AI_SUCCESS)
   {
+    if (!specularDefine)
+    {
+      mat->SetSpecular(math::Color(value, value, value));
+    }
     pbr.SetMetalness(value);
   }
   ret = assimpMat->Get(AI_MATKEY_ROUGHNESS_FACTOR, value);
@@ -499,13 +522,13 @@ std::pair<ImagePtr, ImagePtr>
   std::vector<unsigned char> metalnessData(width * height * bytesPerPixel);
   std::vector<unsigned char> roughnessData(width * height * bytesPerPixel);
 
-  for (unsigned int x = 0; x < width; ++x)
+  for (unsigned int y = 0; y < height; ++y)
   {
-    for (unsigned int y = 0; y < height; ++y)
+    for (unsigned int x = 0; x < width; ++x)
     {
       // RGBA so 4 bytes per pixel, alpha fully opaque
-      auto baseIndex = bytesPerPixel * (x * height + y);
-      auto color = _img.Pixel(x, y);
+      auto baseIndex = bytesPerPixel * (y * width + x);
+      auto color = _img.Pixel(x, (height - y - 1));
       metalnessData[baseIndex] = color.B() * 255.0;
       metalnessData[baseIndex + 1] = color.B() * 255.0;
       metalnessData[baseIndex + 2] = color.B() * 255.0;
@@ -528,23 +551,45 @@ std::pair<ImagePtr, ImagePtr>
 ImagePtr AssimpLoader::Implementation::LoadEmbeddedTexture(
     const aiTexture* _texture) const
 {
-  auto img = std::make_shared<Image>();
   if (_texture->mHeight == 0)
   {
+    Image::PixelFormatType format = Image::PixelFormatType::UNKNOWN_PIXEL_FORMAT;
     if (_texture->CheckFormat("png"))
     {
-      img->SetFromCompressedData((unsigned char*)_texture->pcData,
-          _texture->mWidth, Image::PixelFormatType::COMPRESSED_PNG);
+      format = Image::PixelFormatType::COMPRESSED_PNG;
+    }
+    else if (_texture->CheckFormat("jpg"))
+    {
+      format = Image::PixelFormatType::COMPRESSED_JPEG;
+    }
+    if (format != Image::PixelFormatType::UNKNOWN_PIXEL_FORMAT)
+    {
+      auto img = std::make_shared<Image>();
+      img->SetFromCompressedData(
+          reinterpret_cast<unsigned char *>(_texture->pcData),
+          _texture->mWidth, format);
+      return img;
+    }
+    else
+    {
+      gzerr << "Unable to load embedded texture. "
+            << "Unsupported compressed image format"
+            << std::endl;
     }
   }
-  return img;
+  return ImagePtr();
 }
 
 //////////////////////////////////////////////////
 std::string AssimpLoader::Implementation::GenerateTextureName(
     const aiScene* _scene, aiMaterial* _mat, const std::string& _type) const
 {
-  return ToString(_scene->mRootNode->mName) + "_" + ToString(_mat->GetName()) +
+#ifdef GZ_ASSIMP_PRE_5_2_0
+  auto rootName = _scene->mRootNode->mName;
+#else
+  auto rootName = _scene->mName;
+#endif
+  return ToString(rootName) + "_" + ToString(_mat->GetName()) +
     "_" + _type;
 }
 
@@ -626,21 +671,20 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
       0);
   if (scene == nullptr)
   {
-    ignerr << "Unable to import mesh [" << _filename << "]" << std::endl;
+    gzerr << "Unable to import mesh [" << _filename << "]" << std::endl;
     return mesh;
   }
   auto& rootNode = scene->mRootNode;
   auto rootName = ToString(rootNode->mName);
-  auto transform = scene->mRootNode->mTransformation;
-  aiVector3D rootScaling, rootAxis, rootPos;
-  float angle;
-  transform.Decompose(rootScaling, rootAxis, angle, rootPos);
-  // drop rotation, but keep scaling and position
-  // TODO(luca) it seems imported assets are rotated by 90 degrees
-  // as documented here https://github.com/assimp/assimp/issues/849
-  // remove workaround when fixed
-  transform = aiMatrix4x4(rootScaling, aiQuaternion(), rootPos);
 
+  // compute assimp root node transform
+  std::string extension = _filename.substr(_filename.rfind(".") + 1,
+      _filename.size());
+  std::transform(extension.begin(), extension.end(),
+      extension.begin(), ::tolower);
+  bool useIdentityRotation = (extension != "glb" && extension != "glTF");
+  auto transform = this->dataPtr->UpdatedRootNodeTransform(scene,
+    useIdentityRotation);
   auto rootTransform = this->dataPtr->ConvertTransform(transform);
 
   // Add the materials first
@@ -685,12 +729,19 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     {
       auto& animChan = anim->mChannels[chanIdx];
       auto chanName = ToString(animChan->mNodeName);
-      for (unsigned keyIdx = 0; keyIdx < animChan->mNumPositionKeys; ++keyIdx)
+      auto numKeys = std::max(
+          animChan->mNumPositionKeys, animChan->mNumRotationKeys);
+      // Position and rotation arrays might be different lengths,
+      // iterate over the maximum of the two, safely access by checking
+      // number of keys
+      for (unsigned keyIdx = 0; keyIdx < numKeys; ++keyIdx)
       {
         // Note, Scaling keys are not supported right now
         // Compute the position into a math pose
-        auto& posKey = animChan->mPositionKeys[keyIdx];
-        auto& quatKey = animChan->mRotationKeys[keyIdx];
+        auto& posKey = animChan->mPositionKeys[
+          std::min(keyIdx, animChan->mNumPositionKeys - 1)];
+        auto& quatKey = animChan->mRotationKeys[
+          std::min(keyIdx, animChan->mNumRotationKeys - 1)];
         math::Vector3d pos(posKey.mValue.x, posKey.mValue.y, posKey.mValue.z);
         math::Quaterniond quat(quatKey.mValue.w, quatKey.mValue.x,
             quatKey.mValue.y, quatKey.mValue.z);
@@ -729,6 +780,30 @@ void AssimpLoader::Implementation::ApplyInvBindTransform(
     for (unsigned int i = 0; i < node->ChildCount(); i++)
       queue.push(node->Child(i));
   }
+}
+
+/////////////////////////////////////////////////
+aiMatrix4x4 AssimpLoader::Implementation::UpdatedRootNodeTransform(
+    const aiScene *_scene, bool _useIdentityRotation)
+{
+  // Some assets apear to be rotated by 90 degrees as documented here
+  // https://github.com/assimp/assimp/issues/849.
+  auto transform = _scene->mRootNode->mTransformation;
+  if (_useIdentityRotation)
+  {
+    // drop rotation, but keep scaling and position
+    aiVector3D rootScaling, rootAxis, rootPos;
+    float angle;
+    transform.Decompose(rootScaling, rootAxis, angle, rootPos);
+    transform = aiMatrix4x4(rootScaling, aiQuaternion(), rootPos);
+  }
+  // for glTF / glb meshes, it was found that the transform is needed to
+  // produce a result that is consistent with other engines / glTF viewers.
+  else
+  {
+    transform = _scene->mRootNode->mTransformation;
+  }
+  return transform;
 }
 
 }

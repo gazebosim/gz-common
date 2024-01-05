@@ -16,6 +16,7 @@
  */
 #include "gz/common/Console.hh"
 #include "gz/common/geospatial/ImageHeightmap.hh"
+#include "gz/common/Util.hh"
 
 using namespace gz;
 using namespace common;
@@ -39,8 +40,8 @@ int ImageHeightmap::Load(const std::string &_filename)
 
 //////////////////////////////////////////////////
 void ImageHeightmap::FillHeightMap(int _subSampling,
-    unsigned int _vertSize, const gz::math::Vector3d &_size,
-    const gz::math::Vector3d &_scale, bool _flipY,
+    unsigned int _vertSize, const math::Vector3d &_size,
+    const math::Vector3d &_scale, bool _flipY,
     std::vector<float> &_heights) const
 {
   // Resize the vector to match the size of the vertices.
@@ -60,25 +61,25 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
 
   auto data = this->img.Data();
 
-  if (imgFormat == gz::common::Image::PixelFormatType::L_INT8 ||
-    imgFormat == gz::common::Image::PixelFormatType::RGB_INT8 ||
-    imgFormat == gz::common::Image::PixelFormatType::RGBA_INT8 ||
-    imgFormat == gz::common::Image::PixelFormatType::BAYER_BGGR8 ||
-    imgFormat == gz::common::Image::PixelFormatType::BAYER_GBRG8 ||
-    imgFormat == gz::common::Image::PixelFormatType::BAYER_GRBG8 ||
-    imgFormat == gz::common::Image::PixelFormatType::BAYER_GRBG8 ||
-    imgFormat == gz::common::Image::PixelFormatType::BAYER_RGGB8 ||
-    imgFormat == gz::common::Image::PixelFormatType::BGR_INT8 ||
-    imgFormat == gz::common::Image::PixelFormatType::BGRA_INT8)
+  if (imgFormat == common::Image::PixelFormatType::L_INT8 ||
+    imgFormat == common::Image::PixelFormatType::RGB_INT8 ||
+    imgFormat == common::Image::PixelFormatType::RGBA_INT8 ||
+    imgFormat == common::Image::PixelFormatType::BAYER_BGGR8 ||
+    imgFormat == common::Image::PixelFormatType::BAYER_GBRG8 ||
+    imgFormat == common::Image::PixelFormatType::BAYER_GRBG8 ||
+    imgFormat == common::Image::PixelFormatType::BAYER_GRBG8 ||
+    imgFormat == common::Image::PixelFormatType::BAYER_RGGB8 ||
+    imgFormat == common::Image::PixelFormatType::BGR_INT8 ||
+    imgFormat == common::Image::PixelFormatType::BGRA_INT8)
   {
     this->FillHeights<unsigned char>(&data[0], imgHeight, imgWidth, pitch,
         _subSampling, _vertSize, _size, _scale, _flipY, _heights);
   }
-  else if (imgFormat == gz::common::Image::PixelFormatType::BGR_INT16 ||
-    imgFormat == gz::common::Image::PixelFormatType::L_INT16 ||
-    imgFormat == gz::common::Image::PixelFormatType::RGB_FLOAT16 ||
-    imgFormat == gz::common::Image::PixelFormatType::RGB_INT16 ||
-    imgFormat == gz::common::Image::PixelFormatType::R_FLOAT16)
+  else if (imgFormat == common::Image::PixelFormatType::BGR_INT16 ||
+    imgFormat == common::Image::PixelFormatType::L_INT16 ||
+    imgFormat == common::Image::PixelFormatType::RGB_FLOAT16 ||
+    imgFormat == common::Image::PixelFormatType::RGB_INT16 ||
+    imgFormat == common::Image::PixelFormatType::R_FLOAT16)
   {
     uint16_t *dataShort = reinterpret_cast<uint16_t *>(&data[0]);
     this->FillHeights<uint16_t>(dataShort, imgHeight, imgWidth, pitch,

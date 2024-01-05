@@ -41,7 +41,7 @@ BVHLoader::~BVHLoader()
 std::unique_ptr<Skeleton> BVHLoader::Load(const std::string &_filename,
     const double _scale)
 {
-  std::string fullname = common::findFile(_filename);
+  std::string fullname = findFile(_filename);
   if (fullname.empty())
     return nullptr;
 

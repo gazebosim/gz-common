@@ -645,6 +645,45 @@ TEST_F(AssimpLoader, LoadGlTF2BoxExternalTexture)
 }
 
 /////////////////////////////////////////////////
+// This test loads a box glb mesh with embedded compressed jpeg texture
+TEST_F(AssimpLoader, LoadGlTF2BoxWithJPEGTexture)
+{
+  common::AssimpLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "box_texture_jpg.glb"));
+
+  EXPECT_STREQ("unknown", mesh->Name().c_str());
+  EXPECT_EQ(math::Vector3d(1, 1, 1), mesh->Max());
+  EXPECT_EQ(math::Vector3d(-1, -1, -1), mesh->Min());
+
+  EXPECT_EQ(24u, mesh->VertexCount());
+  EXPECT_EQ(24u, mesh->NormalCount());
+  EXPECT_EQ(36u, mesh->IndexCount());
+  EXPECT_EQ(24u, mesh->TexCoordCount());
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(1u, mesh->MaterialCount());
+
+  // Make sure we can read the submesh name
+  EXPECT_STREQ("Cube", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+
+  const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+  ASSERT_TRUE(mat.get());
+
+  // Make sure we read the material color values
+  EXPECT_EQ(math::Color(0.4f, 0.4f, 0.4f, 1.0f), mat->Ambient());
+  EXPECT_EQ(math::Color(1.0f, 1.0f, 1.0f, 1.0f), mat->Diffuse());
+  EXPECT_EQ(math::Color(0.0f, 0.0f, 0.0f, 1.0f), mat->Specular());
+  // Assimp 5.2.0 and above uses the scene name for its texture names,
+  // older version use the root node instead.
+#ifdef GZ_ASSIMP_PRE_5_2_0
+  EXPECT_EQ("Cube_Material_Diffuse", mat->TextureImage());
+#else
+  EXPECT_EQ("Scene_Material_Diffuse", mat->TextureImage());
+#endif
+  EXPECT_NE(nullptr, mat->TextureData());
+}
+
+/////////////////////////////////////////////////
 // Use a fully featured glb test asset, including PBR textures, emissive maps
 // embedded textures, lightmaps, animations to test advanced glb features
 TEST_F(AssimpLoader, LoadGlbPbrAsset)
@@ -708,10 +747,16 @@ TEST_F(AssimpLoader, LoadGlbPbrAsset)
   // Check pixel values to test metallicroughness texture splitting
   EXPECT_FLOAT_EQ(pbr->MetalnessMapData()->Pixel(256, 256).R(), 0.0);
   EXPECT_FLOAT_EQ(pbr->RoughnessMapData()->Pixel(256, 256).R(), 124.0 / 255.0);
+
   // Bug in assimp 5.0.x that doesn't parse coordinate sets properly
-  EXPECT_EQ(pbr->LightMapTexCoordSet(), 1);
+  // \todo(iche033) Lightmaps are disabled for glb meshes
+  // due to upstream bug
+  // EXPECT_EQ(pbr->LightMapTexCoordSet(), 1);
 #endif
-  EXPECT_NE(pbr->LightMapData(), nullptr);
+
+  // \todo(iche033) Lightmaps are disabled for glb meshes
+  // due to upstream bug
+  // EXPECT_NE(pbr->LightMapData(), nullptr);
 
   // Mesh has 3 animations
   auto skel = mesh->MeshSkeleton();
@@ -737,4 +782,47 @@ TEST_F(AssimpLoader, CheckNonRootDisplacement)
   EXPECT_EQ(nullptr, rootNode);
   auto xDisplacement = skelAnim->XDisplacement();
   ASSERT_TRUE(xDisplacement);
+}
+
+/////////////////////////////////////////////////
+TEST_F(AssimpLoader, LoadGLTF2Triangle)
+{
+  common::AssimpLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data",
+        "multiple_texture_coordinates_triangle.glb"));
+  ASSERT_TRUE(mesh);
+
+  EXPECT_EQ(6u, mesh->VertexCount());
+  EXPECT_EQ(6u, mesh->NormalCount());
+  EXPECT_EQ(6u, mesh->IndexCount());
+  EXPECT_EQ(6u, mesh->TexCoordCount());
+  EXPECT_EQ(2u, mesh->SubMeshCount());
+  EXPECT_EQ(1u, mesh->MaterialCount());
+
+  auto sm = mesh->SubMeshByIndex(0u);
+  auto subMesh = sm.lock();
+  EXPECT_NE(nullptr, subMesh);
+  EXPECT_EQ(math::Vector3d(0, 0, 0), subMesh->Vertex(0u));
+  EXPECT_EQ(math::Vector3d(10, 0, 0), subMesh->Vertex(1u));
+  EXPECT_EQ(math::Vector3d(10, 10, 0), subMesh->Vertex(2u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), subMesh->Normal(0u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), subMesh->Normal(1u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), subMesh->Normal(2u));
+  EXPECT_EQ(math::Vector2d(0, 1), subMesh->TexCoord(0u));
+  EXPECT_EQ(math::Vector2d(0, 1), subMesh->TexCoord(1u));
+  EXPECT_EQ(math::Vector2d(0, 1), subMesh->TexCoord(2u));
+
+  auto smb = mesh->SubMeshByIndex(1u);
+  auto subMeshB = smb.lock();
+  EXPECT_NE(nullptr, subMeshB);
+  EXPECT_EQ(math::Vector3d(10, 0, 0), subMeshB->Vertex(0u));
+  EXPECT_EQ(math::Vector3d(20, 0, 0), subMeshB->Vertex(1u));
+  EXPECT_EQ(math::Vector3d(20, 10, 0), subMeshB->Vertex(2u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), subMeshB->Normal(0u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), subMeshB->Normal(1u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), subMeshB->Normal(2u));
+  EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoord(0u));
+  EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoord(1u));
+  EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoord(2u));
 }

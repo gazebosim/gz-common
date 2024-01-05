@@ -43,7 +43,7 @@ using OutputFormat = AVOutputFormat*;
 
 // Private data class
 // hidden visibility specifier has to be explicitly set to silent a gcc warning
-class GZ_COMMON_AV_HIDDEN gz::common::VideoEncoder::Implementation
+class GZ_COMMON_AV_HIDDEN common::VideoEncoder::Implementation
 {
   /// \brief Name of the file which stores the video while it is being
   ///        recorded.
@@ -149,10 +149,10 @@ AVFrame* VideoEncoder::Implementation::GetFrameForEncoder(AVFrame* _inFrame)
 
 /////////////////////////////////////////////////
 VideoEncoder::VideoEncoder()
-  : dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
+  : dataPtr(utils::MakeUniqueImpl<Implementation>())
 {
   // Make sure libav is loaded.
-  gz::common::load();
+  common::load();
 }
 
 /////////////////////////////////////////////////
@@ -305,7 +305,7 @@ bool VideoEncoder::Start(
   }
 
   // Remove old temp file, if it exists.
-  if (common::exists(this->dataPtr->filename))
+  if (exists(this->dataPtr->filename))
   {
     auto success = removeFile(this->dataPtr->filename.c_str());
     if (!success)
@@ -363,7 +363,7 @@ bool VideoEncoder::Start(
     }
     else
     {
-      this->dataPtr->filename = joinPaths(common::cwd(), "TMP_RECORDING." +
+      this->dataPtr->filename = joinPaths(cwd(), "TMP_RECORDING." +
                                 this->dataPtr->format);
     }
   }
@@ -387,27 +387,26 @@ bool VideoEncoder::Start(
     do
     {
       outputFormat = av_output_video_device_next(outputFormat);
-      
+
       if (outputFormat)
       {
         // Break when the output device name matches 'v4l2'
         if (this->dataPtr->format.compare(outputFormat->name) == 0)
         {
           // Allocate the context using the correct outputFormat
-          auto result = avformat_alloc_output_context2(&this->dataPtr->formatCtx,
+          auto result = avformat_alloc_output_context2(
+              &this->dataPtr->formatCtx,
               outputFormat, nullptr, this->dataPtr->filename.c_str());
           if (result < 0)
           {
-            gzerr << "Failed to allocate AV context [" << av_err2str_cpp(result)
-                   << "]" << std::endl;
+            gzerr << "Failed to allocate AV context ["
+                  << av_err2str_cpp(result)
+                  << "]" << std::endl;
           }
           break;
         }
       }
-    }
-    while (outputFormat);
-
-
+    } while (outputFormat);
 #endif
   }
   else
@@ -839,7 +838,7 @@ bool VideoEncoder::Stop()
         if (ret >= 0)
           ret = this->dataPtr->ProcessPacket(avPacket);
       }
-      av_packet_unref(avPacket);
+      av_packet_free(&avPacket);
     }
   }
 
@@ -885,7 +884,7 @@ bool VideoEncoder::SaveToFile(const std::string &_filename)
 
   if (this->dataPtr->format != "v4l2")
   {
-    result = common::moveFile(this->dataPtr->filename, _filename);
+    result = moveFile(this->dataPtr->filename, _filename);
 
     if (!result)
     {
@@ -908,7 +907,7 @@ void VideoEncoder::Reset()
   this->Stop();
 
   // Remove old temp file, if it exists.
-  if (common::exists(this->dataPtr->filename))
+  if (exists(this->dataPtr->filename))
   {
     auto success = removeFile(this->dataPtr->filename.c_str());
     if (!success)

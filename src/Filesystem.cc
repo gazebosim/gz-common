@@ -34,18 +34,20 @@
 
 namespace fs = std::filesystem;
 
+using namespace gz;
+
 /////////////////////////////////////////////////
 // Return true if success, false if error
 inline bool fsWarn(const std::string &_fcn,
              const std::error_code &_ec,
-             const gz::common::FilesystemWarningOp &_warningOp =
-             gz::common::FSWO_LOG_WARNINGS)
+             const common::FilesystemWarningOp &_warningOp =
+             common::FSWO_LOG_WARNINGS)
 {
   if (_ec)
   {
-    if (gz::common::FSWO_LOG_WARNINGS == _warningOp)
+    if (common::FSWO_LOG_WARNINGS == _warningOp)
     {
-      gzwarn << "Failed gz::common::" << _fcn
+      gzwarn << "Failed common::" << _fcn
         << " (ec: " << _ec << " " << _ec.message() << ")\n";
     }
     return false;
@@ -54,31 +56,31 @@ inline bool fsWarn(const std::string &_fcn,
 }
 
 /////////////////////////////////////////////////
-bool gz::common::exists(const std::string &_path)
+bool common::exists(const std::string &_path)
 {
   return fs::exists(_path);
 }
 
 /////////////////////////////////////////////////
-bool gz::common::isDirectory(const std::string &_path)
+bool common::isDirectory(const std::string &_path)
 {
   return fs::is_directory(_path);
 }
 
 /////////////////////////////////////////////////
-bool gz::common::isFile(const std::string &_path)
+bool common::isFile(const std::string &_path)
 {
   return fs::is_regular_file(_path);
 }
 
 /////////////////////////////////////////////////
-bool gz::common::isRelativePath(const std::string &_path)
+bool common::isRelativePath(const std::string &_path)
 {
   return fs::path(_path).is_relative();
 }
 
 /////////////////////////////////////////////////
-bool gz::common::createDirectory(const std::string &_path)
+bool common::createDirectory(const std::string &_path)
 {
   std::error_code ec;
   fs::create_directory(_path, ec);
@@ -86,7 +88,7 @@ bool gz::common::createDirectory(const std::string &_path)
 }
 
 /////////////////////////////////////////////////
-bool gz::common::createDirectories(const std::string &_path)
+bool common::createDirectories(const std::string &_path)
 {
   std::error_code ec;
   // Disregard return of create_directories, because it may return false if the
@@ -97,19 +99,19 @@ bool gz::common::createDirectories(const std::string &_path)
 }
 
 /////////////////////////////////////////////////
-std::string const gz::common::separator(std::string const &_s)
+std::string const common::separator(std::string const &_s)
 {
   return _s + std::string{fs::path::preferred_separator};
 }
 
 /////////////////////////////////////////////////
-void gz::common::changeFromUnixPath(std::string &_path) {
+void common::changeFromUnixPath(std::string &_path) {
   std::replace(_path.begin(), _path.end(), '/',
       static_cast<char>(fs::path::preferred_separator));
 }
 
 /////////////////////////////////////////////////
-std::string gz::common::copyFromUnixPath(const std::string &_path)
+std::string common::copyFromUnixPath(const std::string &_path)
 {
   std::string copy = _path;
   changeFromUnixPath(copy);
@@ -117,13 +119,13 @@ std::string gz::common::copyFromUnixPath(const std::string &_path)
 }
 
 /////////////////////////////////////////////////
-void gz::common::changeToUnixPath(std::string &_path) {
+void common::changeToUnixPath(std::string &_path) {
   std::replace(_path.begin(), _path.end(),
       static_cast<char>(fs::path::preferred_separator), '/');
 }
 
 /////////////////////////////////////////////////
-std::string gz::common::copyToUnixPath(const std::string &_path)
+std::string common::copyToUnixPath(const std::string &_path)
 {
   std::string copy = _path;
   changeToUnixPath(copy);
@@ -131,13 +133,13 @@ std::string gz::common::copyToUnixPath(const std::string &_path)
 }
 
 /////////////////////////////////////////////////
-std::string gz::common::absPath(const std::string &_path)
+std::string common::absPath(const std::string &_path)
 {
   return fs::absolute(_path).string();
 }
 
 /////////////////////////////////////////////////
-std::string gz::common::joinPaths(
+std::string common::joinPaths(
     const std::string &_path1, const std::string &_path2)
 {
   fs::path p1{_path1};
@@ -145,7 +147,7 @@ std::string gz::common::joinPaths(
 
   if (p1.empty())
   {
-    p1 = gz::common::separator("");
+    p1 = common::separator("");
   }
 
   bool is_url = false;
@@ -181,7 +183,7 @@ std::string gz::common::joinPaths(
 }
 
 /////////////////////////////////////////////////
-std::string gz::common::cwd()
+std::string common::cwd()
 {
   std::error_code ec;
   auto curdir = fs::current_path(ec);
@@ -195,7 +197,7 @@ std::string gz::common::cwd()
 }
 
 /////////////////////////////////////////////////
-bool gz::common::chdir(const std::string &_dir)
+bool common::chdir(const std::string &_dir)
 {
   std::error_code ec;
   fs::current_path(_dir, ec);
@@ -203,7 +205,7 @@ bool gz::common::chdir(const std::string &_dir)
 }
 
 /////////////////////////////////////////////////
-std::string gz::common::basename(const std::string &_path)
+std::string common::basename(const std::string &_path)
 {
   fs::path p(_path);
   p /= "FOO.TXT";
@@ -214,7 +216,7 @@ std::string gz::common::basename(const std::string &_path)
 }
 
 /////////////////////////////////////////////////
-std::string gz::common::parentPath(const std::string &_path)
+std::string common::parentPath(const std::string &_path)
 {
   std::string result;
   size_t last_sep = _path.find_last_of(separator(""));
@@ -226,7 +228,7 @@ std::string gz::common::parentPath(const std::string &_path)
 }
 
 /////////////////////////////////////////////////
-bool gz::common::copyFile(
+bool common::copyFile(
     const std::string &_existingFilename,
     const std::string &_newFilename,
     const FilesystemWarningOp _warningOp)
@@ -238,7 +240,7 @@ bool gz::common::copyFile(
 }
 
 /////////////////////////////////////////////////
-bool gz::common::copyDirectory(
+bool common::copyDirectory(
     const std::string &_existingDirname,
     const std::string &_newDirname,
     const FilesystemWarningOp _warningOp)
@@ -248,7 +250,7 @@ bool gz::common::copyDirectory(
 
   // std::filesystem won't create intermediate directories
   // before copying, this maintains compatibility with Gazebo behavior.
-  if (!gz::common::createDirectories(_newDirname))
+  if (!common::createDirectories(_newDirname))
   {
     return false;
   }
@@ -259,7 +261,7 @@ bool gz::common::copyDirectory(
 }
 
 /////////////////////////////////////////////////
-bool gz::common::moveFile(
+bool common::moveFile(
     const std::string &_existingFilename,
     const std::string &_newFilename,
     const FilesystemWarningOp _warningOp)
@@ -270,7 +272,7 @@ bool gz::common::moveFile(
 }
 
 /////////////////////////////////////////////////
-bool gz::common::removeDirectory(
+bool common::removeDirectory(
     const std::string &_path,
     const FilesystemWarningOp _warningOp)
 {
@@ -288,7 +290,7 @@ bool gz::common::removeDirectory(
 }
 
 /////////////////////////////////////////////////
-bool gz::common::removeFile(
+bool common::removeFile(
     const std::string &_existingFilename,
     const FilesystemWarningOp _warningOp)
 {
@@ -305,7 +307,7 @@ bool gz::common::removeFile(
 }
 
 /////////////////////////////////////////////////
-bool gz::common::removeDirectoryOrFile(
+bool common::removeDirectoryOrFile(
     const std::string &_path,
     const FilesystemWarningOp _warningOp)
 {
@@ -316,7 +318,7 @@ bool gz::common::removeDirectoryOrFile(
 }
 
 /////////////////////////////////////////////////
-bool gz::common::removeAll(
+bool common::removeAll(
     const std::string &_path,
     const FilesystemWarningOp _warningOp)
 {
@@ -326,7 +328,7 @@ bool gz::common::removeAll(
 }
 
 /////////////////////////////////////////////////
-std::string gz::common::uniqueFilePath(
+std::string common::uniqueFilePath(
     const std::string &_pathAndName,
     const std::string &_extension)
 {
@@ -344,7 +346,7 @@ std::string gz::common::uniqueFilePath(
 }
 
 /////////////////////////////////////////////////
-std::string gz::common::uniqueDirectoryPath(const std::string &_dir)
+std::string common::uniqueDirectoryPath(const std::string &_dir)
 {
   std::string result = _dir;
   int count = 1;
