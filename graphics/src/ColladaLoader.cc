@@ -40,7 +40,7 @@
 
 using namespace gz;
 using namespace common;
-using RawNodeAnim = std::map<double, std::vector<NodeTransform>>;
+using RawNodeAnim = std::map<double, std::vector<NodeTransform> >;
 using RawSkeletonAnim = std::map<std::string, RawNodeAnim>;
 
 namespace gz
@@ -48,7 +48,7 @@ namespace gz
   namespace common
   {
     /// \brief Private data for the ColladaLoader class
-    class ColladaLoader::Implementation
+    class  ColladaLoader::Implementation
     {
       /// \brief scaling factor
       public: double meter;
@@ -91,16 +91,13 @@ namespace gz
 
       /// \brief Map of collada NORMAL ids to a map of
       /// duplicate normals.
-      public:
-      std::map<std::string, std::shared_ptr<std::unordered_map<unsigned int,
-        unsigned int>>> normalDuplicateMap;
+      public: std::map<std::string, std::shared_ptr
+        <std::unordered_map<unsigned int, unsigned int>>> normalDuplicateMap;
 
       /// \brief Map of collada TEXCOORD ids to a map of
       /// duplicate texture coordinates.
-      public:
-      std::map<std::string, std::shared_ptr<std::unordered_map
-        <unsigned int, unsigned int>>>
-          texcoordDuplicateMap;
+      public: std::map<std::string, std::shared_ptr<std::unordered_map
+        <unsigned int, unsigned int>>> texcoordDuplicateMap;
 
       /// \brief Current scene being parsed
       public: tinyxml2::XMLElement *currentScene = nullptr;
@@ -257,25 +254,25 @@ namespace gz
       /// \param[in] _trianglesXml Pointer the triangles XML instance
       /// \param[in] _transform Transform to apply to all triangles
       /// \param[out] _mesh Mesh that is currently being loaded
-    public: void LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
-                         const gz::math::Matrix4d &_transform,
-                         Mesh *_mesh);
+      public: void LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
+                                  const gz::math::Matrix4d &_transform,
+                                  Mesh *_mesh);
 
       /// \brief Load a polygon list
       /// \param[in] _polylistXml Pointer to the XML element
       /// \param[in] _transform Transform to apply to each polygon
       /// \param[out] _mesh Mesh that is currently being loaded
-    public: void LoadPolylist(tinyxml2::XMLElement *_polylistXml,
-                        const gz::math::Matrix4d &_transform,
-                        Mesh *_mesh);
+      public: void LoadPolylist(tinyxml2::XMLElement *_polylistXml,
+                                   const gz::math::Matrix4d &_transform,
+                                   Mesh *_mesh);
 
       /// \brief Load lines
       /// \param[in] _xml Pointer to the XML element
       /// \param[in] _transform Transform to apply
       /// \param[out] _mesh Mesh that is currently being loaded
-    public: void LoadLines(tinyxml2::XMLElement *_xml,
-                     const gz::math::Matrix4d &_transform,
-                     Mesh *_mesh);
+      public: void LoadLines(tinyxml2::XMLElement *_xml,
+                              const gz::math::Matrix4d &_transform,
+                              Mesh *_mesh);
 
       /// \brief Load an entire scene
       /// \param[out] _mesh Mesh that is currently being loaded
@@ -369,7 +366,7 @@ struct Vector2dHash
 
 //////////////////////////////////////////////////
 ColladaLoader::ColladaLoader()
-    : MeshLoader(), dataPtr(gz::utils::MakeImpl<Implementation>())
+: MeshLoader(), dataPtr(gz::utils::MakeImpl<Implementation>())
 {
   this->dataPtr->meter = 1.0;
 }
@@ -519,7 +516,7 @@ void ColladaLoader::Implementation::LoadNode(
   if (_elem->FirstChildElement("instance_node"))
   {
     std::string nodeURLStr =
-        _elem->FirstChildElement("instance_node")->Attribute("url");
+      _elem->FirstChildElement("instance_node")->Attribute("url");
 
     nodeXml = this->ElementId("node", nodeURLStr);
     if (!nodeXml)
@@ -565,7 +562,7 @@ void ColladaLoader::Implementation::LoadNode(
   }
 
   tinyxml2::XMLElement *instContrXml =
-      nodeXml->FirstChildElement("instance_controller");
+    nodeXml->FirstChildElement("instance_controller");
   while (instContrXml)
   {
     std::string contrURL = instContrXml->Attribute("url");
@@ -629,9 +626,9 @@ gz::math::Matrix4d ColladaLoader::Implementation::LoadNodeTransform(
     for (unsigned int i = 0; i < 16; ++i)
       iss >> values[i];
     transform.Set(values[0], values[1], values[2], values[3],
-                  values[4], values[5], values[6], values[7],
-                  values[8], values[9], values[10], values[11],
-                  values[12], values[13], values[14], values[15]);
+        values[4], values[5], values[6], values[7],
+        values[8], values[9], values[10], values[11],
+        values[12], values[13], values[14], values[15]);
   }
   else
   {
@@ -757,8 +754,7 @@ void ColladaLoader::Implementation::LoadController(
   if (!jointsXml)
   {
     gzerr << "Could not find node [" << jointsURL << "]. "
-          << "Failed to parse skinning information in Collada file."
-          << std::endl;
+        << "Failed to parse skinning information in Collada file." << std::endl;
     return;
   }
 
@@ -801,7 +797,7 @@ void ColladaLoader::Implementation::LoadController(
   if (rootXml && rootXml->FirstChildElement("library_animations"))
   {
     this->LoadAnimations(rootXml->FirstChildElement("library_animations"),
-                         skeleton);
+        skeleton);
   }
 
   tinyxml2::XMLElement *invBMXml = this->ElementId("source", invBindMatURL);
@@ -809,8 +805,7 @@ void ColladaLoader::Implementation::LoadController(
   if (nullptr == invBMXml)
   {
     gzerr << "Could not find node[" << invBindMatURL << "]. "
-          << "Failed to parse skinning information in Collada file."
-          << std::endl;
+        << "Faild to parse skinning information in Collada file." << std::endl;
     return;
   }
 
@@ -829,16 +824,16 @@ void ColladaLoader::Implementation::LoadController(
 
     unsigned int id = i * 16;
     gz::math::Matrix4d mat;
-    mat.Set(gz::math::parseFloat(strs[id + 0]),
-            gz::math::parseFloat(strs[id + 1]),
-            gz::math::parseFloat(strs[id + 2]),
-            gz::math::parseFloat(strs[id + 3]),
-            gz::math::parseFloat(strs[id + 4]),
-            gz::math::parseFloat(strs[id + 5]),
-            gz::math::parseFloat(strs[id + 6]),
-            gz::math::parseFloat(strs[id + 7]),
-            gz::math::parseFloat(strs[id + 8]),
-            gz::math::parseFloat(strs[id + 9]),
+    mat.Set(gz::math::parseFloat(strs[id +  0]),
+            gz::math::parseFloat(strs[id +  1]),
+            gz::math::parseFloat(strs[id +  2]),
+            gz::math::parseFloat(strs[id +  3]),
+            gz::math::parseFloat(strs[id +  4]),
+            gz::math::parseFloat(strs[id +  5]),
+            gz::math::parseFloat(strs[id +  6]),
+            gz::math::parseFloat(strs[id +  7]),
+            gz::math::parseFloat(strs[id +  8]),
+            gz::math::parseFloat(strs[id +  9]),
             gz::math::parseFloat(strs[id + 10]),
             gz::math::parseFloat(strs[id + 11]),
             gz::math::parseFloat(strs[id + 12]),
@@ -924,7 +919,7 @@ void ColladaLoader::Implementation::LoadController(
 
 /////////////////////////////////////////////////
 void ColladaLoader::Implementation::LoadAnimations(tinyxml2::XMLElement *_xml,
-                                                   SkeletonPtr _skel)
+    SkeletonPtr _skel)
 {
   tinyxml2::XMLElement *childXml = _xml->FirstChildElement("animation");
   if (childXml->FirstChildElement("animation"))
@@ -941,7 +936,7 @@ void ColladaLoader::Implementation::LoadAnimations(tinyxml2::XMLElement *_xml,
 
 /////////////////////////////////////////////////
 void ColladaLoader::Implementation::LoadAnimationSet(tinyxml2::XMLElement *_xml,
-                                                     SkeletonPtr _skel)
+    SkeletonPtr _skel)
 {
   std::stringstream animName;
   if (_xml->Attribute("name"))
@@ -981,7 +976,7 @@ void ColladaLoader::Implementation::LoadAnimationSet(tinyxml2::XMLElement *_xml,
         targetTrans = targetStr.substr(targetStr.find('/') + 1);
       else
         targetTrans = targetStr.substr(targetStr.find('/') + 1,
-                              targetStr.find(sep) - targetStr.find('/') - 1);
+                          targetStr.find(sep) - targetStr.find('/') - 1);
 
       std::string idxStr = targetStr.substr(targetStr.find(sep) + 1);
       int idx1 = -1;
@@ -1044,7 +1039,7 @@ void ColladaLoader::Implementation::LoadAnimationSet(tinyxml2::XMLElement *_xml,
         values.push_back(math::parseFloat(outputStrs[i]));
 
       tinyxml2::XMLElement *accessor =
-          frameTransXml->FirstChildElement("technique_common");
+        frameTransXml->FirstChildElement("technique_common");
       accessor = accessor->FirstChildElement("accessor");
 
       // stride is optional, default to 1
@@ -1064,7 +1059,7 @@ void ColladaLoader::Implementation::LoadAnimationSet(tinyxml2::XMLElement *_xml,
         if (targetNodeXml == nullptr)
         {
           gzerr << "Failed to load animation, [" << targetBone << "] not found"
-                << std::endl;
+              << std::endl;
           continue;
         }
         targetNode = this->LoadSkeletonNodes(targetNodeXml, nullptr);
@@ -1093,7 +1088,7 @@ void ColladaLoader::Implementation::LoadAnimationSet(tinyxml2::XMLElement *_xml,
           else
           {
             gzerr << "Failed to find node with ID [" << targetBone << "]"
-                  << std::endl;
+                    << std::endl;
           }
         }
 
@@ -1113,7 +1108,7 @@ void ColladaLoader::Implementation::LoadAnimationSet(tinyxml2::XMLElement *_xml,
             else
             {
               for (unsigned int k = 0; k < stride; k++)
-                nt->SetComponent(k, values[(i * stride) + k]);
+                nt->SetComponent(k, values[(i*stride) + k]);
             }
           }
         }
@@ -1128,9 +1123,9 @@ void ColladaLoader::Implementation::LoadAnimationSet(tinyxml2::XMLElement *_xml,
   SkeletonAnimation *anim = new SkeletonAnimation(animName.str());
 
   for (RawSkeletonAnim::iterator iter = animation.begin();
-       iter != animation.end(); ++iter)
+        iter != animation.end(); ++iter)
     for (RawNodeAnim::iterator niter = iter->second.begin();
-         niter != iter->second.end(); ++niter)
+          niter != iter->second.end(); ++niter)
     {
       gz::math::Matrix4d transform(gz::math::Matrix4d::Identity);
       for (unsigned int i = 0; i < niter->second.size(); ++i)
@@ -1167,10 +1162,10 @@ SkeletonNode *ColladaLoader::Implementation::LoadSingleSkeletonNode(
     return nullptr;
   }
 
-  SkeletonNode *node = new SkeletonNode(_parent, name, _xml->Attribute("id"));
+  SkeletonNode* node = new SkeletonNode(_parent, name, _xml->Attribute("id"));
 
-  if (!_xml->Attribute("type") ||
-    std::string(_xml->Attribute("type")) == "NODE")
+  if (!_xml->Attribute("type")
+      || std::string(_xml->Attribute("type")) == "NODE")
   {
     node->SetType(SkeletonNode::NODE);
   }
@@ -1198,7 +1193,7 @@ SkeletonNode *ColladaLoader::Implementation::LoadSkeletonNodes(
   if (std::string(_xml->Value()) != "node")
   {
     gzwarn << "Failed to load element [" << _xml->Value()
-           << "] as skeleton node." << std::endl;
+            << "] as skeleton node." << std::endl;
     return nullptr;
   }
 
@@ -1240,9 +1235,9 @@ void ColladaLoader::Implementation::SetSkeletonNodeTransform(
     for (unsigned int i = 0; i < 16; ++i)
       iss >> values[i];
     transform.Set(values[0], values[1], values[2], values[3],
-                  values[4], values[5], values[6], values[7],
-                  values[8], values[9], values[10], values[11],
-                  values[12], values[13], values[14], values[15]);
+        values[4], values[5], values[6], values[7],
+        values[8], values[9], values[10], values[11],
+        values[12], values[13], values[14], values[15]);
 
     NodeTransform nt(transform);
     nt.SetSourceValues(transform);
@@ -1324,7 +1319,7 @@ void ColladaLoader::Implementation::SetSkeletonNodeTransform(
 
 /////////////////////////////////////////////////
 void ColladaLoader::Implementation::LoadGeometry(tinyxml2::XMLElement *_xml,
-                            const gz::math::Matrix4d &_transform, Mesh *_mesh)
+    const gz::math::Matrix4d &_transform, Mesh *_mesh)
 {
   tinyxml2::XMLElement *meshXml = _xml->FirstChildElement("mesh");
   tinyxml2::XMLElement *childXml;
@@ -1412,7 +1407,7 @@ void ColladaLoader::Implementation::LoadVertices(const std::string &_id,
   std::shared_ptr<std::unordered_map<unsigned int, unsigned int>> &_normDups)
 {
   tinyxml2::XMLElement *verticesXml = this->ElementId(this->colladaXml,
-                                                      "vertices", _id);
+      "vertices", _id);
 
   if (!verticesXml)
   {
@@ -1473,7 +1468,7 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
       {
         count = std::stoi(floatArrayXml->Attribute("count"));
       }
-      catch (...)
+      catch(...)
       {
         // Do nothing. Messages are printed out below.
       }
@@ -1482,12 +1477,12 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
     if (count)
     {
       gzerr << "Vertex source missing float_array element, "
-            << "or count is invalid.\n";
+        << "or count is invalid.\n";
     }
     else
     {
       gzlog << "Vertex source has a float_array with a count of zero. "
-            << "This is likely not desired\n";
+        << "This is likely not desired\n";
     }
 
     return;
@@ -1541,13 +1536,12 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
   std::string valueStr = floatArrayXml->GetText();
 
   std::unordered_map<gz::math::Vector3d,
-                     unsigned int, Vector3Hash>
-      unique;
+      unsigned int, Vector3Hash> unique;
 
-  auto to_double_vec = [](std::string_view sv, size_t total_count)
+  auto toDoubleVec = [](std::string_view sv, size_t totalCount)
   {
     std::vector<double> result;
-    result.reserve(total_count * 3);
+    result.reserve(totalCount * 3);
     const char *start = sv.data();
     char *end{};
     while (true)
@@ -1563,7 +1557,7 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
     return result;
   };
 
-  auto values = to_double_vec(valueStr, totCount);
+  auto values = toDoubleVec(valueStr, totCount);
   for (int i = 0; i < totCount; i += stride)
   {
     gz::math::Vector3d vec(values[i],
@@ -1586,11 +1580,11 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
     // create a map of duplicate indices
     if (unique.find(vec) != unique.end())
     {
-      (*_duplicates)[(*_values).size() - 1] = unique[vec];
+      (*_duplicates)[(*_values).size()-1] = unique[vec];
     }
     else
     {
-      unique[vec] = (*_values).size() - 1;
+      unique[vec] = (*_values).size()-1;
     }
   }
 
@@ -1600,10 +1594,10 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
 
 /////////////////////////////////////////////////
 void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
-                const gz::math::Matrix4d &_transform,
-                std::shared_ptr<std::vector<gz::math::Vector3d>> &_values,
-                std::shared_ptr<std::unordered_map<unsigned int,
-                  unsigned int>> &_duplicates)
+    const gz::math::Matrix4d &_transform,
+    std::shared_ptr<std::vector<gz::math::Vector3d>> &_values,
+    std::shared_ptr<std::unordered_map<unsigned int,
+    unsigned int>> &_duplicates)
 {
   if (this->normalIds.find(_id) != this->normalIds.end())
   {
@@ -1633,7 +1627,7 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
       {
         count = std::stoi(floatArrayXml->Attribute("count"));
       }
-      catch (...)
+      catch(...)
       {
         // Do nothing. Messages are printed out below.
       }
@@ -1642,20 +1636,19 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
     if (count)
     {
       gzwarn << "Normal source missing float_array element, or count is "
-             << "invalid.\n";
+        << "invalid.\n";
     }
     else
     {
       gzlog << "Normal source has a float_array with a count of zero. "
-            << "This is likely not desired\n";
+        << "This is likely not desired\n";
     }
 
     return;
   }
 
   std::unordered_map<gz::math::Vector3d,
-                     unsigned int, Vector3Hash>
-      unique;
+      unsigned int, Vector3Hash> unique;
 
   std::string valueStr = floatArrayXml->GetText();
   std::istringstream iss(valueStr);
@@ -1682,11 +1675,11 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
       // create a map of duplicate indices
       if (unique.find(vec) != unique.end())
       {
-        (*_duplicates)[(*_values).size() - 1] = unique[vec];
+        (*_duplicates)[(*_values).size()-1] = unique[vec];
       }
       else
       {
-        unique[vec] = (*_values).size() - 1;
+        unique[vec] = (*_values).size()-1;
       }
     }
   } while (iss);
@@ -1697,9 +1690,9 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
 
 /////////////////////////////////////////////////
 void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
-                  std::shared_ptr<std::vector<gz::math::Vector2d>> &_values,
-                  std::shared_ptr<std::unordered_map<unsigned int,
-                    unsigned int>> &_duplicates)
+    std::shared_ptr<std::vector<gz::math::Vector2d>> &_values,
+    std::shared_ptr<std::unordered_map<unsigned int,
+    unsigned int>> &_duplicates)
 {
   if (this->texcoordIds.find(_id) != this->texcoordIds.end())
   {
@@ -1732,7 +1725,7 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
       {
         count = std::stoi(floatArrayXml->Attribute("count"));
       }
-      catch (...)
+      catch(...)
       {
         // Do nothing. Messages are printed out below.
       }
@@ -1741,12 +1734,12 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
     if (count)
     {
       gzerr << "Normal source missing float_array element, or count is "
-            << "invalid.\n";
+        << "invalid.\n";
     }
     else
     {
       gzlog << "Normal source has a float_array with a count of zero. "
-            << "This is likely not desired\n";
+        << "This is likely not desired\n";
     }
 
     return;
@@ -1824,10 +1817,10 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
       unique;
 
 
-  auto to_double_vec = [](std::string_view sv, size_t total_count)
+  auto toDoubleVec = [](std::string_view sv, size_t totalCount)
   {
     std::vector<double> result;
-    result.reserve(total_count * 2);
+    result.reserve(totalCount * 2);
     const char *start = sv.data();
     char *end{};
     while (true)
@@ -1845,7 +1838,7 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
 
   // Read the raw texture values, and split them on spaces.
   std::string valueStr = floatArrayXml->GetText();
-  auto values = to_double_vec(valueStr, totCount);
+  auto values = toDoubleVec(valueStr, totCount);
 
   // Read in all the texture coordinates.
   for (int i = 0; i < totCount; i += stride)
@@ -1869,10 +1862,10 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
     // create a map of duplicate indices
     if (unique.find(vec) != unique.end())
     {
-      (*_duplicates)[(*_values).size() - 1] = unique[vec];
+      (*_duplicates)[(*_values).size()-1] = unique[vec];
     }
     else
-      unique[vec] = (*_values).size() - 1;
+      unique[vec] = (*_values).size()-1;
   }
 
   this->texcoordDuplicateMap[_id] = _duplicates;
@@ -1883,7 +1876,8 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
 MaterialPtr ColladaLoader::Implementation::LoadMaterial(
     const std::string &_name)
 {
-  if (this->materialIds.find(_name) != this->materialIds.end())
+  if (this->materialIds.find(_name)
+      != this->materialIds.end())
   {
     return this->materialIds[_name];
   }
@@ -1894,7 +1888,7 @@ MaterialPtr ColladaLoader::Implementation::LoadMaterial(
 
   MaterialPtr mat(new Material());
   std::string effectName =
-      matXml->FirstChildElement("instance_effect")->Attribute("url");
+    matXml->FirstChildElement("instance_effect")->Attribute("url");
   tinyxml2::XMLElement *effectXml = this->ElementId("effect", effectName);
 
   tinyxml2::XMLElement *commonXml =
@@ -2043,7 +2037,8 @@ void ColladaLoader::Implementation::LoadColorOrTexture(
 
     // rendering pipeline doesn't respect the blend mode, here we set
     // the diffuse to full white as a workaround.
-    if (_type == "diffuse" && _mat->Blend() == Material::BlendMode::REPLACE)
+    if (_type == "diffuse"
+        && _mat->Blend() == Material::BlendMode::REPLACE)
     {
       _mat->SetDiffuse(math::Color(1, 1, 1, 1));
     }
@@ -2051,7 +2046,7 @@ void ColladaLoader::Implementation::LoadColorOrTexture(
     _mat->SetLighting(true);
     tinyxml2::XMLElement *imageXml = NULL;
     std::string textureName =
-        typeElem->FirstChildElement("texture")->Attribute("texture");
+      typeElem->FirstChildElement("texture")->Attribute("texture");
     tinyxml2::XMLElement *textureXml = this->ElementId("newparam", textureName);
     if (textureXml)
     {
@@ -2076,7 +2071,7 @@ void ColladaLoader::Implementation::LoadColorOrTexture(
             if (surfaceXml && surfaceXml->FirstChildElement("init_from"))
             {
               imageXml = this->ElementId("image",
-                    surfaceXml->FirstChildElement("init_from")->GetText());
+                  surfaceXml->FirstChildElement("init_from")->GetText());
             }
           }
         }
@@ -2149,9 +2144,7 @@ void ColladaLoader::Implementation::LoadPolylist(
 
   // look up table of position/normal/texcoord duplicate indices
   std::unordered_map<unsigned int, std::shared_ptr
-    <std::unordered_map<unsigned int,
-  unsigned int>>>
-      texDupMap;
+    <std::unordered_map<unsigned int, unsigned int>>> texDupMap;
   std::shared_ptr<std::unordered_map<unsigned int,
     unsigned int>> normalDupMap;
   std::shared_ptr<std::unordered_map<unsigned int,
@@ -2174,7 +2167,7 @@ void ColladaLoader::Implementation::LoadPolylist(
     {
       unsigned int count = (*norms).size();
       this->LoadVertices(source, _transform, verts, norms,
-                         positionDupMap, normalDupMap);
+          positionDupMap, normalDupMap);
       if ((*norms).size() > count)
         combinedVertNorms = true;
       inputs[VERTEX].insert(gz::math::parseInt(offset));
@@ -2200,7 +2193,7 @@ void ColladaLoader::Implementation::LoadPolylist(
     {
       inputs[otherSemantics++].insert(gz::math::parseInt(offset));
       gzwarn << "Polylist input semantic: '" << semantic << "' is currently"
-             << " not supported" << std::endl;
+          << " not supported" << std::endl;
     }
 
     polylistInputXml = polylistInputXml->NextSiblingElement("input");
@@ -2226,7 +2219,7 @@ void ColladaLoader::Implementation::LoadPolylist(
 
   // vertexIndexMap is a map of collada vertex index to Gazebo submesh vertex
   // indices, used for identifying vertices that can be shared.
-  std::map<unsigned int, std::vector<GeometryIndices>> vertexIndexMap;
+  std::map<unsigned int, std::vector<GeometryIndices> > vertexIndexMap;
   unsigned int *values = new unsigned int[inputSize];
   memset(values, 0, inputSize);
 
@@ -2236,7 +2229,7 @@ void ColladaLoader::Implementation::LoadPolylist(
   {
     // put us at the beginning of the polygon list
     if (l > 0)
-      strs_iter += inputSize * vcounts[l - 1];
+      strs_iter += inputSize * vcounts[l-1];
 
     for (unsigned int k = 2; k < static_cast<unsigned int>(vcounts[l]); ++k)
     {
@@ -2251,13 +2244,13 @@ void ColladaLoader::Implementation::LoadPolylist(
         if (j == 0)
           triangle_index = 0;
         if (j == 1)
-          triangle_index = (k - 1) * inputSize;
+          triangle_index = (k-1)*inputSize;
         if (j == 2)
           triangle_index = (k)*inputSize;
 
         for (unsigned int i = 0; i < inputSize; ++i)
         {
-          values[i] = gz::math::parseInt(strs_iter[triangle_index + i]);
+          values[i] = gz::math::parseInt(strs_iter[triangle_index+i]);
         }
 
         unsigned int daeVertIndex = 0;
@@ -2321,7 +2314,7 @@ void ColladaLoader::Implementation::LoadPolylist(
                   // duplicate then reset the index to the first instance of the
                   // duplicated texcoord
                   unsigned int remappedTexcoordIndex =
-                      values[offset];
+                    values[offset];
                   auto &texDupMapSet = (*texDupMap[set]);
                   auto texDupMapSetIt = texDupMapSet.find(
                       remappedTexcoordIndex);
@@ -2358,24 +2351,24 @@ void ColladaLoader::Implementation::LoadPolylist(
           if (!inputs[VERTEX].empty())
           {
             subMesh->AddVertex((*verts)[daeVertIndex]);
-            unsigned int newVertIndex = subMesh->VertexCount() - 1;
+            unsigned int newVertIndex = subMesh->VertexCount()-1;
             subMesh->AddIndex(newVertIndex);
             if (combinedVertNorms)
               subMesh->AddNormal((*norms)[daeVertIndex]);
             if (_mesh->HasSkeleton())
             {
               subMesh->SetVertex(newVertIndex, bindShapeMat *
-                                                subMesh->Vertex(newVertIndex));
+                  subMesh->Vertex(newVertIndex));
               SkeletonPtr skel = _mesh->MeshSkeleton();
               for (unsigned int i = 0;
-                   i < skel->VertNodeWeightCount(daeVertIndex); ++i)
+                  i < skel->VertNodeWeightCount(daeVertIndex); ++i)
               {
                 std::pair<std::string, double> node_weight =
-                    skel->VertNodeWeight(daeVertIndex, i);
+                  skel->VertNodeWeight(daeVertIndex, i);
                 SkeletonNode *node =
                     _mesh->MeshSkeleton()->NodeByName(node_weight.first);
-                subMesh->AddNodeAssignment(subMesh->VertexCount() - 1,
-                                           node->Handle(), node_weight.second);
+                subMesh->AddNodeAssignment(subMesh->VertexCount()-1,
+                                node->Handle(), node_weight.second);
               }
             }
             input.vertexIndex = daeVertIndex;
@@ -2384,7 +2377,7 @@ void ColladaLoader::Implementation::LoadPolylist(
           if (!inputs[NORMAL].empty())
           {
             unsigned int inputRemappedNormalIndex =
-                values[*inputs[NORMAL].begin()];
+              values[*inputs[NORMAL].begin()];
 
             if ((*normalDupMap).find(inputRemappedNormalIndex) !=
               (*normalDupMap).end())
@@ -2408,7 +2401,7 @@ void ColladaLoader::Implementation::LoadPolylist(
               unsigned int set = pair.second;
 
               unsigned int inputRemappedTexcoordIndex =
-                  values[offset];
+                values[offset];
 
               auto &texDupMapSet = (*texDupMap[set]);
               auto texDupMapSetIt = texDupMapSet.find(
@@ -2434,7 +2427,7 @@ void ColladaLoader::Implementation::LoadPolylist(
       }
     }
   }
-  delete[] values;
+  delete [] values;
 
   _mesh->AddSubMesh(std::move(subMesh));
 }
@@ -2562,7 +2555,7 @@ void ColladaLoader::Implementation::LoadTriangles(
     {
       inputs[otherSemantics++].insert(gz::math::parseInt(offset));
       gzwarn << "Triangle input semantic: '" << semantic << "' is currently"
-            << " not supported" << std::endl;
+          << " not supported" << std::endl;
     }
     trianglesInputXml = trianglesInputXml->NextSiblingElement("input");
   }
@@ -2591,12 +2584,12 @@ void ColladaLoader::Implementation::LoadTriangles(
     if (count)
     {
       gzerr << "Collada file[" << this->filename
-            << "] is invalid. Loading what we can...\n";
+        << "] is invalid. Loading what we can...\n";
     }
     else
     {
       gzlog << "Triangle input has a count of zero. "
-            << "This is likely not desired\n";
+        << "This is likely not desired\n";
     }
 
     return;
@@ -2611,7 +2604,7 @@ void ColladaLoader::Implementation::LoadTriangles(
 
   // vertexIndexMap is a map of collada vertex index to Gazebo submesh vertex
   // indices, used for identifying vertices that can be shared.
-  std::map<unsigned int, std::vector<GeometryIndices>> vertexIndexMap;
+  std::map<unsigned int, std::vector<GeometryIndices> > vertexIndexMap;
 
   std::vector<unsigned int> values(offsetSize);
   std::vector<std::string> strs = split(pStr, " \t\r\n");
@@ -2619,7 +2612,7 @@ void ColladaLoader::Implementation::LoadTriangles(
   for (unsigned int j = 0; j < strs.size(); j += offsetSize)
   {
     for (unsigned int i = 0; i < offsetSize; ++i)
-      values.at(i) = gz::math::parseInt(strs[j + i]);
+      values.at(i) = gz::math::parseInt(strs[j+i]);
 
     unsigned int daeVertIndex = 0;
     bool addIndex = !hasVertices;
@@ -2714,7 +2707,7 @@ void ColladaLoader::Implementation::LoadTriangles(
       if (hasVertices)
       {
         subMesh->AddVertex((*verts)[daeVertIndex]);
-        unsigned int newVertIndex = subMesh->VertexCount() - 1;
+        unsigned int newVertIndex = subMesh->VertexCount()-1;
         subMesh->AddIndex(newVertIndex);
 
         if (combinedVertNorms)
@@ -2723,20 +2716,20 @@ void ColladaLoader::Implementation::LoadTriangles(
         {
           SkeletonPtr skel = _mesh->MeshSkeleton();
           for (unsigned int i = 0;
-               i < skel->VertNodeWeightCount(daeVertIndex); ++i)
+              i < skel->VertNodeWeightCount(daeVertIndex); ++i)
           {
             std::pair<std::string, double> node_weight =
-                skel->VertNodeWeight(daeVertIndex, i);
+              skel->VertNodeWeight(daeVertIndex, i);
             SkeletonNode *node =
                 _mesh->MeshSkeleton()->NodeByName(node_weight.first);
             if (nullptr == node)
             {
               gzerr << "Failed to find skeleton node named ["
-                    << node_weight.first << "]" << std::endl;
+                  << node_weight.first << "]" << std::endl;
               continue;
             }
-            subMesh->AddNodeAssignment(subMesh->VertexCount() - 1,
-                                       node->Handle(), node_weight.second);
+            subMesh->AddNodeAssignment(subMesh->VertexCount()-1,
+                            node->Handle(), node_weight.second);
           }
         }
         input.vertexIndex = daeVertIndex;
@@ -2790,7 +2783,7 @@ void ColladaLoader::Implementation::LoadTriangles(
 
 /////////////////////////////////////////////////
 void ColladaLoader::Implementation::LoadLines(tinyxml2::XMLElement *_xml,
-                      const gz::math::Matrix4d &_transform, Mesh *_mesh)
+    const gz::math::Matrix4d &_transform, Mesh *_mesh)
 {
   std::unique_ptr<SubMesh> subMesh(new SubMesh);
   subMesh->SetName(this->currentNodeName);
@@ -2832,16 +2825,15 @@ float ColladaLoader::Implementation::LoadFloat(tinyxml2::XMLElement *_elem)
   if (_elem->FirstChildElement("float"))
   {
     value =
-        gz::math::parseFloat(_elem->FirstChildElement("float")->GetText());
+      gz::math::parseFloat(_elem->FirstChildElement("float")->GetText());
   }
 
   return value;
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::Implementation::LoadTransparent(
-                                      tinyxml2::XMLElement *_elem,
-                                      MaterialPtr _mat)
+void ColladaLoader::Implementation::LoadTransparent(tinyxml2::XMLElement *_elem,
+    MaterialPtr _mat)
 {
   const char *opaqueCStr = _elem->Attribute("opaque");
   if (!opaqueCStr)
@@ -2947,7 +2939,7 @@ void ColladaLoader::Implementation::LoadTransparent(
 
 /////////////////////////////////////////////////
 void ColladaLoader::Implementation::MergeSkeleton(SkeletonPtr _skeleton,
-                                                  SkeletonNode *_mergeNode)
+    SkeletonNode *_mergeNode)
 {
   if (nullptr == _skeleton)
   {
@@ -2986,7 +2978,7 @@ void ColladaLoader::Implementation::MergeSkeleton(SkeletonPtr _skeleton,
     // Check if the node that will be merged contains the dummy-root
     // if so, replace dummyRoot
     bool mergeNodeContainsRoot = true;
-    for (unsigned int i = 0; i < currentRoot->ChildCount(); ++i)
+    for (unsigned int i=0; i < currentRoot->ChildCount(); ++i)
     {
       if (_mergeNode->ChildById(currentRoot->Child(i)->Id()) == nullptr)
       {
