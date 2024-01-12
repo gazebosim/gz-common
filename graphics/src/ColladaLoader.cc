@@ -1561,7 +1561,8 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
   auto values = toDoubleVec(valueStr, totCount);
 
   gz::math::Vector3d vec;
-  std::shared_ptr<gz::math::Vector3d> prev_vec = std::make_shared<gz::math::Vector3d>(gz::math::Vector3d::Zero);
+  std::shared_ptr<gz::math::Vector3d> prev_vec =
+    std::make_shared<gz::math::Vector3d>(gz::math::Vector3d::Zero);
   if (!_values)
     _values = std::make_shared<std::vector<gz::math::Vector3d>>();
   if (!_duplicates)
@@ -1726,7 +1727,8 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
   auto values = toDoubleVec(valueStr, totCount);
 
   gz::math::Vector3d vec;
-  std::shared_ptr<gz::math::Vector3d> prev_vec = std::make_shared<gz::math::Vector3d>(gz::math::Vector3d::Zero);
+  std::shared_ptr<gz::math::Vector3d> prev_vec =
+    std::make_shared<gz::math::Vector3d>(gz::math::Vector3d::Zero);
   if (!_values)
     _values = std::make_shared<std::vector<gz::math::Vector3d>>();
   if (!_duplicates)
@@ -1914,7 +1916,8 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
   auto values = toDoubleVec(valueStr, totCount);
 
   gz::math::Vector2d vec;
-  std::shared_ptr<gz::math::Vector2d> prev_vec = std::make_shared<gz::math::Vector2d>(gz::math::Vector2d::Zero);
+  std::shared_ptr<gz::math::Vector2d> prev_vec =
+    std::make_shared<gz::math::Vector2d>(gz::math::Vector2d::Zero);
   if (!_values)
     _values = std::make_shared<std::vector<gz::math::Vector2d>>();
   if (!_duplicates)
@@ -1926,7 +1929,6 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
     // We only handle 2D texture coordinates right now.
     vec.Set(values[i],
             1.0 - values[i + 1]);
-    // std::cout << "vector is: " << vec << std::endl;
     (*_values).emplace_back(vec);
 
     // create a map of duplicate indices
@@ -2293,7 +2295,7 @@ void ColladaLoader::Implementation::LoadPolylist(
 
   // vertexIndexMap is a map of collada vertex index to Gazebo submesh vertex
   // indices, used for identifying vertices that can be shared.
-  std::map<unsigned int, std::vector<GeometryIndices> > vertexIndexMap;
+  std::unordered_map<unsigned int, std::vector<GeometryIndices>> vertexIndexMap;
   unsigned int *values = new unsigned int[inputSize];
   memset(values, 0, inputSize);
 
@@ -2678,7 +2680,7 @@ void ColladaLoader::Implementation::LoadTriangles(
 
   // vertexIndexMap is a map of collada vertex index to Gazebo submesh vertex
   // indices, used for identifying vertices that can be shared.
-  std::map<unsigned int, std::vector<GeometryIndices> > vertexIndexMap;
+  std::unordered_map<unsigned int, std::vector<GeometryIndices>> vertexIndexMap;
 
   std::vector<unsigned int> values(offsetSize);
   std::vector<std::string> strs = split(pStr, " \t\r\n");
