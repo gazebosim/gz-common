@@ -292,6 +292,17 @@
 
 ## Gazebo Common 3.x
 
+## Gazebo Common 3.17.0 (2024-01-05)
+
+1. Fix error output when creating directories
+    * [Pull request #561](https://github.com/gazebosim/gz-common/pull/561)
+
+1. Update github action workflows
+    * [Pull request #558](https://github.com/gazebosim/gz-common/pull/558)
+
+1. Fix segfault in case of no write access to log dir
+    * [Pull request #546](https://github.com/gazebosim/gz-common/pull/546)
+
 ## Gazebo Common 3.16.0 (2023-06-05)
 
 1. Include cstdint to build with GCC 13
