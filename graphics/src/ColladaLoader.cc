@@ -884,7 +884,7 @@ void ColladaLoader::Implementation::LoadController(
 
   std::vector<float> weights;
   for (unsigned int i = 0; i < wStrs.size(); ++i)
-    weights.push_back(math::parseFloat(wStrs[i]));
+    weights.emplace_back(math::parseFloat(wStrs[i]));
 
   std::string cString = vertWeightsXml->FirstChildElement("vcount")->GetText();
   std::string vString = vertWeightsXml->FirstChildElement("v")->GetText();
@@ -895,10 +895,10 @@ void ColladaLoader::Implementation::LoadController(
   std::vector<unsigned int> v;
 
   for (unsigned int i = 0; i < vCountStrs.size(); ++i)
-    vCount.push_back(math::parseInt(vCountStrs[i]));
+    vCount.emplace_back(math::parseInt(vCountStrs[i]));
 
   for (unsigned int i = 0; i < vStrs.size(); ++i)
-    v.push_back(math::parseInt(vStrs[i]));
+    v.emplace_back(math::parseInt(vStrs[i]));
 
   skeleton->SetNumVertAttached(vCount.size());
 
@@ -1027,7 +1027,7 @@ void ColladaLoader::Implementation::LoadAnimationSet(tinyxml2::XMLElement *_xml,
 
       std::vector<double> times;
       for (unsigned int i = 0; i < timeStrs.size(); ++i)
-        times.push_back(math::parseFloat(timeStrs[i]));
+        times.emplace_back(math::parseFloat(timeStrs[i]));
 
       tinyxml2::XMLElement *output =
           frameTransXml->FirstChildElement("float_array");
@@ -1036,7 +1036,7 @@ void ColladaLoader::Implementation::LoadAnimationSet(tinyxml2::XMLElement *_xml,
 
       std::vector<double> values;
       for (unsigned int i = 0; i < outputStrs.size(); ++i)
-        values.push_back(math::parseFloat(outputStrs[i]));
+        values.emplace_back(math::parseFloat(outputStrs[i]));
 
       tinyxml2::XMLElement *accessor =
         frameTransXml->FirstChildElement("technique_common");
@@ -1541,6 +1541,7 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
   auto toDoubleVec = [](std::string_view sv, size_t totalCount)
   {
     std::vector<double> result;
+    // Preallocate memory based on known count
     result.reserve(totalCount * 3);
     const char *start = sv.data();
     char *end{};
@@ -1552,40 +1553,33 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
       start = end;
       if (errno == ERANGE)
         throw std::runtime_error("strtod() overflow");
-      result.push_back(d);
+      result.emplace_back(d);
     }
     return result;
   };
 
   auto values = toDoubleVec(valueStr, totCount);
+
+  gz::math::Vector3d vec;
+  if (!_values)
+    _values = std::make_shared<std::vector<gz::math::Vector3d>>();
+  if (!_duplicates)
+    _duplicates = std::make_shared<std::unordered_map<unsigned int,
+                                                      unsigned int>>();
   for (int i = 0; i < totCount; i += stride)
   {
-    gz::math::Vector3d vec(values[i],
-                           values[i+1],
-                           values[i+2]);
+    vec.Set(values[i],
+            values[i+1],
+            values[i+2]);
 
     vec = _transform * vec;
-    if (!_values)
-    {
-      _values = std::make_shared<std::vector<gz::math::Vector3d>>();
-    }
-    (*_values).push_back(vec);
-
-    if (!_duplicates)
-    {
-      _duplicates = std::make_shared<std::unordered_map<unsigned int,
-                                                        unsigned int>>();
-    }
+    (*_values).emplace_back(vec);
 
     // create a map of duplicate indices
     if (unique.find(vec) != unique.end())
-    {
       (*_duplicates)[(*_values).size()-1] = unique[vec];
-    }
     else
-    {
       unique[vec] = (*_values).size()-1;
-    }
   }
 
   this->positionDuplicateMap[_id] = _duplicates;
@@ -1618,6 +1612,10 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
 
   tinyxml2::XMLElement *floatArrayXml =
       normalsXml->FirstChildElement("float_array");
+
+  int totCount = 0;
+  int stride = 0;
+
   if (!floatArrayXml || !floatArrayXml->GetText())
   {
     int count = 1;
@@ -1635,7 +1633,7 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
 
     if (count)
     {
-      gzwarn << "Normal source missing float_array element, or count is "
+      gzerr << "Normal source missing float_array element, or count is "
         << "invalid.\n";
     }
     else
@@ -1646,43 +1644,103 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
 
     return;
   }
+  // Read in the total number of normal coordinate values
+  else if (floatArrayXml->Attribute("count"))
+    totCount = std::stoi(floatArrayXml->Attribute("count"));
+  else
+  {
+    gzerr << "<float_array> has no count attribute in normal coordinate "
+          << "element with id[" << _id << "]\n";
+    return;
+  }
+
+  normalsXml = normalsXml->FirstChildElement("technique_common");
+  if (!normalsXml)
+  {
+    gzerr << "Unable to find technique_common element for normals "
+          << "coordinates with id[" << _id << "]\n";
+    return;
+  }
+
+  // Get the accessor XML element.
+  normalsXml = normalsXml->FirstChildElement("accessor");
+  if (!normalsXml)
+  {
+    gzerr << "Unable to find <accessor> as a child of <technique_common> "
+          << "for normals coordinates with id[" << _id << "]\n";
+    return;
+  }
+
+  // Read in the stride for the normals coordinate values. The stride
+  // indicates the number of values in the float array the comprise
+  // a complete normal coordinate.
+  if (normalsXml->Attribute("stride"))
+  {
+    stride = std::stoi(normalsXml->Attribute("stride"));
+  }
+  else
+  {
+    gzerr << "<accessor> has no stride attribute in normal coordinate "
+          << "element with id[" << _id << "]\n";
+    return;
+  }
+
+  // Nothing to read. Don't print a warning because the collada file is
+  // correct.
+  if (totCount == 0)
+    return;
 
   std::unordered_map<gz::math::Vector3d,
       unsigned int, Vector3Hash> unique;
 
   std::string valueStr = floatArrayXml->GetText();
-  std::istringstream iss(valueStr);
-  do
-  {
-    gz::math::Vector3d vec;
-    iss >> vec.X() >> vec.Y() >> vec.Z();
-    if (iss)
-    {
-      vec = rotMat * vec;
-      vec.Normalize();
-      if (!_values)
-      {
-        _values = std::make_shared<std::vector<gz::math::Vector3d>>();
-      }
-      (*_values).push_back(vec);
+  // std::istringstream iss(valueStr);
 
-      if (!_duplicates)
-      {
+  auto toDoubleVec = [](std::string_view sv, size_t totalCount)
+  {
+    std::vector<double> result;
+    // Preallocate memory based on known count
+    result.reserve(totalCount * 3);
+    const char *start = sv.data();
+    char *end{};
+    while (true)
+    {
+      double d = std::strtod(start, &end);
+      if (start == end)
+        break;
+      start = end;
+      if (errno == ERANGE)
+        throw std::runtime_error("strtod() overflow");
+      result.emplace_back(d);
+    }
+    return result;
+  };
+
+  auto values = toDoubleVec(valueStr, totCount);
+
+  gz::math::Vector3d vec;
+  if (!_values)
+    _values = std::make_shared<std::vector<gz::math::Vector3d>>();
+  if (!_duplicates)
         _duplicates = std::make_shared<std::unordered_map<unsigned int,
                                                           unsigned int>>();
-      }
 
-      // create a map of duplicate indices
-      if (unique.find(vec) != unique.end())
-      {
-        (*_duplicates)[(*_values).size()-1] = unique[vec];
-      }
-      else
-      {
-        unique[vec] = (*_values).size()-1;
-      }
-    }
-  } while (iss);
+  for (int i = 0; i < totCount; i += stride)
+  {
+    vec.Set(values[i],
+            values[i+1],
+            values[i+2]);
+
+    vec = rotMat * vec;
+    vec.Normalize();
+    (*_values).emplace_back(vec);
+
+    // create a map of duplicate indices
+    if (unique.find(vec) != unique.end())
+      (*_duplicates)[(*_values).size()-1] = unique[vec];
+    else
+      unique[vec] = (*_values).size()-1;
+  }
 
   this->normalDuplicateMap[_id] = _duplicates;
   this->normalIds[_id] = _values;
@@ -1820,6 +1878,7 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
   auto toDoubleVec = [](std::string_view sv, size_t totalCount)
   {
     std::vector<double> result;
+    // Preallocate memory based on known count
     result.reserve(totalCount * 2);
     const char *start = sv.data();
     char *end{};
@@ -1831,7 +1890,7 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
       start = end;
       if (errno == ERANGE)
         throw std::runtime_error("strtod() overflow");
-      result.push_back(d);
+      result.emplace_back(d);
     }
     return result;
   };
@@ -1840,30 +1899,23 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
   std::string valueStr = floatArrayXml->GetText();
   auto values = toDoubleVec(valueStr, totCount);
 
+  gz::math::Vector2d vec;
+  if (!_values)
+    _values = std::make_shared<std::vector<gz::math::Vector2d>>();
+  if (!_duplicates)
+    _duplicates = std::make_shared<std::unordered_map<unsigned int,
+                                                      unsigned int>>();
   // Read in all the texture coordinates.
   for (int i = 0; i < totCount; i += stride)
   {
     // We only handle 2D texture coordinates right now.
-    gz::math::Vector2d vec(values[i],
-                           1.0 - values[i + 1]);
-
-    if (!_values)
-    {
-      _values = std::make_shared<std::vector<gz::math::Vector2d>>();
-    }
-    (*_values).push_back(vec);
-
-    if (!_duplicates)
-    {
-      _duplicates = std::make_shared<std::unordered_map<unsigned int,
-                                                        unsigned int>>();
-    }
+    vec.Set(values[i],
+            1.0 - values[i + 1]);
+    (*_values).emplace_back(vec);
 
     // create a map of duplicate indices
     if (unique.find(vec) != unique.end())
-    {
       (*_duplicates)[(*_values).size()-1] = unique[vec];
-    }
     else
       unique[vec] = (*_values).size()-1;
   }
@@ -2187,7 +2239,7 @@ void ColladaLoader::Implementation::LoadPolylist(
         set = gz::math::parseInt(setStr);
       this->LoadTexCoords(source, texcoords[set], texDupMap[set]);
       inputs[TEXCOORD].insert(offsetInt);
-      texcoordsOffsetToSet.push_back(std::make_pair(offsetInt, set));
+      texcoordsOffsetToSet.emplace_back(std::make_pair(offsetInt, set));
     }
     else
     {
@@ -2211,7 +2263,7 @@ void ColladaLoader::Implementation::LoadPolylist(
   std::vector<std::string> vcountStrs = split(vcountStr, " \t\r\n");
   std::vector<int> vcounts;
   for (unsigned int j = 0; j < vcountStrs.size(); ++j)
-    vcounts.push_back(math::parseInt(vcountStrs[j]));
+    vcounts.emplace_back(math::parseInt(vcountStrs[j]));
 
   // read p
   tinyxml2::XMLElement *pXml = _polylistXml->FirstChildElement("p");
@@ -2420,7 +2472,7 @@ void ColladaLoader::Implementation::LoadPolylist(
           if (!inputs[VERTEX].empty())
           {
             std::vector<GeometryIndices> inputValues;
-            inputValues.push_back(input);
+            inputValues.emplace_back(input);
             vertexIndexMap[daeVertIndex] = inputValues;
           }
         }
@@ -2548,7 +2600,7 @@ void ColladaLoader::Implementation::LoadTriangles(
         set = gz::math::parseInt(setStr);
       this->LoadTexCoords(source, texcoords[set], texDupMap[set]);
       inputs[TEXCOORD].insert(offsetInt);
-      texcoordsOffsetToSet.push_back(std::make_pair(offsetInt, set));
+      texcoordsOffsetToSet.emplace_back(std::make_pair(offsetInt, set));
       hasTexcoords = true;
     }
     else
@@ -2771,7 +2823,7 @@ void ColladaLoader::Implementation::LoadTriangles(
       if (hasVertices)
       {
         std::vector<GeometryIndices> inputValues;
-        inputValues.push_back(input);
+        inputValues.emplace_back(input);
         vertexIndexMap[daeVertIndex] = inputValues;
       }
     }
@@ -3014,7 +3066,7 @@ void ColladaLoader::Implementation::MergeSkeleton(SkeletonPtr _skeleton,
 void ColladaLoader::Implementation::ApplyInvBindTransform(SkeletonPtr _skeleton)
 {
   std::list<SkeletonNode *> queue;
-  queue.push_back(_skeleton->RootNode());
+  queue.emplace_back(_skeleton->RootNode());
 
   while (!queue.empty())
   {
@@ -3026,6 +3078,6 @@ void ColladaLoader::Implementation::ApplyInvBindTransform(SkeletonPtr _skeleton)
     if (node->HasInvBindTransform())
       node->SetModelTransform(node->InverseBindTransform().Inverse(), false);
     for (unsigned int i = 0; i < node->ChildCount(); i++)
-      queue.push_back(node->Child(i));
+      queue.emplace_back(node->Child(i));
   }
 }
