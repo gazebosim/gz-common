@@ -1088,7 +1088,7 @@ void ColladaLoader::Implementation::LoadAnimationSet(tinyxml2::XMLElement *_xml,
           else
           {
             gzerr << "Failed to find node with ID [" << targetBone << "]"
-                    << std::endl;
+                   << std::endl;
           }
         }
 
@@ -1892,13 +1892,13 @@ MaterialPtr ColladaLoader::Implementation::LoadMaterial(
   tinyxml2::XMLElement *effectXml = this->ElementId("effect", effectName);
 
   tinyxml2::XMLElement *commonXml =
-      effectXml->FirstChildElement("profile_COMMON");
+     effectXml->FirstChildElement("profile_COMMON");
   if (commonXml)
   {
     tinyxml2::XMLElement *techniqueXml =
-        commonXml->FirstChildElement("technique");
+       commonXml->FirstChildElement("technique");
     tinyxml2::XMLElement *lambertXml =
-        techniqueXml->FirstChildElement("lambert");
+       techniqueXml->FirstChildElement("lambert");
 
     tinyxml2::XMLElement *phongXml = techniqueXml->FirstChildElement("phong");
     tinyxml2::XMLElement *blinnXml = techniqueXml->FirstChildElement("blinn");
@@ -2725,7 +2725,7 @@ void ColladaLoader::Implementation::LoadTriangles(
             if (nullptr == node)
             {
               gzerr << "Failed to find skeleton node named ["
-                  << node_weight.first << "]" << std::endl;
+                     << node_weight.first << "]" << std::endl;
               continue;
             }
             subMesh->AddNodeAssignment(subMesh->VertexCount()-1,
@@ -2776,7 +2776,6 @@ void ColladaLoader::Implementation::LoadTriangles(
       }
     }
   }
-
 
   _mesh->AddSubMesh(std::move(subMesh));
 }
