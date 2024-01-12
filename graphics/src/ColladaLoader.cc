@@ -1561,6 +1561,7 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
   auto values = toDoubleVec(valueStr, totCount);
 
   gz::math::Vector3d vec;
+  std::shared_ptr<gz::math::Vector3d> prev_vec = std::make_shared<gz::math::Vector3d>(gz::math::Vector3d::Zero);
   if (!_values)
     _values = std::make_shared<std::vector<gz::math::Vector3d>>();
   if (!_duplicates)
@@ -1576,10 +1577,16 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
     (*_values).emplace_back(vec);
 
     // create a map of duplicate indices
-    if (unique.find(vec) != unique.end())
-      (*_duplicates)[(*_values).size()-1] = unique[vec];
+    if((*prev_vec) != vec){
+      if (unique.find(vec) != unique.end())
+        (*_duplicates)[(*_values).size()-1] = unique[vec];
+      else
+        unique[vec] = (*_values).size()-1;
+    }
     else
       unique[vec] = (*_values).size()-1;
+
+    (*prev_vec) = vec;
   }
 
   this->positionDuplicateMap[_id] = _duplicates;
@@ -1719,6 +1726,7 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
   auto values = toDoubleVec(valueStr, totCount);
 
   gz::math::Vector3d vec;
+  std::shared_ptr<gz::math::Vector3d> prev_vec = std::make_shared<gz::math::Vector3d>(gz::math::Vector3d::Zero);
   if (!_values)
     _values = std::make_shared<std::vector<gz::math::Vector3d>>();
   if (!_duplicates)
@@ -1736,10 +1744,16 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
     (*_values).emplace_back(vec);
 
     // create a map of duplicate indices
-    if (unique.find(vec) != unique.end())
-      (*_duplicates)[(*_values).size()-1] = unique[vec];
+    if((*prev_vec) != vec){
+      if (unique.find(vec) != unique.end())
+        (*_duplicates)[(*_values).size()-1] = unique[vec];
+      else
+        unique[vec] = (*_values).size()-1;
+    }
     else
       unique[vec] = (*_values).size()-1;
+
+    (*prev_vec) = vec;
   }
 
   this->normalDuplicateMap[_id] = _duplicates;
@@ -1900,6 +1914,7 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
   auto values = toDoubleVec(valueStr, totCount);
 
   gz::math::Vector2d vec;
+  std::shared_ptr<gz::math::Vector2d> prev_vec = std::make_shared<gz::math::Vector2d>(gz::math::Vector2d::Zero);
   if (!_values)
     _values = std::make_shared<std::vector<gz::math::Vector2d>>();
   if (!_duplicates)
@@ -1911,13 +1926,20 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
     // We only handle 2D texture coordinates right now.
     vec.Set(values[i],
             1.0 - values[i + 1]);
+    // std::cout << "vector is: " << vec << std::endl;
     (*_values).emplace_back(vec);
 
     // create a map of duplicate indices
-    if (unique.find(vec) != unique.end())
-      (*_duplicates)[(*_values).size()-1] = unique[vec];
+    if((*prev_vec) != vec){
+      if (unique.find(vec) != unique.end())
+        (*_duplicates)[(*_values).size()-1] = unique[vec];
+      else
+        unique[vec] = (*_values).size()-1;
+    }
     else
       unique[vec] = (*_values).size()-1;
+
+   (*prev_vec) = vec;
   }
 
   this->texcoordDuplicateMap[_id] = _duplicates;
