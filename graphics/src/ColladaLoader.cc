@@ -2241,11 +2241,21 @@ void ColladaLoader::Implementation::LoadPolylist(
     std::string offset = polylistInputXml->Attribute("offset");
     if (semantic == "VERTEX")
     {
-      unsigned int count = (*norms).size();
+      unsigned int count;
+      if (!norms || norms->empty())
+        count = 0;
+      else
+        count = (*norms).size();
+
       this->LoadVertices(source, _transform, verts, norms,
           positionDupMap, normalDupMap);
-      if ((*norms).size() > count)
-        combinedVertNorms = true;
+
+      if (norms && !norms->empty())
+      {
+        if ((*norms).size() > count)
+          combinedVertNorms = true;
+      }
+
       inputs[VERTEX].insert(gz::math::parseInt(offset));
     }
     else if (semantic == "NORMAL")
@@ -2581,22 +2591,17 @@ void ColladaLoader::Implementation::LoadTriangles(
     {
       unsigned int count;
       if (!norms || norms->empty())
-      {
         count = 0;
-      }
       else
-      {
         count = (*norms).size();
-      }
+
       this->LoadVertices(source, _transform, verts, norms,
                         positionDupMap, normalDupMap);
 
       if (norms && !norms->empty())
       {
         if ((*norms).size() > count)
-        {
           combinedVertNorms = true;
-        }
       }
       inputs[VERTEX].insert(gz::math::parseInt(offset));
       hasVertices = true;
@@ -2610,9 +2615,7 @@ void ColladaLoader::Implementation::LoadTriangles(
       if (norms && !norms->empty())
       {
         if ((*norms).size() > 0)
-        {
           hasNormals = true;
-        }
       }
     }
     else if (semantic == "TEXCOORD")
