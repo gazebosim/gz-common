@@ -694,7 +694,13 @@ TEST_F(AssimpLoader, LoadGlTF2BoxWithJPEGTexture)
   EXPECT_EQ(math::Color(0.4f, 0.4f, 0.4f, 1.0f), mat->Ambient());
   EXPECT_EQ(math::Color(1.0f, 1.0f, 1.0f, 1.0f), mat->Diffuse());
   EXPECT_EQ(math::Color(0.0f, 0.0f, 0.0f, 1.0f), mat->Specular());
+  // Assimp 5.2.0 and above uses the scene name for its texture names,
+  // older version use the root node instead.
+#ifdef GZ_ASSIMP_PRE_5_2_0
   EXPECT_EQ("Cube_Material_Diffuse", mat->TextureImage());
+#else
+  EXPECT_EQ("Scene_Material_Diffuse", mat->TextureImage());
+#endif
   EXPECT_NE(nullptr, mat->TextureData());
   delete mesh;
 }
