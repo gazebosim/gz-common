@@ -18,6 +18,7 @@
 #ifndef GZ_COMMON_PROFILERIMPL_HH_
 #define GZ_COMMON_PROFILERIMPL_HH_
 
+#include <cstdint>
 #include <string>
 
 namespace gz
