@@ -72,10 +72,9 @@ Skeleton::Skeleton()
 
 //////////////////////////////////////////////////
 Skeleton::Skeleton(SkeletonNode *_root)
-: dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
+: Skeleton()
 {
-  this->dataPtr->root = _root;
-  this->BuildNodeMap();
+  this->RootNode(_root);
 }
 
 //////////////////////////////////////////////////

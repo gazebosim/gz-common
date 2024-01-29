@@ -688,8 +688,17 @@ BOOL Image::Implementation::PixelIndex(
 //////////////////////////////////////////////////
 void Image::Rescale(int _width, int _height)
 {
-  this->dataPtr->bitmap = FreeImage_Rescale(
+  auto *scaled = FreeImage_Rescale(
       this->dataPtr->bitmap, _width, _height, FILTER_LANCZOS3);
+
+  if (!scaled)
+  {
+    gzerr << "Failed to rescale image\n";
+    return;
+  }
+
+  FreeImage_Unload(this->dataPtr->bitmap);
+  this->dataPtr->bitmap = scaled;
 }
 
 //////////////////////////////////////////////////
