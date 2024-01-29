@@ -32,4 +32,6 @@ TEST_F(SkeletonAnimation, CheckNoXDisplacement)
     new common::SkeletonAnimation("emptyAnimation");
   auto xDisplacement = skelAnim->XDisplacement();
   ASSERT_FALSE(xDisplacement);
+
+  delete skelAnim;
 }

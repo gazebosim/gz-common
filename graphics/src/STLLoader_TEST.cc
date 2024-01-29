@@ -61,6 +61,7 @@ TEST_F(STLLoaderTest, LoadSTL)
   EXPECT_EQ(math::Vector3d(0, 0, -1), subMesh->Normal(2u));
 
   EXPECT_STREQ("", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+  delete mesh;
 
   mesh = loader.Load(
       common::testing::TestFile("data", "cube_binary.stl"));
@@ -88,4 +89,5 @@ TEST_F(STLLoaderTest, LoadSTL)
   EXPECT_EQ(math::Vector3d(0, 0, -1), subMesh->Normal(2u));
 
   EXPECT_STREQ("", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+  delete mesh;
 }
