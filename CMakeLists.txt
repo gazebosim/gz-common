@@ -99,6 +99,7 @@ gz_find_package(
 # Find GDAL
 gz_find_package(GDAL VERSION 3.0
   PKGCONFIG gdal
+  PKGCONFIG_VER_COMPARISON >=
   PRIVATE_FOR geospatial
   REQUIRED_BY geospatial)
 
