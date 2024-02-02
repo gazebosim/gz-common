@@ -1,5 +1,57 @@
 ## Gazebo Common 5.x
 
+## Gazebo Common 5.5.0 (2024-02-26)
+
+1. Be louder when graphics is missing for geospatial
+    * [Pull request #573](https://github.com/gazebosim/gz-common/pull/573)
+
+1. Multiple memory cleanup fixes
+    * [Pull request #571](https://github.com/gazebosim/gz-common/pull/571)
+
+1. Clarify GDAL version requirement
+    * [Pull request #574](https://github.com/gazebosim/gz-common/pull/574)
+
+1. 🎈  3.17.0
+    * [Pull request #567](https://github.com/gazebosim/gz-common/pull/567)
+
+1. Update CI badges in README
+    * [Pull request #566](https://github.com/gazebosim/gz-common/pull/566)
+
+1. Backwards compatible assimp texture name fix
+    * [Pull request #565](https://github.com/gazebosim/gz-common/pull/565)
+
+1. Fix error output when creating directories
+    * [Pull request #561](https://github.com/gazebosim/gz-common/pull/561)
+
+1. Update github action workflows
+    * [Pull request #558](https://github.com/gazebosim/gz-common/pull/558)
+
+1. Fix segfault in case of no write access to log dir
+    * [Pull request #546](https://github.com/gazebosim/gz-common/pull/546)
+
+1. ign -> gz
+    * [Pull request #547](https://github.com/gazebosim/gz-common/pull/547)
+
+1. Support loading glb with compressed jpeg textures
+    * [Pull request #545](https://github.com/gazebosim/gz-common/pull/545)
+
+1. Fix glTF / glb root node transform
+    * [Pull request #543](https://github.com/gazebosim/gz-common/pull/543)
+
+1. EnumIface: suppress deprecation warning
+    * [Pull request #540](https://github.com/gazebosim/gz-common/pull/540)
+
+1. Prevent loading lightmaps if mesh is a glb file that has an occlusion-metallic-roughness texture
+    * [Pull request #538](https://github.com/gazebosim/gz-common/pull/538)
+
+1. 🎈 3.16.0
+    * [Pull request #519](https://github.com/gazebosim/gz-common/pull/519)
+
+1. Fix cstdint with GCC 13
+    * [Pull request #528](https://github.com/gazebosim/gz-common/pull/528)
+    * [Pull request #517](https://github.com/gazebosim/gz-common/pull/517)
+    * [Pull request #513](https://github.com/gazebosim/gz-common/pull/513)
+
 ## Gazebo Common 5.4.2 (2023-09-26)
 
 1. Documentation fixes
