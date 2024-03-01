@@ -363,6 +363,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     mat->SetBlendFactors(opacity, 1.0 - opacity);
   }
 
+#ifndef GZ_ASSIMP_PRE_5_1_0
   // basic support for transmission - currently just overrides opacity
   // \todo(iche033) The transmission factor can be used with volume
   // material extension to simulate effects like refraction
@@ -374,6 +375,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   {
     mat->SetTransparency(transmission);
   }
+#endif
 
   // TODO(luca) more than one texture, Gazebo assumes UV index 0
   Pbr pbr;

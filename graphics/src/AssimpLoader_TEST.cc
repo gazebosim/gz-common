@@ -669,6 +669,7 @@ TEST_F(AssimpLoader, LoadGlTF2BoxExternalTexture)
 // Open a gltf mesh with transmission extension
 TEST_F(AssimpLoader, LoadGlTF2BoxTransmission)
 {
+#ifdef GZ_ASSIMP_PRE_5_1_0
   common::AssimpLoader loader;
   common::Mesh *mesh = loader.Load(
       common::testing::TestFile("data", "box_transmission.glb"));
@@ -685,6 +686,7 @@ TEST_F(AssimpLoader, LoadGlTF2BoxTransmission)
   // transmission currently modeled as transparency
   EXPECT_FLOAT_EQ(0.1, mat->Transparency());
   delete mesh;
+#endif
 }
 
 /////////////////////////////////////////////////
