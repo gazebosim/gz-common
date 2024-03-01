@@ -533,7 +533,8 @@ math::Color Image::Pixel(unsigned int _x, unsigned int _y) const
         << _x << " " << _y << "] \n";
       return clr;
     }
-    clr.Set(firgb.rgbRed, firgb.rgbGreen, firgb.rgbBlue);
+    clr.Set(firgb.rgbRed / 255.0f, firgb.rgbGreen / 255.0f,
+            firgb.rgbBlue / 255.0f);
   }
   else
   {
@@ -606,7 +607,8 @@ math::Color Image::MaxColor() const
             << x << " " << y << "] \n";
           continue;
         }
-        clr.Set(firgb.rgbRed, firgb.rgbGreen, firgb.rgbBlue);
+        clr.Set(firgb.rgbRed / 255.0f, firgb.rgbGreen / 255.0f,
+                firgb.rgbBlue / 255.0f);
 
         if (clr.R() + clr.G() + clr.B() > maxClr.R() + maxClr.G() + maxClr.B())
         {
