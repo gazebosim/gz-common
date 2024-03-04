@@ -666,6 +666,30 @@ TEST_F(AssimpLoader, LoadGlTF2BoxExternalTexture)
 }
 
 /////////////////////////////////////////////////
+// Open a gltf mesh with transmission extension
+TEST_F(AssimpLoader, LoadGlTF2BoxTransmission)
+{
+#ifndef GZ_ASSIMP_PRE_5_1_0
+  common::AssimpLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "box_transmission.glb"));
+
+  EXPECT_STREQ("unknown", mesh->Name().c_str());
+
+  // Make sure we can read the submesh name
+  EXPECT_STREQ("Cube", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+
+  EXPECT_EQ(mesh->MaterialCount(), 1u);
+
+  const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+  ASSERT_TRUE(mat.get());
+  // transmission currently modeled as transparency
+  EXPECT_FLOAT_EQ(0.1, mat->Transparency());
+  delete mesh;
+#endif
+}
+
+/////////////////////////////////////////////////
 // This test loads a box glb mesh with embedded compressed jpeg texture
 TEST_F(AssimpLoader, LoadGlTF2BoxWithJPEGTexture)
 {
