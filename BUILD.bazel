@@ -7,13 +7,20 @@ load(
     "gz_export_header",
     "gz_include_header",
 )
+load("@rules_license//rules:license.bzl", "license")
 
 package(
+    default_applicable_licenses = [GZ_ROOT + "common:license"],
     default_visibility = GZ_VISIBILITY,
     features = GZ_FEATURES,
 )
 
-licenses(["notice"])  # Apache-2.0
+license(
+    name = "license",
+    package_name = "gz-common",
+)
+
+licenses(["notice"])
 
 exports_files(["LICENSE"])
 
@@ -93,3 +100,5 @@ test_sources = glob(
         "@gtest//:gtest_main",
     ],
 ) for src in test_sources]
+
+add_lint_tests()
