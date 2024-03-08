@@ -6,10 +6,14 @@ load(
     "gz_export_header",
     "gz_include_header",
 )
+load(
+    "@gz//bazel/lint:lint.bzl",
+    "add_lint_tests",
+)
 
 package(
-  default_applicable_licenses = [GZ_ROOT + "common:license"],
-  features = GZ_FEATURES
+    default_applicable_licenses = [GZ_ROOT + "common:license"],
+    features = GZ_FEATURES,
 )
 
 public_headers_no_gen = glob([
@@ -69,3 +73,5 @@ cc_library(
         "@gtest//:gtest_main",
     ],
 ) for src in test_sources]
+
+add_lint_tests()

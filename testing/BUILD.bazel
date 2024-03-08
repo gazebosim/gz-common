@@ -4,10 +4,14 @@ load(
     "GZ_ROOT",
     "gz_export_header",
 )
+load(
+    "@gz//bazel/lint:lint.bzl",
+    "add_lint_tests",
+)
 
 package(
-  default_applicable_licenses = [GZ_ROOT + "common:license"],
-  features = GZ_FEATURES
+    default_applicable_licenses = [GZ_ROOT + "common:license"],
+    features = GZ_FEATURES,
 )
 
 gz_export_header(
@@ -73,3 +77,5 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
+
+add_lint_tests()
