@@ -79,6 +79,10 @@ cc_library(
     srcs = sources + private_headers,
     hdrs = public_headers,
     includes = ["include"],
+    copts = [
+      "-fexceptions",
+      "-Wno-unused-value",
+    ],
     deps = [
         GZ_ROOT + "utils",
         GZ_ROOT + "math",
