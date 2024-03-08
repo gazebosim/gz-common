@@ -97,6 +97,7 @@ test_sources = glob(
 [cc_test(
     name = src.replace("/", "_").replace(".cc", "").replace("src_", ""),
     srcs = [src],
+    copts = ["-fexceptions"],
     deps = [
         ":common",
         GZ_ROOT + "common/testing",

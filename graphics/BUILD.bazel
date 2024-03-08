@@ -53,6 +53,10 @@ cc_library(
     name = "graphics",
     srcs = sources,
     hdrs = public_headers,
+    copts = [
+        "-Wno-implicit-fallthrough",
+        "-Wno-unused-value",
+    ],
     includes = ["include"],
     visibility = GZ_VISIBILITY,
     deps = [

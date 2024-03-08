@@ -35,6 +35,7 @@ cc_library(
         "src/Utils.cc",
     ],
     hdrs = public_headers,
+    copts = ["-fexceptions"],
     includes = ["include"],
     visibility = ["//visibility:public"],
     deps = [

@@ -52,6 +52,10 @@ cc_library(
     name = "geospatial",
     srcs = sources,
     hdrs = public_headers,
+    copts = [
+        "-Wno-unused-value",
+        "-fexceptions",
+    ],
     includes = ["include"],
     visibility = GZ_VISIBILITY,
     deps = [

@@ -52,6 +52,9 @@ cc_library(
     name = "io",
     srcs = sources,
     hdrs = public_headers,
+    copts = [
+        "-fexceptions",
+    ],
     includes = ["include"],
     visibility = GZ_VISIBILITY,
     deps = [

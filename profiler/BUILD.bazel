@@ -107,6 +107,7 @@ cc_library(
 cc_test(
     name = "Profiler_Disabled_TEST",
     srcs = ["src/Profiler_Disabled_TEST.cc"],
+    copts = ["-Wno-macro-redefined"],
     defines = [
         "GZ_PROFILER_ENABLE=0",
         "GZ_PROFILER_REMOTERY=0",
