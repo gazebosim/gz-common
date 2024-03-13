@@ -310,16 +310,18 @@ TEST_F(MeshManager, ConvexDecomposition)
   EXPECT_EQ(8u, boxSubmesh.NormalCount());
   EXPECT_EQ(36u, boxSubmesh.IndexCount());
 
+  std::size_t maxConvexHulls = 4;
+  std::size_t resolution = 1000;
   const common::Mesh *drillMesh = mgr->Load(
       common::testing::TestFile("data", "cordless_drill",
       "meshes", "cordless_drill.dae"));
   EXPECT_EQ(1u, drillMesh->SubMeshCount());
   decomposed = mgr->ConvexDecomposition(
-      drillMesh->SubMeshByIndex(0u).lock().get());
+      drillMesh->SubMeshByIndex(0u).lock().get(), maxConvexHulls, resolution);
 
   // A drill should be decomposed into multiple submeshes
   EXPECT_LT(1u, decomposed.size());
-  EXPECT_GE(32u, decomposed.size());
+  EXPECT_GE(maxConvexHulls, decomposed.size());
   // Check submeshes are not empty
   for (const auto &d : decomposed)
   {
@@ -329,6 +331,5 @@ TEST_F(MeshManager, ConvexDecomposition)
     EXPECT_LT(3u, drillSubmesh.IndexCount());
   }
 }
-
 
 #endif
