@@ -23,6 +23,7 @@
 #include "gz/common/config.hh"
 
 #include "gz/common/testing/AutoLogFixture.hh"
+#include "gz/common/testing/TestPaths.hh"
 
 using namespace gz;
 
@@ -289,4 +290,45 @@ TEST_F(MeshManager, Remove)
   mgr->RemoveAll();
   EXPECT_FALSE(mgr->HasMesh("sphere"));
 }
+
+/////////////////////////////////////////////////
+TEST_F(MeshManager, ConvexDecomposition)
+{
+  auto mgr = common::MeshManager::Instance();
+  const common::Mesh *boxMesh = mgr->Load(
+      common::testing::TestFile("data", "box.dae"));
+
+  EXPECT_EQ(1u, boxMesh->SubMeshCount());
+  auto decomposed = mgr->ConvexDecomposition(
+      boxMesh->SubMeshByIndex(0u).lock().get());
+
+  // Decomposing a box should just produce a box
+  EXPECT_EQ(1u, decomposed.size());
+  common::SubMesh &boxSubmesh = decomposed[0];
+  // A convex hull of a box should contain exactly 8 vertices
+  EXPECT_EQ(8u, boxSubmesh.VertexCount());
+  EXPECT_EQ(8u, boxSubmesh.NormalCount());
+  EXPECT_EQ(36u, boxSubmesh.IndexCount());
+
+  const common::Mesh *drillMesh = mgr->Load(
+      common::testing::TestFile("data", "cordless_drill",
+      "meshes", "cordless_drill.dae"));
+  EXPECT_EQ(1u, drillMesh->SubMeshCount());
+  decomposed = mgr->ConvexDecomposition(
+      drillMesh->SubMeshByIndex(0u).lock().get());
+
+  // A drill should be decomposed into multiple submeshes
+  EXPECT_LT(1u, decomposed.size());
+  EXPECT_GE(32u, decomposed.size());
+  // Check submeshes are not empty
+  for (const auto &d : decomposed)
+  {
+    const common::SubMesh &drillSubmesh = d;
+    EXPECT_LT(3u, boxSubmesh.VertexCount());
+    EXPECT_EQ(drillSubmesh.VertexCount(), drillSubmesh.NormalCount());
+    EXPECT_LT(3u, drillSubmesh.IndexCount());
+  }
+}
+
+
 #endif
