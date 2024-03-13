@@ -1688,16 +1688,11 @@ MeshManager::ConvexDecomposition(const SubMesh *_subMesh,
     indices[i] = _subMesh->Index(i);
   }
 
-  VHACD::IVHACD *iface = VHACD::CreateVHACD_ASYNC();
+  VHACD::IVHACD *iface = VHACD::CreateVHACD();
   VHACD::IVHACD::Parameters parameters;
   parameters.m_maxConvexHulls = _maxConvexHulls;
   parameters.m_resolution = _voxelResolution;
-  parameters.m_asyncACD = true;
   iface->Compute(points, vertexCount, indices, triangleCount, parameters);
-  while (!iface->IsReady())
-  {
-    std::this_thread::sleep_for(std::chrono::nanoseconds(10000));
-  }
 
   if (!iface->GetNConvexHulls())
     return decomposed;
