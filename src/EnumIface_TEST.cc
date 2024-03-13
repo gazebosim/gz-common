@@ -43,7 +43,7 @@ auto myTypeIface = gz::common::gzEnum(
 /////////////////////////////////////////////////
 TEST_F(EnumIfaceTest, StringCoversion)
 {
-  MyType type;
+  MyType type = MyType::TYPE2;
 
   // Set value from string
   myTypeIface.Set(type, "TYPE1");

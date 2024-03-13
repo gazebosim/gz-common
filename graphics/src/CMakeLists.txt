@@ -23,11 +23,18 @@ gz_build_tests(
 )
 
 # Assimp doesn't offer preprocessor version, use cmake to set a compatibility
-# mode for versions below 5.2.0
+# mode for versions below 5.2.0 and 5.1.0
 if(${GzAssimp_VERSION} STRLESS "5.2.0")
   message("Warning, assimp below 5.2.0 detected, setting compatibility mode")
   target_compile_definitions(${graphics_target} PRIVATE GZ_ASSIMP_PRE_5_2_0)
   if(TARGET UNIT_AssimpLoader_TEST)
     target_compile_definitions(UNIT_AssimpLoader_TEST PRIVATE GZ_ASSIMP_PRE_5_2_0)
+  endif()
+  if(${GzAssimp_VERSION} STRLESS "5.1.0")
+    message("Warning, assimp below 5.1.0 detected, setting compatibility mode")
+    target_compile_definitions(${graphics_target} PRIVATE GZ_ASSIMP_PRE_5_1_0)
+    if(TARGET UNIT_AssimpLoader_TEST)
+      target_compile_definitions(UNIT_AssimpLoader_TEST PRIVATE GZ_ASSIMP_PRE_5_1_0)
+    endif()
   endif()
 endif()

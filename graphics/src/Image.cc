@@ -268,10 +268,22 @@ void Image::SetFromCompressedData(unsigned char *_data,
     FreeImage_Unload(this->dataPtr->bitmap);
   this->dataPtr->bitmap = nullptr;
 
-  if (_format == COMPRESSED_PNG)
+  FREE_IMAGE_FORMAT format = FIF_UNKNOWN;
+  switch (_format)
+  {
+    case COMPRESSED_PNG:
+      format = FIF_PNG;
+      break;
+    case COMPRESSED_JPEG:
+      format = FIF_JPEG;
+      break;
+    default:
+      break;
+  }
+  if (format != FIF_UNKNOWN)
   {
     FIMEMORY *fiMem = FreeImage_OpenMemory(_data, _size);
-    this->dataPtr->bitmap = FreeImage_LoadFromMemory(FIF_PNG, fiMem);
+    this->dataPtr->bitmap = FreeImage_LoadFromMemory(format, fiMem);
     FreeImage_CloseMemory(fiMem);
   }
   else
@@ -415,7 +427,8 @@ math::Color Image::Pixel(unsigned int _x, unsigned int _y) const
         << _x << " " << _y << "] \n";
       return clr;
     }
-    clr.Set(firgb.rgbRed, firgb.rgbGreen, firgb.rgbBlue);
+    clr.Set(firgb.rgbRed / 255.0f, firgb.rgbGreen / 255.0f,
+            firgb.rgbBlue / 255.0f);
   }
   else
   {
@@ -488,7 +501,8 @@ math::Color Image::MaxColor() const
             << x << " " << y << "] \n";
           continue;
         }
-        clr.Set(firgb.rgbRed, firgb.rgbGreen, firgb.rgbBlue);
+        clr.Set(firgb.rgbRed / 255.0f, firgb.rgbGreen / 255.0f,
+                firgb.rgbBlue / 255.0f);
 
         if (clr.R() + clr.G() + clr.B() > maxClr.R() + maxClr.G() + maxClr.B())
         {
@@ -570,8 +584,17 @@ BOOL Image::Implementation::PixelIndex(
 //////////////////////////////////////////////////
 void Image::Rescale(int _width, int _height)
 {
-  this->dataPtr->bitmap = FreeImage_Rescale(
+  auto *scaled = FreeImage_Rescale(
       this->dataPtr->bitmap, _width, _height, FILTER_LANCZOS3);
+
+  if (!scaled)
+  {
+    gzerr << "Failed to rescale image\n";
+    return;
+  }
+
+  FreeImage_Unload(this->dataPtr->bitmap);
+  this->dataPtr->bitmap = scaled;
 }
 
 //////////////////////////////////////////////////
