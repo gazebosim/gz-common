@@ -280,6 +280,21 @@ namespace gz
           const Mesh *_m2, const int _operation,
           const gz::math::Pose3d &_offset = gz::math::Pose3d::Zero);
 
+      /// \brief Perform convex decomposition on a submesh.
+      /// The submesh is decomposed into multiple convex submeshes. The output
+      /// submeshes contain vertices and indices but texture coordinates
+      /// not preserved.
+      /// \param[in] _subMesh Input submesh to decompose.
+      /// \param[in] _maxConvexHulls Maximum number of convex hull submeshes to
+      /// produce.
+      /// \param[in] _voxelResolution Voxel resolution to use. Higher value
+      /// produces more accurate shapes.
+      /// \return A vector of decomposed submeshes.
+      public: std::vector<SubMesh> ConvexDecomposition(
+                  const common::SubMesh *_subMesh,
+                  std::size_t _maxConvexHulls = 16u,
+                  std::size_t _voxelResolution = 200000u);
+
       /// \brief Converts a vector of polylines into a table of vertices and
       /// a list of edges (each made of 2 points from the table of vertices.
       /// \param[in] _polys the polylines

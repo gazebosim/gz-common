@@ -22,6 +22,14 @@
 #include <unordered_set>
 #include <cctype>
 
+// Suppress warnings for VHACD
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+#pragma GCC diagnostic ignored "-Wswitch-default"
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#define ENABLE_VHACD_IMPLEMENTATION 1
+#include "VHACD.h"
+#pragma GCC diagnostic pop
+
 #ifndef _WIN32
   #include "gz/common/GTSMeshUtils.hh"
   #include "gz/common/MeshCSG.hh"
@@ -1648,4 +1656,83 @@ void MeshManager::SetAssimpEnvs()
     gzmsg << "Using assimp to load all mesh formats"  << std::endl;
     this->dataPtr->forceAssimp = true;
   }
+}
+
+//////////////////////////////////////////////////
+std::vector<SubMesh>
+MeshManager::ConvexDecomposition(const SubMesh *_subMesh,
+                                 std::size_t _maxConvexHulls,
+                                 std::size_t _voxelResolution)
+{
+  std::vector<SubMesh> decomposed;
+
+  if (!_subMesh)
+    return decomposed;
+
+  auto vertexCount = _subMesh->VertexCount();
+  auto indexCount = _subMesh->IndexCount();
+  auto triangleCount = indexCount / 3u;
+
+  float *points = new float[vertexCount * 3u];
+  for (std::size_t i = 0; i < vertexCount; ++i)
+  {
+    std::size_t idx = i * 3u;
+    points[idx] = _subMesh->Vertex(i).X();
+    points[idx + 1] = _subMesh->Vertex(i).Y();
+    points[idx + 2] = _subMesh->Vertex(i).Z();
+  }
+
+  uint32_t *indices = new uint32_t[indexCount];
+  for (std::size_t i = 0; i < indexCount; ++i)
+  {
+    indices[i] = _subMesh->Index(i);
+  }
+
+  VHACD::IVHACD *iface = VHACD::CreateVHACD_ASYNC();
+  VHACD::IVHACD::Parameters parameters;
+  parameters.m_maxConvexHulls = _maxConvexHulls;
+  parameters.m_resolution = _voxelResolution;
+  parameters.m_asyncACD = true;
+  iface->Compute(points, vertexCount, indices, triangleCount, parameters);
+  while (!iface->IsReady())
+  {
+    std::this_thread::sleep_for(std::chrono::nanoseconds(10000));
+  }
+
+  if (!iface->GetNConvexHulls())
+    return decomposed;
+
+  for (std::size_t n = 0; n < iface->GetNConvexHulls(); ++n)
+  {
+    VHACD::IVHACD::ConvexHull ch;
+    iface->GetConvexHull(n, ch);
+
+    SubMesh convexMesh;
+    for (std::size_t i = 0u; i < ch.m_points.size(); ++i)
+    {
+      const VHACD::Vertex &p = ch.m_points[i];
+      gz::math::Vector3d vertex(p.mX, p.mY, p.mZ);
+      convexMesh.AddVertex(vertex);
+
+      // add dummy normal
+      auto norm = vertex;
+      norm.Normalize();
+      convexMesh.AddNormal(norm);
+    }
+
+    for (std::size_t i = 0u; i < ch.m_triangles.size(); ++i)
+    {
+      const VHACD::Triangle &tri = ch.m_triangles[i];
+      convexMesh.AddIndex(tri.mI0);
+      convexMesh.AddIndex(tri.mI1);
+      convexMesh.AddIndex(tri.mI2);
+    }
+    decomposed.push_back(convexMesh);
+  }
+
+  delete [] points;
+  delete [] indices;
+  iface->Release();
+
+  return decomposed;
 }
