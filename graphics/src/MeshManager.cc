@@ -26,13 +26,17 @@
 #include <vector>
 
 // Suppress warnings for VHACD
+#ifndef _WIN32
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wfloat-equal"
 #pragma GCC diagnostic ignored "-Wswitch-default"
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 #define ENABLE_VHACD_IMPLEMENTATION 1
 #include "VHACD/VHACD.h"
+#ifndef _WIN32
 #pragma GCC diagnostic pop
+#endif
 
 #ifndef _WIN32
   #include "gz/common/GTSMeshUtils.hh"
