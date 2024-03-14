@@ -31,7 +31,7 @@
 #pragma GCC diagnostic ignored "-Wswitch-default"
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #define ENABLE_VHACD_IMPLEMENTATION 1
-#include "VHACD.h"
+#include "VHACD/VHACD.h"
 #pragma GCC diagnostic pop
 
 #ifndef _WIN32
@@ -47,6 +47,7 @@
 #include "gz/common/ColladaExporter.hh"
 #include "gz/common/OBJLoader.hh"
 #include "gz/common/STLLoader.hh"
+#include "gz/common/Timer.hh"
 #include "gz/common/Util.hh"
 #include "gz/common/config.hh"
 
@@ -1663,32 +1664,31 @@ void MeshManager::SetAssimpEnvs()
 
 //////////////////////////////////////////////////
 std::vector<SubMesh>
-MeshManager::ConvexDecomposition(const SubMesh *_subMesh,
+MeshManager::ConvexDecomposition(const SubMesh &_subMesh,
                                  std::size_t _maxConvexHulls,
                                  std::size_t _voxelResolution)
 {
   std::vector<SubMesh> decomposed;
 
-  if (!_subMesh)
-    return decomposed;
-
-  auto vertexCount = _subMesh->VertexCount();
-  auto indexCount = _subMesh->IndexCount();
+  auto vertexCount = _subMesh.VertexCount();
+  auto indexCount = _subMesh.IndexCount();
   auto triangleCount = indexCount / 3u;
 
-  float *points = new float[vertexCount * 3u];
+  std::vector<float> points;
+  points.resize(vertexCount * 3u);
   for (std::size_t i = 0; i < vertexCount; ++i)
   {
     std::size_t idx = i * 3u;
-    points[idx] = _subMesh->Vertex(i).X();
-    points[idx + 1] = _subMesh->Vertex(i).Y();
-    points[idx + 2] = _subMesh->Vertex(i).Z();
+    points[idx] = _subMesh.Vertex(i).X();
+    points[idx + 1] = _subMesh.Vertex(i).Y();
+    points[idx + 2] = _subMesh.Vertex(i).Z();
   }
 
-  uint32_t *indices = new uint32_t[indexCount];
+  std::vector<uint32_t> indices;
+  indices.resize(indexCount);
   for (std::size_t i = 0; i < indexCount; ++i)
   {
-    indices[i] = _subMesh->Index(i);
+    indices[i] = _subMesh.Index(i);
   }
 
   VHACD::IVHACD *iface = VHACD::CreateVHACD_ASYNC();
@@ -1696,14 +1696,32 @@ MeshManager::ConvexDecomposition(const SubMesh *_subMesh,
   parameters.m_maxConvexHulls = _maxConvexHulls;
   parameters.m_resolution = _voxelResolution;
   parameters.m_asyncACD = true;
-  iface->Compute(points, vertexCount, indices, triangleCount, parameters);
+  iface->Compute(points.data(), vertexCount, indices.data(), triangleCount,
+                 parameters);
+
+  common::Timer t;
+  t.Start();
+  auto timeout = std::chrono::seconds(300);
   while (!iface->IsReady())
   {
+    if (t.ElapsedTime() > timeout)
+    {
+      iface->Cancel();
+      gzwarn << "Convex decomposition timed out. Process took more than "
+             << timeout.count() << " seconds. "  << std::endl;
+      t.Stop();
+      break;
+    }
     std::this_thread::sleep_for(std::chrono::nanoseconds(10000));
   }
 
   if (!iface->GetNConvexHulls())
+  {
+    gzwarn << "No convex hulls are generated "
+           << (!_subMesh.Name().empty() ? "from " : "")
+           <<  _subMesh.Name();
     return decomposed;
+  }
 
   for (std::size_t n = 0; n < iface->GetNConvexHulls(); ++n)
   {
@@ -1733,8 +1751,6 @@ MeshManager::ConvexDecomposition(const SubMesh *_subMesh,
     decomposed.push_back(convexMesh);
   }
 
-  delete [] points;
-  delete [] indices;
   iface->Release();
 
   return decomposed;

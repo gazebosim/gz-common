@@ -303,8 +303,9 @@ TEST_F(MeshManager, ConvexDecomposition)
 
   std::size_t maxConvexHulls = 4;
   std::size_t resolution = 1000;
+  auto submesh = boxMesh->SubMeshByIndex(0u).lock();
   auto decomposed = std::move(mgr->ConvexDecomposition(
-      boxMesh->SubMeshByIndex(0u).lock().get(), maxConvexHulls, resolution));
+      *(submesh.get()), maxConvexHulls, resolution));
 
   // Decomposing a box should just produce a box
   EXPECT_EQ(1u, decomposed.size());
@@ -319,8 +320,9 @@ TEST_F(MeshManager, ConvexDecomposition)
       "meshes", "cordless_drill.dae"));
   ASSERT_NE(nullptr, drillMesh);
   EXPECT_EQ(1u, drillMesh->SubMeshCount());
+  submesh = drillMesh->SubMeshByIndex(0u).lock();
   decomposed = std::move(mgr->ConvexDecomposition(
-      drillMesh->SubMeshByIndex(0u).lock().get(), maxConvexHulls, resolution));
+      *(submesh.get()), maxConvexHulls, resolution));
 
   // A drill should be decomposed into multiple submeshes
   EXPECT_LT(1u, decomposed.size());

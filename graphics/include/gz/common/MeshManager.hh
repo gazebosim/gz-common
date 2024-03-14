@@ -283,7 +283,7 @@ namespace gz
       /// \brief Perform convex decomposition on a submesh.
       /// The submesh is decomposed into multiple convex submeshes. The output
       /// submeshes contain vertices and indices but texture coordinates
-      /// not preserved.
+      /// are not preserved.
       /// \param[in] _subMesh Input submesh to decompose.
       /// \param[in] _maxConvexHulls Maximum number of convex hull submeshes to
       /// produce.
@@ -291,7 +291,7 @@ namespace gz
       /// produces more accurate shapes.
       /// \return A vector of decomposed submeshes.
       public: std::vector<SubMesh> ConvexDecomposition(
-                  const common::SubMesh *_subMesh,
+                  const common::SubMesh &_subMesh,
                   std::size_t _maxConvexHulls = 16u,
                   std::size_t _voxelResolution = 200000u);
 
