@@ -1735,10 +1735,9 @@ MeshManager::ConvexDecomposition(const SubMesh &_subMesh,
       gz::math::Vector3d vertex(p.mX, p.mY, p.mZ);
       convexMesh.AddVertex(vertex);
 
-      // add dummy normal
-      auto norm = vertex;
-      norm.Normalize();
-      convexMesh.AddNormal(norm);
+      // add dummy normal - this will be overriden by the
+      // RecalculateNormals call
+      convexMesh.AddNormal(vertex);
     }
 
     for (std::size_t i = 0u; i < ch.m_triangles.size(); ++i)
@@ -1748,6 +1747,7 @@ MeshManager::ConvexDecomposition(const SubMesh &_subMesh,
       convexMesh.AddIndex(tri.mI1);
       convexMesh.AddIndex(tri.mI2);
     }
+    convexMesh.RecalculateNormals();
     decomposed.push_back(convexMesh);
   }
 
