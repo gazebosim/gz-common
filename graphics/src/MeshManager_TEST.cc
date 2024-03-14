@@ -294,13 +294,20 @@ TEST_F(MeshManager, Remove)
 /////////////////////////////////////////////////
 TEST_F(MeshManager, ConvexDecomposition)
 {
+  gzerr << "ConvexDecomposition " << std::endl;
   auto mgr = common::MeshManager::Instance();
   const common::Mesh *boxMesh = mgr->Load(
       common::testing::TestFile("data", "box.dae"));
 
+  ASSERT_NE(nullptr, boxMesh);
   EXPECT_EQ(1u, boxMesh->SubMeshCount());
+
+  gzerr << "Decomposing box " << std::endl;
+  std::size_t maxConvexHulls = 4;
+  std::size_t resolution = 1000;
   auto decomposed = mgr->ConvexDecomposition(
-      boxMesh->SubMeshByIndex(0u).lock().get());
+      boxMesh->SubMeshByIndex(0u).lock().get(), maxConvexHulls, resolution);
+  gzerr << "Decomposing box done " << std::endl;
 
   // Decomposing a box should just produce a box
   EXPECT_EQ(1u, decomposed.size());
@@ -310,14 +317,15 @@ TEST_F(MeshManager, ConvexDecomposition)
   EXPECT_EQ(8u, boxSubmesh.NormalCount());
   EXPECT_EQ(36u, boxSubmesh.IndexCount());
 
-  std::size_t maxConvexHulls = 4;
-  std::size_t resolution = 1000;
   const common::Mesh *drillMesh = mgr->Load(
       common::testing::TestFile("data", "cordless_drill",
       "meshes", "cordless_drill.dae"));
+  ASSERT_NE(nullptr, drillMesh);
   EXPECT_EQ(1u, drillMesh->SubMeshCount());
+  gzerr << "Decomposing drill " << std::endl;
   decomposed = mgr->ConvexDecomposition(
       drillMesh->SubMeshByIndex(0u).lock().get(), maxConvexHulls, resolution);
+  gzerr << "Decomposing drill done " << std::endl;
 
   // A drill should be decomposed into multiple submeshes
   EXPECT_LT(1u, decomposed.size());
