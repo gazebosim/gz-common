@@ -1,5 +1,16 @@
 ## Gazebo Common 5.x
 
+## Gazebo Common 5.5.1 (2024-03-14)
+
+1. Various Bazel adjustments for linting
+    * [Pull request #582](https://github.com/gazebosim/gz-common/pull/582)
+
+1. Extend AssimpLoader to parse material transmission factor
+    * [Pull request #577](https://github.com/gazebosim/gz-common/pull/577)
+
+1. Fix noise issue that appears in certain image textures
+    * [Pull request #578](https://github.com/gazebosim/gz-common/pull/578)
+
 ## Gazebo Common 5.5.0 (2024-02-26)
 
 1. Be louder when graphics is missing for geospatial
