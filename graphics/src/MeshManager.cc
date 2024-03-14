@@ -16,11 +16,14 @@
  */
 
 #include <sys/stat.h>
-#include <string>
+
+#include <cctype>
+#include <cstdint>
 #include <mutex>
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
-#include <cctype>
+#include <vector>
 
 // Suppress warnings for VHACD
 #pragma GCC diagnostic ignored "-Wfloat-equal"
