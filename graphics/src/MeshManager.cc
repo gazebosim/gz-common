@@ -19,6 +19,7 @@
 
 #include <cctype>
 #include <cstdint>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <unordered_map>
@@ -1811,7 +1812,7 @@ std::unique_ptr<Mesh> MeshManager::MergeSubMeshes(const Mesh &_mesh)
       }
       else
       {
-        // Set texcoord to zero if it the input submesh does not have that many
+        // Set texcoord to zero if the input submesh does not have that many
         // texcoord sets. Note the texcoord count should be the same as vertex
         // count.
         for (unsigned int k = 0; k < submesh->VertexCount(); ++k)
