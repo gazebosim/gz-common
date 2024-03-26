@@ -290,10 +290,16 @@ namespace gz
       /// \param[in] _voxelResolution Voxel resolution to use. Higher value
       /// produces more accurate shapes.
       /// \return A vector of decomposed submeshes.
-      public: std::vector<SubMesh> ConvexDecomposition(
+      public: static std::vector<SubMesh> ConvexDecomposition(
                   const common::SubMesh &_subMesh,
                   std::size_t _maxConvexHulls = 16u,
                   std::size_t _voxelResolution = 200000u);
+
+      /// \brief Merge all submeshes from one mesh into one single submesh.
+      /// \param[in] _mesh Input mesh with submeshes to merge.
+      /// \return A new mesh with the submeshes merged.
+      public: static std::unique_ptr<Mesh> MergeSubMeshes(
+                  const common::Mesh &_mesh);
 
       /// \brief Converts a vector of polylines into a table of vertices and
       /// a list of edges (each made of 2 points from the table of vertices.

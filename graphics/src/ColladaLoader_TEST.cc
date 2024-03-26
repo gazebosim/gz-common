@@ -242,8 +242,6 @@ TEST_F(ColladaLoader, TexCoordSets)
   EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoordBySet(0u, 0u));
   EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoordBySet(1u, 0u));
   EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoordBySet(2u, 0u));
-  EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoordBySet(1u, 0u));
-  EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoordBySet(2u, 0u));
 
   EXPECT_TRUE(subMeshB->HasTexCoordBySet(0u, 0u));
   EXPECT_TRUE(subMeshB->HasTexCoordBySet(1u, 0u));
