@@ -1759,3 +1759,72 @@ MeshManager::ConvexDecomposition(const SubMesh &_subMesh,
 
   return decomposed;
 }
+
+//////////////////////////////////////////////////
+std::unique_ptr<Mesh> MeshManager::MergeSubMeshes(const Mesh &_mesh)
+{
+  SubMesh mergedSubMesh;
+
+  // The final merged submesh should contain all the texcoord sets
+  // in the original submeshes. Determine the max texcoord sets we need.
+  unsigned int maxTexCoordSet = 0u;
+  for (unsigned int i = 0u; i < _mesh.SubMeshCount(); ++i)
+  {
+    auto submesh = _mesh.SubMeshByIndex(i).lock();
+    maxTexCoordSet = (maxTexCoordSet > submesh->TexCoordSetCount()) ?
+        maxTexCoordSet : submesh->TexCoordSetCount();
+  }
+
+  unsigned int indexOffset = 0u;
+  for (unsigned int i = 0u; i < _mesh.SubMeshCount(); ++i)
+  {
+    auto submesh = _mesh.SubMeshByIndex(i).lock();
+    // vertices
+    for (unsigned int j = 0; j < submesh->VertexCount(); ++j)
+    {
+      mergedSubMesh.AddVertex(submesh->Vertex(j));
+    }
+
+    // normals
+    for (unsigned int j = 0; j < submesh->NormalCount(); ++j)
+    {
+      mergedSubMesh.AddNormal(submesh->Normal(j));
+    }
+
+    // indices - the index needs to start at an offset for each new submesh
+    for (unsigned int j = 0; j < submesh->IndexCount(); ++j)
+    {
+      mergedSubMesh.AddIndex(submesh->Index(j) + indexOffset);
+    }
+    indexOffset += submesh->VertexCount();
+
+    // texcoords
+    for (unsigned int j = 0; j < maxTexCoordSet; ++j)
+    {
+      if (j < submesh->TexCoordSetCount())
+      {
+        // Populate texcoords from input submesh
+        for (unsigned int k = 0; k < submesh->TexCoordCountBySet(j); ++k)
+        {
+          mergedSubMesh.AddTexCoordBySet(submesh->TexCoordBySet(k, j), j);
+        }
+      }
+      else
+      {
+        // Set texcoord to zero if it the input submesh does not have that many
+        // texcoord sets. Note the texcoord count should be the same as vertex
+        // count.
+        for (unsigned int k = 0; k < submesh->VertexCount(); ++k)
+        {
+          mergedSubMesh.AddTexCoordBySet(math::Vector2d::Zero, j);
+        }
+      }
+    }
+  }
+  auto mesh = std::make_unique<Mesh>();
+  mesh->SetName(_mesh.Name() + "_merged");
+  mergedSubMesh.SetName(mesh->Name() + "_submesh");
+  mesh->AddSubMesh(mergedSubMesh);
+
+  return mesh;
+}
