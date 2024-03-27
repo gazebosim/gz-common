@@ -712,14 +712,16 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     auto mat = this->dataPtr->CreateMaterial(scene, _matIdx, path);
     mesh->AddMaterial(mat);
   }
-  // Create the skeleton
+  //Create the skeleton
+  std::unordered_set<std::string> boneNames;
+  this->dataPtr->RecursiveStoreBoneNames(scene, rootNode, boneNames);
+  auto rootSkelNode = new SkeletonNode(
+      nullptr, rootName, rootName, SkeletonNode::NODE);
+  rootSkelNode->SetTransform(rootTransform);
+  rootSkelNode->SetModelTransform(rootTransform);
+
+  if (boneNames.size() > 0)
   {
-    std::unordered_set<std::string> boneNames;
-    this->dataPtr->RecursiveStoreBoneNames(scene, rootNode, boneNames);
-    auto rootSkelNode = new SkeletonNode(
-        nullptr, rootName, rootName, SkeletonNode::NODE);
-    rootSkelNode->SetTransform(rootTransform);
-    rootSkelNode->SetModelTransform(rootTransform);
     for (unsigned childIdx = 0; childIdx < rootNode->mNumChildren; ++childIdx)
     {
       // First populate the skeleton with the node transforms
@@ -727,11 +729,11 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
           rootNode->mChildren[childIdx], rootSkelNode,
           rootTransform, boneNames);
     }
-    rootSkelNode->SetParent(nullptr);
-
-    SkeletonPtr rootSkeleton = std::make_shared<Skeleton>(rootSkelNode);
-    mesh->SetSkeleton(rootSkeleton);
+    rootSkelNode = rootSkelNode->Child(0);
   }
+  rootSkelNode->SetParent(nullptr);
+  SkeletonPtr rootSkeleton = std::make_shared<Skeleton>(rootSkelNode);
+  mesh->SetSkeleton(rootSkeleton);
   // Now create the meshes
   // Recursive call to keep track of transforms,
   // mesh is passed by reference and edited throughout
