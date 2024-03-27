@@ -1,17 +1,19 @@
 load(
-    "//gz_bazel:build_defs.bzl",
+    "@gz//bazel/skylark:build_defs.bzl",
+    "GZ_FEATURES",
     "GZ_ROOT",
     "GZ_VISIBILITY",
-    "generate_include_header",
     "gz_export_header",
+    "gz_include_header",
+)
+load(
+    "@gz//bazel/lint:lint.bzl",
+    "add_lint_tests",
 )
 
 package(
-    default_visibility = GZ_VISIBILITY,
-    features = [
-        "-parse_headers",
-        "-layering_check",
-    ],
+    default_applicable_licenses = [GZ_ROOT + "common:license"],
+    features = GZ_FEATURES,
 )
 
 public_headers_no_gen = glob([
@@ -33,7 +35,7 @@ gz_export_header(
     visibility = ["//visibility:private"],
 )
 
-generate_include_header(
+gz_include_header(
     name = "graphics_hh_genrule",
     out = "include/gz/common/graphics.hh",
     hdrs = public_headers_no_gen + [
@@ -51,35 +53,36 @@ cc_library(
     name = "graphics",
     srcs = sources,
     hdrs = public_headers,
+    copts = [
+        "-Wno-implicit-fallthrough",
+        "-Wno-unused-value",
+    ],
     includes = ["include"],
+    visibility = GZ_VISIBILITY,
     deps = [
+        "@assimp",
         "@freeimage",
         "@glib",
         "@gts",
         "@tinyxml2",
-        GZ_ROOT + "gz_common",
-        GZ_ROOT + "gz_utils",
+        GZ_ROOT + "common",
+        GZ_ROOT + "utils",
     ],
-)
-
-cc_binary(
-    name = "libgz-common5-graphics.so",
-    includes = ["include"],
-    linkopts = ["-Wl,-soname,libgz-common5-graphics.so"],
-    linkshared = True,
-    deps = [":graphics"],
 )
 
 [cc_test(
     name = src.replace("/", "_").replace(".cc", "").replace("src_", ""),
     srcs = [src],
-    data = [
-        GZ_ROOT + "gz_common/test:data",
-    ],
+    data = [GZ_ROOT + "common/test:data"],
+    env = {
+        "GZ_BAZEL": "1",
+        "GZ_BAZEL_PATH": "common",
+    },
     deps = [
         ":graphics",
-        GZ_ROOT + "gz_common/test:test_utils",
-        "@gtest",
+        GZ_ROOT + "common/testing",
         "@gtest//:gtest_main",
     ],
 ) for src in test_sources]
+
+add_lint_tests()

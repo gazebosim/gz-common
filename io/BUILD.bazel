@@ -1,21 +1,24 @@
 load(
-    "//gz_bazel:build_defs.bzl",
+    "@gz//bazel/skylark:build_defs.bzl",
+    "GZ_FEATURES",
     "GZ_ROOT",
     "GZ_VISIBILITY",
-    "generate_include_header",
     "gz_export_header",
+    "gz_include_header",
+)
+load(
+    "@gz//bazel/lint:lint.bzl",
+    "add_lint_tests",
 )
 
 package(
-    default_visibility = GZ_VISIBILITY,
-    features = [
-        "-parse_headers",
-        "-layering_check",
-    ],
+    default_applicable_licenses = [GZ_ROOT + "common:license"],
+    features = GZ_FEATURES,
 )
 
 public_headers_no_gen = glob([
     "include/gz/common/*.hh",
+    "include/gz/common/**/*.hh",
 ])
 
 sources = glob(
@@ -32,8 +35,8 @@ gz_export_header(
     visibility = ["//visibility:private"],
 )
 
-generate_include_header(
-    name = "iohh_genrule",
+gz_include_header(
+    name = "io_hh_genrule",
     out = "include/gz/common/io.hh",
     hdrs = public_headers_no_gen + [
         "include/gz/common/io/Export.hh",
@@ -49,28 +52,29 @@ cc_library(
     name = "io",
     srcs = sources,
     hdrs = public_headers,
-    includes = ["include"],
-    deps = [
-        GZ_ROOT + "gz_common",
-        GZ_ROOT + "gz_math",
+    copts = [
+        "-fexceptions",
     ],
-)
-
-cc_binary(
-    name = "libgz-common5-io.so",
     includes = ["include"],
-    linkopts = ["-Wl,-soname,libgz-common5-io.so"],
-    linkshared = True,
-    deps = [":events"],
+    visibility = GZ_VISIBILITY,
+    deps = [
+        GZ_ROOT + "common",
+        GZ_ROOT + "utils",
+    ],
 )
 
 [cc_test(
     name = src.replace("/", "_").replace(".cc", "").replace("src_", ""),
     srcs = [src],
+    env = {
+        "GZ_BAZEL": "1",
+        "GZ_BAZEL_PATH": "common",
+    },
     deps = [
         ":io",
-        GZ_ROOT + "gz_common/test:test_utils",
-        "@gtest",
+        GZ_ROOT + "common/testing",
         "@gtest//:gtest_main",
     ],
 ) for src in test_sources]
+
+add_lint_tests()

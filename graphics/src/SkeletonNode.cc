@@ -87,9 +87,7 @@ SkeletonNode::SkeletonNode(SkeletonNode *_parent,
 }
 
 //////////////////////////////////////////////////
-SkeletonNode::~SkeletonNode()
-{
-}
+SkeletonNode::~SkeletonNode() = default;
 
 //////////////////////////////////////////////////
 void SkeletonNode::Name(const std::string &_name)

@@ -49,6 +49,7 @@ TEST_F(AssimpLoader, LoadBox)
 
   // Make sure we can read a submesh name
   EXPECT_STREQ("Cube", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -104,6 +105,8 @@ TEST_F(AssimpLoader, Material)
   matOpaque->BlendFactors(srcFactor, dstFactor);
   EXPECT_DOUBLE_EQ(1.0, srcFactor);
   EXPECT_DOUBLE_EQ(0.0, dstFactor);
+  delete mesh;
+  delete meshOpaque;
 }
 
 /////////////////////////////////////////////////
@@ -155,6 +158,7 @@ TEST_F(AssimpLoader, ShareVertices)
       }
     }
   }
+  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -164,6 +168,7 @@ TEST_F(AssimpLoader, LoadZeroCount)
   common::Mesh *mesh = loader.Load(
       common::testing::TestFile("data", "zero_count.dae"));
   ASSERT_TRUE(mesh);
+  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -251,6 +256,7 @@ TEST_F(AssimpLoader, TexCoordSets)
 
   subMeshB->SetTexCoordBySet(2u, math::Vector2d(0.1, 0.2), 1u);
   EXPECT_EQ(math::Vector2d(0.1, 0.2), subMeshB->TexCoordBySet(2u, 1u));
+  delete mesh;
 }
 
 // Test fails for assimp below 5.2.0
@@ -289,6 +295,7 @@ TEST_F(AssimpLoader, LoadBoxWithAnimationOutsideSkeleton)
         0, 0, 1, 0,
         0, 0, 0, 1);
   EXPECT_EQ(expectedTrans, poseEnd.at("Armature"));
+  delete mesh;
 }
 #endif
 
@@ -308,6 +315,7 @@ TEST_F(AssimpLoader, LoadBoxInstControllerWithoutSkeleton)
   common::SkeletonPtr skeleton = mesh->MeshSkeleton();
   EXPECT_LT(0u, skeleton->NodeCount());
   EXPECT_NE(nullptr, skeleton->NodeById("Armature_Bone"));
+  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -335,6 +343,7 @@ TEST_F(AssimpLoader, LoadBoxMultipleInstControllers)
   common::SkeletonPtr skeleton = mesh->MeshSkeleton();
   EXPECT_LT(0u, skeleton->NodeCount());
   EXPECT_NE(nullptr, skeleton->NodeById("Armature_Bone"));
+  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -374,6 +383,7 @@ TEST_F(AssimpLoader, LoadBoxNestedAnimation)
         0, 0, 1, 0,
         0, 0, 0, 1);
   EXPECT_EQ(expectedTrans, poseEnd.at("Armature_Bone"));
+  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -392,6 +402,7 @@ TEST_F(AssimpLoader, LoadBoxWithDefaultStride)
   ASSERT_NE(mesh->MeshSkeleton(), nullptr);
   // TODO(luca) not working, investigate
   // ASSERT_EQ(1u, mesh->MeshSkeleton()->AnimationCount());
+  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -409,6 +420,7 @@ TEST_F(AssimpLoader, LoadBoxWithMultipleGeoms)
   ASSERT_EQ(2u, mesh->SubMeshCount());
   EXPECT_EQ(24u, mesh->SubMeshByIndex(0).lock()->NodeAssignmentsCount());
   EXPECT_EQ(0u, mesh->SubMeshByIndex(1).lock()->NodeAssignmentsCount());
+  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -435,6 +447,7 @@ TEST_F(AssimpLoader, LoadBoxWithHierarchicalNodes)
 
   // nested node with name
   EXPECT_EQ("StaticCubeNested", mesh->SubMeshByIndex(4).lock()->Name());
+  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -448,6 +461,7 @@ TEST_F(AssimpLoader, MergeBoxWithDoubleSkeleton)
   // The two skeletons have been joined and their root is the
   // animation root, called Scene
   EXPECT_EQ(skeleton_ptr->RootNode()->Name(), std::string("Scene"));
+  delete mesh;
 }
 
 // For assimp below 5.2.0 mesh loading fails because of
@@ -487,6 +501,7 @@ TEST_F(AssimpLoader, LoadCylinderAnimatedFrom3dsMax)
   // EXPECT_EQ("Bone02", anim->Name());
   EXPECT_EQ(1u, anim->NodeCount());
   EXPECT_TRUE(anim->HasNode("Bone02"));
+  delete mesh;
 }
 #endif
 
@@ -521,6 +536,7 @@ TEST_F(AssimpLoader, LoadObjBox)
   EXPECT_EQ(mat->Diffuse(), math::Color(0.512f, 0.512f, 0.512f, 1.0f));
   EXPECT_EQ(mat->Specular(), math::Color(0.25, 0.25, 0.25, 1.0));
   EXPECT_DOUBLE_EQ(mat->Transparency(), 0.0);
+  delete mesh;
 }
 
 
@@ -536,6 +552,7 @@ TEST_F(AssimpLoader, ObjInvalidMaterial)
   common::Mesh *mesh = loader.Load(meshFilename);
 
   EXPECT_TRUE(mesh != nullptr);
+  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -550,6 +567,7 @@ TEST_F(AssimpLoader, NonExistingMesh)
   common::Mesh *mesh = loader.Load(meshFilename);
 
   EXPECT_EQ(mesh->SubMeshCount(), 0);
+  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -584,6 +602,7 @@ TEST_F(AssimpLoader, LoadFbxBox)
   EXPECT_EQ(mat->Diffuse(), math::Color(0.8f, 0.8f, 0.8f, 1.0f));
   EXPECT_EQ(mat->Specular(), math::Color(0.8f, 0.8f, 0.8f, 1.0f));
   EXPECT_DOUBLE_EQ(mat->Transparency(), 0.0);
+  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -618,6 +637,7 @@ TEST_F(AssimpLoader, LoadGlTF2Box)
   EXPECT_EQ(mat->Diffuse(), math::Color(0.8f, 0.8f, 0.8f, 1.0f));
   EXPECT_EQ(mat->Specular(), math::Color(0.0f, 0.0f, 0.0f, 1.0f));
   EXPECT_DOUBLE_EQ(mat->Transparency(), 0.0);
+  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -642,6 +662,71 @@ TEST_F(AssimpLoader, LoadGlTF2BoxExternalTexture)
   auto testTextureFile =
     common::testing::TestFile("data/gltf", "PurpleCube_Diffuse.png");
   EXPECT_EQ(testTextureFile, mat->TextureImage());
+  delete mesh;
+}
+
+/////////////////////////////////////////////////
+// Open a gltf mesh with transmission extension
+TEST_F(AssimpLoader, LoadGlTF2BoxTransmission)
+{
+#ifndef GZ_ASSIMP_PRE_5_1_0
+  common::AssimpLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "box_transmission.glb"));
+
+  EXPECT_STREQ("unknown", mesh->Name().c_str());
+
+  // Make sure we can read the submesh name
+  EXPECT_STREQ("Cube", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+
+  EXPECT_EQ(mesh->MaterialCount(), 1u);
+
+  const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+  ASSERT_TRUE(mat.get());
+  // transmission currently modeled as transparency
+  EXPECT_FLOAT_EQ(0.1, mat->Transparency());
+  delete mesh;
+#endif
+}
+
+/////////////////////////////////////////////////
+// This test loads a box glb mesh with embedded compressed jpeg texture
+TEST_F(AssimpLoader, LoadGlTF2BoxWithJPEGTexture)
+{
+  common::AssimpLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "box_texture_jpg.glb"));
+
+  EXPECT_STREQ("unknown", mesh->Name().c_str());
+  EXPECT_EQ(math::Vector3d(1, 1, 1), mesh->Max());
+  EXPECT_EQ(math::Vector3d(-1, -1, -1), mesh->Min());
+
+  EXPECT_EQ(24u, mesh->VertexCount());
+  EXPECT_EQ(24u, mesh->NormalCount());
+  EXPECT_EQ(36u, mesh->IndexCount());
+  EXPECT_EQ(24u, mesh->TexCoordCount());
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(1u, mesh->MaterialCount());
+
+  // Make sure we can read the submesh name
+  EXPECT_STREQ("Cube", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+
+  const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+  ASSERT_TRUE(mat.get());
+
+  // Make sure we read the material color values
+  EXPECT_EQ(math::Color(0.4f, 0.4f, 0.4f, 1.0f), mat->Ambient());
+  EXPECT_EQ(math::Color(1.0f, 1.0f, 1.0f, 1.0f), mat->Diffuse());
+  EXPECT_EQ(math::Color(0.0f, 0.0f, 0.0f, 1.0f), mat->Specular());
+  // Assimp 5.2.0 and above uses the scene name for its texture names,
+  // older version use the root node instead.
+#ifdef GZ_ASSIMP_PRE_5_2_0
+  EXPECT_EQ("Cube_Material_Diffuse", mat->TextureImage());
+#else
+  EXPECT_EQ("Scene_Material_Diffuse", mat->TextureImage());
+#endif
+  EXPECT_NE(nullptr, mat->TextureData());
+  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -694,7 +779,6 @@ TEST_F(AssimpLoader, LoadGlbPbrAsset)
   EXPECT_EQ(img->Pixel(0, 0), math::Color(0.0f, 0.0f, 0.0f, 1.0f));
   EXPECT_EQ(img->Pixel(100, 100), math::Color(1.0f, 1.0f, 1.0f, 1.0f));
 
-
   EXPECT_NE(pbr->NormalMapData(), nullptr);
   // Metallic roughness and alpha from textures only works in assimp > 5.2.0
 #ifndef GZ_ASSIMP_PRE_5_2_0
@@ -708,10 +792,16 @@ TEST_F(AssimpLoader, LoadGlbPbrAsset)
   // Check pixel values to test metallicroughness texture splitting
   EXPECT_FLOAT_EQ(pbr->MetalnessMapData()->Pixel(256, 256).R(), 0.0);
   EXPECT_FLOAT_EQ(pbr->RoughnessMapData()->Pixel(256, 256).R(), 124.0 / 255.0);
+
   // Bug in assimp 5.0.x that doesn't parse coordinate sets properly
-  EXPECT_EQ(pbr->LightMapTexCoordSet(), 1);
+  // \todo(iche033) Lightmaps are disabled for glb meshes
+  // due to upstream bug
+  // EXPECT_EQ(pbr->LightMapTexCoordSet(), 1);
 #endif
-  EXPECT_NE(pbr->LightMapData(), nullptr);
+
+  // \todo(iche033) Lightmaps are disabled for glb meshes
+  // due to upstream bug
+  // EXPECT_NE(pbr->LightMapData(), nullptr);
 
   // Mesh has 3 animations
   auto skel = mesh->MeshSkeleton();
@@ -720,6 +810,7 @@ TEST_F(AssimpLoader, LoadGlbPbrAsset)
   EXPECT_STREQ("Action1", skel->Animation(0)->Name().c_str());
   EXPECT_STREQ("Action2", skel->Animation(1)->Name().c_str());
   EXPECT_STREQ("Action3", skel->Animation(2)->Name().c_str());
+  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -737,4 +828,49 @@ TEST_F(AssimpLoader, CheckNonRootDisplacement)
   EXPECT_EQ(nullptr, rootNode);
   auto xDisplacement = skelAnim->XDisplacement();
   ASSERT_TRUE(xDisplacement);
+  delete mesh;
+}
+
+/////////////////////////////////////////////////
+TEST_F(AssimpLoader, LoadGLTF2Triangle)
+{
+  common::AssimpLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data",
+        "multiple_texture_coordinates_triangle.glb"));
+  ASSERT_TRUE(mesh);
+
+  EXPECT_EQ(6u, mesh->VertexCount());
+  EXPECT_EQ(6u, mesh->NormalCount());
+  EXPECT_EQ(6u, mesh->IndexCount());
+  EXPECT_EQ(6u, mesh->TexCoordCount());
+  EXPECT_EQ(2u, mesh->SubMeshCount());
+  EXPECT_EQ(1u, mesh->MaterialCount());
+
+  auto sm = mesh->SubMeshByIndex(0u);
+  auto subMesh = sm.lock();
+  EXPECT_NE(nullptr, subMesh);
+  EXPECT_EQ(math::Vector3d(0, 0, 0), subMesh->Vertex(0u));
+  EXPECT_EQ(math::Vector3d(10, 0, 0), subMesh->Vertex(1u));
+  EXPECT_EQ(math::Vector3d(10, 10, 0), subMesh->Vertex(2u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), subMesh->Normal(0u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), subMesh->Normal(1u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), subMesh->Normal(2u));
+  EXPECT_EQ(math::Vector2d(0, 1), subMesh->TexCoord(0u));
+  EXPECT_EQ(math::Vector2d(0, 1), subMesh->TexCoord(1u));
+  EXPECT_EQ(math::Vector2d(0, 1), subMesh->TexCoord(2u));
+
+  auto smb = mesh->SubMeshByIndex(1u);
+  auto subMeshB = smb.lock();
+  EXPECT_NE(nullptr, subMeshB);
+  EXPECT_EQ(math::Vector3d(10, 0, 0), subMeshB->Vertex(0u));
+  EXPECT_EQ(math::Vector3d(20, 0, 0), subMeshB->Vertex(1u));
+  EXPECT_EQ(math::Vector3d(20, 10, 0), subMeshB->Vertex(2u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), subMeshB->Normal(0u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), subMeshB->Normal(1u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), subMeshB->Normal(2u));
+  EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoord(0u));
+  EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoord(1u));
+  EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoord(2u));
+  delete mesh;
 }

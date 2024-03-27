@@ -1,32 +1,55 @@
 load(
-    "//gz_bazel:cmake_configure_file.bzl",
-    "cmake_configure_file",
+    "@gz//bazel/skylark:build_defs.bzl",
+    "GZ_FEATURES",
+    "GZ_ROOT",
+)
+load(
+    "@gz//bazel/lint:lint.bzl",
+    "add_lint_tests",
 )
 
-BINARY_DIR = "./gz_common"
-
-SOURCE_DIR = "./gz_common"
-
-# Generates config.hh based on the version numbers in CMake code.
-cmake_configure_file(
-    name = "test_config",
-    src = "test_config.h.in",
-    out = "test_config.h",
-    cmakelists = ["CMakeLists.txt"],
-    defines = [
-        "PROJECT_BINARY_DIR=%s" % BINARY_DIR,
-        "PROJECT_SOURCE_DIR=%s" % SOURCE_DIR,
-    ],
-    visibility = ["//visibility:private"],
+package(
+    default_applicable_licenses = [GZ_ROOT + "common:license"],
+    features = GZ_FEATURES,
 )
 
-cc_library(
-    name = "test_utils",
-    srcs = [
-        "test_config.h",
+cc_test(
+    name = "INTEGRATION_console",
+    srcs = ["integration/console.cc"],
+    env = {
+        "GZ_BAZEL": "1",
+        "GZ_BAZEL_PATH": "common",
+    },
+    deps = [
+        GZ_ROOT + "common",
+        GZ_ROOT + "common/testing",
+        "@gtest//:gtest_main",
     ],
-    includes = ["."],
-    visibility = ["//visibility:public"],
+)
+
+cc_test(
+    name = "INTEGRATION_mesh",
+    srcs = ["integration/mesh.cc"],
+    data = [
+        "data/box.dae",
+        "data/box.fbx",
+        "data/box.glb",
+        "data/box.mtl",
+        "data/box.obj",
+    ],
+    env = {
+        "GZ_BAZEL": "1",
+        "GZ_BAZEL_PATH": "common",
+    },
+    deps = [
+        GZ_ROOT + "common",
+        GZ_ROOT + "common/graphics",
+        GZ_ROOT + "common/testing",
+        GZ_ROOT + "math",
+        "@gtest//:gtest_main",
+    ],
 )
 
 exports_files(["data"])
+
+add_lint_tests()

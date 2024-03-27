@@ -59,6 +59,8 @@ TEST_F(OBJLoaderTest, LoadObjBox)
   EXPECT_EQ(mat->Diffuse(), math::Color(0.512f, 0.512f, 0.512f, 1.0f));
   EXPECT_EQ(mat->Specular(), math::Color(0.25, 0.25, 0.25, 1.0));
   EXPECT_DOUBLE_EQ(mat->Transparency(), 0.0);
+
+  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -73,6 +75,7 @@ TEST_F(OBJLoaderTest, InvalidMaterial)
   gz::common::Mesh *mesh = objLoader.Load(meshFilename);
 
   EXPECT_TRUE(mesh != nullptr);
+  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -104,6 +107,7 @@ TEST_F(OBJLoaderTest, PBR)
     EXPECT_EQ("LightDome_Metalness.png", pbr->MetalnessMap());
     EXPECT_EQ("LightDome_Roughness.png", pbr->RoughnessMap());
     EXPECT_EQ("LightDome_Normal.png", pbr->NormalMap());
+    delete mesh;
   }
 
   // load obj file exported by blender - it shoves pbr maps into
@@ -131,5 +135,6 @@ TEST_F(OBJLoaderTest, PBR)
     EXPECT_EQ("mesh_Metal.png", pbr->MetalnessMap());
     EXPECT_EQ("mesh_Rough.png", pbr->RoughnessMap());
     EXPECT_EQ("mesh_Normal.png", pbr->NormalMap());
+    delete mesh;
   }
 }

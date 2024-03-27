@@ -105,7 +105,7 @@ xdg-open /usr/share/gz/gz-common5/profiler_vis/index.html
 open /usr/share/gz/gz-common5/profiler_vis/index.html
 
 # Inside a Docker container with port 8000 exposed
-# 1. Find your container's IP with `ifconfig`
+# 1. Find your container's IP with 'ifconfig'
 # 2. Start a basic web server:
 python3 -m http.server $SOURCE_DIR/gz-common/profiler/src/Remotery/vis/index.html
 # 3. Open URL "http://<container IP>:8000/" with a browser on the host.
@@ -125,8 +125,8 @@ colcon build --cmake-args -DENABLE_PROFILER=1
 ```
 
 Run your Gazebo library then go to your Gazebo installation path and open the profiler browser using:
-```
-libexec/gz/gz-common<N>/gz_remotery_vis
+```{.sh}
+<workspace>/install/libexec/gz/gz-common<N>/gz_remotery_vis
 ```
 
 If the profiler is run successfully, you should see output in a browser. Similar to this

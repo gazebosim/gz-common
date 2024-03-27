@@ -14,24 +14,30 @@
  * limitations under the License.
  *
 */
+
 #include <gtest/gtest.h>
 
+#include "gz/common/BVHLoader.hh"
 #include "gz/common/Skeleton.hh"
 #include "gz/common/SkeletonAnimation.hh"
-
 #include "gz/common/testing/AutoLogFixture.hh"
 #include "gz/common/testing/TestPaths.hh"
 
 using namespace gz;
-class SkeletonAnimation : public common::testing::AutoLogFixture { };
+
+class BHVLoaderTest : public common::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
-TEST_F(SkeletonAnimation, CheckNoXDisplacement)
+TEST_F(BHVLoaderTest, LoadBVH)
 {
-  common::SkeletonAnimation* skelAnim =
-    new common::SkeletonAnimation("emptyAnimation");
-  auto xDisplacement = skelAnim->XDisplacement();
-  ASSERT_FALSE(xDisplacement);
+  common::BVHLoader loader;
+  auto skel = loader.Load("", 1);
+  EXPECT_EQ(nullptr, skel);
 
-  delete skelAnim;
+  skel = loader.Load(
+      common::testing::TestFile("data", "cmu-13_26.bvh"), 1);
+  EXPECT_NE(nullptr, skel->RootNode());
+
+  EXPECT_EQ(skel->RootNode()->Name(), std::string("Hips"));
+  EXPECT_EQ(31u, skel->NodeCount());
 }
