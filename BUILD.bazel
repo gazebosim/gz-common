@@ -7,13 +7,24 @@ load(
     "gz_export_header",
     "gz_include_header",
 )
+load(
+    "@gz//bazel/lint:lint.bzl",
+    "add_lint_tests",
+)
+load("@rules_license//rules:license.bzl", "license")
 
 package(
+    default_applicable_licenses = [GZ_ROOT + "common:license"],
     default_visibility = GZ_VISIBILITY,
     features = GZ_FEATURES,
 )
 
-licenses(["notice"])  # Apache-2.0
+license(
+    name = "license",
+    package_name = "gz-common",
+)
+
+licenses(["notice"])
 
 exports_files(["LICENSE"])
 
@@ -67,6 +78,10 @@ cc_library(
     name = "common",
     srcs = sources + private_headers,
     hdrs = public_headers,
+    copts = [
+        "-fexceptions",
+        "-Wno-unused-value",
+    ],
     includes = ["include"],
     deps = [
         GZ_ROOT + "utils",
@@ -86,6 +101,7 @@ test_sources = glob(
 [cc_test(
     name = src.replace("/", "_").replace(".cc", "").replace("src_", ""),
     srcs = [src],
+    copts = ["-fexceptions"],
     deps = [
         ":common",
         GZ_ROOT + "common/testing",
@@ -93,3 +109,5 @@ test_sources = glob(
         "@gtest//:gtest_main",
     ],
 ) for src in test_sources]
+
+add_lint_tests()

@@ -112,6 +112,8 @@ TEST_F(ColladaExporter, ExportBox)
                 meshReloaded->SubMeshByIndex(i).lock()->TexCoord(j));
     }
   }
+  delete meshOriginal;
+  delete meshReloaded;
 }
 
 /////////////////////////////////////////////////
@@ -206,6 +208,8 @@ TEST_F(ColladaExporter, ExportCordlessDrill)
                 meshReloaded->SubMeshByIndex(i).lock()->TexCoord(j));
     }
   }
+  delete meshOriginal;
+  delete meshReloaded;
 }
 
 /////////////////////////////////////////////////
@@ -319,6 +323,10 @@ TEST_F(ColladaExporter, ExportMeshWithSubmeshes)
   EXPECT_EQ(outMesh.NormalCount(), meshReloaded->NormalCount());
   EXPECT_EQ(outMesh.TexCoordCount(),
       meshReloaded->TexCoordCount());
+
+  delete boxMesh;
+  delete drillMesh;
+  delete meshReloaded;
 }
 
 TEST_F(ColladaExporter, ExportLights)
@@ -448,4 +456,5 @@ TEST_F(ColladaExporter, ExportLights)
     }
   }
   EXPECT_EQ(node_with_light_count, 3);
+  delete meshOriginal;
 }

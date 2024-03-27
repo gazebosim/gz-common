@@ -1,9 +1,19 @@
 load(
     "@gz//bazel/skylark:build_defs.bzl",
+    "GZ_FEATURES",
     "GZ_ROOT",
     "GZ_VISIBILITY",
     "gz_export_header",
     "gz_include_header",
+)
+load(
+    "@gz//bazel/lint:lint.bzl",
+    "add_lint_tests",
+)
+
+package(
+    default_applicable_licenses = [GZ_ROOT + "common:license"],
+    features = GZ_FEATURES,
 )
 
 public_headers_no_gen = glob([
@@ -43,6 +53,10 @@ cc_library(
     name = "graphics",
     srcs = sources,
     hdrs = public_headers,
+    copts = [
+        "-Wno-implicit-fallthrough",
+        "-Wno-unused-value",
+    ],
     includes = ["include"],
     visibility = GZ_VISIBILITY,
     deps = [
@@ -70,3 +84,5 @@ cc_library(
         "@gtest//:gtest_main",
     ],
 ) for src in test_sources]
+
+add_lint_tests()
