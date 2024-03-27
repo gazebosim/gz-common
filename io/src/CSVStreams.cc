@@ -174,10 +174,21 @@ class CSVIStreamIterator::Implementation
   {
   }
 
+  /// \brief Copy assignment.
+  public: Implementation& operator=(Implementation other)
+  {
+    if (this != &other)
+    {
+      std::swap(this->stream, other.stream);
+      std::swap(this->dialect, other.dialect);
+      std::swap(this->row, other.row);
+    }
+    return *this;
+  }
   /// \brief Advance iterator to next row if possible.
   public: void Next()
   {
-    if (this->stream)
+    if (this->stream != nullptr)
     {
       try
       {
