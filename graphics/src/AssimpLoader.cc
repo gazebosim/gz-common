@@ -147,6 +147,12 @@ class AssimpLoader::Implementation
           const aiNode* _node,
           std::unordered_set<std::string>& _boneNames) const;
 
+  /// \brief Adds animation at time 0, with default translation and
+  /// quaternion values for the given node.
+  /// \param[in] _skeleton Skeleton for the animation.
+  /// \param[in] _nodeName Node name for the animation.
+  public: void AddDumyAnimation(SkeletonPtr _skeleton, const char *_nodeName);
+
   /// \brief Apply the the inv bind transform to the skeleton pose.
   /// \remarks have to set the model transforms starting from the root in
   /// breadth first order. Because setting the model transform also updates
@@ -674,6 +680,19 @@ AssimpLoader::~AssimpLoader()
 }
 
 //////////////////////////////////////////////////
+void AssimpLoader::Implementation::AddDumyAnimation(SkeletonPtr _skeleton,
+  const char *_nodeName)
+{
+  SkeletonAnimation* skelAnim = new SkeletonAnimation("dummyAnimation");
+  math::Vector3d pos(0, 0, 0);
+  math::Quaterniond quat(0, 0, 0, 0);
+  math::Pose3d pose(pos, quat);
+  skelAnim->AddKeyFrame(_nodeName, 0, pose);
+  _skeleton->AddAnimation(skelAnim);
+  return;
+}
+
+//////////////////////////////////////////////////
 Mesh *AssimpLoader::Load(const std::string &_filename)
 {
   Mesh *mesh = new Mesh();
@@ -736,6 +755,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   // Recursive call to keep track of transforms,
   // mesh is passed by reference and edited throughout
   this->dataPtr->RecursiveCreate(scene, rootNode, rootTransform, mesh);
+  this->dataPtr->AddDumyAnimation(mesh->MeshSkeleton(), "scene");
   // Add the animations
   for (unsigned animIdx = 0; animIdx < scene->mNumAnimations; ++animIdx)
   {
