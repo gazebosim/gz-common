@@ -168,6 +168,27 @@ TEST(CSVStreams, CanIterateValidCSV)
         CSVIStreamIterator(ss), CSVIStreamIterator());
     EXPECT_EQ(expectedRows, rows);
   }
+
+  {
+    std::stringstream ss;
+    ss << "foo,bar" << std::endl
+       << "bar," << std::endl
+       << ",foo" << std::endl
+       << "," << std::endl
+       << "baz,baz";
+    auto it = CSVIStreamIterator(ss);
+    // Copy constructor for coverage
+    auto it_copy = it;
+
+    auto row0 = *it_copy;
+    EXPECT_EQ(row0[0], "foo");
+    EXPECT_EQ(row0[1], "bar");
+    it_copy++;
+
+    auto row1 = *it_copy;
+    EXPECT_EQ(row1[0], "bar");
+    EXPECT_EQ(row1[1], "");
+  }
 }
 
 /////////////////////////////////////////////////
