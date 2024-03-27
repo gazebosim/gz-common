@@ -1,6 +1,16 @@
 load(
     "@gz//bazel/skylark:build_defs.bzl",
+    "GZ_FEATURES",
     "GZ_ROOT",
+)
+load(
+    "@gz//bazel/lint:lint.bzl",
+    "add_lint_tests",
+)
+
+package(
+    default_applicable_licenses = [GZ_ROOT + "common:license"],
+    features = GZ_FEATURES,
 )
 
 cc_test(
@@ -35,8 +45,11 @@ cc_test(
         GZ_ROOT + "common",
         GZ_ROOT + "common/graphics",
         GZ_ROOT + "common/testing",
+        GZ_ROOT + "math",
         "@gtest//:gtest_main",
     ],
 )
 
 exports_files(["data"])
+
+add_lint_tests()

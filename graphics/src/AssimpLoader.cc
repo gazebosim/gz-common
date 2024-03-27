@@ -357,8 +357,26 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   }
   float opacity = 1.0;
   ret = assimpMat->Get(AI_MATKEY_OPACITY, opacity);
-  mat->SetTransparency(1.0 - opacity);
-  mat->SetBlendFactors(opacity, 1.0 - opacity);
+  if (ret == AI_SUCCESS)
+  {
+    mat->SetTransparency(1.0 - opacity);
+    mat->SetBlendFactors(opacity, 1.0 - opacity);
+  }
+
+#ifndef GZ_ASSIMP_PRE_5_1_0
+  // basic support for transmission - currently just overrides opacity
+  // \todo(iche033) The transmission factor can be used with volume
+  // material extension to simulate effects like refraction
+  // so consider also extending support for other properties like
+  // AI_MATKEY_VOLUME_THICKNESS_FACTOR
+  float transmission = 0.0;
+  ret = assimpMat->Get(AI_MATKEY_TRANSMISSION_FACTOR, transmission);
+  if (ret == AI_SUCCESS)
+  {
+    mat->SetTransparency(transmission);
+  }
+#endif
+
   // TODO(luca) more than one texture, Gazebo assumes UV index 0
   Pbr pbr;
   aiString texturePath(_path.c_str());
@@ -593,6 +611,7 @@ std::string AssimpLoader::Implementation::GenerateTextureName(
     "_" + _type;
 }
 
+//////////////////////////////////////////////////
 SubMesh AssimpLoader::Implementation::CreateSubMesh(
     const aiMesh* _assimpMesh, const math::Matrix4d& _transform) const
 {
