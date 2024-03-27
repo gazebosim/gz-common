@@ -17,6 +17,10 @@ if(GZ_PROFILER_REMOTERY)
     ./Remotery/lib/Remotery.h
   )
 
+  # A few warnings to suppress, rather than modifying vendored code
+  set_source_files_properties(./Remotery/lib/Remotery.c PROPERTIES
+    COMPILE_FLAGS "-Wno-strict-prototypes -Wno-unused-but-set-variable")
+
 
   if(APPLE)
     set(
