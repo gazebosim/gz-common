@@ -20,7 +20,6 @@
 #include "gz/common/Mesh.hh"
 #include "gz/common/SubMesh.hh"
 #include "gz/common/MeshManager.hh"
-#include "gz/common/config.hh"
 
 #include "gz/common/testing/AutoLogFixture.hh"
 #include "gz/common/testing/TestPaths.hh"
@@ -38,18 +37,18 @@ TEST_F(MeshManager, CreateExtrudedPolyline)
   // The smaller square should be treated as a hole inside the bigger square.
   std::vector<std::vector<gz::math::Vector2d> > path;
   std::vector<gz::math::Vector2d> subpath01;
-  subpath01.push_back(gz::math::Vector2d(0, 0));
-  subpath01.push_back(gz::math::Vector2d(1, 0));
-  subpath01.push_back(gz::math::Vector2d(1, 1));
-  subpath01.push_back(gz::math::Vector2d(0, 1));
-  subpath01.push_back(gz::math::Vector2d(0, 0));
+  subpath01.emplace_back(0, 0);
+  subpath01.emplace_back(1, 0);
+  subpath01.emplace_back(1, 1);
+  subpath01.emplace_back(0, 1);
+  subpath01.emplace_back(0, 0);
 
   std::vector<gz::math::Vector2d> subpath02;
-  subpath02.push_back(gz::math::Vector2d(0.25, 0.25));
-  subpath02.push_back(gz::math::Vector2d(0.25, 0.75));
-  subpath02.push_back(gz::math::Vector2d(0.75, 0.75));
-  subpath02.push_back(gz::math::Vector2d(0.75, 0.25));
-  subpath02.push_back(gz::math::Vector2d(0.25, 0.25));
+  subpath02.emplace_back(0.25, 0.25);
+  subpath02.emplace_back(0.25, 0.75);
+  subpath02.emplace_back(0.75, 0.75);
+  subpath02.emplace_back(0.75, 0.25);
+  subpath02.emplace_back(0.25, 0.25);
 
   path.push_back(subpath01);
   path.push_back(subpath02);
@@ -141,19 +140,19 @@ TEST_F(MeshManager, CreateExtrudedPolylineClosedPath)
   // The following two subpaths form the letter 'A'.
   std::vector<std::vector<gz::math::Vector2d> > path2;
   std::vector<gz::math::Vector2d> subpath03;
-  subpath03.push_back(gz::math::Vector2d(2.27467, 1.0967));
-  subpath03.push_back(gz::math::Vector2d(1.81094, 2.35418));
-  subpath03.push_back(gz::math::Vector2d(2.74009, 2.35418));
+  subpath03.emplace_back(2.27467, 1.0967);
+  subpath03.emplace_back(1.81094, 2.35418);
+  subpath03.emplace_back(2.74009, 2.35418);
 
   std::vector<gz::math::Vector2d> subpath04;
-  subpath04.push_back(gz::math::Vector2d(2.08173, 0.7599));
-  subpath04.push_back(gz::math::Vector2d(2.4693, 0.7599));
-  subpath04.push_back(gz::math::Vector2d(3.4323, 3.28672));
-  subpath04.push_back(gz::math::Vector2d(3.07689, 3.28672));
-  subpath04.push_back(gz::math::Vector2d(2.84672, 2.63851));
-  subpath04.push_back(gz::math::Vector2d(1.7077, 2.63851));
-  subpath04.push_back(gz::math::Vector2d(1.47753, 3.28672));
-  subpath04.push_back(gz::math::Vector2d(1.11704, 3.28672));
+  subpath04.emplace_back(2.08173, 0.7599);
+  subpath04.emplace_back(2.4693, 0.7599);
+  subpath04.emplace_back(3.4323, 3.28672);
+  subpath04.emplace_back(3.07689, 3.28672);
+  subpath04.emplace_back(2.84672, 2.63851);
+  subpath04.emplace_back(1.7077, 2.63851);
+  subpath04.emplace_back(1.47753, 3.28672);
+  subpath04.emplace_back(1.11704, 3.28672);
 
   path2.push_back(subpath03);
   path2.push_back(subpath04);
@@ -254,9 +253,9 @@ TEST_F(MeshManager, CreateExtrudedPolylineInvalid)
   // test extruding invalid polyline
   std::vector<std::vector<gz::math::Vector2d> > path;
   std::vector<gz::math::Vector2d> subpath01;
-  subpath01.push_back(gz::math::Vector2d(0, 0));
-  subpath01.push_back(gz::math::Vector2d(0, 1));
-  subpath01.push_back(gz::math::Vector2d(0, 2));
+  subpath01.emplace_back(0, 0);
+  subpath01.emplace_back(0, 1);
+  subpath01.emplace_back(0, 2);
 
   path.push_back(subpath01);
 
@@ -272,7 +271,7 @@ TEST_F(MeshManager, CreateExtrudedPolylineInvalid)
 /////////////////////////////////////////////////
 TEST_F(MeshManager, Remove)
 {
-  auto mgr = common::MeshManager::Instance();
+  auto *mgr = common::MeshManager::Instance();
 
   EXPECT_FALSE(mgr->HasMesh("box"));
   mgr->CreateBox("box",
@@ -294,7 +293,7 @@ TEST_F(MeshManager, Remove)
 /////////////////////////////////////////////////
 TEST_F(MeshManager, ConvexDecomposition)
 {
-  auto mgr = common::MeshManager::Instance();
+  auto *mgr = common::MeshManager::Instance();
   const common::Mesh *boxMesh = mgr->Load(
       common::testing::TestFile("data", "box.dae"));
 
@@ -304,8 +303,8 @@ TEST_F(MeshManager, ConvexDecomposition)
   std::size_t maxConvexHulls = 4;
   std::size_t resolution = 1000;
   auto submesh = boxMesh->SubMeshByIndex(0u).lock();
-  auto decomposed = std::move(common::MeshManager::ConvexDecomposition(
-      *(submesh.get()), maxConvexHulls, resolution));
+  auto decomposed = common::MeshManager::ConvexDecomposition(
+      *submesh, maxConvexHulls, resolution);
 
   // Decomposing a box should just produce a box
   EXPECT_EQ(1u, decomposed.size());
@@ -321,8 +320,8 @@ TEST_F(MeshManager, ConvexDecomposition)
   ASSERT_NE(nullptr, drillMesh);
   EXPECT_EQ(1u, drillMesh->SubMeshCount());
   submesh = drillMesh->SubMeshByIndex(0u).lock();
-  decomposed = std::move(common::MeshManager::ConvexDecomposition(
-      *(submesh.get()), maxConvexHulls, resolution));
+  decomposed = common::MeshManager::ConvexDecomposition(
+      *submesh, maxConvexHulls, resolution);
 
   // A drill should be decomposed into multiple submeshes
   EXPECT_LT(1u, decomposed.size());
@@ -340,7 +339,7 @@ TEST_F(MeshManager, ConvexDecomposition)
 /////////////////////////////////////////////////
 TEST_F(MeshManager, MergeSubMeshes)
 {
-  auto mgr = common::MeshManager::Instance();
+  auto *mgr = common::MeshManager::Instance();
   const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data",
         "multiple_texture_coordinates_triangle.dae"));
