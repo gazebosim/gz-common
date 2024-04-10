@@ -304,8 +304,8 @@ TEST_F(MeshManager, ConvexDecomposition)
   std::size_t maxConvexHulls = 4;
   std::size_t resolution = 1000;
   auto submesh = boxMesh->SubMeshByIndex(0u).lock();
-  auto decomposed = std::move(common::MeshManager::ConvexDecomposition(
-      *(submesh.get()), maxConvexHulls, resolution));
+  auto decomposed = common::MeshManager::ConvexDecomposition(
+      *(submesh.get()), maxConvexHulls, resolution);
 
   // Decomposing a box should just produce a box
   EXPECT_EQ(1u, decomposed.size());
