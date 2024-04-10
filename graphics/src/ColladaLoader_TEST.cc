@@ -49,6 +49,7 @@ TEST_F(ColladaLoader, LoadBox)
 
   // Make sure we can read a submesh name
   EXPECT_STREQ("Cube", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -100,6 +101,7 @@ TEST_F(ColladaLoader, ShareVertices)
       }
     }
   }
+  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -124,6 +126,7 @@ TEST_F(ColladaLoader, LoadZeroCount)
   EXPECT_NE(log.find("Normal source has a float_array with a count of zero"),
       std::string::npos);
 #endif
+  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -179,6 +182,9 @@ TEST_F(ColladaLoader, Material)
   matOpaque->BlendFactors(srcFactor, dstFactor);
   EXPECT_DOUBLE_EQ(1.0, srcFactor);
   EXPECT_DOUBLE_EQ(0.0, dstFactor);
+
+  delete mesh;
+  delete meshOpaque;
 }
 
 /////////////////////////////////////////////////
@@ -236,8 +242,6 @@ TEST_F(ColladaLoader, TexCoordSets)
   EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoordBySet(0u, 0u));
   EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoordBySet(1u, 0u));
   EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoordBySet(2u, 0u));
-  EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoordBySet(1u, 0u));
-  EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoordBySet(2u, 0u));
 
   EXPECT_TRUE(subMeshB->HasTexCoordBySet(0u, 0u));
   EXPECT_TRUE(subMeshB->HasTexCoordBySet(1u, 0u));
@@ -266,6 +270,7 @@ TEST_F(ColladaLoader, TexCoordSets)
 
   subMeshB->SetTexCoordBySet(2u, math::Vector2d(0.1, 0.2), 1u);
   EXPECT_EQ(math::Vector2d(0.1, 0.2), subMeshB->TexCoordBySet(2u, 1u));
+  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -302,6 +307,7 @@ TEST_F(ColladaLoader, LoadBoxWithAnimationOutsideSkeleton)
         0, 0, 1, 0,
         0, 0, 0, 1);
   EXPECT_EQ(expectedTrans, poseEnd.at("Armature"));
+  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -320,6 +326,7 @@ TEST_F(ColladaLoader, LoadBoxInstControllerWithoutSkeleton)
   common::SkeletonPtr skeleton = mesh->MeshSkeleton();
   EXPECT_LT(0u, skeleton->NodeCount());
   EXPECT_NE(nullptr, skeleton->NodeById("Armature_Bone"));
+  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -347,6 +354,7 @@ TEST_F(ColladaLoader, LoadBoxMultipleInstControllers)
   common::SkeletonPtr skeleton = mesh->MeshSkeleton();
   EXPECT_NE(nullptr, skeleton->NodeById("Armature_Bone"));
   EXPECT_NE(nullptr, skeleton->NodeById("Armature_Bone2"));
+  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -383,6 +391,7 @@ TEST_F(ColladaLoader, LoadBoxNestedAnimation)
         0, 0, 1, 0,
         0, 0, 0, 1);
   EXPECT_EQ(expectedTrans, poseEnd.at("Bone"));
+  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -398,6 +407,7 @@ TEST_F(ColladaLoader, LoadBoxWithDefaultStride)
   EXPECT_EQ(1u, mesh->MaterialCount());
   EXPECT_EQ(35u, mesh->TexCoordCount());
   ASSERT_EQ(1u, mesh->MeshSkeleton()->AnimationCount());
+  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -415,6 +425,7 @@ TEST_F(ColladaLoader, LoadBoxWithMultipleGeoms)
   ASSERT_EQ(2u, mesh->SubMeshCount());
   EXPECT_EQ(24u, mesh->SubMeshByIndex(0).lock()->NodeAssignmentsCount());
   EXPECT_EQ(0u, mesh->SubMeshByIndex(1).lock()->NodeAssignmentsCount());
+  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -440,6 +451,7 @@ TEST_F(ColladaLoader, LoadBoxWithHierarchicalNodes)
 
   // Parent of nested node with name
   EXPECT_EQ("StaticCubeParent2", mesh->SubMeshByIndex(4).lock()->Name());
+  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -453,6 +465,7 @@ TEST_F(ColladaLoader, MergeBoxWithDoubleSkeleton)
   // The two skeletons have been joined and their root is the
   // animation root, called Armature
   EXPECT_EQ(skeleton_ptr->RootNode()->Name(), std::string("Armature"));
+  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -488,4 +501,5 @@ TEST_F(ColladaLoader, LoadCylinderAnimatedFrom3dsMax)
   EXPECT_EQ("Bone02", anim->Name());
   EXPECT_EQ(1u, anim->NodeCount());
   EXPECT_TRUE(anim->HasNode("Bone02"));
+  delete mesh;
 }
