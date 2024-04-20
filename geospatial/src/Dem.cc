@@ -150,6 +150,7 @@ int Dem::Load(const std::string &_filename)
   {
     // https://github.com/gazebosim/gz-common/issues/596
     // Attempt loading anyways to support /vsicurl, /vsizip, and other GDAL Virtual File Formats.
+    // The "exists()" function does not handle GDAL's special formats.
     if (!OpenInGdal(_filename)) {
       gzerr << "Unable to read DEM file[" << _filename << "]." << std::endl;
       return -1;
