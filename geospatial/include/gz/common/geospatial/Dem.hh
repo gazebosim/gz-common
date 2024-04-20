@@ -46,11 +46,23 @@ namespace gz
       public: virtual ~Dem();
 
       /// \brief Sets the spherical coordinates reference object.
-      /// \param[in] _worldSphericalCoordinates The spherical coordiantes
+      /// \param[in] _worldSphericalCoordinates The spherical coordinates
       /// object contained in the world. This is used to compute accurate
       /// sizes of the DEM object.
       public: void SetSphericalCoordinates(
                   const math::SphericalCoordinates &_worldSphericalCoordinates);
+
+      /// \brief Sets the X size limit of the raster data to be loaded.
+      ///        This is useful for large raster files.
+      /// \param[in] _xLimit The maximium size of the raster data to load in the X direction
+      public: void SetXSizeLimit(
+                  const unsigned int &_xLimit);
+
+      /// \brief Sets the Y size limit of the raster data to be loaded.
+      ///        This is useful for large raster files.
+      /// \param[in] _yLimit The maximium size of the raster data to load in the X direction
+      public: void SetYSizeLimit(
+                  const unsigned int &_YLimit);
 
       /// \brief Load a DEM file.
       /// \param[in] _filename the path to the terrain file.
@@ -133,6 +145,8 @@ namespace gz
       private: bool GeoReference(double _x, double _y,
                                  gz::math::Angle &_latitude,
                                  gz::math::Angle &_longitude) const;
+
+      private: [[nodiscard]] bool ConfigureLoadedSize();
 
       /// \brief Get the terrain file as a data array. Due to the Ogre
       /// constrains, the data might be stored in a bigger vector representing
