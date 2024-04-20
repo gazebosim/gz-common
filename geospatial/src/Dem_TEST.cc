@@ -285,7 +285,7 @@ TEST_F(DemTest, LunarDemLoad)
 
 TEST_F(DemTest, LargeVRTWithZipAndCurl)
 {
-  // Load a large VRT DEM from another server (used by ArduPilot)
+  // Load a large VRT DEM from another server (used by ArduPilot).
   common::Dem dem;
   dem.SetXSizeLimit(100);
   dem.SetYSizeLimit(50);
