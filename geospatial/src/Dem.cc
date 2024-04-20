@@ -550,7 +550,9 @@ int Dem::LoadData()
   // In this step the DEM is scaled to destWidth x destHeight.
 
   std::vector<float> buffer;
-  buffer.resize(destWidth * destHeight);
+  // Convert to uint64_t for multiplication to avoid overflow.
+  // https://github.com/OSGeo/gdal/issues/9713
+  buffer.resize(static_cast<uint64_t>(destWidth) * static_cast<uint64_t>(destHeight));
   //! @todo Do not assume users only want to load from the origin of the dataset.
   // Instead, add a configuration to change where in the dataset to read from.
   if (this->dataPtr->band->RasterIO(GF_Read, 0, 0, desiredXSize, desiredYSize, &buffer[0],

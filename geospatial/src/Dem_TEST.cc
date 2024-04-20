@@ -293,3 +293,11 @@ TEST_F(DemTest, LargeVRTWithZipAndCurl)
   auto const res = dem.Load("/vsizip/vsicurl/https://terrain.ardupilot.org/SRTM1/ap_srtm1.zip/ap_srtm1.vrt");
   EXPECT_EQ(res, 0);
 }
+
+TEST_F(DemTest, LargeVRTWithoutLimitsThrows)
+{
+  // Load a large VRT DEM from another server (used by ArduPilot).
+  common::Dem dem;
+  // We expect not to be able to allocate the data, so ensure we throw instead of segfault.
+  EXPECT_THROW(dem.Load("/vsizip/vsicurl/https://terrain.ardupilot.org/SRTM1/ap_srtm1.zip/ap_srtm1.vrt"), std::bad_alloc);
+}
