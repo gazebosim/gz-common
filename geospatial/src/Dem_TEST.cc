@@ -282,3 +282,14 @@ TEST_F(DemTest, LunarDemLoad)
   EXPECT_NEAR(dem.WorldWidth(), 80.0417, 1e-2);
   EXPECT_NEAR(dem.WorldHeight(), 80.0417, 1e-2);
 }
+
+TEST_F(DemTest, LargeVRTWithZipAndCurl)
+{
+  // Load a large VRT DEM from another server (used by ArduPilot)
+  common::Dem dem;
+  dem.SetXSizeLimit(100);
+  dem.SetYSizeLimit(50);
+  //! @todo Make a really large VRT locally
+  auto const res = dem.Load("/vsizip/vsicurl/https://terrain.ardupilot.org/SRTM1/ap_srtm1.zip/ap_srtm1.vrt");
+  EXPECT_EQ(res, 0);
+}
