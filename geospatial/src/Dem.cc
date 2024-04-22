@@ -58,7 +58,6 @@ class gz::common::Dem::Implementation
 
   /// \brief The desired length of data to load in the Y direction.
   ///        Internally, the implementation may use a higher value for performance.
-
   public: unsigned int configuredYSize;
 
   /// \brief Minimum elevation in meters.
