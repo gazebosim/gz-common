@@ -62,7 +62,7 @@ namespace gz
       ///        This is useful for large raster files.
       /// \param[in] _yLimit The maximium size of the raster data to load in the X direction
       public: void SetYSizeLimit(
-                  const unsigned int &_YLimit);
+                  const unsigned int &_yLimit);
 
       /// \brief Load a DEM file.
       /// \param[in] _filename the path to the terrain file.
