@@ -551,6 +551,7 @@ int Dem::LoadData()
   std::vector<float> buffer;
   // Convert to uint64_t for multiplication to avoid overflow.
   // https://github.com/OSGeo/gdal/issues/9713
+  static_assert(std::numeric_limits<uint64_t>::max() >= std::numeric_limits<uint32_t>::max() * std::numeric_limits<uint32_t>::max());
   buffer.resize(static_cast<uint64_t>(destWidth) * static_cast<uint64_t>(destHeight));
   //! @todo Do not assume users only want to load from the origin of the dataset.
   // Instead, add a configuration to change where in the dataset to read from.
@@ -564,7 +565,7 @@ int Dem::LoadData()
   // Copy and align 'buffer' into the target vector. The destination vector is
   // initialized to max() and later converted to the minimum elevation, so all
   // the points not contained in 'buffer' will be extra padding
-  this->dataPtr->demData.resize(this->Width() * this->Height(),
+  this->dataPtr->demData.resize(static_cast<uint64_t>(this->Width()) * static_cast<uint64_t>(this->Height()),
       this->dataPtr->bufferVal);
   for (unsigned int y = 0; y < destHeight; ++y)
   {
