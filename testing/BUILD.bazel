@@ -1,82 +1,81 @@
-load(
-    "@gz//bazel/skylark:build_defs.bzl",
-    "GZ_FEATURES",
-    "GZ_ROOT",
-    "gz_export_header",
-)
-load(
-    "@gz//bazel/lint:lint.bzl",
-    "add_lint_tests",
-)
+load("@rules_gz//gz:headers.bzl", "gz_include_header", "gz_export_header")
+load("@rules_license//rules:license.bzl", "license")
 
 package(
-    default_applicable_licenses = [GZ_ROOT + "common:license"],
-    features = GZ_FEATURES,
+    default_applicable_licenses = ["//:license"],
 )
+
+public_headers_no_gen = glob([
+    "include/gz/common/testing/*.hh",
+    "include/gz/common/testing/detail/*.hh",
+])
 
 gz_export_header(
     name = "include/gz/common/testing/Export.hh",
     export_base = "GZ_COMMON_TESTING",
-    lib_name = "gz-common-testing",
+    lib_name = "gz-common",
     visibility = ["//visibility:private"],
 )
 
-public_headers = glob([
-    "include/gz/common/testing/*.hh",
-    "include/gz/common/testing/detail/*.hh",
-]) + ["include/gz/common/testing/Export.hh"]
+public_headers = public_headers_no_gen + [
+  "include/gz/common/testing/Export.hh"
+]
+
+gz_include_header(
+    name = "testing_hh_genrule",
+    out = "include/gz/common/testing.hh",
+    hdrs = public_headers,
+)
 
 cc_library(
     name = "testing",
     srcs = [
-        "src/BazelTestPaths.cc",
-        "src/CMakeTestPaths.cc",
-        "src/TestPaths.cc",
-        "src/Utils.cc",
+      "src/BazelTestPaths.cc",
+      "src/CMakeTestPaths.cc",
+      "src/RedirectConsoleStream.cc",
+      "src/TestPaths.cc",
+      "src/Utils.cc"
     ],
-    hdrs = public_headers,
-    copts = ["-fexceptions"],
+    hdrs = public_headers + [
+        "include/gz/common/testing.hh",
+    ],
     includes = ["include"],
-    visibility = ["//visibility:public"],
     deps = [
-        GZ_ROOT + "common",
+        "//:gz-common",
     ],
+    visibility = ["//visibility:public"]
 )
 
 cc_test(
-    name = "AutoLogFixture_TEST",
-    srcs = ["src/AutoLogFixture_TEST.cc"],
-    deps = [
-        ":testing",
-        "@gtest//:gtest_main",
-    ],
+  name = "AutoLogFixture_TEST",
+  srcs = [
+    "src/AutoLogFixture_TEST.cc",
+  ],
+  deps = [
+    "@googletest//:gtest_main",
+    ":testing",
+  ]
 )
 
 cc_test(
-    name = "BazelTestPaths_TEST",
-    srcs = ["src/BazelTestPaths_TEST.cc"],
-    data = glob(["test_files/**"]),
-    env = {
-        "GZ_BAZEL": "1",
-        "GZ_BAZEL_PATH": "common",
-    },
-    deps = [
-        ":testing",
-        "@gtest//:gtest_main",
-    ],
+  name = "BazelTestPaths_TEST",
+  srcs = [
+    "src/BazelTestPaths_TEST.cc",
+  ],
+  data = ["test_files"],
+  deps = [
+    "@googletest//:gtest_main",
+    ":testing",
+  ]
 )
 
 cc_test(
-    name = "Utils_TEST",
-    srcs = ["src/Utils_TEST.cc"],
-    env = {
-        "GZ_BAZEL": "1",
-        "GZ_BAZEL_PATH": "common",
-    },
-    deps = [
-        ":testing",
-        "@gtest//:gtest_main",
-    ],
+  name = "RedirectConsoleStream_TEST",
+  srcs = [
+    "src/RedirectConsoleStream_TEST.cc",
+  ],
+  deps = [
+    "@googletest//:gtest_main",
+    ":testing",
+  ]
 )
-
-add_lint_tests()
