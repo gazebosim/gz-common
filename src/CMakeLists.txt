@@ -10,7 +10,11 @@ ign_create_core_library(
 
 # Link the libraries that we always need
 target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
-  PRIVATE ${DL_TARGET})
+  PRIVATE
+    ${DL_TARGET}
+  PUBLIC
+    gz-utils${GZ_UTILS_VER}::gz-utils${GZ_UTILS_VER}
+)
 
 # This is required by the WorkerPool::WaitForResults(const Time &_timeout)
 # TODO(anyone): IGN_DEPRECATED(4). Remove this part when the method is removed
