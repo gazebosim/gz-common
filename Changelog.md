@@ -1,5 +1,22 @@
 ## Gazebo Common 5.x
 
+## Gazebo Common 5.6.0 (2024-04-23)
+
+1. Clarify units for the DEM classes
+    * [Pull request #595](https://github.com/gazebosim/gz-common/pull/595)
+
+1. Remove pessimizing move
+    * [Pull request #593](https://github.com/gazebosim/gz-common/pull/593)
+
+1. Fix bazel build
+    * [Pull request #592](https://github.com/gazebosim/gz-common/pull/592)
+
+1. Add new function in MeshManager to merge all submeshes of a mesh into one
+    * [Pull request #588](https://github.com/gazebosim/gz-common/pull/588)
+
+1. Adds new function in MeshManager for performing convex decomposition
+    * [Pull request #585](https://github.com/gazebosim/gz-common/pull/585)
+
 ## Gazebo Common 5.5.1 (2024-03-14)
 
 1. Various Bazel adjustments for linting

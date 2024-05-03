@@ -16,11 +16,28 @@
  */
 
 #include <sys/stat.h>
-#include <string>
+
+#include <cctype>
+#include <cstdint>
+#include <memory>
 #include <mutex>
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
-#include <cctype>
+#include <vector>
+
+// Suppress warnings for VHACD
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+#pragma GCC diagnostic ignored "-Wswitch-default"
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
+#define ENABLE_VHACD_IMPLEMENTATION 1
+#include "VHACD/VHACD.h"
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif
 
 #ifndef _WIN32
   #include "gz/common/GTSMeshUtils.hh"
@@ -35,6 +52,7 @@
 #include "gz/common/ColladaExporter.hh"
 #include "gz/common/OBJLoader.hh"
 #include "gz/common/STLLoader.hh"
+#include "gz/common/Timer.hh"
 #include "gz/common/Util.hh"
 #include "gz/common/config.hh"
 
@@ -1648,4 +1666,167 @@ void MeshManager::SetAssimpEnvs()
     gzmsg << "Using assimp to load all mesh formats"  << std::endl;
     this->dataPtr->forceAssimp = true;
   }
+}
+
+//////////////////////////////////////////////////
+std::vector<SubMesh>
+MeshManager::ConvexDecomposition(const SubMesh &_subMesh,
+                                 std::size_t _maxConvexHulls,
+                                 std::size_t _voxelResolution)
+{
+  std::vector<SubMesh> decomposed;
+
+  auto vertexCount = _subMesh.VertexCount();
+  auto indexCount = _subMesh.IndexCount();
+  auto triangleCount = indexCount / 3u;
+
+  std::vector<float> points;
+  points.resize(vertexCount * 3u);
+  for (std::size_t i = 0; i < vertexCount; ++i)
+  {
+    std::size_t idx = i * 3u;
+    points[idx] = _subMesh.Vertex(i).X();
+    points[idx + 1] = _subMesh.Vertex(i).Y();
+    points[idx + 2] = _subMesh.Vertex(i).Z();
+  }
+
+  std::vector<uint32_t> indices;
+  indices.resize(indexCount);
+  for (std::size_t i = 0; i < indexCount; ++i)
+  {
+    indices[i] = _subMesh.Index(i);
+  }
+
+  VHACD::IVHACD *iface = VHACD::CreateVHACD_ASYNC();
+  VHACD::IVHACD::Parameters parameters;
+  parameters.m_maxConvexHulls = _maxConvexHulls;
+  parameters.m_resolution = _voxelResolution;
+  parameters.m_asyncACD = true;
+  iface->Compute(points.data(), vertexCount, indices.data(), triangleCount,
+                 parameters);
+
+  common::Timer t;
+  t.Start();
+  auto timeout = std::chrono::seconds(300);
+  while (!iface->IsReady())
+  {
+    if (t.ElapsedTime() > timeout)
+    {
+      iface->Cancel();
+      gzwarn << "Convex decomposition timed out. Process took more than "
+             << timeout.count() << " seconds. "  << std::endl;
+      t.Stop();
+      break;
+    }
+    std::this_thread::sleep_for(std::chrono::nanoseconds(10000));
+  }
+
+  if (!iface->GetNConvexHulls())
+  {
+    gzwarn << "No convex hulls are generated "
+           << (!_subMesh.Name().empty() ? "from " : "")
+           <<  _subMesh.Name();
+    return decomposed;
+  }
+
+  for (std::size_t n = 0; n < iface->GetNConvexHulls(); ++n)
+  {
+    VHACD::IVHACD::ConvexHull ch;
+    iface->GetConvexHull(n, ch);
+
+    SubMesh convexMesh;
+    for (std::size_t i = 0u; i < ch.m_points.size(); ++i)
+    {
+      const VHACD::Vertex &p = ch.m_points[i];
+      gz::math::Vector3d vertex(p.mX, p.mY, p.mZ);
+      convexMesh.AddVertex(vertex);
+
+      // add dummy normal - this will be overriden by the
+      // RecalculateNormals call
+      convexMesh.AddNormal(vertex);
+    }
+
+    for (std::size_t i = 0u; i < ch.m_triangles.size(); ++i)
+    {
+      const VHACD::Triangle &tri = ch.m_triangles[i];
+      convexMesh.AddIndex(tri.mI0);
+      convexMesh.AddIndex(tri.mI1);
+      convexMesh.AddIndex(tri.mI2);
+    }
+    convexMesh.RecalculateNormals();
+    decomposed.push_back(convexMesh);
+  }
+
+  iface->Release();
+
+  return decomposed;
+}
+
+//////////////////////////////////////////////////
+std::unique_ptr<Mesh> MeshManager::MergeSubMeshes(const Mesh &_mesh)
+{
+  SubMesh mergedSubMesh;
+
+  // The final merged submesh should contain all the texcoord sets
+  // in the original submeshes. Determine the max texcoord sets we need.
+  unsigned int maxTexCoordSet = 0u;
+  for (unsigned int i = 0u; i < _mesh.SubMeshCount(); ++i)
+  {
+    auto submesh = _mesh.SubMeshByIndex(i).lock();
+    maxTexCoordSet = (maxTexCoordSet > submesh->TexCoordSetCount()) ?
+        maxTexCoordSet : submesh->TexCoordSetCount();
+  }
+
+  unsigned int indexOffset = 0u;
+  for (unsigned int i = 0u; i < _mesh.SubMeshCount(); ++i)
+  {
+    auto submesh = _mesh.SubMeshByIndex(i).lock();
+    // vertices
+    for (unsigned int j = 0; j < submesh->VertexCount(); ++j)
+    {
+      mergedSubMesh.AddVertex(submesh->Vertex(j));
+    }
+
+    // normals
+    for (unsigned int j = 0; j < submesh->NormalCount(); ++j)
+    {
+      mergedSubMesh.AddNormal(submesh->Normal(j));
+    }
+
+    // indices - the index needs to start at an offset for each new submesh
+    for (unsigned int j = 0; j < submesh->IndexCount(); ++j)
+    {
+      mergedSubMesh.AddIndex(submesh->Index(j) + indexOffset);
+    }
+    indexOffset += submesh->VertexCount();
+
+    // texcoords
+    for (unsigned int j = 0; j < maxTexCoordSet; ++j)
+    {
+      if (j < submesh->TexCoordSetCount())
+      {
+        // Populate texcoords from input submesh
+        for (unsigned int k = 0; k < submesh->TexCoordCountBySet(j); ++k)
+        {
+          mergedSubMesh.AddTexCoordBySet(submesh->TexCoordBySet(k, j), j);
+        }
+      }
+      else
+      {
+        // Set texcoord to zero if the input submesh does not have that many
+        // texcoord sets. Note the texcoord count should be the same as vertex
+        // count.
+        for (unsigned int k = 0; k < submesh->VertexCount(); ++k)
+        {
+          mergedSubMesh.AddTexCoordBySet(math::Vector2d::Zero, j);
+        }
+      }
+    }
+  }
+  auto mesh = std::make_unique<Mesh>();
+  mesh->SetName(_mesh.Name() + "_merged");
+  mergedSubMesh.SetName(mesh->Name() + "_submesh");
+  mesh->AddSubMesh(mergedSubMesh);
+
+  return mesh;
 }
