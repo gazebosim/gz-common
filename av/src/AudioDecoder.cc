@@ -67,7 +67,7 @@ void AudioDecoder::Cleanup()
 {
   // Close the codec
   if (this->data->codecCtx)
-    avcodec_close(this->data->codecCtx);
+    avcodec_free_context(&this->data->codecCtx);
 
   // Close the audio file
   if (this->data->formatCtx)

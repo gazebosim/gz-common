@@ -83,7 +83,7 @@ void Video::Cleanup()
   avformat_close_input(&this->dataPtr->formatCtx);
 
   // Close the codec
-  avcodec_close(this->dataPtr->codecCtx);
+  avcodec_free_context(&this->dataPtr->codecCtx);
 
   av_free(this->dataPtr->avFrameDst);
 }
