@@ -142,7 +142,7 @@ namespace ignition
     /// \verbatim
 #if defined __APPLE__ && defined __clang__
   _Pragma("clang diagnostic push")
-  _Pragma("clang diagnostic ignored -Wdeprecated-declarations")
+  _Pragma("clang diagnostic ignored \"-Wdeprecated-declarations\"")
 #endif
     template<typename Enum>
     class EnumIterator
