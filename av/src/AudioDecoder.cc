@@ -67,7 +67,13 @@ void AudioDecoder::Cleanup()
 {
   // Close the codec
   if (this->data->codecCtx)
+  {
+#if LIBAVFORMAT_VERSION_MAJOR < 59
     avcodec_close(this->data->codecCtx);
+#else
+    avcodec_free_context(&this->data->codecCtx);
+#endif
+  }
 
   // Close the audio file
   if (this->data->formatCtx)
