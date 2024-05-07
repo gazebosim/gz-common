@@ -83,7 +83,11 @@ void Video::Cleanup()
   avformat_close_input(&this->dataPtr->formatCtx);
 
   // Close the codec
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 48, 101)
+  avcodec_free_context(&this->dataPtr->codecCtx);
+#else
   avcodec_close(this->dataPtr->codecCtx);
+#endif
 
   av_free(this->dataPtr->avFrameDst);
 }

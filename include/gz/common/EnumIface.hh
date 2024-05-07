@@ -142,6 +142,10 @@ namespace ignition
     ///   std::cout << "Type++ Name[" << myTypeIface.Str(*i) << "]\n";
     /// }
     /// \verbatim
+#if defined __APPLE__ && defined __clang__
+  _Pragma("clang diagnostic push")
+  _Pragma("clang diagnostic ignored \"-Wdeprecated-declarations\"")
+#endif
     template<typename Enum>
     class EnumIterator
     : std::iterator<std::bidirectional_iterator_tag, Enum>
@@ -219,6 +223,9 @@ namespace ignition
       /// member value ever used.
       private: Enum c;
     };
+#if defined __APPLE__ && defined __clang__
+  _Pragma("clang diagnostic pop")
+#endif
 
     /// \brief Equality operator
     /// \param[in] _e1 First iterator
