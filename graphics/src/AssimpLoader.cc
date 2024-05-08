@@ -15,7 +15,9 @@
  *
  */
 
+#include <cstddef>
 #include <queue>
+#include <string>
 #include <unordered_set>
 
 #include "gz/common/graphics/Types.hh"
