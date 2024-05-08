@@ -13,7 +13,7 @@ target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
   PRIVATE
     ${DL_TARGET}
   PUBLIC
-    gz-utils${GZ_UTILS_VER}::gz-utils${GZ_UTILS_VER}
+    ignition-utils${IGN_UTILS_VER }::ignition-utils${IGN_UTILS_VER }
 )
 
 # This is required by the WorkerPool::WaitForResults(const Time &_timeout)
