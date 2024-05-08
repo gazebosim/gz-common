@@ -143,6 +143,10 @@ namespace ignition
     ///   std::cout << "Type++ Name[" << myTypeIface.Str(*i) << "]\n";
     /// }
     /// \verbatim
+#if defined __APPLE__ && defined __clang__
+  _Pragma("clang diagnostic push")
+  _Pragma("clang diagnostic ignored \"-Wdeprecated-declarations\"")
+#endif
     IGN_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
     template<typename Enum>
     class EnumIterator
@@ -222,6 +226,9 @@ namespace ignition
       private: Enum c;
     };
     IGN_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
+#if defined __APPLE__ && defined __clang__
+  _Pragma("clang diagnostic pop")
+#endif
 
     /// \brief Equality operator
     /// \param[in] _e1 First iterator
