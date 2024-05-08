@@ -69,10 +69,12 @@ class AssimpLoader::Implementation
   /// \param[in] _scene the assimp scene
   /// \param[in] _matIdx index of the material in the scene
   /// \param[in] _path path where the mesh is located
+  /// \param[in] _fileBaseName Base name of the mesh file.
   /// \return pointer to the converted common::Material
-  public: MaterialPtr CreateMaterial(const aiScene* _scene,
+  public: MaterialPtr CreateMaterial(const aiScene *_scene,
                                      unsigned _matIdx,
-                                     const std::string& _path) const;
+                                     const std::string &_path,
+                                     const std::string &_fileBaseName) const;
 
   /// \brief Load a texture embedded in a mesh (i.e. for GLB format)
   /// into a gz::common::Image
@@ -82,13 +84,15 @@ class AssimpLoader::Implementation
 
   /// \brief Utility function to generate a texture name for both embedded
   /// and external textures
+  /// \param[in] _prefix Prefix to add to the texture name
   /// \param[in] _scene the assimp scene
   /// \param[in] _mat the assimp material
   /// \param[in] _type the type of texture (i.e. Diffuse, Metal)
   /// \return the generated texture name
-  public: std::string GenerateTextureName(const aiScene* _scene,
-                                          aiMaterial*  _mat,
-                                          const std::string& _type) const;
+  public: std::string GenerateTextureName(const std::string &_prefix,
+                                          const aiScene* _scene,
+                                          aiMaterial *_mat,
+                                          const std::string &_type) const;
 
   /// \brief Function to parse texture information and load it if embedded
   /// \param[in] _scene the assimp scene
@@ -320,7 +324,8 @@ void AssimpLoader::Implementation::RecursiveSkeletonCreate(const aiNode* _node,
 
 //////////////////////////////////////////////////
 MaterialPtr AssimpLoader::Implementation::CreateMaterial(
-    const aiScene* _scene, unsigned _matIdx, const std::string& _path) const
+    const aiScene *_scene, unsigned _matIdx, const std::string &_path,
+    const std::string &_fileBaseName) const
 {
   MaterialPtr mat = std::make_shared<Material>();
   aiColor4D color;
@@ -386,8 +391,8 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   if (ret == AI_SUCCESS)
   {
     // Check if the texture is embedded or not
-    auto [texName, texData] = this->LoadTexture(_scene,
-        texturePath, this->GenerateTextureName(_scene, assimpMat, "Diffuse"));
+    auto [texName, texData] = this->LoadTexture(_scene, texturePath,
+        this->GenerateTextureName(_fileBaseName, _scene, assimpMat, "Diffuse"));
     if (texData != nullptr)
       mat->SetTextureImage(texName, texData);
     else
@@ -421,18 +426,19 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   if (ret == AI_SUCCESS)
   {
     auto [texName, texData] = this->LoadTexture(_scene, texturePath,
-        this->GenerateTextureName(_scene, assimpMat, "MetallicRoughness"));
+        this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
+        "MetallicRoughness"));
     // Load it into a common::Image then split it
     auto texImg = texData != nullptr ? texData :
       std::make_shared<common::Image>(joinPaths(_path, texName));
     auto [metalTexture, roughTexture] =
       this->SplitMetallicRoughnessMap(*texImg);
     pbr.SetMetalnessMap(
-        this->GenerateTextureName(_scene, assimpMat, "Metalness"),
-        metalTexture);
+        this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
+        "Metalness"), metalTexture);
     pbr.SetRoughnessMap(
-        this->GenerateTextureName(_scene, assimpMat, "Roughness"),
-        roughTexture);
+        this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
+        "Roughness"), roughTexture);
   }
   else
   {
@@ -441,7 +447,8 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     if (ret == AI_SUCCESS)
     {
       auto [texName, texData] = this->LoadTexture(_scene, texturePath,
-          this->GenerateTextureName(_scene, assimpMat, "Metalness"));
+          this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
+          "Metalness"));
       pbr.SetMetalnessMap(texName, texData);
     }
     ret = assimpMat->GetTexture(
@@ -449,7 +456,8 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     if (ret == AI_SUCCESS)
     {
       auto [texName, texData] = this->LoadTexture(_scene, texturePath,
-          this->GenerateTextureName(_scene, assimpMat, "Roughness"));
+          this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
+          "Roughness"));
       pbr.SetRoughnessMap(texName, texData);
     }
     // Load lightmap only if it is not a glb/glTF mesh that contains a
@@ -464,7 +472,8 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     if (ret == AI_SUCCESS)
     {
       auto [texName, texData] = this->LoadTexture(_scene, texturePath,
-          this->GenerateTextureName(_scene, assimpMat, "Lightmap"));
+          this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
+          "Lightmap"));
       pbr.SetLightMap(texName, uvIdx, texData);
     }
   }
@@ -473,7 +482,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   if (ret == AI_SUCCESS)
   {
     auto [texName, texData] = this->LoadTexture(_scene, texturePath,
-        this->GenerateTextureName(_scene, assimpMat, "Normal"));
+        this->GenerateTextureName(_fileBaseName, _scene, assimpMat, "Normal"));
     // TODO(luca) different normal map spaces
     pbr.SetNormalMap(texName, NormalMapSpace::TANGENT, texData);
   }
@@ -481,7 +490,8 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   if (ret == AI_SUCCESS)
   {
     auto [texName, texData] = this->LoadTexture(_scene, texturePath,
-        this->GenerateTextureName(_scene, assimpMat, "Emissive"));
+        this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
+        "Emissive"));
     pbr.SetEmissiveMap(texName, texData);
   }
 #ifndef GZ_ASSIMP_PRE_5_2_0
@@ -600,15 +610,16 @@ ImagePtr AssimpLoader::Implementation::LoadEmbeddedTexture(
 
 //////////////////////////////////////////////////
 std::string AssimpLoader::Implementation::GenerateTextureName(
-    const aiScene* _scene, aiMaterial* _mat, const std::string& _type) const
+    const std::string &_prefix, const aiScene *_scene, aiMaterial *_mat,
+    const std::string &_type) const
 {
 #ifdef GZ_ASSIMP_PRE_5_2_0
   auto rootName = _scene->mRootNode->mName;
 #else
   auto rootName = _scene->mName;
 #endif
-  return ToString(rootName) + "_" + ToString(_mat->GetName()) +
-    "_" + _type;
+  return _prefix + "_" + ToString(rootName) + "_" +
+    ToString(_mat->GetName()) + "_" + _type;
 }
 
 //////////////////////////////////////////////////
@@ -695,12 +706,18 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   }
   auto& rootNode = scene->mRootNode;
   auto rootName = ToString(rootNode->mName);
-
-  // compute assimp root node transform
-  std::string extension = _filename.substr(_filename.rfind(".") + 1,
-      _filename.size());
+  auto fileBaseName = common::basename(_filename);
+  std::string extension;
+  std::size_t extIdx = _filename.rfind(".");
+  if (extIdx != std::string::npos)
+  {
+    extension = _filename.substr(extIdx + 1, _filename.size());
+    fileBaseName = fileBaseName.substr(0, fileBaseName.rfind(extension) - 1);
+  }
   std::transform(extension.begin(), extension.end(),
       extension.begin(), ::tolower);
+
+  // compute assimp root node transform
   bool useIdentityRotation = (extension != "glb" && extension != "glTF");
   auto transform = this->dataPtr->UpdatedRootNodeTransform(scene,
     useIdentityRotation);
@@ -709,7 +726,8 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   // Add the materials first
   for (unsigned _matIdx = 0; _matIdx < scene->mNumMaterials; ++_matIdx)
   {
-    auto mat = this->dataPtr->CreateMaterial(scene, _matIdx, path);
+    auto mat = this->dataPtr->CreateMaterial(scene, _matIdx, path,
+        fileBaseName);
     mesh->AddMaterial(mat);
   }
   // Create the skeleton
