@@ -283,21 +283,33 @@ TEST_F(DemTest, LunarDemLoad)
   EXPECT_NEAR(dem.WorldHeight(), 80.0417, 1e-2);
 }
 
-TEST_F(DemTest, LargeVRTWithZipAndCurl)
+TEST_F(DemTest, LargeVRTWithLimits)
 {
-  // Load a large VRT DEM from another server (used by ArduPilot).
+  // Load a large VRT DEM using GDAL but set limits on the size.
   common::Dem dem;
   dem.SetXSizeLimit(100);
   dem.SetYSizeLimit(50);
-  //! @todo Make a really large VRT locally
-  auto const res = dem.Load("/vsizip/vsicurl/https://terrain.ardupilot.org/SRTM1/ap_srtm1.zip/ap_srtm1.vrt");
+  auto const path = common::testing::TestFile("data", "ap_srtm1.vrt");
+  auto const res = dem.Load(path);
+  EXPECT_EQ(res, 0);
+}
+
+TEST_F(DemTest, LargeVRTWithVSIZIPAndLimits)
+{
+  // Load a large vzizip VRT DEM using GDAL but set limits on the size.
+  common::Dem dem;
+  dem.SetXSizeLimit(100);
+  dem.SetYSizeLimit(50);
+  auto const path = common::testing::TestFile("data", "ap_srtm1.zip");
+  auto const res = dem.Load("/vsizip/" + path + "/ap_srtm1.vrt");
   EXPECT_EQ(res, 0);
 }
 
 TEST_F(DemTest, LargeVRTWithoutLimitsThrows)
 {
-  // Load a large VRT DEM from another server (used by ArduPilot).
+  // Load a large VRT DEM without limits.
   common::Dem dem;
+  auto const path = common::testing::TestFile("data", "ap_srtm1.vrt");
   // We expect not to be able to allocate the data, so ensure we throw instead of segfault.
-  EXPECT_THROW(dem.Load("/vsizip/vsicurl/https://terrain.ardupilot.org/SRTM1/ap_srtm1.zip/ap_srtm1.vrt"), std::bad_alloc);
+  EXPECT_THROW(dem.Load(path), std::bad_alloc);
 }
