@@ -545,7 +545,6 @@ int Dem::LoadData()
   std::vector<float> buffer;
   // Convert to uint64_t for multiplication to avoid overflow.
   // https://github.com/OSGeo/gdal/issues/9713
-  static_assert(std::numeric_limits<uint64_t>::max() >= std::numeric_limits<int>::max() * std::numeric_limits<int>::max());
   buffer.resize(static_cast<uint64_t>(destWidth) * static_cast<uint64_t>(destHeight));
   //! @todo Do not assume users only want to load from the origin of the dataset.
   // Instead, add a configuration to change where in the dataset to read from.
