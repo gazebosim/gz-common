@@ -538,14 +538,8 @@ int Dem::LoadData()
     float w = static_cast<float>(destHeight) / static_cast<float>(ratio);
     destWidth = static_cast<unsigned int>(w);
   }
-
-  //! @todo In GDAL versions 3.5 or higher, where GDT_Int64 and GDT_UInt64 datasets were added,
-  // this logic will lose precision because it loads into a float.
-  // Additionally, the NoData value will not work.
-  //! @ref https://gdal.org/api/gdalrasterband_cpp.html#_CPPv4N14GDALRasterBand21GetNoDataValueAsInt64EPi
-  #if GDAL_VERSION_MINOR >= 5
-  #warning "DEM datasets with 64 bit height precision are not yet supported. Accuracy will be lost."
-  #endif  // Read the whole raster data and convert it to a GDT_Float32 array.
+  
+  // Read the whole raster data and convert it to a GDT_Float32 array.
   // In this step the DEM is scaled to destWidth x destHeight.
 
   std::vector<float> buffer;
