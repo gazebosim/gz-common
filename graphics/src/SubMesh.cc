@@ -576,7 +576,8 @@ void SubMesh::FillArrays(double **_vertArr, int **_indArr) const
 //////////////////////////////////////////////////
 void SubMesh::RecalculateNormals()
 {
-  if (this->dataPtr->normals.size() < 3u)
+  if (this->dataPtr->indices.size() == 0
+      || this->dataPtr->indices.size() % 3u != 0)
     return;
 
   // Reset all the normals
@@ -597,14 +598,9 @@ void SubMesh::RecalculateNormals()
         this->dataPtr->vertices[this->dataPtr->indices[i+2]];
     gz::math::Vector3d n = gz::math::Vector3d::Normal(v1, v2, v3);
 
-    for (unsigned int j = 0; j < this->dataPtr->vertices.size(); ++j)
-    {
-      gz::math::Vector3d v = this->dataPtr->vertices[j];
-      if (v == v1 || v == v2 || v == v3)
-      {
-        this->dataPtr->normals[j] += n;
-      }
-    }
+    this->dataPtr->normals[this->dataPtr->indices[i]] += n;
+    this->dataPtr->normals[this->dataPtr->indices[i+1]] += n;
+    this->dataPtr->normals[this->dataPtr->indices[i+2]] += n;
   }
 
   // Normalize the results
