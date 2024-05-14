@@ -58,8 +58,8 @@ namespace gz
       public: int Load(const std::string &_filename = "");
 
       /// \brief Get the elevation of a terrain's point in meters.
-      /// \param[in] _x X coordinate of the terrain.
-      /// \param[in] _y Y coordinate of the terrain.
+      /// \param[in] _x X coordinate of the terrain in raster coordinates.
+      /// \param[in] _y Y coordinate of the terrain in raster coordinates.
       /// \return Terrain's elevation at (x,y) in meters or infinity if illegal
       /// coordinates were provided.
       public: double Elevation(double _x, double _y);
