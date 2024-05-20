@@ -598,9 +598,30 @@ void SubMesh::RecalculateNormals()
         this->dataPtr->vertices[this->dataPtr->indices[i+2]];
     gz::math::Vector3d n = gz::math::Vector3d::Normal(v1, v2, v3);
 
+#if 1
+  /*
+  i7-11800H @ Ubuntu22 VM; 2^14 triangles
+    SubMeshTest.NormalsRecalculation (1105 ms)
+    SubMeshTest.NormalsRecalculation (1158 ms)
+    SubMeshTest.NormalsRecalculation (1117 ms)
+    SubMeshTest.NormalsRecalculation (1137 ms)
+    SubMeshTest.NormalsRecalculation (1156 ms)
+  */
+    for (unsigned int j = 0; j < this->dataPtr->vertices.size(); ++j)
+    {
+      gz::math::Vector3d v = this->dataPtr->vertices[j];
+      if (v == v1 || v == v2 || v == v3)
+      {
+        this->dataPtr->normals[j] += n;
+      }
+    }
+#else
+  // same env, ~1ms
+  // FAILS: ASSERT_NE(submesh->Normal(0), submesh->Normal(1));
     this->dataPtr->normals[this->dataPtr->indices[i]] += n;
     this->dataPtr->normals[this->dataPtr->indices[i+1]] += n;
     this->dataPtr->normals[this->dataPtr->indices[i+2]] += n;
+#endif
   }
 
   // Normalize the results

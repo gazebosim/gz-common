@@ -585,3 +585,27 @@ TEST_F(SubMeshTest, Volume)
   boxSub.AddIndex(1);
   EXPECT_DOUBLE_EQ(0.0, boxSub.Volume());
 }
+
+/////////////////////////////////////////////////
+TEST_F(SubMeshTest, NormalsRecalculation)
+{
+  auto submesh = std::make_shared<common::SubMesh>();
+  submesh->SetPrimitiveType(common::SubMesh::TRIANGLES);
+
+  constexpr unsigned int elements = 65536/4;
+  for (unsigned int i = 0; i < elements; ++i) {
+    submesh->AddVertex(i, i, i);
+    submesh->AddVertex(i+1, i+1, i+1);
+    submesh->AddVertex(i, i, -i);
+
+    submesh->AddIndex(3*i);
+    submesh->AddIndex(3*i+1);
+    submesh->AddIndex(3*i+2);
+  }
+
+  ASSERT_EQ(submesh->IndexCount() % 3, 0u);
+  submesh->RecalculateNormals();
+  ASSERT_EQ(submesh->NormalCount(), submesh->VertexCount());
+  // Same triangle, but different normals
+  ASSERT_NE(submesh->Normal(0), submesh->Normal(1));
+}
