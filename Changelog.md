@@ -1,5 +1,85 @@
 ## Gazebo Common 5.x
 
+## Gazebo Common 5.6.0 (2024-04-23)
+
+1. Clarify units for the DEM classes
+    * [Pull request #595](https://github.com/gazebosim/gz-common/pull/595)
+
+1. Remove pessimizing move
+    * [Pull request #593](https://github.com/gazebosim/gz-common/pull/593)
+
+1. Fix bazel build
+    * [Pull request #592](https://github.com/gazebosim/gz-common/pull/592)
+
+1. Add new function in MeshManager to merge all submeshes of a mesh into one
+    * [Pull request #588](https://github.com/gazebosim/gz-common/pull/588)
+
+1. Adds new function in MeshManager for performing convex decomposition
+    * [Pull request #585](https://github.com/gazebosim/gz-common/pull/585)
+
+## Gazebo Common 5.5.1 (2024-03-14)
+
+1. Various Bazel adjustments for linting
+    * [Pull request #582](https://github.com/gazebosim/gz-common/pull/582)
+
+1. Extend AssimpLoader to parse material transmission factor
+    * [Pull request #577](https://github.com/gazebosim/gz-common/pull/577)
+
+1. Fix noise issue that appears in certain image textures
+    * [Pull request #578](https://github.com/gazebosim/gz-common/pull/578)
+
+## Gazebo Common 5.5.0 (2024-02-26)
+
+1. Be louder when graphics is missing for geospatial
+    * [Pull request #573](https://github.com/gazebosim/gz-common/pull/573)
+
+1. Multiple memory cleanup fixes
+    * [Pull request #571](https://github.com/gazebosim/gz-common/pull/571)
+
+1. Clarify GDAL version requirement
+    * [Pull request #574](https://github.com/gazebosim/gz-common/pull/574)
+
+1. 🎈  3.17.0
+    * [Pull request #567](https://github.com/gazebosim/gz-common/pull/567)
+
+1. Update CI badges in README
+    * [Pull request #566](https://github.com/gazebosim/gz-common/pull/566)
+
+1. Backwards compatible assimp texture name fix
+    * [Pull request #565](https://github.com/gazebosim/gz-common/pull/565)
+
+1. Fix error output when creating directories
+    * [Pull request #561](https://github.com/gazebosim/gz-common/pull/561)
+
+1. Update github action workflows
+    * [Pull request #558](https://github.com/gazebosim/gz-common/pull/558)
+
+1. Fix segfault in case of no write access to log dir
+    * [Pull request #546](https://github.com/gazebosim/gz-common/pull/546)
+
+1. ign -> gz
+    * [Pull request #547](https://github.com/gazebosim/gz-common/pull/547)
+
+1. Support loading glb with compressed jpeg textures
+    * [Pull request #545](https://github.com/gazebosim/gz-common/pull/545)
+
+1. Fix glTF / glb root node transform
+    * [Pull request #543](https://github.com/gazebosim/gz-common/pull/543)
+
+1. EnumIface: suppress deprecation warning
+    * [Pull request #540](https://github.com/gazebosim/gz-common/pull/540)
+
+1. Prevent loading lightmaps if mesh is a glb file that has an occlusion-metallic-roughness texture
+    * [Pull request #538](https://github.com/gazebosim/gz-common/pull/538)
+
+1. 🎈 3.16.0
+    * [Pull request #519](https://github.com/gazebosim/gz-common/pull/519)
+
+1. Fix cstdint with GCC 13
+    * [Pull request #528](https://github.com/gazebosim/gz-common/pull/528)
+    * [Pull request #517](https://github.com/gazebosim/gz-common/pull/517)
+    * [Pull request #513](https://github.com/gazebosim/gz-common/pull/513)
+
 ## Gazebo Common 5.4.2 (2023-09-26)
 
 1. Documentation fixes
@@ -668,6 +748,52 @@
     * [BitBucket pull request xxx](https://osrf-migration.github.io/ignition-gh-pages/#!/ignitionrobotics/ign-common/pull-requests/213)
 
 ## Gazebo Common 3.x
+
+## Gazebo Common 3.17.0 (2024-01-05)
+
+1. Fix error output when creating directories
+    * [Pull request #561](https://github.com/gazebosim/gz-common/pull/561)
+
+1. Update github action workflows
+    * [Pull request #558](https://github.com/gazebosim/gz-common/pull/558)
+
+1. Fix segfault in case of no write access to log dir
+    * [Pull request #546](https://github.com/gazebosim/gz-common/pull/546)
+
+## Gazebo Common 3.16.0 (2023-06-05)
+
+1. Include cstdint to build with GCC 13
+    * [Pull request #517](https://github.com/gazebosim/gz-common/pull/517)
+
+1. Fix missing cstdint header in latest gcc build
+    * [Pull request #513](https://github.com/gazebosim/gz-common/pull/513)
+
+1. Fix for ffmpeg v6
+    * [Pull request #497](https://github.com/gazebosim/gz-common/pull/497)
+
+1. Include cstring for memcpy
+    * [Pull request #501](https://github.com/gazebosim/gz-common/pull/501)
+
+1. Fixed MeshManager Singleton
+    * [Pull request #451](https://github.com/gazebosim/gz-common/pull/451)
+
+1. Rename COPYING to LICENSE
+    * [Pull request #494](https://github.com/gazebosim/gz-common/pull/494)
+
+1. Add marcoag as codeowner
+    * [Pull request #493](https://github.com/gazebosim/gz-common/pull/493)
+
+1. CI workflow: use checkout v3
+    * [Pull request #490](https://github.com/gazebosim/gz-common/pull/490)
+
+1. Improved coverage remotery
+    * [Pull request #467](https://github.com/gazebosim/gz-common/pull/467)
+
+1. Added BVH and STL loader tests
+    * [Pull request #466](https://github.com/gazebosim/gz-common/pull/466)
+
+1. Increased Image coverage
+    * [Pull request #465](https://github.com/gazebosim/gz-common/pull/465)
 
 ## Gazebo Common 3.15.1 (2022-10-11)
 

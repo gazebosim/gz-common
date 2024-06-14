@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10.2 FATAL_ERROR)
 #============================================================================
 # Initialize the project
 #============================================================================
-project(gz-common5 VERSION 5.4.2)
+project(gz-common5 VERSION 5.6.0)
 set(GZ_COMMON_VER ${PROJECT_VERSION_MAJOR})
 
 #============================================================================
@@ -99,6 +99,7 @@ gz_find_package(
 # Find GDAL
 gz_find_package(GDAL VERSION 3.0
   PKGCONFIG gdal
+  PKGCONFIG_VER_COMPARISON >=
   PRIVATE_FOR geospatial
   REQUIRED_BY geospatial)
 
@@ -137,7 +138,7 @@ configure_file("${PROJECT_SOURCE_DIR}/cppcheck.suppress.in"
                ${PROJECT_BINARY_DIR}/cppcheck.suppress)
 
 gz_configure_build(QUIT_IF_BUILD_ERRORS
-  COMPONENTS av events geospatial graphics io profiler testing)
+  COMPONENTS av events graphics geospatial io profiler testing)
 
 #============================================================================
 # Create package information

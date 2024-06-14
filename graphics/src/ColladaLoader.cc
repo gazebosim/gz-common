@@ -372,9 +372,7 @@ ColladaLoader::ColladaLoader()
 }
 
 //////////////////////////////////////////////////
-ColladaLoader::~ColladaLoader()
-{
-}
+ColladaLoader::~ColladaLoader() = default;
 
 //////////////////////////////////////////////////
 Mesh *ColladaLoader::Load(const std::string &_filename)
@@ -778,13 +776,16 @@ void ColladaLoader::Implementation::LoadController(
   {
     SkeletonNode *rootSkelNode =
         this->LoadSkeletonNodes(rootNodeXml, nullptr);
+
     if (nullptr == skeleton)
     {
-      skeleton = SkeletonPtr(new Skeleton(rootSkelNode));
+      skeleton = std::make_shared<Skeleton>(rootSkelNode);
       _mesh->SetSkeleton(skeleton);
     }
     else if (nullptr != rootSkelNode)
+    {
       this->MergeSkeleton(skeleton, rootSkelNode);
+    }
   }
   if (nullptr == skeleton)
   {
@@ -1197,7 +1198,7 @@ SkeletonNode *ColladaLoader::Implementation::LoadSkeletonNodes(
     return nullptr;
   }
 
-  auto node = this->LoadSingleSkeletonNode(_xml, _parent);
+  auto *node = this->LoadSingleSkeletonNode(_xml, _parent);
   this->SetSkeletonNodeTransform(_xml, node);
 
   auto childXml = _xml->FirstChildElement("node");
@@ -3044,8 +3045,14 @@ void ColladaLoader::Implementation::MergeSkeleton(SkeletonPtr _skeleton,
   if (currentRoot->Id() == _mergeNode->Id())
     return;
 
-  if (_mergeNode->ChildById(currentRoot->Id()))
+  auto *rootInMergeNode = _mergeNode->ChildById(currentRoot->Id());
+
+  if (rootInMergeNode != nullptr)
   {
+    if (rootInMergeNode != currentRoot)
+    {
+      delete currentRoot;
+    }
     _skeleton->RootNode(_mergeNode);
     return;
   }
@@ -3066,8 +3073,21 @@ void ColladaLoader::Implementation::MergeSkeleton(SkeletonPtr _skeleton,
     }
     if (mergeNodeContainsRoot)
     {
+      std::function<void(SkeletonNode*)> delete_children;
+      delete_children =
+        [&delete_children](SkeletonNode *node)-> void {
+          for (size_t ii = 0; ii < node->ChildCount(); ++ii)
+          {
+            auto *child = node->Child(ii);
+            delete_children(child);
+            delete child;
+          }
+      };
+
+      // Since we are replacing the whole tree, recursively clean up
+      // the existing skeleton nodes
       _skeleton->RootNode(_mergeNode);
-      // TODO(anyone) since we are replacing the whole tree delete the old one
+      delete_children(currentRoot);
       delete currentRoot;
       return;
     }
@@ -3078,6 +3098,7 @@ void ColladaLoader::Implementation::MergeSkeleton(SkeletonPtr _skeleton,
     dummyRoot =
         new SkeletonNode(nullptr, "dummy-root", "dummy-root");
   }
+
   if (dummyRoot != currentRoot)
   {
     dummyRoot->AddChild(currentRoot);
