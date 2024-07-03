@@ -18,17 +18,19 @@
 #include <sstream>
 #include <string>
 
+#include <gz/common/ConsoleNew.hh>
 #include <gz/common/config.hh>
 #include <gz/common/ConsoleNew.hh>
 #include <gz/common/Util.hh>
 #include <gz/utils/NeverDestroyed.hh>
 
-#include <spdlog/sinks/basic_file_sink.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/dist_sink.h>
 
 namespace {
-/// \brief ToDo.
+/// \brief Custom log sink that routes to stdout/stderr in Gazebo conventions
 class GzSplitSink : public spdlog::sinks::sink
 {
   /// \brief Class destructor.
@@ -112,32 +114,38 @@ std::ostream& LogMessage::stream()
 /// \brief Private data for the ConsoleNew class.
 class ConsoleNew::Implementation
 {
-  /// \brief .
-  public: std::shared_ptr<GzSplitSink> consoleSink {nullptr};
+ public:
+  explicit Implementation(const std::string &_loggerName):
+    consoleSink(std::make_shared<GzSplitSink>()),
+    sinks(std::make_shared<spdlog::sinks::dist_sink_mt>()),
+    logger(std::make_shared<spdlog::logger>(_loggerName, sinks))
+  {
+  }
 
   /// \brief .
-  public: std::shared_ptr<spdlog::sinks::basic_file_sink_mt> fileSink {nullptr};
+  std::shared_ptr<GzSplitSink> consoleSink;
 
   /// \brief .
-  public: std::shared_ptr<spdlog::logger> logger {nullptr};
+  std::shared_ptr<spdlog::sinks::basic_file_sink_mt> fileSink {nullptr};
+
+  /// \brief .
+  std::shared_ptr<spdlog::sinks::dist_sink_mt> sinks {nullptr};
+
+  /// \brief .
+  std::shared_ptr<spdlog::logger> logger {nullptr};
 };
 
 /////////////////////////////////////////////////
-ConsoleNew::ConsoleNew(const std::string &loggerName):
-  dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
+ConsoleNew::ConsoleNew(const std::string &_loggerName):
+  dataPtr(gz::utils::MakeUniqueImpl<Implementation>(_loggerName))
 {
-  this->dataPtr->consoleSink = std::make_shared<GzSplitSink>();
-  this->dataPtr->fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(
-    "/tmp/filename.txt", true);
-  this->dataPtr->logger = std::make_shared<spdlog::logger>(
-    spdlog::logger(loggerName,
-    {
-      this->dataPtr->fileSink, this->dataPtr->consoleSink
-    }));
+  // Add the console sink as a destination
+  this->dataPtr->sinks->add_sink(this->dataPtr->consoleSink);
 
   // Configure the logger
-  this->dataPtr->logger->set_level(spdlog::level::trace);
+  this->dataPtr->logger->set_level(spdlog::level::info);
   this->dataPtr->logger->flush_on(spdlog::level::err);
+
   spdlog::flush_every(std::chrono::seconds(5));
   spdlog::register_logger(this->dataPtr->logger);
 }
@@ -149,9 +157,27 @@ void ConsoleNew::SetColorMode(spdlog::color_mode _mode)
 }
 
 /////////////////////////////////////////////////
+void ConsoleNew::SetLogDestination(const std::string &_filename)
+{
+  if (this->dataPtr->fileSink != nullptr)
+  {
+    this->dataPtr->sinks->remove_sink(this->dataPtr->fileSink);
+  }
+  this->dataPtr->fileSink =
+    std::make_shared<spdlog::sinks::basic_file_sink_mt>(_filename, true);
+  this->dataPtr->sinks->add_sink(this->dataPtr->fileSink);
+}
+
+/////////////////////////////////////////////////
 spdlog::logger& ConsoleNew::Logger() const
 {
   return *this->dataPtr->logger;
+}
+
+/////////////////////////////////////////////////
+std::shared_ptr<spdlog::logger> ConsoleNew::LoggerPtr() const
+{
+  return this->dataPtr->logger;
 }
 
 /////////////////////////////////////////////////

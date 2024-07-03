@@ -24,16 +24,16 @@
 #include <spdlog/spdlog.h>
 
 class ConsoleNew_TEST : public ::testing::Test {
-  protected: virtual void SetUp()
+  protected: void SetUp() override
   {
     this->temp = std::make_unique<gz::common::TempDirectory>(
-        "test", "gz_common", true);
+        "test", "gz_common", false);
     ASSERT_TRUE(this->temp->Valid());
     gz::common::setenv(GZ_HOMEDIR, this->temp->Path());
   }
 
   /// \brief Clear out all the directories we produced during this test.
-  public: virtual void TearDown()
+  public: void TearDown() override
   {
     EXPECT_TRUE(gz::common::unsetenv(GZ_HOMEDIR));
   }
@@ -89,10 +89,30 @@ TEST_F(ConsoleNew_TEST, RootLoggerNoColor)
 
 TEST_F(ConsoleNew_TEST, RootLoggerMacros)
 {
-    gztrace << "This is a trace message";
-    gzdbg << "This is a debug message";
-    gzmsg << "This is an info message";
-    gzwarn << "This is a warning message";
-    gzerr << "This is an error message";
-    gzcrit << "This is a critical message";
+  gztrace << "This is a trace message";
+  gzdbg << "This is a debug message";
+  gzmsg << "This is an info message";
+  gzwarn << "This is a warning message";
+  gzerr << "This is an error message";
+  gzcrit << "This is a critical message";
+}
+
+TEST_F(ConsoleNew_TEST, LogToFile)
+{
+  gzLogInit("", "test.log");
+
+  gztrace << "This is a trace message";
+  gzdbg << "This is a debug message";
+  gzmsg << "This is an info message";
+  gzwarn << "This is a warning message";
+  gzerr << "This is an error message";
+  gzcrit << "This is a critical message";
+
+  // gzLogInit installs a global handler
+  spdlog::trace("This is a trace message");
+  spdlog::debug("This is a debug message");
+  spdlog::info("This is an info message");
+  spdlog::warn("This is a warning message");
+  spdlog::error("This is an error message");
+  spdlog::critical("This is a critical message");
 }

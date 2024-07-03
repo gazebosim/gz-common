@@ -25,8 +25,10 @@
 #include <gz/common/Export.hh>
 #include <gz/common/Util.hh>
 #include <gz/utils/ImplPtr.hh>
+#include "gz/common/Filesystem.hh"
 
 #include <spdlog/logger.h>
+#include <spdlog/spdlog.h>
 
 namespace gz::common
 {
@@ -44,13 +46,17 @@ namespace gz::common
     ///\param[in] _mode Color mode.  
     public: void SetColorMode(spdlog::color_mode _mode);
 
-    /// \brief Access the underlying spdlog logger.
-    /// \return The spdlog logger.
-    public: [[nodiscard]] spdlog::logger &Logger() const;
+    /// \brief Set the log destnation filename
+    public: void SetLogDestination(const std::string &_filename);
 
-    /// \brief Access the global gz console logger.
-    /// \return The global console logger.
-    public: static ConsoleNew &Root();
+    /// \brief Access the underlying spdlog logger
+    public: [[nodiscard]] spdlog::logger& Logger() const;
+
+    /// \brief Access the underlying spdlog logger, with ownership
+    public: [[nodiscard]] std::shared_ptr<spdlog::logger> LoggerPtr() const;
+
+    /// \brief Access the global gz console logger
+    public: static ConsoleNew& Root();
 
     /// \brief Implementation Pointer.
     GZ_UTILS_UNIQUE_IMPL_PTR(dataPtr)
@@ -99,5 +105,30 @@ namespace gz::common
   __FILE__, __LINE__, spdlog::level::debug).stream()
 #define gztrace gz::common::LogMessage( \
   __FILE__, __LINE__, spdlog::level::trace).stream()
+
+void gzLogInit(const std::string &directory, const std::string &filename)
+{
+  auto &root = gz::common::ConsoleNew::Root();
+
+  std::string logPath;
+  if (!directory.empty())
+  {
+    logPath = directory;
+  } else if(!gz::common::env(GZ_HOMEDIR, logPath)) {
+    root.Logger().error("Missing HOME environment variable. No log file will be generated.");
+    return;
+  }
+
+  if(!gz::common::createDirectories(logPath))
+  {
+    root.Logger().error("Failed to create output log directory {}", logPath.c_str());
+    return;
+  }
+
+  logPath = gz::common::joinPaths(logPath, filename);
+  root.Logger().info("Setting log file output destination to {}", logPath.c_str());
+  gz::common::ConsoleNew::Root().SetLogDestination(logPath);
+  spdlog::set_default_logger(root.LoggerPtr());
+}
 
 #endif  // GZ_COMMON_CONSOLENEW_HH_
