@@ -27,8 +27,10 @@
 #include <gz/utils/SuppressWarning.hh>
 #include <gz/common/Util.hh>
 #include <gz/utils/ImplPtr.hh>
+#include "gz/common/Filesystem.hh"
 
 #include <spdlog/logger.h>
+#include <spdlog/spdlog.h>
 
 namespace gz::common
 {
@@ -42,8 +44,14 @@ namespace gz::common
     /// \brief Set the console output color mode
     public: void set_color_mode(spdlog::color_mode mode);
 
+    /// \brief Set the log destnation filename
+    public: void set_log_destination(const std::string &filename);
+
     /// \brief Access the underlying spdlog logger
     public: [[nodiscard]] spdlog::logger& Logger() const;
+
+    /// \brief Access the underlying spdlog logger, with ownership
+    public: [[nodiscard]] std::shared_ptr<spdlog::logger> LoggerPtr() const;
 
     /// \brief Access the global gz console logger
     public: static ConsoleNew& Root();
@@ -73,17 +81,39 @@ namespace gz::common
     /// \brief Underlying stream
     private: std::ostringstream ss;
   };
-
-
-
 }  // namespace gz::common
 
-#define gzcrit (gz::common::LogMessage(__FILE__, __LINE__, spdlog::level::critical).stream())
+#define gzcrit gz::common::LogMessage(__FILE__, __LINE__, spdlog::level::critical).stream()
 #define gzerr gz::common::LogMessage(__FILE__, __LINE__, spdlog::level::err).stream()
 #define gzwarn gz::common::LogMessage(__FILE__, __LINE__, spdlog::level::warn).stream()
 #define gzlog gz::common::LogMessage(__FILE__, __LINE__, spdlog::level::info).stream()
 #define gzmsg gz::common::LogMessage(__FILE__, __LINE__, spdlog::level::info).stream()
 #define gzdbg gz::common::LogMessage(__FILE__, __LINE__, spdlog::level::debug).stream()
 #define gztrace gz::common::LogMessage(__FILE__, __LINE__, spdlog::level::trace).stream()
+
+void gzLogInit(const std::string &directory, const std::string &filename)
+{
+  auto &root = gz::common::ConsoleNew::Root();
+
+  std::string logPath;
+  if (!directory.empty())
+  {
+    logPath = directory;
+  } else if(!gz::common::env(GZ_HOMEDIR, logPath)) {
+    root.Logger().error("Missing HOME environment variable. No log file will be generated.");
+    return;
+  }
+
+  if(!gz::common::createDirectories(logPath))
+  {
+    root.Logger().error("Failed to create output log directory {}", logPath.c_str());
+    return;
+  }
+
+  logPath = gz::common::joinPaths(logPath, filename);
+  root.Logger().info("Setting log file output destination to {}", logPath.c_str());
+  gz::common::ConsoleNew::Root().set_log_destination(logPath);
+  spdlog::set_default_logger(root.LoggerPtr());
+}
 
 #endif  // GZ_COMMON_CONSOLENEW_HH_
