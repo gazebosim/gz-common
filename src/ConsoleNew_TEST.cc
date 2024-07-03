@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Open Source Robotics Foundation
+ * Copyright (C) 2024 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,7 +67,7 @@ TEST_F(ConsoleNew_TEST, RootLogger)
 
 TEST_F(ConsoleNew_TEST, RootLoggerColor)
 {
-  gz::common::ConsoleNew::Root().set_color_mode(spdlog::color_mode::always);
+  gz::common::ConsoleNew::Root().SetColorMode(spdlog::color_mode::always);
   spdlog::get("gz")->log(spdlog::level::trace, "This is a trace message");
   spdlog::get("gz")->log(spdlog::level::debug , "This is a debug message");
   spdlog::get("gz")->log(spdlog::level::info, "This is an info message");
@@ -78,7 +78,7 @@ TEST_F(ConsoleNew_TEST, RootLoggerColor)
 
 TEST_F(ConsoleNew_TEST, RootLoggerNoColor)
 {
-  gz::common::ConsoleNew::Root().set_color_mode(spdlog::color_mode::never);
+  gz::common::ConsoleNew::Root().SetColorMode(spdlog::color_mode::never);
   spdlog::get("gz")->trace("This is a trace message");
   spdlog::get("gz")->debug("This is a debug message");
   spdlog::get("gz")->info("This is an info message");

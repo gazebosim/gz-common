@@ -15,100 +15,124 @@
  *
  */
 #include <memory>
-#include <string>
 #include <sstream>
+#include <string>
 
-#include <gz/common/ConsoleNew.hh>
 #include <gz/common/config.hh>
+#include <gz/common/ConsoleNew.hh>
 #include <gz/common/Util.hh>
 #include <gz/utils/NeverDestroyed.hh>
 
-#include <spdlog/spdlog.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
 
 namespace {
-class gz_split_sink : public spdlog::sinks::sink {
- public:
-    ~gz_split_sink() override = default;
+/// \brief ToDo.
+class GzSplitSink : public spdlog::sinks::sink
+{
+  /// \brief Class destructor.
+  public: ~GzSplitSink() override = default;
 
-    void log(const spdlog::details::log_msg &msg) override
+  /// \brief Log a message.
+  /// \param[in] _msg The message to log.
+  public: void log(const spdlog::details::log_msg &_msg) override
+  {
+    if (_msg.level == spdlog::level::warn ||
+        _msg.level == spdlog::level::err  ||
+        _msg.level == spdlog::level::critical)
     {
-      if (msg.level == spdlog::level::warn ||
-          msg.level == spdlog::level::err ||
-          msg.level == spdlog::level::critical)
-        stderr.log(msg);
-      else
-        stdout.log(msg);
+      stderr.log(_msg);
     }
+    else
+      stdout.log(_msg);
+  }
 
-    void flush() override
-    {
-      stdout.flush();
-      stderr.flush();
-    }
+  /// \brief Flush messages.
+  public: void flush() override
+  {
+    stdout.flush();
+    stderr.flush();
+  }
 
-    void set_pattern(const std::string &pattern) override
-    {
-      stdout.set_pattern(pattern);
-      stderr.set_pattern(pattern);
-    }
+  /// \brief Set the logging pattern.
+  /// \param[in] _pattern The logging pattern. 
+  public: void set_pattern(const std::string &_pattern) override
+  {
+    stdout.set_pattern(_pattern);
+    stderr.set_pattern(_pattern);
+  }
 
-    void set_formatter(std::unique_ptr<spdlog::formatter> sink_formatter) override
-    {
-      stdout.set_formatter(sink_formatter->clone());
-      stderr.set_formatter(std::move(sink_formatter));
-    }
+  /// \brief Set the new formatter.
+  /// \param[in] _sinkFormatter The formatter.
+  public: void set_formatter(std::unique_ptr<spdlog::formatter> _sinkFormatter)
+  override
+  {
+    stdout.set_formatter(_sinkFormatter->clone());
+    stderr.set_formatter(std::move(_sinkFormatter));
+  }
 
-    void set_color_mode(spdlog::color_mode mode)
-    {
-      stdout.set_color_mode(mode);
-      stderr.set_color_mode(mode);
-    }
+  /// \brief Set the color mode.
+  /// \param[in] _mode Color mode.
+  public: void set_color_mode(spdlog::color_mode _mode)
+  {
+    stdout.set_color_mode(_mode);
+    stderr.set_color_mode(_mode);
+  }
 
- private:
-  spdlog::sinks::stdout_color_sink_mt stdout;
-  spdlog::sinks::stderr_color_sink_mt stderr;
+  /// \brief Standard output.
+  private: spdlog::sinks::stdout_color_sink_mt stdout;
+
+  /// \brief Standard error.
+  private: spdlog::sinks::stderr_color_sink_mt stderr;
 };
 }  // namespace
 
 namespace gz::common
 {
-
-LogMessage::LogMessage(const char* file, int line, spdlog::level::level_enum log_level):
-  severity(log_level),
-  source_location(file, line, "")
+/////////////////////////////////////////////////
+LogMessage::LogMessage(const char* _file, int _line,
+  spdlog::level::level_enum _logLevel)
+  : severity(_logLevel), sourceLocation(_file, _line, "")
 {
 }
 
+/////////////////////////////////////////////////
 LogMessage::~LogMessage()
 {
-  gz::common::ConsoleNew::Root().Logger().log(source_location, severity, ss.str());
+  gz::common::ConsoleNew::Root().Logger().log(sourceLocation, severity, ss.str());
 }
 
+/////////////////////////////////////////////////
 std::ostream& LogMessage::stream()
 {
   return ss;
 }
 
+/// \brief Private data for the ConsoleNew class.
 class ConsoleNew::Implementation
 {
- public:
-  std::shared_ptr<gz_split_sink> console_sink {nullptr};
+  /// \brief .
+  public: std::shared_ptr<GzSplitSink> consoleSink {nullptr};
 
-  std::shared_ptr<spdlog::sinks::basic_file_sink_mt> file_sink {nullptr};
+  /// \brief .
+  public: std::shared_ptr<spdlog::sinks::basic_file_sink_mt> fileSink {nullptr};
 
-  std::shared_ptr<spdlog::logger> logger {nullptr};
+  /// \brief .
+  public: std::shared_ptr<spdlog::logger> logger {nullptr};
 };
 
-ConsoleNew::ConsoleNew(const std::string &logger_name):
+/////////////////////////////////////////////////
+ConsoleNew::ConsoleNew(const std::string &loggerName):
   dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
 {
-  this->dataPtr->console_sink = std::make_shared<gz_split_sink>();
-  this->dataPtr->file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("/tmp/filename.txt", true);
-  this->dataPtr->logger = std::make_shared<spdlog::logger>(spdlog::logger(logger_name,
+  this->dataPtr->consoleSink = std::make_shared<GzSplitSink>();
+  this->dataPtr->fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(
+    "/tmp/filename.txt", true);
+  this->dataPtr->logger = std::make_shared<spdlog::logger>(
+    spdlog::logger(loggerName,
     {
-      this->dataPtr->file_sink, this->dataPtr->console_sink
+      this->dataPtr->fileSink, this->dataPtr->consoleSink
     }));
 
   // Configure the logger
@@ -118,16 +142,19 @@ ConsoleNew::ConsoleNew(const std::string &logger_name):
   spdlog::register_logger(this->dataPtr->logger);
 }
 
-void ConsoleNew::set_color_mode(spdlog::color_mode mode)
+/////////////////////////////////////////////////
+void ConsoleNew::SetColorMode(spdlog::color_mode _mode)
 {
-  this->dataPtr->console_sink->set_color_mode(mode);
+  this->dataPtr->consoleSink->set_color_mode(_mode);
 }
 
+/////////////////////////////////////////////////
 spdlog::logger& ConsoleNew::Logger() const
 {
   return *this->dataPtr->logger;
 }
 
+/////////////////////////////////////////////////
 ConsoleNew& ConsoleNew::Root()
 {
   static gz::utils::NeverDestroyed<ConsoleNew> root{"gz"};

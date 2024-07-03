@@ -19,12 +19,10 @@
 
 #include <iostream>
 #include <fstream>
-#include <memory>
 #include <sstream>
 #include <string>
 
 #include <gz/common/Export.hh>
-#include <gz/utils/SuppressWarning.hh>
 #include <gz/common/Util.hh>
 #include <gz/utils/ImplPtr.hh>
 
@@ -33,57 +31,73 @@
 namespace gz::common
 {
 
-  /// Gazebo Console and File logging class
-  /// This will configure spdlog with a sane set of defaults for logging to the console as well as a file
+  /// \brief Gazebo Console and File logging class.
+  /// This will configure spdlog with a sane set of defaults for logging to the
+  /// console as well as a file.
   class GZ_COMMON_VISIBLE ConsoleNew
   {
-    public: explicit ConsoleNew(const std::string &logger_name);
+    /// \brief Class constructor.
+    /// \param[in] _loggerName Logger name.
+    public: explicit ConsoleNew(const std::string &_loggerName);
 
-    /// \brief Set the console output color mode
-    public: void set_color_mode(spdlog::color_mode mode);
+    /// \brief Set the console output color mode.
+    ///\param[in] _mode Color mode.  
+    public: void SetColorMode(spdlog::color_mode _mode);
 
-    /// \brief Access the underlying spdlog logger
-    public: [[nodiscard]] spdlog::logger& Logger() const;
+    /// \brief Access the underlying spdlog logger.
+    /// \return The spdlog logger.
+    public: [[nodiscard]] spdlog::logger &Logger() const;
 
-    /// \brief Access the global gz console logger
-    public: static ConsoleNew& Root();
+    /// \brief Access the global gz console logger.
+    /// \return The global console logger.
+    public: static ConsoleNew &Root();
 
-    /// \brief Implementation Pointer
+    /// \brief Implementation Pointer.
     GZ_UTILS_UNIQUE_IMPL_PTR(dataPtr)
   };
 
-  /// Helper class for providing gzlog macros
+  /// Helper class for providing gzlog macros.
   class GZ_COMMON_VISIBLE LogMessage
   {
-    /// \brief Constructor
-    public: LogMessage(const char * file, int line, spdlog::level::level_enum log_level);
+    /// \brief Constructor.
+    /// \param[in] _file Filename.
+    /// \param[in] _line Line number.
+    /// \param[in] _logLevel Log level.
+    public: LogMessage(const char * _file,
+                       int _line,
+                       spdlog::level::level_enum _logLevel);
 
-    /// \brief Destructor
+    /// \brief Destructor.
     public: ~LogMessage();
 
-    /// \brief Get access to the underlying stream
-    public: std::ostream& stream();
+    /// \brief Get access to the underlying stream.
+    /// \return The underlying stream.
+    public: std::ostream &stream();
 
-    /// \brief Log level
+    /// \brief Log level.
     private: spdlog::level::level_enum severity;
 
-    /// \brief Source file location information
-    private: spdlog::source_loc source_location;
+    /// \brief Source file location information.
+    private: spdlog::source_loc sourceLocation;
 
-    /// \brief Underlying stream
+    /// \brief Underlying stream.
     private: std::ostringstream ss;
   };
-
-
-
 }  // namespace gz::common
 
-#define gzcrit (gz::common::LogMessage(__FILE__, __LINE__, spdlog::level::critical).stream())
-#define gzerr gz::common::LogMessage(__FILE__, __LINE__, spdlog::level::err).stream()
-#define gzwarn gz::common::LogMessage(__FILE__, __LINE__, spdlog::level::warn).stream()
-#define gzlog gz::common::LogMessage(__FILE__, __LINE__, spdlog::level::info).stream()
-#define gzmsg gz::common::LogMessage(__FILE__, __LINE__, spdlog::level::info).stream()
-#define gzdbg gz::common::LogMessage(__FILE__, __LINE__, spdlog::level::debug).stream()
-#define gztrace gz::common::LogMessage(__FILE__, __LINE__, spdlog::level::trace).stream()
+#define gzcrit (gz::common::LogMessage( \
+  __FILE__, __LINE__, spdlog::level::critical).stream())
+#define gzerr gz::common::LogMessage( \
+  __FILE__, __LINE__, spdlog::level::err).stream()
+#define gzwarn gz::common::LogMessage( \
+  __FILE__, __LINE__, spdlog::level::warn).stream()
+#define gzlog gz::common::LogMessage( \
+  __FILE__, __LINE__, spdlog::level::info).stream()
+#define gzmsg gz::common::LogMessage( \
+  __FILE__, __LINE__, spdlog::level::info).stream()
+#define gzdbg gz::common::LogMessage( \
+  __FILE__, __LINE__, spdlog::level::debug).stream()
+#define gztrace gz::common::LogMessage( \
+  __FILE__, __LINE__, spdlog::level::trace).stream()
 
 #endif  // GZ_COMMON_CONSOLENEW_HH_
