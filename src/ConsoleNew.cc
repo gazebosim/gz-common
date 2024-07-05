@@ -39,8 +39,8 @@ class GzSplitSink : public spdlog::sinks::sink
   /// \param[in] _msg The message to log.
   public: void log(const spdlog::details::log_msg &_msg) override
   {
-    if (_msg.level == spdlog::level::warn ||
-        _msg.level == spdlog::level::err  ||
+    if (_msg.level == spdlog::level::warn       ||
+        _msg.level == spdlog::level::err        ||
         _msg.level == spdlog::level::critical)
     {
       this->stderr.log(_msg);
@@ -92,7 +92,7 @@ class GzSplitSink : public spdlog::sinks::sink
 namespace gz::common
 {
 /////////////////////////////////////////////////
-LogMessage::LogMessage(const char* _file, int _line,
+LogMessage::LogMessage(const char *_file, int _line,
   spdlog::level::level_enum _logLevel)
   : severity(_logLevel), sourceLocation(_file, _line, "")
 {

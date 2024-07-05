@@ -24,7 +24,7 @@
 #include <string>
 
 #include <gz/common/Export.hh>
-#include "gz/common/Filesystem.hh"
+#include <gz/common/Filesystem.hh>
 #include <gz/common/Util.hh>
 #include <gz/utils/ImplPtr.hh>
 
@@ -73,7 +73,7 @@ namespace gz::common
     /// \param[in] _file Filename.
     /// \param[in] _line Line number.
     /// \param[in] _logLevel Log level.
-    public: LogMessage(const char * _file,
+    public: LogMessage(const char *_file,
                        int _line,
                        spdlog::level::level_enum _logLevel);
 
@@ -95,18 +95,31 @@ namespace gz::common
   };
 }  // namespace gz::common
 
+/// \brief Output a critical message.
 #define gzcrit (gz::common::LogMessage( \
   __FILE__, __LINE__, spdlog::level::critical).stream())
+
+/// \brief Output an error message.
 #define gzerr gz::common::LogMessage( \
   __FILE__, __LINE__, spdlog::level::err).stream()
+
+/// \brief Output a warning message.
 #define gzwarn gz::common::LogMessage( \
   __FILE__, __LINE__, spdlog::level::warn).stream()
+
+/// \brief Output a message to a log file.
 #define gzlog gz::common::LogMessage( \
   __FILE__, __LINE__, spdlog::level::info).stream()
+
+/// \brief Output a message.
 #define gzmsg gz::common::LogMessage( \
   __FILE__, __LINE__, spdlog::level::info).stream()
+
+/// \brief Output a debug message.
 #define gzdbg gz::common::LogMessage( \
   __FILE__, __LINE__, spdlog::level::debug).stream()
+
+/// \brief Output a trace message.
 #define gztrace gz::common::LogMessage( \
   __FILE__, __LINE__, spdlog::level::trace).stream()
 
@@ -140,6 +153,8 @@ void gzLogInit(const std::string &_directory, const std::string &_filename)
     logPath.c_str());
   gz::common::ConsoleNew::Root().SetLogDestination(logPath);
   spdlog::set_default_logger(root.LoggerPtr());
+
+  std::cerr << logPath << std::endl;
 }
 
 #endif  // GZ_COMMON_CONSOLENEW_HH_

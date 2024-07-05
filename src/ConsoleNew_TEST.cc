@@ -17,26 +17,56 @@
 
 #include <gtest/gtest.h>
 
-#include "gz/common/ConsoleNew.hh"
-#include "gz/common/TempDirectory.hh"
-#include "gz/common/Util.hh"
+#include <memory>
+#include <string>
+
+#include <gz/common/ConsoleNew.hh>
+#include <gz/common/TempDirectory.hh>
+#include <gz/common/Util.hh>
 
 #include <spdlog/spdlog.h>
 
+/// \brief Test ConsoleNew.
 class ConsoleNew_TEST : public ::testing::Test
 {
+  // Documentation inherited
   protected: void SetUp() override
   {
     this->temp = std::make_unique<gz::common::TempDirectory>(
-        "test", "gz_common", false);
+      "test", "gz_common", false);
     ASSERT_TRUE(this->temp->Valid());
-    gz::common::setenv(GZ_HOMEDIR, this->temp->Path());
+    EXPECT_TRUE(gz::common::setenv(GZ_HOMEDIR, this->temp->Path()));
   }
 
   /// \brief Clear out all the directories we produced during this test.
   public: void TearDown() override
   {
     EXPECT_TRUE(gz::common::unsetenv(GZ_HOMEDIR));
+  }
+
+  /// \brief Read the log content.
+  /// \param[in] _filename Log filename.
+  /// \return Log content.
+  public: std::string GetLogContent(const std::string &_filename)
+  {
+    // Get the absolute path
+    std::string path;
+    EXPECT_TRUE(gz::common::env(GZ_HOMEDIR, path));
+    path = gz::common::joinPaths(path, _filename);
+    EXPECT_TRUE(gz::common::exists(path));
+
+    // Open the log file, and read back the string
+    std::ifstream ifs(path.c_str(), std::ios::in);
+    std::string loggedString;
+
+    while (!ifs.eof())
+    {
+      std::string line;
+      std::getline(ifs, line);
+      loggedString += line;
+    }
+
+    return loggedString;
   }
 
   /// \brief Temporary directory to run test in.
@@ -46,61 +76,77 @@ class ConsoleNew_TEST : public ::testing::Test
 /////////////////////////////////////////////////
 TEST_F(ConsoleNew_TEST, NonRootLogger)
 {
-  gz::common::ConsoleNew test_console("test");
-  auto test_logger = test_console.Logger();
-  test_logger.log(spdlog::level::trace, "This is a trace message");
-  test_logger.log(spdlog::level::debug , "This is a debug message");
-  test_logger.log(spdlog::level::info, "This is an info message");
-  test_logger.log(spdlog::level::warn, "This is a warn message");
-  test_logger.log(spdlog::level::err, "This is an error message");
-  test_logger.log(spdlog::level::critical, "This is a critical error message");
+  // Create a unique directory path
+  auto path = gz::common::uuid();
+
+  // Initialize logging
+  gzLogInit("", "test.log");
+
+  gz::common::ConsoleNew testConsole("test");
+  auto testLogger = testConsole.Logger();
+
+  testLogger.log(spdlog::level::trace,    "This is a trace message");
+  testLogger.log(spdlog::level::debug ,   "This is a debug message");
+  testLogger.log(spdlog::level::info,     "This is an info message");
+  testLogger.log(spdlog::level::warn,     "This is a warn message");
+  testLogger.log(spdlog::level::err,      "This is an error message");
+  testLogger.log(spdlog::level::critical, "This is a critical error message");
+
+  getchar();
 }
 
 /////////////////////////////////////////////////
 TEST_F(ConsoleNew_TEST, RootLogger)
 {
-  auto gz_logger = gz::common::ConsoleNew::Root().Logger();
-  gz_logger.log(spdlog::level::trace, "This is a trace message");
-  gz_logger.log(spdlog::level::debug , "This is a debug message");
-  gz_logger.log(spdlog::level::info, "This is an info message");
-  gz_logger.log(spdlog::level::warn, "This is a warn message");
-  gz_logger.log(spdlog::level::err, "This is an error message");
-  gz_logger.log(spdlog::level::critical, "This is a critical error message");
+  auto gzLogger = gz::common::ConsoleNew::Root().Logger();
+
+  gzLogger.log(spdlog::level::trace,    "This is a trace message");
+  gzLogger.log(spdlog::level::debug ,   "This is a debug message");
+  gzLogger.log(spdlog::level::info,     "This is an info message");
+  gzLogger.log(spdlog::level::warn,     "This is a warn message");
+  gzLogger.log(spdlog::level::err,      "This is an error message");
+  gzLogger.log(spdlog::level::critical, "This is a critical error message");
 }
 
 /////////////////////////////////////////////////
 TEST_F(ConsoleNew_TEST, RootLoggerColor)
 {
   gz::common::ConsoleNew::Root().SetColorMode(spdlog::color_mode::always);
-  spdlog::get("gz")->log(spdlog::level::trace, "This is a trace message");
-  spdlog::get("gz")->log(spdlog::level::debug , "This is a debug message");
-  spdlog::get("gz")->log(spdlog::level::info, "This is an info message");
-  spdlog::get("gz")->log(spdlog::level::warn, "This is a warn message");
-  spdlog::get("gz")->log(spdlog::level::err, "This is an error message");
-  spdlog::get("gz")->log(spdlog::level::critical, "This is a critical error message");
+  auto logger = spdlog::get("gz");
+  ASSERT_TRUE(logger);
+
+  logger->log(spdlog::level::trace,    "This is a trace message");
+  logger->log(spdlog::level::debug ,   "This is a debug message");
+  logger->log(spdlog::level::info,     "This is an info message");
+  logger->log(spdlog::level::warn,     "This is a warn message");
+  logger->log(spdlog::level::err,      "This is an error message");
+  logger->log(spdlog::level::critical, "This is a critical error message");
 }
 
 /////////////////////////////////////////////////
 TEST_F(ConsoleNew_TEST, RootLoggerNoColor)
 {
   gz::common::ConsoleNew::Root().SetColorMode(spdlog::color_mode::never);
-  spdlog::get("gz")->trace("This is a trace message");
-  spdlog::get("gz")->debug("This is a debug message");
-  spdlog::get("gz")->info("This is an info message");
-  spdlog::get("gz")->warn("This is a warning message");
-  spdlog::get("gz")->error("This is an error message");
-  spdlog::get("gz")->critical("This is a critical message");
+  auto logger = spdlog::get("gz");
+  ASSERT_TRUE(logger);
+
+  logger->trace("This is a trace message");
+  logger->debug("This is a debug message");
+  logger->info("This is an info message");
+  logger->warn("This is a warning message");
+  logger->error("This is an error message");
+  logger->critical("This is a critical message");
 }
 
 /////////////////////////////////////////////////
 TEST_F(ConsoleNew_TEST, RootLoggerMacros)
 {
   gztrace << "This is a trace message";
-  gzdbg << "This is a debug message";
-  gzmsg << "This is an info message";
-  gzwarn << "This is a warning message";
-  gzerr << "This is an error message";
-  gzcrit << "This is a critical message";
+  gzdbg   << "This is a debug message";
+  gzmsg   << "This is an info message";
+  gzwarn  << "This is a warning message";
+  gzerr   << "This is an error message";
+  gzcrit  << "This is a critical message";
 }
 
 /////////////////////////////////////////////////
@@ -109,13 +155,13 @@ TEST_F(ConsoleNew_TEST, LogToFile)
   gzLogInit("", "test.log");
 
   gztrace << "This is a trace message";
-  gzdbg << "This is a debug message";
-  gzmsg << "This is an info message";
-  gzwarn << "This is a warning message";
-  gzerr << "This is an error message";
-  gzcrit << "This is a critical message";
+  gzdbg   << "This is a debug message";
+  gzmsg   << "This is an info message";
+  gzwarn  << "This is a warning message";
+  gzerr   << "This is an error message";
+  gzcrit  << "This is a critical message";
 
-  // gzLogInit installs a global handler
+  // gzLogInit installs a global handler.
   spdlog::trace("This is a trace message");
   spdlog::debug("This is a debug message");
   spdlog::info("This is an info message");
