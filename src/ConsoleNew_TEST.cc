@@ -23,7 +23,8 @@
 
 #include <spdlog/spdlog.h>
 
-class ConsoleNew_TEST : public ::testing::Test {
+class ConsoleNew_TEST : public ::testing::Test
+{
   protected: void SetUp() override
   {
     this->temp = std::make_unique<gz::common::TempDirectory>(
@@ -38,10 +39,11 @@ class ConsoleNew_TEST : public ::testing::Test {
     EXPECT_TRUE(gz::common::unsetenv(GZ_HOMEDIR));
   }
 
-  /// \brief Temporary directory to run test in
+  /// \brief Temporary directory to run test in.
   private: std::unique_ptr<gz::common::TempDirectory> temp;
 };
 
+/////////////////////////////////////////////////
 TEST_F(ConsoleNew_TEST, NonRootLogger)
 {
   gz::common::ConsoleNew test_console("test");
@@ -54,6 +56,7 @@ TEST_F(ConsoleNew_TEST, NonRootLogger)
   test_logger.log(spdlog::level::critical, "This is a critical error message");
 }
 
+/////////////////////////////////////////////////
 TEST_F(ConsoleNew_TEST, RootLogger)
 {
   auto gz_logger = gz::common::ConsoleNew::Root().Logger();
@@ -65,6 +68,7 @@ TEST_F(ConsoleNew_TEST, RootLogger)
   gz_logger.log(spdlog::level::critical, "This is a critical error message");
 }
 
+/////////////////////////////////////////////////
 TEST_F(ConsoleNew_TEST, RootLoggerColor)
 {
   gz::common::ConsoleNew::Root().SetColorMode(spdlog::color_mode::always);
@@ -76,6 +80,7 @@ TEST_F(ConsoleNew_TEST, RootLoggerColor)
   spdlog::get("gz")->log(spdlog::level::critical, "This is a critical error message");
 }
 
+/////////////////////////////////////////////////
 TEST_F(ConsoleNew_TEST, RootLoggerNoColor)
 {
   gz::common::ConsoleNew::Root().SetColorMode(spdlog::color_mode::never);
@@ -87,6 +92,7 @@ TEST_F(ConsoleNew_TEST, RootLoggerNoColor)
   spdlog::get("gz")->critical("This is a critical message");
 }
 
+/////////////////////////////////////////////////
 TEST_F(ConsoleNew_TEST, RootLoggerMacros)
 {
   gztrace << "This is a trace message";
@@ -97,6 +103,7 @@ TEST_F(ConsoleNew_TEST, RootLoggerMacros)
   gzcrit << "This is a critical message";
 }
 
+/////////////////////////////////////////////////
 TEST_F(ConsoleNew_TEST, LogToFile)
 {
   gzLogInit("", "test.log");

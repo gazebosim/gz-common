@@ -17,23 +17,23 @@
 #ifndef GZ_COMMON_CONSOLENEW_HH_
 #define GZ_COMMON_CONSOLENEW_HH_
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
+#include <memory>
 #include <sstream>
 #include <string>
 
 #include <gz/common/Export.hh>
+#include "gz/common/Filesystem.hh"
 #include <gz/common/Util.hh>
 #include <gz/utils/ImplPtr.hh>
-#include "gz/common/Filesystem.hh"
 
 #include <spdlog/logger.h>
 #include <spdlog/spdlog.h>
 
 namespace gz::common
 {
-
-  /// \brief Gazebo Console and File logging class.
+  /// \brief Gazebo console and file logging class.
   /// This will configure spdlog with a sane set of defaults for logging to the
   /// console as well as a file.
   class GZ_COMMON_VISIBLE ConsoleNew
@@ -46,17 +46,21 @@ namespace gz::common
     ///\param[in] _mode Color mode.  
     public: void SetColorMode(spdlog::color_mode _mode);
 
-    /// \brief Set the log destnation filename
+    /// \brief Set the log destnation filename.
+    /// \param[in] _filename Log file name.
     public: void SetLogDestination(const std::string &_filename);
 
-    /// \brief Access the underlying spdlog logger
-    public: [[nodiscard]] spdlog::logger& Logger() const;
+    /// \brief Access the underlying spdlog logger.
+    /// \return The spdlog logger.
+    public: [[nodiscard]] spdlog::logger &Logger() const;
 
-    /// \brief Access the underlying spdlog logger, with ownership
+    /// \brief Access the underlying spdlog logger, with ownership.
+    /// \return The spdlog logger.
     public: [[nodiscard]] std::shared_ptr<spdlog::logger> LoggerPtr() const;
 
-    /// \brief Access the global gz console logger
-    public: static ConsoleNew& Root();
+    /// \brief Access the global gz console logger.
+    /// \return The gz consoler logger.
+    public: static ConsoleNew &Root();
 
     /// \brief Implementation Pointer.
     GZ_UTILS_UNIQUE_IMPL_PTR(dataPtr)
@@ -106,27 +110,34 @@ namespace gz::common
 #define gztrace gz::common::LogMessage( \
   __FILE__, __LINE__, spdlog::level::trace).stream()
 
-void gzLogInit(const std::string &directory, const std::string &filename)
+/// \brief Initialize the Gazebo log.
+/// \param[in] _directory Directory to log.
+/// \param[in] _filename Filename to log.
+void gzLogInit(const std::string &_directory, const std::string &_filename)
 {
   auto &root = gz::common::ConsoleNew::Root();
 
   std::string logPath;
-  if (!directory.empty())
+  if (!_directory.empty())
   {
-    logPath = directory;
-  } else if(!gz::common::env(GZ_HOMEDIR, logPath)) {
-    root.Logger().error("Missing HOME environment variable. No log file will be generated.");
+    logPath = _directory;
+  } else if (!gz::common::env(GZ_HOMEDIR, logPath))
+  {
+    root.Logger().error(
+      "Missing HOME environment variable. No log file will be generated.");
     return;
   }
 
-  if(!gz::common::createDirectories(logPath))
+  if (!gz::common::createDirectories(logPath))
   {
-    root.Logger().error("Failed to create output log directory {}", logPath.c_str());
+    root.Logger().error("Failed to create output log directory {}",
+      logPath.c_str());
     return;
   }
 
-  logPath = gz::common::joinPaths(logPath, filename);
-  root.Logger().info("Setting log file output destination to {}", logPath.c_str());
+  logPath = gz::common::joinPaths(logPath, _filename);
+  root.Logger().info("Setting log file output destination to {}",
+    logPath.c_str());
   gz::common::ConsoleNew::Root().SetLogDestination(logPath);
   spdlog::set_default_logger(root.LoggerPtr());
 }

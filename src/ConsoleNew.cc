@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Open Source Robotics Foundation
+ * Copyright (C) 2024 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,19 +18,18 @@
 #include <sstream>
 #include <string>
 
-#include <gz/common/ConsoleNew.hh>
 #include <gz/common/config.hh>
 #include <gz/common/ConsoleNew.hh>
 #include <gz/common/Util.hh>
 #include <gz/utils/NeverDestroyed.hh>
 
-#include <spdlog/spdlog.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/dist_sink.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
 
 namespace {
-/// \brief Custom log sink that routes to stdout/stderr in Gazebo conventions
+/// \brief Custom log sink that routes to stdout/stderr in Gazebo conventions.
 class GzSplitSink : public spdlog::sinks::sink
 {
   /// \brief Class destructor.
@@ -44,25 +43,25 @@ class GzSplitSink : public spdlog::sinks::sink
         _msg.level == spdlog::level::err  ||
         _msg.level == spdlog::level::critical)
     {
-      stderr.log(_msg);
+      this->stderr.log(_msg);
     }
     else
-      stdout.log(_msg);
+      this->stdout.log(_msg);
   }
 
   /// \brief Flush messages.
   public: void flush() override
   {
-    stdout.flush();
-    stderr.flush();
+    this->stdout.flush();
+    this->stderr.flush();
   }
 
   /// \brief Set the logging pattern.
   /// \param[in] _pattern The logging pattern. 
   public: void set_pattern(const std::string &_pattern) override
   {
-    stdout.set_pattern(_pattern);
-    stderr.set_pattern(_pattern);
+    this->stdout.set_pattern(_pattern);
+    this->stderr.set_pattern(_pattern);
   }
 
   /// \brief Set the new formatter.
@@ -70,16 +69,16 @@ class GzSplitSink : public spdlog::sinks::sink
   public: void set_formatter(std::unique_ptr<spdlog::formatter> _sinkFormatter)
   override
   {
-    stdout.set_formatter(_sinkFormatter->clone());
-    stderr.set_formatter(std::move(_sinkFormatter));
+    this->stdout.set_formatter(_sinkFormatter->clone());
+    this->stderr.set_formatter(std::move(_sinkFormatter));
   }
 
   /// \brief Set the color mode.
   /// \param[in] _mode Color mode.
   public: void set_color_mode(spdlog::color_mode _mode)
   {
-    stdout.set_color_mode(_mode);
-    stderr.set_color_mode(_mode);
+    this->stdout.set_color_mode(_mode);
+    this->stderr.set_color_mode(_mode);
   }
 
   /// \brief Standard output.
@@ -102,23 +101,25 @@ LogMessage::LogMessage(const char* _file, int _line,
 /////////////////////////////////////////////////
 LogMessage::~LogMessage()
 {
-  gz::common::ConsoleNew::Root().Logger().log(sourceLocation, severity, ss.str());
+  gz::common::ConsoleNew::Root().Logger().log(
+    this->sourceLocation, this->severity, this->ss.str());
 }
 
 /////////////////////////////////////////////////
-std::ostream& LogMessage::stream()
+std::ostream &LogMessage::stream()
 {
-  return ss;
+  return this->ss;
 }
 
 /// \brief Private data for the ConsoleNew class.
 class ConsoleNew::Implementation
 {
- public:
-  explicit Implementation(const std::string &_loggerName):
-    consoleSink(std::make_shared<GzSplitSink>()),
-    sinks(std::make_shared<spdlog::sinks::dist_sink_mt>()),
-    logger(std::make_shared<spdlog::logger>(_loggerName, sinks))
+  /// \brief Constructor.
+  /// \param[in] _loggerName Logger name.
+  public: explicit Implementation(const std::string &_loggerName)
+    : consoleSink(std::make_shared<GzSplitSink>()),
+      sinks(std::make_shared<spdlog::sinks::dist_sink_mt>()),
+      logger(std::make_shared<spdlog::logger>(_loggerName, sinks))
   {
   }
 
@@ -136,13 +137,13 @@ class ConsoleNew::Implementation
 };
 
 /////////////////////////////////////////////////
-ConsoleNew::ConsoleNew(const std::string &_loggerName):
-  dataPtr(gz::utils::MakeUniqueImpl<Implementation>(_loggerName))
+ConsoleNew::ConsoleNew(const std::string &_loggerName)
+  : dataPtr(gz::utils::MakeUniqueImpl<Implementation>(_loggerName))
 {
-  // Add the console sink as a destination
+  // Add the console sink as a destination.
   this->dataPtr->sinks->add_sink(this->dataPtr->consoleSink);
 
-  // Configure the logger
+  // Configure the logger.
   this->dataPtr->logger->set_level(spdlog::level::info);
   this->dataPtr->logger->flush_on(spdlog::level::err);
 
@@ -159,17 +160,16 @@ void ConsoleNew::SetColorMode(spdlog::color_mode _mode)
 /////////////////////////////////////////////////
 void ConsoleNew::SetLogDestination(const std::string &_filename)
 {
-  if (this->dataPtr->fileSink != nullptr)
-  {
+  if (this->dataPtr->fileSink)
     this->dataPtr->sinks->remove_sink(this->dataPtr->fileSink);
-  }
+
   this->dataPtr->fileSink =
     std::make_shared<spdlog::sinks::basic_file_sink_mt>(_filename, true);
   this->dataPtr->sinks->add_sink(this->dataPtr->fileSink);
 }
 
 /////////////////////////////////////////////////
-spdlog::logger& ConsoleNew::Logger() const
+spdlog::logger &ConsoleNew::Logger() const
 {
   return *this->dataPtr->logger;
 }
@@ -181,7 +181,7 @@ std::shared_ptr<spdlog::logger> ConsoleNew::LoggerPtr() const
 }
 
 /////////////////////////////////////////////////
-ConsoleNew& ConsoleNew::Root()
+ConsoleNew &ConsoleNew::Root()
 {
   static gz::utils::NeverDestroyed<ConsoleNew> root{"gz"};
   return root.Access();
