@@ -153,8 +153,6 @@ void gzLogInit(const std::string &_directory, const std::string &_filename)
     logPath.c_str());
   gz::common::ConsoleNew::Root().SetLogDestination(logPath);
   spdlog::set_default_logger(root.LoggerPtr());
-
-  std::cerr << logPath << std::endl;
 }
 
 #endif  // GZ_COMMON_CONSOLENEW_HH_
