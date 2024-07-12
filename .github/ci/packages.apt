@@ -9,6 +9,7 @@ libgts-dev
 libgz-cmake4-dev
 libgz-math8-dev
 libgz-utils3-dev
+libspdlog-dev
 libswscale-dev
 libtinyxml2-dev
 pkg-config
