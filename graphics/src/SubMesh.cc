@@ -575,7 +575,7 @@ void SubMesh::FillArrays(double **_vertArr, int **_indArr) const
 }
 
 namespace {
-// Simple way to finding neighbors by grouping all vertexes
+// Simple way to find neighbors by grouping all vertices
 // by X coordinate with (ordered) map. KD-tree maybe better
 // but not sure about construction overhead
 struct Neighbors {
