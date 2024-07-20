@@ -592,9 +592,9 @@ TEST_F(SubMeshTest, NormalsRecalculation)
   auto submesh = std::make_shared<common::SubMesh>();
   submesh->SetPrimitiveType(common::SubMesh::TRIANGLES);
 
-  constexpr unsigned int elements = 16384;
-  for (unsigned int i = 0; i < elements; ++i) {
-    // sub to X less than _epsilon from even elements
+  constexpr unsigned int triangles = 16384;
+  for (unsigned int i = 0; i < triangles; ++i) {
+    // sub to X less than _epsilon from even triangles
     // expect that the 2nd vertex should be matched with
     // the 1st of next triangle
     const auto jitter = i % 2 ? 1e-7 : 0.0;

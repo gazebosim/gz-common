@@ -20,7 +20,6 @@
 #include <memory>
 #include <optional>
 #include <string>
-#include <vector>
 
 #include <gz/math/Vector3.hh>
 #include <gz/math/Vector2.hh>

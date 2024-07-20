@@ -18,7 +18,6 @@
 #include <algorithm>
 #include <limits>
 #include <map>
-#include <optional>
 #include <string>
 #include <vector>
 
@@ -578,7 +577,8 @@ namespace {
 // Simple way to find neighbors by grouping all vertices
 // by X coordinate with (ordered) map. KD-tree maybe better
 // but not sure about construction overhead
-struct Neighbors {
+struct Neighbors
+{
   Neighbors(const std::vector<unsigned int> &_indices,
             const std::vector<gz::math::Vector3d> &_vertices)
     : vertices(_vertices)
@@ -591,7 +591,7 @@ struct Neighbors {
   }
 
   template<typename Visitor>
-  void Visit(const gz::math::Vector3d &_point, Visitor _v)
+  void Visit(const gz::math::Vector3d &_point, Visitor _v) const
   {
     auto it = this->neighbors.find(_point.X());
     // find smaller acceptable value
@@ -645,7 +645,7 @@ void SubMesh::RecalculateNormals()
     gz::math::Vector3d n = gz::math::Vector3d::Normal(v1, v2, v3);
 
     for (const auto &point : {v1, v2, v3})
-      neighbors.Visit(point, [&](unsigned int index)
+      neighbors.Visit(point, [&](const unsigned int index)
       {
         this->dataPtr->normals[index] += n;
       });
