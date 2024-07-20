@@ -644,54 +644,11 @@ void SubMesh::RecalculateNormals()
         this->dataPtr->vertices[this->dataPtr->indices[i+2]];
     gz::math::Vector3d n = gz::math::Vector3d::Normal(v1, v2, v3);
 
-#if 0
-  /*
-  i7-11800H @ Ubuntu22 VM; 2^14 triangles
-    SubMeshTest.NormalsRecalculation (1105 ms)
-    SubMeshTest.NormalsRecalculation (1158 ms)
-    SubMeshTest.NormalsRecalculation (1117 ms)
-    SubMeshTest.NormalsRecalculation (1137 ms)
-    SubMeshTest.NormalsRecalculation (1156 ms)
-  */
-    for (unsigned int j = 0; j < this->dataPtr->vertices.size(); ++j)
-    {
-      gz::math::Vector3d v = this->dataPtr->vertices[j];
-      if (v == v1 || v == v2 || v == v3)
-      {
-        this->dataPtr->normals[j] += n;
-      }
-    }
-#else
-  // same env, ~1ms
-  // FAILS: ASSERT_NE(submesh->Normal(0), submesh->Normal(1));
-    /*this->dataPtr->normals[this->dataPtr->indices[i]] += n;
-    this->dataPtr->normals[this->dataPtr->indices[i+1]] += n;
-    this->dataPtr->normals[this->dataPtr->indices[i+2]] += n;*/
-
-    for (const auto& point : {v1, v2, v3})
+    for (const auto &point : {v1, v2, v3})
       neighbors.Visit(point, [&](unsigned int index)
       {
         this->dataPtr->normals[index] += n;
       });
-
-    //auto& nv1 = neighbors[v1];
-    //nv1.insert(this->dataPtr->indices[i]);
-    /*for (const auto index: neighbors[v1])
-      this->dataPtr->normals[index] += n;*/
-
-    //neighbors[v2].insert(this->dataPtr->indices[i+1]);
-    //auto& nv2 = neighbors[v2];
-    //nv2.insert(this->dataPtr->indices[i+1]);
-    /*for (const auto index: neighbors[v2])
-      this->dataPtr->normals[index] += n;*/
-
-    //neighbors[v3].insert(this->dataPtr->indices[i+2]);
-    //auto& nv3 = neighbors[v3];
-    //nv3.insert(this->dataPtr->indices[i+2]);
-    /*for (const auto index: neighbors[v3])
-      this->dataPtr->normals[index] += n;*/
-
-#endif
   }
 
   // Normalize the results
