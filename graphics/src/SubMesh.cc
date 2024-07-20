@@ -20,6 +20,7 @@
 #include <map>
 #include <optional>
 #include <string>
+#include <vector>
 
 #include "gz/math/Helpers.hh"
 
@@ -573,10 +574,53 @@ void SubMesh::FillArrays(double **_vertArr, int **_indArr) const
   }
 }
 
+namespace {
+// Simple way to finding neighbors by grouping all vertexes
+// by X coordinate with (ordered) map. KD-tree maybe better
+// but not sure about construction overhead
+struct Neighbors {
+  Neighbors(const std::vector<unsigned int> &_indices,
+            const std::vector<gz::math::Vector3d> &_vertices)
+    : vertices(_vertices)
+  {
+    for (unsigned int i = 0; i < _indices.size(); ++i)
+    {
+      const auto index = _indices[i];
+      this->neighbors[_vertices[index].X()].push_back(index);
+    }
+  }
+
+  template<typename Visitor>
+  void Visit(const gz::math::Vector3d &_point, Visitor _v)
+  {
+    auto it = this->neighbors.find(_point.X());
+    // find smaller acceptable value
+    while (it != this->neighbors.begin())
+    {
+      auto prev = it;
+      --prev;
+      if (!gz::math::equal(prev->first, _point.X()))
+        break;
+      it = prev;
+    }
+    while (gz::math::equal(it->first, _point.X()))
+    {
+      for (const auto index : it->second)
+        if (this->vertices[index] == _point)
+          _v(index);
+      ++it;
+    }
+  }
+
+  private: std::map<double, std::vector<unsigned int>> neighbors;
+  private: const std::vector<gz::math::Vector3d> &vertices;
+};
+}  // namespace
+
 //////////////////////////////////////////////////
 void SubMesh::RecalculateNormals()
 {
-  if (this->dataPtr->indices.size() == 0
+  if (this->dataPtr->indices.empty()
       || this->dataPtr->indices.size() % 3u != 0)
     return;
 
@@ -586,6 +630,8 @@ void SubMesh::RecalculateNormals()
 
   if (this->dataPtr->normals.size() != this->dataPtr->vertices.size())
     this->dataPtr->normals.resize(this->dataPtr->vertices.size());
+
+  Neighbors neighbors(this->dataPtr->indices, this->dataPtr->vertices);
 
   // For each face, which is defined by three indices, calculate the normals
   for (unsigned int i = 0; i < this->dataPtr->indices.size(); i+= 3)
@@ -598,7 +644,7 @@ void SubMesh::RecalculateNormals()
         this->dataPtr->vertices[this->dataPtr->indices[i+2]];
     gz::math::Vector3d n = gz::math::Vector3d::Normal(v1, v2, v3);
 
-#if 1
+#if 0
   /*
   i7-11800H @ Ubuntu22 VM; 2^14 triangles
     SubMeshTest.NormalsRecalculation (1105 ms)
@@ -618,9 +664,33 @@ void SubMesh::RecalculateNormals()
 #else
   // same env, ~1ms
   // FAILS: ASSERT_NE(submesh->Normal(0), submesh->Normal(1));
-    this->dataPtr->normals[this->dataPtr->indices[i]] += n;
+    /*this->dataPtr->normals[this->dataPtr->indices[i]] += n;
     this->dataPtr->normals[this->dataPtr->indices[i+1]] += n;
-    this->dataPtr->normals[this->dataPtr->indices[i+2]] += n;
+    this->dataPtr->normals[this->dataPtr->indices[i+2]] += n;*/
+
+    for (const auto& point : {v1, v2, v3})
+      neighbors.Visit(point, [&](unsigned int index)
+      {
+        this->dataPtr->normals[index] += n;
+      });
+
+    //auto& nv1 = neighbors[v1];
+    //nv1.insert(this->dataPtr->indices[i]);
+    /*for (const auto index: neighbors[v1])
+      this->dataPtr->normals[index] += n;*/
+
+    //neighbors[v2].insert(this->dataPtr->indices[i+1]);
+    //auto& nv2 = neighbors[v2];
+    //nv2.insert(this->dataPtr->indices[i+1]);
+    /*for (const auto index: neighbors[v2])
+      this->dataPtr->normals[index] += n;*/
+
+    //neighbors[v3].insert(this->dataPtr->indices[i+2]);
+    //auto& nv3 = neighbors[v3];
+    //nv3.insert(this->dataPtr->indices[i+2]);
+    /*for (const auto index: neighbors[v3])
+      this->dataPtr->normals[index] += n;*/
+
 #endif
   }
 

@@ -592,9 +592,13 @@ TEST_F(SubMeshTest, NormalsRecalculation)
   auto submesh = std::make_shared<common::SubMesh>();
   submesh->SetPrimitiveType(common::SubMesh::TRIANGLES);
 
-  constexpr unsigned int elements = 65536/4;
+  constexpr unsigned int elements = 16384;
   for (unsigned int i = 0; i < elements; ++i) {
-    submesh->AddVertex(i, i, i);
+    // sub to X less than _epsilon from even elements
+    // expect that the 2nd vertex should be matched with
+    // the 1st of next triangle
+    const auto jitter = i % 2 ? 1e-7 : 0.0;
+    submesh->AddVertex(i-jitter, i, i);
     submesh->AddVertex(i+1, i+1, i+1);
     submesh->AddVertex(i, i, -i);
 
@@ -607,5 +611,6 @@ TEST_F(SubMeshTest, NormalsRecalculation)
   submesh->RecalculateNormals();
   ASSERT_EQ(submesh->NormalCount(), submesh->VertexCount());
   // Same triangle, but different normals
+  // because of neighbour vertex
   ASSERT_NE(submesh->Normal(0), submesh->Normal(1));
 }
