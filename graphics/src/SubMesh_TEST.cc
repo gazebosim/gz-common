@@ -600,7 +600,7 @@ TEST_F(SubMeshTest, NormalsRecalculation)
     const auto jitter = i % 2 ? 1e-7 : 0.0;
     submesh->AddVertex(i-jitter, i, i);
     submesh->AddVertex(i+1, i+1, i+1);
-    submesh->AddVertex(i, i, -i);
+    submesh->AddVertex(i, i, -static_cast<double>(i));
 
     submesh->AddIndex(3*i);
     submesh->AddIndex(3*i+1);
