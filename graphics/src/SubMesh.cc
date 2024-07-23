@@ -603,7 +603,8 @@ struct Neighbors
         break;
       it = prev;
     }
-    while (gz::math::equal(it->first, _point.X()))
+    while (it != this->neighbors.end()
+           && gz::math::equal(it->first, _point.X()))
     {
       for (const auto index : it->second)
         if (this->vertices[index] == _point)
