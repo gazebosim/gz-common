@@ -18,23 +18,17 @@
 #include <gtest/gtest.h>
 #include <memory>
 
-#include "gz/common/GTSMeshUtils.hh"
+#include "gz/common/DelaunayTriangulation.hh"
 #include "gz/common/Mesh.hh"
 #include "gz/common/SubMesh.hh"
 
 #include "gz/common/testing/AutoLogFixture.hh"
 
-using namespace gz;
-
-class GTSMeshUtils : public common::testing::AutoLogFixture { };
+class DelaunayTriangulation: public gz::common::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
-TEST_F(GTSMeshUtils, DelaunayTriangulation)
+TEST_F(DelaunayTriangulation, DelaunayTriangulation)
 {
-  #ifdef _WIN32
-  std::cerr << "Skipping test on windows due to issue #50" << std::endl;
-  return;
-  #endif
 
   // test triangulation of a path with two subpaths:
   // a smaller square inside a bigger square.
@@ -63,13 +57,13 @@ TEST_F(GTSMeshUtils, DelaunayTriangulation)
   edges.push_back(gz::math::Vector2i(6, 7));
   edges.push_back(gz::math::Vector2i(7, 4));
 
-  auto mesh = std::make_unique<common::Mesh>();
+  auto mesh = std::make_unique<gz::common::Mesh>();
   mesh->SetName("extruded");
-  common::SubMesh subMesh;
+  gz::common::SubMesh subMesh;
 
-  bool result = common::GTSMeshUtils::DelaunayTriangulation(vertices,
-                                                            edges,
-                                                            &subMesh);
+  bool result = gz::common::DelaunayTriangulation(vertices,
+                                                  edges,
+                                                  &subMesh);
   EXPECT_TRUE(result);
 
   // same as number of vertices in the path

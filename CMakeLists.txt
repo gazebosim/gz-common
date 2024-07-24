@@ -67,15 +67,8 @@ endif()
 gz_find_package(FreeImage VERSION 3.9
   REQUIRED_BY graphics
   PRIVATE_FOR graphics)
-
 #------------------------------------
-# Find GNU Triangulation Surface Library
-gz_find_package(
-  GTS PRETTY gts PURPOSE "GNU Triangulation Surface library"
-  REQUIRED_BY graphics
-  PRIVATE_FOR graphics)
 
-#------------------------------------
 # Find GDAL
 gz_find_package(GDAL VERSION 3.0
   PKGCONFIG gdal

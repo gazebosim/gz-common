@@ -270,16 +270,6 @@ namespace gz
       /// \param[in] _scale scaling factor for the camera
       public: void CreateCamera(const std::string &_name, const float _scale);
 
-      /// \brief Create a boolean mesh from two meshes
-      /// \param[in] _name the name of the new mesh
-      /// \param[in] _m1 the parent mesh in the boolean operation
-      /// \param[in] _m2 the child mesh in the boolean operation
-      /// \param[in] _operation the boolean operation applied to the two meshes
-      /// \param[in] _offset _m2's pose offset from _m1
-      public: void CreateBoolean(const std::string &_name, const Mesh *_m1,
-          const Mesh *_m2, const int _operation,
-          const gz::math::Pose3d &_offset = gz::math::Pose3d::Zero);
-
       /// \brief Perform convex decomposition on a submesh.
       /// The submesh is decomposed into multiple convex submeshes. The output
       /// submeshes contain vertices and indices but texture coordinates
