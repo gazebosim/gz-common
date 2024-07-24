@@ -13,7 +13,10 @@ target_link_libraries(${graphics_target}
 )
 
 # CDT does a few float comparisons that cause warnings
-target_compile_options(${graphics_target} PRIVATE -Wno-float-equal)
+target_compile_options(${graphics_target} PRIVATE
+    $<$<CXX_COMPILER_ID:GNU>:   -Wno-switch-default -Wno-float-equal>   # GCC
+    $<$<CXX_COMPILER_ID:Clang>: -Wno-switch-default -Wno-float-equal>   # Clang
+)
 
 gz_build_tests(
   TYPE UNIT
