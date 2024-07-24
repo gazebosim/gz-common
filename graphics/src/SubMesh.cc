@@ -575,7 +575,7 @@ void SubMesh::FillArrays(double **_vertArr, int **_indArr) const
 
 namespace {
 // Simple way to find neighbors by grouping all vertices
-// by X coordinate with (ordered) map. KD-tree maybe better
+// by X coordinate in (ordered) map. KD-tree maybe better
 // but not sure about construction overhead
 struct Neighbors
 {
@@ -586,16 +586,24 @@ struct Neighbors
     for (unsigned int i = 0; i < _indices.size(); ++i)
     {
       const auto index = _indices[i];
-      this->neighbors[_vertices[index].X()].push_back(index);
+      this->groups[_vertices[index].X()].push_back(index);
     }
   }
 
+  // When we have a concrete point to check, we are looking for
+  // a group inside a map with a same X.
+  // Then we check neighbors with the smaller X until
+  // it's in tolerance of the math::equal function.
+  // Starting from smallest X, which is in a tolerance range,
+  // testing all points in group for equality. In case of equality,
+  // call a Visitor with element index as an argument.
+  // Continue until a greater side of X tolerance range reached.
   template<typename Visitor>
   void Visit(const gz::math::Vector3d &_point, Visitor _v) const
   {
-    auto it = this->neighbors.find(_point.X());
+    auto it = this->groups.find(_point.X());
     // find smaller acceptable value
-    while (it != this->neighbors.begin())
+    while (it != this->groups.begin())
     {
       auto prev = it;
       --prev;
@@ -603,7 +611,7 @@ struct Neighbors
         break;
       it = prev;
     }
-    while (it != this->neighbors.end()
+    while (it != this->groups.end()
            && gz::math::equal(it->first, _point.X()))
     {
       for (const auto index : it->second)
@@ -613,7 +621,9 @@ struct Neighbors
     }
   }
 
-  private: std::map<double, std::vector<unsigned int>> neighbors;
+  // Indexes of vertices grouped by X coordinate
+  private: std::map<double, std::vector<unsigned int>> groups;
+  // Const reference to a vertices vector
   private: const std::vector<gz::math::Vector3d> &vertices;
 };
 }  // namespace
@@ -621,7 +631,8 @@ struct Neighbors
 //////////////////////////////////////////////////
 void SubMesh::RecalculateNormals()
 {
-  if (this->dataPtr->indices.empty()
+  if (this->dataPtr->primitiveType != SubMesh::TRIANGLES
+      || this->dataPtr->indices.empty()
       || this->dataPtr->indices.size() % 3u != 0)
     return;
 
