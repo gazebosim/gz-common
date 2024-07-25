@@ -20,7 +20,6 @@
 #include <memory>
 #include <optional>
 #include <string>
-#include <vector>
 
 #include <gz/math/Vector3.hh>
 #include <gz/math/Vector2.hh>
@@ -158,7 +157,7 @@ namespace gz
       public: gz::math::Vector3d Vertex(const unsigned int _index) const;
 
       /// \brief Get the raw vertex pointer. This is unsafe, it is the
-      /// caller's responsability to ensure it's not indexed out of bounds.
+      /// caller's responsibility to ensure it's not indexed out of bounds.
       /// The valid range is [0; VertexCount())
       /// \return Raw vertices
       public: const gz::math::Vector3d* VertexPtr() const;
@@ -224,7 +223,7 @@ namespace gz
       public: int Index(const unsigned int _index) const;
 
       /// \brief Get the raw index pointer. This is unsafe, it is the
-      /// caller's responsability to ensure it's not indexed out of bounds.
+      /// caller's responsibility to ensure it's not indexed out of bounds.
       /// The valid range is [0; IndexCount())
       /// \return Raw indices
       public: const unsigned int* IndexPtr() const;
@@ -416,7 +415,7 @@ namespace gz
       GZ_UTILS_IMPL_PTR(dataPtr)
     };
 
-    /// \brief Vertex to node weighted assignement for skeleton animation
+    /// \brief Vertex to node weighted assignment for skeleton animation
     /// visualization
     class GZ_COMMON_GRAPHICS_VISIBLE NodeAssignment
     {
