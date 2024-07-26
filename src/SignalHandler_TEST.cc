@@ -19,6 +19,7 @@
 // comments when upgrading to gz-cmake's "make codecheck"
 #include "gz/common/SignalHandler.hh" // NOLINT(*)
 #include <gtest/gtest.h> // NOLINT(*)
+#include <chrono>
 #include <csignal> // NOLINT(*)
 #include <condition_variable> // NOLINT(*)
 #include <map> // NOLINT(*)
@@ -79,6 +80,7 @@ TEST(SignalHandler, Single)
   common::SignalHandler handler1;
   EXPECT_TRUE(handler1.AddCallback(handler1Cb));
   std::raise(SIGTERM);
+  std::this_thread::sleep_for(std::chrono::milliseconds(1));
   EXPECT_EQ(SIGTERM, gHandler1Sig);
 }
 
@@ -98,6 +100,7 @@ TEST(SignalHandler, Multiple)
 
   std::raise(SIGINT);
 
+  std::this_thread::sleep_for(std::chrono::milliseconds(1));
   EXPECT_EQ(-1, gHandler1Sig);
   EXPECT_EQ(-1, gHandler2Sig);
 
