@@ -41,6 +41,7 @@ class ConsoleNew_TEST : public ::testing::Test
   /// \brief Clear out all the directories we produced during this test.
   public: void TearDown() override
   {
+    gzLogClose();
     EXPECT_TRUE(gz::common::unsetenv(GZ_HOMEDIR));
   }
 
@@ -230,4 +231,6 @@ TEST_F(ConsoleNew_TEST, LogToFile)
   std::string logContent = GetLogContent("test.log");
   for (auto word : {"info", "warn", "error", "critical"})
     EXPECT_TRUE(logContent.find(word) != std::string::npos);
+
+  auto dir = gzLogDirectory();
 }

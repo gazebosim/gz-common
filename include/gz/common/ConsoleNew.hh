@@ -17,6 +17,7 @@
 #ifndef GZ_COMMON_CONSOLENEW_HH_
 #define GZ_COMMON_CONSOLENEW_HH_
 
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -27,6 +28,7 @@
 #include <gz/common/Filesystem.hh>
 #include <gz/common/Util.hh>
 #include <gz/utils/ImplPtr.hh>
+#include <gz/utils/SuppressWarning.hh>
 
 #include <spdlog/logger.h>
 #include <spdlog/spdlog.h>
@@ -46,9 +48,13 @@ namespace gz::common
     ///\param[in] _mode Color mode.  
     public: void SetColorMode(spdlog::color_mode _mode);
 
-    /// \brief Set the log destnation filename.
+    /// \brief Set the log destination filename.
     /// \param[in] _filename Log file name.
     public: void SetLogDestination(const std::string &_filename);
+
+    /// \brief Get the log destination filename.
+    /// \return Log file name.
+    public: std::string LogDestination() const;
 
     /// \brief Access the underlying spdlog logger.
     /// \return The spdlog logger.
@@ -92,6 +98,55 @@ namespace gz::common
 
     /// \brief Underlying stream.
     private: std::ostringstream ss;
+  };
+
+  /// \brief Helper class for providing global options.
+  class GZ_COMMON_VISIBLE ConsoleGlobal
+  {
+    /// \brief Set verbosity, where
+    /// <= 0: No output,
+    /// 1: Error messages,
+    /// 2: Error and warning messages,
+    /// 3: Error, warning, and info messages,
+    /// >= 4: Error, warning, info, and debug messages.
+    /// \param[in] _level The new verbose level.
+    public: static void SetVerbosity(const int _level);
+
+    /// \brief Get the verbose level.
+    /// \return The level of verbosity.
+    /// \sa SetVerbosity(const int _level)
+    public: static int Verbosity();
+
+    /// \brief Add a custom prefix in front of the default prefixes.
+    ///
+    /// By default, the custom prefix is an empty string, so the messages
+    /// start as:
+    ///
+    /// [Err], [Wrn], [Msg], [Dbg]
+    ///
+    /// If you set the prefix to "-my-", for example, they become:
+    ///
+    /// -my-[Err], -my-[Wrn], -my-[Msg], -my-[Dbg]
+    ///
+    /// \param[in] _customPrefix Prefix string.
+    /// \sa std::string Prefix() const
+    public: static void SetPrefix(const std::string &_customPrefix);
+
+    /// \brief Get custom prefix. This is empty by default.
+    /// \return The custom prefix.
+    /// \sa void SetPrefix(const std::string &_customPrefix)
+    public: static std::string Prefix();
+
+    /// \brief ToDo.
+    public: friend class LogMessage;
+
+    /// \brief The level of verbosity, the default level is 1.
+    private: static int verbosity;
+
+    //GZ_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
+    /// \brief A custom prefix. See SetPrefix().
+    private: static std::string customPrefix;
+    //GZ_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
   };
 }  // namespace gz::common
 
@@ -153,6 +208,23 @@ void gzLogInit(const std::string &_directory, const std::string &_filename)
     logPath.c_str());
   gz::common::ConsoleNew::Root().SetLogDestination(logPath);
   spdlog::set_default_logger(root.LoggerPtr());
+}
+
+/// \brief Close the file used for logging.
+void gzLogClose()
+{
+  auto filePath = gz::common::ConsoleNew::Root().LogDestination();
+  std::ifstream ifs(filePath);
+  if (!ifs.is_open())
+    std::filesystem::remove(filePath);
+}
+
+/// \brief Get the full path of the directory where the log files are stored
+/// \return Full path of the directory.
+std::string gzLogDirectory()
+{
+  std::filesystem::path path = gz::common::ConsoleNew::Root().LogDestination();
+  return path.parent_path();
 }
 
 #endif  // GZ_COMMON_CONSOLENEW_HH_

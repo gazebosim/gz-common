@@ -91,6 +91,9 @@ class GzSplitSink : public spdlog::sinks::sink
 
 namespace gz::common
 {
+int ConsoleGlobal::verbosity = 1;
+std::string ConsoleGlobal::customPrefix = ""; // NOLINT(*)
+
 /////////////////////////////////////////////////
 LogMessage::LogMessage(const char *_file, int _line,
   spdlog::level::level_enum _logLevel)
@@ -102,7 +105,8 @@ LogMessage::LogMessage(const char *_file, int _line,
 LogMessage::~LogMessage()
 {
   gz::common::ConsoleNew::Root().Logger().log(
-    this->sourceLocation, this->severity, this->ss.str());
+    this->sourceLocation, this->severity,
+    gz::common::ConsoleGlobal::Prefix() + this->ss.str());
 }
 
 /////////////////////////////////////////////////
@@ -144,7 +148,7 @@ ConsoleNew::ConsoleNew(const std::string &_loggerName)
   this->dataPtr->sinks->add_sink(this->dataPtr->consoleSink);
 
   // Configure the logger.
-  this->dataPtr->logger->set_level(spdlog::level::info);
+  this->dataPtr->logger->set_level(spdlog::level::err);
   this->dataPtr->logger->flush_on(spdlog::level::err);
 
   spdlog::flush_every(std::chrono::seconds(5));
@@ -169,6 +173,18 @@ void ConsoleNew::SetLogDestination(const std::string &_filename)
 }
 
 /////////////////////////////////////////////////
+std::string ConsoleNew::LogDestination() const
+{
+  std::string logPath = "";
+  if (this->dataPtr->fileSink)
+  {
+    logPath = this->dataPtr->fileSink->filename();
+  }
+
+  return logPath;
+}
+
+/////////////////////////////////////////////////
 spdlog::logger &ConsoleNew::Logger() const
 {
   return *this->dataPtr->logger;
@@ -185,5 +201,52 @@ ConsoleNew &ConsoleNew::Root()
 {
   static gz::utils::NeverDestroyed<ConsoleNew> root{"gz"};
   return root.Access();
+}
+
+/////////////////////////////////////////////////
+void ConsoleGlobal::SetVerbosity(const int _level)
+{
+  verbosity = _level;
+  switch (_level)
+  {
+  case 0:
+    gz::common::ConsoleNew::Root().Logger().set_level(spdlog::level::critical);
+    break;
+  case 1:
+    gz::common::ConsoleNew::Root().Logger().set_level(spdlog::level::err);
+    break;
+  case 2:
+    gz::common::ConsoleNew::Root().Logger().set_level(spdlog::level::warn);
+    break;
+  case 3:
+    gz::common::ConsoleNew::Root().Logger().set_level(spdlog::level::info);
+    break;
+  case 4:
+    gz::common::ConsoleNew::Root().Logger().set_level(spdlog::level::debug);
+    break;
+  case 5:
+    gz::common::ConsoleNew::Root().Logger().set_level(spdlog::level::trace);
+    break;
+  default:
+    break;
+  }
+}
+
+//////////////////////////////////////////////////
+int ConsoleGlobal::Verbosity()
+{
+  return verbosity;
+}
+
+//////////////////////////////////////////////////
+void ConsoleGlobal::SetPrefix(const std::string &_prefix)
+{
+  customPrefix = _prefix;
+}
+
+//////////////////////////////////////////////////
+std::string ConsoleGlobal::Prefix()
+{
+  return customPrefix;
 }
 }  // namespace gz::common
