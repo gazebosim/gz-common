@@ -138,7 +138,8 @@ int Dem::Load(const std::string &_filename)
   auto OpenInGdal = [this](const std::string& name) -> bool
   {
     GDALDatasetH handle = GDALOpen(name.c_str(), GA_ReadOnly);
-    if (handle) {
+    if (handle)
+    {
       this->dataPtr->dataSet = GDALDataset::FromHandle(handle);
     }
 
