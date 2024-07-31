@@ -30,7 +30,7 @@ using namespace common;
 class gz::common::Dem::Implementation
 {
   /// \brief A set of associated raster bands.
-  public: GDALDataset* dataSet;
+  public: GDALDataset *dataSet;
 
   /// \brief A pointer to the band.
   public: GDALRasterBand *band;
@@ -53,11 +53,13 @@ class gz::common::Dem::Implementation
   public: unsigned int maxYSize {std::numeric_limits<unsigned int>::max()};
 
   /// \brief The desired length of data to load in the X direction.
-  ///        Internally, the implementation may use a higher value for performance.
+  ///        Internally, the implementation may use a
+  //         higher value for performance.
   public: unsigned int configuredXSize;
 
   /// \brief The desired length of data to load in the Y direction.
-  ///        Internally, the implementation may use a higher value for performance.
+  ///        Internally, the implementation may use a
+  //         higher value for performance.
   public: unsigned int configuredYSize;
 
   /// \brief Minimum elevation in meters.
@@ -83,6 +85,12 @@ class gz::common::Dem::Implementation
   /// \brief Holds the spherical coordinates object from the world.
   public: math::SphericalCoordinates sphericalCoordinates =
            math::SphericalCoordinates();
+
+  /// \brief Once the user configures size limits, apply that
+  ///    to the internal configured size, which is limited
+  ///    based on the dataset size.
+  /// \return True if configured size was valid.
+  public: [[nodiscard]] bool ConfigureLoadedSize();
 };
 
 //////////////////////////////////////////////////
@@ -109,13 +117,25 @@ void Dem::SetSphericalCoordinates(
 }
 
 //////////////////////////////////////////////////
-void Dem::SetXSizeLimit(const unsigned int &_xLimit)
+unsigned int Dem::RasterXSizeLimit()
+{
+  return this->dataPtr->maxXSize;
+}
+
+//////////////////////////////////////////////////
+void Dem::SetRasterXSizeLimit(const unsigned int &_xLimit)
 {
   this->dataPtr->maxXSize = _xLimit;
 }
 
 //////////////////////////////////////////////////
-void Dem::SetYSizeLimit(const unsigned int &_yLimit)
+unsigned int Dem::RasterYSizeLimit()
+{
+  return this->dataPtr->maxYSize;
+}
+
+//////////////////////////////////////////////////
+void Dem::SetRasterYSizeLimit(const unsigned int &_yLimit)
 {
   this->dataPtr->maxYSize = _yLimit;
 }
@@ -135,7 +155,7 @@ int Dem::Load(const std::string &_filename)
   this->dataPtr->filename = fullName;
 
   // Create a re-usable lambda for opening a dataset.
-  auto OpenInGdal = [this](const std::string& name) -> bool
+  auto openInGdal = [this](const std::string& name) -> bool
   {
     GDALDatasetH handle = GDALOpen(name.c_str(), GA_ReadOnly);
     if (handle)
@@ -149,13 +169,14 @@ int Dem::Load(const std::string &_filename)
   if (!exists(findFilePath(fullName)))
   {
     // https://github.com/gazebosim/gz-common/issues/596
-    // Attempt loading anyways to support /vsicurl, /vsizip, and other GDAL Virtual File Formats.
+    // Attempt loading anyways to support /vsicurl, /vsizip, and other
+    // GDAL Virtual File Formats.
     // The "exists()" function does not handle GDAL's special formats.
-    if (!OpenInGdal(_filename)) {
+    if (!openInGdal(_filename)) {
       gzerr << "Unable to read DEM file[" << _filename << "]." << std::endl;
       return -1;
     }
-  } else if(!OpenInGdal(fullName)){
+  } else if(!openInGdal(fullName)){
     gzerr << "Unable to open DEM file[" << fullName
            << "]. Format not recognized as a supported dataset." << std::endl;
     return -1;
@@ -173,8 +194,9 @@ int Dem::Load(const std::string &_filename)
   // Set the pointer to the band
   this->dataPtr->band = this->dataPtr->dataSet->GetRasterBand(1);
 
-  // Validate the raster size and apply the user-configured size limits on loaded data.
-  if(!ConfigureLoadedSize())
+  // Validate the raster size and apply the user-configured size limits
+  //  on loaded data.
+  if(!this->dataPtr->ConfigureLoadedSize())
   {
     return -1;
   }
@@ -495,11 +517,11 @@ void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
   }
 }
 
-bool Dem::ConfigureLoadedSize()
+bool gz::common::Dem::Implementation::ConfigureLoadedSize()
 {
-  assert(this->dataPtr->dataSet != nullptr);
-  const unsigned int nRasterXSize = this->dataPtr->dataSet->GetRasterXSize();
-  const unsigned int nRasterYSize = this->dataPtr->dataSet->GetRasterYSize();
+  assert(this->dataSet != nullptr);
+  const unsigned int nRasterXSize = this->dataSet->GetRasterXSize();
+  const unsigned int nRasterYSize = this->dataSet->GetRasterYSize();
   if (nRasterXSize == 0 || nRasterYSize == 0)
   {
     gzerr << "Illegal raster size loading a DEM file (" << nRasterXSize << ","
@@ -507,8 +529,8 @@ bool Dem::ConfigureLoadedSize()
     return false;
   }
 
-  this->dataPtr->configuredXSize = std::min(nRasterXSize, this->dataPtr->maxXSize);
-  this->dataPtr->configuredYSize = std::min(nRasterYSize, this->dataPtr->maxYSize);
+  this->configuredXSize = std::min(nRasterXSize, this->maxXSize);
+  this->configuredYSize = std::min(nRasterYSize, this->maxYSize);
   return true;
 }
 
@@ -539,17 +561,20 @@ int Dem::LoadData()
     float w = static_cast<float>(destHeight) / static_cast<float>(ratio);
     destWidth = static_cast<unsigned int>(w);
   }
-  
+
   // Read the whole raster data and convert it to a GDT_Float32 array.
   // In this step the DEM is scaled to destWidth x destHeight.
 
   std::vector<float> buffer;
   // Convert to uint64_t for multiplication to avoid overflow.
   // https://github.com/OSGeo/gdal/issues/9713
-  buffer.resize(static_cast<uint64_t>(destWidth) * static_cast<uint64_t>(destHeight));
-  //! @todo Do not assume users only want to load from the origin of the dataset.
+  buffer.resize(static_cast<uint64_t>(destWidth) * \
+    static_cast<uint64_t>(destHeight));
+  //! @todo Do not assume users only want to load
+  //! from the origin of the dataset.
   // Instead, add a configuration to change where in the dataset to read from.
-  if (this->dataPtr->band->RasterIO(GF_Read, 0, 0, desiredXSize, desiredYSize, &buffer[0],
+  if (this->dataPtr->band->RasterIO(GF_Read, 0, 0,
+                       desiredXSize, desiredYSize, &buffer[0],
                        destWidth, destHeight, GDT_Float32, 0, 0) != CE_None)
   {
     gzerr << "Failure calling RasterIO while loading a DEM file\n";
@@ -558,8 +583,9 @@ int Dem::LoadData()
 
   // Copy and align 'buffer' into the target vector. The destination vector is
   // initialized to max() and later converted to the minimum elevation, so all
-  // the points not contained in 'buffer' will be extra padding
-  this->dataPtr->demData.resize(static_cast<uint64_t>(this->Width()) * static_cast<uint64_t>(this->Height()),
+  // the points not contained in 'buffer' will be extra padding.
+  this->dataPtr->demData.resize(static_cast<uint64_t>(this->Width()) * \
+    static_cast<uint64_t>(this->Height()),
       this->dataPtr->bufferVal);
   for (unsigned int y = 0; y < destHeight; ++y)
   {

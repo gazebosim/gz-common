@@ -52,16 +52,30 @@ namespace gz
       public: void SetSphericalCoordinates(
                   const math::SphericalCoordinates &_worldSphericalCoordinates);
 
+      /// \brief Gets the X size limit of the raster data to be loaded.
+      ///        This is useful for large raster files.
+      /// \return The maximium size of the raster data to load in
+      /// the X direction
+      public: unsigned int RasterXSizeLimit();
+
       /// \brief Sets the X size limit of the raster data to be loaded.
       ///        This is useful for large raster files.
-      /// \param[in] _xLimit The maximium size of the raster data to load in the X direction
-      public: void SetXSizeLimit(
+      /// \param[in] _xLimit The maximium size of the raster data to
+      /// load in the X direction
+      public: void SetRasterXSizeLimit(
                   const unsigned int &_xLimit);
+
+      /// \brief Gets the Y size limit of the raster data to be loaded.
+      ///        This is useful for large raster files.
+      /// \return The maximium size of the raster data to load in the
+      ///  X direction
+      public: unsigned int RasterYSizeLimit();
 
       /// \brief Sets the Y size limit of the raster data to be loaded.
       ///        This is useful for large raster files.
-      /// \param[in] _yLimit The maximium size of the raster data to load in the X direction
-      public: void SetYSizeLimit(
+      /// \param[in] _yLimit The maximium size of the raster data to
+      /// load in the X direction
+      public: void SetRasterYSizeLimit(
                   const unsigned int &_yLimit);
 
       /// \brief Load a DEM file.
@@ -145,8 +159,6 @@ namespace gz
       private: bool GeoReference(double _x, double _y,
                                  gz::math::Angle &_latitude,
                                  gz::math::Angle &_longitude) const;
-
-      private: [[nodiscard]] bool ConfigureLoadedSize();
 
       /// \brief Get the terrain file as a data array. Due to the Ogre
       /// constrains, the data might be stored in a bigger vector representing
