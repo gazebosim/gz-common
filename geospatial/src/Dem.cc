@@ -106,7 +106,7 @@ Dem::~Dem()
 {
   this->dataPtr->demData.clear();
   if (this->dataPtr->dataSet)
-    GDALClose(reinterpret_cast<GDALDataset *>(this->dataPtr->dataSet));
+    GDALClose(GDALDataset::ToHandle(this->dataPtr->dataSet));
 }
 
 //////////////////////////////////////////////////
