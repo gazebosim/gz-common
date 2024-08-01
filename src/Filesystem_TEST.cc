@@ -636,3 +636,9 @@ TEST_F(FilesystemTest, separator)
   EXPECT_EQ("\\", gz::common::separator(""));
 #endif
 }
+
+/////////////////////////////////////////////////
+TEST_F(FilesystemTest, empty)
+{
+  EXPECT_EQ(common::absPath(""), "");
+}
