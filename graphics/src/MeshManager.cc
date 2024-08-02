@@ -39,11 +39,6 @@
 #pragma GCC diagnostic pop
 #endif
 
-#ifndef _WIN32
-  #include "gz/common/GTSMeshUtils.hh"
-  #include "gz/common/MeshCSG.hh"
-#endif
-
 #include "gz/common/Console.hh"
 #include "gz/common/Mesh.hh"
 #include "gz/common/SubMesh.hh"
@@ -57,6 +52,7 @@
 #include "gz/common/config.hh"
 
 #include "gz/common/MeshManager.hh"
+#include "gz/common/DelaunayTriangulation.hh"
 
 using namespace gz::common;
 
@@ -616,7 +612,7 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
                                                   tol,
                                                   vertices,
                                                   edges);
-  if (!GTSMeshUtils::DelaunayTriangulation(vertices, edges, &subMesh))
+  if (!gz::common::DelaunayTriangulation(vertices, edges, &subMesh))
   {
     gzerr << "Unable to triangulate polyline." << std::endl;
     delete mesh;
@@ -1580,23 +1576,8 @@ void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
     vInc = -vInc;
   }
 }
-
 //////////////////////////////////////////////////
-void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
-    const Mesh *_m2, int _operation, const gz::math::Pose3d &_offset)
-{
-  if (this->HasMesh(_name))
-    return;
 
-#ifndef _WIN32
-  MeshCSG csg;
-  Mesh *mesh = csg.CreateBoolean(_m1, _m2, _operation, _offset);
-  mesh->SetName(_name);
-  this->dataPtr->meshes.insert(std::make_pair(_name, mesh));
-#endif
-}
-
-//////////////////////////////////////////////////
 size_t MeshManager::AddUniquePointToVerticesTable(
                      std::vector<gz::math::Vector2d> &_vertices,
                      const gz::math::Vector2d &_p,
