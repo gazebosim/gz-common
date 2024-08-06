@@ -46,11 +46,37 @@ namespace gz
       public: virtual ~Dem();
 
       /// \brief Sets the spherical coordinates reference object.
-      /// \param[in] _worldSphericalCoordinates The spherical coordiantes
+      /// \param[in] _worldSphericalCoordinates The spherical coordinates
       /// object contained in the world. This is used to compute accurate
       /// sizes of the DEM object.
       public: void SetSphericalCoordinates(
                   const math::SphericalCoordinates &_worldSphericalCoordinates);
+
+      /// \brief Gets the X size limit of the raster data to be loaded.
+      ///        This is useful for large raster files.
+      /// \return The maximium size of the raster data to load in
+      /// the X direction
+      public: unsigned int RasterXSizeLimit();
+
+      /// \brief Sets the X size limit of the raster data to be loaded.
+      ///        This is useful for large raster files.
+      /// \param[in] _xLimit The maximium size of the raster data to
+      /// load in the X direction
+      public: void SetRasterXSizeLimit(
+                  const unsigned int &_xLimit);
+
+      /// \brief Gets the Y size limit of the raster data to be loaded.
+      ///        This is useful for large raster files.
+      /// \return The maximium size of the raster data to load in the
+      ///  X direction
+      public: unsigned int RasterYSizeLimit();
+
+      /// \brief Sets the Y size limit of the raster data to be loaded.
+      ///        This is useful for large raster files.
+      /// \param[in] _yLimit The maximium size of the raster data to
+      /// load in the X direction
+      public: void SetRasterYSizeLimit(
+                  const unsigned int &_yLimit);
 
       /// \brief Load a DEM file.
       /// \param[in] _filename the path to the terrain file.

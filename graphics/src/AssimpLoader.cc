@@ -513,6 +513,10 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     pbr.SetRoughness(value);
   }
 #endif
+  std::cout << "Diffuse: " << mat->Diffuse() << std::endl;
+  std::cout << "Specular: " << mat->Specular() << std::endl;
+  std::cout << "Roughness: " << pbr.Roughness() << std::endl;
+  std::cout << "Metalness: " << pbr.Metalness() << std::endl;
   mat->SetPbrMaterial(pbr);
   return mat;
 }
