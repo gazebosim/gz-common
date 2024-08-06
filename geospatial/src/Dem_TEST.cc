@@ -309,7 +309,7 @@ TEST_F(DemTest, LargeVRTWithVSIZIPAndLimits)
 
 TEST_F(DemTest, LargeVRTWithoutLimitsThrows)
 {
-  GTEST_SKIP << "Skipping this test because it's not platform-portable";
+  GTEST_SKIP() << "Skipping this test because it's not platform-portable";
   // Load a large VRT DEM without limits.
   common::Dem dem;
   auto const path = common::testing::TestFile("data", "ap_srtm1.vrt");
