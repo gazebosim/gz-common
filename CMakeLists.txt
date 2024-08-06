@@ -47,6 +47,8 @@ set(GZ_MATH_VER ${gz-math8_VERSION_MAJOR})
 gz_find_package(gz-utils3 REQUIRED)
 set(GZ_UTILS_VER ${gz-utils3_VERSION_MAJOR})
 
+gz_find_package(spdlog REQUIRED)
+
 #--------------------------------------
 # Find Tinyxml2
 gz_find_package(TINYXML2 PRETTY tinyxml2

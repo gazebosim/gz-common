@@ -19,6 +19,7 @@ target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
     ${CXX_FILESYSTEM_LIBRARIES}
   PUBLIC
     gz-utils${GZ_UTILS_VER}::gz-utils${GZ_UTILS_VER}
+    spdlog::spdlog
 )
 
 # Handle non-Windows configuration settings

@@ -6,8 +6,8 @@ project(gz-common-examples)
 find_package(gz-common6 QUIET REQUIRED COMPONENTS events profiler)
 set(GZ_COMMON_VER ${gz-common6_VERSION_MAJOR})
 
-add_executable(assert_example assert_example.cc)
-target_link_libraries(assert_example gz-common${GZ_COMMON_VER}::core)
+#add_executable(assert_example assert_example.cc)
+#target_link_libraries(assert_example gz-common${GZ_COMMON_VER}::core)
 
 add_executable(console_example console.cc)
 target_link_libraries(console_example gz-common${GZ_COMMON_VER}::core)

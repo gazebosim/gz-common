@@ -14,22 +14,30 @@
  * limitations under the License.
  *
 */
-#include <gz/common.hh>
+#include <gz/common/ConsoleNew.hh>
 
 int main(int argc, char **argv)
 {
   // Default verbosity is 1, only error messages show
-  gzdbg << "This is a debug message" << std::endl;
-  gzmsg << "This is an informational message" << std::endl;
-  gzwarn << "This is a warning" << std::endl;
-  gzerr << "This is an error" << std::endl;
+  gzdbg << "This is a debug message";
+  gzmsg << "This is an informational message";
+  gzwarn << "This is a warning";
+  gzerr << "This is an error";
+  gzcrit << "This is a critical error";
 
   // Change verbosity to level 4, all messages show
-  gz::common::Console::SetVerbosity(4);
-  gzdbg << "This is a debug message" << std::endl;
-  gzmsg << "This is an informational message" << std::endl;
-  gzwarn << "This is a warning" << std::endl;
-  gzerr << "This is an error" << std::endl;
+  gz::common::ConsoleGlobal::SetVerbosity(4);
+  gz::common::ConsoleGlobal::SetPrefix("My prefix. ");
+  gzdbg << "This is a debug message";
+  gzmsg << "This is an informational message";
+  gzwarn << "This is a warning";
+  gzerr << "This is an error";
+  gzcrit << "This is a critical error";
+
+  gz::common::ConsoleNew c("gz_tmp");
+  c.SetLogDestination("/tmp/my_test_log.txt");
+  auto logger = c.Logger();
+  logger.log(spdlog::level::err, "Hello");
 
   return 0;
 }
