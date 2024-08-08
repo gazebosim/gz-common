@@ -641,7 +641,7 @@ TEST_F(FilesystemTest, separator)
 TEST_F(FilesystemTest, empty)
 {
 #ifdef __APPLE__
-  EXPECT_EQ(common::absPath(""), gz::common::cwd());
+  EXPECT_EQ(common::absPath(""), gz::common::cwd() + "/");
 #else
   EXPECT_EQ(common::absPath(""), "");
 #endif
