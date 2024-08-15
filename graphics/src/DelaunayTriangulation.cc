@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Open Source Robotics Foundation
+ * Copyright (C) 2024 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,25 +42,25 @@ bool gz::common::DelaunayTriangulation(
     return false;
   }
 
-  std::vector<CDT::V2d<double>> cdt_verts;
-  std::vector<CDT::Edge> cdt_edges;
+  std::vector<CDT::V2d<double>> cdtVerts;
+  std::vector<CDT::Edge> cdtEdges;
 
-  cdt_verts.reserve(_vertices.size());
-  cdt_edges.reserve(_edges.size());
+  cdtVerts.reserve(_vertices.size());
+  cdtEdges.reserve(_edges.size());
 
   for (const auto &vert : _vertices)
   {
-    cdt_verts.push_back({vert.X(), vert.Y()});
+    cdtVerts.push_back({vert.X(), vert.Y()});
   }
 
   for (const auto &edge : _edges)
   {
-    cdt_edges.emplace_back(edge.X(), edge.Y());
+    cdtEdges.emplace_back(edge.X(), edge.Y());
   }
 
   CDT::Triangulation<double> cdt;
-  cdt.insertVertices(cdt_verts);
-  cdt.insertEdges(cdt_edges);
+  cdt.insertVertices(cdtVerts);
+  cdt.insertEdges(cdtEdges);
   cdt.eraseOuterTrianglesAndHoles();
 
   for (const auto & vert : cdt.vertices)
@@ -68,11 +68,14 @@ bool gz::common::DelaunayTriangulation(
     _subMesh->AddVertex(vert.x, vert.y, 0.0);
   }
 
+  // Resulting triangles are counter-clockwise winding
+  // Add the indices so that they are clockwise winding
+  // in the submesh
   for (const auto & tri : cdt.triangles)
   {
-    _subMesh->AddIndex(tri.vertices[0]);
-    _subMesh->AddIndex(tri.vertices[1]);
     _subMesh->AddIndex(tri.vertices[2]);
+    _subMesh->AddIndex(tri.vertices[1]);
+    _subMesh->AddIndex(tri.vertices[0]);
   }
 
   return true;
