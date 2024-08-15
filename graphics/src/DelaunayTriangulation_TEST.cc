@@ -71,4 +71,25 @@ TEST_F(DelaunayTriangulation, DelaunayTriangulation)
 
   // there should be 8 triangles.
   EXPECT_EQ(subMesh.IndexCount() / 3u, 8u);
+
+  // verify that triangles have clockwise winding
+  for (int t = 0; t < subMesh.IndexCount() / 3u; ++t)
+  {
+    int vertexIndex1 = subMesh.Index(t*3 + 0);
+    int vertexIndex2 = subMesh.Index(t*3 + 1);
+    int vertexIndex3 = subMesh.Index(t*3 + 2);
+    // compute displacement from vertex 1 to 2
+    auto displacement12 =
+        subMesh.Vertex(vertexIndex2) - subMesh.Vertex(vertexIndex1);
+    // compute displacement from vertex 2 to 3
+    auto displacement23 =
+        subMesh.Vertex(vertexIndex3) - subMesh.Vertex(vertexIndex2);
+    // compute cross product (v2-v1) x (v3 - v2)
+    auto crossProduct_12_23 = displacement12.Cross(displacement23);
+    // X and Y components should be zero
+    EXPECT_DOUBLE_EQ(0.0, crossProduct_12_23.X());
+    EXPECT_DOUBLE_EQ(0.0, crossProduct_12_23.Y());
+    // Z component should be negative for a clockwise winding
+    EXPECT_LT(crossProduct_12_23.Z(), 0.0);
+  }
 }
