@@ -43,8 +43,8 @@ GZ_COMMON_VISIBLE std::map<int, std::function<void(int)>> gOnSignalWrappers;
 std::mutex gWrapperMutex;
 
 #ifdef _WIN32
-  define write _write
-  define read _read
+  #define write _write
+  #define read _read
 #endif
 namespace
 {
