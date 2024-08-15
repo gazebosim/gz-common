@@ -80,7 +80,7 @@ TEST(SignalHandler, Single)
   common::SignalHandler handler1;
   EXPECT_TRUE(handler1.AddCallback(handler1Cb));
   std::raise(SIGTERM);
-  std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  std::this_thread::sleep_for(std::chrono::milliseconds(11));
   EXPECT_EQ(SIGTERM, gHandler1Sig);
 }
 
@@ -100,7 +100,7 @@ TEST(SignalHandler, Multiple)
 
   std::raise(SIGINT);
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  std::this_thread::sleep_for(std::chrono::milliseconds(11));
   EXPECT_EQ(-1, gHandler1Sig);
   EXPECT_EQ(-1, gHandler2Sig);
 
@@ -130,6 +130,7 @@ TEST(SignalHandler, InitFailure)
 
   std::raise(SIGINT);
 
+  std::this_thread::sleep_for(std::chrono::milliseconds(11));
   EXPECT_EQ(-1, gHandler1Sig);
   EXPECT_EQ(-1, gHandler2Sig);
 }
