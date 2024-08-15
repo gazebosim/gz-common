@@ -1576,8 +1576,8 @@ void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
     vInc = -vInc;
   }
 }
-//////////////////////////////////////////////////
 
+//////////////////////////////////////////////////
 size_t MeshManager::AddUniquePointToVerticesTable(
                      std::vector<gz::math::Vector2d> &_vertices,
                      const gz::math::Vector2d &_p,
