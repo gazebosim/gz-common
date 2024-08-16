@@ -18,7 +18,6 @@
   <depend>gz-utils3</depend>
   <depend>libfreeimage-dev</depend>
   <depend>libgdal-dev</depend>
-  <depend>libgts</depend>
   <depend>tinyxml2</depend>
   <depend>uuid</depend>
 
