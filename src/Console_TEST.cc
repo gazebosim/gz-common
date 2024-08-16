@@ -17,6 +17,7 @@
 
 #include <gtest/gtest.h>
 #include <stdlib.h>
+#include <fstream>
 
 #include "gz/common/Console.hh"
 #include "gz/common/Filesystem.hh"

@@ -14,30 +14,41 @@
  * limitations under the License.
  *
 */
-#include <gz/common/ConsoleNew.hh>
+#include <filesystem>
+#include <gz/common/Console.hh>
 
 int main(int argc, char **argv)
 {
   // Default verbosity is 1, only error messages show
-  gzdbg << "This is a debug message";
-  gzmsg << "This is an informational message";
+  gzdbg  << "This is a debug message";
+  gzmsg  << "This is an informational message";
   gzwarn << "This is a warning";
-  gzerr << "This is an error";
+  gzerr  << "This is an error";
   gzcrit << "This is a critical error";
 
   // Change verbosity to level 4, all messages show
-  gz::common::ConsoleGlobal::SetVerbosity(4);
-  gz::common::ConsoleGlobal::SetPrefix("My prefix. ");
-  gzdbg << "This is a debug message";
-  gzmsg << "This is an informational message";
+  // gz::common::ConsoleGlobal::SetVerbosity(4);
+  // gz::common::ConsoleGlobal::SetPrefix("My prefix. ");
+  gzdbg  << "This is a debug message";
+  gzmsg  << "This is an informational message";
   gzwarn << "This is a warning";
-  gzerr << "This is an error";
+  gzerr  << "This is an error";
   gzcrit << "This is a critical error";
 
-  gz::common::ConsoleNew c("gz_tmp");
-  c.SetLogDestination("/tmp/my_test_log.txt");
-  auto logger = c.Logger();
+  std::filesystem::path logDir = std::filesystem::temp_directory_path();
+  std::filesystem::path logFile = "my_log.txt";
+
+  gz::common::Console c("gz_tmp");
+  c.SetLogDestination(logDir / "tmp2" / logFile);
+  auto logger = c.RawLogger();
   logger.log(spdlog::level::err, "Hello");
+
+  gz::common::Console::Init(logDir / "tmp3", logFile);
+  gzerr << "Error 1";
+  gzerr << "Error 2";
+  gzerr << "Directory: " << gz::common::Console::Directory();
+  gz::common::Console::Close();
+  gzerr << "Error 3";
 
   return 0;
 }

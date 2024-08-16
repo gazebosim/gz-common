@@ -17,35 +17,79 @@
 #ifndef GZ_COMMON_CONSOLE_HH_
 #define GZ_COMMON_CONSOLE_HH_
 
-#include <iostream>
+#include <spdlog/logger.h>
+#include <spdlog/spdlog.h>
+
 #include <fstream>
-#include <memory>
-#include <mutex>
+#include <iostream>
+#include <ostream>
 #include <sstream>
 #include <string>
 
 #include <gz/common/Export.hh>
-#include <gz/utils/SuppressWarning.hh>
 #include <gz/common/Util.hh>
+#include <gz/utils/log/Logger.hh>
+#include <gz/utils/SuppressWarning.hh>
 
 namespace gz
 {
   namespace common
   {
-    /// \brief Output an error message, if the verbose level is >= 1
-    #define gzerr  (gz::common::Console::err(__FILE__, __LINE__))
+    /// \brief Helper class for providing gzlog macros.
+    class GZ_COMMON_VISIBLE LogMessage
+    {
+      /// \brief Constructor.
+      /// \param[in] _file Filename.
+      /// \param[in] _line Line number.
+      /// \param[in] _logLevel Log level.
+      public: LogMessage(const char *_file,
+                         int _line,
+                         spdlog::level::level_enum _logLevel);
 
-    /// \brief Output a warning message, if the verbose level is >= 2
-    #define gzwarn  (gz::common::Console::warn(__FILE__, __LINE__))
+      /// \brief Destructor.
+      public: ~LogMessage();
 
-    /// \brief Output a message, if the verbose level is >= 3
-    #define gzmsg  (gz::common::Console::msg())
+      /// \brief Get access to the underlying stream.
+      /// \return The underlying stream.
+      public: std::ostream &stream();
 
-    /// \brief Output a debug message, if the verbose level is >= 4
-    #define gzdbg  (gz::common::Console::dbg(__FILE__, __LINE__))
+      /// \brief Log level.
+      private: spdlog::level::level_enum severity;
 
-    /// \brief Output a message to a log file, regardless of verbosity level
-    #define gzlog  (gz::common::Console::log())
+      /// \brief Source file location information.
+      private: spdlog::source_loc sourceLocation;
+
+      /// \brief Underlying stream.
+      private: std::ostringstream ss;
+    };
+
+    /// \brief Output a critical message.
+    #define gzcrit (gz::common::LogMessage( \
+      __FILE__, __LINE__, spdlog::level::critical).stream())
+
+    /// \brief Output an error message.
+    #define gzerr gz::common::LogMessage( \
+      __FILE__, __LINE__, spdlog::level::err).stream()
+
+    /// \brief Output a warning message.
+    #define gzwarn gz::common::LogMessage( \
+      __FILE__, __LINE__, spdlog::level::warn).stream()
+
+    /// \brief Output a message to a log file.
+    #define gzlog gz::common::LogMessage( \
+      __FILE__, __LINE__, spdlog::level::info).stream()
+
+    /// \brief Output a message.
+    #define gzmsg gz::common::LogMessage( \
+      __FILE__, __LINE__, spdlog::level::info).stream()
+
+    /// \brief Output a debug message.
+    #define gzdbg gz::common::LogMessage( \
+      __FILE__, __LINE__, spdlog::level::debug).stream()
+
+    /// \brief Output a trace message.
+    #define gztrace gz::common::LogMessage( \
+      __FILE__, __LINE__, spdlog::level::trace).stream()
 
     /// \brief Initialize log file with filename given by _dir/_file.
     /// If called twice, it will close the file currently in use and open a new
@@ -55,192 +99,53 @@ namespace gz
     /// be relative to your home directory.
     /// \param[in] _file Name of log file for ignlog messages.
     #define gzLogInit(_dir, _file)\
-        gz::common::Console::log.Init(_dir, _file)
-
+      gz::common::Console::Init(_dir, _file)
+    
     /// \brief Close the file used for logging.
     #define gzLogClose()\
-        gz::common::Console::log.Close()
+      gz::common::Console::Close()
 
     /// \brief Get the full path of the directory where the log files are stored
     /// \return Full path of the directory
     #define gzLogDirectory()\
-        (gz::common::Console::log.LogDirectory())
-
-    /// \class FileLogger FileLogger.hh common/common.hh
-    /// \brief A logger that outputs messages to a file.
-    class GZ_COMMON_VISIBLE FileLogger : public std::ostream
-    {
-      /// \brief Constructor.
-      /// \param[in] _filename Filename to write into. If empty,
-      /// FileLogger::Init must be called separately.
-      public: explicit FileLogger(const std::string &_filename = "");
-
-      /// \brief Destructor.
-      public: virtual ~FileLogger();
-
-      /// \brief Initialize the file logger.
-      /// \param[in] _directory Name of directory that holds the log file.
-      /// \param[in] _filename Name of the log file to write output into.
-      public: void Init(const std::string &_directory,
-                        const std::string &_filename);
-
-      /// \brief Close the open file handles.
-      public: void Close();
-
-      /// \brief Output a filename and line number, then return a reference
-      /// to the logger.
-      /// \return Reference to this logger.
-      public: virtual FileLogger &operator()();
-
-      /// \brief Output a filename and line number, then return a reference
-      /// to the logger.
-      /// \param[in] _file Filename to output.
-      /// \param[in] _line Line number in the _file.
-      /// \return Reference to this logger.
-      public: virtual FileLogger &operator()(
-                  const std::string &_file, int _line);
-
-      /// \brief Get the full path of the directory where all the log files
-      /// are stored.
-      /// \return Full path of the directory.
-      public: std::string LogDirectory() const;
-
-      /// \brief String buffer for the file logger.
-      protected: class Buffer : public std::stringbuf
-                 {
-                   /// \brief Constructor.
-                   /// \param[in] _filename Filename to write into.
-                   public: explicit Buffer(const std::string &_filename);
-
-                   /// \brief Destructor.
-                   public: virtual ~Buffer();
-
-                   /// \brief Writes _count characters to the string buffer
-                   /// \param[in] _char Input rharacter array.
-                   /// \param[in] _count Number of characters in array.
-                   /// \return The number of characters successfully written.
-                   public: std::streamsize xsputn(
-                        const char *_char, std::streamsize _count) override;
-
-                   /// \brief Sync the stream (output the string buffer
-                   /// contents).
-                   /// \return Return 0 on success.
-                   public: int sync() override;
-
-                   /// \brief Stream to output information into.
-                   public: std::ofstream *stream;
-
-                   /// \brief Mutex to synchronize writes to the string buffer
-                   /// and the output stream.
-                   public: std::mutex syncMutex;
-                 };
-
-      GZ_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
-      /// \brief Stores the full path of the directory where all the log files
-      /// are stored.
-      private: std::string logDirectory;
-      GZ_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
-
-      /// \brief True if initialized.
-      private: bool initialized;
-    };
-
-    /// \class Logger Logger.hh common/common.hh
-    /// \brief Terminal logger.
-    class GZ_COMMON_VISIBLE Logger : public std::ostream
-    {
-      /// \enum LogType.
-      /// \brief Output destination type.
-      public: enum LogType
-              {
-                /// \brief Output to stdout.
-                STDOUT,
-                /// \brief Output to stderr.
-                STDERR
-              };
-
-      /// \brief Constructor.
-      /// \param[in] _prefix String to use as prefix when logging to file.
-      /// \param[in] _color Color of the output stream.
-      /// \param[in] _type Output destination type (STDOUT, or STDERR)
-      /// \param[in] _verbosity Verbosity level.
-      public: Logger(const std::string &_prefix, const int _color,
-                     const LogType _type, const int _verbosity);
-
-      /// \brief Destructor.
-      public: virtual ~Logger();
-
-      /// \brief Access operator.
-      /// \return Reference to this logger.
-      public: virtual Logger &operator()();
-
-      /// \brief Output a filename and line number, then return a reference
-      /// to the logger.
-      /// \param[in] _file Filename to output.
-      /// \param[in] _line Line number in the _file.
-      /// \return Reference to this logger.
-      public: virtual Logger &operator()(
-                  const std::string &_file, int _line);
-
-      /// \brief String buffer for the base logger.
-      protected: class Buffer : public std::stringbuf
-                 {
-                   /// \brief Constructor.
-                   /// \param[in] _type Output destination type
-                   /// (STDOUT, or STDERR)
-                   /// \param[in] _color Color of the output stream.
-                   /// \param[in] _verbosity Verbosity level.
-                   public: Buffer(LogType _type, const int _color,
-                                  const int _verbosity);
-
-                   /// \brief Destructor.
-                   public: virtual ~Buffer();
-
-                   /// \brief Writes _count characters to the string buffer
-                   /// \param[in] _char Input rharacter array.
-                   /// \param[in] _count Number of characters in array.
-                   /// \return The number of characters successfully written.
-                   public: std::streamsize xsputn(
-                        const char *_char, std::streamsize _count) override;
-
-                   /// \brief Sync the stream (output the string buffer
-                   /// contents).
-                   /// \return Return 0 on success.
-                   public: int sync() override;
-
-                   /// \brief Destination type for the messages.
-                   public: LogType type;
-
-                   /// \brief ANSI color code using Select Graphic Rendition
-                   /// parameters (SGR). See
-                   /// http://en.wikipedia.org/wiki/ANSI_escape_code#Colors
-                   public: int color;
-
-                   /// \brief Level of verbosity
-                   public: int verbosity;
-
-                   /// \brief Mutex to synchronize writes to the string buffer
-                   /// and the output stream.
-                   public: std::mutex syncMutex;
-                 };
-
-      GZ_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
-      /// \brief Prefix to use when logging to file.
-      private: std::string prefix;
-      GZ_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
-    };
+      (gz::common::Console::Directory())
 
     /// \class Console Console.hh common/common.hh
     /// \brief Container for loggers, and global logging options
     /// (such as verbose vs. quiet output).
-    class GZ_COMMON_VISIBLE Console
+    class GZ_COMMON_VISIBLE Console : public gz::utils::log::Logger
     {
+      /// \brief Class constructor.
+      /// \param[in] _loggerName Logger name.
+      public: explicit Console(const std::string &_loggerName);
+
+      /// \brief Access the global gz console logger.
+      /// \return The gz consoler logger.
+      public: static Console &Root();
+
+      /// \brief Initialize the global logger.
+      /// \param[in] _directory Name of directory that holds the log file.
+      /// \param[in] _filename Name of the log file to write output into.
+      /// \return True when the initialization succeed or false otherwise.
+      public: static bool Init(const std::string &_directory,
+                               const std::string &_filename);
+     
+      /// \brief Detach fhe file sink from the global logger. After this call,
+      /// console logging will keep working but no file logging.
+      public: static void Close();
+      
+      /// \brief Get the full path of the directory where all the log files
+      /// are stored.
+      /// \return Full path of the directory.
+      public: static std::string Directory();
+
       /// \brief Set verbosity, where
-      /// <= 0: No output,
-      /// 1: Error messages,
-      /// 2: Error and warning messages,
-      /// 3: Error, warning, and info messages,
-      /// >= 4: Error, warning, info, and debug messages.
+      /// 0: Critical messages,
+      /// 1: Critical, error messages,
+      /// 2: Critical, error and warning messages,
+      /// 3: Critical, error, warning, and info messages,
+      /// 4: Critical, error, warning, info, and debug messages.
+      /// 5: Critical, error, warning, info, debug, and trace messages.
       /// \param[in] _level The new verbose level.
       public: static void SetVerbosity(const int _level);
 
@@ -269,28 +174,17 @@ namespace gz
       /// \sa void SetPrefix(const std::string &_customPrefix)
       public: static std::string Prefix();
 
-      /// \brief Global instance of the message logger.
-      public: static Logger msg;
-
-      /// \brief Global instance of the error logger.
-      public: static Logger err;
-
-      /// \brief Global instance of the debug logger.
-      public: static Logger dbg;
-
-      /// \brief Global instance of the warning logger.
-      public: static Logger warn;
-
-      /// \brief Global instance of the file logger.
-      public: static FileLogger log;
-
       /// \brief The level of verbosity, the default level is 1.
       private: static int verbosity;
 
-      GZ_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
+      //GZ_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief A custom prefix. See SetPrefix().
       private: static std::string customPrefix;
-      GZ_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
+
+      /// \brief Stores the full path of the directory where all the log files
+      /// are stored.
+      private: std::string logDirectory;
+      //GZ_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING  
     };
   }
 }

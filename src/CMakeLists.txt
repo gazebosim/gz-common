@@ -18,7 +18,7 @@ target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
   PRIVATE
     ${CXX_FILESYSTEM_LIBRARIES}
   PUBLIC
-    gz-utils${GZ_UTILS_VER}::gz-utils${GZ_UTILS_VER}
+    gz-utils${GZ_UTILS_VER}::log
     spdlog::spdlog
 )
 
@@ -43,7 +43,7 @@ gz_build_tests(
   TYPE UNIT
   SOURCES ${gtest_sources}
   LIB_DEPS
-    gz-utils${GZ_UTILS_VER}::gz-utils${GZ_UTILS_VER}
+    gz-utils${GZ_UTILS_VER}::log
     gz-common${GZ_COMMON_VER}-testing
   INCLUDE_DIRS
     # Used to make internal source file headers visible to the unit tests
