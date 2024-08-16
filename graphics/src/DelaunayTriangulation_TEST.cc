@@ -73,7 +73,7 @@ TEST_F(DelaunayTriangulation, DelaunayTriangulation)
   EXPECT_EQ(subMesh.IndexCount() / 3u, 8u);
 
   // verify that triangles have clockwise winding
-  for (int t = 0; t < subMesh.IndexCount() / 3u; ++t)
+  for (unsigned int t = 0; t < subMesh.IndexCount() / 3u; ++t)
   {
     int vertexIndex1 = subMesh.Index(t*3 + 0);
     int vertexIndex2 = subMesh.Index(t*3 + 1);
