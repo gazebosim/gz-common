@@ -18,8 +18,8 @@
 #include <algorithm>
 #include <limits>
 #include <map>
-#include <optional>
 #include <string>
+#include <vector>
 
 #include "gz/math/Helpers.hh"
 
@@ -566,10 +566,67 @@ void SubMesh::FillArrays(double **_vertArr, int **_indArr) const
   }
 }
 
+namespace {
+// Simple way to find neighbors by grouping all vertices
+// by X coordinate in (ordered) map. KD-tree maybe better
+// but not sure about construction overhead
+struct Neighbors
+{
+  Neighbors(const std::vector<unsigned int> &_indices,
+            const std::vector<gz::math::Vector3d> &_vertices)
+    : vertices(_vertices)
+  {
+    for (unsigned int i = 0; i < _indices.size(); ++i)
+    {
+      const auto index = _indices[i];
+      this->groups[_vertices[index].X()].push_back(index);
+    }
+  }
+
+  // When we have a concrete point to check, we are looking for
+  // a group inside a map with a same X.
+  // Then we check neighbors with the smaller X until
+  // it's in tolerance of the math::equal function.
+  // Starting from smallest X, which is in a tolerance range,
+  // testing all points in group for equality. In case of equality,
+  // call a Visitor with element index as an argument.
+  // Continue until a greater side of X tolerance range reached.
+  template<typename Visitor>
+  void Visit(const gz::math::Vector3d &_point, Visitor _v) const
+  {
+    auto it = this->groups.find(_point.X());
+    // find smaller acceptable value
+    while (it != this->groups.begin())
+    {
+      auto prev = it;
+      --prev;
+      if (!gz::math::equal(prev->first, _point.X()))
+        break;
+      it = prev;
+    }
+    while (it != this->groups.end()
+           && gz::math::equal(it->first, _point.X()))
+    {
+      for (const auto index : it->second)
+        if (this->vertices[index] == _point)
+          _v(index);
+      ++it;
+    }
+  }
+
+  // Indexes of vertices grouped by X coordinate
+  private: std::map<double, std::vector<unsigned int>> groups;
+  // Const reference to a vertices vector
+  private: const std::vector<gz::math::Vector3d> &vertices;
+};
+}  // namespace
+
 //////////////////////////////////////////////////
 void SubMesh::RecalculateNormals()
 {
-  if (this->dataPtr->normals.size() < 3u)
+  if (this->dataPtr->primitiveType != SubMesh::TRIANGLES
+      || this->dataPtr->indices.empty()
+      || this->dataPtr->indices.size() % 3u != 0)
     return;
 
   // Reset all the normals
@@ -578,6 +635,8 @@ void SubMesh::RecalculateNormals()
 
   if (this->dataPtr->normals.size() != this->dataPtr->vertices.size())
     this->dataPtr->normals.resize(this->dataPtr->vertices.size());
+
+  Neighbors neighbors(this->dataPtr->indices, this->dataPtr->vertices);
 
   // For each face, which is defined by three indices, calculate the normals
   for (unsigned int i = 0; i < this->dataPtr->indices.size(); i+= 3)
@@ -590,14 +649,11 @@ void SubMesh::RecalculateNormals()
         this->dataPtr->vertices[this->dataPtr->indices[i+2]];
     gz::math::Vector3d n = gz::math::Vector3d::Normal(v1, v2, v3);
 
-    for (unsigned int j = 0; j < this->dataPtr->vertices.size(); ++j)
-    {
-      gz::math::Vector3d v = this->dataPtr->vertices[j];
-      if (v == v1 || v == v2 || v == v3)
+    for (const auto &point : {v1, v2, v3})
+      neighbors.Visit(point, [&](const unsigned int index)
       {
-        this->dataPtr->normals[j] += n;
-      }
-    }
+        this->dataPtr->normals[index] += n;
+      });
   }
 
   // Normalize the results

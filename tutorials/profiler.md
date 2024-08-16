@@ -57,7 +57,7 @@ Update your CMakeLists.txt to the following. Note that the profiler must be
 enabled at compile time in order to function.
 
 ```{.cpp}
-cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.22.1 FATAL_ERROR)
 
 # Find the gz-common library
 find_package(gz-common6 QUIET REQUIRED COMPONENTS profiler)
