@@ -19,21 +19,23 @@
 
 int main(int argc, char **argv)
 {
-  // Default verbosity is 1, only error messages show
-  gzdbg  << "This is a debug message";
-  gzmsg  << "This is an informational message";
-  gzwarn << "This is a warning";
-  gzerr  << "This is an error";
-  gzcrit << "This is a critical error";
+  // Default verbosity is 1, only critical and error messages show.
+  gztrace << "This is a trace message";
+  gzdbg   << "This is a debug message";
+  gzmsg   << "This is an informational message";
+  gzwarn  << "This is a warning";
+  gzerr   << "This is an error";
+  gzcrit  << "This is a critical error";
 
-  // Change verbosity to level 4, all messages show
-  // gz::common::ConsoleGlobal::SetVerbosity(4);
-  // gz::common::ConsoleGlobal::SetPrefix("My prefix. ");
-  gzdbg  << "This is a debug message";
-  gzmsg  << "This is an informational message";
-  gzwarn << "This is a warning";
-  gzerr  << "This is an error";
-  gzcrit << "This is a critical error";
+  // Change verbosity to level 5, all messages show.
+  gz::common::Console::SetVerbosity(5);
+  gz::common::Console::SetPrefix("My prefix. ");
+  gztrace << "This is a trace message";
+  gzdbg   << "This is a debug message";
+  gzmsg   << "This is an informational message";
+  gzwarn  << "This is a warning";
+  gzerr   << "This is an error";
+  gzcrit  << "This is a critical error";
 
   std::filesystem::path logDir = std::filesystem::temp_directory_path();
   std::filesystem::path logFile = "my_log.txt";
