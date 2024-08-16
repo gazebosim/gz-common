@@ -113,6 +113,12 @@
 #include <stdint.h>
 #include <functional>
 
+// Local modification done by @iche033
+// The m_voxelHullCount variable type is changed from
+// uint32_t to std::atomic<uint32_t>
+// to fix data race issue picked up by TSAN
+#include <atomic>
+
 #include <vector>
 #include <array>
 #include <cmath>
@@ -5965,12 +5971,12 @@ public:
     std::unordered_map<uint32_t, uint32_t>      m_voxelIndexMap; // Maps from a voxel coordinate space into a vertex index space
     std::vector<VHACD::Vertex>                  m_vertices;
     std::vector<VHACD::Triangle>                m_indices;
-    static uint32_t                             m_voxelHullCount;
+    static std::atomic<uint32_t>                m_voxelHullCount;
     IVHACD::Parameters                          m_params;
     VHACDCallbacks*                             m_callbacks{ nullptr };
 };
 
-uint32_t VoxelHull::m_voxelHullCount = 0;
+std::atomic<uint32_t> VoxelHull::m_voxelHullCount = 0;
 
 VoxelHull::VoxelHull(const VoxelHull& parent,
                      SplitAxis axis,
