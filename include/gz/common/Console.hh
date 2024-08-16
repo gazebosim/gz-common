@@ -100,7 +100,7 @@ namespace gz
     /// \param[in] _file Name of log file for ignlog messages.
     #define gzLogInit(_dir, _file)\
       gz::common::Console::Init(_dir, _file)
-    
+
     /// \brief Close the file used for logging.
     #define gzLogClose()\
       gz::common::Console::Close()
@@ -177,14 +177,14 @@ namespace gz
       /// \brief The level of verbosity, the default level is 1.
       private: static int verbosity;
 
-      //GZ_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
+      GZ_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief A custom prefix. See SetPrefix().
       private: static std::string customPrefix;
 
       /// \brief Stores the full path of the directory where all the log files
       /// are stored.
       private: std::string logDirectory;
-      //GZ_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING  
+      GZ_UTILS_WARN_RESUME__DLL_INTERFACE_MISSING
     };
   }
 }

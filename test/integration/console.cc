@@ -16,7 +16,6 @@
 */
 
 #include <gtest/gtest.h>
-#include <fstream>
 
 #include <gz/common/Console.hh>
 #include <gz/common/testing/TestPaths.hh>
