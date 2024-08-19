@@ -5,6 +5,22 @@ Deprecated code produces compile-time warnings. These warning serve as
 notification to users that their code should be upgraded. The next major
 release will remove the deprecated code.
 
+## Gazebo Common 5.X to 6.X
+
+### Modifications
+
+1. Removed the `graphics` component's dependency on the GTS
+   (GNU Triangulated Surface) library which was used for doing triangulation
+   and CSG Boolean operation by the `MeshManager`. The Delaunay triangulation
+   function now uses the CDT (Constrained Delaunay Triangulation) library.
+
+### Deletions
+
+1. **MeshManager.hh**
+    + `void CreateBoolean(const std::string &_name, const Mesh *_m1,
+          const Mesh *_m2, const int _operation,
+          const gz::math::Pose3d &_offset = gz::math::Pose3d::Zero)`
+
 ## Gazebo Common 4.X to 5.X
 
 ### Deprecations
