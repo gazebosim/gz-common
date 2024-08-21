@@ -485,60 +485,61 @@ TEST_F(Console_TEST, ColorErr)
   EXPECT_TRUE(logContent.find(logString) != std::string::npos);
 }
 
-// /////////////////////////////////////////////////
-// /// \brief Test Console::Verbosity
-// TEST_F(Console_TEST, Verbosity)
-// {
-//   EXPECT_EQ(common::Console::Verbosity(), 1);
+/////////////////////////////////////////////////
+/// \brief Test Console::Verbosity
+TEST_F(Console_TEST, Verbosity)
+{
+  common::Console::SetVerbosity(2);
+  EXPECT_EQ(2, common::Console::Verbosity());
 
-//   common::Console::SetVerbosity(2);
-//   EXPECT_EQ(common::Console::Verbosity(), 2);
+  common::Console::SetVerbosity(-1);
+  EXPECT_EQ(2, common::Console::Verbosity());
 
-//   common::Console::SetVerbosity(-1);
-//   EXPECT_EQ(common::Console::Verbosity(), -1);
-// }
+  common::Console::SetVerbosity(1000);
+  EXPECT_EQ(2, common::Console::Verbosity());
+}
 
-// /////////////////////////////////////////////////
-// /// \brief Test Console::Prefix
-// TEST_F(Console_TEST, Prefix)
-// {
-//   // Max verbosity
-//   common::Console::SetVerbosity(4);
+/////////////////////////////////////////////////
+/// \brief Test Console::Prefix
+TEST_F(Console_TEST, Prefix)
+{
+  // Max verbosity
+  common::Console::SetVerbosity(4);
 
-//   // Path to log file
-//   auto path = common::uuid();
+  // Path to log file
+  auto path = common::uuid();
 
-//   gzLogInit(path, "test.log");
-//   std::string logPath = common::joinPaths(path, "test.log");
+  gzLogInit(path, "test.log");
+  std::string logPath = common::joinPaths(path, "test.log");
 
-//   // Check default prefix
-//   EXPECT_EQ(common::Console::Prefix(), "");
+  // Check default prefix
+  EXPECT_EQ(common::Console::Prefix(), "");
 
-//   // Set new prefix
-//   common::Console::SetPrefix("**test** ");
-//   EXPECT_EQ(common::Console::Prefix(), "**test** ");
+  // Set new prefix
+  common::Console::SetPrefix("**test** ");
+  EXPECT_EQ(common::Console::Prefix(), "**test** ");
 
-//   // Use the console
-//   gzerr << "error" << std::endl;
-//   gzwarn << "warning" << std::endl;
-//   gzmsg << "message" << std::endl;
-//   gzdbg << "debug" << std::endl;
+  // Use the console
+  gzerr << "error" << std::endl;
+  gzwarn << "warning" << std::endl;
+  gzmsg << "message" << std::endl;
+  gzdbg << "debug" << std::endl;
 
-//   common::Console::Root().RawLogger().flush();
+  common::Console::Root().RawLogger().flush();
 
-//   // Get the logged content
-//   std::string logContent = GetLogContent(logPath);
+  // Get the logged content
+  std::string logContent = GetLogContent(logPath);
 
-//   // Check
-//   EXPECT_TRUE(logContent.find("**test** [Err]") != std::string::npos);
-//   EXPECT_TRUE(logContent.find("**test** [Wrn]") != std::string::npos);
-//   EXPECT_TRUE(logContent.find("**test** [Msg]") != std::string::npos);
-//   EXPECT_TRUE(logContent.find("**test** [Dbg]") != std::string::npos);
+  // Check
+  EXPECT_TRUE(logContent.find("**test** error") != std::string::npos);
+  EXPECT_TRUE(logContent.find("**test** warning") != std::string::npos);
+  EXPECT_TRUE(logContent.find("**test** message") != std::string::npos);
+  EXPECT_TRUE(logContent.find("**test** debug") != std::string::npos);
 
-//     // Reset
-//   common::Console::SetPrefix("");
-//   EXPECT_EQ(common::Console::Prefix(), "");
-// }
+  // Reset
+  common::Console::SetPrefix("");
+  EXPECT_EQ(common::Console::Prefix(), "");
+}
 
 /////////////////////////////////////////////////
 /// \brief Test Console::LogDirectory

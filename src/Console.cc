@@ -142,7 +142,6 @@ void Console::SetVerbosity(const int _level)
     return;
   }
 
-  verbosity = _level;
   switch (_level)
   {
   case 0:
@@ -166,8 +165,10 @@ void Console::SetVerbosity(const int _level)
   default:
     Console::Root().RawLogger().log(spdlog::level::info,
       "Unknown verbosity level. Values should be between 0 and 5. Ignoring it");
-    break;
+    return;
   }
+
+  verbosity = _level;
 }
 
 //////////////////////////////////////////////////
