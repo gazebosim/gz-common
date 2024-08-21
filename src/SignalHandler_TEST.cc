@@ -291,3 +291,39 @@ TEST(SignalHandler, MultipleThreads)
   for (int i = 0; i < threadCount; ++i)
     EXPECT_EQ(SIGINT, results[i]);
 }
+
+/////////////////////////////////////////////////
+TEST(SignalHandler, RapidFire)
+{
+  resetSignals();
+  std::condition_variable cv;
+  std::mutex countMutex;
+  int countHandlerCalls = 0;
+  constexpr int kNumSignals = 100;
+  auto cb = [&](int _sig)
+  {
+    if (_sig == SIGTERM)
+    {
+      std::lock_guard<std::mutex> lk(countMutex);
+      ++countHandlerCalls;
+      if (countHandlerCalls >= kNumSignals)
+      {
+        cv.notify_one();
+      }
+    }
+  };
+  common::SignalHandler handler1;
+  EXPECT_TRUE(handler1.AddCallback(cb));
+
+  for (int i=0; i < kNumSignals; ++i)
+  {
+    std::raise(SIGTERM);
+    std::this_thread::sleep_for(std::chrono::microseconds(100));
+  }
+
+  // wait for callback to be called kNumSignal times with a timeout
+  std::unique_lock<std::mutex> lk(countMutex);
+  cv.wait_for(lk, std::chrono::seconds(5),
+              [&] { return countHandlerCalls >= kNumSignals; });
+  EXPECT_GE(countHandlerCalls, kNumSignals);
+}
