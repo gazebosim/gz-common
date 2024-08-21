@@ -101,6 +101,10 @@ int SelfPipe::pipeFd[2];
 /// \param[in] _value Signal number.
 void onSignalWriteToSelfPipe(int _value)
 {
+#ifdef _WIN32
+  // Windows resets the signal handler every time a signal is handled.
+  std::signal(_value, onSignalWriteToSelfPipe);
+#endif
   auto valueByte = static_cast<std::uint8_t>(_value);
   if (write(SelfPipe::pipeFd[kWriteFd], &valueByte, 1) == -1)
   {
