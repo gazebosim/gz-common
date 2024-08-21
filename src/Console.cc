@@ -14,22 +14,22 @@
  * limitations under the License.
  *
  */
-#include <filesystem>
-#include <iostream>
-#include <string>
-#include <sstream>
 
-#include <gz/common/Console.hh>
-#include <gz/common/config.hh>
-#include <gz/common/Util.hh>
-
-#include <gz/utils/log/Console.hh>
-#include <gz/utils/NeverDestroyed.hh>
 #include <spdlog/spdlog.h>
-
 #ifdef _WIN32
 #include <Windows.h>
 #endif
+
+#include <filesystem>
+#include <iostream>
+#include <sstream>
+#include <string>
+
+#include <gz/common/config.hh>
+#include <gz/common/Console.hh>
+#include <gz/common/Util.hh>
+#include <gz/utils/log/Logger.hh>
+#include <gz/utils/NeverDestroyed.hh>
 
 using namespace gz;
 using namespace common;
