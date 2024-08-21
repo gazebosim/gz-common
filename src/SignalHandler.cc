@@ -38,7 +38,8 @@ using namespace gz;
 using namespace common;
 
 // A wrapper for the sigaction sa_handler.
-// TODO(azeey) We should avoid using objects with non-trivial destructors as globals.
+// TODO(azeey) We should avoid using objects with non-trivial destructors as
+// globals.
 GZ_COMMON_VISIBLE std::map<int, std::function<void(int)>> gOnSignalWrappers;
 std::mutex gWrapperMutex;
 
@@ -54,10 +55,10 @@ constexpr int kReadFd = 0;
 /// \brief Index of the write file descriptor
 constexpr int kWriteFd = 1;
 
-/// \brief Class to encalpsulate the self-pipe trick which is a way enable the user of
-/// non async-signal-safe functions in downstream signal handler
-/// callbacks. 
-/// 
+/// \brief Class to encalpsulate the self-pipe trick which is a way enable
+/// the user of non async-signal-safe functions in downstream signal handler
+/// callbacks.
+///
 /// It works by creating a pipe between the actual signal handler and
 /// a servicing thread. When a signal is received the signal handler
 /// writes a byte to the pipe and returns. The servicing thread reads the
@@ -83,7 +84,7 @@ class SelfPipe {
 
   /// \brief Servicing thread
   private: void CheckPipe();
-  
+
   /// \brief Handle for CheckPipe thread
   private: std::thread checkPipeThread;
 
@@ -103,7 +104,7 @@ void onSignalWriteToSelfPipe(int _value)
   auto valueByte = static_cast<std::uint8_t>(_value);
   if (write(SelfPipe::pipeFd[kWriteFd], &valueByte, 1) == -1)
   {
-    // TODO (azeey) Not clear what to do here.
+    // TODO(azeey) Not clear what to do here.
   }
 }
 
@@ -123,7 +124,8 @@ SelfPipe::SelfPipe()
   int flags = fcntl(this->pipeFd[kWriteFd], F_GETFL);
   if (fcntl(this->pipeFd[kWriteFd], F_SETFL, flags | O_NONBLOCK) < 0)
   {
-    gzerr << "Failed to set flags on pipe. Signal handling may not work properly" << std::endl;
+    gzerr << "Failed to set flags on pipe. "
+          << "Signal handling may not work properly" << std::endl;
   }
 #endif
   this->running = true;
