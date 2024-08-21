@@ -36,10 +36,17 @@ using namespace common;
 
 /////////////////////////////////////////////////
 LogMessage::LogMessage(const char *_file, int _line,
-  spdlog::level::level_enum _logLevel)
+  spdlog::level::level_enum _logLevel, bool _fileInitialize)
   : severity(_logLevel),
     sourceLocation(_file, _line, "")
 {
+  // Use default initialization if needed.
+  if (_fileInitialize && !Console::initialized)
+  {
+    Console::Init(".gz", "auto_default.log");
+    // Allow gzlog to pass through.
+    Console::SetVerbosity(5);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -56,6 +63,7 @@ std::ostream &LogMessage::stream()
   return this->ss;
 }
 
+bool Console::initialized = false;
 int Console::verbosity = 1;
 std::string Console::customPrefix = ""; // NOLINT(*)
 
@@ -105,6 +113,7 @@ bool Console::Init(const std::string &_directory, const std::string &_filename)
   Console::Root().SetLogDestination(logPath.c_str());
   Console::Root().RawLogger().log(spdlog::level::info,
     "Setting log file output destination to {}", logPath.c_str());
+  Console::initialized = true;
 
   return true;
 }
@@ -133,27 +142,26 @@ void Console::SetVerbosity(const int _level)
     return;
   }
 
-  auto globalLogger = gz::common::Console::Root().RawLogger();
   verbosity = _level;
   switch (_level)
   {
   case 0:
-    globalLogger.set_level(spdlog::level::critical);
+    gz::common::Console::Root().RawLogger().set_level(spdlog::level::critical);
     break;
   case 1:
-    globalLogger.set_level(spdlog::level::err);
+    gz::common::Console::Root().RawLogger().set_level(spdlog::level::err);
     break;
   case 2:
-    globalLogger.set_level(spdlog::level::warn);
+    gz::common::Console::Root().RawLogger().set_level(spdlog::level::warn);
     break;
   case 3:
-    globalLogger.set_level(spdlog::level::info);
+    gz::common::Console::Root().RawLogger().set_level(spdlog::level::info);
     break;
   case 4:
-    globalLogger.set_level(spdlog::level::debug);
+    gz::common::Console::Root().RawLogger().set_level(spdlog::level::debug);
     break;
   case 5:
-    globalLogger.set_level(spdlog::level::trace);
+    gz::common::Console::Root().RawLogger().set_level(spdlog::level::trace);
     break;
   default:
     Console::Root().RawLogger().log(spdlog::level::info,

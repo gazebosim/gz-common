@@ -19,7 +19,7 @@
 
 int main(int argc, char **argv)
 {
-  // Default verbosity is 1, only critical and error messages show.
+  // Default verbosity is 3 (critical, error, warn and info messages show).
   gztrace << "This is a trace message";
   gzdbg   << "This is a debug message";
   gzmsg   << "This is an informational message";

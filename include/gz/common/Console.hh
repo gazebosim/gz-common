@@ -42,9 +42,12 @@ namespace gz
       /// \param[in] _file Filename.
       /// \param[in] _line Line number.
       /// \param[in] _logLevel Log level.
+      /// \param[in] _fileInitialize True if the file logger needs to be
+      /// initialized or false otherwise.
       public: LogMessage(const char *_file,
                          int _line,
-                         spdlog::level::level_enum _logLevel);
+                         spdlog::level::level_enum _logLevel,
+                         bool _fileInitialize = false);
 
       /// \brief Destructor.
       public: ~LogMessage();
@@ -77,7 +80,7 @@ namespace gz
 
     /// \brief Output a message to a log file.
     #define gzlog gz::common::LogMessage( \
-      __FILE__, __LINE__, spdlog::level::info).stream()
+      __FILE__, __LINE__, spdlog::level::err, true).stream()
 
     /// \brief Output a message.
     #define gzmsg gz::common::LogMessage( \
@@ -97,7 +100,7 @@ namespace gz
     /// \param[in] _dir Name of directory in which to store the log file. Note
     /// that if _dir is not an absolute path, then _dir will
     /// be relative to your home directory.
-    /// \param[in] _file Name of log file for ignlog messages.
+    /// \param[in] _file Name of log file for gzlog messages.
     #define gzLogInit(_dir, _file)\
       gz::common::Console::Init(_dir, _file)
 
@@ -173,6 +176,9 @@ namespace gz
       /// \return The custom prefix.
       /// \sa void SetPrefix(const std::string &_customPrefix)
       public: static std::string Prefix();
+
+      /// \brief True if initialized.
+      public: static bool initialized;
 
       /// \brief The level of verbosity, the default level is 1.
       private: static int verbosity;
