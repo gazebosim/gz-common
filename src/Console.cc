@@ -129,7 +129,7 @@ void Console::Close()
 std::string Console::Directory()
 {
   std::filesystem::path path = gz::common::Console::Root().LogDestination();
-  return path.parent_path();
+  return path.parent_path().string();
 }
 
 //////////////////////////////////////////////////
