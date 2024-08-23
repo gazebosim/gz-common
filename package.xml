@@ -16,6 +16,7 @@
   <depend>ffmpeg-dev</depend>
   <depend>gz-math8</depend>
   <depend>gz-utils3</depend>
+  <depend>gz-utils3-log-dev</depend>
   <depend>libfreeimage-dev</depend>
   <depend>libgdal-dev</depend>
   <depend>libgts</depend>
