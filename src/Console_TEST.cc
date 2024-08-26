@@ -90,9 +90,6 @@ TEST_F(Console_TEST, NoInitAndLog)
   std::string path;
   EXPECT_TRUE(common::env(GZ_HOMEDIR, path));
   path = common::joinPaths(path, logPath);
-
-  spdlog::shutdown();
-  EXPECT_TRUE(common::removeAll(path));
 }
 
 /////////////////////////////////////////////////
@@ -122,8 +119,6 @@ TEST_F(Console_TEST, InitAndLog)
 
   // Cleanup
   gzLogClose();
-  spdlog::shutdown();
-  EXPECT_TRUE(common::removeAll(basePath));
 }
 
 //////////////////////////////////////////////////
