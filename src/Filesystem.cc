@@ -135,7 +135,14 @@ std::string common::copyToUnixPath(const std::string &_path)
 /////////////////////////////////////////////////
 std::string common::absPath(const std::string &_path)
 {
-  return fs::absolute(_path).string();
+  std::error_code ec;
+  auto path = fs::absolute(_path, ec);
+  if (!fsWarn("absPath", ec))
+  {
+    path = "";
+  }
+
+  return path.string();
 }
 
 /////////////////////////////////////////////////
