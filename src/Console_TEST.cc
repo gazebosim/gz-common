@@ -90,6 +90,9 @@ TEST_F(Console_TEST, NoInitAndLog)
   std::string path;
   EXPECT_TRUE(common::env(GZ_HOMEDIR, path));
   path = common::joinPaths(path, logPath);
+
+  // This is causing an issue on Windows as the resource is busy,
+  // probably locked by spdlog.
   common::removeAll(path);
 }
 
@@ -120,6 +123,9 @@ TEST_F(Console_TEST, InitAndLog)
 
   // Cleanup
   gzLogClose();
+
+  // This is causing an issue on Windows as the resource is busy,
+  // probably locked by spdlog.
   common::removeAll(basePath);
 }
 
