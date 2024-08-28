@@ -145,22 +145,22 @@ void Console::SetVerbosity(const int _level)
   switch (_level)
   {
   case 0:
-    gz::common::Console::Root().RawLogger().set_level(spdlog::level::critical);
+    gz::common::Console::Root().SetConsoleSinkLevel(spdlog::level::critical);
     break;
   case 1:
-    gz::common::Console::Root().RawLogger().set_level(spdlog::level::err);
+    gz::common::Console::Root().SetConsoleSinkLevel(spdlog::level::err);
     break;
   case 2:
-    gz::common::Console::Root().RawLogger().set_level(spdlog::level::warn);
+    gz::common::Console::Root().SetConsoleSinkLevel(spdlog::level::warn);
     break;
   case 3:
-    gz::common::Console::Root().RawLogger().set_level(spdlog::level::info);
+    gz::common::Console::Root().SetConsoleSinkLevel(spdlog::level::info);
     break;
   case 4:
-    gz::common::Console::Root().RawLogger().set_level(spdlog::level::debug);
+    gz::common::Console::Root().SetConsoleSinkLevel(spdlog::level::debug);
     break;
   case 5:
-    gz::common::Console::Root().RawLogger().set_level(spdlog::level::trace);
+    gz::common::Console::Root().SetConsoleSinkLevel(spdlog::level::trace);
     break;
   default:
     Console::Root().RawLogger().log(spdlog::level::info,
