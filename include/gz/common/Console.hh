@@ -42,8 +42,6 @@ namespace gz
       /// \param[in] _file Filename.
       /// \param[in] _line Line number.
       /// \param[in] _logLevel Log level.
-      /// \param[in] _fileInitialize True if the file logger needs to be
-      /// initialized or false otherwise.
       public: LogMessage(const char *_file,
                          int _line,
                          spdlog::level::level_enum _logLevel);
