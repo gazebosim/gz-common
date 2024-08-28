@@ -28,7 +28,7 @@ TEST_F(AutoLogFixture, AutoLogFixture)
   EXPECT_FALSE(this->FullLogPath().empty());
   EXPECT_TRUE(this->LogContent().empty());
 
-  Console::SetVerbosity(4);
+  Console::SetVerbosity(0);
   gzdbg << "This is a debug" << std::endl;
   gz::common::Console::Root().RawLogger().flush();
   EXPECT_FALSE(this->LogContent().empty());

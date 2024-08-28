@@ -37,7 +37,7 @@ TEST(Console_TEST, LogInitAfterConsoleOut)
   gz::common::Console::SetVerbosity(4);
 
   // Before console is initialized, logs go to default file location
-  gzlog << "Error before logging initialized" << std::endl;
+  gzerr << "Error before logging initialized" << std::endl;
 
   {
     auto defaultPath = gz::common::joinPaths(home,

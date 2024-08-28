@@ -20,6 +20,7 @@
 #include <Windows.h>
 #endif
 
+#include <algorithm>
 #include <filesystem>
 #include <iostream>
 #include <sstream>
@@ -42,11 +43,7 @@ LogMessage::LogMessage(const char *_file, int _line,
 {
   // Use default initialization if needed.
   if (_fileInitialize && !Console::initialized)
-  {
     Console::Init(".gz", "auto_default.log");
-    // Allow gzlog to pass through.
-    Console::SetVerbosity(5);
-  }
 }
 
 /////////////////////////////////////////////////
@@ -137,7 +134,7 @@ void Console::SetVerbosity(const int _level)
 {
   if (_level < 0)
   {
-    Console::Root().RawLogger().log(spdlog::level::info,
+    Console::Root().RawLogger().log(spdlog::level::err,
       "Negative verbosity level. Ignoring it");
     return;
   }
@@ -163,12 +160,10 @@ void Console::SetVerbosity(const int _level)
     gz::common::Console::Root().SetConsoleSinkLevel(spdlog::level::trace);
     break;
   default:
-    Console::Root().RawLogger().log(spdlog::level::info,
-      "Unknown verbosity level. Values should be between 0 and 5. Ignoring it");
-    return;
+    gz::common::Console::Root().SetConsoleSinkLevel(spdlog::level::trace);
   }
 
-  verbosity = _level;
+  verbosity = std::min(5, _level);
 }
 
 //////////////////////////////////////////////////

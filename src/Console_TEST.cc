@@ -489,6 +489,8 @@ TEST_F(Console_TEST, ColorErr)
 /// \brief Test Console::Verbosity
 TEST_F(Console_TEST, Verbosity)
 {
+  EXPECT_EQ(1, common::Console::Verbosity());
+
   common::Console::SetVerbosity(2);
   EXPECT_EQ(2, common::Console::Verbosity());
 
@@ -496,7 +498,7 @@ TEST_F(Console_TEST, Verbosity)
   EXPECT_EQ(2, common::Console::Verbosity());
 
   common::Console::SetVerbosity(1000);
-  EXPECT_EQ(2, common::Console::Verbosity());
+  EXPECT_EQ(5, common::Console::Verbosity());
 }
 
 /////////////////////////////////////////////////
