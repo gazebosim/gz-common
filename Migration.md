@@ -9,6 +9,19 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. Logging has been heavily modified as we're relying on
+ [spdlog](https://github.com/gabime/spdlog). See
+ [example1](https://github.com/gazebosim/gz-utils/blob/gz-utils3/examples/log/main.cc)
+ and [example2]((https://github.com/gazebosim/gz-common/blob/gz-common6/examples/console.cc))
+ to learn how to access the internal spdlog logger and the global options.
+
+ The `gzdbg`, `gzmsg`, `gzlog`, `gzwarn` and `gzerr` macros should work the
+ same as previous versions but you now have two extra macros: `gzcrit` and
+ `gztrace` for logging critical errors and traces respectively.
+
+ `Console::SetVerbosity` only accepts values between 0 (critical errors only)
+ and 5 (all log messages). Other values don't have any effect.
+
 1. Removed the `graphics` component's dependency on the GTS
    (GNU Triangulated Surface) library which was used for doing triangulation
    and CSG Boolean operation by the `MeshManager`. The Delaunay triangulation

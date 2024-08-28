@@ -44,7 +44,7 @@ set(GZ_MATH_VER ${gz-math8_VERSION_MAJOR})
 
 #--------------------------------------
 # Find gz-utils
-gz_find_package(gz-utils3 REQUIRED)
+gz_find_package(gz-utils3 REQUIRED COMPONENTS log)
 set(GZ_UTILS_VER ${gz-utils3_VERSION_MAJOR})
 
 #--------------------------------------
