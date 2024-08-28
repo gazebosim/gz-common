@@ -203,8 +203,6 @@ TEST_F(Console_TEST, ColorWarnSlashN)
     gzwarn << logString << " _n__ " << i << '\n';
   }
 
-  common::Console::Root().RawLogger().flush();
-
   std::string logContent = GetLogContent(logPath);
 
   for (int i = 0; i < g_messageRepeat; ++i)
@@ -234,8 +232,6 @@ TEST_F(Console_TEST, ColorWarnStdEndl)
   {
     gzwarn << logString << " endl " << i << std::endl;
   }
-
-  common::Console::Root().RawLogger().flush();
 
   std::string logContent = GetLogContent(logPath);
 
@@ -267,8 +263,6 @@ TEST_F(Console_TEST, ColorDbgSlashN)
     gzdbg << logString << " _n__ " << i << '\n';
   }
 
-  common::Console::Root().RawLogger().flush();
-
   std::string logContent = GetLogContent(logPath);
 
   for (int i = 0; i < g_messageRepeat; ++i)
@@ -298,8 +292,6 @@ TEST_F(Console_TEST, ColorDbgStdEndl)
   {
     gzdbg << logString << " endl " << i << std::endl;
   }
-
-  common::Console::Root().RawLogger().flush();
 
   std::string logContent = GetLogContent(logPath);
 
@@ -331,8 +323,6 @@ TEST_F(Console_TEST, ColorMsgSlashN)
     gzmsg << logString << " _n__ " << i << '\n';
   }
 
-  common::Console::Root().RawLogger().flush();
-
   std::string logContent = GetLogContent(logPath);
 
   for (int i = 0; i < g_messageRepeat; ++i)
@@ -362,8 +352,6 @@ TEST_F(Console_TEST, ColorMsgStdEndl)
   {
     gzmsg << logString << " endl " << i << std::endl;
   }
-
-  common::Console::Root().RawLogger().flush();
 
   std::string logContent = GetLogContent(logPath);
 
@@ -395,8 +383,6 @@ TEST_F(Console_TEST, ColorErrSlashN)
     gzerr << logString << " _n__ " << i << '\n';
   }
 
-  common::Console::Root().RawLogger().flush();
-
   std::string logContent = GetLogContent(logPath);
 
   for (int i = 0; i < g_messageRepeat; ++i)
@@ -427,8 +413,6 @@ TEST_F(Console_TEST, ColorErrStdEndl)
     gzerr << logString << " endl " << i << std::endl;
   }
 
-  common::Console::Root().RawLogger().flush();
-
   std::string logContent = GetLogContent(logPath);
 
   for (int i = 0; i < g_messageRepeat; ++i)
@@ -455,8 +439,6 @@ TEST_F(Console_TEST, ColorMsg)
   std::string logString = "this is a msg test";
 
   gzmsg << logString << std::endl;
-
-  common::Console::Root().RawLogger().flush();
 
   std::string logContent = GetLogContent(logPath);
 
@@ -526,8 +508,6 @@ TEST_F(Console_TEST, Prefix)
   gzwarn << "warning" << std::endl;
   gzmsg << "message" << std::endl;
   gzdbg << "debug" << std::endl;
-
-  common::Console::Root().RawLogger().flush();
 
   // Get the logged content
   std::string logContent = GetLogContent(logPath);

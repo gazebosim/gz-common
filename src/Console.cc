@@ -37,12 +37,12 @@ using namespace common;
 
 /////////////////////////////////////////////////
 LogMessage::LogMessage(const char *_file, int _line,
-  spdlog::level::level_enum _logLevel, bool _fileInitialize)
+  spdlog::level::level_enum _logLevel)
   : severity(_logLevel),
     sourceLocation(_file, _line, "")
 {
   // Use default initialization if needed.
-  if (_fileInitialize && !Console::initialized)
+  if (!Console::initialized)
     Console::Init(".gz", "auto_default.log");
 }
 
@@ -108,8 +108,6 @@ bool Console::Init(const std::string &_directory, const std::string &_filename)
   logPath = joinPaths(logPath, _filename);
 
   Console::Root().SetLogDestination(logPath.c_str());
-  Console::Root().RawLogger().log(spdlog::level::info,
-    "Setting log file output destination to {}", logPath.c_str());
   Console::initialized = true;
 
   return true;

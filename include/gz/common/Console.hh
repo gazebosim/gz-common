@@ -46,8 +46,7 @@ namespace gz
       /// initialized or false otherwise.
       public: LogMessage(const char *_file,
                          int _line,
-                         spdlog::level::level_enum _logLevel,
-                         bool _fileInitialize = false);
+                         spdlog::level::level_enum _logLevel);
 
       /// \brief Destructor.
       public: ~LogMessage();
@@ -80,7 +79,7 @@ namespace gz
 
     /// \brief Output a message to a log file.
     #define gzlog gz::common::LogMessage( \
-      __FILE__, __LINE__, spdlog::level::err, true).stream()
+      __FILE__, __LINE__, spdlog::level::err).stream()
 
     /// \brief Output a message.
     #define gzmsg gz::common::LogMessage( \
