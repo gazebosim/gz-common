@@ -14,22 +14,43 @@
  * limitations under the License.
  *
 */
-#include <gz/common.hh>
+#include <filesystem>
+#include <gz/common/Console.hh>
 
 int main(int argc, char **argv)
 {
-  // Default verbosity is 1, only error messages show
-  gzdbg << "This is a debug message" << std::endl;
-  gzmsg << "This is an informational message" << std::endl;
-  gzwarn << "This is a warning" << std::endl;
-  gzerr << "This is an error" << std::endl;
+  // Default verbosity is 3 (critical, error, warn and info messages show).
+  gztrace << "This is a trace message";
+  gzdbg   << "This is a debug message";
+  gzmsg   << "This is an informational message";
+  gzwarn  << "This is a warning";
+  gzerr   << "This is an error";
+  gzcrit  << "This is a critical error";
 
-  // Change verbosity to level 4, all messages show
-  gz::common::Console::SetVerbosity(4);
-  gzdbg << "This is a debug message" << std::endl;
-  gzmsg << "This is an informational message" << std::endl;
-  gzwarn << "This is a warning" << std::endl;
-  gzerr << "This is an error" << std::endl;
+  // Change verbosity to level 5, all messages show.
+  gz::common::Console::SetVerbosity(5);
+  gz::common::Console::SetPrefix("My prefix. ");
+  gztrace << "This is a trace message";
+  gzdbg   << "This is a debug message";
+  gzmsg   << "This is an informational message";
+  gzwarn  << "This is a warning";
+  gzerr   << "This is an error";
+  gzcrit  << "This is a critical error";
+
+  std::filesystem::path logDir = std::filesystem::temp_directory_path();
+  std::filesystem::path logFile = "my_log.txt";
+
+  gz::common::Console c("gz_tmp");
+  c.SetLogDestination(logDir / "tmp2" / logFile);
+  auto logger = c.RawLogger();
+  logger.log(spdlog::level::err, "Hello");
+
+  gz::common::Console::Init(logDir / "tmp3", logFile);
+  gzerr << "Error 1";
+  gzerr << "Error 2";
+  gzerr << "Directory: " << gz::common::Console::Directory();
+  gz::common::Console::Close();
+  gzerr << "Error 3";
 
   return 0;
 }

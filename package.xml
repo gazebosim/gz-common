@@ -18,6 +18,7 @@
   <depend>gz-utils3</depend>
   <depend>libfreeimage-dev</depend>
   <depend>libgdal-dev</depend>
+  <depend>spdlog</depend>
   <depend>tinyxml2</depend>
   <depend>uuid</depend>
 

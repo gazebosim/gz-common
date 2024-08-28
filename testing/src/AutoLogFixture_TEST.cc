@@ -30,5 +30,6 @@ TEST_F(AutoLogFixture, AutoLogFixture)
 
   Console::SetVerbosity(0);
   gzdbg << "This is a debug" << std::endl;
+  gz::common::Console::Root().RawLogger().flush();
   EXPECT_FALSE(this->LogContent().empty());
 }
