@@ -4,6 +4,12 @@
 
 1. **Baseline:** this includes all changes from 5.6.0 and earlier.
 
+1. Experimenting with spdlog
+    * [Pull request #615](https://github.com/gazebosim/gz-common/pull/615)
+
+1. Update Changelog, README and prepare for gz-common6.0.0~pre1 release
+    * [Pull request #626](https://github.com/gazebosim/gz-common/pull/626)
+
 1. Use self-pipe trick to implement signal handlers
     * [Pull request #618](https://github.com/gazebosim/gz-common/pull/618)
 
