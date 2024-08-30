@@ -462,21 +462,49 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
           "Roughness"));
       pbr.SetRoughnessMap(texName, texData);
     }
-    // Load lightmap only if it is not a glb/glTF mesh that contains a
-    // MetallicRoughness texture
-    // It was found that lightmap field just stores the entire MetallicRoughness
-    // texture. Issues were also reported in assimp:
-    // https://github.com/assimp/assimp/issues/3120
-    // https://github.com/assimp/assimp/issues/4637
-    unsigned int uvIdx = 0;
-    ret = assimpMat->GetTexture(
-        aiTextureType_LIGHTMAP, 0, &texturePath, NULL, &uvIdx);
-    if (ret == AI_SUCCESS)
+  }
+
+  // The lightmap / ambient occlusion texture may be the same texture as the
+  // metallicRoughness texture but it can also be a separate texture using a
+  // different uv index. In the former case, we expect the occlusion
+  // data to be packed in the R channel of the metallicRoughness texture,
+  // so load the occlusion data in the same ways as we do in the
+  // SplitMetallicRoughnessMap function.
+  // In the latter case (separate texture), no extra processing is
+  // required.
+  unsigned int uvIdx = 0;
+  ret = assimpMat->GetTexture(
+      aiTextureType_LIGHTMAP, 0, &texturePath, NULL, &uvIdx);
+  if (ret == AI_SUCCESS)
+  {
+    auto [texName, texData] = this->LoadTexture(_scene, texturePath,
+        this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
+        "Lightmap"));
+    // Separate uv set so treat it as a separate texture
+    if (uvIdx > 0)
     {
-      auto [texName, texData] = this->LoadTexture(_scene, texturePath,
-          this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
-          "Lightmap"));
       pbr.SetLightMap(texName, uvIdx, texData);
+    }
+    // else split the occlusion data from the metallicRoughness texture
+    else
+    {
+      // R channel contains the occlusion data
+      // Note we are still creating an RGBA texture which seems watesful
+      // but that's what gz-rendering expects
+      auto origRGBAData = texData->RGBAData();
+      std::vector<unsigned char> texRData(origRGBAData.size());
+      for (unsigned int i = 0; i < origRGBAData.size(); i+=4)
+      {
+        auto r = origRGBAData.at(i);
+        texRData[i] = r;
+        texRData[i + 1] = r;
+        texRData[i + 2] = r;
+        texRData[i + 3] = 255;
+      }
+      auto tex = std::make_shared<Image>();
+      tex->SetFromData(&texRData[0], texData->Width(), texData->Height(),
+          Image::RGBA_INT8);
+      pbr.SetLightMap(texName, uvIdx, tex);
     }
   }
 #endif
