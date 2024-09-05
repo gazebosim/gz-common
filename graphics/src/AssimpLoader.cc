@@ -16,9 +16,11 @@
  */
 
 #include <cstddef>
+#include <memory>
 #include <queue>
 #include <string>
 #include <unordered_set>
+#include <vector>
 
 #include "gz/common/graphics/Types.hh"
 #include "gz/common/AssimpLoader.hh"
