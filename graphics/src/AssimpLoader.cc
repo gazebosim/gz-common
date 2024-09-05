@@ -680,14 +680,14 @@ SubMesh AssimpLoader::Implementation::CreateSubMesh(
     subMesh.AddVertex(vertex);
     subMesh.AddNormal(normal);
     // Iterate over sets of texture coordinates
-    int uvIdx = 0;
-    while(_assimpMesh->HasTextureCoords(uvIdx))
+    for (unsigned int i = 0; i < AI_MAX_NUMBER_OF_TEXTURECOORDS; ++i)
     {
+      if (!_assimpMesh->HasTextureCoords(i))
+        continue;
       math::Vector3d texcoords;
-      texcoords.X(_assimpMesh->mTextureCoords[uvIdx][vertexIdx].x);
-      texcoords.Y(_assimpMesh->mTextureCoords[uvIdx][vertexIdx].y);
-      subMesh.AddTexCoordBySet(texcoords.X(), texcoords.Y(), uvIdx);
-      ++uvIdx;
+      texcoords.X(_assimpMesh->mTextureCoords[i][vertexIdx].x);
+      texcoords.Y(_assimpMesh->mTextureCoords[i][vertexIdx].y);
+      subMesh.AddTexCoordBySet(texcoords.X(), texcoords.Y(), i);
     }
   }
   for (unsigned faceIdx = 0; faceIdx < _assimpMesh->mNumFaces; ++faceIdx)
