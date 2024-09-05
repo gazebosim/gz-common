@@ -650,15 +650,14 @@ SubMesh AssimpLoader::Implementation::CreateSubMesh(
     subMesh.AddVertex(vertex);
     subMesh.AddNormal(normal);
     // Iterate over sets of texture coordinates
-    int uvIdx = 0;
-    while(_assimpMesh->HasTextureCoords(uvIdx))
+    for (unsigned int i = 0; i < AI_MAX_NUMBER_OF_TEXTURECOORDS; ++i)
     {
+      if (!_assimpMesh->HasTextureCoords(i))
+        continue;
       math::Vector3d texcoords;
-      texcoords.X(_assimpMesh->mTextureCoords[uvIdx][vertexIdx].x);
-      texcoords.Y(_assimpMesh->mTextureCoords[uvIdx][vertexIdx].y);
-      // TODO(luca) why do we need 1.0 - Y?
-      subMesh.AddTexCoordBySet(texcoords.X(), 1.0 - texcoords.Y(), uvIdx);
-      ++uvIdx;
+      texcoords.X(_assimpMesh->mTextureCoords[i][vertexIdx].x);
+      texcoords.Y(_assimpMesh->mTextureCoords[i][vertexIdx].y);
+      subMesh.AddTexCoordBySet(texcoords.X(), texcoords.Y(), i);
     }
   }
   for (unsigned faceIdx = 0; faceIdx < _assimpMesh->mNumFaces; ++faceIdx)
@@ -695,6 +694,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
       aiProcess_JoinIdenticalVertices |
       aiProcess_RemoveRedundantMaterials |
       aiProcess_SortByPType |
+      aiProcess_FlipUVs |
 #ifndef GZ_ASSIMP_PRE_5_2_0
       aiProcess_PopulateArmatureData |
 #endif
@@ -756,11 +756,17 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   // Recursive call to keep track of transforms,
   // mesh is passed by reference and edited throughout
   this->dataPtr->RecursiveCreate(scene, rootNode, rootTransform, mesh);
+  auto rootSkeleton = mesh->MeshSkeleton();
   // Add the animations
   for (unsigned animIdx = 0; animIdx < scene->mNumAnimations; ++animIdx)
   {
     auto& anim = scene->mAnimations[animIdx];
     auto animName = ToString(anim->mName);
+    if (animName.empty())
+    {
+      animName = "animation" +
+                 std::to_string(rootSkeleton->AnimationCount() + 1);
+    }
     SkeletonAnimation* skelAnim = new SkeletonAnimation(animName);
     for (unsigned chanIdx = 0; chanIdx < anim->mNumChannels; ++chanIdx)
     {
