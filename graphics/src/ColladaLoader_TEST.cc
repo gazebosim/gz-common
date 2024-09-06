@@ -112,6 +112,7 @@ TEST_F(ColladaLoader, LoadZeroCount)
       common::testing::TestFile("data", "zero_count.dae"));
   ASSERT_TRUE(mesh);
 #ifndef _WIN32
+  common::Console::Root().RawLogger().flush();
   std::string log = LogContent();
 
   // Expect no errors about missing values
