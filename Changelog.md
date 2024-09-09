@@ -1,6 +1,116 @@
 ## Gazebo Common 6.x
 
-## Gazebo Common 6.0.0 (20XX-XX-XX)
+## Gazebo Common 6.0.0 (2024-09-XX)
+
+1. **Baseline:** this includes all changes from 5.6.0 and earlier.
+
+1. Experimenting with spdlog
+    * [Pull request #615](https://github.com/gazebosim/gz-common/pull/615)
+
+1. Update Changelog, README and prepare for gz-common6.0.0~pre1 release
+    * [Pull request #626](https://github.com/gazebosim/gz-common/pull/626)
+
+1. Use self-pipe trick to implement signal handlers
+    * [Pull request #618](https://github.com/gazebosim/gz-common/pull/618)
+
+1. Replace GTS with CDT
+    * [Pull request #617](https://github.com/gazebosim/gz-common/pull/617)
+
+1. Remove debug logging introduced accidentally in PR review
+    * [Pull request #622](https://github.com/gazebosim/gz-common/pull/622)
+
+1. Fix crash when calling absPath with empty input
+    * [Pull request #620](https://github.com/gazebosim/gz-common/pull/620)
+
+1. DEM: Add support for GDAL vsicurl, vsizip support and avoid segfaults with huge VRT datasets
+    * [Pull request #597](https://github.com/gazebosim/gz-common/pull/597)
+
+1. Enable 24.04 CI, require cmake 3.22.1
+    * [Pull request #619](https://github.com/gazebosim/gz-common/pull/619)
+
+1. SubMesh::RecalculateNormals improvement
+    * [Pull request #609](https://github.com/gazebosim/gz-common/pull/609)
+
+1. fix data race tsan issue
+    * [Pull request #612](https://github.com/gazebosim/gz-common/pull/612)
+
+1. Generate a more unique texture name for glb embedded textures
+    * [Pull request #606](https://github.com/gazebosim/gz-common/pull/606)
+
+1. Add package.xml
+    * [Pull request #587](https://github.com/gazebosim/gz-common/pull/587)
+
+1. Fix deprecation warnings
+    * [Pull request #603](https://github.com/gazebosim/gz-common/pull/603)
+
+1. Fix macOS workflow and update on-push branches
+    * [Pull request #602](https://github.com/gazebosim/gz-common/pull/602)
+
+1. port: 5 to main
+    * [Pull request #594](https://github.com/gazebosim/gz-common/pull/594)
+
+1. Clean up Clang compiler warnings
+    * [Pull request #589](https://github.com/gazebosim/gz-common/pull/589)
+
+1. Add new function in MeshManager to merge all submeshes of a mesh into one
+    * [Pull request #588](https://github.com/gazebosim/gz-common/pull/588)
+
+1. Adds new function in MeshManager for performing convex decomposition
+    * [Pull request #585](https://github.com/gazebosim/gz-common/pull/585)
+
+1. Fix compatibility with FFmpeg5.0
+    * [Pull request #581](https://github.com/gazebosim/gz-common/pull/581)
+
+1. Remove HIDE_SYMBOLS_BY_DEFAULT: replace by a default configuration in gz-cmake.
+    * [Pull request #568](https://github.com/gazebosim/gz-common/pull/568)
+
+1. Fix search for UUID on Windows logic
+    * [Pull request #556](https://github.com/gazebosim/gz-common/pull/556)
+
+1. Fix windows compilation by setting right visibility attributes
+    * [Pull request #550](https://github.com/gazebosim/gz-common/pull/550)
+
+1. Drop the internal vendored version of TinyXML2
+    * [Pull request #542](https://github.com/gazebosim/gz-common/pull/542)
+
+1. Revert "Add missing visibility declarations (#548)"
+    * [Pull request #553](https://github.com/gazebosim/gz-common/pull/553)
+
+1. Add missing visibility declarations
+    * [Pull request #548](https://github.com/gazebosim/gz-common/pull/548)
+
+1. Remove ignition
+    * [Pull request #525](https://github.com/gazebosim/gz-common/pull/525)
+
+1. Bumps in ionic: use gz-cmake4, gz-utils3, gz-math8
+    * [Pull request #539](https://github.com/gazebosim/gz-common/pull/539)
+
+1. Remove deprecated std::iterator inheritance
+    * [Pull request #529](https://github.com/gazebosim/gz-common/pull/529)
+
+1. Collada and Assimp test for default animation names
+    * [Pull request #476](https://github.com/gazebosim/gz-common/pull/476)
+
+1. Avoid Io.hh header name clash
+    * [Pull request #471](https://github.com/gazebosim/gz-common/pull/471)
+
+1. Default name assignment to animations without names
+    * [Pull request #413](https://github.com/gazebosim/gz-common/pull/413)
+
+1. Skip CSV header when reading DataFrame
+    * [Pull request #435](https://github.com/gazebosim/gz-common/pull/435)
+
+1. Main deprecations
+    * [Pull request #433](https://github.com/gazebosim/gz-common/pull/433)
+
+1. Add CSV data parsing
+    * [Pull request #402](https://github.com/gazebosim/gz-common/pull/402)
+
+1. Introduces Flips UV flag, removes empty space
+    * [Pull request #420](https://github.com/gazebosim/gz-common/pull/420)
+
+1. ⬆️  Bump main to 6.0.0~pre1
+    * [Pull request #412](https://github.com/gazebosim/gz-common/pull/412)
 
 ## Gazebo Common 5.x
 

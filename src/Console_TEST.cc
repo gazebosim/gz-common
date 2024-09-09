@@ -82,6 +82,7 @@ TEST_F(Console_TEST, NoInitAndLog)
   // Get the absolute log file path
   std::string logPath = ".gz/auto_default.log";
 
+  common::Console::Root().RawLogger().flush();
   // Expect to find the string in the log file
   EXPECT_TRUE(GetLogContent(logPath).find(logString) != std::string::npos);
 
@@ -118,6 +119,7 @@ TEST_F(Console_TEST, InitAndLog)
   // Get the absolute log file path
   std::string logPath = common::joinPaths(path, "test.log");
 
+  common::Console::Root().RawLogger().flush();
   // Expect to find the string in the log file
   EXPECT_TRUE(GetLogContent(logPath).find(logString) != std::string::npos);
 
@@ -149,6 +151,7 @@ TEST_F(Console_TEST, LogSlashN)
     gzlog << logString << " _n__ " << i << '\n';
   }
 
+  common::Console::Root().RawLogger().flush();
   std::string logContent = GetLogContent(logPath);
 
   for (int i = 0; i < g_messageRepeat; ++i)
@@ -179,6 +182,7 @@ TEST_F(Console_TEST, LogStdEndl)
     gzlog << logString << " endl " << i << std::endl;
   }
 
+  common::Console::Root().RawLogger().flush();
   std::string logContent = GetLogContent(logPath);
 
   for (int i = 0; i < g_messageRepeat; ++i)
