@@ -77,7 +77,7 @@ namespace gz
 
     /// \brief Output a message to a log file.
     #define gzlog gz::common::LogMessage( \
-      __FILE__, __LINE__, spdlog::level::err).stream()
+      __FILE__, __LINE__, spdlog::level::trace).stream()
 
     /// \brief Output a message.
     #define gzmsg gz::common::LogMessage( \
