@@ -31,9 +31,9 @@ encoding/decoding to thread pools.
 
 [Folder Structure](#folder-structure)
 
-[Code of Conduct](#code-of-conduct)
+[Contributing](#contributing)
 
-[Contributing](#code-of-contributing)
+[Code of Conduct](#code-of-conduct)
 
 [Versioning](#versioning)
 
