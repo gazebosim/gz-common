@@ -271,6 +271,14 @@ Just give them a try and dig deeper in the configuration if something is wrong.
 
 # Caveats
 
+## FFMpeg on Windows via Conda
+
+The current distribution of FFMpeg via Conda for Windows does not include the h264_qsv
+encoder. It only has h264_nvenc. This means that using Intel GPUs for HW acceleration is
+not possible out of the box. A possible solution would be to build a custom build of
+ffmpeg in the workspace with gz-common. Pull requests with the relevant tutorial are
+welcome.
+
 ## NVEnc per-machine limit
 
 If you have a multi-GPU station with desktop-class (not server-class) GPUs, you will
