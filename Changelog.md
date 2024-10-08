@@ -1,10 +1,25 @@
 ## Gazebo Common 6.x
 
-## Gazebo Common 6.0.0 (2024-09-XX)
+## Gazebo Common 6.0.0 (2024-09-25)
 
 1. **Baseline:** this includes all changes from 5.6.0 and earlier.
 
-1. Experimenting with spdlog
+1. Add a note about the conda-distributed ffmpeg on windows
+    * [Pull request #640](https://github.com/gazebosim/gz-common/pull/640)
+
+1. Fix table of content
+    * [Pull request #639](https://github.com/gazebosim/gz-common/pull/639)
+
+1. Fix severity level of gzlog
+    * [Pull request #635](https://github.com/gazebosim/gz-common/pull/635)
+
+1. Fix loading lightmaps from gltf / glb meshes
+    * [Pull request #630](https://github.com/gazebosim/gz-common/pull/630)
+
+1. Fix AssimpLoader collada texture coordinates
+    * [Pull request #634](https://github.com/gazebosim/gz-common/pull/634)
+
+1. Implement console logging using `spdlog`
     * [Pull request #615](https://github.com/gazebosim/gz-common/pull/615)
 
 1. Update Changelog, README and prepare for gz-common6.0.0~pre1 release

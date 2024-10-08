@@ -71,7 +71,6 @@ Gazebo Common requires:
 The Graphics component requires:
 
   * [FreeImage](http://freeimage.sourceforge.net/)
-  * [GTS](http://gts.sourceforge.net/).
 
 The AV component requires:
 
@@ -98,7 +97,7 @@ conda activate gz-ws
 
 Install prerequisites:
 ```
-conda install freeimage gdal gts glib dlfcn-win32 ffmpeg --channel conda-forge
+conda install freeimage gdal glib dlfcn-win32 ffmpeg --channel conda-forge
 ```
 
 Install Gazebo dependencies:
