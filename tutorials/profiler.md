@@ -60,10 +60,10 @@ enabled at compile time in order to function.
 cmake_minimum_required(VERSION 3.22.1 FATAL_ERROR)
 
 # Find the gz-common library
-find_package(gz-common6 QUIET REQUIRED COMPONENTS profiler)
+find_package(gz-common7 QUIET REQUIRED COMPONENTS profiler)
 
 add_executable(profiler_example profiler.cc)
-target_link_libraries(profiler_example gz-common6::profiler)
+target_link_libraries(profiler_example gz-common7::profiler)
 # Enable the profiler for the example
 target_compile_definitions(profiler_example PUBLIC "GZ_PROFILER_ENABLE=1")
 ```
@@ -99,10 +99,10 @@ xdg-open $SOURCE_DIR/gz-common/profiler/src/Remotery/vis/index.html
 
 # Use the installation path (Linux)
 # This may vary depending on where you have choosen to install
-xdg-open /usr/share/gz/gz-common6/profiler_vis/index.html
+xdg-open /usr/share/gz/gz-common7/profiler_vis/index.html
 
 # Use the installation path (macOS)
-open /usr/share/gz/gz-common6/profiler_vis/index.html
+open /usr/share/gz/gz-common7/profiler_vis/index.html
 
 # Inside a Docker container with port 8000 exposed
 # 1. Find your container's IP with 'ifconfig'

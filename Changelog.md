@@ -1,3 +1,7 @@
+## Gazebo Common 7.x
+
+## Gazebo Common 7.0.0 (20XX-XX-XX)
+
 ## Gazebo Common 6.x
 
 ## Gazebo Common 6.0.0 (2024-09-25)
