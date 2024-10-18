@@ -23,9 +23,10 @@
 
 #include "tinyxml2.h"
 
+#include "gz/math/Angle.hh"
+
 #include "gz/common/Console.hh"
 #include "gz/common/Util.hh"
-
 #include "gz/common/SVGLoader.hh"
 
 using namespace gz;
