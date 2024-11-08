@@ -1,5 +1,43 @@
 ## Gazebo Common 5.x
 
+## Gazebo Common 5.7.0 (2024-11-08)
+
+1. Fix loading lightmaps from gltf / glb meshes (#630)
+    * [Pull request #630) (#646](https://github.com/gazebosim/gz-common/pull/630) (#646)
+
+1. Fix AssimpLoader collada texture coordinates
+    * [Pull request #634](https://github.com/gazebosim/gz-common/pull/634)
+
+1. Remove debug logging introduced accidentally in PR review
+    * [Pull request #622](https://github.com/gazebosim/gz-common/pull/622)
+
+1. Fix crash when calling absPath with empty input
+    * [Pull request #620](https://github.com/gazebosim/gz-common/pull/620)
+
+1. DEM: Add support for GDAL vsicurl, vsizip support and avoid segfaults with huge VRT datasets
+    * [Pull request #597](https://github.com/gazebosim/gz-common/pull/597)
+
+1. SubMesh::RecalculateNormals improvement
+    * [Pull request #609](https://github.com/gazebosim/gz-common/pull/609)
+
+1. fix data race tsan issue
+    * [Pull request #612](https://github.com/gazebosim/gz-common/pull/612)
+
+1. Generate a more unique texture name for glb embedded textures
+    * [Pull request #606](https://github.com/gazebosim/gz-common/pull/606)
+
+1. Add package.xml
+    * [Pull request #587](https://github.com/gazebosim/gz-common/pull/587)
+
+1. Fix deprecation warnings
+    * [Pull request #603](https://github.com/gazebosim/gz-common/pull/603)
+
+1. Fix macOS workflow and update on-push branches
+    * [Pull request #602](https://github.com/gazebosim/gz-common/pull/602)
+
+1. Fix compatibility with FFmpeg5.0
+    * [Pull request #581](https://github.com/gazebosim/gz-common/pull/581)
+
 ## Gazebo Common 5.6.0 (2024-04-23)
 
 1. Clarify units for the DEM classes
