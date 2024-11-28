@@ -684,7 +684,7 @@ TEST_F(AssimpLoader, LoadGlTF2BoxTransmission)
   const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
   ASSERT_TRUE(mat.get());
   // transmission currently modeled as transparency
-  EXPECT_DOUBLE_EQ(0.1f, mat->Transparency());
+  EXPECT_DOUBLE_EQ(0.1, mat->Transparency());
   delete mesh;
 #endif
 }
