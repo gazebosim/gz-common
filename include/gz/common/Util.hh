@@ -209,16 +209,6 @@ namespace gz
     }
 
     /// \brief Find the environment variable '_name' and return its value.
-    ///
-    /// \TODO(mjcarroll): Deprecate and remove in tick-tock.
-    ///
-    /// \param[in] _name Name of the environment variable.
-    /// \param[out] _value Value if the variable was found.
-    /// \return True if the variable was found or false otherwise.
-    bool GZ_COMMON_VISIBLE env(
-        const std::string &_name, std::string &_value);
-
-    /// \brief Find the environment variable '_name' and return its value.
     /// \param[in] _name Name of the environment variable.
     /// \param[out] _value Value if the variable was found.
     /// \param[in] _allowEmpty Allow set-but-empty variables.
@@ -226,7 +216,7 @@ namespace gz
     /// \return True if the variable was found or false otherwise.
     bool GZ_COMMON_VISIBLE env(
         const std::string &_name, std::string &_value,
-        bool _allowEmpty);
+        bool _allowEmpty = false);
 
     /// \brief Set the environment variable '_name'.
     ///
