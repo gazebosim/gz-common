@@ -20,6 +20,8 @@
 #include <gz/common/Console.hh>
 #include <gz/common/Util.hh>
 
+#include <gz/utils/Environment.hh>
+
 namespace gz::common::testing
 {
 
@@ -31,10 +33,18 @@ bool BazelTestPaths::ProjectSourcePath(std::string &_sourceDir)
 {
   std::string test_srcdir, bazel_path;
 
-  if (common::env("TEST_SRCDIR", test_srcdir) &&
-      common::env("GZ_BAZEL_PATH", bazel_path))
+
+  auto env = gz::utils::env();
+
+  for (auto &[k, v]: env)
   {
-    _sourceDir = gz::common::joinPaths(test_srcdir, "gz", bazel_path);
+       std::cout << k << " " << v << std::endl;
+  }
+
+
+  if (common::env("TEST_SRCDIR", test_srcdir))
+  {
+    _sourceDir = gz::common::joinPaths(test_srcdir, "_main");
     return true;
   }
   else
