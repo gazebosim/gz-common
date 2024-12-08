@@ -40,6 +40,7 @@
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/postprocess.h>     // Post processing flags
 #include <assimp/scene.h>           // Output data structure
+#include <assimp/material.h>
 
 // Disable warning for converting double to unsigned char
 #ifdef _WIN32
