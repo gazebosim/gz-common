@@ -667,18 +667,20 @@ SubMesh AssimpLoader::Implementation::CreateSubMesh(
   {
     // Add the vertex
     math::Vector3d vertex;
-    math::Vector3d normal;
     vertex.X(_assimpMesh->mVertices[vertexIdx].x);
     vertex.Y(_assimpMesh->mVertices[vertexIdx].y);
     vertex.Z(_assimpMesh->mVertices[vertexIdx].z);
-    normal.X(_assimpMesh->mNormals[vertexIdx].x);
-    normal.Y(_assimpMesh->mNormals[vertexIdx].y);
-    normal.Z(_assimpMesh->mNormals[vertexIdx].z);
     vertex = _transform * vertex;
-    normal = rot * normal;
-    normal.Normalize();
     subMesh.AddVertex(vertex);
-    subMesh.AddNormal(normal);
+    if (_assimpMesh->HasNormals()) {
+      math::Vector3d normal;
+      normal.X(_assimpMesh->mNormals[vertexIdx].x);
+      normal.Y(_assimpMesh->mNormals[vertexIdx].y);
+      normal.Z(_assimpMesh->mNormals[vertexIdx].z);
+      normal = rot * normal;
+      normal.Normalize();
+      subMesh.AddNormal(normal);
+    }
     // Iterate over sets of texture coordinates
     for (unsigned int i = 0; i < AI_MAX_NUMBER_OF_TEXTURECOORDS; ++i)
     {
@@ -698,6 +700,9 @@ SubMesh AssimpLoader::Implementation::CreateSubMesh(
     subMesh.AddIndex(face.mIndices[2]);
   }
   subMesh.SetMaterialIndex(_assimpMesh->mMaterialIndex);
+  if (subMesh.NormalCount() == 0u){
+    subMesh.RecalculateNormals();
+  }
   return subMesh;
 }
 
