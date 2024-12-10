@@ -700,6 +700,9 @@ SubMesh AssimpLoader::Implementation::CreateSubMesh(
     subMesh.AddIndex(face.mIndices[2]);
   }
   subMesh.SetMaterialIndex(_assimpMesh->mMaterialIndex);
+  if (subMesh.NormalCount() == 0u){
+    subMesh.RecalculateNormals();
+  }
   return subMesh;
 }
 
