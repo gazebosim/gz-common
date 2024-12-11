@@ -18,6 +18,7 @@
 #define GZ_COMMON_EVENT_HH_
 
 #include <atomic>
+#include <chrono>
 #include <functional>
 #include <list>
 #include <map>
