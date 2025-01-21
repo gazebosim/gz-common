@@ -17,6 +17,7 @@
 #ifndef GZ_COMMON_TESTING_DETAIL_AUTOLOGFIXTURE_HH_
 #define GZ_COMMON_TESTING_DETAIL_AUTOLOGFIXTURE_HH_
 
+#include <algorithm>
 #include <memory>
 #include <string>
 
