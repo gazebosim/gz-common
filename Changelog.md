@@ -1,5 +1,13 @@
 ## Gazebo Common 3.x
 
+### Gazebo Common 3.17.1 (2025-01-29)
+
+1. Fix deprecation warnings
+    * [Pull request #603](https://github.com/gazebosim/gz-common/pull/603)
+
+1. Fix compatibility with FFmpeg5.0
+    * [Pull request #581](https://github.com/gazebosim/gz-common/pull/581)
+
 ## Gazebo Common 3.17.0 (2024-01-05)
 
 1. Fix error output when creating directories
