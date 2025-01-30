@@ -1,5 +1,16 @@
 ## Gazebo Common 5.x
 
+### Gazebo Common 5.7.1 (2025-01-30)
+
+1. Add include <chrono> for system_clock in Event.hh
+    * [Pull request #655](https://github.com/gazebosim/gz-common/pull/655)
+
+1. Check normal presence before trying to read asMesh normals
+    * [Pull request #654](https://github.com/gazebosim/gz-common/pull/654)
+
+1. Remove Conda Windows warnings
+    * [Pull request #652](https://github.com/gazebosim/gz-common/pull/652)
+
 ## Gazebo Common 5.7.0 (2024-11-08)
 
 1. Fix loading lightmaps from gltf / glb meshes (#630)
