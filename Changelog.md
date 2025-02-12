@@ -1,5 +1,10 @@
 ## Gazebo Common 6.x
 
+### Gazebo Common 6.0.2 (2025-02-12)
+
+1. Add missing includes
+    * [Pull request #660](https://github.com/gazebosim/gz-common/pull/660)
+
 ### Gazebo Common 6.0.1 (2024-12-17)
 
 1. Check normal presence before trying to read asMesh normals
