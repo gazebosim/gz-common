@@ -632,8 +632,10 @@ struct Neighbors
 void SubMesh::RecalculateNormals()
 {
   if (this->dataPtr->primitiveType != SubMesh::TRIANGLES
-      || this->dataPtr->indices.empty()
       || this->dataPtr->indices.size() % 3u != 0)
+    return;
+
+  if (!this->HasValidIndices())
     return;
 
   // Reset all the normals
@@ -750,6 +752,9 @@ std::string SubMesh::Name() const
 //////////////////////////////////////////////////
 double SubMesh::Volume() const
 {
+  if (!this->HasValidIndices())
+    return 0.0;
+
   double volume = 0.0;
   if (this->dataPtr->primitiveType == SubMesh::TRIANGLES)
   {
@@ -779,6 +784,20 @@ double SubMesh::Volume() const
   }
 
   return volume;
+}
+
+//////////////////////////////////////////////////
+bool SubMesh::HasValidIndices() const
+{
+  if (this->dataPtr->indices.empty())
+    return false;
+
+  for (unsigned int idx = 0u; idx < this->dataPtr->indices.size(); ++idx)
+  {
+    if (this->dataPtr->indices[idx] >= this->dataPtr->vertices.size())
+      return false;
+  }
+  return true;
 }
 
 //////////////////////////////////////////////////
