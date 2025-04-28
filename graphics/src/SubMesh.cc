@@ -782,7 +782,7 @@ double SubMesh::Volume() const
 //////////////////////////////////////////////////
 bool SubMesh::HasValidIndices() const
 {
-  if (this->dataPtr->indices.size() == 0u)
+  if (this->dataPtr->indices.empty())
     return false;
 
   for (unsigned int idx = 0u; idx < this->dataPtr->indices.size(); ++idx)
