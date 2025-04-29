@@ -18,6 +18,7 @@
 #ifndef GZ_COMMON_PROFILER_HH_
 #define GZ_COMMON_PROFILER_HH_
 
+#include <cstdint>
 #include <memory>
 #include <string>
 
