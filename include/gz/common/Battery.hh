@@ -17,6 +17,7 @@
 #ifndef GZ_COMMON_BATTERY_HH_
 #define GZ_COMMON_BATTERY_HH_
 
+#include <cstdint>
 #include <functional>
 #include <map>
 #include <memory>
