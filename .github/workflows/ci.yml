@@ -37,3 +37,4 @@ jobs:
           gzdev-project-name: rotary
           cppcheck-enabled: true
           cpplint-enabled: true
+          doxygen-enabled: true
