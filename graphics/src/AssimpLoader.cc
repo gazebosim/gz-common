@@ -613,7 +613,8 @@ ImagePtr AssimpLoader::Implementation::LoadEmbeddedTexture(
 {
   if (_texture->mHeight == 0)
   {
-    Image::PixelFormatType format = Image::PixelFormatType::UNKNOWN_PIXEL_FORMAT;
+    Image::PixelFormatType format =
+        Image::PixelFormatType::UNKNOWN_PIXEL_FORMAT;
     if (_texture->CheckFormat("png"))
     {
       format = Image::PixelFormatType::COMPRESSED_PNG;
