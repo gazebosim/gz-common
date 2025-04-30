@@ -99,10 +99,10 @@ xdg-open $SOURCE_DIR/gz-common/profiler/src/Remotery/vis/index.html
 
 # Use the installation path (Linux)
 # This may vary depending on where you have choosen to install
-xdg-open /usr/share/gz/gz-common7/profiler_vis/index.html
+xdg-open /usr/share/gz/gz-common/profiler_vis/index.html
 
 # Use the installation path (macOS)
-open /usr/share/gz/gz-common7/profiler_vis/index.html
+open /usr/share/gz/gz-common/profiler_vis/index.html
 
 # Inside a Docker container with port 8000 exposed
 # 1. Find your container's IP with 'ifconfig'
