@@ -92,7 +92,7 @@ gz_build_tests(
   SOURCES ${PROFILER_TESTS}
   LIB_DEPS
     ${profiler_target}
-    gz-common${GZ_COMMON_VER}-testing
+    gz-common-testing
   TEST_LIST profiler_tests)
 
 if(TARGET UNIT_Profiler_Remotery_TEST)

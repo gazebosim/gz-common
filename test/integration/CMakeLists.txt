@@ -12,7 +12,7 @@ endif()
 gz_build_tests(
   TYPE INTEGRATION
   SOURCES ${tests}
-  LIB_DEPS gz-common${GZ_COMMON_VER}-testing
+  LIB_DEPS gz-common-testing
 )
 
 # Graphics specific integration tests

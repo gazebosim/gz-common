@@ -11,7 +11,7 @@ on:
 jobs:
   build:
     env:
-      PACKAGE: gz-common6
+      PACKAGE: gz-common7
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v4
@@ -47,7 +47,7 @@ jobs:
           popd
           echo '# END SECTION'
         fi
-        # gz-math8 has problems with swig, remove it for now
+        # gz-math9 has problems with swig, remove it for now
         brew remove swig || true
         brew install --only-dependencies ${PACKAGE};
     - run: mkdir build

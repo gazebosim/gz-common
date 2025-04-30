@@ -60,10 +60,10 @@ enabled at compile time in order to function.
 cmake_minimum_required(VERSION 3.22.1 FATAL_ERROR)
 
 # Find the gz-common library
-find_package(gz-common7 QUIET REQUIRED COMPONENTS profiler)
+find_package(gz-common QUIET REQUIRED COMPONENTS profiler)
 
 add_executable(profiler_example profiler.cc)
-target_link_libraries(profiler_example gz-common7::profiler)
+target_link_libraries(profiler_example gz-common::profiler)
 # Enable the profiler for the example
 target_compile_definitions(profiler_example PUBLIC "GZ_PROFILER_ENABLE=1")
 ```
