@@ -101,7 +101,7 @@ if(TARGET UNIT_Profiler_Remotery_TEST)
 endif()
 
 if(GZ_PROFILER_REMOTERY)
-  set(GZ_PROFILER_SCRIPT_PATH ${CMAKE_INSTALL_LIBEXECDIR}/gz/gz-common${PROJECT_VERSION_MAJOR})
+  set(GZ_PROFILER_SCRIPT_PATH ${CMAKE_INSTALL_LIBEXECDIR}/gz/gz-common)
   set(GZ_PROFILER_VIS_PATH ${GZ_DATA_INSTALL_DIR}/profiler_vis)
 
   configure_file(Remotery/gz_remotery_vis.in
