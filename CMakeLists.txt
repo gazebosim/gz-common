@@ -3,14 +3,12 @@ cmake_minimum_required(VERSION 3.22.1 FATAL_ERROR)
 #============================================================================
 # Initialize the project
 #============================================================================
-project(gz-common7 VERSION 7.0.0)
-set(GZ_COMMON_VER ${PROJECT_VERSION_MAJOR})
+project(gz-common VERSION 7.0.0)
 
 #============================================================================
 # Find gz-cmake
 #============================================================================
-find_package(gz-cmake4 REQUIRED)
-set(GZ_CMAKE_VER ${gz-cmake4_VERSION_MAJOR})
+find_package(gz-cmake REQUIRED)
 
 #============================================================================
 # Configure the project
@@ -39,13 +37,11 @@ message(STATUS "\n\n-- ====== Finding Dependencies ======")
 
 #--------------------------------------
 # Find gz-math
-gz_find_package(gz-math8 REQUIRED_BY geospatial graphics events)
-set(GZ_MATH_VER ${gz-math8_VERSION_MAJOR})
+gz_find_package(gz-math REQUIRED_BY geospatial graphics events)
 
 #--------------------------------------
 # Find gz-utils
-gz_find_package(gz-utils3 REQUIRED COMPONENTS log)
-set(GZ_UTILS_VER ${gz-utils3_VERSION_MAJOR})
+gz_find_package(gz-utils REQUIRED COMPONENTS log)
 
 #--------------------------------------
 # Find Tinyxml2

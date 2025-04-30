@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>gz-common7</name>
+  <name>gz-common</name>
   <version>7.0.0</version>
   <description>Gazebo Common : AV, Graphics, Events, and much more.</description>
   <maintainer email="natekoenig@gmail.com">Nate Koenig</maintainer>
@@ -10,12 +10,12 @@
   <buildtool_depend>cmake</buildtool_depend>
   <buildtool_depend>pkg-config</buildtool_depend>
 
-  <build_depend>gz-cmake4</build_depend>
+  <build_depend>gz-cmake</build_depend>
 
   <depend>assimp-dev</depend>
   <depend>ffmpeg-dev</depend>
-  <depend>gz-math8</depend>
-  <depend>gz-utils3</depend>
+  <depend>gz-math</depend>
+  <depend>gz-utils</depend>
   <depend>libfreeimage-dev</depend>
   <depend>libgdal-dev</depend>
   <depend>spdlog</depend>

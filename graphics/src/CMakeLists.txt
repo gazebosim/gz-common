@@ -4,8 +4,8 @@ gz_add_component(graphics SOURCES ${sources} GET_TARGET_NAME graphics_target)
 
 target_link_libraries(${graphics_target}
   PUBLIC
-    gz-math${GZ_MATH_VER}::gz-math${GZ_MATH_VER}
-    gz-utils${GZ_UTILS_VER}::gz-utils${GZ_UTILS_VER}
+    gz-math::gz-math
+    gz-utils::gz-utils
   PRIVATE
     ${GzAssimp_LIBRARIES}
     FreeImage::FreeImage
@@ -23,7 +23,7 @@ gz_build_tests(
   SOURCES ${gtest_sources}
   LIB_DEPS
     ${graphics_target}
-    gz-common${GZ_COMMON_VER}-testing
+    gz-common-testing
     TINYXML2::TINYXML2
 )
 
