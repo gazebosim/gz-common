@@ -36,7 +36,7 @@ TestPaths::~TestPaths() = default;
 BuildType TestBuildType(const std::string &_projectSourcePath)
 {
   std::string gz_bazel;
-  bool gz_bazel_set = common::env("GZ_BAZEL", gz_bazel);
+  bool gz_bazel_set = common::env("BAZEL_TEST", gz_bazel);
   bool gz_cmake_set = !_projectSourcePath.empty();
 
   if (gz_bazel_set && gz_cmake_set)
