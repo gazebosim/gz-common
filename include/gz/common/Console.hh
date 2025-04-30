@@ -129,11 +129,11 @@ namespace gz
       /// \return True when the initialization succeed or false otherwise.
       public: static bool Init(const std::string &_directory,
                                const std::string &_filename);
-     
+
       /// \brief Detach fhe file sink from the global logger. After this call,
       /// console logging will keep working but no file logging.
       public: static void Close();
-      
+
       /// \brief Get the full path of the directory where all the log files
       /// are stored.
       /// \return Full path of the directory.
