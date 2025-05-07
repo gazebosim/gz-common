@@ -32,7 +32,6 @@ namespace gz::common::testing
 ///
 /// The main mechanism for detecting a bazel build is via the presence of the
 /// TEST_SRCDIR and TEST_UNDECLARED_OUTPUTS_DIR environment variables.
-/// Additionally, tests built via gz-bazel should set GZ_BAZEL_DIR.
 ///
 /// For source files to be available for bazel builds, they need to be set in
 /// the "data" section of the relevant cc_library or cc_test call.
@@ -55,4 +54,4 @@ class BazelTestPaths: public TestPaths
 
 }  // namespace gz::common::testing
 
-#endif  // GZ_COMMON_TESTING_AUTOLOGFIXTURE_HH_
+#endif  // GZ_COMMON_TESTING_BAZELTESTPATHS_HH_

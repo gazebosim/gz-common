@@ -1,33 +1,34 @@
-load(
-    "@gz//bazel/skylark:build_defs.bzl",
-    "GZ_FEATURES",
-    "GZ_ROOT",
-    "gz_export_header",
-)
-load(
-    "@gz//bazel/lint:lint.bzl",
-    "add_lint_tests",
-)
+load("@rules_gazebo//gazebo:headers.bzl", "gz_export_header")
+load("@rules_license//rules:license.bzl", "license")
 
 package(
-    default_applicable_licenses = [GZ_ROOT + "common:license"],
-    features = GZ_FEATURES,
+    default_applicable_licenses = ["//:license"],
+    features = ["layering_check"],
+)
+
+license(
+    name = "license",
+    package_name = "gz-common-testing",
 )
 
 gz_export_header(
-    name = "include/gz/common/testing/Export.hh",
+    name = "Export",
+    out = "include/gz/common/testing/Export.hh",
     export_base = "GZ_COMMON_TESTING",
     lib_name = "gz-common-testing",
-    visibility = ["//visibility:private"],
 )
 
-public_headers = glob([
-    "include/gz/common/testing/*.hh",
-    "include/gz/common/testing/detail/*.hh",
-]) + ["include/gz/common/testing/Export.hh"]
+public_headers = glob(
+    include = [
+        "include/gz/common/testing/*.hh",
+        "include/gz/common/testing/detail/*.hh",
+    ],
+) + [
+        "include/gz/common/testing/Export.hh"
+]
 
 cc_library(
-    name = "testing",
+    name = "gz-common-testing",
     srcs = [
         "src/BazelTestPaths.cc",
         "src/CMakeTestPaths.cc",
@@ -39,7 +40,7 @@ cc_library(
     includes = ["include"],
     visibility = ["//visibility:public"],
     deps = [
-        GZ_ROOT + "common",
+        "//:gz-common",
     ],
 )
 
@@ -47,8 +48,8 @@ cc_test(
     name = "AutoLogFixture_TEST",
     srcs = ["src/AutoLogFixture_TEST.cc"],
     deps = [
-        ":testing",
-        "@gtest//:gtest_main",
+        ":gz-common-testing",
+        "@googletest//:gtest_main",
     ],
 )
 
@@ -58,11 +59,10 @@ cc_test(
     data = glob(["test_files/**"]),
     env = {
         "GZ_BAZEL": "1",
-        "GZ_BAZEL_PATH": "common",
     },
     deps = [
-        ":testing",
-        "@gtest//:gtest_main",
+        ":gz-common-testing",
+        "@googletest//:gtest_main",
     ],
 )
 
@@ -71,12 +71,9 @@ cc_test(
     srcs = ["src/Utils_TEST.cc"],
     env = {
         "GZ_BAZEL": "1",
-        "GZ_BAZEL_PATH": "common",
     },
     deps = [
-        ":testing",
-        "@gtest//:gtest_main",
+        ":gz-common-testing",
+        "@googletest//:gtest_main",
     ],
 )
-
-add_lint_tests()

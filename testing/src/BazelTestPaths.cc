@@ -31,10 +31,10 @@ bool BazelTestPaths::ProjectSourcePath(std::string &_sourceDir)
 {
   std::string test_srcdir, bazel_path;
 
-  if (common::env("TEST_SRCDIR", test_srcdir) &&
-      common::env("GZ_BAZEL_PATH", bazel_path))
+  if (common::env("TEST_SRCDIR", test_srcdir))
   {
-    _sourceDir = gz::common::joinPaths(test_srcdir, "gz", bazel_path);
+    // bzlmod puts run files in _main instead of workspace name
+    _sourceDir = gz::common::joinPaths(test_srcdir, "_main");
     return true;
   }
   else
