@@ -3,8 +3,10 @@ load("@rules_license//rules:license.bzl", "license")
 
 package(
     default_applicable_licenses = [":license"],
-    default_visibility = ["__subpackages__"],
-    features = ["layering_check"],
+    features = [
+        "layering_check",
+        "parse_headers",
+    ],
 )
 
 license(
@@ -20,6 +22,12 @@ exports_files([
     "MODULE.bazel",
 ])
 
+gz_configure_header(
+    name = "Config",
+    src = "include/gz/common/config.hh.in",
+    package_xml = "package.xml",
+)
+
 gz_export_header(
     name = "Export",
     out = "include/gz/common/Export.hh",
@@ -27,22 +35,11 @@ gz_export_header(
     lib_name = "gz-common",
 )
 
-gz_configure_header(
-    name = "Config",
-    src = "include/gz/common/config.hh.in",
-    package_xml = "package.xml",
-)
-
-public_headers = glob(
-    include = [
-        "include/gz/common/*.hh",
-        "include/gz/common/detail/*.hh",
-        "include/gz/common/graph/*.hh",
-    ],
-) + [
-    "include/gz/common/Export.hh",
-    "include/gz/common/config.hh",
-]
+public_headers_no_gen = glob([
+    "include/gz/common/*.hh",
+    "include/gz/common/detail/*.hh",
+    "include/gz/common/graph/*.hh",
+])
 
 private_headers = glob(
     include = [
@@ -60,6 +57,11 @@ sources = glob(
         "src/*_TEST.cc",
     ],
 )
+
+public_headers = public_headers_no_gen + [
+    "include/gz/common/config.hh",
+    "include/gz/common/Export.hh",
+]
 
 cc_library(
     name = "gz-common",
