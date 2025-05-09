@@ -1,4 +1,3 @@
-load("@buildifier_prebuilt//:rules.bzl", "buildifier", "buildifier_test")
 load("@rules_gazebo//gazebo:headers.bzl", "gz_configure_header", "gz_export_header")
 load("@rules_license//rules:license.bzl", "license")
 
@@ -96,5 +95,6 @@ test_sources = glob(
         ":gz-common",
         "//testing:gz-common-testing",
         "@googletest//:gtest_main",
+        "@gz-utils//:ExtraTestMacros",
     ],
 ) for src in test_sources]
