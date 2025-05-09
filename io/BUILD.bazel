@@ -33,7 +33,7 @@ public_headers = public_headers_no_gen + [
 ]
 
 cc_library(
-    name = "gz-common-io",
+    name = "io",
     srcs = sources,
     hdrs = public_headers,
     copts = [
@@ -52,11 +52,10 @@ cc_library(
     srcs = [src],
     env = {
         "GZ_BAZEL": "1",
-        "GZ_BAZEL_PATH": "common",
     },
     deps = [
-        ":gz-common-io",
-        "//testing:gz-common-testing",
+        ":io",
+        "//testing:testing",
         "@googletest//:gtest_main",
 
     ],

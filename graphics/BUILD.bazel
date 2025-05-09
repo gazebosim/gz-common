@@ -64,9 +64,9 @@ public_headers = public_headers_no_gen + [
 #         "GZ_BAZEL": "1",
 #     },
 #     deps = [
-#         ":gz-common-graphics",
+#         ":graphics",
 #         GZ_ROOT + "common/testing",
-#         "//testing:gz-common-testing",
+#         "//testing:testing",
 #         "@googletest//:gtest_main",
 #     ],
 # ) for src in test_sources]

@@ -44,7 +44,7 @@ public_headers = public_headers_no_gen + [
 #     visibility = ["//visibility:public"],
 #     deps = [
 #         "//:gz-common",
-#         "//graphics:gz-common-graphics",
+#         "//graphics:graphics",
 #         "@gz-utils//:ImplPtr",
 #         "@gdal",
 #     ],
@@ -58,8 +58,8 @@ public_headers = public_headers_no_gen + [
 #         "GZ_BAZEL": "1",
 #     },
 #     deps = [
-#         ":gz-common-geospatial",
-#         "//testing:gz-common-testing",
+#         ":geospatial",
+#         "//testing:testing",
 #         "@googletest//:gtest_main",
 #     ],
 # ) for src in test_sources]

@@ -33,7 +33,7 @@ public_headers = public_headers_no_gen + [
 ]
 
 # cc_library(
-#     name = "gz-common-av",
+#     name = "av",
 #     srcs = sources,
 #     hdrs = public_headers,
 #     includes = ["include"],
@@ -57,8 +57,8 @@ public_headers = public_headers_no_gen + [
 #         "GZ_BAZEL": "1",
 #     },
 #     deps = [
-#         ":gz-common-av",
-#         "//testing:gz-common-testing",
+#         ":av",
+#         "//testing:testing",
 #         "@googletest//:gtest_main",
 #
 #     ],

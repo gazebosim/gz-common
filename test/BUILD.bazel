@@ -14,7 +14,7 @@ cc_test(
     },
     deps = [
         "//:gz-common",
-        "//testing:gz-common-testing",
+        "//testing:testing",
         "@googletest//:gtest_main",
     ],
 )
@@ -34,8 +34,8 @@ cc_test(
 #     },
 #     deps = [
 #         "//:gz-common",
-#         "//testing:gz-common-testing",
-#         "//gz-common:gz-common-graphics",
+#         "//testing:testing",
+#         "//gz-common:graphics",
 #         "@gz-math//:gz-math",
 #         "@googletest//:gtest_main",
 #     ],
