@@ -95,7 +95,7 @@ test_sources = glob(
     copts = ["-fexceptions"],
     deps = [
         ":gz-common",
-        "//testing:gz-common-testing",
+        "//testing:testing",
         "@googletest//:gtest_main",
         "@gz-utils//:ExtraTestMacros",
     ],

@@ -64,15 +64,14 @@ private_headers = [
 ]
 
 cc_library(
-    name = "gz-common-remotery",
+    name = "remotery",
     srcs = ["src/Remotery/lib/Remotery.c"],
     hdrs = ["src/Remotery/lib/Remotery.h"],
     includes = ["src/Remotery/lib"],
-    visibility = ["//visibility:private"],
 )
 
 cc_library(
-    name = "gz-common-profiler",
+    name = "profiler",
     srcs = sources,
     hdrs = public_headers + private_headers,
     defines = [
@@ -83,7 +82,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//:gz-common",
-        ":gz-common-remotery",
+        ":remotery",
     ],
 )
 
@@ -96,7 +95,7 @@ cc_test(
         "GZ_PROFILER_REMOTERY=0",
     ],
     deps = [
-        ":gz-common-profiler",
+        ":profiler",
         "@googletest//:gtest_main",
     ],
 )
@@ -105,7 +104,7 @@ cc_test(
     name = "Profiler_Remotery_TEST",
     srcs = ["src/Profiler_Remotery_TEST.cc"],
     deps = [
-        ":gz-common-profiler",
+        ":profiler",
         "@googletest//:gtest_main",
     ],
 )

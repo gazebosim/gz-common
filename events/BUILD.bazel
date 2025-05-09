@@ -35,7 +35,7 @@ public_headers = public_headers_no_gen + [
 ]
 
 cc_library(
-    name = "gz-common-events",
+    name = "events",
     srcs = sources,
     hdrs = public_headers,
     includes = ["include"],
@@ -50,8 +50,8 @@ cc_library(
     name = src.replace("/", "_").replace(".cc", "").replace("src_", ""),
     srcs = [src],
     deps = [
-        ":gz-common-events",
-        "//testing:gz-common-testing",
+        ":events",
+        "//testing:testing",
         "@googletest//:gtest_main",
     ],
 ) for src in test_sources]

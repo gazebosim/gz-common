@@ -25,7 +25,7 @@ public_headers = glob(
     ]
 
 cc_library(
-    name = "gz-common-testing",
+    name = "testing",
     srcs = [
         "src/BazelTestPaths.cc",
         "src/CMakeTestPaths.cc",
@@ -45,7 +45,7 @@ cc_test(
     name = "AutoLogFixture_TEST",
     srcs = ["src/AutoLogFixture_TEST.cc"],
     deps = [
-        ":gz-common-testing",
+        ":testing",
         "@googletest//:gtest_main",
     ],
 )
@@ -58,7 +58,7 @@ cc_test(
         "GZ_BAZEL": "1",
     },
     deps = [
-        ":gz-common-testing",
+        ":testing",
         "@googletest//:gtest_main",
     ],
 )
@@ -70,7 +70,7 @@ cc_test(
         "GZ_BAZEL": "1",
     },
     deps = [
-        ":gz-common-testing",
+        ":testing",
         "@googletest//:gtest_main",
     ],
 )
