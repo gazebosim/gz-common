@@ -1,20 +1,12 @@
-load(
-    "@gz//bazel/skylark:build_defs.bzl",
-    "GZ_FEATURES",
-    "GZ_ROOT",
-    "GZ_VISIBILITY",
-    "cmake_configure_file",
-    "gz_export_header",
-    "gz_include_header",
-)
-load(
-    "@gz//bazel/lint:lint.bzl",
-    "add_lint_tests",
-)
+load("@rules_gazebo//gazebo:headers.bzl", "gz_configure_header", "gz_export_header")
+load("@rules_license//rules:license.bzl", "license")
 
 package(
-    default_applicable_licenses = [GZ_ROOT + "common:license"],
-    features = GZ_FEATURES,
+    default_applicable_licenses = ["//:license"],
+    features = [
+        "layering_check",
+        "parse_headers",
+    ],
 )
 
 # Configuration for UNIX
@@ -30,11 +22,10 @@ RMT_USE_OPENGL = 1
 
 RMT_USE_METAL = 0
 
-cmake_configure_file(
-    name = "remotery_config",
+gz_configure_header(
+    name = "Config",
     src = "src/RemoteryConfig.h.in",
     out = "include/RemoteryConfig.h",
-    cmakelists = ["CMakeLists.txt"],
     defines = [
         "RMT_ENABLED=%d" % RMT_ENABLED,
         "RMT_USE_TINYCRT=%d" % RMT_USE_TINYCRT,
@@ -43,7 +34,7 @@ cmake_configure_file(
         "RMT_USE_OPENGL=%d" % RMT_USE_OPENGL,
         "RMT_USE_METAL=%d" % RMT_USE_METAL,
     ],
-    visibility = ["//visibility:private"],
+    package_xml = "//:package.xml",
 )
 
 public_headers_no_gen = [
@@ -56,23 +47,14 @@ sources = [
 ]
 
 gz_export_header(
-    name = "include/gz/common/profiler/Export.hh",
+    name = "Export",
+    out = "include/gz/common/profiler/Export.hh",
     export_base = "GZ_COMMON_PROFILER",
     lib_name = "gz-common-profiler",
-    visibility = ["//visibility:private"],
-)
-
-gz_include_header(
-    name = "profiler_hh_genrule",
-    out = "include/gz/common/profiler.hh",
-    hdrs = public_headers_no_gen + [
-        "include/gz/common/profiler/Export.hh",
-    ],
 )
 
 public_headers = public_headers_no_gen + [
     "include/gz/common/profiler/Export.hh",
-    "include/gz/common/profiler.hh",
 ]
 
 private_headers = [
@@ -82,14 +64,15 @@ private_headers = [
 ]
 
 cc_library(
-    name = "remotery",
+    name = "gz-common-remotery",
     srcs = ["src/Remotery/lib/Remotery.c"],
     hdrs = ["src/Remotery/lib/Remotery.h"],
     includes = ["src/Remotery/lib"],
+    visibility = ["//visibility:private"],
 )
 
 cc_library(
-    name = "profiler",
+    name = "gz-common-profiler",
     srcs = sources,
     hdrs = public_headers + private_headers,
     defines = [
@@ -97,10 +80,10 @@ cc_library(
         "GZ_PROFILER_REMOTERY=1",
     ],
     includes = ["include"],
-    visibility = GZ_VISIBILITY,
+    visibility = ["//visibility:public"],
     deps = [
-        GZ_ROOT + "common",
-        ":remotery",
+        "//:gz-common",
+        ":gz-common-remotery",
     ],
 )
 
@@ -113,9 +96,8 @@ cc_test(
         "GZ_PROFILER_REMOTERY=0",
     ],
     deps = [
-        ":profiler",
-        "@gtest",
-        "@gtest//:gtest_main",
+        ":gz-common-profiler",
+        "@googletest//:gtest_main",
     ],
 )
 
@@ -123,10 +105,7 @@ cc_test(
     name = "Profiler_Remotery_TEST",
     srcs = ["src/Profiler_Remotery_TEST.cc"],
     deps = [
-        ":profiler",
-        "@gtest",
-        "@gtest//:gtest_main",
+        ":gz-common-profiler",
+        "@googletest//:gtest_main",
     ],
 )
-
-add_lint_tests()

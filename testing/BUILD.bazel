@@ -3,12 +3,10 @@ load("@rules_license//rules:license.bzl", "license")
 
 package(
     default_applicable_licenses = ["//:license"],
-    features = ["layering_check"],
-)
-
-license(
-    name = "license",
-    package_name = "gz-common-testing",
+    features = [
+        "layering_check",
+        "parse_headers",
+    ],
 )
 
 gz_export_header(
@@ -22,10 +20,9 @@ public_headers = glob(
     include = [
         "include/gz/common/testing/*.hh",
         "include/gz/common/testing/detail/*.hh",
-    ],
-) + [
+    ]) + [
         "include/gz/common/testing/Export.hh"
-]
+    ]
 
 cc_library(
     name = "gz-common-testing",
