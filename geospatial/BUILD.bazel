@@ -60,6 +60,7 @@ public_headers = public_headers_no_gen + [
 #     deps = [
 #         ":geospatial",
 #         "//testing:testing",
+#         "@googletest//:gtest",
 #         "@googletest//:gtest_main",
 #     ],
 # ) for src in test_sources]

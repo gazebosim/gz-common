@@ -48,10 +48,10 @@ public_headers = public_headers_no_gen + [
 #     deps = [
 #         "//:gz-common",
 #         "@gz-utils//:ImplPtr",
-#         "@assimp",
-#         "@freeimage",
-#         "@glib",
-#         "@gts",
+#         #"@assimp",
+#         #"@freeimage//:freeimage",
+#         #"@glib",
+#         #"@gts",
 #         "@tinyxml2",
 #     ],
 # )
@@ -67,6 +67,7 @@ public_headers = public_headers_no_gen + [
 #         ":graphics",
 #         GZ_ROOT + "common/testing",
 #         "//testing:testing",
+#         "@googletest//:gtest",
 #         "@googletest//:gtest_main",
 #     ],
 # ) for src in test_sources]

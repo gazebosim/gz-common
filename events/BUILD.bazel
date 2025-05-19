@@ -53,5 +53,6 @@ cc_library(
         ":events",
         "//testing:testing",
         "@googletest//:gtest_main",
+        "@googletest//:gtest",
     ],
 ) for src in test_sources]

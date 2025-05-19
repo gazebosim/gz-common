@@ -96,6 +96,7 @@ test_sources = glob(
     deps = [
         ":gz-common",
         "//testing:testing",
+        "@googletest//:gtest",
         "@googletest//:gtest_main",
         "@gz-utils//:ExtraTestMacros",
     ],

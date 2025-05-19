@@ -46,6 +46,7 @@ cc_test(
     srcs = ["src/AutoLogFixture_TEST.cc"],
     deps = [
         ":testing",
+        "@googletest//:gtest",
         "@googletest//:gtest_main",
     ],
 )
@@ -59,6 +60,7 @@ cc_test(
     },
     deps = [
         ":testing",
+        "@googletest//:gtest",
         "@googletest//:gtest_main",
     ],
 )
@@ -71,6 +73,7 @@ cc_test(
     },
     deps = [
         ":testing",
+        "@googletest//:gtest",
         "@googletest//:gtest_main",
     ],
 )
