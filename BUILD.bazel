@@ -1,22 +1,12 @@
-load(
-    "@gz//bazel/skylark:build_defs.bzl",
-    "GZ_FEATURES",
-    "GZ_ROOT",
-    "GZ_VISIBILITY",
-    "gz_configure_header",
-    "gz_export_header",
-    "gz_include_header",
-)
-load(
-    "@gz//bazel/lint:lint.bzl",
-    "add_lint_tests",
-)
+load("@rules_gazebo//gazebo:headers.bzl", "gz_configure_header", "gz_export_header")
 load("@rules_license//rules:license.bzl", "license")
 
 package(
-    default_applicable_licenses = [GZ_ROOT + "common:license"],
-    default_visibility = GZ_VISIBILITY,
-    features = GZ_FEATURES,
+    default_applicable_licenses = [":license"],
+    features = [
+        "layering_check",
+        "parse_headers",
+    ],
 )
 
 license(
@@ -26,20 +16,23 @@ license(
 
 licenses(["notice"])
 
-exports_files(["LICENSE"])
+exports_files([
+    "package.xml",
+    "LICENSE",
+    "MODULE.bazel",
+])
 
 gz_configure_header(
-    name = "config",
+    name = "Config",
     src = "include/gz/common/config.hh.in",
-    cmakelists = ["CMakeLists.txt"],
-    package = "common",
+    package_xml = "package.xml",
 )
 
 gz_export_header(
-    name = "include/gz/common/Export.hh",
+    name = "Export",
+    out = "include/gz/common/Export.hh",
     export_base = "GZ_COMMON",
     lib_name = "gz-common",
-    visibility = ["//visibility:private"],
 )
 
 public_headers_no_gen = glob([
@@ -48,10 +41,16 @@ public_headers_no_gen = glob([
     "include/gz/common/graph/*.hh",
 ])
 
-private_headers = glob(["src/*.hh"])
+private_headers = glob(
+    include = [
+        "src/*.hh",
+    ],
+)
 
 sources = glob(
-    ["src/*.cc"],
+    include = [
+        "src/*.cc",
+    ],
     exclude = [
         "src/Plugin.cc",
         "src/PluginLoader.cc",
@@ -59,23 +58,13 @@ sources = glob(
     ],
 )
 
-gz_include_header(
-    name = "commonhh_genrule",
-    out = "include/gz/common.hh",
-    hdrs = public_headers_no_gen + [
-        "include/gz/common/config.hh",
-        "include/gz/common/Export.hh",
-    ],
-)
-
 public_headers = public_headers_no_gen + [
     "include/gz/common/config.hh",
     "include/gz/common/Export.hh",
-    "include/gz/common.hh",
 ]
 
 cc_library(
-    name = "common",
+    name = "gz-common",
     srcs = sources + private_headers,
     hdrs = public_headers,
     copts = [
@@ -83,10 +72,12 @@ cc_library(
         "-Wno-unused-value",
     ],
     includes = ["include"],
+    visibility = ["//visibility:public"],
     deps = [
-        GZ_ROOT + "utils",
-        GZ_ROOT + "math",
-        "@uuid",
+        "@gz-utils//:ImplPtr",
+        "@gz-utils//log:Logger",
+        "@gz-math//:gz-math",
+        "@libuuid",
     ],
 )
 
@@ -103,11 +94,10 @@ test_sources = glob(
     srcs = [src],
     copts = ["-fexceptions"],
     deps = [
-        ":common",
-        GZ_ROOT + "common/testing",
-        "@gtest",
-        "@gtest//:gtest_main",
+        ":gz-common",
+        "//testing:testing",
+        "@googletest//:gtest",
+        "@googletest//:gtest_main",
+        "@gz-utils//:ExtraTestMacros",
     ],
 ) for src in test_sources]
-
-add_lint_tests()

@@ -2,3 +2,6 @@ build
 build_*
 .DS_Store
 *.swp
+
+# Bazel generated files
+bazel-*
