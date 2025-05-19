@@ -36,7 +36,8 @@ namespace gz
       /// heightmap type is DEM.
       /// \return heightmap
       std::unique_ptr<HeightmapData>
-      GZ_COMMON_GEOSPATIAL_VISIBLE loadHeightmapData(const std::string &_filename,
+      GZ_COMMON_GEOSPATIAL_VISIBLE loadHeightmapData(
+                  const std::string &_filename,
                   const math::SphericalCoordinates &_sphericalCoordinates =
                   math::SphericalCoordinates());
 
