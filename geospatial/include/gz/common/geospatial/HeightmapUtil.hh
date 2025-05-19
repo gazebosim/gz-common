@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GZ_COMMON_GEOSPATIAL_HEIGHTMAPLOADER_HH_
-#define GZ_COMMON_GEOSPATIAL_HEIGHTMAPLOADER_HH_
+#ifndef GZ_COMMON_GEOSPATIAL_HEIGHTMAPUTIL_HH_
+#define GZ_COMMON_GEOSPATIAL_HEIGHTMAPUTIL_HH_
 
 #include <memory>
 #include <string>
@@ -29,29 +29,23 @@ namespace gz
 {
   namespace common
   {
-    /// \class HeightmapLoader HeightmapLoader.hh gz/common/HeightmapLoader.hh
-    /// \brief Helper class for loading heigtmap data
-    class GZ_COMMON_GEOSPATIAL_VISIBLE HeightmapLoader
-    {
       /// \brief Load a heightmap from file
       /// \param[in] _filename Path to heightmap file
       /// \param[in] _sphericalCoordinates The spherical coordinates
       /// object contained in the world. This is used if the underlying
       /// heightmap type is DEM.
       /// \return heightmap
-      public: static std::unique_ptr<HeightmapData> Load(const std::string &_filename,
+      std::unique_ptr<HeightmapData>
+      GZ_COMMON_GEOSPATIAL_VISIBLE loadHeightmapData(const std::string &_filename,
                   const math::SphericalCoordinates &_sphericalCoordinates =
                   math::SphericalCoordinates());
 
       /// \brief Check if input file has a file extension that can be
       /// loaded as an ImageHeightmap
       /// \param[in] _filename Path to heightmap file
-      /// \return True if the filename has an image file extension that is
-      /// supported.
-      public: static bool SupportedImageFileExtension(
+      /// \return True if the filename has a file extension that is supported.
+      bool GZ_COMMON_GEOSPATIAL_VISIBLE isSupportedImageHeightmapFileExtension(
                   const std::string &_filename);
-
-    };
   }
 }
 #endif

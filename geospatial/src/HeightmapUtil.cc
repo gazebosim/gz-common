@@ -20,15 +20,16 @@
 #include "gz/common/Util.hh"
 
 #include "gz/common/geospatial/Dem.hh"
-#include "gz/common/geospatial/HeightmapLoader.hh"
+#include "gz/common/geospatial/HeightmapUtil.hh"
 #include "gz/common/geospatial/ImageHeightmap.hh"
 
-using namespace gz;
-using namespace common;
+namespace gz
+{
+namespace common
+{
 
 //////////////////////////////////////////////////
-bool HeightmapLoader::SupportedImageFileExtension(
-    const std::string &_filename)
+bool isSupportedImageHeightmapFileExtension(const std::string &_filename)
 {
   if (_filename.empty())
     return false;
@@ -40,7 +41,7 @@ bool HeightmapLoader::SupportedImageFileExtension(
 }
 
 //////////////////////////////////////////////////
-std::unique_ptr<HeightmapData> HeightmapLoader::Load(
+std::unique_ptr<HeightmapData> loadHeightmapData(
     const std::string &_filename,
     const math::SphericalCoordinates &_sphericalCoordinates)
 {
@@ -49,7 +50,7 @@ std::unique_ptr<HeightmapData> HeightmapLoader::Load(
 
   std::unique_ptr<HeightmapData> data;
   // check if heightmap is an image
-  if (HeightmapLoader::SupportedImageFileExtension(_filename))
+  if (isSupportedImageHeightmapFileExtension(_filename))
   {
     auto imgHeightmap = std::make_unique<ImageHeightmap>();
     if (imgHeightmap->Load(_filename) < 0)
@@ -76,4 +77,7 @@ std::unique_ptr<HeightmapData> HeightmapLoader::Load(
   }
 
   return data;
+}
+
+}
 }

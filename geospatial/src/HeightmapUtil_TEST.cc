@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 
-#include "gz/common/geospatial/HeightmapLoader.hh"
+#include "gz/common/geospatial/HeightmapUtil.hh"
 
 #include "gz/common/testing/AutoLogFixture.hh"
 #include "gz/common/testing/TestPaths.hh"
@@ -27,18 +27,18 @@ using namespace gz;
 class HeightmapLoaderTest : public common::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
-TEST_F(HeightmapLoaderTest, SupportedImageFileExtension)
+TEST_F(HeightmapLoaderTest, SupportedImageHeightmapFileExtension)
 {
-  EXPECT_TRUE(common::HeightmapLoader::SupportedImageFileExtension("f.jpg"));
-  EXPECT_TRUE(common::HeightmapLoader::SupportedImageFileExtension("f.jpeg"));
-  EXPECT_TRUE(common::HeightmapLoader::SupportedImageFileExtension("f.png"));
-  EXPECT_TRUE(common::HeightmapLoader::SupportedImageFileExtension("f.JPG"));
-  EXPECT_TRUE(common::HeightmapLoader::SupportedImageFileExtension("f.JPEG"));
-  EXPECT_TRUE(common::HeightmapLoader::SupportedImageFileExtension("f.PNG"));
-  EXPECT_TRUE(common::HeightmapLoader::SupportedImageFileExtension(".PNG"));
-  EXPECT_FALSE(common::HeightmapLoader::SupportedImageFileExtension("f.tiff"));
-  EXPECT_FALSE(common::HeightmapLoader::SupportedImageFileExtension("invalid"));
-  EXPECT_FALSE(common::HeightmapLoader::SupportedImageFileExtension(""));
+  EXPECT_TRUE(common::isSupportedImageHeightmapFileExtension("f.jpg"));
+  EXPECT_TRUE(common::isSupportedImageHeightmapFileExtension("f.jpeg"));
+  EXPECT_TRUE(common::isSupportedImageHeightmapFileExtension("f.png"));
+  EXPECT_TRUE(common::isSupportedImageHeightmapFileExtension("f.JPG"));
+  EXPECT_TRUE(common::isSupportedImageHeightmapFileExtension("f.JPEG"));
+  EXPECT_TRUE(common::isSupportedImageHeightmapFileExtension("f.PNG"));
+  EXPECT_TRUE(common::isSupportedImageHeightmapFileExtension(".PNG"));
+  EXPECT_FALSE(common::isSupportedImageHeightmapFileExtension("f.tiff"));
+  EXPECT_FALSE(common::isSupportedImageHeightmapFileExtension("invalid"));
+  EXPECT_FALSE(common::isSupportedImageHeightmapFileExtension(""));
 }
 
 /////////////////////////////////////////////////
@@ -46,7 +46,7 @@ TEST_F(HeightmapLoaderTest, LoadImage)
 {
   const auto path = common::testing::TestFile("data", "heightmap_bowl.png");
   std::unique_ptr<common::HeightmapData> data =
-      common::HeightmapLoader::Load(path);
+      common::loadHeightmapData(path);
   EXPECT_NE(nullptr, data);
 }
 
@@ -55,13 +55,13 @@ TEST_F(HeightmapLoaderTest, LoadDEM)
 {
   const auto path = common::testing::TestFile("data", "dem_squared.tif");
   std::unique_ptr<common::HeightmapData> data =
-      common::HeightmapLoader::Load(path);
+      common::loadHeightmapData(path);
   EXPECT_NE(nullptr, data);
 }
 
 /////////////////////////////////////////////////
 TEST_F(HeightmapLoaderTest, LoadInvalidFile)
 {
-  EXPECT_EQ(nullptr, common::HeightmapLoader::Load("invalid/file.jpg"));
-  EXPECT_EQ(nullptr, common::HeightmapLoader::Load("invalid/file_no_extension"));
+  EXPECT_EQ(nullptr, common::loadHeightmapData("invalid/file.jpg"));
+  EXPECT_EQ(nullptr, common::loadHeightmapData("invalid/file_no_extension"));
 }
