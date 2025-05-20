@@ -4,7 +4,10 @@ module(
     repo_name = "org_gazebosim_gz-common",
 )
 
+bazel_dep(name = "assimp", version = "5.4.3")
 bazel_dep(name = "buildifier_prebuilt", version = "7.3.1")
+bazel_dep(name = "cdt", version = "1.4.0")
+bazel_dep(name = "freeimage", version = "3.19.10")
 bazel_dep(name = "googletest", version = "1.14.0")
 bazel_dep(name = "rules_license", version = "1.0.0")
 bazel_dep(name = "tinyxml2", version = "10.0.0")

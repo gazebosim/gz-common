@@ -32,6 +32,7 @@ public_headers = public_headers_no_gen + [
     "include/gz/common/av/Export.hh",
 ]
 
+# \todo(iche033) Add av component once ffmpeg dep is available in BCR
 # cc_library(
 #     name = "av",
 #     srcs = sources,

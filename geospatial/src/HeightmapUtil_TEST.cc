@@ -51,6 +51,7 @@ TEST_F(HeightmapLoaderTest, LoadImage)
   EXPECT_NE(nullptr, data);
 }
 
+#ifndef BAZEL_DISABLE_DEM_LOADER
 /////////////////////////////////////////////////
 TEST_F(HeightmapLoaderTest, LoadDEM)
 {
@@ -59,6 +60,7 @@ TEST_F(HeightmapLoaderTest, LoadDEM)
       common::loadHeightmapData(path);
   EXPECT_NE(nullptr, data);
 }
+#endif
 
 /////////////////////////////////////////////////
 TEST_F(HeightmapLoaderTest, LoadInvalidFile)
