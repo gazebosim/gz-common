@@ -16,6 +16,7 @@
 */
 
 #include <gtest/gtest.h>
+#include <memory>
 
 #include "gz/common/geospatial/HeightmapUtil.hh"
 

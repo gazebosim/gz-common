@@ -15,6 +15,11 @@
  *
  */
 
+#include <memory>
+#include <ostream>
+#include <string>
+#include <utility>
+
 #include "gz/common/Console.hh"
 #include "gz/common/StringUtils.hh"
 #include "gz/common/Util.hh"
