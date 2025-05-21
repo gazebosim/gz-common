@@ -64,13 +64,6 @@ private_headers = [
 ]
 
 cc_library(
-    name = "remotery",
-    srcs = ["src/Remotery/lib/Remotery.c"],
-    hdrs = ["src/Remotery/lib/Remotery.h"],
-    includes = ["src/Remotery/lib"],
-)
-
-cc_library(
     name = "profiler",
     srcs = sources,
     hdrs = public_headers + private_headers,
@@ -82,7 +75,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//:gz-common",
-        ":remotery",
+        "@remotery",
     ],
 )
 
