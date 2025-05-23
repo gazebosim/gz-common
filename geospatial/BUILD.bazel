@@ -10,7 +10,6 @@ package(
 
 public_headers_no_gen = glob(
     include = [
-        "include/gz/common/*.hh",
         "include/gz/common/**/*.hh",
     ],
     exclude = ["include/gz/common/geospatial/Dem.hh"],
