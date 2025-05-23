@@ -1,5 +1,4 @@
 load("@rules_gazebo//gazebo:headers.bzl", "gz_configure_header", "gz_export_header")
-load("@rules_license//rules:license.bzl", "license")
 
 package(
     default_applicable_licenses = ["//:license"],
