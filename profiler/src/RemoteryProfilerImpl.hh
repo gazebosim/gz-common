@@ -21,10 +21,10 @@
 #include <string>
 #include <cstdint>
 
+#include "gz/common/ProfilerImpl.hh"
+
 #include "RemoteryConfig.h"
 #include "Remotery.h"
-
-#include "ProfilerImpl.hh"
 
 namespace gz
 {

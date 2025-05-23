@@ -20,6 +20,7 @@
 
 #include <atomic> // NOLINT(*)
 #include <thread> // NOLINT(*)
+#include "gz/common/Console.hh"
 #include "gz/common/Util.hh" // NOLINT(*)
 
 using namespace gz;
@@ -28,6 +29,10 @@ using namespace common;
 /////////////////////////////////////////////////
 TEST(Profiler, ProfilerDisabled)
 {
+#ifndef BAZEL_SKIP_PROFILER_TEST
   EXPECT_FALSE(GZ_PROFILER_ENABLE);
   EXPECT_FALSE(GZ_PROFILER_VALID);
+#else
+  gzerr << "Test case is disabled" << std::endl;
+#endif
 }
