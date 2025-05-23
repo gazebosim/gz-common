@@ -19,26 +19,27 @@ cc_test(
     ],
 )
 
-# cc_test(
-#     name = "INTEGRATION_mesh",
-#     srcs = ["integration/mesh.cc"],
-#     data = [
-#         "data/box.dae",
-#         "data/box.fbx",
-#         "data/box.glb",
-#         "data/box.mtl",
-#         "data/box.obj",
-#     ],
-#     env = {
-#         "GZ_BAZEL": "1",
-#     },
-#     deps = [
-#         "//:gz-common",
-#         "//testing:testing",
-#         "//gz-common:graphics",
-#         "@gz-math//:gz-math",
-#         "@googletest//:gtest_main",
-#     ],
-# )
+cc_test(
+    name = "INTEGRATION_mesh",
+    srcs = ["integration/mesh.cc"],
+    data = [
+        "data/box.dae",
+        "data/box.fbx",
+        "data/box.glb",
+        "data/box.mtl",
+        "data/box.obj",
+    ],
+    env = {
+        "GZ_BAZEL": "1",
+    },
+    deps = [
+        "//:gz-common",
+        "//testing:testing",
+        "//graphics:graphics",
+        "@gz-math//:gz-math",
+        "@googletest//:gtest",
+        "@googletest//:gtest_main",
+    ],
+)
 
 exports_files(["data"])
