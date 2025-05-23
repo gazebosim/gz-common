@@ -20,16 +20,21 @@
 
 #include <atomic> // NOLINT(*)
 #include <thread> // NOLINT(*)
+#include "gz/common/Console.hh"
 #include "gz/common/Util.hh" // NOLINT(*)
 
 using namespace gz;
 using namespace common;
 
 /////////////////////////////////////////////////
-TEST(Profiler, ProfilerDisabled)
+TEST(Profiler, ProfilerRemotery)
 {
+#ifndef BAZEL_SKIP_PROFILER_TEST
   EXPECT_TRUE(GZ_PROFILER_ENABLE);
   EXPECT_TRUE(GZ_PROFILER_VALID);
   EXPECT_EQ(Profiler::Instance()->ImplementationName(),
             "gz_profiler_remotery");
+#else
+  gzerr << "Test case is disabled" << std::endl;
+#endif
 }
