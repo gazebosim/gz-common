@@ -1,5 +1,4 @@
 load("@rules_gazebo//gazebo:headers.bzl", "gz_export_header")
-load("@rules_license//rules:license.bzl", "license")
 
 package(
     default_applicable_licenses = ["//:license"],
@@ -14,7 +13,8 @@ public_headers_no_gen = glob([
     "include/gz/common/**/*.hh",
 ])
 
-private_headers = glob(["src/VHACD/*.h"])
+vhacd_header = ["src/VHACD/VHACD.h"]
+tiny_obj_loader_header = ["src/tiny_obj_loader.h"]
 
 sources = glob(
     ["src/*.cc"],
@@ -32,42 +32,39 @@ gz_export_header(
 
 public_headers = public_headers_no_gen + [
     "include/gz/common/graphics/Export.hh",
-    "src/tiny_obj_loader.h",
 ]
 
-# cc_library(
-#     name = "graphics",
-#     srcs = sources + private_headers,
-#     hdrs = public_headers,
-#     copts = [
-#         "-Wno-implicit-fallthrough",
-#         "-Wno-unused-value",
-#     ],
-#     includes = ["include"],
-#     visibility = ["//visibility:public"],
-#     deps = [
-#         "//:gz-common",
-#         "@gz-utils//:ImplPtr",
-#         #"@assimp",
-#         #"@freeimage//:freeimage",
-#         #"@glib",
-#         #"@gts",
-#         "@tinyxml2",
-#     ],
-# )
-#
-# [cc_test(
-#     name = src.replace("/", "_").replace(".cc", "").replace("src_", ""),
-#     srcs = [src],
-#     data = ["//test:data"],
-#     env = {
-#         "GZ_BAZEL": "1",
-#     },
-#     deps = [
-#         ":graphics",
-#         GZ_ROOT + "common/testing",
-#         "//testing:testing",
-#         "@googletest//:gtest",
-#         "@googletest//:gtest_main",
-#     ],
-# ) for src in test_sources]
+cc_library(
+    name = "graphics",
+    srcs = sources + vhacd_header + tiny_obj_loader_header,
+    hdrs = public_headers,
+    copts = [
+        "-Wno-implicit-fallthrough",
+        "-Wno-unused-value",
+    ],
+    includes = ["include"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:gz-common",
+        "@assimp",
+        "@cdt",
+        "@freeimage//:freeimage",
+        "@gz-utils//:ImplPtr",
+        "@tinyxml2",
+    ],
+)
+
+[cc_test(
+    name = src.replace("/", "_").replace(".cc", "").replace("src_", ""),
+    srcs = [src],
+    data = ["//test:data"],
+    env = {
+        "GZ_BAZEL": "1",
+    },
+    deps = [
+        ":graphics",
+        "//testing:testing",
+        "@googletest//:gtest",
+        "@googletest//:gtest_main",
+    ],
+) for src in test_sources]

@@ -24,7 +24,10 @@
 #include "gz/common/StringUtils.hh"
 #include "gz/common/Util.hh"
 
+#ifndef BAZEL_DISABLE_DEM_LOADER
 #include "gz/common/geospatial/Dem.hh"
+#endif
+
 #include "gz/common/geospatial/HeightmapUtil.hh"
 #include "gz/common/geospatial/ImageHeightmap.hh"
 
@@ -69,6 +72,9 @@ std::unique_ptr<HeightmapData> loadHeightmapData(
   }
   else
   {
+// This macro is used by bazel build only. Dem classes are not built
+// due to missing gdal dependency in BCR. So diable loading Dem heightmaps.
+#ifndef BAZEL_DISABLE_DEM_LOADER
     // try loading as DEM
     auto dem = std::make_unique<Dem>();
     dem->SetSphericalCoordinates(_sphericalCoordinates);
@@ -79,6 +85,10 @@ std::unique_ptr<HeightmapData> loadHeightmapData(
       return nullptr;
     }
     data = std::move(dem);
+#else
+    (void)_sphericalCoordinates;
+    gzerr << "Unable to load heightmap. DEM loading disabled."  << std::endl;
+#endif
   }
 
   return data;

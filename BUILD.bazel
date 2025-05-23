@@ -38,7 +38,6 @@ gz_export_header(
 public_headers_no_gen = glob([
     "include/gz/common/*.hh",
     "include/gz/common/detail/*.hh",
-    "include/gz/common/graph/*.hh",
 ])
 
 private_headers = glob(
