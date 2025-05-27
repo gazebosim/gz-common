@@ -101,14 +101,14 @@ bool Profiler::SetImplementation(std::unique_ptr<ProfilerImpl> _impl)
 {
   if (_impl == nullptr)
   {
-    gzdbg << "Setting an empty profiler implementation is not supported"
-          << std::endl;
+    gzwarn << "Setting an empty profiler implementation is not supported"
+           << std::endl;
     return false;
   }
   if (this->impl != nullptr)
   {
-    gzdbg << "A profiler implementation named '" << this->impl->Name()
-          << "' is already in use. Cannot set a new one." << std::endl;
+    gzwarn << "A profiler implementation named '" << this->impl->Name()
+           << "' is already in use. Cannot set a new one." << std::endl;
     return false;
   }
   this->impl = _impl.release();
