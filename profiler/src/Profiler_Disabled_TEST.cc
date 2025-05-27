@@ -33,6 +33,6 @@ TEST(Profiler, ProfilerDisabled)
   gzerr << "Test case is disabled for current bazel build config." << std::endl;
 #else
   EXPECT_FALSE(GZ_PROFILER_ENABLE);
-  EXPECT_FALSE(GZ_PROFILER_VALID);  
+  EXPECT_FALSE(GZ_PROFILER_VALID);
 #endif
 }
