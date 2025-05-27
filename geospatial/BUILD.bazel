@@ -20,14 +20,14 @@ sources = glob(
     exclude = [
         "src/*_TEST.cc",
         # \todo(iche033) include Dem.cc once gdal dep is available.
-        "src/Dem.cc"
+        "src/Dem.cc",
     ],
 )
 
 test_sources = glob(
     include = ["src/*_TEST.cc"],
     # \todo(iche033) include this test once gdal dep is available.
-    exclude = ["src/Dem_TEST.cc"]
+    exclude = ["src/Dem_TEST.cc"],
 )
 
 gz_export_header(
@@ -49,36 +49,37 @@ cc_library(
         "-Wno-unused-value",
         "-fexceptions",
     ],
+    # \todo(iche033) remove this macro once gdal dep is available.
+    defines = [
+        "BAZEL_DISABLE_DEM_LOADER=1",
+    ],
     includes = ["include"],
     visibility = ["//visibility:public"],
     deps = [
         "//:gz-common",
-        "//graphics:graphics",
+        "//graphics",
         "@gz-utils//:ImplPtr",
+        "@gz-math",
         # \todo(iche033) gdal is not in BCR yet
         # "@gdal",
     ],
-    # \todo(iche033) remove this macro once gdal dep is available.
-    defines = [
-        "BAZEL_DISABLE_DEM_LOADER=1"
-    ]
 )
 
 [cc_test(
     name = src.replace("/", "_").replace(".cc", "").replace("src_", ""),
     srcs = [src],
     data = ["//test:data"],
+    # \todo(iche033) remove this macro once gdal dep is available.
+    defines = [
+        "BAZEL_DISABLE_DEM_LOADER=1",
+    ],
     env = {
         "GZ_BAZEL": "1",
     },
     deps = [
         ":geospatial",
-        "//testing:testing",
+        "//testing",
         "@googletest//:gtest",
         "@googletest//:gtest_main",
     ],
-    # \todo(iche033) remove this macro once gdal dep is available.
-    defines = [
-        "BAZEL_DISABLE_DEM_LOADER=1"
-    ]
 ) for src in test_sources]

@@ -14,6 +14,7 @@ public_headers_no_gen = glob([
 ])
 
 vhacd_header = ["src/VHACD/VHACD.h"]
+
 tiny_obj_loader_header = ["src/tiny_obj_loader.h"]
 
 sources = glob(
@@ -48,7 +49,8 @@ cc_library(
         "//:gz-common",
         "@assimp",
         "@cdt",
-        "@freeimage//:freeimage",
+        "@freeimage",
+        "@gz-math",
         "@gz-utils//:ImplPtr",
         "@tinyxml2",
     ],
@@ -63,8 +65,11 @@ cc_library(
     },
     deps = [
         ":graphics",
-        "//testing:testing",
+        "//:gz-common",
+        "//testing",
         "@googletest//:gtest",
         "@googletest//:gtest_main",
+        "@gz-math",
+        "@tinyxml2",
     ],
 ) for src in test_sources]

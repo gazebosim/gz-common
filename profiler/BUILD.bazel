@@ -88,6 +88,7 @@ cc_test(
     ],
     deps = [
         ":profiler",
+        "//:gz-common",
         "@googletest//:gtest",
         "@googletest//:gtest_main",
     ],
@@ -98,6 +99,7 @@ cc_test(
     srcs = ["src/Profiler_Remotery_TEST.cc"],
     deps = [
         ":profiler",
+        "//:gz-common",
         "@googletest//:gtest",
         "@googletest//:gtest_main",
     ],

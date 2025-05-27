@@ -42,6 +42,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//:gz-common",
+        "@gz-math",
         "@gz-utils//:ImplPtr",
     ],
 )
@@ -54,10 +55,10 @@ cc_library(
     },
     deps = [
         ":io",
-        "//testing:testing",
+        "//:gz-common",
+        "//testing",
         "@googletest//:gtest",
         "@googletest//:gtest_main",
-
+        "@gz-math",
     ],
 ) for src in test_sources]
-
