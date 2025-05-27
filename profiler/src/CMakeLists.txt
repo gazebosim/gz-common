@@ -103,7 +103,7 @@ if(TARGET UNIT_Profiler_Remotery_TEST)
 endif()
 
 if(TARGET UNIT_Profiler_Error_TEST)
-  target_include_directories(UNIT_Profiler_Custom_TEST
+  target_include_directories(UNIT_Profiler_Error_TEST
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Remotery/lib>
   )
 endif()
