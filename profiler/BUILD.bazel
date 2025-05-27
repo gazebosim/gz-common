@@ -196,8 +196,8 @@ cc_test(
     deps = [
         ":RemoteryProfilerImpl",
         ":profiler",
-        ":remotery",
         "@googletest//:gtest",
         "@googletest//:gtest_main",
+        "@remotery",
     ],
 )
