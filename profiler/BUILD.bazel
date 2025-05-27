@@ -1,6 +1,5 @@
 load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
 load("@rules_gazebo//gazebo:headers.bzl", "gz_configure_header", "gz_export_header")
-load("@rules_license//rules:license.bzl", "license")
 
 package(
     default_applicable_licenses = ["//:license"],
@@ -46,13 +45,6 @@ gz_export_header(
 )
 
 cc_library(
-    name = "remotery",
-    srcs = ["src/Remotery/lib/Remotery.c"],
-    hdrs = ["src/Remotery/lib/Remotery.h"],
-    includes = ["src/Remotery/lib"],
-)
-
-cc_library(
     name = "ProfilerImplInterface",
     hdrs = ["include/gz/common/ProfilerImpl.hh"],
     includes = ["include"],
@@ -70,8 +62,8 @@ cc_library(
     includes = ["include"],
     deps = [
         ":ProfilerImplInterface",
-        ":remotery",
         "//:gz-common",
+        "@remotery",
     ],
 )
 
