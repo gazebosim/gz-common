@@ -29,10 +29,10 @@ using namespace common;
 /////////////////////////////////////////////////
 TEST(Profiler, ProfilerDisabled)
 {
-#ifndef BAZEL_SKIP_PROFILER_TEST
-  EXPECT_FALSE(GZ_PROFILER_ENABLE);
-  EXPECT_FALSE(GZ_PROFILER_VALID);
+#ifdef BAZEL_SKIP_PROFILER_TEST
+  gzerr << "Test case is disabled for current bazel build config." << std::endl;
 #else
-  gzerr << "Test case is disabled" << std::endl;
+  EXPECT_FALSE(GZ_PROFILER_ENABLE);
+  EXPECT_FALSE(GZ_PROFILER_VALID);  
 #endif
 }
