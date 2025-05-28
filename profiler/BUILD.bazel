@@ -61,6 +61,7 @@ cc_library(
     ],
     includes = ["include"],
     deps = [
+        ":Export",
         ":ProfilerImplInterface",
         "//:gz-common",
         "@remotery",
@@ -186,7 +187,9 @@ cc_test(
         "//conditions:default": ["BAZEL_SKIP_PROFILER_TEST=1"],
     }),
     deps = [
+        ":ProfilerImplInterface",
         ":profiler",
+        "//:gz-common",
         "@googletest//:gtest",
         "@googletest//:gtest_main",
     ],
@@ -198,6 +201,7 @@ cc_test(
     deps = [
         ":RemoteryProfilerImpl",
         ":profiler",
+        "//:gz-common",
         "@googletest//:gtest",
         "@googletest//:gtest_main",
         "@remotery",
