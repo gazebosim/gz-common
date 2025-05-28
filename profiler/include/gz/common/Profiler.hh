@@ -89,7 +89,7 @@ namespace gz
 
       /// \brief Set a profiler implementation.
       ///  Takes ownership of the pointer if the call succeeds. This method will
-      ///  fail if a profiler implemenation was previously set (i.e. if `Valid`
+      ///  fail if a profiler implementation was previously set (i.e. if `Valid`
       ///  returns `True`).
       /// \param[in] _impl Profiler implementation to set.
       /// \return True if the new profiler implementation was accepted.
