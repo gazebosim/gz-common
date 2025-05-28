@@ -73,10 +73,13 @@ cc_library(
     includes = ["include"],
     visibility = ["//visibility:public"],
     deps = [
+        "@gz-math",
         "@gz-utils//:ImplPtr",
+        "@gz-utils//:NeverDestroyed",
+        "@gz-utils//:SuppressWarning",
         "@gz-utils//log:Logger",
-        "@gz-math//:gz-math",
         "@libuuid",
+        "@spdlog",
     ],
 )
 
@@ -94,9 +97,10 @@ test_sources = glob(
     copts = ["-fexceptions"],
     deps = [
         ":gz-common",
-        "//testing:testing",
+        "//testing",
         "@googletest//:gtest",
         "@googletest//:gtest_main",
+        "@gz-math",
         "@gz-utils//:ExtraTestMacros",
     ],
 ) for src in test_sources]
