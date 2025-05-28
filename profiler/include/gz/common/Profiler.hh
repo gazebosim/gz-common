@@ -25,12 +25,12 @@
 #include <gz/common/profiler/Export.hh>
 #include <gz/common/SingletonT.hh>
 
+#include "ProfilerImpl.hh"
+
 namespace gz
 {
   namespace common
   {
-    class ProfilerImpl;
-
     /// \brief Used to perform application-wide performance profiling
     ///
     /// This class provides the necessary infrastructure for recording profiling
@@ -85,6 +85,14 @@ namespace gz
 
       /// \brief End a profiling sample.
       public: void EndSample();
+
+      /// \brief Set a profiler implementation.
+      ///  Takes ownership of the pointer if the call succeeds. This method will
+      ///  fail if a profiler implementation was previously set (i.e. if `Valid`
+      ///  returns `True`).
+      /// \param[in] _impl Profiler implementation to set.
+      /// \return True if the new profiler implementation was accepted.
+      public: bool SetImplementation(std::unique_ptr<ProfilerImpl> _impl);
 
       /// \brief Get the underlying profiler implentation name
       public: std::string ImplementationName() const;
