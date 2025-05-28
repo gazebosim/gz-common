@@ -17,7 +17,7 @@
 
 #include "gz/common/Profiler.hh" // NOLINT(*)
 #include <gtest/gtest.h> // NOLINT(*)
-#include "Remotery/lib/Remotery.h"
+#include "Remotery.h"
 
 #include <gz/common/Export.hh>
 
