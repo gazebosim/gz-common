@@ -177,4 +177,53 @@ cc_library(
     }),
 )
 
+cc_test(
+    name = "Profiler_Disabled_TEST",
+    srcs = ["src/Profiler_Disabled_TEST.cc"],
+    # This test is only compatible with --//profiler:config="disabled"
+    defines = select({
+        "disabled": [],
+        "//conditions:default": ["BAZEL_SKIP_PROFILER_TEST=1"],
+    }),
+    deps = [
+        GZ_ROOT + "common",
+        ":profiler",
+        "@gtest",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "Profiler_Remotery_TEST",
+    srcs = ["src/Profiler_Remotery_TEST.cc"],
+    # This test is only compatible with --//profiler:config="remotery"
+    defines = select({
+        "use_remotery": [],
+        "//conditions:default": ["BAZEL_SKIP_PROFILER_TEST=1"],
+    }),
+    deps = [
+        GZ_ROOT + "common",
+        ":profiler",
+        "@gtest",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "Profiler_Custom_TEST",
+    srcs = ["src/Profiler_Custom_TEST.cc"],
+    # This test is only compatible with --//profiler:config="custom"
+    defines = select({
+        "use_custom": [],
+        "//conditions:default": ["BAZEL_SKIP_PROFILER_TEST=1"],
+    }),
+    deps = [
+        GZ_ROOT + "common",
+        ":ProfilerImplInterface",
+        ":profiler",
+        "@gtest",
+        "@gtest//:gtest_main",
+    ],
+)
+
 add_lint_tests()
