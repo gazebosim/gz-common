@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>gz-common6</name>
-  <version>6.0.2</version>
+  <version>6.1.0</version>
   <description>Gazebo Common : AV, Graphics, Events, and much more.</description>
   <maintainer email="natekoenig@gmail.com">Nate Koenig</maintainer>
   <license>Apache License 2.0</license>
