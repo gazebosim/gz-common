@@ -1654,6 +1654,14 @@ MeshManager::ConvexDecomposition(const SubMesh &_subMesh,
                                  std::size_t _maxConvexHulls,
                                  std::size_t _voxelResolution)
 {
+  if (!_subMesh.HasValidIndices())
+  {
+    gzwarn << "Unable to perform convex decomposition on submesh: "
+           <<  _subMesh.Name() << ". It has invalid indices."
+           << std::endl;
+    return {};
+  }
+
   std::vector<SubMesh> decomposed;
 
   auto vertexCount = _subMesh.VertexCount();
