@@ -124,7 +124,7 @@ RedirectConsoleStream::RedirectConsoleStream(const StreamSource &_source,
   if (common::exists(this->dataPtr->sink))
   {
     gzerr << "Failed to open sink file: console redirection disabled"
-      << "(destination exists)" << std::endl;
+          << "(" << this->dataPtr->sink << " exists)" << std::endl;
     return;
   }
 
