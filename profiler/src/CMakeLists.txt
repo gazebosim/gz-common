@@ -60,6 +60,8 @@ if(GZ_PROFILER_REMOTERY)
   if(NOT WIN32)
     list(APPEND PROFILER_TESTS Profiler_Error_TEST.cc)
   endif()
+else()  # GZ_PROFILER_REMOTERY
+  list(APPEND PROFILER_TESTS Profiler_Custom_TEST.cc)
 endif()
 
 gz_add_component(profiler SOURCES ${PROFILER_SRCS} GET_TARGET_NAME profiler_target)
@@ -97,6 +99,17 @@ gz_build_tests(
 
 if(TARGET UNIT_Profiler_Remotery_TEST)
   target_compile_definitions(UNIT_Profiler_Remotery_TEST
+    PUBLIC "GZ_PROFILER_ENABLE=1")
+endif()
+
+if(TARGET UNIT_Profiler_Error_TEST)
+  target_include_directories(UNIT_Profiler_Error_TEST
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Remotery/lib>
+  )
+endif()
+
+if(TARGET UNIT_Profiler_Custom_TEST)
+  target_compile_definitions(UNIT_Profiler_Custom_TEST
     PUBLIC "GZ_PROFILER_ENABLE=1")
 endif()
 
