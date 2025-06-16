@@ -17,10 +17,13 @@
 
 #include <gtest/gtest.h>
 #include <gz/math/Vector3.hh>
+#include <gz/utils/SuppressWarning.hh>
 
 #include "gz/common/MovingWindowFilter.hh"
 
 using namespace gz;
+
+GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
 
 /////////////////////////////////////////////////
 TEST(MovingWindowFilterTest, SetWindowSize)
@@ -69,3 +72,4 @@ TEST(MovingWindowFilterTest, FilterSomething)
         3.0*static_cast<double>(i));
   EXPECT_EQ(vectorMWF.Value(), vsum / 20.0);
 }
+GZ_UTILS_WARN_RESUME__DEPRECATED_DECLARATION
