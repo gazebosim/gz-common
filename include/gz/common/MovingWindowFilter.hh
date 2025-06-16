@@ -19,6 +19,7 @@
 
 #include <memory>
 #include <vector>
+#include <gz/common/Export.hh>
 
 namespace gz
 {
