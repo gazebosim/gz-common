@@ -246,7 +246,7 @@ void MeshManager::AddMesh(Mesh *_mesh)
   auto iter = this->dataPtr->meshes.find(_mesh->Name());
   if (iter != this->dataPtr->meshes.end())
   {
-    gzdbg << "MeshManager::AddMesh replaced: " << _mesh->Name();
+    gzdbg << "MeshManager::AddMesh replaced: " << _mesh->Name() << std::endl;
     iter->second.reset(_mesh);
   }
   else
