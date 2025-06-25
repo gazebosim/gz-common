@@ -6,7 +6,7 @@ libavutil-dev
 libfreeimage-dev
 libgdal-dev
 libgz-cmake5-dev
-libgz-math9-dev
+gz-jetty-math
 libgz-utils4-dev
 libgz-utils4-log-dev
 libspdlog-dev
