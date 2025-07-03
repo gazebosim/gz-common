@@ -20,7 +20,7 @@ if(GZ_PROFILER_REMOTERY)
   # A few warnings to suppress, rather than modifying vendored code
   set_source_files_properties(./Remotery/lib/Remotery.c PROPERTIES
     COMPILE_FLAGS
-    "$<$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU,LCC>:-Wno-strict-prototypes -Wno-unused-but-set-variable>")
+    "$<$<COMPILE_LANG_AND_ID:C,ARMClang,AppleClang,Clang,GNU,LCC>:-Wno-unused-variable -Wno-unused-parameter -Wno-switch-default -Wno-unused-function -Wno-pedantic>")
 
   if(APPLE)
     set(
@@ -37,8 +37,10 @@ if(GZ_PROFILER_REMOTERY)
   set(RMT_USE_TINYCRT 0)
   set(RMT_USE_CUDA 0)
   set(RMT_USE_D3D11 0)
+  set(RMT_USE_D3D12 0)
   set(RMT_USE_OPENGL 0)
   set(RMT_USE_METAL 0)
+  set(RMT_USE_VULKAN 0)
 
   if(UNIX OR WIN32)
     set(RMT_USE_OPENGL 1)
@@ -46,6 +48,7 @@ if(GZ_PROFILER_REMOTERY)
 
   if(WIN32)
     set(RMT_USE_D3D11 1)
+    set(RMT_USE_D3D12 1)
   endif()
 
   if(APPLE)
