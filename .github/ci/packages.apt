@@ -1,3 +1,7 @@
+gz-jetty-cmake
+gz-jetty-math
+gz-jetty-utils
+gz-jetty-utils-log
 libassimp-dev
 libavcodec-dev
 libavdevice-dev
@@ -5,10 +9,6 @@ libavformat-dev
 libavutil-dev
 libfreeimage-dev
 libgdal-dev
-libgz-cmake5-dev
-gz-jetty-math
-libgz-utils4-dev
-libgz-utils4-log-dev
 libspdlog-dev
 libswscale-dev
 libtinyxml2-dev
