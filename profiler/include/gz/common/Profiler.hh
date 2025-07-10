@@ -100,6 +100,9 @@ namespace gz
       /// \brief Detect if profiler is enabled and has an implementation
       public: bool Valid() const;
 
+      /// \brief Get an instance of the singleton
+      public: static Profiler *Instance();
+
       /// \brief Pointer to the profiler implementation
       private: ProfilerImpl *impl;
 
