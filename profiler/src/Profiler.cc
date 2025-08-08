@@ -119,6 +119,5 @@ bool Profiler::SetImplementation(std::unique_ptr<ProfilerImpl> _impl)
 //////////////////////////////////////////////////
 Profiler *Profiler::Instance()
 {
-  static Profiler profiler;
-  return &profiler;
+  return SingletonT<Profiler>::Instance();
 }
