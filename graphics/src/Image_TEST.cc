@@ -413,6 +413,8 @@ TEST_F(ImageTest, ConvertPixelFormat)
          Image::ConvertPixelFormat("RGBA_INT8"));
   EXPECT_EQ(Image::PixelFormatType::RGB_INT16,
          Image::ConvertPixelFormat("RGB_INT16"));
+  EXPECT_EQ(Image::PixelFormatType::RGBA_INT16,
+         Image::ConvertPixelFormat("RGBA_INT16"));
   EXPECT_EQ(Image::PixelFormatType::RGB_INT32,
          Image::ConvertPixelFormat("RGB_INT32"));
   EXPECT_EQ(Image::PixelFormatType::BGR_INT8,
@@ -670,6 +672,53 @@ TEST_F(ImageTest, Grayscale)
     EXPECT_NEAR(maxColor.R(), img.MaxColor().R(), 1e-3);
     EXPECT_NEAR(maxColor.G(), img.MaxColor().G(), 1e-3);
     EXPECT_NEAR(maxColor.B(), img.MaxColor().B(), 1e-3);
+  }
+}
+
+
+/////////////////////////////////////////////////
+TEST_F(ImageTest, Color16bit)
+{
+  {
+    common::Image img;
+    std::string fileName = common::testing::TestFile("data",
+        "rgb_16bit.png");
+    EXPECT_EQ(0, img.Load(fileName));
+    unsigned int width = 4u;
+    unsigned int height = 4u;
+    unsigned int channels = 3u;
+    unsigned int bpp = channels * 16u;
+    EXPECT_TRUE(img.Valid());
+    EXPECT_EQ(width, img.Width());
+    EXPECT_EQ(height, img.Height());
+    EXPECT_EQ(bpp, img.BPP());
+    EXPECT_EQ(width * bpp / 8u, img.Pitch());
+    EXPECT_EQ(common::Image::PixelFormatType::RGB_INT16, img.PixelFormat());
+    math::Color maxColor(0.0f, 0.0f, 0.847f);
+    EXPECT_NEAR(maxColor.R(), img.MaxColor().R(), 1e-3);
+    EXPECT_NEAR(maxColor.G(), img.MaxColor().G(), 1e-3);
+    EXPECT_NEAR(maxColor.B(), img.MaxColor().B(), 1e-3);
+  }
+  {
+    common::Image img;
+    std::string fileName = common::testing::TestFile("data",
+        "rgba_16bit.png");
+    EXPECT_EQ(0, img.Load(fileName));
+    unsigned int width = 4u;
+    unsigned int height = 4u;
+    unsigned int channels = 4u;
+    unsigned int bpp = channels * 16u;
+    EXPECT_TRUE(img.Valid());
+    EXPECT_EQ(width, img.Width());
+    EXPECT_EQ(height, img.Height());
+    EXPECT_EQ(bpp, img.BPP());
+    EXPECT_EQ(width * bpp / 8u, img.Pitch());
+    EXPECT_EQ(common::Image::PixelFormatType::RGBA_INT16, img.PixelFormat());
+    math::Color maxColor(0.0f, 0.0f, 0.847f, 0.5f);
+    EXPECT_NEAR(maxColor.R(), img.MaxColor().R(), 1e-3);
+    EXPECT_NEAR(maxColor.G(), img.MaxColor().G(), 1e-3);
+    EXPECT_NEAR(maxColor.B(), img.MaxColor().B(), 1e-3);
+    EXPECT_NEAR(maxColor.A(), img.MaxColor().A(), 1e-3);
   }
 }
 
