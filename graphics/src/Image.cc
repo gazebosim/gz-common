@@ -38,16 +38,16 @@ namespace gz
     class Image::Implementation
     {
       /// \brief bitmap data
-      public: FIBITMAP *bitmap;
+      public: FIBITMAP *bitmap{nullptr};
 
       /// \brief path name of the image file
       public: std::string fullName;
 
       /// \brief Color type for this image
-      public: FREE_IMAGE_COLOR_TYPE colorType;
+      public: FREE_IMAGE_COLOR_TYPE colorType{FIC_RGB};
 
       /// \brief Image type, i.e. pixel format
-      public: FREE_IMAGE_TYPE imageType;
+      public: FREE_IMAGE_TYPE imageType{FIT_UNKNOWN};
 
       /// \brief Implementation of Data, returns vector of bytes
       public: std::vector<unsigned char> DataImpl(FIBITMAP *_img) const;
