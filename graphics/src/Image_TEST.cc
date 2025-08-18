@@ -684,10 +684,10 @@ TEST_F(ImageTest, Color16bit)
     std::string fileName = common::testing::TestFile("data",
         "rgb_16bit.png");
     EXPECT_EQ(0, img.Load(fileName));
-    unsigned int width = 4u;
-    unsigned int height = 4u;
-    unsigned int channels = 3u;
-    unsigned int bpp = channels * 16u;
+    const unsigned int width = 4u;
+    const unsigned int height = 4u;
+    const unsigned int channels = 3u;
+    const unsigned int bpp = channels * 16u;
     EXPECT_TRUE(img.Valid());
     EXPECT_EQ(width, img.Width());
     EXPECT_EQ(height, img.Height());
@@ -698,16 +698,20 @@ TEST_F(ImageTest, Color16bit)
     EXPECT_NEAR(maxColor.R(), img.MaxColor().R(), 1e-3);
     EXPECT_NEAR(maxColor.G(), img.MaxColor().G(), 1e-3);
     EXPECT_NEAR(maxColor.B(), img.MaxColor().B(), 1e-3);
+    math::Color pixelWithMaxColor = img.Pixel(3, 1);
+    EXPECT_NEAR(maxColor.R(), pixelWithMaxColor.R(), 1e-3);
+    EXPECT_NEAR(maxColor.G(), pixelWithMaxColor.G(), 1e-3);
+    EXPECT_NEAR(maxColor.B(), pixelWithMaxColor.B(), 1e-3);
   }
   {
     common::Image img;
     std::string fileName = common::testing::TestFile("data",
         "rgba_16bit.png");
     EXPECT_EQ(0, img.Load(fileName));
-    unsigned int width = 4u;
-    unsigned int height = 4u;
-    unsigned int channels = 4u;
-    unsigned int bpp = channels * 16u;
+    const unsigned int width = 4u;
+    const unsigned int height = 4u;
+    const unsigned int channels = 4u;
+    const unsigned int bpp = channels * 16u;
     EXPECT_TRUE(img.Valid());
     EXPECT_EQ(width, img.Width());
     EXPECT_EQ(height, img.Height());
@@ -719,6 +723,11 @@ TEST_F(ImageTest, Color16bit)
     EXPECT_NEAR(maxColor.G(), img.MaxColor().G(), 1e-3);
     EXPECT_NEAR(maxColor.B(), img.MaxColor().B(), 1e-3);
     EXPECT_NEAR(maxColor.A(), img.MaxColor().A(), 1e-3);
+    math::Color pixelWithMaxColor = img.Pixel(3, 1);
+    EXPECT_NEAR(maxColor.R(), pixelWithMaxColor.R(), 1e-3);
+    EXPECT_NEAR(maxColor.G(), pixelWithMaxColor.G(), 1e-3);
+    EXPECT_NEAR(maxColor.B(), pixelWithMaxColor.B(), 1e-3);
+    EXPECT_NEAR(maxColor.A(), pixelWithMaxColor.A(), 1e-3);
   }
 }
 
