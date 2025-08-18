@@ -19,6 +19,7 @@
 #endif
 #include <FreeImage.h>
 
+#include <cstdint>
 #include <cstring>
 #include <string>
 
@@ -431,7 +432,7 @@ math::Color Image::Pixel(unsigned int _x, unsigned int _y) const
   if (_x >= this->Width() || _y >= this->Height())
   {
     gzerr << "Image: Coordinates out of range["
-      << _x << " " << _y << "] \n";
+      << _x << ", " << _y << "] \n";
     return clr;
   }
 
@@ -443,7 +444,7 @@ math::Color Image::Pixel(unsigned int _x, unsigned int _y) const
     if (FreeImage_GetPixelColor(this->dataPtr->bitmap, _x, _y, &firgb) == FALSE)
     {
       gzerr << "Failed to get pixel value at ["
-            << _x << " " << _y << "] \n";
+            << _x << ", " << _y << "] \n";
       return clr;
     }
     clr.Set(firgb.rgbRed / 255.0f, firgb.rgbGreen / 255.0f,
@@ -455,7 +456,7 @@ math::Color Image::Pixel(unsigned int _x, unsigned int _y) const
            this->dataPtr->bitmap, _x, _y, clr) == FALSE)
     {
       gzerr << "Failed to get pixel value at ["
-            << _x << " " << _y << "] \n";
+            << _x << ", " << _y << "] \n";
       return clr;
     }
   }
@@ -520,7 +521,7 @@ BOOL Image::Implementation::PixelIndex(
   if (!_dib)
     return FALSE;
 
-  if (_x >= this->Width() || _y >= this->Height())
+  if (_x >= FreeImage_GetWidth(_dib) || _y >= FreeImage_GetHeight(_dib))
     return FALSE;
 
   // 8 bit images
