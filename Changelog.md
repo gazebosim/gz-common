@@ -4,6 +4,9 @@
 
 1. **Baseline:** this includes all changes from 6.1.0 and earlier.
 
+1. Support reading pixel values from color 16 bit images
+    * [Pull request #699](https://github.com/gazebosim/gz-common/pull/699)
+
 1. Deprecate `MovingWindowFilter`, use gz-math instead
     * [Pull request #692](https://github.com/gazebosim/gz-common/pull/692)
 
