@@ -19,6 +19,7 @@
 #endif
 #include <FreeImage.h>
 
+#include <cstdint>
 #include <cstring>
 #include <string>
 
@@ -37,7 +38,7 @@ namespace gz
     class Image::Implementation
     {
       /// \brief bitmap data
-      public: FIBITMAP *bitmap;
+      public: FIBITMAP *bitmap{nullptr};
 
       /// \brief path name of the image file
       public: std::string fullName;
@@ -47,6 +48,12 @@ namespace gz
       /// are removed, in favor of returning vectors of bytes
       public: void DataImpl(unsigned char **_data, unsigned int &_count,
           FIBITMAP *_img) const;
+
+      /// \brief Color type for this image
+      public: FREE_IMAGE_COLOR_TYPE colorType{FIC_RGB};
+
+      /// \brief Image type, i.e. pixel format
+      public: FREE_IMAGE_TYPE imageType{FIT_UNKNOWN};
 
       /// \brief Implementation of Data, returns vector of bytes
       public: std::vector<unsigned char> DataImpl(FIBITMAP *_img) const;
@@ -156,6 +163,9 @@ int Image::Load(const std::string &_filename)
       return -1;
     }
 
+    this->dataPtr->colorType = FreeImage_GetColorType(this->dataPtr->bitmap);
+    this->dataPtr->imageType = FreeImage_GetImageType(this->dataPtr->bitmap);
+
     return 0;
   }
 
@@ -263,6 +273,8 @@ void Image::SetFromData(const unsigned char *_data,
                                                        this->Height());
     FreeImage_Unload(toDelete);
   }
+  this->dataPtr->colorType = FreeImage_GetColorType(this->dataPtr->bitmap);
+  this->dataPtr->imageType = FreeImage_GetImageType(this->dataPtr->bitmap);
 }
 
 //////////////////////////////////////////////////
@@ -291,6 +303,8 @@ void Image::SetFromCompressedData(unsigned char *_data,
     FIMEMORY *fiMem = FreeImage_OpenMemory(_data, _size);
     this->dataPtr->bitmap = FreeImage_LoadFromMemory(format, fiMem);
     FreeImage_CloseMemory(fiMem);
+    this->dataPtr->colorType = FreeImage_GetColorType(this->dataPtr->bitmap);
+    this->dataPtr->imageType = FreeImage_GetImageType(this->dataPtr->bitmap);
   }
   else
   {
@@ -521,16 +535,22 @@ math::Color Image::Pixel(unsigned int _x, unsigned int _y) const
   if (!this->Valid())
     return clr;
 
-  FREE_IMAGE_COLOR_TYPE type = FreeImage_GetColorType(this->dataPtr->bitmap);
+  if (_x >= this->Width() || _y >= this->Height())
+  {
+    gzerr << "Image: Coordinates out of range["
+      << _x << ", " << _y << "] \n";
+    return clr;
+  }
 
-  if (type == FIC_RGB || type == FIC_RGBALPHA)
+  if ((this->dataPtr->colorType == FIC_RGB ||
+       this->dataPtr->colorType == FIC_RGBALPHA) &&
+      (this->dataPtr->imageType == FIT_BITMAP))
   {
     RGBQUAD firgb;
-
     if (FreeImage_GetPixelColor(this->dataPtr->bitmap, _x, _y, &firgb) == FALSE)
     {
-      gzerr << "Image: Coordinates out of range["
-        << _x << " " << _y << "] \n";
+      gzerr << "Failed to get pixel value at ["
+            << _x << ", " << _y << "] \n";
       return clr;
     }
     clr.Set(firgb.rgbRed / 255.0f, firgb.rgbGreen / 255.0f,
@@ -541,8 +561,8 @@ math::Color Image::Pixel(unsigned int _x, unsigned int _y) const
     if (this->dataPtr->PixelIndex(
            this->dataPtr->bitmap, _x, _y, clr) == FALSE)
     {
-      gzerr << "Image: Coordinates out of range ["
-        << _x << " " << _y << "] \n";
+      gzerr << "Failed to get pixel value at ["
+            << _x << ", " << _y << "] \n";
       return clr;
     }
   }
@@ -579,64 +599,20 @@ math::Color Image::AvgColor() const
 //////////////////////////////////////////////////
 math::Color Image::MaxColor() const
 {
-  unsigned int x, y;
-  math::Color clr;
   math::Color maxClr;
 
-  maxClr.Set(0, 0, 0, 0);
-
   if (!this->Valid())
-    return clr;
+    return maxClr;
 
-  FREE_IMAGE_COLOR_TYPE type = FreeImage_GetColorType(this->dataPtr->bitmap);
-
-  if (type == FIC_RGB || type == FIC_RGBALPHA)
+  maxClr.Set(0, 0, 0, 0);
+  for (unsigned int y = 0; y < this->Height(); y++)
   {
-    RGBQUAD firgb;
-
-    for (y = 0; y < this->Height(); y++)
+    for (unsigned int x = 0; x < this->Width(); x++)
     {
-      for (x = 0; x < this->Width(); x++)
+      math::Color clr = this->Pixel(x, y);
+      if (clr.R() + clr.G() + clr.B() > maxClr.R() + maxClr.G() + maxClr.B())
       {
-        clr.Set(0, 0, 0, 0);
-
-        if (FALSE ==
-              FreeImage_GetPixelColor(this->dataPtr->bitmap, x, y, &firgb))
-        {
-          gzerr << "Image: Coordinates out of range["
-            << x << " " << y << "] \n";
-          continue;
-        }
-        clr.Set(firgb.rgbRed / 255.0f, firgb.rgbGreen / 255.0f,
-                firgb.rgbBlue / 255.0f);
-
-        if (clr.R() + clr.G() + clr.B() > maxClr.R() + maxClr.G() + maxClr.B())
-        {
-          maxClr = clr;
-        }
-      }
-    }
-  }
-  else
-  {
-    for (y = 0; y < this->Height(); y++)
-    {
-      for (x = 0; x < this->Width(); x++)
-      {
-        clr.Set(0, 0, 0, 0);
-
-        if (this->dataPtr->PixelIndex(
-               this->dataPtr->bitmap, x, y, clr) == FALSE)
-        {
-          gzerr << "Image: Coordinates out of range ["
-            << x << " " << y << "] \n";
-          continue;
-        }
-
-        if (clr.R() + clr.G() + clr.B() > maxClr.R() + maxClr.G() + maxClr.B())
-        {
-          maxClr = clr;
-        }
+        maxClr = clr;
       }
     }
   }
@@ -651,9 +627,11 @@ BOOL Image::Implementation::PixelIndex(
   if (!_dib)
     return FALSE;
 
-  FREE_IMAGE_TYPE imageType = FreeImage_GetImageType(_dib);
+  if (_x >= FreeImage_GetWidth(_dib) || _y >= FreeImage_GetHeight(_dib))
+    return FALSE;
+
   // 8 bit images
-  if (imageType == FIT_BITMAP)
+  if (this->imageType == FIT_BITMAP)
   {
     BYTE byteValue;
     // FreeImage_GetPixelIndex should also work with 1 and 4 bit images
@@ -669,21 +647,51 @@ BOOL Image::Implementation::PixelIndex(
     _color.Set(value, value, value);
   }
   // 16 bit images
-  else if (imageType == FIT_UINT16)
+  else if (this->imageType == FIT_UINT16)
   {
-    if ((_x < FreeImage_GetWidth(_dib)) && (_y < FreeImage_GetHeight(_dib)))
-    {
-      WORD *bits = reinterpret_cast<WORD *>(FreeImage_GetScanLine(_dib, _y));
-      uint16_t word = static_cast<uint16_t>(bits[_x]);
-      // convert to float value between 0-1
-      float value = word / static_cast<float>(math::MAX_UI16);
-      _color.Set(value, value, value);
-    }
-    else
-    {
-      return FALSE;
-    }
+    WORD *bits = reinterpret_cast<WORD *>(FreeImage_GetScanLine(_dib, _y));
+    uint16_t word = static_cast<uint16_t>(bits[_x]);
+    // convert to float value between 0-1
+    float value = word / static_cast<float>(math::MAX_UI16);
+    _color.Set(value, value, value);
   }
+  else if (this->imageType == FIT_INT16)
+  {
+    WORD *bits = reinterpret_cast<WORD *>(FreeImage_GetScanLine(_dib, _y));
+    int16_t word = static_cast<int16_t>(bits[_x]);
+    // convert to float value between 0-1
+    float value = word / static_cast<float>(math::MAX_I16);
+    _color.Set(value, value, value);
+  }
+  else if (this->imageType == FIT_RGB16)
+  {
+    const unsigned int channels = 3u;
+    WORD *bits = reinterpret_cast<WORD *>(FreeImage_GetScanLine(_dib, _y));
+    uint16_t r = static_cast<uint16_t>(bits[_x * channels]);
+    uint16_t g = static_cast<uint16_t>(bits[_x * channels + 1]);
+    uint16_t b = static_cast<uint16_t>(bits[_x * channels + 2]);
+    // convert to float value between 0-1
+    float valueR = r / static_cast<float>(math::MAX_UI16);
+    float valueG = g / static_cast<float>(math::MAX_UI16);
+    float valueB = b / static_cast<float>(math::MAX_UI16);
+    _color.Set(valueR, valueG, valueB);
+  }
+  else if (this->imageType == FIT_RGBA16)
+  {
+    const unsigned int channels = 4u;
+    WORD *bits = reinterpret_cast<WORD *>(FreeImage_GetScanLine(_dib, _y));
+    uint16_t r = static_cast<uint16_t>(bits[_x * channels]);
+    uint16_t g = static_cast<uint16_t>(bits[_x * channels + 1]);
+    uint16_t b = static_cast<uint16_t>(bits[_x * channels + 2]);
+    uint16_t a = static_cast<uint16_t>(bits[_x * channels + 3]);
+    // convert to float value between 0-1
+    float valueR = r / static_cast<float>(math::MAX_UI16);
+    float valueG = g / static_cast<float>(math::MAX_UI16);
+    float valueB = b / static_cast<float>(math::MAX_UI16);
+    float valueA = a / static_cast<float>(math::MAX_UI16);
+    _color.Set(valueR, valueG, valueB, valueA);
+  }
+
   return TRUE;
 }
 
