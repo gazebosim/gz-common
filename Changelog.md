@@ -1,6 +1,24 @@
 ## Gazebo Common 7.x
 
-## Gazebo Common 7.0.0 (20XX-XX-XX)
+### Gazebo Common 7.0.0 (2025-09-30)
+
+1. **Baseline:** this includes all changes from 6.1.0 and earlier.
+
+1. Support reading pixel values from color 16 bit images
+    * [Pull request #699](https://github.com/gazebosim/gz-common/pull/699)
+
+1. Deprecate `MovingWindowFilter`, use gz-math instead
+    * [Pull request #692](https://github.com/gazebosim/gz-common/pull/692)
+
+1. Bump gz-cmake and others in jetty
+    * [Pull request #675](https://github.com/gazebosim/gz-common/pull/675)
+    * [Tracking issue](https://github.com/gazebo-tooling/release-tools/issues/1309)
+
+1. Deprecate env() with two parameters
+    * [Pull request #653](https://github.com/gazebosim/gz-common/pull/653)
+
+1. Bump main to gz-common 7.0.0~pre1
+    * [Pull request #648](https://github.com/gazebosim/gz-common/pull/648)
 
 ## Gazebo Common 6.x
 
