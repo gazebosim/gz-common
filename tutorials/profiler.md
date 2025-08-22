@@ -25,7 +25,7 @@ In order to use the profiler, inspection points must be added to the source code
 and the application or library must be linked to the `gz-common::profiler`
 component.
 
-To start, download the [profiler.cc](https://github.com/gazebosim/gz-common/raw/main/examples/profiler.cc) example.
+To start, download the [profiler.cc](https://github.com/gazebosim/gz-common/raw/gz-common7/examples/profiler.cc) example.
 
 The relevant corresponding C++ would be as follows:
 
@@ -131,7 +131,7 @@ Run your Gazebo library then go to your Gazebo installation path and open the pr
 
 If the profiler is run successfully, you should see output in a browser. Similar to this
 
-<img src="https://raw.githubusercontent.com/gazebosim/gz-common/main/tutorials/imgs/profiler_tutorial_example.png">
+<img src="https://raw.githubusercontent.com/gazebosim/gz-common/gz-common7/tutorials/imgs/profiler_tutorial_example.png">
 
 ### Troubleshoot the web viewer
 

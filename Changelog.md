@@ -1,6 +1,24 @@
 ## Gazebo Common 7.x
 
-## Gazebo Common 7.0.0 (20XX-XX-XX)
+### Gazebo Common 7.0.0 (2025-09-30)
+
+1. **Baseline:** this includes all changes from 6.1.0 and earlier.
+
+1. Support reading pixel values from color 16 bit images
+    * [Pull request #699](https://github.com/gazebosim/gz-common/pull/699)
+
+1. Deprecate `MovingWindowFilter`, use gz-math instead
+    * [Pull request #692](https://github.com/gazebosim/gz-common/pull/692)
+
+1. Bump gz-cmake and others in jetty
+    * [Pull request #675](https://github.com/gazebosim/gz-common/pull/675)
+    * [Tracking issue](https://github.com/gazebo-tooling/release-tools/issues/1309)
+
+1. Deprecate env() with two parameters
+    * [Pull request #653](https://github.com/gazebosim/gz-common/pull/653)
+
+1. Bump main to gz-common 7.0.0~pre1
+    * [Pull request #648](https://github.com/gazebosim/gz-common/pull/648)
 
 ## Gazebo Common 6.x
 
@@ -183,6 +201,55 @@
     * [Pull request #412](https://github.com/gazebosim/gz-common/pull/412)
 
 ## Gazebo Common 5.x
+
+### Gazebo Common 5.7.1 (2025-01-30)
+
+1. Add include <chrono> for system_clock in Event.hh
+    * [Pull request #655](https://github.com/gazebosim/gz-common/pull/655)
+
+1. Check normal presence before trying to read asMesh normals
+    * [Pull request #654](https://github.com/gazebosim/gz-common/pull/654)
+
+1. Remove Conda Windows warnings
+    * [Pull request #652](https://github.com/gazebosim/gz-common/pull/652)
+
+## Gazebo Common 5.7.0 (2024-11-08)
+
+1. Fix loading lightmaps from gltf / glb meshes (#630)
+    * [Pull request #630) (#646](https://github.com/gazebosim/gz-common/pull/630) (#646)
+
+1. Fix AssimpLoader collada texture coordinates
+    * [Pull request #634](https://github.com/gazebosim/gz-common/pull/634)
+
+1. Remove debug logging introduced accidentally in PR review
+    * [Pull request #622](https://github.com/gazebosim/gz-common/pull/622)
+
+1. Fix crash when calling absPath with empty input
+    * [Pull request #620](https://github.com/gazebosim/gz-common/pull/620)
+
+1. DEM: Add support for GDAL vsicurl, vsizip support and avoid segfaults with huge VRT datasets
+    * [Pull request #597](https://github.com/gazebosim/gz-common/pull/597)
+
+1. SubMesh::RecalculateNormals improvement
+    * [Pull request #609](https://github.com/gazebosim/gz-common/pull/609)
+
+1. fix data race tsan issue
+    * [Pull request #612](https://github.com/gazebosim/gz-common/pull/612)
+
+1. Generate a more unique texture name for glb embedded textures
+    * [Pull request #606](https://github.com/gazebosim/gz-common/pull/606)
+
+1. Add package.xml
+    * [Pull request #587](https://github.com/gazebosim/gz-common/pull/587)
+
+1. Fix deprecation warnings
+    * [Pull request #603](https://github.com/gazebosim/gz-common/pull/603)
+
+1. Fix macOS workflow and update on-push branches
+    * [Pull request #602](https://github.com/gazebosim/gz-common/pull/602)
+
+1. Fix compatibility with FFmpeg5.0
+    * [Pull request #581](https://github.com/gazebosim/gz-common/pull/581)
 
 ## Gazebo Common 5.6.0 (2024-04-23)
 
