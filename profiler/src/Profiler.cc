@@ -115,3 +115,10 @@ bool Profiler::SetImplementation(std::unique_ptr<ProfilerImpl> _impl)
   gzdbg << "Gazebo profiling with: " << this->impl->Name() << std::endl;
   return true;
 }
+
+//////////////////////////////////////////////////
+Profiler *Profiler::Instance()
+{
+  static Profiler profiler;
+  return &profiler;
+}
