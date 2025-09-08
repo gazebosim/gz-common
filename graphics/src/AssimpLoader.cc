@@ -572,7 +572,7 @@ std::pair<std::string, ImagePtr> AssimpLoader::Implementation::LoadTexture(
 
 std::pair<ImagePtr, ImagePtr>
     AssimpLoader::Implementation::SplitMetallicRoughnessMap(
-    const Image& _img) const
+    const Image &_img) const
 {
   std::pair<ImagePtr, ImagePtr> ret;
   // Metalness in B roughness in G
@@ -583,28 +583,32 @@ std::pair<ImagePtr, ImagePtr>
   std::vector<unsigned char> metalnessData(width * height * bytesPerPixel);
   std::vector<unsigned char> roughnessData(width * height * bytesPerPixel);
 
+  std::vector<unsigned char> metalnessData8bit = _img.ChannelData(Image::BLUE);
+  std::vector<unsigned char> roughnessData8bit = _img.ChannelData(Image::GREEN);
   for (unsigned int y = 0; y < height; ++y)
   {
     for (unsigned int x = 0; x < width; ++x)
     {
-      // RGBA so 4 bytes per pixel, alpha fully opaque
+      unsigned int colorB = metalnessData8bit[y * width + x];
+      unsigned int colorG = roughnessData8bit[y * width + x];
       auto baseIndex = bytesPerPixel * (y * width + x);
-      auto color = _img.Pixel(x, (height - y - 1));
-      metalnessData[baseIndex] = color.B() * 255.0;
-      metalnessData[baseIndex + 1] = color.B() * 255.0;
-      metalnessData[baseIndex + 2] = color.B() * 255.0;
+      metalnessData[baseIndex] = colorB;
+      metalnessData[baseIndex + 1] = colorB;
+      metalnessData[baseIndex + 2] = colorB;
       metalnessData[baseIndex + 3] = 255;
-      roughnessData[baseIndex] = color.G() * 255.0;
-      roughnessData[baseIndex + 1] = color.G() * 255.0;
-      roughnessData[baseIndex + 2] = color.G() * 255.0;
+      roughnessData[baseIndex] = colorG;
+      roughnessData[baseIndex + 1] = colorG;
+      roughnessData[baseIndex + 2] = colorG;
       roughnessData[baseIndex + 3] = 255;
     }
   }
+
   // First is metal, second is rough
   ret.first = std::make_shared<Image>();
   ret.first->SetFromData(&metalnessData[0], width, height, Image::RGBA_INT8);
   ret.second = std::make_shared<Image>();
   ret.second->SetFromData(&roughnessData[0], width, height, Image::RGBA_INT8);
+
   return ret;
 }
 
