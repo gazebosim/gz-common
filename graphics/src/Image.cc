@@ -22,6 +22,7 @@
 #include <cstdint>
 #include <cstring>
 #include <string>
+#include <vector>
 
 #include <gz/common/Console.hh>
 #include <gz/common/Util.hh>
@@ -703,7 +704,6 @@ FIBITMAP* Image::Implementation::SwapRedBlue(const unsigned int &_width,
   return copy;
 }
 
-
 //////////////////////////////////////////////////
 std::vector<unsigned char> Image::ChannelData(Channel _channel) const
 {
@@ -740,7 +740,6 @@ std::vector<unsigned char> Image::ChannelData(Channel _channel) const
     gzerr << "Invalid input channel: " << _channel << std::endl;
     return {};
   }
-
 
   FIBITMAP *tmp = FreeImage_ConvertTo8Bits(channelData);
   std::vector<unsigned char> data = this->dataPtr->DataImpl(tmp);

@@ -589,9 +589,11 @@ std::pair<ImagePtr, ImagePtr>
   {
     for (unsigned int x = 0; x < width; ++x)
     {
-      unsigned int colorB = metalnessData8bit[y * width + x];
-      unsigned int colorG = roughnessData8bit[y * width + x];
-      auto baseIndex = bytesPerPixel * (y * width + x);
+      // RGBA so 4 bytes per pixel, alpha fully opaque
+      unsigned int idx = y * width + x;
+      unsigned int colorB = metalnessData8bit[idx];
+      unsigned int colorG = roughnessData8bit[idx];
+      auto baseIndex = bytesPerPixel * idx;
       metalnessData[baseIndex] = colorB;
       metalnessData[baseIndex + 1] = colorB;
       metalnessData[baseIndex + 2] = colorB;
@@ -602,13 +604,11 @@ std::pair<ImagePtr, ImagePtr>
       roughnessData[baseIndex + 3] = 255;
     }
   }
-
   // First is metal, second is rough
   ret.first = std::make_shared<Image>();
   ret.first->SetFromData(&metalnessData[0], width, height, Image::RGBA_INT8);
   ret.second = std::make_shared<Image>();
   ret.second->SetFromData(&roughnessData[0], width, height, Image::RGBA_INT8);
-
   return ret;
 }
 
