@@ -212,7 +212,7 @@ messages where `VideoEncoder` documents the detected encoder. It may look like:
 There you can see a NVEnc encoder was successfully used on card `/dev/nvidia1` to
 encode a 2-minute video clip.
 
-If something goes wrong, you'll se a lot of error messages in the console.
+If something goes wrong, you'll see a lot of error messages in the console.
 Sometimes they are helpful, sometimes they are not. In the very worst case,
 wrong configuration may lead to a segfault or any other kind of faulty behavior.
 This is also the reason why HW-acceleration isn't turned on by default.
