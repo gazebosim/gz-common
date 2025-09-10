@@ -732,6 +732,55 @@ TEST_F(ImageTest, Color16bit)
   }
 }
 
+/////////////////////////////////////////////////
+TEST_F(ImageTest, ChannelData)
+{
+  // load image, extra data from each channel and verify values
+  common::Image img;
+  ASSERT_EQ(0, img.Load(kTestData));
+  ASSERT_TRUE(img.Valid());
+
+  std::vector<unsigned char> red =
+      img.ChannelData(common::Image::Channel::RED);
+  std::vector<unsigned char> green =
+      img.ChannelData(common::Image::Channel::GREEN);
+  std::vector<unsigned char> blue =
+      img.ChannelData(common::Image::Channel::BLUE);
+  std::vector<unsigned char> alpha =
+      img.ChannelData(common::Image::Channel::ALPHA);
+
+  EXPECT_FALSE(red.empty());
+  ASSERT_EQ(img.Width() * img.Height(), red.size());
+  ASSERT_EQ(red.size(), green.size());
+  ASSERT_EQ(red.size(), blue.size());
+  ASSERT_EQ(red.size(), alpha.size());
+
+  for (auto i = 0u; i < img.Height(); ++i)
+  {
+    for (auto j = 0u; j < img.Width(); ++j)
+    {
+      unsigned int idx = i * img.Width() + j;
+      unsigned int r = red[idx];
+      unsigned int g = green[idx];
+      unsigned int b = blue[idx];
+      unsigned int a = alpha[idx];
+
+      ASSERT_EQ(0u, g);
+      ASSERT_EQ(255u, a);
+      if (j < 80)
+      {
+        ASSERT_EQ(255u, r);
+        ASSERT_EQ(0u, b);
+      }
+      else
+      {
+        ASSERT_EQ(0u, r);
+        ASSERT_EQ(255u, b);
+      }
+    }
+  }
+}
+
 using string_int2 = std::tuple<const char *, unsigned int, unsigned int>;
 
 class ImagePerformanceTest : public ImageTest,
