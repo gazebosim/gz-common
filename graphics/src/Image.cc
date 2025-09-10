@@ -22,6 +22,7 @@
 #include <cstdint>
 #include <cstring>
 #include <string>
+#include <vector>
 
 #include <gz/common/Console.hh>
 #include <gz/common/Util.hh>
@@ -699,4 +700,48 @@ FIBITMAP* Image::Implementation::SwapRedBlue(const unsigned int &_width,
   }
 
   return copy;
+}
+
+//////////////////////////////////////////////////
+std::vector<unsigned char> Image::ChannelData(Channel _channel) const
+{
+  if ((this->dataPtr->imageType != FIT_BITMAP) ||
+      (this->dataPtr->colorType != FIC_RGB &&
+       this->dataPtr->colorType != FIC_RGBALPHA))
+  {
+    gzerr << "Extraction of channel data is only support for RGB[A] images"
+          << std::endl;
+    return {};
+  }
+
+  FIBITMAP* channelData = nullptr;
+  switch (_channel)
+  {
+    case Channel::RED:
+      channelData = FreeImage_GetChannel(this->dataPtr->bitmap, FICC_RED);
+      break;
+    case Channel::GREEN:
+      channelData = FreeImage_GetChannel(this->dataPtr->bitmap, FICC_GREEN);
+      break;
+    case Channel::BLUE:
+      channelData = FreeImage_GetChannel(this->dataPtr->bitmap, FICC_BLUE);
+      break;
+    case Channel::ALPHA:
+      channelData = FreeImage_GetChannel(this->dataPtr->bitmap, FICC_ALPHA);
+      break;
+    default:
+      break;
+  }
+
+  if (!channelData)
+  {
+    gzerr << "Invalid input channel: " << static_cast<int>(_channel)
+          << std::endl;
+    return {};
+  }
+
+  FIBITMAP *tmp = FreeImage_ConvertTo8Bits(channelData);
+  std::vector<unsigned char> data = this->dataPtr->DataImpl(tmp);
+  FreeImage_Unload(tmp);
+  return data;
 }
