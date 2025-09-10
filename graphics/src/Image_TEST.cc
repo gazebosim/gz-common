@@ -740,10 +740,14 @@ TEST_F(ImageTest, ChannelData)
   ASSERT_EQ(0, img.Load(kTestData));
   ASSERT_TRUE(img.Valid());
 
-  std::vector<unsigned char> red = img.ChannelData(common::Image::RED);
-  std::vector<unsigned char> green = img.ChannelData(common::Image::GREEN);
-  std::vector<unsigned char> blue = img.ChannelData(common::Image::BLUE);
-  std::vector<unsigned char> alpha = img.ChannelData(common::Image::ALPHA);
+  std::vector<unsigned char> red =
+      img.ChannelData(common::Image::Channel::RED);
+  std::vector<unsigned char> green =
+      img.ChannelData(common::Image::Channel::GREEN);
+  std::vector<unsigned char> blue =
+      img.ChannelData(common::Image::Channel::BLUE);
+  std::vector<unsigned char> alpha =
+      img.ChannelData(common::Image::Channel::ALPHA);
 
   EXPECT_FALSE(red.empty());
   ASSERT_EQ(img.Width() * img.Height(), red.size());

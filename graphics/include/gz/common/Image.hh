@@ -64,7 +64,7 @@ namespace gz
     class GZ_COMMON_GRAPHICS_VISIBLE Image
     {
       /// \brief Image channel
-      public: enum Channel
+      public: enum class Channel
               {
                 /// \brief Red channel
                 RED = 0,

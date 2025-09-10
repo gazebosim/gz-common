@@ -583,8 +583,10 @@ std::pair<ImagePtr, ImagePtr>
   std::vector<unsigned char> metalnessData(width * height * bytesPerPixel);
   std::vector<unsigned char> roughnessData(width * height * bytesPerPixel);
 
-  std::vector<unsigned char> metalnessData8bit = _img.ChannelData(Image::BLUE);
-  std::vector<unsigned char> roughnessData8bit = _img.ChannelData(Image::GREEN);
+  std::vector<unsigned char> metalnessData8bit =
+      _img.ChannelData(Image::Channel::BLUE);
+  std::vector<unsigned char> roughnessData8bit =
+      _img.ChannelData(Image::Channel::GREEN);
   for (unsigned int y = 0; y < height; ++y)
   {
     for (unsigned int x = 0; x < width; ++x)

@@ -711,7 +711,7 @@ std::vector<unsigned char> Image::ChannelData(Channel _channel) const
       (this->dataPtr->colorType != FIC_RGB &&
        this->dataPtr->colorType != FIC_RGBALPHA))
   {
-    gzerr << "Extraction of channel data is only support for RGB[A] image"
+    gzerr << "Extraction of channel data is only support for RGB[A] images"
           << std::endl;
     return {};
   }
@@ -719,16 +719,16 @@ std::vector<unsigned char> Image::ChannelData(Channel _channel) const
   FIBITMAP* channelData = nullptr;
   switch (_channel)
   {
-    case RED:
+    case Channel::RED:
       channelData = FreeImage_GetChannel(this->dataPtr->bitmap, FICC_RED);
       break;
-    case GREEN:
+    case Channel::GREEN:
       channelData = FreeImage_GetChannel(this->dataPtr->bitmap, FICC_GREEN);
       break;
-    case BLUE:
+    case Channel::BLUE:
       channelData = FreeImage_GetChannel(this->dataPtr->bitmap, FICC_BLUE);
       break;
-    case ALPHA:
+    case Channel::ALPHA:
       channelData = FreeImage_GetChannel(this->dataPtr->bitmap, FICC_ALPHA);
       break;
     default:
@@ -737,7 +737,8 @@ std::vector<unsigned char> Image::ChannelData(Channel _channel) const
 
   if (!channelData)
   {
-    gzerr << "Invalid input channel: " << _channel << std::endl;
+    gzerr << "Invalid input channel: " << static_cast<int>(_channel)
+          << std::endl;
     return {};
   }
 
