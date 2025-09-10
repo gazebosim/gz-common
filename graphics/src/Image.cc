@@ -711,7 +711,7 @@ std::vector<unsigned char> Image::ChannelData(Channel _channel) const
       (this->dataPtr->colorType != FIC_RGB &&
        this->dataPtr->colorType != FIC_RGBALPHA))
   {
-    gzerr << "Extraction of channeld ata is only support for RGB[A] image"
+    gzerr << "Extraction of channel data is only support for RGB[A] image"
           << std::endl;
     return {};
   }
