@@ -62,6 +62,19 @@ namespace gz
     /// \brief Encapsulates an image
     class GZ_COMMON_GRAPHICS_VISIBLE Image
     {
+      /// \brief Image channel
+      public: enum class Channel
+              {
+                /// \brief Red channel
+                RED = 0,
+                /// \brief Green channel
+                GREEN = 1,
+                /// \brief Blue channel
+                BLUE = 2,
+                /// \brief Alpha channel
+                ALPHA = 3
+              };
+
       /// \brief Pixel formats enumeration
       public: enum PixelFormatType
               {
@@ -221,6 +234,12 @@ namespace gz
       /// \brief Returns whether this is a valid image
       /// \return true if image has a bitmap
       public: bool Valid() const;
+
+      /// \brief Extract a single channel (red, green, blue, or alpha) from
+      /// an RGB[A] image and return a single channel 8 bit image data.
+      /// \param[in] _channel Channel to extract
+      /// \return 8 bit single channel image data
+      public: std::vector<unsigned char> ChannelData(Channel _channel) const;
 
       /// \brief Convert a single channel image data buffer into an RGB image.
       /// During the conversion, the input image data are normalized to 8 bit
