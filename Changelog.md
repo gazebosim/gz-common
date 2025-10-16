@@ -4,6 +4,16 @@
 
 1. **Baseline:** this includes all changes from 6.1.0 and earlier.
 
+1. Add function for extracting single channel data from an `RGB[A]` image
+    * [Pull request #706](https://github.com/gazebosim/gz-common/pull/706)
+
+1. Documentation updates
+    * [Pull request #707](https://github.com/gazebosim/gz-common/pull/707)
+    * [Pull request #703](https://github.com/gazebosim/gz-common/pull/703)
+
+1. [Bazel] Update bazel module to use jetty release branches
+    * [Pull request #705](https://github.com/gazebosim/gz-common/pull/705)
+
 1. Support reading pixel values from color 16 bit images
     * [Pull request #699](https://github.com/gazebosim/gz-common/pull/699)
 
