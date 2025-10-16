@@ -25,7 +25,17 @@ In order to use the profiler, inspection points must be added to the source code
 and the application or library must be linked to the `gz-common::profiler`
 component.
 
-To start, download the [profiler.cc](https://github.com/gazebosim/gz-common/raw/main/examples/profiler.cc) example.
+To start, create a new CMake project directory and navigate to it:
+
+```{.sh}
+mkdir -p ~/profiler_example && cd ~/profiler_example
+```
+
+Next, download the [profiler.cc](https://github.com/gazebosim/gz-common/raw/main/examples/profiler.cc) example into the project:
+
+```{.sh}
+wget https://raw.githubusercontent.com/gazebosim/gz-common/main/examples/profiler.cc
+```
 
 The relevant corresponding C++ would be as follows:
 
@@ -53,7 +63,7 @@ void thread(const char *_thread_name)
 }
 ```
 
-Update your CMakeLists.txt to the following. Note that the profiler must be
+Create a new `CMakeLists.txt` at the root of the project directory (`~/profiler_example`). Note that the profiler must be
 enabled at compile time in order to function.
 
 ```{.cpp}
@@ -71,46 +81,49 @@ target_compile_definitions(profiler_example PUBLIC "GZ_PROFILER_ENABLE=1")
 Run `cmake` and build the example
 
 ```{.sh}
-cd build
+mkdir -p build && cd build
 cmake ..
 make profiler_example
 ```
 
-Then execute the example and the profiler visualization:
+Then use two terminals to execute the example and the profiler visualization:
 
-From terminal 1:
+From terminal 1, inside `~/profiler_example/build`:
 
 ```{.sh}
 ./profiler_example
 ```
 
-From terminal 2, open the visualizer using one of the following commands
+From terminal 2, use one of the following commands, depending on your configuration:
 
-```{.sh}
-# Find the launcher script and use it (Linux and macOS)
-find /usr | grep gz_remotery_vis
-...
+- If you installed `gz-common` as a package/binary:
+    - Open the HTML file directly via a convenience script:
 
-/usr/<path_to>/gz_remotery_vis
+        ```{.sh}
+        $(find /usr -type f -name 'gz_remotery_vis')
+        ```
 
-# Use the source path (Linux)
-# Substitute the path to your gz-common source checkout
-xdg-open $SOURCE_DIR/gz-common/profiler/src/Remotery/vis/index.html
+    - Or, if you're running inside a Docker container, start a server:
 
-# Use the installation path (Linux)
-# This may vary depending on where you have choosen to install
-xdg-open /usr/share/gz/gz-common/profiler_vis/index.html
+        ```{.sh}
+        python3 -m http.server -d $(find / -type d -name 'profiler_vis')
+        ```
 
-# Use the installation path (macOS)
-open /usr/share/gz/gz-common/profiler_vis/index.html
+- If you installed `gz-common` from source, we assume it is located at `$SOURCE_DIR/gz-common`, where `$SOURCE_DIR` is a variable representing a file path
+    - Open the HTML file directly:
 
-# Inside a Docker container with port 8000 exposed
-# 1. Find your container's IP with 'ifconfig'
-# 2. Start a basic web server:
-python3 -m http.server $SOURCE_DIR/gz-common/profiler/src/Remotery/vis/index.html
-# 3. Open URL "http://<container IP>:8000/" with a browser on the host.
-```
+        ```{.sh}
+        xdg-open $SOURCE_DIR/gz-common/profiler/src/Remotery/vis/index.html
+        ```
 
+    - Or, if you're running inside a Docker container, start a server:
+
+        ```{.sh}
+        python3 -m http.server -d $SOURCE_DIR/gz-common/profiler/src/Remotery/vis
+        ```
+
+If you are running the profiler visualization as a server, the command will display an output `Serving HTTP on [IP_ADDRESS]
+ port 8000 (http://[IP_ADDRESS]:8000/) ...` - navigate to that URL in your browser and you should see the profiler displayed.
 ### On Gazebo library
 
 If you want to use profiler on any other Gazebo library, enable the profiler at compile time with ``ENABLE_PROFILER`` cmake argument.
