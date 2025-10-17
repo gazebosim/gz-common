@@ -102,5 +102,6 @@ test_sources = glob(
         "@googletest//:gtest_main",
         "@gz-math",
         "@gz-utils//:ExtraTestMacros",
+        "@gz-utils//:SuppressWarning",
     ],
 ) for src in test_sources]
