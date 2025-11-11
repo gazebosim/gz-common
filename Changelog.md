@@ -1,5 +1,16 @@
 ## Gazebo Common 6.x
 
+### Gazebo Common 6.2.0 (2025-11-11)
+
+. Add function for extracting single channel data from an RGB[A] image (backport #706)
+    * [Pull request #709](https://github.com/gazebosim/gz-common/pull/709)
+
+1. Support reading pixel values from color 16 bit images (backport #699)
+    * [Pull request #701](https://github.com/gazebosim/gz-common/pull/701)
+
+1. Bump assimp version to fix build with --dynamic_mode off
+    * [Pull request #687](https://github.com/gazebosim/gz-common/pull/687)
+
 ### Gazebo Common 6.1.0 (2025-05-28)
 
 1. Add support for custom profiler
@@ -194,7 +205,7 @@
 ## Gazebo Common 5.7.0 (2024-11-08)
 
 1. Fix loading lightmaps from gltf / glb meshes (#630)
-    * [Pull request #630) (#646](https://github.com/gazebosim/gz-common/pull/630) (#646)
+    * [Pull request #646](https://github.com/gazebosim/gz-common/pull/646)
 
 1. Fix AssimpLoader collada texture coordinates
     * [Pull request #634](https://github.com/gazebosim/gz-common/pull/634)
