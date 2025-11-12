@@ -723,7 +723,7 @@ std::vector<unsigned char> Image::ChannelData(Channel _channel) const
       channelData = FreeImage_GetChannel(this->dataPtr->bitmap, FICC_ALPHA);
       break;
     default:
-      return {};
+      break;
   }
 
   if (!channelData)
