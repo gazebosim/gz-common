@@ -438,12 +438,18 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
       std::make_shared<Image>(joinPaths(_path, texName));
     auto [metalTexture, roughTexture] =
       this->SplitMetallicRoughnessMap(*texImg);
-    pbr.SetMetalnessMap(
-        this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
-        "Metalness"), metalTexture);
-    pbr.SetRoughnessMap(
-        this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
-        "Roughness"), roughTexture);
+    if (metalTexture)
+    {
+      pbr.SetMetalnessMap(
+          this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
+          "Metalness"), metalTexture);
+    }
+    if (roughTexture)
+    {
+      pbr.SetRoughnessMap(
+          this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
+          "Roughness"), roughTexture);
+    }
   }
   else
   {
@@ -587,6 +593,14 @@ std::pair<ImagePtr, ImagePtr>
       _img.ChannelData(Image::Channel::BLUE);
   std::vector<unsigned char> roughnessData8bit =
       _img.ChannelData(Image::Channel::GREEN);
+
+  if (metalnessData8bit.empty() || roughnessData8bit.empty())
+  {
+    gzerr << "Unable to extract channel data when splitting metallic "
+          << "roughness map: " << std::endl;
+    return ret;
+  }
+
   for (unsigned int y = 0; y < height; ++y)
   {
     for (unsigned int x = 0; x < width; ++x)

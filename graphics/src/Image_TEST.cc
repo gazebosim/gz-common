@@ -34,6 +34,10 @@ const std::string kTestDataGazeboBmp =  // NOLINT(*)
     common::testing::TestFile("data", "gazebo_logo.bmp");
 const std::string kTestData =  // NOLINT(*)
     common::testing::TestFile("data", "red_blue_colors.png");
+const std::string kTestDataRGB16 =  // NOLINT(*)
+    common::testing::TestFile("data", "rgb_16bit.png");
+const std::string kTestDataRGBA16 =  // NOLINT(*)
+    common::testing::TestFile("data", "rgba_16bit.png");
 
 const auto kWidth = 121u;
 const auto kHeight = 81u;
@@ -735,7 +739,7 @@ TEST_F(ImageTest, Color16bit)
 /////////////////////////////////////////////////
 TEST_F(ImageTest, ChannelData)
 {
-  // load image, extra data from each channel and verify values
+  // load image, extract data from each channel and verify values
   common::Image img;
   ASSERT_EQ(0, img.Load(kTestData));
   ASSERT_TRUE(img.Valid());
@@ -776,6 +780,88 @@ TEST_F(ImageTest, ChannelData)
       {
         ASSERT_EQ(0u, r);
         ASSERT_EQ(255u, b);
+      }
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+TEST_F(ImageTest, ChannelData16bit)
+{
+  {
+    // load load 16 bit RGBA image
+    // extract data from each channel and verify values
+    common::Image img;
+    ASSERT_EQ(0, img.Load(kTestDataRGBA16));
+    ASSERT_TRUE(img.Valid());
+
+    std::vector<unsigned char> red =
+        img.ChannelData(common::Image::Channel::RED);
+    std::vector<unsigned char> green =
+        img.ChannelData(common::Image::Channel::GREEN);
+    std::vector<unsigned char> blue =
+        img.ChannelData(common::Image::Channel::BLUE);
+    std::vector<unsigned char> alpha =
+        img.ChannelData(common::Image::Channel::ALPHA);
+
+    EXPECT_FALSE(red.empty());
+    ASSERT_EQ(img.Width() * img.Height(), red.size());
+    ASSERT_EQ(red.size(), green.size());
+    ASSERT_EQ(red.size(), blue.size());
+    ASSERT_EQ(red.size(), alpha.size());
+
+    for (auto i = 0u; i < img.Height(); ++i)
+    {
+      for (auto j = 0u; j < img.Width(); ++j)
+      {
+        unsigned int idx = i * img.Width() + j;
+        unsigned int r = red[idx];
+        unsigned int g = green[idx];
+        unsigned int b = blue[idx];
+        unsigned int a = alpha[idx];
+
+        EXPECT_EQ(0u, r);
+        EXPECT_EQ(0u, g);
+        EXPECT_LT(0u, b);
+        EXPECT_EQ(128u, a);
+      }
+    }
+  }
+
+  {
+    // load 16 bit RGB image (no alpha channel)
+    // extra data from each channel and verify values
+    common::Image img;
+    ASSERT_EQ(0, img.Load(kTestDataRGB16));
+    ASSERT_TRUE(img.Valid());
+
+    std::vector<unsigned char> red =
+        img.ChannelData(common::Image::Channel::RED);
+    std::vector<unsigned char> green =
+        img.ChannelData(common::Image::Channel::GREEN);
+    std::vector<unsigned char> blue =
+        img.ChannelData(common::Image::Channel::BLUE);
+    std::vector<unsigned char> alpha =
+        img.ChannelData(common::Image::Channel::ALPHA);
+
+    EXPECT_FALSE(red.empty());
+    ASSERT_EQ(img.Width() * img.Height(), red.size());
+    ASSERT_EQ(red.size(), green.size());
+    ASSERT_EQ(red.size(), blue.size());
+    ASSERT_EQ(0u, alpha.size());
+
+    for (auto i = 0u; i < img.Height(); ++i)
+    {
+      for (auto j = 0u; j < img.Width(); ++j)
+      {
+        unsigned int idx = i * img.Width() + j;
+        unsigned int r = red[idx];
+        unsigned int g = green[idx];
+        unsigned int b = blue[idx];
+
+        EXPECT_EQ(0u, r);
+        EXPECT_EQ(0u, g);
+        EXPECT_LT(0u, b);
       }
     }
   }
