@@ -811,15 +811,6 @@ FIBITMAP* Image::Implementation::SwapRedBlue(const unsigned int &_width,
 //////////////////////////////////////////////////
 std::vector<unsigned char> Image::ChannelData(Channel _channel) const
 {
-  if ((this->dataPtr->imageType != FIT_BITMAP) ||
-      (this->dataPtr->colorType != FIC_RGB &&
-       this->dataPtr->colorType != FIC_RGBALPHA))
-  {
-    gzerr << "Extraction of channel data is only support for RGB[A] images"
-          << std::endl;
-    return {};
-  }
-
   FIBITMAP* channelData = nullptr;
   switch (_channel)
   {
@@ -841,8 +832,8 @@ std::vector<unsigned char> Image::ChannelData(Channel _channel) const
 
   if (!channelData)
   {
-    gzerr << "Invalid input channel: " << static_cast<int>(_channel)
-          << std::endl;
+    gzerr << "Failed to extract channel data for input channel: "
+          << static_cast<int>(_channel) << std::endl;
     return {};
   }
 
