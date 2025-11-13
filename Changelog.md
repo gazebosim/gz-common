@@ -1,8 +1,13 @@
 ## Gazebo Common 6.x
 
+### Gazebo Common 6.2.1 (2025-11-12)
+
+1. Fix Image::ChannelData for 16 bit RGB[A] images (backport #720)
+    * [Pull request #721](https://github.com/gazebosim/gz-common/pull/721)
+
 ### Gazebo Common 6.2.0 (2025-11-11)
 
-. Add function for extracting single channel data from an RGB[A] image (backport #706)
+1. Add function for extracting single channel data from an RGB[A] image (backport #706)
     * [Pull request #709](https://github.com/gazebosim/gz-common/pull/709)
 
 1. Support reading pixel values from color 16 bit images (backport #699)
