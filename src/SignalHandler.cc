@@ -34,14 +34,24 @@
 #include <vector> // NOLINT(*)
 #include "gz/common/Console.hh" // NOLINT(*)
 
+#include <gz/utils/NeverDestroyed.hh>
+
 using namespace gz;
 using namespace common;
 
 // A wrapper for the sigaction sa_handler.
-// TODO(azeey) We should avoid using objects with non-trivial destructors as
-// globals.
-GZ_COMMON_VISIBLE std::map<int, std::function<void(int)>> gOnSignalWrappers;
-std::mutex gWrapperMutex;
+// Using NeverDestroyed to avoid static initialization order fiasco
+GZ_COMMON_VISIBLE std::map<int, std::function<void(int)>>& GetSignalWrappers()
+{
+  static gz::utils::NeverDestroyed<std::map<int, std::function<void(int)>>> wrappers;
+  return wrappers.Access();
+}
+
+std::mutex& GetWrapperMutex()
+{
+  static gz::utils::NeverDestroyed<std::mutex> mutex;
+  return mutex.Access();
+}
 
 #ifdef _WIN32
   #define write _write
@@ -165,9 +175,9 @@ void SelfPipe::CheckPipe()
     {
       if (this->running)
       {
-        std::lock_guard<std::mutex> lock(gWrapperMutex);
+        std::lock_guard<std::mutex> lock(GetWrapperMutex());
         // Send the signal to each wrapper
-        for (std::pair<int, std::function<void(int)>> func : gOnSignalWrappers)
+        for (std::pair<int, std::function<void(int)>> func : GetSignalWrappers())
         {
           func.second(signal);
         }
@@ -198,7 +208,7 @@ class common::SignalHandlerPrivate
   /// \brief True if signal handlers were successfully initialized.
   public: std::atomic<bool> initialized = {false};
 
-  /// \brief Index in the global gOnSignalWrappers map.
+  /// \brief Index in the global signal wrappers map.
   public: int wrapperIndex = -1;
 };
 
@@ -207,7 +217,7 @@ SignalHandler::SignalHandler()
   : dataPtr(new SignalHandlerPrivate)
 {
   static int counter = 0;
-  std::lock_guard<std::mutex> lock(gWrapperMutex);
+  std::lock_guard<std::mutex> lock(GetWrapperMutex());
 
   SelfPipe::Initialize();
   if (std::signal(SIGINT, onSignalWriteToSelfPipe) == SIG_ERR)
@@ -224,7 +234,7 @@ SignalHandler::SignalHandler()
     return;
   }
 
-  gOnSignalWrappers[counter] = std::bind(&SignalHandlerPrivate::OnSignal,
+  GetSignalWrappers()[counter] = std::bind(&SignalHandlerPrivate::OnSignal,
       this->dataPtr, std::placeholders::_1);
   this->dataPtr->wrapperIndex = counter;
 
@@ -236,8 +246,8 @@ SignalHandler::SignalHandler()
 /////////////////////////////////////////////////
 SignalHandler::~SignalHandler()
 {
-  std::lock_guard<std::mutex> lock(gWrapperMutex);
-  gOnSignalWrappers.erase(this->dataPtr->wrapperIndex);
+  std::lock_guard<std::mutex> lock(GetWrapperMutex());
+  GetSignalWrappers().erase(this->dataPtr->wrapperIndex);
   delete this->dataPtr;
   this->dataPtr = nullptr;
 }

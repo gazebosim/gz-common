@@ -126,17 +126,6 @@ namespace gz
       /// \return The nearest material type. MATERIAL_TYPE_END on error.
       public: static Type NearestMaterial(const double _value,
                   const double _epsilon = std::numeric_limits<double>::max());
-
-#ifdef _WIN32
-// Disable warning C4251
-#pragma warning(push)
-#pragma warning(disable: 4251)
-#endif
-      /// \brief List of density entries
-      private: static std::map<Type, double> materials;
-#ifdef _WIN32
-#pragma warning(pop)
-#endif
     };
   }
 }

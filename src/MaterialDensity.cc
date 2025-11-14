@@ -19,6 +19,8 @@
 #include "gz/common/EnumIface.hh"
 #include "gz/common/MaterialDensity.hh"
 
+#include <gz/utils/NeverDestroyed.hh>
+
 using namespace gz;
 using namespace common;
 
@@ -44,30 +46,36 @@ GZ_ENUM(materialDensityIface, MaterialDensity::Type,
   "end"
 )
 
-// Initialize the materials
-std::map<MaterialDensity::Type, double> MaterialDensity::materials =
+// Helper function to get the materials map using NeverDestroyed pattern
+// to avoid static initialization order fiasco
+static std::map<MaterialDensity::Type, double>& GetMaterialsMap()
 {
-  {MaterialDensity::Type::STYROFOAM, 75.0},
-  {MaterialDensity::Type::PINE, 373.0},
-  {MaterialDensity::Type::WOOD, 700.0},
-  {MaterialDensity::Type::OAK, 710.0},
-  {MaterialDensity::Type::ICE, 916.0},
-  {MaterialDensity::Type::WATER, 1000.0},
-  {MaterialDensity::Type::PLASTIC, 1175.0},
-  {MaterialDensity::Type::CONCRETE, 2000.0},
-  {MaterialDensity::Type::ALUMINUM, 2700.0},
-  {MaterialDensity::Type::STEEL_ALLOY, 7600.0},
-  {MaterialDensity::Type::STEEL_STAINLESS, 7800.0},
-  {MaterialDensity::Type::IRON, 7870.0},
-  {MaterialDensity::Type::BRASS, 8600.0},
-  {MaterialDensity::Type::COPPER, 8940.0},
-  {MaterialDensity::Type::TUNGSTEN, 19300.0}
-};
+  static gz::utils::NeverDestroyed<std::map<MaterialDensity::Type, double>> materials(
+    std::map<MaterialDensity::Type, double>{
+      {MaterialDensity::Type::STYROFOAM, 75.0},
+      {MaterialDensity::Type::PINE, 373.0},
+      {MaterialDensity::Type::WOOD, 700.0},
+      {MaterialDensity::Type::OAK, 710.0},
+      {MaterialDensity::Type::ICE, 916.0},
+      {MaterialDensity::Type::WATER, 1000.0},
+      {MaterialDensity::Type::PLASTIC, 1175.0},
+      {MaterialDensity::Type::CONCRETE, 2000.0},
+      {MaterialDensity::Type::ALUMINUM, 2700.0},
+      {MaterialDensity::Type::STEEL_ALLOY, 7600.0},
+      {MaterialDensity::Type::STEEL_STAINLESS, 7800.0},
+      {MaterialDensity::Type::IRON, 7870.0},
+      {MaterialDensity::Type::BRASS, 8600.0},
+      {MaterialDensity::Type::COPPER, 8940.0},
+      {MaterialDensity::Type::TUNGSTEN, 19300.0}
+    }
+  );
+  return materials.Access();
+}
 
 /////////////////////////////////////////////////
 const std::map<MaterialDensity::Type, double> &MaterialDensity::Materials()
 {
-  return materials;
+  return GetMaterialsMap();
 }
 
 /////////////////////////////////////////////////
@@ -77,7 +85,7 @@ double MaterialDensity::Density(const std::string &_material)
   materialDensityIface.Set(type, _material);
 
   if (type != MaterialDensity::Type::END)
-    return materials[type];
+    return GetMaterialsMap()[type];
   else
     return -1;
 }
@@ -85,7 +93,7 @@ double MaterialDensity::Density(const std::string &_material)
 /////////////////////////////////////////////////
 double MaterialDensity::Density(const MaterialDensity::Type _material)
 {
-  return materials[_material];
+  return GetMaterialsMap()[_material];
 }
 
 /////////////////////////////////////////////////
@@ -98,7 +106,7 @@ std::tuple<MaterialDensity::Type, double> MaterialDensity::Nearest(
     MaterialDensity::Type::END, -1.0
   };
 
-  for (auto const &mat : materials)
+  for (auto const &mat : GetMaterialsMap())
   {
     double diff = std::fabs(mat.second - _value);
     if (diff < min && diff < _epsilon)
