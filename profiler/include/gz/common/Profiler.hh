@@ -25,6 +25,7 @@
 #include <gz/common/config.hh>
 #include <gz/common/profiler/Export.hh>
 #include <gz/common/SingletonT.hh>
+#include <gz/utils/NeverDestroyed.hh>
 
 #include "ProfilerImpl.hh"
 
@@ -101,11 +102,17 @@ namespace gz
       /// \brief Detect if profiler is enabled and has an implementation
       public: bool Valid() const;
 
-      /// \brief Pointer to the profiler implementation
-      private: ProfilerImpl *impl;
+      /// \brief Get an instance of the singleton
+      public: static Profiler *Instance();
 
-      /// \brief Needed for SingletonT.
+      /// \brief Pointer to the profiler implementation
+      private: std::unique_ptr<ProfilerImpl> impl;
+
+      /// \brief Needed for SingletonT (outdated).
       private: friend class SingletonT<Profiler>;
+
+      /// @brief Needed for access to Profiler::Profiler() for NeverDestroyed
+      private: friend class gz::utils::NeverDestroyed<Profiler>;
     };
 
     /// \brief Used to provide C++ RAII-style profiling sample.
