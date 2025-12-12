@@ -14,10 +14,29 @@
  * limitations under the License.
  *
  */
-#ifdef BOOL
-#undef BOOL
+#include <algorithm>
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 #endif
-#include <FreeImage.h>
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
+
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#endif
+#define STB_IMAGE_RESIZE_IMPLEMENTATION
+#include "stb_image_resize2.h"
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 #include <cstdint>
 #include <cstring>
@@ -38,61 +57,44 @@ namespace gz
     class Image::Implementation
     {
       /// \brief bitmap data
-      public: FIBITMAP *bitmap{nullptr};
+      public: void *bitmap{nullptr};
 
       /// \brief path name of the image file
       public: std::string fullName;
 
-      /// \brief Color type for this image
-      public: FREE_IMAGE_COLOR_TYPE colorType{FIC_RGB};
+      /// \brief Width of the image
+      public: int width;
 
-      /// \brief Image type, i.e. pixel format
-      public: FREE_IMAGE_TYPE imageType{FIT_UNKNOWN};
+      /// \brief Height of the image
+      public: int height;
+
+      /// \brief the number of channels per pixel
+      ///
+      ///     channels    components
+      ///       1           grey
+      ///       2           grey, alpha
+      ///       3           red, green, blue
+      ///       4           red, green, blue, alpha
+      public: int channels;
+
+      /// \brief the number of bits per pixel
+      public: int bits_per_channel;
+
+      /// \brief Converts bitmap data to the given number of channels
+      public:
+        std::vector<unsigned char> DataWithChannels(int out_channels) const;
 
       /// \brief Implementation of Data, returns vector of bytes
-      public: std::vector<unsigned char> DataImpl(FIBITMAP *_img) const;
-
-      /// \brief Returns true if SwapRedBlue can and should be called
-      /// If it returns false, it may not be safe to call SwapRedBlue
-      /// (it could lead to memory corruption!). See CanSwapRedBlue
-      /// \return True if we should call SwapRedBlue
-      public: bool ShouldSwapRedBlue() const;
-
-      /// \brief Returns true if SwapRedBlue is safe to be called
-      /// \return False if it is NOT safe to call SwapRedBlue
-      public: bool CanSwapRedBlue() const;
-
-      /// \brief Swap red and blue pixels
-      /// \param[in] _width Width of the image
-      /// \param[in] _height Height of the image
-      /// \return bitmap data with red and blue pixels swapped
-      public: FIBITMAP* SwapRedBlue(const unsigned int &_width,
-                                    const unsigned int &_height) const;
-
-      /// \brief Get pixel value at specified index.
-      /// \param[in] _dib Pointer to Freeimage bitmap
-      /// \param[in] _x Pixel index in horizontal direction
-      /// \param[in] _y Pixel index in vertical direction
-      /// \param[out] _color Pixel value at specified index
-      /// \return TRUE value if the pixel index was found and the color
-      /// value set, FALSE otherwise.
-      public: BOOL PixelIndex(FIBITMAP *_dib, unsigned _x, unsigned _y,
-            math::Color &_color) const;
+      public:
+        std::vector<unsigned char> DataImpl(void * _img, size_t size) const;
     };
   }
 }
-
-static int count = 0;
 
 //////////////////////////////////////////////////
 Image::Image(const std::string &_filename)
 : dataPtr(gz::utils::MakeImpl<Implementation>())
 {
-  if (count == 0)
-    FreeImage_Initialise();
-
-  count++;
-
   this->dataPtr->bitmap = NULL;
   if (!_filename.empty())
   {
@@ -107,14 +109,9 @@ Image::Image(const std::string &_filename)
 //////////////////////////////////////////////////
 Image::~Image()
 {
-  count--;
-
   if (this->dataPtr->bitmap)
-    FreeImage_Unload(this->dataPtr->bitmap);
+    stbi_image_free(this->dataPtr->bitmap);
   this->dataPtr->bitmap = NULL;
-
-  if (count == 0)
-    FreeImage_DeInitialise();
 }
 
 
@@ -129,36 +126,37 @@ int Image::Load(const std::string &_filename)
 
   if (exists(this->dataPtr->fullName))
   {
-    FREE_IMAGE_FORMAT fifmt =
-      FreeImage_GetFIFFromFilename(this->dataPtr->fullName.c_str());
-
     if (this->dataPtr->bitmap)
-      FreeImage_Unload(this->dataPtr->bitmap);
+      stbi_image_free(this->dataPtr->bitmap);
     this->dataPtr->bitmap = NULL;
 
-    if (fifmt == FIF_PNG)
-    {
-      this->dataPtr->bitmap = FreeImage_Load(fifmt,
-          this->dataPtr->fullName.c_str(), PNG_DEFAULT);
+    void *bitmap = NULL;
+    int bpc = 0;
+    const char *fn = this->dataPtr->fullName.c_str();
+    int w, h, n;
+
+    if (stbi_is_hdr(fn)) {
+      bitmap = stbi_loadf(fn, &w, &h, &n, 0);
+      bpc = 32;
+    } else if (stbi_is_16_bit(fn)) {
+      bitmap = stbi_load_16(fn, &w, &h, &n, 0);
+      bpc = 16;
+    } else {
+      bitmap = stbi_load(fn, &w, &h, &n, 0);
+      bpc = 8;
     }
-    else if (fifmt == FIF_JPEG)
-    {
-      this->dataPtr->bitmap =
-        FreeImage_Load(fifmt, this->dataPtr->fullName.c_str(), JPEG_DEFAULT);
-    }
-    else if (fifmt == FIF_BMP)
-    {
-      this->dataPtr->bitmap = FreeImage_Load(fifmt,
-          this->dataPtr->fullName.c_str(), BMP_DEFAULT);
-    }
-    else
-    {
-      gzerr << "Unknown image format[" << this->dataPtr->fullName << "]\n";
+
+    if (bitmap == NULL) {
+      gzerr << "Failed to load file [" << this->dataPtr->fullName
+            << "]: " << stbi_failure_reason() << std::endl;
       return -1;
     }
 
-    this->dataPtr->colorType = FreeImage_GetColorType(this->dataPtr->bitmap);
-    this->dataPtr->imageType = FreeImage_GetImageType(this->dataPtr->bitmap);
+    this->dataPtr->bitmap = bitmap;
+    this->dataPtr->bits_per_channel = bpc;
+    this->dataPtr->width = w;
+    this->dataPtr->height = h;
+    this->dataPtr->channels = n;
 
     return 0;
   }
@@ -171,104 +169,77 @@ int Image::Load(const std::string &_filename)
 //////////////////////////////////////////////////
 void Image::SavePNG(const std::string &_filename)
 {
-  FreeImage_Save(FIF_PNG, this->dataPtr->bitmap, _filename.c_str(),
-      PNG_DEFAULT);
+  if (this->dataPtr->bits_per_channel != 8) {
+    gzerr << "Cannot write " << this->dataPtr->bits_per_channel
+          << "-bit PNG image (" << _filename << ")\n";
+    return;
+  }
+  int ret = stbi_write_png(
+    _filename.c_str(), dataPtr->width, dataPtr->height, dataPtr->channels,
+    dataPtr->bitmap, dataPtr->width * dataPtr->channels);
+  if (ret == 0) gzerr << "Error writing PNG image to [" << _filename << "]\n";
 }
 
 //////////////////////////////////////////////////
-void Image::SavePNGToBuffer(std::vector<unsigned char>& buffer)
+static void vector_write_func(void *context, void *data, int size)
 {
-  FIMEMORY *hmem = FreeImage_OpenMemory();
-  FreeImage_SaveToMemory(FIF_PNG, this->dataPtr->bitmap, hmem);
-  unsigned char *memBuffer = nullptr;
-#ifndef _WIN32
-  unsigned int sizeInBytes = 0;
-#else
-  DWORD sizeInBytes = 0;
-#endif
-  FreeImage_AcquireMemory(hmem, &memBuffer, &sizeInBytes);
-  buffer.resize(sizeInBytes);
-  std::memcpy(buffer.data(), memBuffer, sizeInBytes);
-  FreeImage_CloseMemory(hmem);
+  auto buffer = reinterpret_cast<std::vector<unsigned char> *>(context);
+  auto prev_size = buffer->size();
+  buffer->resize(prev_size + size);
+  std::memcpy(buffer->data() + prev_size, data, size);
+}
+
+void Image::SavePNGToBuffer(std::vector<unsigned char> &buffer)
+{
+  if (this->dataPtr->bits_per_channel != 8) {
+    gzerr << "Cannot export " << this->dataPtr->bits_per_channel
+          << "-bit PNG image\n";
+    return;
+  }
+  int ret = stbi_write_png_to_func(
+    vector_write_func, &buffer, dataPtr->width, dataPtr->height,
+    dataPtr->channels, dataPtr->bitmap,
+    dataPtr->width * dataPtr->channels * dataPtr->bits_per_channel / 8);
+  if (ret == 0) gzerr << "Error exporting PNG image\n";
 }
 
 //////////////////////////////////////////////////
-void Image::SetFromData(const unsigned char *_data,
-    unsigned int _width,
-    unsigned int _height,
-    Image::PixelFormatType _format)
+void Image::SetFromData(
+  const unsigned char *_data, unsigned int _width, unsigned int _height,
+  Image::PixelFormatType _format)
 {
-  if (this->dataPtr->bitmap)
-    FreeImage_Unload(this->dataPtr->bitmap);
+  if (this->dataPtr->bitmap) stbi_image_free(this->dataPtr->bitmap);
   this->dataPtr->bitmap = NULL;
-
-  // int redmask = FI_RGBA_RED_MASK;
-  int redmask = 0x0000ff;
-
-  // int greenmask = FI_RGBA_GREEN_MASK;
-  int greenmask = 0x00ff00;
-
-  // int bluemask = FI_RGBA_BLUE_MASK;
-  int bluemask = 0xff0000;
 
   unsigned int bpp;
   int scanlineBytes;
 
-  if (_format == L_INT8)
-  {
+  if (_format == L_INT8) {
     bpp = 8;
     scanlineBytes = _width;
-  }
-  else if (_format == RGB_INT8)
-  {
+  } else if (_format == RGB_INT8) {
     bpp = 24;
-    redmask = 0xff0000;
-    greenmask = 0x00ff00;
-    bluemask = 0x0000ff;
     scanlineBytes = _width * 3;
-  }
-  else if (_format == RGBA_INT8)
-  {
+  } else if (_format == RGBA_INT8) {
     bpp = 32;
-    redmask = 0xff000000;
-    greenmask = 0x00ff0000;
-    bluemask = 0x0000ff00;
     scanlineBytes = _width * 4;
-  }
-  else if (_format == BGR_INT8)
-  {
-    bpp = 24;
-    redmask = 0x0000ff;
-    greenmask = 0x00ff00;
-    bluemask = 0xff0000;
-    scanlineBytes = _width * 3;
-  }
-  else if ((_format == BAYER_RGGB8) ||
-           (_format == BAYER_BGGR8) ||
-           (_format == BAYER_GBRG8) ||
-           (_format == BAYER_GRBG8))
-  {
-    bpp = 8;
-    scanlineBytes = _width;
-  }
-  else
-  {
+  } else {
     gzerr << "Unable to handle format[" << _format << "]\n";
     return;
   }
 
-  this->dataPtr->bitmap = FreeImage_ConvertFromRawBits(const_cast<BYTE*>(_data),
-      _width, _height, scanlineBytes, bpp, redmask, greenmask, bluemask, true);
-
-  if (this->dataPtr->ShouldSwapRedBlue())
-  {
-    FIBITMAP *toDelete = this->dataPtr->bitmap;
-    this->dataPtr->bitmap = this->dataPtr->SwapRedBlue(this->Width(),
-                                                       this->Height());
-    FreeImage_Unload(toDelete);
+  const size_t size = _height * scanlineBytes;
+  this->dataPtr->bitmap = STBI_MALLOC(size);
+  if (this->dataPtr->bitmap == NULL) {
+    gzerr << "Error allocating image memory\n";
+    return;
   }
-  this->dataPtr->colorType = FreeImage_GetColorType(this->dataPtr->bitmap);
-  this->dataPtr->imageType = FreeImage_GetImageType(this->dataPtr->bitmap);
+  memcpy(this->dataPtr->bitmap, _data, size);
+
+  this->dataPtr->width = _width;
+  this->dataPtr->height = _height;
+  this->dataPtr->channels = bpp / 8;
+  this->dataPtr->bits_per_channel = 8;
 }
 
 //////////////////////////////////////////////////
@@ -277,120 +248,115 @@ void Image::SetFromCompressedData(unsigned char *_data,
                                   Image::PixelFormatType _format)
 {
   if (this->dataPtr->bitmap)
-    FreeImage_Unload(this->dataPtr->bitmap);
-  this->dataPtr->bitmap = nullptr;
+    stbi_image_free(this->dataPtr->bitmap);
+  this->dataPtr->bitmap = NULL;
 
-  FREE_IMAGE_FORMAT format = FIF_UNKNOWN;
-  switch (_format)
-  {
-    case COMPRESSED_PNG:
-      format = FIF_PNG;
-      break;
+  void *bitmap = NULL;
+  int bpc = 0;
+  int w, h, n;
+
+  switch (_format) {
+    case COMPRESSED_PNG:  // fall through
     case COMPRESSED_JPEG:
-      format = FIF_JPEG;
+      if (stbi_is_hdr_from_memory(_data, _size)) {
+        bitmap = stbi_loadf_from_memory(_data, _size, &w, &h, &n, 0);
+        bpc = 32;
+      } else if (stbi_is_16_bit_from_memory(_data, _size)) {
+        bitmap = stbi_load_16_from_memory(_data, _size, &w, &h, &n, 0);
+        bpc = 16;
+      } else {
+        bitmap = stbi_load_from_memory(_data, _size, &w, &h, &n, 0);
+        bpc = 8;
+      }
       break;
     default:
-      break;
+      gzerr << "Unable to handle format[" << _format << "]\n";
+      return;
   }
-  if (format != FIF_UNKNOWN)
-  {
-    FIMEMORY *fiMem = FreeImage_OpenMemory(_data, _size);
-    this->dataPtr->bitmap = FreeImage_LoadFromMemory(format, fiMem);
-    FreeImage_CloseMemory(fiMem);
-    this->dataPtr->colorType = FreeImage_GetColorType(this->dataPtr->bitmap);
-    this->dataPtr->imageType = FreeImage_GetImageType(this->dataPtr->bitmap);
-  }
-  else
-  {
-    gzerr << "Unable to handle format[" << _format << "]\n";
-    return;
-  }
+  this->dataPtr->bitmap = bitmap;
+  this->dataPtr->bits_per_channel = bpc;
+  this->dataPtr->width = w;
+  this->dataPtr->height = h;
+  this->dataPtr->channels = n;
 }
 
 //////////////////////////////////////////////////
 int Image::Pitch() const
 {
-  return FreeImage_GetLine(this->dataPtr->bitmap);
+  return this->dataPtr->width * this->dataPtr->channels *
+         this->dataPtr->bits_per_channel / 8;
+}
+//////////////////////////////////////////////////
+std::vector<unsigned char>
+Image::Implementation::DataWithChannels(int out_channels) const {
+  std::vector<unsigned char> data;
+  const size_t size =
+    this->width * this->height * this->channels * this->bits_per_channel / 8;
+
+  if (this->channels != out_channels) {
+    // Copy data because stbi__convert_format() frees the original data
+    unsigned char *bitmap_copy = (unsigned char *)STBI_MALLOC(size);
+    if (bitmap_copy == NULL) {
+      gzerr << "Error allocating image memory\n";
+      return std::vector<unsigned char>();
+    }
+    memcpy(bitmap_copy, this->bitmap, size);
+
+    unsigned char *bitmap_rgb = NULL;
+    switch (this->bits_per_channel) {
+      case 8:
+        bitmap_rgb = stbi__convert_format(
+          bitmap_copy, this->channels, out_channels, this->width, this->height);
+        break;
+      case 16:
+        bitmap_rgb = reinterpret_cast<unsigned char *>(stbi__convert_format16(
+          reinterpret_cast<uint16_t *>(bitmap_copy), this->channels,
+          out_channels, this->width, this->height));
+        break;
+      case 32:  // not implemented in stbi
+        break;
+    }
+    if (bitmap_rgb == NULL) {
+      gzerr << "Error converting image to " << out_channels << " channels\n";
+      return std::vector<unsigned char>();
+    }
+    data = this->DataImpl(
+      bitmap_rgb,
+      this->width * this->height * out_channels * this->bits_per_channel / 8);
+    STBI_FREE(bitmap_rgb);
+  } else {
+    data = this->DataImpl(this->bitmap, size);
+  }
+  return data;
 }
 
 //////////////////////////////////////////////////
 std::vector<unsigned char> Image::RGBData() const
 {
-  std::vector<unsigned char> data;
-
-  FIBITMAP *tmp = this->dataPtr->bitmap;
-  FIBITMAP *tmp2 = nullptr;
-  if (this->dataPtr->ShouldSwapRedBlue())
-  {
-    tmp = this->dataPtr->SwapRedBlue(this->Width(), this->Height());
-    tmp2 = tmp;
-  }
-  tmp = FreeImage_ConvertTo24Bits(tmp);
-  data = this->dataPtr->DataImpl(tmp);
-  FreeImage_Unload(tmp);
-  if (tmp2)
-    FreeImage_Unload(tmp2);
-
-  return data;
+  return this->dataPtr->DataWithChannels(3);
 }
 
 //////////////////////////////////////////////////
 std::vector<unsigned char> Image::RGBAData() const
 {
-  std::vector<unsigned char> data;
-
-  FIBITMAP *tmp = this->dataPtr->bitmap;
-  FIBITMAP *tmp2 = nullptr;
-  if (this->dataPtr->ShouldSwapRedBlue())
-  {
-    tmp = this->dataPtr->SwapRedBlue(this->Width(), this->Height());
-    tmp2 = tmp;
-  }
-  tmp = FreeImage_ConvertTo32Bits(tmp);
-  data = this->dataPtr->DataImpl(tmp);
-  FreeImage_Unload(tmp);
-  if (tmp2)
-    FreeImage_Unload(tmp2);
-
-  return data;
+  return this->dataPtr->DataWithChannels(4);
 }
 
 //////////////////////////////////////////////////
 std::vector<unsigned char> Image::Data() const
 {
   std::vector<unsigned char> data;
-  if (this->dataPtr->ShouldSwapRedBlue())
-  {
-    FIBITMAP *tmp = this->dataPtr->SwapRedBlue(this->Width(), this->Height());
-    data = this->dataPtr->DataImpl(tmp);
-    FreeImage_Unload(tmp);
-  }
-  else
-  {
-    data = this->dataPtr->DataImpl(this->dataPtr->bitmap);
-  }
+  const size_t size = this->dataPtr->height * this->Pitch();
+  data = this->dataPtr->DataImpl(this->dataPtr->bitmap, size);
   return data;
 }
 
 //////////////////////////////////////////////////
-std::vector<unsigned char> Image::Implementation::DataImpl(FIBITMAP *_img) const
+std::vector<unsigned char> Image::Implementation::DataImpl(
+  void * _img, size_t size) const
 {
-  int redmask = FI_RGBA_RED_MASK;
-  // int bluemask = 0x00ff0000;
-
-  int greenmask = FI_RGBA_GREEN_MASK;
-  // int greenmask = 0x0000ff00;
-
-  int bluemask = FI_RGBA_BLUE_MASK;
-  // int redmask = 0x000000ff;
-
-  int scanWidth = FreeImage_GetLine(_img);
-
-  std::vector<unsigned char> data(scanWidth * FreeImage_GetHeight(_img));
-
-  FreeImage_ConvertToRawBits(reinterpret_cast<BYTE*>(&data[0]), _img,
-      scanWidth, FreeImage_GetBPP(_img), redmask, greenmask, bluemask, true);
-
+  std::vector<unsigned char> data(size);
+  memcpy(data.data(), _img, size);
   return data;
 }
 
@@ -400,7 +366,7 @@ unsigned int Image::Width() const
   if (!this->Valid())
     return 0;
 
-  return FreeImage_GetWidth(this->dataPtr->bitmap);
+  return this->dataPtr->width;
 }
 
 //////////////////////////////////////////////////
@@ -409,7 +375,7 @@ unsigned int Image::Height() const
   if (!this->Valid())
     return 0;
 
-  return FreeImage_GetHeight(this->dataPtr->bitmap);
+  return this->dataPtr->height;
 }
 
 //////////////////////////////////////////////////
@@ -418,10 +384,30 @@ unsigned int Image::BPP() const
   if (!this->Valid())
     return 0;
 
-  return FreeImage_GetBPP(this->dataPtr->bitmap);
+  return this->dataPtr->channels * this->dataPtr->bits_per_channel;
 }
 
 //////////////////////////////////////////////////
+template <typename T, unsigned DIV>
+static void readPixel(math::Color &clr, const void *pixel_ptr, int channels)
+{
+  auto pixel = reinterpret_cast<const T *>(pixel_ptr);
+  float div = static_cast<float>(DIV);
+
+  switch (channels) {
+    case 1: /* Grayscale */
+      clr.Set(pixel[0] / div, pixel[0] / div, pixel[0] / div);
+      break;
+    case 3: /* RGB */
+      clr.Set(pixel[0] / div, pixel[1] / div, pixel[2] / div);
+      break;
+    case 4: /* RGBA */
+      clr.Set(pixel[0] / div, pixel[1] / div, pixel[2] / div, pixel[3] / div);
+      break;
+    default:
+      gzerr << "Image: Unsupported number of channels [" << channels << "] \n";
+  }
+}
 math::Color Image::Pixel(unsigned int _x, unsigned int _y) const
 {
   math::Color clr;
@@ -436,29 +422,27 @@ math::Color Image::Pixel(unsigned int _x, unsigned int _y) const
     return clr;
   }
 
-  if ((this->dataPtr->colorType == FIC_RGB ||
-       this->dataPtr->colorType == FIC_RGBALPHA) &&
-      (this->dataPtr->imageType == FIT_BITMAP))
-  {
-    RGBQUAD firgb;
-    if (FreeImage_GetPixelColor(this->dataPtr->bitmap, _x, _y, &firgb) == FALSE)
-    {
-      gzerr << "Failed to get pixel value at ["
-            << _x << ", " << _y << "] \n";
+  // FreeImage used to index rows in the opposite way
+  _y = this->dataPtr->height - 1 - _y;
+
+  void *pixel_ptr = (unsigned char *)this->dataPtr->bitmap +
+                    _y * this->dataPtr->width * this->BPP() / 8 +
+                    _x * this->BPP() / 8;
+
+  switch (this->dataPtr->bits_per_channel) {
+    case 8:
+      readPixel<unsigned char, 255>(clr, pixel_ptr, this->dataPtr->channels);
+      break;
+    case 16:
+      readPixel<uint16_t, 65535>(clr, pixel_ptr, this->dataPtr->channels);
+      break;
+    case 32:
+      readPixel<float, 1>(clr, pixel_ptr, this->dataPtr->channels);
+      break;
+    default:
+      gzerr << "Image: Unsupported bits per channel ["
+            << this->dataPtr->bits_per_channel << "] \n";
       return clr;
-    }
-    clr.Set(firgb.rgbRed / 255.0f, firgb.rgbGreen / 255.0f,
-            firgb.rgbBlue / 255.0f);
-  }
-  else
-  {
-    if (this->dataPtr->PixelIndex(
-           this->dataPtr->bitmap, _x, _y, clr) == FALSE)
-    {
-      gzerr << "Failed to get pixel value at ["
-            << _x << ", " << _y << "] \n";
-      return clr;
-    }
   }
 
   return clr;
@@ -515,94 +499,54 @@ math::Color Image::MaxColor() const
 }
 
 //////////////////////////////////////////////////
-BOOL Image::Implementation::PixelIndex(
-    FIBITMAP *_dib, unsigned _x, unsigned _y, math::Color &_color) const
-{
-  if (!_dib)
-    return FALSE;
-
-  if (_x >= FreeImage_GetWidth(_dib) || _y >= FreeImage_GetHeight(_dib))
-    return FALSE;
-
-  // 8 bit images
-  if (this->imageType == FIT_BITMAP)
-  {
-    BYTE byteValue;
-    // FreeImage_GetPixelIndex should also work with 1 and 4 bit images
-    if (FreeImage_GetPixelIndex(
-        _dib, _x, _y, &byteValue) == FALSE)
-    {
-      return FALSE;
-    }
-
-    unsigned int bpp = FreeImage_GetBPP(_dib);
-    // convert to float value between 0-1
-    float value = byteValue / static_cast<float>(((1 << (bpp)) - 1));
-    _color.Set(value, value, value);
-  }
-  // 16 bit images
-  else if (this->imageType == FIT_UINT16)
-  {
-    WORD *bits = reinterpret_cast<WORD *>(FreeImage_GetScanLine(_dib, _y));
-    uint16_t word = static_cast<uint16_t>(bits[_x]);
-    // convert to float value between 0-1
-    float value = word / static_cast<float>(math::MAX_UI16);
-    _color.Set(value, value, value);
-  }
-  else if (this->imageType == FIT_INT16)
-  {
-    WORD *bits = reinterpret_cast<WORD *>(FreeImage_GetScanLine(_dib, _y));
-    int16_t word = static_cast<int16_t>(bits[_x]);
-    // convert to float value between 0-1
-    float value = word / static_cast<float>(math::MAX_I16);
-    _color.Set(value, value, value);
-  }
-  else if (this->imageType == FIT_RGB16)
-  {
-    const unsigned int channels = 3u;
-    WORD *bits = reinterpret_cast<WORD *>(FreeImage_GetScanLine(_dib, _y));
-    uint16_t r = static_cast<uint16_t>(bits[_x * channels]);
-    uint16_t g = static_cast<uint16_t>(bits[_x * channels + 1]);
-    uint16_t b = static_cast<uint16_t>(bits[_x * channels + 2]);
-    // convert to float value between 0-1
-    float valueR = r / static_cast<float>(math::MAX_UI16);
-    float valueG = g / static_cast<float>(math::MAX_UI16);
-    float valueB = b / static_cast<float>(math::MAX_UI16);
-    _color.Set(valueR, valueG, valueB);
-  }
-  else if (this->imageType == FIT_RGBA16)
-  {
-    const unsigned int channels = 4u;
-    WORD *bits = reinterpret_cast<WORD *>(FreeImage_GetScanLine(_dib, _y));
-    uint16_t r = static_cast<uint16_t>(bits[_x * channels]);
-    uint16_t g = static_cast<uint16_t>(bits[_x * channels + 1]);
-    uint16_t b = static_cast<uint16_t>(bits[_x * channels + 2]);
-    uint16_t a = static_cast<uint16_t>(bits[_x * channels + 3]);
-    // convert to float value between 0-1
-    float valueR = r / static_cast<float>(math::MAX_UI16);
-    float valueG = g / static_cast<float>(math::MAX_UI16);
-    float valueB = b / static_cast<float>(math::MAX_UI16);
-    float valueA = a / static_cast<float>(math::MAX_UI16);
-    _color.Set(valueR, valueG, valueB, valueA);
-  }
-
-  return TRUE;
-}
-
-//////////////////////////////////////////////////
 void Image::Rescale(int _width, int _height)
 {
-  auto *scaled = FreeImage_Rescale(
-      this->dataPtr->bitmap, _width, _height, FILTER_LANCZOS3);
+  stbir_pixel_layout pixel_layout;
+  stbir_datatype data_type;
 
-  if (!scaled)
-  {
-    gzerr << "Failed to rescale image\n";
+  switch (this->dataPtr->channels) {
+    case 1:
+      pixel_layout = STBIR_1CHANNEL;
+      break;
+    case 3:
+      pixel_layout = STBIR_RGB;
+      break;
+    case 4:
+      pixel_layout = STBIR_RGBA;
+      break;
+    default:
+      gzerr << "Cannot rescale " << dataPtr->channels << "-channel image\n";
+      stbi_image_free(dataPtr->bitmap);
+      dataPtr->bitmap = NULL;
+      return;
+  }
+
+  switch (this->dataPtr->bits_per_channel) {
+  case 8: data_type = STBIR_TYPE_UINT8; break;
+  case 16: data_type = STBIR_TYPE_UINT16; break;
+  case 32: data_type = STBIR_TYPE_FLOAT; break;
+  default:
+    gzerr << "Cannot rescale " << dataPtr->bits_per_channel << "-bit image\n";
+    stbi_image_free(dataPtr->bitmap);
+    dataPtr->bitmap = NULL;
     return;
   }
 
-  FreeImage_Unload(this->dataPtr->bitmap);
-  this->dataPtr->bitmap = scaled;
+  void *ret = stbir_resize(
+    dataPtr->bitmap,  dataPtr->width,  dataPtr->height,  0,
+    NULL, _width, _height, 0,
+    pixel_layout, data_type, STBIR_EDGE_CLAMP, STBIR_FILTER_DEFAULT);
+
+  stbi_image_free(dataPtr->bitmap);
+  dataPtr->bitmap = NULL;
+
+  if (ret != NULL) {
+    this->dataPtr->bitmap = ret;
+    this->dataPtr->width = _width;
+    this->dataPtr->height = _height;
+  } else {
+    gzerr << "Rescaling image failed\n";
+  }
 }
 
 //////////////////////////////////////////////////
@@ -620,36 +564,27 @@ std::string Image::Filename() const
 //////////////////////////////////////////////////
 Image::PixelFormatType Image::PixelFormat() const
 {
-  Image::PixelFormatType fmt = UNKNOWN_PIXEL_FORMAT;
-  FREE_IMAGE_TYPE type = FreeImage_GetImageType(this->dataPtr->bitmap);
+  Image::PixelFormatType types_8b[] = {
+    UNKNOWN_PIXEL_FORMAT, L_INT8, UNKNOWN_PIXEL_FORMAT, RGB_INT8, RGBA_INT8};
+  Image::PixelFormatType types_16b[] = {
+    UNKNOWN_PIXEL_FORMAT, L_INT16, UNKNOWN_PIXEL_FORMAT, RGB_INT16, RGBA_INT16};
+  Image::PixelFormatType types_32b[] = {
+    UNKNOWN_PIXEL_FORMAT, R_FLOAT32, UNKNOWN_PIXEL_FORMAT, RGB_FLOAT32,
+    UNKNOWN_PIXEL_FORMAT};
+  Image::PixelFormatType *types;
 
-  unsigned int redMask = FreeImage_GetRedMask(this->dataPtr->bitmap);
-  unsigned int bpp = this->BPP();
-
-  if (type == FIT_BITMAP)
-  {
-    if (bpp == 8)
-      fmt = L_INT8;
-    else if (bpp == 16)
-      fmt = L_INT16;
-    else if (bpp == 24)
-      redMask == 0xff0000 ? fmt = RGB_INT8 : fmt = BGR_INT8;
-    else if (bpp == 32)
-    {
-      redMask == 0xff0000 || redMask == 0xff000000 ?
-        fmt = RGBA_INT8 : fmt = BGRA_INT8;
-    }
+  switch (this->dataPtr->bits_per_channel) {
+    case 8: types = types_8b; break;
+    case 16: types = types_16b; break;
+    case 32: types = types_32b; break;
+    default:
+      return UNKNOWN_PIXEL_FORMAT;
   }
-  else if (type == FIT_RGB16)
-    fmt = RGB_INT16;
-  else if (type == FIT_RGBA16)
-    fmt = RGBA_INT16;
-  else if (type == FIT_RGBF)
-    fmt = RGB_FLOAT32;
-  else if (type == FIT_UINT16 || type == FIT_INT16)
-    fmt = L_INT16;
-
-  return fmt;
+  if (this->dataPtr->channels >= 0 && this->dataPtr->channels <= 4) {
+    return types[this->dataPtr->channels];
+  } else {
+    return UNKNOWN_PIXEL_FORMAT;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -669,36 +604,3 @@ Image::PixelFormatType Image::ConvertPixelFormat(const std::string &_format)
 }
 
 //////////////////////////////////////////////////
-bool Image::Implementation::ShouldSwapRedBlue() const
-{
-  return CanSwapRedBlue() && FREEIMAGE_COLORORDER != FREEIMAGE_COLORORDER_RGB;
-}
-
-//////////////////////////////////////////////////
-bool Image::Implementation::CanSwapRedBlue() const
-{
-  const unsigned bpp = FreeImage_GetBPP(this->bitmap);
-  return bpp == 24u || bpp == 32u;
-}
-
-//////////////////////////////////////////////////
-FIBITMAP* Image::Implementation::SwapRedBlue(const unsigned int &_width,
-                                    const unsigned int &_height) const
-{
-  FIBITMAP *copy = FreeImage_Copy(this->bitmap, 0, 0, _width, _height);
-
-  const unsigned bytesperpixel = FreeImage_GetBPP(this->bitmap) / 8;
-  const unsigned pitch = FreeImage_GetPitch(this->bitmap);
-  const unsigned lineSize = FreeImage_GetLine(this->bitmap);
-
-  BYTE *line = FreeImage_GetBits(copy);
-  for (unsigned y = 0; y < _height; ++y, line += pitch)
-  {
-    for (BYTE *pixel = line; pixel < line + lineSize ; pixel += bytesperpixel)
-    {
-      std::swap(pixel[0], pixel[2]);
-    }
-  }
-
-  return copy;
-}
