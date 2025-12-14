@@ -26,11 +26,10 @@ using namespace gz;
 using namespace common;
 
 //////////////////////////////////////////////////
-Profiler::Profiler():
-  impl(nullptr)
+Profiler::Profiler()
 {
 #if GZ_PROFILER_REMOTERY
-  impl = new RemoteryProfilerImpl();
+  impl = std::make_unique<RemoteryProfilerImpl>();
 #endif  // GZ_PROFILER_REMOTERY
 
   if (this->impl == nullptr)
@@ -45,12 +44,7 @@ Profiler::Profiler():
 }
 
 //////////////////////////////////////////////////
-Profiler::~Profiler()
-{
-  if (this->impl)
-    delete this->impl;
-  this->impl = nullptr;
-}
+Profiler::~Profiler() = default;
 
 //////////////////////////////////////////////////
 void Profiler::SetThreadName(const char * _name)
@@ -111,7 +105,16 @@ bool Profiler::SetImplementation(std::unique_ptr<ProfilerImpl> _impl)
            << "' is already in use. Cannot set a new one." << std::endl;
     return false;
   }
-  this->impl = _impl.release();
+  this->impl = std::move(_impl);
   gzdbg << "Gazebo profiling with: " << this->impl->Name() << std::endl;
   return true;
+}
+
+//////////////////////////////////////////////////
+Profiler *Profiler::Instance()
+{
+  // Warning: destructor won't be called, so profiler can't
+  // do any actions on teardown, like: close connections or save to file
+  static utils::NeverDestroyed<Profiler> profiler;
+  return &profiler.Access();
 }
