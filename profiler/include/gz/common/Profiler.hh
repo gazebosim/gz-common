@@ -24,7 +24,6 @@
 
 #include <gz/common/config.hh>
 #include <gz/common/profiler/Export.hh>
-#include <gz/common/SingletonT.hh>
 #include <gz/utils/NeverDestroyed.hh>
 
 #include "ProfilerImpl.hh"
@@ -55,8 +54,7 @@ namespace gz
     /// * GZ_PROFILE_END - End a named profile sample
     /// * GZ_PROFILE - RAII-style profile sample. The sample will end at the
     ///     end of the current scope.
-    class GZ_COMMON_PROFILER_VISIBLE Profiler
-        : public virtual SingletonT<Profiler>
+    class GZ_COMMON_PROFILER_VISIBLE Profiler final
     {
       /// \brief Constructor
       protected: Profiler();
@@ -107,9 +105,6 @@ namespace gz
 
       /// \brief Pointer to the profiler implementation
       private: std::unique_ptr<ProfilerImpl> impl;
-
-      /// \brief Needed for SingletonT (outdated).
-      private: friend class SingletonT<Profiler>;
 
       /// @brief Needed for access to Profiler::Profiler() for NeverDestroyed
       private: friend class gz::utils::NeverDestroyed<Profiler>;
