@@ -24,6 +24,8 @@
 
 #include "gz/common/testing/Export.hh"
 
+#include <thread>
+
 namespace gz::common::testing
 {
 
@@ -62,14 +64,18 @@ class GZ_COMMON_TESTING_VISIBLE RedirectConsoleStream
 /// \brief Redirect standard out to a test-specific temporary path
 inline RedirectConsoleStream RedirectStdout()
 {
-  auto path = gz::common::testing::TempPath("stdout.out");
+  auto id = std::this_thread::get_id();
+  std::string filename = "stdout_" + std::to_string(std::hash<std::thread::id>{}(id)) + ".out";
+  auto path = gz::common::testing::TempPath(filename);
   return RedirectConsoleStream(StreamSource::STDOUT, path);
 }
 
 /// \brief Redirect standard error to a test-specific temporary path
 inline RedirectConsoleStream RedirectStderr()
 {
-  auto path = gz::common::testing::TempPath("stderr.out");
+  auto id = std::this_thread::get_id();
+  std::string filename = "stderr_" + std::to_string(std::hash<std::thread::id>{}(id)) + ".out";
+  auto path = gz::common::testing::TempPath(filename);
   return RedirectConsoleStream(StreamSource::STDERR, path);
 }
 }  // namespace gz::common::testing
