@@ -65,7 +65,7 @@ class GZ_COMMON_TESTING_VISIBLE RedirectConsoleStream
 inline RedirectConsoleStream RedirectStdout()
 {
   auto id = std::this_thread::get_id();
-  std::string filename = "stdout_" + std::to_string(std::hash<std::thread::id>{}(id)) + ".out";
+  std::string filename = "stdout_" + std::to_string(std::hash<std::thread::id>{}(id)).substr(0,6) + ".out";
   auto path = gz::common::testing::TempPath(filename);
   return RedirectConsoleStream(StreamSource::STDOUT, path);
 }
@@ -74,7 +74,7 @@ inline RedirectConsoleStream RedirectStdout()
 inline RedirectConsoleStream RedirectStderr()
 {
   auto id = std::this_thread::get_id();
-  std::string filename = "stderr_" + std::to_string(std::hash<std::thread::id>{}(id)) + ".out";
+  std::string filename = "stderr_" + std::to_string(std::hash<std::thread::id>{}(id)).substr(0,6) + ".out";
   auto path = gz::common::testing::TempPath(filename);
   return RedirectConsoleStream(StreamSource::STDERR, path);
 }
