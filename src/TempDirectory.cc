@@ -94,7 +94,8 @@ std::string createTempDirectory(
   {
     std::error_code ec(static_cast<int>(errcode), std::system_category());
     throw std::system_error(ec,
-        "could not format the temp directory name template");
+        "could not create unique temp directory name from template " +
+        fullTemplateStr);
   }
   const fs::path finalPath{fullTemplateStr};
   if (!createDirectories(finalPath.string()))
