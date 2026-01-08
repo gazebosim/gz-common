@@ -8,7 +8,7 @@ project(gz-common VERSION 7.0.0)
 #============================================================================
 # Find gz-cmake
 #============================================================================
-find_package(gz-cmake REQUIRED)
+find_package(gz-cmake 5 REQUIRED)
 
 #============================================================================
 # Configure the project
@@ -37,11 +37,11 @@ message(STATUS "\n\n-- ====== Finding Dependencies ======")
 
 #--------------------------------------
 # Find gz-math
-gz_find_package(gz-math REQUIRED_BY geospatial graphics events)
+gz_find_package(gz-math VERSION 9 REQUIRED_BY geospatial graphics events)
 
 #--------------------------------------
 # Find gz-utils
-gz_find_package(gz-utils REQUIRED COMPONENTS log)
+gz_find_package(gz-utils VERSION 4 REQUIRED COMPONENTS log)
 
 #--------------------------------------
 # Find Tinyxml2
