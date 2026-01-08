@@ -89,13 +89,14 @@ std::string createTempDirectory(
   }
 
 #ifdef _WIN32
+  const std::string fullTemplateStrCopy = fullTemplateStr;
   errno_t errcode = _mktemp_s(&fullTemplateStr[0], fullTemplateStr.size() + 1);
   if (errcode)
   {
     std::error_code ec(static_cast<int>(errcode), std::system_category());
     throw std::system_error(ec,
         "could not create unique temp directory name from template " +
-        fullTemplateStr);
+        fullTemplateStrCopy);
   }
   const fs::path finalPath{fullTemplateStr};
   if (!createDirectories(finalPath.string()))
