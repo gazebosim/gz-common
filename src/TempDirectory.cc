@@ -78,7 +78,7 @@ std::string createTempDirectory(
     const std::string &_parentPath)
 {
   fs::path parentPath(_parentPath);
-  fs::path templatePath = _baseName + "XXXXXX";
+  fs::path templatePath = _baseName + "XXXXXXXXXXXX";
 
   std::string fullTemplateStr = (parentPath / templatePath).string();
   if (!createDirectories(parentPath.string()))
