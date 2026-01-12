@@ -8,17 +8,17 @@ package(
     ],
 )
 
-public_headers_no_gen = glob([
-    "include/gz/common/*.hh",
-    "include/gz/common/**/*.hh",
-])
+# public_headers_no_gen = glob([
+#     "include/gz/common/*.hh",
+#     "include/gz/common/**/*.hh",
+# ])
 
-sources = glob(
-    ["src/*.cc"],
-    exclude = ["src/*_TEST.cc"],
-)
+# sources = glob(
+#     ["src/*.cc"],
+#     exclude = ["src/*_TEST.cc"],
+# )
 
-test_sources = glob(["src/*_TEST.cc"])
+# test_sources = glob(["src/*_TEST.cc"])
 
 gz_export_header(
     name = "Export",
@@ -27,9 +27,9 @@ gz_export_header(
     lib_name = "gz-common-av",
 )
 
-public_headers = public_headers_no_gen + [
-    "include/gz/common/av/Export.hh",
-]
+# public_headers = public_headers_no_gen + [
+#     "include/gz/common/av/Export.hh",
+# ]
 
 # \todo(iche033) Add av component once ffmpeg dep is available in BCR
 # cc_library(
