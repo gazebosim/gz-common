@@ -160,7 +160,7 @@ void Animation::Time(const double _time)
     this->dataPtr->timePos = _time;
     if (this->dataPtr->loop)
     {
-      if (this->dataPtr->length <= 1e-6)
+      if (math::equal(this->dataPtr->length, 0.0))
       {
         this->dataPtr->timePos = 0;
       }
