@@ -597,6 +597,7 @@ math::Vector2d SVGLoader::Implementation::SubpathToPolyline(
           _last = pEnd;
           i += 7;
         }
+        break;
       // Z and z indicate closed path.
       // just add the first point to the list
       case 'Z':
