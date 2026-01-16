@@ -18,24 +18,31 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "STB/stb_image.h"
 
-#ifdef __GNUC__
+#if defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 #endif
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "STB/stb_image_write.h"
-#ifdef __GNUC__
+#if defined(__GNUC__)
 #pragma GCC diagnostic pop
 #endif
 
-#ifdef __GNUC__
+#if defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#elif defined(__APPLE__)
+// Suppress deprecation warning around snprintf
+// Ref: https://github.com/nothings/stb/issues/1446
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #endif
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include "STB/stb_image_resize2.h"
-#ifdef __GNUC__
+#if defined(__GNUC__)
 #pragma GCC diagnostic pop
+#elif defined(__APPLE__)
+#pragma clang diagnostic pop
 #endif
 
 #include <cstdint>
