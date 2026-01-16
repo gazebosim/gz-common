@@ -91,8 +91,8 @@ public:
 public:
   std::vector<unsigned char> DataImpl(void *_img, size_t size) const;
 };
-} // namespace common
-} // namespace gz
+}  // namespace common
+}  // namespace gz
 
 //////////////////////////////////////////////////
 Image::Image(const std::string &_filename)
@@ -248,7 +248,7 @@ void Image::SetFromCompressedData(unsigned char *_data, unsigned int _size,
   int w, h, n;
 
   switch (_format) {
-  case COMPRESSED_PNG: // fall through
+  case COMPRESSED_PNG:  // fall through
   case COMPRESSED_JPEG:
     if (stbi_is_hdr_from_memory(_data, _size)) {
       bitmap = stbi_loadf_from_memory(_data, _size, &w, &h, &n, 0);
@@ -304,7 +304,7 @@ Image::Implementation::DataWithChannels(int out_channels) const {
           reinterpret_cast<uint16_t *>(bitmap_copy), this->channels,
           out_channels, this->width, this->height));
       break;
-    case 32: // not implemented in stbi
+    case 32:  // not implemented in stbi
       break;
     }
     if (bitmap_rgb == NULL) {
