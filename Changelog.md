@@ -1,5 +1,28 @@
 ## Gazebo Common 7.x
 
+### Gazebo Common 7.0.1 (2026-01-20)
+
+1. [bazel] Fix CI on MacOS
+    * [Pull request #750](https://github.com/gazebosim/gz-common/pull/750)
+
+1. Find jetty packages with explicit version
+    * [Pull request #743](https://github.com/gazebosim/gz-common/pull/743)
+
+1. [bazel/infra] Add manual BCR release workflow
+    * [Pull request #732](https://github.com/gazebosim/gz-common/pull/732)
+
+1. Bazel updates
+    * [Pull request #726](https://github.com/gazebosim/gz-common/pull/726)
+
+1. Fix Image::ChannelData for 16 bit RGB[A] images
+    * [Pull request #720](https://github.com/gazebosim/gz-common/pull/720)
+
+1. Improvements to Profiler Tutorial
+    * [Pull request #711](https://github.com/gazebosim/gz-common/pull/711)
+
+1. [bazel] Bump spdlog version
+    * [Pull request #714](https://github.com/gazebosim/gz-common/pull/714)
+
 ### Gazebo Common 7.0.0 (2025-09-30)
 
 1. **Baseline:** this includes all changes from 6.1.0 and earlier.
