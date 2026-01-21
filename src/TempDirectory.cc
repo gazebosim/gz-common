@@ -78,7 +78,7 @@ std::string createTempDirectory(
     const std::string &_parentPath)
 {
   fs::path parentPath(_parentPath);
-  fs::path templatePath = _baseName + "XXXXXXXXXXXX";
+  fs::path templatePath = _baseName + "XXXXXX";
 
   std::string fullTemplateStr = (parentPath / templatePath).string();
   if (!createDirectories(parentPath.string()))
@@ -89,21 +89,13 @@ std::string createTempDirectory(
   }
 
 #ifdef _WIN32
-  const std::string fullTemplateStrCopy = fullTemplateStr;
-  errno_t errcode = _mktemp_s(&fullTemplateStr[0], fullTemplateStr.size() + 1);
-  if (errcode)
-  {
-    std::error_code ec(static_cast<int>(errcode), std::system_category());
-    throw std::system_error(ec,
-        "could not create unique temp directory name from template " +
-        fullTemplateStrCopy);
-  }
-  const fs::path finalPath{fullTemplateStr};
+  const fs::path finalPath{common::uniqueDirectoryPath(fullTemplateStr)};
   if (!createDirectories(finalPath.string()))
   {
     std::error_code ec(static_cast<int>(GetLastError()),
         std::system_category());
-    throw std::system_error(ec, "could not create the temp directory");
+    throw std::system_error(ec,
+        "could not create the temp directory " + finalPath.string());
   }
 #else
   const char * dirName = mkdtemp(&fullTemplateStr[0]);
