@@ -41,6 +41,8 @@ class GZ_COMMON_TESTING_VISIBLE CMakeTestPaths: public TestPaths
   /// Documentation inherited
   public: bool ProjectSourcePath(std::string &_sourceDir) override;
 
+  public: std::string SourceFile(const std::string &_relativePath) override;
+
   /// Documentation inherited
   public: bool TestTmpPath(std::string &_tmpDir) override;
 };

@@ -41,6 +41,7 @@ cc_library(
         "//:gz-common",
         "@gz-utils//:ImplPtr",
         "@gz-utils//:SuppressWarning",
+        "@bazel_tools//tools/cpp/runfiles",
     ],
 )
 

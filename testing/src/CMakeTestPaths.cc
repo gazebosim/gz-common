@@ -42,6 +42,13 @@ bool CMakeTestPaths::ProjectSourcePath(std::string &_sourceDir)
   return false;
 }
 
+std::string CMakeTestPaths::SourceFile(const std::string &_relativePath)
+{
+  std::string dataDir;
+  this->ProjectSourcePath(dataDir);
+  return common::joinPaths(dataDir, _relativePath);
+}
+
 //////////////////////////////////////////////////
 bool CMakeTestPaths::TestTmpPath(std::string &_tmpDir)
 {

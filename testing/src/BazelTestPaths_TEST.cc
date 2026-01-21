@@ -33,7 +33,7 @@ TEST(BazelTestPaths, ProjectSourcePath)
   ASSERT_TRUE(exists(sourceDir)) << sourceDir;
   ASSERT_TRUE(isDirectory(sourceDir));
 
-  auto installedDir = joinPaths(sourceDir, "testing", "test_files");
+  auto installedDir = testPaths.SourceFile(joinPaths("testing", "test_files"));
   EXPECT_TRUE(exists(installedDir)) << installedDir;
   EXPECT_TRUE(isDirectory(installedDir));
 

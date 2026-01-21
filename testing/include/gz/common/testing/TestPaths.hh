@@ -76,6 +76,8 @@ class GZ_COMMON_TESTING_VISIBLE TestPaths
   /// \return True if path successfully found and set, false otherwise
   public: virtual bool ProjectSourcePath(std::string &_sourceDir) = 0;
 
+  public: virtual std::string SourceFile(const std::string &_relativePath) = 0;
+
   /// \brief Populate the path to a temporary directory
   /// \param[out] _tmpDir path to the root temporary directory
   /// \return True if path successfully found and set, false otherwise
@@ -161,10 +163,7 @@ std::string SourceFile(Args const &... args)
 {
   auto testPaths = TestPathFactory(kTestingProjectSourceDir);
   assert(nullptr != testPaths);
-
-  std::string dataDir;
-  testPaths->ProjectSourcePath(dataDir);
-  return common::joinPaths(dataDir, args...);
+  return testPaths->SourceFile(common::joinPaths(args...));
 }
 
 //////////////////////////////////////////////////

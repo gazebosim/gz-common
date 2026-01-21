@@ -20,6 +20,8 @@
 #include <gz/common/Console.hh>
 #include <gz/common/Util.hh>
 
+#include "tools/cpp/runfiles/runfiles.h"
+
 namespace gz::common::testing
 {
 
@@ -29,8 +31,7 @@ BazelTestPaths::~BazelTestPaths() = default;
 //////////////////////////////////////////////////
 bool BazelTestPaths::ProjectSourcePath(std::string &_sourceDir)
 {
-  std::string test_srcdir, bazel_path;
-
+  std::string test_srcdir;
   if (common::env("TEST_SRCDIR", test_srcdir))
   {
     // bzlmod puts run files in _main instead of workspace name
@@ -40,6 +41,24 @@ bool BazelTestPaths::ProjectSourcePath(std::string &_sourceDir)
   else
   {
     return false;
+  }
+}
+
+std::string BazelTestPaths::SourceFile(const std::string &_relativePath)
+{
+  std::string error;
+  using ::bazel::tools::cpp::runfiles::Runfiles;
+  std::unique_ptr<Runfiles> runfiles(
+      Runfiles::Create(program_invocation_name, &error));
+  if (runfiles == nullptr) {
+    gzerr << "Error creating bazel runfiles: " << error << std::endl;
+    return "";
+  }
+
+  std::string resolvedPath =
+      runfiles->Rlocation(gz::common::joinPaths(BAZEL_CURRENT_REPOSITORY, _relativePath));
+  if (!resolvedPath.empty()) {
+    return resolvedPath;
   }
 }
 

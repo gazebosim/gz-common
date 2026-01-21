@@ -47,6 +47,9 @@ class BazelTestPaths: public TestPaths
   public: bool GZ_COMMON_TESTING_VISIBLE
           ProjectSourcePath(std::string &_sourceDir) override;
 
+  public: std::string GZ_COMMON_TESTING_VISIBLE SourceFile(
+        const std::string &_relativePath) override;
+
   /// Documentation inherited
   public: bool GZ_COMMON_TESTING_VISIBLE
           TestTmpPath(std::string &_tmpDir) override;
