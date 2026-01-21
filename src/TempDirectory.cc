@@ -19,12 +19,16 @@
 
 #include <ignition/common/Console.hh>
 
+#include <filesystem>
+
 #ifdef _WIN32
 #include <windows.h>
 #include <direct.h>
 #include <fileapi.h>
 #include <io.h>
 #endif
+
+namespace fs = std::filesystem;
 
 using namespace ignition;
 using namespace common;
@@ -107,17 +111,13 @@ std::string createTempDirectory(
   }
 
 #ifdef _WIN32
-  errno_t errcode = _mktemp_s(&fullTemplateStr[0], fullTemplateStr.size() + 1);
-  if (errcode) {
-    std::error_code ec(static_cast<int>(errcode), std::system_category());
-    throw std::system_error(ec,
-        "could not format the temp directory name template");
-  }
-  const std::string finalPath{fullTemplateStr};
-  if (!createDirectories(finalPath)) {
+  const fs::path finalPath{common::uniqueDirectoryPath(fullTemplateStr)};
+  if (!createDirectories(finalPath.string()))
+  {
     std::error_code ec(static_cast<int>(GetLastError()),
         std::system_category());
-    throw std::system_error(ec, "could not create the temp directory");
+    throw std::system_error(ec,
+        "could not create the temp directory " + finalPath.string());
   }
 #else
   const char * dirName = mkdtemp(&fullTemplateStr[0]);
@@ -127,10 +127,10 @@ std::string createTempDirectory(
     throw std::system_error(ec,
         "could not format or create the temp directory");
   }
-  const std::string finalPath{dirName};
+  const fs::path finalPath{dirName};
 #endif
 
-  return finalPath;
+  return finalPath.string();
 }
 
 /////////////////////////////////////////////////
