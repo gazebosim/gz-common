@@ -21,7 +21,8 @@
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
-#elif defined(__APPLE__)
+#endif
+#if defined(__APPLE__)
 // Suppress deprecation warning around snprintf
 // Ref: https://github.com/nothings/stb/issues/1446
 #pragma clang diagnostic push
@@ -31,7 +32,8 @@
 #include "STB/stb_image_write.h"
 #if defined(__GNUC__)
 #pragma GCC diagnostic pop
-#elif defined(__APPLE__)
+#endif
+#if defined(__APPLE__)
 #pragma clang diagnostic pop
 #endif
 
