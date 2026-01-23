@@ -39,6 +39,7 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
+#endif
 #include "STB/stb_image_resize2.h"
 #if defined(__GNUC__)
 #pragma GCC diagnostic pop
