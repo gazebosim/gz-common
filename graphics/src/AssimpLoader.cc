@@ -438,12 +438,18 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
       std::make_shared<Image>(joinPaths(_path, texName));
     auto [metalTexture, roughTexture] =
       this->SplitMetallicRoughnessMap(*texImg);
-    pbr.SetMetalnessMap(
-        this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
-        "Metalness"), metalTexture);
-    pbr.SetRoughnessMap(
-        this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
-        "Roughness"), roughTexture);
+    if (metalTexture)
+    {
+      pbr.SetMetalnessMap(
+          this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
+          "Metalness"), metalTexture);
+    }
+    if (roughTexture)
+    {
+      pbr.SetRoughnessMap(
+          this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
+          "Roughness"), roughTexture);
+    }
   }
   else
   {
@@ -572,7 +578,7 @@ std::pair<std::string, ImagePtr> AssimpLoader::Implementation::LoadTexture(
 
 std::pair<ImagePtr, ImagePtr>
     AssimpLoader::Implementation::SplitMetallicRoughnessMap(
-    const Image& _img) const
+    const Image &_img) const
 {
   std::pair<ImagePtr, ImagePtr> ret;
   // Metalness in B roughness in G
@@ -583,20 +589,34 @@ std::pair<ImagePtr, ImagePtr>
   std::vector<unsigned char> metalnessData(width * height * bytesPerPixel);
   std::vector<unsigned char> roughnessData(width * height * bytesPerPixel);
 
+  std::vector<unsigned char> metalnessData8bit =
+      _img.ChannelData(Image::Channel::BLUE);
+  std::vector<unsigned char> roughnessData8bit =
+      _img.ChannelData(Image::Channel::GREEN);
+
+  if (metalnessData8bit.empty() || roughnessData8bit.empty())
+  {
+    gzerr << "Unable to extract channel data when splitting metallic "
+          << "roughness map: " << std::endl;
+    return ret;
+  }
+
   for (unsigned int y = 0; y < height; ++y)
   {
     for (unsigned int x = 0; x < width; ++x)
     {
       // RGBA so 4 bytes per pixel, alpha fully opaque
-      auto baseIndex = bytesPerPixel * (y * width + x);
-      auto color = _img.Pixel(x, (height - y - 1));
-      metalnessData[baseIndex] = color.B() * 255.0;
-      metalnessData[baseIndex + 1] = color.B() * 255.0;
-      metalnessData[baseIndex + 2] = color.B() * 255.0;
+      unsigned int idx = y * width + x;
+      unsigned int colorB = metalnessData8bit[idx];
+      unsigned int colorG = roughnessData8bit[idx];
+      auto baseIndex = bytesPerPixel * idx;
+      metalnessData[baseIndex] = colorB;
+      metalnessData[baseIndex + 1] = colorB;
+      metalnessData[baseIndex + 2] = colorB;
       metalnessData[baseIndex + 3] = 255;
-      roughnessData[baseIndex] = color.G() * 255.0;
-      roughnessData[baseIndex + 1] = color.G() * 255.0;
-      roughnessData[baseIndex + 2] = color.G() * 255.0;
+      roughnessData[baseIndex] = colorG;
+      roughnessData[baseIndex + 1] = colorG;
+      roughnessData[baseIndex + 2] = colorG;
       roughnessData[baseIndex + 3] = 255;
     }
   }
