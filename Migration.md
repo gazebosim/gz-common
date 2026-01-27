@@ -5,6 +5,10 @@ Deprecated code produces compile-time warnings. These warning serve as
 notification to users that their code should be upgraded. The next major
 release will remove the deprecated code.
 
+
+## Gazebo Common 7.X to 8.X
+
+
 ## Gazebo Common 6.X to 7.X
 
 1. The major version has been removed from the cmake project name and the
