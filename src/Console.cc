@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <filesystem>
 #include <iostream>
+#include <mutex>
 #include <sstream>
 #include <string>
 
@@ -42,8 +43,11 @@ LogMessage::LogMessage(const char *_file, int _line,
     sourceLocation(_file, _line, "")
 {
   // Use default initialization if needed.
-  if (!Console::initialized)
-    Console::Init(".gz", "auto_default.log");
+  static std::once_flag flag;
+  std::call_once(flag, []{
+    if (!Console::initialized)
+      Console::Init(".gz", "auto_default.log");
+  });
 }
 
 /////////////////////////////////////////////////
