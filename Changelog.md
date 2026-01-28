@@ -1,5 +1,19 @@
 ## Gazebo Common 6.x
 
+### Gazebo Common 6.3.0 (2026-01-28)
+
+1. Add functions for clearing FindFile* callbacks
+    * [Pull request #754](https://github.com/gazebosim/gz-common/pull/754)
+
+1. TempDirectory: improve windows reliability
+    * [Pull request #744](https://github.com/gazebosim/gz-common/pull/744)
+
+1. [bazel/infra] Add manual BCR release workflow
+    * [Pull request #732](https://github.com/gazebosim/gz-common/pull/732)
+
+1. Manual backport of: Bazel updates
+    * [Pull request #726](https://github.com/gazebosim/gz-common/pull/726)
+
 ### Gazebo Common 6.2.1 (2025-11-12)
 
 1. Fix Image::ChannelData for 16 bit RGB[A] images (backport #720)

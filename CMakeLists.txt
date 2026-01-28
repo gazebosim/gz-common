@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.22.1 FATAL_ERROR)
 #============================================================================
 # Initialize the project
 #============================================================================
-project(gz-common6 VERSION 6.2.1)
+project(gz-common6 VERSION 6.3.0)
 set(GZ_COMMON_VER ${PROJECT_VERSION_MAJOR})
 
 #============================================================================
