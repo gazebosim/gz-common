@@ -300,6 +300,20 @@ TEST_F(SystemPathsFixture, FindFileURI)
   EXPECT_EQ(file2, sp.FindFileURI("anything://test_f2"));
 }
 
+TEST_F(SystemPathsFixture, ClearFindFileURICallbacks)
+{
+  auto testCb = [this](const common::URI &)
+  {
+    return this->temp->Path();
+  };
+  common::SystemPaths sp;
+  sp.AddFindFileURICallback(testCb);
+  EXPECT_EQ(this->temp->Path(), sp.FindFileURI("test://test_f1"));
+
+  sp.ClearFindFileURICallbacks();
+  EXPECT_EQ("", sp.FindFileURI("test://test_f1"));
+}
+
 //////////////////////////////////////////////////
 TEST_F(SystemPathsFixture, FindFile)
 {
@@ -420,6 +434,19 @@ TEST_F(SystemPathsFixture, FindFile)
   }
 }
 
+TEST_F(SystemPathsFixture, ClearFindFileCallbacks)
+{
+  auto testCb = [this](const std::string &)
+  {
+    return this->temp->Path();
+  };
+  common::SystemPaths sp;
+  sp.AddFindFileCallback(testCb);
+  EXPECT_EQ(this->temp->Path(), sp.FindFile("test_file"));
+
+  sp.ClearFindFileCallbacks();
+  EXPECT_EQ("", sp.FindFile("test_file"));
+}
 //////////////////////////////////////////////////
 TEST_F(SystemPathsFixture, NormalizeDirectoryPath)
 {
