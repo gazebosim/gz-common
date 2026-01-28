@@ -1,5 +1,13 @@
 ## Gazebo Common 7.x
 
+### Gazebo Common 7.1.0 (2026-01-28)
+
+1. Add functions for clearing FindFile* callbacks
+    * [Pull request #754](https://github.com/gazebosim/gz-common/pull/754)
+
+1. TempDirectory: improve windows reliability
+    * [Pull request #744](https://github.com/gazebosim/gz-common/pull/744)
+
 ### Gazebo Common 7.0.1 (2026-01-20)
 
 1. Find jetty packages with explicit version
