@@ -15,12 +15,10 @@
  *
  */
 
-#include <sys/stat.h>
-
 #include <cctype>
 #include <cstdint>
 #include <memory>
-#include <mutex>
+#include <shared_mutex>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -79,16 +77,16 @@ class gz::common::MeshManager::Implementation
   public: AssimpLoader assimpLoader;
 
   /// \brief Dictionary of meshes, indexed by name
-  public: std::unordered_map<std::string, Mesh*> meshes;
+  public: std::unordered_map<std::string, std::unique_ptr<Mesh>> meshes;
 
   /// \brief supported file extensions for meshes
   public: std::unordered_set<std::string> fileExtensions;
 
   /// \brief Mutex to protect the mesh map
-  public: std::mutex mutex;
+  public: std::shared_mutex mutex;
 
   /// \brief True if assimp is used for loading all supported mesh formats
-  public: bool forceAssimp;
+  public: bool forceAssimp{};
 #ifdef _WIN32
 #pragma warning(pop)
 #endif
@@ -129,13 +127,7 @@ MeshManager::MeshManager()
 }
 
 //////////////////////////////////////////////////
-MeshManager::~MeshManager()
-{
-  for (auto iter = this->dataPtr->meshes.begin();
-      iter != this->dataPtr->meshes.end(); ++iter)
-    delete iter->second;
-  this->dataPtr->meshes.clear();
-}
+MeshManager::~MeshManager() = default;
 
 //////////////////////////////////////////////////
 const Mesh *MeshManager::Load(const std::string &_filename)
@@ -145,23 +137,22 @@ const Mesh *MeshManager::Load(const std::string &_filename)
     gzerr << "Invalid mesh filename extension[" << _filename << "]\n";
     return nullptr;
   }
+  std::unique_lock lock(this->dataPtr->mutex);
 
-  Mesh *mesh = nullptr;
-
-  std::string extension;
-
-  if (this->HasMesh(_filename))
+  auto iter = this->dataPtr->meshes.find(_filename);
+  if (iter != this->dataPtr->meshes.end())
   {
-    return this->dataPtr->meshes[_filename];
+    return iter->second.get();
   }
 
+  Mesh *mesh = nullptr;
   std::string fullname = common::findFile(_filename);
 
   if (!fullname.empty())
   {
-    extension = fullname.substr(fullname.rfind(".")+1, fullname.size());
-    std::transform(extension.begin(), extension.end(),
-        extension.begin(), ::tolower);
+    const auto extension = gz::common::lowercase(
+        fullname.substr(fullname.rfind(".")+1, fullname.size()));
+
     MeshLoader *loader = nullptr;
     this->SetAssimpEnvs();
     if (this->dataPtr->forceAssimp)
@@ -184,23 +175,13 @@ const Mesh *MeshManager::Load(const std::string &_filename)
         return nullptr;
       }
     }
-    // This mutex prevents two threads from loading the same mesh at the
-    // same time.
-    std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-    if (!this->HasMesh(_filename))
+    if ((mesh = loader->Load(fullname)) != nullptr)
     {
-      if ((mesh = loader->Load(fullname)) != nullptr)
-      {
-        mesh->SetName(_filename);
-        this->dataPtr->meshes.insert(std::make_pair(_filename, mesh));
-      }
-      else
-        gzerr << "Unable to load mesh[" << fullname << "]\n";
+      mesh->SetName(_filename);
+      this->dataPtr->meshes.insert(std::make_pair(_filename, mesh));
     }
     else
-    {
-      mesh = this->dataPtr->meshes[_filename];
-    }
+      gzerr << "Unable to load mesh[" << fullname << "]\n";
   }
   else
     gzerr << "Unable to find file[" << _filename << "]\n";
@@ -225,13 +206,10 @@ void MeshManager::Export(const Mesh *_mesh, const std::string &_filename,
 //////////////////////////////////////////////////
 bool MeshManager::IsValidFilename(const std::string &_filename)
 {
-  std::string extension;
-
-  extension = _filename.substr(_filename.rfind(".")+1, _filename.size());
+  const auto extension = gz::common::lowercase(
+      _filename.substr(_filename.rfind(".")+1, _filename.size()));
   if (extension.empty())
     return false;
-  std::transform(extension.begin(), extension.end(),
-                 extension.begin(), ::tolower);
 
   return this->dataPtr->fileExtensions.find(extension) !=
       this->dataPtr->fileExtensions.end();
@@ -242,32 +220,49 @@ void MeshManager::MeshAABB(const Mesh *_mesh,
     gz::math::Vector3d &_center,
     gz::math::Vector3d &_minXYZ, gz::math::Vector3d &_maxXYZ)
 {
-  if (this->HasMesh(_mesh->Name()))
-    this->dataPtr->meshes[_mesh->Name()]->AABB(_center, _minXYZ, _maxXYZ);
+  std::shared_lock lock(this->dataPtr->mutex);
+
+  auto iter = this->dataPtr->meshes.find(_mesh->Name());
+  if (iter != this->dataPtr->meshes.end())
+    iter->second->AABB(_center, _minXYZ, _maxXYZ);
 }
 
 //////////////////////////////////////////////////
 void MeshManager::GenSphericalTexCoord(const Mesh *_mesh,
     const gz::math::Vector3d &_center)
 {
-  if (this->HasMesh(_mesh->Name()))
-    this->dataPtr->meshes[_mesh->Name()]->GenSphericalTexCoord(_center);
+  std::shared_lock lock(this->dataPtr->mutex);
+
+  auto iter = this->dataPtr->meshes.find(_mesh->Name());
+  if (iter != this->dataPtr->meshes.end())
+    iter->second->GenSphericalTexCoord(_center);
 }
 
 //////////////////////////////////////////////////
 void MeshManager::AddMesh(Mesh *_mesh)
 {
-  if (!this->HasMesh(_mesh->Name()))
-    this->dataPtr->meshes[_mesh->Name()] = _mesh;
+  std::unique_lock lock(this->dataPtr->mutex);
+
+  auto iter = this->dataPtr->meshes.find(_mesh->Name());
+  if (iter != this->dataPtr->meshes.end())
+  {
+    gzdbg << "MeshManager::AddMesh replaced: " << _mesh->Name() << std::endl;
+    iter->second.reset(_mesh);
+  }
+  else
+  {
+    this->dataPtr->meshes.insert({_mesh->Name(), std::unique_ptr<Mesh>(_mesh)});
+  }
 }
 
 //////////////////////////////////////////////////
 const Mesh *MeshManager::MeshByName(const std::string &_name) const
 {
-  auto iter = this->dataPtr->meshes.find(_name);
+  std::shared_lock lock(this->dataPtr->mutex);
 
+  auto iter = this->dataPtr->meshes.find(_name);
   if (iter != this->dataPtr->meshes.end())
-    return iter->second;
+    return iter->second.get();
 
   return nullptr;
 }
@@ -275,23 +270,18 @@ const Mesh *MeshManager::MeshByName(const std::string &_name) const
 //////////////////////////////////////////////////
 void MeshManager::RemoveAll()
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-  for (auto m : this->dataPtr->meshes)
-  {
-    delete m.second;
-  }
+  std::unique_lock lock(this->dataPtr->mutex);
   this->dataPtr->meshes.clear();
 }
 
 //////////////////////////////////////////////////
 bool MeshManager::RemoveMesh(const std::string &_name)
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  std::unique_lock lock(this->dataPtr->mutex);
 
   auto iter = this->dataPtr->meshes.find(_name);
   if (iter != this->dataPtr->meshes.end())
   {
-    delete iter->second;
     this->dataPtr->meshes.erase(iter);
     return true;
   }
@@ -305,8 +295,9 @@ bool MeshManager::HasMesh(const std::string &_name) const
   if (_name.empty())
     return false;
 
-  auto iter = this->dataPtr->meshes.find(_name);
+  std::shared_lock lock(this->dataPtr->mutex);
 
+  auto iter = this->dataPtr->meshes.find(_name);
   return iter != this->dataPtr->meshes.end();
 }
 
@@ -318,8 +309,8 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
   {
     return;
   }
+  std::unique_lock lock(this->dataPtr->mutex);
 
-  int ring, seg;
   float deltaSegAngle = (2.0 * GZ_PI / segments);
   float deltaRingAngle = (GZ_PI / rings);
   gz::math::Vector3d vert, norm;
@@ -332,13 +323,13 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
   SubMesh subMesh;
 
   // Generate the group of rings for the sphere
-  for (ring = 0; ring <= rings; ++ring)
+  for (int ring = 0; ring <= rings; ++ring)
   {
     float r0 = radius * sinf(ring * deltaRingAngle);
     vert.Y() = radius * cosf(ring * deltaRingAngle);
 
     // Generate the group of segments for the current ring
-    for (seg = 0; seg <= segments; ++seg)
+    for (int seg = 0; seg <= segments; ++seg)
     {
       vert.X() = r0 * sinf(seg * deltaSegAngle);
       vert.Z() = r0 * cosf(seg * deltaSegAngle);
@@ -392,6 +383,7 @@ void MeshManager::CreatePlane(const std::string &_name,
   {
     return;
   }
+  std::unique_lock lock(this->dataPtr->mutex);
 
   Mesh *mesh = new Mesh();
   mesh->SetName(_name);
@@ -449,7 +441,7 @@ void MeshManager::CreatePlane(const std::string &_name,
         // Compute the normal
         if (!xform.TransformAffine(norm, vec))
         {
-          gzerr << "Unable to tranform matrix4d\n";
+          gzerr << "Unable to transform matrix4d\n";
           continue;
         }
 
@@ -472,12 +464,11 @@ void MeshManager::CreateBox(const std::string &_name,
     const gz::math::Vector3d &_sides,
     const gz::math::Vector2d &_uvCoords)
 {
-  int i, k;
-
   if (this->HasMesh(_name))
   {
     return;
   }
+  std::unique_lock lock(this->dataPtr->mutex);
 
   Mesh *mesh = new Mesh();
   mesh->SetName(_name);
@@ -499,7 +490,7 @@ void MeshManager::CreateBox(const std::string &_name,
   };
 
   // Normals for each face
-  float n[6][3]=
+  const float n[6][3]=
   {
     {+0, -1, +0},
     {+0, +1, +0},
@@ -510,14 +501,14 @@ void MeshManager::CreateBox(const std::string &_name,
   };
 
   // Texture coords
-  double t[4][2] =
+  const double t[4][2] =
   {
     {_uvCoords.X(), 0}, {0, 0}, {0, _uvCoords.Y()},
     {_uvCoords.X(), _uvCoords.Y()}
   };
 
   // Vertices
-  int faces[6][4] =
+  const int faces[6][4] =
   {
     {2, 1, 0, 3}, {5, 6, 7, 4},
     {2, 6, 5, 1}, {1, 5, 4, 0},
@@ -525,7 +516,7 @@ void MeshManager::CreateBox(const std::string &_name,
   };
 
   // Indices
-  int ind[36] =
+  const int ind[36] =
   {
     0, 1, 2,
     2, 3, 0,
@@ -542,7 +533,7 @@ void MeshManager::CreateBox(const std::string &_name,
   };
 
   // Compute the vertices
-  for (i = 0; i < 8; ++i)
+  for (int i = 0; i < 8; ++i)
   {
     v[i][0] *= _sides.X() * 0.5;
     v[i][1] *= _sides.Y() * 0.5;
@@ -550,10 +541,10 @@ void MeshManager::CreateBox(const std::string &_name,
   }
 
   // For each face
-  for (i = 0; i < 6; ++i)
+  for (int i = 0; i < 6; ++i)
   {
     // For each vertex in the face
-    for (k = 0; k < 4; k++)
+    for (int k = 0; k < 4; k++)
     {
       subMesh.AddVertex(v[faces[i][k]][0],
                          v[faces[i][k]][1],
@@ -564,7 +555,7 @@ void MeshManager::CreateBox(const std::string &_name,
   }
 
   // Set the indices
-  for (i = 0; i < 36; ++i)
+  for (int i = 0; i < 36; ++i)
     subMesh.AddIndex(ind[i]);
   mesh->AddSubMesh(subMesh);
 }
@@ -575,7 +566,7 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
     double _height)
 {
 #ifndef _WIN32
-  // distance tolerence between 2 points. This is used when creating a list
+  // distance tolerance between 2 points. This is used when creating a list
   // of distinct points in the polylines.
   double tol = 1e-4;
   auto polys = _polys;
@@ -777,6 +768,7 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
   }
 
   mesh->AddSubMesh(subMesh);
+  std::unique_lock lock(this->dataPtr->mutex);
   this->dataPtr->meshes.insert(std::make_pair(_name, mesh));
 #endif
   return;
@@ -785,12 +777,11 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
 //////////////////////////////////////////////////
 void MeshManager::CreateCamera(const std::string &_name, float _scale)
 {
-  int i, k;
-
   if (this->HasMesh(_name))
   {
     return;
   }
+  std::unique_lock lock(this->dataPtr->mutex);
 
   Mesh *mesh = new Mesh();
   mesh->SetName(_name);
@@ -806,7 +797,7 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
   };
 
   // Normals for each vertex
-  float n[8][3]=
+  const float n[8][3]=
   {
     {-0.577350f, -0.577350f, -0.577350f},
     {-0.577350f, -0.577350f, 0.577350f},
@@ -825,7 +816,7 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
     };*/
 
   // Vertices
-  int faces[6][4] =
+  const int faces[6][4] =
   {
     {2, 1, 0, 3}, {5, 6, 7, 4},
     {2, 6, 5, 1}, {1, 5, 4, 0},
@@ -833,7 +824,7 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
   };
 
   // Indices
-  int ind[36] =
+  const int ind[36] =
   {
     0, 1, 2,
     2, 3, 0,
@@ -850,7 +841,7 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
   };
 
   // Compute the vertices
-  for (i = 0; i < 8; ++i)
+  for (int i = 0; i < 8; ++i)
   {
     v[i][0] *= _scale * 0.5;
     v[i][1] *= _scale * 0.5;
@@ -858,10 +849,10 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
   }
 
   // For each face
-  for (i = 0; i < 6; ++i)
+  for (int i = 0; i < 6; ++i)
   {
     // For each vertex in the face
-    for (k = 0; k < 4; k++)
+    for (int k = 0; k < 4; k++)
     {
       subMesh.AddVertex(v[faces[i][k]][0], v[faces[i][k]][1],
           v[faces[i][k]][2]);
@@ -872,7 +863,7 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
   }
 
   // Set the indices
-  for (i = 0; i < 36; ++i)
+  for (int i = 0; i < 36; ++i)
     subMesh.AddIndex(ind[i]);
 
   mesh->AddSubMesh(subMesh);
@@ -889,6 +880,7 @@ void MeshManager::CreateEllipsoid(const std::string &_name,
   {
     return;
   }
+  std::unique_lock lock(this->dataPtr->mutex);
 
   Mesh *mesh = new Mesh();
   mesh->SetName(_name);
@@ -969,6 +961,7 @@ void MeshManager::CreateCapsule(const std::string &_name,
   {
     return;
   }
+  std::unique_lock lock(this->dataPtr->mutex);
 
   Mesh *mesh = new Mesh();
   mesh->SetName(_name);
@@ -1130,6 +1123,7 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
   {
     return;
   }
+  std::unique_lock lock(this->dataPtr->mutex);
 
   Mesh *mesh = new Mesh();
   mesh->SetName(name);
@@ -1247,6 +1241,7 @@ void MeshManager::CreateCone(const std::string &name, float radius,
   {
     return;
   }
+  std::unique_lock lock(this->dataPtr->mutex);
 
   Mesh *mesh = new Mesh();
   mesh->SetName(name);
@@ -1350,7 +1345,6 @@ void MeshManager::CreateTube(const std::string &_name, float _innerRadius,
 {
   gz::math::Vector3d vert, norm;
   unsigned int verticeIndex = 0;
-  int ring, seg;
 
   // Needs at lest 1 ring, and 3 segments
   int rings = std::max(_rings, 1);
@@ -1358,12 +1352,13 @@ void MeshManager::CreateTube(const std::string &_name, float _innerRadius,
 
   float deltaSegAngle = (_arc / segments);
 
-  float radius = 0;
-
-  radius = _outerRadius;
+  float radius = _outerRadius;
 
   if (this->HasMesh(_name))
+  {
     return;
+  }
+  std::unique_lock lock(this->dataPtr->mutex);
 
   Mesh *mesh = new Mesh();
   mesh->SetName(_name);
@@ -1371,12 +1366,12 @@ void MeshManager::CreateTube(const std::string &_name, float _innerRadius,
   SubMesh subMesh;
 
   // Generate the group of rings for the outsides of the cylinder
-  for (ring = 0; ring <= rings; ++ring)
+  for (int ring = 0; ring <= rings; ++ring)
   {
     vert.Z() = ring * _height/rings - _height/2.0;
 
     // Generate the group of segments for the current ring
-    for (seg = 0; seg <= segments; ++seg)
+    for (int seg = 0; seg <= segments; ++seg)
     {
       vert.Y() = radius * cosf(seg * deltaSegAngle);
       vert.X() = radius * sinf(seg * deltaSegAngle);
@@ -1440,12 +1435,12 @@ void MeshManager::CreateTube(const std::string &_name, float _innerRadius,
 
   // Generate the group of rings for the inside of the cylinder
   radius = _innerRadius;
-  for (ring = 0; ring <= rings; ++ring)
+  for (int ring = 0; ring <= rings; ++ring)
   {
     vert.Z() = (_height/2.0) - (ring * _height/rings);
 
     // Generate the group of segments for the current ring
-    for (seg = 0; seg <= segments; ++seg)
+    for (int seg = 0; seg <= segments; ++seg)
     {
       vert.Y() = radius * cosf(seg * deltaSegAngle);
       vert.X() = radius * sinf(seg * deltaSegAngle);
@@ -1485,7 +1480,7 @@ void MeshManager::CreateTube(const std::string &_name, float _innerRadius,
   // Close ends in case it's not a full circle
   if (!gz::math::equal(_arc, 2.0 * GZ_PI))
   {
-    for (ring = 0; ring < rings; ++ring)
+    for (int ring = 0; ring < rings; ++ring)
     {
       // Close beginning
       subMesh.AddIndex((segments+1)*(ring+1));
@@ -1605,7 +1600,7 @@ void MeshManager::ConvertPolylinesToVerticesAndEdges(
     std::vector<gz::math::Vector2d> &_vertices,
     std::vector<gz::math::Vector2i> &edges)
 {
-  for (auto poly : _polys)
+  for (const auto &poly : _polys)
   {
     gz::math::Vector2d previous = poly[0];
     for (auto i = 1u; i != poly.size(); ++i)
