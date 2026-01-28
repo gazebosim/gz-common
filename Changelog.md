@@ -1,5 +1,37 @@
 ## Gazebo Common 5.x
 
+### Gazebo Common 5.8.0 (2026-01-28)
+
+1. Add functions for clearing FindFile* callbacks
+    * [Pull request #754](https://github.com/gazebosim/gz-common/pull/754)
+
+1. TempDirectory: improve windows reliability
+    * [Pull request #744](https://github.com/gazebosim/gz-common/pull/744)
+
+1. Fix deprecation warnings on including gts headers on macOS
+    * [Pull request #739](https://github.com/gazebosim/gz-common/pull/739)
+
+1. Fix Image::ChannelData for 16 bit RGB[A] images
+    * [Pull request #720](https://github.com/gazebosim/gz-common/pull/720)
+
+1. Add function for extracting single channel data from an RGB[A] image
+    * [Pull request #706](https://github.com/gazebosim/gz-common/pull/706)
+
+1. Add missing includes
+    * [Pull request #660](https://github.com/gazebosim/gz-common/pull/660)
+
+1. Support reading pixel values from color 16 bit images
+    * [Pull request #699](https://github.com/gazebosim/gz-common/pull/699)
+
+1. Add support for custom profiler
+    * [Pull request #682](https://github.com/gazebosim/gz-common/pull/682)
+
+1. Check valid indices before doing convex decomposition
+    * [Pull request #677](https://github.com/gazebosim/gz-common/pull/677)
+
+1. Add check for valid indices in submesh
+    * [Pull request #667](https://github.com/gazebosim/gz-common/pull/667)
+
 ### Gazebo Common 5.7.1 (2025-01-30)
 
 1. Add include <chrono> for system_clock in Event.hh
