@@ -34,6 +34,7 @@
 #include "gz/common/Console.hh"
 #include "gz/common/StringUtils.hh"
 #include "gz/common/SystemPaths.hh"
+#include "gz/common/URI.hh"
 #include "gz/common/Util.hh"
 
 using namespace ignition;
@@ -563,10 +564,22 @@ void SystemPaths::AddFindFileCallback(
 }
 
 /////////////////////////////////////////////////
+void SystemPaths::ClearFindFileCallbacks()
+{
+  this->dataPtr->findFileCbs.clear();
+}
+
+/////////////////////////////////////////////////
 void SystemPaths::AddFindFileURICallback(
     std::function<std::string(const URI &)> _cb)
 {
   this->dataPtr->findFileURICbs.push_back(_cb);
+}
+
+/////////////////////////////////////////////////
+void SystemPaths::ClearFindFileURICallbacks()
+{
+  this->dataPtr->findFileURICbs.clear();
 }
 
 /////////////////////////////////////////////////
