@@ -99,12 +99,12 @@ class AssimpLoader::Implementation
   /// and external textures
   /// \param[in] _prefix Prefix to add to the texture name
   /// \param[in] _scene the assimp scene
-  /// \param[in] _mat the assimp material
+  /// \param[in] _texId the unique identifier for the texture (path or index)
   /// \param[in] _type the type of texture (i.e. Diffuse, Metal)
   /// \return the generated texture name
   public: std::string GenerateTextureName(const std::string &_prefix,
                                           const aiScene* _scene,
-                                          aiMaterial *_mat,
+                                          const std::string &_texId,
                                           const std::string &_type) const;
 
   /// \brief Function to parse texture information and load it if embedded
@@ -403,9 +403,10 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   // type of mappings to be UV, uv index, blend mode
   if (ret == AI_SUCCESS)
   {
+    std::string textureKey = texturePath.C_Str();
     // Check if the texture is embedded or not
     auto [texName, texData] = this->LoadTexture(_scene, texturePath,
-        this->GenerateTextureName(_fileBaseName, _scene, assimpMat, "Diffuse"));
+        this->GenerateTextureName(_fileBaseName, _scene, textureKey, "Diffuse"));
     if (texData != nullptr)
       mat->SetTextureImage(texName, texData);
     else
@@ -445,16 +446,16 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
       gzdbg << "Split PBR maps for [" << textureKey << "] found in cache"
             << std::endl;
       pbr.SetMetalnessMap(
-          this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
+          this->GenerateTextureName(_fileBaseName, _scene, textureKey,
           "Metalness"), it->second.first);
       pbr.SetRoughnessMap(
-          this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
+          this->GenerateTextureName(_fileBaseName, _scene, textureKey,
           "Roughness"), it->second.second);
     }
     else
     {
       auto [texName, texData] = this->LoadTexture(_scene, texturePath,
-          this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
+          this->GenerateTextureName(_fileBaseName, _scene, textureKey,
           "MetallicRoughness"));
 
       ImagePtr texImg;
@@ -487,13 +488,13 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
       if (splitMaps.first)
       {
         pbr.SetMetalnessMap(
-            this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
+            this->GenerateTextureName(_fileBaseName, _scene, textureKey,
             "Metalness"), splitMaps.first);
       }
       if (splitMaps.second)
       {
         pbr.SetRoughnessMap(
-            this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
+            this->GenerateTextureName(_fileBaseName, _scene, textureKey,
             "Roughness"), splitMaps.second);
       }
       this->splitMapCache[textureKey] = splitMaps;
@@ -505,8 +506,9 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     ret = assimpMat->GetTexture(aiTextureType_METALNESS, 0, &texturePath);
     if (ret == AI_SUCCESS)
     {
+      std::string textureKey = texturePath.C_Str();
       auto [texName, texData] = this->LoadTexture(_scene, texturePath,
-          this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
+          this->GenerateTextureName(_fileBaseName, _scene, textureKey,
           "Metalness"));
       pbr.SetMetalnessMap(texName, texData);
     }
@@ -514,8 +516,9 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
         aiTextureType_DIFFUSE_ROUGHNESS, 0, &texturePath);
     if (ret == AI_SUCCESS)
     {
+      std::string textureKey = texturePath.C_Str();
       auto [texName, texData] = this->LoadTexture(_scene, texturePath,
-          this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
+          this->GenerateTextureName(_fileBaseName, _scene, textureKey,
           "Roughness"));
       pbr.SetRoughnessMap(texName, texData);
     }
@@ -534,8 +537,9 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
       aiTextureType_LIGHTMAP, 0, &texturePath, NULL, &uvIdx);
   if (ret == AI_SUCCESS)
   {
+    std::string textureKey = texturePath.C_Str();
     auto [texName, texData] = this->LoadTexture(_scene, texturePath,
-        this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
+        this->GenerateTextureName(_fileBaseName, _scene, textureKey,
         "Lightmap"));
     // Separate uv set so treat it as a separate texture
     if (uvIdx > 0)
@@ -566,16 +570,18 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   ret = assimpMat->GetTexture(aiTextureType_NORMALS, 0, &texturePath);
   if (ret == AI_SUCCESS)
   {
+    std::string textureKey = texturePath.C_Str();
     auto [texName, texData] = this->LoadTexture(_scene, texturePath,
-        this->GenerateTextureName(_fileBaseName, _scene, assimpMat, "Normal"));
+        this->GenerateTextureName(_fileBaseName, _scene, textureKey, "Normal"));
     // TODO(luca) different normal map spaces
     pbr.SetNormalMap(texName, NormalMapSpace::TANGENT, texData);
   }
   ret = assimpMat->GetTexture(aiTextureType_EMISSIVE, 0, &texturePath);
   if (ret == AI_SUCCESS)
   {
+    std::string textureKey = texturePath.C_Str();
     auto [texName, texData] = this->LoadTexture(_scene, texturePath,
-        this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
+        this->GenerateTextureName(_fileBaseName, _scene, textureKey,
         "Emissive"));
     pbr.SetEmissiveMap(texName, texData);
   }
@@ -702,16 +708,15 @@ ImagePtr AssimpLoader::Implementation::LoadEmbeddedTexture(
 
 //////////////////////////////////////////////////
 std::string AssimpLoader::Implementation::GenerateTextureName(
-    const std::string &_prefix, const aiScene *_scene, aiMaterial *_mat,
-    const std::string &_type) const
+    const std::string &_prefix, const aiScene *_scene,
+    const std::string &_texId, const std::string &_type) const
 {
 #ifdef GZ_ASSIMP_PRE_5_2_0
   auto rootName = _scene->mRootNode->mName;
 #else
   auto rootName = _scene->mName;
 #endif
-  return _prefix + "_" + ToString(rootName) + "_" +
-    ToString(_mat->GetName()) + "_" + _type;
+  return _prefix + "_" + ToString(rootName) + "_" + _texId + "_" + _type;
 }
 
 //////////////////////////////////////////////////
