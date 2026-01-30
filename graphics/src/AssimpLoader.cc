@@ -497,23 +497,26 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     // else split the occlusion data from the metallicRoughness texture
     else
     {
-      // R channel contains the occlusion data
-      // Note we are still creating an RGBA texture which seems watesful
-      // but that's what gz-rendering expects
-      auto origRGBAData = texData->RGBAData();
-      std::vector<unsigned char> texRData(origRGBAData.size());
-      for (unsigned int i = 0; i < origRGBAData.size(); i+=4)
+      if (!texData)
       {
-        auto r = origRGBAData.at(i);
-        texRData[i] = r;
-        texRData[i + 1] = r;
-        texRData[i + 2] = r;
-        texRData[i + 3] = 255;
+        gzerr << "Texture not loaded\n";
+        texData = std::make_shared<Image>(texName);
       }
-      auto tex = std::make_shared<Image>();
-      tex->SetFromData(&texRData[0], texData->Width(), texData->Height(),
-          Image::RGBA_INT8);
-      pbr.SetLightMap(texName, uvIdx, tex);
+      // R channel contains the occlusion data
+      // Note we are using L_INT8 format to save memory, and it will be
+      // converted to RGBA by common::Image if requested by the renderer.
+      auto texRData = texData->ChannelData(Image::Channel::RED);
+      if (texRData.empty())
+      {
+        gzerr << "Unable to extract channel data for lightmap\n";
+      }
+      else
+      {
+        auto tex = std::make_shared<Image>();
+        tex->SetFromData(texRData.data(), texData->Width(), texData->Height(),
+            Image::L_INT8);
+        pbr.SetLightMap(texName, uvIdx, tex);
+      }
     }
   }
 #endif
@@ -567,6 +570,7 @@ std::pair<std::string, ImagePtr> AssimpLoader::Implementation::LoadTexture(
   {
     // Load embedded texture
     ret.first = _textureName;
+    gzdbg << "Loading embeddedTexture " << _textureName << std::endl;
     ret.second = this->LoadEmbeddedTexture(embeddedTexture);
   }
   else
@@ -584,10 +588,6 @@ std::pair<ImagePtr, ImagePtr>
   // Metalness in B roughness in G
   const auto width = _img.Width();
   const auto height = _img.Height();
-  const auto bytesPerPixel = 4;
-
-  std::vector<unsigned char> metalnessData(width * height * bytesPerPixel);
-  std::vector<unsigned char> roughnessData(width * height * bytesPerPixel);
 
   std::vector<unsigned char> metalnessData8bit =
       _img.ChannelData(Image::Channel::BLUE);
@@ -601,30 +601,11 @@ std::pair<ImagePtr, ImagePtr>
     return ret;
   }
 
-  for (unsigned int y = 0; y < height; ++y)
-  {
-    for (unsigned int x = 0; x < width; ++x)
-    {
-      // RGBA so 4 bytes per pixel, alpha fully opaque
-      unsigned int idx = y * width + x;
-      unsigned int colorB = metalnessData8bit[idx];
-      unsigned int colorG = roughnessData8bit[idx];
-      auto baseIndex = bytesPerPixel * idx;
-      metalnessData[baseIndex] = colorB;
-      metalnessData[baseIndex + 1] = colorB;
-      metalnessData[baseIndex + 2] = colorB;
-      metalnessData[baseIndex + 3] = 255;
-      roughnessData[baseIndex] = colorG;
-      roughnessData[baseIndex + 1] = colorG;
-      roughnessData[baseIndex + 2] = colorG;
-      roughnessData[baseIndex + 3] = 255;
-    }
-  }
   // First is metal, second is rough
   ret.first = std::make_shared<Image>();
-  ret.first->SetFromData(&metalnessData[0], width, height, Image::RGBA_INT8);
+  ret.first->SetFromData(&metalnessData8bit[0], width, height, Image::L_INT8);
   ret.second = std::make_shared<Image>();
-  ret.second->SetFromData(&roughnessData[0], width, height, Image::RGBA_INT8);
+  ret.second->SetFromData(&roughnessData8bit[0], width, height, Image::L_INT8);
   return ret;
 }
 
