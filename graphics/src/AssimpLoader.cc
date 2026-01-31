@@ -68,6 +68,9 @@ class AssimpLoader::Implementation
   public: mutable std::unordered_map<std::string,
           std::pair<ImagePtr, ImagePtr>> splitMapCache;
 
+  /// \brief Path of the mesh being loaded, used to qualify embedded textures
+  public: std::string currentMeshPath;
+
   /// \brief Convert a color from assimp implementation to Gazebo common
   /// \param[in] _color the assimp color to convert
   /// \return the matching math::Color
@@ -181,6 +184,11 @@ class AssimpLoader::Implementation
   /// \return Updated transform
   public: aiMatrix4x4 UpdatedRootNodeTransform(const aiScene *_scene,
       bool _useIdentityRotation = true);
+
+  /// \brief Helper to generate a globally unique key for a texture
+  /// \param[in] _texturePath path string from assimp
+  /// \return the unique key
+  public: std::string FullTextureKey(const std::string &_texturePath) const;
 };
 
 //////////////////////////////////////////////////
@@ -188,6 +196,27 @@ class AssimpLoader::Implementation
 static std::string ToString(const aiString& str)
 {
   return std::string(str.C_Str());
+}
+
+//////////////////////////////////////////////////
+std::string AssimpLoader::Implementation::FullTextureKey(
+    const std::string &_texturePath) const
+{
+  if (_texturePath.empty())
+    return "";
+
+  if (_texturePath[0] == '*')
+  {
+    return this->currentMeshPath + "#" + _texturePath;
+  }
+
+  if (common::isRelativePath(_texturePath))
+  {
+    return common::joinPaths(common::parentPath(this->currentMeshPath),
+                             _texturePath);
+  }
+
+  return _texturePath;
 }
 
 //////////////////////////////////////////////////
@@ -403,14 +432,14 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   // type of mappings to be UV, uv index, blend mode
   if (ret == AI_SUCCESS)
   {
-    std::string textureKey = texturePath.C_Str();
+    std::string textureKey = this->FullTextureKey(texturePath.C_Str());
+
     // Check if the texture is embedded or not
-    auto [texName, texData] = this->LoadTexture(_scene, texturePath,
-        this->GenerateTextureName(_fileBaseName, _scene, textureKey, "Diffuse"));
-    if (texData != nullptr)
-      mat->SetTextureImage(texName, texData);
-    else
-      mat->SetTextureImage(texName, _path);
+    auto [texName, texData] =
+        this->LoadTexture(_scene, texturePath,
+                          this->GenerateTextureName(_fileBaseName, _scene,
+                                                    textureKey, "Diffuse"));
+    mat->SetTextureImage(texName, texData);
 #ifndef GZ_ASSIMP_PRE_5_2_0
     // Now set the alpha from texture, if enabled, only supported in GLTF
     aiString alphaMode;
@@ -439,7 +468,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
       &texturePath);
   if (ret == AI_SUCCESS)
   {
-    std::string textureKey = texturePath.C_Str();
+    std::string textureKey = this->FullTextureKey(texturePath.C_Str());
     auto it = this->splitMapCache.find(textureKey);
     if (it != this->splitMapCache.end())
     {
@@ -458,46 +487,30 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
           this->GenerateTextureName(_fileBaseName, _scene, textureKey,
           "MetallicRoughness"));
 
-      ImagePtr texImg;
-      if (texData != nullptr)
+      if (texData == nullptr)
       {
-        texImg = texData;
+        gzerr << "Unable to load MetallicRoughness texture [" << textureKey
+              << "]" << std::endl;
       }
       else
       {
-        std::string fullPath = joinPaths(_path, texName);
-        auto itImg = this->imageCache.find(fullPath);
-        if (itImg != this->imageCache.end())
+        gzdbg << "Splitting MetallicRoughness map for [" << textureKey << "]"
+              << std::endl;
+        auto splitMaps = this->SplitMetallicRoughnessMap(*texData);
+        if (splitMaps.first)
         {
-          gzdbg << "Source PBR image [" << fullPath << "] found in cache"
-                << std::endl;
-          texImg = itImg->second;
+          pbr.SetMetalnessMap(
+              this->GenerateTextureName(_fileBaseName, _scene, textureKey,
+              "Metalness"), splitMaps.first);
         }
-        else
+        if (splitMaps.second)
         {
-          gzdbg << "Loading PBR image from disk: [" << fullPath << "]"
-                << std::endl;
-          texImg = std::make_shared<Image>(fullPath);
-          this->imageCache[fullPath] = texImg;
+          pbr.SetRoughnessMap(
+              this->GenerateTextureName(_fileBaseName, _scene, textureKey,
+              "Roughness"), splitMaps.second);
         }
+        this->splitMapCache[textureKey] = splitMaps;
       }
-
-      gzdbg << "Splitting MetallicRoughness map for [" << textureKey << "]"
-            << std::endl;
-      auto splitMaps = this->SplitMetallicRoughnessMap(*texImg);
-      if (splitMaps.first)
-      {
-        pbr.SetMetalnessMap(
-            this->GenerateTextureName(_fileBaseName, _scene, textureKey,
-            "Metalness"), splitMaps.first);
-      }
-      if (splitMaps.second)
-      {
-        pbr.SetRoughnessMap(
-            this->GenerateTextureName(_fileBaseName, _scene, textureKey,
-            "Roughness"), splitMaps.second);
-      }
-      this->splitMapCache[textureKey] = splitMaps;
     }
   }
   else
@@ -506,7 +519,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     ret = assimpMat->GetTexture(aiTextureType_METALNESS, 0, &texturePath);
     if (ret == AI_SUCCESS)
     {
-      std::string textureKey = texturePath.C_Str();
+      std::string textureKey = this->FullTextureKey(texturePath.C_Str());
       auto [texName, texData] = this->LoadTexture(_scene, texturePath,
           this->GenerateTextureName(_fileBaseName, _scene, textureKey,
           "Metalness"));
@@ -516,7 +529,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
         aiTextureType_DIFFUSE_ROUGHNESS, 0, &texturePath);
     if (ret == AI_SUCCESS)
     {
-      std::string textureKey = texturePath.C_Str();
+      std::string textureKey = this->FullTextureKey(texturePath.C_Str());
       auto [texName, texData] = this->LoadTexture(_scene, texturePath,
           this->GenerateTextureName(_fileBaseName, _scene, textureKey,
           "Roughness"));
@@ -537,7 +550,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
       aiTextureType_LIGHTMAP, 0, &texturePath, NULL, &uvIdx);
   if (ret == AI_SUCCESS)
   {
-    std::string textureKey = texturePath.C_Str();
+    std::string textureKey = this->FullTextureKey(texturePath.C_Str());
     auto [texName, texData] = this->LoadTexture(_scene, texturePath,
         this->GenerateTextureName(_fileBaseName, _scene, textureKey,
         "Lightmap"));
@@ -549,20 +562,28 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     // else split the occlusion data from the metallicRoughness texture
     else
     {
-      // R channel contains the occlusion data
-      // Note we are using L_INT8 format to save memory, and it will be
-      // converted to RGBA by common::Image if requested by the renderer.
-      auto texRData = texData->ChannelData(Image::Channel::RED);
-      if (texRData.empty())
+      if (!texData)
       {
-        gzerr << "Unable to extract channel data for lightmap\n";
+        gzerr << "Texture [" << textureKey << "] not loaded, cannot extract "
+              << "lightmap channel" << std::endl;
       }
       else
       {
-        auto tex = std::make_shared<Image>();
-        tex->SetFromData(texRData.data(), texData->Width(), texData->Height(),
-            Image::L_INT8);
-        pbr.SetLightMap(texName, uvIdx, tex);
+        // R channel contains the occlusion data
+        // Note we are using L_INT8 format to save memory, and it will be
+        // converted to RGBA by common::Image if requested by the renderer.
+        auto texRData = texData->ChannelData(Image::Channel::RED);
+        if (texRData.empty())
+        {
+          gzerr << "Unable to extract channel data for lightmap\n";
+        }
+        else
+        {
+          auto tex = std::make_shared<Image>();
+          tex->SetFromData(texRData.data(), texData->Width(), texData->Height(),
+              Image::L_INT8);
+          pbr.SetLightMap(texName, uvIdx, tex);
+        }
       }
     }
   }
@@ -570,7 +591,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   ret = assimpMat->GetTexture(aiTextureType_NORMALS, 0, &texturePath);
   if (ret == AI_SUCCESS)
   {
-    std::string textureKey = texturePath.C_Str();
+    std::string textureKey = this->FullTextureKey(texturePath.C_Str());
     auto [texName, texData] = this->LoadTexture(_scene, texturePath,
         this->GenerateTextureName(_fileBaseName, _scene, textureKey, "Normal"));
     // TODO(luca) different normal map spaces
@@ -579,7 +600,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   ret = assimpMat->GetTexture(aiTextureType_EMISSIVE, 0, &texturePath);
   if (ret == AI_SUCCESS)
   {
-    std::string textureKey = texturePath.C_Str();
+    std::string textureKey = this->FullTextureKey(texturePath.C_Str());
     auto [texName, texData] = this->LoadTexture(_scene, texturePath,
         this->GenerateTextureName(_fileBaseName, _scene, textureKey,
         "Emissive"));
@@ -613,7 +634,7 @@ std::pair<std::string, ImagePtr> AssimpLoader::Implementation::LoadTexture(
     const std::string& _textureName) const
 {
   std::pair<std::string, ImagePtr> ret;
-  std::string textureKey = _texturePath.C_Str();
+  std::string textureKey = this->FullTextureKey(_texturePath.C_Str());
 
   // Check if the texture is already in the cache
   auto it = this->imageCache.find(textureKey);
@@ -638,7 +659,18 @@ std::pair<std::string, ImagePtr> AssimpLoader::Implementation::LoadTexture(
   }
   else
   {
-    ret.first = textureKey;
+    // Load external texture from disk
+    if (common::exists(textureKey))
+    {
+      gzdbg << "Loading external texture [" << textureKey << "]" << std::endl;
+      ret.second = std::make_shared<Image>(textureKey);
+      this->imageCache[textureKey] = ret.second;
+    }
+    else
+    {
+      gzerr << "External texture [" << textureKey << "] not found" << std::endl;
+    }
+    ret.first = _textureName;
   }
   return ret;
 }
@@ -708,15 +740,10 @@ ImagePtr AssimpLoader::Implementation::LoadEmbeddedTexture(
 
 //////////////////////////////////////////////////
 std::string AssimpLoader::Implementation::GenerateTextureName(
-    const std::string &_prefix, const aiScene *_scene,
+    const std::string &/*_prefix*/, const aiScene * /*_scene*/,
     const std::string &_texId, const std::string &_type) const
 {
-#ifdef GZ_ASSIMP_PRE_5_2_0
-  auto rootName = _scene->mRootNode->mName;
-#else
-  auto rootName = _scene->mName;
-#endif
-  return _prefix + "_" + ToString(rootName) + "_" + _texId + "_" + _type;
+  return _texId + "_" + _type;
 }
 
 //////////////////////////////////////////////////
@@ -788,8 +815,7 @@ AssimpLoader::~AssimpLoader()
 //////////////////////////////////////////////////
 Mesh *AssimpLoader::Load(const std::string &_filename)
 {
-  this->dataPtr->imageCache.clear();
-  this->dataPtr->splitMapCache.clear();
+  this->dataPtr->currentMeshPath = _filename;
   Mesh *mesh = new Mesh();
   std::string path = common::parentPath(_filename);
   const aiScene* scene = this->dataPtr->importer.ReadFile(_filename,
