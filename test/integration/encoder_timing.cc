@@ -23,7 +23,7 @@ using namespace ignition;
 using namespace common;
 
 const unsigned int kSize = 10;
-const std::array<unsigned char, kSize*kSize> kFrame = {};
+const std::array<unsigned char, kSize*kSize*3> kFrame = {};
 
 // set to 720ms because video duration missing additional 18 frames
 //    which may be due to how video encoding works
