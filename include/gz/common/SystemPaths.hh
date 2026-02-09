@@ -172,6 +172,12 @@ namespace ignition
       public: void AddFindFileCallback(
                   std::function<std::string(const std::string &)> _cb);
 
+      /// \brief Clear the FindFile callbacks added by AddFindFileCallback
+      ///
+      /// This is useful in tests where we do not want callbacks added from
+      /// previous tests to affect the current test.
+      public: void ClearFindFileCallbacks();
+
       /// \brief Add a callback to use when FindFileURI() can't find a file.
       /// The callback should return a full local path to the requested file, or
       /// and empty string if the file was not found in the callback. The path
@@ -192,6 +198,12 @@ namespace ignition
       /// \deprecated Use AddFindFileURICallback instead
       public: void IGN_DEPRECATED(3) SetFindFileURICallback(
                   std::function<std::string(const std::string &)> _cb);
+
+      /// \brief Clear the FindFileURI callbacks added by AddFindFileURICallback
+      ///
+      /// This is useful in tests where we do not want callbacks added from
+      /// previous tests to affect the current test.
+      public: void ClearFindFileURICallbacks();
 
       /// \brief look for a file in a set of search paths (not recursive)
       /// \description This method checks if a file exists in given directories.
