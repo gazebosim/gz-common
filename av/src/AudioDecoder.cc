@@ -126,6 +126,8 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
       if (ret < 0)
       {
         gzerr << "Error submitting the packet to the decoder" << std::endl;
+        av_packet_free(&packet);
+        av_frame_free(&decodedFrame);
         return false;
       }
 
@@ -141,6 +143,8 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
         else if (ret < 0)
         {
             gzerr << "Error during decoding" << std::endl;
+            av_packet_free(&packet);
+            av_frame_free(&decodedFrame);
             return false;
         }
 
@@ -150,12 +154,13 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
         int numChannels = this->dataPtr->codecCtx->channels;
 #endif
 
+        int bytesPerSample =
+          av_get_bytes_per_sample(this->dataPtr->codecCtx->sample_fmt);
+
         // Total size of the data. Some padding can be added to
         // decodedFrame->data[0], which is why we can't use
         // decodedFrame->linesize[0].
-        int size = decodedFrame->nb_samples *
-          av_get_bytes_per_sample(this->dataPtr->codecCtx->sample_fmt) *
-          numChannels;
+        int size = decodedFrame->nb_samples * bytesPerSample * numChannels;
 
         // Resize the audio buffer as necessary
         if (*_outBufferSize + size > maxBufferSize)
@@ -165,15 +170,33 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
                 maxBufferSize * sizeof(*_outBuffer[0])));
         }
 
-        memcpy(*_outBuffer + *_outBufferSize, decodedFrame->data[0],
-            size);
+        if (av_sample_fmt_is_planar(this->dataPtr->codecCtx->sample_fmt))
+        {
+          // Interleave planar data
+          for (int s = 0; s < decodedFrame->nb_samples; ++s)
+          {
+            for (int c = 0; c < numChannels; ++c)
+            {
+              memcpy(*_outBuffer + *_outBufferSize +
+                  (s * numChannels + c) * bytesPerSample,
+                  decodedFrame->data[c] + s * bytesPerSample,
+                  bytesPerSample);
+            }
+          }
+        }
+        else
+        {
+          memcpy(*_outBuffer + *_outBufferSize, decodedFrame->data[0],
+              size);
+        }
         *_outBufferSize += size;
     }
     }
     av_packet_unref(packet);
   }
 
-  av_packet_unref(packet);
+  av_packet_free(&packet);
+  av_frame_free(&decodedFrame);
 
   // Seek to the beginning so that it can be decoded again, if necessary.
   av_seek_frame(this->dataPtr->formatCtx, this->dataPtr->audioStream, 0, 0);
