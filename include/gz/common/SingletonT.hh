@@ -41,6 +41,7 @@ namespace gz
       /// \brief Creates and returns a reference to the unique (static) instance
       private: static T &GetInstance()
       {
+        // Caution: object `t` will be duplicated in each translation unit
         static T t;
         return static_cast<T &>(t);
       }
