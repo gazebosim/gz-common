@@ -22,12 +22,10 @@
 #include <thread>
 
 #include <gz/common/Console.hh>
-#include <gz/common/testing/RedirectConsoleStream.hh>
+#include <gz/common/testing/TestPaths.hh>
+#include <spdlog/sinks/basic_file_sink.h>
 
 using namespace gz;
-
-using RedirectConsoleStream = common::testing::RedirectConsoleStream;
-using StreamSource = common::testing::StreamSource;
 
 namespace {
 // Lower value than spdlog to keep CI from flaking
@@ -76,6 +74,11 @@ void PrintStats(const std::string &filename,
   std::ostringstream oss;
   for (auto t_result : threads_result)
   {
+    if (t_result.second.empty())
+    {
+      oss << idx++ << " no logs were recorded for this thread" << std::endl;
+      continue;
+    }
     uint64_t worstUs =
         (*std::max_element(t_result.second.begin(), t_result.second.end()));
     oss << idx++ << " the worst thread latency was:" << worstUs / uint64_t(1000)
@@ -105,6 +108,12 @@ void SaveResultToBucketFile(
 
   std::map<uint64_t, uint64_t> bucketsWithEmpty;
   std::map<uint64_t, uint64_t> buckets;
+
+  if (all_measurements.empty())
+  {
+    return;
+  }
+
   // force empty buckets to appear
   auto maxValueIterator =
       std::max_element(all_measurements.begin(), all_measurements.end());
@@ -168,7 +177,16 @@ void run(size_t number_of_threads)
       << filename_result << std::endl;
   WriteToFile(filename_result, oss.str());
 
-  auto stream = common::testing::RedirectStdout();
+  // We use a direct spdlog file sink instead of RedirectStdout.
+  // RedirectStdout relies on dup2, which is unstable on Windows when
+  // combined with high-concurrency writes, leading to SEH exceptions.
+  // Using a file sink preserves I/O testing while ensuring stability.
+  auto &logger = gz::common::Console::Root().RawLogger();
+  auto original_sinks = logger.sinks();
+  logger.sinks().clear();
+  std::string logPath = gz::common::testing::TempPath("perf_test.log");
+  logger.sinks().push_back(
+      std::make_shared<spdlog::sinks::basic_file_sink_mt>(logPath));
 
   auto start_time_application_total =
   std::chrono::high_resolution_clock::now();
@@ -183,7 +201,8 @@ void run(size_t number_of_threads)
   }
   auto stop_time_application_total = std::chrono::high_resolution_clock::now();
 
-  auto output = stream.GetString();
+  // Restore original sinks
+  logger.sinks() = original_sinks;
 
   uint64_t total_time_in_us =
       std::chrono::duration_cast<std::chrono::microseconds>(
