@@ -17,7 +17,6 @@
 #ifndef GZ_COMMON_MESHMANAGER_HH_
 #define GZ_COMMON_MESHMANAGER_HH_
 
-#include <map>
 #include <utility>
 #include <string>
 #include <vector>
