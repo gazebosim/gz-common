@@ -721,9 +721,9 @@ TEST_F(AssimpLoader, LoadGlTF2BoxWithJPEGTexture)
   // Assimp 5.2.0 and above uses the scene name for its texture names,
   // older version use the root node instead.
 #ifdef GZ_ASSIMP_PRE_5_2_0
-  EXPECT_EQ("box_texture_jpg_Cube_Material_Diffuse", mat->TextureImage());
+  EXPECT_EQ("box_texture_jpg_Cube_*0_Diffuse", mat->TextureImage());
 #else
-  EXPECT_EQ("box_texture_jpg_Scene_Material_Diffuse", mat->TextureImage());
+  EXPECT_EQ("box_texture_jpg_Scene_*0_Diffuse", mat->TextureImage());
 #endif
   EXPECT_NE(nullptr, mat->TextureData());
   delete mesh;
