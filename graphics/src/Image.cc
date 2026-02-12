@@ -50,6 +50,7 @@
 #include <cstdint>
 #include <cstring>
 #include <string>
+#include <vector>
 
 #include <gz/common/Console.hh>
 #include <gz/common/Image.hh>
@@ -589,3 +590,42 @@ Image::PixelFormatType Image::ConvertPixelFormat(const std::string &_format) {
 }
 
 //////////////////////////////////////////////////
+std::vector<unsigned char> Image::ChannelData(Channel _channel) const
+{
+  const int bpc = this->dataPtr->bits_per_channel;
+  const int ch = this->dataPtr->channels;
+  const void *bitmap = this->dataPtr->bitmap;
+
+  if ((ch == 1 && _channel != Channel::RED) ||
+      (ch == 3 && _channel == Channel::ALPHA))
+  {
+    gzerr << "Failed to extract channel data for input channel: "
+          << static_cast<int>(_channel) << std::endl;
+    return {};
+  }
+  std::vector<unsigned char> data;
+  data.resize(Width() * Height());
+
+  int ch_i = static_cast<int>(_channel);
+
+  for (size_t i = 0; i < Width() * Height(); i++) {
+    switch (bpc) {
+    case 8: {
+      auto * pixel = reinterpret_cast<const uint8_t *>(bitmap) + i * ch;
+      data[i] = pixel[ch_i];
+      break;
+    }
+    case 16: {
+      auto * pixel = reinterpret_cast<const uint16_t *>(bitmap) + i * ch;
+      data[i] = pixel[ch_i] >> 8;
+      break;
+    }
+    case 32: {
+      auto * pixel = reinterpret_cast<const float *>(bitmap) + i * ch;
+      data[i] = pixel[ch_i] * 255.0f;
+      break;
+    }
+    }
+  }
+  return data;
+}
