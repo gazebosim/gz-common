@@ -15,29 +15,78 @@
 *
 */
 
+#include <algorithm>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
+#include <iostream>
+#include <mutex>
 #include <sstream>
+#include <vector>
 
 #include <gz/common/testing/RedirectConsoleStream.hh>
 #include <gz/common/Console.hh>
 #include <gz/common/testing/TestPaths.hh>
 #include <gz/utils/SuppressWarning.hh>
 
-#ifdef _WIN32
-#include <io.h>
-#include <windows.h>
-#else
-#include <unistd.h>
-#endif
-
-#include <fcntl.h>
-#include <sys/stat.h>
+#include <spdlog/sinks/base_sink.h>
 
 namespace gz::common::testing
 {
+
+/// \brief A spdlog sink that redirects logs to an ostream with level filtering.
+///
+/// Level filtering is necessary to maintain the expected separation between
+/// standard output (stdout) and standard error (stderr). Gazebo's logging
+/// system typically routes Trace, Debug, and Info levels to stdout, and
+/// Warn, Error, and Critical levels to stderr.
+///
+/// Since spdlog's built-in sinks only support a minimum level threshold
+/// (via set_level), this custom sink implements a range-based filter
+/// (min and max levels) to ensure that RedirectStdout only captures
+/// stdout-bound logs and RedirectStderr only captures stderr-bound logs.
+class RedirectConsoleSink : public spdlog::sinks::base_sink<std::mutex>
+{
+  /// \brief Constructor.
+  /// \param[in] _os Output stream to write to.
+  /// \param[in] _min Minimum log level to capture.
+  /// \param[in] _max Maximum log level to capture.
+  public: RedirectConsoleSink(std::ostream &_os,
+                              spdlog::level::level_enum _min,
+                              spdlog::level::level_enum _max)
+    : os(_os), minLevel(_min), maxLevel(_max)
+  {
+  }
+
+  /// \brief Logic for processing a log message.
+  /// \param[in] _msg Log message to process.
+  protected: void sink_it_(const spdlog::details::log_msg &_msg) override
+  {
+    if (_msg.level >= this->minLevel && _msg.level <= this->maxLevel)
+    {
+      spdlog::memory_buf_t formatted;
+      this->formatter_->format(_msg, formatted);
+      this->os.write(formatted.data(),
+                     static_cast<std::streamsize>(formatted.size()));
+    }
+  }
+
+  /// \brief Logic for flushing the output stream.
+  protected: void flush_() override
+  {
+    this->os.flush();
+  }
+
+  /// \brief Output stream where logs are written.
+  private: std::ostream &os;
+
+  /// \brief Minimum log level to capture.
+  private: spdlog::level::level_enum minLevel;
+
+  /// \brief Maximum log level to capture.
+  private: spdlog::level::level_enum maxLevel;
+};
 
 class RedirectConsoleStream::Implementation
 {
@@ -45,13 +94,19 @@ class RedirectConsoleStream::Implementation
   public: StreamSource source;
 
   /// \brief Filename to write console output to
-  public: std::string sink {""};
+  public: std::string sinkPath {""};
 
-  /// \brief Holds the redirected file descriptor
-  public: int fd {-1};
+  /// \brief File stream for the redirected output
+  public: std::ofstream fileStream;
 
-  /// \brief Holds the original source file descriptor
-  public: int originalFd {-1};
+  /// \brief Original stream buffer to restore
+  public: std::streambuf *oldBuf {nullptr};
+
+  /// \brief C++ stream being redirected (cout or cerr)
+  public: std::ostream *stream {nullptr};
+
+  /// \brief Custom spdlog sink for capturing Gazebo logs
+  public: std::shared_ptr<RedirectConsoleSink> spdlogSink;
 
   /// \brief Remove any console redirection, restoring original sink
   public: void RemoveRedirection();
@@ -63,18 +118,25 @@ class RedirectConsoleStream::Implementation
 //////////////////////////////////////////////////
 void RedirectConsoleStream::Implementation::RemoveRedirection()
 {
-  // MSVC treats dup and dup2 as deprecated, preferring _dup and _dup2
-  // We can safely ignore that here.
-  GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION;
-  /// Restore the orignal source file descriptor
-  if (this->originalFd != -1)
+  if (this->stream && this->oldBuf)
   {
-    fflush(nullptr);
-    dup2(this->originalFd, this->fd);
-    close(this->originalFd);
-    this->originalFd = -1;
+    this->stream->rdbuf(this->oldBuf);
+    this->oldBuf = nullptr;
+    this->stream = nullptr;
   }
-  GZ_UTILS_WARN_RESUME__DEPRECATED_DECLARATION;
+
+  if (this->spdlogSink)
+  {
+    auto &sinks = gz::common::Console::Root().RawLogger().sinks();
+    sinks.erase(std::remove(sinks.begin(), sinks.end(), this->spdlogSink),
+                sinks.end());
+    this->spdlogSink.reset();
+  }
+
+  if (this->fileStream.is_open())
+  {
+    this->fileStream.close();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -82,25 +144,9 @@ RedirectConsoleStream::Implementation::~Implementation()
 {
   this->RemoveRedirection();
 
-  if (!this->sink.empty() && common::exists(this->sink))
+  if (!this->sinkPath.empty() && common::exists(this->sinkPath))
   {
-    common::removeFile(this->sink);
-  }
-}
-
-//////////////////////////////////////////////////
-int GetSourceFd(const StreamSource &_source)
-{
-  switch(_source)
-  {
-    case StreamSource::STDOUT:
-      return fileno(stdout);
-      break;
-    case StreamSource::STDERR:
-      return fileno(stderr);
-      break;
-    default:
-      return -1;
+    common::removeFile(this->sinkPath);
   }
 }
 
@@ -109,47 +155,57 @@ RedirectConsoleStream::RedirectConsoleStream(const StreamSource &_source,
     const std::string &_destination):
   dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
 {
-  // MSVC treats dup and dup2 as deprecated, preferring _dup and _dup2
-  // We can safely ignore that here.
-  GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION;
-  this->dataPtr->sink = _destination;
+  this->dataPtr->sinkPath = _destination;
 
-  if (this->dataPtr->sink.empty())
+  if (this->dataPtr->sinkPath.empty())
   {
-    gzerr << "Failed to open sink file: console redirection disabled"
+    gzerr << "Failed to open sink file: console redirection disabled "
       << "(empty filename)" << std::endl;
     return;
   }
 
-  if (common::exists(this->dataPtr->sink))
+  if (common::exists(this->dataPtr->sinkPath))
   {
-    gzerr << "Failed to open sink file: console redirection disabled"
+    gzerr << "Failed to open sink file: console redirection disabled "
       << "(destination exists)" << std::endl;
     return;
   }
 
-  this->dataPtr->fd = GetSourceFd(_source);
-
-  // Store the fd so that it can be restored upon destruction
-  this->dataPtr->originalFd = dup(this->dataPtr->fd);
-
-  int sinkFd;
-  // Create a file with read/write permissions and exclusive access
-  if ((sinkFd = open(this->dataPtr->sink.c_str(),
-          O_EXCL | O_RDWR | O_CREAT,
-          S_IREAD | S_IWRITE)) < 0)
+  this->dataPtr->fileStream.open(this->dataPtr->sinkPath);
+  if (!this->dataPtr->fileStream.is_open())
   {
-    gzerr << "Failed to open sink file, console redirection disabled"
-      << "(" << strerror(sinkFd) << ")" << std::endl;
+    gzerr << "Failed to open sink file: console redirection disabled "
+      << "(could not open file)" << std::endl;
     return;
   }
 
-  fflush(nullptr);
-  // Duplicate the sink file descriptor onto the source
-  dup2(sinkFd, this->dataPtr->fd);
-  // Close the file handle;
-  close(sinkFd);
-  GZ_UTILS_WARN_RESUME__DEPRECATED_DECLARATION;
+  spdlog::level::level_enum minLevel;
+  spdlog::level::level_enum maxLevel;
+
+  if (_source == StreamSource::STDOUT)
+  {
+    this->dataPtr->stream = &std::cout;
+    minLevel = spdlog::level::trace;
+    maxLevel = spdlog::level::info;
+  }
+  else
+  {
+    this->dataPtr->stream = &std::cerr;
+    minLevel = spdlog::level::warn;
+    maxLevel = spdlog::level::critical;
+  }
+
+  // Redirect C++ stream
+  this->dataPtr->oldBuf = this->dataPtr->stream->rdbuf(
+      this->dataPtr->fileStream.rdbuf());
+
+  // Add spdlog sink
+  this->dataPtr->spdlogSink = std::make_shared<RedirectConsoleSink>(
+      *this->dataPtr->stream, minLevel, maxLevel);
+
+  auto &logger = gz::common::Console::Root().RawLogger();
+
+  logger.sinks().push_back(this->dataPtr->spdlogSink);
 }
 
 //////////////////////////////////////////////////
@@ -158,7 +214,7 @@ std::string RedirectConsoleStream::GetString()
   this->dataPtr->RemoveRedirection();
 
   // Read the file contents and return to the user
-  std::ifstream input(this->dataPtr->sink);
+  std::ifstream input(this->dataPtr->sinkPath);
   std::stringstream buffer;
   buffer << input.rdbuf();
   return buffer.str();
@@ -167,7 +223,7 @@ std::string RedirectConsoleStream::GetString()
 //////////////////////////////////////////////////
 bool RedirectConsoleStream::Active() const
 {
-  return !this->dataPtr->sink.empty() && this->dataPtr->originalFd != -1;
+  return !this->dataPtr->sinkPath.empty() && this->dataPtr->oldBuf != nullptr;
 }
 
 }  // namespace gz::common::testing
