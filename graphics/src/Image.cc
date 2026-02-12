@@ -622,7 +622,7 @@ std::vector<unsigned char> Image::ChannelData(Channel _channel) const
     }
     case 32: {
       auto * pixel = reinterpret_cast<const float *>(bitmap) + i * ch;
-      data[i] = pixel[ch_i] * 255.0f;
+      data[i] = static_cast<unsigned char>(pixel[ch_i] * 255.0f);
       break;
     }
     }
