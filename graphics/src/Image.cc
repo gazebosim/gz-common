@@ -235,6 +235,7 @@ void Image::SetFromData(const unsigned char *_data,
 
   unsigned int bpp;
   int scanlineBytes;
+  bool swapRedBlue = false;
 
   if (_format == L_INT8)
   {
@@ -250,6 +251,12 @@ void Image::SetFromData(const unsigned char *_data,
   {
     bpp = 32;
     scanlineBytes = _width * 4;
+  }
+  else if (_format == BGR_INT8)
+  {
+    bpp = 24;
+    swapRedBlue = true;
+    scanlineBytes = _width * 3;
   }
   else if ((_format == BAYER_RGGB8) ||
            (_format == BAYER_BGGR8) ||
@@ -275,6 +282,13 @@ void Image::SetFromData(const unsigned char *_data,
     return;
   }
   memcpy(this->dataPtr->bitmap, _data, size);
+
+  if (swapRedBlue)
+  {
+    auto bitmap = reinterpret_cast<uint8_t*>(this->dataPtr->bitmap);
+    for (size_t i = 0; i < _width * _height; ++i)
+      std::swap(bitmap[3 * i], bitmap[3 * i + 2]);
+  }
 
   this->dataPtr->width = _width;
   this->dataPtr->height = _height;
