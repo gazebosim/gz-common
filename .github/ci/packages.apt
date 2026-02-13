@@ -7,7 +7,6 @@ libavcodec-dev
 libavdevice-dev
 libavformat-dev
 libavutil-dev
-libfreeimage-dev
 libgdal-dev
 libspdlog-dev
 libswscale-dev

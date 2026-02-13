@@ -8,7 +8,6 @@ target_link_libraries(${graphics_target}
     gz-utils::gz-utils
   PRIVATE
     ${GzAssimp_LIBRARIES}
-    FreeImage::FreeImage
     TINYXML2::TINYXML2
 )
 
