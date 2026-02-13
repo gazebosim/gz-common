@@ -91,10 +91,12 @@ namespace gz
       public: int bits_per_channel;
 
       /// \brief Converts bitmap data to the given number of channels
-      public: std::vector<unsigned char> DataWithChannels(int out_channels) const;
+      public: std::vector<unsigned char> DataWithChannels(int out_channels)
+        const;
 
       /// \brief Implementation of Data, returns vector of bytes
-      public: std::vector<unsigned char> DataImpl(void *_img, size_t size) const;
+      public: std::vector<unsigned char> DataImpl(void *_img, size_t size)
+        const;
     };
   }  // namespace common
 }  // namespace gz
@@ -394,7 +396,8 @@ std::vector<unsigned char> Image::Data() const
 }
 
 //////////////////////////////////////////////////
-std::vector<unsigned char> Image::Implementation::DataImpl(void *_img, size_t _size) const
+std::vector<unsigned char> Image::Implementation::DataImpl(void *_img,
+                                                           size_t _size) const
 {
   std::vector<unsigned char> data(_size);
   memcpy(data.data(), _img, _size);
