@@ -251,6 +251,16 @@ void Image::SetFromData(const unsigned char *_data,
     bpp = 32;
     scanlineBytes = _width * 4;
   }
+  else if ((_format == BAYER_RGGB8) ||
+           (_format == BAYER_BGGR8) ||
+           (_format == BAYER_GBRG8) ||
+           (_format == BAYER_GRBG8))
+  {
+    // STB doesn't support Bayer pixel format - this will end up as a
+    // grayscale image.
+    bpp = 8;
+    scanlineBytes = _width;
+  }
   else
   {
     gzerr << "Unable to handle format[" << _format << "]\n";
