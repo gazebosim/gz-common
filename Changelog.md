@@ -1,5 +1,31 @@
 ## Gazebo Common 4.x
 
+### Gazebo Common 4.8.0 (2026-02-12)
+
+1. TempDirectory: improve windows reliability
+    * [Pull request #744](https://github.com/gazebosim/gz-common/pull/744)
+
+1. Add functions for clearing FindFile* callbacks
+    * [Pull request #754](https://github.com/gazebosim/gz-common/pull/754)
+
+1. Fortress: disable Ubuntu Focal CI
+    * [Pull request #747](https://github.com/gazebosim/gz-common/pull/747)
+
+1. Fix deprecation warnings on including gts headers on macOS
+    * [Pull request #739](https://github.com/gazebosim/gz-common/pull/739)
+
+1. Prevent switch case statement fall through.
+    * [Pull request #345](https://github.com/gazebosim/gz-common/pull/345)
+
+1. Fix deprecation warnings
+    * [Pull request #603](https://github.com/gazebosim/gz-common/pull/603)
+
+1. Fix compatibility with FFmpeg5.0
+    * [Pull request #581](https://github.com/gazebosim/gz-common/pull/581)
+
+1. Missing cstdint header to use uint32_t with gcc-13
+    * [Pull request #528](https://github.com/gazebosim/gz-common/pull/528)
+
 ## Gazebo Common 4.7.0 (2023-05-17)
 
 1. Forward Ports: 3 -> 4 (#506)
