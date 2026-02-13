@@ -3,7 +3,6 @@ libavcodec-dev
 libavdevice-dev
 libavformat-dev
 libavutil-dev
-libfreeimage-dev
 libgdal-dev
 libgz-cmake5-dev
 libgz-math9-dev

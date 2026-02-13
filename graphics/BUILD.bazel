@@ -18,6 +18,12 @@ vhacd_header = ["src/VHACD/VHACD.h"]
 
 tiny_obj_loader_header = ["src/tiny_obj_loader.h"]
 
+stb_headers = [
+    "src/STB/stb_image.h",
+    "src/STB/stb_image_write.h",
+    "src/STB/stb_image_resize2.h",
+]
+
 sources = glob(
     ["src/*.cc"],
     exclude = ["src/*_TEST.cc"],
@@ -38,7 +44,7 @@ public_headers = public_headers_no_gen + [
 
 cc_library(
     name = "graphics",
-    srcs = sources + vhacd_header + tiny_obj_loader_header,
+    srcs = sources + vhacd_header + tiny_obj_loader_header + stb_headers,
     hdrs = public_headers,
     copts = [
         "-Wno-implicit-fallthrough",
@@ -50,7 +56,6 @@ cc_library(
         "//:gz-common",
         "@assimp",
         "@cdt",
-        "@freeimage",
         "@gz-math",
         "@gz-utils//:ImplPtr",
         "@tinyxml2",
