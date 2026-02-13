@@ -564,8 +564,6 @@ void Image::Rescale(int _width, int _height)
     break;
   default:
     gzerr << "Cannot rescale " << dataPtr->channels << "-channel image\n";
-    stbi_image_free(dataPtr->bitmap);
-    dataPtr->bitmap = NULL;
     return;
   }
 
@@ -582,20 +580,15 @@ void Image::Rescale(int _width, int _height)
     break;
   default:
     gzerr << "Cannot rescale " << dataPtr->bits_per_channel << "-bit image\n";
-    stbi_image_free(dataPtr->bitmap);
-    dataPtr->bitmap = NULL;
     return;
   }
 
   void *ret = stbir_resize(dataPtr->bitmap, dataPtr->width, dataPtr->height, 0,
                            NULL, _width, _height, 0, pixel_layout, data_type,
                            STBIR_EDGE_CLAMP, STBIR_FILTER_DEFAULT);
-
-  stbi_image_free(dataPtr->bitmap);
-  dataPtr->bitmap = NULL;
-
   if (ret != NULL)
   {
+    stbi_image_free(dataPtr->bitmap);
     this->dataPtr->bitmap = ret;
     this->dataPtr->width = _width;
     this->dataPtr->height = _height;
