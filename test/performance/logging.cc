@@ -40,7 +40,6 @@ void WriteToFile(std::string result_filename, std::string content)
     std::cerr << "Error writing to " << result_filename << std::endl;
   }
   out << content << std::flush;
-  std::cout << content;
 }
 
 void MeasurePeakDuringLogWrites(const size_t id, std::vector<uint64_t> &result)
