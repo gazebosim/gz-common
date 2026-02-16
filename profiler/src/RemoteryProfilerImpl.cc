@@ -33,7 +33,7 @@ std::string rmtErrorToString(rmtError error) {
     case RMT_ERROR_RECURSIVE_SAMPLE:
       return "Not an error but an internal message to calling code";
     case RMT_ERROR_UNKNOWN:
-      return "An error with a message yet to be defined, only for internal error handling";
+      return "An error with a message yet to be defined, only for internal error handling"; //NOLINT
     case RMT_ERROR_INVALID_INPUT:
       return "An invalid input to a function call was provided";
     case RMT_ERROR_RESOURCE_CREATE_FAIL:
@@ -132,7 +132,7 @@ std::string rmtErrorToString(rmtError error) {
       return "Unknown CUDA error";
 
     default:
-      return "Unknown remotery error: " + std::to_string(static_cast<int>(error));
+      return "Unknown remotery error: " + std::to_string(static_cast<int>(error)); //NOLINT
   }
 }
 

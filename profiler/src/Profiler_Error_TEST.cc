@@ -30,7 +30,7 @@ TEST(Profiler, ProfilerRemoteryErrorCodes)
   EXPECT_EQ("none", rmtErrorToString(RMT_ERROR_NONE));
   EXPECT_EQ("Not an error but an internal message to calling code",
     rmtErrorToString(RMT_ERROR_RECURSIVE_SAMPLE));
-  EXPECT_EQ("An error with a message yet to be defined, only for internal error handling",
+  EXPECT_EQ("An error with a message yet to be defined, only for internal error handling", //NOLINT
     rmtErrorToString(RMT_ERROR_UNKNOWN));
   EXPECT_EQ("An invalid input to a function call was provided",
     rmtErrorToString(RMT_ERROR_INVALID_INPUT));
