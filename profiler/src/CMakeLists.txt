@@ -22,6 +22,11 @@ if(GZ_PROFILER_REMOTERY)
     COMPILE_FLAGS
     "$<$<COMPILE_LANG_AND_ID:C,ARMClang,AppleClang,Clang,GNU,LCC>:-Wno-unused-variable -Wno-unused-parameter -Wno-switch-default -Wno-unused-function -Wno-pedantic>")
 
+  if(MSVC)
+    set_source_files_properties(./Remotery/lib/Remotery.c PROPERTIES
+    COMPILE_OPTIONS "/wd4114")
+  endif()
+
   if(APPLE)
     set(
       Remotery_SRC
