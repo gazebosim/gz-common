@@ -201,6 +201,8 @@ std::string AssimpLoader::Implementation::FullTextureKey(
   if (_texturePath.empty())
     return "";
 
+  // Assimp uses '*' as a prefix for embedded texture paths
+  // See https://github.com/assimp/assimp/blob/3e672ff856b0bad35f478cc11acdd903674066ee/include/assimp/texture.h#L66-L81
   if (_texturePath[0] == '*')
   {
     return this->currentMeshPath + "#" + _texturePath;
