@@ -110,12 +110,14 @@ class AssimpLoader::Implementation
   /// \param[in] _scene the assimp scene
   /// \param[in] _texturePath the path where the texture is located
   /// \param[in] _textureName the name of the texture
+  /// \param[in] _shouldCache Whether the image should be cached
   /// \return a pair containing the name of the texture and a pointer to the
   /// image data, if the texture was loaded in memory
   public: std::pair<std::string, ImagePtr>
           LoadTexture(const aiScene* _scene,
                       const aiString& _texturePath,
-                      const std::string& _textureName) const;
+                      const std::string& _textureName,
+                      bool _shouldCache = true) const;
 
   /// \brief Function to split a gltf metallicroughness map into
   /// a metalness and roughness map
@@ -477,9 +479,13 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     }
     else
     {
+      // There is no need to cache this image (last argument to LoadTexture) and
+      // use up more memory because we will be caching the split images. We will
+      // not be trying to load the image again because the if condition above
+      // would have found a cache hit based on the texture key.
       auto [texName, texData] = this->LoadTexture(
           _scene, texturePath,
-          this->GenerateTextureName(textureKey, "MetallicRoughness"));
+          this->GenerateTextureName(textureKey, "MetallicRoughness"), false);
 
       if (texData == nullptr)
       {
@@ -623,7 +629,8 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
 std::pair<std::string, ImagePtr> AssimpLoader::Implementation::LoadTexture(
     const aiScene* _scene,
     const aiString& _texturePath,
-    const std::string& _textureName) const
+    const std::string& _textureName,
+    bool _shouldCache) const
 {
   std::pair<std::string, ImagePtr> ret;
   std::string textureKey = this->FullTextureKey(_texturePath.C_Str());
@@ -647,7 +654,10 @@ std::pair<std::string, ImagePtr> AssimpLoader::Implementation::LoadTexture(
     gzdbg << "Loading embedded texture [" << textureKey << "] as ["
           << _textureName << "]" << std::endl;
     ret.second = this->LoadEmbeddedTexture(embeddedTexture);
-    this->imageCache[textureKey] = ret.second;
+    if (_shouldCache)
+    {
+      this->imageCache[textureKey] = ret.second;
+    }
   }
   else
   {
@@ -656,7 +666,10 @@ std::pair<std::string, ImagePtr> AssimpLoader::Implementation::LoadTexture(
     {
       gzdbg << "Loading external texture [" << textureKey << "]" << std::endl;
       ret.second = std::make_shared<Image>(textureKey);
-      this->imageCache[textureKey] = ret.second;
+      if (_shouldCache)
+      {
+        this->imageCache[textureKey] = ret.second;
+      }
     }
     else
     {
