@@ -85,12 +85,10 @@ class AssimpLoader::Implementation
   /// \param[in] _scene the assimp scene
   /// \param[in] _matIdx index of the material in the scene
   /// \param[in] _path path where the mesh is located
-  /// \param[in] _fileBaseName Base name of the mesh file.
   /// \return pointer to the converted common::Material
   public: MaterialPtr CreateMaterial(const aiScene *_scene,
                                      unsigned _matIdx,
-                                     const std::string &_path,
-                                     const std::string &_fileBaseName) const;
+                                     const std::string &_path) const;
 
   /// \brief Load a texture embedded in a mesh (i.e. for GLB format)
   /// into a gz::common::Image
@@ -366,8 +364,7 @@ void AssimpLoader::Implementation::RecursiveSkeletonCreate(const aiNode* _node,
 
 //////////////////////////////////////////////////
 MaterialPtr AssimpLoader::Implementation::CreateMaterial(
-    const aiScene *_scene, unsigned _matIdx, const std::string &_path,
-    const std::string &_fileBaseName) const
+    const aiScene *_scene, unsigned _matIdx, const std::string &_path) const
 {
   MaterialPtr mat = std::make_shared<Material>();
   aiColor4D color;
@@ -840,13 +837,11 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   }
   auto& rootNode = scene->mRootNode;
   auto rootName = ToString(rootNode->mName);
-  auto fileBaseName = common::basename(_filename);
   std::string extension;
   std::size_t extIdx = _filename.rfind(".");
   if (extIdx != std::string::npos)
   {
     extension = _filename.substr(extIdx + 1, _filename.size());
-    fileBaseName = fileBaseName.substr(0, fileBaseName.rfind(extension) - 1);
   }
   std::transform(extension.begin(), extension.end(),
       extension.begin(), ::tolower);
@@ -860,8 +855,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   // Add the materials first
   for (unsigned _matIdx = 0; _matIdx < scene->mNumMaterials; ++_matIdx)
   {
-    auto mat = this->dataPtr->CreateMaterial(scene, _matIdx, path,
-        fileBaseName);
+    auto mat = this->dataPtr->CreateMaterial(scene, _matIdx, path);
     mesh->AddMaterial(mat);
   }
   // Create the skeleton
