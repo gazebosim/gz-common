@@ -695,6 +695,19 @@ std::vector<unsigned char> Image::ChannelData(Channel _channel) const
   const int ch = this->dataPtr->channels;
   const void *bitmap = this->dataPtr->bitmap;
 
+  if (!this->Valid())
+    return {};
+
+  // If the image is already 8-bit grayscale, return the whole data buffer.
+  if (this->PixelFormat() == L_INT8)
+  {
+    if (_channel == Channel::ALPHA)
+    {
+      return std::vector<unsigned char>(this->Width() * this->Height(), 255);
+    }
+    return this->Data();
+  }
+
   if ((ch == 1 && _channel != Channel::RED) ||
       (ch == 3 && _channel == Channel::ALPHA))
   {
