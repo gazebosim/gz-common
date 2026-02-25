@@ -705,6 +705,19 @@ FIBITMAP* Image::Implementation::SwapRedBlue(const unsigned int &_width,
 //////////////////////////////////////////////////
 std::vector<unsigned char> Image::ChannelData(Channel _channel) const
 {
+  if (!this->Valid())
+    return {};
+
+  // If the image is already 8-bit grayscale, return the whole data buffer.
+  if (this->PixelFormat() == L_INT8)
+  {
+    if (_channel == Channel::ALPHA)
+    {
+      return std::vector<unsigned char>(this->Width() * this->Height(), 255);
+    }
+    return this->Data();
+  }
+
   FIBITMAP* channelData = nullptr;
   switch (_channel)
   {
@@ -734,5 +747,6 @@ std::vector<unsigned char> Image::ChannelData(Channel _channel) const
   FIBITMAP *tmp = FreeImage_ConvertTo8Bits(channelData);
   std::vector<unsigned char> data = this->dataPtr->DataImpl(tmp);
   FreeImage_Unload(tmp);
+  FreeImage_Unload(channelData);
   return data;
 }
