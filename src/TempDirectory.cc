@@ -89,19 +89,13 @@ std::string createTempDirectory(
   }
 
 #ifdef _WIN32
-  errno_t errcode = _mktemp_s(&fullTemplateStr[0], fullTemplateStr.size() + 1);
-  if (errcode)
-  {
-    std::error_code ec(static_cast<int>(errcode), std::system_category());
-    throw std::system_error(ec,
-        "could not format the temp directory name template");
-  }
-  const fs::path finalPath{fullTemplateStr};
+  const fs::path finalPath{common::uniqueDirectoryPath(fullTemplateStr)};
   if (!createDirectories(finalPath.string()))
   {
     std::error_code ec(static_cast<int>(GetLastError()),
         std::system_category());
-    throw std::system_error(ec, "could not create the temp directory");
+    throw std::system_error(ec,
+        "could not create the temp directory " + finalPath.string());
   }
 #else
   const char * dirName = mkdtemp(&fullTemplateStr[0]);

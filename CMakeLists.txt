@@ -59,12 +59,6 @@ if(NOT WIN32)
 endif()
 
 #------------------------------------
-# Find Freeimage
-gz_find_package(FreeImage VERSION 3.9
-  REQUIRED_BY graphics
-  PRIVATE_FOR graphics)
-
-#------------------------------------
 # Find GDAL
 gz_find_package(GDAL VERSION 3.0
   PKGCONFIG gdal
