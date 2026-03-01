@@ -840,5 +840,6 @@ std::vector<unsigned char> Image::ChannelData(Channel _channel) const
   FIBITMAP *tmp = FreeImage_ConvertTo8Bits(channelData);
   std::vector<unsigned char> data = this->dataPtr->DataImpl(tmp);
   FreeImage_Unload(tmp);
+  FreeImage_Unload(channelData);
   return data;
 }
