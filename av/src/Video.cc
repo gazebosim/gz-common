@@ -288,7 +288,7 @@ bool Video::NextFrame(unsigned char **_buffer)
 
   while (frameAvailable == 0)
   {
-    if(!this->dataPtr->drainingMode)
+    if (!this->dataPtr->drainingMode)
     {
       packet = av_packet_alloc();
       if (!packet)
@@ -297,11 +297,11 @@ bool Video::NextFrame(unsigned char **_buffer)
         return false;
       }
     
-    // this loop will always exit because each call to AVCodecDecode()
-    // reads from the input buffer and it has to either end at some time or
-    // return a valid frame
+      // this loop will always exit because each call to AVCodecDecode()
+      // reads from the input buffer and it has to either end at some time or
+      // return a valid frame
 
-    // in draining mode, we no longer read the input stream as it has ended
+      // in draining mode, we no longer read the input stream as it has ended
       // read a frame from the input stream
       ret = av_read_frame(this->dataPtr->formatCtx, packet);
       if (ret < 0)
