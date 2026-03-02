@@ -705,6 +705,7 @@ std::vector<unsigned char> Image::ChannelData(Channel _channel) const
   std::vector<unsigned char> data;
   data.resize(Width() * Height());
 
+<<<<<<< HEAD
   int ch_i = static_cast<int>(_channel);
 
   for (size_t i = 0; i < Width() * Height(); i++)
@@ -728,5 +729,11 @@ std::vector<unsigned char> Image::ChannelData(Channel _channel) const
     }
     }
   }
+=======
+  FIBITMAP *tmp = FreeImage_ConvertTo8Bits(channelData);
+  std::vector<unsigned char> data = this->dataPtr->DataImpl(tmp);
+  FreeImage_Unload(tmp);
+  FreeImage_Unload(channelData);
+>>>>>>> fe70596 (graphics:Fix Image memory leak (#789))
   return data;
 }
