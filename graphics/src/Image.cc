@@ -691,9 +691,43 @@ Image::PixelFormatType Image::ConvertPixelFormat(const std::string &_format)
 //////////////////////////////////////////////////
 std::vector<unsigned char> Image::ChannelData(Channel _channel) const
 {
+<<<<<<< HEAD
   const int bpc = this->dataPtr->bits_per_channel;
   const int ch = this->dataPtr->channels;
   const void *bitmap = this->dataPtr->bitmap;
+=======
+  if (!this->Valid())
+    return {};
+
+  // If the image is already 8-bit grayscale, return the whole data buffer.
+  if (this->PixelFormat() == L_INT8)
+  {
+    if (_channel == Channel::ALPHA)
+    {
+      return std::vector<unsigned char>(this->Width() * this->Height(), 255);
+    }
+    return this->Data();
+  }
+
+  FIBITMAP* channelData = nullptr;
+  switch (_channel)
+  {
+    case Channel::RED:
+      channelData = FreeImage_GetChannel(this->dataPtr->bitmap, FICC_RED);
+      break;
+    case Channel::GREEN:
+      channelData = FreeImage_GetChannel(this->dataPtr->bitmap, FICC_GREEN);
+      break;
+    case Channel::BLUE:
+      channelData = FreeImage_GetChannel(this->dataPtr->bitmap, FICC_BLUE);
+      break;
+    case Channel::ALPHA:
+      channelData = FreeImage_GetChannel(this->dataPtr->bitmap, FICC_ALPHA);
+      break;
+    default:
+      break;
+  }
+>>>>>>> 6459d6b (graphics: Optimize Texture Processing and Memory in AssimpLoader (#767))
 
   if ((ch == 1 && _channel != Channel::RED) ||
       (ch == 3 && _channel == Channel::ALPHA))
@@ -705,6 +739,7 @@ std::vector<unsigned char> Image::ChannelData(Channel _channel) const
   std::vector<unsigned char> data;
   data.resize(Width() * Height());
 
+<<<<<<< HEAD
   int ch_i = static_cast<int>(_channel);
 
   for (size_t i = 0; i < Width() * Height(); i++)
@@ -728,5 +763,11 @@ std::vector<unsigned char> Image::ChannelData(Channel _channel) const
     }
     }
   }
+=======
+  FIBITMAP *tmp = FreeImage_ConvertTo8Bits(channelData);
+  std::vector<unsigned char> data = this->dataPtr->DataImpl(tmp);
+  FreeImage_Unload(tmp);
+  FreeImage_Unload(channelData);
+>>>>>>> 6459d6b (graphics: Optimize Texture Processing and Memory in AssimpLoader (#767))
   return data;
 }
