@@ -108,19 +108,40 @@ Video::~Video()
 void Video::Cleanup()
 {
   // Free the YUV frame
-  av_free(this->dataPtr->avFrame);
+  if (this->dataPtr->avFrame)
+  {
+    av_frame_free(&this->dataPtr->avFrame);
+  }
 
   // Close the video file
-  avformat_close_input(&this->dataPtr->formatCtx);
+  if (this->dataPtr->formatCtx)
+  {
+    avformat_close_input(&this->dataPtr->formatCtx);
+  }
 
   // Close the codec
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 48, 101)
-  avcodec_free_context(&this->dataPtr->codecCtx);
+  if (this->dataPtr->codecCtx)
+  {
+    avcodec_free_context(&this->dataPtr->codecCtx);
+  }
 #else
-  avcodec_close(this->dataPtr->codecCtx);
+  if (this->dataPtr->codecCtx)
+  {
+    avcodec_close(this->dataPtr->codecCtx);
+  }
 #endif
 
-  av_free(this->dataPtr->avFrameDst);
+  if (this->dataPtr->avFrameDst)
+  {
+    av_frame_free(&this->dataPtr->avFrameDst);
+  }
+
+  if (this->dataPtr->swsCtx)
+  {
+    sws_freeContext(this->dataPtr->swsCtx);
+    this->dataPtr->swsCtx = nullptr;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -261,26 +282,26 @@ bool Video::Load(const std::string &_filename)
 /////////////////////////////////////////////////
 bool Video::NextFrame(unsigned char **_buffer)
 {
-  AVPacket* packet;
+  AVPacket* packet = nullptr;
   int frameAvailable = 0;
   int ret;
 
   while (frameAvailable == 0)
   {
-    packet = av_packet_alloc();
-    if (!packet)
-    {
-      gzerr << "Failed to allocate AVPacket" << std::endl;
-      return false;
-    }
-
-    // this loop will always exit because each call to AVCodecDecode()
-    // reads from the input buffer and it has to either end at some time or
-    // return a valid frame
-
-    // in draining mode, we no longer read the input stream as it has ended
     if (!this->dataPtr->drainingMode)
     {
+      packet = av_packet_alloc();
+      if (!packet)
+      {
+        gzerr << "Failed to allocate AVPacket" << std::endl;
+        return false;
+      }
+    
+      // this loop will always exit because each call to AVCodecDecode()
+      // reads from the input buffer and it has to either end at some time or
+      // return a valid frame
+
+      // in draining mode, we no longer read the input stream as it has ended
       // read a frame from the input stream
       ret = av_read_frame(this->dataPtr->formatCtx, packet);
       if (ret < 0)
@@ -290,20 +311,26 @@ bool Video::NextFrame(unsigned char **_buffer)
           // end of stream, enter draining mode
           avcodec_send_packet(this->dataPtr->codecCtx, nullptr);
           this->dataPtr->drainingMode = true;
+          av_packet_free(&packet);
         }
         else
         {
           gzerr << "Error reading packet: " << av_err2str_cpp(ret)
                  << ". Stopped reading the file." << std::endl;
+          av_packet_free(&packet);
           return false;
         }
       }
       else if (packet->stream_index != this->dataPtr->videoStream)
       {
         // packet belongs to a stream we're not interested in (e.g. audio)
-        av_packet_unref(packet);
+        av_packet_free(&packet);
         continue;
       }
+    }
+    else
+    {
+      packet = nullptr;
     }
 
     // Process all the data in the frame
@@ -314,7 +341,7 @@ bool Video::NextFrame(unsigned char **_buffer)
     if (ret == AVERROR_EOF)
     {
       if (!this->dataPtr->drainingMode)
-        av_packet_unref(packet);
+        av_packet_free(&packet);
       return false;
     }
     else if (ret < 0)
@@ -323,8 +350,8 @@ bool Video::NextFrame(unsigned char **_buffer)
              << av_err2str_cpp(ret) << std::endl;
       // continue processing data
     }
-    if (!this->dataPtr->drainingMode)
-      av_packet_unref(packet);
+    if (packet)
+      av_packet_free(&packet);
   }
 
   // processing the image if available
