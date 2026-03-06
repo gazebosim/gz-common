@@ -563,3 +563,41 @@ TEST_F(Console_TEST, NoInitAndLogNoHome)
   // This should not throw
   gzlog << "this is a test" << std::endl;
 }
+
+/////////////////////////////////////////////////
+/// \brief Test Console color output with GZ_CONSOLE_COLOR=yes
+TEST_F(Console_TEST, ConsoleColorYes)
+{
+  EXPECT_TRUE(common::setenv("GZ_CONSOLE_COLOR", "yes"));
+
+  auto path = common::uuid();
+  gzLogInit(path, "test.log");
+  std::string logPath = common::joinPaths(path, "test.log");
+
+  std::string logString = "color yes test";
+  gzmsg << logString << std::endl;
+
+  common::Console::Root().RawLogger().flush();
+  EXPECT_TRUE(GetLogContent(logPath).find(logString) != std::string::npos);
+
+  EXPECT_TRUE(common::unsetenv("GZ_CONSOLE_COLOR"));
+}
+
+/////////////////////////////////////////////////
+/// \brief Test Console color output with GZ_CONSOLE_COLOR=no
+TEST_F(Console_TEST, ConsoleColorNo)
+{
+  EXPECT_TRUE(common::setenv("GZ_CONSOLE_COLOR", "no"));
+
+  auto path = common::uuid();
+  gzLogInit(path, "test.log");
+  std::string logPath = common::joinPaths(path, "test.log");
+
+  std::string logString = "color no test";
+  gzmsg << logString << std::endl;
+
+  common::Console::Root().RawLogger().flush();
+  EXPECT_TRUE(GetLogContent(logPath).find(logString) != std::string::npos);
+
+  EXPECT_TRUE(common::unsetenv("GZ_CONSOLE_COLOR"));
+}

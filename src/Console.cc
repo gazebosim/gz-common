@@ -85,6 +85,28 @@ Console &Console::Root()
 bool Console::Init(const std::string &_directory, const std::string &_filename)
 {
   std::string logPath;
+  std::string consoleColor;
+
+  if (env("GZ_CONSOLE_COLOR", consoleColor))
+  {
+    const auto value = lowercase(trimmed(consoleColor));
+
+    if (value == "yes")
+    {
+      Console::Root().SetConsoleColorMode(spdlog::color_mode::always);
+    }
+    else if (value == "no")
+    {
+      Console::Root().SetConsoleColorMode(spdlog::color_mode::never);
+    }
+    else
+    {
+      Console::Root().RawLogger().log(
+        spdlog::level::warn,
+        "Invalid value for GZ_CONSOLE_COLOR='" + consoleColor +
+        "'. Valid values are: yes, no.");
+    }
+  }
 
   if (_directory.empty() ||
 #ifndef _WIN32

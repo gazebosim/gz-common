@@ -61,6 +61,11 @@ See the [installation tutorial](https://gazebosim.org/api/common/7/install.html)
 
 Please refer to the [examples directory](https://github.com/gazebosim/gz-common/tree/gz-common7/examples).
 
+Console color output can be controlled with `GZ_CONSOLE_COLOR`:
+
+* `yes`: always emit ANSI color codes.
+* `no`: never emit ANSI color codes.
+
 # Folder Structure
 
 Refer to the following table for information about important directories and files in this repository.
