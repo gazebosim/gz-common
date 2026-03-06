@@ -101,8 +101,10 @@ bool Console::Init(const std::string &_directory, const std::string &_filename)
     }
     else
     {
-      Console::Root().RawLogger().log(spdlog::level::warn,
-        "Valid values are: yes, no.");
+      Console::Root().RawLogger().log(
+        spdlog::level::warn,
+        "Invalid value for GZ_CONSOLE_COLOR='" + consoleColor +
+        "'. Valid values are: yes, no.");
     }
   }
 
