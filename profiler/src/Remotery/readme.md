@@ -1,52 +1,58 @@
 Remotery
 --------
 
-[![Build Status](https://travis-ci.org/Celtoys/Remotery.svg?branch=master)](https://travis-ci.org/Celtoys/Remotery)
-[![Build status](https://ci.appveyor.com/api/projects/status/d1o8620mws9ihbsd?svg=true)](https://ci.appveyor.com/project/Celtoys/remotery)
+[![Build](https://github.com/Celtoys/Remotery/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/Celtoys/Remotery/actions/workflows/build.yml)
 
 A realtime CPU/GPU profiler hosted in a single C file with a viewer that runs in a web browser.
 
-![screenshot](screenshot.png?raw=true)
+![RemoteryNew](https://github.com/Celtoys/Remotery/assets/1532903/bc5117f6-0f1e-438c-a096-67c8ff7747e7)
 
-Supported Platforms:
-
-* Windows
-* Linux
-* OSX
-* iOS
-* Android
-* XBox One
-* FreeBSD
-
-Supported GPU Profiling APIS:
-
-* D3D 11
-* OpenGL
-* CUDA
-* Metal
 
 Features:
 
-* Lightweight instrumentation of multiple threads running on the CPU.
-* Web viewer that runs in Chrome, Firefox and Safari. Custom WebSockets server
-  transmits sample data to the browser on a latent thread.
-* Profiles itself and shows how it's performing in the viewer.
+* Lightweight instrumentation of multiple threads running on the CPU and GPU.
+* Web viewer that runs in Chrome, Firefox and Safari; on Desktops, Mobiles or Tablets.
+* GPU UI rendering, bypassing the DOM completely, for real-time 60hz viewer updates at 10,000x the performance.
+* Automatic thread sampler that tells you what processor cores your threads are running on without requiring Administrator privileges.
+* Drop saved traces onto the Remotery window to load historical runs for inspection.
 * Console output for logging text.
 * Console input for sending commands to your game.
+* A Property API for recording named/typed values over time, alongside samples.
+* Profiles itself and shows how it's performing in the viewer.
 
+Supported Profiling Platforms:
+
+* Windows 7/8/10/11/UWP (Hololens), Linux, OSX, iOS, Android, Xbox One/Series, Free BSD.
+
+Supported GPU Profiling APIS:
+
+* D3D 11/12, OpenGL, CUDA, Metal, Vulkan.
 
 Compiling
 ---------
 
 * Windows (MSVC) - add lib/Remotery.c and lib/Remotery.h to your program. Set include
-  directories to add Remotery/lib path. The required library ws2_32.lib should be picked
-  up through the use of the #pragma comment(lib, "ws2_32.lib") directive in Remotery.c.
+  directories to add Remotery/lib path. The required libraries (ws2_32.lib and winmm.lib) should be picked
+  up through the use of the `#pragma comment` directives in Remotery.c.
+
+* Windows (MINGW-64) - add lib/Remotery.c and lib/Remotery.h to your program. Set include
+  directories to add Remotery/lib path. You will need to link libws2_32.a and libwinmm.a yourself through your build system, as GCC (and therefore MINGW-64) do not support `#pragma comment` directives
 
 * Mac OS X (XCode) - simply add lib/Remotery.c, lib/Remotery.h and lib/Remotery.mm to your program.
 
 * Linux (GCC) - add the source in lib folder. Compilation of the code requires -pthreads for
   library linkage. For example to compile the same run: cc lib/Remotery.c sample/sample.c
   -I lib -pthread -lm
+
+* FreeBSD - the easiest way is to take a look at the official port
+  ([devel/remotery](https://www.freshports.org/devel/remotery/)) and modify the port's
+  Makefile if needed. There is also a package available via `pkg install remotery`.
+
+* Vulkan - Ensure your include directories are set such that the Vulkan headers can be
+  included with the statement: `#include <vulkan/vulkan.h>`. Currently the Vulkan implementation
+  requires either Vulkan 1.2+ with the `hostQueryReset` and `timelineSemaphore` features enabled,
+  or < 1.2 with the `VK_EXT_host_query_reset` and `VK_KHR_timeline_semaphore` extensions. The
+  extension `VK_EXT_calibrated_timestamps` (or `VK_KHR_calibrated_timestamps`) is also always required.
 
 You can define some extra macros to modify what features are compiled into Remotery:
 
@@ -56,8 +62,10 @@ You can define some extra macros to modify what features are compiled into Remot
     RMT_USE_TINYCRT     0           Used by the Celtoys TinyCRT library (not released yet)
     RMT_USE_CUDA        0           Assuming CUDA headers/libs are setup, allow CUDA profiling
     RMT_USE_D3D11       0           Assuming Direct3D 11 headers/libs are setup, allow D3D11 GPU profiling
+    RMT_USE_D3D12       0           Allow D3D12 GPU profiling
     RMT_USE_OPENGL      0           Allow OpenGL GPU profiling (dynamically links OpenGL libraries on available platforms)
     RMT_USE_METAL       0           Allow Metal profiling of command buffers
+    RMT_USE_VULKAN      0           Allow Vulkan GPU profiling
 
 
 Basic Use
@@ -140,8 +148,7 @@ ensure the current thread has the context you specify in rmtCUDABind.context.
 Sampling Direct3D 11 GPU activity
 ---------------------------------
 
-Remotery allows sampling of GPU activity on your main D3D11 context. After initialising Remotery, you need
-to bind it to D3D11 with a single call from the thread that owns the device context:
+Remotery allows sampling of D3D11 GPU activity on multiple devices on multiple threads. After initialising Remotery, you need to bind it to D3D11 with a single call from the thread that owns the device context:
 
     // Parameters are ID3D11Device* and ID3D11DeviceContext*
     rmt_BindD3D11(d3d11_device, d3d11_context);
@@ -161,8 +168,7 @@ Sampling is then a simple case of:
         // ... D3D code ...
     }
 
-Support for multiple contexts can be added pretty easily if there is demand for the feature. When you shutdown
-your D3D11 device and context, ensure you notify Remotery before shutting down Remotery itself:
+Subsequent sampling calls from the same thread will use that device/context combination. When you shutdown your D3D11 device and context, ensure you notify Remotery before shutting down Remotery itself:
 
     rmt_UnbindD3D11();
 
@@ -212,6 +218,54 @@ The C API supports begin/end also:
     rmt_BeginMetalSample(command_buffer_name);
     ...
     rmt_EndMetalSample();
+
+
+Sampling Vulkan GPU activity
+---------------------------
+
+Remotery can sample Vulkan command buffers issued to the GPU on multiple queues from multiple threads. Command buffers
+must be submitted to the same queue as the samples are issued to. Multiple queues can be profiled by creating multiple
+Vulkan bind objects.
+
+    rmtVulkanFunctions vulkan_funcs;
+    vulkan_funcs.vkGetPhysicalDeviceProperties = (void*)my_vulkan_instance_table->vkGetPhysicalDeviceProperties;
+    vulkan_funcs.vkQueueSubmit = (void*)my_vulkan_device_table->vkQueueSubmit;
+    // ... All other function pointers
+
+    // Parameters are VkInstance, VkPhysicalDevice, VkDevice, VkQueue, rmtVulkanFunctions*, rmtVulkanBind**
+    // NOTE: The Vulkan functions are copied internally and so do not have to be kept alive after this call.
+    rmtVulkanBind* vulkan_bind = NULL;
+    rmt_BindVulkan(instance, physical_device, device, queue, &vulkan_funcs, &vulkan_bind);
+
+Sampling is then a simple case of:
+
+    // Explicit begin/end for C
+    {
+        rmt_BeginVulkanSample(vulkan_bind, command_buffer, UnscopedSample);
+        // ... Vulkan code ...
+        rmt_EndVulkanSample();
+    }
+
+    // Scoped begin/end for C++
+    {
+        rmt_ScopedVulkanSample(vulkan_bind, command_buffer, ScopedSample);
+        // ... Vulkan code ...
+    }
+
+NOTE: Vulkan sampling on Apple platforms via MoltenVK must be done with caution. Metal doesn't natively support timestamps
+inside of render or compute passes, so MoltenVK simply reports all timestamps inside those scopes as the begin/end time of
+the entire render pass!
+
+Sampling calls using the same `vulkan_bind` object measure use the device and queue specified when the bind was created.
+Once per frame you must call `rmt_MarkFrame()` to gather GPU timestamps on the CPU.
+
+    // End of frame, possibly after calling vkPresentKHR or at the very beginning of the frame
+    rmt_MarkFrame();
+
+Before you destroy your Vulkan device and queue you can manually clean up resources by calling `rmt_UnbindVulkan`, though this is
+done automatically by `rmt_DestroyGlobalInstance` as well for all `rmt_BindVulkan` objects:
+
+    rmt_UnbindVulkan(vulkan_bind);
 
 
 Applying Configuration Settings
