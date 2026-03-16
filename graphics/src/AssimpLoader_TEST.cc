@@ -657,11 +657,11 @@ TEST_F(AssimpLoader, LoadGlTF2BoxExternalTexture)
 
   const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
   ASSERT_TRUE(mat.get());
-  // No data (it is a file), but a populated filename
-  EXPECT_EQ(nullptr, mat->TextureData());
+  // Data is now loaded in memory
+  EXPECT_NE(nullptr, mat->TextureData());
   auto testTextureFile =
     common::testing::TestFile("data/gltf", "PurpleCube_Diffuse.png");
-  EXPECT_EQ(testTextureFile, mat->TextureImage());
+  EXPECT_EQ(testTextureFile + "_Diffuse", mat->TextureImage());
   delete mesh;
 }
 
@@ -718,13 +718,10 @@ TEST_F(AssimpLoader, LoadGlTF2BoxWithJPEGTexture)
   EXPECT_EQ(math::Color(0.4f, 0.4f, 0.4f, 1.0f), mat->Ambient());
   EXPECT_EQ(math::Color(1.0f, 1.0f, 1.0f, 1.0f), mat->Diffuse());
   EXPECT_EQ(math::Color(0.0f, 0.0f, 0.0f, 1.0f), mat->Specular());
-  // Assimp 5.2.0 and above uses the scene name for its texture names,
-  // older version use the root node instead.
-#ifdef GZ_ASSIMP_PRE_5_2_0
-  EXPECT_EQ("box_texture_jpg_Cube_Material_Diffuse", mat->TextureImage());
-#else
-  EXPECT_EQ("box_texture_jpg_Scene_Material_Diffuse", mat->TextureImage());
-#endif
+  // Use the new globally unique canonical name format
+  std::string expectedName = common::testing::TestFile("data",
+      "box_texture_jpg.glb") + "#*0_Diffuse";
+  EXPECT_EQ(expectedName, mat->TextureImage());
   EXPECT_NE(nullptr, mat->TextureData());
   delete mesh;
 }
@@ -791,7 +788,8 @@ TEST_F(AssimpLoader, LoadGlbPbrAsset)
   EXPECT_NE(pbr->RoughnessMapData(), nullptr);
   // Check pixel values to test metallicroughness texture splitting
   EXPECT_FLOAT_EQ(pbr->MetalnessMapData()->Pixel(256, 256).R(), 0.0);
-  EXPECT_FLOAT_EQ(pbr->RoughnessMapData()->Pixel(256, 256).R(), 124.0f / 255.0f);
+  EXPECT_FLOAT_EQ(pbr->RoughnessMapData()->Pixel(256, 256).R(),
+                  124.0f / 255.0f);
 
   // Bug in assimp 5.0.x that doesn't parse coordinate sets properly
   // \todo(iche033) Lightmaps are disabled for glb meshes
