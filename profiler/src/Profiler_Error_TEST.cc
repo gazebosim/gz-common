@@ -15,7 +15,6 @@
  *
 */
 
-#include "gz/common/Profiler.hh" // NOLINT(*)
 #include <gtest/gtest.h> // NOLINT(*)
 #include "Remotery.h"
 
@@ -26,11 +25,20 @@
 std::string rmtErrorToString(rmtError error);
 
 /////////////////////////////////////////////////
-TEST(Profiler, ProfilerErrorCodes)
+TEST(Profiler, ProfilerRemoteryErrorCodes)
 {
   EXPECT_EQ("none", rmtErrorToString(RMT_ERROR_NONE));
   EXPECT_EQ("Not an error but an internal message to calling code",
     rmtErrorToString(RMT_ERROR_RECURSIVE_SAMPLE));
+  EXPECT_EQ("An error with a message yet to be defined, only for internal error handling", //NOLINT
+    rmtErrorToString(RMT_ERROR_UNKNOWN));
+  EXPECT_EQ("An invalid input to a function call was provided",
+    rmtErrorToString(RMT_ERROR_INVALID_INPUT));
+  EXPECT_EQ("Creation of an internal resource failed",
+    rmtErrorToString(RMT_ERROR_RESOURCE_CREATE_FAIL));
+  EXPECT_EQ("Access of an internal resource failed",
+    rmtErrorToString(RMT_ERROR_RESOURCE_ACCESS_FAIL));
+  EXPECT_EQ("Internal system timeout", rmtErrorToString(RMT_ERROR_TIMEOUT));
 
   EXPECT_EQ("Malloc call within remotery failed",
     rmtErrorToString(RMT_ERROR_MALLOC_FAIL));
@@ -40,27 +48,15 @@ TEST(Profiler, ProfilerErrorCodes)
     rmtErrorToString(RMT_ERROR_VIRTUAL_MEMORY_BUFFER_FAIL));
   EXPECT_EQ("Failed to create a thread for the server",
     rmtErrorToString(RMT_ERROR_CREATE_THREAD_FAIL));
+  EXPECT_EQ("Failed to open a thread handle, given a thread id",
+    rmtErrorToString(RMT_ERROR_OPEN_THREAD_HANDLE_FAIL));
 
-  EXPECT_EQ("Network initialisation failure (e.g. on Win32, WSAStartup fails)",
-    rmtErrorToString(RMT_ERROR_SOCKET_INIT_NETWORK_FAIL));
-  EXPECT_EQ("Can't create a socket for connection to the remote viewer",
-    rmtErrorToString(RMT_ERROR_SOCKET_CREATE_FAIL));
-  EXPECT_EQ("Can't bind a socket for the server",
-    rmtErrorToString(RMT_ERROR_SOCKET_BIND_FAIL));
-  EXPECT_EQ("Created server socket failed to enter a listen state",
-    rmtErrorToString(RMT_ERROR_SOCKET_LISTEN_FAIL));
-  EXPECT_EQ("Created server socket failed to switch to a non-blocking state",
-    rmtErrorToString(RMT_ERROR_SOCKET_SET_NON_BLOCKING_FAIL));
   EXPECT_EQ("Poll attempt on an invalid socket",
     rmtErrorToString(RMT_ERROR_SOCKET_INVALID_POLL));
   EXPECT_EQ("Server failed to call select on socket",
     rmtErrorToString(RMT_ERROR_SOCKET_SELECT_FAIL));
   EXPECT_EQ("Poll notified that the socket has errors",
     rmtErrorToString(RMT_ERROR_SOCKET_POLL_ERRORS));
-  EXPECT_EQ("Server failed to accept connection from client",
-    rmtErrorToString(RMT_ERROR_SOCKET_ACCEPT_FAIL));
-  EXPECT_EQ("Timed out trying to send data",
-    rmtErrorToString(RMT_ERROR_SOCKET_SEND_TIMEOUT));
   EXPECT_EQ("Unrecoverable error occured while client/server tried to send data", //NOLINT
     rmtErrorToString(RMT_ERROR_SOCKET_SEND_FAIL));
   EXPECT_EQ("No data available when attempting a receive",
@@ -124,6 +120,6 @@ TEST(Profiler, ProfilerErrorCodes)
     rmtErrorToString(RMT_ERROR_OPENGL_ERROR));
   EXPECT_EQ("Unknown CUDA error",
     rmtErrorToString(RMT_ERROR_CUDA_UNKNOWN));
-  EXPECT_EQ("Unknown remotery error",
+  EXPECT_EQ("Unknown remotery error: 1000",
     rmtErrorToString(static_cast<rmtError>(1000)));
 }

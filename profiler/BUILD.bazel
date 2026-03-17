@@ -19,9 +19,13 @@ RMT_USE_CUDA = 0
 
 RMT_USE_D3D11 = 0
 
+RMT_USE_D3D12 = 0
+
 RMT_USE_OPENGL = 1
 
 RMT_USE_METAL = 0
+
+RMT_USE_VULKAN = 0
 
 gz_configure_header(
     name = "Config",
@@ -32,8 +36,10 @@ gz_configure_header(
         "RMT_USE_TINYCRT=%d" % RMT_USE_TINYCRT,
         "RMT_USE_CUDA=%d" % RMT_USE_CUDA,
         "RMT_USE_D3D11=%d" % RMT_USE_D3D11,
+        "RMT_USE_D3D12=%d" % RMT_USE_D3D12,
         "RMT_USE_OPENGL=%d" % RMT_USE_OPENGL,
         "RMT_USE_METAL=%d" % RMT_USE_METAL,
+        "RMT_USE_VULKAN=%d" % RMT_USE_VULKAN,
     ],
     package_xml = "//:package.xml",
 )
@@ -55,24 +61,30 @@ cc_library(
 
 cc_library(
     name = "RemoteryProfilerImpl",
-    srcs = ["src/RemoteryProfilerImpl.cc"],
+    srcs = [
+        "src/Remotery/lib/Remotery.c",
+        "src/RemoteryProfilerImpl.cc",
+    ],
     hdrs = [
         "include/RemoteryConfig.h",
+        "src/Remotery/lib/Remotery.h",
         "src/RemoteryProfilerImpl.hh",
     ],
-    includes = ["include"],
+    includes = [
+        "include",
+        "src/Remotery/lib",
+    ],
     deps = [
         ":Export",
         ":ProfilerImplInterface",
         "//:gz-common",
-        "@remotery",
     ],
 )
 
 # Build flag to control how the Gz Profiler is configured.
 # --//profiler:config="disabled" (default): Profiler will be disabled.
 # --//profiler:config="remotery": Profiler will be enabled and the Remotery
-#   profiler implemenation will be used.
+#   profiler implementation will be used.
 # --//profiler:config="custom": Profiler will be enabled and a custom profiler
 #   implementation can be set to be used. See Profiler class for details.
 #
@@ -205,6 +217,5 @@ cc_test(
         "//:gz-common",
         "@googletest//:gtest",
         "@googletest//:gtest_main",
-        "@remotery",
     ],
 )
