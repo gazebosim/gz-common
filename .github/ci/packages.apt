@@ -4,10 +4,10 @@ libavdevice-dev
 libavformat-dev
 libavutil-dev
 libgdal-dev
-libgz-cmake-dev
-libgz-math-dev
-libgz-utils-dev
-libgz-utils-log-dev
+gz-rotary-cmake
+gz-rotary-math
+gz-rotary-utils
+gz-rotary-utils-log
 libspdlog-dev
 libswscale-dev
 libtinyxml2-dev
