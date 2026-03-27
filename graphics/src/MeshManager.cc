@@ -262,6 +262,21 @@ void MeshManager::AddMesh(Mesh *_mesh)
 }
 
 //////////////////////////////////////////////////
+Mesh *MeshManager::CreateMesh(const std::string &_name)
+{
+  if (this->HasMesh(_name))
+  {
+    gzerr << "Mesh [" << _name << "] already exists." << std::endl;
+    return nullptr;
+  }
+
+  Mesh *newMesh = new Mesh();
+  newMesh->SetName(_name);
+  this->dataPtr->meshes[_name] = newMesh;
+  return newMesh;
+}
+
+//////////////////////////////////////////////////
 const Mesh *MeshManager::MeshByName(const std::string &_name) const
 {
   auto iter = this->dataPtr->meshes.find(_name);
