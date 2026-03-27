@@ -425,4 +425,37 @@ TEST_F(MeshManager, MergeSubMeshes)
   EXPECT_EQ(math::Vector2d(0, 0.6), mergedSubmesh->TexCoordBySet(5u, 2u));
 }
 
+/////////////////////////////////////////////////
+TEST_F(MeshManager, CreateMesh)
+{
+  auto *mgr = common::MeshManager::Instance();
+  std::string meshName = "test_create_mesh";
+
+  // Pre-condition
+  EXPECT_FALSE(mgr->HasMesh(meshName));
+  EXPECT_EQ(nullptr, mgr->MeshByName(meshName));
+
+  // Create the mesh
+  common::Mesh *mutableMesh = mgr->CreateMesh(meshName);
+  ASSERT_NE(nullptr, mutableMesh);
+  EXPECT_EQ(meshName, mutableMesh->Name());
+
+  // Fetch the newly created mesh
+  const common::Mesh *cachedMesh = mgr->MeshByName(meshName);
+  ASSERT_NE(nullptr, cachedMesh);
+  EXPECT_EQ(mutableMesh, cachedMesh);
+  EXPECT_TRUE(mgr->HasMesh(meshName));
+
+  // Attempt to create the same mesh again should return nullptr safely
+  common::Mesh *duplicateMesh = mgr->CreateMesh(meshName);
+  EXPECT_EQ(nullptr, duplicateMesh);
+
+  // Verify original mesh is intact
+  const common::Mesh *verifyMesh = mgr->MeshByName(meshName);
+  EXPECT_NE(nullptr, verifyMesh);
+  EXPECT_EQ(meshName, verifyMesh->Name());
+
+  mgr->RemoveAll();
+}
+
 #endif

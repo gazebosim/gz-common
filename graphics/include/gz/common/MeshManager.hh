@@ -107,7 +107,11 @@ namespace gz
       /// This MeshManager takes ownership of the mesh and will destroy it.
       /// See ~MeshManager.
       /// \param[in] the mesh to add.
-      public: void AddMesh(Mesh *_mesh);
+      /// \deprecated This API requires the user to allocate a Mesh object on
+      /// the heap and "move" it into MeshManager. However, this is not safe to
+      /// do across shared library boundaries and may cause segfaults during
+      /// MeshManager destruction. Use \ref CreateMesh instead
+      public: void GZ_DEPRECATED(8) AddMesh(Mesh *_mesh);
 
       /// \brief Remove a mesh based on a name.
       /// \param[in] _name Name of the mesh to remove.
@@ -127,6 +131,13 @@ namespace gz
       /// \brief Return true if the mesh exists.
       /// \param[in] _name the name of the mesh
       public: bool HasMesh(const std::string &_name) const;
+
+      /// \brief Create an empty mesh and register it by name. If the mesh
+      /// already exists, returns nullptr.
+      /// \param[in] _name the name of the new mesh
+      /// \return a mutable pointer pointing to the newly allocated mesh, or
+      /// nullptr if the mesh name is already claimed.
+      public: common::Mesh *CreateMesh(const std::string &_name);
 
       /// \brief Create a sphere mesh.
       /// \param[in] _name the name of the mesh
