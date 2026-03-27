@@ -264,6 +264,12 @@ void MeshManager::AddMesh(Mesh *_mesh)
 //////////////////////////////////////////////////
 Mesh *MeshManager::CreateMesh(const std::string &_name)
 {
+  if (_name.empty())
+  {
+    gzerr << "Valid mesh name required." << std::endl;
+    return nullptr;
+  }
+
   if (this->HasMesh(_name))
   {
     gzerr << "Mesh [" << _name << "] already exists." << std::endl;
