@@ -128,11 +128,11 @@ namespace gz
       /// \param[in] _name the name of the mesh
       public: bool HasMesh(const std::string &_name) const;
 
-      /// \brief Create an empty mesh and register it by name. If the mesh already
-      /// exists, returns nullptr.
+      /// \brief Create an empty mesh and register it by name. If the mesh
+      /// already exists, returns nullptr.
       /// \param[in] _name the name of the new mesh
-      /// \return a mutable pointer pointing to the newly allocated mesh, or nullptr
-      /// if the mesh name is already claimed.
+      /// \return a mutable pointer pointing to the newly allocated mesh, or
+      /// nullptr if the mesh name is already claimed.
       public: common::Mesh *CreateMesh(const std::string &_name);
 
       /// \brief Create a sphere mesh.
