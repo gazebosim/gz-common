@@ -17,6 +17,7 @@
 #ifndef IGNITION_COMMON_BATTERY_HH_
 #define IGNITION_COMMON_BATTERY_HH_
 
+#include <cstdint>
 #include <map>
 #include <string>
 #include <functional>
