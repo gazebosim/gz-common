@@ -31,7 +31,7 @@ using namespace gz;
 
 // Capture the gOnSignalWrappers map from SignalHandlers.cc
 #ifndef _WIN32
-extern std::map<int, std::function<void(int)>>& gOnSignalWrappers;
+extern std::map<int, std::function<void(int)>> gOnSignalWrappers;
 #endif
 
 int gHandler1Sig = -1;
