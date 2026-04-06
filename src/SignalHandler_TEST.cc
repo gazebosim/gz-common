@@ -261,11 +261,13 @@ TEST(SignalHandler, MultipleThreads)
   EXPECT_EQ(threadCount, static_cast<int>(threads.size()));
 
 #ifndef _WIN32
-  EXPECT_EQ(threadCount, static_cast<int>(GetSignalWrappersInternal().size()));
+  EXPECT_EQ(threadCount,
+            static_cast<int>(GetSignalWrappersInternal().size()));
 
-  // Check that all the indices in the signal wrappers map are increasing by one.
+  // Check that all the indices in the signal wrappers map are increasing
+  // by one.
   int index = GetSignalWrappersInternal().begin()->first;
-  for (std::pair<int, std::function<void(int)>> func : GetSignalWrappersInternal())
+  for (auto& func : GetSignalWrappersInternal())
   {
     EXPECT_EQ(index, func.first);
     ++index;

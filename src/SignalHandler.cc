@@ -41,7 +41,8 @@ using namespace common;
 
 // Helper function to get signal wrappers map using NeverDestroyed pattern
 // to avoid static initialization order fiasco
-GZ_COMMON_VISIBLE std::map<int, std::function<void(int)>>& GetSignalWrappersInternal()
+GZ_COMMON_VISIBLE std::map<int, std::function<void(int)>>&
+GetSignalWrappersInternal()
 {
   static gz::utils::NeverDestroyed<
     std::map<int, std::function<void(int)>>> wrappers;
@@ -180,7 +181,7 @@ void SelfPipe::CheckPipe()
       {
         std::lock_guard<std::mutex> lock(GetWrapperMutexInternal());
         // Send the signal to each wrapper
-        for (std::pair<int, std::function<void(int)>> func : GetSignalWrappersInternal())
+        for (auto& func : GetSignalWrappersInternal())
         {
           func.second(signal);
         }
