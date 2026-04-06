@@ -29,9 +29,8 @@
 
 using namespace gz;
 
-// Capture the gOnSignalWrappers map from SignalHandlers.cc
 #ifndef _WIN32
-extern std::map<int, std::function<void(int)>> gOnSignalWrappers;
+extern std::map<int, std::function<void(int)>>& GetSignalWrappersInternal();
 #endif
 
 int gHandler1Sig = -1;
@@ -262,11 +261,13 @@ TEST(SignalHandler, MultipleThreads)
   EXPECT_EQ(threadCount, static_cast<int>(threads.size()));
 
 #ifndef _WIN32
-  EXPECT_EQ(threadCount, static_cast<int>(gOnSignalWrappers.size()));
+  EXPECT_EQ(threadCount,
+            static_cast<int>(GetSignalWrappersInternal().size()));
 
-  // Check that all the indices in gOnSignalWrappers are increasing by one.
-  int index = gOnSignalWrappers.begin()->first;
-  for (std::pair<int, std::function<void(int)>> func : gOnSignalWrappers)
+  // Check that all the indices in the signal wrappers map are increasing
+  // by one.
+  int index = GetSignalWrappersInternal().begin()->first;
+  for (auto& func : GetSignalWrappersInternal())
   {
     EXPECT_EQ(index, func.first);
     ++index;
