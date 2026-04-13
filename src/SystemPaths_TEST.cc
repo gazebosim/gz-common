@@ -346,7 +346,7 @@ TEST_F(SystemPathsFixture, FindFile)
 #ifndef _WIN32
   const auto tmpDir = "/tmp";
   const auto uriTmpDir = "file:///tmp";
-  const auto homeDir = "/home";
+  const auto homeDir = "/tmp";
   const auto badDir = "/bad";
   const auto uriBadDir = "file:///bad";
 #else
