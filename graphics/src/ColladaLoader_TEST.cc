@@ -520,4 +520,5 @@ TEST_F(ColladaLoader, NoAnimName)
   common::SkeletonAnimation *anim = skeleton->Animation(0);
   auto animName = anim->Name();
   EXPECT_EQ(animName, "animation1");
+  delete mesh;
 }
