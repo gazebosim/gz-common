@@ -218,6 +218,19 @@ bool AudioDecoder::SetFile(const std::string &_filename)
 {
   unsigned int i;
 
+  // Release any context allocated by a previous SetFile call
+  if (this->dataPtr->codecCtx)
+  {
+#if LIBAVFORMAT_VERSION_MAJOR < 59
+    avcodec_close(this->dataPtr->codecCtx);
+#else
+    avcodec_free_context(&this->dataPtr->codecCtx);
+#endif
+  }
+  if (this->dataPtr->formatCtx)
+    avformat_close_input(&this->dataPtr->formatCtx);
+  this->dataPtr->codec = nullptr;
+
   this->dataPtr->formatCtx = avformat_alloc_context();
 
   // Open file
