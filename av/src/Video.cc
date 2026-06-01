@@ -107,8 +107,8 @@ Video::~Video()
 /////////////////////////////////////////////////
 void Video::Cleanup()
 {
-  // Free the YUV frame
-  av_free(this->dataPtr->avFrame);
+  // Free the YUV frame (and any reference-counted side data)
+  av_frame_free(&this->dataPtr->avFrame);
 
   // Close the video file
   avformat_close_input(&this->dataPtr->formatCtx);
@@ -120,7 +120,13 @@ void Video::Cleanup()
   avcodec_close(this->dataPtr->codecCtx);
 #endif
 
-  av_free(this->dataPtr->avFrameDst);
+  av_frame_free(&this->dataPtr->avFrameDst);
+
+  if (this->dataPtr->swsCtx)
+  {
+    sws_freeContext(this->dataPtr->swsCtx);
+    this->dataPtr->swsCtx = nullptr;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -261,19 +267,18 @@ bool Video::Load(const std::string &_filename)
 /////////////////////////////////////////////////
 bool Video::NextFrame(unsigned char **_buffer)
 {
-  AVPacket* packet;
   int frameAvailable = 0;
   int ret;
 
+  AVPacket* packet = av_packet_alloc();
+  if (!packet)
+  {
+    gzerr << "Failed to allocate AVPacket" << std::endl;
+    return false;
+  }
+
   while (frameAvailable == 0)
   {
-    packet = av_packet_alloc();
-    if (!packet)
-    {
-      gzerr << "Failed to allocate AVPacket" << std::endl;
-      return false;
-    }
-
     // this loop will always exit because each call to AVCodecDecode()
     // reads from the input buffer and it has to either end at some time or
     // return a valid frame
@@ -295,6 +300,7 @@ bool Video::NextFrame(unsigned char **_buffer)
         {
           gzerr << "Error reading packet: " << av_err2str_cpp(ret)
                  << ". Stopped reading the file." << std::endl;
+          av_packet_free(&packet);
           return false;
         }
       }
@@ -315,6 +321,7 @@ bool Video::NextFrame(unsigned char **_buffer)
     {
       if (!this->dataPtr->drainingMode)
         av_packet_unref(packet);
+      av_packet_free(&packet);
       return false;
     }
     else if (ret < 0)
@@ -326,6 +333,8 @@ bool Video::NextFrame(unsigned char **_buffer)
     if (!this->dataPtr->drainingMode)
       av_packet_unref(packet);
   }
+
+  av_packet_free(&packet);
 
   // processing the image if available
   if (frameAvailable)
