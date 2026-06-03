@@ -18,12 +18,43 @@
 #include "gz/common/config.hh"
 #include <gz/common/profiler/Export.hh>
 
+#include <cstdlib>
+
 #include "RemoteryProfilerImpl.hh"
 #include "gz/common/Console.hh"
 #include "gz/common/Util.hh"
 
 using namespace gz;
 using namespace common;
+
+namespace {
+  /// \brief The single active Remotery instance to shut down at process exit.
+  ///
+  /// The Profiler that owns the RemoteryProfilerImpl is a NeverDestroyed
+  /// singleton (see Profiler::Instance), so RemoteryProfilerImpl's destructor
+  /// is never run. Without an explicit shutdown the Remotery background worker
+  /// thread keeps running -- and continuously allocating its own profiling
+  /// samples -- right up until the process is torn down. LeakSanitizer pauses
+  /// that still-running thread to scan and intermittently catches samples it
+  /// has malloc'd but not yet linked into the (reachable) sample tree,
+  /// reporting them as leaks.
+  ///
+  /// Destroying the instance from an atexit handler joins the worker thread and
+  /// releases all Remotery memory before LeakSanitizer's end-of-process check
+  /// runs (atexit handlers registered after the sanitizer's own run before it),
+  /// which removes the nondeterministic leak reports.
+  Remotery *g_remoteryToShutdown = nullptr;
+
+  /// \brief atexit handler that tears down the active Remotery instance.
+  void shutdownRemotery()
+  {
+    if (g_remoteryToShutdown != nullptr)
+    {
+      rmt_DestroyGlobalInstance(g_remoteryToShutdown);
+      g_remoteryToShutdown = nullptr;
+    }
+  }
+}  // namespace
 
 GZ_COMMON_PROFILER_VISIBLE
 std::string rmtErrorToString(rmtError error) {
@@ -197,13 +228,34 @@ RemoteryProfilerImpl::RemoteryProfilerImpl()
       rmtErrorToString(error) << ": " << rmt_GetLastErrorMessage() << std::endl;
     this->rmt = nullptr;
   }
+  else
+  {
+    // Ensure Remotery is cleanly shut down at process exit. The owning Profiler
+    // is NeverDestroyed so this destructor will not run; the atexit handler
+    // joins the worker thread and frees all memory before exit (and, with
+    // sanitizers, before the leak check). Registration happens once.
+    g_remoteryToShutdown = this->rmt;
+    static const bool registered = []()
+    {
+      std::atexit(shutdownRemotery);
+      return true;
+    }();
+    (void) registered;
+  }
 }
 
 //////////////////////////////////////////////////
 RemoteryProfilerImpl::~RemoteryProfilerImpl()
 {
-  if (this->rmt)
+  // Shutdown is normally handled by the atexit handler registered in the
+  // constructor, because the owning Profiler singleton is NeverDestroyed. Guard
+  // against double destruction should this destructor ever run.
+  if (this->rmt && this->rmt == g_remoteryToShutdown)
+  {
     rmt_DestroyGlobalInstance(this->rmt);
+    g_remoteryToShutdown = nullptr;
+    this->rmt = nullptr;
+  }
 }
 
 //////////////////////////////////////////////////
