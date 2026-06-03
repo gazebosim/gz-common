@@ -25,7 +25,7 @@ using namespace gz;
 
 class EnumIfaceTest : public common::testing::AutoLogFixture { };
 
-enum MyType
+enum MyType : int
 {
   MY_TYPE_BEGIN = 0,
   TYPE1 = MY_TYPE_BEGIN,
