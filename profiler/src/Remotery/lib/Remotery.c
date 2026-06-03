@@ -4927,13 +4927,25 @@ static rmtError SampleTree_Constructor(SampleTree* tree, rmtU32 sample_size, Obj
     return RMT_ERROR_NONE;
 }
 
+// gz-common: forward declaration so SampleTree_Destructor can release the
+// whole tree (root + descendants), see leak fix below. FreeSamples is defined
+// further down in this file.
+static void FreeSamples(Sample* sample, ObjectAllocator* allocator);
+
 static void SampleTree_Destructor(SampleTree* tree)
 {
     assert(tree != NULL);
 
+    // gz-common ASAN fix: free the entire sample tree, not just the root.
+    // Persistent samples (e.g. the aggregate samples the Remotery worker thread
+    // creates while profiling its own loop) accumulate as children of the root
+    // and are never returned to the allocator's free list. ObjectAllocator's
+    // destructor only frees objects on that free list, so those orphaned child
+    // samples were leaked at shutdown. FreeSamples() flattens root and all of
+    // its descendants back into the allocator before it is destroyed.
     if (tree->root != NULL)
     {
-        ObjectAllocator_Free(tree->allocator, tree->root);
+        FreeSamples(tree->root, tree->allocator);
         tree->root = NULL;
     }
 
