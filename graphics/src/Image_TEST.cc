@@ -266,6 +266,61 @@ TEST_F(ImageTest, Data)
 }
 
 /////////////////////////////////////////////////
+// Golden checks for the single-pass channel converter in DataWithChannels:
+// RGBData()/RGBAData() must match stb_image semantics for every channel count
+// reachable through these accessors (1/3/4 -> 3/4), including passthrough.
+TEST_F(ImageTest, RGBADataChannelConversions)
+{
+  auto expectEq = [](const std::vector<unsigned char> &_got,
+                     const std::vector<unsigned char> &_want,
+                     const std::string &_label)
+  {
+    ASSERT_EQ(_want.size(), _got.size()) << _label;
+    for (size_t i = 0; i < _want.size(); ++i)
+      EXPECT_EQ(_want[i], _got[i]) << _label << " at index " << i;
+  };
+
+  // --- 1-channel (grayscale) source, 2x2 ---
+  const std::vector<unsigned char> gray = {10, 20, 30, 40};
+  common::Image grayImg;
+  grayImg.SetFromData(gray.data(), 2, 2,
+      common::Image::PixelFormatType::L_INT8);
+  ASSERT_TRUE(grayImg.Valid());
+  // 1 -> 3: replicate the gray value across RGB
+  expectEq(grayImg.RGBData(),
+      {10, 10, 10, 20, 20, 20, 30, 30, 30, 40, 40, 40}, "gray->RGB");
+  // 1 -> 4: replicate gray across RGB, opaque alpha
+  expectEq(grayImg.RGBAData(),
+      {10, 10, 10, 255, 20, 20, 20, 255,
+       30, 30, 30, 255, 40, 40, 40, 255}, "gray->RGBA");
+
+  // --- 3-channel (RGB) source, 2x2 ---
+  const std::vector<unsigned char> rgb = {
+      1, 2, 3,  4, 5, 6,  7, 8, 9,  10, 11, 12};
+  common::Image rgbImg;
+  rgbImg.SetFromData(rgb.data(), 2, 2,
+      common::Image::PixelFormatType::RGB_INT8);
+  ASSERT_TRUE(rgbImg.Valid());
+  expectEq(rgbImg.RGBData(), rgb, "RGB->RGB (passthrough)");
+  // 3 -> 4: append opaque alpha
+  expectEq(rgbImg.RGBAData(),
+      {1, 2, 3, 255,  4, 5, 6, 255,  7, 8, 9, 255,  10, 11, 12, 255},
+      "RGB->RGBA");
+
+  // --- 4-channel (RGBA) source, 2x2 ---
+  const std::vector<unsigned char> rgba = {
+      1, 2, 3, 200,  4, 5, 6, 201,  7, 8, 9, 202,  10, 11, 12, 203};
+  common::Image rgbaImg;
+  rgbaImg.SetFromData(rgba.data(), 2, 2,
+      common::Image::PixelFormatType::RGBA_INT8);
+  ASSERT_TRUE(rgbaImg.Valid());
+  // 4 -> 3: drop the alpha channel
+  expectEq(rgbaImg.RGBData(),
+      {1, 2, 3,  4, 5, 6,  7, 8, 9,  10, 11, 12}, "RGBA->RGB");
+  expectEq(rgbaImg.RGBAData(), rgba, "RGBA->RGBA (passthrough)");
+}
+
+/////////////////////////////////////////////////
 TEST_F(ImageTest, SetFromData)
 {
   // load image and test colors

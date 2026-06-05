@@ -348,52 +348,99 @@ int Image::Pitch() const
 }
 
 //////////////////////////////////////////////////
+namespace {
+
+/// \brief Compute the luminance of an RGB triple, matching stbi__compute_y so
+/// that channel reductions stay bit-identical to stb_image.
+/// \tparam T Sample type (unsigned char for 8-bit, uint16_t for 16-bit).
+template <typename T>
+inline T ComputeLuminance(int _r, int _g, int _b)
+{
+  return static_cast<T>(((_r * 77) + (_g * 150) + (29 * _b)) >> 8);
+}
+
+/// \brief Convert pixel data from _inCh to _outCh channels in a single pass,
+/// writing straight into _dst (sized _npix * _outCh samples). _src is never
+/// modified or freed. This mirrors stbi__convert_format / stbi__convert_format16
+/// byte-for-byte, but avoids the clone-input + copy-output overhead those
+/// functions impose (they free their input, so the caller previously had to
+/// duplicate the bitmap and then copy the result into the returned vector).
+/// \param[in] _aMax Opaque alpha to insert (255 for 8-bit, 0xffff for 16-bit).
+/// \return False if the channel combination is unsupported.
+template <typename T>
+bool ConvertChannels(const T *_src, int _inCh, T *_dst, int _outCh,
+    std::size_t _npix, T _aMax)
+{
+  switch (_inCh * 8 + _outCh)
+  {
+    case 1 * 8 + 2: for (std::size_t p = 0; p < _npix; ++p, _src += 1, _dst += 2)
+      { _dst[0] = _src[0]; _dst[1] = _aMax; } break;
+    case 1 * 8 + 3: for (std::size_t p = 0; p < _npix; ++p, _src += 1, _dst += 3)
+      { _dst[0] = _dst[1] = _dst[2] = _src[0]; } break;
+    case 1 * 8 + 4: for (std::size_t p = 0; p < _npix; ++p, _src += 1, _dst += 4)
+      { _dst[0] = _dst[1] = _dst[2] = _src[0]; _dst[3] = _aMax; } break;
+    case 2 * 8 + 1: for (std::size_t p = 0; p < _npix; ++p, _src += 2, _dst += 1)
+      { _dst[0] = _src[0]; } break;
+    case 2 * 8 + 3: for (std::size_t p = 0; p < _npix; ++p, _src += 2, _dst += 3)
+      { _dst[0] = _dst[1] = _dst[2] = _src[0]; } break;
+    case 2 * 8 + 4: for (std::size_t p = 0; p < _npix; ++p, _src += 2, _dst += 4)
+      { _dst[0] = _dst[1] = _dst[2] = _src[0]; _dst[3] = _src[1]; } break;
+    case 3 * 8 + 4: for (std::size_t p = 0; p < _npix; ++p, _src += 3, _dst += 4)
+      { _dst[0] = _src[0]; _dst[1] = _src[1]; _dst[2] = _src[2]; _dst[3] = _aMax; } break;
+    case 3 * 8 + 1: for (std::size_t p = 0; p < _npix; ++p, _src += 3, _dst += 1)
+      { _dst[0] = ComputeLuminance<T>(_src[0], _src[1], _src[2]); } break;
+    case 3 * 8 + 2: for (std::size_t p = 0; p < _npix; ++p, _src += 3, _dst += 2)
+      { _dst[0] = ComputeLuminance<T>(_src[0], _src[1], _src[2]); _dst[1] = _aMax; } break;
+    case 4 * 8 + 1: for (std::size_t p = 0; p < _npix; ++p, _src += 4, _dst += 1)
+      { _dst[0] = ComputeLuminance<T>(_src[0], _src[1], _src[2]); } break;
+    case 4 * 8 + 2: for (std::size_t p = 0; p < _npix; ++p, _src += 4, _dst += 2)
+      { _dst[0] = ComputeLuminance<T>(_src[0], _src[1], _src[2]); _dst[1] = _src[3]; } break;
+    case 4 * 8 + 3: for (std::size_t p = 0; p < _npix; ++p, _src += 4, _dst += 3)
+      { _dst[0] = _src[0]; _dst[1] = _src[1]; _dst[2] = _src[2]; } break;
+    default: return false;
+  }
+  return true;
+}
+
+}  // namespace
+
 std::vector<unsigned char>
 Image::Implementation::DataWithChannels(int out_channels) const
 {
-  std::vector<unsigned char> data;
-  const size_t size =
-      this->width * this->height * this->channels * this->bits_per_channel / 8;
+  const size_t outSize = static_cast<size_t>(this->width) * this->height *
+      out_channels * this->bits_per_channel / 8;
+  std::vector<unsigned char> data(outSize);
 
-  if (this->channels != out_channels)
+  // No conversion needed: copy the bitmap straight into the output buffer.
+  if (this->channels == out_channels)
   {
-    // Copy data because stbi__convert_format() frees the original data
-    unsigned char *bitmap_copy = (unsigned char *)STBI_MALLOC(size);
-    if (bitmap_copy == NULL)
-    {
-      gzerr << "Error allocating image memory\n";
-      return std::vector<unsigned char>();
-    }
-    memcpy(bitmap_copy, this->bitmap, size);
-
-    unsigned char *bitmap_rgb = NULL;
-    switch (this->bits_per_channel)
-    {
-    case 8:
-      bitmap_rgb = stbi__convert_format(
-          bitmap_copy, this->channels, out_channels, this->width, this->height);
-      break;
-    case 16:
-      bitmap_rgb = reinterpret_cast<unsigned char *>(stbi__convert_format16(
-          reinterpret_cast<uint16_t *>(bitmap_copy), this->channels,
-          out_channels, this->width, this->height));
-      break;
-    case 32:  // not implemented in stbi
-      break;
-    }
-    if (bitmap_rgb == NULL)
-    {
-      gzerr << "Error converting image to " << out_channels << " channels\n";
-      return std::vector<unsigned char>();
-    }
-    data =
-        this->DataImpl(bitmap_rgb, this->width * this->height * out_channels *
-                                       this->bits_per_channel / 8);
-    STBI_FREE(bitmap_rgb);
+    memcpy(data.data(), this->bitmap, outSize);
+    return data;
   }
-  else
+
+  // Convert channels in a single pass directly into the output buffer.
+  const std::size_t npix = static_cast<std::size_t>(this->width) * this->height;
+  bool ok = false;
+  switch (this->bits_per_channel)
   {
-    data = this->DataImpl(this->bitmap, size);
+  case 8:
+    ok = ConvertChannels(static_cast<const unsigned char *>(this->bitmap),
+        this->channels, data.data(), out_channels, npix,
+        static_cast<unsigned char>(255));
+    break;
+  case 16:
+    ok = ConvertChannels(static_cast<const uint16_t *>(this->bitmap),
+        this->channels, reinterpret_cast<uint16_t *>(data.data()),
+        out_channels, npix, static_cast<uint16_t>(0xffff));
+    break;
+  default:  // 32-bit float is not supported by the channel converter
+    break;
+  }
+
+  if (!ok)
+  {
+    gzerr << "Error converting image to " << out_channels << " channels\n";
+    return std::vector<unsigned char>();
   }
   return data;
 }
