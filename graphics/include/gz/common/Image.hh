@@ -126,6 +126,18 @@ namespace gz
       /// \return 0 when the operation succeeds to open a file or -1 when fails.
       public: int Load(const std::string &_filename);
 
+      /// \brief Load an image and decode it directly to 8-bit RGBA (4
+      /// channels) in a single pass. For textures destined for RGBA upload this
+      /// is faster than Load() followed by RGBAData(): it avoids a second
+      /// channel conversion and lets the decoder write 4-wide RGBA more
+      /// efficiently than packed RGB. The loaded image reports 4 channels
+      /// (RGBA_INT8); opaque alpha is added when the source has none, and any
+      /// source format (8/16-bit or HDR) is down-converted to 8-bit RGBA. Use
+      /// Load() instead to preserve the source's native channels and bit depth.
+      /// \param[in] _filename the path to the image file
+      /// \return 0 when the operation succeeds to open a file or -1 when fails.
+      public: int LoadAsRgba(const std::string &_filename);
+
       /// \brief Save the image in PNG format
       /// \param[in] _filename The name of the saved image
       public: void SavePNG(const std::string &_filename);
@@ -151,6 +163,15 @@ namespace gz
       public: void SetFromCompressedData(unsigned char *_data,
                                          unsigned int _size,
                                          Image::PixelFormatType _format);
+
+      /// \brief Set the image from compressed (i.e. png/jpeg) data, decoding it
+      /// directly to 8-bit RGBA (4 channels) in a single pass. \sa LoadAsRgba.
+      /// \param[in] _data Pointer to the compressed image data
+      /// \param[in] _size Size of the buffer
+      /// \param[in] _format Pixel format of the provided data
+      public: void SetFromCompressedDataAsRgba(unsigned char *_data,
+                                               unsigned int _size,
+                                               Image::PixelFormatType _format);
 
       /// \brief Get the image as a data array
       /// \return The image data

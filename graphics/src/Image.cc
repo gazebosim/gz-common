@@ -183,6 +183,50 @@ int Image::Load(const std::string &_filename)
 }
 
 //////////////////////////////////////////////////
+int Image::LoadAsRgba(const std::string &_filename)
+{
+  this->dataPtr->fullName = _filename;
+  if (!exists(this->dataPtr->fullName))
+  {
+    this->dataPtr->fullName = common::findFile(_filename);
+  }
+
+  if (!exists(this->dataPtr->fullName))
+  {
+    gzerr << "Unable to open image file[" << this->dataPtr->fullName
+          << "], check your GZ_RESOURCE_PATH settings.\n";
+    return -1;
+  }
+
+  if (this->dataPtr->bitmap)
+    stbi_image_free(this->dataPtr->bitmap);
+  this->dataPtr->bitmap = NULL;
+
+  // Decode straight to 8-bit RGBA in a single pass (req_comp = 4). This is
+  // faster than decoding to native channels and converting afterwards -- stb's
+  // SIMD path writes 4-wide RGBA more efficiently than packed RGB -- and yields
+  // a texture-ready buffer with no later channel conversion. Any source format
+  // (8/16-bit or HDR) is down-converted to 8-bit RGBA by stb.
+  int w;
+  int h;
+  int n;
+  void *bitmap = stbi_load(this->dataPtr->fullName.c_str(), &w, &h, &n, 4);
+  if (bitmap == NULL)
+  {
+    gzerr << "Failed to load file [" << this->dataPtr->fullName
+          << "]: " << stbi_failure_reason() << std::endl;
+    return -1;
+  }
+
+  this->dataPtr->bitmap = bitmap;
+  this->dataPtr->bits_per_channel = 8;
+  this->dataPtr->width = w;
+  this->dataPtr->height = h;
+  this->dataPtr->channels = 4;
+  return 0;
+}
+
+//////////////////////////////////////////////////
 void Image::SavePNG(const std::string &_filename)
 {
   if (this->dataPtr->bits_per_channel != 8)
@@ -341,6 +385,41 @@ void Image::SetFromCompressedData(unsigned char *_data,
 }
 
 //////////////////////////////////////////////////
+void Image::SetFromCompressedDataAsRgba(unsigned char *_data,
+                                        unsigned int _size,
+                                        Image::PixelFormatType _format)
+{
+  if (this->dataPtr->bitmap)
+    stbi_image_free(this->dataPtr->bitmap);
+  this->dataPtr->bitmap = NULL;
+
+  if (_format != COMPRESSED_PNG && _format != COMPRESSED_JPEG)
+  {
+    gzerr << "Unable to handle format[" << _format << "]\n";
+    return;
+  }
+
+  // Decode straight to 8-bit RGBA in a single pass (req_comp = 4). \sa
+  // LoadAsRgba.
+  int w;
+  int h;
+  int n;
+  void *bitmap = stbi_load_from_memory(_data, _size, &w, &h, &n, 4);
+  if (bitmap == NULL)
+  {
+    gzerr << "Failed to decode compressed image data: "
+          << stbi_failure_reason() << std::endl;
+    return;
+  }
+
+  this->dataPtr->bitmap = bitmap;
+  this->dataPtr->bits_per_channel = 8;
+  this->dataPtr->width = w;
+  this->dataPtr->height = h;
+  this->dataPtr->channels = 4;
+}
+
+//////////////////////////////////////////////////
 int Image::Pitch() const
 {
   return this->dataPtr->width * this->dataPtr->channels *
@@ -353,18 +432,28 @@ namespace {
 /// \brief Compute the luminance of an RGB triple, matching stbi__compute_y so
 /// that channel reductions stay bit-identical to stb_image.
 /// \tparam T Sample type (unsigned char for 8-bit, uint16_t for 16-bit).
+/// \param[in] _r Red component.
+/// \param[in] _g Green component.
+/// \param[in] _b Blue component.
+/// \return The computed luminance as type T.
 template <typename T>
 inline T ComputeLuminance(int _r, int _g, int _b)
 {
   return static_cast<T>(((_r * 77) + (_g * 150) + (29 * _b)) >> 8);
 }
 
-/// \brief Convert pixel data from _inCh to _outCh channels in a single pass,
-/// writing straight into _dst (sized _npix * _outCh samples). _src is never
-/// modified or freed. This mirrors stbi__convert_format / stbi__convert_format16
-/// byte-for-byte, but avoids the clone-input + copy-output overhead those
-/// functions impose (they free their input, so the caller previously had to
-/// duplicate the bitmap and then copy the result into the returned vector).
+/// \brief Convert pixel data from _inCh to _outCh channels in a single pass.
+/// _src is never modified or freed. This mirrors stbi__convert_format /
+/// stbi__convert_format16 byte-for-byte, but avoids the clone-input +
+/// copy-output overhead those functions impose (they free their input, so the
+/// caller previously had to duplicate the bitmap and then copy the result into
+/// the returned vector).
+/// \tparam T Sample type (unsigned char for 8-bit, uint16_t for 16-bit).
+/// \param[in] _src Source pixels (_npix * _inCh samples).
+/// \param[in] _inCh Number of channels in the source.
+/// \param[out] _dst Destination buffer (_npix * _outCh samples).
+/// \param[in] _outCh Number of channels to write.
+/// \param[in] _npix Number of pixels to convert.
 /// \param[in] _aMax Opaque alpha to insert (255 for 8-bit, 0xffff for 16-bit).
 /// \return False if the channel combination is unsupported.
 template <typename T>
@@ -373,31 +462,65 @@ bool ConvertChannels(const T *_src, int _inCh, T *_dst, int _outCh,
 {
   switch (_inCh * 8 + _outCh)
   {
-    case 1 * 8 + 2: for (std::size_t p = 0; p < _npix; ++p, _src += 1, _dst += 2)
-      { _dst[0] = _src[0]; _dst[1] = _aMax; } break;
-    case 1 * 8 + 3: for (std::size_t p = 0; p < _npix; ++p, _src += 1, _dst += 3)
-      { _dst[0] = _dst[1] = _dst[2] = _src[0]; } break;
-    case 1 * 8 + 4: for (std::size_t p = 0; p < _npix; ++p, _src += 1, _dst += 4)
-      { _dst[0] = _dst[1] = _dst[2] = _src[0]; _dst[3] = _aMax; } break;
-    case 2 * 8 + 1: for (std::size_t p = 0; p < _npix; ++p, _src += 2, _dst += 1)
-      { _dst[0] = _src[0]; } break;
-    case 2 * 8 + 3: for (std::size_t p = 0; p < _npix; ++p, _src += 2, _dst += 3)
-      { _dst[0] = _dst[1] = _dst[2] = _src[0]; } break;
-    case 2 * 8 + 4: for (std::size_t p = 0; p < _npix; ++p, _src += 2, _dst += 4)
-      { _dst[0] = _dst[1] = _dst[2] = _src[0]; _dst[3] = _src[1]; } break;
-    case 3 * 8 + 4: for (std::size_t p = 0; p < _npix; ++p, _src += 3, _dst += 4)
-      { _dst[0] = _src[0]; _dst[1] = _src[1]; _dst[2] = _src[2]; _dst[3] = _aMax; } break;
-    case 3 * 8 + 1: for (std::size_t p = 0; p < _npix; ++p, _src += 3, _dst += 1)
-      { _dst[0] = ComputeLuminance<T>(_src[0], _src[1], _src[2]); } break;
-    case 3 * 8 + 2: for (std::size_t p = 0; p < _npix; ++p, _src += 3, _dst += 2)
-      { _dst[0] = ComputeLuminance<T>(_src[0], _src[1], _src[2]); _dst[1] = _aMax; } break;
-    case 4 * 8 + 1: for (std::size_t p = 0; p < _npix; ++p, _src += 4, _dst += 1)
-      { _dst[0] = ComputeLuminance<T>(_src[0], _src[1], _src[2]); } break;
-    case 4 * 8 + 2: for (std::size_t p = 0; p < _npix; ++p, _src += 4, _dst += 2)
-      { _dst[0] = ComputeLuminance<T>(_src[0], _src[1], _src[2]); _dst[1] = _src[3]; } break;
-    case 4 * 8 + 3: for (std::size_t p = 0; p < _npix; ++p, _src += 4, _dst += 3)
-      { _dst[0] = _src[0]; _dst[1] = _src[1]; _dst[2] = _src[2]; } break;
-    default: return false;
+    case 1 * 8 + 2:
+      for (std::size_t p = 0; p < _npix; ++p, _src += 1, _dst += 2)
+      { _dst[0] = _src[0]; _dst[1] = _aMax; }
+      break;
+    case 1 * 8 + 3:
+      for (std::size_t p = 0; p < _npix; ++p, _src += 1, _dst += 3)
+      { _dst[0] = _dst[1] = _dst[2] = _src[0]; }
+      break;
+    case 1 * 8 + 4:
+      for (std::size_t p = 0; p < _npix; ++p, _src += 1, _dst += 4)
+      { _dst[0] = _dst[1] = _dst[2] = _src[0]; _dst[3] = _aMax; }
+      break;
+    case 2 * 8 + 1:
+      for (std::size_t p = 0; p < _npix; ++p, _src += 2, _dst += 1)
+      { _dst[0] = _src[0]; }
+      break;
+    case 2 * 8 + 3:
+      for (std::size_t p = 0; p < _npix; ++p, _src += 2, _dst += 3)
+      { _dst[0] = _dst[1] = _dst[2] = _src[0]; }
+      break;
+    case 2 * 8 + 4:
+      for (std::size_t p = 0; p < _npix; ++p, _src += 2, _dst += 4)
+      { _dst[0] = _dst[1] = _dst[2] = _src[0]; _dst[3] = _src[1]; }
+      break;
+    case 3 * 8 + 4:
+      for (std::size_t p = 0; p < _npix; ++p, _src += 3, _dst += 4)
+      {
+        _dst[0] = _src[0]; _dst[1] = _src[1];
+        _dst[2] = _src[2]; _dst[3] = _aMax;
+      }
+      break;
+    case 3 * 8 + 1:
+      for (std::size_t p = 0; p < _npix; ++p, _src += 3, _dst += 1)
+      { _dst[0] = ComputeLuminance<T>(_src[0], _src[1], _src[2]); }
+      break;
+    case 3 * 8 + 2:
+      for (std::size_t p = 0; p < _npix; ++p, _src += 3, _dst += 2)
+      {
+        _dst[0] = ComputeLuminance<T>(_src[0], _src[1], _src[2]);
+        _dst[1] = _aMax;
+      }
+      break;
+    case 4 * 8 + 1:
+      for (std::size_t p = 0; p < _npix; ++p, _src += 4, _dst += 1)
+      { _dst[0] = ComputeLuminance<T>(_src[0], _src[1], _src[2]); }
+      break;
+    case 4 * 8 + 2:
+      for (std::size_t p = 0; p < _npix; ++p, _src += 4, _dst += 2)
+      {
+        _dst[0] = ComputeLuminance<T>(_src[0], _src[1], _src[2]);
+        _dst[1] = _src[3];
+      }
+      break;
+    case 4 * 8 + 3:
+      for (std::size_t p = 0; p < _npix; ++p, _src += 4, _dst += 3)
+      { _dst[0] = _src[0]; _dst[1] = _src[1]; _dst[2] = _src[2]; }
+      break;
+    default:
+      return false;
   }
   return true;
 }

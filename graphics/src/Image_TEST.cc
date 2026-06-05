@@ -321,6 +321,56 @@ TEST_F(ImageTest, RGBADataChannelConversions)
 }
 
 /////////////////////////////////////////////////
+// LoadAsRgba / SetFromCompressedDataAsRgba decode straight to RGBA and must
+// yield byte-identical results to the native decode followed by RGBAData(),
+// reporting 4 channels (RGBA_INT8) with RGBAData() as a passthrough.
+TEST_F(ImageTest, LoadAsRgba)
+{
+  for (const std::string &file : {kTestData, kTestDataGazeboJpeg})
+  {
+    common::Image native;
+    ASSERT_EQ(0, native.Load(file)) << file;
+    ASSERT_TRUE(native.Valid());
+    const std::vector<unsigned char> nativeRgba = native.RGBAData();
+
+    common::Image rgba;
+    ASSERT_EQ(0, rgba.LoadAsRgba(file)) << file;
+    ASSERT_TRUE(rgba.Valid());
+    EXPECT_EQ(common::Image::PixelFormatType::RGBA_INT8, rgba.PixelFormat());
+    EXPECT_EQ(native.Width(), rgba.Width());
+    EXPECT_EQ(native.Height(), rgba.Height());
+    // Single-pass RGBA == native decode + channel conversion.
+    EXPECT_EQ(nativeRgba, rgba.Data()) << "LoadAsRgba mismatch for " << file;
+    // RGBAData() on an already-RGBA image is a passthrough of its data.
+    EXPECT_EQ(rgba.Data(), rgba.RGBAData()) << "passthrough for " << file;
+  }
+}
+
+/////////////////////////////////////////////////
+TEST_F(ImageTest, SetFromCompressedDataAsRgba)
+{
+  std::ifstream ifs(kTestData, std::ios::binary | std::ios::ate);
+  std::ifstream::pos_type fileEnd = ifs.tellg();
+  std::vector<unsigned char> fileData(fileEnd);
+  ifs.seekg(0);
+  ifs.read(reinterpret_cast<char *>(&fileData[0]), fileEnd);
+
+  common::Image native;
+  native.SetFromCompressedData(&fileData[0], fileData.size(),
+      common::Image::PixelFormatType::COMPRESSED_PNG);
+  ASSERT_TRUE(native.Valid());
+  const std::vector<unsigned char> nativeRgba = native.RGBAData();
+
+  common::Image rgba;
+  rgba.SetFromCompressedDataAsRgba(&fileData[0], fileData.size(),
+      common::Image::PixelFormatType::COMPRESSED_PNG);
+  ASSERT_TRUE(rgba.Valid());
+  EXPECT_EQ(common::Image::PixelFormatType::RGBA_INT8, rgba.PixelFormat());
+  EXPECT_EQ(nativeRgba, rgba.Data());
+  EXPECT_EQ(rgba.Data(), rgba.RGBAData());
+}
+
+/////////////////////////////////////////////////
 TEST_F(ImageTest, SetFromData)
 {
   // load image and test colors
