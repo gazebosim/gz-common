@@ -73,10 +73,10 @@ namespace gz
       public: std::string fullName;
 
       /// \brief Width of the image
-      public: int width;
+      public: int width{0};
 
       /// \brief Height of the image
-      public: int height;
+      public: int height{0};
 
       /// \brief the number of channels per pixel
       ///
@@ -85,10 +85,10 @@ namespace gz
       ///       2           grey, alpha
       ///       3           red, green, blue
       ///       4           red, green, blue, alpha
-      public: int channels;
+      public: int channels{0};
 
       /// \brief the number of bits per pixel
-      public: int bits_per_channel;
+      public: int bits_per_channel{0};
 
       /// \brief Converts bitmap data to the given number of channels
       public: std::vector<unsigned char> DataWithChannels(int out_channels)
@@ -200,7 +200,7 @@ int Image::LoadAsRgba(const std::string &_filename)
 
   if (this->dataPtr->bitmap)
     stbi_image_free(this->dataPtr->bitmap);
-  this->dataPtr->bitmap = NULL;
+  this->dataPtr->bitmap = nullptr;
 
   // Decode straight to 8-bit RGBA in a single pass (req_comp = 4). This is
   // faster than decoding to native channels and converting afterwards -- stb's
@@ -211,7 +211,7 @@ int Image::LoadAsRgba(const std::string &_filename)
   int h;
   int n;
   void *bitmap = stbi_load(this->dataPtr->fullName.c_str(), &w, &h, &n, 4);
-  if (bitmap == NULL)
+  if (bitmap == nullptr)
   {
     gzerr << "Failed to load file [" << this->dataPtr->fullName
           << "]: " << stbi_failure_reason() << std::endl;
@@ -385,13 +385,13 @@ void Image::SetFromCompressedData(unsigned char *_data,
 }
 
 //////////////////////////////////////////////////
-void Image::SetFromCompressedDataAsRgba(unsigned char *_data,
+void Image::SetFromCompressedDataAsRgba(const unsigned char *_data,
                                         unsigned int _size,
                                         Image::PixelFormatType _format)
 {
   if (this->dataPtr->bitmap)
     stbi_image_free(this->dataPtr->bitmap);
-  this->dataPtr->bitmap = NULL;
+  this->dataPtr->bitmap = nullptr;
 
   if (_format != COMPRESSED_PNG && _format != COMPRESSED_JPEG)
   {
@@ -405,7 +405,7 @@ void Image::SetFromCompressedDataAsRgba(unsigned char *_data,
   int h;
   int n;
   void *bitmap = stbi_load_from_memory(_data, _size, &w, &h, &n, 4);
-  if (bitmap == NULL)
+  if (bitmap == nullptr)
   {
     gzerr << "Failed to decode compressed image data: "
           << stbi_failure_reason() << std::endl;
@@ -460,42 +460,64 @@ template <typename T>
 bool ConvertChannels(const T *_src, int _inCh, T *_dst, int _outCh,
     std::size_t _npix, T _aMax)
 {
+  // Pack the (input, output) channel counts into one integer, _inCh * 8 +
+  // _outCh, so each supported combination maps to a unique case and can be
+  // dispatched by a single switch (mirrors stb_image's STBI__COMBO macro).
   switch (_inCh * 8 + _outCh)
   {
     case 1 * 8 + 2:
       for (std::size_t p = 0; p < _npix; ++p, _src += 1, _dst += 2)
-      { _dst[0] = _src[0]; _dst[1] = _aMax; }
+      {
+        _dst[0] = _src[0];
+        _dst[1] = _aMax;
+      }
       break;
     case 1 * 8 + 3:
       for (std::size_t p = 0; p < _npix; ++p, _src += 1, _dst += 3)
-      { _dst[0] = _dst[1] = _dst[2] = _src[0]; }
+      {
+        _dst[0] = _dst[1] = _dst[2] = _src[0];
+      }
       break;
     case 1 * 8 + 4:
       for (std::size_t p = 0; p < _npix; ++p, _src += 1, _dst += 4)
-      { _dst[0] = _dst[1] = _dst[2] = _src[0]; _dst[3] = _aMax; }
+      {
+        _dst[0] = _dst[1] = _dst[2] = _src[0];
+        _dst[3] = _aMax;
+      }
       break;
     case 2 * 8 + 1:
       for (std::size_t p = 0; p < _npix; ++p, _src += 2, _dst += 1)
-      { _dst[0] = _src[0]; }
+      {
+        _dst[0] = _src[0];
+      }
       break;
     case 2 * 8 + 3:
       for (std::size_t p = 0; p < _npix; ++p, _src += 2, _dst += 3)
-      { _dst[0] = _dst[1] = _dst[2] = _src[0]; }
+      {
+        _dst[0] = _dst[1] = _dst[2] = _src[0];
+      }
       break;
     case 2 * 8 + 4:
       for (std::size_t p = 0; p < _npix; ++p, _src += 2, _dst += 4)
-      { _dst[0] = _dst[1] = _dst[2] = _src[0]; _dst[3] = _src[1]; }
+      {
+        _dst[0] = _dst[1] = _dst[2] = _src[0];
+        _dst[3] = _src[1];
+      }
       break;
     case 3 * 8 + 4:
       for (std::size_t p = 0; p < _npix; ++p, _src += 3, _dst += 4)
       {
-        _dst[0] = _src[0]; _dst[1] = _src[1];
-        _dst[2] = _src[2]; _dst[3] = _aMax;
+        _dst[0] = _src[0];
+        _dst[1] = _src[1];
+        _dst[2] = _src[2];
+        _dst[3] = _aMax;
       }
       break;
     case 3 * 8 + 1:
       for (std::size_t p = 0; p < _npix; ++p, _src += 3, _dst += 1)
-      { _dst[0] = ComputeLuminance<T>(_src[0], _src[1], _src[2]); }
+      {
+        _dst[0] = ComputeLuminance<T>(_src[0], _src[1], _src[2]);
+      }
       break;
     case 3 * 8 + 2:
       for (std::size_t p = 0; p < _npix; ++p, _src += 3, _dst += 2)
@@ -506,7 +528,9 @@ bool ConvertChannels(const T *_src, int _inCh, T *_dst, int _outCh,
       break;
     case 4 * 8 + 1:
       for (std::size_t p = 0; p < _npix; ++p, _src += 4, _dst += 1)
-      { _dst[0] = ComputeLuminance<T>(_src[0], _src[1], _src[2]); }
+      {
+        _dst[0] = ComputeLuminance<T>(_src[0], _src[1], _src[2]);
+      }
       break;
     case 4 * 8 + 2:
       for (std::size_t p = 0; p < _npix; ++p, _src += 4, _dst += 2)
@@ -517,7 +541,11 @@ bool ConvertChannels(const T *_src, int _inCh, T *_dst, int _outCh,
       break;
     case 4 * 8 + 3:
       for (std::size_t p = 0; p < _npix; ++p, _src += 4, _dst += 3)
-      { _dst[0] = _src[0]; _dst[1] = _src[1]; _dst[2] = _src[2]; }
+      {
+        _dst[0] = _src[0];
+        _dst[1] = _src[1];
+        _dst[2] = _src[2];
+      }
       break;
     default:
       return false;
@@ -530,6 +558,10 @@ bool ConvertChannels(const T *_src, int _inCh, T *_dst, int _outCh,
 std::vector<unsigned char>
 Image::Implementation::DataWithChannels(int out_channels) const
 {
+  // Nothing to convert if the image is empty or has not been loaded.
+  if (this->width <= 0 || this->height <= 0 || this->bitmap == nullptr)
+    return {};
+
   const size_t outSize = static_cast<size_t>(this->width) * this->height *
       out_channels * this->bits_per_channel / 8;
   std::vector<unsigned char> data(outSize);

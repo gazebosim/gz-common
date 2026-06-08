@@ -169,7 +169,7 @@ namespace gz
       /// \param[in] _data Pointer to the compressed image data
       /// \param[in] _size Size of the buffer
       /// \param[in] _format Pixel format of the provided data
-      public: void SetFromCompressedDataAsRgba(unsigned char *_data,
+      public: void SetFromCompressedDataAsRgba(const unsigned char *_data,
                                                unsigned int _size,
                                                Image::PixelFormatType _format);
 
