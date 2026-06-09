@@ -1,5 +1,16 @@
 ## Gazebo Common 4.x
 
+### Gazebo Common 4.8.1 (2026-06-09)
+
+1. Added missing includes
+    * [Pull request #797](https://github.com/gazebosim/gz-common/pull/797)
+
+1. Logging test: reduce console output
+    * [Pull request #778](https://github.com/gazebosim/gz-common/pull/778)
+
+1. av: Fix data races and buffer overflows
+    * [Pull request #759](https://github.com/gazebosim/gz-common/pull/759)
+
 ### Gazebo Common 4.8.0 (2026-02-12)
 
 1. TempDirectory: improve windows reliability
