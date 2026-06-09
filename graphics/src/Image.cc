@@ -49,6 +49,7 @@
 
 #include <cstdint>
 #include <cstring>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -183,8 +184,21 @@ int Image::Load(const std::string &_filename)
 }
 
 //////////////////////////////////////////////////
-int Image::LoadAsRgba(const std::string &_filename)
+int Image::Load(const std::string &_filename,
+                std::optional<PixelFormatType> _type)
 {
+  // No target format requested: load in the source's native format.
+  if (!_type.has_value())
+    return this->Load(_filename);
+
+  if (_type.value() != RGBA_INT8)
+  {
+    gzerr << "Unsupported target pixel format[" << _type.value() << "] for ["
+          << _filename << "]; only RGBA_INT8 (or std::nullopt for the native "
+          << "format) is supported.\n";
+    return -1;
+  }
+
   this->dataPtr->fullName = _filename;
   if (!exists(this->dataPtr->fullName))
   {
@@ -385,10 +399,29 @@ void Image::SetFromCompressedData(unsigned char *_data,
 }
 
 //////////////////////////////////////////////////
-void Image::SetFromCompressedDataAsRgba(const unsigned char *_data,
-                                        unsigned int _size,
-                                        Image::PixelFormatType _format)
+void Image::SetFromCompressedData(const unsigned char *_data,
+                                  unsigned int _size,
+                                  Image::PixelFormatType _format,
+                                  std::optional<PixelFormatType> _type)
 {
+  // No target format requested: decode to the source's native format. The
+  // 3-argument overload does not modify _data (stb takes it as const), so the
+  // const_cast is safe.
+  if (!_type.has_value())
+  {
+    this->SetFromCompressedData(const_cast<unsigned char *>(_data), _size,
+        _format);
+    return;
+  }
+
+  if (_type.value() != RGBA_INT8)
+  {
+    gzerr << "Unsupported target pixel format[" << _type.value()
+          << "]; only RGBA_INT8 (or std::nullopt for the native format) is "
+          << "supported.\n";
+    return;
+  }
+
   if (this->dataPtr->bitmap)
     stbi_image_free(this->dataPtr->bitmap);
   this->dataPtr->bitmap = nullptr;
@@ -399,8 +432,7 @@ void Image::SetFromCompressedDataAsRgba(const unsigned char *_data,
     return;
   }
 
-  // Decode straight to 8-bit RGBA in a single pass (req_comp = 4). \sa
-  // LoadAsRgba.
+  // Decode straight to 8-bit RGBA in a single pass (req_comp = 4). \sa Load.
   int w;
   int h;
   int n;

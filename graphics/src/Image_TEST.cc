@@ -15,6 +15,7 @@
  *
 */
 #include <fstream>
+#include <optional>
 #include <string>
 
 #include <gtest/gtest.h>
@@ -321,10 +322,10 @@ TEST_F(ImageTest, RGBADataChannelConversions)
 }
 
 /////////////////////////////////////////////////
-// LoadAsRgba / SetFromCompressedDataAsRgba decode straight to RGBA and must
-// yield byte-identical results to the native decode followed by RGBAData(),
-// reporting 4 channels (RGBA_INT8) with RGBAData() as a passthrough.
-TEST_F(ImageTest, LoadAsRgba)
+// Load(file, RGBA_INT8) decodes straight to RGBA and must yield byte-identical
+// results to the native decode followed by RGBAData(), reporting 4 channels
+// (RGBA_INT8) with RGBAData() as a passthrough. std::nullopt loads natively.
+TEST_F(ImageTest, LoadRgba)
 {
   for (const std::string &file : {kTestData, kTestDataGazeboJpeg})
   {
@@ -334,20 +335,27 @@ TEST_F(ImageTest, LoadAsRgba)
     const std::vector<unsigned char> nativeRgba = native.RGBAData();
 
     common::Image rgba;
-    ASSERT_EQ(0, rgba.LoadAsRgba(file)) << file;
+    ASSERT_EQ(0, rgba.Load(file, common::Image::PixelFormatType::RGBA_INT8))
+        << file;
     ASSERT_TRUE(rgba.Valid());
     EXPECT_EQ(common::Image::PixelFormatType::RGBA_INT8, rgba.PixelFormat());
     EXPECT_EQ(native.Width(), rgba.Width());
     EXPECT_EQ(native.Height(), rgba.Height());
     // Single-pass RGBA == native decode + channel conversion.
-    EXPECT_EQ(nativeRgba, rgba.Data()) << "LoadAsRgba mismatch for " << file;
+    EXPECT_EQ(nativeRgba, rgba.Data()) << "Load RGBA mismatch for " << file;
     // RGBAData() on an already-RGBA image is a passthrough of its data.
     EXPECT_EQ(rgba.Data(), rgba.RGBAData()) << "passthrough for " << file;
+
+    // std::nullopt loads in the native format, identical to Load(file).
+    common::Image nativeOpt;
+    ASSERT_EQ(0, nativeOpt.Load(file, std::nullopt)) << file;
+    EXPECT_EQ(native.PixelFormat(), nativeOpt.PixelFormat());
+    EXPECT_EQ(native.Data(), nativeOpt.Data());
   }
 }
 
 /////////////////////////////////////////////////
-TEST_F(ImageTest, SetFromCompressedDataAsRgba)
+TEST_F(ImageTest, SetFromCompressedDataRgba)
 {
   std::ifstream ifs(kTestData, std::ios::binary | std::ios::ate);
   std::ifstream::pos_type fileEnd = ifs.tellg();
@@ -362,12 +370,21 @@ TEST_F(ImageTest, SetFromCompressedDataAsRgba)
   const std::vector<unsigned char> nativeRgba = native.RGBAData();
 
   common::Image rgba;
-  rgba.SetFromCompressedDataAsRgba(&fileData[0], fileData.size(),
-      common::Image::PixelFormatType::COMPRESSED_PNG);
+  rgba.SetFromCompressedData(&fileData[0], fileData.size(),
+      common::Image::PixelFormatType::COMPRESSED_PNG,
+      common::Image::PixelFormatType::RGBA_INT8);
   ASSERT_TRUE(rgba.Valid());
   EXPECT_EQ(common::Image::PixelFormatType::RGBA_INT8, rgba.PixelFormat());
   EXPECT_EQ(nativeRgba, rgba.Data());
   EXPECT_EQ(rgba.Data(), rgba.RGBAData());
+
+  // std::nullopt decodes in the native format, identical to the 3-arg overload.
+  common::Image nativeOpt;
+  nativeOpt.SetFromCompressedData(&fileData[0], fileData.size(),
+      common::Image::PixelFormatType::COMPRESSED_PNG, std::nullopt);
+  ASSERT_TRUE(nativeOpt.Valid());
+  EXPECT_EQ(native.PixelFormat(), nativeOpt.PixelFormat());
+  EXPECT_EQ(native.Data(), nativeOpt.Data());
 }
 
 /////////////////////////////////////////////////
