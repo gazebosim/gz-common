@@ -18,8 +18,6 @@
 #include "gz/common/config.hh"
 #include <gz/common/profiler/Export.hh>
 
-#include <cstdlib>
-
 #include "RemoteryProfilerImpl.hh"
 #include "gz/common/Console.hh"
 #include "gz/common/Util.hh"
@@ -28,31 +26,41 @@ using namespace gz;
 using namespace common;
 
 namespace {
-  /// \brief The single active Remotery instance to shut down at process exit.
+  /// \brief RAII owner that shuts down the active Remotery instance at process
+  /// exit.
   ///
   /// The Profiler that owns the RemoteryProfilerImpl is a NeverDestroyed
   /// singleton (see Profiler::Instance), so RemoteryProfilerImpl's destructor
   /// is never run. Without an explicit shutdown the Remotery background worker
   /// thread keeps running -- and continuously allocating its own profiling
-  /// samples -- right up until the process is torn down. LeakSanitizer pauses
-  /// that still-running thread to scan and intermittently catches samples it
-  /// has malloc'd but not yet linked into the (reachable) sample tree,
-  /// reporting them as leaks.
+  /// samples -- right up until the process is torn down.
   ///
-  /// Destroying the instance from an atexit handler joins the worker thread and
-  /// releases all Remotery memory before LeakSanitizer's end-of-process check
-  /// runs (atexit handlers registered after the sanitizer's own run before it),
-  /// which removes the nondeterministic leak reports.
-  Remotery *g_remoteryToShutdown = nullptr;
-
-  /// \brief atexit handler that tears down the active Remotery instance.
-  void shutdownRemotery()
+  /// This object has static storage duration, so its destructor runs at
+  /// process exit via the same mechanism the compiler uses for any static
+  /// object (__cxa_atexit). It joins the worker thread and releases all
+  /// Remotery memory before LeakSanitizer's end-of-process check runs (static
+  /// destructors run after the sanitizer's own atexit registration, so before
+  /// its check), which removes the nondeterministic leak reports.
+  struct RemoteryShutdown
   {
-    if (g_remoteryToShutdown != nullptr)
+    /// \brief The active Remotery instance, or nullptr once destroyed.
+    Remotery *rmt = nullptr;
+
+    ~RemoteryShutdown()
     {
-      rmt_DestroyGlobalInstance(g_remoteryToShutdown);
-      g_remoteryToShutdown = nullptr;
+      if (this->rmt != nullptr)
+      {
+        rmt_DestroyGlobalInstance(this->rmt);
+        this->rmt = nullptr;
+      }
     }
+  };
+
+  /// \brief Accessor for the single RemoteryShutdown owner (Meyers singleton).
+  RemoteryShutdown &remoteryShutdown()
+  {
+    static RemoteryShutdown shutdown;
+    return shutdown;
   }
 }  // namespace
 
@@ -230,30 +238,27 @@ RemoteryProfilerImpl::RemoteryProfilerImpl()
   }
   else
   {
-    // Ensure Remotery is cleanly shut down at process exit. The owning Profiler
-    // is NeverDestroyed so this destructor will not run; the atexit handler
-    // joins the worker thread and frees all memory before exit (and, with
-    // sanitizers, before the leak check). Registration happens once.
-    g_remoteryToShutdown = this->rmt;
-    static const bool registered = []()
-    {
-      std::atexit(shutdownRemotery);
-      return true;
-    }();
-    (void) registered;
+    // Hand the instance to the static RAII owner so it is cleanly shut down at
+    // process exit. The owning Profiler is NeverDestroyed, so this object's own
+    // destructor will not run; the static owner's destructor joins the worker
+    // thread and frees all memory before exit (and, with sanitizers, before the
+    // leak check).
+    remoteryShutdown().rmt = this->rmt;
   }
 }
 
 //////////////////////////////////////////////////
 RemoteryProfilerImpl::~RemoteryProfilerImpl()
 {
-  // Shutdown is normally handled by the atexit handler registered in the
-  // constructor, because the owning Profiler singleton is NeverDestroyed. Guard
-  // against double destruction should this destructor ever run.
-  if (this->rmt && this->rmt == g_remoteryToShutdown)
+  // Shutdown is normally handled by the static RemoteryShutdown owner at
+  // process exit, because the owning Profiler singleton is NeverDestroyed.
+  // Should this destructor ever run, tear Remotery down here and clear the
+  // static owner so it does not double-destroy at exit.
+  if (this->rmt != nullptr)
   {
+    if (remoteryShutdown().rmt == this->rmt)
+      remoteryShutdown().rmt = nullptr;
     rmt_DestroyGlobalInstance(this->rmt);
-    g_remoteryToShutdown = nullptr;
     this->rmt = nullptr;
   }
 }
