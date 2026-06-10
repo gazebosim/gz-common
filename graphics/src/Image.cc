@@ -20,6 +20,7 @@
 #include <FreeImage.h>
 
 #include <cstring>
+#include <optional>
 #include <string>
 
 #include <gz/common/Console.hh>
@@ -42,6 +43,7 @@ namespace ignition
       /// \brief path name of the image file
       public: std::string fullName;
 
+<<<<<<< HEAD
       /// \brief Implementation of GetData
       public: void DataImpl(unsigned char **_data, unsigned int &_count,
           FIBITMAP *_img) const;
@@ -62,6 +64,33 @@ namespace ignition
       /// \return bitmap data with red and blue pixels swapped
       public: FIBITMAP* SwapRedBlue(const unsigned int &_width,
                                     const unsigned int &_height);
+=======
+      /// \brief Width of the image
+      public: int width{0};
+
+      /// \brief Height of the image
+      public: int height{0};
+
+      /// \brief the number of channels per pixel
+      ///
+      ///     channels    components
+      ///       1           grey
+      ///       2           grey, alpha
+      ///       3           red, green, blue
+      ///       4           red, green, blue, alpha
+      public: int channels{0};
+
+      /// \brief the number of bits per pixel
+      public: int bits_per_channel{0};
+
+      /// \brief Converts bitmap data to the given number of channels
+      public: std::vector<unsigned char> DataWithChannels(int out_channels)
+        const;
+
+      /// \brief Implementation of Data, returns vector of bytes
+      public: std::vector<unsigned char> DataImpl(void *_img, size_t size)
+        const;
+>>>>>>> b632fbd (Optimize texture image decoding and channel conversion (#817))
     };
   }
 }
@@ -147,6 +176,64 @@ int Image::Load(const std::string &_filename)
   ignerr << "Unable to open image file[" << this->dataPtr->fullName
         << "], check your IGNITION_RESOURCE_PATH settings.\n";
   return -1;
+}
+
+//////////////////////////////////////////////////
+int Image::Load(const std::string &_filename,
+                std::optional<PixelFormatType> _outputFormat)
+{
+  // No target format requested: load in the source's native format.
+  if (!_outputFormat.has_value())
+    return this->Load(_filename);
+
+  if (_outputFormat.value() != RGBA_INT8)
+  {
+    gzerr << "Unsupported target pixel format["
+          << _outputFormat.value() << "] for [" << _filename
+          << "]; only RGBA_INT8 (or std::nullopt for the native format) is "
+          << "supported.\n";
+    return -1;
+  }
+
+  this->dataPtr->fullName = _filename;
+  if (!exists(this->dataPtr->fullName))
+  {
+    this->dataPtr->fullName = common::findFile(_filename);
+  }
+
+  if (!exists(this->dataPtr->fullName))
+  {
+    gzerr << "Unable to open image file[" << this->dataPtr->fullName
+          << "], check your GZ_RESOURCE_PATH settings.\n";
+    return -1;
+  }
+
+  if (this->dataPtr->bitmap)
+    stbi_image_free(this->dataPtr->bitmap);
+  this->dataPtr->bitmap = nullptr;
+
+  // Decode straight to 8-bit RGBA in a single pass (req_comp = 4). This is
+  // faster than decoding to native channels and converting afterwards -- stb's
+  // SIMD path writes 4-wide RGBA more efficiently than packed RGB -- and yields
+  // a texture-ready buffer with no later channel conversion. Any source format
+  // (8/16-bit or HDR) is down-converted to 8-bit RGBA by stb.
+  int w;
+  int h;
+  int n;
+  void *bitmap = stbi_load(this->dataPtr->fullName.c_str(), &w, &h, &n, 4);
+  if (bitmap == nullptr)
+  {
+    gzerr << "Failed to load file [" << this->dataPtr->fullName
+          << "]: " << stbi_failure_reason() << std::endl;
+    return -1;
+  }
+
+  this->dataPtr->bitmap = bitmap;
+  this->dataPtr->bits_per_channel = 8;
+  this->dataPtr->width = w;
+  this->dataPtr->height = h;
+  this->dataPtr->channels = 4;
+  return 0;
 }
 
 //////////////////////////////////////////////////
@@ -243,12 +330,66 @@ void Image::SetFromData(const unsigned char *_data,
 }
 
 //////////////////////////////////////////////////
+void Image::SetFromCompressedData(const unsigned char *_data,
+                                  unsigned int _size,
+                                  Image::PixelFormatType _inputFormat,
+                                  std::optional<PixelFormatType> _outputFormat)
+{
+  // No target format requested: decode to the source's native format. The
+  // 3-argument overload does not modify _data (stb takes it as const), so the
+  // const_cast is safe.
+  if (!_outputFormat.has_value())
+  {
+    this->SetFromCompressedData(const_cast<unsigned char *>(_data), _size,
+        _inputFormat);
+    return;
+  }
+
+  if (_outputFormat.value() != RGBA_INT8)
+  {
+    gzerr << "Unsupported target pixel format[" << _outputFormat.value()
+          << "]; only RGBA_INT8 (or std::nullopt for the native format) is "
+          << "supported.\n";
+    return;
+  }
+
+  if (this->dataPtr->bitmap)
+    stbi_image_free(this->dataPtr->bitmap);
+  this->dataPtr->bitmap = nullptr;
+
+  if (_inputFormat != COMPRESSED_PNG && _inputFormat != COMPRESSED_JPEG)
+  {
+    gzerr << "Unable to handle format[" << _inputFormat << "]\n";
+    return;
+  }
+
+  // Decode straight to 8-bit RGBA in a single pass (req_comp = 4). \sa Load.
+  int w;
+  int h;
+  int n;
+  void *bitmap = stbi_load_from_memory(_data, _size, &w, &h, &n, 4);
+  if (bitmap == nullptr)
+  {
+    gzerr << "Failed to decode compressed image data: "
+          << stbi_failure_reason() << std::endl;
+    return;
+  }
+
+  this->dataPtr->bitmap = bitmap;
+  this->dataPtr->bits_per_channel = 8;
+  this->dataPtr->width = w;
+  this->dataPtr->height = h;
+  this->dataPtr->channels = 4;
+}
+
+//////////////////////////////////////////////////
 int Image::Pitch() const
 {
   return FreeImage_GetLine(this->dataPtr->bitmap);
 }
 
 //////////////////////////////////////////////////
+<<<<<<< HEAD
 void Image::RGBData(unsigned char **_data, unsigned int &_count)
 {
   FIBITMAP *tmp = this->dataPtr->bitmap;
@@ -273,10 +414,181 @@ void Image::Data(unsigned char **_data, unsigned int &_count)
     FIBITMAP *tmp = this->dataPtr->SwapRedBlue(this->Width(), this->Height());
     this->dataPtr->DataImpl(_data, _count, tmp);
     FreeImage_Unload(tmp);
-  }
-  else
+=======
+namespace {
+
+/// \brief Compute the luminance of an RGB triple, matching stbi__compute_y so
+/// that channel reductions stay bit-identical to stb_image.
+/// \tparam T Sample type (unsigned char for 8-bit, uint16_t for 16-bit).
+/// \param[in] _r Red component.
+/// \param[in] _g Green component.
+/// \param[in] _b Blue component.
+/// \return The computed luminance as type T.
+template <typename T>
+inline T ComputeLuminance(int _r, int _g, int _b)
+{
+  return static_cast<T>(((_r * 77) + (_g * 150) + (29 * _b)) >> 8);
+}
+
+/// \brief Convert pixel data from _inCh to _outCh channels in a single pass.
+/// _src is never modified or freed. This mirrors stbi__convert_format /
+/// stbi__convert_format16 byte-for-byte, but avoids the clone-input +
+/// copy-output overhead those functions impose (they free their input, so the
+/// caller previously had to duplicate the bitmap and then copy the result into
+/// the returned vector).
+/// \tparam T Sample type (unsigned char for 8-bit, uint16_t for 16-bit).
+/// \param[in] _src Source pixels (_npix * _inCh samples).
+/// \param[in] _inCh Number of channels in the source.
+/// \param[out] _dst Destination buffer (_npix * _outCh samples).
+/// \param[in] _outCh Number of channels to write.
+/// \param[in] _npix Number of pixels to convert.
+/// \param[in] _aMax Opaque alpha to insert (255 for 8-bit, 0xffff for 16-bit).
+/// \return False if the channel combination is unsupported.
+template <typename T>
+bool ConvertChannels(const T *_src, int _inCh, T *_dst, int _outCh,
+    std::size_t _npix, T _aMax)
+{
+  // Pack the (input, output) channel counts into one integer, _inCh * 8 +
+  // _outCh, so each supported combination maps to a unique case and can be
+  // dispatched by a single switch (mirrors stb_image's STBI__COMBO macro).
+  switch (_inCh * 8 + _outCh)
   {
+    case 1 * 8 + 2:
+      for (std::size_t p = 0; p < _npix; ++p, _src += 1, _dst += 2)
+      {
+        _dst[0] = _src[0];
+        _dst[1] = _aMax;
+      }
+      break;
+    case 1 * 8 + 3:
+      for (std::size_t p = 0; p < _npix; ++p, _src += 1, _dst += 3)
+      {
+        _dst[0] = _dst[1] = _dst[2] = _src[0];
+      }
+      break;
+    case 1 * 8 + 4:
+      for (std::size_t p = 0; p < _npix; ++p, _src += 1, _dst += 4)
+      {
+        _dst[0] = _dst[1] = _dst[2] = _src[0];
+        _dst[3] = _aMax;
+      }
+      break;
+    case 2 * 8 + 1:
+      for (std::size_t p = 0; p < _npix; ++p, _src += 2, _dst += 1)
+      {
+        _dst[0] = _src[0];
+      }
+      break;
+    case 2 * 8 + 3:
+      for (std::size_t p = 0; p < _npix; ++p, _src += 2, _dst += 3)
+      {
+        _dst[0] = _dst[1] = _dst[2] = _src[0];
+      }
+      break;
+    case 2 * 8 + 4:
+      for (std::size_t p = 0; p < _npix; ++p, _src += 2, _dst += 4)
+      {
+        _dst[0] = _dst[1] = _dst[2] = _src[0];
+        _dst[3] = _src[1];
+      }
+      break;
+    case 3 * 8 + 4:
+      for (std::size_t p = 0; p < _npix; ++p, _src += 3, _dst += 4)
+      {
+        _dst[0] = _src[0];
+        _dst[1] = _src[1];
+        _dst[2] = _src[2];
+        _dst[3] = _aMax;
+      }
+      break;
+    case 3 * 8 + 1:
+      for (std::size_t p = 0; p < _npix; ++p, _src += 3, _dst += 1)
+      {
+        _dst[0] = ComputeLuminance<T>(_src[0], _src[1], _src[2]);
+      }
+      break;
+    case 3 * 8 + 2:
+      for (std::size_t p = 0; p < _npix; ++p, _src += 3, _dst += 2)
+      {
+        _dst[0] = ComputeLuminance<T>(_src[0], _src[1], _src[2]);
+        _dst[1] = _aMax;
+      }
+      break;
+    case 4 * 8 + 1:
+      for (std::size_t p = 0; p < _npix; ++p, _src += 4, _dst += 1)
+      {
+        _dst[0] = ComputeLuminance<T>(_src[0], _src[1], _src[2]);
+      }
+      break;
+    case 4 * 8 + 2:
+      for (std::size_t p = 0; p < _npix; ++p, _src += 4, _dst += 2)
+      {
+        _dst[0] = ComputeLuminance<T>(_src[0], _src[1], _src[2]);
+        _dst[1] = _src[3];
+      }
+      break;
+    case 4 * 8 + 3:
+      for (std::size_t p = 0; p < _npix; ++p, _src += 4, _dst += 3)
+      {
+        _dst[0] = _src[0];
+        _dst[1] = _src[1];
+        _dst[2] = _src[2];
+      }
+      break;
+    default:
+      return false;
+  }
+  return true;
+}
+
+}  // namespace
+
+std::vector<unsigned char>
+Image::Implementation::DataWithChannels(int out_channels) const
+{
+  // Nothing to convert if the image is empty or has not been loaded.
+  if (this->width <= 0 || this->height <= 0 || this->bitmap == nullptr)
+    return {};
+
+  const size_t outSize = static_cast<size_t>(this->width) * this->height *
+      out_channels * this->bits_per_channel / 8;
+  std::vector<unsigned char> data(outSize);
+
+  // No conversion needed: copy the bitmap straight into the output buffer.
+  if (this->channels == out_channels)
+  {
+    memcpy(data.data(), this->bitmap, outSize);
+    return data;
+>>>>>>> b632fbd (Optimize texture image decoding and channel conversion (#817))
+  }
+
+  // Convert channels in a single pass directly into the output buffer.
+  const std::size_t npix = static_cast<std::size_t>(this->width) * this->height;
+  bool ok = false;
+  switch (this->bits_per_channel)
+  {
+<<<<<<< HEAD
     this->dataPtr->DataImpl(_data, _count, this->dataPtr->bitmap);
+=======
+  case 8:
+    ok = ConvertChannels(static_cast<const unsigned char *>(this->bitmap),
+        this->channels, data.data(), out_channels, npix,
+        static_cast<unsigned char>(255));
+    break;
+  case 16:
+    ok = ConvertChannels(static_cast<const uint16_t *>(this->bitmap),
+        this->channels, reinterpret_cast<uint16_t *>(data.data()),
+        out_channels, npix, static_cast<uint16_t>(0xffff));
+    break;
+  default:  // 32-bit float is not supported by the channel converter
+    break;
+  }
+
+  if (!ok)
+  {
+    gzerr << "Error converting image to " << out_channels << " channels\n";
+    return std::vector<unsigned char>();
+>>>>>>> b632fbd (Optimize texture image decoding and channel conversion (#817))
   }
 }
 

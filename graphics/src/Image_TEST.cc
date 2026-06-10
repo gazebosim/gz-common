@@ -14,6 +14,12 @@
  * limitations under the License.
  *
 */
+<<<<<<< HEAD
+=======
+#include <fstream>
+#include <optional>
+#include <string>
+>>>>>>> b632fbd (Optimize texture image decoding and channel conversion (#817))
 
 #include <gtest/gtest.h>
 
@@ -262,6 +268,127 @@ TEST_F(ImageTest, Data)
       }
     }
   }
+}
+
+/////////////////////////////////////////////////
+// Golden checks for the single-pass channel converter in DataWithChannels:
+// RGBData()/RGBAData() must match stb_image semantics for every channel count
+// reachable through these accessors (1/3/4 -> 3/4), including passthrough.
+TEST_F(ImageTest, RGBADataChannelConversions)
+{
+  auto expectEq = [](const std::vector<unsigned char> &_got,
+                     const std::vector<unsigned char> &_want,
+                     const std::string &_label)
+  {
+    ASSERT_EQ(_want.size(), _got.size()) << _label;
+    for (size_t i = 0; i < _want.size(); ++i)
+      EXPECT_EQ(_want[i], _got[i]) << _label << " at index " << i;
+  };
+
+  // --- 1-channel (grayscale) source, 2x2 ---
+  const std::vector<unsigned char> gray = {10, 20, 30, 40};
+  common::Image grayImg;
+  grayImg.SetFromData(gray.data(), 2, 2,
+      common::Image::PixelFormatType::L_INT8);
+  ASSERT_TRUE(grayImg.Valid());
+  // 1 -> 3: replicate the gray value across RGB
+  expectEq(grayImg.RGBData(),
+      {10, 10, 10, 20, 20, 20, 30, 30, 30, 40, 40, 40}, "gray->RGB");
+  // 1 -> 4: replicate gray across RGB, opaque alpha
+  expectEq(grayImg.RGBAData(),
+      {10, 10, 10, 255, 20, 20, 20, 255,
+       30, 30, 30, 255, 40, 40, 40, 255}, "gray->RGBA");
+
+  // --- 3-channel (RGB) source, 2x2 ---
+  const std::vector<unsigned char> rgb = {
+      1, 2, 3,  4, 5, 6,  7, 8, 9,  10, 11, 12};
+  common::Image rgbImg;
+  rgbImg.SetFromData(rgb.data(), 2, 2,
+      common::Image::PixelFormatType::RGB_INT8);
+  ASSERT_TRUE(rgbImg.Valid());
+  expectEq(rgbImg.RGBData(), rgb, "RGB->RGB (passthrough)");
+  // 3 -> 4: append opaque alpha
+  expectEq(rgbImg.RGBAData(),
+      {1, 2, 3, 255,  4, 5, 6, 255,  7, 8, 9, 255,  10, 11, 12, 255},
+      "RGB->RGBA");
+
+  // --- 4-channel (RGBA) source, 2x2 ---
+  const std::vector<unsigned char> rgba = {
+      1, 2, 3, 200,  4, 5, 6, 201,  7, 8, 9, 202,  10, 11, 12, 203};
+  common::Image rgbaImg;
+  rgbaImg.SetFromData(rgba.data(), 2, 2,
+      common::Image::PixelFormatType::RGBA_INT8);
+  ASSERT_TRUE(rgbaImg.Valid());
+  // 4 -> 3: drop the alpha channel
+  expectEq(rgbaImg.RGBData(),
+      {1, 2, 3,  4, 5, 6,  7, 8, 9,  10, 11, 12}, "RGBA->RGB");
+  expectEq(rgbaImg.RGBAData(), rgba, "RGBA->RGBA (passthrough)");
+}
+
+/////////////////////////////////////////////////
+// Load(file, RGBA_INT8) decodes straight to RGBA and must yield byte-identical
+// results to the native decode followed by RGBAData(), reporting 4 channels
+// (RGBA_INT8) with RGBAData() as a passthrough. std::nullopt loads natively.
+TEST_F(ImageTest, LoadRgba)
+{
+  for (const std::string &file : {kTestData, kTestDataGazeboJpeg})
+  {
+    common::Image native;
+    ASSERT_EQ(0, native.Load(file)) << file;
+    ASSERT_TRUE(native.Valid());
+    const std::vector<unsigned char> nativeRgba = native.RGBAData();
+
+    common::Image rgba;
+    ASSERT_EQ(0, rgba.Load(file, common::Image::PixelFormatType::RGBA_INT8))
+        << file;
+    ASSERT_TRUE(rgba.Valid());
+    EXPECT_EQ(common::Image::PixelFormatType::RGBA_INT8, rgba.PixelFormat());
+    EXPECT_EQ(native.Width(), rgba.Width());
+    EXPECT_EQ(native.Height(), rgba.Height());
+    // Single-pass RGBA == native decode + channel conversion.
+    EXPECT_EQ(nativeRgba, rgba.Data()) << "Load RGBA mismatch for " << file;
+    // RGBAData() on an already-RGBA image is a passthrough of its data.
+    EXPECT_EQ(rgba.Data(), rgba.RGBAData()) << "passthrough for " << file;
+
+    // std::nullopt loads in the native format, identical to Load(file).
+    common::Image nativeOpt;
+    ASSERT_EQ(0, nativeOpt.Load(file, std::nullopt)) << file;
+    EXPECT_EQ(native.PixelFormat(), nativeOpt.PixelFormat());
+    EXPECT_EQ(native.Data(), nativeOpt.Data());
+  }
+}
+
+/////////////////////////////////////////////////
+TEST_F(ImageTest, SetFromCompressedDataRgba)
+{
+  std::ifstream ifs(kTestData, std::ios::binary | std::ios::ate);
+  std::ifstream::pos_type fileEnd = ifs.tellg();
+  std::vector<unsigned char> fileData(fileEnd);
+  ifs.seekg(0);
+  ifs.read(reinterpret_cast<char *>(&fileData[0]), fileEnd);
+
+  common::Image native;
+  native.SetFromCompressedData(&fileData[0], fileData.size(),
+      common::Image::PixelFormatType::COMPRESSED_PNG);
+  ASSERT_TRUE(native.Valid());
+  const std::vector<unsigned char> nativeRgba = native.RGBAData();
+
+  common::Image rgba;
+  rgba.SetFromCompressedData(&fileData[0], fileData.size(),
+      common::Image::PixelFormatType::COMPRESSED_PNG,
+      common::Image::PixelFormatType::RGBA_INT8);
+  ASSERT_TRUE(rgba.Valid());
+  EXPECT_EQ(common::Image::PixelFormatType::RGBA_INT8, rgba.PixelFormat());
+  EXPECT_EQ(nativeRgba, rgba.Data());
+  EXPECT_EQ(rgba.Data(), rgba.RGBAData());
+
+  // std::nullopt decodes in the native format, identical to the 3-arg overload.
+  common::Image nativeOpt;
+  nativeOpt.SetFromCompressedData(&fileData[0], fileData.size(),
+      common::Image::PixelFormatType::COMPRESSED_PNG, std::nullopt);
+  ASSERT_TRUE(nativeOpt.Valid());
+  EXPECT_EQ(native.PixelFormat(), nativeOpt.PixelFormat());
+  EXPECT_EQ(native.Data(), nativeOpt.Data());
 }
 
 /////////////////////////////////////////////////
