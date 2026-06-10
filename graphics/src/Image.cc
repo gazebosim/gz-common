@@ -185,17 +185,18 @@ int Image::Load(const std::string &_filename)
 
 //////////////////////////////////////////////////
 int Image::Load(const std::string &_filename,
-                std::optional<PixelFormatType> _type)
+                std::optional<PixelFormatType> _outputFormat)
 {
   // No target format requested: load in the source's native format.
-  if (!_type.has_value())
+  if (!_outputFormat.has_value())
     return this->Load(_filename);
 
-  if (_type.value() != RGBA_INT8)
+  if (_outputFormat.value() != RGBA_INT8)
   {
-    gzerr << "Unsupported target pixel format[" << _type.value() << "] for ["
-          << _filename << "]; only RGBA_INT8 (or std::nullopt for the native "
-          << "format) is supported.\n";
+    gzerr << "Unsupported target pixel format["
+          << _outputFormat.value() << "] for [" << _filename
+          << "]; only RGBA_INT8 (or std::nullopt for the native format) is "
+          << "supported.\n";
     return -1;
   }
 
@@ -401,22 +402,22 @@ void Image::SetFromCompressedData(unsigned char *_data,
 //////////////////////////////////////////////////
 void Image::SetFromCompressedData(const unsigned char *_data,
                                   unsigned int _size,
-                                  Image::PixelFormatType _format,
-                                  std::optional<PixelFormatType> _type)
+                                  Image::PixelFormatType _inputFormat,
+                                  std::optional<PixelFormatType> _outputFormat)
 {
   // No target format requested: decode to the source's native format. The
   // 3-argument overload does not modify _data (stb takes it as const), so the
   // const_cast is safe.
-  if (!_type.has_value())
+  if (!_outputFormat.has_value())
   {
     this->SetFromCompressedData(const_cast<unsigned char *>(_data), _size,
-        _format);
+        _inputFormat);
     return;
   }
 
-  if (_type.value() != RGBA_INT8)
+  if (_outputFormat.value() != RGBA_INT8)
   {
-    gzerr << "Unsupported target pixel format[" << _type.value()
+    gzerr << "Unsupported target pixel format[" << _outputFormat.value()
           << "]; only RGBA_INT8 (or std::nullopt for the native format) is "
           << "supported.\n";
     return;
@@ -426,9 +427,9 @@ void Image::SetFromCompressedData(const unsigned char *_data,
     stbi_image_free(this->dataPtr->bitmap);
   this->dataPtr->bitmap = nullptr;
 
-  if (_format != COMPRESSED_PNG && _format != COMPRESSED_JPEG)
+  if (_inputFormat != COMPRESSED_PNG && _inputFormat != COMPRESSED_JPEG)
   {
-    gzerr << "Unable to handle format[" << _format << "]\n";
+    gzerr << "Unable to handle format[" << _inputFormat << "]\n";
     return;
   }
 

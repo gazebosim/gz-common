@@ -138,11 +138,11 @@ namespace gz
       /// source's native format (equivalent to Load(_filename)). Only the
       /// native format and RGBA_INT8 are currently supported.
       /// \param[in] _filename the path to the image file
-      /// \param[in] _type Desired output pixel format, or std::nullopt for the
-      /// source's native format.
+      /// \param[in] _outputFormat Desired output pixel format, or std::nullopt
+      /// for the source's native format.
       /// \return 0 when the operation succeeds to open a file or -1 when fails.
       public: int Load(const std::string &_filename,
-                        std::optional<PixelFormatType> _type);
+                        std::optional<PixelFormatType> _outputFormat);
 
       /// \brief Save the image in PNG format
       /// \param[in] _filename The name of the saved image
@@ -177,13 +177,14 @@ namespace gz
       /// Load. Only the native format and RGBA_INT8 are currently supported.
       /// \param[in] _data Pointer to the compressed image data
       /// \param[in] _size Size of the buffer
-      /// \param[in] _format Pixel format of the provided (compressed) data
-      /// \param[in] _type Desired output pixel format, or std::nullopt for the
-      /// source's native format.
+      /// \param[in] _inputFormat Pixel format of the provided (compressed) data
+      /// \param[in] _outputFormat Desired output pixel format, or std::nullopt
+      /// for the source's native format.
       public: void SetFromCompressedData(const unsigned char *_data,
                                          unsigned int _size,
-                                         Image::PixelFormatType _format,
-                                         std::optional<PixelFormatType> _type);
+                                         Image::PixelFormatType _inputFormat,
+                                         std::optional<PixelFormatType>
+                                             _outputFormat);
 
       /// \brief Get the image as a data array
       /// \return The image data
