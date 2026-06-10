@@ -662,7 +662,10 @@ std::pair<std::string, ImagePtr> AssimpLoader::Implementation::LoadTexture(
     if (common::exists(textureKey))
     {
       gzdbg << "Loading external texture [" << textureKey << "]" << std::endl;
-      ret.second = std::make_shared<Image>(textureKey);
+      // Textures are uploaded to the GPU as RGBA; decode straight to RGBA in a
+      // single pass to avoid a later channel conversion.
+      ret.second = std::make_shared<Image>();
+      ret.second->Load(textureKey, Image::PixelFormatType::RGBA_INT8);
       if (_shouldCache)
       {
         this->imageCache[textureKey] = ret.second;
@@ -725,9 +728,11 @@ ImagePtr AssimpLoader::Implementation::LoadEmbeddedTexture(
     if (format != Image::PixelFormatType::UNKNOWN_PIXEL_FORMAT)
     {
       auto img = std::make_shared<Image>();
+      // Textures are uploaded to the GPU as RGBA; decode straight to RGBA in a
+      // single pass to avoid a later channel conversion.
       img->SetFromCompressedData(
           reinterpret_cast<unsigned char *>(_texture->pcData),
-          _texture->mWidth, format);
+          _texture->mWidth, format, Image::PixelFormatType::RGBA_INT8);
       return img;
     }
     else
