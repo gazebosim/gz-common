@@ -620,3 +620,176 @@ TEST_F(ColladaLoader, LoadMissingVisualScene)
   delete mesh;
 }
 
+
+/////////////////////////////////////////////////
+// A malformed <float_array> (missing count attribute) must be reported and
+// must not crash the loader.
+TEST_F(ColladaLoader, LoadMalformedPositionNoCount)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "malformed_position_no_count.dae"));
+  ASSERT_TRUE(mesh);
+#ifndef _WIN32
+  common::Console::Root().RawLogger().flush();
+  EXPECT_NE(LogContent().find("no count attribute in position"),
+      std::string::npos);
+#endif
+  delete mesh;
+}
+
+/////////////////////////////////////////////////
+// A non-numeric count attribute must be caught (not throw) and reported.
+TEST_F(ColladaLoader, LoadMalformedPositionBadCount)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "malformed_position_bad_count.dae"));
+  ASSERT_TRUE(mesh);
+#ifndef _WIN32
+  common::Console::Root().RawLogger().flush();
+  EXPECT_NE(LogContent().find("Invalid count attribute in position"),
+      std::string::npos);
+#endif
+  delete mesh;
+}
+
+/////////////////////////////////////////////////
+// A missing accessor stride attribute must be reported and must not crash.
+TEST_F(ColladaLoader, LoadMalformedPositionNoStride)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "malformed_position_no_stride.dae"));
+  ASSERT_TRUE(mesh);
+#ifndef _WIN32
+  common::Console::Root().RawLogger().flush();
+  EXPECT_NE(LogContent().find("no stride attribute in position"),
+      std::string::npos);
+#endif
+  delete mesh;
+}
+
+/////////////////////////////////////////////////
+// An overflowing float value must be handled gracefully (not throw).
+TEST_F(ColladaLoader, LoadMalformedPositionOverflow)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "malformed_position_overflow.dae"));
+  ASSERT_TRUE(mesh);
+#ifndef _WIN32
+  common::Console::Root().RawLogger().flush();
+  EXPECT_NE(LogContent().find("Overflow while parsing <float_array>"),
+      std::string::npos);
+#endif
+  delete mesh;
+}
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadMalformedNormalNoCount)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "malformed_normal_no_count.dae"));
+  ASSERT_TRUE(mesh);
+#ifndef _WIN32
+  common::Console::Root().RawLogger().flush();
+  EXPECT_NE(LogContent().find("no count attribute in normal"),
+      std::string::npos);
+#endif
+  delete mesh;
+}
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadMalformedNormalBadCount)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "malformed_normal_bad_count.dae"));
+  ASSERT_TRUE(mesh);
+#ifndef _WIN32
+  common::Console::Root().RawLogger().flush();
+  EXPECT_NE(LogContent().find("Invalid count attribute in normal"),
+      std::string::npos);
+#endif
+  delete mesh;
+}
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadMalformedNormalNoStride)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "malformed_normal_no_stride.dae"));
+  ASSERT_TRUE(mesh);
+#ifndef _WIN32
+  common::Console::Root().RawLogger().flush();
+  EXPECT_NE(LogContent().find("no stride attribute in normal"),
+      std::string::npos);
+#endif
+  delete mesh;
+}
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadMalformedTexcoordNoCount)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "malformed_texcoord_no_count.dae"));
+  ASSERT_TRUE(mesh);
+#ifndef _WIN32
+  common::Console::Root().RawLogger().flush();
+  EXPECT_NE(LogContent().find("no count attribute in texture coordinate"),
+      std::string::npos);
+#endif
+  delete mesh;
+}
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadMalformedTexcoordBadCount)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "malformed_texcoord_bad_count.dae"));
+  ASSERT_TRUE(mesh);
+#ifndef _WIN32
+  common::Console::Root().RawLogger().flush();
+  EXPECT_NE(LogContent().find("Invalid count attribute in texture coordinate"),
+      std::string::npos);
+#endif
+  delete mesh;
+}
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadMalformedTexcoordNoStride)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "malformed_texcoord_no_stride.dae"));
+  ASSERT_TRUE(mesh);
+#ifndef _WIN32
+  common::Console::Root().RawLogger().flush();
+  EXPECT_NE(LogContent().find("no stride attribute in texture coordinate"),
+      std::string::npos);
+#endif
+  delete mesh;
+}
+
+/////////////////////////////////////////////////
+// A texcoord source whose accessor count*stride disagrees with the
+// float_array count must be reported, not crash.
+TEST_F(ColladaLoader, LoadMalformedTexcoordMismatch)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "malformed_texcoord_mismatch.dae"));
+  ASSERT_TRUE(mesh);
+#ifndef _WIN32
+  common::Console::Root().RawLogger().flush();
+  EXPECT_NE(LogContent().find("Error reading texture coordinates"),
+      std::string::npos);
+#endif
+  delete mesh;
+}
+
