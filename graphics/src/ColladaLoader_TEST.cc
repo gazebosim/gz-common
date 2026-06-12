@@ -604,3 +604,87 @@ TEST_F(ColladaLoader, LoadTextureMaterial)
   EXPECT_NE(mat->TextureImage().find("box_texture.png"), std::string::npos);
   delete mesh;
 }
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadMalformedNormalNoCount)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "malformed_normal_no_count.dae"));
+  ASSERT_TRUE(mesh);
+#ifndef _WIN32
+  EXPECT_NE(LogContent().find("no count attribute in normal"),
+      std::string::npos);
+#endif
+  delete mesh;
+}
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadMalformedNormalBadCount)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "malformed_normal_bad_count.dae"));
+  ASSERT_TRUE(mesh);
+#ifndef _WIN32
+  EXPECT_NE(LogContent().find("Invalid count attribute in normal"),
+      std::string::npos);
+#endif
+  delete mesh;
+}
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadMalformedNormalNoStride)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "malformed_normal_no_stride.dae"));
+  ASSERT_TRUE(mesh);
+#ifndef _WIN32
+  EXPECT_NE(LogContent().find("no stride attribute in normal"),
+      std::string::npos);
+#endif
+  delete mesh;
+}
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadMalformedTexcoordNoCount)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "malformed_texcoord_no_count.dae"));
+  ASSERT_TRUE(mesh);
+#ifndef _WIN32
+  EXPECT_NE(LogContent().find("no count attribute in texture coordinate"),
+      std::string::npos);
+#endif
+  delete mesh;
+}
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadMalformedTexcoordBadCount)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "malformed_texcoord_bad_count.dae"));
+  ASSERT_TRUE(mesh);
+#ifndef _WIN32
+  EXPECT_NE(LogContent().find("Invalid count attribute in texture coordinate"),
+      std::string::npos);
+#endif
+  delete mesh;
+}
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadMalformedTexcoordNoStride)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "malformed_texcoord_no_stride.dae"));
+  ASSERT_TRUE(mesh);
+#ifndef _WIN32
+  EXPECT_NE(LogContent().find("no stride attribute in texture coordinate"),
+      std::string::npos);
+#endif
+  delete mesh;
+}
