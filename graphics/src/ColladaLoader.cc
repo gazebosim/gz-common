@@ -1551,8 +1551,9 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
   auto toDoubleVec = [](std::string_view sv, size_t totalCount)
   {
     std::vector<double> result;
-    // Preallocate memory based on known count
-    result.reserve(totalCount * 3);
+    // Preallocate memory based on known count. totalCount is the number of
+    // float values declared by the <float_array> count attribute.
+    result.reserve(totalCount);
     const char *start = sv.data();
     char *end{};
     while (true)
@@ -1576,7 +1577,10 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
   if (!_duplicates)
     _duplicates = std::make_shared<std::unordered_map<unsigned int,
                                                       unsigned int>>();
-  for (int i = 0; i < totCount; i += stride)
+  // Bound by the actual number of parsed values, not just the declared
+  // count, so a too-large count attribute cannot drive an out-of-bounds read.
+  for (int i = 0; i < totCount && i + 2 < static_cast<int>(values.size());
+       i += stride)
   {
     vec.Set(values[i],
             values[i+1],
@@ -1709,8 +1713,9 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
   auto toDoubleVec = [](std::string_view sv, size_t totalCount)
   {
     std::vector<double> result;
-    // Preallocate memory based on known count
-    result.reserve(totalCount * 3);
+    // Preallocate memory based on known count. totalCount is the number of
+    // float values declared by the <float_array> count attribute.
+    result.reserve(totalCount);
     const char *start = sv.data();
     char *end{};
     while (true)
@@ -1735,7 +1740,10 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
     _duplicates = std::make_shared<std::unordered_map<unsigned int,
                                                       unsigned int>>();
 
-  for (int i = 0; i < totCount; i += stride)
+  // Bound by the actual number of parsed values, not just the declared
+  // count, so a too-large count attribute cannot drive an out-of-bounds read.
+  for (int i = 0; i < totCount && i + 2 < static_cast<int>(values.size());
+       i += stride)
   {
     vec.Set(values[i],
             values[i+1],
@@ -1888,8 +1896,9 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
   auto toDoubleVec = [](std::string_view sv, size_t totalCount)
   {
     std::vector<double> result;
-    // Preallocate memory based on known count
-    result.reserve(totalCount * 2);
+    // Preallocate memory based on known count. totalCount is the number of
+    // float values declared by the <float_array> count attribute.
+    result.reserve(totalCount);
     const char *start = sv.data();
     char *end{};
     while (true)
@@ -1915,8 +1924,11 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
   if (!_duplicates)
     _duplicates = std::make_shared<std::unordered_map<unsigned int,
                                                       unsigned int>>();
-  // Read in all the texture coordinates.
-  for (int i = 0; i < totCount; i += stride)
+  // Read in all the texture coordinates. Bound by the actual number of parsed
+  // values, not just the declared count, so a too-large count attribute cannot
+  // drive an out-of-bounds read.
+  for (int i = 0; i < totCount && i + 1 < static_cast<int>(values.size());
+       i += stride)
   {
     // We only handle 2D texture coordinates right now.
     vec.Set(values[i],
