@@ -327,9 +327,11 @@ namespace gz
       /// \brief Index of a normal in the collada <p> element
       public: unsigned int normalIndex;
 
-      /// \brief A map of texture coordinate set index to index of a texture
-      /// coordinate in the collada <p> element
-      public: std::map<unsigned int, unsigned int> texcoordIndex;
+      /// \brief Texture coordinate set index paired with the index of a
+      /// texture coordinate in the collada <p> element. A flat vector is used
+      /// instead of std::map because the number of sets is tiny (usually one),
+      /// avoiding a tree-node allocation per vertex record.
+      public: std::vector<std::pair<unsigned int, unsigned int>> texcoordIndex;
 
       /// \brief Index of a vertex in the Gazebo mesh
       public: unsigned int mappedIndex;
@@ -2446,9 +2448,9 @@ void ColladaLoader::Implementation::LoadPolylist(
                       remappedTexcoordIndex);
                   if (texDupMapSetIt != texDupMapSet.end())
                     remappedTexcoordIndex = texDupMapSetIt->second;
-                  auto ivTexIt = iv.texcoordIndex.find(set);
-                  unsigned int ivTexIndex = ivTexIt != iv.texcoordIndex.end() ?
-                      ivTexIt->second : 0u;
+                  unsigned int ivTexIndex = 0u;
+                  for (const auto &tc : iv.texcoordIndex)
+                    if (tc.first == set) { ivTexIndex = tc.second; break; }
                   if (ivTexIndex != remappedTexcoordIndex)
                   {
                     texEqual = false;
@@ -2541,7 +2543,7 @@ void ColladaLoader::Implementation::LoadPolylist(
               subMesh->AddTexCoordBySet(
                   (*texcoordsSet)[inputRemappedTexcoordIndex].X(),
                   (*texcoordsSet)[inputRemappedTexcoordIndex].Y(), set);
-              input.texcoordIndex[set] = inputRemappedTexcoordIndex;
+              input.texcoordIndex.emplace_back(set, inputRemappedTexcoordIndex);
             }
           }
 
@@ -2800,9 +2802,9 @@ void ColladaLoader::Implementation::LoadTriangles(
               if (texDupMapSetIt != texDupMapSet.end())
                 remappedTexcoordIndex = texDupMapSetIt->second;
 
-              auto ivTexIt = iv.texcoordIndex.find(set);
-              unsigned int ivTexIndex =
-                  ivTexIt != iv.texcoordIndex.end() ? ivTexIt->second : 0u;
+              unsigned int ivTexIndex = 0u;
+              for (const auto &tc : iv.texcoordIndex)
+                if (tc.first == set) { ivTexIndex = tc.second; break; }
               if (ivTexIndex != remappedTexcoordIndex)
               {
                 texEqual = false;
@@ -2889,7 +2891,7 @@ void ColladaLoader::Implementation::LoadTriangles(
           subMesh->AddTexCoordBySet(
               (*texcoordsSet)[inputRemappedTexcoordIndex].X(),
               (*texcoordsSet)[inputRemappedTexcoordIndex].Y(), set);
-          input.texcoordIndex[set] = inputRemappedTexcoordIndex;
+          input.texcoordIndex.emplace_back(set, inputRemappedTexcoordIndex);
         }
       }
 
