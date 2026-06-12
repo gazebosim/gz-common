@@ -1569,6 +1569,9 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
     char *end{};
     while (true)
     {
+      // Reset errno so a stale ERANGE set by earlier code is not misread as
+      // an overflow from this call.
+      errno = 0;
       double d = std::strtod(start, &end);
       if (start == end)
         break;
@@ -1755,6 +1758,9 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
     char *end{};
     while (true)
     {
+      // Reset errno so a stale ERANGE set by earlier code is not misread as
+      // an overflow from this call.
+      errno = 0;
       double d = std::strtod(start, &end);
       if (start == end)
         break;
@@ -1942,6 +1948,9 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
     char *end{};
     while (true)
     {
+      // Reset errno so a stale ERANGE set by earlier code is not misread as
+      // an overflow from this call.
+      errno = 0;
       double d = std::strtod(start, &end);
       if (start == end)
         break;
