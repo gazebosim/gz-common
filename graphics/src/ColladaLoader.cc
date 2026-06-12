@@ -1615,13 +1615,13 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
             values[i+2]);
 
     vec = _transform * vec;
-    (*_values).emplace_back(vec);
+    _values->emplace_back(vec);
 
     // create a map of duplicate indices
     if (unique.find(vec) != unique.end())
-      (*_duplicates)[(*_values).size()-1] = unique[vec];
+      (*_duplicates)[_values->size()-1] = unique[vec];
     else
-      unique[vec] = (*_values).size()-1;
+      unique[vec] = _values->size()-1;
   }
 
   this->positionDuplicateMap[_id] = _duplicates;
@@ -1776,13 +1776,13 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
 
     vec = rotMat * vec;
     vec.Normalize();
-    (*_values).emplace_back(vec);
+    _values->emplace_back(vec);
 
     // create a map of duplicate indices
     if (unique.find(vec) != unique.end())
-      (*_duplicates)[(*_values).size()-1] = unique[vec];
+      (*_duplicates)[_values->size()-1] = unique[vec];
     else
-      unique[vec] = (*_values).size()-1;
+      unique[vec] = _values->size()-1;
   }
 
   this->normalDuplicateMap[_id] = _duplicates;
@@ -1935,13 +1935,13 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
     // We only handle 2D texture coordinates right now.
     vec.Set(values[i],
             1.0 - values[i + 1]);
-    (*_values).emplace_back(vec);
+    _values->emplace_back(vec);
 
     // create a map of duplicate indices
     if (unique.find(vec) != unique.end())
-      (*_duplicates)[(*_values).size()-1] = unique[vec];
+      (*_duplicates)[_values->size()-1] = unique[vec];
     else
-      unique[vec] = (*_values).size()-1;
+      unique[vec] = _values->size()-1;
   }
 
   this->texcoordDuplicateMap[_id] = _duplicates;
@@ -2349,7 +2349,7 @@ void ColladaLoader::Implementation::LoadPolylist(
           // Get the vertex position index value. If it is a duplicate then use
           // the existing index instead
           daeVertIndex = values[*inputs[VERTEX].begin()];
-          if ((*positionDupMap).find(daeVertIndex) != (*positionDupMap).end())
+          if (positionDupMap->find(daeVertIndex) != positionDupMap->end())
             daeVertIndex = (*positionDupMap)[daeVertIndex];
 
           // if the vertex index has not been previously added then just add it.
@@ -2379,8 +2379,8 @@ void ColladaLoader::Implementation::LoadPolylist(
                 // duplicated position
                 unsigned int remappedNormalIndex =
                     values[*inputs[NORMAL].begin()];
-                if ((*normalDupMap).find(remappedNormalIndex) !=
-                  (*normalDupMap).end())
+                if (normalDupMap->find(remappedNormalIndex) !=
+                  normalDupMap->end())
                 {
                   remappedNormalIndex = (*normalDupMap)[remappedNormalIndex];
                 }
@@ -2465,14 +2465,14 @@ void ColladaLoader::Implementation::LoadPolylist(
             unsigned int inputRemappedNormalIndex =
               values[*inputs[NORMAL].begin()];
 
-            if ((*normalDupMap).find(inputRemappedNormalIndex) !=
-              (*normalDupMap).end())
+            if (normalDupMap->find(inputRemappedNormalIndex) !=
+              normalDupMap->end())
             {
               inputRemappedNormalIndex =
                 (*normalDupMap)[inputRemappedNormalIndex];
             }
 
-            if ((*norms).size() > inputRemappedNormalIndex)
+            if (norms->size() > inputRemappedNormalIndex)
             {
               subMesh->AddNormal((*norms)[inputRemappedNormalIndex]);
               input.normalIndex = inputRemappedNormalIndex;
@@ -2700,7 +2700,7 @@ void ColladaLoader::Implementation::LoadTriangles(
       // Get the vertex position index value. If the position is a duplicate
       // then reset the index to the first instance of the duplicated position
       daeVertIndex = values.at(*inputs[VERTEX].begin());
-      if ((*positionDupMap).find(daeVertIndex) != (*positionDupMap).end())
+      if (positionDupMap->find(daeVertIndex) != positionDupMap->end())
         daeVertIndex = (*positionDupMap)[daeVertIndex];
 
       // if the vertex index has not been previously added then just add it.
@@ -2728,8 +2728,8 @@ void ColladaLoader::Implementation::LoadTriangles(
             // position
             unsigned int remappedNormalIndex = values.at(
                 *inputs[NORMAL].begin());
-            if ((*normalDupMap).find(remappedNormalIndex) !=
-              (*normalDupMap).end())
+            if (normalDupMap->find(remappedNormalIndex) !=
+              normalDupMap->end())
               remappedNormalIndex = (*normalDupMap)[remappedNormalIndex];
 
             if (iv.normalIndex == remappedNormalIndex)
@@ -2815,8 +2815,8 @@ void ColladaLoader::Implementation::LoadTriangles(
       {
         unsigned int inputRemappedNormalIndex = values.at(
             *inputs[NORMAL].begin());
-        if ((*normalDupMap).find(inputRemappedNormalIndex) !=
-          (*normalDupMap).end())
+        if (normalDupMap->find(inputRemappedNormalIndex) !=
+          normalDupMap->end())
           inputRemappedNormalIndex = (*normalDupMap)[inputRemappedNormalIndex];
         subMesh->AddNormal((*norms)[inputRemappedNormalIndex]);
         input.normalIndex = inputRemappedNormalIndex;
