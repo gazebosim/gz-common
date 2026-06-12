@@ -338,6 +338,13 @@ namespace gz
 }
 
 /////////////////////////////////////////////////
+// Classic boost::hash_combine. The 0x9e3779b9 term (the golden ratio in
+// 32-bit fixed point) is intentional: it avoids the "zero trap" where an
+// all-zero input (std::hash<double>(0.0) == 0) hashes to 0 regardless of
+// position. Keep it. Benchmarks on large meshes show it has no measurable
+// cost, and replacing this with a stronger mixer (e.g. MurmurHash3/mx3) was
+// measured slightly slower here with no fewer collisions, since mesh loading
+// is dominated by XML parsing rather than hashing.
 void hash_combine(std::size_t &_seed, const double &_v)
 {
   std::hash<double> hasher;
