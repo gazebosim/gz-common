@@ -336,7 +336,7 @@ namespace gz
 void hash_combine(std::size_t &_seed, const double &_v)
 {
   std::hash<double> hasher;
-  _seed ^= hasher(_v) + (_seed << 6) + (_seed >> 2);
+  _seed ^= hasher(_v) + 0x9e3779b9 + (_seed << 6) + (_seed >> 2);
 }
 
 /////////////////////////////////////////////////
