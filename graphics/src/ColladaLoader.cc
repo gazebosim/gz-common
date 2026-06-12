@@ -2184,8 +2184,10 @@ void ColladaLoader::Implementation::LoadPolylist(
   tinyxml2::XMLElement *polylistInputXml =
       _polylistXml->FirstChildElement("input");
 
-  std::shared_ptr<std::vector<gz::math::Vector3d>> verts;
-  std::shared_ptr<std::vector<gz::math::Vector3d>> norms;
+  // Initialize as empty (non-null) so error/early-return paths in the
+  // Load* helpers cannot leave these dangling for the dereferences below.
+  auto verts = std::make_shared<std::vector<gz::math::Vector3d>>();
+  auto norms = std::make_shared<std::vector<gz::math::Vector3d>>();
   std::unordered_map<unsigned int, std::shared_ptr<
     std::vector<gz::math::Vector2d>>> texcoords;
   std::vector<std::pair<unsigned int, unsigned int>> texcoordsOffsetToSet;
@@ -2198,10 +2200,10 @@ void ColladaLoader::Implementation::LoadPolylist(
   // look up table of position/normal/texcoord duplicate indices
   std::unordered_map<unsigned int, std::shared_ptr
     <std::unordered_map<unsigned int, unsigned int>>> texDupMap;
-  std::shared_ptr<std::unordered_map<unsigned int,
-    unsigned int>> normalDupMap;
-  std::shared_ptr<std::unordered_map<unsigned int,
-    unsigned int>> positionDupMap;
+  auto normalDupMap =
+    std::make_shared<std::unordered_map<unsigned int, unsigned int>>();
+  auto positionDupMap =
+    std::make_shared<std::unordered_map<unsigned int, unsigned int>>();
 
   gz::math::Matrix4d bindShapeMat(gz::math::Matrix4d::Identity);
   if (_mesh->HasSkeleton())
@@ -2249,6 +2251,11 @@ void ColladaLoader::Implementation::LoadPolylist(
       if (setStr)
         set = gz::math::parseInt(setStr);
       this->LoadTexCoords(source, texcoords[set], texDupMap[set]);
+      if (!texcoords[set])
+        texcoords[set] = std::make_shared<std::vector<gz::math::Vector2d>>();
+      if (!texDupMap[set])
+        texDupMap[set] =
+          std::make_shared<std::unordered_map<unsigned int, unsigned int>>();
       inputs[TEXCOORD].insert(offsetInt);
       texcoordsOffsetToSet.emplace_back(std::make_pair(offsetInt, set));
     }
@@ -2531,8 +2538,10 @@ void ColladaLoader::Implementation::LoadTriangles(
       _trianglesXml->FirstChildElement("input");
 
 
-  std::shared_ptr<std::vector<gz::math::Vector3d>> verts;
-  std::shared_ptr<std::vector<gz::math::Vector3d>> norms;
+  // Initialize as empty (non-null) so error/early-return paths in the
+  // Load* helpers cannot leave these dangling for the dereferences below.
+  auto verts = std::make_shared<std::vector<gz::math::Vector3d>>();
+  auto norms = std::make_shared<std::vector<gz::math::Vector3d>>();
   std::unordered_map<unsigned int, std::shared_ptr
     <std::vector<gz::math::Vector2d>>> texcoords;
   std::vector<std::pair<unsigned int, unsigned int>> texcoordsOffsetToSet;
@@ -2553,10 +2562,10 @@ void ColladaLoader::Implementation::LoadTriangles(
   // look up table of position/normal/texcoord duplicate indices
   std::unordered_map<unsigned int, std::shared_ptr
     <std::unordered_map<unsigned int, unsigned int>>> texDupMap;
-  std::shared_ptr<std::unordered_map<unsigned int,
-    unsigned int>> normalDupMap;
-  std::shared_ptr<std::unordered_map<unsigned int,
-    unsigned int>> positionDupMap;
+  auto normalDupMap =
+    std::make_shared<std::unordered_map<unsigned int, unsigned int>>();
+  auto positionDupMap =
+    std::make_shared<std::unordered_map<unsigned int, unsigned int>>();
 
 
   while (trianglesInputXml)
@@ -2603,6 +2612,11 @@ void ColladaLoader::Implementation::LoadTriangles(
       if (setStr)
         set = gz::math::parseInt(setStr);
       this->LoadTexCoords(source, texcoords[set], texDupMap[set]);
+      if (!texcoords[set])
+        texcoords[set] = std::make_shared<std::vector<gz::math::Vector2d>>();
+      if (!texDupMap[set])
+        texDupMap[set] =
+          std::make_shared<std::unordered_map<unsigned int, unsigned int>>();
       inputs[TEXCOORD].insert(offsetInt);
       texcoordsOffsetToSet.emplace_back(std::make_pair(offsetInt, set));
       hasTexcoords = true;
@@ -2848,8 +2862,10 @@ void ColladaLoader::Implementation::LoadLines(tinyxml2::XMLElement *_xml,
   // std::string semantic = inputXml->Attribute("semantic");
   std::string source = inputXml->Attribute("source");
 
-  std::shared_ptr<std::vector<gz::math::Vector3d>> verts;
-  std::shared_ptr<std::vector<gz::math::Vector3d>> norms;
+  // Initialize as empty (non-null) so an error/early-return path in
+  // LoadVertices cannot leave these dangling for the dereferences below.
+  auto verts = std::make_shared<std::vector<gz::math::Vector3d>>();
+  auto norms = std::make_shared<std::vector<gz::math::Vector3d>>();
   this->LoadVertices(source, _transform, verts, norms);
 
   tinyxml2::XMLElement *pXml = _xml->FirstChildElement("p");
