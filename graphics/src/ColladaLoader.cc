@@ -2327,10 +2327,8 @@ void ColladaLoader::Implementation::LoadPolylist(
   //   e.g. if vcount = 4, break into triangle 1: [0,1,2], triangle 2: [0,2,3]
   tinyxml2::XMLElement *vcountXml = _polylistXml->FirstChildElement("vcount");
   std::string vcountStr = vcountXml->GetText();
-  std::vector<std::string> vcountStrs = split(vcountStr, " \t\r\n");
-  std::vector<int> vcounts;
-  for (unsigned int j = 0; j < vcountStrs.size(); ++j)
-    vcounts.emplace_back(math::parseInt(vcountStrs[j]));
+  std::vector<unsigned int> vcounts = parseUints(vcountStr,
+      vcountStr.size() / 2);
 
   // read p
   tinyxml2::XMLElement *pXml = _polylistXml->FirstChildElement("p");
@@ -2339,16 +2337,17 @@ void ColladaLoader::Implementation::LoadPolylist(
   // vertexIndexMap is a map of collada vertex index to Gazebo submesh vertex
   // indices, used for identifying vertices that can be shared.
   std::unordered_map<unsigned int, std::vector<GeometryIndices>> vertexIndexMap;
-  unsigned int *values = new unsigned int[inputSize];
-  memset(values, 0, inputSize);
+  std::vector<unsigned int> values(inputSize, 0);
 
-  std::vector<std::string> strs = split(pStr, " \t\r\n");
-  std::vector<std::string>::iterator strs_iter = strs.begin();
+  // Parse the index array directly (avoids ~1 string allocation per index that
+  // split() + parseInt() would incur).
+  std::vector<unsigned int> indices = parseUints(pStr, pStr.size() / 2);
+  std::size_t polyStart = 0;
   for (unsigned int l = 0; l < vcounts.size(); ++l)
   {
     // put us at the beginning of the polygon list
     if (l > 0)
-      strs_iter += inputSize * vcounts[l-1];
+      polyStart += inputSize * vcounts[l-1];
 
     for (unsigned int k = 2; k < static_cast<unsigned int>(vcounts[l]); ++k)
     {
@@ -2369,7 +2368,7 @@ void ColladaLoader::Implementation::LoadPolylist(
 
         for (unsigned int i = 0; i < inputSize; ++i)
         {
-          values[i] = gz::math::parseInt(strs_iter[triangle_index+i]);
+          values[i] = indices[polyStart + triangle_index + i];
         }
 
         unsigned int daeVertIndex = 0;
@@ -2396,12 +2395,12 @@ void ColladaLoader::Implementation::LoadPolylist(
             // the same normal and texcoord index values
             bool toDuplicate = true;
             unsigned int reuseIndex = 0;
-            std::vector<GeometryIndices> inputValues =
+            const std::vector<GeometryIndices> &inputValues =
                 vertexIndexMap[daeVertIndex];
 
             for (unsigned int i = 0; i < inputValues.size(); ++i)
             {
-              GeometryIndices iv = inputValues[i];
+              const GeometryIndices &iv = inputValues[i];
               bool normEqual = false;
               bool texEqual = false;
 
@@ -2439,7 +2438,10 @@ void ColladaLoader::Implementation::LoadPolylist(
                       remappedTexcoordIndex);
                   if (texDupMapSetIt != texDupMapSet.end())
                     remappedTexcoordIndex = texDupMapSetIt->second;
-                  if (iv.texcoordIndex[set] != remappedTexcoordIndex)
+                  auto ivTexIt = iv.texcoordIndex.find(set);
+                  unsigned int ivTexIndex = ivTexIt != iv.texcoordIndex.end() ?
+                      ivTexIt->second : 0u;
+                  if (ivTexIndex != remappedTexcoordIndex)
                   {
                     texEqual = false;
                     break;
@@ -2546,7 +2548,6 @@ void ColladaLoader::Implementation::LoadPolylist(
       }
     }
   }
-  delete [] values;
 
   _mesh->AddSubMesh(std::move(subMesh));
 }
