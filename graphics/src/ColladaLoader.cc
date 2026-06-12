@@ -1629,6 +1629,8 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
 
   std::unordered_map<gz::math::Vector3d,
       unsigned int, Vector3Hash> unique;
+  // Reserve based on the coordinate count to avoid rehashing during insertion.
+  unique.reserve(totCount / stride);
 
   auto values = parseDoubles(valueStr, totCount);
 
@@ -1787,6 +1789,8 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
 
   std::unordered_map<gz::math::Vector3d,
       unsigned int, Vector3Hash> unique;
+  // Reserve based on the coordinate count to avoid rehashing during insertion.
+  unique.reserve(totCount / stride);
 
   std::string valueStr = floatArrayXml->GetText();
   auto values = parseDoubles(valueStr, totCount);
@@ -1948,6 +1952,8 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
 
   std::unordered_map<gz::math::Vector2d,
                      unsigned int, Vector2dHash> unique;
+  // Reserve based on the coordinate count to avoid rehashing during insertion.
+  unique.reserve(totCount / stride);
 
   // Read the raw texture values.
   std::string valueStr = floatArrayXml->GetText();
@@ -2337,6 +2343,8 @@ void ColladaLoader::Implementation::LoadPolylist(
   // vertexIndexMap is a map of collada vertex index to Gazebo submesh vertex
   // indices, used for identifying vertices that can be shared.
   std::unordered_map<unsigned int, std::vector<GeometryIndices>> vertexIndexMap;
+  // Reserve based on the number of positions to avoid rehashing.
+  vertexIndexMap.reserve(verts->size());
   std::vector<unsigned int> values(inputSize, 0);
 
   // Parse the index array directly (avoids ~1 string allocation per index that
@@ -2715,6 +2723,8 @@ void ColladaLoader::Implementation::LoadTriangles(
   // vertexIndexMap is a map of collada vertex index to Gazebo submesh vertex
   // indices, used for identifying vertices that can be shared.
   std::unordered_map<unsigned int, std::vector<GeometryIndices>> vertexIndexMap;
+  // Reserve based on the number of positions to avoid rehashing.
+  vertexIndexMap.reserve(verts->size());
 
   std::vector<unsigned int> values(offsetSize);
   // Parse the index array directly (avoids ~1 string allocation per index that
