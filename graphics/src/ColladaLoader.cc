@@ -1863,20 +1863,31 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
 
     if (count)
     {
-      gzerr << "Normal source missing float_array element, or count is "
-        << "invalid.\n";
+      gzerr << "Texture coordinate source missing float_array element, or "
+        << "count is invalid.\n";
     }
     else
     {
-      gzlog << "Normal source has a float_array with a count of zero. "
-        << "This is likely not desired\n";
+      gzlog << "Texture coordinate source has a float_array with a count of "
+        << "zero. This is likely not desired\n";
     }
 
     return;
   }
   // Read in the total number of texture coordinate values
   else if (floatArrayXml->Attribute("count"))
-    totCount = std::stoi(floatArrayXml->Attribute("count"));
+  {
+    try
+    {
+      totCount = std::stoi(floatArrayXml->Attribute("count"));
+    }
+    catch (...)
+    {
+      gzerr << "Invalid count attribute in texture coordinate <float_array> "
+            << "with id[" << _id << "]\n";
+      return;
+    }
+  }
   else
   {
     gzerr << "<float_array> has no count attribute in texture coordinate "
@@ -1908,7 +1919,16 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
   // a complete texture coordinate.
   if (xml->Attribute("stride"))
   {
-    stride = std::stoi(xml->Attribute("stride"));
+    try
+    {
+      stride = std::stoi(xml->Attribute("stride"));
+    }
+    catch (...)
+    {
+      gzerr << "Invalid stride attribute in texture coordinate <accessor> "
+            << "with id[" << _id << "]\n";
+      return;
+    }
   }
   else
   {
@@ -1919,7 +1939,18 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
 
   // Read in the count of texture coordinates.
   if (xml->Attribute("count"))
-    texCount = std::stoi(xml->Attribute("count"));
+  {
+    try
+    {
+      texCount = std::stoi(xml->Attribute("count"));
+    }
+    catch (...)
+    {
+      gzerr << "Invalid count attribute in texture coordinate <accessor> "
+            << "with id[" << _id << "]\n";
+      return;
+    }
+  }
   else
   {
     gzerr << "<accessor> has no count attribute in texture coordinate element "
