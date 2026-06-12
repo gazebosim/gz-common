@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset>
+    <up_axis>Z_UP</up_axis>
+  </asset>
+  <library_geometries>
+    <geometry id="g-mesh" name="g">
+      <mesh>
+        <source id="g-mesh-positions">
+          <float_array id="g-mesh-positions-array" count="9">0 0 0 1 0 0 0 1 0</float_array>
+          <technique_common>
+            <accessor source="#g-mesh-positions-array" count="3" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="g-mesh-map">
+          <!-- malformed: accessor count*stride (2*2=4) != float_array count (6) -->
+          <float_array id="g-mesh-map-array" count="6">0 0 1 0 0 1</float_array>
+          <technique_common>
+            <accessor source="#g-mesh-map-array" count="2" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="g-mesh-vertices">
+          <input semantic="POSITION" source="#g-mesh-positions"/>
+        </vertices>
+        <triangles count="0">
+          <input semantic="VERTEX" source="#g-mesh-vertices" offset="0"/>
+          <input semantic="TEXCOORD" source="#g-mesh-map" offset="1" set="0"/>
+        </triangles>
+      </mesh>
+    </geometry>
+  </library_geometries>
+  <library_visual_scenes>
+    <visual_scene id="Scene" name="Scene">
+      <node id="g" name="g" type="NODE">
+        <instance_geometry url="#g-mesh"/>
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#Scene"/>
+  </scene>
+</COLLADA>
