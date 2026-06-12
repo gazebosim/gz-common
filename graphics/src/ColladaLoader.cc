@@ -385,6 +385,32 @@ std::vector<double> parseDoubles(const std::string &_str, size_t _reserveCount)
 }
 
 /////////////////////////////////////////////////
+/// \brief Parse a whitespace-delimited list of unsigned integers from a
+/// string. Parsing stops at the first non-numeric token. This avoids the
+/// per-token std::string allocations that split() + parseInt() incur on the
+/// large index (<p>) arrays.
+/// \param[in] _str Text to parse. Must be null-terminated (std::string is).
+/// \param[in] _reserveCount Number of values to reserve space for up front.
+/// \return The parsed values.
+std::vector<unsigned int> parseUints(const std::string &_str,
+    size_t _reserveCount)
+{
+  std::vector<unsigned int> result;
+  result.reserve(_reserveCount);
+  const char *start = _str.c_str();
+  char *end{};
+  while (true)
+  {
+    unsigned long v = std::strtoul(start, &end, 10);
+    if (start == end)
+      break;
+    start = end;
+    result.emplace_back(static_cast<unsigned int>(v));
+  }
+  return result;
+}
+
+/////////////////////////////////////////////////
 struct Vector3Hash
 {
   std::size_t operator()(const gz::math::Vector3d &_v) const
@@ -2730,12 +2756,14 @@ void ColladaLoader::Implementation::LoadTriangles(
   std::unordered_map<unsigned int, std::vector<GeometryIndices>> vertexIndexMap;
 
   std::vector<unsigned int> values(offsetSize);
-  std::vector<std::string> strs = split(pStr, " \t\r\n");
+  // Parse the index array directly (avoids ~1 string allocation per index that
+  // split() + parseInt() would incur). Rough reserve: ~2 chars per token.
+  std::vector<unsigned int> indices = parseUints(pStr, pStr.size() / 2);
 
-  for (unsigned int j = 0; j < strs.size(); j += offsetSize)
+  for (unsigned int j = 0; j + offsetSize <= indices.size(); j += offsetSize)
   {
     for (unsigned int i = 0; i < offsetSize; ++i)
-      values.at(i) = gz::math::parseInt(strs[j+i]);
+      values[i] = indices[j+i];
 
     unsigned int daeVertIndex = 0;
     bool addIndex = !hasVertices;
@@ -2761,11 +2789,12 @@ void ColladaLoader::Implementation::LoadTriangles(
         // same normal and texcoord index values
         bool toDuplicate = true;
         unsigned int reuseIndex = 0;
-        std::vector<GeometryIndices> inputValues = vertexIndexMap[daeVertIndex];
+        const std::vector<GeometryIndices> &inputValues =
+            vertexIndexMap[daeVertIndex];
 
         for (unsigned int i = 0; i < inputValues.size(); ++i)
         {
-          GeometryIndices iv = inputValues[i];
+          const GeometryIndices &iv = inputValues[i];
           bool normEqual = false;
           bool texEqual = false;
           if (hasNormals)
@@ -2800,7 +2829,10 @@ void ColladaLoader::Implementation::LoadTriangles(
               if (texDupMapSetIt != texDupMapSet.end())
                 remappedTexcoordIndex = texDupMapSetIt->second;
 
-              if (iv.texcoordIndex[set] != remappedTexcoordIndex)
+              auto ivTexIt = iv.texcoordIndex.find(set);
+              unsigned int ivTexIndex =
+                  ivTexIt != iv.texcoordIndex.end() ? ivTexIt->second : 0u;
+              if (ivTexIndex != remappedTexcoordIndex)
               {
                 texEqual = false;
                 break;
