@@ -1756,7 +1756,6 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
       unsigned int, Vector3Hash> unique;
 
   std::string valueStr = floatArrayXml->GetText();
-  // std::istringstream iss(valueStr);
   auto values = parseDoubles(valueStr, totCount);
 
   gz::math::Vector3d vec;
