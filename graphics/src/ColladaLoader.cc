@@ -475,15 +475,24 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
 
   this->dataPtr->filename = _filename;
   if (xmlDoc.LoadFile(_filename.c_str()) != tinyxml2::XML_SUCCESS)
+  {
     gzerr << "Unable to load collada file[" << _filename << "]\n";
+    return nullptr;
+  }
 
   this->dataPtr->colladaXml = xmlDoc.FirstChildElement("COLLADA");
   if (!this->dataPtr->colladaXml)
+  {
     gzerr << "Missing COLLADA tag\n";
+    return nullptr;
+  }
 
-  if (std::string(this->dataPtr->colladaXml->Attribute("version")) != "1.4.0" &&
-      std::string(this->dataPtr->colladaXml->Attribute("version")) != "1.4.1")
+  const char *version = this->dataPtr->colladaXml->Attribute("version");
+  if (!version ||
+      (std::string(version) != "1.4.0" && std::string(version) != "1.4.1"))
+  {
     gzerr << "Invalid collada file. Must be version 1.4.0 or 1.4.1\n";
+  }
 
   tinyxml2::XMLElement *assetXml =
       this->dataPtr->colladaXml->FirstChildElement("asset");
