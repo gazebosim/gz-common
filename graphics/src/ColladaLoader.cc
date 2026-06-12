@@ -1490,7 +1490,18 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
   }
   // Read in the total number of position coordinate values
   else if (floatArrayXml->Attribute("count"))
-    totCount = std::stoi(floatArrayXml->Attribute("count"));
+  {
+    try
+    {
+      totCount = std::stoi(floatArrayXml->Attribute("count"));
+    }
+    catch (...)
+    {
+      gzerr << "Invalid count attribute in position <float_array> with id["
+            << _id << "]\n";
+      return;
+    }
+  }
   else
   {
     gzerr << "<float_array> has no count attribute in position coordinate "
@@ -1520,7 +1531,16 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
   // a complete texture coordinate.
   if (sourceXml->Attribute("stride"))
   {
-    stride = std::stoi(sourceXml->Attribute("stride"));
+    try
+    {
+      stride = std::stoi(sourceXml->Attribute("stride"));
+    }
+    catch (...)
+    {
+      gzerr << "Invalid stride attribute in position <accessor> with id["
+            << _id << "]\n";
+      return;
+    }
   }
   else
   {
@@ -1554,7 +1574,11 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
         break;
       start = end;
       if (errno == ERANGE)
-        throw std::runtime_error("strtod() overflow");
+      {
+        gzerr << "Overflow while parsing <float_array>; truncating after "
+              << result.size() << " value(s).\n";
+        break;
+      }
       result.emplace_back(d);
     }
     return result;
@@ -1651,7 +1675,18 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
   }
   // Read in the total number of normal coordinate values
   else if (floatArrayXml->Attribute("count"))
-    totCount = std::stoi(floatArrayXml->Attribute("count"));
+  {
+    try
+    {
+      totCount = std::stoi(floatArrayXml->Attribute("count"));
+    }
+    catch (...)
+    {
+      gzerr << "Invalid count attribute in normal <float_array> with id["
+            << _id << "]\n";
+      return;
+    }
+  }
   else
   {
     gzerr << "<float_array> has no count attribute in normal coordinate "
@@ -1681,7 +1716,16 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
   // a complete normal coordinate.
   if (normalsXml->Attribute("stride"))
   {
-    stride = std::stoi(normalsXml->Attribute("stride"));
+    try
+    {
+      stride = std::stoi(normalsXml->Attribute("stride"));
+    }
+    catch (...)
+    {
+      gzerr << "Invalid stride attribute in normal <accessor> with id["
+            << _id << "]\n";
+      return;
+    }
   }
   else
   {
@@ -1716,7 +1760,11 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
         break;
       start = end;
       if (errno == ERANGE)
-        throw std::runtime_error("strtod() overflow");
+      {
+        gzerr << "Overflow while parsing <float_array>; truncating after "
+              << result.size() << " value(s).\n";
+        break;
+      }
       result.emplace_back(d);
     }
     return result;
@@ -1899,7 +1947,11 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
         break;
       start = end;
       if (errno == ERANGE)
-        throw std::runtime_error("strtod() overflow");
+      {
+        gzerr << "Overflow while parsing <float_array>; truncating after "
+              << result.size() << " value(s).\n";
+        break;
+      }
       result.emplace_back(d);
     }
     return result;
