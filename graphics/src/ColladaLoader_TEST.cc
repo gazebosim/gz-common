@@ -522,3 +522,104 @@ TEST_F(ColladaLoader, NoAnimName)
   EXPECT_EQ(animName, "animation1");
   delete mesh;
 }
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadLines)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "box_lines.dae"));
+  ASSERT_TRUE(mesh);
+
+  // 4 line segments, each contributes 2 vertices and 2 indices.
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(8u, mesh->VertexCount());
+  EXPECT_EQ(8u, mesh->IndexCount());
+
+  auto subMesh = mesh->SubMeshByIndex(0u).lock();
+  ASSERT_NE(nullptr, subMesh);
+  EXPECT_EQ(common::SubMesh::LINES, subMesh->SubMeshPrimitiveType());
+  delete mesh;
+}
+
+/////////////////////////////////////////////////
+// A malformed <float_array> (missing count attribute) must be reported and
+// must not crash the loader.
+TEST_F(ColladaLoader, LoadMalformedPositionNoCount)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "malformed_position_no_count.dae"));
+  ASSERT_TRUE(mesh);
+#ifndef _WIN32
+  EXPECT_NE(LogContent().find("no count attribute in position"),
+      std::string::npos);
+#endif
+  delete mesh;
+}
+
+/////////////////////////////////////////////////
+// A non-numeric count attribute must be caught (not throw) and reported.
+TEST_F(ColladaLoader, LoadMalformedPositionBadCount)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "malformed_position_bad_count.dae"));
+  ASSERT_TRUE(mesh);
+#ifndef _WIN32
+  EXPECT_NE(LogContent().find("Invalid count attribute in position"),
+      std::string::npos);
+#endif
+  delete mesh;
+}
+
+/////////////////////////////////////////////////
+// A missing accessor stride attribute must be reported and must not crash.
+TEST_F(ColladaLoader, LoadMalformedPositionNoStride)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "malformed_position_no_stride.dae"));
+  ASSERT_TRUE(mesh);
+#ifndef _WIN32
+  EXPECT_NE(LogContent().find("no stride attribute in position"),
+      std::string::npos);
+#endif
+  delete mesh;
+}
+
+/////////////////////////////////////////////////
+// An overflowing float value must be handled gracefully (not throw).
+TEST_F(ColladaLoader, LoadMalformedPositionOverflow)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "malformed_position_overflow.dae"));
+  ASSERT_TRUE(mesh);
+#ifndef _WIN32
+  EXPECT_NE(LogContent().find("Overflow while parsing <float_array>"),
+      std::string::npos);
+#endif
+  delete mesh;
+}
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadTextureMaterial)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "box_texture.dae"));
+  ASSERT_TRUE(mesh);
+
+  EXPECT_EQ(3u, mesh->VertexCount());
+  EXPECT_EQ(3u, mesh->TexCoordCount());
+  ASSERT_EQ(1u, mesh->MaterialCount());
+
+  common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+  ASSERT_NE(nullptr, mat);
+
+  // The diffuse texture chain should have been resolved and stored.
+  EXPECT_FALSE(mat->TextureImage().empty());
+  EXPECT_NE(mat->TextureImage().find("box_texture.png"), std::string::npos);
+  delete mesh;
+}
