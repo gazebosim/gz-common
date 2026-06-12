@@ -340,6 +340,39 @@ void hash_combine(std::size_t &_seed, const double &_v)
 }
 
 /////////////////////////////////////////////////
+/// \brief Parse a whitespace-delimited list of doubles from a string.
+/// Parsing stops at the first non-numeric token or on overflow.
+/// \param[in] _str Text to parse. Must be null-terminated (std::string is).
+/// \param[in] _reserveCount Number of values to reserve space for up front.
+/// \return The parsed values.
+std::vector<double> parseDoubles(const std::string &_str, size_t _reserveCount)
+{
+  std::vector<double> result;
+  // Preallocate memory based on the known count.
+  result.reserve(_reserveCount);
+  const char *start = _str.c_str();
+  char *end{};
+  while (true)
+  {
+    // Reset errno so a stale ERANGE set by earlier code is not misread as
+    // an overflow from this call.
+    errno = 0;
+    double d = std::strtod(start, &end);
+    if (start == end)
+      break;
+    start = end;
+    if (errno == ERANGE)
+    {
+      gzerr << "Overflow while parsing <float_array>; truncating after "
+            << result.size() << " value(s).\n";
+      break;
+    }
+    result.emplace_back(d);
+  }
+  return result;
+}
+
+/////////////////////////////////////////////////
 struct Vector3Hash
 {
   std::size_t operator()(const gz::math::Vector3d &_v) const
@@ -1559,35 +1592,7 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
   std::unordered_map<gz::math::Vector3d,
       unsigned int, Vector3Hash> unique;
 
-  auto toDoubleVec = [](std::string_view sv, size_t totalCount)
-  {
-    std::vector<double> result;
-    // Preallocate memory based on known count. totalCount is the number of
-    // float values declared by the <float_array> count attribute.
-    result.reserve(totalCount);
-    const char *start = sv.data();
-    char *end{};
-    while (true)
-    {
-      // Reset errno so a stale ERANGE set by earlier code is not misread as
-      // an overflow from this call.
-      errno = 0;
-      double d = std::strtod(start, &end);
-      if (start == end)
-        break;
-      start = end;
-      if (errno == ERANGE)
-      {
-        gzerr << "Overflow while parsing <float_array>; truncating after "
-              << result.size() << " value(s).\n";
-        break;
-      }
-      result.emplace_back(d);
-    }
-    return result;
-  };
-
-  auto values = toDoubleVec(valueStr, totCount);
+  auto values = parseDoubles(valueStr, totCount);
 
   gz::math::Vector3d vec;
   if (!_values)
@@ -1748,35 +1753,7 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
   std::string valueStr = floatArrayXml->GetText();
   // std::istringstream iss(valueStr);
 
-  auto toDoubleVec = [](std::string_view sv, size_t totalCount)
-  {
-    std::vector<double> result;
-    // Preallocate memory based on known count. totalCount is the number of
-    // float values declared by the <float_array> count attribute.
-    result.reserve(totalCount);
-    const char *start = sv.data();
-    char *end{};
-    while (true)
-    {
-      // Reset errno so a stale ERANGE set by earlier code is not misread as
-      // an overflow from this call.
-      errno = 0;
-      double d = std::strtod(start, &end);
-      if (start == end)
-        break;
-      start = end;
-      if (errno == ERANGE)
-      {
-        gzerr << "Overflow while parsing <float_array>; truncating after "
-              << result.size() << " value(s).\n";
-        break;
-      }
-      result.emplace_back(d);
-    }
-    return result;
-  };
-
-  auto values = toDoubleVec(valueStr, totCount);
+  auto values = parseDoubles(valueStr, totCount);
 
   gz::math::Vector3d vec;
   if (!_values)
@@ -1934,41 +1911,11 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
     return;
 
   std::unordered_map<gz::math::Vector2d,
-                     unsigned int, Vector2dHash>
-      unique;
+                     unsigned int, Vector2dHash> unique;
 
-
-  auto toDoubleVec = [](std::string_view sv, size_t totalCount)
-  {
-    std::vector<double> result;
-    // Preallocate memory based on known count. totalCount is the number of
-    // float values declared by the <float_array> count attribute.
-    result.reserve(totalCount);
-    const char *start = sv.data();
-    char *end{};
-    while (true)
-    {
-      // Reset errno so a stale ERANGE set by earlier code is not misread as
-      // an overflow from this call.
-      errno = 0;
-      double d = std::strtod(start, &end);
-      if (start == end)
-        break;
-      start = end;
-      if (errno == ERANGE)
-      {
-        gzerr << "Overflow while parsing <float_array>; truncating after "
-              << result.size() << " value(s).\n";
-        break;
-      }
-      result.emplace_back(d);
-    }
-    return result;
-  };
-
-  // Read the raw texture values, and split them on spaces.
+  // Read the raw texture values.
   std::string valueStr = floatArrayXml->GetText();
-  auto values = toDoubleVec(valueStr, totCount);
+  auto values = parseDoubles(valueStr, totCount);
 
   gz::math::Vector2d vec;
   if (!_values)
