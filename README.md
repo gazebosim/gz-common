@@ -12,7 +12,7 @@ Build | Status
 Test coverage | [![codecov](https://codecov.io/gh/gazebosim/gz-common/tree/gz-common5/graph/badge.svg)](https://codecov.io/gh/gazebosim/gz-common/tree/gz-common5)
 Ubuntu Jammy  | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=gz_common-ci-gz-common5-jammy-amd64)](https://build.osrfoundation.org/job/gz_common-ci-gz-common5-jammy-amd64)
 Homebrew      | [![Build Status](https://build.osrfoundation.org/buildStatus/icon?job=gz_common-ci-gz-common5-homebrew-amd64)](https://build.osrfoundation.org/job/gz_common-ci-gz-common5-homebrew-amd64)
-Windows       | [![Build Status](https://build.osrfoundation.org/job/gz_common-5-win/badge/icon)](https://build.osrfoundation.org/job/gz_common-5-win/)
+Windows       | [![Build Status](https://build.osrfoundation.org/job/gz_common-5-clowin/badge/icon)](https://build.osrfoundation.org/job/gz_common-5-clowin/)
 
 Gazebo Common, a component of [Gazebo](https://gazebosim.org), provides a set of libraries that
 cover many different use cases. An audio-visual library supports

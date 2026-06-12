@@ -17,6 +17,7 @@
 #ifndef GZ_COMMON_TESTING_DETAIL_AUTOLOGFIXTURE_HH_
 #define GZ_COMMON_TESTING_DETAIL_AUTOLOGFIXTURE_HH_
 
+#include <algorithm>
 #include <memory>
 #include <string>
 
@@ -69,6 +70,8 @@ AutoLogFixture::~AutoLogFixture()
 //////////////////////////////////////////////////
 void AutoLogFixture::SetUp()
 {
+  gz::common::Console::SetVerbosity(4);
+
   const ::testing::TestInfo *const testInfo =
     ::testing::UnitTest::GetInstance()->current_test_info();
 
@@ -97,8 +100,6 @@ void AutoLogFixture::SetUp()
   this->dataPtr->logDirectory = gzLogDirectory();
   ASSERT_FALSE(this->dataPtr->logDirectory.empty());
   ASSERT_TRUE(gz::common::exists(this->dataPtr->logDirectory));
-
-  gz::common::Console::SetVerbosity(4);
 }
 
 //////////////////////////////////////////////////

@@ -15,6 +15,7 @@
  *
 */
 #include <fstream>
+#include <string>
 
 #include <gtest/gtest.h>
 
@@ -33,6 +34,10 @@ const std::string kTestDataGazeboBmp =  // NOLINT(*)
     common::testing::TestFile("data", "gazebo_logo.bmp");
 const std::string kTestData =  // NOLINT(*)
     common::testing::TestFile("data", "red_blue_colors.png");
+const std::string kTestDataRGB16 =  // NOLINT(*)
+    common::testing::TestFile("data", "rgb_16bit.png");
+const std::string kTestDataRGBA16 =  // NOLINT(*)
+    common::testing::TestFile("data", "rgba_16bit.png");
 
 const auto kWidth = 121u;
 const auto kHeight = 81u;
@@ -725,6 +730,192 @@ TEST_F(ImageTest, Grayscale)
     EXPECT_NEAR(maxColor.R(), img.MaxColor().R(), 1e-3);
     EXPECT_NEAR(maxColor.G(), img.MaxColor().G(), 1e-3);
     EXPECT_NEAR(maxColor.B(), img.MaxColor().B(), 1e-3);
+  }
+}
+
+
+/////////////////////////////////////////////////
+TEST_F(ImageTest, Color16bit)
+{
+  {
+    common::Image img;
+    std::string fileName = common::testing::TestFile("data",
+        "rgb_16bit.png");
+    EXPECT_EQ(0, img.Load(fileName));
+    const unsigned int width = 4u;
+    const unsigned int height = 4u;
+    const unsigned int channels = 3u;
+    const unsigned int bpp = channels * 16u;
+    EXPECT_TRUE(img.Valid());
+    EXPECT_EQ(width, img.Width());
+    EXPECT_EQ(height, img.Height());
+    EXPECT_EQ(bpp, img.BPP());
+    EXPECT_EQ(width * bpp / 8u, img.Pitch());
+    EXPECT_EQ(common::Image::PixelFormatType::RGB_INT16, img.PixelFormat());
+    math::Color maxColor(0.0f, 0.0f, 0.847f);
+    EXPECT_NEAR(maxColor.R(), img.MaxColor().R(), 1e-3);
+    EXPECT_NEAR(maxColor.G(), img.MaxColor().G(), 1e-3);
+    EXPECT_NEAR(maxColor.B(), img.MaxColor().B(), 1e-3);
+    math::Color pixelWithMaxColor = img.Pixel(3, 1);
+    EXPECT_NEAR(maxColor.R(), pixelWithMaxColor.R(), 1e-3);
+    EXPECT_NEAR(maxColor.G(), pixelWithMaxColor.G(), 1e-3);
+    EXPECT_NEAR(maxColor.B(), pixelWithMaxColor.B(), 1e-3);
+  }
+  {
+    common::Image img;
+    std::string fileName = common::testing::TestFile("data",
+        "rgba_16bit.png");
+    EXPECT_EQ(0, img.Load(fileName));
+    const unsigned int width = 4u;
+    const unsigned int height = 4u;
+    const unsigned int channels = 4u;
+    const unsigned int bpp = channels * 16u;
+    EXPECT_TRUE(img.Valid());
+    EXPECT_EQ(width, img.Width());
+    EXPECT_EQ(height, img.Height());
+    EXPECT_EQ(bpp, img.BPP());
+    EXPECT_EQ(width * bpp / 8u, img.Pitch());
+    math::Color maxColor(0.0f, 0.0f, 0.847f, 0.5f);
+    EXPECT_NEAR(maxColor.R(), img.MaxColor().R(), 1e-3);
+    EXPECT_NEAR(maxColor.G(), img.MaxColor().G(), 1e-3);
+    EXPECT_NEAR(maxColor.B(), img.MaxColor().B(), 1e-3);
+    EXPECT_NEAR(maxColor.A(), img.MaxColor().A(), 1e-3);
+    math::Color pixelWithMaxColor = img.Pixel(3, 1);
+    EXPECT_NEAR(maxColor.R(), pixelWithMaxColor.R(), 1e-3);
+    EXPECT_NEAR(maxColor.G(), pixelWithMaxColor.G(), 1e-3);
+    EXPECT_NEAR(maxColor.B(), pixelWithMaxColor.B(), 1e-3);
+    EXPECT_NEAR(maxColor.A(), pixelWithMaxColor.A(), 1e-3);
+  }
+}
+
+/////////////////////////////////////////////////
+TEST_F(ImageTest, ChannelData)
+{
+  // load image, extract data from each channel and verify values
+  common::Image img;
+  ASSERT_EQ(0, img.Load(kTestData));
+  ASSERT_TRUE(img.Valid());
+
+  std::vector<unsigned char> red =
+      img.ChannelData(common::Image::Channel::RED);
+  std::vector<unsigned char> green =
+      img.ChannelData(common::Image::Channel::GREEN);
+  std::vector<unsigned char> blue =
+      img.ChannelData(common::Image::Channel::BLUE);
+  std::vector<unsigned char> alpha =
+      img.ChannelData(common::Image::Channel::ALPHA);
+
+  EXPECT_FALSE(red.empty());
+  ASSERT_EQ(img.Width() * img.Height(), red.size());
+  ASSERT_EQ(red.size(), green.size());
+  ASSERT_EQ(red.size(), blue.size());
+  ASSERT_EQ(red.size(), alpha.size());
+
+  for (auto i = 0u; i < img.Height(); ++i)
+  {
+    for (auto j = 0u; j < img.Width(); ++j)
+    {
+      unsigned int idx = i * img.Width() + j;
+      unsigned int r = red[idx];
+      unsigned int g = green[idx];
+      unsigned int b = blue[idx];
+      unsigned int a = alpha[idx];
+
+      ASSERT_EQ(0u, g);
+      ASSERT_EQ(255u, a);
+      if (j < 80)
+      {
+        ASSERT_EQ(255u, r);
+        ASSERT_EQ(0u, b);
+      }
+      else
+      {
+        ASSERT_EQ(0u, r);
+        ASSERT_EQ(255u, b);
+      }
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+TEST_F(ImageTest, ChannelData16bit)
+{
+  {
+    // load load 16 bit RGBA image
+    // extract data from each channel and verify values
+    common::Image img;
+    ASSERT_EQ(0, img.Load(kTestDataRGBA16));
+    ASSERT_TRUE(img.Valid());
+
+    std::vector<unsigned char> red =
+        img.ChannelData(common::Image::Channel::RED);
+    std::vector<unsigned char> green =
+        img.ChannelData(common::Image::Channel::GREEN);
+    std::vector<unsigned char> blue =
+        img.ChannelData(common::Image::Channel::BLUE);
+    std::vector<unsigned char> alpha =
+        img.ChannelData(common::Image::Channel::ALPHA);
+
+    EXPECT_FALSE(red.empty());
+    ASSERT_EQ(img.Width() * img.Height(), red.size());
+    ASSERT_EQ(red.size(), green.size());
+    ASSERT_EQ(red.size(), blue.size());
+    ASSERT_EQ(red.size(), alpha.size());
+
+    for (auto i = 0u; i < img.Height(); ++i)
+    {
+      for (auto j = 0u; j < img.Width(); ++j)
+      {
+        unsigned int idx = i * img.Width() + j;
+        unsigned int r = red[idx];
+        unsigned int g = green[idx];
+        unsigned int b = blue[idx];
+        unsigned int a = alpha[idx];
+
+        EXPECT_EQ(0u, r);
+        EXPECT_EQ(0u, g);
+        EXPECT_LT(0u, b);
+        EXPECT_EQ(128u, a);
+      }
+    }
+  }
+
+  {
+    // load 16 bit RGB image (no alpha channel)
+    // extra data from each channel and verify values
+    common::Image img;
+    ASSERT_EQ(0, img.Load(kTestDataRGB16));
+    ASSERT_TRUE(img.Valid());
+
+    std::vector<unsigned char> red =
+        img.ChannelData(common::Image::Channel::RED);
+    std::vector<unsigned char> green =
+        img.ChannelData(common::Image::Channel::GREEN);
+    std::vector<unsigned char> blue =
+        img.ChannelData(common::Image::Channel::BLUE);
+    std::vector<unsigned char> alpha =
+        img.ChannelData(common::Image::Channel::ALPHA);
+
+    EXPECT_FALSE(red.empty());
+    ASSERT_EQ(img.Width() * img.Height(), red.size());
+    ASSERT_EQ(red.size(), green.size());
+    ASSERT_EQ(red.size(), blue.size());
+    ASSERT_EQ(0u, alpha.size());
+
+    for (auto i = 0u; i < img.Height(); ++i)
+    {
+      for (auto j = 0u; j < img.Width(); ++j)
+      {
+        unsigned int idx = i * img.Width() + j;
+        unsigned int r = red[idx];
+        unsigned int g = green[idx];
+        unsigned int b = blue[idx];
+
+        EXPECT_EQ(0u, r);
+        EXPECT_EQ(0u, g);
+        EXPECT_LT(0u, b);
+      }
+    }
   }
 }
 

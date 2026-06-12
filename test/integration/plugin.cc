@@ -40,9 +40,28 @@ GZ_UTILS_WARN_IGNORE__DEPRECATED_DECLARATION
 #include "ignition/common/PluginPtr.hh"
 #include "ignition/common/SpecializedPluginPtr.hh"
 
+// Detect AddressSanitizer so we can adjust only the tests that are
+// incompatible with ASan's ODR checks, without disabling them globally.
+#if defined(__has_feature)
+#  if __has_feature(address_sanitizer)
+#    define GZ_TESTS_ASAN_ENABLED 1
+#  endif
+#endif
+
+#if !defined(GZ_TESTS_ASAN_ENABLED) && defined(__SANITIZE_ADDRESS__)
+#  define GZ_TESTS_ASAN_ENABLED 1
+#endif
+
 /////////////////////////////////////////////////
 TEST(PluginLoader, LoadBadPlugins)
 {
+#if defined(GZ_TESTS_ASAN_ENABLED)
+  // Loading multiple mock plugins with different API versions can trigger
+  // legitimate ASan ODR violations. Under ASan, skip this test so that
+  // ODR checks remain enabled for the rest of the plugin tests.
+  GTEST_SKIP() << "PluginLoader.LoadBadPlugins is skipped under ASan due to "
+                  "expected ODR violations in intentionally bad plugins.";
+#endif
   std::string dummyPath =
     gz::common::copyFromUnixPath(GZ_DUMMY_PLUGIN_PATH);
 

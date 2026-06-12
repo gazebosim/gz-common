@@ -411,6 +411,10 @@ namespace gz
       /// the primitive type is not TRIANGLES, or there are no triangles.
       public: double Volume() const;
 
+      /// \brief Verify that all indices point to a valid vertex in the submesh
+      /// \return True if all values of indices are valid, false otherwise.
+      public: bool HasValidIndices() const;
+
       /// \brief Private data pointer.
       GZ_UTILS_IMPL_PTR(dataPtr)
     };

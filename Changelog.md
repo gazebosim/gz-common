@@ -1,5 +1,86 @@
 ## Gazebo Common 5.x
 
+### Gazebo Common 5.8.0 (2026-01-28)
+
+1. Add functions for clearing FindFile* callbacks
+    * [Pull request #754](https://github.com/gazebosim/gz-common/pull/754)
+
+1. TempDirectory: improve windows reliability
+    * [Pull request #744](https://github.com/gazebosim/gz-common/pull/744)
+
+1. Fix deprecation warnings on including gts headers on macOS
+    * [Pull request #739](https://github.com/gazebosim/gz-common/pull/739)
+
+1. Fix Image::ChannelData for 16 bit RGB[A] images
+    * [Pull request #720](https://github.com/gazebosim/gz-common/pull/720)
+
+1. Add function for extracting single channel data from an RGB[A] image
+    * [Pull request #706](https://github.com/gazebosim/gz-common/pull/706)
+
+1. Add missing includes
+    * [Pull request #660](https://github.com/gazebosim/gz-common/pull/660)
+
+1. Support reading pixel values from color 16 bit images
+    * [Pull request #699](https://github.com/gazebosim/gz-common/pull/699)
+
+1. Add support for custom profiler
+    * [Pull request #682](https://github.com/gazebosim/gz-common/pull/682)
+
+1. Check valid indices before doing convex decomposition
+    * [Pull request #677](https://github.com/gazebosim/gz-common/pull/677)
+
+1. Add check for valid indices in submesh
+    * [Pull request #667](https://github.com/gazebosim/gz-common/pull/667)
+
+### Gazebo Common 5.7.1 (2025-01-30)
+
+1. Add include <chrono> for system_clock in Event.hh
+    * [Pull request #655](https://github.com/gazebosim/gz-common/pull/655)
+
+1. Check normal presence before trying to read asMesh normals
+    * [Pull request #654](https://github.com/gazebosim/gz-common/pull/654)
+
+1. Remove Conda Windows warnings
+    * [Pull request #652](https://github.com/gazebosim/gz-common/pull/652)
+
+## Gazebo Common 5.7.0 (2024-11-08)
+
+1. Fix loading lightmaps from gltf / glb meshes (#630)
+    * [Pull request #630) (#646](https://github.com/gazebosim/gz-common/pull/630) (#646)
+
+1. Fix AssimpLoader collada texture coordinates
+    * [Pull request #634](https://github.com/gazebosim/gz-common/pull/634)
+
+1. Remove debug logging introduced accidentally in PR review
+    * [Pull request #622](https://github.com/gazebosim/gz-common/pull/622)
+
+1. Fix crash when calling absPath with empty input
+    * [Pull request #620](https://github.com/gazebosim/gz-common/pull/620)
+
+1. DEM: Add support for GDAL vsicurl, vsizip support and avoid segfaults with huge VRT datasets
+    * [Pull request #597](https://github.com/gazebosim/gz-common/pull/597)
+
+1. SubMesh::RecalculateNormals improvement
+    * [Pull request #609](https://github.com/gazebosim/gz-common/pull/609)
+
+1. fix data race tsan issue
+    * [Pull request #612](https://github.com/gazebosim/gz-common/pull/612)
+
+1. Generate a more unique texture name for glb embedded textures
+    * [Pull request #606](https://github.com/gazebosim/gz-common/pull/606)
+
+1. Add package.xml
+    * [Pull request #587](https://github.com/gazebosim/gz-common/pull/587)
+
+1. Fix deprecation warnings
+    * [Pull request #603](https://github.com/gazebosim/gz-common/pull/603)
+
+1. Fix macOS workflow and update on-push branches
+    * [Pull request #602](https://github.com/gazebosim/gz-common/pull/602)
+
+1. Fix compatibility with FFmpeg5.0
+    * [Pull request #581](https://github.com/gazebosim/gz-common/pull/581)
+
 ## Gazebo Common 5.6.0 (2024-04-23)
 
 1. Clarify units for the DEM classes

@@ -776,7 +776,7 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
         ret = this->dataPtr->ProcessPacket(avPacket);
     }
 
-    av_packet_unref(avPacket);
+    av_packet_free(&avPacket);
   }
   return ret >= 0 || ret == AVERROR(EAGAIN);
 }

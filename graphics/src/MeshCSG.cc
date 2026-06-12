@@ -15,7 +15,17 @@
  *
  */
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-W#pragma-messages"
+// Including gts causes deprecation warnings on certain versions of macOS.
+// Newer versions of Gazebo do not depend on gts, so we'll simply
+// suppress the warning here instead of a more long term solution.
+#endif
 #include <gts.h>
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 #include <string>
 

@@ -614,3 +614,37 @@ TEST_F(SubMeshTest, NormalsRecalculation)
   // because of neighbour vertex
   ASSERT_NE(submesh->Normal(0), submesh->Normal(1));
 }
+
+/////////////////////////////////////////////////
+TEST_F(SubMeshTest, HasValidIndices)
+{
+  // Check empty submesh
+  auto submesh = std::make_shared<common::SubMesh>();
+  EXPECT_FALSE(submesh->HasValidIndices());
+
+  // Check box submesh
+  const common::Mesh *unitBox =
+    common::MeshManager::Instance()->MeshByName("unit_box");
+  ASSERT_TRUE(unitBox != nullptr);
+  auto unitBoxSubmesh = unitBox->SubMeshByIndex(0).lock();
+
+  // Submesh has valid indices and we should be able to calculate normals
+  // and volume
+  EXPECT_TRUE(unitBoxSubmesh->HasValidIndices());
+  unitBoxSubmesh->RecalculateNormals();
+  ASSERT_EQ(unitBoxSubmesh->VertexCount(), unitBoxSubmesh->NormalCount());
+  EXPECT_EQ(24u, unitBoxSubmesh->NormalCount());
+  EXPECT_DOUBLE_EQ(1.0, unitBoxSubmesh->Volume());
+
+  // Add some invalid indices
+  unitBoxSubmesh->AddIndex(100);
+  unitBoxSubmesh->AddIndex(101);
+  unitBoxSubmesh->AddIndex(102);
+
+  // Submesh has invalid indices so it is no longer able to update normals or
+  // compute volume.
+  EXPECT_FALSE(unitBoxSubmesh->HasValidIndices());
+  unitBoxSubmesh->RecalculateNormals();
+  EXPECT_EQ(24u, unitBoxSubmesh->NormalCount());
+  EXPECT_DOUBLE_EQ(0.0, unitBoxSubmesh->Volume());
+}

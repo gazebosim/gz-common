@@ -16,9 +16,12 @@
  */
 
 #include <cstddef>
+#include <memory>
 #include <queue>
 #include <string>
+#include <unordered_map>
 #include <unordered_set>
+#include <vector>
 
 #include "gz/common/graphics/Types.hh"
 #include "gz/common/AssimpLoader.hh"
@@ -38,6 +41,7 @@
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/postprocess.h>     // Post processing flags
 #include <assimp/scene.h>           // Output data structure
+#include <assimp/material.h>
 
 // Disable warning for converting double to unsigned char
 #ifdef _WIN32
@@ -57,7 +61,17 @@ class AssimpLoader::Implementation
   /// \brief the Assimp importer used to parse meshes
   public: Assimp::Importer importer;
 
-  /// \brief Convert a color from assimp implementation to Ignition common
+  /// \brief Cache for images loaded from memory (e.g. embedded)
+  public: mutable std::unordered_map<std::string, ImagePtr> imageCache;
+
+  /// \brief Cache for split metallic roughness maps
+  public: mutable std::unordered_map<std::string,
+          std::pair<ImagePtr, ImagePtr>> splitMapCache;
+
+  /// \brief Path of the mesh being loaded, used to qualify embedded textures
+  public: std::string currentMeshPath;
+
+  /// \brief Convert a color from assimp implementation to Gazebo common
   /// \param[in] _color the assimp color to convert
   /// \return the matching math::Color
   public: math::Color ConvertColor(aiColor4D& _color) const;
@@ -71,12 +85,10 @@ class AssimpLoader::Implementation
   /// \param[in] _scene the assimp scene
   /// \param[in] _matIdx index of the material in the scene
   /// \param[in] _path path where the mesh is located
-  /// \param[in] _fileBaseName Base name of the mesh file.
   /// \return pointer to the converted common::Material
   public: MaterialPtr CreateMaterial(const aiScene *_scene,
                                      unsigned _matIdx,
-                                     const std::string &_path,
-                                     const std::string &_fileBaseName) const;
+                                     const std::string &_path) const;
 
   /// \brief Load a texture embedded in a mesh (i.e. for GLB format)
   /// into a gz::common::Image
@@ -86,26 +98,24 @@ class AssimpLoader::Implementation
 
   /// \brief Utility function to generate a texture name for both embedded
   /// and external textures
-  /// \param[in] _prefix Prefix to add to the texture name
-  /// \param[in] _scene the assimp scene
-  /// \param[in] _mat the assimp material
+  /// \param[in] _texId the unique identifier for the texture (path or index)
   /// \param[in] _type the type of texture (i.e. Diffuse, Metal)
   /// \return the generated texture name
-  public: std::string GenerateTextureName(const std::string &_prefix,
-                                          const aiScene* _scene,
-                                          aiMaterial *_mat,
+  public: std::string GenerateTextureName(const std::string &_texId,
                                           const std::string &_type) const;
 
   /// \brief Function to parse texture information and load it if embedded
   /// \param[in] _scene the assimp scene
   /// \param[in] _texturePath the path where the texture is located
   /// \param[in] _textureName the name of the texture
+  /// \param[in] _shouldCache Whether the image should be cached
   /// \return a pair containing the name of the texture and a pointer to the
   /// image data, if the texture was loaded in memory
   public: std::pair<std::string, ImagePtr>
           LoadTexture(const aiScene* _scene,
                       const aiString& _texturePath,
-                      const std::string& _textureName) const;
+                      const std::string& _textureName,
+                      bool _shouldCache = true) const;
 
   /// \brief Function to split a gltf metallicroughness map into
   /// a metalness and roughness map
@@ -170,6 +180,11 @@ class AssimpLoader::Implementation
   /// \return Updated transform
   public: aiMatrix4x4 UpdatedRootNodeTransform(const aiScene *_scene,
       bool _useIdentityRotation = true);
+
+  /// \brief Helper to generate a globally unique key for a texture
+  /// \param[in] _texturePath path string from assimp
+  /// \return the unique key
+  public: std::string FullTextureKey(const std::string &_texturePath) const;
 };
 
 //////////////////////////////////////////////////
@@ -177,6 +192,29 @@ class AssimpLoader::Implementation
 static std::string ToString(const aiString& str)
 {
   return std::string(str.C_Str());
+}
+
+//////////////////////////////////////////////////
+std::string AssimpLoader::Implementation::FullTextureKey(
+    const std::string &_texturePath) const
+{
+  if (_texturePath.empty())
+    return "";
+
+  // Assimp uses '*' as a prefix for embedded texture paths
+  // See https://github.com/assimp/assimp/blob/3e672ff856b0bad35f478cc11acdd903674066ee/include/assimp/texture.h#L66-L81
+  if (_texturePath[0] == '*')
+  {
+    return this->currentMeshPath + "#" + _texturePath;
+  }
+
+  if (common::isRelativePath(_texturePath))
+  {
+    return common::joinPaths(common::parentPath(this->currentMeshPath),
+                             _texturePath);
+  }
+
+  return _texturePath;
 }
 
 //////////////////////////////////////////////////
@@ -326,8 +364,7 @@ void AssimpLoader::Implementation::RecursiveSkeletonCreate(const aiNode* _node,
 
 //////////////////////////////////////////////////
 MaterialPtr AssimpLoader::Implementation::CreateMaterial(
-    const aiScene *_scene, unsigned _matIdx, const std::string &_path,
-    const std::string &_fileBaseName) const
+    const aiScene *_scene, unsigned _matIdx, const std::string &_path) const
 {
   MaterialPtr mat = std::make_shared<Material>();
   aiColor4D color;
@@ -392,13 +429,12 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   // type of mappings to be UV, uv index, blend mode
   if (ret == AI_SUCCESS)
   {
+    std::string textureKey = this->FullTextureKey(texturePath.C_Str());
+
     // Check if the texture is embedded or not
-    auto [texName, texData] = this->LoadTexture(_scene, texturePath,
-        this->GenerateTextureName(_fileBaseName, _scene, assimpMat, "Diffuse"));
-    if (texData != nullptr)
-      mat->SetTextureImage(texName, texData);
-    else
-      mat->SetTextureImage(texName, _path);
+    auto [texName, texData] = this->LoadTexture(
+        _scene, texturePath, this->GenerateTextureName(textureKey, "Diffuse"));
+    mat->SetTextureImage(texName, texData);
 #ifndef GZ_ASSIMP_PRE_5_2_0
     // Now set the alpha from texture, if enabled, only supported in GLTF
     aiString alphaMode;
@@ -427,20 +463,52 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
       &texturePath);
   if (ret == AI_SUCCESS)
   {
-    auto [texName, texData] = this->LoadTexture(_scene, texturePath,
-        this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
-        "MetallicRoughness"));
-    // Load it into a common::Image then split it
-    auto texImg = texData != nullptr ? texData :
-      std::make_shared<common::Image>(joinPaths(_path, texName));
-    auto [metalTexture, roughTexture] =
-      this->SplitMetallicRoughnessMap(*texImg);
-    pbr.SetMetalnessMap(
-        this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
-        "Metalness"), metalTexture);
-    pbr.SetRoughnessMap(
-        this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
-        "Roughness"), roughTexture);
+    std::string textureKey = this->FullTextureKey(texturePath.C_Str());
+    auto it = this->splitMapCache.find(textureKey);
+    if (it != this->splitMapCache.end())
+    {
+      gzdbg << "Split PBR maps for [" << textureKey << "] found in cache"
+            << std::endl;
+      pbr.SetMetalnessMap(this->GenerateTextureName(textureKey, "Metalness"),
+                          it->second.first);
+      pbr.SetRoughnessMap(this->GenerateTextureName(textureKey, "Roughness"),
+                          it->second.second);
+    }
+    else
+    {
+      // There is no need to cache this image (last argument to LoadTexture) and
+      // use up more memory because we will be caching the split images. We will
+      // not be trying to load the image again because the if condition above
+      // would have found a cache hit based on the texture key.
+      auto [texName, texData] = this->LoadTexture(
+          _scene, texturePath,
+          this->GenerateTextureName(textureKey, "MetallicRoughness"), false);
+
+      if (texData == nullptr)
+      {
+        gzerr << "Unable to load MetallicRoughness texture [" << textureKey
+              << "]" << std::endl;
+      }
+      else
+      {
+        gzdbg << "Splitting MetallicRoughness map for [" << textureKey << "]"
+              << std::endl;
+        auto splitMaps = this->SplitMetallicRoughnessMap(*texData);
+        if (splitMaps.first)
+        {
+          pbr.SetMetalnessMap(
+              this->GenerateTextureName(textureKey, "Metalness"),
+              splitMaps.first);
+        }
+        if (splitMaps.second)
+        {
+          pbr.SetRoughnessMap(
+              this->GenerateTextureName(textureKey, "Roughness"),
+              splitMaps.second);
+        }
+        this->splitMapCache[textureKey] = splitMaps;
+      }
+    }
   }
   else
   {
@@ -448,52 +516,89 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     ret = assimpMat->GetTexture(aiTextureType_METALNESS, 0, &texturePath);
     if (ret == AI_SUCCESS)
     {
-      auto [texName, texData] = this->LoadTexture(_scene, texturePath,
-          this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
-          "Metalness"));
+      std::string textureKey = this->FullTextureKey(texturePath.C_Str());
+      auto [texName, texData] =
+          this->LoadTexture(_scene, texturePath,
+                            this->GenerateTextureName(textureKey, "Metalness"));
       pbr.SetMetalnessMap(texName, texData);
     }
     ret = assimpMat->GetTexture(
         aiTextureType_DIFFUSE_ROUGHNESS, 0, &texturePath);
     if (ret == AI_SUCCESS)
     {
-      auto [texName, texData] = this->LoadTexture(_scene, texturePath,
-          this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
-          "Roughness"));
+      std::string textureKey = this->FullTextureKey(texturePath.C_Str());
+      auto [texName, texData] =
+          this->LoadTexture(_scene, texturePath,
+                            this->GenerateTextureName(textureKey, "Roughness"));
       pbr.SetRoughnessMap(texName, texData);
     }
-    // Load lightmap only if it is not a glb/glTF mesh that contains a
-    // MetallicRoughness texture
-    // It was found that lightmap field just stores the entire MetallicRoughness
-    // texture. Issues were also reported in assimp:
-    // https://github.com/assimp/assimp/issues/3120
-    // https://github.com/assimp/assimp/issues/4637
-    unsigned int uvIdx = 0;
-    ret = assimpMat->GetTexture(
-        aiTextureType_LIGHTMAP, 0, &texturePath, NULL, &uvIdx);
-    if (ret == AI_SUCCESS)
+  }
+
+  // The lightmap / ambient occlusion texture may be the same texture as the
+  // metallicRoughness texture but it can also be a separate texture using a
+  // different uv index. In the former case, we expect the occlusion
+  // data to be packed in the R channel of the metallicRoughness texture,
+  // so load the occlusion data in the same ways as we do in the
+  // SplitMetallicRoughnessMap function.
+  // In the latter case (separate texture), no extra processing is
+  // required.
+  unsigned int uvIdx = 0;
+  ret = assimpMat->GetTexture(
+      aiTextureType_LIGHTMAP, 0, &texturePath, NULL, &uvIdx);
+  if (ret == AI_SUCCESS)
+  {
+    std::string textureKey = this->FullTextureKey(texturePath.C_Str());
+    auto [texName, texData] = this->LoadTexture(
+        _scene, texturePath, this->GenerateTextureName(textureKey, "Lightmap"));
+    // Separate uv set so treat it as a separate texture
+    if (uvIdx > 0)
     {
-      auto [texName, texData] = this->LoadTexture(_scene, texturePath,
-          this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
-          "Lightmap"));
       pbr.SetLightMap(texName, uvIdx, texData);
+    }
+    // else split the occlusion data from the metallicRoughness texture
+    else
+    {
+      if (!texData)
+      {
+        gzerr << "Texture [" << textureKey << "] not loaded, cannot extract "
+              << "lightmap channel" << std::endl;
+      }
+      else
+      {
+        // R channel contains the occlusion data
+        // Note we are using L_INT8 format to save memory, and it will be
+        // converted to RGBA by common::Image if requested by the renderer.
+        auto texRData = texData->ChannelData(Image::Channel::RED);
+        if (texRData.empty())
+        {
+          gzerr << "Unable to extract channel data for lightmap\n";
+        }
+        else
+        {
+          auto tex = std::make_shared<Image>();
+          tex->SetFromData(texRData.data(), texData->Width(), texData->Height(),
+              Image::L_INT8);
+          pbr.SetLightMap(texName, uvIdx, tex);
+        }
+      }
     }
   }
 #endif
   ret = assimpMat->GetTexture(aiTextureType_NORMALS, 0, &texturePath);
   if (ret == AI_SUCCESS)
   {
-    auto [texName, texData] = this->LoadTexture(_scene, texturePath,
-        this->GenerateTextureName(_fileBaseName, _scene, assimpMat, "Normal"));
+    std::string textureKey = this->FullTextureKey(texturePath.C_Str());
+    auto [texName, texData] = this->LoadTexture(
+        _scene, texturePath, this->GenerateTextureName(textureKey, "Normal"));
     // TODO(luca) different normal map spaces
     pbr.SetNormalMap(texName, NormalMapSpace::TANGENT, texData);
   }
   ret = assimpMat->GetTexture(aiTextureType_EMISSIVE, 0, &texturePath);
   if (ret == AI_SUCCESS)
   {
-    auto [texName, texData] = this->LoadTexture(_scene, texturePath,
-        this->GenerateTextureName(_fileBaseName, _scene, assimpMat,
-        "Emissive"));
+    std::string textureKey = this->FullTextureKey(texturePath.C_Str());
+    auto [texName, texData] = this->LoadTexture(
+        _scene, texturePath, this->GenerateTextureName(textureKey, "Emissive"));
     pbr.SetEmissiveMap(texName, texData);
   }
 #ifndef GZ_ASSIMP_PRE_5_2_0
@@ -521,59 +626,83 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
 std::pair<std::string, ImagePtr> AssimpLoader::Implementation::LoadTexture(
     const aiScene* _scene,
     const aiString& _texturePath,
-    const std::string& _textureName) const
+    const std::string& _textureName,
+    bool _shouldCache) const
 {
   std::pair<std::string, ImagePtr> ret;
+  std::string textureKey = this->FullTextureKey(_texturePath.C_Str());
+
+  // Check if the texture is already in the cache
+  auto it = this->imageCache.find(textureKey);
+  if (it != this->imageCache.end())
+  {
+    gzdbg << "Texture [" << textureKey << "] found in cache" << std::endl;
+    ret.first = _textureName;
+    ret.second = it->second;
+    return ret;
+  }
+
   // Check if the texture is embedded or not
   auto embeddedTexture = _scene->GetEmbeddedTexture(_texturePath.C_Str());
   if (embeddedTexture)
   {
     // Load embedded texture
     ret.first = _textureName;
+    gzdbg << "Loading embedded texture [" << textureKey << "] as ["
+          << _textureName << "]" << std::endl;
     ret.second = this->LoadEmbeddedTexture(embeddedTexture);
+    if (_shouldCache)
+    {
+      this->imageCache[textureKey] = ret.second;
+    }
   }
   else
   {
-    ret.first = ToString(_texturePath);
+    // Load external texture from disk
+    if (common::exists(textureKey))
+    {
+      gzdbg << "Loading external texture [" << textureKey << "]" << std::endl;
+      ret.second = std::make_shared<Image>(textureKey);
+      if (_shouldCache)
+      {
+        this->imageCache[textureKey] = ret.second;
+      }
+    }
+    else
+    {
+      gzerr << "External texture [" << textureKey << "] not found" << std::endl;
+    }
+    ret.first = _textureName;
   }
   return ret;
 }
 
 std::pair<ImagePtr, ImagePtr>
     AssimpLoader::Implementation::SplitMetallicRoughnessMap(
-    const common::Image& _img) const
+    const common::Image &_img) const
 {
   std::pair<ImagePtr, ImagePtr> ret;
   // Metalness in B roughness in G
   const auto width = _img.Width();
   const auto height = _img.Height();
-  const auto bytesPerPixel = 4;
 
-  std::vector<unsigned char> metalnessData(width * height * bytesPerPixel);
-  std::vector<unsigned char> roughnessData(width * height * bytesPerPixel);
+  std::vector<unsigned char> metalnessData8bit =
+      _img.ChannelData(Image::Channel::BLUE);
+  std::vector<unsigned char> roughnessData8bit =
+      _img.ChannelData(Image::Channel::GREEN);
 
-  for (unsigned int y = 0; y < height; ++y)
+  if (metalnessData8bit.empty() || roughnessData8bit.empty())
   {
-    for (unsigned int x = 0; x < width; ++x)
-    {
-      // RGBA so 4 bytes per pixel, alpha fully opaque
-      auto baseIndex = bytesPerPixel * (y * width + x);
-      auto color = _img.Pixel(x, (height - y - 1));
-      metalnessData[baseIndex] = color.B() * 255.0;
-      metalnessData[baseIndex + 1] = color.B() * 255.0;
-      metalnessData[baseIndex + 2] = color.B() * 255.0;
-      metalnessData[baseIndex + 3] = 255;
-      roughnessData[baseIndex] = color.G() * 255.0;
-      roughnessData[baseIndex + 1] = color.G() * 255.0;
-      roughnessData[baseIndex + 2] = color.G() * 255.0;
-      roughnessData[baseIndex + 3] = 255;
-    }
+    gzerr << "Unable to extract channel data when splitting metallic "
+          << "roughness map: " << std::endl;
+    return ret;
   }
+
   // First is metal, second is rough
   ret.first = std::make_shared<Image>();
-  ret.first->SetFromData(&metalnessData[0], width, height, Image::RGBA_INT8);
+  ret.first->SetFromData(&metalnessData8bit[0], width, height, Image::L_INT8);
   ret.second = std::make_shared<Image>();
-  ret.second->SetFromData(&roughnessData[0], width, height, Image::RGBA_INT8);
+  ret.second->SetFromData(&roughnessData8bit[0], width, height, Image::L_INT8);
   return ret;
 }
 
@@ -583,7 +712,8 @@ ImagePtr AssimpLoader::Implementation::LoadEmbeddedTexture(
 {
   if (_texture->mHeight == 0)
   {
-    Image::PixelFormatType format = Image::PixelFormatType::UNKNOWN_PIXEL_FORMAT;
+    Image::PixelFormatType format =
+      Image::PixelFormatType::UNKNOWN_PIXEL_FORMAT;
     if (_texture->CheckFormat("png"))
     {
       format = Image::PixelFormatType::COMPRESSED_PNG;
@@ -612,16 +742,9 @@ ImagePtr AssimpLoader::Implementation::LoadEmbeddedTexture(
 
 //////////////////////////////////////////////////
 std::string AssimpLoader::Implementation::GenerateTextureName(
-    const std::string &_prefix, const aiScene *_scene, aiMaterial *_mat,
-    const std::string &_type) const
+    const std::string &_texId, const std::string &_type) const
 {
-#ifdef GZ_ASSIMP_PRE_5_2_0
-  auto rootName = _scene->mRootNode->mName;
-#else
-  auto rootName = _scene->mName;
-#endif
-  return _prefix + "_" + ToString(rootName) + "_" +
-    ToString(_mat->GetName()) + "_" + _type;
+  return _texId + "_" + _type;
 }
 
 //////////////////////////////////////////////////
@@ -637,28 +760,29 @@ SubMesh AssimpLoader::Implementation::CreateSubMesh(
   {
     // Add the vertex
     math::Vector3d vertex;
-    math::Vector3d normal;
     vertex.X(_assimpMesh->mVertices[vertexIdx].x);
     vertex.Y(_assimpMesh->mVertices[vertexIdx].y);
     vertex.Z(_assimpMesh->mVertices[vertexIdx].z);
-    normal.X(_assimpMesh->mNormals[vertexIdx].x);
-    normal.Y(_assimpMesh->mNormals[vertexIdx].y);
-    normal.Z(_assimpMesh->mNormals[vertexIdx].z);
     vertex = _transform * vertex;
-    normal = rot * normal;
-    normal.Normalize();
     subMesh.AddVertex(vertex);
-    subMesh.AddNormal(normal);
+    if (_assimpMesh->HasNormals()) {
+      math::Vector3d normal;
+      normal.X(_assimpMesh->mNormals[vertexIdx].x);
+      normal.Y(_assimpMesh->mNormals[vertexIdx].y);
+      normal.Z(_assimpMesh->mNormals[vertexIdx].z);
+      normal = rot * normal;
+      normal.Normalize();
+      subMesh.AddNormal(normal);
+    }
     // Iterate over sets of texture coordinates
-    int uvIdx = 0;
-    while(_assimpMesh->HasTextureCoords(uvIdx))
+    for (unsigned int i = 0; i < AI_MAX_NUMBER_OF_TEXTURECOORDS; ++i)
     {
+      if (!_assimpMesh->HasTextureCoords(i))
+        continue;
       math::Vector3d texcoords;
-      texcoords.X(_assimpMesh->mTextureCoords[uvIdx][vertexIdx].x);
-      texcoords.Y(_assimpMesh->mTextureCoords[uvIdx][vertexIdx].y);
-      // TODO(luca) why do we need 1.0 - Y?
-      subMesh.AddTexCoordBySet(texcoords.X(), 1.0 - texcoords.Y(), uvIdx);
-      ++uvIdx;
+      texcoords.X(_assimpMesh->mTextureCoords[i][vertexIdx].x);
+      texcoords.Y(_assimpMesh->mTextureCoords[i][vertexIdx].y);
+      subMesh.AddTexCoordBySet(texcoords.X(), texcoords.Y(), i);
     }
   }
   for (unsigned faceIdx = 0; faceIdx < _assimpMesh->mNumFaces; ++faceIdx)
@@ -669,6 +793,9 @@ SubMesh AssimpLoader::Implementation::CreateSubMesh(
     subMesh.AddIndex(face.mIndices[2]);
   }
   subMesh.SetMaterialIndex(_assimpMesh->mMaterialIndex);
+  if (subMesh.NormalCount() == 0u){
+    subMesh.RecalculateNormals();
+  }
   return subMesh;
 }
 
@@ -689,12 +816,14 @@ AssimpLoader::~AssimpLoader()
 //////////////////////////////////////////////////
 Mesh *AssimpLoader::Load(const std::string &_filename)
 {
+  this->dataPtr->currentMeshPath = _filename;
   Mesh *mesh = new Mesh();
   std::string path = common::parentPath(_filename);
   const aiScene* scene = this->dataPtr->importer.ReadFile(_filename,
       aiProcess_JoinIdenticalVertices |
       aiProcess_RemoveRedundantMaterials |
       aiProcess_SortByPType |
+      aiProcess_FlipUVs |
 #ifndef GZ_ASSIMP_PRE_5_2_0
       aiProcess_PopulateArmatureData |
 #endif
@@ -708,13 +837,11 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   }
   auto& rootNode = scene->mRootNode;
   auto rootName = ToString(rootNode->mName);
-  auto fileBaseName = common::basename(_filename);
   std::string extension;
   std::size_t extIdx = _filename.rfind(".");
   if (extIdx != std::string::npos)
   {
     extension = _filename.substr(extIdx + 1, _filename.size());
-    fileBaseName = fileBaseName.substr(0, fileBaseName.rfind(extension) - 1);
   }
   std::transform(extension.begin(), extension.end(),
       extension.begin(), ::tolower);
@@ -728,8 +855,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   // Add the materials first
   for (unsigned _matIdx = 0; _matIdx < scene->mNumMaterials; ++_matIdx)
   {
-    auto mat = this->dataPtr->CreateMaterial(scene, _matIdx, path,
-        fileBaseName);
+    auto mat = this->dataPtr->CreateMaterial(scene, _matIdx, path);
     mesh->AddMaterial(mat);
   }
   // Create the skeleton
@@ -756,11 +882,17 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   // Recursive call to keep track of transforms,
   // mesh is passed by reference and edited throughout
   this->dataPtr->RecursiveCreate(scene, rootNode, rootTransform, mesh);
+  auto rootSkeleton = mesh->MeshSkeleton();
   // Add the animations
   for (unsigned animIdx = 0; animIdx < scene->mNumAnimations; ++animIdx)
   {
     auto& anim = scene->mAnimations[animIdx];
     auto animName = ToString(anim->mName);
+    if (animName.empty())
+    {
+      animName = "animation" +
+                 std::to_string(rootSkeleton->AnimationCount() + 1);
+    }
     SkeletonAnimation* skelAnim = new SkeletonAnimation(animName);
     for (unsigned chanIdx = 0; chanIdx < anim->mNumChannels; ++chanIdx)
     {
