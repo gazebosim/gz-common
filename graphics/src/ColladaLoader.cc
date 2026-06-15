@@ -894,7 +894,7 @@ void ColladaLoader::Implementation::LoadController(
 
   std::vector<float> weights;
   for (unsigned int i = 0; i < wStrs.size(); ++i)
-    weights.emplace_back(math::parseFloat(wStrs[i]));
+    weights.emplace_back(static_cast<float>(math::parseFloat(wStrs[i])));
 
   std::string cString = vertWeightsXml->FirstChildElement("vcount")->GetText();
   std::string vString = vertWeightsXml->FirstChildElement("v")->GetText();
