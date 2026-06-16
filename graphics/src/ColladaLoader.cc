@@ -1521,7 +1521,7 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
   sourceXml = sourceXml->FirstChildElement("technique_common");
   if (!sourceXml)
   {
-    gzerr << "Unable to find technique_common element for texture "
+    gzerr << "Unable to find technique_common element for position "
           << "coordinates with id[" << _id << "]\n";
     return;
   }
@@ -1531,13 +1531,13 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
   if (!sourceXml)
   {
     gzerr << "Unable to find <accessor> as a child of <technique_common> "
-          << "for texture coordinates with id[" << _id << "]\n";
+          << "for position coordinates with id[" << _id << "]\n";
     return;
   }
 
-  // Read in the stride for the texture coordinate values. The stride
-  // indicates the number of values in the float array the comprise
-  // a complete texture coordinate.
+  // Read in the stride for the position coordinate values. The stride
+  // indicates the number of values in the float array that comprise
+  // a complete position coordinate.
   if (sourceXml->Attribute("stride"))
   {
     try
@@ -1553,7 +1553,7 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
   }
   else
   {
-    gzerr << "<accessor> has no stride attribute in texture coordinate "
+    gzerr << "<accessor> has no stride attribute in position coordinate "
           << "element with id[" << _id << "]\n";
     return;
   }
