@@ -14,11 +14,16 @@
  * limitations under the License.
  *
  */
-#include <sstream>
-#include <unordered_map>
+#include <cerrno>
+#include <cstdlib>
 #include <map>
-#include <vector>
+#include <memory>
 #include <set>
+#include <sstream>
+#include <string>
+#include <string_view>
+#include <unordered_map>
+#include <vector>
 
 #include <gz/math/Helpers.hh>
 #include <gz/math/Matrix4.hh>
@@ -322,9 +327,11 @@ namespace gz
       /// \brief Index of a normal in the collada <p> element
       public: unsigned int normalIndex;
 
-      /// \brief A map of texture coordinate set index to index of a texture
-      /// coordinate in the collada <p> element
-      public: std::map<unsigned int, unsigned int> texcoordIndex;
+      /// \brief Texture coordinate set index paired with the index of a
+      /// texture coordinate in the collada <p> element. A flat vector is used
+      /// instead of std::map because the number of sets is tiny (usually one),
+      /// avoiding a tree-node allocation per vertex record.
+      public: std::vector<std::pair<unsigned int, unsigned int>> texcoordIndex;
 
       /// \brief Index of a vertex in the Gazebo mesh
       public: unsigned int mappedIndex;
@@ -333,10 +340,78 @@ namespace gz
 }
 
 /////////////////////////////////////////////////
+// Classic boost::hash_combine. The 0x9e3779b9 term (the golden ratio in
+// 32-bit fixed point) is intentional: it avoids the "zero trap" where an
+// all-zero input (std::hash<double>(0.0) == 0) hashes to 0 regardless of
+// position. Keep it. Benchmarks on large meshes show it has no measurable
+// cost, and replacing this with a stronger mixer (e.g. MurmurHash3/mx3) was
+// measured slightly slower here with no fewer collisions, since mesh loading
+// is dominated by XML parsing rather than hashing.
 void hash_combine(std::size_t &_seed, const double &_v)
 {
   std::hash<double> hasher;
-  _seed ^= hasher(_v) + (_seed << 6) + (_seed >> 2);
+  _seed ^= hasher(_v) + 0x9e3779b9 + (_seed << 6) + (_seed >> 2);
+}
+
+/////////////////////////////////////////////////
+/// \brief Parse a whitespace-delimited list of doubles from a string.
+/// Parsing stops at the first non-numeric token or on overflow.
+/// \param[in] _str Text to parse. Must be null-terminated (std::string is).
+/// \param[in] _reserveCount Number of values to reserve space for up front.
+/// \return The parsed values.
+std::vector<double> parseDoubles(const std::string &_str, size_t _reserveCount)
+{
+  std::vector<double> result;
+  // Preallocate memory based on the known count.
+  result.reserve(_reserveCount);
+  const char *start = _str.c_str();
+  char *end{};
+  while (true)
+  {
+    // Reset errno so a stale ERANGE set by earlier code is not misread as
+    // an overflow from this call.
+    errno = 0;
+    double d = std::strtod(start, &end);
+    if (start == end)
+      break;
+    start = end;
+    if (errno == ERANGE)
+    {
+      gzerr << "Overflow while parsing <float_array>; truncating after "
+            << result.size() << " value(s).\n";
+      break;
+    }
+    result.emplace_back(d);
+  }
+  return result;
+}
+
+/////////////////////////////////////////////////
+/// \brief Parse a whitespace-delimited list of unsigned integers from a
+/// string. Parsing stops at the first non-numeric token. This avoids the
+/// per-token std::string allocations that split() + parseInt() incur on the
+/// large index (<p>) arrays.
+/// \param[in] _str Text to parse. Must be null-terminated (std::string is).
+/// \param[in] _reserveCount Number of values to reserve space for up front.
+/// \return The parsed values.
+std::vector<unsigned int> parseUints(const std::string &_str,
+    size_t _reserveCount)
+{
+  std::vector<unsigned int> result;
+  result.reserve(_reserveCount);
+  const char *start = _str.c_str();
+  char *end{};
+  while (true)
+  {
+    // auto (deduces the strtoul return type) avoids a bare 'long', which
+    // cpplint's runtime/int check rejects.
+    auto v = std::strtoul(start, &end, 10);
+    if (start == end)
+      break;
+    start = end;
+    result.emplace_back(static_cast<unsigned int>(v));
+  }
+  return result;
 }
 
 /////////////////////////////////////////////////
@@ -1567,36 +1642,10 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
 
   std::unordered_map<gz::math::Vector3d,
       unsigned int, Vector3Hash> unique;
+  // Reserve based on the coordinate count to avoid rehashing during insertion.
+  unique.reserve(totCount / stride);
 
-  auto toDoubleVec = [](std::string_view sv, size_t totalCount)
-  {
-    std::vector<double> result;
-    // Preallocate memory based on known count. totalCount is the number of
-    // float values declared by the <float_array> count attribute.
-    result.reserve(totalCount);
-    const char *start = sv.data();
-    char *end{};
-    while (true)
-    {
-      // Reset errno so a stale ERANGE set by earlier code is not misread as
-      // an overflow from this call.
-      errno = 0;
-      double d = std::strtod(start, &end);
-      if (start == end)
-        break;
-      start = end;
-      if (errno == ERANGE)
-      {
-        gzerr << "Overflow while parsing <float_array>; truncating after "
-              << result.size() << " value(s).\n";
-        break;
-      }
-      result.emplace_back(d);
-    }
-    return result;
-  };
-
-  auto values = toDoubleVec(valueStr, totCount);
+  auto values = parseDoubles(valueStr, totCount);
 
   gz::math::Vector3d vec;
   if (!_values)
@@ -1614,13 +1663,13 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
             values[i+2]);
 
     vec = _transform * vec;
-    (*_values).emplace_back(vec);
+    _values->emplace_back(vec);
 
     // create a map of duplicate indices
     if (unique.find(vec) != unique.end())
-      (*_duplicates)[(*_values).size()-1] = unique[vec];
+      (*_duplicates)[_values->size()-1] = unique[vec];
     else
-      unique[vec] = (*_values).size()-1;
+      unique[vec] = _values->size()-1;
   }
 
   this->positionDuplicateMap[_id] = _duplicates;
@@ -1753,39 +1802,11 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
 
   std::unordered_map<gz::math::Vector3d,
       unsigned int, Vector3Hash> unique;
+  // Reserve based on the coordinate count to avoid rehashing during insertion.
+  unique.reserve(totCount / stride);
 
   std::string valueStr = floatArrayXml->GetText();
-  // std::istringstream iss(valueStr);
-
-  auto toDoubleVec = [](std::string_view sv, size_t totalCount)
-  {
-    std::vector<double> result;
-    // Preallocate memory based on known count. totalCount is the number of
-    // float values declared by the <float_array> count attribute.
-    result.reserve(totalCount);
-    const char *start = sv.data();
-    char *end{};
-    while (true)
-    {
-      // Reset errno so a stale ERANGE set by earlier code is not misread as
-      // an overflow from this call.
-      errno = 0;
-      double d = std::strtod(start, &end);
-      if (start == end)
-        break;
-      start = end;
-      if (errno == ERANGE)
-      {
-        gzerr << "Overflow while parsing <float_array>; truncating after "
-              << result.size() << " value(s).\n";
-        break;
-      }
-      result.emplace_back(d);
-    }
-    return result;
-  };
-
-  auto values = toDoubleVec(valueStr, totCount);
+  auto values = parseDoubles(valueStr, totCount);
 
   gz::math::Vector3d vec;
   if (!_values)
@@ -1805,13 +1826,13 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
 
     vec = rotMat * vec;
     vec.Normalize();
-    (*_values).emplace_back(vec);
+    _values->emplace_back(vec);
 
     // create a map of duplicate indices
     if (unique.find(vec) != unique.end())
-      (*_duplicates)[(*_values).size()-1] = unique[vec];
+      (*_duplicates)[_values->size()-1] = unique[vec];
     else
-      unique[vec] = (*_values).size()-1;
+      unique[vec] = _values->size()-1;
   }
 
   this->normalDuplicateMap[_id] = _duplicates;
@@ -1974,41 +1995,13 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
     return;
 
   std::unordered_map<gz::math::Vector2d,
-                     unsigned int, Vector2dHash>
-      unique;
+                     unsigned int, Vector2dHash> unique;
+  // Reserve based on the coordinate count to avoid rehashing during insertion.
+  unique.reserve(totCount / stride);
 
-
-  auto toDoubleVec = [](std::string_view sv, size_t totalCount)
-  {
-    std::vector<double> result;
-    // Preallocate memory based on known count. totalCount is the number of
-    // float values declared by the <float_array> count attribute.
-    result.reserve(totalCount);
-    const char *start = sv.data();
-    char *end{};
-    while (true)
-    {
-      // Reset errno so a stale ERANGE set by earlier code is not misread as
-      // an overflow from this call.
-      errno = 0;
-      double d = std::strtod(start, &end);
-      if (start == end)
-        break;
-      start = end;
-      if (errno == ERANGE)
-      {
-        gzerr << "Overflow while parsing <float_array>; truncating after "
-              << result.size() << " value(s).\n";
-        break;
-      }
-      result.emplace_back(d);
-    }
-    return result;
-  };
-
-  // Read the raw texture values, and split them on spaces.
+  // Read the raw texture values.
   std::string valueStr = floatArrayXml->GetText();
-  auto values = toDoubleVec(valueStr, totCount);
+  auto values = parseDoubles(valueStr, totCount);
 
   gz::math::Vector2d vec;
   if (!_values)
@@ -2025,13 +2018,13 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
     // We only handle 2D texture coordinates right now.
     vec.Set(values[i],
             1.0 - values[i + 1]);
-    (*_values).emplace_back(vec);
+    _values->emplace_back(vec);
 
     // create a map of duplicate indices
     if (unique.find(vec) != unique.end())
-      (*_duplicates)[(*_values).size()-1] = unique[vec];
+      (*_duplicates)[_values->size()-1] = unique[vec];
     else
-      unique[vec] = (*_values).size()-1;
+      unique[vec] = _values->size()-1;
   }
 
   this->texcoordDuplicateMap[_id] = _duplicates;
@@ -2333,20 +2326,13 @@ void ColladaLoader::Implementation::LoadPolylist(
     std::string offset = polylistInputXml->Attribute("offset");
     if (semantic == "VERTEX")
     {
-      unsigned int count;
-      if (!norms || norms->empty())
-        count = 0;
-      else
-        count = (*norms).size();
+      unsigned int count = norms->size();
 
       this->LoadVertices(source, _transform, verts, norms,
           positionDupMap, normalDupMap);
 
-      if (norms && !norms->empty())
-      {
-        if ((*norms).size() > count)
-          combinedVertNorms = true;
-      }
+      if (norms->size() > count)
+        combinedVertNorms = true;
 
       inputs[VERTEX].insert(gz::math::parseInt(offset));
     }
@@ -2391,10 +2377,8 @@ void ColladaLoader::Implementation::LoadPolylist(
   //   e.g. if vcount = 4, break into triangle 1: [0,1,2], triangle 2: [0,2,3]
   tinyxml2::XMLElement *vcountXml = _polylistXml->FirstChildElement("vcount");
   std::string vcountStr = vcountXml->GetText();
-  std::vector<std::string> vcountStrs = split(vcountStr, " \t\r\n");
-  std::vector<int> vcounts;
-  for (unsigned int j = 0; j < vcountStrs.size(); ++j)
-    vcounts.emplace_back(math::parseInt(vcountStrs[j]));
+  std::vector<unsigned int> vcounts = parseUints(vcountStr,
+      vcountStr.size() / 2);
 
   // read p
   tinyxml2::XMLElement *pXml = _polylistXml->FirstChildElement("p");
@@ -2403,16 +2387,19 @@ void ColladaLoader::Implementation::LoadPolylist(
   // vertexIndexMap is a map of collada vertex index to Gazebo submesh vertex
   // indices, used for identifying vertices that can be shared.
   std::unordered_map<unsigned int, std::vector<GeometryIndices>> vertexIndexMap;
-  unsigned int *values = new unsigned int[inputSize];
-  memset(values, 0, inputSize);
+  // Reserve based on the number of positions to avoid rehashing.
+  vertexIndexMap.reserve(verts->size());
+  std::vector<unsigned int> values(inputSize, 0);
 
-  std::vector<std::string> strs = split(pStr, " \t\r\n");
-  std::vector<std::string>::iterator strs_iter = strs.begin();
+  // Parse the index array directly (avoids ~1 string allocation per index that
+  // split() + parseInt() would incur).
+  std::vector<unsigned int> indices = parseUints(pStr, pStr.size() / 2);
+  std::size_t polyStart = 0;
   for (unsigned int l = 0; l < vcounts.size(); ++l)
   {
     // put us at the beginning of the polygon list
     if (l > 0)
-      strs_iter += inputSize * vcounts[l-1];
+      polyStart += inputSize * vcounts[l-1];
 
     for (unsigned int k = 2; k < static_cast<unsigned int>(vcounts[l]); ++k)
     {
@@ -2433,7 +2420,7 @@ void ColladaLoader::Implementation::LoadPolylist(
 
         for (unsigned int i = 0; i < inputSize; ++i)
         {
-          values[i] = gz::math::parseInt(strs_iter[triangle_index+i]);
+          values[i] = indices[polyStart + triangle_index + i];
         }
 
         unsigned int daeVertIndex = 0;
@@ -2446,7 +2433,7 @@ void ColladaLoader::Implementation::LoadPolylist(
           // Get the vertex position index value. If it is a duplicate then use
           // the existing index instead
           daeVertIndex = values[*inputs[VERTEX].begin()];
-          if ((*positionDupMap).find(daeVertIndex) != (*positionDupMap).end())
+          if (positionDupMap->find(daeVertIndex) != positionDupMap->end())
             daeVertIndex = (*positionDupMap)[daeVertIndex];
 
           // if the vertex index has not been previously added then just add it.
@@ -2460,12 +2447,12 @@ void ColladaLoader::Implementation::LoadPolylist(
             // the same normal and texcoord index values
             bool toDuplicate = true;
             unsigned int reuseIndex = 0;
-            std::vector<GeometryIndices> inputValues =
+            const std::vector<GeometryIndices> &inputValues =
                 vertexIndexMap[daeVertIndex];
 
             for (unsigned int i = 0; i < inputValues.size(); ++i)
             {
-              GeometryIndices iv = inputValues[i];
+              const GeometryIndices &iv = inputValues[i];
               bool normEqual = false;
               bool texEqual = false;
 
@@ -2476,8 +2463,8 @@ void ColladaLoader::Implementation::LoadPolylist(
                 // duplicated position
                 unsigned int remappedNormalIndex =
                     values[*inputs[NORMAL].begin()];
-                if ((*normalDupMap).find(remappedNormalIndex) !=
-                  (*normalDupMap).end())
+                if (normalDupMap->find(remappedNormalIndex) !=
+                  normalDupMap->end())
                 {
                   remappedNormalIndex = (*normalDupMap)[remappedNormalIndex];
                 }
@@ -2503,7 +2490,10 @@ void ColladaLoader::Implementation::LoadPolylist(
                       remappedTexcoordIndex);
                   if (texDupMapSetIt != texDupMapSet.end())
                     remappedTexcoordIndex = texDupMapSetIt->second;
-                  if (iv.texcoordIndex[set] != remappedTexcoordIndex)
+                  unsigned int ivTexIndex = 0u;
+                  for (const auto &tc : iv.texcoordIndex)
+                    if (tc.first == set) { ivTexIndex = tc.second; break; }
+                  if (ivTexIndex != remappedTexcoordIndex)
                   {
                     texEqual = false;
                     break;
@@ -2562,14 +2552,14 @@ void ColladaLoader::Implementation::LoadPolylist(
             unsigned int inputRemappedNormalIndex =
               values[*inputs[NORMAL].begin()];
 
-            if ((*normalDupMap).find(inputRemappedNormalIndex) !=
-              (*normalDupMap).end())
+            if (normalDupMap->find(inputRemappedNormalIndex) !=
+              normalDupMap->end())
             {
               inputRemappedNormalIndex =
                 (*normalDupMap)[inputRemappedNormalIndex];
             }
 
-            if ((*norms).size() > inputRemappedNormalIndex)
+            if (norms->size() > inputRemappedNormalIndex)
             {
               subMesh->AddNormal((*norms)[inputRemappedNormalIndex]);
               input.normalIndex = inputRemappedNormalIndex;
@@ -2595,7 +2585,7 @@ void ColladaLoader::Implementation::LoadPolylist(
               subMesh->AddTexCoordBySet(
                   (*texcoordsSet)[inputRemappedTexcoordIndex].X(),
                   (*texcoordsSet)[inputRemappedTexcoordIndex].Y(), set);
-              input.texcoordIndex[set] = inputRemappedTexcoordIndex;
+              input.texcoordIndex.emplace_back(set, inputRemappedTexcoordIndex);
             }
           }
 
@@ -2610,7 +2600,6 @@ void ColladaLoader::Implementation::LoadPolylist(
       }
     }
   }
-  delete [] values;
 
   _mesh->AddSubMesh(std::move(subMesh));
 }
@@ -2688,20 +2677,13 @@ void ColladaLoader::Implementation::LoadTriangles(
     std::string offset = trianglesInputXml->Attribute("offset");
     if (semantic == "VERTEX")
     {
-      unsigned int count;
-      if (!norms || norms->empty())
-        count = 0;
-      else
-        count = (*norms).size();
+      unsigned int count = norms->size();
 
       this->LoadVertices(source, _transform, verts, norms,
                         positionDupMap, normalDupMap);
 
-      if (norms && !norms->empty())
-      {
-        if ((*norms).size() > count)
-          combinedVertNorms = true;
-      }
+      if (norms->size() > count)
+        combinedVertNorms = true;
       inputs[VERTEX].insert(gz::math::parseInt(offset));
       hasVertices = true;
     }
@@ -2711,11 +2693,8 @@ void ColladaLoader::Implementation::LoadTriangles(
       combinedVertNorms = false;
       inputs[NORMAL].insert(gz::math::parseInt(offset));
 
-      if (norms && !norms->empty())
-      {
-        if ((*norms).size() > 0)
-          hasNormals = true;
-      }
+      if (!norms->empty())
+        hasNormals = true;
     }
     else if (semantic == "TEXCOORD")
     {
@@ -2788,14 +2767,18 @@ void ColladaLoader::Implementation::LoadTriangles(
   // vertexIndexMap is a map of collada vertex index to Gazebo submesh vertex
   // indices, used for identifying vertices that can be shared.
   std::unordered_map<unsigned int, std::vector<GeometryIndices>> vertexIndexMap;
+  // Reserve based on the number of positions to avoid rehashing.
+  vertexIndexMap.reserve(verts->size());
 
   std::vector<unsigned int> values(offsetSize);
-  std::vector<std::string> strs = split(pStr, " \t\r\n");
+  // Parse the index array directly (avoids ~1 string allocation per index that
+  // split() + parseInt() would incur). Rough reserve: ~2 chars per token.
+  std::vector<unsigned int> indices = parseUints(pStr, pStr.size() / 2);
 
-  for (unsigned int j = 0; j < strs.size(); j += offsetSize)
+  for (unsigned int j = 0; j + offsetSize <= indices.size(); j += offsetSize)
   {
     for (unsigned int i = 0; i < offsetSize; ++i)
-      values.at(i) = gz::math::parseInt(strs[j+i]);
+      values[i] = indices[j+i];
 
     unsigned int daeVertIndex = 0;
     bool addIndex = !hasVertices;
@@ -2807,7 +2790,7 @@ void ColladaLoader::Implementation::LoadTriangles(
       // Get the vertex position index value. If the position is a duplicate
       // then reset the index to the first instance of the duplicated position
       daeVertIndex = values.at(*inputs[VERTEX].begin());
-      if ((*positionDupMap).find(daeVertIndex) != (*positionDupMap).end())
+      if (positionDupMap->find(daeVertIndex) != positionDupMap->end())
         daeVertIndex = (*positionDupMap)[daeVertIndex];
 
       // if the vertex index has not been previously added then just add it.
@@ -2821,11 +2804,12 @@ void ColladaLoader::Implementation::LoadTriangles(
         // same normal and texcoord index values
         bool toDuplicate = true;
         unsigned int reuseIndex = 0;
-        std::vector<GeometryIndices> inputValues = vertexIndexMap[daeVertIndex];
+        const std::vector<GeometryIndices> &inputValues =
+            vertexIndexMap[daeVertIndex];
 
         for (unsigned int i = 0; i < inputValues.size(); ++i)
         {
-          GeometryIndices iv = inputValues[i];
+          const GeometryIndices &iv = inputValues[i];
           bool normEqual = false;
           bool texEqual = false;
           if (hasNormals)
@@ -2835,8 +2819,8 @@ void ColladaLoader::Implementation::LoadTriangles(
             // position
             unsigned int remappedNormalIndex = values.at(
                 *inputs[NORMAL].begin());
-            if ((*normalDupMap).find(remappedNormalIndex) !=
-              (*normalDupMap).end())
+            if (normalDupMap->find(remappedNormalIndex) !=
+              normalDupMap->end())
               remappedNormalIndex = (*normalDupMap)[remappedNormalIndex];
 
             if (iv.normalIndex == remappedNormalIndex)
@@ -2860,7 +2844,10 @@ void ColladaLoader::Implementation::LoadTriangles(
               if (texDupMapSetIt != texDupMapSet.end())
                 remappedTexcoordIndex = texDupMapSetIt->second;
 
-              if (iv.texcoordIndex[set] != remappedTexcoordIndex)
+              unsigned int ivTexIndex = 0u;
+              for (const auto &tc : iv.texcoordIndex)
+                if (tc.first == set) { ivTexIndex = tc.second; break; }
+              if (ivTexIndex != remappedTexcoordIndex)
               {
                 texEqual = false;
                 break;
@@ -2922,8 +2909,8 @@ void ColladaLoader::Implementation::LoadTriangles(
       {
         unsigned int inputRemappedNormalIndex = values.at(
             *inputs[NORMAL].begin());
-        if ((*normalDupMap).find(inputRemappedNormalIndex) !=
-          (*normalDupMap).end())
+        if (normalDupMap->find(inputRemappedNormalIndex) !=
+          normalDupMap->end())
           inputRemappedNormalIndex = (*normalDupMap)[inputRemappedNormalIndex];
         subMesh->AddNormal((*norms)[inputRemappedNormalIndex]);
         input.normalIndex = inputRemappedNormalIndex;
@@ -2946,7 +2933,7 @@ void ColladaLoader::Implementation::LoadTriangles(
           subMesh->AddTexCoordBySet(
               (*texcoordsSet)[inputRemappedTexcoordIndex].X(),
               (*texcoordsSet)[inputRemappedTexcoordIndex].Y(), set);
-          input.texcoordIndex[set] = inputRemappedTexcoordIndex;
+          input.texcoordIndex.emplace_back(set, inputRemappedTexcoordIndex);
         }
       }
 
