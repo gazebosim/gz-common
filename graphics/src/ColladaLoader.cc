@@ -403,7 +403,9 @@ std::vector<unsigned int> parseUints(const std::string &_str,
   char *end{};
   while (true)
   {
-    unsigned long v = std::strtoul(start, &end, 10);
+    // auto (deduces the strtoul return type) avoids a bare 'long', which
+    // cpplint's runtime/int check rejects.
+    auto v = std::strtoul(start, &end, 10);
     if (start == end)
       break;
     start = end;
