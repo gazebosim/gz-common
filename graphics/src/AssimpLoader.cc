@@ -246,9 +246,7 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene,
   {
     auto assimpMeshIdx = _node->mMeshes[meshIdx];
     auto& assimpMesh = _scene->mMeshes[assimpMeshIdx];
-    auto nodeName = ToString(_node->mName);
     auto subMesh = this->CreateSubMesh(assimpMesh, _transform);
-    subMesh.SetName(nodeName);
     // Now add the bones to the skeleton
     if (assimpMesh->HasBones() && _scene->HasAnimations())
     {
@@ -796,6 +794,7 @@ SubMesh AssimpLoader::Implementation::CreateSubMesh(
   if (subMesh.NormalCount() == 0u){
     subMesh.RecalculateNormals();
   }
+  subMesh.SetName(ToString(_assimpMesh->mName));
   return subMesh;
 }
 
