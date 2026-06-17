@@ -21,21 +21,29 @@
 #include "gz/common/testing/TestPaths.hh"
 #include "gz/common/ColladaLoader.hh"
 #include "gz/common/Mesh.hh"
+#include "gz/common/MeshManager.hh"
 #include "gz/common/testing/AutoLogFixture.hh"
 
 using namespace gz;
 
 void BM_ColladaLoader(benchmark::State &_st, const std::string &_meshFile)
 {
-  common::ColladaLoader loader;
-
+  auto *mgr = common::MeshManager::Instance();
   auto iterations = _st.range(0);
   
   for (auto _ : _st)
   {
     for (int64_t ii = 0; ii < iterations; ++ii)
-  {
-    benchmark::DoNotOptimize(loader.Load(common::testing::TestFile("data", _meshFile)));
+    {
+      const common::Mesh *mesh = mgr->Load(common::testing::TestFile("data", _meshFile));
+
+      // Remove meshes from MeshManager, else MeshManager "keeps" a copy of the mesh 
+      // loaded the first time. Load time for subsequent iterations will be 
+      // very fast because it'll be retrieving the mesh from an unordered_map and not 
+      // actually using the loader to load the mesh
+      _st.PauseTiming();
+      mgr->RemoveAll();
+      _st.ResumeTiming();
     }
   }
 }
