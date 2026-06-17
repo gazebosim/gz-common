@@ -41,11 +41,13 @@ void BM_ColladaLoader(benchmark::State &_st, const std::string &_meshFile)
 }
 
 // NOLINTNEXTLINE
-BENCHMARK_CAPTURE(BM_ColladaLoader, sydney_regatta, "sydney_regatta/meshes/sydney_regatta.dae")
+// 565 vertices, 1126 faces
+BENCHMARK_CAPTURE(BM_ColladaLoader, cordless_drill, "cordless_drill/meshes/cordless_drill.dae")
     ->Arg(1)
     ->Unit(benchmark::kMillisecond);
 
-BENCHMARK_CAPTURE(BM_ColladaLoader, lruav_base, "base.dae")
+// 144 vertices, 284 faces
+BENCHMARK_CAPTURE(BM_ColladaLoader, cylinder_animated_from_3ds_max, "cylinder_animated_from_3ds_max.dae")
     ->Arg(1)
     ->Unit(benchmark::kMillisecond);
 
