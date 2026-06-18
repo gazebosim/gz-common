@@ -50,12 +50,42 @@ void BM_MeshManager(benchmark::State &_st, const std::string &_meshFile)
 
 // NOLINTNEXTLINE
 // 565 vertices, 1126 faces
-BENCHMARK_CAPTURE(BM_MeshManager, cordless_drill, "cordless_drill/meshes/cordless_drill.dae")
+BENCHMARK_CAPTURE(BM_MeshManager, cordless_drill_dae, "cordless_drill/meshes/cordless_drill.dae")
     ->Arg(1)
     ->Unit(benchmark::kMillisecond);
 
 // 144 vertices, 284 faces
-BENCHMARK_CAPTURE(BM_MeshManager, cylinder_animated_from_3ds_max, "cylinder_animated_from_3ds_max.dae")
+BENCHMARK_CAPTURE(BM_MeshManager, cylinder_animated_from_3ds_max_dae, "cylinder_animated_from_3ds_max.dae")
+    ->Arg(1)
+    ->Unit(benchmark::kMillisecond);
+
+// 8 vertices, 12 faces
+BENCHMARK_CAPTURE(BM_MeshManager, box_dae, "box.dae")
+    ->Arg(1)
+    ->Unit(benchmark::kMillisecond);
+
+// 8 vertices, 12 faces
+BENCHMARK_CAPTURE(BM_MeshManager, box_fbx, "box.fbx")
+    ->Arg(1)
+    ->Unit(benchmark::kMillisecond);
+
+// 8 vertices, 12 faces
+BENCHMARK_CAPTURE(BM_MeshManager, box_glb, "box.glb")
+    ->Arg(1)
+    ->Unit(benchmark::kMillisecond);
+
+// 8 vertices, 12 faces
+BENCHMARK_CAPTURE(BM_MeshManager, box_obj, "box.obj")
+    ->Arg(1)
+    ->Unit(benchmark::kMillisecond);
+
+// 8 vertices, 12 faces
+BENCHMARK_CAPTURE(BM_MeshManager, cube_stl, "cube.stl")
+    ->Arg(1)
+    ->Unit(benchmark::kMillisecond);
+
+// 24 vertices, 12 faces
+BENCHMARK_CAPTURE(BM_MeshManager, PurpleCube_gltf, "gltf/PurpleCube.gltf")
     ->Arg(1)
     ->Unit(benchmark::kMillisecond);
 
