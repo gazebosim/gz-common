@@ -60,17 +60,12 @@ BENCHMARK_CAPTURE(BM_MeshManager, cylinder_animated_from_3ds_max_dae, "cylinder_
     ->Unit(benchmark::kMillisecond);
 
 // 8 vertices, 12 faces
-BENCHMARK_CAPTURE(BM_MeshManager, box_dae, "box.dae")
-    ->Arg(1)
-    ->Unit(benchmark::kMillisecond);
-
-// 8 vertices, 12 faces
 BENCHMARK_CAPTURE(BM_MeshManager, box_fbx, "box.fbx")
     ->Arg(1)
     ->Unit(benchmark::kMillisecond);
 
-// 8 vertices, 12 faces
-BENCHMARK_CAPTURE(BM_MeshManager, box_glb, "box.glb")
+// collection of meshes, total 1718 vertices, 846 faces
+BENCHMARK_CAPTURE(BM_MeshManager, fully_featured_glb, "fully_featured.glb")
     ->Arg(1)
     ->Unit(benchmark::kMillisecond);
 
