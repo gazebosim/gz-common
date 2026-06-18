@@ -26,7 +26,7 @@
 
 using namespace gz;
 
-void BM_ColladaLoader(benchmark::State &_st, const std::string &_meshFile)
+void BM_MeshManager(benchmark::State &_st, const std::string &_meshFile)
 {
   auto *mgr = common::MeshManager::Instance();
   auto iterations = _st.range(0);
@@ -50,12 +50,12 @@ void BM_ColladaLoader(benchmark::State &_st, const std::string &_meshFile)
 
 // NOLINTNEXTLINE
 // 565 vertices, 1126 faces
-BENCHMARK_CAPTURE(BM_ColladaLoader, cordless_drill, "cordless_drill/meshes/cordless_drill.dae")
+BENCHMARK_CAPTURE(BM_MeshManager, cordless_drill, "cordless_drill/meshes/cordless_drill.dae")
     ->Arg(1)
     ->Unit(benchmark::kMillisecond);
 
 // 144 vertices, 284 faces
-BENCHMARK_CAPTURE(BM_ColladaLoader, cylinder_animated_from_3ds_max, "cylinder_animated_from_3ds_max.dae")
+BENCHMARK_CAPTURE(BM_MeshManager, cylinder_animated_from_3ds_max, "cylinder_animated_from_3ds_max.dae")
     ->Arg(1)
     ->Unit(benchmark::kMillisecond);
 

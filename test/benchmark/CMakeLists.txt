@@ -4,18 +4,18 @@ include(GzBenchmark OPTIONAL RESULT_VARIABLE GzBenchmark_FOUND)
 
 if (GzBenchmark_FOUND)
   set(tests
-    ColladaLoader.cc
+    MeshManager.cc
   )
 
   gz_add_benchmarks(SOURCES ${tests})
 
-  if (TARGET BENCHMARK_ColladaLoader)
-    target_link_libraries(BENCHMARK_ColladaLoader
+  if (TARGET BENCHMARK_MeshManager)
+    target_link_libraries(BENCHMARK_MeshManager
       ${PROJECT_LIBRARY_TARGET_NAME}-graphics
       ${PROJECT_LIBRARY_TARGET_NAME}-testing
       gtest
     )
-    target_compile_definitions(BENCHMARK_ColladaLoader PRIVATE
+    target_compile_definitions(BENCHMARK_MeshManager PRIVATE
       "TESTING_PROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\"")
   endif()
 
