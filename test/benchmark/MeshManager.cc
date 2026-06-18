@@ -35,7 +35,7 @@ void BM_MeshManager(benchmark::State &_st, const std::string &_meshFile)
   {
     for (int64_t ii = 0; ii < iterations; ++ii)
     {
-      const common::Mesh *mesh = mgr->Load(common::testing::TestFile("data", _meshFile));
+      mgr->Load(common::testing::TestFile("data", _meshFile));
 
       // Remove meshes from MeshManager, else MeshManager "keeps" a copy of the mesh 
       // loaded the first time. Load time for subsequent iterations will be 
