@@ -1499,7 +1499,18 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
   }
   // Read in the total number of position coordinate values
   else if (floatArrayXml->Attribute("count"))
-    totCount = std::stoi(floatArrayXml->Attribute("count"));
+  {
+    try
+    {
+      totCount = std::stoi(floatArrayXml->Attribute("count"));
+    }
+    catch (...)
+    {
+      gzerr << "Invalid count attribute in position <float_array> with id["
+            << _id << "]\n";
+      return;
+    }
+  }
   else
   {
     gzerr << "<float_array> has no count attribute in position coordinate "
@@ -1510,7 +1521,7 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
   sourceXml = sourceXml->FirstChildElement("technique_common");
   if (!sourceXml)
   {
-    gzerr << "Unable to find technique_common element for texture "
+    gzerr << "Unable to find technique_common element for position "
           << "coordinates with id[" << _id << "]\n";
     return;
   }
@@ -1520,20 +1531,29 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
   if (!sourceXml)
   {
     gzerr << "Unable to find <accessor> as a child of <technique_common> "
-          << "for texture coordinates with id[" << _id << "]\n";
+          << "for position coordinates with id[" << _id << "]\n";
     return;
   }
 
-  // Read in the stride for the texture coordinate values. The stride
-  // indicates the number of values in the float array the comprise
-  // a complete texture coordinate.
+  // Read in the stride for the position coordinate values. The stride
+  // indicates the number of values in the float array that comprise
+  // a complete position coordinate.
   if (sourceXml->Attribute("stride"))
   {
-    stride = std::stoi(sourceXml->Attribute("stride"));
+    try
+    {
+      stride = std::stoi(sourceXml->Attribute("stride"));
+    }
+    catch (...)
+    {
+      gzerr << "Invalid stride attribute in position <accessor> with id["
+            << _id << "]\n";
+      return;
+    }
   }
   else
   {
-    gzerr << "<accessor> has no stride attribute in texture coordinate "
+    gzerr << "<accessor> has no stride attribute in position coordinate "
           << "element with id[" << _id << "]\n";
     return;
   }
@@ -1551,18 +1571,26 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
   auto toDoubleVec = [](std::string_view sv, size_t totalCount)
   {
     std::vector<double> result;
-    // Preallocate memory based on known count
-    result.reserve(totalCount * 3);
+    // Preallocate memory based on known count. totalCount is the number of
+    // float values declared by the <float_array> count attribute.
+    result.reserve(totalCount);
     const char *start = sv.data();
     char *end{};
     while (true)
     {
+      // Reset errno so a stale ERANGE set by earlier code is not misread as
+      // an overflow from this call.
+      errno = 0;
       double d = std::strtod(start, &end);
       if (start == end)
         break;
       start = end;
       if (errno == ERANGE)
-        throw std::runtime_error("strtod() overflow");
+      {
+        gzerr << "Overflow while parsing <float_array>; truncating after "
+              << result.size() << " value(s).\n";
+        break;
+      }
       result.emplace_back(d);
     }
     return result;
@@ -1576,7 +1604,10 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
   if (!_duplicates)
     _duplicates = std::make_shared<std::unordered_map<unsigned int,
                                                       unsigned int>>();
-  for (int i = 0; i < totCount; i += stride)
+  // Bound by the actual number of parsed values, not just the declared
+  // count, so a too-large count attribute cannot drive an out-of-bounds read.
+  for (int i = 0; i < totCount && i + 2 < static_cast<int>(values.size());
+       i += stride)
   {
     vec.Set(values[i],
             values[i+1],
@@ -1656,7 +1687,18 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
   }
   // Read in the total number of normal coordinate values
   else if (floatArrayXml->Attribute("count"))
-    totCount = std::stoi(floatArrayXml->Attribute("count"));
+  {
+    try
+    {
+      totCount = std::stoi(floatArrayXml->Attribute("count"));
+    }
+    catch (...)
+    {
+      gzerr << "Invalid count attribute in normal <float_array> with id["
+            << _id << "]\n";
+      return;
+    }
+  }
   else
   {
     gzerr << "<float_array> has no count attribute in normal coordinate "
@@ -1686,7 +1728,16 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
   // a complete normal coordinate.
   if (normalsXml->Attribute("stride"))
   {
-    stride = std::stoi(normalsXml->Attribute("stride"));
+    try
+    {
+      stride = std::stoi(normalsXml->Attribute("stride"));
+    }
+    catch (...)
+    {
+      gzerr << "Invalid stride attribute in normal <accessor> with id["
+            << _id << "]\n";
+      return;
+    }
   }
   else
   {
@@ -1709,18 +1760,26 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
   auto toDoubleVec = [](std::string_view sv, size_t totalCount)
   {
     std::vector<double> result;
-    // Preallocate memory based on known count
-    result.reserve(totalCount * 3);
+    // Preallocate memory based on known count. totalCount is the number of
+    // float values declared by the <float_array> count attribute.
+    result.reserve(totalCount);
     const char *start = sv.data();
     char *end{};
     while (true)
     {
+      // Reset errno so a stale ERANGE set by earlier code is not misread as
+      // an overflow from this call.
+      errno = 0;
       double d = std::strtod(start, &end);
       if (start == end)
         break;
       start = end;
       if (errno == ERANGE)
-        throw std::runtime_error("strtod() overflow");
+      {
+        gzerr << "Overflow while parsing <float_array>; truncating after "
+              << result.size() << " value(s).\n";
+        break;
+      }
       result.emplace_back(d);
     }
     return result;
@@ -1735,7 +1794,10 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
     _duplicates = std::make_shared<std::unordered_map<unsigned int,
                                                       unsigned int>>();
 
-  for (int i = 0; i < totCount; i += stride)
+  // Bound by the actual number of parsed values, not just the declared
+  // count, so a too-large count attribute cannot drive an out-of-bounds read.
+  for (int i = 0; i < totCount && i + 2 < static_cast<int>(values.size());
+       i += stride)
   {
     vec.Set(values[i],
             values[i+1],
@@ -1801,20 +1863,31 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
 
     if (count)
     {
-      gzerr << "Normal source missing float_array element, or count is "
-        << "invalid.\n";
+      gzerr << "Texture coordinate source missing float_array element, or "
+        << "count is invalid.\n";
     }
     else
     {
-      gzlog << "Normal source has a float_array with a count of zero. "
-        << "This is likely not desired\n";
+      gzlog << "Texture coordinate source has a float_array with a count of "
+        << "zero. This is likely not desired\n";
     }
 
     return;
   }
   // Read in the total number of texture coordinate values
   else if (floatArrayXml->Attribute("count"))
-    totCount = std::stoi(floatArrayXml->Attribute("count"));
+  {
+    try
+    {
+      totCount = std::stoi(floatArrayXml->Attribute("count"));
+    }
+    catch (...)
+    {
+      gzerr << "Invalid count attribute in texture coordinate <float_array> "
+            << "with id[" << _id << "]\n";
+      return;
+    }
+  }
   else
   {
     gzerr << "<float_array> has no count attribute in texture coordinate "
@@ -1846,7 +1919,16 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
   // a complete texture coordinate.
   if (xml->Attribute("stride"))
   {
-    stride = std::stoi(xml->Attribute("stride"));
+    try
+    {
+      stride = std::stoi(xml->Attribute("stride"));
+    }
+    catch (...)
+    {
+      gzerr << "Invalid stride attribute in texture coordinate <accessor> "
+            << "with id[" << _id << "]\n";
+      return;
+    }
   }
   else
   {
@@ -1857,7 +1939,18 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
 
   // Read in the count of texture coordinates.
   if (xml->Attribute("count"))
-    texCount = std::stoi(xml->Attribute("count"));
+  {
+    try
+    {
+      texCount = std::stoi(xml->Attribute("count"));
+    }
+    catch (...)
+    {
+      gzerr << "Invalid count attribute in texture coordinate <accessor> "
+            << "with id[" << _id << "]\n";
+      return;
+    }
+  }
   else
   {
     gzerr << "<accessor> has no count attribute in texture coordinate element "
@@ -1888,18 +1981,26 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
   auto toDoubleVec = [](std::string_view sv, size_t totalCount)
   {
     std::vector<double> result;
-    // Preallocate memory based on known count
-    result.reserve(totalCount * 2);
+    // Preallocate memory based on known count. totalCount is the number of
+    // float values declared by the <float_array> count attribute.
+    result.reserve(totalCount);
     const char *start = sv.data();
     char *end{};
     while (true)
     {
+      // Reset errno so a stale ERANGE set by earlier code is not misread as
+      // an overflow from this call.
+      errno = 0;
       double d = std::strtod(start, &end);
       if (start == end)
         break;
       start = end;
       if (errno == ERANGE)
-        throw std::runtime_error("strtod() overflow");
+      {
+        gzerr << "Overflow while parsing <float_array>; truncating after "
+              << result.size() << " value(s).\n";
+        break;
+      }
       result.emplace_back(d);
     }
     return result;
@@ -1915,8 +2016,11 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
   if (!_duplicates)
     _duplicates = std::make_shared<std::unordered_map<unsigned int,
                                                       unsigned int>>();
-  // Read in all the texture coordinates.
-  for (int i = 0; i < totCount; i += stride)
+  // Read in all the texture coordinates. Bound by the actual number of parsed
+  // values, not just the declared count, so a too-large count attribute cannot
+  // drive an out-of-bounds read.
+  for (int i = 0; i < totCount && i + 1 < static_cast<int>(values.size());
+       i += stride)
   {
     // We only handle 2D texture coordinates right now.
     vec.Set(values[i],
