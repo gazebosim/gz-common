@@ -42,7 +42,7 @@ TEST_F(STLLoaderTest, LoadSTL)
   EXPECT_STREQ("unknown", mesh->Name().c_str());
   EXPECT_EQ(math::Vector3d(20, 0, 20), mesh->Max());
   EXPECT_EQ(math::Vector3d(0, -20, 0), mesh->Min());
-  // 36 vertices, 24 unique, 12 shared.
+  // 12 triangles x 3 = 36 vertices (no deduplication).
   EXPECT_EQ(36u, mesh->VertexCount());
   EXPECT_EQ(36u, mesh->NormalCount());
   EXPECT_EQ(36u, mesh->IndexCount());
@@ -60,6 +60,11 @@ TEST_F(STLLoaderTest, LoadSTL)
   EXPECT_EQ(math::Vector3d(0, 0, -1), subMesh->Normal(1u));
   EXPECT_EQ(math::Vector3d(0, 0, -1), subMesh->Normal(2u));
 
+  // Vertices are not deduplicated, so the index buffer is the identity
+  // sequence (each vertex is referenced by its own position).
+  for (unsigned int i = 0; i < subMesh->IndexCount(); ++i)
+    EXPECT_EQ(i, static_cast<unsigned int>(subMesh->Index(i)));
+
   EXPECT_STREQ("", mesh->SubMeshByIndex(0).lock()->Name().c_str());
 
   mesh = loader.Load(
@@ -69,7 +74,7 @@ TEST_F(STLLoaderTest, LoadSTL)
   EXPECT_STREQ("unknown", mesh->Name().c_str());
   EXPECT_EQ(math::Vector3d(20, 0, 20), mesh->Max());
   EXPECT_EQ(math::Vector3d(0, -20, 0), mesh->Min());
-  // 36 vertices, 24 unique, 12 shared.
+  // 12 triangles x 3 = 36 vertices (no deduplication).
   EXPECT_EQ(36u, mesh->VertexCount());
   EXPECT_EQ(36u, mesh->NormalCount());
   EXPECT_EQ(36u, mesh->IndexCount());
@@ -86,6 +91,11 @@ TEST_F(STLLoaderTest, LoadSTL)
   EXPECT_EQ(math::Vector3d(0, 0, -1), subMesh->Normal(0u));
   EXPECT_EQ(math::Vector3d(0, 0, -1), subMesh->Normal(1u));
   EXPECT_EQ(math::Vector3d(0, 0, -1), subMesh->Normal(2u));
+
+  // Vertices are not deduplicated, so the index buffer is the identity
+  // sequence (each vertex is referenced by its own position).
+  for (unsigned int i = 0; i < subMesh->IndexCount(); ++i)
+    EXPECT_EQ(i, static_cast<unsigned int>(subMesh->Index(i)));
 
   EXPECT_STREQ("", mesh->SubMeshByIndex(0).lock()->Name().c_str());
 }
