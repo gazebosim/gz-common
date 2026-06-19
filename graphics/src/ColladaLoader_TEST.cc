@@ -522,3 +522,101 @@ TEST_F(ColladaLoader, NoAnimName)
   EXPECT_EQ(animName, "animation1");
   delete mesh;
 }
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadLines)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "box_lines.dae"));
+  ASSERT_TRUE(mesh);
+
+  // 4 line segments, each contributes 2 vertices and 2 indices.
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(8u, mesh->VertexCount());
+  EXPECT_EQ(8u, mesh->IndexCount());
+
+  auto subMesh = mesh->SubMeshByIndex(0u).lock();
+  ASSERT_NE(nullptr, subMesh);
+  EXPECT_EQ(common::SubMesh::LINES, subMesh->SubMeshPrimitiveType());
+  delete mesh;
+}
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadTextureMaterial)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "box_texture.dae"));
+  ASSERT_TRUE(mesh);
+
+  EXPECT_EQ(3u, mesh->VertexCount());
+  EXPECT_EQ(3u, mesh->TexCoordCount());
+  ASSERT_EQ(1u, mesh->MaterialCount());
+
+  common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+  ASSERT_NE(nullptr, mat);
+
+  // The diffuse texture chain should have been resolved and stored.
+  EXPECT_FALSE(mat->TextureImage().empty());
+  EXPECT_NE(mat->TextureImage().find("box_texture.png"), std::string::npos);
+  delete mesh;
+}
+
+/////////////////////////////////////////////////
+// Loading a non-existent file must return null, not crash.
+TEST_F(ColladaLoader, LoadNonexistentFile)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "this_file_does_not_exist.dae"));
+  EXPECT_EQ(nullptr, mesh);
+}
+
+/////////////////////////////////////////////////
+// A file whose root element is not <COLLADA> must return null, not crash.
+TEST_F(ColladaLoader, LoadNoColladaTag)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "no_collada_tag.dae"));
+  EXPECT_EQ(nullptr, mesh);
+#ifndef _WIN32
+  common::Console::Root().RawLogger().flush();
+  EXPECT_NE(LogContent().find("Missing COLLADA tag"), std::string::npos);
+#endif
+}
+
+/////////////////////////////////////////////////
+// An unsupported version is reported but the mesh still loads.
+TEST_F(ColladaLoader, LoadBadVersion)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "bad_version.dae"));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(3u, mesh->VertexCount());
+#ifndef _WIN32
+  common::Console::Root().RawLogger().flush();
+  EXPECT_NE(LogContent().find("Invalid collada file"), std::string::npos);
+#endif
+  delete mesh;
+}
+
+/////////////////////////////////////////////////
+// A <scene> referencing a missing visual_scene must be reported, not crash.
+TEST_F(ColladaLoader, LoadMissingVisualScene)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "missing_visual_scene.dae"));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->VertexCount());
+#ifndef _WIN32
+  common::Console::Root().RawLogger().flush();
+  EXPECT_NE(LogContent().find("Unable to find visual_scene"),
+      std::string::npos);
+#endif
+  delete mesh;
+}
+
