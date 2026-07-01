@@ -259,8 +259,6 @@ TEST_F(AssimpLoader, TexCoordSets)
   delete mesh;
 }
 
-// Test fails for assimp below 5.2.0
-#ifndef GZ_ASSIMP_PRE_5_2_0
 /////////////////////////////////////////////////
 TEST_F(AssimpLoader, LoadBoxWithAnimationOutsideSkeleton)
 {
@@ -297,7 +295,6 @@ TEST_F(AssimpLoader, LoadBoxWithAnimationOutsideSkeleton)
   EXPECT_EQ(expectedTrans, poseEnd.at("Armature"));
   delete mesh;
 }
-#endif
 
 /////////////////////////////////////////////////
 TEST_F(AssimpLoader, LoadBoxInstControllerWithoutSkeleton)
@@ -464,9 +461,6 @@ TEST_F(AssimpLoader, MergeBoxWithDoubleSkeleton)
   delete mesh;
 }
 
-// For assimp below 5.2.0 mesh loading fails because of
-// failing to parse the empty <author> tag
-#ifndef GZ_ASSIMP_PRE_5_2_0
 /////////////////////////////////////////////////
 TEST_F(AssimpLoader, LoadCylinderAnimatedFrom3dsMax)
 {
@@ -503,7 +497,6 @@ TEST_F(AssimpLoader, LoadCylinderAnimatedFrom3dsMax)
   EXPECT_TRUE(anim->HasNode("Bone02"));
   delete mesh;
 }
-#endif
 
 /////////////////////////////////////////////////
 TEST_F(AssimpLoader, LoadObjBox)
@@ -730,7 +723,6 @@ TEST_F(AssimpLoader, LoadGlTF2BoxExternalTexture)
 // Open a gltf mesh with transmission extension
 TEST_F(AssimpLoader, LoadGlTF2BoxTransmission)
 {
-#ifndef GZ_ASSIMP_PRE_5_1_0
   common::AssimpLoader loader;
   common::Mesh *mesh = loader.Load(
       common::testing::TestFile("data", "box_transmission.glb"));
@@ -747,7 +739,6 @@ TEST_F(AssimpLoader, LoadGlTF2BoxTransmission)
   // transmission currently modeled as transparency
   EXPECT_FLOAT_EQ(0.1f, mat->Transparency());
   delete mesh;
-#endif
 }
 
 /////////////////////////////////////////////////
@@ -839,7 +830,6 @@ TEST_F(AssimpLoader, LoadGlbPbrAsset)
 
   EXPECT_NE(pbr->NormalMapData(), nullptr);
   // Metallic roughness and alpha from textures only works in assimp > 5.2.0
-#ifndef GZ_ASSIMP_PRE_5_2_0
   // Alpha from textures
   EXPECT_TRUE(material->TextureAlphaEnabled());
   EXPECT_TRUE(material->TwoSidedEnabled());
@@ -856,7 +846,6 @@ TEST_F(AssimpLoader, LoadGlbPbrAsset)
   // \todo(iche033) Lightmaps are disabled for glb meshes
   // due to upstream bug
   // EXPECT_EQ(pbr->LightMapTexCoordSet(), 1);
-#endif
 
   // \todo(iche033) Lightmaps are disabled for glb meshes
   // due to upstream bug
