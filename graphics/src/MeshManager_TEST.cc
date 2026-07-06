@@ -32,6 +32,12 @@ using namespace gz;
 #ifndef _WIN32
 class MeshManager : public common::testing::AutoLogFixture { };
 
+const bool forceAssimpEnv = []() {
+  std::string forceAssimpStr;
+  common::env("GZ_MESH_FORCE_ASSIMP", forceAssimpStr);
+  return forceAssimpStr == "true";
+}();
+
 /////////////////////////////////////////////////
 TEST_F(MeshManager, CreateExtrudedPolyline)
 {
@@ -467,8 +473,8 @@ TEST_F(MeshManager, LoadBox)
   auto *mgr = common::MeshManager::Instance();
   std::string filename = common::testing::TestFile("data", "box.dae");
   const common::Mesh *mesh = mgr->Load(filename);
-
-  EXPECT_STREQ("unknown", mesh->Name().c_str());
+  ASSERT_NE(nullptr, mesh);
+  EXPECT_EQ(filename, mesh->Name());
   EXPECT_EQ(gz::math::Vector3d(1, 1, 1), mesh->Max());
   EXPECT_EQ(gz::math::Vector3d(-1, -1, -1), mesh->Min());
   // 36 vertices, 24 unique, 12 shared.
@@ -552,12 +558,14 @@ TEST_F(MeshManager, LoadZeroCount)
   EXPECT_EQ(log.find("Normal source missing float_array"), std::string::npos);
 
   // Expect the logs to contain information
-  EXPECT_NE(log.find("Triangle input has a count of zero"), std::string::npos);
-  EXPECT_NE(log.find("Vertex source has a float_array with a count of zero"),
-      std::string::npos);
-  EXPECT_NE(log.find("Normal source has a float_array with a count of zero"),
-      std::string::npos);
-
+  if (!forceAssimpEnv)
+  {
+    EXPECT_NE(log.find("Triangle input has a count of zero"), std::string::npos);
+    EXPECT_NE(log.find("Vertex source has a float_array with a count of zero"),
+        std::string::npos);
+    EXPECT_NE(log.find("Normal source has a float_array with a count of zero"),
+        std::string::npos);
+  }
   mgr->RemoveAll();
 }
 
@@ -634,7 +642,14 @@ TEST_F(MeshManager, TexCoordSets)
   EXPECT_EQ(6u, mesh->IndexCount());
   EXPECT_EQ(6u, mesh->TexCoordCount());
   EXPECT_EQ(2u, mesh->SubMeshCount());
-  EXPECT_EQ(0u, mesh->MaterialCount());
+  if (forceAssimpEnv)
+  {
+    EXPECT_EQ(1u, mesh->MaterialCount());
+  }
+  else
+  {
+    EXPECT_EQ(0u, mesh->MaterialCount());
+  }
 
   auto sm = mesh->SubMeshByIndex(0u);
   auto subMesh = sm.lock();
@@ -731,7 +746,7 @@ TEST_F(MeshManager, LoadBoxWithAnimationOutsideSkeleton)
       0, 0, 1, 0,
       0, 0, 0, 1);
   EXPECT_EQ(expectedTrans, poseStart.at("Armature"));
-  auto poseEnd = anim->PoseAt(1.666667);
+  auto poseEnd = anim->PoseAt(1.666666);
   expectedTrans = math::Matrix4d(
         1, 0, 0, 2,
         0, 1, 0, -1,
@@ -749,11 +764,19 @@ TEST_F(MeshManager, LoadBoxInstControllerWithoutSkeleton)
       common::testing::TestFile("data",
         "box_inst_controller_without_skeleton.dae"));
 
+  if (forceAssimpEnv)
+  {
+    EXPECT_EQ(24u, mesh->VertexCount());
+    EXPECT_EQ(24u, mesh->TexCoordCount());
+  }
+  else
+  {
+    EXPECT_EQ(35u, mesh->VertexCount());
+    EXPECT_EQ(35u, mesh->TexCoordCount());
+  }
   EXPECT_EQ(36u, mesh->IndexCount());
-  EXPECT_EQ(35u, mesh->VertexCount());
   EXPECT_EQ(1u, mesh->SubMeshCount());
   EXPECT_EQ(1u, mesh->MaterialCount());
-  EXPECT_EQ(35u, mesh->TexCoordCount());
   common::SkeletonPtr skeleton = mesh->MeshSkeleton();
   EXPECT_LT(0u, skeleton->NodeCount());
   EXPECT_NE(nullptr, skeleton->NodeById("Armature_Bone"));
@@ -767,23 +790,45 @@ TEST_F(MeshManager, LoadBoxMultipleInstControllers)
   const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "box_multiple_inst_controllers.dae"));
 
+  if (forceAssimpEnv)
+  {
+    EXPECT_EQ(48u, mesh->VertexCount());
+    EXPECT_EQ(48u, mesh->TexCoordCount());
+  }
+  else
+  {
+    EXPECT_EQ(70u, mesh->VertexCount());
+    EXPECT_EQ(70u, mesh->TexCoordCount());
+  }
   EXPECT_EQ(72u, mesh->IndexCount());
-  EXPECT_EQ(70u, mesh->VertexCount());
   EXPECT_EQ(2u, mesh->SubMeshCount());
   EXPECT_EQ(1u, mesh->MaterialCount());
-  EXPECT_EQ(70u, mesh->TexCoordCount());
 
   std::shared_ptr<common::SubMesh> submesh = mesh->SubMeshByIndex(0).lock();
   std::shared_ptr<common::SubMesh> submesh2 = mesh->SubMeshByIndex(1).lock();
   EXPECT_EQ(36u, submesh->IndexCount());
   EXPECT_EQ(36u, submesh2->IndexCount());
-  EXPECT_EQ(35u, submesh->VertexCount());
-  EXPECT_EQ(35u, submesh2->VertexCount());
-  EXPECT_EQ(35u, submesh->TexCoordCount());
-  EXPECT_EQ(35u, submesh2->TexCoordCount());
+  if (forceAssimpEnv)
+  {
+    EXPECT_EQ(24u, submesh->VertexCount());
+    EXPECT_EQ(24u, submesh2->VertexCount());
+    EXPECT_EQ(24u, submesh->TexCoordCount());
+    EXPECT_EQ(24u, submesh2->TexCoordCount());
+  }
+  else
+  {
+    EXPECT_EQ(35u, submesh->VertexCount());
+    EXPECT_EQ(35u, submesh2->VertexCount());
+    EXPECT_EQ(35u, submesh->TexCoordCount());
+    EXPECT_EQ(35u, submesh2->TexCoordCount());
+  }
 
   common::SkeletonPtr skeleton = mesh->MeshSkeleton();
   EXPECT_NE(nullptr, skeleton->NodeById("Armature_Bone"));
+  if (!forceAssimpEnv)
+  {
+    EXPECT_NE(nullptr, skeleton->NodeById("Armature_Bone2"));
+  }
   mgr->RemoveAll();
 }
 
@@ -794,33 +839,51 @@ TEST_F(MeshManager, LoadBoxNestedAnimation)
   const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "box_nested_animation.dae"));
 
+  if (forceAssimpEnv)
+  {
+    EXPECT_EQ(24u, mesh->VertexCount()); //
+    EXPECT_EQ(24u, mesh->TexCoordCount()); //
+  }
+  else
+  {
+    EXPECT_EQ(35u, mesh->VertexCount()); //
+    EXPECT_EQ(35u, mesh->TexCoordCount()); //
+  }
   EXPECT_EQ(36u, mesh->IndexCount());
-  EXPECT_EQ(35u, mesh->VertexCount());
   EXPECT_EQ(1u, mesh->SubMeshCount());
   EXPECT_EQ(1u, mesh->MaterialCount());
-  EXPECT_EQ(35u, mesh->TexCoordCount());
+  std::string nodeName;
+  if (forceAssimpEnv)
+  {
+    nodeName = "Armature_Bone";
+  }
+  else
+  {
+    nodeName = "Bone";
+  }
   common::SkeletonPtr skeleton = mesh->MeshSkeleton();
   ASSERT_EQ(1u, mesh->MeshSkeleton()->AnimationCount());
   common::SkeletonAnimation *anim = skeleton->Animation(0);
+  EXPECT_EQ(anim->Name(), "Armature");
   EXPECT_EQ(1u, anim->NodeCount());
-  EXPECT_TRUE(anim->HasNode("Bone"));
-  auto nodeAnimation = anim->NodeAnimationByName("Bone");
+  EXPECT_TRUE(anim->HasNode(nodeName));
+  auto nodeAnimation = anim->NodeAnimationByName(nodeName);
   EXPECT_NE(nullptr, nodeAnimation);
-  EXPECT_EQ("Bone", nodeAnimation->Name());
+  EXPECT_EQ(nodeName, nodeAnimation->Name());
   auto poseStart = anim->PoseAt(0);
   math::Matrix4d expectedTrans = math::Matrix4d(
       1, 0, 0, 1,
       0, 1, 0, -1,
       0, 0, 1, 0,
       0, 0, 0, 1);
-  EXPECT_EQ(expectedTrans, poseStart.at("Bone"));
-  auto poseEnd = anim->PoseAt(1.666667);
+  EXPECT_EQ(expectedTrans, poseStart.at(nodeName));
+  auto poseEnd = anim->PoseAt(1.666666);
   expectedTrans = math::Matrix4d(
         1, 0, 0, 2,
         0, 1, 0, -1,
         0, 0, 1, 0,
         0, 0, 0, 1);
-  EXPECT_EQ(expectedTrans, poseEnd.at("Bone"));
+  EXPECT_EQ(expectedTrans, poseEnd.at(nodeName));
   mgr->RemoveAll();
 }
 
@@ -830,11 +893,28 @@ TEST_F(MeshManager, LoadBoxWithDefaultStride)
   auto *mgr = common::MeshManager::Instance();
   const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "box_with_default_stride.dae"));
-
+  
+  if (forceAssimpEnv)
+  {
+    EXPECT_EQ(24u, mesh->VertexCount());
+    EXPECT_EQ(24u, mesh->TexCoordCount());
+  }
+  else
+  {
+    EXPECT_EQ(35u, mesh->VertexCount());
+    EXPECT_EQ(35u, mesh->TexCoordCount());
+  }
   EXPECT_EQ(36u, mesh->IndexCount());
-  EXPECT_EQ(35u, mesh->VertexCount());
   EXPECT_EQ(1u, mesh->SubMeshCount());
   EXPECT_EQ(1u, mesh->MaterialCount());
+  if (forceAssimpEnv)
+  {
+    ASSERT_EQ(0u, mesh->MeshSkeleton()->AnimationCount());
+  }
+  else
+  {
+    ASSERT_EQ(1u, mesh->MeshSkeleton()->AnimationCount());
+  }
   mgr->RemoveAll();
 }
 
@@ -847,7 +927,14 @@ TEST_F(MeshManager, LoadBoxWithMultipleGeoms)
 
   EXPECT_EQ(72u, mesh->IndexCount());
   EXPECT_EQ(48u, mesh->VertexCount());
-  EXPECT_EQ(0u, mesh->MaterialCount());
+  if (forceAssimpEnv)
+  {
+    EXPECT_EQ(1u, mesh->MaterialCount());
+  }
+  else
+  {
+    EXPECT_EQ(0u, mesh->MaterialCount());
+  }
   EXPECT_EQ(48u, mesh->TexCoordCount());
   ASSERT_EQ(1u, mesh->MeshSkeleton()->AnimationCount());
   ASSERT_EQ(2u, mesh->SubMeshCount());
@@ -862,7 +949,6 @@ TEST_F(MeshManager, LoadBoxWithHierarchicalNodes)
   auto *mgr = common::MeshManager::Instance();
   const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "box_with_hierarchical_nodes.dae"));
-
   ASSERT_EQ(5u, mesh->SubMeshCount());
 
   // node by itself
@@ -871,15 +957,28 @@ TEST_F(MeshManager, LoadBoxWithHierarchicalNodes)
   // nested node with no name so it takes the parent's name instead
   EXPECT_EQ("StaticCubeParent", mesh->SubMeshByIndex(1).lock()->Name());
 
-  // parent node containing child node with no name
-  EXPECT_EQ("StaticCubeParent", mesh->SubMeshByIndex(2).lock()->Name());
-
-  // nested node with name
-  EXPECT_EQ("StaticCubeNested", mesh->SubMeshByIndex(3).lock()->Name());
-
-  // Parent of nested node with name
-  EXPECT_EQ("StaticCubeParent2", mesh->SubMeshByIndex(4).lock()->Name());
-
+  if (forceAssimpEnv)
+  {
+    // parent node containing child node with no name
+    EXPECT_EQ("StaticCubeNestedNoName", mesh->SubMeshByIndex(2).lock()->Name());
+  
+    // nested node with name
+    EXPECT_EQ("StaticCubeParent2", mesh->SubMeshByIndex(3).lock()->Name());
+  
+    // Parent of nested node with name
+    EXPECT_EQ("StaticCubeNested", mesh->SubMeshByIndex(4).lock()->Name());
+  }
+  else
+  {
+    // parent node containing child node with no name
+    EXPECT_EQ("StaticCubeParent", mesh->SubMeshByIndex(2).lock()->Name());
+  
+    // nested node with name
+    EXPECT_EQ("StaticCubeNested", mesh->SubMeshByIndex(3).lock()->Name());
+  
+    // Parent of nested node with name
+    EXPECT_EQ("StaticCubeParent2", mesh->SubMeshByIndex(4).lock()->Name());
+  }
   mgr->RemoveAll();
 }
 
@@ -889,11 +988,20 @@ TEST_F(MeshManager, MergeBoxWithDoubleSkeleton)
   auto *mgr = common::MeshManager::Instance();
   const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "box_with_double_skeleton.dae"));
+  std::string skeletonRootName;
+  if (forceAssimpEnv)
+  {
+    skeletonRootName = "Scene";
+  }
+  else
+  {
+    skeletonRootName = "Armature";
+  }
   EXPECT_TRUE(mesh->HasSkeleton());
   auto skeleton_ptr = mesh->MeshSkeleton();
   // The two skeletons have been joined and their root is the
-  // animation root, called Armature
-  EXPECT_EQ(skeleton_ptr->RootNode()->Name(), std::string("Armature"));
+  // animation root, called Armature (ColladaLoader) or Scene (AssimpLoader)
+  EXPECT_EQ(skeleton_ptr->RootNode()->Name(), std::string(skeletonRootName));
   mgr->RemoveAll();
 }
 
@@ -907,18 +1015,21 @@ TEST_F(MeshManager, LoadCylinderAnimatedFrom3dsMax)
   std::string filename = common::testing::TestFile("data",
         "cylinder_animated_from_3ds_max.dae");
   const common::Mesh *mesh = mgr->Load(filename);
-  common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data",
-        "cylinder_animated_from_3ds_max.dae"));
-
-  EXPECT_EQ("unknown", mesh->Name());
-  EXPECT_EQ(202u, mesh->VertexCount());
-  EXPECT_EQ(202u, mesh->NormalCount());
+  EXPECT_EQ(filename, mesh->Name());
+  if (forceAssimpEnv)
+  {
+    EXPECT_EQ(194u, mesh->VertexCount());
+    EXPECT_EQ(194u, mesh->NormalCount());
+    EXPECT_EQ(1u, mesh->MaterialCount());
+  }
+  else
+  {
+    EXPECT_EQ(202u, mesh->VertexCount());
+    EXPECT_EQ(202u, mesh->NormalCount());
+    EXPECT_EQ(0u, mesh->MaterialCount());
+  }
   EXPECT_EQ(852u, mesh->IndexCount());
   EXPECT_LT(0u, mesh->TexCoordCount());
-  EXPECT_EQ(0u, mesh->MaterialCount());
-
   EXPECT_EQ(1u, mesh->SubMeshCount());
   auto subMesh = mesh->SubMeshByIndex(0);
   ASSERT_NE(nullptr, subMesh.lock());
