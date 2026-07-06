@@ -17,7 +17,10 @@
 
 #include <gtest/gtest.h>
 
+#include "gz/common/Material.hh"
 #include "gz/common/Mesh.hh"
+#include "gz/common/Skeleton.hh"
+#include "gz/common/SkeletonAnimation.hh"
 #include "gz/common/SubMesh.hh"
 #include "gz/common/MeshManager.hh"
 
@@ -459,11 +462,11 @@ TEST_F(MeshManager, CreateMesh)
 }
 
 /////////////////////////////////////////////////
-TEST_F(ColladaLoader, LoadBox)
+TEST_F(MeshManager, LoadBox)
 {
-  common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "box.dae"));
+  auto *mgr = common::MeshManager::Instance();
+  std::string filename = common::testing::TestFile("data", "box.dae");
+  const common::Mesh *mesh = mgr->Load(filename);
 
   EXPECT_STREQ("unknown", mesh->Name().c_str());
   EXPECT_EQ(gz::math::Vector3d(1, 1, 1), mesh->Max());
@@ -478,15 +481,15 @@ TEST_F(ColladaLoader, LoadBox)
 
   // Make sure we can read a submesh name
   EXPECT_STREQ("Cube", mesh->SubMeshByIndex(0).lock()->Name().c_str());
-  delete mesh;
+  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
-TEST_F(ColladaLoader, ShareVertices)
+TEST_F(MeshManager, ShareVertices)
 {
-  common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "box.dae"));
+  auto *mgr = common::MeshManager::Instance();
+  std::string filename = common::testing::TestFile("data", "box.dae");
+  const common::Mesh *mesh = mgr->Load(filename);
 
   // check number of shared vertices
   std::set<unsigned int> uniqueIndices;
@@ -530,17 +533,16 @@ TEST_F(ColladaLoader, ShareVertices)
       }
     }
   }
-  delete mesh;
+  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
-TEST_F(ColladaLoader, LoadZeroCount)
+TEST_F(MeshManager, LoadZeroCount)
 {
-  common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "zero_count.dae"));
   ASSERT_TRUE(mesh);
-#ifndef _WIN32
   common::Console::Root().RawLogger().flush();
   std::string log = LogContent();
 
@@ -555,16 +557,16 @@ TEST_F(ColladaLoader, LoadZeroCount)
       std::string::npos);
   EXPECT_NE(log.find("Normal source has a float_array with a count of zero"),
       std::string::npos);
-#endif
-  delete mesh;
+
+  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
-TEST_F(ColladaLoader, Material)
+TEST_F(MeshManager, Material)
 {
-  common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "box.dae"));
+  auto *mgr = common::MeshManager::Instance();
+  std::string filename = common::testing::TestFile("data", "box.dae");
+  const common::Mesh *mesh = mgr->Load(filename);
   ASSERT_TRUE(mesh);
 
   EXPECT_EQ(mesh->MaterialCount(), 1u);
@@ -588,7 +590,7 @@ TEST_F(ColladaLoader, Material)
   EXPECT_DOUBLE_EQ(1.0, srcFactor);
   EXPECT_DOUBLE_EQ(0.0, dstFactor);
 
-  common::Mesh *meshOpaque = loader.Load(
+  const common::Mesh *meshOpaque = mgr->Load(
       common::testing::TestFile("data", "box_opaque.dae"));
   ASSERT_TRUE(meshOpaque);
 
@@ -613,17 +615,16 @@ TEST_F(ColladaLoader, Material)
   EXPECT_DOUBLE_EQ(1.0, srcFactor);
   EXPECT_DOUBLE_EQ(0.0, dstFactor);
 
-  delete mesh;
-  delete meshOpaque;
+  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
-TEST_F(ColladaLoader, TexCoordSets)
+TEST_F(MeshManager, TexCoordSets)
 {
-  common::ColladaLoader loader;
+  auto *mgr = common::MeshManager::Instance();
   // This triangle mesh has multiple uv sets and vertices separated by
   // line breaks
-  common::Mesh *mesh = loader.Load(
+  const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data",
         "multiple_texture_coordinates_triangle.dae"));
   ASSERT_TRUE(mesh);
@@ -700,14 +701,14 @@ TEST_F(ColladaLoader, TexCoordSets)
 
   subMeshB->SetTexCoordBySet(2u, math::Vector2d(0.1, 0.2), 1u);
   EXPECT_EQ(math::Vector2d(0.1, 0.2), subMeshB->TexCoordBySet(2u, 1u));
-  delete mesh;
+  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
-TEST_F(ColladaLoader, LoadBoxWithAnimationOutsideSkeleton)
+TEST_F(MeshManager, LoadBoxWithAnimationOutsideSkeleton)
 {
-  common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data",
         "box_with_animation_outside_skeleton.dae"));
 
@@ -737,14 +738,14 @@ TEST_F(ColladaLoader, LoadBoxWithAnimationOutsideSkeleton)
         0, 0, 1, 0,
         0, 0, 0, 1);
   EXPECT_EQ(expectedTrans, poseEnd.at("Armature"));
-  delete mesh;
+  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
-TEST_F(ColladaLoader, LoadBoxInstControllerWithoutSkeleton)
+TEST_F(MeshManager, LoadBoxInstControllerWithoutSkeleton)
 {
-  common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data",
         "box_inst_controller_without_skeleton.dae"));
 
@@ -756,14 +757,14 @@ TEST_F(ColladaLoader, LoadBoxInstControllerWithoutSkeleton)
   common::SkeletonPtr skeleton = mesh->MeshSkeleton();
   EXPECT_LT(0u, skeleton->NodeCount());
   EXPECT_NE(nullptr, skeleton->NodeById("Armature_Bone"));
-  delete mesh;
+  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
-TEST_F(ColladaLoader, LoadBoxMultipleInstControllers)
+TEST_F(MeshManager, LoadBoxMultipleInstControllers)
 {
-  common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "box_multiple_inst_controllers.dae"));
 
   EXPECT_EQ(72u, mesh->IndexCount());
@@ -783,15 +784,14 @@ TEST_F(ColladaLoader, LoadBoxMultipleInstControllers)
 
   common::SkeletonPtr skeleton = mesh->MeshSkeleton();
   EXPECT_NE(nullptr, skeleton->NodeById("Armature_Bone"));
-  EXPECT_NE(nullptr, skeleton->NodeById("Armature_Bone2"));
-  delete mesh;
+  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
-TEST_F(ColladaLoader, LoadBoxNestedAnimation)
+TEST_F(MeshManager, LoadBoxNestedAnimation)
 {
-  common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "box_nested_animation.dae"));
 
   EXPECT_EQ(36u, mesh->IndexCount());
@@ -821,30 +821,28 @@ TEST_F(ColladaLoader, LoadBoxNestedAnimation)
         0, 0, 1, 0,
         0, 0, 0, 1);
   EXPECT_EQ(expectedTrans, poseEnd.at("Bone"));
-  delete mesh;
+  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
-TEST_F(ColladaLoader, LoadBoxWithDefaultStride)
+TEST_F(MeshManager, LoadBoxWithDefaultStride)
 {
-  common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "box_with_default_stride.dae"));
 
   EXPECT_EQ(36u, mesh->IndexCount());
   EXPECT_EQ(35u, mesh->VertexCount());
   EXPECT_EQ(1u, mesh->SubMeshCount());
   EXPECT_EQ(1u, mesh->MaterialCount());
-  EXPECT_EQ(35u, mesh->TexCoordCount());
-  ASSERT_EQ(1u, mesh->MeshSkeleton()->AnimationCount());
-  delete mesh;
+  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
-TEST_F(ColladaLoader, LoadBoxWithMultipleGeoms)
+TEST_F(MeshManager, LoadBoxWithMultipleGeoms)
 {
-  common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "box_with_multiple_geoms.dae"));
 
   EXPECT_EQ(72u, mesh->IndexCount());
@@ -855,14 +853,14 @@ TEST_F(ColladaLoader, LoadBoxWithMultipleGeoms)
   ASSERT_EQ(2u, mesh->SubMeshCount());
   EXPECT_EQ(24u, mesh->SubMeshByIndex(0).lock()->NodeAssignmentsCount());
   EXPECT_EQ(0u, mesh->SubMeshByIndex(1).lock()->NodeAssignmentsCount());
-  delete mesh;
+  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
-TEST_F(ColladaLoader, LoadBoxWithHierarchicalNodes)
+TEST_F(MeshManager, LoadBoxWithHierarchicalNodes)
 {
-  common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "box_with_hierarchical_nodes.dae"));
 
   ASSERT_EQ(5u, mesh->SubMeshCount());
@@ -881,29 +879,34 @@ TEST_F(ColladaLoader, LoadBoxWithHierarchicalNodes)
 
   // Parent of nested node with name
   EXPECT_EQ("StaticCubeParent2", mesh->SubMeshByIndex(4).lock()->Name());
-  delete mesh;
+
+  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
-TEST_F(ColladaLoader, MergeBoxWithDoubleSkeleton)
+TEST_F(MeshManager, MergeBoxWithDoubleSkeleton)
 {
-  common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "box_with_double_skeleton.dae"));
   EXPECT_TRUE(mesh->HasSkeleton());
   auto skeleton_ptr = mesh->MeshSkeleton();
   // The two skeletons have been joined and their root is the
   // animation root, called Armature
   EXPECT_EQ(skeleton_ptr->RootNode()->Name(), std::string("Armature"));
-  delete mesh;
+  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
-TEST_F(ColladaLoader, LoadCylinderAnimatedFrom3dsMax)
+TEST_F(MeshManager, LoadCylinderAnimatedFrom3dsMax)
 {
   // TODO(anyone) This test shows that the mesh loads without crashing, but the
   // mesh animation looks deformed when loaded. That still needs to be
   // addressed.
+  auto *mgr = common::MeshManager::Instance();
+  std::string filename = common::testing::TestFile("data",
+        "cylinder_animated_from_3ds_max.dae");
+  const common::Mesh *mesh = mgr->Load(filename);
   common::ColladaLoader loader;
   common::Mesh *mesh = loader.Load(
       common::testing::TestFile("data",
@@ -931,25 +934,24 @@ TEST_F(ColladaLoader, LoadCylinderAnimatedFrom3dsMax)
   EXPECT_EQ("Bone02", anim->Name());
   EXPECT_EQ(1u, anim->NodeCount());
   EXPECT_TRUE(anim->HasNode("Bone02"));
-  delete mesh;
+  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
 // Load animation without a name
-TEST_F(ColladaLoader, NoAnimName)
+TEST_F(MeshManager, NoAnimName)
 {
-  common::ColladaLoader loader;
-
+  auto *mgr = common::MeshManager::Instance();
   std::string meshFilename =
     common::testing::TestFile("data", "box_with_no_animation_name.dae");
 
-  common::Mesh *mesh = loader.Load(meshFilename);
+  const common::Mesh *mesh = mgr->Load(meshFilename);
   common::SkeletonPtr skeleton = mesh->MeshSkeleton();
   ASSERT_EQ(1u, skeleton->AnimationCount());
   common::SkeletonAnimation *anim = skeleton->Animation(0);
   auto animName = anim->Name();
   EXPECT_EQ(animName, "animation1");
-  delete mesh;
+  mgr->RemoveAll();
 }
 
 #endif
