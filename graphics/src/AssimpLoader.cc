@@ -576,8 +576,10 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
       }
     }
   }
-  ret = assimpMat->GetTexture(aiTextureType_NORMALS, 0, &texturePath);
-  if (ret == AI_SUCCESS)
+  if (assimpMat->GetTexture(
+          aiTextureType_NORMALS, 0, &texturePath) == AI_SUCCESS ||
+      assimpMat->GetTexture(
+          aiTextureType_HEIGHT, 0, &texturePath) == AI_SUCCESS)
   {
     std::string textureKey = this->FullTextureKey(texturePath.C_Str());
     auto [texName, texData] = this->LoadTexture(
