@@ -1323,4 +1323,322 @@ TEST_F(MeshManager, LoadSTL)
   mgr->RemoveAll();
 }
 
+/////////////////////////////////////////////////
+// Open a non existing file
+TEST_F(MeshManager, NonExistingMesh)
+{
+  auto *mgr = common::MeshManager::Instance();
+  std::string meshFilename =
+    common::testing::TestFile("data", "non_existing_mesh.glb");
+  const common::Mesh *mesh = mgr->Load(meshFilename);
+
+  EXPECT_EQ(mesh, nullptr);
+  mgr->RemoveAll();
+}
+
+/////////////////////////////////////////////////
+// This test opens a FBX file
+TEST_F(MeshManager, LoadFbxBox)
+{
+  auto *mgr = common::MeshManager::Instance();
+  std::string meshFilename =
+    common::testing::TestFile("data", "box.fbx");
+  const common::Mesh *mesh = mgr->Load(meshFilename);
+
+  EXPECT_EQ(meshFilename, mesh->Name());
+  EXPECT_EQ(math::Vector3d(100, 100, 100), mesh->Max());
+  EXPECT_EQ(math::Vector3d(-100, -100, -100), mesh->Min());
+
+  EXPECT_EQ(24u, mesh->VertexCount());
+  EXPECT_EQ(24u, mesh->NormalCount());
+  EXPECT_EQ(36u, mesh->IndexCount());
+  EXPECT_EQ(24u, mesh->TexCoordCount());
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(1u, mesh->MaterialCount());
+
+  // Make sure we can read the submesh name
+  EXPECT_STREQ("Cube", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+
+  EXPECT_EQ(mesh->MaterialCount(), 1u);
+
+  const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+  ASSERT_TRUE(mat.get());
+
+  // Make sure we read the material color values
+  EXPECT_EQ(mat->Ambient(), math::Color(0.0f, 0.0f, 0.0f, 1.0f));
+  EXPECT_EQ(mat->Diffuse(), math::Color(0.8f, 0.8f, 0.8f, 1.0f));
+  EXPECT_EQ(mat->Specular(), math::Color(0.8f, 0.8f, 0.8f, 1.0f));
+  EXPECT_DOUBLE_EQ(mat->Transparency(), 0.0);
+  mgr->RemoveAll();
+}
+
+/////////////////////////////////////////////////
+// This test opens a GLB file
+TEST_F(MeshManager, LoadGlTF2Box)
+{
+  auto *mgr = common::MeshManager::Instance();
+  std::string meshFilename =
+    common::testing::TestFile("data", "box.glb");
+  const common::Mesh *mesh = mgr->Load(meshFilename);
+
+  EXPECT_EQ(meshFilename, mesh->Name());
+  EXPECT_EQ(math::Vector3d(1, 1, 1), mesh->Max());
+  EXPECT_EQ(math::Vector3d(-1, -1, -1), mesh->Min());
+
+  EXPECT_EQ(24u, mesh->VertexCount());
+  EXPECT_EQ(24u, mesh->NormalCount());
+  EXPECT_EQ(36u, mesh->IndexCount());
+  EXPECT_EQ(24u, mesh->TexCoordCount());
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(1u, mesh->MaterialCount());
+
+  // Make sure we can read the submesh name
+  EXPECT_STREQ("Cube", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+
+  EXPECT_EQ(mesh->MaterialCount(), 1u);
+
+  const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+  ASSERT_TRUE(mat.get());
+
+  // Make sure we read the material color values
+  EXPECT_EQ(mat->Ambient(), math::Color(0.4f, 0.4f, 0.4f, 1.0f));
+  EXPECT_EQ(mat->Diffuse(), math::Color(0.8f, 0.8f, 0.8f, 1.0f));
+  EXPECT_EQ(mat->Specular(), math::Color(0.0f, 0.0f, 0.0f, 1.0f));
+  EXPECT_DOUBLE_EQ(mat->Transparency(), 0.0);
+  mgr->RemoveAll();
+}
+
+/////////////////////////////////////////////////
+// Open a gltf mesh with an external texture
+TEST_F(MeshManager, LoadGlTF2BoxExternalTexture)
+{
+  auto *mgr = common::MeshManager::Instance();
+  std::string meshFilename =
+    common::testing::TestFile("data", "gltf", "PurpleCube.gltf");
+  const common::Mesh *mesh = mgr->Load(meshFilename);
+
+  EXPECT_EQ(meshFilename, mesh->Name());
+
+  // Make sure we can read the submesh name
+  EXPECT_STREQ("PurpleCube", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+
+  EXPECT_EQ(mesh->MaterialCount(), 1u);
+
+  const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+  ASSERT_TRUE(mat.get());
+  // Data is now loaded in memory
+  EXPECT_NE(nullptr, mat->TextureData());
+  auto testTextureFile =
+    common::testing::TestFile("data/gltf", "PurpleCube_Diffuse.png");
+  EXPECT_EQ(testTextureFile + "_Diffuse", mat->TextureImage());
+  mgr->RemoveAll();
+}
+
+/////////////////////////////////////////////////
+// Open a gltf mesh with transmission extension
+TEST_F(MeshManager, LoadGlTF2BoxTransmission)
+{
+  auto *mgr = common::MeshManager::Instance();
+  std::string meshFilename =
+    common::testing::TestFile("data", "box_transmission.glb");
+  const common::Mesh *mesh = mgr->Load(meshFilename);
+
+  EXPECT_EQ(meshFilename, mesh->Name());
+
+  // Make sure we can read the submesh name
+  EXPECT_STREQ("Cube", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+
+  EXPECT_EQ(mesh->MaterialCount(), 1u);
+
+  const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+  ASSERT_TRUE(mat.get());
+  // transmission currently modeled as transparency
+  EXPECT_FLOAT_EQ(0.1f, mat->Transparency());
+  mgr->RemoveAll();
+}
+
+/////////////////////////////////////////////////
+// This test loads a box glb mesh with embedded compressed jpeg texture
+TEST_F(MeshManager, LoadGlTF2BoxWithJPEGTexture)
+{
+  auto *mgr = common::MeshManager::Instance();
+  std::string meshFilename =
+    common::testing::TestFile("data", "box_texture_jpg.glb");
+  const common::Mesh *mesh = mgr->Load(meshFilename);
+
+  EXPECT_EQ(meshFilename, mesh->Name());
+  EXPECT_EQ(math::Vector3d(1, 1, 1), mesh->Max());
+  EXPECT_EQ(math::Vector3d(-1, -1, -1), mesh->Min());
+
+  EXPECT_EQ(24u, mesh->VertexCount());
+  EXPECT_EQ(24u, mesh->NormalCount());
+  EXPECT_EQ(36u, mesh->IndexCount());
+  EXPECT_EQ(24u, mesh->TexCoordCount());
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(1u, mesh->MaterialCount());
+
+  // Make sure we can read the submesh name
+  EXPECT_STREQ("Cube", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+
+  const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+  ASSERT_TRUE(mat.get());
+
+  // Make sure we read the material color values
+  EXPECT_EQ(math::Color(0.4f, 0.4f, 0.4f, 1.0f), mat->Ambient());
+  EXPECT_EQ(math::Color(1.0f, 1.0f, 1.0f, 1.0f), mat->Diffuse());
+  EXPECT_EQ(math::Color(0.0f, 0.0f, 0.0f, 1.0f), mat->Specular());
+  // Use the new globally unique canonical name format
+  std::string expectedName = common::testing::TestFile("data",
+      "box_texture_jpg.glb") + "#*0_Diffuse";
+  EXPECT_EQ(expectedName, mat->TextureImage());
+  EXPECT_NE(nullptr, mat->TextureData());
+  mgr->RemoveAll();
+}
+
+/////////////////////////////////////////////////
+// Use a fully featured glb test asset, including PBR textures, emissive maps
+// embedded textures, lightmaps, animations to test advanced glb features
+TEST_F(MeshManager, LoadGlbPbrAsset)
+{
+  auto *mgr = common::MeshManager::Instance();
+  std::string meshFilename =
+    common::testing::TestFile("data", "fully_featured.glb");
+  const common::Mesh *mesh = mgr->Load(meshFilename);
+
+  EXPECT_EQ(meshFilename, mesh->Name());
+
+  EXPECT_EQ(mesh->SubMeshCount(), 7);
+  EXPECT_STREQ("Floor", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+  EXPECT_STREQ("SquareShelf", mesh->SubMeshByIndex(1).lock()->Name().c_str());
+  EXPECT_STREQ("OpenRoboticsLogo.002",
+      mesh->SubMeshByIndex(2).lock()->Name().c_str());
+  EXPECT_STREQ("OpenRoboticsLogo.001",
+      mesh->SubMeshByIndex(3).lock()->Name().c_str());
+  EXPECT_STREQ("EmissiveCube", mesh->SubMeshByIndex(4).lock()->Name().c_str());
+  EXPECT_STREQ("OpenCola", mesh->SubMeshByIndex(5).lock()->Name().c_str());
+  EXPECT_STREQ("OpenRoboticsLogo",
+      mesh->SubMeshByIndex(6).lock()->Name().c_str());
+
+  // Emissive cube has an embedded emissive texture
+  auto materialId = mesh->SubMeshByIndex(4).lock()->GetMaterialIndex();
+  ASSERT_TRUE(materialId.has_value());
+  auto material = mesh->MaterialByIndex(materialId.value());
+  ASSERT_NE(material, nullptr);
+  auto pbr = material->PbrMaterial();
+  ASSERT_NE(pbr, nullptr);
+  EXPECT_NE(pbr->EmissiveMapData(), nullptr);
+
+  // SquareShelf has full PBR textures, including metallicroughness
+  // and ambient occlusion
+  materialId = mesh->SubMeshByIndex(1).lock()->GetMaterialIndex();
+  ASSERT_TRUE(materialId.has_value());
+  material = mesh->MaterialByIndex(materialId.value());
+  ASSERT_NE(material, nullptr);
+  pbr = material->PbrMaterial();
+  ASSERT_NE(pbr, nullptr);
+
+  // Check the texture data itself
+  auto img = material->TextureData();
+  ASSERT_NE(img, nullptr);
+  EXPECT_EQ(img->Width(), 512);
+  EXPECT_EQ(img->Height(), 512);
+  // A black and a white pixel
+  EXPECT_EQ(img->Pixel(0, 0), math::Color(0.0f, 0.0f, 0.0f, 1.0f));
+  EXPECT_EQ(img->Pixel(100, 100), math::Color(1.0f, 1.0f, 1.0f, 1.0f));
+
+  EXPECT_NE(pbr->NormalMapData(), nullptr);
+  // Metallic roughness and alpha from textures only works in assimp > 5.2.0
+  // Alpha from textures
+  EXPECT_TRUE(material->TextureAlphaEnabled());
+  EXPECT_TRUE(material->TwoSidedEnabled());
+  EXPECT_EQ(material->AlphaThreshold(), 0.5);
+  // Metallic and roughness maps
+  EXPECT_NE(pbr->MetalnessMapData(), nullptr);
+  EXPECT_NE(pbr->RoughnessMapData(), nullptr);
+  // Check pixel values to test metallicroughness texture splitting
+  EXPECT_FLOAT_EQ(pbr->MetalnessMapData()->Pixel(256, 256).R(), 0.0f);
+  EXPECT_FLOAT_EQ(pbr->RoughnessMapData()->Pixel(256, 256).R(),
+                  124.0f / 255.0f);
+
+  // Bug in assimp 5.0.x that doesn't parse coordinate sets properly
+  // \todo(iche033) Lightmaps are disabled for glb meshes
+  // due to upstream bug
+  // EXPECT_EQ(pbr->LightMapTexCoordSet(), 1);
+
+  // \todo(iche033) Lightmaps are disabled for glb meshes
+  // due to upstream bug
+  // EXPECT_NE(pbr->LightMapData(), nullptr);
+
+  // Mesh has 3 animations
+  auto skel = mesh->MeshSkeleton();
+  ASSERT_NE(skel, nullptr);
+  ASSERT_EQ(skel->AnimationCount(), 3);
+  EXPECT_STREQ("Action1", skel->Animation(0)->Name().c_str());
+  EXPECT_STREQ("Action2", skel->Animation(1)->Name().c_str());
+  EXPECT_STREQ("Action3", skel->Animation(2)->Name().c_str());
+  mgr->RemoveAll();
+}
+
+/////////////////////////////////////////////////
+// Checks for null root node animation and valid
+// x displacement in non root node's animation.
+TEST_F(MeshManager, CheckNonRootDisplacement)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+    common::testing::TestFile("data", "walk.dae"));
+  auto meshSkel =  mesh->MeshSkeleton();
+  std::string rootNodeName = meshSkel->RootNode()->Name();
+  common::SkeletonAnimation *skelAnim = meshSkel->Animation(0);
+  common::NodeAnimation *rootNode = skelAnim->NodeAnimationByName(rootNodeName);
+  // EXPECT_EQ(nullptr, rootNode); // this fails when GZ_MESH_FORCE_ASSIMP=false
+  auto xDisplacement = skelAnim->XDisplacement();
+  ASSERT_TRUE(xDisplacement);
+  mgr->RemoveAll();
+}
+
+/////////////////////////////////////////////////
+TEST_F(MeshManager, LoadGLTF2Triangle)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data",
+        "multiple_texture_coordinates_triangle.glb"));
+  ASSERT_TRUE(mesh);
+
+  EXPECT_EQ(6u, mesh->VertexCount());
+  EXPECT_EQ(6u, mesh->NormalCount());
+  EXPECT_EQ(6u, mesh->IndexCount());
+  EXPECT_EQ(6u, mesh->TexCoordCount());
+  EXPECT_EQ(2u, mesh->SubMeshCount());
+  EXPECT_EQ(1u, mesh->MaterialCount());
+
+  auto sm = mesh->SubMeshByIndex(0u);
+  auto subMesh = sm.lock();
+  EXPECT_NE(nullptr, subMesh);
+  EXPECT_EQ(math::Vector3d(0, 0, 0), subMesh->Vertex(0u));
+  EXPECT_EQ(math::Vector3d(10, 0, 0), subMesh->Vertex(1u));
+  EXPECT_EQ(math::Vector3d(10, 10, 0), subMesh->Vertex(2u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), subMesh->Normal(0u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), subMesh->Normal(1u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), subMesh->Normal(2u));
+  EXPECT_EQ(math::Vector2d(0, 1), subMesh->TexCoord(0u));
+  EXPECT_EQ(math::Vector2d(0, 1), subMesh->TexCoord(1u));
+  EXPECT_EQ(math::Vector2d(0, 1), subMesh->TexCoord(2u));
+
+  auto smb = mesh->SubMeshByIndex(1u);
+  auto subMeshB = smb.lock();
+  EXPECT_NE(nullptr, subMeshB);
+  EXPECT_EQ(math::Vector3d(10, 0, 0), subMeshB->Vertex(0u));
+  EXPECT_EQ(math::Vector3d(20, 0, 0), subMeshB->Vertex(1u));
+  EXPECT_EQ(math::Vector3d(20, 10, 0), subMeshB->Vertex(2u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), subMeshB->Normal(0u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), subMeshB->Normal(1u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), subMeshB->Normal(2u));
+  EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoord(0u));
+  EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoord(1u));
+  EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoord(2u));
+  mgr->RemoveAll();
+}
+
 #endif
