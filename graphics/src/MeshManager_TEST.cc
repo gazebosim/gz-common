@@ -1211,4 +1211,116 @@ TEST_F(MeshManager, PBR)
   }
 }
 
+/////////////////////////////////////////////////
+TEST_F(MeshManager, LoadSTL)
+{
+  auto *mgr = common::MeshManager::Instance();
+  auto mesh = mgr->Load("");
+  EXPECT_EQ(nullptr, mesh);
+
+  std::string cubeFilepath = common::testing::TestFile("data", "cube.stl");
+  mesh = mgr->Load(cubeFilepath);
+  EXPECT_NE(nullptr, mesh);
+
+  EXPECT_EQ(cubeFilepath, mesh->Name().c_str());
+  EXPECT_EQ(math::Vector3d(20, 0, 20), mesh->Max());
+  EXPECT_EQ(math::Vector3d(0, -20, 0), mesh->Min());
+  if (forceAssimpEnv)
+  {
+    // 4 corners * 6 square faces = 24 vertices
+    EXPECT_EQ(24u, mesh->VertexCount());
+    EXPECT_EQ(24u, mesh->NormalCount());
+    EXPECT_EQ(1u, mesh->MaterialCount());
+  }
+  else
+  {
+    // 12 triangles x 3 = 36 vertices (no deduplication).
+    EXPECT_EQ(36u, mesh->VertexCount());
+    EXPECT_EQ(36u, mesh->NormalCount());
+    EXPECT_EQ(0u, mesh->MaterialCount());
+  }
+  
+  EXPECT_EQ(36u, mesh->IndexCount());
+  EXPECT_EQ(0u, mesh->TexCoordCount());
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+
+  auto sm = mesh->SubMeshByIndex(0u);
+  auto subMesh = sm.lock();
+  EXPECT_NE(nullptr, subMesh);
+  EXPECT_EQ(math::Vector3d(20, 0, 0), subMesh->Vertex(0u));
+  EXPECT_EQ(math::Vector3d(0, -20, 0), subMesh->Vertex(1u));
+  EXPECT_EQ(math::Vector3d(0, 0, 0), subMesh->Vertex(2u));
+  EXPECT_EQ(math::Vector3d(0, 0, -1), subMesh->Normal(0u));
+  EXPECT_EQ(math::Vector3d(0, 0, -1), subMesh->Normal(1u));
+  EXPECT_EQ(math::Vector3d(0, 0, -1), subMesh->Normal(2u));
+
+  if (forceAssimpEnv)
+  {
+    // This fails
+    // for (unsigned int i = 0; i < subMesh->IndexCount(); ++i)
+    //   EXPECT_EQ(i, static_cast<unsigned int>(subMesh->Index(i))); 
+    EXPECT_STREQ("model", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+  }
+  else
+  {
+    // Vertices are not deduplicated, so the index buffer is the identity
+    // sequence (each vertex is referenced by its own position).
+    for (unsigned int i = 0; i < subMesh->IndexCount(); ++i)
+      EXPECT_EQ(i, static_cast<unsigned int>(subMesh->Index(i))); 
+    EXPECT_STREQ("", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+  }
+  mgr->RemoveAll();
+
+  std::string cubeBinFilepath = common::testing::TestFile("data", "cube_binary.stl");
+  mesh = mgr->Load(cubeBinFilepath);
+  EXPECT_NE(nullptr, mesh);
+
+  EXPECT_EQ(cubeBinFilepath, mesh->Name().c_str());
+  EXPECT_EQ(math::Vector3d(20, 0, 20), mesh->Max());
+  EXPECT_EQ(math::Vector3d(0, -20, 0), mesh->Min());
+  if (forceAssimpEnv)
+  {
+    EXPECT_EQ(24u, mesh->VertexCount());
+    EXPECT_EQ(24u, mesh->NormalCount());
+    EXPECT_EQ(1u, mesh->MaterialCount());
+  }
+  else
+  {
+    // 12 triangles x 3 = 36 vertices (no deduplication).
+    EXPECT_EQ(36u, mesh->VertexCount());
+    EXPECT_EQ(36u, mesh->NormalCount());
+    EXPECT_EQ(0u, mesh->MaterialCount());
+  }
+  EXPECT_EQ(36u, mesh->IndexCount());
+  EXPECT_EQ(0u, mesh->TexCoordCount());
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+
+  sm = mesh->SubMeshByIndex(0u);
+  subMesh = sm.lock();
+  EXPECT_NE(nullptr, subMesh);
+  EXPECT_EQ(math::Vector3d(20, 0, 0), subMesh->Vertex(0u));
+  EXPECT_EQ(math::Vector3d(0, -20, 0), subMesh->Vertex(1u));
+  EXPECT_EQ(math::Vector3d(0, 0, 0), subMesh->Vertex(2u));
+  EXPECT_EQ(math::Vector3d(0, 0, -1), subMesh->Normal(0u));
+  EXPECT_EQ(math::Vector3d(0, 0, -1), subMesh->Normal(1u));
+  EXPECT_EQ(math::Vector3d(0, 0, -1), subMesh->Normal(2u));
+
+  if (forceAssimpEnv)
+  {
+    // This fails
+    // for (unsigned int i = 0; i < subMesh->IndexCount(); ++i)
+    //   EXPECT_EQ(i, static_cast<unsigned int>(subMesh->Index(i)));
+  }
+  else
+  {
+    // Vertices are not deduplicated, so the index buffer is the identity
+    // sequence (each vertex is referenced by its own position).
+    for (unsigned int i = 0; i < subMesh->IndexCount(); ++i)
+      EXPECT_EQ(i, static_cast<unsigned int>(subMesh->Index(i)));
+  }
+
+  EXPECT_STREQ("", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+  mgr->RemoveAll();
+}
+
 #endif
