@@ -6,14 +6,9 @@ module(
 bazel_dep(name = "bazel_skylib", version = "1.7.1")
 bazel_dep(name = "assimp", version = "6.0.3")
 bazel_dep(name = "buildifier_prebuilt", version = "8.2.1")
-<<<<<<< HEAD
-bazel_dep(name = "cdt", version = "1.4.0")
-bazel_dep(name = "googletest", version = "1.15.2")
-bazel_dep(name = "remotery", version = "1.0.0")
-=======
 bazel_dep(name = "cdt", version = "1.4.0.bcr.0")
 bazel_dep(name = "googletest", version = "1.17.0.bcr.2")
->>>>>>> 843fc9f ([bazel] Bump default bazel version to 9.1.1 and bump CI workflow version (#840))
+bazel_dep(name = "remotery", version = "1.0.0.bcr.0")
 bazel_dep(name = "rules_cc", version = "0.2.14")
 bazel_dep(name = "rules_license", version = "1.0.0")
 bazel_dep(name = "spdlog", version = "1.17.0")
