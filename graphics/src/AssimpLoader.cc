@@ -584,8 +584,10 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     }
   }
 #endif
-  ret = assimpMat->GetTexture(aiTextureType_NORMALS, 0, &texturePath);
-  if (ret == AI_SUCCESS)
+  if (assimpMat->GetTexture(
+          aiTextureType_NORMALS, 0, &texturePath) == AI_SUCCESS ||
+      assimpMat->GetTexture(
+          aiTextureType_HEIGHT, 0, &texturePath) == AI_SUCCESS)
   {
     std::string textureKey = this->FullTextureKey(texturePath.C_Str());
     auto [texName, texData] = this->LoadTexture(
@@ -601,6 +603,16 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
         _scene, texturePath, this->GenerateTextureName(textureKey, "Emissive"));
     pbr.SetEmissiveMap(texName, texData);
   }
+
+  ret = assimpMat->GetTexture(aiTextureType_SHININESS, 0, &texturePath);
+  if (ret == AI_SUCCESS)
+  {
+    std::string textureKey = this->FullTextureKey(texturePath.C_Str());
+    auto [texName, texData] = this->LoadTexture(
+        _scene, texturePath, this->GenerateTextureName(textureKey, "Shininess"));
+    pbr.SetSpecularMap(texName);
+  }
+
 #ifndef GZ_ASSIMP_PRE_5_2_0
   float value;
   ret = assimpMat->Get(AI_MATKEY_METALLIC_FACTOR, value);
@@ -675,7 +687,7 @@ std::pair<std::string, ImagePtr> AssimpLoader::Implementation::LoadTexture(
     {
       gzerr << "External texture [" << textureKey << "] not found" << std::endl;
     }
-    ret.first = _textureName;
+    ret.first = ToString(_texturePath);
   }
   return ret;
 }
