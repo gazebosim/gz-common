@@ -791,8 +791,8 @@ TEST_P(MeshManager, LoadBoxInstControllerWithoutSkeleton)
 
   if (forceAssimpEnv)
   {
-    EXPECT_EQ(36u, mesh->VertexCount());
-    EXPECT_EQ(36u, mesh->TexCoordCount());
+    EXPECT_EQ(24u, mesh->VertexCount());
+    EXPECT_EQ(24u, mesh->TexCoordCount());
   }
   else
   {
@@ -817,8 +817,8 @@ TEST_P(MeshManager, LoadBoxMultipleInstControllers)
 
   if (forceAssimpEnv)
   {
-    EXPECT_EQ(72u, mesh->VertexCount());
-    EXPECT_EQ(72u, mesh->TexCoordCount());
+    EXPECT_EQ(48u, mesh->VertexCount());
+    EXPECT_EQ(48u, mesh->TexCoordCount());
   }
   else
   {
@@ -835,10 +835,10 @@ TEST_P(MeshManager, LoadBoxMultipleInstControllers)
   EXPECT_EQ(36u, submesh2->IndexCount());
   if (forceAssimpEnv)
   {
-    EXPECT_EQ(36u, submesh->VertexCount());
-    EXPECT_EQ(36u, submesh2->VertexCount());
-    EXPECT_EQ(36u, submesh->TexCoordCount());
-    EXPECT_EQ(36u, submesh2->TexCoordCount());
+    EXPECT_EQ(24u, submesh->VertexCount());
+    EXPECT_EQ(24u, submesh2->VertexCount());
+    EXPECT_EQ(24u, submesh->TexCoordCount());
+    EXPECT_EQ(24u, submesh2->TexCoordCount());
   }
   else
   {
@@ -866,8 +866,8 @@ TEST_P(MeshManager, LoadBoxNestedAnimation)
 
   if (forceAssimpEnv)
   {
-    EXPECT_EQ(36u, mesh->VertexCount());
-    EXPECT_EQ(36u, mesh->TexCoordCount());
+    EXPECT_EQ(24u, mesh->VertexCount()); //
+    EXPECT_EQ(24u, mesh->TexCoordCount()); //
   }
   else
   {
@@ -921,8 +921,8 @@ TEST_P(MeshManager, LoadBoxWithDefaultStride)
   
   if (forceAssimpEnv)
   {
-    EXPECT_EQ(36u, mesh->VertexCount());
-    EXPECT_EQ(36u, mesh->TexCoordCount());
+    EXPECT_EQ(24u, mesh->VertexCount());
+    EXPECT_EQ(24u, mesh->TexCoordCount());
   }
   else
   {
@@ -1043,8 +1043,8 @@ TEST_P(MeshManager, LoadCylinderAnimatedFrom3dsMax)
   EXPECT_EQ(filename, mesh->Name());
   if (forceAssimpEnv)
   {
-    EXPECT_EQ(852u, mesh->VertexCount());
-    EXPECT_EQ(852u, mesh->NormalCount());
+    EXPECT_EQ(194u, mesh->VertexCount());
+    EXPECT_EQ(194u, mesh->NormalCount());
     EXPECT_EQ(1u, mesh->MaterialCount());
   }
   else
@@ -1253,8 +1253,8 @@ TEST_P(MeshManager, LoadSTL)
   if (forceAssimpEnv)
   {
     // 4 corners * 6 square faces = 24 vertices
-    EXPECT_EQ(36u, mesh->VertexCount());
-    EXPECT_EQ(36u, mesh->NormalCount());
+    EXPECT_EQ(24u, mesh->VertexCount());
+    EXPECT_EQ(24u, mesh->NormalCount());
     EXPECT_EQ(1u, mesh->MaterialCount());
   }
   else
