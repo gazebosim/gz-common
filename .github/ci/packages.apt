@@ -3,6 +3,7 @@ libavcodec-dev
 libavdevice-dev
 libavformat-dev
 libavutil-dev
+libbenchmark-dev
 libgdal-dev
 libgz-rotary-cmake-dev
 libgz-rotary-math-dev

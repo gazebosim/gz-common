@@ -793,3 +793,70 @@ TEST_F(ColladaLoader, LoadMalformedTexcoordMismatch)
   delete mesh;
 }
 
+
+/////////////////////////////////////////////////
+// A zero accessor stride must be rejected: it previously caused an
+// infinite read loop (and a division by zero in later revisions).
+TEST_F(ColladaLoader, LoadMalformedPositionZeroStride)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "malformed_position_zero_stride.dae"));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->VertexCount());
+#ifndef _WIN32
+  common::Console::Root().RawLogger().flush();
+  EXPECT_NE(LogContent().find("Invalid stride attribute in position"),
+      std::string::npos);
+#endif
+  delete mesh;
+}
+
+/////////////////////////////////////////////////
+// A negative float_array count must be rejected: it previously drove a
+// huge (wrapped-around) allocation that threw std::length_error.
+TEST_F(ColladaLoader, LoadMalformedPositionNegativeCount)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data",
+      "malformed_position_negative_count.dae"));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->VertexCount());
+#ifndef _WIN32
+  common::Console::Root().RawLogger().flush();
+  EXPECT_NE(LogContent().find("Invalid count attribute in position"),
+      std::string::npos);
+#endif
+  delete mesh;
+}
+
+/////////////////////////////////////////////////
+// A count far larger than the actual data must neither over-allocate nor
+// read out of bounds; the values that are present are loaded.
+TEST_F(ColladaLoader, LoadMalformedPositionHugeCount)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "malformed_position_huge_count.dae"));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(3u, mesh->VertexCount());
+  delete mesh;
+}
+
+/////////////////////////////////////////////////
+// An empty <init_from/> element must be reported, not crash.
+TEST_F(ColladaLoader, LoadEmptyInitFrom)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      common::testing::TestFile("data", "empty_init_from.dae"));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(3u, mesh->VertexCount());
+#ifndef _WIN32
+  common::Console::Root().RawLogger().flush();
+  EXPECT_NE(LogContent().find("Empty <init_from> element"),
+      std::string::npos);
+#endif
+  delete mesh;
+}
