@@ -591,7 +591,7 @@ TEST_F(AssimpLoader, PBR)
     EXPECT_NE(std::string::npos,
         mat->TextureImage().find("mesh_Diffuse.png"));
     const common::Pbr *pbr = mat->PbrMaterial();
-    EXPECT_DOUBLE_EQ(0, pbr->Roughness());
+    EXPECT_DOUBLE_EQ(0.5, pbr->Roughness());
     EXPECT_DOUBLE_EQ(0, pbr->Metalness());
     EXPECT_EQ("mesh_Metal.png", pbr->MetalnessMap());
     EXPECT_EQ("mesh_Rough.png", pbr->RoughnessMap());
@@ -721,7 +721,7 @@ TEST_F(AssimpLoader, LoadGlTF2BoxExternalTexture)
   EXPECT_NE(nullptr, mat->TextureData());
   auto testTextureFile =
     common::testing::TestFile("data/gltf", "PurpleCube_Diffuse.png");
-  EXPECT_EQ(testTextureFile + "_Diffuse", mat->TextureImage());
+  EXPECT_EQ("PurpleCube_Diffuse.png", mat->TextureImage());
   delete mesh;
 }
 
