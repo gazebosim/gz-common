@@ -1101,20 +1101,36 @@ TEST_P(MeshManager, LoadObjBox)
   EXPECT_EQ(gz::math::Vector3d(1, 1, 1), mesh->Max());
   EXPECT_EQ(gz::math::Vector3d(-1, -1, -1), mesh->Min());
   // 36 vertices
-  if (forceAssimpEnv)
-  {
-    EXPECT_EQ(24u, mesh->VertexCount());
-    EXPECT_EQ(24u, mesh->NormalCount());
-  }
-  else
-  {
-    EXPECT_EQ(36u, mesh->VertexCount());
-    EXPECT_EQ(36u, mesh->NormalCount());
-  }
+
   EXPECT_EQ(36u, mesh->IndexCount());
   EXPECT_EQ(0u, mesh->TexCoordCount());
   EXPECT_EQ(1u, mesh->SubMeshCount());
   EXPECT_EQ(1u, mesh->MaterialCount());
+  EXPECT_EQ(mesh->VertexCount(), mesh->NormalCount());
+
+  auto sm = mesh->SubMeshByIndex(0u);
+  auto subMesh = sm.lock();
+  std::vector<std::vector<double>> vertexValues {
+    {1, -1, -1}, {1, -1, 1}, {-1, -1, 1},
+    {1, -1, -1}, {-1, -1, 1}, {-1, -1, -1},
+    {1, 1, -1}, {-1, 1, -1}, {-1, 1, 1},
+    {1, 1, -1}, {-1, 1, 1}, {0.999999, 1, 1},
+    {1, -1, -1}, {1, 1, -1}, {0.999999, 1, 1},
+    {1, -1, -1}, {0.999999, 1, 1}, {1, -1, 1},
+    {1, -1, 1}, {0.999999, 1, 1}, {-1, 1, 1},
+    {1, -1, 1}, {-1, 1, 1}, {-1, -1, 1},
+    {-1, -1, 1}, {-1, 1, 1}, {-1, 1, -1},
+    {-1, -1, 1}, {-1, 1, -1}, {-1, -1, -1},
+    {1, 1, -1}, {1, -1, -1}, {-1, -1, -1},
+    {1, 1, -1}, {-1, -1, -1}, {-1, 1, -1}
+  };
+  
+  EXPECT_EQ(mesh->IndexCount(), vertexValues.size());
+  for (unsigned int i = 0; i < mesh->IndexCount(); ++i)
+  {
+    math::Vector3d vectorCoord(vertexValues[i][0], vertexValues[i][1], vertexValues[i][2]);
+    EXPECT_EQ(subMesh->Vertex(subMesh->Index(i)), vectorCoord);
+  }
 
   // Make sure we can read the submesh name
   EXPECT_STREQ("Cube_Cube.001", mesh->SubMeshByIndex(0).lock()->Name().c_str());
@@ -1252,16 +1268,10 @@ TEST_P(MeshManager, LoadSTL)
   EXPECT_EQ(math::Vector3d(0, -20, 0), mesh->Min());
   if (forceAssimpEnv)
   {
-    // 4 corners * 6 square faces = 24 vertices
-    EXPECT_EQ(24u, mesh->VertexCount());
-    EXPECT_EQ(24u, mesh->NormalCount());
     EXPECT_EQ(1u, mesh->MaterialCount());
   }
   else
   {
-    // 12 triangles x 3 = 36 vertices (no deduplication).
-    EXPECT_EQ(36u, mesh->VertexCount());
-    EXPECT_EQ(36u, mesh->NormalCount());
     EXPECT_EQ(0u, mesh->MaterialCount());
   }
   
@@ -1272,26 +1282,39 @@ TEST_P(MeshManager, LoadSTL)
   auto sm = mesh->SubMeshByIndex(0u);
   auto subMesh = sm.lock();
   EXPECT_NE(nullptr, subMesh);
-  EXPECT_EQ(math::Vector3d(20, 0, 0), subMesh->Vertex(0u));
-  EXPECT_EQ(math::Vector3d(0, -20, 0), subMesh->Vertex(1u));
-  EXPECT_EQ(math::Vector3d(0, 0, 0), subMesh->Vertex(2u));
   EXPECT_EQ(math::Vector3d(0, 0, -1), subMesh->Normal(0u));
   EXPECT_EQ(math::Vector3d(0, 0, -1), subMesh->Normal(1u));
   EXPECT_EQ(math::Vector3d(0, 0, -1), subMesh->Normal(2u));
+  
+  EXPECT_EQ(mesh->VertexCount(), mesh->NormalCount());
+  std::vector<std::vector<double>> vertexValues {
+    {20, 0, 0}, {0, -20, 0}, {0, 0, 0},
+    {0, -20, 0}, {20, 0, 0}, {20, -20, 0},
+    {20, -20, 20}, {0, -20, 0}, {20, -20, 0},
+    {0, -20, 0}, {20, -20, 20}, {0, -20, 20},
+    {20, 0, 0}, {20, -20, 20}, {20, -20, 0},
+    {20, -20, 20}, {20, 0, 0}, {20, 0, 20},
+    {20, -20, 20}, {0, 0, 20}, {0, -20, 20},
+    {0, 0, 20}, {20, -20, 20}, {20, 0, 20},
+    {0, 0, 20}, {0, -20, 0}, {0, -20, 20},
+    {0, -20, 0}, {0, 0, 20}, {0, 0, 0},
+    {0, 0, 20}, {20, 0, 0}, {0, 0, 0},
+    {20, 0, 0}, {0, 0, 20}, {20, 0, 20}
+  };
+
+  EXPECT_EQ(vertexValues.size(), subMesh->IndexCount());
+  for (unsigned int i = 0; i < subMesh->IndexCount(); ++i)
+  {
+    math::Vector3d vertexCoord(vertexValues[i][0], vertexValues[i][1], vertexValues[i][2]);
+    EXPECT_EQ(subMesh->Vertex(subMesh->Index(i)), vertexCoord);
+  }
 
   if (forceAssimpEnv)
   {
-    // This fails
-    // for (unsigned int i = 0; i < subMesh->IndexCount(); ++i)
-    //   EXPECT_EQ(i, static_cast<unsigned int>(subMesh->Index(i))); 
     EXPECT_STREQ("model", mesh->SubMeshByIndex(0).lock()->Name().c_str());
   }
   else
   {
-    // Vertices are not deduplicated, so the index buffer is the identity
-    // sequence (each vertex is referenced by its own position).
-    for (unsigned int i = 0; i < subMesh->IndexCount(); ++i)
-      EXPECT_EQ(i, static_cast<unsigned int>(subMesh->Index(i))); 
     EXPECT_STREQ("", mesh->SubMeshByIndex(0).lock()->Name().c_str());
   }
   mgr->RemoveAll();
@@ -1305,15 +1328,10 @@ TEST_P(MeshManager, LoadSTL)
   EXPECT_EQ(math::Vector3d(0, -20, 0), mesh->Min());
   if (forceAssimpEnv)
   {
-    EXPECT_EQ(24u, mesh->VertexCount());
-    EXPECT_EQ(24u, mesh->NormalCount());
     EXPECT_EQ(1u, mesh->MaterialCount());
   }
   else
   {
-    // 12 triangles x 3 = 36 vertices (no deduplication).
-    EXPECT_EQ(36u, mesh->VertexCount());
-    EXPECT_EQ(36u, mesh->NormalCount());
     EXPECT_EQ(0u, mesh->MaterialCount());
   }
   EXPECT_EQ(36u, mesh->IndexCount());
@@ -1323,25 +1341,16 @@ TEST_P(MeshManager, LoadSTL)
   sm = mesh->SubMeshByIndex(0u);
   subMesh = sm.lock();
   EXPECT_NE(nullptr, subMesh);
-  EXPECT_EQ(math::Vector3d(20, 0, 0), subMesh->Vertex(0u));
-  EXPECT_EQ(math::Vector3d(0, -20, 0), subMesh->Vertex(1u));
-  EXPECT_EQ(math::Vector3d(0, 0, 0), subMesh->Vertex(2u));
   EXPECT_EQ(math::Vector3d(0, 0, -1), subMesh->Normal(0u));
   EXPECT_EQ(math::Vector3d(0, 0, -1), subMesh->Normal(1u));
   EXPECT_EQ(math::Vector3d(0, 0, -1), subMesh->Normal(2u));
-
-  if (forceAssimpEnv)
+  EXPECT_EQ(mesh->VertexCount(), mesh->NormalCount());
+  // Coordinates of the vertices should be the same as in the cube.stl
+  EXPECT_EQ(vertexValues.size(), subMesh->IndexCount());
+  for (unsigned int i = 0; i < subMesh->IndexCount(); ++i)
   {
-    // This fails
-    // for (unsigned int i = 0; i < subMesh->IndexCount(); ++i)
-    //   EXPECT_EQ(i, static_cast<unsigned int>(subMesh->Index(i)));
-  }
-  else
-  {
-    // Vertices are not deduplicated, so the index buffer is the identity
-    // sequence (each vertex is referenced by its own position).
-    for (unsigned int i = 0; i < subMesh->IndexCount(); ++i)
-      EXPECT_EQ(i, static_cast<unsigned int>(subMesh->Index(i)));
+    math::Vector3d vertexCoord(vertexValues[i][0], vertexValues[i][1], vertexValues[i][2]);
+    EXPECT_EQ(subMesh->Vertex(subMesh->Index(i)), vertexCoord);
   }
 
   EXPECT_STREQ("", mesh->SubMeshByIndex(0).lock()->Name().c_str());
