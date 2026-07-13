@@ -1309,14 +1309,7 @@ TEST_P(MeshManager, LoadSTL)
     EXPECT_EQ(subMesh->Vertex(subMesh->Index(i)), vertexCoord);
   }
 
-  if (forceAssimpEnv)
-  {
-    EXPECT_STREQ("model", mesh->SubMeshByIndex(0).lock()->Name().c_str());
-  }
-  else
-  {
-    EXPECT_STREQ("", mesh->SubMeshByIndex(0).lock()->Name().c_str());
-  }
+  EXPECT_STREQ("model", mesh->SubMeshByIndex(0).lock()->Name().c_str());
   mgr->RemoveAll();
 
   std::string cubeBinFilepath = common::testing::TestFile("data", "cube_binary.stl");
