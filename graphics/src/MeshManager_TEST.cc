@@ -52,6 +52,7 @@ class MeshManager : public common::testing::AutoLogFixture,
   {
     common::unsetenv("GZ_MESH_FORCE_ASSIMP");
     common::MeshManager::Instance()->SetAssimpEnvs();
+    common::MeshManager::Instance()->RemoveAll();
     common::testing::AutoLogFixture::TearDown();
   }
 
@@ -577,14 +578,13 @@ TEST_P(MeshManager, LoadZeroCount)
   common::Console::Root().RawLogger().flush();
   std::string log = LogContent();
 
-  // Expect no errors about missing values
-  EXPECT_EQ(log.find("Loading what we can..."), std::string::npos);
-  EXPECT_EQ(log.find("Vertex source missing float_array"), std::string::npos);
-  EXPECT_EQ(log.find("Normal source missing float_array"), std::string::npos);
-
-  // Expect the logs to contain information
   if (!forceAssimpEnv)
   {
+    // Expect no errors about missing values
+    EXPECT_EQ(log.find("Loading what we can..."), std::string::npos);
+    EXPECT_EQ(log.find("Vertex source missing float_array"), std::string::npos);
+    EXPECT_EQ(log.find("Normal source missing float_array"), std::string::npos);
+    // Expect the logs to contain information
     EXPECT_NE(log.find("Triangle input has a count of zero"), std::string::npos);
     EXPECT_NE(log.find("Vertex source has a float_array with a count of zero"),
         std::string::npos);
@@ -866,13 +866,13 @@ TEST_P(MeshManager, LoadBoxNestedAnimation)
 
   if (forceAssimpEnv)
   {
-    EXPECT_EQ(24u, mesh->VertexCount()); //
-    EXPECT_EQ(24u, mesh->TexCoordCount()); //
+    EXPECT_EQ(24u, mesh->VertexCount());
+    EXPECT_EQ(24u, mesh->TexCoordCount());
   }
   else
   {
-    EXPECT_EQ(35u, mesh->VertexCount()); //
-    EXPECT_EQ(35u, mesh->TexCoordCount()); //
+    EXPECT_EQ(35u, mesh->VertexCount());
+    EXPECT_EQ(35u, mesh->TexCoordCount());
   }
   EXPECT_EQ(36u, mesh->IndexCount());
   EXPECT_EQ(1u, mesh->SubMeshCount());
@@ -1618,7 +1618,10 @@ TEST_P(MeshManager, CheckNonRootDisplacement)
   std::string rootNodeName = meshSkel->RootNode()->Name();
   common::SkeletonAnimation *skelAnim = meshSkel->Animation(0);
   common::NodeAnimation *rootNode = skelAnim->NodeAnimationByName(rootNodeName);
-  // EXPECT_EQ(nullptr, rootNode); // this fails when GZ_MESH_FORCE_ASSIMP=false
+  if (forceAssimpEnv)
+  {
+    EXPECT_EQ(nullptr, rootNode);
+  }
   auto xDisplacement = skelAnim->XDisplacement();
   ASSERT_TRUE(xDisplacement);
   mgr->RemoveAll();
