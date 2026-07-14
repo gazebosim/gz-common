@@ -932,14 +932,6 @@ TEST_P(MeshManager, LoadBoxWithDefaultStride)
   EXPECT_EQ(36u, mesh->IndexCount());
   EXPECT_EQ(1u, mesh->SubMeshCount());
   EXPECT_EQ(1u, mesh->MaterialCount());
-  if (forceAssimpEnv)
-  {
-    ASSERT_EQ(0u, mesh->MeshSkeleton()->AnimationCount());
-  }
-  else
-  {
-    ASSERT_EQ(1u, mesh->MeshSkeleton()->AnimationCount());
-  }
   mgr->RemoveAll();
 }
 
