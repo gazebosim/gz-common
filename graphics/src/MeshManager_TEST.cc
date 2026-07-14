@@ -1182,24 +1182,9 @@ TEST_P(MeshManager, PBR)
     const common::Pbr *pbr = mat->PbrMaterial();
     EXPECT_DOUBLE_EQ(0, pbr->Roughness());
     EXPECT_DOUBLE_EQ(0, pbr->Metalness());
-    if (forceAssimpEnv)
-    {
-      EXPECT_EQ(
-        common::testing::TestFile("data", "LightDome_Metalness.png_Metalness"), 
-        pbr->MetalnessMap());
-      EXPECT_EQ(
-        common::testing::TestFile("data", "LightDome_Roughness.png_Roughness"), 
-        pbr->RoughnessMap());
-      EXPECT_EQ(
-        common::testing::TestFile("data", "LightDome_Normal.png_Normal"), 
-        pbr->NormalMap());
-    }
-    else
-    {
-      EXPECT_EQ("LightDome_Metalness.png", pbr->MetalnessMap());
-      EXPECT_EQ("LightDome_Roughness.png", pbr->RoughnessMap());
-      EXPECT_EQ("LightDome_Normal.png", pbr->NormalMap());
-    }
+    EXPECT_EQ("LightDome_Metalness.png", pbr->MetalnessMap());
+    EXPECT_EQ("LightDome_Roughness.png", pbr->RoughnessMap());
+    EXPECT_EQ("LightDome_Normal.png", pbr->NormalMap());
     mgr->RemoveAll();
   }
 
@@ -1223,21 +1208,19 @@ TEST_P(MeshManager, PBR)
     EXPECT_NE(std::string::npos,
         mat->TextureImage().find("mesh_Diffuse.png"));
     const common::Pbr *pbr = mat->PbrMaterial();
+    EXPECT_EQ("mesh_Normal.png", pbr->NormalMap());
     if (forceAssimpEnv)
     {
       EXPECT_DOUBLE_EQ(0.5, pbr->Roughness());
       // this fails
       // EXPECT_EQ("mesh_Metal.png", pbr->MetalnessMap());
       // EXPECT_EQ("mesh_Rough.png", pbr->RoughnessMap());
-      EXPECT_EQ(common::testing::TestFile("data", "mesh_Normal.png_Normal"), 
-        pbr->NormalMap());
     }
     else
     {
       EXPECT_DOUBLE_EQ(0, pbr->Roughness());
       EXPECT_EQ("mesh_Metal.png", pbr->MetalnessMap());
       EXPECT_EQ("mesh_Rough.png", pbr->RoughnessMap());
-      EXPECT_EQ("mesh_Normal.png", pbr->NormalMap());
     }
     EXPECT_DOUBLE_EQ(0, pbr->Metalness());
     mgr->RemoveAll();
@@ -1447,9 +1430,7 @@ TEST_P(MeshManager, LoadGlTF2BoxExternalTexture)
   ASSERT_TRUE(mat.get());
   // Data is now loaded in memory
   EXPECT_NE(nullptr, mat->TextureData());
-  auto testTextureFile =
-    common::testing::TestFile("data/gltf", "PurpleCube_Diffuse.png");
-  EXPECT_EQ(testTextureFile + "_Diffuse", mat->TextureImage());
+  EXPECT_EQ("PurpleCube_Diffuse.png", mat->TextureImage());
   mgr->RemoveAll();
 }
 
