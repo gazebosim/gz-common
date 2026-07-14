@@ -161,6 +161,17 @@ class AssimpLoader::Implementation
           const aiNode* _node,
           std::unordered_set<std::string>& _boneNames) const;
 
+  /// \brief Recursively check if the subtree contains any bones
+  public: bool ContainsBones(
+          const aiNode *_node,
+          const std::unordered_set<std::string> &_boneNames) const;
+
+  /// \brief Find the actual root node of the armature
+  public: const aiNode *GetArmatureRoot(
+          const aiNode *_node,
+          const std::unordered_set<std::string> &_boneNames,
+          const std::unordered_set<std::string> &_animNodeNames) const;
+
   /// \brief Apply the the inv bind transform to the skeleton pose.
   /// \remarks have to set the model transforms starting from the root in
   /// breadth first order. Because setting the model transform also updates
@@ -329,6 +340,70 @@ void AssimpLoader::Implementation::RecursiveStoreBoneNames(
     // Finally recursive call to explore subnode
     this->RecursiveStoreBoneNames(_scene, child_node, _boneNames);
   }
+}
+
+//////////////////////////////////////////////////
+bool AssimpLoader::Implementation::ContainsBones(
+    const aiNode *_node,
+    const std::unordered_set<std::string> &_boneNames) const
+{
+  if (!_node)
+    return false;
+  
+  if (_boneNames.find(ToString(_node->mName)) != _boneNames.end())
+    return true;
+    
+  for (unsigned int i = 0; i < _node->mNumChildren; ++i)
+  {
+    if (this->ContainsBones(_node->mChildren[i], _boneNames))
+      return true;
+  }
+  return false;
+}
+
+//////////////////////////////////////////////////
+const aiNode *AssimpLoader::Implementation::GetArmatureRoot(
+    const aiNode *_node,
+    const std::unordered_set<std::string> &_boneNames,
+    const std::unordered_set<std::string> &_animNodeNames) const
+{
+  if (!_node)
+    return nullptr;
+    
+  std::string nodeName = ToString(_node->mName);
+  
+  // If the current node itself is a bone, this is the root of the armature
+  if (_boneNames.find(nodeName) != _boneNames.end())
+    return _node;
+    
+  // If the current node is targeted by an animation and contains bones, it is the root
+  if (_animNodeNames.find(nodeName) != _animNodeNames.end() &&
+      this->ContainsBones(_node, _boneNames))
+  {
+    return _node;
+  }
+
+  unsigned int childrenWithBones = 0;
+  const aiNode* singleChildWithBones = nullptr;
+
+  for (unsigned int i = 0; i < _node->mNumChildren; ++i)
+  {
+    if (this->ContainsBones(_node->mChildren[i], _boneNames))
+    {
+      childrenWithBones++;
+      singleChildWithBones = _node->mChildren[i];
+    }
+  }
+
+  // If exactly one child contains all the bones, the root might be that child or further down
+  if (childrenWithBones == 1)
+  {
+    return this->GetArmatureRoot(singleChildWithBones, _boneNames, _animNodeNames);
+  }
+  
+  // If more than 1 child contains bones, or no children contain bones (but the current node might be a bone),
+  // then this node is the lowest common ancestor.
+  return _node;
 }
 
 //////////////////////////////////////////////////
@@ -857,16 +932,49 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   {
     std::unordered_set<std::string> boneNames;
     this->dataPtr->RecursiveStoreBoneNames(scene, rootNode, boneNames);
+    
+    std::unordered_set<std::string> animNodeNames;
+    if (scene->HasAnimations())
+    {
+      for (unsigned i = 0; i < scene->mNumAnimations; ++i)
+      {
+        auto anim = scene->mAnimations[i];
+        for (unsigned j = 0; j < anim->mNumChannels; ++j)
+        {
+          animNodeNames.insert(ToString(anim->mChannels[j]->mNodeName));
+        }
+      }
+    }
+    
+    const aiNode *armatureRoot = this->dataPtr->GetArmatureRoot(rootNode, boneNames, animNodeNames);
+    if (!armatureRoot)
+    {
+      armatureRoot = rootNode;
+    }
+    
+    std::string armatureRootName = ToString(armatureRoot->mName);
+    
     auto rootSkelNode = new SkeletonNode(
-        nullptr, rootName, rootName, SkeletonNode::NODE);
-    rootSkelNode->SetTransform(rootTransform);
-    rootSkelNode->SetModelTransform(rootTransform);
-    for (unsigned childIdx = 0; childIdx < rootNode->mNumChildren; ++childIdx)
+        nullptr, armatureRootName, armatureRootName, SkeletonNode::NODE);
+    
+    // Convert transform for the new root node
+    math::Matrix4d armatureTransform = math::Matrix4d::Identity;
+    const aiNode *currNode = armatureRoot;
+    while (currNode != nullptr && currNode != rootNode->mParent)
+    {
+      armatureTransform = this->dataPtr->ConvertTransform(currNode->mTransformation) * armatureTransform;
+      currNode = currNode->mParent;
+    }
+    armatureTransform = this->dataPtr->ConvertTransform(transform) * armatureTransform;
+    
+    rootSkelNode->SetTransform(armatureTransform);
+    rootSkelNode->SetModelTransform(armatureTransform);
+    for (unsigned childIdx = 0; childIdx < armatureRoot->mNumChildren; ++childIdx)
     {
       // First populate the skeleton with the node transforms
       this->dataPtr->RecursiveSkeletonCreate(
-          rootNode->mChildren[childIdx], rootSkelNode,
-          rootTransform, boneNames);
+          armatureRoot->mChildren[childIdx], rootSkelNode,
+          armatureTransform, boneNames);
     }
     rootSkelNode->SetParent(nullptr);
 
