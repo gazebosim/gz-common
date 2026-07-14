@@ -643,19 +643,26 @@ std::pair<std::string, ImagePtr> AssimpLoader::Implementation::LoadTexture(
 {
   std::pair<std::string, ImagePtr> ret;
   std::string textureKey = this->FullTextureKey(_texturePath.C_Str());
+  // Check if the texture is embedded or not
+  auto embeddedTexture = _scene->GetEmbeddedTexture(_texturePath.C_Str());
 
   // Check if the texture is already in the cache
   auto it = this->imageCache.find(textureKey);
   if (it != this->imageCache.end())
   {
     gzdbg << "Texture [" << textureKey << "] found in cache" << std::endl;
-    ret.first = _textureName;
+    if (embeddedTexture)
+    {
+      ret.first = _textureName;
+    }
+    else
+    {
+      ret.first = ToString(_texturePath);
+    }
     ret.second = it->second;
     return ret;
   }
 
-  // Check if the texture is embedded or not
-  auto embeddedTexture = _scene->GetEmbeddedTexture(_texturePath.C_Str());
   if (embeddedTexture)
   {
     // Load embedded texture
