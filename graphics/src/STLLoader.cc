@@ -99,7 +99,7 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
   int width;
   char input[LINE_MAX_LEN];
   bool result = true;
-  char name[LINE_MAX_LEN];
+  char name[LINE_MAX_LEN] = "";
 
   SubMesh subMesh;
 
@@ -181,7 +181,7 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
     else if (this->Leqi (token, const_cast<char*>("endsolid")))
     {
       // warn if name after 'endsolid 'is different from name after 'solid'
-      char endSolidName[LINE_MAX_LEN];
+      char endSolidName[LINE_MAX_LEN] = "";
       sscanf(next, "%s", endSolidName);
 
       if (strcmp(endSolidName, name) != 0)
