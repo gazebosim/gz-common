@@ -667,14 +667,7 @@ TEST_P(MeshManager, TexCoordSets)
   EXPECT_EQ(6u, mesh->IndexCount());
   EXPECT_EQ(6u, mesh->TexCoordCount());
   EXPECT_EQ(2u, mesh->SubMeshCount());
-  if (forceAssimpEnv)
-  {
-    EXPECT_EQ(1u, mesh->MaterialCount());
-  }
-  else
-  {
-    EXPECT_EQ(0u, mesh->MaterialCount());
-  }
+  EXPECT_EQ(0u, mesh->MaterialCount());
 
   auto sm = mesh->SubMeshByIndex(0u);
   auto subMesh = sm.lock();
@@ -944,14 +937,7 @@ TEST_P(MeshManager, LoadBoxWithMultipleGeoms)
 
   EXPECT_EQ(72u, mesh->IndexCount());
   EXPECT_EQ(48u, mesh->VertexCount());
-  if (forceAssimpEnv)
-  {
-    EXPECT_EQ(1u, mesh->MaterialCount());
-  }
-  else
-  {
-    EXPECT_EQ(0u, mesh->MaterialCount());
-  }
+  EXPECT_EQ(0u, mesh->MaterialCount());
   EXPECT_EQ(48u, mesh->TexCoordCount());
   ASSERT_EQ(1u, mesh->MeshSkeleton()->AnimationCount());
   ASSERT_EQ(2u, mesh->SubMeshCount());
@@ -1037,14 +1023,14 @@ TEST_P(MeshManager, LoadCylinderAnimatedFrom3dsMax)
   {
     EXPECT_EQ(194u, mesh->VertexCount());
     EXPECT_EQ(194u, mesh->NormalCount());
-    EXPECT_EQ(1u, mesh->MaterialCount());
   }
   else
   {
+    // possibly delete vertex/normal + ask maybe in pr
     EXPECT_EQ(202u, mesh->VertexCount());
     EXPECT_EQ(202u, mesh->NormalCount());
-    EXPECT_EQ(0u, mesh->MaterialCount());
   }
+  EXPECT_EQ(0u, mesh->MaterialCount());
   EXPECT_EQ(852u, mesh->IndexCount());
   EXPECT_LT(0u, mesh->TexCoordCount());
   EXPECT_EQ(1u, mesh->SubMeshCount());
@@ -1241,15 +1227,7 @@ TEST_P(MeshManager, LoadSTL)
   EXPECT_EQ(cubeFilepath, mesh->Name().c_str());
   EXPECT_EQ(math::Vector3d(20, 0, 20), mesh->Max());
   EXPECT_EQ(math::Vector3d(0, -20, 0), mesh->Min());
-  if (forceAssimpEnv)
-  {
-    EXPECT_EQ(1u, mesh->MaterialCount());
-  }
-  else
-  {
-    EXPECT_EQ(0u, mesh->MaterialCount());
-  }
-  
+  EXPECT_EQ(0u, mesh->MaterialCount());
   EXPECT_EQ(36u, mesh->IndexCount());
   EXPECT_EQ(0u, mesh->TexCoordCount());
   EXPECT_EQ(1u, mesh->SubMeshCount());
@@ -1294,14 +1272,7 @@ TEST_P(MeshManager, LoadSTL)
   EXPECT_EQ(cubeBinFilepath, mesh->Name().c_str());
   EXPECT_EQ(math::Vector3d(20, 0, 20), mesh->Max());
   EXPECT_EQ(math::Vector3d(0, -20, 0), mesh->Min());
-  if (forceAssimpEnv)
-  {
-    EXPECT_EQ(1u, mesh->MaterialCount());
-  }
-  else
-  {
-    EXPECT_EQ(0u, mesh->MaterialCount());
-  }
+  EXPECT_EQ(0u, mesh->MaterialCount());
   EXPECT_EQ(36u, mesh->IndexCount());
   EXPECT_EQ(0u, mesh->TexCoordCount());
   EXPECT_EQ(1u, mesh->SubMeshCount());

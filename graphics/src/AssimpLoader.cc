@@ -942,6 +942,15 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   // Add the materials first
   for (unsigned _matIdx = 0; _matIdx < scene->mNumMaterials; ++_matIdx)
   {
+    aiString matName;
+    if (scene->mNumMaterials == 1 &&
+      AI_SUCCESS == scene->mMaterials[_matIdx]->Get(AI_MATKEY_NAME, matName) &&
+      std::string(matName.C_Str()) == AI_DEFAULT_MATERIAL_NAME)
+    {
+      // If there's only 1 material and it's Assimp's default, skip adding it.
+      continue;
+    }
+
     auto mat = this->dataPtr->CreateMaterial(scene, _matIdx, path);
     mesh->AddMaterial(mat);
   }
