@@ -187,7 +187,7 @@ TEST_F(AssimpLoader, TexCoordSets)
   EXPECT_EQ(6u, mesh->IndexCount());
   EXPECT_EQ(6u, mesh->TexCoordCount());
   EXPECT_EQ(2u, mesh->SubMeshCount());
-  EXPECT_EQ(1u, mesh->MaterialCount());
+  EXPECT_EQ(0u, mesh->MaterialCount());
 
   auto sm = mesh->SubMeshByIndex(0u);
   auto subMesh = sm.lock();
@@ -414,7 +414,7 @@ TEST_F(AssimpLoader, LoadBoxWithMultipleGeoms)
 
   EXPECT_EQ(72u, mesh->IndexCount());
   EXPECT_EQ(48u, mesh->VertexCount());
-  EXPECT_EQ(1u, mesh->MaterialCount());
+  EXPECT_EQ(0u, mesh->MaterialCount());
   EXPECT_EQ(48u, mesh->TexCoordCount());
   ASSERT_EQ(1u, mesh->MeshSkeleton()->AnimationCount());
   ASSERT_EQ(2u, mesh->SubMeshCount());
@@ -483,7 +483,7 @@ TEST_F(AssimpLoader, LoadCylinderAnimatedFrom3dsMax)
   EXPECT_EQ(194u, mesh->NormalCount());
   EXPECT_EQ(852u, mesh->IndexCount());
   EXPECT_LT(0u, mesh->TexCoordCount());
-  EXPECT_EQ(1u, mesh->MaterialCount());
+  EXPECT_EQ(0u, mesh->MaterialCount());
 
   EXPECT_EQ(1u, mesh->SubMeshCount());
   auto subMesh = mesh->SubMeshByIndex(0);
