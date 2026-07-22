@@ -65,7 +65,12 @@ TEST_F(STLLoaderTest, LoadSTL)
   for (unsigned int i = 0; i < subMesh->IndexCount(); ++i)
     EXPECT_EQ(i, static_cast<unsigned int>(subMesh->Index(i)));
 
+<<<<<<< HEAD
   EXPECT_STREQ("", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+=======
+  EXPECT_STREQ("model", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+  delete mesh;
+>>>>>>> b68746f (Change STLLoader to assign name to submesh  (#843))
 
   mesh = loader.Load(
       common::testing::TestFile("data", "cube_binary.stl"));
