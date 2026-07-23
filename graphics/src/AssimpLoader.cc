@@ -601,7 +601,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   {
     std::string textureKey = this->FullTextureKey(texturePath.C_Str());
     auto [texName, texData] = this->LoadTexture(
-        _scene, texturePath, this->GenerateTextureName(textureKey, "Shininess"));
+      _scene, texturePath, this->GenerateTextureName(textureKey, "Shininess"));
     pbr.SetSpecularMap(texName);
   }
 

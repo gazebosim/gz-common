@@ -605,7 +605,7 @@ TEST_F(AssimpLoader, PBR)
     const common::Pbr *pbr = mat->PbrMaterial();
     EXPECT_DOUBLE_EQ(0.5, pbr->Roughness());
     EXPECT_DOUBLE_EQ(0, pbr->Metalness());
-    // Fails Assimp doesn't do anything with the 'refl' field in mtl files ?
+    // Fails Assimp doesn't do anything with the 'refl' field in mtl files
     // EXPECT_EQ("mesh_Metal.png", pbr->MetalnessMap());
     EXPECT_EQ("mesh_Rough.png", pbr->SpecularMap());
     EXPECT_EQ("mesh_Normal.png", pbr->NormalMap());
