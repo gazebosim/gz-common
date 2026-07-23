@@ -546,6 +546,12 @@ TEST_F(AssimpLoader, PBR)
     gz::common::Mesh *mesh = loader.Load(meshFilename);
     EXPECT_NE(nullptr, mesh);
 
+    // Expect warnings about the OBJ/PBR combination
+    common::Console::Root().RawLogger().flush();
+    std::string log = LogContent();
+    EXPECT_NE(log.find(
+      "OBJ file with PBR materials detected"), std::string::npos);
+
     const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
     ASSERT_TRUE(mat.get());
 
@@ -567,11 +573,24 @@ TEST_F(AssimpLoader, PBR)
   // load obj file exported by blender - it shoves pbr maps into
   // existing fields
   {
+    // Ensure that the previous logs were cleared
+    common::Console::Root().RawLogger().flush();
+    std::string log = LogContent();
+    size_t prevLogSize = log.size();
+    EXPECT_EQ(log.find(
+      "OBJ file with PBR materials detected", prevLogSize), std::string::npos);
+
     std::string meshFilename =
       common::testing::TestFile("data", "blender_pbr.obj");
 
     gz::common::Mesh *mesh = loader.Load(meshFilename);
     EXPECT_NE(nullptr, mesh);
+
+    // Expect warnings about the OBJ/PBR combination
+    common::Console::Root().RawLogger().flush();
+    log = LogContent();
+    EXPECT_NE(log.find(
+      "OBJ file with PBR materials detected", prevLogSize), std::string::npos);
 
     const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
     ASSERT_TRUE(mat.get());

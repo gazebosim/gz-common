@@ -877,6 +877,17 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     }
 
     auto mat = this->dataPtr->CreateMaterial(scene, _matIdx, path);
+
+    // Warn if file is an OBJ file with real PBR information
+    common::Pbr defaultPbr;
+    if (extension == "obj" && *mat->PbrMaterial() != defaultPbr)
+    {
+      gzwarn << "OBJ file with PBR materials detected. Note that the fields in "
+             << "the .mtl file may not be read as expected "
+             << "(eg. if you exported this file with Blender). "
+             << "Use GLTF for a more modern format that supports PBR."
+             << std::endl;
+    }
     mesh->AddMaterial(mat);
   }
   // Create the skeleton
