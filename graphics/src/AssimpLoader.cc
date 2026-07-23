@@ -35,9 +35,7 @@
 #include "gz/common/SystemPaths.hh"
 #include "gz/common/Util.hh"
 
-#ifndef GZ_ASSIMP_PRE_5_2_0
-  #include <assimp/GltfMaterial.h>    // GLTF specific material properties
-#endif
+#include <assimp/GltfMaterial.h>    // GLTF specific material properties
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/postprocess.h>     // Post processing flags
 #include <assimp/scene.h>           // Output data structure
@@ -162,6 +160,17 @@ class AssimpLoader::Implementation
           const aiScene *_scene,
           const aiNode* _node,
           std::unordered_set<std::string>& _boneNames) const;
+
+  /// \brief Recursively check if the subtree contains any bones
+  public: bool ContainsBones(
+          const aiNode *_node,
+          const std::unordered_set<std::string> &_boneNames) const;
+
+  /// \brief Find the actual root node of the armature
+  public: const aiNode *GetArmatureRoot(
+          const aiNode *_node,
+          const std::unordered_set<std::string> &_boneNames,
+          const std::unordered_set<std::string> &_animNodeNames) const;
 
   /// \brief Apply the the inv bind transform to the skeleton pose.
   /// \remarks have to set the model transforms starting from the root in
@@ -334,6 +343,70 @@ void AssimpLoader::Implementation::RecursiveStoreBoneNames(
 }
 
 //////////////////////////////////////////////////
+bool AssimpLoader::Implementation::ContainsBones(
+    const aiNode *_node,
+    const std::unordered_set<std::string> &_boneNames) const
+{
+  if (!_node)
+    return false;
+  
+  if (_boneNames.find(ToString(_node->mName)) != _boneNames.end())
+    return true;
+    
+  for (unsigned int i = 0; i < _node->mNumChildren; ++i)
+  {
+    if (this->ContainsBones(_node->mChildren[i], _boneNames))
+      return true;
+  }
+  return false;
+}
+
+//////////////////////////////////////////////////
+const aiNode *AssimpLoader::Implementation::GetArmatureRoot(
+    const aiNode *_node,
+    const std::unordered_set<std::string> &_boneNames,
+    const std::unordered_set<std::string> &_animNodeNames) const
+{
+  if (!_node)
+    return nullptr;
+    
+  std::string nodeName = ToString(_node->mName);
+  
+  // If the current node itself is a bone, this is the root of the armature
+  if (_boneNames.find(nodeName) != _boneNames.end())
+    return _node;
+    
+  // If the current node is targeted by an animation and contains bones, it is the root
+  if (_animNodeNames.find(nodeName) != _animNodeNames.end() &&
+      this->ContainsBones(_node, _boneNames))
+  {
+    return _node;
+  }
+
+  unsigned int childrenWithBones = 0;
+  const aiNode* singleChildWithBones = nullptr;
+
+  for (unsigned int i = 0; i < _node->mNumChildren; ++i)
+  {
+    if (this->ContainsBones(_node->mChildren[i], _boneNames))
+    {
+      childrenWithBones++;
+      singleChildWithBones = _node->mChildren[i];
+    }
+  }
+
+  // If exactly one child contains all the bones, the root might be that child or further down
+  if (childrenWithBones == 1)
+  {
+    return this->GetArmatureRoot(singleChildWithBones, _boneNames, _animNodeNames);
+  }
+  
+  // If more than 1 child contains bones, or no children contain bones (but the current node might be a bone),
+  // then this node is the lowest common ancestor.
+  return _node;
+}
+
+//////////////////////////////////////////////////
 void AssimpLoader::Implementation::RecursiveSkeletonCreate(const aiNode* _node,
     SkeletonNode* _parent, const math::Matrix4d& _transform,
     const std::unordered_set<std::string> &_boneNames) const
@@ -407,7 +480,6 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     mat->SetBlendFactors(opacity, 1.0 - opacity);
   }
 
-#ifndef GZ_ASSIMP_PRE_5_1_0
   // basic support for transmission - currently just overrides opacity
   // \todo(iche033) The transmission factor can be used with volume
   // material extension to simulate effects like refraction
@@ -419,7 +491,6 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   {
     mat->SetTransparency(transmission);
   }
-#endif
 
   // TODO(luca) more than one texture, Gazebo assumes UV index 0
   Pbr pbr;
@@ -435,7 +506,6 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     auto [texName, texData] = this->LoadTexture(
         _scene, texturePath, this->GenerateTextureName(textureKey, "Diffuse"));
     mat->SetTextureImage(texName, texData);
-#ifndef GZ_ASSIMP_PRE_5_2_0
     // Now set the alpha from texture, if enabled, only supported in GLTF
     aiString alphaMode;
     auto paramRet = assimpMat->Get(AI_MATKEY_GLTF_ALPHAMODE, alphaMode);
@@ -452,9 +522,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
         mat->SetAlphaFromTexture(true, alphaCutoff, twoSided);
       }
     }
-#endif
   }
-#ifndef GZ_ASSIMP_PRE_5_2_0
   // Edge case for GLTF, Metal and Rough texture are embedded in a
   // MetallicRoughness texture with metalness in B and roughness in G
   // Open, preprocess and split into metal and roughness map
@@ -583,9 +651,10 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
       }
     }
   }
-#endif
-  ret = assimpMat->GetTexture(aiTextureType_NORMALS, 0, &texturePath);
-  if (ret == AI_SUCCESS)
+  if (assimpMat->GetTexture(
+          aiTextureType_NORMALS, 0, &texturePath) == AI_SUCCESS ||
+      assimpMat->GetTexture(
+          aiTextureType_HEIGHT, 0, &texturePath) == AI_SUCCESS)
   {
     std::string textureKey = this->FullTextureKey(texturePath.C_Str());
     auto [texName, texData] = this->LoadTexture(
@@ -601,7 +670,16 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
         _scene, texturePath, this->GenerateTextureName(textureKey, "Emissive"));
     pbr.SetEmissiveMap(texName, texData);
   }
-#ifndef GZ_ASSIMP_PRE_5_2_0
+
+  ret = assimpMat->GetTexture(aiTextureType_SHININESS, 0, &texturePath);
+  if (ret == AI_SUCCESS)
+  {
+    std::string textureKey = this->FullTextureKey(texturePath.C_Str());
+    auto [texName, texData] = this->LoadTexture(
+        _scene, texturePath, this->GenerateTextureName(textureKey, "Shininess"));
+    pbr.SetSpecularMap(texName);
+  }
+
   float value;
   ret = assimpMat->Get(AI_MATKEY_METALLIC_FACTOR, value);
   if (ret == AI_SUCCESS)
@@ -617,7 +695,6 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   {
     pbr.SetRoughness(value);
   }
-#endif
   mat->SetPbrMaterial(pbr);
   return mat;
 }
@@ -631,19 +708,26 @@ std::pair<std::string, ImagePtr> AssimpLoader::Implementation::LoadTexture(
 {
   std::pair<std::string, ImagePtr> ret;
   std::string textureKey = this->FullTextureKey(_texturePath.C_Str());
+  // Check if the texture is embedded or not
+  auto embeddedTexture = _scene->GetEmbeddedTexture(_texturePath.C_Str());
 
   // Check if the texture is already in the cache
   auto it = this->imageCache.find(textureKey);
   if (it != this->imageCache.end())
   {
     gzdbg << "Texture [" << textureKey << "] found in cache" << std::endl;
-    ret.first = _textureName;
+    if (embeddedTexture)
+    {
+      ret.first = _textureName;
+    }
+    else
+    {
+      ret.first = ToString(_texturePath);
+    }
     ret.second = it->second;
     return ret;
   }
 
-  // Check if the texture is embedded or not
-  auto embeddedTexture = _scene->GetEmbeddedTexture(_texturePath.C_Str());
   if (embeddedTexture)
   {
     // Load embedded texture
@@ -675,7 +759,7 @@ std::pair<std::string, ImagePtr> AssimpLoader::Implementation::LoadTexture(
     {
       gzerr << "External texture [" << textureKey << "] not found" << std::endl;
     }
-    ret.first = _textureName;
+    ret.first = ToString(_texturePath);
   }
   return ret;
 }
@@ -829,9 +913,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
       aiProcess_RemoveRedundantMaterials |
       aiProcess_SortByPType |
       aiProcess_FlipUVs |
-#ifndef GZ_ASSIMP_PRE_5_2_0
       aiProcess_PopulateArmatureData |
-#endif
       aiProcess_Triangulate |
       aiProcess_GenNormals |
       0);
@@ -860,6 +942,15 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   // Add the materials first
   for (unsigned _matIdx = 0; _matIdx < scene->mNumMaterials; ++_matIdx)
   {
+    aiString matName;
+    if (scene->mNumMaterials == 1 &&
+      AI_SUCCESS == scene->mMaterials[_matIdx]->Get(AI_MATKEY_NAME, matName) &&
+      std::string(matName.C_Str()) == AI_DEFAULT_MATERIAL_NAME)
+    {
+      // If there's only 1 material and it's Assimp's default, skip adding it.
+      continue;
+    }
+
     auto mat = this->dataPtr->CreateMaterial(scene, _matIdx, path);
     mesh->AddMaterial(mat);
   }
@@ -867,16 +958,49 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   {
     std::unordered_set<std::string> boneNames;
     this->dataPtr->RecursiveStoreBoneNames(scene, rootNode, boneNames);
+    
+    std::unordered_set<std::string> animNodeNames;
+    if (scene->HasAnimations())
+    {
+      for (unsigned i = 0; i < scene->mNumAnimations; ++i)
+      {
+        auto anim = scene->mAnimations[i];
+        for (unsigned j = 0; j < anim->mNumChannels; ++j)
+        {
+          animNodeNames.insert(ToString(anim->mChannels[j]->mNodeName));
+        }
+      }
+    }
+    
+    const aiNode *armatureRoot = this->dataPtr->GetArmatureRoot(rootNode, boneNames, animNodeNames);
+    if (!armatureRoot)
+    {
+      armatureRoot = rootNode;
+    }
+    
+    std::string armatureRootName = ToString(armatureRoot->mName);
+    
     auto rootSkelNode = new SkeletonNode(
-        nullptr, rootName, rootName, SkeletonNode::NODE);
-    rootSkelNode->SetTransform(rootTransform);
-    rootSkelNode->SetModelTransform(rootTransform);
-    for (unsigned childIdx = 0; childIdx < rootNode->mNumChildren; ++childIdx)
+        nullptr, armatureRootName, armatureRootName, SkeletonNode::NODE);
+    
+    // Convert transform for the new root node
+    math::Matrix4d armatureTransform = math::Matrix4d::Identity;
+    const aiNode *currNode = armatureRoot;
+    while (currNode != nullptr && currNode != rootNode->mParent)
+    {
+      armatureTransform = this->dataPtr->ConvertTransform(currNode->mTransformation) * armatureTransform;
+      currNode = currNode->mParent;
+    }
+    armatureTransform = this->dataPtr->ConvertTransform(transform) * armatureTransform;
+    
+    rootSkelNode->SetTransform(armatureTransform);
+    rootSkelNode->SetModelTransform(armatureTransform);
+    for (unsigned childIdx = 0; childIdx < armatureRoot->mNumChildren; ++childIdx)
     {
       // First populate the skeleton with the node transforms
       this->dataPtr->RecursiveSkeletonCreate(
-          rootNode->mChildren[childIdx], rootSkelNode,
-          rootTransform, boneNames);
+          armatureRoot->mChildren[childIdx], rootSkelNode,
+          armatureTransform, boneNames);
     }
     rootSkelNode->SetParent(nullptr);
 
