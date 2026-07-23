@@ -187,7 +187,7 @@ TEST_F(AssimpLoader, TexCoordSets)
   EXPECT_EQ(6u, mesh->IndexCount());
   EXPECT_EQ(6u, mesh->TexCoordCount());
   EXPECT_EQ(2u, mesh->SubMeshCount());
-  EXPECT_EQ(1u, mesh->MaterialCount());
+  EXPECT_EQ(0u, mesh->MaterialCount());
 
   auto sm = mesh->SubMeshByIndex(0u);
   auto subMesh = sm.lock();
@@ -259,8 +259,6 @@ TEST_F(AssimpLoader, TexCoordSets)
   delete mesh;
 }
 
-// Test fails for assimp below 5.2.0
-#ifndef GZ_ASSIMP_PRE_5_2_0
 /////////////////////////////////////////////////
 TEST_F(AssimpLoader, LoadBoxWithAnimationOutsideSkeleton)
 {
@@ -297,7 +295,6 @@ TEST_F(AssimpLoader, LoadBoxWithAnimationOutsideSkeleton)
   EXPECT_EQ(expectedTrans, poseEnd.at("Armature"));
   delete mesh;
 }
-#endif
 
 /////////////////////////////////////////////////
 TEST_F(AssimpLoader, LoadBoxInstControllerWithoutSkeleton)
@@ -414,7 +411,7 @@ TEST_F(AssimpLoader, LoadBoxWithMultipleGeoms)
 
   EXPECT_EQ(72u, mesh->IndexCount());
   EXPECT_EQ(48u, mesh->VertexCount());
-  EXPECT_EQ(1u, mesh->MaterialCount());
+  EXPECT_EQ(0u, mesh->MaterialCount());
   EXPECT_EQ(48u, mesh->TexCoordCount());
   ASSERT_EQ(1u, mesh->MeshSkeleton()->AnimationCount());
   ASSERT_EQ(2u, mesh->SubMeshCount());
@@ -464,9 +461,6 @@ TEST_F(AssimpLoader, MergeBoxWithDoubleSkeleton)
   delete mesh;
 }
 
-// For assimp below 5.2.0 mesh loading fails because of
-// failing to parse the empty <author> tag
-#ifndef GZ_ASSIMP_PRE_5_2_0
 /////////////////////////////////////////////////
 TEST_F(AssimpLoader, LoadCylinderAnimatedFrom3dsMax)
 {
@@ -483,7 +477,7 @@ TEST_F(AssimpLoader, LoadCylinderAnimatedFrom3dsMax)
   EXPECT_EQ(194u, mesh->NormalCount());
   EXPECT_EQ(852u, mesh->IndexCount());
   EXPECT_LT(0u, mesh->TexCoordCount());
-  EXPECT_EQ(1u, mesh->MaterialCount());
+  EXPECT_EQ(0u, mesh->MaterialCount());
 
   EXPECT_EQ(1u, mesh->SubMeshCount());
   auto subMesh = mesh->SubMeshByIndex(0);
@@ -503,7 +497,6 @@ TEST_F(AssimpLoader, LoadCylinderAnimatedFrom3dsMax)
   EXPECT_TRUE(anim->HasNode("Bone02"));
   delete mesh;
 }
-#endif
 
 /////////////////////////////////////////////////
 TEST_F(AssimpLoader, LoadObjBox)
@@ -539,6 +532,86 @@ TEST_F(AssimpLoader, LoadObjBox)
   delete mesh;
 }
 
+/////////////////////////////////////////////////
+// This tests opening an OBJ file that has PBR fields
+TEST_F(AssimpLoader, PBR)
+{
+  common::AssimpLoader loader;
+
+  // load obj file exported by 3ds max that has pbr extension
+  {
+    std::string meshFilename =
+      common::testing::TestFile("data", "cube_pbr.obj");
+
+    gz::common::Mesh *mesh = loader.Load(meshFilename);
+    EXPECT_NE(nullptr, mesh);
+
+    // Expect warnings about the OBJ/PBR combination
+    common::Console::Root().RawLogger().flush();
+    std::string log = LogContent();
+    EXPECT_NE(log.find(
+      "OBJ file with PBR materials detected"), std::string::npos);
+
+    const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+    ASSERT_TRUE(mat.get());
+
+    EXPECT_EQ(math::Color(0.0f, 0.0f, 0.0f, 1.0f), mat->Ambient());
+    EXPECT_EQ(math::Color(0.5f, 0.5f, 0.5f, 1.0f), mat->Diffuse());
+    EXPECT_EQ(math::Color(1.0f, 1.0f, 1.0f, 1.0f), mat->Specular());
+    EXPECT_DOUBLE_EQ(0.0, mat->Transparency());
+    EXPECT_NE(std::string::npos,
+        mat->TextureImage().find("LightDome_Albedo.png"));
+    const common::Pbr *pbr = mat->PbrMaterial();
+    EXPECT_DOUBLE_EQ(0, pbr->Roughness());
+    EXPECT_DOUBLE_EQ(0, pbr->Metalness());
+    EXPECT_EQ("LightDome_Metalness.png", pbr->MetalnessMap());
+    EXPECT_EQ("LightDome_Roughness.png", pbr->RoughnessMap());
+    EXPECT_EQ("LightDome_Normal.png", pbr->NormalMap());
+    delete mesh;
+  }
+
+  // load obj file exported by blender - it shoves pbr maps into
+  // existing fields
+  {
+    // Ensure that the previous logs were cleared
+    common::Console::Root().RawLogger().flush();
+    std::string log = LogContent();
+    size_t prevLogSize = log.size();
+    EXPECT_EQ(log.find(
+      "OBJ file with PBR materials detected", prevLogSize), std::string::npos);
+
+    std::string meshFilename =
+      common::testing::TestFile("data", "blender_pbr.obj");
+
+    gz::common::Mesh *mesh = loader.Load(meshFilename);
+    EXPECT_NE(nullptr, mesh);
+
+    // Expect warnings about the OBJ/PBR combination
+    common::Console::Root().RawLogger().flush();
+    log = LogContent();
+    EXPECT_NE(log.find(
+      "OBJ file with PBR materials detected", prevLogSize), std::string::npos);
+
+    const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+    ASSERT_TRUE(mat.get());
+
+    EXPECT_EQ(math::Color(1.0f, 1.0f, 1.0f, 1.0f), mat->Ambient());
+    EXPECT_EQ(math::Color(0.8f, 0.8f, 0.8f, 1.0f), mat->Diffuse());
+    EXPECT_EQ(math::Color(0.5f, 0.5f, 0.5f, 1.0f), mat->Specular());
+    EXPECT_EQ(math::Color(0.0f, 0.0f, 0.0f, 1.0f), mat->Emissive());
+    EXPECT_DOUBLE_EQ(0.0, mat->Transparency());
+    EXPECT_NE(std::string::npos,
+        mat->TextureImage().find("mesh_Diffuse.png"));
+    const common::Pbr *pbr = mat->PbrMaterial();
+    EXPECT_DOUBLE_EQ(0.5, pbr->Roughness());
+    EXPECT_DOUBLE_EQ(0, pbr->Metalness());
+    // Fails Assimp doesn't do anything with the 'refl' field in mtl files
+    // EXPECT_EQ("mesh_Metal.png", pbr->MetalnessMap());
+    EXPECT_EQ("mesh_Rough.png", pbr->SpecularMap());
+    EXPECT_EQ("mesh_Normal.png", pbr->NormalMap());
+    delete mesh;
+  }
+}
 
 /////////////////////////////////////////////////
 // This tests opening an OBJ file that has an invalid material reference
@@ -661,7 +734,7 @@ TEST_F(AssimpLoader, LoadGlTF2BoxExternalTexture)
   EXPECT_NE(nullptr, mat->TextureData());
   auto testTextureFile =
     common::testing::TestFile("data/gltf", "PurpleCube_Diffuse.png");
-  EXPECT_EQ(testTextureFile + "_Diffuse", mat->TextureImage());
+  EXPECT_EQ("PurpleCube_Diffuse.png", mat->TextureImage());
   delete mesh;
 }
 
@@ -669,7 +742,6 @@ TEST_F(AssimpLoader, LoadGlTF2BoxExternalTexture)
 // Open a gltf mesh with transmission extension
 TEST_F(AssimpLoader, LoadGlTF2BoxTransmission)
 {
-#ifndef GZ_ASSIMP_PRE_5_1_0
   common::AssimpLoader loader;
   common::Mesh *mesh = loader.Load(
       common::testing::TestFile("data", "box_transmission.glb"));
@@ -686,7 +758,6 @@ TEST_F(AssimpLoader, LoadGlTF2BoxTransmission)
   // transmission currently modeled as transparency
   EXPECT_FLOAT_EQ(0.1f, mat->Transparency());
   delete mesh;
-#endif
 }
 
 /////////////////////////////////////////////////
@@ -778,7 +849,6 @@ TEST_F(AssimpLoader, LoadGlbPbrAsset)
 
   EXPECT_NE(pbr->NormalMapData(), nullptr);
   // Metallic roughness and alpha from textures only works in assimp > 5.2.0
-#ifndef GZ_ASSIMP_PRE_5_2_0
   // Alpha from textures
   EXPECT_TRUE(material->TextureAlphaEnabled());
   EXPECT_TRUE(material->TwoSidedEnabled());
@@ -795,7 +865,6 @@ TEST_F(AssimpLoader, LoadGlbPbrAsset)
   // \todo(iche033) Lightmaps are disabled for glb meshes
   // due to upstream bug
   // EXPECT_EQ(pbr->LightMapTexCoordSet(), 1);
-#endif
 
   // \todo(iche033) Lightmaps are disabled for glb meshes
   // due to upstream bug
