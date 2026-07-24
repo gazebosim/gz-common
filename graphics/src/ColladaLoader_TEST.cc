@@ -828,3 +828,37 @@ TEST_F(ColladaLoader, LoadEmptyInitFrom)
       std::string::npos);
 #endif
 }
+
+/////////////////////////////////////////////////
+// A negative index in <p> must be rejected: strtoul would silently wrap
+// it to a huge unsigned value that reads out of bounds.
+TEST_F(ColladaLoader, LoadMalformedPNegativeIndex)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_p_negative_index.dae")));
+  ASSERT_TRUE(mesh);
+#ifndef _WIN32
+  common::Console::Root().RawLogger().flush();
+  EXPECT_NE(LogContent().find("Negative index in <p> element"),
+      std::string::npos);
+#endif
+}
+
+/////////////////////////////////////////////////
+// A polylist whose <p> holds fewer indices than <vcount> declares must be
+// truncated, not read out of bounds.
+TEST_F(ColladaLoader, LoadMalformedPolylistShortP)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_polylist_short_p.dae")));
+  ASSERT_TRUE(mesh);
+  // Only the complete first triangle is loaded.
+  EXPECT_EQ(3u, mesh->IndexCount());
+#ifndef _WIN32
+  common::Console::Root().RawLogger().flush();
+  EXPECT_NE(LogContent().find("fewer indices than its <vcount>"),
+      std::string::npos);
+#endif
+}
