@@ -544,7 +544,8 @@ TEST_F(ColladaLoader, LoadTextureMaterial)
 
   // The diffuse texture chain should have been resolved and stored.
   EXPECT_FALSE(mat->TextureImage().empty());
-  EXPECT_NE(mat->TextureImage().find("xy_triangle_texture.png"), std::string::npos);
+  EXPECT_NE(mat->TextureImage().find("xy_triangle_texture.png"),
+      std::string::npos);
 }
 
 /////////////////////////////////////////////////
