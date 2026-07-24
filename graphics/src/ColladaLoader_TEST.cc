@@ -834,15 +834,14 @@ TEST_F(ColladaLoader, LoadEmptyInitFrom)
 TEST_F(ColladaLoader, LoadMalformedPNegativeIndex)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "malformed_p_negative_index.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_p_negative_index.dae")));
   ASSERT_TRUE(mesh);
 #ifndef _WIN32
   common::Console::Root().RawLogger().flush();
   EXPECT_NE(LogContent().find("Negative index in <p> element"),
       std::string::npos);
 #endif
-  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -851,8 +850,8 @@ TEST_F(ColladaLoader, LoadMalformedPNegativeIndex)
 TEST_F(ColladaLoader, LoadMalformedPolylistShortP)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "malformed_polylist_short_p.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_polylist_short_p.dae")));
   ASSERT_TRUE(mesh);
   // Only the complete first triangle is loaded.
   EXPECT_EQ(3u, mesh->IndexCount());
@@ -861,5 +860,4 @@ TEST_F(ColladaLoader, LoadMalformedPolylistShortP)
   EXPECT_NE(LogContent().find("fewer indices than its <vcount>"),
       std::string::npos);
 #endif
-  delete mesh;
 }
