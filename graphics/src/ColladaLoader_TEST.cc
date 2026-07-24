@@ -609,15 +609,14 @@ TEST_F(ColladaLoader, LoadMissingVisualScene)
 TEST_F(ColladaLoader, LoadMalformedPositionNoCount)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "malformed_position_no_count.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_position_no_count.dae")));
   ASSERT_TRUE(mesh);
 #ifndef _WIN32
   common::Console::Root().RawLogger().flush();
   EXPECT_NE(LogContent().find("no count attribute in position"),
       std::string::npos);
 #endif
-  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -625,15 +624,14 @@ TEST_F(ColladaLoader, LoadMalformedPositionNoCount)
 TEST_F(ColladaLoader, LoadMalformedPositionBadCount)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "malformed_position_bad_count.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_position_bad_count.dae")));
   ASSERT_TRUE(mesh);
 #ifndef _WIN32
   common::Console::Root().RawLogger().flush();
   EXPECT_NE(LogContent().find("Invalid count attribute in position"),
       std::string::npos);
 #endif
-  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -641,15 +639,14 @@ TEST_F(ColladaLoader, LoadMalformedPositionBadCount)
 TEST_F(ColladaLoader, LoadMalformedPositionNoStride)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "malformed_position_no_stride.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_position_no_stride.dae")));
   ASSERT_TRUE(mesh);
 #ifndef _WIN32
   common::Console::Root().RawLogger().flush();
   EXPECT_NE(LogContent().find("no stride attribute in position"),
       std::string::npos);
 #endif
-  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -657,105 +654,98 @@ TEST_F(ColladaLoader, LoadMalformedPositionNoStride)
 TEST_F(ColladaLoader, LoadMalformedPositionOverflow)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "malformed_position_overflow.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_position_overflow.dae")));
   ASSERT_TRUE(mesh);
 #ifndef _WIN32
   common::Console::Root().RawLogger().flush();
   EXPECT_NE(LogContent().find("Overflow while parsing <float_array>"),
       std::string::npos);
 #endif
-  delete mesh;
 }
 
 /////////////////////////////////////////////////
 TEST_F(ColladaLoader, LoadMalformedNormalNoCount)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "malformed_normal_no_count.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_normal_no_count.dae")));
   ASSERT_TRUE(mesh);
 #ifndef _WIN32
   common::Console::Root().RawLogger().flush();
   EXPECT_NE(LogContent().find("no count attribute in normal"),
       std::string::npos);
 #endif
-  delete mesh;
 }
 
 /////////////////////////////////////////////////
 TEST_F(ColladaLoader, LoadMalformedNormalBadCount)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "malformed_normal_bad_count.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_normal_bad_count.dae")));
   ASSERT_TRUE(mesh);
 #ifndef _WIN32
   common::Console::Root().RawLogger().flush();
   EXPECT_NE(LogContent().find("Invalid count attribute in normal"),
       std::string::npos);
 #endif
-  delete mesh;
 }
 
 /////////////////////////////////////////////////
 TEST_F(ColladaLoader, LoadMalformedNormalNoStride)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "malformed_normal_no_stride.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_normal_no_stride.dae")));
   ASSERT_TRUE(mesh);
 #ifndef _WIN32
   common::Console::Root().RawLogger().flush();
   EXPECT_NE(LogContent().find("no stride attribute in normal"),
       std::string::npos);
 #endif
-  delete mesh;
 }
 
 /////////////////////////////////////////////////
 TEST_F(ColladaLoader, LoadMalformedTexcoordNoCount)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "malformed_texcoord_no_count.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_texcoord_no_count.dae")));
   ASSERT_TRUE(mesh);
 #ifndef _WIN32
   common::Console::Root().RawLogger().flush();
   EXPECT_NE(LogContent().find("no count attribute in texture coordinate"),
       std::string::npos);
 #endif
-  delete mesh;
 }
 
 /////////////////////////////////////////////////
 TEST_F(ColladaLoader, LoadMalformedTexcoordBadCount)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "malformed_texcoord_bad_count.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_texcoord_bad_count.dae")));
   ASSERT_TRUE(mesh);
 #ifndef _WIN32
   common::Console::Root().RawLogger().flush();
   EXPECT_NE(LogContent().find("Invalid count attribute in texture coordinate"),
       std::string::npos);
 #endif
-  delete mesh;
 }
 
 /////////////////////////////////////////////////
 TEST_F(ColladaLoader, LoadMalformedTexcoordNoStride)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "malformed_texcoord_no_stride.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_texcoord_no_stride.dae")));
   ASSERT_TRUE(mesh);
 #ifndef _WIN32
   common::Console::Root().RawLogger().flush();
   EXPECT_NE(LogContent().find("no stride attribute in texture coordinate"),
       std::string::npos);
 #endif
-  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -764,15 +754,14 @@ TEST_F(ColladaLoader, LoadMalformedTexcoordNoStride)
 TEST_F(ColladaLoader, LoadMalformedTexcoordMismatch)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "malformed_texcoord_mismatch.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_texcoord_mismatch.dae")));
   ASSERT_TRUE(mesh);
 #ifndef _WIN32
   common::Console::Root().RawLogger().flush();
   EXPECT_NE(LogContent().find("Error reading texture coordinates"),
       std::string::npos);
 #endif
-  delete mesh;
 }
 
 
@@ -782,8 +771,8 @@ TEST_F(ColladaLoader, LoadMalformedTexcoordMismatch)
 TEST_F(ColladaLoader, LoadMalformedPositionZeroStride)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "malformed_position_zero_stride.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_position_zero_stride.dae")));
   ASSERT_TRUE(mesh);
   EXPECT_EQ(0u, mesh->VertexCount());
 #ifndef _WIN32
@@ -791,7 +780,6 @@ TEST_F(ColladaLoader, LoadMalformedPositionZeroStride)
   EXPECT_NE(LogContent().find("Invalid stride attribute in position"),
       std::string::npos);
 #endif
-  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -800,9 +788,9 @@ TEST_F(ColladaLoader, LoadMalformedPositionZeroStride)
 TEST_F(ColladaLoader, LoadMalformedPositionNegativeCount)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
       common::testing::TestFile("data",
-      "malformed_position_negative_count.dae"));
+      "malformed_position_negative_count.dae")));
   ASSERT_TRUE(mesh);
   EXPECT_EQ(0u, mesh->VertexCount());
 #ifndef _WIN32
@@ -810,7 +798,6 @@ TEST_F(ColladaLoader, LoadMalformedPositionNegativeCount)
   EXPECT_NE(LogContent().find("Invalid count attribute in position"),
       std::string::npos);
 #endif
-  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -819,11 +806,10 @@ TEST_F(ColladaLoader, LoadMalformedPositionNegativeCount)
 TEST_F(ColladaLoader, LoadMalformedPositionHugeCount)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "malformed_position_huge_count.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_position_huge_count.dae")));
   ASSERT_TRUE(mesh);
   EXPECT_EQ(3u, mesh->VertexCount());
-  delete mesh;
 }
 
 /////////////////////////////////////////////////
@@ -831,8 +817,8 @@ TEST_F(ColladaLoader, LoadMalformedPositionHugeCount)
 TEST_F(ColladaLoader, LoadEmptyInitFrom)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "empty_init_from.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "empty_init_from.dae")));
   ASSERT_TRUE(mesh);
   EXPECT_EQ(3u, mesh->VertexCount());
 #ifndef _WIN32
@@ -840,7 +826,6 @@ TEST_F(ColladaLoader, LoadEmptyInitFrom)
   EXPECT_NE(LogContent().find("Empty <init_from> element"),
       std::string::npos);
 #endif
-  delete mesh;
 }
 
 /////////////////////////////////////////////////
