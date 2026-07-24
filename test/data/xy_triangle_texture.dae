@@ -6,7 +6,7 @@
   </asset>
   <library_images>
     <image id="tex0" name="tex0">
-      <init_from>box_texture.png</init_from>
+      <init_from>xy_triangle_texture.png</init_from>
     </image>
   </library_images>
   <library_effects>
