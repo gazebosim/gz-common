@@ -40,7 +40,15 @@ namespace gz
 
       /// \brief Load a mesh
       /// \param[in] _filename Collada file to load
-      /// \return Pointer to a new Mesh
+      /// \return Pointer to a new Mesh, owned by the caller. A null
+      /// pointer is returned when the file does not exist, cannot be
+      /// parsed, or its root element is not COLLADA. Other problems are
+      /// reported through the console log and do not abort loading:
+      /// a COLLADA version other than 1.4.0 or 1.4.1 is reported but the
+      /// mesh is still loaded, and a scene that references a missing visual
+      /// scene is reported and yields a valid mesh with no geometry.
+      /// In general, malformed subelements are skipped and the loader
+      /// returns whatever geometry could be recovered.
       public: virtual Mesh *Load(const std::string &_filename);
 
       /// \internal
