@@ -2256,6 +2256,8 @@ void ColladaLoader::Implementation::LoadPolylist(
   memset(values, 0, inputSize);
 
   std::vector<std::string> strs = split(pStr, " \t\r\n");
+  if (inputSize > 0)
+    vertexIndexMap.reserve(strs.size() / inputSize);
   std::vector<std::string>::iterator strs_iter = strs.begin();
   for (unsigned int l = 0; l < vcounts.size(); ++l)
   {
@@ -2623,6 +2625,8 @@ void ColladaLoader::Implementation::LoadTriangles(
 
   std::vector<unsigned int> values(offsetSize);
   std::vector<std::string> strs = split(pStr, " \t\r\n");
+  if (offsetSize > 0)
+    vertexIndexMap.reserve(strs.size() / offsetSize);
 
   for (unsigned int j = 0; j < strs.size(); j += offsetSize)
   {
