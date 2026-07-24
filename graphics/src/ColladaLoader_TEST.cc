@@ -16,7 +16,12 @@
 */
 #include <gtest/gtest.h>
 
+<<<<<<< HEAD
 #include "test_config.h"
+=======
+#include <memory>
+
+>>>>>>> 082e05a (Improve COLLADA loader (supersedes #569) - Part 1/3 (#830))
 #include "gz/common/Mesh.hh"
 #include "gz/common/SubMesh.hh"
 #include "gz/common/Material.hh"
@@ -31,8 +36,8 @@ class ColladaLoader : public common::testing::AutoLogFixture { };
 TEST_F(ColladaLoader, LoadBox)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "box.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "box.dae")));
 
   EXPECT_STREQ("unknown", mesh->Name().c_str());
   EXPECT_EQ(math::Vector3d(1, 1, 1), mesh->Max());
@@ -53,8 +58,8 @@ TEST_F(ColladaLoader, LoadBox)
 TEST_F(ColladaLoader, ShareVertices)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "box.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "box.dae")));
 
   // check number of shared vertices
   std::set<unsigned int> uniqueIndices;
@@ -104,8 +109,8 @@ TEST_F(ColladaLoader, ShareVertices)
 TEST_F(ColladaLoader, LoadZeroCount)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "zero_count.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "zero_count.dae")));
   ASSERT_TRUE(mesh);
 #ifndef _WIN32
   std::string log = LogContent();
@@ -128,8 +133,8 @@ TEST_F(ColladaLoader, LoadZeroCount)
 TEST_F(ColladaLoader, Material)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "box.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "box.dae")));
   ASSERT_TRUE(mesh);
 
   EXPECT_EQ(mesh->MaterialCount(), 1u);
@@ -153,8 +158,8 @@ TEST_F(ColladaLoader, Material)
   EXPECT_DOUBLE_EQ(1.0, srcFactor);
   EXPECT_DOUBLE_EQ(0.0, dstFactor);
 
-  common::Mesh *meshOpaque = loader.Load(
-      common::testing::TestFile("data", "box_opaque.dae"));
+  std::unique_ptr<common::Mesh> meshOpaque(loader.Load(
+      common::testing::TestFile("data", "box_opaque.dae")));
   ASSERT_TRUE(meshOpaque);
 
   EXPECT_EQ(meshOpaque->MaterialCount(), 1u);
@@ -177,6 +182,10 @@ TEST_F(ColladaLoader, Material)
   matOpaque->BlendFactors(srcFactor, dstFactor);
   EXPECT_DOUBLE_EQ(1.0, srcFactor);
   EXPECT_DOUBLE_EQ(0.0, dstFactor);
+<<<<<<< HEAD
+=======
+
+>>>>>>> 082e05a (Improve COLLADA loader (supersedes #569) - Part 1/3 (#830))
 }
 
 /////////////////////////////////////////////////
@@ -185,9 +194,9 @@ TEST_F(ColladaLoader, TexCoordSets)
   common::ColladaLoader loader;
   // This triangle mesh has multiple uv sets and vertices separated by
   // line breaks
-  common::Mesh *mesh = loader.Load(
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
       common::testing::TestFile("data",
-        "multiple_texture_coordinates_triangle.dae"));
+        "multiple_texture_coordinates_triangle.dae")));
   ASSERT_TRUE(mesh);
 
   EXPECT_EQ(6u, mesh->VertexCount());
@@ -270,9 +279,9 @@ TEST_F(ColladaLoader, TexCoordSets)
 TEST_F(ColladaLoader, LoadBoxWithAnimationOutsideSkeleton)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
       common::testing::TestFile("data",
-        "box_with_animation_outside_skeleton.dae"));
+        "box_with_animation_outside_skeleton.dae")));
 
   EXPECT_EQ(36u, mesh->IndexCount());
   EXPECT_EQ(1u, mesh->SubMeshCount());
@@ -306,9 +315,9 @@ TEST_F(ColladaLoader, LoadBoxWithAnimationOutsideSkeleton)
 TEST_F(ColladaLoader, LoadBoxInstControllerWithoutSkeleton)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
       common::testing::TestFile("data",
-        "box_inst_controller_without_skeleton.dae"));
+        "box_inst_controller_without_skeleton.dae")));
 
   EXPECT_EQ(36u, mesh->IndexCount());
   EXPECT_EQ(35u, mesh->VertexCount());
@@ -324,8 +333,8 @@ TEST_F(ColladaLoader, LoadBoxInstControllerWithoutSkeleton)
 TEST_F(ColladaLoader, LoadBoxMultipleInstControllers)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "box_multiple_inst_controllers.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "box_multiple_inst_controllers.dae")));
 
   EXPECT_EQ(72u, mesh->IndexCount());
   EXPECT_EQ(70u, mesh->VertexCount());
@@ -351,8 +360,8 @@ TEST_F(ColladaLoader, LoadBoxMultipleInstControllers)
 TEST_F(ColladaLoader, LoadBoxNestedAnimation)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "box_nested_animation.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "box_nested_animation.dae")));
 
   EXPECT_EQ(36u, mesh->IndexCount());
   EXPECT_EQ(35u, mesh->VertexCount());
@@ -387,8 +396,8 @@ TEST_F(ColladaLoader, LoadBoxNestedAnimation)
 TEST_F(ColladaLoader, LoadBoxWithDefaultStride)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "box_with_default_stride.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "box_with_default_stride.dae")));
 
   EXPECT_EQ(36u, mesh->IndexCount());
   EXPECT_EQ(35u, mesh->VertexCount());
@@ -402,8 +411,8 @@ TEST_F(ColladaLoader, LoadBoxWithDefaultStride)
 TEST_F(ColladaLoader, LoadBoxWithMultipleGeoms)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "box_with_multiple_geoms.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "box_with_multiple_geoms.dae")));
 
   EXPECT_EQ(72u, mesh->IndexCount());
   EXPECT_EQ(48u, mesh->VertexCount());
@@ -419,8 +428,8 @@ TEST_F(ColladaLoader, LoadBoxWithMultipleGeoms)
 TEST_F(ColladaLoader, LoadBoxWithHierarchicalNodes)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "box_with_hierarchical_nodes.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "box_with_hierarchical_nodes.dae")));
 
   ASSERT_EQ(5u, mesh->SubMeshCount());
 
@@ -444,8 +453,8 @@ TEST_F(ColladaLoader, LoadBoxWithHierarchicalNodes)
 TEST_F(ColladaLoader, MergeBoxWithDoubleSkeleton)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "box_with_double_skeleton.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "box_with_double_skeleton.dae")));
   EXPECT_TRUE(mesh->HasSkeleton());
   auto skeleton_ptr = mesh->MeshSkeleton();
   // The two skeletons have been joined and their root is the
@@ -460,9 +469,9 @@ TEST_F(ColladaLoader, LoadCylinderAnimatedFrom3dsMax)
   // mesh animation looks deformed when loaded. That still needs to be
   // addressed.
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
       common::testing::TestFile("data",
-        "cylinder_animated_from_3ds_max.dae"));
+        "cylinder_animated_from_3ds_max.dae")));
 
   EXPECT_EQ("unknown", mesh->Name());
   EXPECT_EQ(202u, mesh->VertexCount());
@@ -491,6 +500,115 @@ TEST_F(ColladaLoader, LoadCylinderAnimatedFrom3dsMax)
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
+<<<<<<< HEAD
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
+=======
+  common::ColladaLoader loader;
+
+  std::string meshFilename =
+    common::testing::TestFile("data", "box_with_no_animation_name.dae");
+
+  std::unique_ptr<common::Mesh> mesh(loader.Load(meshFilename));
+  common::SkeletonPtr skeleton = mesh->MeshSkeleton();
+  ASSERT_EQ(1u, skeleton->AnimationCount());
+  common::SkeletonAnimation *anim = skeleton->Animation(0);
+  auto animName = anim->Name();
+  EXPECT_EQ(animName, "animation1");
+>>>>>>> 082e05a (Improve COLLADA loader (supersedes #569) - Part 1/3 (#830))
 }
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadLines)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "xy_square_lines.dae")));
+  ASSERT_TRUE(mesh);
+
+  // 4 line segments, each contributes 2 vertices and 2 indices.
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(8u, mesh->VertexCount());
+  EXPECT_EQ(8u, mesh->IndexCount());
+
+  auto subMesh = mesh->SubMeshByIndex(0u).lock();
+  ASSERT_NE(nullptr, subMesh);
+  EXPECT_EQ(common::SubMesh::LINES, subMesh->SubMeshPrimitiveType());
+}
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadTextureMaterial)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "xy_triangle_texture.dae")));
+  ASSERT_TRUE(mesh);
+
+  EXPECT_EQ(3u, mesh->VertexCount());
+  EXPECT_EQ(3u, mesh->TexCoordCount());
+  ASSERT_EQ(1u, mesh->MaterialCount());
+
+  common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+  ASSERT_NE(nullptr, mat);
+
+  // The diffuse texture chain should have been resolved and stored.
+  EXPECT_FALSE(mat->TextureImage().empty());
+  EXPECT_NE(mat->TextureImage().find("xy_triangle_texture.png"),
+      std::string::npos);
+}
+
+/////////////////////////////////////////////////
+// Loading a non-existent file must return null, not crash.
+TEST_F(ColladaLoader, LoadNonexistentFile)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "this_file_does_not_exist.dae")));
+  EXPECT_EQ(nullptr, mesh);
+}
+
+/////////////////////////////////////////////////
+// A file whose root element is not <COLLADA> must return null, not crash.
+TEST_F(ColladaLoader, LoadNoColladaTag)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "no_collada_tag.dae")));
+  EXPECT_EQ(nullptr, mesh);
+#ifndef _WIN32
+  common::Console::Root().RawLogger().flush();
+  EXPECT_NE(LogContent().find("Missing COLLADA tag"), std::string::npos);
+#endif
+}
+
+/////////////////////////////////////////////////
+// An unsupported version is reported but the mesh still loads.
+TEST_F(ColladaLoader, LoadBadVersion)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "bad_version.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(3u, mesh->VertexCount());
+#ifndef _WIN32
+  common::Console::Root().RawLogger().flush();
+  EXPECT_NE(LogContent().find("Invalid collada file"), std::string::npos);
+#endif
+}
+
+/////////////////////////////////////////////////
+// A <scene> referencing a missing visual_scene must be reported, not crash.
+TEST_F(ColladaLoader, LoadMissingVisualScene)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "missing_visual_scene.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->VertexCount());
+#ifndef _WIN32
+  common::Console::Root().RawLogger().flush();
+  EXPECT_NE(LogContent().find("Unable to find visual_scene"),
+      std::string::npos);
+#endif
+}
+

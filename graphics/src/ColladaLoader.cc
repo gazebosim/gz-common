@@ -14,11 +14,18 @@
  * limitations under the License.
  *
  */
-#include <sstream>
-#include <unordered_map>
+#include <cerrno>
+#include <cmath>
+#include <cstdlib>
 #include <map>
-#include <vector>
+#include <memory>
 #include <set>
+#include <sstream>
+#include <string>
+#include <string_view>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 #include <gz/math/Helpers.hh>
 #include <gz/math/Matrix4.hh>
@@ -50,6 +57,21 @@ namespace ignition
     /// \brief Private data for the ColladaLoader class
     class  ColladaLoader::Implementation
     {
+      /// \brief Shared handle to an immutable list of 3D vectors
+      /// (positions or normals). Cached source data is shared between the
+      /// cache and all callers, so it must never be modified after creation.
+      public: using Vector3dArrayPtr =
+          std::shared_ptr<const std::vector<gz::math::Vector3d>>;
+
+      /// \brief Shared handle to an immutable list of 2D texture coordinates.
+      public: using Vector2dArrayPtr =
+          std::shared_ptr<const std::vector<gz::math::Vector2d>>;
+
+      /// \brief Shared handle to an immutable map from the index of a
+      /// duplicate value to the index of its first occurrence.
+      public: using DuplicateMapPtr = std::shared_ptr<
+          const std::unordered_map<unsigned int, unsigned int>>;
+
       /// \brief scaling factor
       public: double meter;
 
@@ -69,6 +91,7 @@ namespace ignition
       public: std::string currentNodeName;
 
       /// \brief Map of collada POSITION ids to list of vectors.
+<<<<<<< HEAD
       public: std::map<std::string,
               std::vector<math::Vector3d> > positionIds;
 
@@ -79,23 +102,32 @@ namespace ignition
       /// \brief Map of collada TEXCOORD ids to list of texture coordinates.
       public: std::map<std::string,
               std::vector<math::Vector2d> >texcoordIds;
+=======
+      public: std::unordered_map<std::string, Vector3dArrayPtr> positionIds;
+
+      /// \brief Map of collada NORMAL ids to list of normals.
+      public: std::unordered_map<std::string, Vector3dArrayPtr> normalIds;
+
+      /// \brief Map of collada TEXCOORD ids to list of texture coordinates.
+      public: std::unordered_map<std::string, Vector2dArrayPtr> texcoordIds;
+>>>>>>> 082e05a (Improve COLLADA loader (supersedes #569) - Part 1/3 (#830))
 
       /// \brief Map of collada Material ids to Gazebo materials.
       public: std::map<std::string, MaterialPtr> materialIds;
 
       /// \brief Map of collada POSITION ids to a map of
       /// duplicate positions.
-      public: std::map<std::string, std::map<unsigned int, unsigned int> >
+      public: std::unordered_map<std::string, DuplicateMapPtr>
           positionDuplicateMap;
 
       /// \brief Map of collada NORMAL ids to a map of
       /// duplicate normals.
-      public: std::map<std::string, std::map<unsigned int, unsigned int> >
+      public: std::unordered_map<std::string, DuplicateMapPtr>
           normalDuplicateMap;
 
       /// \brief Map of collada TEXCOORD ids to a map of
       /// duplicate texture coordinates.
-      public: std::map<std::string, std::map<unsigned int, unsigned int> >
+      public: std::unordered_map<std::string, DuplicateMapPtr>
           texcoordDuplicateMap;
 
       /// \brief Current scene being parsed
@@ -182,54 +214,98 @@ namespace ignition
       /// \brief Load vertices
       /// \param[in] _id String id of the vertices XML node
       /// \param[in] _transform Transform to apply to all vertices
-      /// \param[out] _verts Holds the resulting vertices
-      /// \param[out] _norms Holds the resulting normals
+      /// \param[in,out] _verts Holds the resulting vertices
+      /// \param[in,out] _norms Holds the resulting normals
+      /// \note On return the pointers may be replaced with references to
+      /// shared, immutable cached data.
       public: void LoadVertices(const std::string &_id,
+<<<<<<< HEAD
           const math::Matrix4d &_transform,
           std::vector<math::Vector3d> &_verts,
           std::vector<math::Vector3d> &_norms);
+=======
+                    const gz::math::Matrix4d &_transform,
+                    Vector3dArrayPtr &_verts,
+                    Vector3dArrayPtr &_norms);
+>>>>>>> 082e05a (Improve COLLADA loader (supersedes #569) - Part 1/3 (#830))
 
       /// \brief Load vertices
       /// \param[in] _id String id of the vertices XML node
       /// \param[in] _transform Transform to apply to all vertices
-      /// \param[out] _verts Holds the resulting vertices
-      /// \param[out] _norms Holds the resulting normals
-      /// \param[out] _vertDup Holds a map of duplicate position indices
-      /// \param[out] _normDup Holds a map of duplicate normal indices
+      /// \param[in,out] _verts Holds the resulting vertices
+      /// \param[in,out] _norms Holds the resulting normals
+      /// \param[in,out] _vertDup Holds a map of duplicate position indices
+      /// \param[in,out] _normDup Holds a map of duplicate normal indices
+      /// \note On return the pointers may be replaced with references to
+      /// shared, immutable cached data.
       public: void LoadVertices(const std::string &_id,
+<<<<<<< HEAD
                                  const math::Matrix4d &_transform,
                                  std::vector<math::Vector3d> &_verts,
                                  std::vector<math::Vector3d> &_norms,
                                  std::map<unsigned int, unsigned int> &_vertDup,
                                 std::map<unsigned int, unsigned int> &_normDup);
+=======
+                    const gz::math::Matrix4d &_transform,
+                    Vector3dArrayPtr &_verts,
+                    Vector3dArrayPtr &_norms,
+                    DuplicateMapPtr &_vertDup,
+                    DuplicateMapPtr &_normDup);
+>>>>>>> 082e05a (Improve COLLADA loader (supersedes #569) - Part 1/3 (#830))
 
       /// \brief Load positions
       /// \param[in] _id String id of the XML node
       /// \param[in] _transform Transform to apply to all positions
-      /// \param[out] _values Holds the resulting position values
-      /// \param[out] _duplicates Holds a map of duplicate position indices
+      /// \param[in,out] _values Holds the resulting position values. Any
+      /// pre-existing content is preserved (copied, not modified in place).
+      /// \param[in,out] _duplicates Holds a map of duplicate position indices
+      /// \note On return the pointers may be replaced with references to
+      /// shared, immutable cached data.
       public: void LoadPositions(const std::string &_id,
+<<<<<<< HEAD
                                   const math::Matrix4d &_transform,
                                  std::vector<math::Vector3d> &_values,
                              std::map<unsigned int, unsigned int> &_duplicates);
+=======
+                    const gz::math::Matrix4d &_transform,
+                    Vector3dArrayPtr &_values,
+                    DuplicateMapPtr &_duplicates);
+>>>>>>> 082e05a (Improve COLLADA loader (supersedes #569) - Part 1/3 (#830))
 
       /// \brief Load normals
       /// \param[in] _id String id of the XML node
       /// \param[in] _transform Transform to apply to all normals
-      /// \param[out] _values Holds the resulting normal values
-      /// \param[out] _duplicates Holds a map of duplicate normal indices
+      /// \param[in,out] _values Holds the resulting normal values. Any
+      /// pre-existing content is preserved (copied, not modified in place).
+      /// \param[in,out] _duplicates Holds a map of duplicate normal indices
+      /// \note On return the pointers may be replaced with references to
+      /// shared, immutable cached data.
       public: void LoadNormals(const std::string &_id,
+<<<<<<< HEAD
                                 const math::Matrix4d &_transform,
                                 std::vector<math::Vector3d> &_values,
                              std::map<unsigned int, unsigned int> &_duplicates);
+=======
+                    const gz::math::Matrix4d &_transform,
+                    Vector3dArrayPtr &_values,
+                    DuplicateMapPtr &_duplicates);
+>>>>>>> 082e05a (Improve COLLADA loader (supersedes #569) - Part 1/3 (#830))
 
       /// \brief Load texture coordinates
       /// \param[in] _id String id of the XML node
-      /// \param[out] _values Holds the resulting uv values
-      /// \param[out] _duplicates Holds a map of duplicate uv indices
+      /// \param[in,out] _values Holds the resulting uv values. Any
+      /// pre-existing content is preserved (copied, not modified in place).
+      /// \param[in,out] _duplicates Holds a map of duplicate uv indices
+      /// \note On return the pointers may be replaced with references to
+      /// shared, immutable cached data.
       public: void LoadTexCoords(const std::string &_id,
+<<<<<<< HEAD
                                  std::vector<math::Vector2d> &_values,
                              std::map<unsigned int, unsigned int> &_duplicates);
+=======
+                      Vector2dArrayPtr &_values,
+                      DuplicateMapPtr &_duplicates);
+>>>>>>> 082e05a (Improve COLLADA loader (supersedes #569) - Part 1/3 (#830))
 
       /// \brief Load a material
       /// \param _name Name of the material XML element
@@ -326,7 +402,14 @@ namespace ignition
   }
 }
 
+namespace
+{
 /////////////////////////////////////////////////
+// Classic boost::hash_combine. The 0x9e3779b9 term (the golden ratio in
+// 32-bit fixed point) is intentional: it avoids the "zero trap" where an
+// all-zero input (std::hash<double>(0.0) == 0) hashes to 0 regardless of
+// position. Keep it. Benchmarks on large meshes show it has no measurable
+// cost.
 void hash_combine(std::size_t &_seed, const double &_v)
 {
   std::hash<double> hasher;
@@ -357,6 +440,165 @@ struct Vector2dHash
     return seed;
   }
 };
+
+/////////////////////////////////////////////////
+/// \brief Parse a whitespace-delimited list of doubles from a string.
+/// Parsing stops at the first non-numeric token or on overflow.
+/// \param[in] _str Null-terminated text to parse.
+/// \param[in] _reserveCount Number of values to reserve space for up front.
+/// \return The parsed values.
+std::vector<double> parseDoubles(const char *_str, size_t _reserveCount)
+{
+  std::vector<double> result;
+  // Preallocate memory based on the known count.
+  result.reserve(_reserveCount);
+  const char *start = _str;
+  char *end{};
+  while (true)
+  {
+    // Reset errno so a stale ERANGE set by earlier code is not misread as
+    // a range error from this call.
+    errno = 0;
+    double d = std::strtod(start, &end);
+    if (start == end)
+      break;
+    start = end;
+    // Only overflow is fatal. Underflow also sets ERANGE but yields a
+    // harmless denormal or zero, which legitimate exporters do produce.
+    if (errno == ERANGE && (d == HUGE_VAL || d == -HUGE_VAL))
+    {
+      gzerr << "Overflow while parsing <float_array>; truncating after "
+            << result.size() << " value(s).\n";
+      break;
+    }
+    result.push_back(d);
+  }
+  return result;
+}
+
+/////////////////////////////////////////////////
+/// \brief Metadata for a COLLADA <source> element's <float_array> and
+/// <technique_common>/<accessor> children.
+struct SourceAccessor
+{
+  /// \brief Raw whitespace-delimited text of the <float_array> element.
+  public: const char *text = nullptr;
+
+  /// \brief Total number of values declared by the <float_array> count
+  /// attribute.
+  public: int totCount = 0;
+
+  /// \brief Number of values that comprise one complete element (e.g. 3
+  /// for an XYZ position), declared by the <accessor> stride attribute.
+  public: int stride = 0;
+
+  /// \brief Number of elements declared by the <accessor> count attribute,
+  /// or -1 when the accessor has no count attribute.
+  public: int count = -1;
+};
+
+/////////////////////////////////////////////////
+/// \brief Parse the <float_array> and accessor metadata of a COLLADA
+/// <source> element.
+/// \param[in] _sourceXml The <source> XML element.
+/// \param[in] _sourceName Human readable name of the source
+/// (e.g. "Vertex"), used in error messages about the source itself.
+/// \param[in] _semantic Human readable description of the source semantic
+/// (e.g. "position coordinate"), used in error messages about attributes.
+/// \param[in] _id Id of the source element, used in error messages.
+/// \param[out] _out Parsed result. Valid only when true is returned.
+/// \return True when the source holds data to read. False when the source
+/// is empty (not an error) or malformed (an error has been logged).
+bool ParseSourceAccessor(tinyxml2::XMLElement *_sourceXml,
+    const std::string &_sourceName, const std::string &_semantic,
+    const std::string &_id, SourceAccessor &_out)
+{
+  tinyxml2::XMLElement *floatArrayXml =
+      _sourceXml->FirstChildElement("float_array");
+  if (!floatArrayXml || !floatArrayXml->GetText())
+  {
+    int count = 1;
+    if (floatArrayXml)
+      floatArrayXml->QueryIntAttribute("count", &count);
+
+    if (count)
+    {
+      gzerr << _sourceName << " source missing float_array element, "
+        << "or count is invalid.\n";
+    }
+    else
+    {
+      gzlog << _sourceName << " source has a float_array with a count of "
+        << "zero. This is likely not desired\n";
+    }
+    return false;
+  }
+
+  // Read in the total number of values in the float array.
+  switch (floatArrayXml->QueryIntAttribute("count", &_out.totCount))
+  {
+    case tinyxml2::XML_SUCCESS:
+      break;
+    case tinyxml2::XML_NO_ATTRIBUTE:
+      gzerr << "<float_array> has no count attribute in " << _semantic
+            << " element with id[" << _id << "]\n";
+      return false;
+    default:
+      gzerr << "Invalid count attribute in " << _semantic
+            << " <float_array> with id[" << _id << "]\n";
+      return false;
+  }
+
+  tinyxml2::XMLElement *techniqueXml =
+      _sourceXml->FirstChildElement("technique_common");
+  if (!techniqueXml)
+  {
+    gzerr << "Unable to find technique_common element for " << _semantic
+          << "s with id[" << _id << "]\n";
+    return false;
+  }
+
+  tinyxml2::XMLElement *accessorXml =
+      techniqueXml->FirstChildElement("accessor");
+  if (!accessorXml)
+  {
+    gzerr << "Unable to find <accessor> as a child of <technique_common> "
+          << "for " << _semantic << "s with id[" << _id << "]\n";
+    return false;
+  }
+
+  // Read in the stride.
+  switch (accessorXml->QueryIntAttribute("stride", &_out.stride))
+  {
+    case tinyxml2::XML_SUCCESS:
+      break;
+    case tinyxml2::XML_NO_ATTRIBUTE:
+      gzerr << "<accessor> has no stride attribute in " << _semantic
+            << " element with id[" << _id << "]\n";
+      return false;
+    default:
+      gzerr << "Invalid stride attribute in " << _semantic
+            << " <accessor> with id[" << _id << "]\n";
+      return false;
+  }
+
+  // The accessor count attribute is optional for callers; -1 when absent
+  // or invalid.
+  if (accessorXml->QueryIntAttribute("count", &_out.count) !=
+      tinyxml2::XML_SUCCESS)
+  {
+    _out.count = -1;
+  }
+
+  // Nothing to read. Don't print a warning because the collada file is
+  // correct.
+  if (_out.totCount == 0)
+    return false;
+
+  _out.text = floatArrayXml->GetText();
+  return true;
+}
+}  // namespace
 
 //////////////////////////////////////////////////
 ColladaLoader::ColladaLoader()
@@ -398,6 +640,7 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
 
   this->dataPtr->filename = _filename;
   if (xmlDoc.LoadFile(_filename.c_str()) != tinyxml2::XML_SUCCESS)
+<<<<<<< HEAD
     ignerr << "Unable to load collada file[" << _filename << "]\n";
 
   this->dataPtr->colladaXml = xmlDoc.FirstChildElement("COLLADA");
@@ -407,6 +650,28 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
   if (std::string(this->dataPtr->colladaXml->Attribute("version")) != "1.4.0" &&
       std::string(this->dataPtr->colladaXml->Attribute("version")) != "1.4.1")
     ignerr << "Invalid collada file. Must be version 1.4.0 or 1.4.1\n";
+=======
+  {
+    gzerr << "Unable to load collada file[" << _filename << "]\n";
+    return nullptr;
+  }
+
+  this->dataPtr->colladaXml = xmlDoc.FirstChildElement("COLLADA");
+  if (!this->dataPtr->colladaXml)
+  {
+    gzerr << "Missing COLLADA tag\n";
+    return nullptr;
+  }
+
+  const char *version = this->dataPtr->colladaXml->Attribute("version");
+  if (!version ||
+      (std::string(version) != "1.4.0" && std::string(version) != "1.4.1"))
+  {
+    // Not fatal: report it and attempt to load anyway.
+    gzwarn << "Invalid collada file. Must be version 1.4.0 or 1.4.1. "
+           << "Attempting to load anyway\n";
+  }
+>>>>>>> 082e05a (Improve COLLADA loader (supersedes #569) - Part 1/3 (#830))
 
   tinyxml2::XMLElement *assetXml =
       this->dataPtr->colladaXml->FirstChildElement("asset");
@@ -1355,9 +1620,9 @@ tinyxml2::XMLElement *ColladaLoader::Implementation::ElementId(
     tinyxml2::XMLElement *_parent,
     const std::string &_name, const std::string &_id)
 {
-  std::string id = _id;
-  if (id.length() > 0 && id[0] == '#')
-    id.erase(0, 1);
+  std::string_view id = _id;
+  if (!id.empty() && id[0] == '#')
+    id.remove_prefix(1);
 
   if ((id.empty() && _parent->Value() == _name) ||
       (_parent->Attribute("id") && _parent->Attribute("id") == id) ||
@@ -1383,22 +1648,36 @@ tinyxml2::XMLElement *ColladaLoader::Implementation::ElementId(
 
 /////////////////////////////////////////////////
 void ColladaLoader::Implementation::LoadVertices(const std::string &_id,
+<<<<<<< HEAD
     const math::Matrix4d &_transform,
     std::vector<math::Vector3d> &_verts,
     std::vector<math::Vector3d> &_norms)
+=======
+  const gz::math::Matrix4d &_transform,
+  Vector3dArrayPtr &_verts,
+  Vector3dArrayPtr &_norms)
+>>>>>>> 082e05a (Improve COLLADA loader (supersedes #569) - Part 1/3 (#830))
 {
-  std::map<unsigned int, unsigned int> vertDup;
-  std::map<unsigned int, unsigned int> normDup;
+  DuplicateMapPtr vertDup;
+  DuplicateMapPtr normDup;
   this->LoadVertices(_id, _transform, _verts, _norms, vertDup, normDup);
 }
 
 /////////////////////////////////////////////////
 void ColladaLoader::Implementation::LoadVertices(const std::string &_id,
+<<<<<<< HEAD
     const math::Matrix4d &_transform,
     std::vector<math::Vector3d> &_verts,
     std::vector<math::Vector3d> &_norms,
     std::map<unsigned int, unsigned int> &_vertDups,
     std::map<unsigned int, unsigned int> &_normDups)
+=======
+  const gz::math::Matrix4d &_transform,
+  Vector3dArrayPtr &_verts,
+  Vector3dArrayPtr &_norms,
+  DuplicateMapPtr &_vertDups,
+  DuplicateMapPtr &_normDups)
+>>>>>>> 082e05a (Improve COLLADA loader (supersedes #569) - Part 1/3 (#830))
 {
   tinyxml2::XMLElement *verticesXml = this->ElementId(this->colladaXml,
       "vertices", _id);
@@ -1429,13 +1708,20 @@ void ColladaLoader::Implementation::LoadVertices(const std::string &_id,
 
 /////////////////////////////////////////////////
 void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
+<<<<<<< HEAD
     const math::Matrix4d &_transform,
     std::vector<math::Vector3d> &_values,
     std::map<unsigned int, unsigned int> &_duplicates)
+=======
+                    const gz::math::Matrix4d &_transform,
+                    Vector3dArrayPtr &_values,
+                    DuplicateMapPtr &_duplicates)
+>>>>>>> 082e05a (Improve COLLADA loader (supersedes #569) - Part 1/3 (#830))
 {
-  if (this->positionIds.find(_id) != this->positionIds.end())
+  auto cacheIter = this->positionIds.find(_id);
+  if (cacheIter != this->positionIds.end())
   {
-    _values = this->positionIds[_id];
+    _values = cacheIter->second;
     _duplicates = this->positionDuplicateMap[_id];
     return;
   }
@@ -1447,6 +1733,7 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
     return;
   }
 
+<<<<<<< HEAD
   tinyxml2::XMLElement *floatArrayXml =
       sourceXml->FirstChildElement("float_array");
   if (!floatArrayXml || !floatArrayXml->GetText())
@@ -1475,45 +1762,74 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
         << "This is likely not desired\n";
     }
 
+=======
+  SourceAccessor src;
+  if (!ParseSourceAccessor(sourceXml, "Vertex", "position coordinate", _id,
+        src))
+>>>>>>> 082e05a (Improve COLLADA loader (supersedes #569) - Part 1/3 (#830))
     return;
-  }
-  std::string valueStr = floatArrayXml->GetText();
+
+  auto values = parseDoubles(src.text, src.totCount);
+
+  // Build into fresh containers: cached data is immutable, so any content a
+  // caller accumulated earlier (combined vertex normals) is copied rather
+  // than appended to in place.
+  auto positions = _values && !_values->empty()
+      ? std::make_shared<std::vector<gz::math::Vector3d>>(*_values)
+      : std::make_shared<std::vector<gz::math::Vector3d>>();
+  auto duplicates = _duplicates && !_duplicates->empty()
+      ? std::make_shared<std::unordered_map<unsigned int, unsigned int>>(
+          *_duplicates)
+      : std::make_shared<std::unordered_map<unsigned int, unsigned int>>();
 
   std::unordered_map<math::Vector3d,
       unsigned int, Vector3Hash> unique;
 
-  std::vector<std::string>::iterator iter, end;
-  std::vector<std::string> strs = split(valueStr, " \t\r\n");
-  end = strs.end();
-  for (iter = strs.begin(); iter != end; iter += 3)
+  gz::math::Vector3d vec;
+  for (int i = 0; i < src.totCount; i += src.stride)
   {
+<<<<<<< HEAD
     math::Vector3d vec(math::parseFloat(*iter),
         math::parseFloat(*(iter+1)),
         math::parseFloat(*(iter+2)));
+=======
+    vec.Set(values[i],
+            values[i+1],
+            values[i+2]);
+>>>>>>> 082e05a (Improve COLLADA loader (supersedes #569) - Part 1/3 (#830))
 
     vec = _transform * vec;
-    _values.push_back(vec);
+    positions->push_back(vec);
 
     // create a map of duplicate indices
     if (unique.find(vec) != unique.end())
-      _duplicates[_values.size()-1] = unique[vec];
+      (*duplicates)[positions->size()-1] = unique[vec];
     else
-      unique[vec] = _values.size()-1;
+      unique[vec] = positions->size()-1;
   }
 
+  _values = std::move(positions);
+  _duplicates = std::move(duplicates);
   this->positionDuplicateMap[_id] = _duplicates;
   this->positionIds[_id] = _values;
 }
 
 /////////////////////////////////////////////////
 void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
+<<<<<<< HEAD
     const math::Matrix4d &_transform,
     std::vector<math::Vector3d> &_values,
     std::map<unsigned int, unsigned int> &_duplicates)
+=======
+    const gz::math::Matrix4d &_transform,
+    Vector3dArrayPtr &_values,
+    DuplicateMapPtr &_duplicates)
+>>>>>>> 082e05a (Improve COLLADA loader (supersedes #569) - Part 1/3 (#830))
 {
-  if (this->normalIds.find(_id) != this->normalIds.end())
+  auto cacheIter = this->normalIds.find(_id);
+  if (cacheIter != this->normalIds.end())
   {
-    _values = this->normalIds[_id];
+    _values = cacheIter->second;
     _duplicates = this->normalDuplicateMap[_id];
     return;
   }
@@ -1528,6 +1844,7 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
     return;
   }
 
+<<<<<<< HEAD
   tinyxml2::XMLElement *floatArrayXml =
       normalsXml->FirstChildElement("float_array");
   if (!floatArrayXml || !floatArrayXml->GetText())
@@ -1556,16 +1873,33 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
         << "This is likely not desired\n";
     }
 
+=======
+  SourceAccessor src;
+  if (!ParseSourceAccessor(normalsXml, "Normal", "normal coordinate", _id,
+        src))
+>>>>>>> 082e05a (Improve COLLADA loader (supersedes #569) - Part 1/3 (#830))
     return;
-  }
+
+  auto values = parseDoubles(src.text, src.totCount);
+
+  // Build into fresh containers: cached data is immutable, so any content a
+  // caller accumulated earlier (combined vertex normals) is copied rather
+  // than appended to in place.
+  auto normals = _values && !_values->empty()
+      ? std::make_shared<std::vector<gz::math::Vector3d>>(*_values)
+      : std::make_shared<std::vector<gz::math::Vector3d>>();
+  auto duplicates = _duplicates && !_duplicates->empty()
+      ? std::make_shared<std::unordered_map<unsigned int, unsigned int>>(
+          *_duplicates)
+      : std::make_shared<std::unordered_map<unsigned int, unsigned int>>();
 
   std::unordered_map<math::Vector3d,
       unsigned int, Vector3Hash> unique;
 
-  std::string valueStr = floatArrayXml->GetText();
-  std::istringstream iss(valueStr);
-  do
+  gz::math::Vector3d vec;
+  for (int i = 0; i < src.totCount; i += src.stride)
   {
+<<<<<<< HEAD
     math::Vector3d vec;
     iss >> vec.X() >> vec.Y() >> vec.Z();
     if (iss)
@@ -1573,34 +1907,46 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
       vec = rotMat * vec;
       vec.Normalize();
       _values.push_back(vec);
+=======
+    vec.Set(values[i],
+            values[i+1],
+            values[i+2]);
+>>>>>>> 082e05a (Improve COLLADA loader (supersedes #569) - Part 1/3 (#830))
 
-      // create a map of duplicate indices
-      if (unique.find(vec) != unique.end())
-        _duplicates[_values.size()-1] = unique[vec];
-      else
-        unique[vec] = _values.size()-1;
-    }
-  } while (iss);
+    vec = rotMat * vec;
+    vec.Normalize();
+    normals->push_back(vec);
 
+    // create a map of duplicate indices
+    if (unique.find(vec) != unique.end())
+      (*duplicates)[normals->size()-1] = unique[vec];
+    else
+      unique[vec] = normals->size()-1;
+  }
+
+  _values = std::move(normals);
+  _duplicates = std::move(duplicates);
   this->normalDuplicateMap[_id] = _duplicates;
   this->normalIds[_id] = _values;
 }
 
 /////////////////////////////////////////////////
 void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
+<<<<<<< HEAD
     std::vector<math::Vector2d> &_values,
     std::map<unsigned int, unsigned int> &_duplicates)
+=======
+    Vector2dArrayPtr &_values,
+    DuplicateMapPtr &_duplicates)
+>>>>>>> 082e05a (Improve COLLADA loader (supersedes #569) - Part 1/3 (#830))
 {
-  if (this->texcoordIds.find(_id) != this->texcoordIds.end())
+  auto cacheIter = this->texcoordIds.find(_id);
+  if (cacheIter != this->texcoordIds.end())
   {
-    _values = this->texcoordIds[_id];
+    _values = cacheIter->second;
     _duplicates = this->texcoordDuplicateMap[_id];
     return;
   }
-
-  int stride = 0;
-  int texCount = 0;
-  int totCount = 0;
 
   // Get the source element for the texture coordinates.
   tinyxml2::XMLElement *xml = this->ElementId("source", _id);
@@ -1610,6 +1956,7 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
     return;
   }
 
+<<<<<<< HEAD
   // Get the array of float values. These are the raw values for the texture
   // coordinates.
   tinyxml2::XMLElement *floatArrayXml = xml->FirstChildElement("float_array");
@@ -1688,6 +2035,15 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
   if (xml->Attribute("count"))
     texCount = std::stoi(xml->Attribute("count"));
   else
+=======
+  SourceAccessor src;
+  if (!ParseSourceAccessor(xml, "Texture coordinate", "texture coordinate",
+        _id, src))
+    return;
+
+  // Texture coordinates require the accessor count attribute.
+  if (src.count < 0)
+>>>>>>> 082e05a (Improve COLLADA loader (supersedes #569) - Part 1/3 (#830))
   {
     ignerr << "<accessor> has no count attribute in texture coordinate element "
           << "with id[" << _id << "]\n";
@@ -1697,42 +2053,61 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
   // \TODO This is a good a IGN_ASSERT
   // The total number of texture values should equal the stride multiplied
   // by the number of texture coordinates.
-  if (texCount * stride != totCount)
+  if (src.count * src.stride != src.totCount)
   {
     ignerr << "Error reading texture coordinates. Coordinate counts in element "
              "with id[" << _id << "] do not add up correctly\n";
     return;
   }
 
-  // Nothing to read. Don't print a warning because the collada file is
-  // correct.
-  if (totCount == 0)
-    return;
+  auto values = parseDoubles(src.text, src.totCount);
 
+  // Build into fresh containers: cached data is immutable, so any content a
+  // caller accumulated earlier is copied rather than appended to in place.
+  auto texcoords = _values && !_values->empty()
+      ? std::make_shared<std::vector<gz::math::Vector2d>>(*_values)
+      : std::make_shared<std::vector<gz::math::Vector2d>>();
+  auto duplicates = _duplicates && !_duplicates->empty()
+      ? std::make_shared<std::unordered_map<unsigned int, unsigned int>>(
+          *_duplicates)
+      : std::make_shared<std::unordered_map<unsigned int, unsigned int>>();
+
+<<<<<<< HEAD
   std::unordered_map<math::Vector2d,
       unsigned int, Vector2dHash> unique;
 
   // Read the raw texture values, and split them on spaces.
   std::string valueStr = floatArrayXml->GetText();
   std::vector<std::string> values = split(valueStr, " \t\r\n");
+=======
+  std::unordered_map<gz::math::Vector2d,
+                     unsigned int, Vector2dHash> unique;
+>>>>>>> 082e05a (Improve COLLADA loader (supersedes #569) - Part 1/3 (#830))
 
+  gz::math::Vector2d vec;
   // Read in all the texture coordinates.
-  for (int i = 0; i < totCount; i += stride)
+  for (int i = 0; i < src.totCount; i += src.stride)
   {
     // We only handle 2D texture coordinates right now.
+<<<<<<< HEAD
     math::Vector2d vec(std::stod(values[i]),
           1.0 - std::stod(values[i+1]));
     _values.push_back(vec);
+=======
+    vec.Set(values[i],
+            1.0 - values[i + 1]);
+    texcoords->push_back(vec);
+>>>>>>> 082e05a (Improve COLLADA loader (supersedes #569) - Part 1/3 (#830))
 
     // create a map of duplicate indices
     if (unique.find(vec) != unique.end())
-    {
-      _duplicates[_values.size()-1] = unique[vec];
-    }
+      (*duplicates)[texcoords->size()-1] = unique[vec];
     else
-      unique[vec] = _values.size()-1;
+      unique[vec] = texcoords->size()-1;
   }
 
+  _values = std::move(texcoords);
+  _duplicates = std::move(duplicates);
   this->texcoordDuplicateMap[_id] = _duplicates;
   this->texcoordIds[_id] = _values;
 }
@@ -1964,7 +2339,7 @@ void ColladaLoader::Implementation::LoadPolylist(
 {
   // This function parses polylist types in collada into
   // a set of triangle meshes.  The assumption is that
-  // each polylist polygon is convex, and we do decomposion
+  // each polylist polygon is convex, and we do decomposition
   // by anchoring each triangle about vertex 0 or each polygon
   std::unique_ptr<SubMesh> subMesh(new SubMesh);
   subMesh->SetName(this->currentNodeName);
@@ -1997,9 +2372,20 @@ void ColladaLoader::Implementation::LoadPolylist(
   tinyxml2::XMLElement *polylistInputXml =
       _polylistXml->FirstChildElement("input");
 
+<<<<<<< HEAD
   std::vector<math::Vector3d> verts;
   std::vector<math::Vector3d> norms;
   std::map<unsigned int, std::vector<math::Vector2d>> texcoords;
+=======
+  // Initialized empty (never null). The Load* helpers replace these with
+  // shared immutable data on success and leave them untouched on error, so
+  // the dereferences below are always safe.
+  Vector3dArrayPtr verts =
+      std::make_shared<std::vector<gz::math::Vector3d>>();
+  Vector3dArrayPtr norms =
+      std::make_shared<std::vector<gz::math::Vector3d>>();
+  std::unordered_map<unsigned int, Vector2dArrayPtr> texcoords;
+>>>>>>> 082e05a (Improve COLLADA loader (supersedes #569) - Part 1/3 (#830))
   std::vector<std::pair<unsigned int, unsigned int>> texcoordsOffsetToSet;
 
   const unsigned int VERTEX = 0;
@@ -2008,10 +2394,11 @@ void ColladaLoader::Implementation::LoadPolylist(
   unsigned int otherSemantics = TEXCOORD + 1;
 
   // look up table of position/normal/texcoord duplicate indices
-  std::unordered_map<unsigned int, std::map<unsigned int, unsigned int>>
-      texDupMap;
-  std::map<unsigned int, unsigned int> normalDupMap;
-  std::map<unsigned int, unsigned int> positionDupMap;
+  std::unordered_map<unsigned int, DuplicateMapPtr> texDupMap;
+  DuplicateMapPtr normalDupMap =
+      std::make_shared<std::unordered_map<unsigned int, unsigned int>>();
+  DuplicateMapPtr positionDupMap =
+      std::make_shared<std::unordered_map<unsigned int, unsigned int>>();
 
   math::Matrix4d bindShapeMat(math::Matrix4d::Identity);
   if (_mesh->HasSkeleton())
@@ -2028,10 +2415,10 @@ void ColladaLoader::Implementation::LoadPolylist(
     std::string offset = polylistInputXml->Attribute("offset");
     if (semantic == "VERTEX")
     {
-      unsigned int count = norms.size();
+      unsigned int count = norms->size();
       this->LoadVertices(source, _transform, verts, norms,
           positionDupMap, normalDupMap);
-      if (norms.size() > count)
+      if (norms->size() > count)
         combinedVertNorms = true;
       inputs[VERTEX].insert(math::parseInt(offset));
     }
@@ -2049,8 +2436,13 @@ void ColladaLoader::Implementation::LoadPolylist(
       if (setStr)
         set = math::parseInt(setStr);
       this->LoadTexCoords(source, texcoords[set], texDupMap[set]);
+      if (!texcoords[set])
+        texcoords[set] = std::make_shared<std::vector<gz::math::Vector2d>>();
+      if (!texDupMap[set])
+        texDupMap[set] =
+          std::make_shared<std::unordered_map<unsigned int, unsigned int>>();
       inputs[TEXCOORD].insert(offsetInt);
-      texcoordsOffsetToSet.push_back(std::make_pair(offsetInt, set));
+      texcoordsOffsetToSet.emplace_back(offsetInt, set);
     }
     else
     {
@@ -2082,11 +2474,13 @@ void ColladaLoader::Implementation::LoadPolylist(
 
   // vertexIndexMap is a map of collada vertex index to Gazebo submesh vertex
   // indices, used for identifying vertices that can be shared.
-  std::map<unsigned int, std::vector<GeometryIndices> > vertexIndexMap;
+  std::unordered_map<unsigned int, std::vector<GeometryIndices>> vertexIndexMap;
   unsigned int *values = new unsigned int[inputSize];
   memset(values, 0, inputSize);
 
   std::vector<std::string> strs = split(pStr, " \t\r\n");
+  if (inputSize > 0)
+    vertexIndexMap.reserve(strs.size() / inputSize);
   std::vector<std::string>::iterator strs_iter = strs.begin();
   for (unsigned int l = 0; l < vcounts.size(); ++l)
   {
@@ -2126,8 +2520,9 @@ void ColladaLoader::Implementation::LoadPolylist(
           // Get the vertex position index value. If it is a duplicate then use
           // the existing index instead
           daeVertIndex = values[*inputs[VERTEX].begin()];
-          if (positionDupMap.find(daeVertIndex) != positionDupMap.end())
-            daeVertIndex = positionDupMap[daeVertIndex];
+          auto posDupIter = positionDupMap->find(daeVertIndex);
+          if (posDupIter != positionDupMap->end())
+            daeVertIndex = posDupIter->second;
 
           // if the vertex index has not been previously added then just add it.
           if (vertexIndexMap.find(daeVertIndex) == vertexIndexMap.end())
@@ -2155,12 +2550,10 @@ void ColladaLoader::Implementation::LoadPolylist(
                 // duplicate then reset the index to the first instance of the
                 // duplicated position
                 unsigned int remappedNormalIndex =
-                  values[*inputs[NORMAL].begin()];
-                if (normalDupMap.find(remappedNormalIndex)
-                    != normalDupMap.end())
-                 {
-                  remappedNormalIndex = normalDupMap[remappedNormalIndex];
-                 }
+                    values[*inputs[NORMAL].begin()];
+                auto normDupIter = normalDupMap->find(remappedNormalIndex);
+                if (normDupIter != normalDupMap->end())
+                  remappedNormalIndex = normDupIter->second;
 
                 if (iv.normalIndex == remappedNormalIndex)
                   normEqual = true;
@@ -2178,7 +2571,7 @@ void ColladaLoader::Implementation::LoadPolylist(
                   // duplicated texcoord
                   unsigned int remappedTexcoordIndex =
                     values[offset];
-                  auto &texDupMapSet = texDupMap[set];
+                  auto &texDupMapSet = (*texDupMap[set]);
                   auto texDupMapSetIt = texDupMapSet.find(
                       remappedTexcoordIndex);
                   if (texDupMapSetIt != texDupMapSet.end())
@@ -2213,11 +2606,11 @@ void ColladaLoader::Implementation::LoadPolylist(
           GeometryIndices input;
           if (!inputs[VERTEX].empty())
           {
-            subMesh->AddVertex(verts[daeVertIndex]);
+            subMesh->AddVertex((*verts)[daeVertIndex]);
             unsigned int newVertIndex = subMesh->VertexCount()-1;
             subMesh->AddIndex(newVertIndex);
             if (combinedVertNorms)
-              subMesh->AddNormal(norms[daeVertIndex]);
+              subMesh->AddNormal((*norms)[daeVertIndex]);
             if (_mesh->HasSkeleton())
             {
               subMesh->SetVertex(newVertIndex, bindShapeMat *
@@ -2242,15 +2635,13 @@ void ColladaLoader::Implementation::LoadPolylist(
             unsigned int inputRemappedNormalIndex =
               values[*inputs[NORMAL].begin()];
 
-            if (normalDupMap.find(inputRemappedNormalIndex)
-                != normalDupMap.end())
-            {
-              inputRemappedNormalIndex = normalDupMap[inputRemappedNormalIndex];
-            }
+            auto normDupIter = normalDupMap->find(inputRemappedNormalIndex);
+            if (normDupIter != normalDupMap->end())
+              inputRemappedNormalIndex = normDupIter->second;
 
-            if (norms.size() > inputRemappedNormalIndex)
+            if ((*norms).size() > inputRemappedNormalIndex)
             {
-              subMesh->AddNormal(norms[inputRemappedNormalIndex]);
+              subMesh->AddNormal((*norms)[inputRemappedNormalIndex]);
               input.normalIndex = inputRemappedNormalIndex;
             }
           }
@@ -2265,15 +2656,15 @@ void ColladaLoader::Implementation::LoadPolylist(
               unsigned int inputRemappedTexcoordIndex =
                 values[offset];
 
-              auto &texDupMapSet = texDupMap[set];
+              auto &texDupMapSet = (*texDupMap[set]);
               auto texDupMapSetIt = texDupMapSet.find(
                   inputRemappedTexcoordIndex);
               if (texDupMapSetIt != texDupMapSet.end())
                 inputRemappedTexcoordIndex = texDupMapSetIt->second;
               auto &texcoordsSet = texcoords[set];
               subMesh->AddTexCoordBySet(
-                  texcoordsSet[inputRemappedTexcoordIndex].X(),
-                  texcoordsSet[inputRemappedTexcoordIndex].Y(), set);
+                  (*texcoordsSet)[inputRemappedTexcoordIndex].X(),
+                  (*texcoordsSet)[inputRemappedTexcoordIndex].Y(), set);
               input.texcoordIndex[set] = inputRemappedTexcoordIndex;
             }
           }
@@ -2329,9 +2720,20 @@ void ColladaLoader::Implementation::LoadTriangles(
   tinyxml2::XMLElement *trianglesInputXml =
       _trianglesXml->FirstChildElement("input");
 
+<<<<<<< HEAD
   std::vector<math::Vector3d> verts;
   std::vector<math::Vector3d> norms;
   std::map<unsigned int, std::vector<math::Vector2d>> texcoords;
+=======
+  // Initialized empty (never null). The Load* helpers replace these with
+  // shared immutable data on success and leave them untouched on error, so
+  // the dereferences below are always safe.
+  Vector3dArrayPtr verts =
+      std::make_shared<std::vector<gz::math::Vector3d>>();
+  Vector3dArrayPtr norms =
+      std::make_shared<std::vector<gz::math::Vector3d>>();
+  std::unordered_map<unsigned int, Vector2dArrayPtr> texcoords;
+>>>>>>> 082e05a (Improve COLLADA loader (supersedes #569) - Part 1/3 (#830))
   std::vector<std::pair<unsigned int, unsigned int>> texcoordsOffsetToSet;
 
   const unsigned int VERTEX = 0;
@@ -2348,10 +2750,11 @@ void ColladaLoader::Implementation::LoadTriangles(
   std::map<const unsigned int, std::set<int>> inputs;
 
   // look up table of position/normal/texcoord duplicate indices
-  std::unordered_map<unsigned int, std::map<unsigned int, unsigned int>>
-      texDupMap;
-  std::map<unsigned int, unsigned int> normalDupMap;
-  std::map<unsigned int, unsigned int> positionDupMap;
+  std::unordered_map<unsigned int, DuplicateMapPtr> texDupMap;
+  DuplicateMapPtr normalDupMap =
+      std::make_shared<std::unordered_map<unsigned int, unsigned int>>();
+  DuplicateMapPtr positionDupMap =
+      std::make_shared<std::unordered_map<unsigned int, unsigned int>>();
 
   while (trianglesInputXml)
   {
@@ -2360,10 +2763,10 @@ void ColladaLoader::Implementation::LoadTriangles(
     std::string offset = trianglesInputXml->Attribute("offset");
     if (semantic == "VERTEX")
     {
-      unsigned int count = norms.size();
+      unsigned int count = norms->size();
       this->LoadVertices(source, _transform, verts, norms,
           positionDupMap, normalDupMap);
-      if (norms.size() > count)
+      if (norms->size() > count)
         combinedVertNorms = true;
       inputs[VERTEX].insert(math::parseInt(offset));
       hasVertices = true;
@@ -2372,8 +2775,14 @@ void ColladaLoader::Implementation::LoadTriangles(
     {
       this->LoadNormals(source, _transform, norms, normalDupMap);
       combinedVertNorms = false;
+<<<<<<< HEAD
       inputs[NORMAL].insert(math::parseInt(offset));
       if (norms.size() > 0)
+=======
+      inputs[NORMAL].insert(gz::math::parseInt(offset));
+
+      if (!norms->empty())
+>>>>>>> 082e05a (Improve COLLADA loader (supersedes #569) - Part 1/3 (#830))
         hasNormals = true;
     }
     else if (semantic == "TEXCOORD")
@@ -2384,8 +2793,13 @@ void ColladaLoader::Implementation::LoadTriangles(
       if (setStr)
         set = math::parseInt(setStr);
       this->LoadTexCoords(source, texcoords[set], texDupMap[set]);
+      if (!texcoords[set])
+        texcoords[set] = std::make_shared<std::vector<gz::math::Vector2d>>();
+      if (!texDupMap[set])
+        texDupMap[set] =
+          std::make_shared<std::unordered_map<unsigned int, unsigned int>>();
       inputs[TEXCOORD].insert(offsetInt);
-      texcoordsOffsetToSet.push_back(std::make_pair(offsetInt, set));
+      texcoordsOffsetToSet.emplace_back(offsetInt, set);
       hasTexcoords = true;
     }
     else
@@ -2441,10 +2855,12 @@ void ColladaLoader::Implementation::LoadTriangles(
 
   // vertexIndexMap is a map of collada vertex index to Gazebo submesh vertex
   // indices, used for identifying vertices that can be shared.
-  std::map<unsigned int, std::vector<GeometryIndices> > vertexIndexMap;
+  std::unordered_map<unsigned int, std::vector<GeometryIndices>> vertexIndexMap;
 
   std::vector<unsigned int> values(offsetSize);
   std::vector<std::string> strs = split(pStr, " \t\r\n");
+  if (offsetSize > 0)
+    vertexIndexMap.reserve(strs.size() / offsetSize);
 
   for (unsigned int j = 0; j < strs.size(); j += offsetSize)
   {
@@ -2461,8 +2877,9 @@ void ColladaLoader::Implementation::LoadTriangles(
       // Get the vertex position index value. If the position is a duplicate
       // then reset the index to the first instance of the duplicated position
       daeVertIndex = values.at(*inputs[VERTEX].begin());
-      if (positionDupMap.find(daeVertIndex) != positionDupMap.end())
-        daeVertIndex = positionDupMap[daeVertIndex];
+      auto posDupIter = positionDupMap->find(daeVertIndex);
+      if (posDupIter != positionDupMap->end())
+        daeVertIndex = posDupIter->second;
 
       // if the vertex index has not been previously added then just add it.
       if (vertexIndexMap.find(daeVertIndex) == vertexIndexMap.end())
@@ -2489,8 +2906,9 @@ void ColladaLoader::Implementation::LoadTriangles(
             // position
             unsigned int remappedNormalIndex = values.at(
                 *inputs[NORMAL].begin());
-            if (normalDupMap.find(remappedNormalIndex) != normalDupMap.end())
-              remappedNormalIndex = normalDupMap[remappedNormalIndex];
+            auto normDupIter = normalDupMap->find(remappedNormalIndex);
+            if (normDupIter != normalDupMap->end())
+              remappedNormalIndex = normDupIter->second;
 
             if (iv.normalIndex == remappedNormalIndex)
               normEqual = true;
@@ -2508,7 +2926,7 @@ void ColladaLoader::Implementation::LoadTriangles(
               // duplicated texcoord
               unsigned int remappedTexcoordIndex =
                   values.at(offset);
-              auto &texDupMapSet = texDupMap[set];
+              auto &texDupMapSet = (*texDupMap[set]);
               auto texDupMapSetIt = texDupMapSet.find(remappedTexcoordIndex);
               if (texDupMapSetIt != texDupMapSet.end())
                 remappedTexcoordIndex = texDupMapSetIt->second;
@@ -2542,12 +2960,12 @@ void ColladaLoader::Implementation::LoadTriangles(
       GeometryIndices input;
       if (hasVertices)
       {
-        subMesh->AddVertex(verts[daeVertIndex]);
+        subMesh->AddVertex((*verts)[daeVertIndex]);
         unsigned int newVertIndex = subMesh->VertexCount()-1;
         subMesh->AddIndex(newVertIndex);
 
         if (combinedVertNorms)
-          subMesh->AddNormal(norms[daeVertIndex]);
+          subMesh->AddNormal((*norms)[daeVertIndex]);
         if (_mesh->HasSkeleton())
         {
           SkeletonPtr skel = _mesh->MeshSkeleton();
@@ -2575,9 +2993,10 @@ void ColladaLoader::Implementation::LoadTriangles(
       {
         unsigned int inputRemappedNormalIndex = values.at(
             *inputs[NORMAL].begin());
-        if (normalDupMap.find(inputRemappedNormalIndex) != normalDupMap.end())
-          inputRemappedNormalIndex = normalDupMap[inputRemappedNormalIndex];
-        subMesh->AddNormal(norms[inputRemappedNormalIndex]);
+        auto normDupIter = normalDupMap->find(inputRemappedNormalIndex);
+        if (normDupIter != normalDupMap->end())
+          inputRemappedNormalIndex = normDupIter->second;
+        subMesh->AddNormal((*norms)[inputRemappedNormalIndex]);
         input.normalIndex = inputRemappedNormalIndex;
       }
       if (hasTexcoords)
@@ -2590,14 +3009,14 @@ void ColladaLoader::Implementation::LoadTriangles(
           unsigned int inputRemappedTexcoordIndex =
               values.at(offset);
 
-          auto &texDupMapSet = texDupMap[set];
+          auto &texDupMapSet = (*texDupMap[set]);
           auto texDupMapSetIt = texDupMapSet.find(inputRemappedTexcoordIndex);
           if (texDupMapSetIt != texDupMapSet.end())
             inputRemappedTexcoordIndex = texDupMapSetIt->second;
           auto &texcoordsSet = texcoords[set];
           subMesh->AddTexCoordBySet(
-              texcoordsSet[inputRemappedTexcoordIndex].X(),
-              texcoordsSet[inputRemappedTexcoordIndex].Y(), set);
+              (*texcoordsSet)[inputRemappedTexcoordIndex].X(),
+              (*texcoordsSet)[inputRemappedTexcoordIndex].Y(), set);
           input.texcoordIndex[set] = inputRemappedTexcoordIndex;
         }
       }
@@ -2627,8 +3046,18 @@ void ColladaLoader::Implementation::LoadLines(tinyxml2::XMLElement *_xml,
   // std::string semantic = inputXml->Attribute("semantic");
   std::string source = inputXml->Attribute("source");
 
+<<<<<<< HEAD
   std::vector<math::Vector3d> verts;
   std::vector<math::Vector3d> norms;
+=======
+  // Initialized empty (never null). LoadVertices replaces these with shared
+  // immutable data on success and leaves them untouched on error, so the
+  // dereferences below are always safe.
+  Vector3dArrayPtr verts =
+      std::make_shared<std::vector<gz::math::Vector3d>>();
+  Vector3dArrayPtr norms =
+      std::make_shared<std::vector<gz::math::Vector3d>>();
+>>>>>>> 082e05a (Improve COLLADA loader (supersedes #569) - Part 1/3 (#830))
   this->LoadVertices(source, _transform, verts, norms);
 
   tinyxml2::XMLElement *pXml = _xml->FirstChildElement("p");
@@ -2642,9 +3071,9 @@ void ColladaLoader::Implementation::LoadLines(tinyxml2::XMLElement *_xml,
 
     if (!iss)
       break;
-    subMesh->AddVertex(verts[a]);
+    subMesh->AddVertex((*verts)[a]);
     subMesh->AddIndex(subMesh->VertexCount() - 1);
-    subMesh->AddVertex(verts[b]);
+    subMesh->AddVertex((*verts)[b]);
     subMesh->AddIndex(subMesh->VertexCount() - 1);
   } while (iss);
 
