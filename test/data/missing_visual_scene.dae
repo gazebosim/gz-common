@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The <scene> references a visual_scene id that does not exist. -->
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset>
+    <up_axis>Z_UP</up_axis>
+  </asset>
+  <library_visual_scenes>
+    <visual_scene id="RealScene" name="RealScene">
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#NoSuchScene"/>
+  </scene>
+</COLLADA>
