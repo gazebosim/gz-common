@@ -16,12 +16,9 @@
 */
 #include <gtest/gtest.h>
 
-<<<<<<< HEAD
-#include "test_config.h"
-=======
 #include <memory>
 
->>>>>>> 082e05a (Improve COLLADA loader (supersedes #569) - Part 1/3 (#830))
+#include "test_config.h"
 #include "gz/common/Mesh.hh"
 #include "gz/common/SubMesh.hh"
 #include "gz/common/Material.hh"
@@ -182,10 +179,6 @@ TEST_F(ColladaLoader, Material)
   matOpaque->BlendFactors(srcFactor, dstFactor);
   EXPECT_DOUBLE_EQ(1.0, srcFactor);
   EXPECT_DOUBLE_EQ(0.0, dstFactor);
-<<<<<<< HEAD
-=======
-
->>>>>>> 082e05a (Improve COLLADA loader (supersedes #569) - Part 1/3 (#830))
 }
 
 /////////////////////////////////////////////////
@@ -498,27 +491,6 @@ TEST_F(ColladaLoader, LoadCylinderAnimatedFrom3dsMax)
 }
 
 /////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-<<<<<<< HEAD
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-=======
-  common::ColladaLoader loader;
-
-  std::string meshFilename =
-    common::testing::TestFile("data", "box_with_no_animation_name.dae");
-
-  std::unique_ptr<common::Mesh> mesh(loader.Load(meshFilename));
-  common::SkeletonPtr skeleton = mesh->MeshSkeleton();
-  ASSERT_EQ(1u, skeleton->AnimationCount());
-  common::SkeletonAnimation *anim = skeleton->Animation(0);
-  auto animName = anim->Name();
-  EXPECT_EQ(animName, "animation1");
->>>>>>> 082e05a (Improve COLLADA loader (supersedes #569) - Part 1/3 (#830))
-}
-
-/////////////////////////////////////////////////
 TEST_F(ColladaLoader, LoadLines)
 {
   common::ColladaLoader loader;
@@ -576,7 +548,6 @@ TEST_F(ColladaLoader, LoadNoColladaTag)
       common::testing::TestFile("data", "no_collada_tag.dae")));
   EXPECT_EQ(nullptr, mesh);
 #ifndef _WIN32
-  common::Console::Root().RawLogger().flush();
   EXPECT_NE(LogContent().find("Missing COLLADA tag"), std::string::npos);
 #endif
 }
@@ -591,7 +562,6 @@ TEST_F(ColladaLoader, LoadBadVersion)
   ASSERT_TRUE(mesh);
   EXPECT_EQ(3u, mesh->VertexCount());
 #ifndef _WIN32
-  common::Console::Root().RawLogger().flush();
   EXPECT_NE(LogContent().find("Invalid collada file"), std::string::npos);
 #endif
 }
@@ -606,9 +576,15 @@ TEST_F(ColladaLoader, LoadMissingVisualScene)
   ASSERT_TRUE(mesh);
   EXPECT_EQ(0u, mesh->VertexCount());
 #ifndef _WIN32
-  common::Console::Root().RawLogger().flush();
   EXPECT_NE(LogContent().find("Unable to find visual_scene"),
       std::string::npos);
 #endif
 }
 
+
+/////////////////////////////////////////////////
+int main(int argc, char **argv)
+{
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}
