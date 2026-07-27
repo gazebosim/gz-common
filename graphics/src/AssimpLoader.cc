@@ -35,7 +35,9 @@
 #include "gz/common/SystemPaths.hh"
 #include "gz/common/Util.hh"
 
-#include <assimp/GltfMaterial.h>    // GLTF specific material properties
+#ifndef GZ_ASSIMP_PRE_5_2_0
+  #include <assimp/GltfMaterial.h>    // GLTF specific material properties
+#endif
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/postprocess.h>     // Post processing flags
 #include <assimp/scene.h>           // Output data structure
@@ -405,6 +407,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     mat->SetBlendFactors(opacity, 1.0 - opacity);
   }
 
+#ifndef GZ_ASSIMP_PRE_5_1_0
   // basic support for transmission - currently just overrides opacity
   // \todo(iche033) The transmission factor can be used with volume
   // material extension to simulate effects like refraction
@@ -416,6 +419,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   {
     mat->SetTransparency(transmission);
   }
+#endif
 
   // TODO(luca) more than one texture, Gazebo assumes UV index 0
   Pbr pbr;
@@ -431,6 +435,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     auto [texName, texData] = this->LoadTexture(
         _scene, texturePath, this->GenerateTextureName(textureKey, "Diffuse"));
     mat->SetTextureImage(texName, texData);
+#ifndef GZ_ASSIMP_PRE_5_2_0
     // Now set the alpha from texture, if enabled, only supported in GLTF
     aiString alphaMode;
     auto paramRet = assimpMat->Get(AI_MATKEY_GLTF_ALPHAMODE, alphaMode);
@@ -447,7 +452,9 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
         mat->SetAlphaFromTexture(true, alphaCutoff, twoSided);
       }
     }
+#endif
   }
+#ifndef GZ_ASSIMP_PRE_5_2_0
   // Edge case for GLTF, Metal and Rough texture are embedded in a
   // MetallicRoughness texture with metalness in B and roughness in G
   // Open, preprocess and split into metal and roughness map
@@ -576,6 +583,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
       }
     }
   }
+#endif
   if (assimpMat->GetTexture(
           aiTextureType_NORMALS, 0, &texturePath) == AI_SUCCESS ||
       assimpMat->GetTexture(
@@ -605,6 +613,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     pbr.SetSpecularMap(texName);
   }
 
+#ifndef GZ_ASSIMP_PRE_5_2_0
   float value;
   ret = assimpMat->Get(AI_MATKEY_METALLIC_FACTOR, value);
   if (ret == AI_SUCCESS)
@@ -620,6 +629,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   {
     pbr.SetRoughness(value);
   }
+#endif
   mat->SetPbrMaterial(pbr);
   return mat;
 }
@@ -838,7 +848,9 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
       aiProcess_RemoveRedundantMaterials |
       aiProcess_SortByPType |
       aiProcess_FlipUVs |
+#ifndef GZ_ASSIMP_PRE_5_2_0
       aiProcess_PopulateArmatureData |
+#endif
       aiProcess_Triangulate |
       aiProcess_GenNormals |
       0);
