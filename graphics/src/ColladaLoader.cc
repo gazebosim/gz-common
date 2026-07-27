@@ -421,7 +421,7 @@ std::vector<double> parseDoubles(const char *_str, size_t _reserveCount)
     start = end;
     // Only overflow is fatal. Underflow also sets ERANGE but yields a
     // harmless denormal or zero, which legitimate exporters do produce.
-    if (errno == ERANGE && (d == HUGE_VAL || d == -HUGE_VAL))
+    if (errno == ERANGE && std::isinf(d))
     {
       ignerr << "Overflow while parsing <float_array>; truncating after "
             << result.size() << " value(s).\n";
