@@ -840,7 +840,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
       extension.begin(), ::tolower);
 
   // compute assimp root node transform
-  bool useIdentityRotation = (extension != "glb" && extension != "glTF");
+  bool useIdentityRotation = (extension != "glb" && extension != "gltf");
   auto transform = this->dataPtr->UpdatedRootNodeTransform(scene,
     useIdentityRotation);
   auto rootTransform = this->dataPtr->ConvertTransform(transform);
