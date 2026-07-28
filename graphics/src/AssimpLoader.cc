@@ -88,6 +88,10 @@ class AssimpLoader::Implementation
                                      unsigned _matIdx,
                                      const std::string &_path) const;
 
+  /// \brief Check if Assimp material was default created by assimp
+  /// \param[in] _assimpMat the assimp material
+  public: bool IsDefaultMaterial(const aiMaterial* _assimpMat) const;
+
   /// \brief Load a texture embedded in a mesh (i.e. for GLB format)
   /// into a gz::common::Image
   /// \param[in] _texture the assimp texture object
@@ -368,6 +372,11 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   aiColor4D color;
   bool specularDefine = false;
   auto& assimpMat = _scene->mMaterials[_matIdx];
+  bool defaultMaterial = IsDefaultMaterial(assimpMat);
+  if (defaultMaterial)
+  {
+    return nullptr;
+  }
   auto ret = assimpMat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
   if (ret == AI_SUCCESS)
   {
@@ -793,6 +802,23 @@ SubMesh AssimpLoader::Implementation::CreateSubMesh(
 }
 
 //////////////////////////////////////////////////
+bool AssimpLoader::Implementation::IsDefaultMaterial(
+    const aiMaterial* _assimpMat) const
+{
+  aiString matName;
+  aiColor3D clr;
+  _assimpMat->Get(AI_MATKEY_COLOR_DIFFUSE, clr);
+
+  if ((_assimpMat->Get(AI_MATKEY_NAME, matName) == AI_SUCCESS) &&
+      (ToString(matName) == AI_DEFAULT_MATERIAL_NAME) &&
+      (_assimpMat->mNumProperties == 2))
+  {
+    return true;
+  }
+  return false;
+}
+
+//////////////////////////////////////////////////
 AssimpLoader::AssimpLoader()
 : MeshLoader(), dataPtr(utils::MakeUniqueImpl<Implementation>())
 {
@@ -846,15 +872,6 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   // Add the materials first
   for (unsigned _matIdx = 0; _matIdx < scene->mNumMaterials; ++_matIdx)
   {
-    aiString matName;
-    if (scene->mNumMaterials == 1 &&
-      AI_SUCCESS == scene->mMaterials[_matIdx]->Get(AI_MATKEY_NAME, matName) &&
-      std::string(matName.C_Str()) == AI_DEFAULT_MATERIAL_NAME)
-    {
-      // If there's only 1 material and it's Assimp's default, skip adding it.
-      continue;
-    }
-
     auto mat = this->dataPtr->CreateMaterial(scene, _matIdx, path);
     mesh->AddMaterial(mat);
   }
