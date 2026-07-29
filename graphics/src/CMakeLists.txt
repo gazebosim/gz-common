@@ -27,6 +27,7 @@ gz_build_tests(
     ${graphics_target}
     gz-common${GZ_COMMON_VER}-testing
 )
+<<<<<<< HEAD
 
 # Assimp doesn't offer preprocessor version, use cmake to set a compatibility
 # mode for versions below 5.2.0 and 5.1.0
@@ -89,3 +90,5 @@ if (NOT TINYXML2_VERSION VERSION_LESS "6.0.0")
   target_compile_definitions(${graphics_target}
     PRIVATE "TINYXML2_MAJOR_VERSION_GE_6")
 endif()
+=======
+>>>>>>> d7c3fe4 (Minor AssimpLoader changes (#858))
