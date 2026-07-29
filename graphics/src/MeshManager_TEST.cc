@@ -27,10 +27,42 @@
 using namespace gz;
 
 #ifndef _WIN32
-class MeshManager : public common::testing::AutoLogFixture { };
+class MeshManager : public common::testing::AutoLogFixture,
+                    public testing::WithParamInterface<bool> {
+  protected: void SetUp() override
+  {
+    common::testing::AutoLogFixture::SetUp();
+
+    forceAssimpEnv = this->GetParam();
+    if (forceAssimpEnv)
+    {
+      common::setenv("GZ_MESH_FORCE_ASSIMP", "true");
+    }
+    else
+    {
+      common::setenv("GZ_MESH_FORCE_ASSIMP", "false");
+    }
+    common::MeshManager::Instance()->SetAssimpEnvs();
+  }
+
+  protected: void TearDown() override
+  {
+    common::unsetenv("GZ_MESH_FORCE_ASSIMP");
+    common::MeshManager::Instance()->SetAssimpEnvs();
+    common::MeshManager::Instance()->RemoveAll();
+    common::testing::AutoLogFixture::TearDown();
+  }
+
+  protected: bool forceAssimpEnv = false;
+};
+
+INSTANTIATE_TEST_SUITE_P(
+    ForceAssimpScenarios,
+    MeshManager,
+    testing::Bool());
 
 /////////////////////////////////////////////////
-TEST_F(MeshManager, CreateExtrudedPolyline)
+TEST_P(MeshManager, CreateExtrudedPolyline)
 {
   // test extrusion of a path with two subpaths:
   // a smaller square inside a bigger square.
@@ -133,7 +165,7 @@ TEST_F(MeshManager, CreateExtrudedPolyline)
 }
 
 /////////////////////////////////////////////////
-TEST_F(MeshManager, CreateExtrudedPolylineClosedPath)
+TEST_P(MeshManager, CreateExtrudedPolylineClosedPath)
 {
   // test extrusion of a path that has two closed subpaths, i.e.,
   // first and last vertices are the same.
@@ -248,7 +280,7 @@ TEST_F(MeshManager, CreateExtrudedPolylineClosedPath)
 }
 
 /////////////////////////////////////////////////
-TEST_F(MeshManager, CreateExtrudedPolylineInvalid)
+TEST_P(MeshManager, CreateExtrudedPolylineInvalid)
 {
   // test extruding invalid polyline
   std::vector<std::vector<gz::math::Vector2d> > path;
@@ -269,7 +301,7 @@ TEST_F(MeshManager, CreateExtrudedPolylineInvalid)
 }
 
 /////////////////////////////////////////////////
-TEST_F(MeshManager, Remove)
+TEST_P(MeshManager, Remove)
 {
   auto *mgr = common::MeshManager::Instance();
 
@@ -291,7 +323,7 @@ TEST_F(MeshManager, Remove)
 }
 
 /////////////////////////////////////////////////
-TEST_F(MeshManager, ConvexDecomposition)
+TEST_P(MeshManager, ConvexDecomposition)
 {
   auto *mgr = common::MeshManager::Instance();
   const common::Mesh *boxMesh = mgr->Load(
@@ -337,7 +369,7 @@ TEST_F(MeshManager, ConvexDecomposition)
 }
 
 /////////////////////////////////////////////////
-TEST_F(MeshManager, MergeSubMeshes)
+TEST_P(MeshManager, MergeSubMeshes)
 {
   auto *mgr = common::MeshManager::Instance();
   const common::Mesh *mesh = mgr->Load(
@@ -426,7 +458,7 @@ TEST_F(MeshManager, MergeSubMeshes)
 }
 
 /////////////////////////////////////////////////
-TEST_F(MeshManager, CreateMesh)
+TEST_P(MeshManager, CreateMesh)
 {
   auto *mgr = common::MeshManager::Instance();
   std::string meshName = "test_create_mesh";
