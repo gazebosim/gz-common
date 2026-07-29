@@ -83,13 +83,15 @@ class AssimpLoader::Implementation
   /// \param[in] _scene the assimp scene
   /// \param[in] _matIdx index of the material in the scene
   /// \param[in] _path path where the mesh is located
-  /// \return pointer to the converted common::Material
+  /// \return pointer to the converted common::Material, nullptr if the material
+  /// was default created by assimp
   public: MaterialPtr CreateMaterial(const aiScene *_scene,
                                      unsigned _matIdx,
                                      const std::string &_path) const;
 
   /// \brief Check if Assimp material was default created by assimp
   /// \param[in] _assimpMat the assimp material
+  /// \return whether the material was default created by assimp
   public: bool IsDefaultMaterial(const aiMaterial* _assimpMat) const;
 
   /// \brief Load a texture embedded in a mesh (i.e. for GLB format)
