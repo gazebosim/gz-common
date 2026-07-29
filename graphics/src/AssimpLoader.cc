@@ -372,8 +372,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   aiColor4D color;
   bool specularDefine = false;
   auto& assimpMat = _scene->mMaterials[_matIdx];
-  bool defaultMaterial = IsDefaultMaterial(assimpMat);
-  if (defaultMaterial)
+  if (IsDefaultMaterial(assimpMat))
   {
     return nullptr;
   }
@@ -806,9 +805,6 @@ bool AssimpLoader::Implementation::IsDefaultMaterial(
     const aiMaterial* _assimpMat) const
 {
   aiString matName;
-  aiColor3D clr;
-  _assimpMat->Get(AI_MATKEY_COLOR_DIFFUSE, clr);
-
   if ((_assimpMat->Get(AI_MATKEY_NAME, matName) == AI_SUCCESS) &&
       (ToString(matName) == AI_DEFAULT_MATERIAL_NAME) &&
       (_assimpMat->mNumProperties == 2))
