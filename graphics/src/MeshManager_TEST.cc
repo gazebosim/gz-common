@@ -295,4 +295,130 @@ int main(int argc, char **argv)
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
+<<<<<<< HEAD
+=======
+
+/////////////////////////////////////////////////
+TEST_F(MeshManager, MergeSubMeshes)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data",
+        "multiple_texture_coordinates_triangle.dae"));
+  ASSERT_NE(nullptr, mesh);
+  EXPECT_EQ(2u, mesh->SubMeshCount());
+  auto submesh = mesh->SubMeshByIndex(0u).lock();
+  ASSERT_NE(nullptr, submesh);
+  EXPECT_EQ(3u, submesh->VertexCount());
+  EXPECT_EQ(3u, submesh->NormalCount());
+  EXPECT_EQ(3u, submesh->IndexCount());
+  EXPECT_EQ(2u, submesh->TexCoordSetCount());
+  EXPECT_EQ(3u, submesh->TexCoordCountBySet(0));
+  EXPECT_EQ(3u, submesh->TexCoordCountBySet(1));
+  auto submeshB = mesh->SubMeshByIndex(1u).lock();
+  ASSERT_NE(nullptr, submeshB);
+  EXPECT_EQ(3u, submeshB->VertexCount());
+  EXPECT_EQ(3u, submeshB->NormalCount());
+  EXPECT_EQ(3u, submeshB->IndexCount());
+  EXPECT_EQ(3u, submeshB->TexCoordSetCount());
+  EXPECT_EQ(3u, submeshB->TexCoordCountBySet(0));
+  EXPECT_EQ(3u, submeshB->TexCoordCountBySet(1));
+  EXPECT_EQ(3u, submeshB->TexCoordCountBySet(2));
+
+  // merge all submeshes into one
+  auto merged = common::MeshManager::MergeSubMeshes(*mesh);
+  ASSERT_NE(nullptr, merged);
+  EXPECT_FALSE(merged->Name().empty());
+  EXPECT_EQ(1u, merged->SubMeshCount());
+  auto mergedSubmesh = merged->SubMeshByIndex(0u).lock();
+  ASSERT_NE(nullptr, mergedSubmesh);
+  EXPECT_FALSE(mergedSubmesh->Name().empty());
+
+  // Verify vertice, normals, indice, and texcoord values in the
+  // final merged submesh
+  EXPECT_EQ(6u, mergedSubmesh->VertexCount());
+  EXPECT_EQ(6u, mergedSubmesh->NormalCount());
+  EXPECT_EQ(6u, mergedSubmesh->IndexCount());
+  EXPECT_EQ(3u, mergedSubmesh->TexCoordSetCount());
+  EXPECT_EQ(6u, mergedSubmesh->TexCoordCountBySet(0));
+  EXPECT_EQ(6u, mergedSubmesh->TexCoordCountBySet(1));
+  EXPECT_EQ(6u, mergedSubmesh->TexCoordCountBySet(2));
+
+  EXPECT_EQ(math::Vector3d(0, 0, 0), mergedSubmesh->Vertex(0u));
+  EXPECT_EQ(math::Vector3d(10, 0, 0), mergedSubmesh->Vertex(1u));
+  EXPECT_EQ(math::Vector3d(10, 10, 0), mergedSubmesh->Vertex(2u));
+  EXPECT_EQ(math::Vector3d(10, 0, 0), mergedSubmesh->Vertex(3u));
+  EXPECT_EQ(math::Vector3d(20, 0, 0), mergedSubmesh->Vertex(4u));
+  EXPECT_EQ(math::Vector3d(20, 10, 0), mergedSubmesh->Vertex(5u));
+
+  EXPECT_EQ(math::Vector3d(0, 0, 1), mergedSubmesh->Normal(0u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), mergedSubmesh->Normal(1u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), mergedSubmesh->Normal(2u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), mergedSubmesh->Normal(3u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), mergedSubmesh->Normal(4u));
+  EXPECT_EQ(math::Vector3d(0, 0, 1), mergedSubmesh->Normal(5u));
+
+  EXPECT_EQ(0u, mergedSubmesh->Index(0u));
+  EXPECT_EQ(1u, mergedSubmesh->Index(1u));
+  EXPECT_EQ(2u, mergedSubmesh->Index(2u));
+  EXPECT_EQ(3u, mergedSubmesh->Index(3u));
+  EXPECT_EQ(4u, mergedSubmesh->Index(4u));
+  EXPECT_EQ(5u, mergedSubmesh->Index(5u));
+
+  EXPECT_EQ(math::Vector2d(0, 1), mergedSubmesh->TexCoordBySet(0u, 0u));
+  EXPECT_EQ(math::Vector2d(0, 1), mergedSubmesh->TexCoordBySet(1u, 0u));
+  EXPECT_EQ(math::Vector2d(0, 1), mergedSubmesh->TexCoordBySet(2u, 0u));
+  EXPECT_EQ(math::Vector2d(0, 1), mergedSubmesh->TexCoordBySet(3u, 0u));
+  EXPECT_EQ(math::Vector2d(0, 1), mergedSubmesh->TexCoordBySet(4u, 0u));
+  EXPECT_EQ(math::Vector2d(0, 1), mergedSubmesh->TexCoordBySet(5u, 0u));
+
+  EXPECT_EQ(math::Vector2d(0, 1), mergedSubmesh->TexCoordBySet(0u, 1u));
+  EXPECT_EQ(math::Vector2d(0, 1), mergedSubmesh->TexCoordBySet(1u, 1u));
+  EXPECT_EQ(math::Vector2d(0, 1), mergedSubmesh->TexCoordBySet(2u, 1u));
+  EXPECT_EQ(math::Vector2d(0, 0.5), mergedSubmesh->TexCoordBySet(3u, 1u));
+  EXPECT_EQ(math::Vector2d(0, 0.4), mergedSubmesh->TexCoordBySet(4u, 1u));
+  EXPECT_EQ(math::Vector2d(0, 0.3), mergedSubmesh->TexCoordBySet(5u, 1u));
+
+  EXPECT_EQ(math::Vector2d(0, 0), mergedSubmesh->TexCoordBySet(0u, 2u));
+  EXPECT_EQ(math::Vector2d(0, 0), mergedSubmesh->TexCoordBySet(1u, 2u));
+  EXPECT_EQ(math::Vector2d(0, 0), mergedSubmesh->TexCoordBySet(2u, 2u));
+  EXPECT_EQ(math::Vector2d(0, 0.8), mergedSubmesh->TexCoordBySet(3u, 2u));
+  EXPECT_EQ(math::Vector2d(0, 0.7), mergedSubmesh->TexCoordBySet(4u, 2u));
+  EXPECT_EQ(math::Vector2d(0, 0.6), mergedSubmesh->TexCoordBySet(5u, 2u));
+}
+
+/////////////////////////////////////////////////
+TEST_F(MeshManager, CreateMesh)
+{
+  auto *mgr = common::MeshManager::Instance();
+  std::string meshName = "test_create_mesh";
+
+  // Pre-condition
+  EXPECT_FALSE(mgr->HasMesh(meshName));
+  EXPECT_EQ(nullptr, mgr->MeshByName(meshName));
+
+  // Create the mesh
+  common::Mesh *mutableMesh = mgr->CreateMesh(meshName);
+  ASSERT_NE(nullptr, mutableMesh);
+  EXPECT_EQ(meshName, mutableMesh->Name());
+
+  // Fetch the newly created mesh
+  const common::Mesh *cachedMesh = mgr->MeshByName(meshName);
+  ASSERT_NE(nullptr, cachedMesh);
+  EXPECT_EQ(mutableMesh, cachedMesh);
+  EXPECT_TRUE(mgr->HasMesh(meshName));
+
+  // Attempt to create the same mesh again should return nullptr safely
+  common::Mesh *duplicateMesh = mgr->CreateMesh(meshName);
+  EXPECT_EQ(nullptr, duplicateMesh);
+
+  // Verify original mesh is intact
+  const common::Mesh *verifyMesh = mgr->MeshByName(meshName);
+  EXPECT_NE(nullptr, verifyMesh);
+  EXPECT_EQ(meshName, verifyMesh->Name());
+
+  mgr->RemoveAll();
+}
+
+>>>>>>> a83aaf0 (feat: Add API for requesting a new mesh from the MeshManager (#796) (#811))
 #endif
