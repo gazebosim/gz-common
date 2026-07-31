@@ -83,10 +83,16 @@ class AssimpLoader::Implementation
   /// \param[in] _scene the assimp scene
   /// \param[in] _matIdx index of the material in the scene
   /// \param[in] _path path where the mesh is located
-  /// \return pointer to the converted common::Material
+  /// \return pointer to the converted common::Material, nullptr if the material
+  /// was default created by assimp
   public: MaterialPtr CreateMaterial(const aiScene *_scene,
                                      unsigned _matIdx,
                                      const std::string &_path) const;
+
+  /// \brief Check if Assimp material was default created by assimp
+  /// \param[in] _assimpMat the assimp material
+  /// \return whether the material was default created by assimp
+  public: bool IsDefaultMaterial(const aiMaterial* _assimpMat) const;
 
   /// \brief Load a texture embedded in a mesh (i.e. for GLB format)
   /// into a gz::common::Image
@@ -367,9 +373,11 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   MaterialPtr mat = std::make_shared<Material>();
   aiColor4D color;
   bool specularDefine = false;
-  // gcc is complaining about this variable not being used.
-  (void) specularDefine;
   auto& assimpMat = _scene->mMaterials[_matIdx];
+  if (IsDefaultMaterial(assimpMat))
+  {
+    return nullptr;
+  }
   auto ret = assimpMat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
   if (ret == AI_SUCCESS)
   {
@@ -814,6 +822,20 @@ SubMesh AssimpLoader::Implementation::CreateSubMesh(
 }
 
 //////////////////////////////////////////////////
+bool AssimpLoader::Implementation::IsDefaultMaterial(
+    const aiMaterial* _assimpMat) const
+{
+  aiString matName;
+  if ((_assimpMat->Get(AI_MATKEY_NAME, matName) == AI_SUCCESS) &&
+      (ToString(matName) == AI_DEFAULT_MATERIAL_NAME) &&
+      (_assimpMat->mNumProperties == 2))
+  {
+    return true;
+  }
+  return false;
+}
+
+//////////////////////////////////////////////////
 AssimpLoader::AssimpLoader()
 : MeshLoader(), dataPtr(utils::MakeUniqueImpl<Implementation>())
 {
@@ -859,7 +881,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
       extension.begin(), ::tolower);
 
   // compute assimp root node transform
-  bool useIdentityRotation = (extension != "glb" && extension != "glTF");
+  bool useIdentityRotation = (extension != "glb" && extension != "gltf");
   auto transform = this->dataPtr->UpdatedRootNodeTransform(scene,
     useIdentityRotation);
   auto rootTransform = this->dataPtr->ConvertTransform(transform);

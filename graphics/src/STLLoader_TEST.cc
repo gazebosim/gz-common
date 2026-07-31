@@ -65,7 +65,7 @@ TEST_F(STLLoaderTest, LoadSTL)
   for (unsigned int i = 0; i < subMesh->IndexCount(); ++i)
     EXPECT_EQ(i, static_cast<unsigned int>(subMesh->Index(i)));
 
-  EXPECT_STREQ("", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+  EXPECT_STREQ("model", mesh->SubMeshByIndex(0).lock()->Name().c_str());
   delete mesh;
 
   mesh = loader.Load(
