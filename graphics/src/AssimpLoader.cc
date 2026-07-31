@@ -83,8 +83,7 @@ class AssimpLoader::Implementation
   /// \param[in] _scene the assimp scene
   /// \param[in] _matIdx index of the material in the scene
   /// \param[in] _path path where the mesh is located
-  /// \return pointer to the converted common::Material, nullptr if the material
-  /// was default created by assimp
+  /// \return pointer to the converted common::Material
   public: MaterialPtr CreateMaterial(const aiScene *_scene,
                                      unsigned _matIdx,
                                      const std::string &_path) const;
@@ -92,7 +91,8 @@ class AssimpLoader::Implementation
   /// \brief Check if Assimp material was default created by assimp
   /// \param[in] _assimpMat the assimp material
   /// \return whether the material was default created by assimp
-  public: bool IsDefaultMaterial(const aiMaterial* _assimpMat) const;
+  public: bool IsDefaultMaterial(const aiMaterial* _assimpMat,
+                                 const std::string &_extension) const;
 
   /// \brief Load a texture embedded in a mesh (i.e. for GLB format)
   /// into a gz::common::Image
@@ -374,10 +374,6 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   aiColor4D color;
   bool specularDefine = false;
   auto& assimpMat = _scene->mMaterials[_matIdx];
-  if (IsDefaultMaterial(assimpMat))
-  {
-    return nullptr;
-  }
   auto ret = assimpMat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
   if (ret == AI_SUCCESS)
   {
@@ -804,8 +800,12 @@ SubMesh AssimpLoader::Implementation::CreateSubMesh(
 
 //////////////////////////////////////////////////
 bool AssimpLoader::Implementation::IsDefaultMaterial(
-    const aiMaterial* _assimpMat) const
+    const aiMaterial* _assimpMat, const std::string &_extension) const
 {
+  if (_extension == "stl")
+  {
+    return true;
+  }
   aiString matName;
   if ((_assimpMat->Get(AI_MATKEY_NAME, matName) == AI_SUCCESS) &&
       (ToString(matName) == AI_DEFAULT_MATERIAL_NAME) &&
@@ -870,6 +870,10 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   // Add the materials first
   for (unsigned _matIdx = 0; _matIdx < scene->mNumMaterials; ++_matIdx)
   {
+    if (this->dataPtr->IsDefaultMaterial(scene->mMaterials[_matIdx], extension))
+    {
+      continue;
+    }
     auto mat = this->dataPtr->CreateMaterial(scene, _matIdx, path);
     mesh->AddMaterial(mat);
   }
