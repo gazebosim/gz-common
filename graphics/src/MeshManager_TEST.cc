@@ -36,8 +36,8 @@ class MeshManager : public common::testing::AutoLogFixture,
   {
     common::testing::AutoLogFixture::SetUp();
 
-    forceAssimpEnv = this->GetParam();
-    if (forceAssimpEnv)
+    this->forceAssimpEnv = this->GetParam();
+    if (this->forceAssimpEnv)
     {
       common::setenv("GZ_MESH_FORCE_ASSIMP", "true");
     }
