@@ -1071,14 +1071,8 @@ TEST_P(MeshManagerLoad, LoadGlbPbrAsset)
   EXPECT_FLOAT_EQ(pbr->RoughnessMapData()->Pixel(256, 256).R(),
                   124.0f / 255.0f);
 
-  // Bug in assimp 5.0.x that doesn't parse coordinate sets properly
-  // \todo(iche033) Lightmaps are disabled for glb meshes
-  // due to upstream bug
-  // EXPECT_EQ(pbr->LightMapTexCoordSet(), 1);
-
-  // \todo(iche033) Lightmaps are disabled for glb meshes
-  // due to upstream bug
-  // EXPECT_NE(pbr->LightMapData(), nullptr);
+  EXPECT_EQ(pbr->LightMapTexCoordSet(), 1);
+  EXPECT_NE(pbr->LightMapData(), nullptr);
 
   // Mesh has 3 animations
   auto skel = mesh->MeshSkeleton();
