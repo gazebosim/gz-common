@@ -31,8 +31,12 @@ using namespace gz;
 
 #ifndef _WIN32
 
+// Only runs each test once. For cases where the GZ_MESH_FORCE_ASSIMP
+// does not affect the behavior of the test
 class MeshManager : public common::testing::AutoLogFixture { };
 
+// Runs the test twice, once each for GZ_MESH_FORCE_ASSIMP=true and false
+// to test both custom mesh loaders and AssimpLoader
 class MeshManagerLoad : public common::testing::AutoLogFixture,
                     public testing::WithParamInterface<bool> {
   protected: void SetUp() override
@@ -862,7 +866,7 @@ TEST_P(MeshManagerLoad, ObjInvalidMaterial)
 
 /////////////////////////////////////////////////
 // Open a non existing file
-TEST_P(MeshManagerLoad, NonExistingMesh)
+TEST_F(MeshManager, NonExistingMesh)
 {
   auto *mgr = common::MeshManager::Instance();
   std::string meshFilename =
@@ -875,7 +879,7 @@ TEST_P(MeshManagerLoad, NonExistingMesh)
 
 /////////////////////////////////////////////////
 // This test opens a FBX file
-TEST_P(MeshManagerLoad, LoadFbxBox)
+TEST_F(MeshManager, LoadFbxBox)
 {
   auto *mgr = common::MeshManager::Instance();
   std::string meshFilename =
@@ -911,7 +915,7 @@ TEST_P(MeshManagerLoad, LoadFbxBox)
 
 /////////////////////////////////////////////////
 // This test opens a GLB file
-TEST_P(MeshManagerLoad, LoadGlTF2Box)
+TEST_F(MeshManager, LoadGlTF2Box)
 {
   auto *mgr = common::MeshManager::Instance();
   std::string meshFilename =
@@ -947,7 +951,7 @@ TEST_P(MeshManagerLoad, LoadGlTF2Box)
 
 /////////////////////////////////////////////////
 // Open a gltf mesh with transmission extension
-TEST_P(MeshManagerLoad, LoadGlTF2BoxTransmission)
+TEST_F(MeshManager, LoadGlTF2BoxTransmission)
 {
   auto *mgr = common::MeshManager::Instance();
   std::string meshFilename =
@@ -970,7 +974,7 @@ TEST_P(MeshManagerLoad, LoadGlTF2BoxTransmission)
 
 /////////////////////////////////////////////////
 // This test loads a box glb mesh with embedded compressed jpeg texture
-TEST_P(MeshManagerLoad, LoadGlTF2BoxWithJPEGTexture)
+TEST_F(MeshManager, LoadGlTF2BoxWithJPEGTexture)
 {
   auto *mgr = common::MeshManager::Instance();
   std::string meshFilename =
@@ -1009,7 +1013,7 @@ TEST_P(MeshManagerLoad, LoadGlTF2BoxWithJPEGTexture)
 /////////////////////////////////////////////////
 // Use a fully featured glb test asset, including PBR textures, emissive maps
 // embedded textures, lightmaps, animations to test advanced glb features
-TEST_P(MeshManagerLoad, LoadGlbPbrAsset)
+TEST_F(MeshManager, LoadGlbPbrAsset)
 {
   auto *mgr = common::MeshManager::Instance();
   std::string meshFilename =
@@ -1085,7 +1089,7 @@ TEST_P(MeshManagerLoad, LoadGlbPbrAsset)
 }
 
 /////////////////////////////////////////////////
-TEST_P(MeshManagerLoad, LoadGLTF2Triangle)
+TEST_F(MeshManager, LoadGLTF2Triangle)
 {
   auto *mgr = common::MeshManager::Instance();
   const common::Mesh *mesh = mgr->Load(
