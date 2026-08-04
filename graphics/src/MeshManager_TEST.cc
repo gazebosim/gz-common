@@ -30,7 +30,7 @@
 using namespace gz;
 
 #ifndef _WIN32
-  
+
 class MeshManager : public common::testing::AutoLogFixture { };
 
 class MeshManagerLoad : public common::testing::AutoLogFixture,
