@@ -105,24 +105,24 @@ TEST_F(AssimpLoader, LoadBoxNestedAnimation)
   // TODO(luca) Fix is merged in assimp main, add when it is re-released
   // EXPECT_EQ(anim->Name(), "Armature");
   EXPECT_EQ(1u, anim->NodeCount());
-  EXPECT_TRUE(anim->HasNode("Armature_Bone"));
-  auto nodeAnimation = anim->NodeAnimationByName("Armature_Bone");
+  EXPECT_TRUE(anim->HasNode("Bone"));
+  auto nodeAnimation = anim->NodeAnimationByName("Bone");
   ASSERT_NE(nullptr, nodeAnimation);
-  EXPECT_EQ("Armature_Bone", nodeAnimation->Name());
+  EXPECT_EQ("Bone", nodeAnimation->Name());
   auto poseStart = anim->PoseAt(0);
   math::Matrix4d expectedTrans = math::Matrix4d(
       1, 0, 0, 1,
       0, 1, 0, -1,
       0, 0, 1, 0,
       0, 0, 0, 1);
-  EXPECT_EQ(expectedTrans, poseStart.at("Armature_Bone"));
+  EXPECT_EQ(expectedTrans, poseStart.at("Bone"));
   auto poseEnd = anim->PoseAt(1.666666);
   expectedTrans = math::Matrix4d(
         1, 0, 0, 2,
         0, 1, 0, -1,
         0, 0, 1, 0,
         0, 0, 0, 1);
-  EXPECT_EQ(expectedTrans, poseEnd.at("Armature_Bone"));
+  EXPECT_EQ(expectedTrans, poseEnd.at("Bone"));
   delete mesh;
 }
 
