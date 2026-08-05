@@ -264,6 +264,29 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene,
     auto assimpMeshIdx = _node->mMeshes[meshIdx];
     auto& assimpMesh = _scene->mMeshes[assimpMeshIdx];
     auto nodeName = ToString(_node->mName);
+
+    // if node had no name originally and was assigned a default by
+    // assimp, replace it with the name of first ancestor node that has a name
+    if (nodeName.find("$ColladaAutoName$") == 0)
+    {
+      const aiNode *parent = _node->mParent;
+      nodeName = "";
+      while (parent && parent->mParent)
+      {
+        std::string parentName = ToString(parent->mName);
+        if (parentName.find("$ColladaAutoName$") != 0)
+        {
+          nodeName = parentName;
+          break;
+        }
+        parent = parent->mParent;
+      }
+      if (nodeName.empty())
+      {
+        static int nodeCounter = 0;
+        nodeName = "unnamed_submesh_" + std::to_string(nodeCounter++);
+      }
+    }
     auto subMesh = this->CreateSubMesh(assimpMesh, _transform);
     subMesh.SetName(nodeName);
     // Now add the bones to the skeleton
@@ -350,7 +373,7 @@ void AssimpLoader::Implementation::RecursiveSkeletonCreate(const aiNode* _node,
   auto boneExist = _boneNames.find(nodeName) != _boneNames.end();
   auto nodeTrans = this->ConvertTransform(_node->mTransformation);
   auto skelNode = _parent;
-  
+
   // Initialise nodeID to nodeName first
   auto nodeID = ToString(_node->mName);
   if (_node->mMetaData)

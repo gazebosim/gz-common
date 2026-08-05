@@ -830,16 +830,8 @@ TEST_P(MeshManagerLoad, LoadBoxWithHierarchicalNodes)
   // node by itself
   EXPECT_EQ("StaticCube", mesh->SubMeshByIndex(0).lock()->Name());
 
-  if (forceAssimpEnv)
-  {
-    // nested node with no name: Assimp assigns the id to the name if the mesh
-    EXPECT_EQ("StaticCubeNestedNoName", mesh->SubMeshByIndex(1).lock()->Name());
-  }
-  else
-  {
-    // nested node with no name so it takes the parent's name instead
-    EXPECT_EQ("StaticCubeParent", mesh->SubMeshByIndex(1).lock()->Name());
-  }
+  // nested node with no name so it takes the parent's name instead
+  EXPECT_EQ("StaticCubeParent", mesh->SubMeshByIndex(1).lock()->Name());
 
   // parent node containing child node with no name
   EXPECT_EQ("StaticCubeParent", mesh->SubMeshByIndex(2).lock()->Name());
