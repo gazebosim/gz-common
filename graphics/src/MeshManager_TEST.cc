@@ -1133,7 +1133,7 @@ TEST_F(MeshManager, LoadGLTF2Triangle)
 }
 
 /////////////////////////////////////////////////
-TEST_P(MeshManager, LoadSTL)
+TEST_P(MeshManagerLoad, LoadSTL)
 {
   auto *mgr = common::MeshManager::Instance();
   auto mesh = mgr->Load("");
