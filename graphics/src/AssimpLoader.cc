@@ -18,6 +18,7 @@
 #include <cstddef>
 #include <memory>
 #include <queue>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -35,9 +36,8 @@
 #include "gz/common/SystemPaths.hh"
 #include "gz/common/Util.hh"
 
-#ifndef GZ_ASSIMP_PRE_5_2_0
-  #include <assimp/GltfMaterial.h>    // GLTF specific material properties
-#endif
+#include <assimp/AssertHandler.h>   // Custom assert handler support
+#include <assimp/GltfMaterial.h>    // GLTF specific material properties
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/postprocess.h>     // Post processing flags
 #include <assimp/scene.h>           // Output data structure
@@ -85,10 +85,16 @@ class AssimpLoader::Implementation
   /// \param[in] _scene the assimp scene
   /// \param[in] _matIdx index of the material in the scene
   /// \param[in] _path path where the mesh is located
-  /// \return pointer to the converted common::Material
+  /// \return pointer to the converted common::Material, nullptr if the material
+  /// was default created by assimp
   public: MaterialPtr CreateMaterial(const aiScene *_scene,
                                      unsigned _matIdx,
                                      const std::string &_path) const;
+
+  /// \brief Check if Assimp material was default created by assimp
+  /// \param[in] _assimpMat the assimp material
+  /// \return whether the material was default created by assimp
+  public: bool IsDefaultMaterial(const aiMaterial* _assimpMat) const;
 
   /// \brief Load a texture embedded in a mesh (i.e. for GLB format)
   /// into a gz::common::Image
@@ -369,9 +375,11 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   MaterialPtr mat = std::make_shared<Material>();
   aiColor4D color;
   bool specularDefine = false;
-  // gcc is complaining about this variable not being used.
-  (void) specularDefine;
   auto& assimpMat = _scene->mMaterials[_matIdx];
+  if (IsDefaultMaterial(assimpMat))
+  {
+    return nullptr;
+  }
   auto ret = assimpMat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
   if (ret == AI_SUCCESS)
   {
@@ -407,7 +415,6 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     mat->SetBlendFactors(opacity, 1.0 - opacity);
   }
 
-#ifndef GZ_ASSIMP_PRE_5_1_0
   // basic support for transmission - currently just overrides opacity
   // \todo(iche033) The transmission factor can be used with volume
   // material extension to simulate effects like refraction
@@ -419,7 +426,6 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   {
     mat->SetTransparency(transmission);
   }
-#endif
 
   // TODO(luca) more than one texture, Gazebo assumes UV index 0
   Pbr pbr;
@@ -435,7 +441,6 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     auto [texName, texData] = this->LoadTexture(
         _scene, texturePath, this->GenerateTextureName(textureKey, "Diffuse"));
     mat->SetTextureImage(texName, texData);
-#ifndef GZ_ASSIMP_PRE_5_2_0
     // Now set the alpha from texture, if enabled, only supported in GLTF
     aiString alphaMode;
     auto paramRet = assimpMat->Get(AI_MATKEY_GLTF_ALPHAMODE, alphaMode);
@@ -452,9 +457,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
         mat->SetAlphaFromTexture(true, alphaCutoff, twoSided);
       }
     }
-#endif
   }
-#ifndef GZ_ASSIMP_PRE_5_2_0
   // Edge case for GLTF, Metal and Rough texture are embedded in a
   // MetallicRoughness texture with metalness in B and roughness in G
   // Open, preprocess and split into metal and roughness map
@@ -583,7 +586,6 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
       }
     }
   }
-#endif
   ret = assimpMat->GetTexture(aiTextureType_NORMALS, 0, &texturePath);
   if (ret == AI_SUCCESS)
   {
@@ -601,7 +603,6 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
         _scene, texturePath, this->GenerateTextureName(textureKey, "Emissive"));
     pbr.SetEmissiveMap(texName, texData);
   }
-#ifndef GZ_ASSIMP_PRE_5_2_0
   float value;
   ret = assimpMat->Get(AI_MATKEY_METALLIC_FACTOR, value);
   if (ret == AI_SUCCESS)
@@ -617,7 +618,6 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   {
     pbr.SetRoughness(value);
   }
-#endif
   mat->SetPbrMaterial(pbr);
   return mat;
 }
@@ -804,10 +804,47 @@ SubMesh AssimpLoader::Implementation::CreateSubMesh(
   return subMesh;
 }
 
+namespace
+{
+//////////////////////////////////////////////////
+/// \brief Convert assimp assertion failures into exceptions instead of
+/// aborting the whole process. Assertion enabled assimp builds (such as
+/// the Ubuntu packages) call std::abort on internal assertion failures,
+/// even for well formed input files, e.g. a COLLADA file with an empty
+/// <init_from/> element. The exception is caught in Load and reported as
+/// a load failure.
+/// \remarks The signature must match assimp's AiAssertHandler function
+/// pointer type, so the string parameters cannot be std::string.
+/// \param[in] _failedExpression Text of the assertion that failed.
+/// \param[in] _file Source file of the assertion, from __FILE__.
+/// \param[in] _line Source line of the assertion, from __LINE__.
+void ThrowOnAssimpAssert(const char *_failedExpression, const char *_file,
+    int _line)
+{
+  throw std::runtime_error(std::string("assimp assertion failure: ") +
+      _failedExpression + " at " + _file + ":" + std::to_string(_line));
+}
+}  // namespace
+
+//////////////////////////////////////////////////
+bool AssimpLoader::Implementation::IsDefaultMaterial(
+    const aiMaterial* _assimpMat) const
+{
+  aiString matName;
+  if ((_assimpMat->Get(AI_MATKEY_NAME, matName) == AI_SUCCESS) &&
+      (ToString(matName) == AI_DEFAULT_MATERIAL_NAME) &&
+      (_assimpMat->mNumProperties == 2))
+  {
+    return true;
+  }
+  return false;
+}
+
 //////////////////////////////////////////////////
 AssimpLoader::AssimpLoader()
 : MeshLoader(), dataPtr(utils::MakeUniqueImpl<Implementation>())
 {
+  Assimp::setAiAssertHandler(ThrowOnAssimpAssert);
   this->dataPtr->importer.SetPropertyBool(AI_CONFIG_PP_FD_REMOVE, true);
   this->dataPtr->importer.SetPropertyBool(
       AI_CONFIG_IMPORT_REMOVE_EMPTY_BONES, false);
@@ -824,17 +861,26 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   this->dataPtr->currentMeshPath = _filename;
   Mesh *mesh = new Mesh();
   std::string path = common::parentPath(_filename);
-  const aiScene* scene = this->dataPtr->importer.ReadFile(_filename,
-      aiProcess_JoinIdenticalVertices |
-      aiProcess_RemoveRedundantMaterials |
-      aiProcess_SortByPType |
-      aiProcess_FlipUVs |
-#ifndef GZ_ASSIMP_PRE_5_2_0
-      aiProcess_PopulateArmatureData |
-#endif
-      aiProcess_Triangulate |
-      aiProcess_GenNormals |
-      0);
+  const aiScene* scene = nullptr;
+  try
+  {
+    scene = this->dataPtr->importer.ReadFile(_filename,
+        aiProcess_JoinIdenticalVertices |
+        aiProcess_FindDegenerates |
+        aiProcess_RemoveRedundantMaterials |
+        aiProcess_SortByPType |
+        aiProcess_FlipUVs |
+        aiProcess_PopulateArmatureData |
+        aiProcess_Triangulate |
+        aiProcess_GenNormals |
+        0);
+  }
+  catch (const std::exception &_e)
+  {
+    gzerr << "Exception while importing mesh [" << _filename << "]: "
+          << _e.what() << std::endl;
+    scene = nullptr;
+  }
   if (scene == nullptr)
   {
     gzerr << "Unable to import mesh [" << _filename << "]" << std::endl;
@@ -852,7 +898,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
       extension.begin(), ::tolower);
 
   // compute assimp root node transform
-  bool useIdentityRotation = (extension != "glb" && extension != "glTF");
+  bool useIdentityRotation = (extension != "glb" && extension != "gltf");
   auto transform = this->dataPtr->UpdatedRootNodeTransform(scene,
     useIdentityRotation);
   auto rootTransform = this->dataPtr->ConvertTransform(transform);
