@@ -318,3 +318,4 @@ TEST_F(ColladaLoader, LoadMissingVisualScene)
       std::string::npos);
 #endif
 }
+
