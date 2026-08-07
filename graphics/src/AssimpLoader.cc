@@ -813,6 +813,11 @@ namespace
 /// even for well formed input files, e.g. a COLLADA file with an empty
 /// <init_from/> element. The exception is caught in Load and reported as
 /// a load failure.
+/// \remarks The signature must match assimp's AiAssertHandler function
+/// pointer type, so the string parameters cannot be std::string.
+/// \param[in] _failedExpression Text of the assertion that failed.
+/// \param[in] _file Source file of the assertion, from __FILE__.
+/// \param[in] _line Source line of the assertion, from __LINE__.
 void ThrowOnAssimpAssert(const char *_failedExpression, const char *_file,
     int _line)
 {
