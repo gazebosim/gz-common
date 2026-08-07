@@ -1011,6 +1011,32 @@ TEST_F(MeshManager, LoadGlTF2BoxWithJPEGTexture)
 }
 
 /////////////////////////////////////////////////
+// Open a gltf mesh with an external texture
+TEST_F(MeshManager, LoadGlTF2BoxExternalTexture)
+{
+  auto *mgr = common::MeshManager::Instance();
+  std::string meshFilename =
+    common::testing::TestFile("data", "gltf", "PurpleCube.gltf");
+  const common::Mesh *mesh = mgr->Load(meshFilename);
+
+  EXPECT_EQ(meshFilename, mesh->Name());
+
+  // Make sure we can read the submesh name
+  EXPECT_STREQ("PurpleCube", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+
+  EXPECT_EQ(mesh->MaterialCount(), 1u);
+
+  const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+  ASSERT_TRUE(mat.get());
+  // Data is now loaded in memory
+  EXPECT_NE(nullptr, mat->TextureData());
+  auto testTextureFile =
+    common::testing::TestFile("data/gltf", "PurpleCube_Diffuse.png");
+  EXPECT_EQ("PurpleCube_Diffuse.png", mat->TextureImage());
+  mgr->RemoveAll();
+}
+
+/////////////////////////////////////////////////
 // Use a fully featured glb test asset, including PBR textures, emissive maps
 // embedded textures, lightmaps, animations to test advanced glb features
 TEST_F(MeshManager, LoadGlbPbrAsset)
