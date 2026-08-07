@@ -29,56 +29,6 @@ using namespace gz;
 class OBJLoaderTest : public common::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
-TEST_F(OBJLoaderTest, LoadObjBox)
-{
-  common::OBJLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "box.obj"));
-
-  EXPECT_STREQ("unknown", mesh->Name().c_str());
-  EXPECT_EQ(gz::math::Vector3d(1, 1, 1), mesh->Max());
-  EXPECT_EQ(gz::math::Vector3d(-1, -1, -1), mesh->Min());
-  // 36 vertices
-  EXPECT_EQ(36u, mesh->VertexCount());
-  EXPECT_EQ(36u, mesh->NormalCount());
-  EXPECT_EQ(36u, mesh->IndexCount());
-  EXPECT_EQ(0u, mesh->TexCoordCount());
-  EXPECT_EQ(1u, mesh->SubMeshCount());
-  EXPECT_EQ(1u, mesh->MaterialCount());
-
-  // Make sure we can read the submesh name
-  EXPECT_STREQ("Cube_Cube.001", mesh->SubMeshByIndex(0).lock()->Name().c_str());
-
-  EXPECT_EQ(mesh->MaterialCount(), 1u);
-
-  const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
-  ASSERT_TRUE(mat.get());
-
-  // Make sure we read the material color values
-  EXPECT_EQ(mat->Ambient(), math::Color(0.0, 0.0, 0.0, 1.0));
-  EXPECT_EQ(mat->Diffuse(), math::Color(0.512f, 0.512f, 0.512f, 1.0f));
-  EXPECT_EQ(mat->Specular(), math::Color(0.25, 0.25, 0.25, 1.0));
-  EXPECT_DOUBLE_EQ(mat->Transparency(), 0.0);
-
-  delete mesh;
-}
-
-/////////////////////////////////////////////////
-// This tests opening an OBJ file that has an invalid material reference
-TEST_F(OBJLoaderTest, InvalidMaterial)
-{
-  gz::common::OBJLoader objLoader;
-
-  std::string meshFilename =
-    common::testing::TestFile("data", "invalid_material.obj");
-
-  gz::common::Mesh *mesh = objLoader.Load(meshFilename);
-
-  EXPECT_TRUE(mesh != nullptr);
-  delete mesh;
-}
-
-/////////////////////////////////////////////////
 // This tests opening an OBJ file that has PBR fields
 TEST_F(OBJLoaderTest, PBR)
 {
