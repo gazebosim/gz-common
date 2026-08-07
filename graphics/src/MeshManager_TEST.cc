@@ -1341,8 +1341,11 @@ TEST_P(MeshManagerLoad, LoadMalformedPositionHugeCount)
 
 /////////////////////////////////////////////////
 // An empty <init_from/> element is valid COLLADA and must not crash.
-// Recovery policies differ: the COLLADA loader keeps the geometry and
-// creates the material with no texture assigned, assimp rejects the file.
+// The COLLADA loader keeps the geometry and creates the material with no
+// texture assigned. The assimp outcome depends on how the library was
+// built: with assertions enabled (e.g. the Ubuntu packages) the import
+// fails and an empty mesh is returned, without assertions (e.g. Homebrew)
+// the geometry is imported. Either way the process must not crash.
 TEST_P(MeshManagerLoad, LoadEmptyInitFrom)
 {
   auto *mgr = common::MeshManager::Instance();
@@ -1351,8 +1354,8 @@ TEST_P(MeshManagerLoad, LoadEmptyInitFrom)
   ASSERT_NE(nullptr, mesh);
   if (this->forceAssimpEnv)
   {
-    EXPECT_EQ(0u, mesh->SubMeshCount());
-    EXPECT_EQ(0u, mesh->VertexCount());
+    EXPECT_TRUE(mesh->VertexCount() == 0u || mesh->VertexCount() == 3u)
+        << "unexpected vertex count " << mesh->VertexCount();
   }
   else
   {
