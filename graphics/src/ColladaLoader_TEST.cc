@@ -318,32 +318,3 @@ TEST_F(ColladaLoader, LoadMissingVisualScene)
       std::string::npos);
 #endif
 }
-
-
-// A count far larger than the actual data must neither over allocate nor
-// read out of bounds; the values that are present are loaded.
-TEST_F(ColladaLoader, LoadMalformedPositionHugeCount)
-{
-  common::ColladaLoader loader;
-  std::unique_ptr<common::Mesh> mesh(loader.Load(
-      common::testing::TestFile("data", "malformed_position_huge_count.dae")));
-  ASSERT_TRUE(mesh);
-  EXPECT_EQ(1u, mesh->SubMeshCount());
-  EXPECT_EQ(3u, mesh->VertexCount());
-  EXPECT_EQ(3u, mesh->IndexCount());
-}
-
-// An empty <init_from/> element must not crash. The geometry loads and
-// the material is created with no texture assigned.
-TEST_F(ColladaLoader, LoadEmptyInitFrom)
-{
-  common::ColladaLoader loader;
-  std::unique_ptr<common::Mesh> mesh(loader.Load(
-      common::testing::TestFile("data", "empty_init_from.dae")));
-  ASSERT_TRUE(mesh);
-  EXPECT_EQ(3u, mesh->VertexCount());
-  ASSERT_EQ(1u, mesh->MaterialCount());
-  common::MaterialPtr mat = mesh->MaterialByIndex(0u);
-  ASSERT_NE(nullptr, mat);
-  EXPECT_TRUE(mat->TextureImage().empty());
-}

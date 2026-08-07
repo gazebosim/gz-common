@@ -1315,4 +1315,53 @@ TEST_P(MeshManagerLoad, LoadMalformedTexcoordMismatch)
   EXPECT_EQ(0u, mesh->IndexCount());
 }
 
+/////////////////////////////////////////////////
+// A count far larger than the actual data must neither over allocate nor
+// read out of bounds. Recovery policies differ: the COLLADA loader keeps
+// the values that are present, assimp discards the geometry.
+TEST_P(MeshManagerLoad, LoadMalformedPositionHugeCount)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_position_huge_count.dae"));
+  ASSERT_NE(nullptr, mesh);
+  if (this->forceAssimpEnv)
+  {
+    EXPECT_EQ(0u, mesh->SubMeshCount());
+    EXPECT_EQ(0u, mesh->VertexCount());
+    EXPECT_EQ(0u, mesh->IndexCount());
+  }
+  else
+  {
+    EXPECT_EQ(1u, mesh->SubMeshCount());
+    EXPECT_EQ(3u, mesh->VertexCount());
+    EXPECT_EQ(3u, mesh->IndexCount());
+  }
+}
+
+/////////////////////////////////////////////////
+// An empty <init_from/> element is valid COLLADA and must not crash.
+// Recovery policies differ: the COLLADA loader keeps the geometry and
+// creates the material with no texture assigned, assimp rejects the file.
+TEST_P(MeshManagerLoad, LoadEmptyInitFrom)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "empty_init_from.dae"));
+  ASSERT_NE(nullptr, mesh);
+  if (this->forceAssimpEnv)
+  {
+    EXPECT_EQ(0u, mesh->SubMeshCount());
+    EXPECT_EQ(0u, mesh->VertexCount());
+  }
+  else
+  {
+    EXPECT_EQ(3u, mesh->VertexCount());
+    ASSERT_EQ(1u, mesh->MaterialCount());
+    common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+    ASSERT_NE(nullptr, mat);
+    EXPECT_TRUE(mat->TextureImage().empty());
+  }
+}
+
 #endif
