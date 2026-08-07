@@ -1132,4 +1132,187 @@ TEST_F(MeshManager, LoadGLTF2Triangle)
   mgr->RemoveAll();
 }
 
+/////////////////////////////////////////////////
+// A <float_array> without a count attribute must not crash any loader.
+// The malformed source is rejected and an empty mesh is returned.
+TEST_P(MeshManagerLoad, LoadMalformedPositionNoCount)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_position_no_count.dae"));
+  ASSERT_NE(nullptr, mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A non numeric count attribute must be caught, not throw. The
+// malformed source is rejected and an empty mesh is returned.
+TEST_P(MeshManagerLoad, LoadMalformedPositionBadCount)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_position_bad_count.dae"));
+  ASSERT_NE(nullptr, mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A missing accessor stride attribute must not crash any loader. The
+// source is rejected and an empty mesh is returned.
+TEST_P(MeshManagerLoad, LoadMalformedPositionNoStride)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_position_no_stride.dae"));
+  ASSERT_NE(nullptr, mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// An overflowing float value must be handled gracefully, not throw.
+// The malformed source is rejected and an empty mesh is returned.
+TEST_P(MeshManagerLoad, LoadMalformedPositionOverflow)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_position_overflow.dae"));
+  ASSERT_NE(nullptr, mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A zero accessor stride must be rejected: it previously caused an
+// infinite read loop in the COLLADA loader. An empty mesh is returned.
+TEST_P(MeshManagerLoad, LoadMalformedPositionZeroStride)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_position_zero_stride.dae"));
+  ASSERT_NE(nullptr, mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A negative float_array count must be rejected: it previously drove a
+// huge (wrapped around) allocation. An empty mesh is returned.
+TEST_P(MeshManagerLoad, LoadMalformedPositionNegativeCount)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data",
+      "malformed_position_negative_count.dae"));
+  ASSERT_NE(nullptr, mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A normal source without a count attribute must not crash any loader.
+// The submesh that references it is skipped.
+TEST_P(MeshManagerLoad, LoadMalformedNormalNoCount)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_normal_no_count.dae"));
+  ASSERT_NE(nullptr, mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A non numeric count attribute in a normal source must be caught, not
+// throw. The submesh that references it is skipped.
+TEST_P(MeshManagerLoad, LoadMalformedNormalBadCount)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_normal_bad_count.dae"));
+  ASSERT_NE(nullptr, mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A missing accessor stride attribute in a normal source must not crash
+// any loader. The submesh that references it is skipped.
+TEST_P(MeshManagerLoad, LoadMalformedNormalNoStride)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_normal_no_stride.dae"));
+  ASSERT_NE(nullptr, mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A texcoord source without a count attribute must not crash any loader.
+// The submesh that references it is skipped.
+TEST_P(MeshManagerLoad, LoadMalformedTexcoordNoCount)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_texcoord_no_count.dae"));
+  ASSERT_NE(nullptr, mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A non numeric count attribute in a texcoord source must be caught, not
+// throw. The submesh that references it is skipped.
+TEST_P(MeshManagerLoad, LoadMalformedTexcoordBadCount)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_texcoord_bad_count.dae"));
+  ASSERT_NE(nullptr, mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A missing accessor stride attribute in a texcoord source must not
+// crash any loader. The submesh that references it is skipped.
+TEST_P(MeshManagerLoad, LoadMalformedTexcoordNoStride)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_texcoord_no_stride.dae"));
+  ASSERT_NE(nullptr, mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A texcoord source whose accessor count times stride disagrees with
+// the float_array count must not crash. The submesh is skipped.
+TEST_P(MeshManagerLoad, LoadMalformedTexcoordMismatch)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_texcoord_mismatch.dae"));
+  ASSERT_NE(nullptr, mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
 #endif
