@@ -224,6 +224,87 @@ TEST_F(AssimpLoader, LoadCylinderAnimatedFrom3dsMax)
 }
 
 /////////////////////////////////////////////////
+// This tests opening an OBJ file that has PBR fields
+TEST_F(AssimpLoader, PBR)
+{
+  common::AssimpLoader loader;
+
+  // load obj file exported by 3ds max that has pbr extension
+  {
+    std::string meshFilename =
+      common::testing::TestFile("data", "cube_pbr.obj");
+
+    gz::common::Mesh *mesh = loader.Load(meshFilename);
+    EXPECT_NE(nullptr, mesh);
+
+    // Expect warnings about the OBJ/PBR combination
+    common::Console::Root().RawLogger().flush();
+    std::string log = LogContent();
+    EXPECT_NE(log.find(
+      "OBJ file with PBR materials detected"), std::string::npos);
+
+    const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+    ASSERT_TRUE(mat.get());
+
+    EXPECT_EQ(math::Color(0.0f, 0.0f, 0.0f, 1.0f), mat->Ambient());
+    EXPECT_EQ(math::Color(0.5f, 0.5f, 0.5f, 1.0f), mat->Diffuse());
+    EXPECT_EQ(math::Color(1.0f, 1.0f, 1.0f, 1.0f), mat->Specular());
+    EXPECT_DOUBLE_EQ(0.0, mat->Transparency());
+    EXPECT_NE(std::string::npos,
+        mat->TextureImage().find("LightDome_Albedo.png"));
+    const common::Pbr *pbr = mat->PbrMaterial();
+    EXPECT_DOUBLE_EQ(0, pbr->Roughness());
+    EXPECT_DOUBLE_EQ(0, pbr->Metalness());
+    EXPECT_EQ("LightDome_Metalness.png", pbr->MetalnessMap());
+    EXPECT_EQ("LightDome_Roughness.png", pbr->RoughnessMap());
+    EXPECT_EQ("LightDome_Normal.png", pbr->NormalMap());
+    delete mesh;
+  }
+
+  // load obj file exported by blender - it shoves pbr maps into
+  // existing fields
+  {
+    // Ensure that the previous logs were cleared
+    common::Console::Root().RawLogger().flush();
+    std::string log = LogContent();
+    size_t prevLogSize = log.size();
+    EXPECT_EQ(log.find(
+      "OBJ file with PBR materials detected", prevLogSize), std::string::npos);
+
+    std::string meshFilename =
+      common::testing::TestFile("data", "blender_pbr.obj");
+
+    gz::common::Mesh *mesh = loader.Load(meshFilename);
+    EXPECT_NE(nullptr, mesh);
+
+    // Expect warnings about the OBJ/PBR combination
+    common::Console::Root().RawLogger().flush();
+    log = LogContent();
+    EXPECT_NE(log.find(
+      "OBJ file with PBR materials detected", prevLogSize), std::string::npos);
+
+    const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+    ASSERT_TRUE(mat.get());
+
+    EXPECT_EQ(math::Color(1.0f, 1.0f, 1.0f, 1.0f), mat->Ambient());
+    EXPECT_EQ(math::Color(0.8f, 0.8f, 0.8f, 1.0f), mat->Diffuse());
+    EXPECT_EQ(math::Color(0.5f, 0.5f, 0.5f, 1.0f), mat->Specular());
+    EXPECT_EQ(math::Color(0.0f, 0.0f, 0.0f, 1.0f), mat->Emissive());
+    EXPECT_DOUBLE_EQ(0.0, mat->Transparency());
+    EXPECT_NE(std::string::npos,
+        mat->TextureImage().find("mesh_Diffuse.png"));
+    const common::Pbr *pbr = mat->PbrMaterial();
+    EXPECT_DOUBLE_EQ(0.5, pbr->Roughness());
+    EXPECT_DOUBLE_EQ(0, pbr->Metalness());
+    // Fails Assimp doesn't do anything with the 'refl' field in mtl files
+    // EXPECT_EQ("mesh_Metal.png", pbr->MetalnessMap());
+    EXPECT_EQ("mesh_Rough.png", pbr->SpecularMap());
+    EXPECT_EQ("mesh_Normal.png", pbr->NormalMap());
+    delete mesh;
+  }
+}
+
+/////////////////////////////////////////////////
 // Open a gltf mesh with an external texture
 TEST_F(AssimpLoader, LoadGlTF2BoxExternalTexture)
 {
@@ -244,7 +325,7 @@ TEST_F(AssimpLoader, LoadGlTF2BoxExternalTexture)
   EXPECT_NE(nullptr, mat->TextureData());
   auto testTextureFile =
     common::testing::TestFile("data/gltf", "PurpleCube_Diffuse.png");
-  EXPECT_EQ(testTextureFile + "_Diffuse", mat->TextureImage());
+  EXPECT_EQ("PurpleCube_Diffuse.png", mat->TextureImage());
   delete mesh;
 }
 
