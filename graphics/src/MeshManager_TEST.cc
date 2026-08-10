@@ -825,7 +825,7 @@ TEST_P(MeshManagerLoad, LoadBoxWithHierarchicalNodes)
   auto *mgr = common::MeshManager::Instance();
   const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "box_with_hierarchical_nodes.dae"));
-  ASSERT_EQ(5u, mesh->SubMeshCount());
+  ASSERT_EQ(6u, mesh->SubMeshCount());
 
   // node by itself
   EXPECT_EQ("StaticCube", mesh->SubMeshByIndex(0).lock()->Name());
@@ -841,6 +841,10 @@ TEST_P(MeshManagerLoad, LoadBoxWithHierarchicalNodes)
 
   // Parent of nested node with name
   EXPECT_EQ("StaticCubeParent2", mesh->SubMeshByIndex(4).lock()->Name());
+
+  // Nested node that does not have ancestors with a name
+  EXPECT_EQ("unnamed_submesh_0", mesh->SubMeshByIndex(5).lock()->Name());
+
   mgr->RemoveAll();
 }
 
