@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <cerrno>
 #include <cmath>
+#include <cstring>
 #include <cstdlib>
 #include <cstring>
 #include <limits>
