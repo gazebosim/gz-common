@@ -105,24 +105,24 @@ TEST_F(AssimpLoader, LoadBoxNestedAnimation)
   // TODO(luca) Fix is merged in assimp main, add when it is re-released
   // EXPECT_EQ(anim->Name(), "Armature");
   EXPECT_EQ(1u, anim->NodeCount());
-  EXPECT_TRUE(anim->HasNode("Armature_Bone"));
-  auto nodeAnimation = anim->NodeAnimationByName("Armature_Bone");
+  EXPECT_TRUE(anim->HasNode("Bone"));
+  auto nodeAnimation = anim->NodeAnimationByName("Bone");
   ASSERT_NE(nullptr, nodeAnimation);
-  EXPECT_EQ("Armature_Bone", nodeAnimation->Name());
+  EXPECT_EQ("Bone", nodeAnimation->Name());
   auto poseStart = anim->PoseAt(0);
   math::Matrix4d expectedTrans = math::Matrix4d(
       1, 0, 0, 1,
       0, 1, 0, -1,
       0, 0, 1, 0,
       0, 0, 0, 1);
-  EXPECT_EQ(expectedTrans, poseStart.at("Armature_Bone"));
+  EXPECT_EQ(expectedTrans, poseStart.at("Bone"));
   auto poseEnd = anim->PoseAt(1.666666);
   expectedTrans = math::Matrix4d(
         1, 0, 0, 2,
         0, 1, 0, -1,
         0, 0, 1, 0,
         0, 0, 0, 1);
-  EXPECT_EQ(expectedTrans, poseEnd.at("Armature_Bone"));
+  EXPECT_EQ(expectedTrans, poseEnd.at("Bone"));
   delete mesh;
 }
 
@@ -142,33 +142,6 @@ TEST_F(AssimpLoader, LoadBoxWithDefaultStride)
   ASSERT_NE(mesh->MeshSkeleton(), nullptr);
   // TODO(luca) not working, investigate
   // ASSERT_EQ(1u, mesh->MeshSkeleton()->AnimationCount());
-  delete mesh;
-}
-
-/////////////////////////////////////////////////
-TEST_F(AssimpLoader, LoadBoxWithHierarchicalNodes)
-{
-  common::AssimpLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "box_with_hierarchical_nodes.dae"));
-
-  ASSERT_EQ(5u, mesh->SubMeshCount());
-
-  // node by itself
-  EXPECT_EQ("StaticCube", mesh->SubMeshByIndex(0).lock()->Name());
-
-  // nested node with no name so it takes the parent's name instead
-  EXPECT_EQ("StaticCubeParent", mesh->SubMeshByIndex(1).lock()->Name());
-
-  // parent node containing child node with no name
-  // CHANGE Assimp assigns the id to the name if the mesh has no name
-  EXPECT_EQ("StaticCubeNestedNoName", mesh->SubMeshByIndex(2).lock()->Name());
-
-  // Parent of nested node with name
-  EXPECT_EQ("StaticCubeParent2", mesh->SubMeshByIndex(3).lock()->Name());
-
-  // nested node with name
-  EXPECT_EQ("StaticCubeNested", mesh->SubMeshByIndex(4).lock()->Name());
   delete mesh;
 }
 

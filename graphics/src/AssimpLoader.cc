@@ -35,6 +35,7 @@
 #include "gz/common/SystemPaths.hh"
 #include "gz/common/Util.hh"
 
+#include <assimp/ColladaMetaData.h>
 #include <assimp/GltfMaterial.h>    // GLTF specific material properties
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/postprocess.h>     // Post processing flags
@@ -245,12 +246,47 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene,
 {
   if (!_node)
     return;
+   // Iterate over children
+  for (unsigned childIdx = 0; childIdx < _node->mNumChildren; ++childIdx)
+  {
+    // Calculate the transform
+    auto& child_node = _node->mChildren[childIdx];
+    auto nodeTrans = this->ConvertTransform(child_node->mTransformation);
+    nodeTrans = _transform * nodeTrans;
+
+    // Finally recursive call to explore subnode
+    this->RecursiveCreate(_scene, child_node, nodeTrans, _mesh);
+  }
+
   // Visit this node, add the submesh
   for (unsigned meshIdx = 0; meshIdx < _node->mNumMeshes; ++meshIdx)
   {
     auto assimpMeshIdx = _node->mMeshes[meshIdx];
     auto& assimpMesh = _scene->mMeshes[assimpMeshIdx];
     auto nodeName = ToString(_node->mName);
+
+    // if node had no name originally and was assigned a default by
+    // assimp, replace it with the name of first ancestor node that has a name
+    if (nodeName.find("$ColladaAutoName$") == 0)
+    {
+      const aiNode *parent = _node->mParent;
+      nodeName = "";
+      while (parent && parent->mParent)
+      {
+        std::string parentName = ToString(parent->mName);
+        if (parentName.find("$ColladaAutoName$") != 0)
+        {
+          nodeName = parentName;
+          break;
+        }
+        parent = parent->mParent;
+      }
+      if (nodeName.empty())
+      {
+        static int nodeCounter = 0;
+        nodeName = "unnamed_submesh_" + std::to_string(nodeCounter++);
+      }
+    }
     auto subMesh = this->CreateSubMesh(assimpMesh, _transform);
     subMesh.SetName(nodeName);
     // Now add the bones to the skeleton
@@ -296,18 +332,6 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene,
     }
     _mesh->AddSubMesh(std::move(subMesh));
   }
-
-  // Iterate over children
-  for (unsigned childIdx = 0; childIdx < _node->mNumChildren; ++childIdx)
-  {
-    // Calculate the transform
-    auto& child_node = _node->mChildren[childIdx];
-    auto nodeTrans = this->ConvertTransform(child_node->mTransformation);
-    nodeTrans = _transform * nodeTrans;
-
-    // Finally recursive call to explore subnode
-    this->RecursiveCreate(_scene, child_node, nodeTrans, _mesh);
-  }
 }
 
 void AssimpLoader::Implementation::RecursiveStoreBoneNames(
@@ -350,10 +374,22 @@ void AssimpLoader::Implementation::RecursiveSkeletonCreate(const aiNode* _node,
   auto nodeTrans = this->ConvertTransform(_node->mTransformation);
   auto skelNode = _parent;
 
+  // Initialise nodeID to nodeName first
+  auto nodeID = ToString(_node->mName);
+  if (_node->mMetaData)
+  {
+    aiString colladaId;
+    if (_node->mMetaData->Get(AI_METADATA_COLLADA_ID, colladaId))
+    {
+      // If we have a value for the node ID, update it
+      nodeID = ToString(colladaId);
+    }
+  }
+
   if (boneExist)
   {
     skelNode = new SkeletonNode(
-        _parent, nodeName, nodeName, SkeletonNode::JOINT);
+        _parent, nodeName, nodeID, SkeletonNode::JOINT);
     skelNode->SetTransform(nodeTrans);
   }
 
@@ -842,6 +878,8 @@ AssimpLoader::AssimpLoader()
   this->dataPtr->importer.SetPropertyBool(AI_CONFIG_PP_FD_REMOVE, true);
   this->dataPtr->importer.SetPropertyBool(
       AI_CONFIG_IMPORT_REMOVE_EMPTY_BONES, false);
+  this->dataPtr->importer.SetPropertyBool(
+    AI_CONFIG_IMPORT_COLLADA_USE_COLLADA_NAMES, true);
 }
 
 //////////////////////////////////////////////////

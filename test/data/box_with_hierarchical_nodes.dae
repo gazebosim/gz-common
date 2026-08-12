@@ -78,6 +78,10 @@
           <instance_geometry url="#StaticCube-mesh" name="StaticCubeNested"/>
         </node>
       </node>
+      <node id="StaticCubeParentNoName" type="NODE">
+        <matrix sid="transform">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</matrix>
+        <instance_geometry url="#StaticCube-mesh" name="StaticCube"/>
+      </node>
     </visual_scene>
   </library_visual_scenes>
   <scene>
