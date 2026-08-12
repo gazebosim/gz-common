@@ -900,6 +900,24 @@ TEST_P(MeshManagerLoad, LoadBoxWithHierarchicalNodes)
 }
 
 /////////////////////////////////////////////////
+TEST_P(MeshManagerLoad, MergeBoxWithMultipleRoots)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "skeleton_with_multiple_roots.dae"));
+  EXPECT_TRUE(mesh->HasSkeleton());
+  auto skeleton_ptr = mesh->MeshSkeleton();
+  // Both ColladaLoader and AssimpLoader now handle disjoint 
+  // armatures by creating a "dummy-root".
+  EXPECT_EQ(skeleton_ptr->RootNode()->Name(), "dummy-root");
+  ASSERT_EQ(skeleton_ptr->RootNode()->ChildCount(), 2u);
+
+  EXPECT_EQ("Bone", skeleton_ptr->RootNode()->Child(0)->Name());
+  EXPECT_EQ("Bone_003", skeleton_ptr->RootNode()->Child(1)->Name());
+  mgr->RemoveAll();
+}
+
+/////////////////////////////////////////////////
 // Load animation without a name
 TEST_P(MeshManagerLoad, NoAnimName)
 {
