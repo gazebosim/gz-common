@@ -122,6 +122,15 @@ namespace gz
       /// \brief Destructor
       public: virtual ~Image();
 
+      /// \brief Move constructor
+      /// \param[in] _other Image to move from
+      public: Image(Image &&_other) noexcept;
+
+      /// \brief Move assignment operator
+      /// \param[in] _other Image to move from
+      /// \return Reference to this image
+      public: Image &operator=(Image &&_other) noexcept;
+
       /// \brief Load an image. Return 0 on success
       /// \param[in] _filename the path to the image file
       /// \return 0 when the operation succeeds to open a file or -1 when fails.
@@ -329,7 +338,7 @@ namespace gz
       }
 
       /// \brief Private data pointer
-      GZ_UTILS_IMPL_PTR(dataPtr)
+      GZ_UTILS_UNIQUE_IMPL_PTR(dataPtr)
     };
   }
 }

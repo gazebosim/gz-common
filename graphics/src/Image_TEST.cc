@@ -17,6 +17,8 @@
 #include <fstream>
 #include <optional>
 #include <string>
+#include <type_traits>
+#include <utility>
 
 #include <gtest/gtest.h>
 
@@ -26,6 +28,11 @@
 #include "gz/common/testing/TestPaths.hh"
 
 using namespace gz;
+
+static_assert(!std::is_copy_constructible_v<common::Image>);
+static_assert(!std::is_copy_assignable_v<common::Image>);
+static_assert(std::is_nothrow_move_constructible_v<common::Image>);
+static_assert(std::is_nothrow_move_assignable_v<common::Image>);
 
 class ImageTest : public common::testing::AutoLogFixture { };
 
@@ -99,6 +106,20 @@ TEST_F(ImageTest, ImageConstructorProperties)
 
   ASSERT_TRUE(img.Filename().find("red_blue_colors.png") !=
       std::string::npos);
+}
+
+/////////////////////////////////////////////////
+TEST_F(ImageTest, MoveSemantics)
+{
+  common::Image source(kTestData);
+  CheckImageRGBA(source);
+
+  common::Image constructed(std::move(source));
+  CheckImageRGBA(constructed);
+
+  common::Image assigned(kTestDataGazeboJpeg);
+  assigned = std::move(constructed);
+  CheckImageRGBA(assigned);
 }
 
 /////////////////////////////////////////////////

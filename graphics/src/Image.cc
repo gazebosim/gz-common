@@ -15,6 +15,7 @@
  *
  */
 #include <algorithm>
+#include <utility>
 #define STB_IMAGE_IMPLEMENTATION
 #include "STB/stb_image.h"
 
@@ -104,7 +105,7 @@ namespace gz
 
 //////////////////////////////////////////////////
 Image::Image(const std::string &_filename)
-: dataPtr(gz::utils::MakeImpl<Implementation>())
+: dataPtr(gz::utils::MakeUniqueImpl<Implementation>())
 {
   this->dataPtr->bitmap = NULL;
   if (!_filename.empty())
@@ -120,9 +121,33 @@ Image::Image(const std::string &_filename)
 //////////////////////////////////////////////////
 Image::~Image()
 {
-  if (this->dataPtr->bitmap)
+  if (this->dataPtr && this->dataPtr->bitmap)
+  {
     stbi_image_free(this->dataPtr->bitmap);
-  this->dataPtr->bitmap = NULL;
+    this->dataPtr->bitmap = nullptr;
+  }
+}
+
+//////////////////////////////////////////////////
+Image::Image(Image &&_other) noexcept
+: dataPtr(std::move(_other.dataPtr))
+{
+}
+
+//////////////////////////////////////////////////
+Image &Image::operator=(Image &&_other) noexcept
+{
+  if (this == &_other)
+    return *this;
+
+  if (this->dataPtr && this->dataPtr->bitmap)
+  {
+    stbi_image_free(this->dataPtr->bitmap);
+    this->dataPtr->bitmap = nullptr;
+  }
+
+  this->dataPtr = std::move(_other.dataPtr);
+  return *this;
 }
 
 
