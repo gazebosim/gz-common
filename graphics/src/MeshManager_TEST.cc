@@ -878,7 +878,14 @@ TEST_P(MeshManagerLoad, LoadBoxNestedAnimation)
   EXPECT_EQ(1u, mesh->SubMeshCount());
   EXPECT_EQ(1u, mesh->MaterialCount());
   std::string nodeName;
-  nodeName = "Bone";
+  if (forceAssimpEnv)
+  {
+    nodeName = "Armature_Bone";
+  }
+  else
+  {
+    nodeName = "Bone";
+  }
   common::SkeletonPtr skeleton = mesh->MeshSkeleton();
   ASSERT_EQ(1u, mesh->MeshSkeleton()->AnimationCount());
   common::SkeletonAnimation *anim = skeleton->Animation(0);
