@@ -30,6 +30,7 @@
 using namespace gz;
 
 #ifndef _WIN32
+<<<<<<< HEAD
 class MeshManager : public common::testing::AutoLogFixture,
                     public testing::WithParamInterface<bool> {
   protected: void SetUp() override
@@ -62,6 +63,48 @@ class MeshManager : public common::testing::AutoLogFixture,
 INSTANTIATE_TEST_SUITE_P(
     ForceAssimpScenarios,
     MeshManager,
+    testing::Bool());
+=======
+
+// Only runs each test once. For cases where the GZ_MESH_FORCE_ASSIMP
+// does not affect the behavior of the test
+class MeshManager : public common::testing::AutoLogFixture { };
+>>>>>>> main
+
+// Runs the test twice, once each for GZ_MESH_FORCE_ASSIMP=true and false
+// to test both custom mesh loaders and AssimpLoader
+class MeshManagerLoad : public common::testing::AutoLogFixture,
+                    public testing::WithParamInterface<bool> {
+  protected: void SetUp() override
+  {
+    common::testing::AutoLogFixture::SetUp();
+
+    this->forceAssimpEnv = this->GetParam();
+    if (this->forceAssimpEnv)
+    {
+      common::setenv("GZ_MESH_FORCE_ASSIMP", "true");
+    }
+    else
+    {
+      common::setenv("GZ_MESH_FORCE_ASSIMP", "false");
+    }
+    common::MeshManager::Instance()->SetAssimpEnvs();
+  }
+
+  protected: void TearDown() override
+  {
+    common::unsetenv("GZ_MESH_FORCE_ASSIMP");
+    common::MeshManager::Instance()->SetAssimpEnvs();
+    common::MeshManager::Instance()->RemoveAll();
+    common::testing::AutoLogFixture::TearDown();
+  }
+
+  protected: bool forceAssimpEnv = false;
+};
+
+INSTANTIATE_TEST_SUITE_P(
+    ForceAssimpScenarios,
+    MeshManagerLoad,
     testing::Bool());
 
 /////////////////////////////////////////////////
@@ -326,7 +369,11 @@ TEST_P(MeshManager, Remove)
 }
 
 /////////////////////////////////////////////////
+<<<<<<< HEAD
 TEST_P(MeshManager, ConvexDecomposition)
+=======
+TEST_P(MeshManagerLoad, ConvexDecomposition)
+>>>>>>> main
 {
   auto *mgr = common::MeshManager::Instance();
   const common::Mesh *boxMesh = mgr->Load(
@@ -372,7 +419,11 @@ TEST_P(MeshManager, ConvexDecomposition)
 }
 
 /////////////////////////////////////////////////
+<<<<<<< HEAD
 TEST_P(MeshManager, MergeSubMeshes)
+=======
+TEST_P(MeshManagerLoad, MergeSubMeshes)
+>>>>>>> main
 {
   auto *mgr = common::MeshManager::Instance();
   const common::Mesh *mesh = mgr->Load(
@@ -494,7 +545,11 @@ TEST_P(MeshManager, CreateMesh)
 }
 
 /////////////////////////////////////////////////
+<<<<<<< HEAD
 TEST_P(MeshManager, LoadBox)
+=======
+TEST_P(MeshManagerLoad, LoadBox)
+>>>>>>> main
 {
   auto *mgr = common::MeshManager::Instance();
   std::string filename = common::testing::TestFile("data", "box.dae");
@@ -517,7 +572,11 @@ TEST_P(MeshManager, LoadBox)
 }
 
 /////////////////////////////////////////////////
+<<<<<<< HEAD
 TEST_P(MeshManager, ShareVertices)
+=======
+TEST_P(MeshManagerLoad, ShareVertices)
+>>>>>>> main
 {
   auto *mgr = common::MeshManager::Instance();
   std::string filename = common::testing::TestFile("data", "box.dae");
@@ -569,6 +628,7 @@ TEST_P(MeshManager, ShareVertices)
 }
 
 /////////////////////////////////////////////////
+<<<<<<< HEAD
 TEST_P(MeshManager, LoadZeroCount)
 {
   auto *mgr = common::MeshManager::Instance();
@@ -596,6 +656,9 @@ TEST_P(MeshManager, LoadZeroCount)
 
 /////////////////////////////////////////////////
 TEST_P(MeshManager, Material)
+=======
+TEST_P(MeshManagerLoad, Material)
+>>>>>>> main
 {
   auto *mgr = common::MeshManager::Instance();
   std::string filename = common::testing::TestFile("data", "box.dae");
@@ -652,7 +715,11 @@ TEST_P(MeshManager, Material)
 }
 
 /////////////////////////////////////////////////
+<<<<<<< HEAD
 TEST_P(MeshManager, TexCoordSets)
+=======
+TEST_P(MeshManagerLoad, TexCoordSets)
+>>>>>>> main
 {
   auto *mgr = common::MeshManager::Instance();
   // This triangle mesh has multiple uv sets and vertices separated by
@@ -738,7 +805,11 @@ TEST_P(MeshManager, TexCoordSets)
 }
 
 /////////////////////////////////////////////////
+<<<<<<< HEAD
 TEST_P(MeshManager, LoadBoxWithAnimationOutsideSkeleton)
+=======
+TEST_P(MeshManagerLoad, LoadBoxWithAnimationOutsideSkeleton)
+>>>>>>> main
 {
   auto *mgr = common::MeshManager::Instance();
   const common::Mesh *mesh = mgr->Load(
@@ -775,6 +846,7 @@ TEST_P(MeshManager, LoadBoxWithAnimationOutsideSkeleton)
 }
 
 /////////////////////////////////////////////////
+<<<<<<< HEAD
 TEST_P(MeshManager, LoadBoxInstControllerWithoutSkeleton)
 {
   auto *mgr = common::MeshManager::Instance();
@@ -923,6 +995,9 @@ TEST_P(MeshManager, LoadBoxWithDefaultStride)
 
 /////////////////////////////////////////////////
 TEST_P(MeshManager, LoadBoxWithMultipleGeoms)
+=======
+TEST_P(MeshManagerLoad, LoadBoxWithMultipleGeoms)
+>>>>>>> main
 {
   auto *mgr = common::MeshManager::Instance();
   const common::Mesh *mesh = mgr->Load(
@@ -940,6 +1015,7 @@ TEST_P(MeshManager, LoadBoxWithMultipleGeoms)
 }
 
 /////////////////////////////////////////////////
+<<<<<<< HEAD
 TEST_P(MeshManager, LoadBoxWithHierarchicalNodes)
 {
   auto *mgr = common::MeshManager::Instance();
@@ -1033,6 +1109,10 @@ TEST_P(MeshManager, LoadCylinderAnimatedFrom3dsMax)
 /////////////////////////////////////////////////
 // Load animation without a name
 TEST_P(MeshManager, NoAnimName)
+=======
+// Load animation without a name
+TEST_P(MeshManagerLoad, NoAnimName)
+>>>>>>> main
 {
   auto *mgr = common::MeshManager::Instance();
   std::string meshFilename =
@@ -1048,7 +1128,11 @@ TEST_P(MeshManager, NoAnimName)
 }
 
 /////////////////////////////////////////////////
+<<<<<<< HEAD
 TEST_P(MeshManager, LoadObjBox)
+=======
+TEST_P(MeshManagerLoad, LoadObjBox)
+>>>>>>> main
 {
   auto *mgr = common::MeshManager::Instance();
   std::string meshFilename = common::testing::TestFile("data", "box.obj");
@@ -1057,7 +1141,10 @@ TEST_P(MeshManager, LoadObjBox)
   EXPECT_EQ(meshFilename, mesh->Name());
   EXPECT_EQ(gz::math::Vector3d(1, 1, 1), mesh->Max());
   EXPECT_EQ(gz::math::Vector3d(-1, -1, -1), mesh->Min());
+<<<<<<< HEAD
   // 36 vertices
+=======
+>>>>>>> main
 
   EXPECT_EQ(36u, mesh->IndexCount());
   EXPECT_EQ(0u, mesh->TexCoordCount());
@@ -1081,11 +1168,20 @@ TEST_P(MeshManager, LoadObjBox)
     {1, 1, -1}, {1, -1, -1}, {-1, -1, -1},
     {1, 1, -1}, {-1, -1, -1}, {-1, 1, -1}
   };
+<<<<<<< HEAD
   
   EXPECT_EQ(mesh->IndexCount(), vertexValues.size());
   for (unsigned int i = 0; i < mesh->IndexCount(); ++i)
   {
     math::Vector3d vectorCoord(vertexValues[i][0], vertexValues[i][1], vertexValues[i][2]);
+=======
+
+  EXPECT_EQ(mesh->IndexCount(), vertexValues.size());
+  for (unsigned int i = 0; i < mesh->IndexCount(); ++i)
+  {
+    math::Vector3d vectorCoord(
+      vertexValues[i][0], vertexValues[i][1], vertexValues[i][2]);
+>>>>>>> main
     EXPECT_EQ(subMesh->Vertex(subMesh->Index(i)), vectorCoord);
   }
 
@@ -1108,7 +1204,11 @@ TEST_P(MeshManager, LoadObjBox)
 
 /////////////////////////////////////////////////
 // This tests opening an OBJ file that has an invalid material reference
+<<<<<<< HEAD
 TEST_P(MeshManager, ObjInvalidMaterial)
+=======
+TEST_P(MeshManagerLoad, ObjInvalidMaterial)
+>>>>>>> main
 {
   auto *mgr = common::MeshManager::Instance();
 
@@ -1122,6 +1222,7 @@ TEST_P(MeshManager, ObjInvalidMaterial)
 }
 
 /////////////////////////////////////////////////
+<<<<<<< HEAD
 // This tests opening an OBJ file that has PBR fields
 TEST_P(MeshManager, PBR)
 {
@@ -1278,6 +1379,10 @@ TEST_P(MeshManager, LoadSTL)
 /////////////////////////////////////////////////
 // Open a non existing file
 TEST_P(MeshManager, NonExistingMesh)
+=======
+// Open a non existing file
+TEST_F(MeshManager, NonExistingMesh)
+>>>>>>> main
 {
   auto *mgr = common::MeshManager::Instance();
   std::string meshFilename =
@@ -1290,7 +1395,11 @@ TEST_P(MeshManager, NonExistingMesh)
 
 /////////////////////////////////////////////////
 // This test opens a FBX file
+<<<<<<< HEAD
 TEST_P(MeshManager, LoadFbxBox)
+=======
+TEST_F(MeshManager, LoadFbxBox)
+>>>>>>> main
 {
   auto *mgr = common::MeshManager::Instance();
   std::string meshFilename =
@@ -1326,7 +1435,11 @@ TEST_P(MeshManager, LoadFbxBox)
 
 /////////////////////////////////////////////////
 // This test opens a GLB file
+<<<<<<< HEAD
 TEST_P(MeshManager, LoadGlTF2Box)
+=======
+TEST_F(MeshManager, LoadGlTF2Box)
+>>>>>>> main
 {
   auto *mgr = common::MeshManager::Instance();
   std::string meshFilename =
@@ -1361,6 +1474,7 @@ TEST_P(MeshManager, LoadGlTF2Box)
 }
 
 /////////////////////////////////////////////////
+<<<<<<< HEAD
 // Open a gltf mesh with an external texture
 TEST_P(MeshManager, LoadGlTF2BoxExternalTexture)
 {
@@ -1387,6 +1501,10 @@ TEST_P(MeshManager, LoadGlTF2BoxExternalTexture)
 /////////////////////////////////////////////////
 // Open a gltf mesh with transmission extension
 TEST_P(MeshManager, LoadGlTF2BoxTransmission)
+=======
+// Open a gltf mesh with transmission extension
+TEST_F(MeshManager, LoadGlTF2BoxTransmission)
+>>>>>>> main
 {
   auto *mgr = common::MeshManager::Instance();
   std::string meshFilename =
@@ -1409,7 +1527,11 @@ TEST_P(MeshManager, LoadGlTF2BoxTransmission)
 
 /////////////////////////////////////////////////
 // This test loads a box glb mesh with embedded compressed jpeg texture
+<<<<<<< HEAD
 TEST_P(MeshManager, LoadGlTF2BoxWithJPEGTexture)
+=======
+TEST_F(MeshManager, LoadGlTF2BoxWithJPEGTexture)
+>>>>>>> main
 {
   auto *mgr = common::MeshManager::Instance();
   std::string meshFilename =
@@ -1448,7 +1570,11 @@ TEST_P(MeshManager, LoadGlTF2BoxWithJPEGTexture)
 /////////////////////////////////////////////////
 // Use a fully featured glb test asset, including PBR textures, emissive maps
 // embedded textures, lightmaps, animations to test advanced glb features
+<<<<<<< HEAD
 TEST_P(MeshManager, LoadGlbPbrAsset)
+=======
+TEST_F(MeshManager, LoadGlbPbrAsset)
+>>>>>>> main
 {
   auto *mgr = common::MeshManager::Instance();
   std::string meshFilename =
@@ -1510,6 +1636,7 @@ TEST_P(MeshManager, LoadGlbPbrAsset)
   EXPECT_FLOAT_EQ(pbr->RoughnessMapData()->Pixel(256, 256).R(),
                   124.0f / 255.0f);
 
+<<<<<<< HEAD
   // Bug in assimp 5.0.x that doesn't parse coordinate sets properly
   // \todo(iche033) Lightmaps are disabled for glb meshes
   // due to upstream bug
@@ -1518,6 +1645,10 @@ TEST_P(MeshManager, LoadGlbPbrAsset)
   // \todo(iche033) Lightmaps are disabled for glb meshes
   // due to upstream bug
   // EXPECT_NE(pbr->LightMapData(), nullptr);
+=======
+  EXPECT_EQ(pbr->LightMapTexCoordSet(), 1);
+  EXPECT_NE(pbr->LightMapData(), nullptr);
+>>>>>>> main
 
   // Mesh has 3 animations
   auto skel = mesh->MeshSkeleton();
@@ -1530,6 +1661,7 @@ TEST_P(MeshManager, LoadGlbPbrAsset)
 }
 
 /////////////////////////////////////////////////
+<<<<<<< HEAD
 // Checks for null root node animation and valid
 // x displacement in non root node's animation.
 TEST_P(MeshManager, CheckNonRootDisplacement)
@@ -1552,6 +1684,9 @@ TEST_P(MeshManager, CheckNonRootDisplacement)
 
 /////////////////////////////////////////////////
 TEST_P(MeshManager, LoadGLTF2Triangle)
+=======
+TEST_F(MeshManager, LoadGLTF2Triangle)
+>>>>>>> main
 {
   auto *mgr = common::MeshManager::Instance();
   const common::Mesh *mesh = mgr->Load(
