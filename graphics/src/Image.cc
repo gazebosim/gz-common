@@ -15,8 +15,10 @@
  *
  */
 #include <algorithm>
+#ifndef STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
-#include "STB/stb_image.h"
+#endif
+#include <stb_image.h>
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
@@ -29,7 +31,7 @@
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #endif
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "STB/stb_image_write.h"
+#include <stb_image_write.h>
 #if defined(__GNUC__)
 #pragma GCC diagnostic pop
 #endif
@@ -42,7 +44,7 @@
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 #endif
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
-#include "STB/stb_image_resize2.h"
+#include <stb_image_resize2.h>
 #if defined(__GNUC__)
 #pragma GCC diagnostic pop
 #endif
