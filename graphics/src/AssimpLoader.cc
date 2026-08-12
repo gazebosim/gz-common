@@ -245,18 +245,6 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene,
 {
   if (!_node)
     return;
-   // Iterate over children
-  for (unsigned childIdx = 0; childIdx < _node->mNumChildren; ++childIdx)
-  {
-    // Calculate the transform
-    auto& child_node = _node->mChildren[childIdx];
-    auto nodeTrans = this->ConvertTransform(child_node->mTransformation);
-    nodeTrans = _transform * nodeTrans;
-
-    // Finally recursive call to explore subnode
-    this->RecursiveCreate(_scene, child_node, nodeTrans, _mesh);
-  }
-
   // Visit this node, add the submesh
   for (unsigned meshIdx = 0; meshIdx < _node->mNumMeshes; ++meshIdx)
   {
@@ -307,6 +295,18 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene,
       }
     }
     _mesh->AddSubMesh(std::move(subMesh));
+  }
+
+  // Iterate over children
+  for (unsigned childIdx = 0; childIdx < _node->mNumChildren; ++childIdx)
+  {
+    // Calculate the transform
+    auto& child_node = _node->mChildren[childIdx];
+    auto nodeTrans = this->ConvertTransform(child_node->mTransformation);
+    nodeTrans = _transform * nodeTrans;
+
+    // Finally recursive call to explore subnode
+    this->RecursiveCreate(_scene, child_node, nodeTrans, _mesh);
   }
 }
 
