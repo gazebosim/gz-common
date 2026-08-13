@@ -19,7 +19,7 @@
 #ifndef STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
 #endif
-#include <stb_image.h>
+#include "STB/stb_image.h"
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
@@ -33,7 +33,7 @@
 #endif
 #define STB_IMAGE_WRITE_STATIC
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <stb_image_write.h>
+#include "STB/stb_image_write.h"
 #if defined(__GNUC__)
 #pragma GCC diagnostic pop
 #endif
@@ -47,7 +47,7 @@
 #endif
 #define STB_IMAGE_RESIZE_STATIC
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
-#include <stb_image_resize2.h>
+#include "STB/stb_image_resize2.h"
 #if defined(__GNUC__)
 #pragma GCC diagnostic pop
 #endif

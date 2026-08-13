@@ -17,11 +17,6 @@ target_compile_options(${graphics_target} PRIVATE
     $<$<CXX_COMPILER_ID:Clang>: -Wno-switch-default -Wno-float-equal>   # Clang
 )
 
-# Include STB directly to match Bazel behavior
-target_include_directories(${graphics_target} PRIVATE
-  ${CMAKE_CURRENT_SOURCE_DIR}/STB
-)
-
 gz_build_tests(
   TYPE UNIT
   SOURCES ${gtest_sources}

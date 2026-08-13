@@ -13,7 +13,6 @@ bazel_dep(name = "rules_license", version = "1.0.0")
 bazel_dep(name = "spdlog", version = "1.17.0")
 bazel_dep(name = "tinyxml2", version = "10.0.0")
 bazel_dep(name = "libuuid", version = "2.41.2.bcr.0")
-bazel_dep(name = "stb", version = "0.0.0-20251026-f1c79c0")
 
 # Gazebo Dependencies
 bazel_dep(name = "rules_gazebo", version = "0.0.6")
