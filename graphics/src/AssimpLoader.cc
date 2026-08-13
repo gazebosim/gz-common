@@ -18,6 +18,7 @@
 #include <cstddef>
 #include <memory>
 #include <queue>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -35,6 +36,7 @@
 #include "gz/common/SystemPaths.hh"
 #include "gz/common/Util.hh"
 
+#include <assimp/AssertHandler.h>   // Custom assert handler support
 #include <assimp/GltfMaterial.h>    // GLTF specific material properties
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/postprocess.h>     // Post processing flags
@@ -83,16 +85,17 @@ class AssimpLoader::Implementation
   /// \param[in] _scene the assimp scene
   /// \param[in] _matIdx index of the material in the scene
   /// \param[in] _path path where the mesh is located
-  /// \return pointer to the converted common::Material, nullptr if the material
-  /// was default created by assimp
+  /// \return pointer to the converted common::Material
   public: MaterialPtr CreateMaterial(const aiScene *_scene,
                                      unsigned _matIdx,
                                      const std::string &_path) const;
 
   /// \brief Check if Assimp material was default created by assimp
   /// \param[in] _assimpMat the assimp material
+  /// \param[in] _extension the file extension of the mesh
   /// \return whether the material was default created by assimp
-  public: bool IsDefaultMaterial(const aiMaterial* _assimpMat) const;
+  public: bool IsDefaultMaterial(const aiMaterial* _assimpMat,
+                                 const std::string &_extension) const;
 
   /// \brief Load a texture embedded in a mesh (i.e. for GLB format)
   /// into a gz::common::Image
@@ -374,10 +377,6 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   aiColor4D color;
   bool specularDefine = false;
   auto& assimpMat = _scene->mMaterials[_matIdx];
-  if (IsDefaultMaterial(assimpMat))
-  {
-    return nullptr;
-  }
   auto ret = assimpMat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
   if (ret == AI_SUCCESS)
   {
@@ -802,10 +801,36 @@ SubMesh AssimpLoader::Implementation::CreateSubMesh(
   return subMesh;
 }
 
+namespace
+{
+//////////////////////////////////////////////////
+/// \brief Convert assimp assertion failures into exceptions instead of
+/// aborting the whole process. Assertion enabled assimp builds (such as
+/// the Ubuntu packages) call std::abort on internal assertion failures,
+/// even for well formed input files, e.g. a COLLADA file with an empty
+/// <init_from/> element. The exception is caught in Load and reported as
+/// a load failure.
+/// \remarks The signature must match assimp's AiAssertHandler function
+/// pointer type, so the string parameters cannot be std::string.
+/// \param[in] _failedExpression Text of the assertion that failed.
+/// \param[in] _file Source file of the assertion, from __FILE__.
+/// \param[in] _line Source line of the assertion, from __LINE__.
+void ThrowOnAssimpAssert(const char *_failedExpression, const char *_file,
+    int _line)
+{
+  throw std::runtime_error(std::string("assimp assertion failure: ") +
+      _failedExpression + " at " + _file + ":" + std::to_string(_line));
+}
+}  // namespace
+
 //////////////////////////////////////////////////
 bool AssimpLoader::Implementation::IsDefaultMaterial(
-    const aiMaterial* _assimpMat) const
+    const aiMaterial* _assimpMat, const std::string &_extension) const
 {
+  if (_extension == "stl")
+  {
+    return true;
+  }
   aiString matName;
   if ((_assimpMat->Get(AI_MATKEY_NAME, matName) == AI_SUCCESS) &&
       (ToString(matName) == AI_DEFAULT_MATERIAL_NAME) &&
@@ -820,6 +845,7 @@ bool AssimpLoader::Implementation::IsDefaultMaterial(
 AssimpLoader::AssimpLoader()
 : MeshLoader(), dataPtr(utils::MakeUniqueImpl<Implementation>())
 {
+  Assimp::setAiAssertHandler(ThrowOnAssimpAssert);
   this->dataPtr->importer.SetPropertyBool(AI_CONFIG_PP_FD_REMOVE, true);
   this->dataPtr->importer.SetPropertyBool(
       AI_CONFIG_IMPORT_REMOVE_EMPTY_BONES, false);
@@ -836,15 +862,26 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   this->dataPtr->currentMeshPath = _filename;
   Mesh *mesh = new Mesh();
   std::string path = common::parentPath(_filename);
-  const aiScene* scene = this->dataPtr->importer.ReadFile(_filename,
-      aiProcess_JoinIdenticalVertices |
-      aiProcess_RemoveRedundantMaterials |
-      aiProcess_SortByPType |
-      aiProcess_FlipUVs |
-      aiProcess_PopulateArmatureData |
-      aiProcess_Triangulate |
-      aiProcess_GenNormals |
-      0);
+  const aiScene* scene = nullptr;
+  try
+  {
+    scene = this->dataPtr->importer.ReadFile(_filename,
+        aiProcess_JoinIdenticalVertices |
+        aiProcess_FindDegenerates |
+        aiProcess_RemoveRedundantMaterials |
+        aiProcess_SortByPType |
+        aiProcess_FlipUVs |
+        aiProcess_PopulateArmatureData |
+        aiProcess_Triangulate |
+        aiProcess_GenNormals |
+        0);
+  }
+  catch (const std::exception &_e)
+  {
+    gzerr << "Exception while importing mesh [" << _filename << "]: "
+          << _e.what() << std::endl;
+    scene = nullptr;
+  }
   if (scene == nullptr)
   {
     gzerr << "Unable to import mesh [" << _filename << "]" << std::endl;
@@ -870,6 +907,10 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   // Add the materials first
   for (unsigned _matIdx = 0; _matIdx < scene->mNumMaterials; ++_matIdx)
   {
+    if (this->dataPtr->IsDefaultMaterial(scene->mMaterials[_matIdx], extension))
+    {
+      continue;
+    }
     auto mat = this->dataPtr->CreateMaterial(scene, _matIdx, path);
     mesh->AddMaterial(mat);
   }
