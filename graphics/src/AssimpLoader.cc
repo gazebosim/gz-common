@@ -92,6 +92,7 @@ class AssimpLoader::Implementation
 
   /// \brief Check if Assimp material was default created by assimp
   /// \param[in] _assimpMat the assimp material
+  /// \param[in] _extension the file extension of the mesh
   /// \return whether the material was default created by assimp
   public: bool IsDefaultMaterial(const aiMaterial* _assimpMat,
                                  const std::string &_extension) const;
