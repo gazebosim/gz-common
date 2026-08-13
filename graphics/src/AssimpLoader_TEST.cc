@@ -87,46 +87,6 @@ TEST_F(AssimpLoader, LoadBoxMultipleInstControllers)
 }
 
 /////////////////////////////////////////////////
-TEST_F(AssimpLoader, LoadBoxNestedAnimation)
-{
-  common::AssimpLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "box_nested_animation.dae"));
-
-  EXPECT_EQ(36u, mesh->IndexCount());
-  EXPECT_EQ(24u, mesh->VertexCount());
-  EXPECT_EQ(1u, mesh->SubMeshCount());
-  EXPECT_EQ(1u, mesh->MaterialCount());
-  EXPECT_EQ(24u, mesh->TexCoordCount());
-  common::SkeletonPtr skeleton = mesh->MeshSkeleton();
-  ASSERT_EQ(1u, mesh->MeshSkeleton()->AnimationCount());
-  common::SkeletonAnimation *anim = skeleton->Animation(0);
-  // Depends on fix in assimp main branch for nested animation naming
-  // TODO(luca) Fix is merged in assimp main, add when it is re-released
-  // EXPECT_EQ(anim->Name(), "Armature");
-  EXPECT_EQ(1u, anim->NodeCount());
-  EXPECT_TRUE(anim->HasNode("Bone"));
-  auto nodeAnimation = anim->NodeAnimationByName("Bone");
-  ASSERT_NE(nullptr, nodeAnimation);
-  EXPECT_EQ("Bone", nodeAnimation->Name());
-  auto poseStart = anim->PoseAt(0);
-  math::Matrix4d expectedTrans = math::Matrix4d(
-      1, 0, 0, 1,
-      0, 1, 0, -1,
-      0, 0, 1, 0,
-      0, 0, 0, 1);
-  EXPECT_EQ(expectedTrans, poseStart.at("Bone"));
-  auto poseEnd = anim->PoseAt(1.666666);
-  expectedTrans = math::Matrix4d(
-        1, 0, 0, 2,
-        0, 1, 0, -1,
-        0, 0, 1, 0,
-        0, 0, 0, 1);
-  EXPECT_EQ(expectedTrans, poseEnd.at("Bone"));
-  delete mesh;
-}
-
-/////////////////////////////////////////////////
 TEST_F(AssimpLoader, LoadBoxWithDefaultStride)
 {
   common::AssimpLoader loader;

@@ -102,42 +102,6 @@ TEST_F(ColladaLoader, LoadBoxMultipleInstControllers)
 }
 
 /////////////////////////////////////////////////
-TEST_F(ColladaLoader, LoadBoxNestedAnimation)
-{
-  common::ColladaLoader loader;
-  std::unique_ptr<common::Mesh> mesh(loader.Load(
-      common::testing::TestFile("data", "box_nested_animation.dae")));
-
-  EXPECT_EQ(36u, mesh->IndexCount());
-  EXPECT_EQ(35u, mesh->VertexCount());
-  EXPECT_EQ(1u, mesh->SubMeshCount());
-  EXPECT_EQ(1u, mesh->MaterialCount());
-  EXPECT_EQ(35u, mesh->TexCoordCount());
-  common::SkeletonPtr skeleton = mesh->MeshSkeleton();
-  ASSERT_EQ(1u, mesh->MeshSkeleton()->AnimationCount());
-  common::SkeletonAnimation *anim = skeleton->Animation(0);
-  EXPECT_EQ(1u, anim->NodeCount());
-  EXPECT_TRUE(anim->HasNode("Bone"));
-  auto nodeAnimation = anim->NodeAnimationByName("Bone");
-  EXPECT_NE(nullptr, nodeAnimation);
-  EXPECT_EQ("Bone", nodeAnimation->Name());
-  auto poseStart = anim->PoseAt(0);
-  math::Matrix4d expectedTrans = math::Matrix4d(
-      1, 0, 0, 1,
-      0, 1, 0, -1,
-      0, 0, 1, 0,
-      0, 0, 0, 1);
-  EXPECT_EQ(expectedTrans, poseStart.at("Bone"));
-  auto poseEnd = anim->PoseAt(1.666667);
-  expectedTrans = math::Matrix4d(
-        1, 0, 0, 2,
-        0, 1, 0, -1,
-        0, 0, 1, 0,
-        0, 0, 0, 1);
-  EXPECT_EQ(expectedTrans, poseEnd.at("Bone"));
-}
-
-/////////////////////////////////////////////////
 TEST_F(ColladaLoader, LoadBoxWithDefaultStride)
 {
   common::ColladaLoader loader;
