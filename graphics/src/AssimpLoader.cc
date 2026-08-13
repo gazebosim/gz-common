@@ -202,6 +202,27 @@ static std::string ToString(const aiString& str)
 }
 
 //////////////////////////////////////////////////
+// Utility function to get Collada nodeID from assimp node object
+static std::string GetColladaNodeID(const aiNode* _node)
+{
+  if (!_node)
+    return "";
+
+  // Initialise nodeID to nodeName first
+  std::string nodeID = ToString(_node->mName);
+  if (_node->mMetaData)
+  {
+    aiString colladaId;
+    if (_node->mMetaData->Get(AI_METADATA_COLLADA_ID, colladaId))
+    {
+      // If we have a value for the node ID, update it
+      nodeID = ToString(colladaId);
+    }
+  }
+  return nodeID;
+}
+
+//////////////////////////////////////////////////
 std::string AssimpLoader::Implementation::FullTextureKey(
     const std::string &_texturePath) const
 {
@@ -372,21 +393,10 @@ void AssimpLoader::Implementation::RecursiveSkeletonCreate(const aiNode* _node,
     return;
   // First explore this node
   auto nodeName = ToString(_node->mName);
+  auto nodeID = GetColladaNodeID(_node);
   auto boneExist = _boneNames.find(nodeName) != _boneNames.end();
   auto nodeTrans = this->ConvertTransform(_node->mTransformation);
   auto skelNode = _parent;
-
-  // Initialise nodeID to nodeName first
-  auto nodeID = ToString(_node->mName);
-  if (_node->mMetaData)
-  {
-    aiString colladaId;
-    if (_node->mMetaData->Get(AI_METADATA_COLLADA_ID, colladaId))
-    {
-      // If we have a value for the node ID, update it
-      nodeID = ToString(colladaId);
-    }
-  }
 
   if (boneExist)
   {
@@ -926,6 +936,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   }
   auto& rootNode = scene->mRootNode;
   auto rootName = ToString(rootNode->mName);
+  auto rootID = GetColladaNodeID(rootNode);
   std::string extension;
   std::size_t extIdx = _filename.rfind(".");
   if (extIdx != std::string::npos)
@@ -952,7 +963,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     std::unordered_set<std::string> boneNames;
     this->dataPtr->RecursiveStoreBoneNames(scene, rootNode, boneNames);
     auto rootSkelNode = new SkeletonNode(
-        nullptr, rootName, rootName, SkeletonNode::NODE);
+        nullptr, rootName, rootID, SkeletonNode::NODE);
     rootSkelNode->SetTransform(rootTransform);
     rootSkelNode->SetModelTransform(rootTransform);
     for (unsigned childIdx = 0; childIdx < rootNode->mNumChildren; ++childIdx)
