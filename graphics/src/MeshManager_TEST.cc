@@ -1208,6 +1208,93 @@ TEST_F(MeshManager, LoadGLTF2Triangle)
 }
 
 /////////////////////////////////////////////////
+TEST_P(MeshManagerLoad, LoadSTL)
+{
+  auto *mgr = common::MeshManager::Instance();
+  auto mesh = mgr->Load("");
+  EXPECT_EQ(nullptr, mesh);
+
+  std::string cubeFilepath = common::testing::TestFile("data", "cube.stl");
+  mesh = mgr->Load(cubeFilepath);
+  EXPECT_NE(nullptr, mesh);
+
+  EXPECT_EQ(cubeFilepath, mesh->Name().c_str());
+  EXPECT_EQ(math::Vector3d(20, 0, 20), mesh->Max());
+  EXPECT_EQ(math::Vector3d(0, -20, 0), mesh->Min());
+  EXPECT_EQ(0u, mesh->MaterialCount());
+  EXPECT_EQ(36u, mesh->IndexCount());
+  EXPECT_EQ(0u, mesh->TexCoordCount());
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+
+  auto sm = mesh->SubMeshByIndex(0u);
+  auto subMesh = sm.lock();
+  EXPECT_NE(nullptr, subMesh);
+  EXPECT_EQ(math::Vector3d(0, 0, -1), subMesh->Normal(0u));
+  EXPECT_EQ(math::Vector3d(0, 0, -1), subMesh->Normal(1u));
+  EXPECT_EQ(math::Vector3d(0, 0, -1), subMesh->Normal(2u));
+
+  EXPECT_EQ(mesh->VertexCount(), mesh->NormalCount());
+  std::vector<std::vector<double>> vertexValues {
+    {20, 0, 0}, {0, -20, 0}, {0, 0, 0},
+    {0, -20, 0}, {20, 0, 0}, {20, -20, 0},
+    {20, -20, 20}, {0, -20, 0}, {20, -20, 0},
+    {0, -20, 0}, {20, -20, 20}, {0, -20, 20},
+    {20, 0, 0}, {20, -20, 20}, {20, -20, 0},
+    {20, -20, 20}, {20, 0, 0}, {20, 0, 20},
+    {20, -20, 20}, {0, 0, 20}, {0, -20, 20},
+    {0, 0, 20}, {20, -20, 20}, {20, 0, 20},
+    {0, 0, 20}, {0, -20, 0}, {0, -20, 20},
+    {0, -20, 0}, {0, 0, 20}, {0, 0, 0},
+    {0, 0, 20}, {20, 0, 0}, {0, 0, 0},
+    {20, 0, 0}, {0, 0, 20}, {20, 0, 20}
+  };
+
+  EXPECT_EQ(vertexValues.size(), subMesh->IndexCount());
+  for (unsigned int i = 0; i < subMesh->IndexCount(); ++i)
+  {
+    math::Vector3d vertexCoord(vertexValues[i][0],
+                               vertexValues[i][1],
+                               vertexValues[i][2]);
+    EXPECT_EQ(subMesh->Vertex(subMesh->Index(i)), vertexCoord);
+  }
+
+  EXPECT_STREQ("model", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+  mgr->RemoveAll();
+
+  std::string cubeBinFilepath = common::testing::TestFile(
+                                    "data", "cube_binary.stl");
+  mesh = mgr->Load(cubeBinFilepath);
+  EXPECT_NE(nullptr, mesh);
+
+  EXPECT_EQ(cubeBinFilepath, mesh->Name().c_str());
+  EXPECT_EQ(math::Vector3d(20, 0, 20), mesh->Max());
+  EXPECT_EQ(math::Vector3d(0, -20, 0), mesh->Min());
+  EXPECT_EQ(0u, mesh->MaterialCount());
+  EXPECT_EQ(36u, mesh->IndexCount());
+  EXPECT_EQ(0u, mesh->TexCoordCount());
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+
+  sm = mesh->SubMeshByIndex(0u);
+  subMesh = sm.lock();
+  EXPECT_NE(nullptr, subMesh);
+  EXPECT_EQ(math::Vector3d(0, 0, -1), subMesh->Normal(0u));
+  EXPECT_EQ(math::Vector3d(0, 0, -1), subMesh->Normal(1u));
+  EXPECT_EQ(math::Vector3d(0, 0, -1), subMesh->Normal(2u));
+  EXPECT_EQ(mesh->VertexCount(), mesh->NormalCount());
+  // Coordinates of the vertices should be the same as in the cube.stl
+  EXPECT_EQ(vertexValues.size(), subMesh->IndexCount());
+  for (unsigned int i = 0; i < subMesh->IndexCount(); ++i)
+  {
+    math::Vector3d vertexCoord(
+      vertexValues[i][0], vertexValues[i][1], vertexValues[i][2]);
+    EXPECT_EQ(subMesh->Vertex(subMesh->Index(i)), vertexCoord);
+  }
+
+  EXPECT_STREQ("", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+  mgr->RemoveAll();
+}
+
+/////////////////////////////////////////////////
 // A <float_array> without a count attribute must not crash any loader.
 // The malformed source is rejected and an empty mesh is returned.
 TEST_P(MeshManagerLoad, LoadMalformedPositionNoCount)
