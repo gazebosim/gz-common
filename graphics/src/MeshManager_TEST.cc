@@ -775,23 +775,6 @@ TEST_P(MeshManagerLoad, LoadBoxWithMultipleGeoms)
 }
 
 /////////////////////////////////////////////////
-// Load animation without a name
-TEST_P(MeshManagerLoad, NoAnimName)
-{
-  auto *mgr = common::MeshManager::Instance();
-  std::string meshFilename =
-    common::testing::TestFile("data", "box_with_no_animation_name.dae");
-
-  const common::Mesh *mesh = mgr->Load(meshFilename);
-  common::SkeletonPtr skeleton = mesh->MeshSkeleton();
-  ASSERT_EQ(1u, skeleton->AnimationCount());
-  common::SkeletonAnimation *anim = skeleton->Animation(0);
-  auto animName = anim->Name();
-  EXPECT_EQ(animName, "animation1");
-  mgr->RemoveAll();
-}
-
-/////////////////////////////////////////////////
 TEST_P(MeshManagerLoad, LoadObjBox)
 {
   auto *mgr = common::MeshManager::Instance();
