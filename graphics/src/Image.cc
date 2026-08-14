@@ -15,6 +15,10 @@
  *
  */
 #include <algorithm>
+#include <gz/utils/SuppressWarning.hh>
+// Compile STB with internal linkage to avoid duplicated symbols errors
+// when building targets that statically link both stb and gz-common
+GZ_UTILS_WARN_IGNORE__UNUSED_FUNCTION
 #define STB_IMAGE_STATIC
 #ifndef STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
@@ -51,6 +55,7 @@
 #if defined(__GNUC__)
 #pragma GCC diagnostic pop
 #endif
+GZ_UTILS_WARN_RESUME__UNUSED_FUNCTION
 
 #include <cstdint>
 #include <cstring>
