@@ -77,15 +77,15 @@ TEST_F(MeshManager, CreateExtrudedPolyline)
   // test extrusion of a path with two subpaths:
   // a smaller square inside a bigger square.
   // The smaller square should be treated as a hole inside the bigger square.
-  std::vector<std::vector<math::Vector2d> > path;
-  std::vector<math::Vector2d> subpath01;
+  std::vector<std::vector<gz::math::Vector2d> > path;
+  std::vector<gz::math::Vector2d> subpath01;
   subpath01.emplace_back(0, 0);
   subpath01.emplace_back(1, 0);
   subpath01.emplace_back(1, 1);
   subpath01.emplace_back(0, 1);
   subpath01.emplace_back(0, 0);
 
-  std::vector<math::Vector2d> subpath02;
+  std::vector<gz::math::Vector2d> subpath02;
   subpath02.emplace_back(0.25, 0.25);
   subpath02.emplace_back(0.25, 0.75);
   subpath02.emplace_back(0.75, 0.75);
@@ -112,21 +112,21 @@ TEST_F(MeshManager, CreateExtrudedPolyline)
   // check submesh bounds
   auto submesh = mesh->SubMeshByIndex(0).lock();
   EXPECT_TRUE(submesh != nullptr);
-  EXPECT_EQ(math::Vector3d(0, 0, 0), submesh->Min());
-  EXPECT_EQ(math::Vector3d(1.0, 1.0, 10.0), submesh->Max());
+  EXPECT_EQ(gz::math::Vector3d(0, 0, 0), submesh->Min());
+  EXPECT_EQ(gz::math::Vector3d(1.0, 1.0, 10.0), submesh->Max());
 
   // check vertices
   for (unsigned int i = 0; i < submesh->VertexCount(); ++i)
   {
-    math::Vector3d v = submesh->Vertex(i);
+    gz::math::Vector3d v = submesh->Vertex(i);
 
     // check no vertices are in the region of the hole
     EXPECT_FALSE((v.X() > 0.25 && v.X() < 0.75));
     EXPECT_FALSE((v.Y() > 0.25 && v.Y() < 0.75));
 
     // check extruded height
-    EXPECT_TRUE((math::equal(v.Z(), 0.0) ||
-          math::equal(v.Z(), 10.0)));
+    EXPECT_TRUE((gz::math::equal(v.Z(), 0.0) ||
+          gz::math::equal(v.Z(), 10.0)));
   }
 
   // verify same number of normals and vertices
@@ -135,40 +135,40 @@ TEST_F(MeshManager, CreateExtrudedPolyline)
   // check normals
   for (unsigned int i = 0; i < submesh->NormalCount(); ++i)
   {
-    math::Vector3d v = submesh->Vertex(i);
-    math::Vector3d n = submesh->Normal(i);
+    gz::math::Vector3d v = submesh->Vertex(i);
+    gz::math::Vector3d n = submesh->Normal(i);
 
     // vertex at 0 could be a bottom face or side face
-    if (math::equal(v.Z(), 0.0))
+    if (gz::math::equal(v.Z(), 0.0))
     {
-      if (math::equal(n.Z(), 0.0))
+      if (gz::math::equal(n.Z(), 0.0))
       {
         // side face - check non-zero normal
-        EXPECT_TRUE(!(math::equal(n.X(), 0.0) &&
-              math::equal(n.Y(), 0.0)));
+        EXPECT_TRUE(!(gz::math::equal(n.X(), 0.0) &&
+              gz::math::equal(n.Y(), 0.0)));
       }
       else
       {
         // bottom face - normal in -z direction
-        EXPECT_TRUE((n == -math::Vector3d::UnitZ) ||
-            (math::equal(n.Z(), 0.0)));
+        EXPECT_TRUE((n == -gz::math::Vector3d::UnitZ) ||
+            (gz::math::equal(n.Z(), 0.0)));
       }
     }
 
     // vertex at height could be a top face or side face
-    if (math::equal(v.Z(), 10.0))
+    if (gz::math::equal(v.Z(), 10.0))
     {
-      if (math::equal(n.Z(), 0.0))
+      if (gz::math::equal(n.Z(), 0.0))
       {
         // side face - check non-zero normal
-        EXPECT_TRUE(!(math::equal(n.X(), 0.0) &&
-              math::equal(n.Y(), 0.0)));
+        EXPECT_TRUE(!(gz::math::equal(n.X(), 0.0) &&
+              gz::math::equal(n.Y(), 0.0)));
       }
       else
       {
         // top face - normal in +z direction
-        EXPECT_TRUE((n == math::Vector3d::UnitZ) ||
-            (math::equal(n.Z(), 0.0)));
+        EXPECT_TRUE((n == gz::math::Vector3d::UnitZ) ||
+            (gz::math::equal(n.Z(), 0.0)));
       }
     }
   }
@@ -180,13 +180,13 @@ TEST_F(MeshManager, CreateExtrudedPolylineClosedPath)
   // test extrusion of a path that has two closed subpaths, i.e.,
   // first and last vertices are the same.
   // The following two subpaths form the letter 'A'.
-  std::vector<std::vector<math::Vector2d> > path2;
-  std::vector<math::Vector2d> subpath03;
+  std::vector<std::vector<gz::math::Vector2d> > path2;
+  std::vector<gz::math::Vector2d> subpath03;
   subpath03.emplace_back(2.27467, 1.0967);
   subpath03.emplace_back(1.81094, 2.35418);
   subpath03.emplace_back(2.74009, 2.35418);
 
-  std::vector<math::Vector2d> subpath04;
+  std::vector<gz::math::Vector2d> subpath04;
   subpath04.emplace_back(2.08173, 0.7599);
   subpath04.emplace_back(2.4693, 0.7599);
   subpath04.emplace_back(3.4323, 3.28672);
@@ -216,12 +216,12 @@ TEST_F(MeshManager, CreateExtrudedPolylineClosedPath)
   // check submesh bounds
   auto submesh = mesh->SubMeshByIndex(0).lock();
   EXPECT_TRUE(submesh != nullptr);
-  EXPECT_EQ(submesh->Min(), math::Vector3d(1.11704, 0.7599, 0));
-  EXPECT_EQ(submesh->Max(), math::Vector3d(3.4323, 3.28672, 2.0));
+  EXPECT_EQ(submesh->Min(), gz::math::Vector3d(1.11704, 0.7599, 0));
+  EXPECT_EQ(submesh->Max(), gz::math::Vector3d(3.4323, 3.28672, 2.0));
 
   for (unsigned int i = 0; i < submesh->VertexCount(); ++i)
   {
-    math::Vector3d v = submesh->Vertex(i);
+    gz::math::Vector3d v = submesh->Vertex(i);
 
     // check no vertices are in the region of the hole using a point-in-polygon
     // algorithm
@@ -240,8 +240,8 @@ TEST_F(MeshManager, CreateExtrudedPolylineClosedPath)
     EXPECT_FALSE(pointInPolygon);
 
     // check extruded height
-    EXPECT_TRUE((math::equal(v.Z(), 0.0) ||
-          math::equal(v.Z(), 2.0)));
+    EXPECT_TRUE((gz::math::equal(v.Z(), 0.0) ||
+          gz::math::equal(v.Z(), 2.0)));
   }
 
   // verify same number of normals and vertices
@@ -250,40 +250,40 @@ TEST_F(MeshManager, CreateExtrudedPolylineClosedPath)
   // check normals
   for (unsigned int i = 0; i < submesh->NormalCount(); ++i)
   {
-    math::Vector3d v = submesh->Vertex(i);
-    math::Vector3d n = submesh->Normal(i);
+    gz::math::Vector3d v = submesh->Vertex(i);
+    gz::math::Vector3d n = submesh->Normal(i);
 
     // vertex at 0 could be a bottom face or side face
-    if (math::equal(v.Z(), 0.0))
+    if (gz::math::equal(v.Z(), 0.0))
     {
-      if (math::equal(n.Z(), 0.0))
+      if (gz::math::equal(n.Z(), 0.0))
       {
         // side face - check non-zero normal
-        EXPECT_TRUE(!(math::equal(n.X(), 0.0) &&
-                      math::equal(n.Y(), 0.0)));
+        EXPECT_TRUE(!(gz::math::equal(n.X(), 0.0) &&
+                      gz::math::equal(n.Y(), 0.0)));
       }
       else
       {
         // bottom face - normal in -z direction
-        EXPECT_TRUE((n == -math::Vector3d::UnitZ) ||
-                    (math::equal(n.Z(), 0.0)));
+        EXPECT_TRUE((n == -gz::math::Vector3d::UnitZ) ||
+                    (gz::math::equal(n.Z(), 0.0)));
       }
     }
 
     // vertex at height could be a top face or side face
-    if (math::equal(v.Z(), 10.0))
+    if (gz::math::equal(v.Z(), 10.0))
     {
-      if (math::equal(n.Z(), 0.0))
+      if (gz::math::equal(n.Z(), 0.0))
       {
         // side face - check non-zero normal
-        EXPECT_TRUE(!(math::equal(n.X(), 0.0) &&
-                      math::equal(n.Y(), 0.0)));
+        EXPECT_TRUE(!(gz::math::equal(n.X(), 0.0) &&
+                      gz::math::equal(n.Y(), 0.0)));
       }
       else
       {
         // top face - normal in +z direction
-        EXPECT_TRUE((n == math::Vector3d::UnitZ) ||
-                    (math::equal(n.Z(), 0.0)));
+        EXPECT_TRUE((n == gz::math::Vector3d::UnitZ) ||
+                    (gz::math::equal(n.Z(), 0.0)));
       }
     }
   }
@@ -293,8 +293,8 @@ TEST_F(MeshManager, CreateExtrudedPolylineClosedPath)
 TEST_F(MeshManager, CreateExtrudedPolylineInvalid)
 {
   // test extruding invalid polyline
-  std::vector<std::vector<math::Vector2d> > path;
-  std::vector<math::Vector2d> subpath01;
+  std::vector<std::vector<gz::math::Vector2d> > path;
+  std::vector<gz::math::Vector2d> subpath01;
   subpath01.emplace_back(0, 0);
   subpath01.emplace_back(0, 1);
   subpath01.emplace_back(0, 2);
@@ -317,8 +317,8 @@ TEST_F(MeshManager, Remove)
 
   EXPECT_FALSE(mgr->HasMesh("box"));
   mgr->CreateBox("box",
-      math::Vector3d(1, 1, 1),
-      math::Vector2d(0, 0));
+      gz::math::Vector3d(1, 1, 1),
+      gz::math::Vector2d(0, 0));
   EXPECT_TRUE(mgr->HasMesh("box"));
 
   mgr->CreateSphere("sphere", 1.0, 1, 1);
@@ -508,8 +508,8 @@ TEST_P(MeshManagerLoad, LoadBox)
   const common::Mesh *mesh = mgr->Load(filename);
   ASSERT_NE(nullptr, mesh);
   EXPECT_EQ(filename, mesh->Name());
-  EXPECT_EQ(math::Vector3d(1, 1, 1), mesh->Max());
-  EXPECT_EQ(math::Vector3d(-1, -1, -1), mesh->Min());
+  EXPECT_EQ(gz::math::Vector3d(1, 1, 1), mesh->Max());
+  EXPECT_EQ(gz::math::Vector3d(-1, -1, -1), mesh->Min());
   // 36 vertices, 24 unique, 12 shared.
   EXPECT_EQ(24u, mesh->VertexCount());
   EXPECT_EQ(24u, mesh->NormalCount());
@@ -559,8 +559,8 @@ TEST_P(MeshManagerLoad, ShareVertices)
       mesh->SubMeshByIndex(i).lock();
     for (unsigned int j = 0; j < subMesh->VertexCount(); ++j)
     {
-      math::Vector3d v = subMesh->Vertex(j);
-      math::Vector3d n = subMesh->Normal(j);
+      gz::math::Vector3d v = subMesh->Vertex(j);
+      gz::math::Vector3d n = subMesh->Normal(j);
 
       // Verify there is no other vertex with the same position AND normal
       for (unsigned int k = j+1; k < subMesh->VertexCount(); ++k)
@@ -798,8 +798,8 @@ TEST_P(MeshManagerLoad, LoadObjBox)
   const common::Mesh *mesh = mgr->Load(meshFilename);
 
   EXPECT_EQ(meshFilename, mesh->Name());
-  EXPECT_EQ(math::Vector3d(1, 1, 1), mesh->Max());
-  EXPECT_EQ(math::Vector3d(-1, -1, -1), mesh->Min());
+  EXPECT_EQ(gz::math::Vector3d(1, 1, 1), mesh->Max());
+  EXPECT_EQ(gz::math::Vector3d(-1, -1, -1), mesh->Min());
 
   EXPECT_EQ(36u, mesh->IndexCount());
   EXPECT_EQ(0u, mesh->TexCoordCount());
