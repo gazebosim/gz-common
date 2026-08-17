@@ -80,7 +80,11 @@
       </node>
       <node id="StaticCubeParentNoName" type="NODE">
         <matrix sid="transform">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</matrix>
-        <instance_geometry url="#StaticCube-mesh" name="StaticCube"/>
+        <instance_geometry url="#StaticCube-mesh" name="StaticCubeParentNoName"/>
+        <node id="StaticCubeChildNoName" type="NODE">
+          <matrix sid="transform">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</matrix>
+          <instance_geometry url="#StaticCube-mesh" name="StaticCubeChildNoName"/>
+        </node>
       </node>
     </visual_scene>
   </library_visual_scenes>

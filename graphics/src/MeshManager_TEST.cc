@@ -825,7 +825,7 @@ TEST_P(MeshManagerLoad, LoadBoxWithHierarchicalNodes)
   auto *mgr = common::MeshManager::Instance();
   const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "box_with_hierarchical_nodes.dae"));
-  ASSERT_EQ(6u, mesh->SubMeshCount());
+  ASSERT_EQ(7u, mesh->SubMeshCount());
 
   // node by itself
   EXPECT_EQ("StaticCube", mesh->SubMeshByIndex(0).lock()->Name());
