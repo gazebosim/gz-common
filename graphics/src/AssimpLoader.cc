@@ -930,9 +930,10 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     common::Pbr defaultPbr;
     if (extension == "obj" && *mat->PbrMaterial() != defaultPbr)
     {
-      gzwarn << "OBJ file with PBR materials detected. Note that the fields in "
-             << "the .mtl file may not be read as expected "
-             << "(eg. if you exported this file with Blender). "
+      gzwarn << "OBJ file with PBR materials detected in mesh ["
+             << _filename
+             << "]. Note that the fields in the .mtl file may not be read as "
+             << "expected (eg. if you exported this file with Blender). "
              << "Use GLTF for a more modern format that supports PBR."
              << std::endl;
     }
