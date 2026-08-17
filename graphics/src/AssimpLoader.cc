@@ -210,17 +210,16 @@ static std::string GetColladaNodeID(const aiNode* _node)
     return "";
 
   // Initialise nodeID to nodeName first
-  std::string nodeID = ToString(_node->mName);
   if (_node->mMetaData)
   {
     aiString colladaId;
     if (_node->mMetaData->Get(AI_METADATA_COLLADA_ID, colladaId))
     {
       // If we have a value for the node ID, update it
-      nodeID = ToString(colladaId);
+      return ToString(colladaId);
     }
   }
-  return nodeID;
+  return ToString(_node->mName);
 }
 
 //////////////////////////////////////////////////
