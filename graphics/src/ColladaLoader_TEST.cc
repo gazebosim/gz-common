@@ -582,6 +582,223 @@ TEST_F(ColladaLoader, LoadMissingVisualScene)
 }
 
 
+
+/////////////////////////////////////////////////
+// A <float_array> without a count attribute must not crash the loader.
+// The position source is rejected and the loader returns an empty mesh.
+TEST_F(ColladaLoader, LoadMalformedPositionNoCount)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_position_no_count.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A non numeric count attribute must be caught, not throw. The position
+// source is rejected and the loader returns an empty mesh.
+TEST_F(ColladaLoader, LoadMalformedPositionBadCount)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_position_bad_count.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A missing accessor stride attribute must not crash the loader. The
+// position source is rejected and the loader returns an empty mesh.
+TEST_F(ColladaLoader, LoadMalformedPositionNoStride)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_position_no_stride.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// An overflowing float value must be handled gracefully, not throw. The
+// position source is rejected and the loader returns an empty mesh.
+TEST_F(ColladaLoader, LoadMalformedPositionOverflow)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_position_overflow.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A normal source without a count attribute must not crash the loader.
+// The submesh that references it is skipped.
+TEST_F(ColladaLoader, LoadMalformedNormalNoCount)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_normal_no_count.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A non numeric count attribute in a normal source must be caught, not
+// throw. The submesh that references it is skipped.
+TEST_F(ColladaLoader, LoadMalformedNormalBadCount)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_normal_bad_count.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A missing accessor stride attribute in a normal source must not crash
+// the loader. The submesh that references it is skipped.
+TEST_F(ColladaLoader, LoadMalformedNormalNoStride)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_normal_no_stride.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A texcoord source without a count attribute must not crash the loader.
+// The submesh that references it is skipped.
+TEST_F(ColladaLoader, LoadMalformedTexcoordNoCount)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_texcoord_no_count.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A non numeric count attribute in a texcoord source must be caught, not
+// throw. The submesh that references it is skipped.
+TEST_F(ColladaLoader, LoadMalformedTexcoordBadCount)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_texcoord_bad_count.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A missing accessor stride attribute in a texcoord source must not crash
+// the loader. The submesh that references it is skipped.
+TEST_F(ColladaLoader, LoadMalformedTexcoordNoStride)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_texcoord_no_stride.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A texcoord source whose accessor count times stride disagrees with the
+// float_array count must not crash. The submesh that references it is
+// skipped.
+TEST_F(ColladaLoader, LoadMalformedTexcoordMismatch)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_texcoord_mismatch.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A zero accessor stride must be rejected: it previously caused an
+// infinite read loop (and a division by zero in later revisions). The
+// position source is rejected and the loader returns an empty mesh.
+TEST_F(ColladaLoader, LoadMalformedPositionZeroStride)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_position_zero_stride.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A negative float_array count must be rejected: it previously drove a
+// huge (wrapped around) allocation that threw std::length_error. The
+// position source is rejected and the loader returns an empty mesh.
+TEST_F(ColladaLoader, LoadMalformedPositionNegativeCount)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data",
+      "malformed_position_negative_count.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A count far larger than the actual data must neither over allocate nor
+// read out of bounds; the values that are present are loaded.
+TEST_F(ColladaLoader, LoadMalformedPositionHugeCount)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_position_huge_count.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(3u, mesh->VertexCount());
+  EXPECT_EQ(3u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// An empty <init_from/> element must not crash. The geometry loads and
+// the material is created with no texture assigned.
+TEST_F(ColladaLoader, LoadEmptyInitFrom)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "empty_init_from.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(3u, mesh->VertexCount());
+  ASSERT_EQ(1u, mesh->MaterialCount());
+  common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+  ASSERT_NE(nullptr, mat);
+  EXPECT_TRUE(mat->TextureImage().empty());
+}
+
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
