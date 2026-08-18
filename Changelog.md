@@ -1,5 +1,19 @@
 ## Gazebo Common 7.x
 
+### Gazebo Common 7.3.1 (2026-08-18)
+
+1. Build STB with static linkage
+    * [Pull request #874](https://github.com/gazebosim/gz-common/pull/874)
+
+1. ci: test on Ubuntu Resolute (26.04)
+    * [Pull request #876](https://github.com/gazebosim/gz-common/pull/876)
+
+1. Minor AssimpLoader changes (#858)
+    * [Pull request #858) (#861](https://github.com/gazebosim/gz-common/pull/858) (#861)
+
+1. Improve COLLADA loader (supersedes #569) - Part 1/3
+    * [Pull request #569) - Part 1/3 (#830](https://github.com/gazebosim/gz-common/pull/569) - Part 1/3 (#830)
+
 ### Gazebo Common 7.3.0 (2026-07-21)
 
 1. feat: Add API for requesting a new mesh from the MeshManager (backport #796)
