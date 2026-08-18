@@ -14,8 +14,10 @@
  * limitations under the License.
  *
  */
+#include <algorithm>
 #include <cerrno>
 #include <cmath>
+#include <cstring>
 #include <cstdlib>
 #include <map>
 #include <memory>
@@ -406,8 +408,11 @@ struct Vector2dHash
 std::vector<double> parseDoubles(const char *_str, size_t _reserveCount)
 {
   std::vector<double> result;
-  // Preallocate memory based on the known count.
-  result.reserve(_reserveCount);
+  // Preallocate memory based on the known count, clamped by what the text
+  // could possibly hold (a value takes at least 2 characters including its
+  // delimiter) so a huge bogus count attribute cannot drive a huge
+  // allocation.
+  result.reserve(std::min(_reserveCount, std::strlen(_str) / 2 + 1));
   const char *start = _str;
   char *end{};
   while (true)
@@ -462,12 +467,16 @@ struct SourceAccessor
 /// \param[in] _semantic Human readable description of the source semantic
 /// (e.g. "position coordinate"), used in error messages about attributes.
 /// \param[in] _id Id of the source element, used in error messages.
+/// \param[in] _minStride Smallest stride the caller can consume (e.g. 3
+/// for XYZ positions). A declared stride below this is rejected; this
+/// also rejects zero and negative strides that would otherwise hang or
+/// crash the read loops.
 /// \param[out] _out Parsed result. Valid only when true is returned.
 /// \return True when the source holds data to read. False when the source
 /// is empty (not an error) or malformed (an error has been logged).
 bool ParseSourceAccessor(tinyxml2::XMLElement *_sourceXml,
     const std::string &_sourceName, const std::string &_semantic,
-    const std::string &_id, SourceAccessor &_out)
+    const std::string &_id, int _minStride, SourceAccessor &_out)
 {
   tinyxml2::XMLElement *floatArrayXml =
       _sourceXml->FirstChildElement("float_array");
@@ -505,6 +514,14 @@ bool ParseSourceAccessor(tinyxml2::XMLElement *_sourceXml,
       return false;
   }
 
+  if (_out.totCount < 0)
+  {
+    gzerr << "Invalid count attribute in " << _semantic
+          << " <float_array> with id[" << _id << "]: count["
+          << _out.totCount << "] must not be negative\n";
+    return false;
+  }
+
   tinyxml2::XMLElement *techniqueXml =
       _sourceXml->FirstChildElement("technique_common");
   if (!techniqueXml)
@@ -536,6 +553,14 @@ bool ParseSourceAccessor(tinyxml2::XMLElement *_sourceXml,
       gzerr << "Invalid stride attribute in " << _semantic
             << " <accessor> with id[" << _id << "]\n";
       return false;
+  }
+
+  if (_out.stride < _minStride)
+  {
+    gzerr << "Invalid stride attribute in " << _semantic
+          << " <accessor> with id[" << _id << "]: stride[" << _out.stride
+          << "] must be at least " << _minStride << "\n";
+    return false;
   }
 
   // The accessor count attribute is optional for callers; -1 when absent
@@ -1660,7 +1685,7 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
 
   SourceAccessor src;
   if (!ParseSourceAccessor(sourceXml, "Vertex", "position coordinate", _id,
-        src))
+        3, src))
     return;
 
   auto values = parseDoubles(src.text, src.totCount);
@@ -1680,7 +1705,12 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
       unsigned int, Vector3Hash> unique;
 
   gz::math::Vector3d vec;
-  for (int i = 0; i < src.totCount; i += src.stride)
+  // Bound by the actual number of parsed values, not just the declared
+  // count, so a too-large count attribute cannot drive an out-of-bounds
+  // read.
+  for (int i = 0;
+       i < src.totCount && i + 2 < static_cast<int>(values.size());
+       i += src.stride)
   {
     vec.Set(values[i],
             values[i+1],
@@ -1728,7 +1758,7 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
 
   SourceAccessor src;
   if (!ParseSourceAccessor(normalsXml, "Normal", "normal coordinate", _id,
-        src))
+        3, src))
     return;
 
   auto values = parseDoubles(src.text, src.totCount);
@@ -1748,7 +1778,12 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
       unsigned int, Vector3Hash> unique;
 
   gz::math::Vector3d vec;
-  for (int i = 0; i < src.totCount; i += src.stride)
+  // Bound by the actual number of parsed values, not just the declared
+  // count, so a too-large count attribute cannot drive an out-of-bounds
+  // read.
+  for (int i = 0;
+       i < src.totCount && i + 2 < static_cast<int>(values.size());
+       i += src.stride)
   {
     vec.Set(values[i],
             values[i+1],
@@ -1794,7 +1829,7 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
 
   SourceAccessor src;
   if (!ParseSourceAccessor(xml, "Texture coordinate", "texture coordinate",
-        _id, src))
+        _id, 2, src))
     return;
 
   // Texture coordinates require the accessor count attribute.
@@ -1831,8 +1866,12 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
                      unsigned int, Vector2dHash> unique;
 
   gz::math::Vector2d vec;
-  // Read in all the texture coordinates.
-  for (int i = 0; i < src.totCount; i += src.stride)
+  // Read in all the texture coordinates. Bound by the actual number of
+  // parsed values, not just the declared count, so a too-large count
+  // attribute cannot drive an out-of-bounds read.
+  for (int i = 0;
+       i < src.totCount && i + 1 < static_cast<int>(values.size());
+       i += src.stride)
   {
     // We only handle 2D texture coordinates right now.
     vec.Set(values[i],
@@ -2064,9 +2103,13 @@ void ColladaLoader::Implementation::LoadColorOrTexture(
 
     if (imageXml && imageXml->FirstChildElement("init_from"))
     {
-      std::string imgFile =
+      // GetText() returns nullptr for an empty <init_from/> element.
+      const char *imgFile =
         imageXml->FirstChildElement("init_from")->GetText();
-      _mat->SetTextureImage(imgFile, this->path);
+      if (imgFile)
+        _mat->SetTextureImage(imgFile, this->path);
+      else
+        gzerr << "Empty <init_from> element for texture in material\n";
     }
   }
 }
