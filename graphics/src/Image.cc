@@ -15,12 +15,28 @@
  *
  */
 #include <algorithm>
+// Compile STB with internal linkage to avoid duplicated symbols errors
+// when building targets that statically link both stb and gz-common
+#define STB_IMAGE_STATIC
+#ifndef STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
+#endif
+// TODO(luca) Replace all unused function warning suppressions with gz-utils
+// SuppressWarning macro when released.
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
+#endif
 #include "STB/stb_image.h"
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
 #endif
 #if defined(__APPLE__)
 // Suppress deprecation warning around snprintf
@@ -28,9 +44,11 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #endif
+#define STB_IMAGE_WRITE_STATIC
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "STB/stb_image_write.h"
 #if defined(__GNUC__)
+#pragma GCC diagnostic pop
 #pragma GCC diagnostic pop
 #endif
 #if defined(__APPLE__)
@@ -40,10 +58,14 @@
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
 #endif
+#define STB_IMAGE_RESIZE_STATIC
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include "STB/stb_image_resize2.h"
 #if defined(__GNUC__)
+#pragma GCC diagnostic pop
 #pragma GCC diagnostic pop
 #endif
 
