@@ -605,12 +605,12 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     pbr.SetEmissiveMap(texName, texData);
   }
 
-  ret = assimpMat->GetTexture(aiTextureType_SHININESS, 0, &texturePath);
+  ret = assimpMat->GetTexture(aiTextureType_SPECULAR, 0, &texturePath);
   if (ret == AI_SUCCESS)
   {
     std::string textureKey = this->FullTextureKey(texturePath.C_Str());
     auto [texName, texData] = this->LoadTexture(
-      _scene, texturePath, this->GenerateTextureName(textureKey, "Shininess"));
+      _scene, texturePath, this->GenerateTextureName(textureKey, "Specular"));
     pbr.SetSpecularMap(texName);
   }
 
