@@ -33,7 +33,13 @@ using namespace gz;
 
 // Only runs each test once. For cases where the GZ_MESH_FORCE_ASSIMP
 // does not affect the behavior of the test
-class MeshManager : public common::testing::AutoLogFixture { };
+class MeshManager : public common::testing::AutoLogFixture {
+  protected: void TearDown() override
+  {
+    common::MeshManager::Instance()->RemoveAll();
+    common::testing::AutoLogFixture::TearDown();
+  }
+};
 
 // Runs the test twice, once each for GZ_MESH_FORCE_ASSIMP=true and false
 // to test both custom mesh loaders and AssimpLoader
@@ -496,8 +502,6 @@ TEST_F(MeshManager, CreateMesh)
   const common::Mesh *verifyMesh = mgr->MeshByName(meshName);
   EXPECT_NE(nullptr, verifyMesh);
   EXPECT_EQ(meshName, verifyMesh->Name());
-
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -520,7 +524,6 @@ TEST_P(MeshManagerLoad, LoadBox)
 
   // Make sure we can read a submesh name
   EXPECT_STREQ("Cube", mesh->SubMeshByIndex(0).lock()->Name().c_str());
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -572,7 +575,6 @@ TEST_P(MeshManagerLoad, ShareVertices)
       }
     }
   }
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -628,8 +630,6 @@ TEST_P(MeshManagerLoad, Material)
   matOpaque->BlendFactors(srcFactor, dstFactor);
   EXPECT_DOUBLE_EQ(1.0, srcFactor);
   EXPECT_DOUBLE_EQ(0.0, dstFactor);
-
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -715,7 +715,6 @@ TEST_P(MeshManagerLoad, TexCoordSets)
 
   subMeshB->SetTexCoordBySet(2u, math::Vector2d(0.1, 0.2), 1u);
   EXPECT_EQ(math::Vector2d(0.1, 0.2), subMeshB->TexCoordBySet(2u, 1u));
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -752,7 +751,6 @@ TEST_P(MeshManagerLoad, LoadBoxWithAnimationOutsideSkeleton)
         0, 0, 1, 0,
         0, 0, 0, 1);
   EXPECT_EQ(expectedTrans, poseEnd.at("Armature"));
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -770,7 +768,6 @@ TEST_P(MeshManagerLoad, LoadBoxWithMultipleGeoms)
   ASSERT_EQ(2u, mesh->SubMeshCount());
   EXPECT_EQ(24u, mesh->SubMeshByIndex(0).lock()->NodeAssignmentsCount());
   EXPECT_EQ(0u, mesh->SubMeshByIndex(1).lock()->NodeAssignmentsCount());
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -787,7 +784,6 @@ TEST_P(MeshManagerLoad, NoAnimName)
   common::SkeletonAnimation *anim = skeleton->Animation(0);
   auto animName = anim->Name();
   EXPECT_EQ(animName, "animation1");
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -845,8 +841,6 @@ TEST_P(MeshManagerLoad, LoadObjBox)
   EXPECT_EQ(mat->Diffuse(), math::Color(0.512f, 0.512f, 0.512f, 1.0f));
   EXPECT_EQ(mat->Specular(), math::Color(0.25, 0.25, 0.25, 1.0));
   EXPECT_DOUBLE_EQ(mat->Transparency(), 0.0);
-
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -943,7 +937,6 @@ TEST_P(MeshManagerLoad, PBR)
       EXPECT_EQ("mesh_Metal.png", pbr->MetalnessMap());  // refl
     }
     EXPECT_EQ("mesh_Normal.png", pbr->NormalMap());
-    mgr->RemoveAll();
   }
 }
 
@@ -959,7 +952,6 @@ TEST_P(MeshManagerLoad, ObjInvalidMaterial)
   const common::Mesh *mesh = mgr->Load(meshFilename);
 
   EXPECT_TRUE(mesh != nullptr);
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -972,7 +964,6 @@ TEST_F(MeshManager, NonExistingMesh)
   const common::Mesh *mesh = mgr->Load(meshFilename);
 
   EXPECT_EQ(mesh, nullptr);
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -1008,7 +999,6 @@ TEST_F(MeshManager, LoadFbxBox)
   EXPECT_EQ(mat->Diffuse(), math::Color(0.8f, 0.8f, 0.8f, 1.0f));
   EXPECT_EQ(mat->Specular(), math::Color(0.8f, 0.8f, 0.8f, 1.0f));
   EXPECT_DOUBLE_EQ(mat->Transparency(), 0.0);
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -1044,7 +1034,6 @@ TEST_F(MeshManager, LoadGlTF2Box)
   EXPECT_EQ(mat->Diffuse(), math::Color(0.8f, 0.8f, 0.8f, 1.0f));
   EXPECT_EQ(mat->Specular(), math::Color(0.0f, 0.0f, 0.0f, 1.0f));
   EXPECT_DOUBLE_EQ(mat->Transparency(), 0.0);
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -1067,7 +1056,6 @@ TEST_F(MeshManager, LoadGlTF2BoxTransmission)
   ASSERT_TRUE(mat.get());
   // transmission currently modeled as transparency
   EXPECT_FLOAT_EQ(0.1f, mat->Transparency());
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -1105,7 +1093,6 @@ TEST_F(MeshManager, LoadGlTF2BoxWithJPEGTexture)
       "box_texture_jpg.glb") + "#*0_Diffuse";
   EXPECT_EQ(expectedName, mat->TextureImage());
   EXPECT_NE(nullptr, mat->TextureData());
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -1140,7 +1127,6 @@ TEST_F(MeshManager, LoadGlTF2BoxExternalTexture)
   auto pbr = material->PbrMaterial();
   ASSERT_NE(pbr, nullptr);
   EXPECT_NE(pbr->SpecularMap(), testTextureFile);
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -1218,7 +1204,6 @@ TEST_F(MeshManager, LoadGlbPbrAsset)
   EXPECT_STREQ("Action1", skel->Animation(0)->Name().c_str());
   EXPECT_STREQ("Action2", skel->Animation(1)->Name().c_str());
   EXPECT_STREQ("Action3", skel->Animation(2)->Name().c_str());
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -1262,7 +1247,6 @@ TEST_F(MeshManager, LoadGLTF2Triangle)
   EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoord(0u));
   EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoord(1u));
   EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoord(2u));
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -1349,7 +1333,6 @@ TEST_P(MeshManagerLoad, LoadSTL)
   }
 
   EXPECT_STREQ("", mesh->SubMeshByIndex(0).lock()->Name().c_str());
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
