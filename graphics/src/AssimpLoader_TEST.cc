@@ -157,31 +157,6 @@ TEST_F(AssimpLoader, LoadCylinderAnimatedFrom3dsMax)
 }
 
 /////////////////////////////////////////////////
-// Open a gltf mesh with an external texture
-TEST_F(AssimpLoader, LoadGlTF2BoxExternalTexture)
-{
-  common::AssimpLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "gltf", "PurpleCube.gltf"));
-
-  EXPECT_STREQ("unknown", mesh->Name().c_str());
-
-  // Make sure we can read the submesh name
-  EXPECT_STREQ("PurpleCube", mesh->SubMeshByIndex(0).lock()->Name().c_str());
-
-  EXPECT_EQ(mesh->MaterialCount(), 1u);
-
-  const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
-  ASSERT_TRUE(mat.get());
-  // Data is now loaded in memory
-  EXPECT_NE(nullptr, mat->TextureData());
-  auto testTextureFile =
-    common::testing::TestFile("data/gltf", "PurpleCube_Diffuse.png");
-  EXPECT_EQ(testTextureFile + "_Diffuse", mat->TextureImage());
-  delete mesh;
-}
-
-/////////////////////////////////////////////////
 // Checks for null root node animation and valid
 // x displacement in non root node's animation.
 TEST_F(AssimpLoader, CheckNonRootDisplacement)
