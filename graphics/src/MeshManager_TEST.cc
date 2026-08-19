@@ -848,10 +848,7 @@ TEST_P(MeshManagerLoad, LoadBoxMultipleInstControllers)
 
   common::SkeletonPtr skeleton = mesh->MeshSkeleton();
   EXPECT_NE(nullptr, skeleton->NodeById("Armature_Bone"));
-  if (!forceAssimpEnv)
-  {
-    EXPECT_NE(nullptr, skeleton->NodeById("Armature_Bone2"));
-  }
+  EXPECT_NE(nullptr, skeleton->NodeById("Armature_Bone2"));
   mgr->RemoveAll();
 }
 
