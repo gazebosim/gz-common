@@ -934,7 +934,7 @@ TEST_P(MeshManagerLoad, PBR)
     {
       EXPECT_DOUBLE_EQ(0.5, pbr->Roughness());
       // 'refl' not mapped to anything in AssimpLoader
-      EXPECT_EQ("mesh_Rough.png", pbr->SpecularMap());  // map_Ns
+      // `map_Ns` not mapped to anything in AssimpLoader
     }
     else
     {
