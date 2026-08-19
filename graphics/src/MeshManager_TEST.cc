@@ -1131,6 +1131,15 @@ TEST_F(MeshManager, LoadGlTF2BoxExternalTexture)
   auto testTextureFile =
     common::testing::TestFile("data/gltf", "PurpleCube_Diffuse.png");
   EXPECT_EQ("PurpleCube_Diffuse.png", mat->TextureImage());
+
+  // Test that SpecularMap has data
+  auto materialId = mesh->SubMeshByIndex(0).lock()->GetMaterialIndex();
+  ASSERT_TRUE(materialId.has_value());
+  auto material = mesh->MaterialByIndex(materialId.value());
+  ASSERT_NE(material, nullptr);
+  auto pbr = material->PbrMaterial();
+  ASSERT_NE(pbr, nullptr);
+  EXPECT_NE(pbr->SpecularMap(), "");
   mgr->RemoveAll();
 }
 
