@@ -1139,7 +1139,7 @@ TEST_F(MeshManager, LoadGlTF2BoxExternalTexture)
   ASSERT_NE(material, nullptr);
   auto pbr = material->PbrMaterial();
   ASSERT_NE(pbr, nullptr);
-  EXPECT_NE(pbr->SpecularMap(), "");
+  EXPECT_NE(pbr->SpecularMap(), testTextureFile);
   mgr->RemoveAll();
 }
 
