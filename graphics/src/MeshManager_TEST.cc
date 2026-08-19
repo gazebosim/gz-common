@@ -796,7 +796,6 @@ TEST_P(MeshManagerLoad, LoadBoxNestedAnimation)
         0, 0, 1, 0,
         0, 0, 0, 1);
   EXPECT_EQ(expectedTrans, poseEnd.at("Bone"));
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -841,8 +840,6 @@ TEST_P(MeshManagerLoad, LoadBoxWithHierarchicalNodes)
 
   // Nested node that does not have ancestors with a name
   EXPECT_EQ("unnamed_submesh_0", mesh->SubMeshByIndex(5).lock()->Name());
-
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
