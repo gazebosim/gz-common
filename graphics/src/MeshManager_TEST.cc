@@ -600,7 +600,6 @@ TEST_P(MeshManagerLoad, LoadZeroCount)
     EXPECT_NE(log.find("Normal source has a float_array with a count of zero"),
         std::string::npos);
   }
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -803,7 +802,6 @@ TEST_P(MeshManagerLoad, LoadBoxInstControllerWithoutSkeleton)
   common::SkeletonPtr skeleton = mesh->MeshSkeleton();
   EXPECT_LT(0u, skeleton->NodeCount());
   EXPECT_NE(nullptr, skeleton->NodeById("Armature_Bone"));
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -849,7 +847,6 @@ TEST_P(MeshManagerLoad, LoadBoxMultipleInstControllers)
   common::SkeletonPtr skeleton = mesh->MeshSkeleton();
   EXPECT_NE(nullptr, skeleton->NodeById("Armature_Bone"));
   EXPECT_NE(nullptr, skeleton->NodeById("Armature_Bone2"));
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -895,7 +892,6 @@ TEST_P(MeshManagerLoad, LoadBoxNestedAnimation)
         0, 0, 1, 0,
         0, 0, 0, 1);
   EXPECT_EQ(expectedTrans, poseEnd.at("Bone"));
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -918,7 +914,6 @@ TEST_P(MeshManagerLoad, LoadBoxWithDefaultStride)
   EXPECT_EQ(36u, mesh->IndexCount());
   EXPECT_EQ(1u, mesh->SubMeshCount());
   EXPECT_EQ(1u, mesh->MaterialCount());
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -963,8 +958,6 @@ TEST_P(MeshManagerLoad, LoadBoxWithHierarchicalNodes)
 
   // Nested node that does not have ancestors with a name
   EXPECT_EQ("unnamed_submesh_0", mesh->SubMeshByIndex(5).lock()->Name());
-
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -987,7 +980,6 @@ TEST_P(MeshManagerLoad, MergeBoxWithDoubleSkeleton)
   // The two skeletons have been joined and their root is the
   // animation root, called Armature (ColladaLoader) or Scene (AssimpLoader)
   EXPECT_EQ(skeleton_ptr->RootNode()->Name(), std::string(skeletonRootName));
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -1030,7 +1022,6 @@ TEST_P(MeshManagerLoad, LoadCylinderAnimatedFrom3dsMax)
   EXPECT_EQ("Bone02", anim->Name());
   EXPECT_EQ(1u, anim->NodeCount());
   EXPECT_TRUE(anim->HasNode("Bone02"));
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -1487,7 +1478,6 @@ TEST_P(MeshManagerLoad, CheckNonRootDisplacement)
   }
   auto xDisplacement = skelAnim->XDisplacement();
   ASSERT_TRUE(xDisplacement);
-  mgr->RemoveAll();
 }
 
 TEST_F(MeshManager, LoadGLTF2Triangle)
