@@ -34,7 +34,13 @@ using namespace gz;
 
 // Only runs each test once. For cases where the GZ_MESH_FORCE_ASSIMP
 // does not affect the behavior of the test
-class MeshManager : public common::testing::AutoLogFixture { };
+class MeshManager : public common::testing::AutoLogFixture {
+  protected: void TearDown() override
+  {
+    common::MeshManager::Instance()->RemoveAll();
+    common::testing::AutoLogFixture::TearDown();
+  }
+};
 
 // Runs the test twice, once each for GZ_MESH_FORCE_ASSIMP=true and false
 // to test both custom mesh loaders and AssimpLoader
@@ -497,8 +503,6 @@ TEST_F(MeshManager, CreateMesh)
   const common::Mesh *verifyMesh = mgr->MeshByName(meshName);
   EXPECT_NE(nullptr, verifyMesh);
   EXPECT_EQ(meshName, verifyMesh->Name());
-
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -521,7 +525,6 @@ TEST_P(MeshManagerLoad, LoadBox)
 
   // Make sure we can read a submesh name
   EXPECT_STREQ("Cube", mesh->SubMeshByIndex(0).lock()->Name().c_str());
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -573,7 +576,6 @@ TEST_P(MeshManagerLoad, ShareVertices)
       }
     }
   }
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -629,8 +631,6 @@ TEST_P(MeshManagerLoad, Material)
   matOpaque->BlendFactors(srcFactor, dstFactor);
   EXPECT_DOUBLE_EQ(1.0, srcFactor);
   EXPECT_DOUBLE_EQ(0.0, dstFactor);
-
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -716,7 +716,6 @@ TEST_P(MeshManagerLoad, TexCoordSets)
 
   subMeshB->SetTexCoordBySet(2u, math::Vector2d(0.1, 0.2), 1u);
   EXPECT_EQ(math::Vector2d(0.1, 0.2), subMeshB->TexCoordBySet(2u, 1u));
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -753,7 +752,6 @@ TEST_P(MeshManagerLoad, LoadBoxWithAnimationOutsideSkeleton)
         0, 0, 1, 0,
         0, 0, 0, 1);
   EXPECT_EQ(expectedTrans, poseEnd.at("Armature"));
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -771,10 +769,28 @@ TEST_P(MeshManagerLoad, LoadBoxWithMultipleGeoms)
   ASSERT_EQ(2u, mesh->SubMeshCount());
   EXPECT_EQ(24u, mesh->SubMeshByIndex(0).lock()->NodeAssignmentsCount());
   EXPECT_EQ(0u, mesh->SubMeshByIndex(1).lock()->NodeAssignmentsCount());
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
+<<<<<<< HEAD
+=======
+// Load animation without a name
+TEST_P(MeshManagerLoad, NoAnimName)
+{
+  auto *mgr = common::MeshManager::Instance();
+  std::string meshFilename =
+    common::testing::TestFile("data", "box_with_no_animation_name.dae");
+
+  const common::Mesh *mesh = mgr->Load(meshFilename);
+  common::SkeletonPtr skeleton = mesh->MeshSkeleton();
+  ASSERT_EQ(1u, skeleton->AnimationCount());
+  common::SkeletonAnimation *anim = skeleton->Animation(0);
+  auto animName = anim->Name();
+  EXPECT_EQ(animName, "animation1");
+}
+
+/////////////////////////////////////////////////
+>>>>>>> 6274633 (Change AssimpLoader behaviour when dealing with textures (#844))
 TEST_P(MeshManagerLoad, LoadObjBox)
 {
   auto *mgr = common::MeshManager::Instance();
@@ -829,8 +845,103 @@ TEST_P(MeshManagerLoad, LoadObjBox)
   EXPECT_EQ(mat->Diffuse(), math::Color(0.512f, 0.512f, 0.512f, 1.0f));
   EXPECT_EQ(mat->Specular(), math::Color(0.25, 0.25, 0.25, 1.0));
   EXPECT_DOUBLE_EQ(mat->Transparency(), 0.0);
+}
 
-  mgr->RemoveAll();
+/////////////////////////////////////////////////
+// This tests opening an OBJ file that has PBR fields
+TEST_P(MeshManagerLoad, PBR)
+{
+  auto *mgr = common::MeshManager::Instance();
+
+  // load obj file exported by 3ds max that has pbr extension
+  {
+    std::string meshFilename =
+      common::testing::TestFile("data", "cube_pbr.obj");
+
+    const common::Mesh *mesh = mgr->Load(meshFilename);
+    EXPECT_NE(nullptr, mesh);
+    // Expect warnings about the OBJ/PBR combination
+    common::Console::Root().RawLogger().flush();
+    std::string log = LogContent();
+    if (this->forceAssimpEnv)
+    {
+      EXPECT_NE(log.find(
+        "OBJ file with PBR materials detected"), std::string::npos);
+    }
+    const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+    ASSERT_TRUE(mat.get());
+
+    EXPECT_EQ(math::Color(0.0f, 0.0f, 0.0f, 1.0f), mat->Ambient());
+    EXPECT_EQ(math::Color(0.5f, 0.5f, 0.5f, 1.0f), mat->Diffuse());
+    EXPECT_EQ(math::Color(1.0f, 1.0f, 1.0f, 1.0f), mat->Specular());
+    EXPECT_DOUBLE_EQ(0.0, mat->Transparency());
+    EXPECT_NE(std::string::npos,
+        mat->TextureImage().find("LightDome_Albedo.png"));
+    const common::Pbr *pbr = mat->PbrMaterial();
+    EXPECT_DOUBLE_EQ(0, pbr->Roughness());
+    EXPECT_DOUBLE_EQ(0, pbr->Metalness());
+    EXPECT_EQ("LightDome_Metalness.png", pbr->MetalnessMap());
+    EXPECT_EQ("LightDome_Roughness.png", pbr->RoughnessMap());
+    EXPECT_EQ("LightDome_Normal.png", pbr->NormalMap());
+    mgr->RemoveAll();
+  }
+
+  // load obj file exported by blender - it shoves pbr maps into
+  // existing fields
+  {
+    // Ensure that the previous logs were cleared
+    common::Console::Root().RawLogger().flush();
+    std::string log = LogContent();
+    size_t prevLogSize = log.size();
+    if (this->forceAssimpEnv)
+    {
+      EXPECT_EQ(log.find(
+        "OBJ file with PBR materials detected", prevLogSize),
+        std::string::npos);
+    }
+
+    std::string meshFilename =
+      common::testing::TestFile("data", "blender_pbr.obj");
+
+    const common::Mesh *mesh = mgr->Load(meshFilename);
+    EXPECT_NE(nullptr, mesh);
+
+    // Expect warnings about the OBJ/PBR combination
+    common::Console::Root().RawLogger().flush();
+    log = LogContent();
+    if (this->forceAssimpEnv)
+    {
+      EXPECT_NE(log.find(
+        "OBJ file with PBR materials detected", prevLogSize),
+        std::string::npos);
+    }
+
+    const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+    ASSERT_TRUE(mat.get());
+
+    EXPECT_EQ(math::Color(1.0f, 1.0f, 1.0f, 1.0f), mat->Ambient());
+    EXPECT_EQ(math::Color(0.8f, 0.8f, 0.8f, 1.0f), mat->Diffuse());
+    EXPECT_EQ(math::Color(0.5f, 0.5f, 0.5f, 1.0f), mat->Specular());
+    EXPECT_EQ(math::Color(0.0f, 0.0f, 0.0f, 1.0f), mat->Emissive());
+    EXPECT_DOUBLE_EQ(0.0, mat->Transparency());
+    EXPECT_NE(std::string::npos,
+        mat->TextureImage().find("mesh_Diffuse.png"));
+    const common::Pbr *pbr = mat->PbrMaterial();
+    EXPECT_DOUBLE_EQ(0, pbr->Metalness());
+    if (this->forceAssimpEnv)
+    {
+      EXPECT_DOUBLE_EQ(0.5, pbr->Roughness());
+      // 'refl' not mapped to anything in AssimpLoader
+      // `map_Ns` not mapped to anything in AssimpLoader
+    }
+    else
+    {
+      EXPECT_DOUBLE_EQ(0.0, pbr->Roughness());
+      EXPECT_EQ("mesh_Rough.png", pbr->RoughnessMap());  // map_Ns
+      EXPECT_EQ("mesh_Metal.png", pbr->MetalnessMap());  // refl
+    }
+    EXPECT_EQ("mesh_Normal.png", pbr->NormalMap());
+  }
 }
 
 /////////////////////////////////////////////////
@@ -845,7 +956,6 @@ TEST_P(MeshManagerLoad, ObjInvalidMaterial)
   const common::Mesh *mesh = mgr->Load(meshFilename);
 
   EXPECT_TRUE(mesh != nullptr);
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -858,7 +968,6 @@ TEST_F(MeshManager, NonExistingMesh)
   const common::Mesh *mesh = mgr->Load(meshFilename);
 
   EXPECT_EQ(mesh, nullptr);
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -894,7 +1003,6 @@ TEST_F(MeshManager, LoadFbxBox)
   EXPECT_EQ(mat->Diffuse(), math::Color(0.8f, 0.8f, 0.8f, 1.0f));
   EXPECT_EQ(mat->Specular(), math::Color(0.8f, 0.8f, 0.8f, 1.0f));
   EXPECT_DOUBLE_EQ(mat->Transparency(), 0.0);
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -930,7 +1038,6 @@ TEST_F(MeshManager, LoadGlTF2Box)
   EXPECT_EQ(mat->Diffuse(), math::Color(0.8f, 0.8f, 0.8f, 1.0f));
   EXPECT_EQ(mat->Specular(), math::Color(0.0f, 0.0f, 0.0f, 1.0f));
   EXPECT_DOUBLE_EQ(mat->Transparency(), 0.0);
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -953,7 +1060,6 @@ TEST_F(MeshManager, LoadGlTF2BoxTransmission)
   ASSERT_TRUE(mat.get());
   // transmission currently modeled as transparency
   EXPECT_FLOAT_EQ(0.1f, mat->Transparency());
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -991,7 +1097,40 @@ TEST_F(MeshManager, LoadGlTF2BoxWithJPEGTexture)
       "box_texture_jpg.glb") + "#*0_Diffuse";
   EXPECT_EQ(expectedName, mat->TextureImage());
   EXPECT_NE(nullptr, mat->TextureData());
-  mgr->RemoveAll();
+}
+
+/////////////////////////////////////////////////
+// Open a gltf mesh with an external texture
+TEST_F(MeshManager, LoadGlTF2BoxExternalTexture)
+{
+  auto *mgr = common::MeshManager::Instance();
+  std::string meshFilename =
+    common::testing::TestFile("data", "gltf", "PurpleCube.gltf");
+  const common::Mesh *mesh = mgr->Load(meshFilename);
+
+  EXPECT_EQ(meshFilename, mesh->Name());
+
+  // Make sure we can read the submesh name
+  EXPECT_STREQ("PurpleCube", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+
+  EXPECT_EQ(mesh->MaterialCount(), 1u);
+
+  const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+  ASSERT_TRUE(mat.get());
+  // Data is now loaded in memory
+  EXPECT_NE(nullptr, mat->TextureData());
+  auto testTextureFile =
+    common::testing::TestFile("data/gltf", "PurpleCube_Diffuse.png");
+  EXPECT_EQ("PurpleCube_Diffuse.png", mat->TextureImage());
+
+  // Test that SpecularMap has data
+  auto materialId = mesh->SubMeshByIndex(0).lock()->GetMaterialIndex();
+  ASSERT_TRUE(materialId.has_value());
+  auto material = mesh->MaterialByIndex(materialId.value());
+  ASSERT_NE(material, nullptr);
+  auto pbr = material->PbrMaterial();
+  ASSERT_NE(pbr, nullptr);
+  EXPECT_NE(pbr->SpecularMap(), testTextureFile);
 }
 
 /////////////////////////////////////////////////
@@ -1069,7 +1208,6 @@ TEST_F(MeshManager, LoadGlbPbrAsset)
   EXPECT_STREQ("Action1", skel->Animation(0)->Name().c_str());
   EXPECT_STREQ("Action2", skel->Animation(1)->Name().c_str());
   EXPECT_STREQ("Action3", skel->Animation(2)->Name().c_str());
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -1113,7 +1251,6 @@ TEST_F(MeshManager, LoadGLTF2Triangle)
   EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoord(0u));
   EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoord(1u));
   EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoord(2u));
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -1141,6 +1278,11 @@ TEST_P(MeshManagerLoad, LoadMalformedPNegativeIndex)
     EXPECT_EQ(1u, mesh->VertexCount());
     EXPECT_EQ(1u, mesh->IndexCount());
   }
+<<<<<<< HEAD
+=======
+
+  EXPECT_STREQ("", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+>>>>>>> 6274633 (Change AssimpLoader behaviour when dealing with textures (#844))
 }
 
 /////////////////////////////////////////////////
