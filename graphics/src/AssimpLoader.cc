@@ -294,7 +294,7 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene,
     {
       const aiNode *parent = _node->mParent;
       nodeName = "";
-      while (parent && parent->mParent)
+      while (parent && parent != _scene->mRootNode)
       {
         std::string parentName = ToString(parent->mName);
         if (parentName.find("$ColladaAutoName$") != 0)
