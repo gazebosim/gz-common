@@ -589,8 +589,12 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
       }
     }
   }
-  ret = assimpMat->GetTexture(aiTextureType_NORMALS, 0, &texturePath);
-  if (ret == AI_SUCCESS)
+
+  // Assimp OBJ exporter treats height and normal maps the same way
+  if (assimpMat->GetTexture(
+          aiTextureType_NORMALS, 0, &texturePath) == AI_SUCCESS ||
+      assimpMat->GetTexture(
+          aiTextureType_HEIGHT, 0, &texturePath) == AI_SUCCESS)
   {
     std::string textureKey = this->FullTextureKey(texturePath.C_Str());
     auto [texName, texData] = this->LoadTexture(
@@ -606,6 +610,16 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
         _scene, texturePath, this->GenerateTextureName(textureKey, "Emissive"));
     pbr.SetEmissiveMap(texName, texData);
   }
+
+  ret = assimpMat->GetTexture(aiTextureType_SPECULAR, 0, &texturePath);
+  if (ret == AI_SUCCESS)
+  {
+    std::string textureKey = this->FullTextureKey(texturePath.C_Str());
+    auto [texName, texData] = this->LoadTexture(
+      _scene, texturePath, this->GenerateTextureName(textureKey, "Specular"));
+    pbr.SetSpecularMap(texName);
+  }
+
   float value;
   ret = assimpMat->Get(AI_MATKEY_METALLIC_FACTOR, value);
   if (ret == AI_SUCCESS)
@@ -634,19 +648,26 @@ std::pair<std::string, ImagePtr> AssimpLoader::Implementation::LoadTexture(
 {
   std::pair<std::string, ImagePtr> ret;
   std::string textureKey = this->FullTextureKey(_texturePath.C_Str());
+  // Check if the texture is embedded or not
+  auto embeddedTexture = _scene->GetEmbeddedTexture(_texturePath.C_Str());
 
   // Check if the texture is already in the cache
   auto it = this->imageCache.find(textureKey);
   if (it != this->imageCache.end())
   {
     gzdbg << "Texture [" << textureKey << "] found in cache" << std::endl;
-    ret.first = _textureName;
+    if (embeddedTexture)
+    {
+      ret.first = _textureName;
+    }
+    else
+    {
+      ret.first = ToString(_texturePath);
+    }
     ret.second = it->second;
     return ret;
   }
 
-  // Check if the texture is embedded or not
-  auto embeddedTexture = _scene->GetEmbeddedTexture(_texturePath.C_Str());
   if (embeddedTexture)
   {
     // Load embedded texture
@@ -675,7 +696,7 @@ std::pair<std::string, ImagePtr> AssimpLoader::Implementation::LoadTexture(
     {
       gzerr << "External texture [" << textureKey << "] not found" << std::endl;
     }
-    ret.first = _textureName;
+    ret.first = ToString(_texturePath);
   }
   return ret;
 }
@@ -916,6 +937,17 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
       continue;
     }
     auto mat = this->dataPtr->CreateMaterial(scene, _matIdx, path);
+    // Warn if file is an OBJ file with real PBR information
+    common::Pbr defaultPbr;
+    if (extension == "obj" && *mat->PbrMaterial() != defaultPbr)
+    {
+      gzwarn << "OBJ file with PBR materials detected in mesh ["
+             << _filename
+             << "]. Note that the fields in the .mtl file may not be read as "
+             << "expected (eg. if you exported this file with Blender). "
+             << "Use GLTF for a more modern format that supports PBR."
+             << std::endl;
+    }
     mesh->AddMaterial(mat);
   }
   // Create the skeleton
