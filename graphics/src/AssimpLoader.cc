@@ -583,6 +583,8 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
       }
     }
   }
+
+  // Assimp OBJ exporter treats height and normal maps the same way
   if (assimpMat->GetTexture(
           aiTextureType_NORMALS, 0, &texturePath) == AI_SUCCESS ||
       assimpMat->GetTexture(
