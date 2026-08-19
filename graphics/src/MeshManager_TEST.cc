@@ -875,38 +875,29 @@ TEST_P(MeshManagerLoad, LoadBoxNestedAnimation)
   EXPECT_EQ(36u, mesh->IndexCount());
   EXPECT_EQ(1u, mesh->SubMeshCount());
   EXPECT_EQ(1u, mesh->MaterialCount());
-  std::string nodeName;
-  if (forceAssimpEnv)
-  {
-    nodeName = "Armature_Bone";
-  }
-  else
-  {
-    nodeName = "Bone";
-  }
   common::SkeletonPtr skeleton = mesh->MeshSkeleton();
   ASSERT_EQ(1u, mesh->MeshSkeleton()->AnimationCount());
   common::SkeletonAnimation *anim = skeleton->Animation(0);
   EXPECT_EQ(anim->Name(), "Armature");
   EXPECT_EQ(1u, anim->NodeCount());
-  EXPECT_TRUE(anim->HasNode(nodeName));
-  auto nodeAnimation = anim->NodeAnimationByName(nodeName);
+  EXPECT_TRUE(anim->HasNode("Bone"));
+  auto nodeAnimation = anim->NodeAnimationByName("Bone");
   EXPECT_NE(nullptr, nodeAnimation);
-  EXPECT_EQ(nodeName, nodeAnimation->Name());
+  EXPECT_EQ("Bone", nodeAnimation->Name());
   auto poseStart = anim->PoseAt(0);
   math::Matrix4d expectedTrans = math::Matrix4d(
       1, 0, 0, 1,
       0, 1, 0, -1,
       0, 0, 1, 0,
       0, 0, 0, 1);
-  EXPECT_EQ(expectedTrans, poseStart.at(nodeName));
+  EXPECT_EQ(expectedTrans, poseStart.at("Bone"));
   auto poseEnd = anim->PoseAt(1.666666);
   expectedTrans = math::Matrix4d(
         1, 0, 0, 2,
         0, 1, 0, -1,
         0, 0, 1, 0,
         0, 0, 0, 1);
-  EXPECT_EQ(expectedTrans, poseEnd.at(nodeName));
+  EXPECT_EQ(expectedTrans, poseEnd.at("Bone"));
   mgr->RemoveAll();
 }
 
@@ -964,28 +955,18 @@ TEST_P(MeshManagerLoad, LoadBoxWithHierarchicalNodes)
   // nested node with no name so it takes the parent's name instead
   EXPECT_EQ("StaticCubeParent", mesh->SubMeshByIndex(1).lock()->Name());
 
-  if (forceAssimpEnv)
-  {
-    // parent node containing child node with no name
-    EXPECT_EQ("StaticCubeNestedNoName", mesh->SubMeshByIndex(2).lock()->Name());
-  
-    // nested node with name
-    EXPECT_EQ("StaticCubeParent2", mesh->SubMeshByIndex(3).lock()->Name());
-  
-    // Parent of nested node with name
-    EXPECT_EQ("StaticCubeNested", mesh->SubMeshByIndex(4).lock()->Name());
-  }
-  else
-  {
-    // parent node containing child node with no name
-    EXPECT_EQ("StaticCubeParent", mesh->SubMeshByIndex(2).lock()->Name());
-  
-    // nested node with name
-    EXPECT_EQ("StaticCubeNested", mesh->SubMeshByIndex(3).lock()->Name());
-  
-    // Parent of nested node with name
-    EXPECT_EQ("StaticCubeParent2", mesh->SubMeshByIndex(4).lock()->Name());
-  }
+  // parent node containing child node with no name
+  EXPECT_EQ("StaticCubeParent", mesh->SubMeshByIndex(2).lock()->Name());
+
+  // nested node with name
+  EXPECT_EQ("StaticCubeNested", mesh->SubMeshByIndex(3).lock()->Name());
+
+  // Parent of nested node with name
+  EXPECT_EQ("StaticCubeParent2", mesh->SubMeshByIndex(4).lock()->Name());
+
+  // Nested node that does not have ancestors with a name
+  EXPECT_EQ("unnamed_submesh_0", mesh->SubMeshByIndex(5).lock()->Name());
+
   mgr->RemoveAll();
 }
 
@@ -1237,6 +1218,110 @@ TEST_P(MeshManagerLoad, ObjInvalidMaterial)
   const common::Mesh *mesh = mgr->Load(meshFilename);
 
   EXPECT_TRUE(mesh != nullptr);
+}
+
+/////////////////////////////////////////////////
+// Open a non existing file
+TEST_F(MeshManager, NonExistingMesh)
+{
+  auto *mgr = common::MeshManager::Instance();
+  std::string meshFilename =
+    common::testing::TestFile("data", "non_existing_mesh.glb");
+  const common::Mesh *mesh = mgr->Load(meshFilename);
+
+  EXPECT_EQ(mesh, nullptr);
+}
+
+/////////////////////////////////////////////////
+// This test opens a FBX file
+TEST_F(MeshManager, LoadFbxBox)
+{
+  auto *mgr = common::MeshManager::Instance();
+  std::string meshFilename =
+    common::testing::TestFile("data", "box.fbx");
+  const common::Mesh *mesh = mgr->Load(meshFilename);
+
+  EXPECT_EQ(meshFilename, mesh->Name());
+  EXPECT_EQ(math::Vector3d(100, 100, 100), mesh->Max());
+  EXPECT_EQ(math::Vector3d(-100, -100, -100), mesh->Min());
+
+  EXPECT_EQ(24u, mesh->VertexCount());
+  EXPECT_EQ(24u, mesh->NormalCount());
+  EXPECT_EQ(36u, mesh->IndexCount());
+  EXPECT_EQ(24u, mesh->TexCoordCount());
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(1u, mesh->MaterialCount());
+
+  // Make sure we can read the submesh name
+  EXPECT_STREQ("Cube", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+
+  EXPECT_EQ(mesh->MaterialCount(), 1u);
+
+  const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+  ASSERT_TRUE(mat.get());
+
+  // Make sure we read the material color values
+  EXPECT_EQ(mat->Ambient(), math::Color(0.0f, 0.0f, 0.0f, 1.0f));
+  EXPECT_EQ(mat->Diffuse(), math::Color(0.8f, 0.8f, 0.8f, 1.0f));
+  EXPECT_EQ(mat->Specular(), math::Color(0.8f, 0.8f, 0.8f, 1.0f));
+  EXPECT_DOUBLE_EQ(mat->Transparency(), 0.0);
+}
+
+/////////////////////////////////////////////////
+// This test opens a GLB file
+TEST_F(MeshManager, LoadGlTF2Box)
+{
+  auto *mgr = common::MeshManager::Instance();
+  std::string meshFilename =
+    common::testing::TestFile("data", "box.glb");
+  const common::Mesh *mesh = mgr->Load(meshFilename);
+
+  EXPECT_EQ(meshFilename, mesh->Name());
+  EXPECT_EQ(math::Vector3d(1, 1, 1), mesh->Max());
+  EXPECT_EQ(math::Vector3d(-1, -1, -1), mesh->Min());
+
+  EXPECT_EQ(24u, mesh->VertexCount());
+  EXPECT_EQ(24u, mesh->NormalCount());
+  EXPECT_EQ(36u, mesh->IndexCount());
+  EXPECT_EQ(24u, mesh->TexCoordCount());
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(1u, mesh->MaterialCount());
+
+  // Make sure we can read the submesh name
+  EXPECT_STREQ("Cube", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+
+  EXPECT_EQ(mesh->MaterialCount(), 1u);
+
+  const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+  ASSERT_TRUE(mat.get());
+
+  // Make sure we read the material color values
+  EXPECT_EQ(mat->Ambient(), math::Color(0.4f, 0.4f, 0.4f, 1.0f));
+  EXPECT_EQ(mat->Diffuse(), math::Color(0.8f, 0.8f, 0.8f, 1.0f));
+  EXPECT_EQ(mat->Specular(), math::Color(0.0f, 0.0f, 0.0f, 1.0f));
+  EXPECT_DOUBLE_EQ(mat->Transparency(), 0.0);
+}
+
+/////////////////////////////////////////////////
+// Open a gltf mesh with transmission extension
+TEST_F(MeshManager, LoadGlTF2BoxTransmission)
+{
+  auto *mgr = common::MeshManager::Instance();
+  std::string meshFilename =
+    common::testing::TestFile("data", "box_transmission.glb");
+  const common::Mesh *mesh = mgr->Load(meshFilename);
+
+  EXPECT_EQ(meshFilename, mesh->Name());
+
+  // Make sure we can read the submesh name
+  EXPECT_STREQ("Cube", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+
+  EXPECT_EQ(mesh->MaterialCount(), 1u);
+
+  const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+  ASSERT_TRUE(mat.get());
+  // transmission currently modeled as transparency
+  EXPECT_FLOAT_EQ(0.1f, mat->Transparency());
 }
 
 /////////////////////////////////////////////////
