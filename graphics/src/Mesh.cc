@@ -420,3 +420,22 @@ double Mesh::Volume() const
 
   return volume;
 }
+
+//////////////////////////////////////////////////
+gz::math::Vector3d Mesh::Centroid() const
+{
+  gz::math::Vector3d moment;
+  double volume = 0.0;
+
+  for (const std::shared_ptr<SubMesh> &submesh : this->dataPtr->submeshes)
+  {
+    double v = submesh->Volume();
+    moment += submesh->Centroid() * v;
+    volume += v;
+  }
+
+  if (volume < 1e-16)
+    return gz::math::Vector3d::Zero;
+
+  return moment / volume;
+}
