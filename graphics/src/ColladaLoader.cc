@@ -799,6 +799,7 @@ void ColladaLoader::Implementation::LoadNode(
         nodeName = name;
         break;
       }
+      parent = dynamic_cast<tinyxml2::XMLElement *>(parent->Parent());
     }
     if (nodeName.empty())
     {
