@@ -754,6 +754,51 @@ TEST_P(MeshManagerLoad, LoadBoxWithAnimationOutsideSkeleton)
 }
 
 /////////////////////////////////////////////////
+TEST_P(MeshManagerLoad, LoadBoxNestedAnimation)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "box_nested_animation.dae"));
+
+  if (forceAssimpEnv)
+  {
+    EXPECT_EQ(24u, mesh->VertexCount());
+    EXPECT_EQ(24u, mesh->TexCoordCount());
+  }
+  else
+  {
+    EXPECT_EQ(35u, mesh->VertexCount());
+    EXPECT_EQ(35u, mesh->TexCoordCount());
+  }
+  EXPECT_EQ(36u, mesh->IndexCount());
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(1u, mesh->MaterialCount());
+  common::SkeletonPtr skeleton = mesh->MeshSkeleton();
+  ASSERT_EQ(1u, mesh->MeshSkeleton()->AnimationCount());
+  common::SkeletonAnimation *anim = skeleton->Animation(0);
+  EXPECT_EQ(anim->Name(), "Armature");
+  EXPECT_EQ(1u, anim->NodeCount());
+  EXPECT_TRUE(anim->HasNode("Bone"));
+  auto nodeAnimation = anim->NodeAnimationByName("Bone");
+  EXPECT_NE(nullptr, nodeAnimation);
+  EXPECT_EQ("Bone", nodeAnimation->Name());
+  auto poseStart = anim->PoseAt(0);
+  math::Matrix4d expectedTrans = math::Matrix4d(
+      1, 0, 0, 1,
+      0, 1, 0, -1,
+      0, 0, 1, 0,
+      0, 0, 0, 1);
+  EXPECT_EQ(expectedTrans, poseStart.at("Bone"));
+  auto poseEnd = anim->PoseAt(1.666666);
+  expectedTrans = math::Matrix4d(
+        1, 0, 0, 2,
+        0, 1, 0, -1,
+        0, 0, 1, 0,
+        0, 0, 0, 1);
+  EXPECT_EQ(expectedTrans, poseEnd.at("Bone"));
+}
+
+/////////////////////////////////////////////////
 TEST_P(MeshManagerLoad, LoadBoxWithMultipleGeoms)
 {
   auto *mgr = common::MeshManager::Instance();
@@ -768,6 +813,33 @@ TEST_P(MeshManagerLoad, LoadBoxWithMultipleGeoms)
   ASSERT_EQ(2u, mesh->SubMeshCount());
   EXPECT_EQ(24u, mesh->SubMeshByIndex(0).lock()->NodeAssignmentsCount());
   EXPECT_EQ(0u, mesh->SubMeshByIndex(1).lock()->NodeAssignmentsCount());
+}
+
+/////////////////////////////////////////////////
+TEST_P(MeshManagerLoad, LoadBoxWithHierarchicalNodes)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "box_with_hierarchical_nodes.dae"));
+  ASSERT_EQ(7u, mesh->SubMeshCount());
+
+  // node by itself
+  EXPECT_EQ("StaticCube", mesh->SubMeshByIndex(0).lock()->Name());
+
+  // nested node with no name so it takes the parent's name instead
+  EXPECT_EQ("StaticCubeParent", mesh->SubMeshByIndex(1).lock()->Name());
+
+  // parent node containing child node with no name
+  EXPECT_EQ("StaticCubeParent", mesh->SubMeshByIndex(2).lock()->Name());
+
+  // nested node with name
+  EXPECT_EQ("StaticCubeNested", mesh->SubMeshByIndex(3).lock()->Name());
+
+  // Parent of nested node with name
+  EXPECT_EQ("StaticCubeParent2", mesh->SubMeshByIndex(4).lock()->Name());
+
+  // Nested node that does not have ancestors with a name
+  EXPECT_EQ("unnamed_submesh_0", mesh->SubMeshByIndex(5).lock()->Name());
 }
 
 /////////////////////////////////////////////////
