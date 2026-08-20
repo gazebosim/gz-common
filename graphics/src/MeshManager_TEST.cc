@@ -908,6 +908,17 @@ TEST_P(MeshManagerLoad, MergeBoxWithDoubleSkeleton)
   std::string skeletonRootName = "Armature";
   EXPECT_TRUE(mesh->HasSkeleton());
   auto skeleton_ptr = mesh->MeshSkeleton();
+  std::cout << "--- SKELETON HIERARCHY ---" << std::endl;
+  std::function<void(common::SkeletonNode*, int)> printNode = [&](common::SkeletonNode* node, int depth) {
+    if (!node) return;
+    std::cout << std::string(depth * 2, ' ') << "Name: " << node->Name() << ", Id: " << node->Id() << std::endl;
+    std::cout << std::string(depth * 2, ' ') << "Transform:" << node->Transform() << std::endl;
+    for (unsigned int i = 0; i < node->ChildCount(); ++i) {
+      printNode(node->Child(i), depth + 1);
+    }
+  };
+  printNode(skeleton_ptr->RootNode(), 0);
+  std::cout << "--------------------------" << std::endl;
   // The two skeletons have been joined and their root is the
   // animation root, called Armature
   EXPECT_EQ(skeleton_ptr->RootNode()->Name(), std::string(skeletonRootName));
@@ -924,6 +935,17 @@ TEST_P(MeshManagerLoad, MergeBoxWithMultipleRoots)
   auto skeleton_ptr = mesh->MeshSkeleton();
   // Both ColladaLoader and AssimpLoader now handle disjoint 
   // armatures by creating a "dummy-root".
+  std::cout << "--- SKELETON HIERARCHY ---" << std::endl;
+  std::function<void(common::SkeletonNode*, int)> printNode = [&](common::SkeletonNode* node, int depth) {
+    if (!node) return;
+    std::cout << std::string(depth * 2, ' ') << "Name: " << node->Name() << ", Id: " << node->Id() << std::endl;
+    std::cout << std::string(depth * 2, ' ') << "Transform:" << node->Transform() << std::endl;
+    for (unsigned int i = 0; i < node->ChildCount(); ++i) {
+      printNode(node->Child(i), depth + 1);
+    }
+  };
+  printNode(skeleton_ptr->RootNode(), 0);
+  std::cout << "--------------------------" << std::endl;
   EXPECT_EQ(skeleton_ptr->RootNode()->Name(), "dummy-root");
   ASSERT_EQ(skeleton_ptr->RootNode()->ChildCount(), 2u);
 
