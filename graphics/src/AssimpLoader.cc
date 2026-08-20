@@ -956,8 +956,6 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     return mesh;
   }
   auto& rootNode = scene->mRootNode;
-  auto rootName = ToString(rootNode->mName);
-  auto rootID = GetColladaNodeID(rootNode);
   std::string extension;
   std::size_t extIdx = _filename.rfind(".");
   if (extIdx != std::string::npos)
@@ -998,15 +996,50 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   {
     std::unordered_set<std::string> boneNames;
     this->dataPtr->RecursiveStoreBoneNames(scene, rootNode, boneNames);
+    std::function<const aiNode*(const aiNode*)> findLCA =
+      [&](const aiNode* _node) -> const aiNode*
+    {
+      if (!_node) return nullptr;
+      if (boneNames.find(ToString(_node->mName)) != boneNames.end())
+        return _node;
+
+      const aiNode* lca = nullptr;
+      for (unsigned i = 0; i < _node->mNumChildren; ++i)
+      {
+        const aiNode* childLca = findLCA(_node->mChildren[i]);
+        if (childLca)
+        {
+          // If childLCA is the first one found, set it as the root LCA first
+          if (!lca)
+          {
+            lca = childLca;
+          }
+          // If bones are found in more than one child subtree,
+          // this parent node is their LCA
+          else
+          {
+            lca = _node;
+            break;
+          }
+        }
+      }
+      return lca;
+    };
+
+    const aiNode* lcaNode = findLCA(rootNode);
+    const aiNode* skelRoot = lcaNode ? lcaNode : rootNode;
+
+    std::string rootName = ToString(skelRoot->mName);
+    std::string rootID = GetColladaNodeID(skelRoot);
     auto rootSkelNode = new SkeletonNode(
         nullptr, rootName, rootID, SkeletonNode::NODE);
     rootSkelNode->SetTransform(rootTransform);
     rootSkelNode->SetModelTransform(rootTransform);
-    for (unsigned childIdx = 0; childIdx < rootNode->mNumChildren; ++childIdx)
+    for (unsigned childIdx = 0; childIdx < skelRoot->mNumChildren; ++childIdx)
     {
       // First populate the skeleton with the node transforms
       this->dataPtr->RecursiveSkeletonCreate(
-          rootNode->mChildren[childIdx], rootSkelNode,
+          skelRoot->mChildren[childIdx], rootSkelNode,
           rootTransform, boneNames);
     }
     rootSkelNode->SetParent(nullptr);
