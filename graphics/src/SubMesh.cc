@@ -769,7 +769,11 @@ double SubMesh::Volume() const
         gz::math::Vector3d v3 =
           this->dataPtr->vertices[this->dataPtr->indices[idx+2]];
 
-        volume += std::abs(v1.Cross(v2).Dot(v3) / 6.0);
+        // Signed tetrahedron volume: contributions outside the solid
+        // cancel, so the sum is correct for any closed mesh regardless of
+        // where its origin lies. The absolute value is taken once on the
+        // total, making the result independent of winding orientation.
+        volume += v1.Cross(v2).Dot(v3) / 6.0;
       }
     }
     else
@@ -783,7 +787,46 @@ double SubMesh::Volume() const
       << " mesh.\n";
   }
 
-  return volume;
+  return std::abs(volume);
+}
+
+//////////////////////////////////////////////////
+gz::math::Vector3d SubMesh::Centroid() const
+{
+  gz::math::Vector3d moment;
+  double volume = 0.0;
+
+  if (!this->HasValidIndices())
+    return moment;
+
+  if (this->dataPtr->primitiveType != SubMesh::TRIANGLES ||
+      this->dataPtr->indices.size() % 3 != 0)
+  {
+    gzerr << "Centroid calculation can only be accomplished on a "
+      << "triangulated mesh.\n";
+    return moment;
+  }
+
+  for (unsigned int idx = 0; idx < this->dataPtr->indices.size(); idx += 3)
+  {
+    gz::math::Vector3d v1 =
+      this->dataPtr->vertices[this->dataPtr->indices[idx]];
+    gz::math::Vector3d v2 =
+      this->dataPtr->vertices[this->dataPtr->indices[idx+1]];
+    gz::math::Vector3d v3 =
+      this->dataPtr->vertices[this->dataPtr->indices[idx+2]];
+
+    // Signed tetrahedron volume and first moment; the winding orientation
+    // cancels in the moment to volume ratio.
+    double v = v1.Cross(v2).Dot(v3) / 6.0;
+    volume += v;
+    moment += v * (v1 + v2 + v3) / 4.0;
+  }
+
+  if (std::abs(volume) < 1e-16)
+    return gz::math::Vector3d::Zero;
+
+  return moment / volume;
 }
 
 //////////////////////////////////////////////////
