@@ -403,6 +403,7 @@ namespace gz
       ///
       /// \return The submesh's volume. The volume can be zero if
       /// the primitive type is not TRIANGLES, or there are no triangles.
+      /// \sa IsClosed to screen for open surfaces first.
       public: double Volume() const;
 
       /// \brief Get the volumetric centroid of the submesh, the centre of
@@ -414,7 +415,32 @@ namespace gz
       /// Polyhedral Mass Properties", Journal of Graphics Tools, 1996.
       /// \return The centroid position. The zero vector if the primitive
       /// type is not TRIANGLES or there are no triangles.
+      /// \sa IsClosed to screen for open surfaces first.
       public: gz::math::Vector3d Centroid() const;
+
+      /// \brief Check whether the triangle surface is closed, by testing
+      /// that its area vectors sum to zero. Every closed oriented surface
+      /// satisfies this: apply the divergence theorem to a constant field
+      /// (see e.g. D. Griffiths, Introduction to Electrodynamics, on the
+      /// vector area of a closed surface). On a consistently oriented
+      /// closed triangle mesh the cancellation is exact, edge by edge
+      /// (K. Crane, Discrete Differential Geometry: An Applied
+      /// Introduction), so the tolerance only absorbs roundoff.
+      ///
+      /// This is a necessary condition, not a sufficient one: openings
+      /// whose area vectors cancel are not detected, the canonical case
+      /// being a tube open at both ends. It is a cheap screen for the
+      /// common defects (planes, open shells, missing faces) before
+      /// trusting Volume() or Centroid(), not a full manifold check;
+      /// for that, boundary edge detection over welded vertices is the
+      /// standard method (M. Botsch et al., Polygon Mesh Processing,
+      /// 2010).
+      /// \param[in] _tol Tolerance on the area vector magnitude, as a
+      /// fraction of the total surface area.
+      /// \return True when the primitive type is TRIANGLES, the submesh
+      /// has triangles, every index is valid, and the area vector sum is
+      /// within tolerance.
+      public: bool IsClosed(double _tol = 1e-6) const;
 
       /// \brief Verify that all indices point to a valid vertex in the submesh
       /// \return True if all values of indices are valid, false otherwise.

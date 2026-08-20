@@ -439,3 +439,17 @@ gz::math::Vector3d Mesh::Centroid() const
 
   return moment / volume;
 }
+
+//////////////////////////////////////////////////
+bool Mesh::IsClosed(double _tol) const
+{
+  if (this->dataPtr->submeshes.empty())
+    return false;
+
+  for (const std::shared_ptr<SubMesh> &submesh : this->dataPtr->submeshes)
+  {
+    if (!submesh->IsClosed(_tol))
+      return false;
+  }
+  return true;
+}

@@ -183,3 +183,35 @@ TEST_F(MeshTest, Centroid)
   EXPECT_DOUBLE_EQ(1.0, mesh.Volume());
   EXPECT_EQ(shift, mesh.Centroid());
 }
+
+/////////////////////////////////////////////////
+TEST_F(MeshTest, IsClosed)
+{
+  common::MeshManager::Instance()->CreateBox("is_closed_box",
+      gz::math::Vector3d(1, 1, 1), gz::math::Vector2d::One);
+  const common::Mesh *box =
+    common::MeshManager::Instance()->MeshByName("is_closed_box");
+  ASSERT_NE(nullptr, box);
+  EXPECT_TRUE(box->IsClosed());
+
+  // A mesh with no submeshes is not closed.
+  common::Mesh empty;
+  EXPECT_FALSE(empty.IsClosed());
+
+  // One open submesh makes the whole mesh open.
+  common::Mesh mixed;
+  auto closedCopy = std::make_shared<common::SubMesh>(
+      *box->SubMeshByIndex(0).lock());
+  mixed.AddSubMesh(*closedCopy);
+  common::SubMesh triangle;
+  triangle.SetPrimitiveType(common::SubMesh::TRIANGLES);
+  triangle.AddVertex(gz::math::Vector3d(0, 0, 0));
+  triangle.AddVertex(gz::math::Vector3d(1, 0, 0));
+  triangle.AddVertex(gz::math::Vector3d(0, 1, 0));
+  triangle.AddIndex(0);
+  triangle.AddIndex(1);
+  triangle.AddIndex(2);
+  mixed.AddSubMesh(triangle);
+  EXPECT_FALSE(mixed.IsClosed());
+}
+

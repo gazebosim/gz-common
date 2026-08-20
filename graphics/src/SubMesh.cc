@@ -823,6 +823,38 @@ gz::math::Vector3d SubMesh::Centroid() const
 }
 
 //////////////////////////////////////////////////
+bool SubMesh::IsClosed(double _tol) const
+{
+  if (this->dataPtr->primitiveType != SubMesh::TRIANGLES ||
+      this->dataPtr->indices.size() < 3 ||
+      this->dataPtr->indices.size() % 3 != 0 ||
+      !this->HasValidIndices())
+  {
+    return false;
+  }
+
+  gz::math::Vector3d areaVector;
+  double totalArea = 0.0;
+  for (unsigned int idx = 0; idx < this->dataPtr->indices.size(); idx += 3)
+  {
+    const gz::math::Vector3d &v1 =
+      this->dataPtr->vertices[this->dataPtr->indices[idx]];
+    const gz::math::Vector3d &v2 =
+      this->dataPtr->vertices[this->dataPtr->indices[idx+1]];
+    const gz::math::Vector3d &v3 =
+      this->dataPtr->vertices[this->dataPtr->indices[idx+2]];
+    const gz::math::Vector3d cross = (v2 - v1).Cross(v3 - v1);
+    areaVector += cross;
+    totalArea += cross.Length();
+  }
+
+  if (totalArea <= 0.0)
+    return false;
+
+  return areaVector.Length() <= _tol * totalArea;
+}
+
+//////////////////////////////////////////////////
 bool SubMesh::HasValidIndices() const
 {
   if (this->dataPtr->indices.empty())

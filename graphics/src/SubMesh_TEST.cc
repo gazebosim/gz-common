@@ -17,6 +17,8 @@
 
 #include <gtest/gtest.h>
 
+#include <cmath>
+
 #include "gz/math/Vector3.hh"
 #include "gz/common/Mesh.hh"
 #include "gz/common/SubMesh.hh"
@@ -657,3 +659,95 @@ TEST_F(SubMeshTest, VolumeAndCentroidOffsetMesh)
   EXPECT_DOUBLE_EQ(24.0, offset.Volume());
   EXPECT_EQ(shift, offset.Centroid());
 }
+
+/////////////////////////////////////////////////
+TEST_F(SubMeshTest, IsClosed)
+{
+  common::MeshManager::Instance()->CreateBox("closed_box",
+      gz::math::Vector3d(2, 3, 4), gz::math::Vector2d::One);
+  const common::Mesh *box =
+    common::MeshManager::Instance()->MeshByName("closed_box");
+  ASSERT_NE(nullptr, box);
+  auto submesh = box->SubMeshByIndex(0).lock();
+  ASSERT_NE(nullptr, submesh);
+
+  // A box is closed, and stays closed when moved off the origin.
+  EXPECT_TRUE(submesh->IsClosed());
+  common::SubMesh offset(*submesh);
+  offset.Translate(gz::math::Vector3d(10, -20, 30));
+  EXPECT_TRUE(offset.IsClosed());
+
+  // Removing one triangle opens the surface.
+  common::SubMesh open;
+  open.SetPrimitiveType(common::SubMesh::TRIANGLES);
+  for (unsigned int v = 0; v < submesh->VertexCount(); ++v)
+    open.AddVertex(submesh->Vertex(v));
+  for (unsigned int i = 0; i + 3 < submesh->IndexCount(); ++i)
+    open.AddIndex(submesh->Index(i));
+  EXPECT_FALSE(open.IsClosed());
+
+  // A single triangle is an open surface; an empty submesh is not closed.
+  common::SubMesh triangle;
+  triangle.SetPrimitiveType(common::SubMesh::TRIANGLES);
+  triangle.AddVertex(gz::math::Vector3d(0, 0, 0));
+  triangle.AddVertex(gz::math::Vector3d(1, 0, 0));
+  triangle.AddVertex(gz::math::Vector3d(0, 1, 0));
+  triangle.AddIndex(0);
+  triangle.AddIndex(1);
+  triangle.AddIndex(2);
+  EXPECT_FALSE(triangle.IsClosed());
+  common::SubMesh empty;
+  empty.SetPrimitiveType(common::SubMesh::TRIANGLES);
+  EXPECT_FALSE(empty.IsClosed());
+
+  // An index past the vertex range must fail, not crash.
+  common::SubMesh invalid;
+  invalid.SetPrimitiveType(common::SubMesh::TRIANGLES);
+  invalid.AddVertex(gz::math::Vector3d(0, 0, 0));
+  invalid.AddVertex(gz::math::Vector3d(1, 0, 0));
+  invalid.AddVertex(gz::math::Vector3d(0, 1, 0));
+  invalid.AddIndex(0);
+  invalid.AddIndex(1);
+  invalid.AddIndex(99);
+  EXPECT_FALSE(invalid.IsClosed());
+
+  // Not triangles: never closed, whatever the geometry.
+  common::SubMesh lines;
+  lines.SetPrimitiveType(common::SubMesh::LINES);
+  lines.AddVertex(gz::math::Vector3d(0, 0, 0));
+  lines.AddVertex(gz::math::Vector3d(1, 0, 0));
+  lines.AddIndex(0);
+  lines.AddIndex(1);
+  EXPECT_FALSE(lines.IsClosed());
+}
+
+/////////////////////////////////////////////////
+TEST_F(SubMeshTest, IsClosedTubeLimitation)
+{
+  // A tube open at both ends is the documented false pass: its two
+  // openings have equal and opposite vector areas, so the area vector
+  // sum cancels even though the surface is open. This test pins the
+  // documented limitation; if IsClosed is ever upgraded to a full
+  // boundary check, flip the expectation.
+  common::SubMesh tube;
+  tube.SetPrimitiveType(common::SubMesh::TRIANGLES);
+  const unsigned int n = 16;
+  for (unsigned int i = 0; i < n; ++i)
+  {
+    const double a = 2.0 * GZ_PI * i / n;
+    tube.AddVertex(gz::math::Vector3d(std::cos(a), std::sin(a), 0.0));
+    tube.AddVertex(gz::math::Vector3d(std::cos(a), std::sin(a), 1.0));
+  }
+  for (unsigned int i = 0; i < n; ++i)
+  {
+    const unsigned int j = (i + 1) % n;
+    tube.AddIndex(2 * i);
+    tube.AddIndex(2 * j);
+    tube.AddIndex(2 * i + 1);
+    tube.AddIndex(2 * j);
+    tube.AddIndex(2 * j + 1);
+    tube.AddIndex(2 * i + 1);
+  }
+  EXPECT_TRUE(tube.IsClosed());
+}
+

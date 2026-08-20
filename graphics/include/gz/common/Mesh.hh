@@ -201,6 +201,7 @@ namespace gz
       /// \return The mesh's volume. The volume can be zero if
       /// the primitive type of the submeshes is not TRIANGLES,
       /// or there are no submeshes.
+      /// \sa IsClosed to screen for open surfaces first.
       public: double Volume() const;
 
       /// \brief Get the volumetric centroid of the mesh: the volume
@@ -210,7 +211,17 @@ namespace gz
       /// that. See SubMesh::Centroid() for the method reference.
       /// \return The centroid position. The zero vector if the mesh has
       /// no triangulated submeshes.
+      /// \sa IsClosed to screen for open surfaces first.
       public: gz::math::Vector3d Centroid() const;
+
+      /// \brief Check whether every submesh is a closed triangle surface.
+      /// See SubMesh::IsClosed for the method and its limits: this is a
+      /// necessary condition for watertightness, not a proof of it.
+      /// \param[in] _tol Per submesh tolerance on the area vector
+      /// magnitude, as a fraction of that submesh's surface area.
+      /// \return True when the mesh has submeshes and every one of them
+      /// is closed.
+      public: bool IsClosed(double _tol = 1e-6) const;
 
       /// \brief Private data pointer.
       GZ_UTILS_UNIQUE_IMPL_PTR(dataPtr)
