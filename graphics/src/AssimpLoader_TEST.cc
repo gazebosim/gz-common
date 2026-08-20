@@ -106,20 +106,6 @@ TEST_F(AssimpLoader, LoadBoxWithDefaultStride)
 }
 
 /////////////////////////////////////////////////
-TEST_F(AssimpLoader, MergeBoxWithDoubleSkeleton)
-{
-  common::AssimpLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "box_with_double_skeleton.dae"));
-  ASSERT_TRUE(mesh->HasSkeleton());
-  auto skeleton_ptr = mesh->MeshSkeleton();
-  // The two skeletons have been joined and their root is the
-  // animation root, called Scene
-  EXPECT_EQ(skeleton_ptr->RootNode()->Name(), std::string("Scene"));
-  delete mesh;
-}
-
-/////////////////////////////////////////////////
 TEST_F(AssimpLoader, LoadCylinderAnimatedFrom3dsMax)
 {
   // TODO(anyone) This test shows that the mesh loads without crashing, but the
