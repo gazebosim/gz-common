@@ -204,6 +204,15 @@ namespace ignition
       /// or there are no submeshes.
       public: double Volume() const;
 
+      /// \brief Get the volumetric centroid of the mesh: the volume
+      /// weighted average of the submesh centroids, the centre of the
+      /// enclosed solid rather than the average of the vertices. Only
+      /// meaningful for closed submeshes; the formula does not check for
+      /// that. See SubMesh::Centroid() for the method reference.
+      /// \return The centroid position. The zero vector if the mesh has
+      /// no triangulated submeshes.
+      public: ignition::math::Vector3d Centroid() const;
+
       /// \brief Private data pointer.
       IGN_UTILS_UNIQUE_IMPL_PTR(dataPtr)
     };
