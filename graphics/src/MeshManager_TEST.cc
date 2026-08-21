@@ -885,6 +885,7 @@ TEST_P(MeshManagerLoad, CheckNonRootDisplacement)
   std::string rootNodeName = meshSkel->RootNode()->Name();
   common::SkeletonAnimation *skelAnim = meshSkel->Animation(0);
   common::NodeAnimation *rootNode = skelAnim->NodeAnimationByName(rootNodeName);
+  EXPECT_NE(rootNode, nullptr);
   auto xDisplacement = skelAnim->XDisplacement();
   ASSERT_TRUE(xDisplacement);
 }
