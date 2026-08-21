@@ -190,7 +190,7 @@ namespace gz
     /// \brief fnv1a algorithm for 64-bit platforms.
     /// \param[in] _key The input string.
     /// \return A 64-bit unsigned hash value.
-    /// \ref https://notes.underscorediscovery.com/constexpr-fnv1a/
+    /// \sa https://notes.underscorediscovery.com/constexpr-fnv1a/
     constexpr uint64_t GZ_COMMON_VISIBLE hash64(std::string_view _key)
     {
       const char *data = _key.data();
