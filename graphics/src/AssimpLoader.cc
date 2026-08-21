@@ -364,7 +364,7 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene,
         if (skelNode == nullptr)
           continue;
         skelNode->SetInverseBindTransform(
-            this->ConvertTransform(bone->mOffsetMatrix));
+            this->ConvertTransform(bone->mOffsetMatrix) * _transform.Inverse());
         for (unsigned weightIdx = 0; weightIdx < bone->mNumWeights; ++weightIdx)
         {
           auto vertexWeight = bone->mWeights[weightIdx];
