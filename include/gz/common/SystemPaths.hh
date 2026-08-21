@@ -171,7 +171,7 @@ namespace gz
       public: void ClearFindFileURICallbacks();
 
       /// \brief look for a file in a set of search paths (not recursive)
-      /// \description This method checks if a file exists in given directories.
+      /// \details This method checks if a file exists in given directories.
       ///              It does so by joining each path with the filename and
       ///              checking if the file exists. If the file exists in
       ///              multiple paths the first one is found.
