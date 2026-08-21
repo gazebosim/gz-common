@@ -594,7 +594,8 @@ TEST_P(MeshManagerLoad, LoadZeroCount)
     EXPECT_EQ(log.find("Vertex source missing float_array"), std::string::npos);
     EXPECT_EQ(log.find("Normal source missing float_array"), std::string::npos);
     // Expect the logs to contain information
-    EXPECT_NE(log.find("Triangle input has a count of zero"), std::string::npos);
+    EXPECT_NE(log.find("Triangle input has a count of zero"), 
+        std::string::npos);
     EXPECT_NE(log.find("Vertex source has a float_array with a count of zero"),
         std::string::npos);
     EXPECT_NE(log.find("Normal source has a float_array with a count of zero"),
@@ -900,7 +901,7 @@ TEST_P(MeshManagerLoad, LoadBoxWithDefaultStride)
   auto *mgr = common::MeshManager::Instance();
   const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "box_with_default_stride.dae"));
-  
+
   if (forceAssimpEnv)
   {
     EXPECT_EQ(24u, mesh->VertexCount());
