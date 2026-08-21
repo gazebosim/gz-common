@@ -1642,4 +1642,54 @@ TEST_P(MeshManagerLoad, LoadEmptyInitFrom)
   }
 }
 
+/////////////////////////////////////////////////
+// A negative index in <p> must be rejected: strtoul would silently wrap
+// it to a huge unsigned value that reads out of bounds. Recovery policies
+// differ: the COLLADA loader keeps the indices parsed before the invalid
+// one, assimp rejects the geometry.
+TEST_P(MeshManagerLoad, LoadMalformedPNegativeIndex)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_p_negative_index.dae"));
+  ASSERT_NE(nullptr, mesh);
+  if (this->forceAssimpEnv)
+  {
+    EXPECT_EQ(0u, mesh->SubMeshCount());
+    EXPECT_EQ(0u, mesh->VertexCount());
+    EXPECT_EQ(0u, mesh->IndexCount());
+  }
+  else
+  {
+    EXPECT_EQ(1u, mesh->SubMeshCount());
+    EXPECT_EQ(1u, mesh->VertexCount());
+    EXPECT_EQ(1u, mesh->IndexCount());
+  }
+}
+
+/////////////////////////////////////////////////
+// A polylist whose <p> holds fewer indices than <vcount> declares must be
+// truncated, not read out of bounds. Recovery policies differ: the
+// COLLADA loader keeps the complete first triangle, assimp rejects the
+// geometry.
+TEST_P(MeshManagerLoad, LoadMalformedPolylistShortP)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_polylist_short_p.dae"));
+  ASSERT_NE(nullptr, mesh);
+  if (this->forceAssimpEnv)
+  {
+    EXPECT_EQ(0u, mesh->SubMeshCount());
+    EXPECT_EQ(0u, mesh->VertexCount());
+    EXPECT_EQ(0u, mesh->IndexCount());
+  }
+  else
+  {
+    EXPECT_EQ(1u, mesh->SubMeshCount());
+    EXPECT_EQ(3u, mesh->VertexCount());
+    EXPECT_EQ(3u, mesh->IndexCount());
+  }
+}
+
 #endif
