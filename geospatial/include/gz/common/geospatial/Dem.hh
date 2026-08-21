@@ -35,7 +35,7 @@ namespace gz
 {
   namespace common
   {
-    /// \class DEM DEM.hh common/common.hh
+    /// \class Dem Dem.hh gz/common/geospatial/Dem.hh
     /// \brief Encapsulates a DEM (Digital Elevation Model) file.
     class GZ_COMMON_GEOSPATIAL_VISIBLE Dem : public HeightmapData
     {
@@ -133,7 +133,7 @@ namespace gz
       public: double WorldHeight() const;
 
       /// \brief Create a lookup table of the terrain's height.
-      /// \param[in] _subsampling Multiplier used to increase the resolution.
+      /// \param[in] _subSampling Multiplier used to increase the resolution.
       /// Ex: A subsampling of 2 in a terrain of 129x129 means that the height
       /// vector will be 257 * 257.
       /// \param[in] _vertSize Number of points per row.

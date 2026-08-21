@@ -86,6 +86,7 @@ namespace gz
     /// returned.
     /// \param[in] _singular the return value when std::abs(_n) == 1
     /// \param[in] _plural the return value when std::abs(_n) != 1
+    /// \param[in] _n the quantity that is being described
     /// \return _singular if std::abs(_n)==1, otherwise return _plural
     std::string GZ_COMMON_VISIBLE PluralCast(
         const std::string &_singular,

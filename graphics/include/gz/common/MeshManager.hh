@@ -106,7 +106,7 @@ namespace gz
       ///
       /// This MeshManager takes ownership of the mesh and will destroy it.
       /// See ~MeshManager.
-      /// \param[in] the mesh to add.
+      /// \param[in] _mesh The mesh to add.
       /// \deprecated This API requires the user to allocate a Mesh object on
       /// the heap and "move" it into MeshManager. However, this is not safe to
       /// do across shared library boundaries and may cause segfaults during
@@ -200,8 +200,8 @@ namespace gz
      /// \param[in] _rings the number of circles along the height
      /// \param[in] _segments the number of segments per circle
      public: void CreateCapsule(const std::string &_name,
-                                const double radius,
-                                const double length,
+                                const double _radius,
+                                const double _length,
                                 const unsigned int _rings,
                                 const unsigned int _segments);
 
@@ -329,7 +329,7 @@ namespace gz
                       const double _tol);
 
       /// \brief Private data pointer.
-      GZ_UTILS_UNIQUE_IMPL_PTR(dataPtr)
+      GZ_UTILS_UNIQUE_IMPL_PTR(dataPtr);
 
       /// \brief Singleton implementation
       private: friend class SingletonT<MeshManager>;

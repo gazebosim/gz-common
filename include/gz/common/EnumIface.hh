@@ -209,7 +209,7 @@ namespace gz::common
 
   /// \brief Equality operator
   /// \param[in] _e1 First iterator
-  /// \param[in] _e1 Second iterator
+  /// \param[in] _e2 Second iterator
   /// \return True if the two iterators contain equal enum values.
   template<typename Enum>
   bool operator==(EnumIterator<Enum> _e1, EnumIterator<Enum> _e2)
@@ -219,7 +219,7 @@ namespace gz::common
 
   /// \brief Inequality operator
   /// \param[in] _e1 First iterator
-  /// \param[in] _e1 Second iterator
+  /// \param[in] _e2 Second iterator
   /// \return True if the two iterators do not contain equal enum values.
   template<typename Enum>
   bool operator!=(EnumIterator<Enum> _e1, EnumIterator<Enum> _e2)
@@ -229,10 +229,10 @@ namespace gz::common
 
   /// \brief A template that allows an enum to have an iterator and string
   /// conversion.
-  /// \param[in] begin Enum value that marks the beginning of the enum
+  /// \param[in] _enumBegin Enum value that marks the beginning of the enum
   /// values.
-  /// \param[in] end Enum value that marks the end of the enum values.
-  /// \param[in] names A vector of strings, one for each enum value.
+  /// \param[in] _enumEnd Enum value that marks the end of the enum values.
+  /// \param[in] _enumVals A vector of strings, one for each enum value.
   /// \sa EnumIface
   /// \sa EnumIterator
   template<typename T>
@@ -251,7 +251,7 @@ namespace gz::common
 /// \param[in] begin Enum value that marks the beginning of the enum
 /// values.
 /// \param[in] end Enum value that marks the end of the enum values.
-/// \param[in] names A vector of strings, one for each enum value.
+/// \param[in] ... A list of strings, one for each enum value.
 /// \sa EnumIface
 /// \sa EnumIterator
 #define GZ_ENUM(name, enumType, begin, end, ...)  \
