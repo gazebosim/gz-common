@@ -178,7 +178,7 @@ namespace gz
         public: std::weak_ptr<Connection> publicConnection;
       };
 
-      /// \def EvtConnectionMap
+      /// \typedef EvtConnectionMap
       /// \brief Event Connection map typedef.
       typedef std::map<int, std::unique_ptr<EventConnection>> EvtConnectionMap;
 
@@ -218,7 +218,6 @@ namespace gz
     }
 
     /// \brief Adds a connection.
-    /// \param[in] _subscriber the subscriber to connect.
     template<typename T, typename N>
     ConnectionPtr EventT<T, N>::Connect(const std::function<T> &_subscriber)
     {
@@ -243,7 +242,6 @@ namespace gz
     }
 
     /// \brief Removes a connection.
-    /// \param[in] _id the connection index.
     template<typename T, typename N>
     void EventT<T, N>::Disconnect(int _id)
     {
