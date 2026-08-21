@@ -182,10 +182,18 @@ std::map<std::string, math::Matrix4d> SkeletonAnimation::PoseAtX(
     x = firstPos.Translation().X();
 
   double lastX = lastPos.Translation().X();
-  if (x > lastX && !_loop)
-    x = lastX;
-  while (x > lastX)
-    x -= lastX;
+  if (x > lastX)
+  {
+    // TimeAtX expects a value within the keyframe range. Wrapping by a
+    // non-positive or effectively zero endpoint can never reach that range:
+    // subtracting zero stalls, while subtracting a negative value moves x in
+    // the wrong direction.
+    if (!_loop || lastX < 0.0 || math::equal(lastX, 0.0))
+      x = lastX;
+    else
+      while (x > lastX)
+        x -= lastX;
+  }
 
   double time = nodeAnim->second->TimeAtX(x);
 
