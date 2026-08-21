@@ -800,6 +800,35 @@ TEST_F(ColladaLoader, LoadEmptyInitFrom)
 }
 
 /////////////////////////////////////////////////
+// A negative index in <p> must be rejected: strtoul would silently wrap
+// it to a huge unsigned value that reads out of bounds. The indices
+// parsed before the invalid one are kept.
+TEST_F(ColladaLoader, LoadMalformedPNegativeIndex)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_p_negative_index.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(1u, mesh->VertexCount());
+  EXPECT_EQ(1u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A polylist whose <p> holds fewer indices than <vcount> declares must be
+// truncated, not read out of bounds. The complete first triangle is kept.
+TEST_F(ColladaLoader, LoadMalformedPolylistShortP)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_polylist_short_p.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(3u, mesh->VertexCount());
+  EXPECT_EQ(3u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
