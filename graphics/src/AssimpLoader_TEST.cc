@@ -141,21 +141,3 @@ TEST_F(AssimpLoader, LoadCylinderAnimatedFrom3dsMax)
   EXPECT_TRUE(anim->HasNode("Bone02"));
   delete mesh;
 }
-
-/////////////////////////////////////////////////
-// Checks for null root node animation and valid
-// x displacement in non root node's animation.
-TEST_F(AssimpLoader, CheckNonRootDisplacement)
-{
-  common::AssimpLoader loader;
-  common::Mesh *mesh = loader.Load(common::testing::TestFile("data",
-        "walk.dae"));
-  auto meshSkel =  mesh->MeshSkeleton();
-  std::string rootNodeName = meshSkel->RootNode()->Name();
-  common::SkeletonAnimation *skelAnim = meshSkel->Animation(0);
-  common::NodeAnimation *rootNode = skelAnim->NodeAnimationByName(rootNodeName);
-  EXPECT_EQ(nullptr, rootNode);
-  auto xDisplacement = skelAnim->XDisplacement();
-  ASSERT_TRUE(xDisplacement);
-  delete mesh;
-}
