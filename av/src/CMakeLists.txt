@@ -26,5 +26,5 @@ gz_build_tests(
   SOURCES ${gtest_sources}
   LIB_DEPS
     ${av_target}
-    gz-common${GZ_COMMON_VER}-testing
+    gz-common-testing
 )

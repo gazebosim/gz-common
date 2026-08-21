@@ -106,7 +106,7 @@ namespace gz
       public: KeyEvent &operator=(const KeyEvent &_other);
 
       /// \brief Move assignment operator.
-      /// \param[in] _other Other key event
+      /// \param[in] other Other key event
       /// \return this
       public: KeyEvent& operator=(KeyEvent&& other);
 

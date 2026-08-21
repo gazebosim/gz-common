@@ -21,12 +21,14 @@
 #include <cstdint>
 #include <string>
 
+#include <gz/common/profiler/Export.hh>
+
 namespace gz
 {
   namespace common
   {
     /// \brief Interface to be implemented by profiler implementations.
-    class ProfilerImpl
+    class GZ_COMMON_PROFILER_VISIBLE ProfilerImpl
     {
       /// \brief Constructor.
       public: ProfilerImpl() = default;

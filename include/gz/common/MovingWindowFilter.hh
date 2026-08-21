@@ -19,6 +19,7 @@
 
 #include <memory>
 #include <vector>
+#include <gz/common/Export.hh>
 
 namespace gz
 {
@@ -48,27 +49,27 @@ namespace gz
       /// \brief keep track of number of elements
       public: unsigned int samples = 0;
     };
-    /// \endcond
 
     //////////////////////////////////////////////////
     template<typename T>
     MovingWindowFilterPrivate<T>::MovingWindowFilterPrivate()
     {
-      /// \TODO FIXME hardcoded initial value for now
+      // \TODO FIXME hardcoded initial value for now
       this->valHistory.resize(this->valWindowSize);
       this->valIter = this->valHistory.begin();
       this->sum = T();
     }
+    /// \endcond
 
     /// \brief Base class for MovingWindowFilter
     template< typename T>
     class MovingWindowFilter
     {
       /// \brief Constructor
-      public: MovingWindowFilter();
+      public: GZ_DEPRECATED(7) MovingWindowFilter();
 
       /// \brief Destructor
-      public: virtual ~MovingWindowFilter();
+      public: GZ_DEPRECATED(7) virtual ~MovingWindowFilter();
 
       /// \brief Update value of filter
       /// \param[in] _val new raw value
@@ -92,7 +93,7 @@ namespace gz
 
       /// \brief Allow subclasses to initialize their own data pointer.
       /// \param[in] _d Reference to data pointer.
-      protected: explicit MovingWindowFilter<T>(
+      protected: GZ_DEPRECATED(7) explicit MovingWindowFilter(
                      MovingWindowFilterPrivate<T> &_d);
 
       /// \brief Data pointer.

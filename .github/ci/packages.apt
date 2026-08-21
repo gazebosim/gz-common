@@ -3,12 +3,12 @@ libavcodec-dev
 libavdevice-dev
 libavformat-dev
 libavutil-dev
-libfreeimage-dev
+libbenchmark-dev
 libgdal-dev
-libgz-cmake4-dev
-libgz-math8-dev
-libgz-utils3-dev
-libgz-utils3-log-dev
+libgz-rotary-cmake-dev
+libgz-rotary-math-dev
+libgz-rotary-utils-dev
+libgz-rotary-utils-log-dev
 libspdlog-dev
 libswscale-dev
 libtinyxml2-dev

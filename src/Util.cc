@@ -350,12 +350,6 @@ common::SystemPaths *common::systemPaths()
 }
 
 /////////////////////////////////////////////////
-bool common::env(const std::string &_name, std::string &_value)
-{
-  return env(_name, _value, false);
-}
-
-/////////////////////////////////////////////////
 bool common::env(const std::string &_name,
                            std::string &_value,
                            bool _allowEmpty)

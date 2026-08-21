@@ -15,6 +15,8 @@
  *
 */
 #include <fstream>
+#include <optional>
+#include <string>
 
 #include <gtest/gtest.h>
 
@@ -33,6 +35,10 @@ const std::string kTestDataGazeboBmp =  // NOLINT(*)
     common::testing::TestFile("data", "gazebo_logo.bmp");
 const std::string kTestData =  // NOLINT(*)
     common::testing::TestFile("data", "red_blue_colors.png");
+const std::string kTestDataRGB16 =  // NOLINT(*)
+    common::testing::TestFile("data", "rgb_16bit.png");
+const std::string kTestDataRGBA16 =  // NOLINT(*)
+    common::testing::TestFile("data", "rgba_16bit.png");
 
 const auto kWidth = 121u;
 const auto kHeight = 81u;
@@ -261,6 +267,127 @@ TEST_F(ImageTest, Data)
 }
 
 /////////////////////////////////////////////////
+// Golden checks for the single-pass channel converter in DataWithChannels:
+// RGBData()/RGBAData() must match stb_image semantics for every channel count
+// reachable through these accessors (1/3/4 -> 3/4), including passthrough.
+TEST_F(ImageTest, RGBADataChannelConversions)
+{
+  auto expectEq = [](const std::vector<unsigned char> &_got,
+                     const std::vector<unsigned char> &_want,
+                     const std::string &_label)
+  {
+    ASSERT_EQ(_want.size(), _got.size()) << _label;
+    for (size_t i = 0; i < _want.size(); ++i)
+      EXPECT_EQ(_want[i], _got[i]) << _label << " at index " << i;
+  };
+
+  // --- 1-channel (grayscale) source, 2x2 ---
+  const std::vector<unsigned char> gray = {10, 20, 30, 40};
+  common::Image grayImg;
+  grayImg.SetFromData(gray.data(), 2, 2,
+      common::Image::PixelFormatType::L_INT8);
+  ASSERT_TRUE(grayImg.Valid());
+  // 1 -> 3: replicate the gray value across RGB
+  expectEq(grayImg.RGBData(),
+      {10, 10, 10, 20, 20, 20, 30, 30, 30, 40, 40, 40}, "gray->RGB");
+  // 1 -> 4: replicate gray across RGB, opaque alpha
+  expectEq(grayImg.RGBAData(),
+      {10, 10, 10, 255, 20, 20, 20, 255,
+       30, 30, 30, 255, 40, 40, 40, 255}, "gray->RGBA");
+
+  // --- 3-channel (RGB) source, 2x2 ---
+  const std::vector<unsigned char> rgb = {
+      1, 2, 3,  4, 5, 6,  7, 8, 9,  10, 11, 12};
+  common::Image rgbImg;
+  rgbImg.SetFromData(rgb.data(), 2, 2,
+      common::Image::PixelFormatType::RGB_INT8);
+  ASSERT_TRUE(rgbImg.Valid());
+  expectEq(rgbImg.RGBData(), rgb, "RGB->RGB (passthrough)");
+  // 3 -> 4: append opaque alpha
+  expectEq(rgbImg.RGBAData(),
+      {1, 2, 3, 255,  4, 5, 6, 255,  7, 8, 9, 255,  10, 11, 12, 255},
+      "RGB->RGBA");
+
+  // --- 4-channel (RGBA) source, 2x2 ---
+  const std::vector<unsigned char> rgba = {
+      1, 2, 3, 200,  4, 5, 6, 201,  7, 8, 9, 202,  10, 11, 12, 203};
+  common::Image rgbaImg;
+  rgbaImg.SetFromData(rgba.data(), 2, 2,
+      common::Image::PixelFormatType::RGBA_INT8);
+  ASSERT_TRUE(rgbaImg.Valid());
+  // 4 -> 3: drop the alpha channel
+  expectEq(rgbaImg.RGBData(),
+      {1, 2, 3,  4, 5, 6,  7, 8, 9,  10, 11, 12}, "RGBA->RGB");
+  expectEq(rgbaImg.RGBAData(), rgba, "RGBA->RGBA (passthrough)");
+}
+
+/////////////////////////////////////////////////
+// Load(file, RGBA_INT8) decodes straight to RGBA and must yield byte-identical
+// results to the native decode followed by RGBAData(), reporting 4 channels
+// (RGBA_INT8) with RGBAData() as a passthrough. std::nullopt loads natively.
+TEST_F(ImageTest, LoadRgba)
+{
+  for (const std::string &file : {kTestData, kTestDataGazeboJpeg})
+  {
+    common::Image native;
+    ASSERT_EQ(0, native.Load(file)) << file;
+    ASSERT_TRUE(native.Valid());
+    const std::vector<unsigned char> nativeRgba = native.RGBAData();
+
+    common::Image rgba;
+    ASSERT_EQ(0, rgba.Load(file, common::Image::PixelFormatType::RGBA_INT8))
+        << file;
+    ASSERT_TRUE(rgba.Valid());
+    EXPECT_EQ(common::Image::PixelFormatType::RGBA_INT8, rgba.PixelFormat());
+    EXPECT_EQ(native.Width(), rgba.Width());
+    EXPECT_EQ(native.Height(), rgba.Height());
+    // Single-pass RGBA == native decode + channel conversion.
+    EXPECT_EQ(nativeRgba, rgba.Data()) << "Load RGBA mismatch for " << file;
+    // RGBAData() on an already-RGBA image is a passthrough of its data.
+    EXPECT_EQ(rgba.Data(), rgba.RGBAData()) << "passthrough for " << file;
+
+    // std::nullopt loads in the native format, identical to Load(file).
+    common::Image nativeOpt;
+    ASSERT_EQ(0, nativeOpt.Load(file, std::nullopt)) << file;
+    EXPECT_EQ(native.PixelFormat(), nativeOpt.PixelFormat());
+    EXPECT_EQ(native.Data(), nativeOpt.Data());
+  }
+}
+
+/////////////////////////////////////////////////
+TEST_F(ImageTest, SetFromCompressedDataRgba)
+{
+  std::ifstream ifs(kTestData, std::ios::binary | std::ios::ate);
+  std::ifstream::pos_type fileEnd = ifs.tellg();
+  std::vector<unsigned char> fileData(fileEnd);
+  ifs.seekg(0);
+  ifs.read(reinterpret_cast<char *>(&fileData[0]), fileEnd);
+
+  common::Image native;
+  native.SetFromCompressedData(&fileData[0], fileData.size(),
+      common::Image::PixelFormatType::COMPRESSED_PNG);
+  ASSERT_TRUE(native.Valid());
+  const std::vector<unsigned char> nativeRgba = native.RGBAData();
+
+  common::Image rgba;
+  rgba.SetFromCompressedData(&fileData[0], fileData.size(),
+      common::Image::PixelFormatType::COMPRESSED_PNG,
+      common::Image::PixelFormatType::RGBA_INT8);
+  ASSERT_TRUE(rgba.Valid());
+  EXPECT_EQ(common::Image::PixelFormatType::RGBA_INT8, rgba.PixelFormat());
+  EXPECT_EQ(nativeRgba, rgba.Data());
+  EXPECT_EQ(rgba.Data(), rgba.RGBAData());
+
+  // std::nullopt decodes in the native format, identical to the 3-arg overload.
+  common::Image nativeOpt;
+  nativeOpt.SetFromCompressedData(&fileData[0], fileData.size(),
+      common::Image::PixelFormatType::COMPRESSED_PNG, std::nullopt);
+  ASSERT_TRUE(nativeOpt.Valid());
+  EXPECT_EQ(native.PixelFormat(), nativeOpt.PixelFormat());
+  EXPECT_EQ(native.Data(), nativeOpt.Data());
+}
+
+/////////////////////////////////////////////////
 TEST_F(ImageTest, SetFromData)
 {
   // load image and test colors
@@ -413,6 +540,8 @@ TEST_F(ImageTest, ConvertPixelFormat)
          Image::ConvertPixelFormat("RGBA_INT8"));
   EXPECT_EQ(Image::PixelFormatType::RGB_INT16,
          Image::ConvertPixelFormat("RGB_INT16"));
+  EXPECT_EQ(Image::PixelFormatType::RGBA_INT16,
+         Image::ConvertPixelFormat("RGBA_INT16"));
   EXPECT_EQ(Image::PixelFormatType::RGB_INT32,
          Image::ConvertPixelFormat("RGB_INT32"));
   EXPECT_EQ(Image::PixelFormatType::BGR_INT8,
@@ -670,6 +799,193 @@ TEST_F(ImageTest, Grayscale)
     EXPECT_NEAR(maxColor.R(), img.MaxColor().R(), 1e-3);
     EXPECT_NEAR(maxColor.G(), img.MaxColor().G(), 1e-3);
     EXPECT_NEAR(maxColor.B(), img.MaxColor().B(), 1e-3);
+  }
+}
+
+
+/////////////////////////////////////////////////
+TEST_F(ImageTest, Color16bit)
+{
+  {
+    common::Image img;
+    std::string fileName = common::testing::TestFile("data",
+        "rgb_16bit.png");
+    EXPECT_EQ(0, img.Load(fileName));
+    const unsigned int width = 4u;
+    const unsigned int height = 4u;
+    const unsigned int channels = 3u;
+    const unsigned int bpp = channels * 16u;
+    EXPECT_TRUE(img.Valid());
+    EXPECT_EQ(width, img.Width());
+    EXPECT_EQ(height, img.Height());
+    EXPECT_EQ(bpp, img.BPP());
+    EXPECT_EQ(width * bpp / 8u, img.Pitch());
+    EXPECT_EQ(common::Image::PixelFormatType::RGB_INT16, img.PixelFormat());
+    math::Color maxColor(0.0f, 0.0f, 0.847f);
+    EXPECT_NEAR(maxColor.R(), img.MaxColor().R(), 1e-3);
+    EXPECT_NEAR(maxColor.G(), img.MaxColor().G(), 1e-3);
+    EXPECT_NEAR(maxColor.B(), img.MaxColor().B(), 1e-3);
+    math::Color pixelWithMaxColor = img.Pixel(3, 1);
+    EXPECT_NEAR(maxColor.R(), pixelWithMaxColor.R(), 1e-3);
+    EXPECT_NEAR(maxColor.G(), pixelWithMaxColor.G(), 1e-3);
+    EXPECT_NEAR(maxColor.B(), pixelWithMaxColor.B(), 1e-3);
+  }
+  {
+    common::Image img;
+    std::string fileName = common::testing::TestFile("data",
+        "rgba_16bit.png");
+    EXPECT_EQ(0, img.Load(fileName));
+    const unsigned int width = 4u;
+    const unsigned int height = 4u;
+    const unsigned int channels = 4u;
+    const unsigned int bpp = channels * 16u;
+    EXPECT_TRUE(img.Valid());
+    EXPECT_EQ(width, img.Width());
+    EXPECT_EQ(height, img.Height());
+    EXPECT_EQ(bpp, img.BPP());
+    EXPECT_EQ(width * bpp / 8u, img.Pitch());
+    EXPECT_EQ(common::Image::PixelFormatType::RGBA_INT16, img.PixelFormat());
+    math::Color maxColor(0.0f, 0.0f, 0.847f, 0.5f);
+    EXPECT_NEAR(maxColor.R(), img.MaxColor().R(), 1e-3);
+    EXPECT_NEAR(maxColor.G(), img.MaxColor().G(), 1e-3);
+    EXPECT_NEAR(maxColor.B(), img.MaxColor().B(), 1e-3);
+    EXPECT_NEAR(maxColor.A(), img.MaxColor().A(), 1e-3);
+    math::Color pixelWithMaxColor = img.Pixel(3, 1);
+    EXPECT_NEAR(maxColor.R(), pixelWithMaxColor.R(), 1e-3);
+    EXPECT_NEAR(maxColor.G(), pixelWithMaxColor.G(), 1e-3);
+    EXPECT_NEAR(maxColor.B(), pixelWithMaxColor.B(), 1e-3);
+    EXPECT_NEAR(maxColor.A(), pixelWithMaxColor.A(), 1e-3);
+  }
+}
+
+/////////////////////////////////////////////////
+TEST_F(ImageTest, ChannelData)
+{
+  // load image, extract data from each channel and verify values
+  common::Image img;
+  ASSERT_EQ(0, img.Load(kTestData));
+  ASSERT_TRUE(img.Valid());
+
+  std::vector<unsigned char> red =
+      img.ChannelData(common::Image::Channel::RED);
+  std::vector<unsigned char> green =
+      img.ChannelData(common::Image::Channel::GREEN);
+  std::vector<unsigned char> blue =
+      img.ChannelData(common::Image::Channel::BLUE);
+  std::vector<unsigned char> alpha =
+      img.ChannelData(common::Image::Channel::ALPHA);
+
+  EXPECT_FALSE(red.empty());
+  ASSERT_EQ(img.Width() * img.Height(), red.size());
+  ASSERT_EQ(red.size(), green.size());
+  ASSERT_EQ(red.size(), blue.size());
+  ASSERT_EQ(red.size(), alpha.size());
+
+  for (auto i = 0u; i < img.Height(); ++i)
+  {
+    for (auto j = 0u; j < img.Width(); ++j)
+    {
+      unsigned int idx = i * img.Width() + j;
+      unsigned int r = red[idx];
+      unsigned int g = green[idx];
+      unsigned int b = blue[idx];
+      unsigned int a = alpha[idx];
+
+      ASSERT_EQ(0u, g);
+      ASSERT_EQ(255u, a);
+      if (j < 80)
+      {
+        ASSERT_EQ(255u, r);
+        ASSERT_EQ(0u, b);
+      }
+      else
+      {
+        ASSERT_EQ(0u, r);
+        ASSERT_EQ(255u, b);
+      }
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+TEST_F(ImageTest, ChannelData16bit)
+{
+  {
+    // load load 16 bit RGBA image
+    // extract data from each channel and verify values
+    common::Image img;
+    ASSERT_EQ(0, img.Load(kTestDataRGBA16));
+    ASSERT_TRUE(img.Valid());
+
+    std::vector<unsigned char> red =
+        img.ChannelData(common::Image::Channel::RED);
+    std::vector<unsigned char> green =
+        img.ChannelData(common::Image::Channel::GREEN);
+    std::vector<unsigned char> blue =
+        img.ChannelData(common::Image::Channel::BLUE);
+    std::vector<unsigned char> alpha =
+        img.ChannelData(common::Image::Channel::ALPHA);
+
+    EXPECT_FALSE(red.empty());
+    ASSERT_EQ(img.Width() * img.Height(), red.size());
+    ASSERT_EQ(red.size(), green.size());
+    ASSERT_EQ(red.size(), blue.size());
+    ASSERT_EQ(red.size(), alpha.size());
+
+    for (auto i = 0u; i < img.Height(); ++i)
+    {
+      for (auto j = 0u; j < img.Width(); ++j)
+      {
+        unsigned int idx = i * img.Width() + j;
+        unsigned int r = red[idx];
+        unsigned int g = green[idx];
+        unsigned int b = blue[idx];
+        unsigned int a = alpha[idx];
+
+        EXPECT_EQ(0u, r);
+        EXPECT_EQ(0u, g);
+        EXPECT_LT(0u, b);
+        EXPECT_EQ(128u, a);
+      }
+    }
+  }
+
+  {
+    // load 16 bit RGB image (no alpha channel)
+    // extra data from each channel and verify values
+    common::Image img;
+    ASSERT_EQ(0, img.Load(kTestDataRGB16));
+    ASSERT_TRUE(img.Valid());
+
+    std::vector<unsigned char> red =
+        img.ChannelData(common::Image::Channel::RED);
+    std::vector<unsigned char> green =
+        img.ChannelData(common::Image::Channel::GREEN);
+    std::vector<unsigned char> blue =
+        img.ChannelData(common::Image::Channel::BLUE);
+    std::vector<unsigned char> alpha =
+        img.ChannelData(common::Image::Channel::ALPHA);
+
+    EXPECT_FALSE(red.empty());
+    ASSERT_EQ(img.Width() * img.Height(), red.size());
+    ASSERT_EQ(red.size(), green.size());
+    ASSERT_EQ(red.size(), blue.size());
+    ASSERT_EQ(0u, alpha.size());
+
+    for (auto i = 0u; i < img.Height(); ++i)
+    {
+      for (auto j = 0u; j < img.Width(); ++j)
+      {
+        unsigned int idx = i * img.Width() + j;
+        unsigned int r = red[idx];
+        unsigned int g = green[idx];
+        unsigned int b = blue[idx];
+
+        EXPECT_EQ(0u, r);
+        EXPECT_EQ(0u, g);
+        EXPECT_LT(0u, b);
+      }
+    }
   }
 }
 

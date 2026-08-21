@@ -182,6 +182,7 @@ namespace gz
     /// sha1(const T &_buffer) instead of this function
     /// \param[in] _buffer Input sequence. The permitted data types for this
     /// function are std::string and any STL container.
+    /// \param[in] _byteCount Number of bytes in the buffer.
     /// \return The string representation (40 character) of the SHA1 hash.
     /// \sa sha1(const T &_buffer)
     std::string GZ_COMMON_VISIBLE sha1(
@@ -190,7 +191,7 @@ namespace gz
     /// \brief fnv1a algorithm for 64-bit platforms.
     /// \param[in] _key The input string.
     /// \return A 64-bit unsigned hash value.
-    /// \ref https://notes.underscorediscovery.com/constexpr-fnv1a/
+    /// \sa https://notes.underscorediscovery.com/constexpr-fnv1a/
     constexpr uint64_t GZ_COMMON_VISIBLE hash64(std::string_view _key)
     {
       const char *data = _key.data();
@@ -209,16 +210,6 @@ namespace gz
     }
 
     /// \brief Find the environment variable '_name' and return its value.
-    ///
-    /// \TODO(mjcarroll): Deprecate and remove in tick-tock.
-    ///
-    /// \param[in] _name Name of the environment variable.
-    /// \param[out] _value Value if the variable was found.
-    /// \return True if the variable was found or false otherwise.
-    bool GZ_COMMON_VISIBLE env(
-        const std::string &_name, std::string &_value);
-
-    /// \brief Find the environment variable '_name' and return its value.
     /// \param[in] _name Name of the environment variable.
     /// \param[out] _value Value if the variable was found.
     /// \param[in] _allowEmpty Allow set-but-empty variables.
@@ -226,7 +217,7 @@ namespace gz
     /// \return True if the variable was found or false otherwise.
     bool GZ_COMMON_VISIBLE env(
         const std::string &_name, std::string &_value,
-        bool _allowEmpty);
+        bool _allowEmpty = false);
 
     /// \brief Set the environment variable '_name'.
     ///

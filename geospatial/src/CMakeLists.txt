@@ -8,19 +8,20 @@ if (TARGET ${PROJECT_LIBRARY_TARGET_NAME}-graphics)
   target_link_libraries(${geospatial_target}
     PUBLIC
       ${PROJECT_LIBRARY_TARGET_NAME}-graphics
-      gz-math${GZ_MATH_VER}::gz-math${GZ_MATH_VER}
-      gz-utils${GZ_UTILS_VER}::gz-utils${GZ_UTILS_VER}
+      gz-math::gz-math
+      gz-utils::gz-utils
     PRIVATE
       ${GDAL_LIBRARY})
 
   target_include_directories(${geospatial_target}
+    SYSTEM
     PRIVATE
       ${GDAL_INCLUDE_DIR})
 
   gz_build_tests(TYPE UNIT SOURCES ${gtest_sources}
     LIB_DEPS
       ${geospatial_target}
-      gz-common${GZ_COMMON_VER}-testing
+      gz-common-testing
   )
 else()
   message(WARNING "Skipping component [geospatial]: Missing component [graphics].\n    ^~~~~ Set SKIP_geospatial=true in cmake to suppress this warning.")

@@ -18,7 +18,7 @@ target_link_libraries(${PROJECT_LIBRARY_TARGET_NAME}
   PRIVATE
     ${CXX_FILESYSTEM_LIBRARIES}
   PUBLIC
-    gz-utils${GZ_UTILS_VER}::log
+    gz-utils::log
     spdlog::spdlog
 )
 
@@ -34,7 +34,7 @@ else()
 endif()
 
 # don't build MovingWindowFilter_TEST if we don't have gz-math
-if(NOT gz-math${GZ_MATH_VER}_FOUND)
+if(NOT gz-math_FOUND)
   list(REMOVE_ITEM gtest_sources MovingWindowFilter_TEST.cc)
 endif()
 
@@ -43,20 +43,20 @@ gz_build_tests(
   TYPE UNIT
   SOURCES ${gtest_sources}
   LIB_DEPS
-    gz-utils${GZ_UTILS_VER}::log
-    gz-common${GZ_COMMON_VER}-testing
+    gz-utils::log
+    gz-common-testing
   INCLUDE_DIRS
     # Used to make internal source file headers visible to the unit tests
     ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(TARGET UNIT_DataFrame_TEST)
   target_include_directories(UNIT_DataFrame_TEST PRIVATE
-    ${gz-math${GZ_MATH_VER}_INCLUDE_DIRS})
+    ${gz-math_INCLUDE_DIRS})
 endif()
 
 if(TARGET UNIT_MovingWindowFilter_TEST)
   target_include_directories(UNIT_MovingWindowFilter_TEST PRIVATE
-    ${gz-math${GZ_MATH_VER}_INCLUDE_DIRS})
+    ${gz-math_INCLUDE_DIRS})
 endif()
 
 # Produce warning on Windows if the user has decided to turn on the symlink

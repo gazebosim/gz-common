@@ -73,6 +73,9 @@ TEST(AudioDecoder, DataBuffer)
 
   EXPECT_EQ(dataBufferSize2, dataBufferSize);
   EXPECT_EQ(sizeof(dataBuffer), sizeof(dataBuffer2));
+
+  free(dataBuffer);
+  free(dataBuffer2);
 }
 
 /////////////////////////////////////////////////
@@ -150,4 +153,6 @@ TEST(AudioDecoder, GZ_UTILS_TEST_DISABLED_ON_WIN32(CheerFile))
                 dataBufferSize == 4987612u ||
                 dataBufferSize == 4987612u * 2);
   }
+
+  free(dataBuffer);
 }

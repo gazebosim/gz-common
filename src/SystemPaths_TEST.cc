@@ -291,6 +291,20 @@ TEST_F(SystemPathsFixture, FindFileURI)
   EXPECT_EQ(file2, sp.FindFileURI("anything://test_f2"));
 }
 
+TEST_F(SystemPathsFixture, ClearFindFileURICallbacks)
+{
+  auto testCb = [this](const common::URI &)
+  {
+    return this->temp->Path();
+  };
+  common::SystemPaths sp;
+  sp.AddFindFileURICallback(testCb);
+  EXPECT_EQ(this->temp->Path(), sp.FindFileURI("test://test_f1"));
+
+  sp.ClearFindFileURICallbacks();
+  EXPECT_EQ("", sp.FindFileURI("test://test_f1"));
+}
+
 //////////////////////////////////////////////////
 TEST_F(SystemPathsFixture, FindFile)
 {
@@ -332,19 +346,17 @@ TEST_F(SystemPathsFixture, FindFile)
 #ifndef _WIN32
   const auto tmpDir = "/tmp";
   const auto uriTmpDir = "file:///tmp";
-  const auto homeDir = "/home";
   const auto badDir = "/bad";
   const auto uriBadDir = "file:///bad";
 #else
   const auto tmpDir = "C:\\Windows";
   const auto uriTmpDir = "file://C:/Windows";
-  const auto homeDir = "C:\\Users";
   const auto badDir = "C:\\bad";
   const auto uriBadDir = "file://C:/bad";
 #endif
   {
     EXPECT_EQ(tmpDir, sp.FindFile(uriTmpDir));
-    EXPECT_EQ(homeDir, sp.FindFile(homeDir));
+    EXPECT_EQ(tmpDir, sp.FindFile(tmpDir));
     EXPECT_EQ("", sp.FindFile(badDir));
     EXPECT_EQ("", sp.FindFile(uriBadDir));
   }
@@ -366,33 +378,46 @@ TEST_F(SystemPathsFixture, FindFile)
 
   // Custom callback
   {
-    auto homeCb = [homeDir](const std::string &_s)
+    auto tempCb = [tmpDir](const std::string &_s)
     {
-      return _s == "home" ? homeDir : "";
+      return _s == "temp" ? tmpDir : "";
     };
     auto badCb = [badDir](const std::string &_s)
     {
       return _s == "bad" ? badDir : "";
     };
 
-    EXPECT_EQ("", sp.FindFile("home"));
+    EXPECT_EQ("", sp.FindFile("temp"));
     EXPECT_EQ("", sp.FindFile("bad"));
     EXPECT_EQ("", sp.FindFile("banana"));
 
-    sp.AddFindFileCallback(homeCb);
+    sp.AddFindFileCallback(tempCb);
 
-    EXPECT_EQ(homeDir, sp.FindFile("home"));
+    EXPECT_EQ(tmpDir, sp.FindFile("temp"));
     EXPECT_EQ("", sp.FindFile("bad"));
     EXPECT_EQ("", sp.FindFile("banana"));
 
     sp.AddFindFileCallback(badCb);
 
-    EXPECT_EQ(homeDir, sp.FindFile("home"));
+    EXPECT_EQ(tmpDir, sp.FindFile("temp"));
     EXPECT_EQ("", sp.FindFile("bad"));
     EXPECT_EQ("", sp.FindFile("banana"));
   }
 }
 
+TEST_F(SystemPathsFixture, ClearFindFileCallbacks)
+{
+  auto testCb = [this](const std::string &)
+  {
+    return this->temp->Path();
+  };
+  common::SystemPaths sp;
+  sp.AddFindFileCallback(testCb);
+  EXPECT_EQ(this->temp->Path(), sp.FindFile("test_file"));
+
+  sp.ClearFindFileCallbacks();
+  EXPECT_EQ("", sp.FindFile("test_file"));
+}
 //////////////////////////////////////////////////
 TEST_F(SystemPathsFixture, NormalizeDirectoryPath)
 {

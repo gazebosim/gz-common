@@ -15,11 +15,10 @@
  *
  */
 #include "gz/common/Profiler.hh" // NOLINT(*)
+#include "gz/common/ProfilerImpl.hh"
 #include "gz/common/Console.hh"
 
-#include "ProfilerImpl.hh"
-
-#ifdef GZ_PROFILER_REMOTERY
+#if GZ_PROFILER_REMOTERY
 #include "RemoteryProfilerImpl.hh"
 #endif  // GZ_PROFILER_REMOTERY
 
@@ -27,11 +26,10 @@ using namespace gz;
 using namespace common;
 
 //////////////////////////////////////////////////
-Profiler::Profiler():
-  impl(nullptr)
+Profiler::Profiler()
 {
-#ifdef GZ_PROFILER_REMOTERY
-  impl = new RemoteryProfilerImpl();
+#if GZ_PROFILER_REMOTERY
+  impl = std::make_unique<RemoteryProfilerImpl>();
 #endif  // GZ_PROFILER_REMOTERY
 
   if (this->impl == nullptr)
@@ -46,12 +44,7 @@ Profiler::Profiler():
 }
 
 //////////////////////////////////////////////////
-Profiler::~Profiler()
-{
-  if (this->impl)
-    delete this->impl;
-  this->impl = nullptr;
-}
+Profiler::~Profiler() = default;
 
 //////////////////////////////////////////////////
 void Profiler::SetThreadName(const char * _name)
@@ -95,4 +88,33 @@ std::string Profiler::ImplementationName() const
 bool Profiler::Valid() const
 {
   return this->impl != nullptr;
+}
+
+//////////////////////////////////////////////////
+bool Profiler::SetImplementation(std::unique_ptr<ProfilerImpl> _impl)
+{
+  if (_impl == nullptr)
+  {
+    gzwarn << "Setting an empty profiler implementation is not supported"
+           << std::endl;
+    return false;
+  }
+  if (this->impl != nullptr)
+  {
+    gzwarn << "A profiler implementation named '" << this->impl->Name()
+           << "' is already in use. Cannot set a new one." << std::endl;
+    return false;
+  }
+  this->impl = std::move(_impl);
+  gzdbg << "Gazebo profiling with: " << this->impl->Name() << std::endl;
+  return true;
+}
+
+//////////////////////////////////////////////////
+Profiler *Profiler::Instance()
+{
+  // Warning: destructor won't be called, so profiler can't
+  // do any actions on teardown, like: close connections or save to file
+  static utils::NeverDestroyed<Profiler> profiler;
+  return &profiler.Access();
 }

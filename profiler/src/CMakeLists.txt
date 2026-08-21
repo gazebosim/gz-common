@@ -20,7 +20,12 @@ if(GZ_PROFILER_REMOTERY)
   # A few warnings to suppress, rather than modifying vendored code
   set_source_files_properties(./Remotery/lib/Remotery.c PROPERTIES
     COMPILE_FLAGS
-    "$<$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU,LCC>:-Wno-strict-prototypes -Wno-unused-but-set-variable>")
+    "$<$<COMPILE_LANG_AND_ID:C,ARMClang,AppleClang,Clang,GNU,LCC>:-Wno-unused-variable -Wno-unused-parameter -Wno-switch-default -Wno-unused-function -Wno-pedantic>")
+
+  if(MSVC)
+    set_source_files_properties(./Remotery/lib/Remotery.c PROPERTIES
+    COMPILE_OPTIONS "/wd4114")
+  endif()
 
   if(APPLE)
     set(
@@ -37,8 +42,10 @@ if(GZ_PROFILER_REMOTERY)
   set(RMT_USE_TINYCRT 0)
   set(RMT_USE_CUDA 0)
   set(RMT_USE_D3D11 0)
+  set(RMT_USE_D3D12 0)
   set(RMT_USE_OPENGL 0)
   set(RMT_USE_METAL 0)
+  set(RMT_USE_VULKAN 0)
 
   if(UNIX OR WIN32)
     set(RMT_USE_OPENGL 1)
@@ -46,6 +53,7 @@ if(GZ_PROFILER_REMOTERY)
 
   if(WIN32)
     set(RMT_USE_D3D11 1)
+    set(RMT_USE_D3D12 1)
   endif()
 
   if(APPLE)
@@ -60,6 +68,8 @@ if(GZ_PROFILER_REMOTERY)
   if(NOT WIN32)
     list(APPEND PROFILER_TESTS Profiler_Error_TEST.cc)
   endif()
+else()  # GZ_PROFILER_REMOTERY
+  list(APPEND PROFILER_TESTS Profiler_Custom_TEST.cc)
 endif()
 
 gz_add_component(profiler SOURCES ${PROFILER_SRCS} GET_TARGET_NAME profiler_target)
@@ -92,7 +102,7 @@ gz_build_tests(
   SOURCES ${PROFILER_TESTS}
   LIB_DEPS
     ${profiler_target}
-    gz-common${GZ_COMMON_VER}-testing
+    gz-common-testing
   TEST_LIST profiler_tests)
 
 if(TARGET UNIT_Profiler_Remotery_TEST)
@@ -100,8 +110,19 @@ if(TARGET UNIT_Profiler_Remotery_TEST)
     PUBLIC "GZ_PROFILER_ENABLE=1")
 endif()
 
+if(TARGET UNIT_Profiler_Error_TEST)
+  target_include_directories(UNIT_Profiler_Error_TEST
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Remotery/lib>
+  )
+endif()
+
+if(TARGET UNIT_Profiler_Custom_TEST)
+  target_compile_definitions(UNIT_Profiler_Custom_TEST
+    PUBLIC "GZ_PROFILER_ENABLE=1")
+endif()
+
 if(GZ_PROFILER_REMOTERY)
-  set(GZ_PROFILER_SCRIPT_PATH ${CMAKE_INSTALL_LIBEXECDIR}/gz/gz-common${PROJECT_VERSION_MAJOR})
+  set(GZ_PROFILER_SCRIPT_PATH ${CMAKE_INSTALL_LIBEXECDIR}/gz/gz-common)
   set(GZ_PROFILER_VIS_PATH ${GZ_DATA_INSTALL_DIR}/profiler_vis)
 
   configure_file(Remotery/gz_remotery_vis.in

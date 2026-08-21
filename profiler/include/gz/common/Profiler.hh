@@ -24,14 +24,14 @@
 
 #include <gz/common/config.hh>
 #include <gz/common/profiler/Export.hh>
-#include <gz/common/SingletonT.hh>
+#include <gz/utils/NeverDestroyed.hh>
+
+#include "ProfilerImpl.hh"
 
 namespace gz
 {
   namespace common
   {
-    class ProfilerImpl;
-
     /// \brief Used to perform application-wide performance profiling
     ///
     /// This class provides the necessary infrastructure for recording profiling
@@ -54,8 +54,7 @@ namespace gz
     /// * GZ_PROFILE_END - End a named profile sample
     /// * GZ_PROFILE - RAII-style profile sample. The sample will end at the
     ///     end of the current scope.
-    class GZ_COMMON_PROFILER_VISIBLE Profiler
-        : public virtual SingletonT<Profiler>
+    class GZ_COMMON_PROFILER_VISIBLE Profiler final
     {
       /// \brief Constructor
       protected: Profiler();
@@ -87,17 +86,28 @@ namespace gz
       /// \brief End a profiling sample.
       public: void EndSample();
 
+      /// \brief Set a profiler implementation.
+      ///  Takes ownership of the pointer if the call succeeds. This method will
+      ///  fail if a profiler implementation was previously set (i.e. if `Valid`
+      ///  returns `True`).
+      /// \param[in] _impl Profiler implementation to set.
+      /// \return True if the new profiler implementation was accepted.
+      public: bool SetImplementation(std::unique_ptr<ProfilerImpl> _impl);
+
       /// \brief Get the underlying profiler implentation name
       public: std::string ImplementationName() const;
 
       /// \brief Detect if profiler is enabled and has an implementation
       public: bool Valid() const;
 
-      /// \brief Pointer to the profiler implementation
-      private: ProfilerImpl *impl;
+      /// \brief Get an instance of the singleton
+      public: static Profiler *Instance();
 
-      /// \brief Needed for SingletonT.
-      private: friend class SingletonT<Profiler>;
+      /// \brief Pointer to the profiler implementation
+      private: std::unique_ptr<ProfilerImpl> impl;
+
+      /// @brief Needed for access to Profiler::Profiler() for NeverDestroyed
+      private: friend class gz::utils::NeverDestroyed<Profiler>;
     };
 
     /// \brief Used to provide C++ RAII-style profiling sample.

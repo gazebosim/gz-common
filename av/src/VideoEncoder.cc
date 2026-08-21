@@ -713,6 +713,13 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
 
   int ret = 0;
 
+  AVPacket* avPacket = av_packet_alloc();
+  if (!avPacket)
+  {
+    gzerr << "Failed to allocate AVPacket" << std::endl;
+    return false;
+  }
+
   // make sure we have continuous pts (frame number) otherwise some decoders
   // may not be happy. So encode more (duplicate) frames until the current frame
   // number
@@ -721,8 +728,6 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
        ++i)
   {
     frameToEncode->pts = this->dataPtr->frameCount++;
-
-    AVPacket* avPacket = av_packet_alloc();
 
     avPacket->data = nullptr;
     avPacket->size = 0;
@@ -743,6 +748,8 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
 
     av_packet_unref(avPacket);
   }
+
+  av_packet_free(&avPacket);
   return ret >= 0 || ret == AVERROR(EAGAIN);
 }
 

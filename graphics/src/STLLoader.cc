@@ -28,6 +28,20 @@
 using namespace gz;
 using namespace common;
 
+namespace {
+/// \brief Append a vertex with its face normal and index it at its own
+/// position (no deduplication). Shared by the ASCII and binary readers.
+/// \param[in,out] _subMesh Submesh to append the vertex, normal and index to.
+/// \param[in] _vertex Vertex position to append.
+/// \param[in] _normal Face normal associated with the vertex.
+void AppendVertex(SubMesh &_subMesh,
+    const gz::math::Vector3d &_vertex, const gz::math::Vector3d &_normal)
+{
+  _subMesh.AddVertex(_vertex);
+  _subMesh.AddNormal(_normal);
+  _subMesh.AddIndex(_subMesh.VertexCount() - 1);
+}
+}  // namespace
 
 //////////////////////////////////////////////////
 class gz::common::STLLoader::Implementation
@@ -85,6 +99,7 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
   int width;
   char input[LINE_MAX_LEN];
   bool result = true;
+  char name[LINE_MAX_LEN] = "";
 
   SubMesh subMesh;
 
@@ -143,9 +158,7 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
         vertex.Y(r2);
         vertex.Z(r3);
 
-        subMesh.AddVertex(vertex);
-        subMesh.AddNormal(normal);
-        subMesh.AddIndex(subMesh.IndexOfVertex(vertex));
+        AppendVertex(subMesh, vertex, normal);
       }
 
       if (fgets (input, LINE_MAX_LEN, _filein) == nullptr)
@@ -162,10 +175,20 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
     // SOLID
     else if (this->Leqi (token, const_cast<char*>("solid")))
     {
+      sscanf(next, "%s", name);
     }
     // ENDSOLID
     else if (this->Leqi (token, const_cast<char*>("endsolid")))
     {
+      // warn if name after 'endsolid 'is different from name after 'solid'
+      char endSolidName[LINE_MAX_LEN] = "";
+      sscanf(next, "%s", endSolidName);
+
+      if (strcmp(endSolidName, name) != 0)
+      {
+        gzwarn << "End solid name: [" << endSolidName << \
+        "] is not the same as solid name [" << name << "]\n";
+      }
     }
     // Unexpected or unrecognized.
     else
@@ -182,7 +205,11 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
   result = subMesh.VertexCount() > 0;
 
   if (result)
+  {
+    std::string meshName(name);
+    subMesh.SetName(meshName);
     _mesh->AddSubMesh(subMesh);
+  }
 
   return result;
 }
@@ -226,9 +253,7 @@ bool STLLoader::ReadBinary(FILE *_filein, Mesh *_mesh)
     if (!this->FloatRead(_filein, vertex.Z()))
       return false;
 
-    subMesh.AddVertex(vertex);
-    subMesh.AddNormal(normal);
-    subMesh.AddIndex(subMesh.VertexCount()-1);
+    AppendVertex(subMesh, vertex, normal);
 
     if (!this->FloatRead(_filein, vertex.X()))
       return false;
@@ -236,9 +261,7 @@ bool STLLoader::ReadBinary(FILE *_filein, Mesh *_mesh)
       return false;
     if (!this->FloatRead(_filein, vertex.Z()))
       return false;
-    subMesh.AddVertex(vertex);
-    subMesh.AddNormal(normal);
-    subMesh.AddIndex(subMesh.VertexCount()-1);
+    AppendVertex(subMesh, vertex, normal);
 
     if (!this->FloatRead(_filein, vertex.X()))
       return false;
@@ -246,9 +269,7 @@ bool STLLoader::ReadBinary(FILE *_filein, Mesh *_mesh)
       return false;
     if (!this->FloatRead(_filein, vertex.Z()))
       return false;
-    subMesh.AddVertex(vertex);
-    subMesh.AddNormal(normal);
-    subMesh.AddIndex(subMesh.VertexCount()-1);
+    AppendVertex(subMesh, vertex, normal);
 
     uint16_t shortTmp;
     if (!ShortIntRead(_filein, shortTmp))

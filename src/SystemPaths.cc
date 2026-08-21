@@ -28,6 +28,7 @@
 #include "gz/common/Console.hh"
 #include "gz/common/StringUtils.hh"
 #include "gz/common/SystemPaths.hh"
+#include "gz/common/URI.hh"
 #include "gz/common/Util.hh"
 
 using namespace gz;
@@ -531,10 +532,22 @@ void SystemPaths::AddFindFileCallback(
 }
 
 /////////////////////////////////////////////////
+void SystemPaths::ClearFindFileCallbacks()
+{
+  this->dataPtr->findFileCbs.clear();
+}
+
+/////////////////////////////////////////////////
 void SystemPaths::AddFindFileURICallback(
     SystemPaths::Implementation::FindURIFunction _cb)
 {
   this->dataPtr->findFileURICbs.push_back(_cb);
+}
+
+/////////////////////////////////////////////////
+void SystemPaths::ClearFindFileURICallbacks()
+{
+  this->dataPtr->findFileURICbs.clear();
 }
 
 /////////////////////////////////////////////////
