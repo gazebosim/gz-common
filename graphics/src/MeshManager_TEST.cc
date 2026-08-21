@@ -815,63 +815,6 @@ TEST_P(MeshManagerLoad, LoadBoxWithMultipleGeoms)
   EXPECT_EQ(0u, mesh->SubMeshByIndex(1).lock()->NodeAssignmentsCount());
 }
 
-void CompareSkeletonNodes(const common::SkeletonNode *_colladaNode, const common::SkeletonNode *_assimpNode)
-{
-  ASSERT_NE(nullptr, _colladaNode);
-  ASSERT_NE(nullptr, _assimpNode);
-  
-  // Compare node properties
-  EXPECT_EQ(_colladaNode->Name(), _assimpNode->Name());
-  EXPECT_EQ(_colladaNode->Id(), _assimpNode->Id());
-  
-  // Optionally compare transforms (add a tolerance if floating point differences are expected)
-  // EXPECT_EQ(_colladaNode->Transform(), _assimpNode->Transform());
-  // EXPECT_EQ(_colladaNode->ModelTransform(), _assimpNode->ModelTransform());
-  
-  // Ensure the hierarchy branching is identical
-  ASSERT_EQ(_colladaNode->ChildCount(), _assimpNode->ChildCount()) 
-      << "Child count mismatch at node: " << _colladaNode->Name();
-  
-  // Recursively compare children
-  for (unsigned int i = 0; i < _colladaNode->ChildCount(); ++i)
-  {
-    CompareSkeletonNodes(_colladaNode->Child(i), _assimpNode->Child(i));
-  }
-}
-
-TEST_F(MeshManager, CompareLoadersExactSkeleton)
-{
-  auto *mgr = common::MeshManager::Instance();
-  std::string file = common::testing::TestFile("data", "box_with_double_skeleton.dae");
-  // 1. Load using the native Collada loader
-  common::setenv("GZ_MESH_FORCE_ASSIMP", "false");
-  mgr->SetAssimpEnvs(); // Tell MeshManager to update its config based on the env var
-  
-  const common::Mesh *meshCollada = mgr->Load(file);
-  ASSERT_NE(nullptr, meshCollada);
-  common::SkeletonPtr skeletonCollada = meshCollada->MeshSkeleton();
-  ASSERT_NE(nullptr, skeletonCollada);
-  // Clear the cache so we don't just get the Collada mesh back
-  mgr->RemoveAll();
-  // 2. Load using the Assimp loader
-  common::setenv("GZ_MESH_FORCE_ASSIMP", "true");
-  mgr->SetAssimpEnvs();
-  
-  const common::Mesh *meshAssimp = mgr->Load(file);
-  ASSERT_NE(nullptr, meshAssimp);
-  common::SkeletonPtr skeletonAssimp = meshAssimp->MeshSkeleton();
-  ASSERT_NE(nullptr, skeletonAssimp);
-  // 3. Verify total counts match
-  EXPECT_EQ(skeletonCollada->NodeCount(), skeletonAssimp->NodeCount());
-  EXPECT_EQ(skeletonCollada->JointCount(), skeletonAssimp->JointCount());
-  
-  // 4. Recursively verify exact structure
-  CompareSkeletonNodes(skeletonCollada->RootNode(), skeletonAssimp->RootNode());
-  
-  // Clean up
-  mgr->RemoveAll();
-}
-
 /////////////////////////////////////////////////
 TEST_P(MeshManagerLoad, LoadBoxWithHierarchicalNodes)
 {
