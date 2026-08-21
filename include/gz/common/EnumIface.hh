@@ -125,7 +125,7 @@ namespace gz::common
   ///   std::cout << "Type++ Number[" << *i << "]\n";
   ///   std::cout << "Type++ Name[" << myTypeIface.Str(*i) << "]\n";
   /// }
-  /// \verbatim
+  /// \endverbatim
   template<typename Enum>
   class EnumIterator
   {
