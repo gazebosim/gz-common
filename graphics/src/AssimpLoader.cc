@@ -209,17 +209,46 @@ static std::string GetColladaNodeID(const aiNode* _node)
   if (!_node)
     return "";
 
-  // Initialise nodeID to nodeName first
   if (_node->mMetaData)
   {
     aiString colladaId;
     if (_node->mMetaData->Get(AI_METADATA_COLLADA_ID, colladaId))
     {
-      // If we have a value for the node ID, update it
       return ToString(colladaId);
     }
   }
   return ToString(_node->mName);
+}
+
+//////////////////////////////////////////////////
+// Utility function to get Collada name from assimp node object
+static std::string GetColladaSkeletonNodeName(const aiNode* _node)
+{
+  if (!_node)
+    return "";
+
+  // ColladaLoader prioritizes `sid` field for skeleton node name,
+  // then `name`, then `id`. Make AssimpLoader match this behaviour
+  aiString colladaSid;
+  if (_node->mMetaData &&
+    _node->mMetaData->Get(AI_METADATA_COLLADA_SID, colladaSid))
+  {
+    return ToString(colladaSid);
+  }
+
+  std::string nodeName = ToString(_node->mName);
+  if (nodeName.find("$ColladaAutoName$") != 0)
+  {
+    return nodeName;
+  }
+
+  aiString colladaId;
+  if (_node->mMetaData &&
+      _node->mMetaData->Get(AI_METADATA_COLLADA_ID, colladaId))
+  {
+    return ToString(colladaId);
+  }
+  return nodeName;
 }
 
 //////////////////////////////////////////////////
@@ -323,7 +352,12 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene,
       for (unsigned boneIdx = 0; boneIdx < assimpMesh->mNumBones; ++boneIdx)
       {
         auto& bone = assimpMesh->mBones[boneIdx];
-        auto boneNodeName = ToString(bone->mName);
+        auto node = bone->mNode;
+        if (!node)
+        {
+          node = _scene->mRootNode->FindNode(bone->mName);
+        }
+        auto boneNodeName = GetColladaSkeletonNodeName(node);
         // Apply inverse bind transform to the matching node
         SkeletonNode *skelNode =
             skeleton->NodeByName(boneNodeName);
@@ -371,7 +405,12 @@ void AssimpLoader::Implementation::RecursiveStoreBoneNames(
     for (unsigned boneIdx = 0; boneIdx < assimpMesh->mNumBones; ++boneIdx)
     {
       auto bone = assimpMesh->mBones[boneIdx];
-      _boneNames.insert(ToString(bone->mName));
+      auto node = bone->mNode;
+      if (!node)
+      {
+        node = _scene->mRootNode->FindNode(bone->mName);
+      }
+      _boneNames.insert(GetColladaSkeletonNodeName(node));
     }
   }
 
@@ -392,7 +431,7 @@ void AssimpLoader::Implementation::RecursiveSkeletonCreate(const aiNode* _node,
   if (_node == nullptr || _parent == nullptr)
     return;
   // First explore this node
-  auto nodeName = ToString(_node->mName);
+  auto nodeName = GetColladaSkeletonNodeName(_node);
   auto nodeID = GetColladaNodeID(_node);
   auto boneExist = _boneNames.find(nodeName) != _boneNames.end();
   auto nodeTrans = this->ConvertTransform(_node->mTransformation);
@@ -1000,7 +1039,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
       [&](const aiNode* _node) -> const aiNode*
     {
       if (!_node) return nullptr;
-      if (boneNames.find(ToString(_node->mName)) != boneNames.end())
+      if (boneNames.find(GetColladaSkeletonNodeName(_node)) != boneNames.end())
         return _node;
 
       const aiNode* lca = nullptr;
@@ -1029,7 +1068,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     const aiNode* lcaNode = findLCA(rootNode);
     const aiNode* skelRoot = lcaNode ? lcaNode : rootNode;
 
-    std::string rootName = ToString(skelRoot->mName);
+    std::string rootName = GetColladaSkeletonNodeName(skelRoot);
     std::string rootID = GetColladaNodeID(skelRoot);
     auto rootSkelNode = new SkeletonNode(
         nullptr, rootName, rootID, SkeletonNode::NODE);
@@ -1067,6 +1106,10 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     {
       auto& animChan = anim->mChannels[chanIdx];
       auto chanName = ToString(animChan->mNodeName);
+      if (auto animNode = scene->mRootNode->FindNode(animChan->mNodeName))
+      {
+        chanName = GetColladaSkeletonNodeName(animNode);
+      }
       auto numKeys = std::max(
           animChan->mNumPositionKeys, animChan->mNumRotationKeys);
       // Position and rotation arrays might be different lengths,
