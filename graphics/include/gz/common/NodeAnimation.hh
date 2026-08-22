@@ -43,7 +43,7 @@ namespace gz
       public: ~NodeAnimation();
 
       /// \brief Changes the name of the animation
-      /// \param[in] the new name
+      /// \param[in] _name The new name
       public: void SetName(const std::string &_name);
 
       /// \brief Returns the name
