@@ -1185,11 +1185,11 @@ TEST_F(MeshManager, LoadGlTF2BoxExternalTexture)
 
   const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
   ASSERT_TRUE(mat.get());
-  // Data is now loaded in memory
-  EXPECT_NE(nullptr, mat->TextureData());
+  // External textures are not immediately loaded by AssimpLoader
+  EXPECT_EQ(nullptr, mat->TextureData());
   auto testTextureFile =
     common::testing::TestFile("data/gltf", "PurpleCube_Diffuse.png");
-  EXPECT_EQ("PurpleCube_Diffuse.png", mat->TextureImage());
+  EXPECT_EQ(testTextureFile, mat->TextureImage());
 
   // Test that SpecularMap has data
   auto materialId = mesh->SubMeshByIndex(0).lock()->GetMaterialIndex();
