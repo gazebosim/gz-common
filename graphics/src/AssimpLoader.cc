@@ -209,17 +209,46 @@ static std::string GetColladaNodeID(const aiNode* _node)
   if (!_node)
     return "";
 
-  // Initialise nodeID to nodeName first
   if (_node->mMetaData)
   {
     aiString colladaId;
     if (_node->mMetaData->Get(AI_METADATA_COLLADA_ID, colladaId))
     {
-      // If we have a value for the node ID, update it
       return ToString(colladaId);
     }
   }
   return ToString(_node->mName);
+}
+
+//////////////////////////////////////////////////
+// Utility function to get Collada name from assimp node object
+static std::string GetColladaSkeletonNodeName(const aiNode* _node)
+{
+  if (!_node)
+    return "";
+
+  // ColladaLoader prioritizes `sid` field for skeleton node name,
+  // then `name`, then `id`. Make AssimpLoader match this behaviour
+  aiString colladaSid;
+  if (_node->mMetaData &&
+    _node->mMetaData->Get(AI_METADATA_COLLADA_SID, colladaSid))
+  {
+    return ToString(colladaSid);
+  }
+
+  std::string nodeName = ToString(_node->mName);
+  if (nodeName.find("$ColladaAutoName$") != 0)
+  {
+    return nodeName;
+  }
+
+  aiString colladaId;
+  if (_node->mMetaData &&
+      _node->mMetaData->Get(AI_METADATA_COLLADA_ID, colladaId))
+  {
+    return ToString(colladaId);
+  }
+  return nodeName;
 }
 
 //////////////////////////////////////////////////
@@ -323,14 +352,19 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene,
       for (unsigned boneIdx = 0; boneIdx < assimpMesh->mNumBones; ++boneIdx)
       {
         auto& bone = assimpMesh->mBones[boneIdx];
-        auto boneNodeName = ToString(bone->mName);
+        auto node = bone->mNode;
+        if (!node)
+        {
+          node = _scene->mRootNode->FindNode(bone->mName);
+        }
+        auto boneNodeName = GetColladaSkeletonNodeName(node);
         // Apply inverse bind transform to the matching node
         SkeletonNode *skelNode =
             skeleton->NodeByName(boneNodeName);
         if (skelNode == nullptr)
           continue;
         skelNode->SetInverseBindTransform(
-            this->ConvertTransform(bone->mOffsetMatrix));
+            this->ConvertTransform(bone->mOffsetMatrix) * _transform.Inverse());
         for (unsigned weightIdx = 0; weightIdx < bone->mNumWeights; ++weightIdx)
         {
           auto vertexWeight = bone->mWeights[weightIdx];
@@ -371,7 +405,12 @@ void AssimpLoader::Implementation::RecursiveStoreBoneNames(
     for (unsigned boneIdx = 0; boneIdx < assimpMesh->mNumBones; ++boneIdx)
     {
       auto bone = assimpMesh->mBones[boneIdx];
-      _boneNames.insert(ToString(bone->mName));
+      auto node = bone->mNode;
+      if (!node)
+      {
+        node = _scene->mRootNode->FindNode(bone->mName);
+      }
+      _boneNames.insert(GetColladaSkeletonNodeName(node));
     }
   }
 
@@ -392,7 +431,7 @@ void AssimpLoader::Implementation::RecursiveSkeletonCreate(const aiNode* _node,
   if (_node == nullptr || _parent == nullptr)
     return;
   // First explore this node
-  auto nodeName = ToString(_node->mName);
+  auto nodeName = GetColladaSkeletonNodeName(_node);
   auto nodeID = GetColladaNodeID(_node);
   auto boneExist = _boneNames.find(nodeName) != _boneNames.end();
   auto nodeTrans = this->ConvertTransform(_node->mTransformation);
@@ -956,8 +995,6 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     return mesh;
   }
   auto& rootNode = scene->mRootNode;
-  auto rootName = ToString(rootNode->mName);
-  auto rootID = GetColladaNodeID(rootNode);
   std::string extension;
   std::size_t extIdx = _filename.rfind(".");
   if (extIdx != std::string::npos)
@@ -998,15 +1035,50 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   {
     std::unordered_set<std::string> boneNames;
     this->dataPtr->RecursiveStoreBoneNames(scene, rootNode, boneNames);
+    std::function<const aiNode*(const aiNode*)> findLCA =
+      [&](const aiNode* _node) -> const aiNode*
+    {
+      if (!_node) return nullptr;
+      if (boneNames.find(GetColladaSkeletonNodeName(_node)) != boneNames.end())
+        return _node;
+
+      const aiNode* lca = nullptr;
+      for (unsigned i = 0; i < _node->mNumChildren; ++i)
+      {
+        const aiNode* childLca = findLCA(_node->mChildren[i]);
+        if (childLca)
+        {
+          // If childLCA is the first one found, set it as the root LCA first
+          if (!lca)
+          {
+            lca = childLca;
+          }
+          // If bones are found in more than one child subtree,
+          // this parent node is their LCA
+          else
+          {
+            lca = _node;
+            break;
+          }
+        }
+      }
+      return lca;
+    };
+
+    const aiNode* lcaNode = findLCA(rootNode);
+    const aiNode* skelRoot = lcaNode ? lcaNode : rootNode;
+
+    std::string rootName = GetColladaSkeletonNodeName(skelRoot);
+    std::string rootID = GetColladaNodeID(skelRoot);
     auto rootSkelNode = new SkeletonNode(
         nullptr, rootName, rootID, SkeletonNode::NODE);
     rootSkelNode->SetTransform(rootTransform);
     rootSkelNode->SetModelTransform(rootTransform);
-    for (unsigned childIdx = 0; childIdx < rootNode->mNumChildren; ++childIdx)
+    for (unsigned childIdx = 0; childIdx < skelRoot->mNumChildren; ++childIdx)
     {
       // First populate the skeleton with the node transforms
       this->dataPtr->RecursiveSkeletonCreate(
-          rootNode->mChildren[childIdx], rootSkelNode,
+          skelRoot->mChildren[childIdx], rootSkelNode,
           rootTransform, boneNames);
     }
     rootSkelNode->SetParent(nullptr);
@@ -1034,6 +1106,10 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     {
       auto& animChan = anim->mChannels[chanIdx];
       auto chanName = ToString(animChan->mNodeName);
+      if (auto animNode = scene->mRootNode->FindNode(animChan->mNodeName))
+      {
+        chanName = GetColladaSkeletonNodeName(animNode);
+      }
       auto numKeys = std::max(
           animChan->mNumPositionKeys, animChan->mNumRotationKeys);
       // Position and rotation arrays might be different lengths,
