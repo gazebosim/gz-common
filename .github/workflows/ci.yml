@@ -23,7 +23,6 @@ jobs:
           # codecov-enabled: true
           cppcheck-enabled: true
           cpplint-enabled: true
-          doxygen-enabled: true
   resolute-ci:
     runs-on: ubuntu-latest
     name: Ubuntu Resolute CI
