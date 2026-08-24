@@ -54,7 +54,7 @@ namespace gz
       /// \param[in] _width Width in pixels of the output video.
       /// \param[in] _height Height in pixels of the output video.
       /// \param[in] _format String that represents the video type.
-      /// Supported types include: "avi", "ogv", mp4", "v4l2". If using
+      /// Supported types include: "avi", "ogv", "mp4", "v4l2". If using
       /// "v4l2", you must also specify a _filename.
       /// \param[in] _bitRate Bit rate to encode the video. A value of zero
       /// will cause this function to automatically compute a bitrate.
@@ -103,7 +103,7 @@ namespace gz
       /// \param[in] _width Width in pixels of the output video.
       /// \param[in] _height Height in pixels of the output video.
       /// \param[in] _format String that represents the video type.
-      /// Supported types include: "avi", "ogv", mp4", "v4l2". If using
+      /// Supported types include: "avi", "ogv", "mp4", "v4l2". If using
       /// "v4l2", you must also specify a _filename.
       /// \param[in] _bitRate Bit rate to encode the video. A value of zero
       /// will cause this function to automatically compute a bitrate.
@@ -138,7 +138,7 @@ namespace gz
       /// \param[in] _width Width in pixels of the output video.
       /// \param[in] _height Height in pixels of the output video.
       /// \param[in] _format String that represents the video type.
-      /// Supported types include: "avi", "ogv", mp4", "v4l2". If using
+      /// Supported types include: "avi", "ogv", "mp4", "v4l2". If using
       /// "v4l2", you must also specify a _filename.
       /// \param[in] _bitRate Bit rate to encode the video. A value of zero
       /// will cause this function to automatically compute a bitrate.

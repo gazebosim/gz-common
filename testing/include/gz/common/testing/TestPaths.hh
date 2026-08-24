@@ -48,7 +48,7 @@ constexpr char kTestingProjectSourceDir[] = TESTING_PROJECT_SOURCE_DIR;
 
 //////////////////////////////////////////////////
 /// \brief List of buildsystem types
-enum class GZ_COMMON_TESTING_VISIBLE BuildType
+enum class BuildType
 {
   kUnknown,
   kCMake,

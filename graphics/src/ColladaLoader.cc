@@ -14,9 +14,12 @@
  * limitations under the License.
  *
  */
+#include <algorithm>
 #include <cerrno>
 #include <cmath>
 #include <cstdlib>
+#include <cstring>
+#include <limits>
 #include <map>
 #include <memory>
 #include <set>
@@ -348,9 +351,12 @@ namespace gz
       /// \brief Index of a normal in the collada <p> element
       public: unsigned int normalIndex;
 
-      /// \brief A map of texture coordinate set index to index of a texture
-      /// coordinate in the collada <p> element
-      public: std::map<unsigned int, unsigned int> texcoordIndex;
+      /// \brief Texture coordinate set index paired with the index of a
+      /// texture coordinate in the collada <p> element. A flat vector is
+      /// used instead of std::map because the number of sets is tiny
+      /// (usually one), avoiding a tree-node allocation per vertex record.
+      public: std::vector<std::pair<unsigned int, unsigned int>>
+          texcoordIndex;
 
       /// \brief Index of a vertex in the Gazebo mesh
       public: unsigned int mappedIndex;
@@ -406,8 +412,11 @@ struct Vector2dHash
 std::vector<double> parseDoubles(const char *_str, size_t _reserveCount)
 {
   std::vector<double> result;
-  // Preallocate memory based on the known count.
-  result.reserve(_reserveCount);
+  // Preallocate memory based on the known count, clamped by what the text
+  // could possibly hold (a value takes at least 2 characters including its
+  // delimiter) so a huge bogus count attribute cannot drive a huge
+  // allocation.
+  result.reserve(std::min(_reserveCount, std::strlen(_str) / 2 + 1));
   const char *start = _str;
   char *end{};
   while (true)
@@ -430,6 +439,72 @@ std::vector<double> parseDoubles(const char *_str, size_t _reserveCount)
     result.push_back(d);
   }
   return result;
+}
+
+/////////////////////////////////////////////////
+/// \brief Parse a whitespace-delimited list of unsigned integers from a
+/// string. Parsing stops at the first token that is not a non-negative
+/// integer fitting in unsigned int. This avoids the per-token std::string
+/// allocations that split() + parseInt() incur on the large index (<p>)
+/// arrays.
+/// \param[in] _str Null-terminated text to parse.
+/// \param[in] _reserveCount Number of values to reserve space for up front.
+/// \return The parsed values.
+std::vector<unsigned int> parseUints(const char *_str, size_t _reserveCount)
+{
+  std::vector<unsigned int> result;
+  result.reserve(_reserveCount);
+  const char *start = _str;
+  char *end{};
+  while (true)
+  {
+    // Skip whitespace ourselves so a leading '-' can be rejected:
+    // strtoul silently wraps negative numbers to huge values, which would
+    // become out-of-bounds indices downstream.
+    while (*start == ' ' || *start == '\t' || *start == '\r' ||
+           *start == '\n')
+    {
+      ++start;
+    }
+    if (*start == '-')
+    {
+      gzerr << "Negative index in <p> element; truncating after "
+            << result.size() << " value(s).\n";
+      break;
+    }
+    errno = 0;
+    // auto (deduces the strtoul return type) avoids a bare 'long', which
+    // cpplint's runtime/int check rejects.
+    auto v = std::strtoul(start, &end, 10);
+    if (start == end)
+      break;
+    start = end;
+    if (errno == ERANGE || v > std::numeric_limits<unsigned int>::max())
+    {
+      gzerr << "Index out of range in <p> element; truncating after "
+            << result.size() << " value(s).\n";
+      break;
+    }
+    result.push_back(static_cast<unsigned int>(v));
+  }
+  return result;
+}
+
+/////////////////////////////////////////////////
+/// \brief Look up the index recorded for a texture coordinate set.
+/// \param[in] _indices Geometry indices of a previously added vertex.
+/// \param[in] _set Texture coordinate set index.
+/// \return The recorded index, or 0 when the set is not present (matching
+/// the previous std::map operator[] default).
+unsigned int TexcoordIndexForSet(const GeometryIndices &_indices,
+    unsigned int _set)
+{
+  for (const auto &[set, index] : _indices.texcoordIndex)
+  {
+    if (set == _set)
+      return index;
+  }
+  return 0u;
 }
 
 /////////////////////////////////////////////////
@@ -462,12 +537,16 @@ struct SourceAccessor
 /// \param[in] _semantic Human readable description of the source semantic
 /// (e.g. "position coordinate"), used in error messages about attributes.
 /// \param[in] _id Id of the source element, used in error messages.
+/// \param[in] _minStride Smallest stride the caller can consume (e.g. 3
+/// for XYZ positions). A declared stride below this is rejected; this
+/// also rejects zero and negative strides that would otherwise hang or
+/// crash the read loops.
 /// \param[out] _out Parsed result. Valid only when true is returned.
 /// \return True when the source holds data to read. False when the source
 /// is empty (not an error) or malformed (an error has been logged).
 bool ParseSourceAccessor(tinyxml2::XMLElement *_sourceXml,
     const std::string &_sourceName, const std::string &_semantic,
-    const std::string &_id, SourceAccessor &_out)
+    const std::string &_id, int _minStride, SourceAccessor &_out)
 {
   tinyxml2::XMLElement *floatArrayXml =
       _sourceXml->FirstChildElement("float_array");
@@ -505,6 +584,14 @@ bool ParseSourceAccessor(tinyxml2::XMLElement *_sourceXml,
       return false;
   }
 
+  if (_out.totCount < 0)
+  {
+    gzerr << "Invalid count attribute in " << _semantic
+          << " <float_array> with id[" << _id << "]: count["
+          << _out.totCount << "] must not be negative\n";
+    return false;
+  }
+
   tinyxml2::XMLElement *techniqueXml =
       _sourceXml->FirstChildElement("technique_common");
   if (!techniqueXml)
@@ -536,6 +623,14 @@ bool ParseSourceAccessor(tinyxml2::XMLElement *_sourceXml,
       gzerr << "Invalid stride attribute in " << _semantic
             << " <accessor> with id[" << _id << "]\n";
       return false;
+  }
+
+  if (_out.stride < _minStride)
+  {
+    gzerr << "Invalid stride attribute in " << _semantic
+          << " <accessor> with id[" << _id << "]: stride[" << _out.stride
+          << "] must be at least " << _minStride << "\n";
+    return false;
   }
 
   // The accessor count attribute is optional for callers; -1 when absent
@@ -704,6 +799,7 @@ void ColladaLoader::Implementation::LoadNode(
         nodeName = name;
         break;
       }
+      parent = dynamic_cast<tinyxml2::XMLElement *>(parent->Parent());
     }
     if (nodeName.empty())
     {
@@ -1660,7 +1756,7 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
 
   SourceAccessor src;
   if (!ParseSourceAccessor(sourceXml, "Vertex", "position coordinate", _id,
-        src))
+        3, src))
     return;
 
   auto values = parseDoubles(src.text, src.totCount);
@@ -1678,9 +1774,18 @@ void ColladaLoader::Implementation::LoadPositions(const std::string &_id,
 
   std::unordered_map<gz::math::Vector3d,
       unsigned int, Vector3Hash> unique;
+  // Reserve based on the number of actually parsed values (not the
+  // declared count, which may be bogus) to avoid rehashing during
+  // insertion.
+  unique.reserve(values.size() / src.stride);
 
   gz::math::Vector3d vec;
-  for (int i = 0; i < src.totCount; i += src.stride)
+  // Bound by the actual number of parsed values, not just the declared
+  // count, so a too-large count attribute cannot drive an out-of-bounds
+  // read.
+  for (int i = 0;
+       i < src.totCount && i + 2 < static_cast<int>(values.size());
+       i += src.stride)
   {
     vec.Set(values[i],
             values[i+1],
@@ -1728,7 +1833,7 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
 
   SourceAccessor src;
   if (!ParseSourceAccessor(normalsXml, "Normal", "normal coordinate", _id,
-        src))
+        3, src))
     return;
 
   auto values = parseDoubles(src.text, src.totCount);
@@ -1746,9 +1851,18 @@ void ColladaLoader::Implementation::LoadNormals(const std::string &_id,
 
   std::unordered_map<gz::math::Vector3d,
       unsigned int, Vector3Hash> unique;
+  // Reserve based on the number of actually parsed values (not the
+  // declared count, which may be bogus) to avoid rehashing during
+  // insertion.
+  unique.reserve(values.size() / src.stride);
 
   gz::math::Vector3d vec;
-  for (int i = 0; i < src.totCount; i += src.stride)
+  // Bound by the actual number of parsed values, not just the declared
+  // count, so a too-large count attribute cannot drive an out-of-bounds
+  // read.
+  for (int i = 0;
+       i < src.totCount && i + 2 < static_cast<int>(values.size());
+       i += src.stride)
   {
     vec.Set(values[i],
             values[i+1],
@@ -1794,7 +1908,7 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
 
   SourceAccessor src;
   if (!ParseSourceAccessor(xml, "Texture coordinate", "texture coordinate",
-        _id, src))
+        _id, 2, src))
     return;
 
   // Texture coordinates require the accessor count attribute.
@@ -1829,10 +1943,18 @@ void ColladaLoader::Implementation::LoadTexCoords(const std::string &_id,
 
   std::unordered_map<gz::math::Vector2d,
                      unsigned int, Vector2dHash> unique;
+  // Reserve based on the number of actually parsed values (not the
+  // declared count, which may be bogus) to avoid rehashing during
+  // insertion.
+  unique.reserve(values.size() / src.stride);
 
   gz::math::Vector2d vec;
-  // Read in all the texture coordinates.
-  for (int i = 0; i < src.totCount; i += src.stride)
+  // Read in all the texture coordinates. Bound by the actual number of
+  // parsed values, not just the declared count, so a too-large count
+  // attribute cannot drive an out-of-bounds read.
+  for (int i = 0;
+       i < src.totCount && i + 1 < static_cast<int>(values.size());
+       i += src.stride)
   {
     // We only handle 2D texture coordinates right now.
     vec.Set(values[i],
@@ -2064,9 +2186,13 @@ void ColladaLoader::Implementation::LoadColorOrTexture(
 
     if (imageXml && imageXml->FirstChildElement("init_from"))
     {
-      std::string imgFile =
+      // GetText() returns nullptr for an empty <init_from/> element.
+      const char *imgFile =
         imageXml->FirstChildElement("init_from")->GetText();
-      _mat->SetTextureImage(imgFile, this->path);
+      if (imgFile)
+        _mat->SetTextureImage(imgFile, this->path);
+      else
+        gzerr << "Empty <init_from> element for texture in material\n";
     }
   }
 }
@@ -2196,33 +2322,54 @@ void ColladaLoader::Implementation::LoadPolylist(
   // if vcount >= 4, anchor around 0 (note this is bad for concave elements)
   //   e.g. if vcount = 4, break into triangle 1: [0,1,2], triangle 2: [0,2,3]
   tinyxml2::XMLElement *vcountXml = _polylistXml->FirstChildElement("vcount");
-  std::string vcountStr = vcountXml->GetText();
-  std::vector<std::string> vcountStrs = split(vcountStr, " \t\r\n");
-  std::vector<int> vcounts;
-  for (unsigned int j = 0; j < vcountStrs.size(); ++j)
-    vcounts.push_back(math::parseInt(vcountStrs[j]));
+  if (!vcountXml || !vcountXml->GetText())
+  {
+    gzerr << "Polylist is missing a <vcount> element\n";
+    return;
+  }
+  const char *vcountStr = vcountXml->GetText();
+  std::vector<unsigned int> vcounts = parseUints(vcountStr,
+      std::strlen(vcountStr) / 2 + 1);
 
   // read p
   tinyxml2::XMLElement *pXml = _polylistXml->FirstChildElement("p");
-  std::string pStr = pXml->GetText();
+  if (!pXml || !pXml->GetText())
+  {
+    gzerr << "Polylist is missing a <p> element\n";
+    return;
+  }
+  const char *pStr = pXml->GetText();
 
   // vertexIndexMap is a map of collada vertex index to Gazebo submesh vertex
   // indices, used for identifying vertices that can be shared.
   std::unordered_map<unsigned int, std::vector<GeometryIndices>> vertexIndexMap;
-  unsigned int *values = new unsigned int[inputSize];
-  memset(values, 0, inputSize);
+  // Reserve based on the number of positions to avoid rehashing.
+  vertexIndexMap.reserve(verts->size());
+  std::vector<unsigned int> values(inputSize, 0);
 
-  std::vector<std::string> strs = split(pStr, " \t\r\n");
-  if (inputSize > 0)
-    vertexIndexMap.reserve(strs.size() / inputSize);
-  std::vector<std::string>::iterator strs_iter = strs.begin();
+  // Parse the index array directly (avoids ~1 string allocation per index
+  // that split() + parseInt() would incur).
+  std::vector<unsigned int> indices = parseUints(pStr,
+      std::strlen(pStr) / 2 + 1);
+  std::size_t polyStart = 0;
   for (unsigned int l = 0; l < vcounts.size(); ++l)
   {
     // put us at the beginning of the polygon list
     if (l > 0)
-      strs_iter += inputSize * vcounts[l-1];
+      polyStart += static_cast<std::size_t>(inputSize) * vcounts[l-1];
 
-    for (unsigned int k = 2; k < static_cast<unsigned int>(vcounts[l]); ++k)
+    // The last triangle of this polygon reads up to and including index
+    // polyStart + vcounts[l]*inputSize - 1. Stop cleanly when the <p>
+    // element holds fewer indices than <vcount> declares.
+    if (polyStart + static_cast<std::size_t>(vcounts[l]) * inputSize >
+        indices.size())
+    {
+      gzerr << "Polylist <p> element has fewer indices than its <vcount> "
+            << "declares; truncating after " << l << " polygon(s).\n";
+      break;
+    }
+
+    for (unsigned int k = 2; k < vcounts[l]; ++k)
     {
       // if vcounts[l] = 5, then read 0,1,2, then 0,2,3, 0,3,4,...
       // here k = the last number in the series
@@ -2241,7 +2388,7 @@ void ColladaLoader::Implementation::LoadPolylist(
 
         for (unsigned int i = 0; i < inputSize; ++i)
         {
-          values[i] = gz::math::parseInt(strs_iter[triangle_index+i]);
+          values[i] = indices[polyStart + triangle_index + i];
         }
 
         unsigned int daeVertIndex = 0;
@@ -2269,12 +2416,12 @@ void ColladaLoader::Implementation::LoadPolylist(
             // the same normal and texcoord index values
             bool toDuplicate = true;
             unsigned int reuseIndex = 0;
-            std::vector<GeometryIndices> inputValues =
+            const std::vector<GeometryIndices> &inputValues =
                 vertexIndexMap[daeVertIndex];
 
             for (unsigned int i = 0; i < inputValues.size(); ++i)
             {
-              GeometryIndices iv = inputValues[i];
+              const GeometryIndices &iv = inputValues[i];
               bool normEqual = false;
               bool texEqual = false;
 
@@ -2310,7 +2457,7 @@ void ColladaLoader::Implementation::LoadPolylist(
                       remappedTexcoordIndex);
                   if (texDupMapSetIt != texDupMapSet.end())
                     remappedTexcoordIndex = texDupMapSetIt->second;
-                  if (iv.texcoordIndex[set] != remappedTexcoordIndex)
+                  if (TexcoordIndexForSet(iv, set) != remappedTexcoordIndex)
                   {
                     texEqual = false;
                     break;
@@ -2399,7 +2546,7 @@ void ColladaLoader::Implementation::LoadPolylist(
               subMesh->AddTexCoordBySet(
                   (*texcoordsSet)[inputRemappedTexcoordIndex].X(),
                   (*texcoordsSet)[inputRemappedTexcoordIndex].Y(), set);
-              input.texcoordIndex[set] = inputRemappedTexcoordIndex;
+              input.texcoordIndex.emplace_back(set, inputRemappedTexcoordIndex);
             }
           }
 
@@ -2414,7 +2561,6 @@ void ColladaLoader::Implementation::LoadPolylist(
       }
     }
   }
-  delete [] values;
 
   _mesh->AddSubMesh(std::move(subMesh));
 }
@@ -2568,7 +2714,7 @@ void ColladaLoader::Implementation::LoadTriangles(
 
     return;
   }
-  std::string pStr = pXml->GetText();
+  const char *pStr = pXml->GetText();
 
   // Collada format allows normals and texcoords to have their own set of
   // indices for more efficient storage of data but opengl only supports one
@@ -2579,16 +2725,20 @@ void ColladaLoader::Implementation::LoadTriangles(
   // vertexIndexMap is a map of collada vertex index to Gazebo submesh vertex
   // indices, used for identifying vertices that can be shared.
   std::unordered_map<unsigned int, std::vector<GeometryIndices>> vertexIndexMap;
+  // Reserve based on the number of positions to avoid rehashing.
+  vertexIndexMap.reserve(verts->size());
 
   std::vector<unsigned int> values(offsetSize);
-  std::vector<std::string> strs = split(pStr, " \t\r\n");
-  if (offsetSize > 0)
-    vertexIndexMap.reserve(strs.size() / offsetSize);
+  // Parse the index array directly (avoids ~1 string allocation per index
+  // that split() + parseInt() would incur). The loop bound also skips a
+  // trailing incomplete tuple in a truncated <p> element.
+  std::vector<unsigned int> indices = parseUints(pStr,
+      std::strlen(pStr) / 2 + 1);
 
-  for (unsigned int j = 0; j < strs.size(); j += offsetSize)
+  for (std::size_t j = 0; j + offsetSize <= indices.size(); j += offsetSize)
   {
     for (unsigned int i = 0; i < offsetSize; ++i)
-      values.at(i) = gz::math::parseInt(strs[j+i]);
+      values[i] = indices[j+i];
 
     unsigned int daeVertIndex = 0;
     bool addIndex = !hasVertices;
@@ -2615,11 +2765,12 @@ void ColladaLoader::Implementation::LoadTriangles(
         // same normal and texcoord index values
         bool toDuplicate = true;
         unsigned int reuseIndex = 0;
-        std::vector<GeometryIndices> inputValues = vertexIndexMap[daeVertIndex];
+        const std::vector<GeometryIndices> &inputValues =
+            vertexIndexMap[daeVertIndex];
 
         for (unsigned int i = 0; i < inputValues.size(); ++i)
         {
-          GeometryIndices iv = inputValues[i];
+          const GeometryIndices &iv = inputValues[i];
           bool normEqual = false;
           bool texEqual = false;
           if (hasNormals)
@@ -2654,7 +2805,7 @@ void ColladaLoader::Implementation::LoadTriangles(
               if (texDupMapSetIt != texDupMapSet.end())
                 remappedTexcoordIndex = texDupMapSetIt->second;
 
-              if (iv.texcoordIndex[set] != remappedTexcoordIndex)
+              if (TexcoordIndexForSet(iv, set) != remappedTexcoordIndex)
               {
                 texEqual = false;
                 break;
@@ -2740,7 +2891,7 @@ void ColladaLoader::Implementation::LoadTriangles(
           subMesh->AddTexCoordBySet(
               (*texcoordsSet)[inputRemappedTexcoordIndex].X(),
               (*texcoordsSet)[inputRemappedTexcoordIndex].Y(), set);
-          input.texcoordIndex[set] = inputRemappedTexcoordIndex;
+          input.texcoordIndex.emplace_back(set, inputRemappedTexcoordIndex);
         }
       }
 

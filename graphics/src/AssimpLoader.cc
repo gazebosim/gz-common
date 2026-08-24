@@ -18,6 +18,7 @@
 #include <cstddef>
 #include <memory>
 #include <queue>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -35,6 +36,8 @@
 #include "gz/common/SystemPaths.hh"
 #include "gz/common/Util.hh"
 
+#include <assimp/AssertHandler.h>   // Custom assert handler support
+#include <assimp/ColladaMetaData.h>
 #include <assimp/GltfMaterial.h>    // GLTF specific material properties
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/postprocess.h>     // Post processing flags
@@ -83,16 +86,17 @@ class AssimpLoader::Implementation
   /// \param[in] _scene the assimp scene
   /// \param[in] _matIdx index of the material in the scene
   /// \param[in] _path path where the mesh is located
-  /// \return pointer to the converted common::Material, nullptr if the material
-  /// was default created by assimp
+  /// \return pointer to the converted common::Material
   public: MaterialPtr CreateMaterial(const aiScene *_scene,
                                      unsigned _matIdx,
                                      const std::string &_path) const;
 
   /// \brief Check if Assimp material was default created by assimp
   /// \param[in] _assimpMat the assimp material
+  /// \param[in] _extension the file extension of the mesh
   /// \return whether the material was default created by assimp
-  public: bool IsDefaultMaterial(const aiMaterial* _assimpMat) const;
+  public: bool IsDefaultMaterial(const aiMaterial* _assimpMat,
+                                 const std::string &_extension) const;
 
   /// \brief Load a texture embedded in a mesh (i.e. for GLB format)
   /// into a gz::common::Image
@@ -199,6 +203,26 @@ static std::string ToString(const aiString& str)
 }
 
 //////////////////////////////////////////////////
+// Utility function to get Collada nodeID from assimp node object
+static std::string GetColladaNodeID(const aiNode* _node)
+{
+  if (!_node)
+    return "";
+
+  // Initialise nodeID to nodeName first
+  if (_node->mMetaData)
+  {
+    aiString colladaId;
+    if (_node->mMetaData->Get(AI_METADATA_COLLADA_ID, colladaId))
+    {
+      // If we have a value for the node ID, update it
+      return ToString(colladaId);
+    }
+  }
+  return ToString(_node->mName);
+}
+
+//////////////////////////////////////////////////
 std::string AssimpLoader::Implementation::FullTextureKey(
     const std::string &_texturePath) const
 {
@@ -245,12 +269,47 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene,
 {
   if (!_node)
     return;
+   // Iterate over children
+  for (unsigned childIdx = 0; childIdx < _node->mNumChildren; ++childIdx)
+  {
+    // Calculate the transform
+    auto& child_node = _node->mChildren[childIdx];
+    auto nodeTrans = this->ConvertTransform(child_node->mTransformation);
+    nodeTrans = _transform * nodeTrans;
+
+    // Finally recursive call to explore subnode
+    this->RecursiveCreate(_scene, child_node, nodeTrans, _mesh);
+  }
+
   // Visit this node, add the submesh
   for (unsigned meshIdx = 0; meshIdx < _node->mNumMeshes; ++meshIdx)
   {
     auto assimpMeshIdx = _node->mMeshes[meshIdx];
     auto& assimpMesh = _scene->mMeshes[assimpMeshIdx];
     auto nodeName = ToString(_node->mName);
+
+    // if node had no name originally and was assigned a default by
+    // assimp, replace it with the name of first ancestor node that has a name
+    if (nodeName.find("$ColladaAutoName$") == 0)
+    {
+      const aiNode *parent = _node->mParent;
+      nodeName = "";
+      while (parent && parent != _scene->mRootNode)
+      {
+        std::string parentName = ToString(parent->mName);
+        if (parentName.find("$ColladaAutoName$") != 0)
+        {
+          nodeName = parentName;
+          break;
+        }
+        parent = parent->mParent;
+      }
+      if (nodeName.empty())
+      {
+        static int nodeCounter = 0;
+        nodeName = "unnamed_submesh_" + std::to_string(nodeCounter++);
+      }
+    }
     auto subMesh = this->CreateSubMesh(assimpMesh, _transform);
     subMesh.SetName(nodeName);
     // Now add the bones to the skeleton
@@ -296,18 +355,6 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene,
     }
     _mesh->AddSubMesh(std::move(subMesh));
   }
-
-  // Iterate over children
-  for (unsigned childIdx = 0; childIdx < _node->mNumChildren; ++childIdx)
-  {
-    // Calculate the transform
-    auto& child_node = _node->mChildren[childIdx];
-    auto nodeTrans = this->ConvertTransform(child_node->mTransformation);
-    nodeTrans = _transform * nodeTrans;
-
-    // Finally recursive call to explore subnode
-    this->RecursiveCreate(_scene, child_node, nodeTrans, _mesh);
-  }
 }
 
 void AssimpLoader::Implementation::RecursiveStoreBoneNames(
@@ -346,6 +393,7 @@ void AssimpLoader::Implementation::RecursiveSkeletonCreate(const aiNode* _node,
     return;
   // First explore this node
   auto nodeName = ToString(_node->mName);
+  auto nodeID = GetColladaNodeID(_node);
   auto boneExist = _boneNames.find(nodeName) != _boneNames.end();
   auto nodeTrans = this->ConvertTransform(_node->mTransformation);
   auto skelNode = _parent;
@@ -353,7 +401,7 @@ void AssimpLoader::Implementation::RecursiveSkeletonCreate(const aiNode* _node,
   if (boneExist)
   {
     skelNode = new SkeletonNode(
-        _parent, nodeName, nodeName, SkeletonNode::JOINT);
+        _parent, nodeName, nodeID, SkeletonNode::JOINT);
     skelNode->SetTransform(nodeTrans);
   }
 
@@ -374,10 +422,6 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   aiColor4D color;
   bool specularDefine = false;
   auto& assimpMat = _scene->mMaterials[_matIdx];
-  if (IsDefaultMaterial(assimpMat))
-  {
-    return nullptr;
-  }
   auto ret = assimpMat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
   if (ret == AI_SUCCESS)
   {
@@ -584,8 +628,12 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
       }
     }
   }
-  ret = assimpMat->GetTexture(aiTextureType_NORMALS, 0, &texturePath);
-  if (ret == AI_SUCCESS)
+
+  // Assimp OBJ exporter treats height and normal maps the same way
+  if (assimpMat->GetTexture(
+          aiTextureType_NORMALS, 0, &texturePath) == AI_SUCCESS ||
+      assimpMat->GetTexture(
+          aiTextureType_HEIGHT, 0, &texturePath) == AI_SUCCESS)
   {
     std::string textureKey = this->FullTextureKey(texturePath.C_Str());
     auto [texName, texData] = this->LoadTexture(
@@ -601,6 +649,16 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
         _scene, texturePath, this->GenerateTextureName(textureKey, "Emissive"));
     pbr.SetEmissiveMap(texName, texData);
   }
+
+  ret = assimpMat->GetTexture(aiTextureType_SPECULAR, 0, &texturePath);
+  if (ret == AI_SUCCESS)
+  {
+    std::string textureKey = this->FullTextureKey(texturePath.C_Str());
+    auto [texName, texData] = this->LoadTexture(
+      _scene, texturePath, this->GenerateTextureName(textureKey, "Specular"));
+    pbr.SetSpecularMap(texName);
+  }
+
   float value;
   ret = assimpMat->Get(AI_MATKEY_METALLIC_FACTOR, value);
   if (ret == AI_SUCCESS)
@@ -629,19 +687,26 @@ std::pair<std::string, ImagePtr> AssimpLoader::Implementation::LoadTexture(
 {
   std::pair<std::string, ImagePtr> ret;
   std::string textureKey = this->FullTextureKey(_texturePath.C_Str());
+  // Check if the texture is embedded or not
+  auto embeddedTexture = _scene->GetEmbeddedTexture(_texturePath.C_Str());
 
   // Check if the texture is already in the cache
   auto it = this->imageCache.find(textureKey);
   if (it != this->imageCache.end())
   {
     gzdbg << "Texture [" << textureKey << "] found in cache" << std::endl;
-    ret.first = _textureName;
+    if (embeddedTexture)
+    {
+      ret.first = _textureName;
+    }
+    else
+    {
+      ret.first = ToString(_texturePath);
+    }
     ret.second = it->second;
     return ret;
   }
 
-  // Check if the texture is embedded or not
-  auto embeddedTexture = _scene->GetEmbeddedTexture(_texturePath.C_Str());
   if (embeddedTexture)
   {
     // Load embedded texture
@@ -673,7 +738,7 @@ std::pair<std::string, ImagePtr> AssimpLoader::Implementation::LoadTexture(
     {
       gzerr << "External texture [" << textureKey << "] not found" << std::endl;
     }
-    ret.first = _textureName;
+    ret.first = ToString(_texturePath);
   }
   return ret;
 }
@@ -802,10 +867,36 @@ SubMesh AssimpLoader::Implementation::CreateSubMesh(
   return subMesh;
 }
 
+namespace
+{
+//////////////////////////////////////////////////
+/// \brief Convert assimp assertion failures into exceptions instead of
+/// aborting the whole process. Assertion enabled assimp builds (such as
+/// the Ubuntu packages) call std::abort on internal assertion failures,
+/// even for well formed input files, e.g. a COLLADA file with an empty
+/// <init_from/> element. The exception is caught in Load and reported as
+/// a load failure.
+/// \remarks The signature must match assimp's AiAssertHandler function
+/// pointer type, so the string parameters cannot be std::string.
+/// \param[in] _failedExpression Text of the assertion that failed.
+/// \param[in] _file Source file of the assertion, from __FILE__.
+/// \param[in] _line Source line of the assertion, from __LINE__.
+void ThrowOnAssimpAssert(const char *_failedExpression, const char *_file,
+    int _line)
+{
+  throw std::runtime_error(std::string("assimp assertion failure: ") +
+      _failedExpression + " at " + _file + ":" + std::to_string(_line));
+}
+}  // namespace
+
 //////////////////////////////////////////////////
 bool AssimpLoader::Implementation::IsDefaultMaterial(
-    const aiMaterial* _assimpMat) const
+    const aiMaterial* _assimpMat, const std::string &_extension) const
 {
+  if (_extension == "stl")
+  {
+    return true;
+  }
   aiString matName;
   if ((_assimpMat->Get(AI_MATKEY_NAME, matName) == AI_SUCCESS) &&
       (ToString(matName) == AI_DEFAULT_MATERIAL_NAME) &&
@@ -820,9 +911,12 @@ bool AssimpLoader::Implementation::IsDefaultMaterial(
 AssimpLoader::AssimpLoader()
 : MeshLoader(), dataPtr(utils::MakeUniqueImpl<Implementation>())
 {
+  Assimp::setAiAssertHandler(ThrowOnAssimpAssert);
   this->dataPtr->importer.SetPropertyBool(AI_CONFIG_PP_FD_REMOVE, true);
   this->dataPtr->importer.SetPropertyBool(
       AI_CONFIG_IMPORT_REMOVE_EMPTY_BONES, false);
+  this->dataPtr->importer.SetPropertyBool(
+    AI_CONFIG_IMPORT_COLLADA_USE_COLLADA_NAMES, true);
 }
 
 //////////////////////////////////////////////////
@@ -836,15 +930,26 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   this->dataPtr->currentMeshPath = _filename;
   Mesh *mesh = new Mesh();
   std::string path = common::parentPath(_filename);
-  const aiScene* scene = this->dataPtr->importer.ReadFile(_filename,
-      aiProcess_JoinIdenticalVertices |
-      aiProcess_RemoveRedundantMaterials |
-      aiProcess_SortByPType |
-      aiProcess_FlipUVs |
-      aiProcess_PopulateArmatureData |
-      aiProcess_Triangulate |
-      aiProcess_GenNormals |
-      0);
+  const aiScene* scene = nullptr;
+  try
+  {
+    scene = this->dataPtr->importer.ReadFile(_filename,
+        aiProcess_JoinIdenticalVertices |
+        aiProcess_FindDegenerates |
+        aiProcess_RemoveRedundantMaterials |
+        aiProcess_SortByPType |
+        aiProcess_FlipUVs |
+        aiProcess_PopulateArmatureData |
+        aiProcess_Triangulate |
+        aiProcess_GenNormals |
+        0);
+  }
+  catch (const std::exception &_e)
+  {
+    gzerr << "Exception while importing mesh [" << _filename << "]: "
+          << _e.what() << std::endl;
+    scene = nullptr;
+  }
   if (scene == nullptr)
   {
     gzerr << "Unable to import mesh [" << _filename << "]" << std::endl;
@@ -852,6 +957,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   }
   auto& rootNode = scene->mRootNode;
   auto rootName = ToString(rootNode->mName);
+  auto rootID = GetColladaNodeID(rootNode);
   std::string extension;
   std::size_t extIdx = _filename.rfind(".");
   if (extIdx != std::string::npos)
@@ -870,7 +976,22 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   // Add the materials first
   for (unsigned _matIdx = 0; _matIdx < scene->mNumMaterials; ++_matIdx)
   {
+    if (this->dataPtr->IsDefaultMaterial(scene->mMaterials[_matIdx], extension))
+    {
+      continue;
+    }
     auto mat = this->dataPtr->CreateMaterial(scene, _matIdx, path);
+    // Warn if file is an OBJ file with real PBR information
+    common::Pbr defaultPbr;
+    if (extension == "obj" && *mat->PbrMaterial() != defaultPbr)
+    {
+      gzwarn << "OBJ file with PBR materials detected in mesh ["
+             << _filename
+             << "]. Note that the fields in the .mtl file may not be read as "
+             << "expected (eg. if you exported this file with Blender). "
+             << "Use GLTF for a more modern format that supports PBR."
+             << std::endl;
+    }
     mesh->AddMaterial(mat);
   }
   // Create the skeleton
@@ -878,7 +999,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     std::unordered_set<std::string> boneNames;
     this->dataPtr->RecursiveStoreBoneNames(scene, rootNode, boneNames);
     auto rootSkelNode = new SkeletonNode(
-        nullptr, rootName, rootName, SkeletonNode::NODE);
+        nullptr, rootName, rootID, SkeletonNode::NODE);
     rootSkelNode->SetTransform(rootTransform);
     rootSkelNode->SetModelTransform(rootTransform);
     for (unsigned childIdx = 0; childIdx < rootNode->mNumChildren; ++childIdx)

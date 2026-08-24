@@ -87,46 +87,6 @@ TEST_F(AssimpLoader, LoadBoxMultipleInstControllers)
 }
 
 /////////////////////////////////////////////////
-TEST_F(AssimpLoader, LoadBoxNestedAnimation)
-{
-  common::AssimpLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "box_nested_animation.dae"));
-
-  EXPECT_EQ(36u, mesh->IndexCount());
-  EXPECT_EQ(24u, mesh->VertexCount());
-  EXPECT_EQ(1u, mesh->SubMeshCount());
-  EXPECT_EQ(1u, mesh->MaterialCount());
-  EXPECT_EQ(24u, mesh->TexCoordCount());
-  common::SkeletonPtr skeleton = mesh->MeshSkeleton();
-  ASSERT_EQ(1u, mesh->MeshSkeleton()->AnimationCount());
-  common::SkeletonAnimation *anim = skeleton->Animation(0);
-  // Depends on fix in assimp main branch for nested animation naming
-  // TODO(luca) Fix is merged in assimp main, add when it is re-released
-  // EXPECT_EQ(anim->Name(), "Armature");
-  EXPECT_EQ(1u, anim->NodeCount());
-  EXPECT_TRUE(anim->HasNode("Armature_Bone"));
-  auto nodeAnimation = anim->NodeAnimationByName("Armature_Bone");
-  ASSERT_NE(nullptr, nodeAnimation);
-  EXPECT_EQ("Armature_Bone", nodeAnimation->Name());
-  auto poseStart = anim->PoseAt(0);
-  math::Matrix4d expectedTrans = math::Matrix4d(
-      1, 0, 0, 1,
-      0, 1, 0, -1,
-      0, 0, 1, 0,
-      0, 0, 0, 1);
-  EXPECT_EQ(expectedTrans, poseStart.at("Armature_Bone"));
-  auto poseEnd = anim->PoseAt(1.666666);
-  expectedTrans = math::Matrix4d(
-        1, 0, 0, 2,
-        0, 1, 0, -1,
-        0, 0, 1, 0,
-        0, 0, 0, 1);
-  EXPECT_EQ(expectedTrans, poseEnd.at("Armature_Bone"));
-  delete mesh;
-}
-
-/////////////////////////////////////////////////
 TEST_F(AssimpLoader, LoadBoxWithDefaultStride)
 {
   common::AssimpLoader loader;
@@ -142,33 +102,6 @@ TEST_F(AssimpLoader, LoadBoxWithDefaultStride)
   ASSERT_NE(mesh->MeshSkeleton(), nullptr);
   // TODO(luca) not working, investigate
   // ASSERT_EQ(1u, mesh->MeshSkeleton()->AnimationCount());
-  delete mesh;
-}
-
-/////////////////////////////////////////////////
-TEST_F(AssimpLoader, LoadBoxWithHierarchicalNodes)
-{
-  common::AssimpLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "box_with_hierarchical_nodes.dae"));
-
-  ASSERT_EQ(5u, mesh->SubMeshCount());
-
-  // node by itself
-  EXPECT_EQ("StaticCube", mesh->SubMeshByIndex(0).lock()->Name());
-
-  // nested node with no name so it takes the parent's name instead
-  EXPECT_EQ("StaticCubeParent", mesh->SubMeshByIndex(1).lock()->Name());
-
-  // parent node containing child node with no name
-  // CHANGE Assimp assigns the id to the name if the mesh has no name
-  EXPECT_EQ("StaticCubeNestedNoName", mesh->SubMeshByIndex(2).lock()->Name());
-
-  // Parent of nested node with name
-  EXPECT_EQ("StaticCubeParent2", mesh->SubMeshByIndex(3).lock()->Name());
-
-  // nested node with name
-  EXPECT_EQ("StaticCubeNested", mesh->SubMeshByIndex(4).lock()->Name());
   delete mesh;
 }
 
@@ -220,31 +153,6 @@ TEST_F(AssimpLoader, LoadCylinderAnimatedFrom3dsMax)
   // EXPECT_EQ("Bone02", anim->Name());
   EXPECT_EQ(1u, anim->NodeCount());
   EXPECT_TRUE(anim->HasNode("Bone02"));
-  delete mesh;
-}
-
-/////////////////////////////////////////////////
-// Open a gltf mesh with an external texture
-TEST_F(AssimpLoader, LoadGlTF2BoxExternalTexture)
-{
-  common::AssimpLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "gltf", "PurpleCube.gltf"));
-
-  EXPECT_STREQ("unknown", mesh->Name().c_str());
-
-  // Make sure we can read the submesh name
-  EXPECT_STREQ("PurpleCube", mesh->SubMeshByIndex(0).lock()->Name().c_str());
-
-  EXPECT_EQ(mesh->MaterialCount(), 1u);
-
-  const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
-  ASSERT_TRUE(mat.get());
-  // Data is now loaded in memory
-  EXPECT_NE(nullptr, mat->TextureData());
-  auto testTextureFile =
-    common::testing::TestFile("data/gltf", "PurpleCube_Diffuse.png");
-  EXPECT_EQ(testTextureFile + "_Diffuse", mat->TextureImage());
   delete mesh;
 }
 

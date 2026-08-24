@@ -33,7 +33,13 @@ using namespace gz;
 
 // Only runs each test once. For cases where the GZ_MESH_FORCE_ASSIMP
 // does not affect the behavior of the test
-class MeshManager : public common::testing::AutoLogFixture { };
+class MeshManager : public common::testing::AutoLogFixture {
+  protected: void TearDown() override
+  {
+    common::MeshManager::Instance()->RemoveAll();
+    common::testing::AutoLogFixture::TearDown();
+  }
+};
 
 // Runs the test twice, once each for GZ_MESH_FORCE_ASSIMP=true and false
 // to test both custom mesh loaders and AssimpLoader
@@ -496,8 +502,6 @@ TEST_F(MeshManager, CreateMesh)
   const common::Mesh *verifyMesh = mgr->MeshByName(meshName);
   EXPECT_NE(nullptr, verifyMesh);
   EXPECT_EQ(meshName, verifyMesh->Name());
-
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -520,7 +524,6 @@ TEST_P(MeshManagerLoad, LoadBox)
 
   // Make sure we can read a submesh name
   EXPECT_STREQ("Cube", mesh->SubMeshByIndex(0).lock()->Name().c_str());
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -572,7 +575,6 @@ TEST_P(MeshManagerLoad, ShareVertices)
       }
     }
   }
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -628,8 +630,6 @@ TEST_P(MeshManagerLoad, Material)
   matOpaque->BlendFactors(srcFactor, dstFactor);
   EXPECT_DOUBLE_EQ(1.0, srcFactor);
   EXPECT_DOUBLE_EQ(0.0, dstFactor);
-
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -715,7 +715,6 @@ TEST_P(MeshManagerLoad, TexCoordSets)
 
   subMeshB->SetTexCoordBySet(2u, math::Vector2d(0.1, 0.2), 1u);
   EXPECT_EQ(math::Vector2d(0.1, 0.2), subMeshB->TexCoordBySet(2u, 1u));
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -752,7 +751,51 @@ TEST_P(MeshManagerLoad, LoadBoxWithAnimationOutsideSkeleton)
         0, 0, 1, 0,
         0, 0, 0, 1);
   EXPECT_EQ(expectedTrans, poseEnd.at("Armature"));
-  mgr->RemoveAll();
+}
+
+/////////////////////////////////////////////////
+TEST_P(MeshManagerLoad, LoadBoxNestedAnimation)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "box_nested_animation.dae"));
+
+  if (forceAssimpEnv)
+  {
+    EXPECT_EQ(24u, mesh->VertexCount());
+    EXPECT_EQ(24u, mesh->TexCoordCount());
+  }
+  else
+  {
+    EXPECT_EQ(35u, mesh->VertexCount());
+    EXPECT_EQ(35u, mesh->TexCoordCount());
+  }
+  EXPECT_EQ(36u, mesh->IndexCount());
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(1u, mesh->MaterialCount());
+  common::SkeletonPtr skeleton = mesh->MeshSkeleton();
+  ASSERT_EQ(1u, mesh->MeshSkeleton()->AnimationCount());
+  common::SkeletonAnimation *anim = skeleton->Animation(0);
+  EXPECT_EQ(anim->Name(), "Armature");
+  EXPECT_EQ(1u, anim->NodeCount());
+  EXPECT_TRUE(anim->HasNode("Bone"));
+  auto nodeAnimation = anim->NodeAnimationByName("Bone");
+  EXPECT_NE(nullptr, nodeAnimation);
+  EXPECT_EQ("Bone", nodeAnimation->Name());
+  auto poseStart = anim->PoseAt(0);
+  math::Matrix4d expectedTrans = math::Matrix4d(
+      1, 0, 0, 1,
+      0, 1, 0, -1,
+      0, 0, 1, 0,
+      0, 0, 0, 1);
+  EXPECT_EQ(expectedTrans, poseStart.at("Bone"));
+  auto poseEnd = anim->PoseAt(1.666666);
+  expectedTrans = math::Matrix4d(
+        1, 0, 0, 2,
+        0, 1, 0, -1,
+        0, 0, 1, 0,
+        0, 0, 0, 1);
+  EXPECT_EQ(expectedTrans, poseEnd.at("Bone"));
 }
 
 /////////////////////////////////////////////////
@@ -770,7 +813,33 @@ TEST_P(MeshManagerLoad, LoadBoxWithMultipleGeoms)
   ASSERT_EQ(2u, mesh->SubMeshCount());
   EXPECT_EQ(24u, mesh->SubMeshByIndex(0).lock()->NodeAssignmentsCount());
   EXPECT_EQ(0u, mesh->SubMeshByIndex(1).lock()->NodeAssignmentsCount());
-  mgr->RemoveAll();
+}
+
+/////////////////////////////////////////////////
+TEST_P(MeshManagerLoad, LoadBoxWithHierarchicalNodes)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "box_with_hierarchical_nodes.dae"));
+  ASSERT_EQ(7u, mesh->SubMeshCount());
+
+  // node by itself
+  EXPECT_EQ("StaticCube", mesh->SubMeshByIndex(0).lock()->Name());
+
+  // nested node with no name so it takes the parent's name instead
+  EXPECT_EQ("StaticCubeParent", mesh->SubMeshByIndex(1).lock()->Name());
+
+  // parent node containing child node with no name
+  EXPECT_EQ("StaticCubeParent", mesh->SubMeshByIndex(2).lock()->Name());
+
+  // nested node with name
+  EXPECT_EQ("StaticCubeNested", mesh->SubMeshByIndex(3).lock()->Name());
+
+  // Parent of nested node with name
+  EXPECT_EQ("StaticCubeParent2", mesh->SubMeshByIndex(4).lock()->Name());
+
+  // Nested node that does not have ancestors with a name
+  EXPECT_EQ("unnamed_submesh_0", mesh->SubMeshByIndex(5).lock()->Name());
 }
 
 /////////////////////////////////////////////////
@@ -787,7 +856,6 @@ TEST_P(MeshManagerLoad, NoAnimName)
   common::SkeletonAnimation *anim = skeleton->Animation(0);
   auto animName = anim->Name();
   EXPECT_EQ(animName, "animation1");
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -845,8 +913,103 @@ TEST_P(MeshManagerLoad, LoadObjBox)
   EXPECT_EQ(mat->Diffuse(), math::Color(0.512f, 0.512f, 0.512f, 1.0f));
   EXPECT_EQ(mat->Specular(), math::Color(0.25, 0.25, 0.25, 1.0));
   EXPECT_DOUBLE_EQ(mat->Transparency(), 0.0);
+}
 
-  mgr->RemoveAll();
+/////////////////////////////////////////////////
+// This tests opening an OBJ file that has PBR fields
+TEST_P(MeshManagerLoad, PBR)
+{
+  auto *mgr = common::MeshManager::Instance();
+
+  // load obj file exported by 3ds max that has pbr extension
+  {
+    std::string meshFilename =
+      common::testing::TestFile("data", "cube_pbr.obj");
+
+    const common::Mesh *mesh = mgr->Load(meshFilename);
+    EXPECT_NE(nullptr, mesh);
+    // Expect warnings about the OBJ/PBR combination
+    common::Console::Root().RawLogger().flush();
+    std::string log = LogContent();
+    if (this->forceAssimpEnv)
+    {
+      EXPECT_NE(log.find(
+        "OBJ file with PBR materials detected"), std::string::npos);
+    }
+    const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+    ASSERT_TRUE(mat.get());
+
+    EXPECT_EQ(math::Color(0.0f, 0.0f, 0.0f, 1.0f), mat->Ambient());
+    EXPECT_EQ(math::Color(0.5f, 0.5f, 0.5f, 1.0f), mat->Diffuse());
+    EXPECT_EQ(math::Color(1.0f, 1.0f, 1.0f, 1.0f), mat->Specular());
+    EXPECT_DOUBLE_EQ(0.0, mat->Transparency());
+    EXPECT_NE(std::string::npos,
+        mat->TextureImage().find("LightDome_Albedo.png"));
+    const common::Pbr *pbr = mat->PbrMaterial();
+    EXPECT_DOUBLE_EQ(0, pbr->Roughness());
+    EXPECT_DOUBLE_EQ(0, pbr->Metalness());
+    EXPECT_EQ("LightDome_Metalness.png", pbr->MetalnessMap());
+    EXPECT_EQ("LightDome_Roughness.png", pbr->RoughnessMap());
+    EXPECT_EQ("LightDome_Normal.png", pbr->NormalMap());
+    mgr->RemoveAll();
+  }
+
+  // load obj file exported by blender - it shoves pbr maps into
+  // existing fields
+  {
+    // Ensure that the previous logs were cleared
+    common::Console::Root().RawLogger().flush();
+    std::string log = LogContent();
+    size_t prevLogSize = log.size();
+    if (this->forceAssimpEnv)
+    {
+      EXPECT_EQ(log.find(
+        "OBJ file with PBR materials detected", prevLogSize),
+        std::string::npos);
+    }
+
+    std::string meshFilename =
+      common::testing::TestFile("data", "blender_pbr.obj");
+
+    const common::Mesh *mesh = mgr->Load(meshFilename);
+    EXPECT_NE(nullptr, mesh);
+
+    // Expect warnings about the OBJ/PBR combination
+    common::Console::Root().RawLogger().flush();
+    log = LogContent();
+    if (this->forceAssimpEnv)
+    {
+      EXPECT_NE(log.find(
+        "OBJ file with PBR materials detected", prevLogSize),
+        std::string::npos);
+    }
+
+    const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+    ASSERT_TRUE(mat.get());
+
+    EXPECT_EQ(math::Color(1.0f, 1.0f, 1.0f, 1.0f), mat->Ambient());
+    EXPECT_EQ(math::Color(0.8f, 0.8f, 0.8f, 1.0f), mat->Diffuse());
+    EXPECT_EQ(math::Color(0.5f, 0.5f, 0.5f, 1.0f), mat->Specular());
+    EXPECT_EQ(math::Color(0.0f, 0.0f, 0.0f, 1.0f), mat->Emissive());
+    EXPECT_DOUBLE_EQ(0.0, mat->Transparency());
+    EXPECT_NE(std::string::npos,
+        mat->TextureImage().find("mesh_Diffuse.png"));
+    const common::Pbr *pbr = mat->PbrMaterial();
+    EXPECT_DOUBLE_EQ(0, pbr->Metalness());
+    if (this->forceAssimpEnv)
+    {
+      EXPECT_DOUBLE_EQ(0.5, pbr->Roughness());
+      // 'refl' not mapped to anything in AssimpLoader
+      // `map_Ns` not mapped to anything in AssimpLoader
+    }
+    else
+    {
+      EXPECT_DOUBLE_EQ(0.0, pbr->Roughness());
+      EXPECT_EQ("mesh_Rough.png", pbr->RoughnessMap());  // map_Ns
+      EXPECT_EQ("mesh_Metal.png", pbr->MetalnessMap());  // refl
+    }
+    EXPECT_EQ("mesh_Normal.png", pbr->NormalMap());
+  }
 }
 
 /////////////////////////////////////////////////
@@ -861,7 +1024,6 @@ TEST_P(MeshManagerLoad, ObjInvalidMaterial)
   const common::Mesh *mesh = mgr->Load(meshFilename);
 
   EXPECT_TRUE(mesh != nullptr);
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -874,7 +1036,6 @@ TEST_F(MeshManager, NonExistingMesh)
   const common::Mesh *mesh = mgr->Load(meshFilename);
 
   EXPECT_EQ(mesh, nullptr);
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -910,7 +1071,6 @@ TEST_F(MeshManager, LoadFbxBox)
   EXPECT_EQ(mat->Diffuse(), math::Color(0.8f, 0.8f, 0.8f, 1.0f));
   EXPECT_EQ(mat->Specular(), math::Color(0.8f, 0.8f, 0.8f, 1.0f));
   EXPECT_DOUBLE_EQ(mat->Transparency(), 0.0);
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -946,7 +1106,6 @@ TEST_F(MeshManager, LoadGlTF2Box)
   EXPECT_EQ(mat->Diffuse(), math::Color(0.8f, 0.8f, 0.8f, 1.0f));
   EXPECT_EQ(mat->Specular(), math::Color(0.0f, 0.0f, 0.0f, 1.0f));
   EXPECT_DOUBLE_EQ(mat->Transparency(), 0.0);
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -969,7 +1128,6 @@ TEST_F(MeshManager, LoadGlTF2BoxTransmission)
   ASSERT_TRUE(mat.get());
   // transmission currently modeled as transparency
   EXPECT_FLOAT_EQ(0.1f, mat->Transparency());
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -1007,7 +1165,40 @@ TEST_F(MeshManager, LoadGlTF2BoxWithJPEGTexture)
       "box_texture_jpg.glb") + "#*0_Diffuse";
   EXPECT_EQ(expectedName, mat->TextureImage());
   EXPECT_NE(nullptr, mat->TextureData());
-  mgr->RemoveAll();
+}
+
+/////////////////////////////////////////////////
+// Open a gltf mesh with an external texture
+TEST_F(MeshManager, LoadGlTF2BoxExternalTexture)
+{
+  auto *mgr = common::MeshManager::Instance();
+  std::string meshFilename =
+    common::testing::TestFile("data", "gltf", "PurpleCube.gltf");
+  const common::Mesh *mesh = mgr->Load(meshFilename);
+
+  EXPECT_EQ(meshFilename, mesh->Name());
+
+  // Make sure we can read the submesh name
+  EXPECT_STREQ("PurpleCube", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+
+  EXPECT_EQ(mesh->MaterialCount(), 1u);
+
+  const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+  ASSERT_TRUE(mat.get());
+  // Data is now loaded in memory
+  EXPECT_NE(nullptr, mat->TextureData());
+  auto testTextureFile =
+    common::testing::TestFile("data/gltf", "PurpleCube_Diffuse.png");
+  EXPECT_EQ("PurpleCube_Diffuse.png", mat->TextureImage());
+
+  // Test that SpecularMap has data
+  auto materialId = mesh->SubMeshByIndex(0).lock()->GetMaterialIndex();
+  ASSERT_TRUE(materialId.has_value());
+  auto material = mesh->MaterialByIndex(materialId.value());
+  ASSERT_NE(material, nullptr);
+  auto pbr = material->PbrMaterial();
+  ASSERT_NE(pbr, nullptr);
+  EXPECT_NE(pbr->SpecularMap(), testTextureFile);
 }
 
 /////////////////////////////////////////////////
@@ -1085,7 +1276,6 @@ TEST_F(MeshManager, LoadGlbPbrAsset)
   EXPECT_STREQ("Action1", skel->Animation(0)->Name().c_str());
   EXPECT_STREQ("Action2", skel->Animation(1)->Name().c_str());
   EXPECT_STREQ("Action3", skel->Animation(2)->Name().c_str());
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -1129,7 +1319,377 @@ TEST_F(MeshManager, LoadGLTF2Triangle)
   EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoord(0u));
   EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoord(1u));
   EXPECT_EQ(math::Vector2d(0, 1), subMeshB->TexCoord(2u));
+}
+
+/////////////////////////////////////////////////
+TEST_P(MeshManagerLoad, LoadSTL)
+{
+  auto *mgr = common::MeshManager::Instance();
+  auto mesh = mgr->Load("");
+  EXPECT_EQ(nullptr, mesh);
+
+  std::string cubeFilepath = common::testing::TestFile("data", "cube.stl");
+  mesh = mgr->Load(cubeFilepath);
+  EXPECT_NE(nullptr, mesh);
+
+  EXPECT_EQ(cubeFilepath, mesh->Name().c_str());
+  EXPECT_EQ(math::Vector3d(20, 0, 20), mesh->Max());
+  EXPECT_EQ(math::Vector3d(0, -20, 0), mesh->Min());
+  EXPECT_EQ(0u, mesh->MaterialCount());
+  EXPECT_EQ(36u, mesh->IndexCount());
+  EXPECT_EQ(0u, mesh->TexCoordCount());
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+
+  auto sm = mesh->SubMeshByIndex(0u);
+  auto subMesh = sm.lock();
+  EXPECT_NE(nullptr, subMesh);
+  EXPECT_EQ(math::Vector3d(0, 0, -1), subMesh->Normal(0u));
+  EXPECT_EQ(math::Vector3d(0, 0, -1), subMesh->Normal(1u));
+  EXPECT_EQ(math::Vector3d(0, 0, -1), subMesh->Normal(2u));
+
+  EXPECT_EQ(mesh->VertexCount(), mesh->NormalCount());
+  std::vector<std::vector<double>> vertexValues {
+    {20, 0, 0}, {0, -20, 0}, {0, 0, 0},
+    {0, -20, 0}, {20, 0, 0}, {20, -20, 0},
+    {20, -20, 20}, {0, -20, 0}, {20, -20, 0},
+    {0, -20, 0}, {20, -20, 20}, {0, -20, 20},
+    {20, 0, 0}, {20, -20, 20}, {20, -20, 0},
+    {20, -20, 20}, {20, 0, 0}, {20, 0, 20},
+    {20, -20, 20}, {0, 0, 20}, {0, -20, 20},
+    {0, 0, 20}, {20, -20, 20}, {20, 0, 20},
+    {0, 0, 20}, {0, -20, 0}, {0, -20, 20},
+    {0, -20, 0}, {0, 0, 20}, {0, 0, 0},
+    {0, 0, 20}, {20, 0, 0}, {0, 0, 0},
+    {20, 0, 0}, {0, 0, 20}, {20, 0, 20}
+  };
+
+  EXPECT_EQ(vertexValues.size(), subMesh->IndexCount());
+  for (unsigned int i = 0; i < subMesh->IndexCount(); ++i)
+  {
+    math::Vector3d vertexCoord(vertexValues[i][0],
+                               vertexValues[i][1],
+                               vertexValues[i][2]);
+    EXPECT_EQ(subMesh->Vertex(subMesh->Index(i)), vertexCoord);
+  }
+
+  EXPECT_STREQ("model", mesh->SubMeshByIndex(0).lock()->Name().c_str());
   mgr->RemoveAll();
+
+  std::string cubeBinFilepath = common::testing::TestFile(
+                                    "data", "cube_binary.stl");
+  mesh = mgr->Load(cubeBinFilepath);
+  EXPECT_NE(nullptr, mesh);
+
+  EXPECT_EQ(cubeBinFilepath, mesh->Name().c_str());
+  EXPECT_EQ(math::Vector3d(20, 0, 20), mesh->Max());
+  EXPECT_EQ(math::Vector3d(0, -20, 0), mesh->Min());
+  EXPECT_EQ(0u, mesh->MaterialCount());
+  EXPECT_EQ(36u, mesh->IndexCount());
+  EXPECT_EQ(0u, mesh->TexCoordCount());
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+
+  sm = mesh->SubMeshByIndex(0u);
+  subMesh = sm.lock();
+  EXPECT_NE(nullptr, subMesh);
+  EXPECT_EQ(math::Vector3d(0, 0, -1), subMesh->Normal(0u));
+  EXPECT_EQ(math::Vector3d(0, 0, -1), subMesh->Normal(1u));
+  EXPECT_EQ(math::Vector3d(0, 0, -1), subMesh->Normal(2u));
+  EXPECT_EQ(mesh->VertexCount(), mesh->NormalCount());
+  // Coordinates of the vertices should be the same as in the cube.stl
+  EXPECT_EQ(vertexValues.size(), subMesh->IndexCount());
+  for (unsigned int i = 0; i < subMesh->IndexCount(); ++i)
+  {
+    math::Vector3d vertexCoord(
+      vertexValues[i][0], vertexValues[i][1], vertexValues[i][2]);
+    EXPECT_EQ(subMesh->Vertex(subMesh->Index(i)), vertexCoord);
+  }
+
+  EXPECT_STREQ("", mesh->SubMeshByIndex(0).lock()->Name().c_str());
+}
+
+/////////////////////////////////////////////////
+// A <float_array> without a count attribute must not crash any loader.
+// The malformed source is rejected and an empty mesh is returned.
+TEST_P(MeshManagerLoad, LoadMalformedPositionNoCount)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_position_no_count.dae"));
+  ASSERT_NE(nullptr, mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A non numeric count attribute must be caught, not throw. The
+// malformed source is rejected and an empty mesh is returned.
+TEST_P(MeshManagerLoad, LoadMalformedPositionBadCount)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_position_bad_count.dae"));
+  ASSERT_NE(nullptr, mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A missing accessor stride attribute must not crash any loader. The
+// source is rejected and an empty mesh is returned.
+TEST_P(MeshManagerLoad, LoadMalformedPositionNoStride)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_position_no_stride.dae"));
+  ASSERT_NE(nullptr, mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// An overflowing float value must be handled gracefully, not throw.
+// The malformed source is rejected and an empty mesh is returned.
+TEST_P(MeshManagerLoad, LoadMalformedPositionOverflow)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_position_overflow.dae"));
+  ASSERT_NE(nullptr, mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A zero accessor stride must be rejected: it previously caused an
+// infinite read loop in the COLLADA loader. An empty mesh is returned.
+TEST_P(MeshManagerLoad, LoadMalformedPositionZeroStride)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_position_zero_stride.dae"));
+  ASSERT_NE(nullptr, mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A negative float_array count must be rejected: it previously drove a
+// huge (wrapped around) allocation. An empty mesh is returned.
+TEST_P(MeshManagerLoad, LoadMalformedPositionNegativeCount)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data",
+      "malformed_position_negative_count.dae"));
+  ASSERT_NE(nullptr, mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A normal source without a count attribute must not crash any loader.
+// The submesh that references it is skipped.
+TEST_P(MeshManagerLoad, LoadMalformedNormalNoCount)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_normal_no_count.dae"));
+  ASSERT_NE(nullptr, mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A non numeric count attribute in a normal source must be caught, not
+// throw. The submesh that references it is skipped.
+TEST_P(MeshManagerLoad, LoadMalformedNormalBadCount)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_normal_bad_count.dae"));
+  ASSERT_NE(nullptr, mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A missing accessor stride attribute in a normal source must not crash
+// any loader. The submesh that references it is skipped.
+TEST_P(MeshManagerLoad, LoadMalformedNormalNoStride)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_normal_no_stride.dae"));
+  ASSERT_NE(nullptr, mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A texcoord source without a count attribute must not crash any loader.
+// The submesh that references it is skipped.
+TEST_P(MeshManagerLoad, LoadMalformedTexcoordNoCount)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_texcoord_no_count.dae"));
+  ASSERT_NE(nullptr, mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A non numeric count attribute in a texcoord source must be caught, not
+// throw. The submesh that references it is skipped.
+TEST_P(MeshManagerLoad, LoadMalformedTexcoordBadCount)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_texcoord_bad_count.dae"));
+  ASSERT_NE(nullptr, mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A missing accessor stride attribute in a texcoord source must not
+// crash any loader. The submesh that references it is skipped.
+TEST_P(MeshManagerLoad, LoadMalformedTexcoordNoStride)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_texcoord_no_stride.dae"));
+  ASSERT_NE(nullptr, mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A texcoord source whose accessor count times stride disagrees with
+// the float_array count must not crash. The submesh is skipped.
+TEST_P(MeshManagerLoad, LoadMalformedTexcoordMismatch)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_texcoord_mismatch.dae"));
+  ASSERT_NE(nullptr, mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A count far larger than the actual data must neither over allocate nor
+// read out of bounds. Recovery policies differ: the COLLADA loader keeps
+// the values that are present, assimp discards the geometry.
+TEST_P(MeshManagerLoad, LoadMalformedPositionHugeCount)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_position_huge_count.dae"));
+  ASSERT_NE(nullptr, mesh);
+  if (this->forceAssimpEnv)
+  {
+    EXPECT_EQ(0u, mesh->SubMeshCount());
+    EXPECT_EQ(0u, mesh->VertexCount());
+    EXPECT_EQ(0u, mesh->IndexCount());
+  }
+  else
+  {
+    EXPECT_EQ(1u, mesh->SubMeshCount());
+    EXPECT_EQ(3u, mesh->VertexCount());
+    EXPECT_EQ(3u, mesh->IndexCount());
+  }
+}
+
+/////////////////////////////////////////////////
+// An empty <init_from/> element is valid COLLADA and must not crash.
+// The COLLADA loader keeps the geometry and creates the material with no
+// texture assigned. The assimp outcome depends on how the library was
+// built: with assertions enabled (e.g. the Ubuntu packages) the import
+// fails and an empty mesh is returned, without assertions (e.g. Homebrew)
+// the geometry is imported. Either way the process must not crash.
+TEST_P(MeshManagerLoad, LoadEmptyInitFrom)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "empty_init_from.dae"));
+  ASSERT_NE(nullptr, mesh);
+  if (this->forceAssimpEnv)
+  {
+    EXPECT_TRUE(mesh->VertexCount() == 0u || mesh->VertexCount() == 3u)
+        << "unexpected vertex count " << mesh->VertexCount();
+  }
+  else
+  {
+    EXPECT_EQ(3u, mesh->VertexCount());
+    ASSERT_EQ(1u, mesh->MaterialCount());
+    common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+    ASSERT_NE(nullptr, mat);
+    EXPECT_TRUE(mat->TextureImage().empty());
+  }
+}
+
+/////////////////////////////////////////////////
+// A negative index in <p> must be rejected: strtoul would silently wrap
+// it to a huge unsigned value that reads out of bounds. Recovery policies
+// differ: the COLLADA loader keeps the indices parsed before the invalid
+// one, assimp rejects the geometry.
+TEST_P(MeshManagerLoad, LoadMalformedPNegativeIndex)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_p_negative_index.dae"));
+  ASSERT_NE(nullptr, mesh);
+  if (this->forceAssimpEnv)
+  {
+    EXPECT_EQ(0u, mesh->SubMeshCount());
+    EXPECT_EQ(0u, mesh->VertexCount());
+    EXPECT_EQ(0u, mesh->IndexCount());
+  }
+  else
+  {
+    EXPECT_EQ(1u, mesh->SubMeshCount());
+    EXPECT_EQ(1u, mesh->VertexCount());
+    EXPECT_EQ(1u, mesh->IndexCount());
+  }
+}
+
+/////////////////////////////////////////////////
+// A polylist whose <p> holds fewer indices than <vcount> declares must be
+// truncated, not read out of bounds. Recovery policies differ: the
+// COLLADA loader keeps the complete first triangle, assimp rejects the
+// geometry.
+TEST_P(MeshManagerLoad, LoadMalformedPolylistShortP)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_polylist_short_p.dae"));
+  ASSERT_NE(nullptr, mesh);
+  if (this->forceAssimpEnv)
+  {
+    EXPECT_EQ(0u, mesh->SubMeshCount());
+    EXPECT_EQ(0u, mesh->VertexCount());
+    EXPECT_EQ(0u, mesh->IndexCount());
+  }
+  else
+  {
+    EXPECT_EQ(1u, mesh->SubMeshCount());
+    EXPECT_EQ(3u, mesh->VertexCount());
+    EXPECT_EQ(3u, mesh->IndexCount());
+  }
 }
 
 #endif
