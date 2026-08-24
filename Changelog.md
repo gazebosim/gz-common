@@ -1,5 +1,48 @@
 ## Gazebo Common 6.x
 
+### Gazebo Common 6.4.0 (2026-08-24)
+
+1. COLLADA loader updates:
+    * [Pull request #894](https://github.com/gazebosim/gz-common/pull/894)
+    * [Pull request #884](https://github.com/gazebosim/gz-common/pull/884)
+    * [Pull request #855](https://github.com/gazebosim/gz-common/pull/855)
+
+1. Adds mesh Centroid() and fix Volume() for meshes offset from the origin
+    * [Pull request #888](https://github.com/gazebosim/gz-common/pull/888)
+
+1. Merge mesh loader tests with common expectations into MeshManager_TEST
+    * [Pull request #866](https://github.com/gazebosim/gz-common/pull/866)
+
+1. Minor AssimpLoader changes
+    * [Pull request #860](https://github.com/gazebosim/gz-common/pull/860)
+
+1. Change STLLoader to assign name to submesh
+    * [Pull request #852](https://github.com/gazebosim/gz-common/pull/852)
+
+1. Add API for requesting a new mesh from the MeshManager
+    * [Pull request #849](https://github.com/gazebosim/gz-common/pull/849)
+
+1. Improve performance on STL loader (ASCII)
+    * [Pull request #836](https://github.com/gazebosim/gz-common/pull/836)
+
+1. macos CI: use brew trust
+    * [Pull request #828](https://github.com/gazebosim/gz-common/pull/828)
+
+1. Fix SystemPaths_TEST in sandboxed builds
+    * [Pull request #807](https://github.com/gazebosim/gz-common/pull/807)
+
+1. Refactor `RedirectConsoleStream` to use portable C++ stream buffer redirection
+    * [Pull request #809](https://github.com/gazebosim/gz-common/pull/809)
+
+1. graphics: Optimize Texture Processing and Memory in AssimpLoader
+    * [Pull request #781](https://github.com/gazebosim/gz-common/pull/781)
+
+1. av: Fix data races and buffer overflows
+    * [Pull request #773](https://github.com/gazebosim/gz-common/pull/773)
+
+1. Fix `NaN` result in `Animation::Time()` for zero-length animations
+    * [Pull request #769](https://github.com/gazebosim/gz-common/pull/769)
+
 ### Gazebo Common 6.3.0 (2026-01-28)
 
 1. Add functions for clearing FindFile* callbacks
