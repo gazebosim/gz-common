@@ -157,8 +157,10 @@ namespace gz
       /// \param[in] _hwAccelDevice If nonempty, specifies the HW device to use
       /// for encoding. If empty, the framework search method will look for some
       /// default devices.
-      /// \param[in] _useHwSurface Explicitly specifies whether the HW encoder
-      /// should use GPU surface.
+      /// \param[in] _useHwSurface If set, specifies whether the HW encoder
+      /// should explicitly upload frames to the GPU (true) or leave that to
+      /// the internals of the codec (false). If unset, a HW-specific default
+      /// is used that was experimentally found to be faster.
       /// \return True on success. Do NOT ignore the return value. If Start()
       /// failed, encoding will not work. If Start() function failed and you ran
       /// it with some HW acceleration, you can try running it once more

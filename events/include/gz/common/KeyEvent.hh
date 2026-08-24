@@ -106,9 +106,9 @@ namespace gz
       public: KeyEvent &operator=(const KeyEvent &_other);
 
       /// \brief Move assignment operator.
-      /// \param[in] other Other key event
+      /// \param[in] _other Other key event
       /// \return this
-      public: KeyEvent& operator=(KeyEvent&& other);
+      public: KeyEvent& operator=(KeyEvent&& _other);
 
       GZ_UTILS_WARN_IGNORE__DLL_INTERFACE_MISSING
       /// \brief Private data pointer
