@@ -333,7 +333,7 @@ namespace gz
 
     /// \brief A complete URI which has the following components:
     ///
-    /// scheme:[//authority]path[?query][#fragment]
+    /// scheme:[//authority]path[?query][\#fragment]
     ///
     // cppcheck-suppress class_X_Y
     class GZ_COMMON_VISIBLE URI
@@ -350,7 +350,7 @@ namespace gz
 
       /// \brief Get the URI as a string, which has the form:
       ///
-      /// scheme:[//authority]path[?query][#fragment]
+      /// scheme:[//authority]path[?query][\#fragment]
       ///
       /// \return The full URI as a string
       public: std::string Str() const;
