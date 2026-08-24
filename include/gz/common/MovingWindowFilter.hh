@@ -49,17 +49,17 @@ namespace gz
       /// \brief keep track of number of elements
       public: unsigned int samples = 0;
     };
-    /// \endcond
 
     //////////////////////////////////////////////////
     template<typename T>
     MovingWindowFilterPrivate<T>::MovingWindowFilterPrivate()
     {
-      /// \TODO FIXME hardcoded initial value for now
+      // \TODO FIXME hardcoded initial value for now
       this->valHistory.resize(this->valWindowSize);
       this->valIter = this->valHistory.begin();
       this->sum = T();
     }
+    /// \endcond
 
     /// \brief Base class for MovingWindowFilter
     template< typename T>
