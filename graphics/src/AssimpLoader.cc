@@ -193,6 +193,14 @@ class AssimpLoader::Implementation
   /// \param[in] _texturePath path string from assimp
   /// \return the unique key
   public: std::string FullTextureKey(const std::string &_texturePath) const;
+
+  /// \brief Find the lowest common ancestor (LCA) node for a given set of bones
+  /// \param[in] _node The root node to start searching from
+  /// \param[in] _boneNames Set of bone names to find the LCA for
+  /// \return The lowest common ancestor aiNode
+  public: const aiNode* FindLowestCommonAncestor(
+    const aiNode* _node,
+    const std::unordered_set<std::string>& _boneNames) const;
 };
 
 //////////////////////////////////////////////////
@@ -272,6 +280,38 @@ std::string AssimpLoader::Implementation::FullTextureKey(
   }
 
   return _texturePath;
+}
+
+const aiNode* AssimpLoader::Implementation::FindLowestCommonAncestor(
+  const aiNode* _node, const std::unordered_set<std::string>& _boneNames
+) const
+{
+  if (!_node) return nullptr;
+  if (_boneNames.find(GetColladaSkeletonNodeName(_node)) != _boneNames.end())
+    return _node;
+
+  const aiNode* lca = nullptr;
+  for (unsigned i = 0; i < _node->mNumChildren; ++i)
+  {
+    const aiNode* childLca = FindLowestCommonAncestor(
+      _node->mChildren[i], _boneNames);
+    if (childLca)
+    {
+      // If childLCA is the first one found, set it as the root LCA first
+      if (!lca)
+      {
+        lca = childLca;
+      }
+      // If bones are found in more than one child subtree,
+      // this parent node is their LCA
+      else
+      {
+        lca = _node;
+        break;
+      }
+    }
+  }
+  return lca;
 }
 
 //////////////////////////////////////////////////
@@ -1035,37 +1075,9 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   {
     std::unordered_set<std::string> boneNames;
     this->dataPtr->RecursiveStoreBoneNames(scene, rootNode, boneNames);
-    std::function<const aiNode*(const aiNode*)> findLCA =
-      [&](const aiNode* _node) -> const aiNode*
-    {
-      if (!_node) return nullptr;
-      if (boneNames.find(GetColladaSkeletonNodeName(_node)) != boneNames.end())
-        return _node;
 
-      const aiNode* lca = nullptr;
-      for (unsigned i = 0; i < _node->mNumChildren; ++i)
-      {
-        const aiNode* childLca = findLCA(_node->mChildren[i]);
-        if (childLca)
-        {
-          // If childLCA is the first one found, set it as the root LCA first
-          if (!lca)
-          {
-            lca = childLca;
-          }
-          // If bones are found in more than one child subtree,
-          // this parent node is their LCA
-          else
-          {
-            lca = _node;
-            break;
-          }
-        }
-      }
-      return lca;
-    };
-
-    const aiNode* lcaNode = findLCA(rootNode);
+    const aiNode* lcaNode = this->dataPtr->FindLowestCommonAncestor(rootNode,
+                                                                    boneNames);
     const aiNode* skelRoot = lcaNode ? lcaNode : rootNode;
 
     std::string rootName = GetColladaSkeletonNodeName(skelRoot);
