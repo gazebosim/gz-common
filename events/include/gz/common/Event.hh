@@ -217,7 +217,6 @@ namespace gz
       this->connections.clear();
     }
 
-    /// \brief Adds a connection.
     template<typename T, typename N>
     ConnectionPtr EventT<T, N>::Connect(const std::function<T> &_subscriber)
     {
@@ -241,7 +240,6 @@ namespace gz
       return this->connections.size();
     }
 
-    /// \brief Removes a connection.
     template<typename T, typename N>
     void EventT<T, N>::Disconnect(int _id)
     {
