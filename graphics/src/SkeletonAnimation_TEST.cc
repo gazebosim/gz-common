@@ -35,3 +35,23 @@ TEST_F(SkeletonAnimation, CheckNoXDisplacement)
 
   delete skelAnim;
 }
+
+/////////////////////////////////////////////////
+TEST_F(SkeletonAnimation, PoseAtXWithoutForwardDisplacement)
+{
+  const auto checkPose = [](const double _lastX)
+  {
+    common::SkeletonAnimation animation("testAnimation");
+    math::Matrix4d keyFrame = math::Matrix4d::Identity;
+    keyFrame.SetTranslation(math::Vector3d(_lastX, 0.0, 0.0));
+    animation.AddKeyFrame("node", 1.0, keyFrame);
+
+    const auto pose = animation.PoseAtX(2.0, "node", true);
+    ASSERT_EQ(1u, pose.count("node"));
+    EXPECT_EQ(keyFrame, pose.at("node"));
+  };
+
+  checkPose(0.0);
+  checkPose(1e-12);
+  checkPose(-1.0);
+}
