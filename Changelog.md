@@ -1,5 +1,63 @@
 ## Gazebo Common 5.x
 
+### Gazebo Common 5.9.0 (2026-08-24)
+
+1. COLLADA loader updates:
+    * [Pull request #895](https://github.com/gazebosim/gz-common/pull/895)
+    * [Pull request #885](https://github.com/gazebosim/gz-common/pull/885)
+    * [Pull request #856](https://github.com/gazebosim/gz-common/pull/856)
+
+1. Adds mesh Centroid() and fix Volume() for meshes offset from the origin
+    * [Pull request #889](https://github.com/gazebosim/gz-common/pull/889)
+
+1. Merge mesh loader tests with common expectations into MeshManager_TEST
+    * [Pull request #865](https://github.com/gazebosim/gz-common/pull/865)
+
+1. Minor AssimpLoader changes
+    * [Pull request #859](https://github.com/gazebosim/gz-common/pull/859)
+
+1. Drop Focal, add Noble for gz-common5
+    * [Pull request #864](https://github.com/gazebosim/gz-common/pull/864)
+
+1. Change STLLoader to assign name to submesh
+    * [Pull request #851](https://github.com/gazebosim/gz-common/pull/851)
+
+1. Add API for requesting a new mesh from the MeshManager
+    * [Pull request #848](https://github.com/gazebosim/gz-common/pull/848)
+
+1. Improve performance on STL loader (ASCII)
+    * [Pull request #837](https://github.com/gazebosim/gz-common/pull/837)
+
+1. macos CI: use brew trust
+    * [Pull request #829](https://github.com/gazebosim/gz-common/pull/829)
+
+1. Fix flakiness in PluginSpecialization.AccessTime performance test
+    * [Pull request #820](https://github.com/gazebosim/gz-common/pull/820)
+
+1. Added missing includes
+    * [Pull request #798](https://github.com/gazebosim/gz-common/pull/798)
+
+1. Fix SystemPaths_TEST in sandboxed builds
+    * [Pull request #810](https://github.com/gazebosim/gz-common/pull/810)
+
+1. av:Fix memory leak in video and videoEncoder
+    * [Pull request #788](https://github.com/gazebosim/gz-common/pull/788)
+
+1. graphics: Optimize Texture Processing and Memory in AssimpLoader
+    * [Pull request #782](https://github.com/gazebosim/gz-common/pull/782)
+
+1. Fix ASan ODR violation in INTEGRATION_plugin test
+    * [Pull request #791](https://github.com/gazebosim/gz-common/pull/791)
+
+1. graphics:Fix Image memory leak
+    * [Pull request #789](https://github.com/gazebosim/gz-common/pull/789)
+
+1. av: Fix data races and buffer overflows
+    * [Pull request #774](https://github.com/gazebosim/gz-common/pull/774)
+
+1. Fix `NaN` result in `Animation::Time()` for zero-length animations
+    * [Pull request #770](https://github.com/gazebosim/gz-common/pull/770)
+
 ### Gazebo Common 5.8.0 (2026-01-28)
 
 1. Add functions for clearing FindFile* callbacks
