@@ -182,6 +182,7 @@ namespace gz
     /// sha1(const T &_buffer) instead of this function
     /// \param[in] _buffer Input sequence. The permitted data types for this
     /// function are std::string and any STL container.
+    /// \param[in] _byteCount Number of bytes in the buffer.
     /// \return The string representation (40 character) of the SHA1 hash.
     /// \sa sha1(const T &_buffer)
     std::string GZ_COMMON_VISIBLE sha1(
