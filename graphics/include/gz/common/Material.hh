@@ -37,7 +37,7 @@ namespace gz
     /// \brief Encapsulates description of a material
     class GZ_COMMON_GRAPHICS_VISIBLE Material
     {
-      /// \def Shade modes
+      /// \enum ShadeMode
       /// \brief Enumeration of shade mode types
       public: enum ShadeMode
       {
@@ -64,7 +64,7 @@ namespace gz
         SHADE_MODE_END
       };
 
-      /// \def Blend modes
+      /// \enum BlendMode
       /// \brief Enumeration of blend mode types
       public: enum BlendMode
       {
@@ -261,7 +261,7 @@ namespace gz
       public: bool Lighting() const;
 
       /// \brief Set the Physically Based Rendering (PBR) material
-      /// \return The PBR material to set to.
+      /// \param[in] _pbr The PBR material to set to.
       public: void SetPbrMaterial(const Pbr &_pbr);
 
       /// \brief Get the Physically Based Rendering (PBR) material
