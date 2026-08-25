@@ -328,11 +328,11 @@ namespace gz
                       const gz::math::Vector2d &_p,
                       const double _tol);
 
-      /// \brief Private data pointer.
-      GZ_UTILS_UNIQUE_IMPL_PTR(dataPtr);
-
       /// \brief Singleton implementation
       private: friend class SingletonT<MeshManager>;
+
+      /// \brief Private data pointer.
+      GZ_UTILS_UNIQUE_IMPL_PTR(dataPtr)
     };
   }
 }
