@@ -728,23 +728,6 @@ std::pair<std::string, ImagePtr> AssimpLoader::Implementation::LoadTexture(
   }
   else
   {
-    // Load external texture from disk
-    if (common::exists(textureKey))
-    {
-      gzdbg << "Loading external texture [" << textureKey << "]" << std::endl;
-      // Textures are uploaded to the GPU as RGBA; decode straight to RGBA in a
-      // single pass to avoid a later channel conversion.
-      ret.second = std::make_shared<Image>();
-      ret.second->Load(textureKey, Image::PixelFormatType::RGBA_INT8);
-      if (_shouldCache)
-      {
-        this->imageCache[textureKey] = ret.second;
-      }
-    }
-    else
-    {
-      gzerr << "External texture [" << textureKey << "] not found" << std::endl;
-    }
     ret.first = ToString(_texturePath);
   }
   return ret;
