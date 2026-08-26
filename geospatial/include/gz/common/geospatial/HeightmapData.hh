@@ -33,7 +33,7 @@ namespace gz
       public: virtual ~HeightmapData() = default;
 
       /// \brief Create a lookup table of the terrain's height.
-      /// \param[in] _subsampling Multiplier used to increase the resolution.
+      /// \param[in] _subSampling Multiplier used to increase the resolution.
       /// Ex: A subsampling of 2 in a terrain of 129x129 means that the height
       /// vector will be 257 * 257.
       /// \param[in] _vertSize Number of points per row.
