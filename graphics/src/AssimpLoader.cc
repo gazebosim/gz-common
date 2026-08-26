@@ -195,12 +195,39 @@ class AssimpLoader::Implementation
   public: std::string FullTextureKey(const std::string &_texturePath) const;
 
   /// \brief Find the lowest common ancestor (LCA) node for a given set of bones
-  /// \param[in] _node The root node to start searching from
-  /// \param[in] _boneNames Set of bone names to find the LCA for
-  /// \return The lowest common ancestor aiNode
+  /// \param[in] _node the root node to start searching from
+  /// \param[in] _boneNames set of bone names to find the LCA for
+  /// \return the lowest common ancestor aiNode
   public: const aiNode* FindLowestCommonAncestor(
     const aiNode* _node,
     const std::unordered_set<std::string>& _boneNames) const;
+
+  /// \brief Utility function to check if node name was default
+  /// assigned by assimp. Returns false if not a COLLADA file.
+  /// \param[in] _name the name of the node to check
+  /// \return whether the node name was default assigned by assimp
+  public: bool IsDefaultNodeName(
+    const std::string &_name) const;
+
+  /// \brief Utility function to get the node ID of an assimp aiNode.
+  /// Returns node name if not a COLLADA file.
+  /// \param[in] _node the node being processed
+  /// \return the node ID
+  public: std::string GetNodeID(
+    const aiNode* _node) const;
+
+  /// \brief Utility function to get the skeleton node name of an assimp aiNode.
+  /// Returns node name if not a COLLADA file.
+  /// \param[in] _node the node being processed
+  /// \return the skeleton node name
+  /// \note This function is intended specifically for skeleton nodes and
+  /// animation channels. It replicates ColladaLoader's behavior by prioritizing
+  /// the `sid` field over the node `name` or `id` in COLLADA files.
+  public: std::string GetSkeletonNodeName(
+    const aiNode* _node) const;
+
+  /// \brief Utility function to get the current file extension of the mesh file
+  public: std::string GetFileExtension() const;
 };
 
 //////////////////////////////////////////////////
@@ -211,52 +238,83 @@ static std::string ToString(const aiString& str)
 }
 
 //////////////////////////////////////////////////
+bool AssimpLoader::Implementation::IsDefaultNodeName(
+    const std::string &_name) const
+{
+  if (this->GetFileExtension() == "dae")
+  {
+    return _name.find("$ColladaAutoName$") == 0;
+  }
+  return false;
+}
+
+//////////////////////////////////////////////////
 // Utility function to get Collada nodeID from assimp node object
-static std::string GetColladaNodeID(const aiNode* _node)
+std::string AssimpLoader::Implementation::GetNodeID(const aiNode* _node) const
 {
   if (!_node)
     return "";
 
-  if (_node->mMetaData)
+  if (this->GetFileExtension() == "dae" && _node->mMetaData)
   {
     aiString colladaId;
     if (_node->mMetaData->Get(AI_METADATA_COLLADA_ID, colladaId))
     {
       return ToString(colladaId);
     }
+    return ToString(_node->mName);
   }
   return ToString(_node->mName);
 }
 
 //////////////////////////////////////////////////
-// Utility function to get Collada name from assimp node object
-static std::string GetColladaSkeletonNodeName(const aiNode* _node)
+std::string AssimpLoader::Implementation::GetSkeletonNodeName(
+    const aiNode* _node) const
 {
   if (!_node)
     return "";
 
-  // ColladaLoader prioritizes `sid` field for skeleton node name,
-  // then `name`, then `id`. Make AssimpLoader match this behaviour
-  aiString colladaSid;
-  if (_node->mMetaData &&
-    _node->mMetaData->Get(AI_METADATA_COLLADA_SID, colladaSid))
-  {
-    return ToString(colladaSid);
-  }
-
   const std::string nodeName = ToString(_node->mName);
-  if (nodeName.find("$ColladaAutoName$") != 0)
+  if (this->GetFileExtension() == "dae")
   {
-    return nodeName;
+    // ColladaLoader prioritizes `sid` field for skeleton node name,
+    // then `name`, then `id`. Make AssimpLoader match this behaviour
+    aiString colladaSid;
+    if (_node->mMetaData &&
+      _node->mMetaData->Get(AI_METADATA_COLLADA_SID, colladaSid))
+    {
+      return ToString(colladaSid);
+    }
+
+    if (!this->IsDefaultNodeName(nodeName))
+    {
+      return nodeName;
+    }
+
+    aiString colladaId;
+    if (_node->mMetaData &&
+        _node->mMetaData->Get(AI_METADATA_COLLADA_ID, colladaId))
+    {
+      return ToString(colladaId);
+    }
   }
 
-  aiString colladaId;
-  if (_node->mMetaData &&
-      _node->mMetaData->Get(AI_METADATA_COLLADA_ID, colladaId))
-  {
-    return ToString(colladaId);
-  }
   return nodeName;
+}
+
+//////////////////////////////////////////////////
+std::string AssimpLoader::Implementation::GetFileExtension() const
+{
+  std::string filename = this->currentMeshPath;
+  std::string extension;
+  std::size_t extIdx = filename.rfind(".");
+  if (extIdx != std::string::npos)
+  {
+    extension = filename.substr(extIdx + 1, filename.size());
+  }
+  std::transform(extension.begin(), extension.end(),
+      extension.begin(), ::tolower);
+  return extension;
 }
 
 //////////////////////////////////////////////////
@@ -286,8 +344,11 @@ const aiNode* AssimpLoader::Implementation::FindLowestCommonAncestor(
   const aiNode* _node, const std::unordered_set<std::string>& _boneNames
 ) const
 {
-  if (!_node) return nullptr;
-  if (_boneNames.find(GetColladaSkeletonNodeName(_node)) != _boneNames.end())
+  if (!_node)
+    return nullptr;
+
+  if (_boneNames.find(this->GetSkeletonNodeName(_node)) !=
+      _boneNames.end())
     return _node;
 
   const aiNode* lca = nullptr;
@@ -359,14 +420,14 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene,
 
     // if node had no name originally and was assigned a default by
     // assimp, replace it with the name of first ancestor node that has a name
-    if (nodeName.find("$ColladaAutoName$") == 0)
+    if (this->IsDefaultNodeName(nodeName))
     {
       const aiNode *parent = _node->mParent;
       nodeName = "";
       while (parent && parent != _scene->mRootNode)
       {
         std::string parentName = ToString(parent->mName);
-        if (parentName.find("$ColladaAutoName$") != 0)
+        if (!this->IsDefaultNodeName(parentName))
         {
           nodeName = parentName;
           break;
@@ -397,7 +458,7 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene,
         {
           node = _scene->mRootNode->FindNode(bone->mName);
         }
-        const auto boneNodeName = GetColladaSkeletonNodeName(node);
+        const auto boneNodeName = this->GetSkeletonNodeName(node);
         // Apply inverse bind transform to the matching node
         SkeletonNode *skelNode =
             skeleton->NodeByName(boneNodeName);
@@ -450,7 +511,7 @@ void AssimpLoader::Implementation::RecursiveStoreBoneNames(
       {
         node = _scene->mRootNode->FindNode(bone->mName);
       }
-      _boneNames.insert(GetColladaSkeletonNodeName(node));
+      _boneNames.insert(this->GetSkeletonNodeName(node));
     }
   }
 
@@ -471,8 +532,8 @@ void AssimpLoader::Implementation::RecursiveSkeletonCreate(const aiNode* _node,
   if (_node == nullptr || _parent == nullptr)
     return;
   // First explore this node
-  const auto nodeName = GetColladaSkeletonNodeName(_node);
-  const auto nodeID = GetColladaNodeID(_node);
+  const auto nodeName = this->GetSkeletonNodeName(_node);
+  const auto nodeID = this->GetNodeID(_node);
   auto boneExist = _boneNames.find(nodeName) != _boneNames.end();
   auto nodeTrans = this->ConvertTransform(_node->mTransformation);
   auto skelNode = _parent;
@@ -1035,14 +1096,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     return mesh;
   }
   auto& rootNode = scene->mRootNode;
-  std::string extension;
-  std::size_t extIdx = _filename.rfind(".");
-  if (extIdx != std::string::npos)
-  {
-    extension = _filename.substr(extIdx + 1, _filename.size());
-  }
-  std::transform(extension.begin(), extension.end(),
-      extension.begin(), ::tolower);
+  std::string extension = this->dataPtr->GetFileExtension();
 
   // compute assimp root node transform
   bool useIdentityRotation = (extension != "glb" && extension != "gltf");
@@ -1080,8 +1134,8 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
                                                                     boneNames);
     const aiNode* skelRoot = lcaNode ? lcaNode : rootNode;
 
-    const std::string rootName = GetColladaSkeletonNodeName(skelRoot);
-    const std::string rootID = GetColladaNodeID(skelRoot);
+    const std::string rootName = this->dataPtr->GetSkeletonNodeName(skelRoot);
+    const std::string rootID = this->dataPtr->GetNodeID(skelRoot);
     auto rootSkelNode = new SkeletonNode(
         nullptr, rootName, rootID, SkeletonNode::NODE);
     rootSkelNode->SetTransform(rootTransform);
@@ -1120,7 +1174,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
       auto chanName = ToString(animChan->mNodeName);
       if (auto animNode = scene->mRootNode->FindNode(animChan->mNodeName))
       {
-        chanName = GetColladaSkeletonNodeName(animNode);
+        chanName = this->dataPtr->GetSkeletonNodeName(animNode);
       }
       auto numKeys = std::max(
           animChan->mNumPositionKeys, animChan->mNumRotationKeys);
