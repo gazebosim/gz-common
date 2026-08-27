@@ -453,11 +453,15 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene,
       {
         auto& bone = assimpMesh->mBones[boneIdx];
         auto node = bone->mNode;
-        if (!node)
+        std::string boneNodeName;
+        if (node)
         {
-          node = _scene->mRootNode->FindNode(bone->mName);
+          boneNodeName = this->GetSkeletonNodeName(node, extension);
         }
-        const auto boneNodeName = this->GetSkeletonNodeName(node, extension);
+        else
+        {
+          boneNodeName = ToString(bone->mName);
+        }
         // Apply inverse bind transform to the matching node
         SkeletonNode *skelNode =
             skeleton->NodeByName(boneNodeName);
@@ -507,11 +511,14 @@ void AssimpLoader::Implementation::RecursiveStoreBoneNames(
     {
       auto bone = assimpMesh->mBones[boneIdx];
       auto node = bone->mNode;
-      if (!node)
+      if (node)
       {
-        node = _scene->mRootNode->FindNode(bone->mName);
+        _boneNames.insert(this->GetSkeletonNodeName(node, extension));
       }
-      _boneNames.insert(this->GetSkeletonNodeName(node, extension));
+      else
+      {
+        _boneNames.insert(ToString(bone->mName));
+      }
     }
   }
 
