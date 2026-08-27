@@ -146,6 +146,7 @@ TEST_F(AssimpLoader, LoadBoxWithDefaultStride)
 }
 
 /////////////////////////////////////////////////
+<<<<<<< HEAD
 TEST_F(AssimpLoader, LoadBoxWithHierarchicalNodes)
 {
   common::AssimpLoader loader;
@@ -187,6 +188,8 @@ TEST_F(AssimpLoader, MergeBoxWithDoubleSkeleton)
 }
 
 /////////////////////////////////////////////////
+=======
+>>>>>>> 6d22a54 (Fix skeleton root node naming for AssimpLoader (#891))
 TEST_F(AssimpLoader, LoadCylinderAnimatedFrom3dsMax)
 {
   // TODO(anyone) This test shows that the mesh loads without crashing, but the
@@ -222,6 +225,7 @@ TEST_F(AssimpLoader, LoadCylinderAnimatedFrom3dsMax)
   EXPECT_TRUE(anim->HasNode("Bone02"));
   delete mesh;
 }
+<<<<<<< HEAD
 
 /////////////////////////////////////////////////
 // Open a gltf mesh with an external texture
@@ -265,3 +269,5 @@ TEST_F(AssimpLoader, CheckNonRootDisplacement)
   ASSERT_TRUE(xDisplacement);
   delete mesh;
 }
+=======
+>>>>>>> 6d22a54 (Fix skeleton root node naming for AssimpLoader (#891))

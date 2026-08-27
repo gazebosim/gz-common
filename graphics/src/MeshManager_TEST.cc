@@ -774,6 +774,21 @@ TEST_P(MeshManagerLoad, LoadBoxWithMultipleGeoms)
 }
 
 /////////////////////////////////////////////////
+TEST_P(MeshManagerLoad, MergeBoxWithDoubleSkeleton)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "box_with_double_skeleton.dae"));
+  std::string skeletonRootName = "Armature";
+  EXPECT_TRUE(mesh->HasSkeleton());
+  auto skeleton_ptr = mesh->MeshSkeleton();
+  // The two skeletons have been joined and their root is the
+  // animation root, called Armature
+  EXPECT_EQ(skeleton_ptr->RootNode()->Name(), std::string(skeletonRootName));
+  mgr->RemoveAll();
+}
+
+/////////////////////////////////////////////////
 // Load animation without a name
 TEST_P(MeshManagerLoad, NoAnimName)
 {
@@ -788,6 +803,23 @@ TEST_P(MeshManagerLoad, NoAnimName)
   auto animName = anim->Name();
   EXPECT_EQ(animName, "animation1");
   mgr->RemoveAll();
+}
+
+/////////////////////////////////////////////////
+// Checks for null root node animation and valid
+// x displacement in non root node's animation.
+TEST_P(MeshManagerLoad, CheckNonRootDisplacement)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(common::testing::TestFile("data",
+        "walk.dae"));
+  auto meshSkel =  mesh->MeshSkeleton();
+  std::string rootNodeName = meshSkel->RootNode()->Name();
+  common::SkeletonAnimation *skelAnim = meshSkel->Animation(0);
+  common::NodeAnimation *rootNode = skelAnim->NodeAnimationByName(rootNodeName);
+  EXPECT_NE(rootNode, nullptr);
+  auto xDisplacement = skelAnim->XDisplacement();
+  ASSERT_TRUE(xDisplacement);
 }
 
 /////////////////////////////////////////////////
