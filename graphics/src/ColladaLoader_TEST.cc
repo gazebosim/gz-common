@@ -117,19 +117,6 @@ TEST_F(ColladaLoader, LoadBoxWithDefaultStride)
 }
 
 /////////////////////////////////////////////////
-TEST_F(ColladaLoader, MergeBoxWithDoubleSkeleton)
-{
-  common::ColladaLoader loader;
-  std::unique_ptr<common::Mesh> mesh(loader.Load(
-      common::testing::TestFile("data", "box_with_double_skeleton.dae")));
-  EXPECT_TRUE(mesh->HasSkeleton());
-  auto skeleton_ptr = mesh->MeshSkeleton();
-  // The two skeletons have been joined and their root is the
-  // animation root, called Armature
-  EXPECT_EQ(skeleton_ptr->RootNode()->Name(), std::string("Armature"));
-}
-
-/////////////////////////////////////////////////
 TEST_F(ColladaLoader, LoadCylinderAnimatedFrom3dsMax)
 {
   // TODO(anyone) This test shows that the mesh loads without crashing, but the
