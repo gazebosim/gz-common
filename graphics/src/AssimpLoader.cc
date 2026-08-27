@@ -253,7 +253,6 @@ bool AssimpLoader::Implementation::IsDefaultNodeName(
 }
 
 //////////////////////////////////////////////////
-// Utility function to get Collada nodeID from assimp node object
 std::string AssimpLoader::Implementation::GetNodeID(
     const aiNode* _node, const std::string &_extension) const
 {
@@ -267,7 +266,6 @@ std::string AssimpLoader::Implementation::GetNodeID(
     {
       return ToString(colladaId);
     }
-    return ToString(_node->mName);
   }
   return ToString(_node->mName);
 }
@@ -296,12 +294,7 @@ std::string AssimpLoader::Implementation::GetSkeletonNodeName(
       return nodeName;
     }
 
-    aiString colladaId;
-    if (_node->mMetaData &&
-        _node->mMetaData->Get(AI_METADATA_COLLADA_ID, colladaId))
-    {
-      return ToString(colladaId);
-    }
+    return this->GetNodeID(_node, _extension);
   }
 
   return nodeName;
@@ -310,9 +303,9 @@ std::string AssimpLoader::Implementation::GetSkeletonNodeName(
 //////////////////////////////////////////////////
 std::string AssimpLoader::Implementation::GetFileExtension() const
 {
-  std::string filename = this->currentMeshPath;
+  const auto& filename = this->currentMeshPath;
   std::string extension;
-  std::size_t extIdx = filename.rfind(".");
+  const std::size_t extIdx = filename.rfind(".");
   if (extIdx != std::string::npos)
   {
     extension = filename.substr(extIdx + 1, filename.size());
@@ -346,13 +339,13 @@ std::string AssimpLoader::Implementation::FullTextureKey(
 }
 
 const aiNode* AssimpLoader::Implementation::FindLowestCommonAncestor(
-  const aiNode* _node, const std::unordered_set<std::string>& _boneNames
+    const aiNode* _node, const std::unordered_set<std::string>& _boneNames
 ) const
 {
   if (!_node)
     return nullptr;
 
-  std::string extension = this->GetFileExtension();
+  const std::string extension = this->GetFileExtension();
   if (_boneNames.find(this->GetSkeletonNodeName(_node, extension)) !=
       _boneNames.end())
     return _node;
@@ -505,7 +498,7 @@ void AssimpLoader::Implementation::RecursiveStoreBoneNames(
   if (!_node)
     return;
 
-  std::string extension = this->GetFileExtension();
+  const std::string extension = this->GetFileExtension();
   for (unsigned meshIdx = 0; meshIdx < _node->mNumMeshes; ++meshIdx)
   {
     auto assimpMeshIdx = _node->mMeshes[meshIdx];
@@ -1105,7 +1098,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     return mesh;
   }
   auto& rootNode = scene->mRootNode;
-  std::string extension = this->dataPtr->GetFileExtension();
+  const std::string extension = this->dataPtr->GetFileExtension();
 
   // compute assimp root node transform
   bool useIdentityRotation = (extension != "glb" && extension != "gltf");
