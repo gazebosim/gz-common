@@ -572,7 +572,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
       auto [texName, texData] =
           this->LoadTexture(_scene, texturePath,
                             this->GenerateTextureName(textureKey, "Metalness"));
-      pbr.SetMetalnessMap(texName);
+      pbr.SetMetalnessMap(texName, texData);
     }
     ret = assimpMat->GetTexture(
         aiTextureType_DIFFUSE_ROUGHNESS, 0, &texturePath);
@@ -582,7 +582,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
       auto [texName, texData] =
           this->LoadTexture(_scene, texturePath,
                             this->GenerateTextureName(textureKey, "Roughness"));
-      pbr.SetRoughnessMap(texName);
+      pbr.SetRoughnessMap(texName, texData);
     }
   }
 
@@ -605,7 +605,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     // Separate uv set so treat it as a separate texture
     if (uvIdx > 0)
     {
-      pbr.SetLightMap(texName, uvIdx);
+      pbr.SetLightMap(texName, uvIdx, texData);
     }
     // else split the occlusion data from the metallicRoughness texture
     else
@@ -630,7 +630,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
           auto tex = std::make_shared<Image>();
           tex->SetFromData(texRData.data(), texData->Width(), texData->Height(),
               Image::L_INT8);
-          pbr.SetLightMap(texName, uvIdx);
+          pbr.SetLightMap(texName, uvIdx, tex);
         }
       }
     }
@@ -646,7 +646,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     auto [texName, texData] = this->LoadTexture(
         _scene, texturePath, this->GenerateTextureName(textureKey, "Normal"));
     // TODO(luca) different normal map spaces
-    pbr.SetNormalMap(texName, NormalMapSpace::TANGENT);
+    pbr.SetNormalMap(texName, NormalMapSpace::TANGENT, texData);
   }
   ret = assimpMat->GetTexture(aiTextureType_EMISSIVE, 0, &texturePath);
   if (ret == AI_SUCCESS)
@@ -654,7 +654,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     std::string textureKey = this->FullTextureKey(texturePath.C_Str());
     auto [texName, texData] = this->LoadTexture(
         _scene, texturePath, this->GenerateTextureName(textureKey, "Emissive"));
-    pbr.SetEmissiveMap(texName);
+    pbr.SetEmissiveMap(texName, texData);
   }
 
   ret = assimpMat->GetTexture(aiTextureType_SPECULAR, 0, &texturePath);
@@ -728,7 +728,6 @@ std::pair<std::string, ImagePtr> AssimpLoader::Implementation::LoadTexture(
   }
   else
   {
-    std::cout << "Not embedded: " << ToString(_texturePath) << std::endl;
     ret.first = ToString(_texturePath);
   }
   return ret;
