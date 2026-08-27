@@ -771,7 +771,85 @@ TEST_P(MeshManagerLoad, LoadBoxWithMultipleGeoms)
   ASSERT_EQ(2u, mesh->SubMeshCount());
   EXPECT_EQ(24u, mesh->SubMeshByIndex(0).lock()->NodeAssignmentsCount());
   EXPECT_EQ(0u, mesh->SubMeshByIndex(1).lock()->NodeAssignmentsCount());
+<<<<<<< HEAD
   mgr->RemoveAll();
+=======
+}
+
+/////////////////////////////////////////////////
+TEST_P(MeshManagerLoad, LoadBoxWithHierarchicalNodes)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "box_with_hierarchical_nodes.dae"));
+  ASSERT_EQ(7u, mesh->SubMeshCount());
+
+  // node by itself
+  EXPECT_EQ("StaticCube", mesh->SubMeshByIndex(0).lock()->Name());
+
+  // nested node with no name so it takes the parent's name instead
+  EXPECT_EQ("StaticCubeParent", mesh->SubMeshByIndex(1).lock()->Name());
+
+  // parent node containing child node with no name
+  EXPECT_EQ("StaticCubeParent", mesh->SubMeshByIndex(2).lock()->Name());
+
+  // nested node with name
+  EXPECT_EQ("StaticCubeNested", mesh->SubMeshByIndex(3).lock()->Name());
+
+  // Parent of nested node with name
+  EXPECT_EQ("StaticCubeParent2", mesh->SubMeshByIndex(4).lock()->Name());
+
+  // Nested node that does not have ancestors with a name
+  EXPECT_EQ("unnamed_submesh_0", mesh->SubMeshByIndex(5).lock()->Name());
+}
+
+/////////////////////////////////////////////////
+TEST_P(MeshManagerLoad, MergeBoxWithDoubleSkeleton)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "box_with_double_skeleton.dae"));
+  std::string skeletonRootName = "Armature";
+  EXPECT_TRUE(mesh->HasSkeleton());
+  auto skeleton_ptr = mesh->MeshSkeleton();
+  // The two skeletons have been joined and their root is the
+  // animation root, called Armature
+  EXPECT_EQ(skeleton_ptr->RootNode()->Name(), std::string(skeletonRootName));
+  mgr->RemoveAll();
+}
+
+/////////////////////////////////////////////////
+// Load animation without a name
+TEST_P(MeshManagerLoad, NoAnimName)
+{
+  auto *mgr = common::MeshManager::Instance();
+  std::string meshFilename =
+    common::testing::TestFile("data", "box_with_no_animation_name.dae");
+
+  const common::Mesh *mesh = mgr->Load(meshFilename);
+  common::SkeletonPtr skeleton = mesh->MeshSkeleton();
+  ASSERT_EQ(1u, skeleton->AnimationCount());
+  common::SkeletonAnimation *anim = skeleton->Animation(0);
+  auto animName = anim->Name();
+  EXPECT_EQ(animName, "animation1");
+>>>>>>> 6d22a54 (Fix skeleton root node naming for AssimpLoader (#891))
+}
+
+/////////////////////////////////////////////////
+// Checks for null root node animation and valid
+// x displacement in non root node's animation.
+TEST_P(MeshManagerLoad, CheckNonRootDisplacement)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(common::testing::TestFile("data",
+        "walk.dae"));
+  auto meshSkel =  mesh->MeshSkeleton();
+  std::string rootNodeName = meshSkel->RootNode()->Name();
+  common::SkeletonAnimation *skelAnim = meshSkel->Animation(0);
+  common::NodeAnimation *rootNode = skelAnim->NodeAnimationByName(rootNodeName);
+  EXPECT_NE(rootNode, nullptr);
+  auto xDisplacement = skelAnim->XDisplacement();
+  ASSERT_TRUE(xDisplacement);
 }
 
 /////////////////////////////////////////////////

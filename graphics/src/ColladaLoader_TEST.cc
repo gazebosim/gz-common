@@ -152,6 +152,7 @@ TEST_F(ColladaLoader, LoadBoxWithDefaultStride)
 }
 
 /////////////////////////////////////////////////
+<<<<<<< HEAD
 TEST_F(ColladaLoader, LoadBoxWithHierarchicalNodes)
 {
   common::ColladaLoader loader;
@@ -190,6 +191,8 @@ TEST_F(ColladaLoader, MergeBoxWithDoubleSkeleton)
 }
 
 /////////////////////////////////////////////////
+=======
+>>>>>>> 6d22a54 (Fix skeleton root node naming for AssimpLoader (#891))
 TEST_F(ColladaLoader, LoadCylinderAnimatedFrom3dsMax)
 {
   // TODO(anyone) This test shows that the mesh loads without crashing, but the
