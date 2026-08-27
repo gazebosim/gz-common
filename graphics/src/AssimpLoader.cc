@@ -288,15 +288,12 @@ std::string AssimpLoader::Implementation::GetSkeletonNodeName(
     {
       return ToString(colladaSid);
     }
-
     if (!this->IsDefaultNodeName(nodeName, _extension))
     {
       return nodeName;
     }
-
     return this->GetNodeID(_node, _extension);
   }
-
   return nodeName;
 }
 
