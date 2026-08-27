@@ -1128,10 +1128,10 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     mesh->AddMaterial(mat);
   }
   // Create the skeleton
+  std::unordered_set<std::string> boneNames;
+  this->dataPtr->RecursiveStoreBoneNames(scene, rootNode, boneNames);
+  if (!boneNames.empty())
   {
-    std::unordered_set<std::string> boneNames;
-    this->dataPtr->RecursiveStoreBoneNames(scene, rootNode, boneNames);
-
     const aiNode* lcaNode = this->dataPtr->FindLowestCommonAncestor(rootNode,
                                                                     boneNames);
     const aiNode* skelRoot = lcaNode ? lcaNode : rootNode;
@@ -1213,6 +1213,9 @@ void AssimpLoader::Implementation::ApplyInvBindTransform(
     SkeletonPtr _skeleton) const
 
 {
+  if (!_skeleton)
+    return;
+
   std::queue<SkeletonNode *> queue;
   queue.push(_skeleton->RootNode());
 
