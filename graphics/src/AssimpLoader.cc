@@ -452,9 +452,8 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene,
       for (unsigned boneIdx = 0; boneIdx < assimpMesh->mNumBones; ++boneIdx)
       {
         auto& bone = assimpMesh->mBones[boneIdx];
-        auto node = bone->mNode;
         std::string boneNodeName;
-        if (node)
+        if (const auto node = bone->mNode)
         {
           boneNodeName = this->GetSkeletonNodeName(node, extension);
         }
@@ -510,8 +509,7 @@ void AssimpLoader::Implementation::RecursiveStoreBoneNames(
     for (unsigned boneIdx = 0; boneIdx < assimpMesh->mNumBones; ++boneIdx)
     {
       auto bone = assimpMesh->mBones[boneIdx];
-      auto node = bone->mNode;
-      if (node)
+      if (const auto node = bone->mNode)
       {
         _boneNames.insert(this->GetSkeletonNodeName(node, extension));
       }
