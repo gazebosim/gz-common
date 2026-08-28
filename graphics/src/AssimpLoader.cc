@@ -716,18 +716,22 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     {
       std::string textureKey = this->FullTextureKey(texturePath.C_Str());
       auto [texName, texData] =
-          this->LoadTexture(_scene, texturePath,
-                            this->GenerateTextureName(textureKey, "Metalness"));
+      this->LoadTexture(_scene, texturePath,
+        this->GenerateTextureName(textureKey, "Metalness"),
+        true, false);
       pbr.SetMetalnessMap(texName, texData);
+      std::cout << "aiTextureType_METALNESS" << texName << std::endl;
     }
     ret = assimpMat->GetTexture(
         aiTextureType_DIFFUSE_ROUGHNESS, 0, &texturePath);
     if (ret == AI_SUCCESS)
     {
+      std::cout << "aiTextureType_DIFFUSE_ROUGHNESS\n";
       std::string textureKey = this->FullTextureKey(texturePath.C_Str());
       auto [texName, texData] =
           this->LoadTexture(_scene, texturePath,
-                            this->GenerateTextureName(textureKey, "Roughness"));
+                            this->GenerateTextureName(textureKey, "Roughness"),
+                            true, false);
       pbr.SetRoughnessMap(texName, texData);
     }
   }
@@ -751,6 +755,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     // Separate uv set so treat it as a separate texture
     if (uvIdx > 0)
     {
+      std::cout << "aiTextureType_LIGHTMAP 1: " << texName << std::endl;
       pbr.SetLightMap(texName, uvIdx, texData);
     }
     // else split the occlusion data from the metallicRoughness texture
@@ -777,6 +782,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
           tex->SetFromData(texRData.data(), texData->Width(), texData->Height(),
               Image::L_INT8);
           pbr.SetLightMap(texName, uvIdx, tex);
+          std::cout << "aiTextureType_LIGHTMAP 2: " << texName << std::endl;
         }
       }
     }
@@ -790,17 +796,21 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   {
     std::string textureKey = this->FullTextureKey(texturePath.C_Str());
     auto [texName, texData] = this->LoadTexture(
-        _scene, texturePath, this->GenerateTextureName(textureKey, "Normal"));
-    // TODO(luca) different normal map spaces
+      _scene, texturePath, this->GenerateTextureName(textureKey, "Normal"),
+      true, false);
+      // TODO(luca) different normal map spaces
     pbr.SetNormalMap(texName, NormalMapSpace::TANGENT, texData);
+    std::cout << "aiTextureType_NORMALS OR HEIGHT: " << texName << std::endl;
   }
   ret = assimpMat->GetTexture(aiTextureType_EMISSIVE, 0, &texturePath);
   if (ret == AI_SUCCESS)
   {
     std::string textureKey = this->FullTextureKey(texturePath.C_Str());
     auto [texName, texData] = this->LoadTexture(
-        _scene, texturePath, this->GenerateTextureName(textureKey, "Emissive"));
+      _scene, texturePath, this->GenerateTextureName(textureKey, "Emissive"),
+      true, false);
     pbr.SetEmissiveMap(texName, texData);
+    std::cout << "aiTextureType_EMISSIVE: " << texName << std::endl;
   }
 
   ret = assimpMat->GetTexture(aiTextureType_SPECULAR, 0, &texturePath);
@@ -808,8 +818,10 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   {
     std::string textureKey = this->FullTextureKey(texturePath.C_Str());
     auto [texName, texData] = this->LoadTexture(
-      _scene, texturePath, this->GenerateTextureName(textureKey, "Specular"));
+      _scene, texturePath, this->GenerateTextureName(textureKey, "Specular"),
+      true, false);
     pbr.SetSpecularMap(texName);
+    std::cout << "aiTextureType_SPECULAR: " << texName << std::endl;
   }
 
   float value;
