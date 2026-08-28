@@ -36,7 +36,6 @@
 #include "gz/common/SystemPaths.hh"
 #include "gz/common/Util.hh"
 
-<<<<<<< HEAD
 // The assert handler customization header is only available from
 // assimp 5.3.0. Without it the default handler aborts the process on
 // internal assertion failures in assertion enabled assimp builds.
@@ -44,10 +43,7 @@
   #include <assimp/AssertHandler.h>
   #define GZ_ASSIMP_HAS_ASSERT_HANDLER 1
 #endif
-=======
-#include <assimp/AssertHandler.h>   // Custom assert handler support
 #include <assimp/ColladaMetaData.h>
->>>>>>> 0392824 (Modify AssimpLoader behaviour for hierarchical nodes (#873))
 #include <assimp/GltfMaterial.h>    // GLTF specific material properties
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/postprocess.h>     // Post processing flags
