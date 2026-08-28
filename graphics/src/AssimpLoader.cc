@@ -123,7 +123,8 @@ class AssimpLoader::Implementation
           LoadTexture(const aiScene* _scene,
                       const aiString& _texturePath,
                       const std::string& _textureName,
-                      bool _shouldCache = true) const;
+                      bool _shouldCache = true,
+                      bool _loadFullTexture = true) const;
 
   /// \brief Function to split a gltf metallicroughness map into
   /// a metalness and roughness map
@@ -482,7 +483,8 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     // Check if the texture is embedded or not
     auto embeddedTexture = _scene->GetEmbeddedTexture(texturePath.C_Str());
     auto [texName, texData] = this->LoadTexture(
-        _scene, texturePath, this->GenerateTextureName(textureKey, "Diffuse"));
+        _scene, texturePath, this->GenerateTextureName(textureKey, "Diffuse"),
+        true, false);
     // If texture is not embedded, just set the texture
     // image to the path to the parent folder of the texture.
     if (embeddedTexture)
@@ -690,7 +692,8 @@ std::pair<std::string, ImagePtr> AssimpLoader::Implementation::LoadTexture(
     const aiScene* _scene,
     const aiString& _texturePath,
     const std::string& _textureName,
-    bool _shouldCache) const
+    bool _shouldCache,
+    bool _loadFullTexture) const
 {
   std::pair<std::string, ImagePtr> ret;
   std::string textureKey = this->FullTextureKey(_texturePath.C_Str());
@@ -729,6 +732,27 @@ std::pair<std::string, ImagePtr> AssimpLoader::Implementation::LoadTexture(
   else
   {
     ret.first = ToString(_texturePath);
+    if (_loadFullTexture)
+    {
+      // Load external texture from disk
+      if (common::exists(textureKey))
+      {
+        gzdbg << "Loading external texture [" << textureKey << "]" << std::endl;
+        // Textures are uploaded to the GPU as RGBA; decode straight to RGBA in
+        // a single pass to avoid a later channel conversion.
+        ret.second = std::make_shared<Image>();
+        ret.second->Load(textureKey, Image::PixelFormatType::RGBA_INT8);
+        if (_shouldCache)
+        {
+          this->imageCache[textureKey] = ret.second;
+        }
+      }
+      else
+      {
+        gzerr << "External texture [" << textureKey << "] not found"
+              << std::endl;
+      }
+    }
   }
   return ret;
 }
