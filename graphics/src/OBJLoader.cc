@@ -153,7 +153,8 @@ Mesh *OBJLoader::Load(const std::string &_filename)
             Pbr pbrMat;
             // PBR shoved into standard textures
             if (!m.specular_texname.empty())
-              pbrMat.SetRoughnessMap(m.specular_texname);
+              pbrMat.SetRoughnessMap(
+                  common::joinPaths(path, m.specular_texname));
 
             // check if obj is exported by blender
             // blender obj exporter puts roughness map in specular highlight
@@ -164,26 +165,31 @@ Mesh *OBJLoader::Load(const std::string &_filename)
             // when blender fixes their exporter issue
             if (!m.specular_highlight_texname.empty() && exportedByBlender)
             {
-              pbrMat.SetRoughnessMap(m.specular_highlight_texname);
+              pbrMat.SetRoughnessMap(
+                  common::joinPaths(path, m.specular_highlight_texname));
               if (!m.reflection_texname.empty())
                 pbrMat.SetMetalnessMap(m.reflection_texname);
             }
             else if (!m.reflection_texname.empty())
             {
-              pbrMat.SetEnvironmentMap(m.reflection_texname);
+              pbrMat.SetEnvironmentMap(
+                  common::joinPaths(path, m.reflection_texname));
             }
             if (!m.bump_texname.empty())
-              pbrMat.SetNormalMap(m.bump_texname);
+              pbrMat.SetNormalMap(common::joinPaths(path, m.bump_texname));
 
             // PBR extension - overrides standard materials
             if (!m.roughness_texname.empty())
-              pbrMat.SetRoughnessMap(m.roughness_texname);
+              pbrMat.SetRoughnessMap(
+                  common::joinPaths(path, m.roughness_texname));
             if (!m.metallic_texname.empty())
-              pbrMat.SetMetalnessMap(m.metallic_texname);
+              pbrMat.SetMetalnessMap(
+                common::joinPaths(path, m.metallic_texname));
             if (!m.normal_texname.empty())
-              pbrMat.SetNormalMap(m.normal_texname);
+              pbrMat.SetNormalMap(common::joinPaths(path, m.normal_texname));
             if (!m.emissive_texname.empty())
-              pbrMat.SetEmissiveMap(m.emissive_texname);
+              pbrMat.SetEmissiveMap(
+                  common::joinPaths(path, m.emissive_texname));
 
             pbrMat.SetRoughness(m.roughness);
             pbrMat.SetMetalness(m.metallic);
