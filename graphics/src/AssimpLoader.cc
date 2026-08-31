@@ -444,47 +444,50 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene,
     {
       // TODO(luca) merging skeletons here
       auto skeleton = _mesh->MeshSkeleton();
-      // TODO(luca) Append to existing skeleton if multiple submeshes?
-      skeleton->SetNumVertAttached(subMesh.VertexCount());
-      // Now add the bone weights
-      for (unsigned boneIdx = 0; boneIdx < assimpMesh->mNumBones; ++boneIdx)
+      if (skeleton)
       {
-        auto& bone = assimpMesh->mBones[boneIdx];
-        std::string boneNodeName;
-        if (const auto node = bone->mNode)
+        // TODO(luca) Append to existing skeleton if multiple submeshes?
+        skeleton->SetNumVertAttached(subMesh.VertexCount());
+        // Now add the bone weights
+        for (unsigned boneIdx = 0; boneIdx < assimpMesh->mNumBones; ++boneIdx)
         {
-          boneNodeName = this->GetSkeletonNodeName(node, extension);
+          auto& bone = assimpMesh->mBones[boneIdx];
+          std::string boneNodeName;
+          if (const auto node = bone->mNode)
+          {
+            boneNodeName = this->GetSkeletonNodeName(node, extension);
+          }
+          else
+          {
+            boneNodeName = ToString(bone->mName);
+          }
+          // Apply inverse bind transform to the matching node
+          SkeletonNode *skelNode =
+              skeleton->NodeByName(boneNodeName);
+          if (skelNode == nullptr)
+            continue;
+          skelNode->SetInverseBindTransform(
+              this->ConvertTransform(bone->mOffsetMatrix) * _transform.Inverse());
+          for (unsigned weightIdx = 0; weightIdx < bone->mNumWeights; ++weightIdx)
+          {
+            auto vertexWeight = bone->mWeights[weightIdx];
+            skeleton->AddVertNodeWeight(
+                vertexWeight.mVertexId, boneNodeName, vertexWeight.mWeight);
+          }
         }
-        else
+        // Add node assignment to mesh
+        for (unsigned vertexIdx = 0; vertexIdx < subMesh.VertexCount();
+            ++vertexIdx)
         {
-          boneNodeName = ToString(bone->mName);
-        }
-        // Apply inverse bind transform to the matching node
-        SkeletonNode *skelNode =
-            skeleton->NodeByName(boneNodeName);
-        if (skelNode == nullptr)
-          continue;
-        skelNode->SetInverseBindTransform(
-            this->ConvertTransform(bone->mOffsetMatrix) * _transform.Inverse());
-        for (unsigned weightIdx = 0; weightIdx < bone->mNumWeights; ++weightIdx)
-        {
-          auto vertexWeight = bone->mWeights[weightIdx];
-          skeleton->AddVertNodeWeight(
-              vertexWeight.mVertexId, boneNodeName, vertexWeight.mWeight);
-        }
-      }
-      // Add node assignment to mesh
-      for (unsigned vertexIdx = 0; vertexIdx < subMesh.VertexCount();
-          ++vertexIdx)
-      {
-        for (unsigned i = 0; i < skeleton->VertNodeWeightCount(vertexIdx); ++i)
-        {
-          std::pair<std::string, double> nodeWeight =
-            skeleton->VertNodeWeight(vertexIdx, i);
-          SkeletonNode *node =
-              skeleton->NodeByName(nodeWeight.first);
-          subMesh.AddNodeAssignment(vertexIdx,
-                          node->Handle(), nodeWeight.second);
+          for (unsigned i = 0; i < skeleton->VertNodeWeightCount(vertexIdx); ++i)
+          {
+            std::pair<std::string, double> nodeWeight =
+              skeleton->VertNodeWeight(vertexIdx, i);
+            SkeletonNode *node =
+                skeleton->NodeByName(nodeWeight.first);
+            subMesh.AddNodeAssignment(vertexIdx,
+                            node->Handle(), nodeWeight.second);
+          }
         }
       }
     }
@@ -1182,49 +1185,58 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   this->dataPtr->RecursiveCreate(scene, rootNode, rootTransform, mesh);
   auto rootSkeleton = mesh->MeshSkeleton();
   // Add the animations
-  for (unsigned animIdx = 0; animIdx < scene->mNumAnimations; ++animIdx)
+  if (rootSkeleton)
   {
-    auto& anim = scene->mAnimations[animIdx];
-    auto animName = ToString(anim->mName);
-    if (animName.empty())
+    for (unsigned animIdx = 0; animIdx < scene->mNumAnimations; ++animIdx)
     {
-      animName = "animation" +
-                 std::to_string(rootSkeleton->AnimationCount() + 1);
-    }
-    SkeletonAnimation* skelAnim = new SkeletonAnimation(animName);
-    for (unsigned chanIdx = 0; chanIdx < anim->mNumChannels; ++chanIdx)
-    {
-      auto& animChan = anim->mChannels[chanIdx];
-      auto chanName = ToString(animChan->mNodeName);
-      if (auto animNode = scene->mRootNode->FindNode(animChan->mNodeName))
+      auto& anim = scene->mAnimations[animIdx];
+      auto animName = ToString(anim->mName);
+      if (animName.empty())
       {
-        chanName = this->dataPtr->GetSkeletonNodeName(animNode, extension);
+        animName = "animation" +
+                   std::to_string(rootSkeleton->AnimationCount() + 1);
       }
-      auto numKeys = std::max(
-          animChan->mNumPositionKeys, animChan->mNumRotationKeys);
-      // Position and rotation arrays might be different lengths,
-      // iterate over the maximum of the two, safely access by checking
-      // number of keys
-      for (unsigned keyIdx = 0; keyIdx < numKeys; ++keyIdx)
+      SkeletonAnimation* skelAnim = new SkeletonAnimation(animName);
+      for (unsigned chanIdx = 0; chanIdx < anim->mNumChannels; ++chanIdx)
       {
-        // Note, Scaling keys are not supported right now
-        // Compute the position into a math pose
-        auto& posKey = animChan->mPositionKeys[
-          std::min(keyIdx, animChan->mNumPositionKeys - 1)];
-        auto& quatKey = animChan->mRotationKeys[
-          std::min(keyIdx, animChan->mNumRotationKeys - 1)];
-        math::Vector3d pos(posKey.mValue.x, posKey.mValue.y, posKey.mValue.z);
-        math::Quaterniond quat(quatKey.mValue.w, quatKey.mValue.x,
-            quatKey.mValue.y, quatKey.mValue.z);
-        math::Pose3d pose(pos, quat);
-        // Time is in ms
-        skelAnim->AddKeyFrame(chanName, posKey.mTime / 1000.0, pose);
+        auto& animChan = anim->mChannels[chanIdx];
+        auto chanName = ToString(animChan->mNodeName);
+        if (auto animNode = scene->mRootNode->FindNode(animChan->mNodeName))
+        {
+          chanName = this->dataPtr->GetSkeletonNodeName(animNode, extension);
+        }
+        auto numKeys = std::max(
+            animChan->mNumPositionKeys, animChan->mNumRotationKeys);
+        // Position and rotation arrays might be different lengths,
+        // iterate over the maximum of the two, safely access by checking
+        // number of keys
+        for (unsigned keyIdx = 0; keyIdx < numKeys; ++keyIdx)
+        {
+          // Note, Scaling keys are not supported right now
+          // Compute the position into a math pose
+          auto& posKey = animChan->mPositionKeys[
+            std::min(keyIdx, animChan->mNumPositionKeys - 1)];
+          auto& quatKey = animChan->mRotationKeys[
+            std::min(keyIdx, animChan->mNumRotationKeys - 1)];
+          math::Vector3d pos(posKey.mValue.x, posKey.mValue.y, posKey.mValue.z);
+          math::Quaterniond quat(quatKey.mValue.w, quatKey.mValue.x,
+              quatKey.mValue.y, quatKey.mValue.z);
+          math::Pose3d pose(pos, quat);
+          // Time is in ms
+          skelAnim->AddKeyFrame(chanName, posKey.mTime / 1000.0, pose);
+        }
       }
+      rootSkeleton->AddAnimation(skelAnim);
     }
-    mesh->MeshSkeleton()->AddAnimation(skelAnim);
-  }
 
-  this->dataPtr->ApplyInvBindTransform(mesh->MeshSkeleton());
+    this->dataPtr->ApplyInvBindTransform(rootSkeleton);
+  }
+  else if (scene->mNumAnimations > 0)
+  {
+    gzwarn << "Mesh [" << _filename
+           << "] contains animations but no skeleton was found. "
+           << "Animations will not be loaded." << std::endl;
+  }
 
   return mesh;
 }
