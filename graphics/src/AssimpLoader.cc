@@ -723,8 +723,8 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
       std::string textureKey = this->FullTextureKey(texturePath.C_Str());
       auto [texName, texData] =
       this->LoadTexture(_scene, texturePath,
-        this->GenerateTextureName(textureKey, "Metalness"),
-        true, false);
+                        this->GenerateTextureName(textureKey, "Metalness"),
+                        true, false);
       pbr.SetMetalnessMap(textureKey, texData);
     }
     ret = assimpMat->GetTexture(
