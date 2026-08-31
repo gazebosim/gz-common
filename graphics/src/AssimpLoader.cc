@@ -117,14 +117,15 @@ class AssimpLoader::Implementation
   /// \param[in] _texturePath the path where the texture is located
   /// \param[in] _textureName the name of the texture
   /// \param[in] _shouldCache Whether the image should be cached
+  /// \param[in] _loadFullTexture Whether to load the full texture into memory
   /// \return a pair containing the name of the texture and a pointer to the
   /// image data, if the texture was loaded in memory
   public: std::pair<std::string, ImagePtr>
           LoadTexture(const aiScene* _scene,
                       const aiString& _texturePath,
                       const std::string& _textureName,
-                      const bool _shouldCache = true,
-                      const bool _loadFullTexture = true) const;
+                      bool _shouldCache = true,
+                      bool _loadFullTexture = true) const;
 
   /// \brief Function to split a gltf metallicroughness map into
   /// a metalness and roughness map
@@ -847,8 +848,8 @@ std::pair<std::string, ImagePtr> AssimpLoader::Implementation::LoadTexture(
     const aiScene* _scene,
     const aiString& _texturePath,
     const std::string& _textureName,
-    const bool _shouldCache,
-    const bool _loadFullTexture) const
+    bool _shouldCache,
+    bool _loadFullTexture) const
 {
   std::pair<std::string, ImagePtr> ret;
   std::string textureKey = this->FullTextureKey(_texturePath.C_Str());
