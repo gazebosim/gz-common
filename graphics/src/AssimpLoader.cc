@@ -123,8 +123,8 @@ class AssimpLoader::Implementation
           LoadTexture(const aiScene* _scene,
                       const aiString& _texturePath,
                       const std::string& _textureName,
-                      bool _shouldCache = true,
-                      bool _loadFullTexture = true) const;
+                      const bool _shouldCache = true,
+                      const bool _loadFullTexture = true) const;
 
   /// \brief Function to split a gltf metallicroughness map into
   /// a metalness and roughness map
@@ -797,7 +797,7 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     auto [texName, texData] = this->LoadTexture(
       _scene, texturePath, this->GenerateTextureName(textureKey, "Normal"),
       true, false);
-      // TODO(luca) different normal map spaces
+    // TODO(luca) different normal map spaces
     pbr.SetNormalMap(textureKey, NormalMapSpace::TANGENT, texData);
   }
   ret = assimpMat->GetTexture(aiTextureType_EMISSIVE, 0, &texturePath);
@@ -844,8 +844,8 @@ std::pair<std::string, ImagePtr> AssimpLoader::Implementation::LoadTexture(
     const aiScene* _scene,
     const aiString& _texturePath,
     const std::string& _textureName,
-    bool _shouldCache,
-    bool _loadFullTexture) const
+    const bool _shouldCache,
+    const bool _loadFullTexture) const
 {
   std::pair<std::string, ImagePtr> ret;
   std::string textureKey = this->FullTextureKey(_texturePath.C_Str());
