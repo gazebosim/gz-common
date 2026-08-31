@@ -980,9 +980,12 @@ TEST_P(MeshManagerLoad, PBR)
     const common::Pbr *pbr = mat->PbrMaterial();
     EXPECT_DOUBLE_EQ(0, pbr->Roughness());
     EXPECT_DOUBLE_EQ(0, pbr->Metalness());
-    EXPECT_EQ("LightDome_Metalness.png", pbr->MetalnessMap());
-    EXPECT_EQ("LightDome_Roughness.png", pbr->RoughnessMap());
-    EXPECT_EQ("LightDome_Normal.png", pbr->NormalMap());
+    EXPECT_EQ(common::testing::TestFile("data", "LightDome_Metalness.png"),
+        pbr->MetalnessMap());
+    EXPECT_EQ(common::testing::TestFile("data", "LightDome_Roughness.png"),
+        pbr->RoughnessMap());
+    EXPECT_EQ(common::testing::TestFile("data", "LightDome_Normal.png"),
+        pbr->NormalMap());
     mgr->RemoveAll();
   }
 
@@ -1037,10 +1040,13 @@ TEST_P(MeshManagerLoad, PBR)
     else
     {
       EXPECT_DOUBLE_EQ(0.0, pbr->Roughness());
-      EXPECT_EQ("mesh_Rough.png", pbr->RoughnessMap());  // map_Ns
-      EXPECT_EQ("mesh_Metal.png", pbr->MetalnessMap());  // refl
+      EXPECT_EQ(common::testing::TestFile("data", "mesh_Rough.png"),
+          pbr->RoughnessMap());  // map_Ns
+      EXPECT_EQ(common::testing::TestFile("data", "mesh_Metal.png"),
+          pbr->MetalnessMap());  // refl
     }
-    EXPECT_EQ("mesh_Normal.png", pbr->NormalMap());
+    EXPECT_EQ(common::testing::TestFile("data", "mesh_Normal.png"),
+        pbr->NormalMap());
   }
 }
 
@@ -1230,7 +1236,7 @@ TEST_F(MeshManager, LoadGlTF2BoxExternalTexture)
   ASSERT_NE(material, nullptr);
   auto pbr = material->PbrMaterial();
   ASSERT_NE(pbr, nullptr);
-  EXPECT_NE(pbr->SpecularMap(), testTextureFile);
+  EXPECT_EQ(pbr->SpecularMap(), testTextureFile);
 }
 
 /////////////////////////////////////////////////

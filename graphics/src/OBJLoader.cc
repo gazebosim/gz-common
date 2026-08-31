@@ -168,7 +168,8 @@ Mesh *OBJLoader::Load(const std::string &_filename)
               pbrMat.SetRoughnessMap(
                   common::joinPaths(path, m.specular_highlight_texname));
               if (!m.reflection_texname.empty())
-                pbrMat.SetMetalnessMap(m.reflection_texname);
+                pbrMat.SetMetalnessMap(
+                    common::joinPaths(path, m.reflection_texname));
             }
             else if (!m.reflection_texname.empty())
             {
@@ -184,7 +185,7 @@ Mesh *OBJLoader::Load(const std::string &_filename)
                   common::joinPaths(path, m.roughness_texname));
             if (!m.metallic_texname.empty())
               pbrMat.SetMetalnessMap(
-                common::joinPaths(path, m.metallic_texname));
+                  common::joinPaths(path, m.metallic_texname));
             if (!m.normal_texname.empty())
               pbrMat.SetNormalMap(common::joinPaths(path, m.normal_texname));
             if (!m.emissive_texname.empty())
