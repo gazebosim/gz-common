@@ -467,8 +467,10 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene,
           if (skelNode == nullptr)
             continue;
           skelNode->SetInverseBindTransform(
-              this->ConvertTransform(bone->mOffsetMatrix) * _transform.Inverse());
-          for (unsigned weightIdx = 0; weightIdx < bone->mNumWeights; ++weightIdx)
+              this->ConvertTransform(
+                  bone->mOffsetMatrix) * _transform.Inverse());
+          for (unsigned weightIdx = 0; weightIdx < bone->mNumWeights;
+              ++weightIdx)
           {
             auto vertexWeight = bone->mWeights[weightIdx];
             skeleton->AddVertNodeWeight(
@@ -479,7 +481,8 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene,
         for (unsigned vertexIdx = 0; vertexIdx < subMesh.VertexCount();
             ++vertexIdx)
         {
-          for (unsigned i = 0; i < skeleton->VertNodeWeightCount(vertexIdx); ++i)
+          for (unsigned i = 0; i < skeleton->VertNodeWeightCount(vertexIdx);
+              ++i)
           {
             std::pair<std::string, double> nodeWeight =
               skeleton->VertNodeWeight(vertexIdx, i);
