@@ -594,7 +594,7 @@ TEST_P(MeshManagerLoad, LoadZeroCount)
     EXPECT_EQ(log.find("Vertex source missing float_array"), std::string::npos);
     EXPECT_EQ(log.find("Normal source missing float_array"), std::string::npos);
     // Expect the logs to contain information
-    EXPECT_NE(log.find("Triangle input has a count of zero"), 
+    EXPECT_NE(log.find("Triangle input has a count of zero"),
         std::string::npos);
     EXPECT_NE(log.find("Vertex source has a float_array with a count of zero"),
         std::string::npos);
@@ -973,7 +973,6 @@ TEST_P(MeshManagerLoad, MergeBoxWithDoubleSkeleton)
   // The two skeletons have been joined and their root is the
   // animation root, called Armature
   EXPECT_EQ(skeleton_ptr->RootNode()->Name(), std::string(skeletonRootName));
-  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -1882,6 +1881,100 @@ TEST_P(MeshManagerLoad, LoadMalformedPolylistShortP)
     EXPECT_EQ(3u, mesh->VertexCount());
     EXPECT_EQ(3u, mesh->IndexCount());
   }
+}
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadLines)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "xy_square_lines.dae")));
+  ASSERT_TRUE(mesh);
+
+  // 4 line segments, each contributes 2 vertices and 2 indices.
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(8u, mesh->VertexCount());
+  EXPECT_EQ(8u, mesh->IndexCount());
+
+  auto subMesh = mesh->SubMeshByIndex(0u).lock();
+  ASSERT_NE(nullptr, subMesh);
+  EXPECT_EQ(common::SubMesh::LINES, subMesh->SubMeshPrimitiveType());
+}
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadTextureMaterial)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "xy_triangle_texture.dae")));
+  ASSERT_TRUE(mesh);
+
+  EXPECT_EQ(3u, mesh->VertexCount());
+  EXPECT_EQ(3u, mesh->TexCoordCount());
+  ASSERT_EQ(1u, mesh->MaterialCount());
+
+  common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+  ASSERT_NE(nullptr, mat);
+
+  // The diffuse texture chain should have been resolved and stored.
+  EXPECT_FALSE(mat->TextureImage().empty());
+  EXPECT_NE(mat->TextureImage().find("xy_triangle_texture.png"),
+      std::string::npos);
+}
+
+/////////////////////////////////////////////////
+// Loading a non-existent file must return null, not crash.
+TEST_F(ColladaLoader, LoadNonexistentFile)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "this_file_does_not_exist.dae")));
+  EXPECT_EQ(nullptr, mesh);
+}
+
+/////////////////////////////////////////////////
+// A file whose root element is not <COLLADA> must return null, not crash.
+TEST_F(ColladaLoader, LoadNoColladaTag)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "no_collada_tag.dae")));
+  EXPECT_EQ(nullptr, mesh);
+#ifndef _WIN32
+  common::Console::Root().RawLogger().flush();
+  EXPECT_NE(LogContent().find("Missing COLLADA tag"), std::string::npos);
+#endif
+}
+
+/////////////////////////////////////////////////
+// An unsupported version is reported but the mesh still loads.
+TEST_F(ColladaLoader, LoadBadVersion)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "bad_version.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(3u, mesh->VertexCount());
+#ifndef _WIN32
+  common::Console::Root().RawLogger().flush();
+  EXPECT_NE(LogContent().find("Invalid collada file"), std::string::npos);
+#endif
+}
+
+/////////////////////////////////////////////////
+// A <scene> referencing a missing visual_scene must be reported, not crash.
+TEST_F(ColladaLoader, LoadMissingVisualScene)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "missing_visual_scene.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->VertexCount());
+#ifndef _WIN32
+  common::Console::Root().RawLogger().flush();
+  EXPECT_NE(LogContent().find("Unable to find visual_scene"),
+      std::string::npos);
+#endif
 }
 
 #endif
