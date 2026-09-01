@@ -211,8 +211,8 @@ namespace gz
       public: const URIPath operator/(const std::string &_part) const;
 
       /// \brief Return true if the two paths match.
-      /// \param[in] _part Path part.
-      /// return True of the paths match.
+      /// \param[in] _path Path part.
+      /// return True if the paths match.
       public: bool operator==(const URIPath &_path) const;
 
       /// \brief Get the path as a string.
@@ -278,7 +278,7 @@ namespace gz
       public: bool Valid() const;
 
       /// \brief Parse a string as URIQuery.
-      /// \param[in] _str A string.
+      /// \param[in] _string A string.
       /// \return True if the string can be parsed as a URIQuery.
       public: bool Parse(const std::string &_string);
 
@@ -323,7 +323,7 @@ namespace gz
       public: bool Valid() const;
 
       /// \brief Parse a string as URIFragment.
-      /// \param[in] _str A string.
+      /// \param[in] _string A string.
       /// \return True if the string can be parsed as a URIFragment.
       public: bool Parse(const std::string &_string);
 
@@ -333,7 +333,7 @@ namespace gz
 
     /// \brief A complete URI which has the following components:
     ///
-    /// scheme:[//authority]path[?query][#fragment]
+    /// scheme:[//authority]path[?query][\#fragment]
     ///
     // cppcheck-suppress class_X_Y
     class GZ_COMMON_VISIBLE URI
@@ -341,7 +341,8 @@ namespace gz
       /// \brief Default constructor
       public: URI();
 
-      /// \brief Default constructor
+      /// \brief Construct a URI object from a string.
+      /// \param[in] _str URI string.
       /// \param[in] _hasAuthority False if the URI doesn't have an authority.
       /// Defaults to false. If true, an authority will be created and will be
       /// empty.
@@ -350,7 +351,7 @@ namespace gz
 
       /// \brief Get the URI as a string, which has the form:
       ///
-      /// scheme:[//authority]path[?query][#fragment]
+      /// scheme:[//authority]path[?query][\#fragment]
       ///
       /// \return The full URI as a string
       public: std::string Str() const;
@@ -367,7 +368,7 @@ namespace gz
       public: void SetScheme(const std::string &_scheme);
 
       /// \brief Set the URI's authority.
-      /// \return The authority
+      /// \param[in] _authority The authority to set.
       public: void SetAuthority(const URIAuthority &_authority);
 
       /// \brief Get a copy of the URI's authority.

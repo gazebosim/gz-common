@@ -106,20 +106,6 @@ TEST_F(AssimpLoader, LoadBoxWithDefaultStride)
 }
 
 /////////////////////////////////////////////////
-TEST_F(AssimpLoader, MergeBoxWithDoubleSkeleton)
-{
-  common::AssimpLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "box_with_double_skeleton.dae"));
-  ASSERT_TRUE(mesh->HasSkeleton());
-  auto skeleton_ptr = mesh->MeshSkeleton();
-  // The two skeletons have been joined and their root is the
-  // animation root, called Scene
-  EXPECT_EQ(skeleton_ptr->RootNode()->Name(), std::string("Scene"));
-  delete mesh;
-}
-
-/////////////////////////////////////////////////
 TEST_F(AssimpLoader, LoadCylinderAnimatedFrom3dsMax)
 {
   // TODO(anyone) This test shows that the mesh loads without crashing, but the
@@ -153,23 +139,5 @@ TEST_F(AssimpLoader, LoadCylinderAnimatedFrom3dsMax)
   // EXPECT_EQ("Bone02", anim->Name());
   EXPECT_EQ(1u, anim->NodeCount());
   EXPECT_TRUE(anim->HasNode("Bone02"));
-  delete mesh;
-}
-
-/////////////////////////////////////////////////
-// Checks for null root node animation and valid
-// x displacement in non root node's animation.
-TEST_F(AssimpLoader, CheckNonRootDisplacement)
-{
-  common::AssimpLoader loader;
-  common::Mesh *mesh = loader.Load(common::testing::TestFile("data",
-        "walk.dae"));
-  auto meshSkel =  mesh->MeshSkeleton();
-  std::string rootNodeName = meshSkel->RootNode()->Name();
-  common::SkeletonAnimation *skelAnim = meshSkel->Animation(0);
-  common::NodeAnimation *rootNode = skelAnim->NodeAnimationByName(rootNodeName);
-  EXPECT_EQ(nullptr, rootNode);
-  auto xDisplacement = skelAnim->XDisplacement();
-  ASSERT_TRUE(xDisplacement);
   delete mesh;
 }

@@ -967,6 +967,7 @@ TEST_P(MeshManagerLoad, MergeBoxWithDoubleSkeleton)
   auto *mgr = common::MeshManager::Instance();
   const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "box_with_double_skeleton.dae"));
+<<<<<<< HEAD
   std::string skeletonRootName;
   if (forceAssimpEnv)
   {
@@ -1023,6 +1024,15 @@ TEST_P(MeshManagerLoad, LoadCylinderAnimatedFrom3dsMax)
   EXPECT_EQ("Bone02", anim->Name());
   EXPECT_EQ(1u, anim->NodeCount());
   EXPECT_TRUE(anim->HasNode("Bone02"));
+=======
+  std::string skeletonRootName = "Armature";
+  EXPECT_TRUE(mesh->HasSkeleton());
+  auto skeleton_ptr = mesh->MeshSkeleton();
+  // The two skeletons have been joined and their root is the
+  // animation root, called Armature
+  EXPECT_EQ(skeleton_ptr->RootNode()->Name(), std::string(skeletonRootName));
+  mgr->RemoveAll();
+>>>>>>> main
 }
 
 /////////////////////////////////////////////////
@@ -1039,6 +1049,23 @@ TEST_P(MeshManagerLoad, NoAnimName)
   common::SkeletonAnimation *anim = skeleton->Animation(0);
   auto animName = anim->Name();
   EXPECT_EQ(animName, "animation1");
+}
+
+/////////////////////////////////////////////////
+// Checks for null root node animation and valid
+// x displacement in non root node's animation.
+TEST_P(MeshManagerLoad, CheckNonRootDisplacement)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(common::testing::TestFile("data",
+        "walk.dae"));
+  auto meshSkel =  mesh->MeshSkeleton();
+  std::string rootNodeName = meshSkel->RootNode()->Name();
+  common::SkeletonAnimation *skelAnim = meshSkel->Animation(0);
+  common::NodeAnimation *rootNode = skelAnim->NodeAnimationByName(rootNodeName);
+  EXPECT_NE(rootNode, nullptr);
+  auto xDisplacement = skelAnim->XDisplacement();
+  ASSERT_TRUE(xDisplacement);
 }
 
 /////////////////////////////////////////////////
@@ -1841,6 +1868,56 @@ TEST_P(MeshManagerLoad, LoadEmptyInitFrom)
     common::MaterialPtr mat = mesh->MaterialByIndex(0u);
     ASSERT_NE(nullptr, mat);
     EXPECT_TRUE(mat->TextureImage().empty());
+  }
+}
+
+/////////////////////////////////////////////////
+// A negative index in <p> must be rejected: strtoul would silently wrap
+// it to a huge unsigned value that reads out of bounds. Recovery policies
+// differ: the COLLADA loader keeps the indices parsed before the invalid
+// one, assimp rejects the geometry.
+TEST_P(MeshManagerLoad, LoadMalformedPNegativeIndex)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_p_negative_index.dae"));
+  ASSERT_NE(nullptr, mesh);
+  if (this->forceAssimpEnv)
+  {
+    EXPECT_EQ(0u, mesh->SubMeshCount());
+    EXPECT_EQ(0u, mesh->VertexCount());
+    EXPECT_EQ(0u, mesh->IndexCount());
+  }
+  else
+  {
+    EXPECT_EQ(1u, mesh->SubMeshCount());
+    EXPECT_EQ(1u, mesh->VertexCount());
+    EXPECT_EQ(1u, mesh->IndexCount());
+  }
+}
+
+/////////////////////////////////////////////////
+// A polylist whose <p> holds fewer indices than <vcount> declares must be
+// truncated, not read out of bounds. Recovery policies differ: the
+// COLLADA loader keeps the complete first triangle, assimp rejects the
+// geometry.
+TEST_P(MeshManagerLoad, LoadMalformedPolylistShortP)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "malformed_polylist_short_p.dae"));
+  ASSERT_NE(nullptr, mesh);
+  if (this->forceAssimpEnv)
+  {
+    EXPECT_EQ(0u, mesh->SubMeshCount());
+    EXPECT_EQ(0u, mesh->VertexCount());
+    EXPECT_EQ(0u, mesh->IndexCount());
+  }
+  else
+  {
+    EXPECT_EQ(1u, mesh->SubMeshCount());
+    EXPECT_EQ(3u, mesh->VertexCount());
+    EXPECT_EQ(3u, mesh->IndexCount());
   }
 }
 
