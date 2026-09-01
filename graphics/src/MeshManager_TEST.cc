@@ -967,21 +967,13 @@ TEST_P(MeshManagerLoad, MergeBoxWithDoubleSkeleton)
   auto *mgr = common::MeshManager::Instance();
   const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "box_with_double_skeleton.dae"));
-<<<<<<< HEAD
-  std::string skeletonRootName;
-  if (forceAssimpEnv)
-  {
-    skeletonRootName = "Scene";
-  }
-  else
-  {
-    skeletonRootName = "Armature";
-  }
+  std::string skeletonRootName = "Armature";
   EXPECT_TRUE(mesh->HasSkeleton());
   auto skeleton_ptr = mesh->MeshSkeleton();
   // The two skeletons have been joined and their root is the
-  // animation root, called Armature (ColladaLoader) or Scene (AssimpLoader)
+  // animation root, called Armature
   EXPECT_EQ(skeleton_ptr->RootNode()->Name(), std::string(skeletonRootName));
+  mgr->RemoveAll();
 }
 
 /////////////////////////////////////////////////
@@ -1024,15 +1016,6 @@ TEST_P(MeshManagerLoad, LoadCylinderAnimatedFrom3dsMax)
   EXPECT_EQ("Bone02", anim->Name());
   EXPECT_EQ(1u, anim->NodeCount());
   EXPECT_TRUE(anim->HasNode("Bone02"));
-=======
-  std::string skeletonRootName = "Armature";
-  EXPECT_TRUE(mesh->HasSkeleton());
-  auto skeleton_ptr = mesh->MeshSkeleton();
-  // The two skeletons have been joined and their root is the
-  // animation root, called Armature
-  EXPECT_EQ(skeleton_ptr->RootNode()->Name(), std::string(skeletonRootName));
-  mgr->RemoveAll();
->>>>>>> main
 }
 
 /////////////////////////////////////////////////
@@ -1486,26 +1469,6 @@ TEST_F(MeshManager, LoadGlbPbrAsset)
   EXPECT_STREQ("Action1", skel->Animation(0)->Name().c_str());
   EXPECT_STREQ("Action2", skel->Animation(1)->Name().c_str());
   EXPECT_STREQ("Action3", skel->Animation(2)->Name().c_str());
-}
-
-/////////////////////////////////////////////////
-// Checks for null root node animation and valid
-// x displacement in non root node's animation.
-TEST_P(MeshManagerLoad, CheckNonRootDisplacement)
-{
-  auto *mgr = common::MeshManager::Instance();
-  const common::Mesh *mesh = mgr->Load(
-    common::testing::TestFile("data", "walk.dae"));
-  auto meshSkel =  mesh->MeshSkeleton();
-  std::string rootNodeName = meshSkel->RootNode()->Name();
-  common::SkeletonAnimation *skelAnim = meshSkel->Animation(0);
-  common::NodeAnimation *rootNode = skelAnim->NodeAnimationByName(rootNodeName);
-  if (forceAssimpEnv)
-  {
-    EXPECT_EQ(nullptr, rootNode);
-  }
-  auto xDisplacement = skelAnim->XDisplacement();
-  ASSERT_TRUE(xDisplacement);
 }
 
 TEST_F(MeshManager, LoadGLTF2Triangle)
