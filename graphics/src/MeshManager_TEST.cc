@@ -587,7 +587,7 @@ TEST_P(MeshManagerLoad, LoadZeroCount)
   common::Console::Root().RawLogger().flush();
   std::string log = LogContent();
 
-  if (!forceAssimpEnv)
+  if (!this->forceAssimpEnv)
   {
     // Expect no errors about missing values
     EXPECT_EQ(log.find("Loading what we can..."), std::string::npos);
@@ -787,7 +787,7 @@ TEST_P(MeshManagerLoad, LoadBoxInstControllerWithoutSkeleton)
       common::testing::TestFile("data",
         "box_inst_controller_without_skeleton.dae"));
 
-  if (forceAssimpEnv)
+  if (this->forceAssimpEnv)
   {
     EXPECT_EQ(24u, mesh->VertexCount());
     EXPECT_EQ(24u, mesh->TexCoordCount());
@@ -812,7 +812,7 @@ TEST_P(MeshManagerLoad, LoadBoxMultipleInstControllers)
   const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "box_multiple_inst_controllers.dae"));
 
-  if (forceAssimpEnv)
+  if (this->forceAssimpEnv)
   {
     EXPECT_EQ(48u, mesh->VertexCount());
     EXPECT_EQ(48u, mesh->TexCoordCount());
@@ -830,7 +830,7 @@ TEST_P(MeshManagerLoad, LoadBoxMultipleInstControllers)
   std::shared_ptr<common::SubMesh> submesh2 = mesh->SubMeshByIndex(1).lock();
   EXPECT_EQ(36u, submesh->IndexCount());
   EXPECT_EQ(36u, submesh2->IndexCount());
-  if (forceAssimpEnv)
+  if (this->forceAssimpEnv)
   {
     EXPECT_EQ(24u, submesh->VertexCount());
     EXPECT_EQ(24u, submesh2->VertexCount());
@@ -857,7 +857,7 @@ TEST_P(MeshManagerLoad, LoadBoxNestedAnimation)
   const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "box_nested_animation.dae"));
 
-  if (forceAssimpEnv)
+  if (this->forceAssimpEnv)
   {
     EXPECT_EQ(24u, mesh->VertexCount());
     EXPECT_EQ(24u, mesh->TexCoordCount());
@@ -902,7 +902,7 @@ TEST_P(MeshManagerLoad, LoadBoxWithDefaultStride)
   const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "box_with_default_stride.dae"));
 
-  if (forceAssimpEnv)
+  if (this->forceAssimpEnv)
   {
     EXPECT_EQ(24u, mesh->VertexCount());
     EXPECT_EQ(24u, mesh->TexCoordCount());
@@ -986,7 +986,7 @@ TEST_P(MeshManagerLoad, LoadCylinderAnimatedFrom3dsMax)
         "cylinder_animated_from_3ds_max.dae");
   const common::Mesh *mesh = mgr->Load(filename);
   EXPECT_EQ(filename, mesh->Name());
-  if (forceAssimpEnv)
+  if (this->forceAssimpEnv)
   {
     EXPECT_EQ(194u, mesh->VertexCount());
     EXPECT_EQ(194u, mesh->NormalCount());
