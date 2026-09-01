@@ -43,6 +43,7 @@
   #include <assimp/AssertHandler.h>
   #define GZ_ASSIMP_HAS_ASSERT_HANDLER 1
 #endif
+#include <assimp/ColladaMetaData.h>
 #include <assimp/GltfMaterial.h>    // GLTF specific material properties
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/postprocess.h>     // Post processing flags
@@ -208,6 +209,26 @@ static std::string ToString(const aiString& str)
 }
 
 //////////////////////////////////////////////////
+// Utility function to get Collada nodeID from assimp node object
+static std::string GetColladaNodeID(const aiNode* _node)
+{
+  if (!_node)
+    return "";
+
+  // Initialise nodeID to nodeName first
+  if (_node->mMetaData)
+  {
+    aiString colladaId;
+    if (_node->mMetaData->Get(AI_METADATA_COLLADA_ID, colladaId))
+    {
+      // If we have a value for the node ID, update it
+      return ToString(colladaId);
+    }
+  }
+  return ToString(_node->mName);
+}
+
+//////////////////////////////////////////////////
 std::string AssimpLoader::Implementation::FullTextureKey(
     const std::string &_texturePath) const
 {
@@ -254,12 +275,47 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene,
 {
   if (!_node)
     return;
+   // Iterate over children
+  for (unsigned childIdx = 0; childIdx < _node->mNumChildren; ++childIdx)
+  {
+    // Calculate the transform
+    auto& child_node = _node->mChildren[childIdx];
+    auto nodeTrans = this->ConvertTransform(child_node->mTransformation);
+    nodeTrans = _transform * nodeTrans;
+
+    // Finally recursive call to explore subnode
+    this->RecursiveCreate(_scene, child_node, nodeTrans, _mesh);
+  }
+
   // Visit this node, add the submesh
   for (unsigned meshIdx = 0; meshIdx < _node->mNumMeshes; ++meshIdx)
   {
     auto assimpMeshIdx = _node->mMeshes[meshIdx];
     auto& assimpMesh = _scene->mMeshes[assimpMeshIdx];
     auto nodeName = ToString(_node->mName);
+
+    // if node had no name originally and was assigned a default by
+    // assimp, replace it with the name of first ancestor node that has a name
+    if (nodeName.find("$ColladaAutoName$") == 0)
+    {
+      const aiNode *parent = _node->mParent;
+      nodeName = "";
+      while (parent && parent != _scene->mRootNode)
+      {
+        std::string parentName = ToString(parent->mName);
+        if (parentName.find("$ColladaAutoName$") != 0)
+        {
+          nodeName = parentName;
+          break;
+        }
+        parent = parent->mParent;
+      }
+      if (nodeName.empty())
+      {
+        static int nodeCounter = 0;
+        nodeName = "unnamed_submesh_" + std::to_string(nodeCounter++);
+      }
+    }
     auto subMesh = this->CreateSubMesh(assimpMesh, _transform);
     subMesh.SetName(nodeName);
     // Now add the bones to the skeleton
@@ -305,18 +361,6 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene,
     }
     _mesh->AddSubMesh(std::move(subMesh));
   }
-
-  // Iterate over children
-  for (unsigned childIdx = 0; childIdx < _node->mNumChildren; ++childIdx)
-  {
-    // Calculate the transform
-    auto& child_node = _node->mChildren[childIdx];
-    auto nodeTrans = this->ConvertTransform(child_node->mTransformation);
-    nodeTrans = _transform * nodeTrans;
-
-    // Finally recursive call to explore subnode
-    this->RecursiveCreate(_scene, child_node, nodeTrans, _mesh);
-  }
 }
 
 void AssimpLoader::Implementation::RecursiveStoreBoneNames(
@@ -355,6 +399,7 @@ void AssimpLoader::Implementation::RecursiveSkeletonCreate(const aiNode* _node,
     return;
   // First explore this node
   auto nodeName = ToString(_node->mName);
+  auto nodeID = GetColladaNodeID(_node);
   auto boneExist = _boneNames.find(nodeName) != _boneNames.end();
   auto nodeTrans = this->ConvertTransform(_node->mTransformation);
   auto skelNode = _parent;
@@ -362,7 +407,7 @@ void AssimpLoader::Implementation::RecursiveSkeletonCreate(const aiNode* _node,
   if (boneExist)
   {
     skelNode = new SkeletonNode(
-        _parent, nodeName, nodeName, SkeletonNode::JOINT);
+        _parent, nodeName, nodeID, SkeletonNode::JOINT);
     skelNode->SetTransform(nodeTrans);
   }
 
@@ -875,6 +920,8 @@ AssimpLoader::AssimpLoader()
   this->dataPtr->importer.SetPropertyBool(AI_CONFIG_PP_FD_REMOVE, true);
   this->dataPtr->importer.SetPropertyBool(
       AI_CONFIG_IMPORT_REMOVE_EMPTY_BONES, false);
+  this->dataPtr->importer.SetPropertyBool(
+    AI_CONFIG_IMPORT_COLLADA_USE_COLLADA_NAMES, true);
 }
 
 //////////////////////////////////////////////////
@@ -914,6 +961,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   }
   auto& rootNode = scene->mRootNode;
   auto rootName = ToString(rootNode->mName);
+  auto rootID = GetColladaNodeID(rootNode);
   std::string extension;
   std::size_t extIdx = _filename.rfind(".");
   if (extIdx != std::string::npos)
@@ -955,7 +1003,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
     std::unordered_set<std::string> boneNames;
     this->dataPtr->RecursiveStoreBoneNames(scene, rootNode, boneNames);
     auto rootSkelNode = new SkeletonNode(
-        nullptr, rootName, rootName, SkeletonNode::NODE);
+        nullptr, rootName, rootID, SkeletonNode::NODE);
     rootSkelNode->SetTransform(rootTransform);
     rootSkelNode->SetModelTransform(rootTransform);
     for (unsigned childIdx = 0; childIdx < rootNode->mNumChildren; ++childIdx)
