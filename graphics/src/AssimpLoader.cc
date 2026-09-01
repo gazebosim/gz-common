@@ -894,20 +894,11 @@ std::pair<std::string, ImagePtr> AssimpLoader::Implementation::LoadTexture(
     ret.first = ToString(_texturePath);
     if (_loadFullTexture)
     {
-<<<<<<< HEAD
-      gzdbg << "Loading external texture [" << textureKey << "]" << std::endl;
-      ret.second = std::make_shared<Image>(textureKey);
-      if (_shouldCache)
-=======
       // Load external texture from disk
       if (common::exists(textureKey))
->>>>>>> 7111f3d (Do lazy texture loading for non-embedded textures in AssimpLoader (#906))
       {
         gzdbg << "Loading external texture [" << textureKey << "]" << std::endl;
-        // Textures are uploaded to the GPU as RGBA; decode straight to RGBA in
-        // a single pass to avoid a later channel conversion.
         ret.second = std::make_shared<Image>();
-        ret.second->Load(textureKey, Image::PixelFormatType::RGBA_INT8);
         if (_shouldCache)
         {
           this->imageCache[textureKey] = ret.second;
