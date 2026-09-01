@@ -117,13 +117,15 @@ class AssimpLoader::Implementation
   /// \param[in] _texturePath the path where the texture is located
   /// \param[in] _textureName the name of the texture
   /// \param[in] _shouldCache Whether the image should be cached
+  /// \param[in] _loadFullTexture Whether to load the full texture into memory
   /// \return a pair containing the name of the texture and a pointer to the
   /// image data, if the texture was loaded in memory
   public: std::pair<std::string, ImagePtr>
           LoadTexture(const aiScene* _scene,
                       const aiString& _texturePath,
                       const std::string& _textureName,
-                      bool _shouldCache = true) const;
+                      bool _shouldCache = true,
+                      bool _loadFullTexture = true) const;
 
   /// \brief Function to split a gltf metallicroughness map into
   /// a metalness and roughness map
@@ -443,47 +445,53 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene,
     {
       // TODO(luca) merging skeletons here
       auto skeleton = _mesh->MeshSkeleton();
-      // TODO(luca) Append to existing skeleton if multiple submeshes?
-      skeleton->SetNumVertAttached(subMesh.VertexCount());
-      // Now add the bone weights
-      for (unsigned boneIdx = 0; boneIdx < assimpMesh->mNumBones; ++boneIdx)
+      if (skeleton)
       {
-        auto& bone = assimpMesh->mBones[boneIdx];
-        std::string boneNodeName;
-        if (const auto node = bone->mNode)
+        // TODO(luca) Append to existing skeleton if multiple submeshes?
+        skeleton->SetNumVertAttached(subMesh.VertexCount());
+        // Now add the bone weights
+        for (unsigned boneIdx = 0; boneIdx < assimpMesh->mNumBones; ++boneIdx)
         {
-          boneNodeName = this->GetSkeletonNodeName(node, extension);
+          auto& bone = assimpMesh->mBones[boneIdx];
+          std::string boneNodeName;
+          if (const auto node = bone->mNode)
+          {
+            boneNodeName = this->GetSkeletonNodeName(node, extension);
+          }
+          else
+          {
+            boneNodeName = ToString(bone->mName);
+          }
+          // Apply inverse bind transform to the matching node
+          SkeletonNode *skelNode =
+              skeleton->NodeByName(boneNodeName);
+          if (skelNode == nullptr)
+            continue;
+          skelNode->SetInverseBindTransform(
+              this->ConvertTransform(
+                  bone->mOffsetMatrix) * _transform.Inverse());
+          for (unsigned weightIdx = 0; weightIdx < bone->mNumWeights;
+              ++weightIdx)
+          {
+            auto vertexWeight = bone->mWeights[weightIdx];
+            skeleton->AddVertNodeWeight(
+                vertexWeight.mVertexId, boneNodeName, vertexWeight.mWeight);
+          }
         }
-        else
+        // Add node assignment to mesh
+        for (unsigned vertexIdx = 0; vertexIdx < subMesh.VertexCount();
+            ++vertexIdx)
         {
-          boneNodeName = ToString(bone->mName);
-        }
-        // Apply inverse bind transform to the matching node
-        SkeletonNode *skelNode =
-            skeleton->NodeByName(boneNodeName);
-        if (skelNode == nullptr)
-          continue;
-        skelNode->SetInverseBindTransform(
-            this->ConvertTransform(bone->mOffsetMatrix) * _transform.Inverse());
-        for (unsigned weightIdx = 0; weightIdx < bone->mNumWeights; ++weightIdx)
-        {
-          auto vertexWeight = bone->mWeights[weightIdx];
-          skeleton->AddVertNodeWeight(
-              vertexWeight.mVertexId, boneNodeName, vertexWeight.mWeight);
-        }
-      }
-      // Add node assignment to mesh
-      for (unsigned vertexIdx = 0; vertexIdx < subMesh.VertexCount();
-          ++vertexIdx)
-      {
-        for (unsigned i = 0; i < skeleton->VertNodeWeightCount(vertexIdx); ++i)
-        {
-          std::pair<std::string, double> nodeWeight =
-            skeleton->VertNodeWeight(vertexIdx, i);
-          SkeletonNode *node =
-              skeleton->NodeByName(nodeWeight.first);
-          subMesh.AddNodeAssignment(vertexIdx,
-                          node->Handle(), nodeWeight.second);
+          for (unsigned i = 0; i < skeleton->VertNodeWeightCount(vertexIdx);
+              ++i)
+          {
+            std::pair<std::string, double> nodeWeight =
+              skeleton->VertNodeWeight(vertexIdx, i);
+            SkeletonNode *node =
+                skeleton->NodeByName(nodeWeight.first);
+            subMesh.AddNodeAssignment(vertexIdx,
+                            node->Handle(), nodeWeight.second);
+          }
         }
       }
     }
@@ -623,10 +631,16 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   {
     std::string textureKey = this->FullTextureKey(texturePath.C_Str());
 
-    // Check if the texture is embedded or not
     auto [texName, texData] = this->LoadTexture(
-        _scene, texturePath, this->GenerateTextureName(textureKey, "Diffuse"));
-    mat->SetTextureImage(texName, texData);
+        _scene, texturePath, this->GenerateTextureName(textureKey, "Diffuse"),
+        true, false);
+    // If texture is not embedded, just set the texture
+    // image to the path to the parent folder of the texture.
+    if (texData)
+      mat->SetTextureImage(texName, texData);
+    else
+      mat->SetTextureImage(texName, _path);
+
     // Now set the alpha from texture, if enabled, only supported in GLTF
     aiString alphaMode;
     auto paramRet = assimpMat->Get(AI_MATKEY_GLTF_ALPHAMODE, alphaMode);
@@ -707,9 +721,10 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
     {
       std::string textureKey = this->FullTextureKey(texturePath.C_Str());
       auto [texName, texData] =
-          this->LoadTexture(_scene, texturePath,
-                            this->GenerateTextureName(textureKey, "Metalness"));
-      pbr.SetMetalnessMap(texName, texData);
+      this->LoadTexture(_scene, texturePath,
+                        this->GenerateTextureName(textureKey, "Metalness"),
+                        true, false);
+      pbr.SetMetalnessMap(textureKey, texData);
     }
     ret = assimpMat->GetTexture(
         aiTextureType_DIFFUSE_ROUGHNESS, 0, &texturePath);
@@ -718,8 +733,9 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
       std::string textureKey = this->FullTextureKey(texturePath.C_Str());
       auto [texName, texData] =
           this->LoadTexture(_scene, texturePath,
-                            this->GenerateTextureName(textureKey, "Roughness"));
-      pbr.SetRoughnessMap(texName, texData);
+                            this->GenerateTextureName(textureKey, "Roughness"),
+                            true, false);
+      pbr.SetRoughnessMap(textureKey, texData);
     }
   }
 
@@ -781,17 +797,19 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   {
     std::string textureKey = this->FullTextureKey(texturePath.C_Str());
     auto [texName, texData] = this->LoadTexture(
-        _scene, texturePath, this->GenerateTextureName(textureKey, "Normal"));
+      _scene, texturePath, this->GenerateTextureName(textureKey, "Normal"),
+      true, false);
     // TODO(luca) different normal map spaces
-    pbr.SetNormalMap(texName, NormalMapSpace::TANGENT, texData);
+    pbr.SetNormalMap(textureKey, NormalMapSpace::TANGENT, texData);
   }
   ret = assimpMat->GetTexture(aiTextureType_EMISSIVE, 0, &texturePath);
   if (ret == AI_SUCCESS)
   {
     std::string textureKey = this->FullTextureKey(texturePath.C_Str());
     auto [texName, texData] = this->LoadTexture(
-        _scene, texturePath, this->GenerateTextureName(textureKey, "Emissive"));
-    pbr.SetEmissiveMap(texName, texData);
+      _scene, texturePath, this->GenerateTextureName(textureKey, "Emissive"),
+      true, false);
+    pbr.SetEmissiveMap(textureKey, texData);
   }
 
   ret = assimpMat->GetTexture(aiTextureType_SPECULAR, 0, &texturePath);
@@ -799,8 +817,9 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   {
     std::string textureKey = this->FullTextureKey(texturePath.C_Str());
     auto [texName, texData] = this->LoadTexture(
-      _scene, texturePath, this->GenerateTextureName(textureKey, "Specular"));
-    pbr.SetSpecularMap(texName);
+      _scene, texturePath, this->GenerateTextureName(textureKey, "Specular"),
+      true, false);
+    pbr.SetSpecularMap(textureKey);
   }
 
   float value;
@@ -827,7 +846,8 @@ std::pair<std::string, ImagePtr> AssimpLoader::Implementation::LoadTexture(
     const aiScene* _scene,
     const aiString& _texturePath,
     const std::string& _textureName,
-    bool _shouldCache) const
+    bool _shouldCache,
+    bool _loadFullTexture) const
 {
   std::pair<std::string, ImagePtr> ret;
   std::string textureKey = this->FullTextureKey(_texturePath.C_Str());
@@ -865,24 +885,28 @@ std::pair<std::string, ImagePtr> AssimpLoader::Implementation::LoadTexture(
   }
   else
   {
-    // Load external texture from disk
-    if (common::exists(textureKey))
+    ret.first = ToString(_texturePath);
+    if (_loadFullTexture)
     {
-      gzdbg << "Loading external texture [" << textureKey << "]" << std::endl;
-      // Textures are uploaded to the GPU as RGBA; decode straight to RGBA in a
-      // single pass to avoid a later channel conversion.
-      ret.second = std::make_shared<Image>();
-      ret.second->Load(textureKey, Image::PixelFormatType::RGBA_INT8);
-      if (_shouldCache)
+      // Load external texture from disk
+      if (common::exists(textureKey))
       {
-        this->imageCache[textureKey] = ret.second;
+        gzdbg << "Loading external texture [" << textureKey << "]" << std::endl;
+        // Textures are uploaded to the GPU as RGBA; decode straight to RGBA in
+        // a single pass to avoid a later channel conversion.
+        ret.second = std::make_shared<Image>();
+        ret.second->Load(textureKey, Image::PixelFormatType::RGBA_INT8);
+        if (_shouldCache)
+        {
+          this->imageCache[textureKey] = ret.second;
+        }
+      }
+      else
+      {
+        gzerr << "External texture [" << textureKey << "] not found"
+              << std::endl;
       }
     }
-    else
-    {
-      gzerr << "External texture [" << textureKey << "] not found" << std::endl;
-    }
-    ret.first = ToString(_texturePath);
   }
   return ret;
 }
@@ -1163,49 +1187,58 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   this->dataPtr->RecursiveCreate(scene, rootNode, rootTransform, mesh);
   auto rootSkeleton = mesh->MeshSkeleton();
   // Add the animations
-  for (unsigned animIdx = 0; animIdx < scene->mNumAnimations; ++animIdx)
+  if (rootSkeleton)
   {
-    auto& anim = scene->mAnimations[animIdx];
-    auto animName = ToString(anim->mName);
-    if (animName.empty())
+    for (unsigned animIdx = 0; animIdx < scene->mNumAnimations; ++animIdx)
     {
-      animName = "animation" +
-                 std::to_string(rootSkeleton->AnimationCount() + 1);
-    }
-    SkeletonAnimation* skelAnim = new SkeletonAnimation(animName);
-    for (unsigned chanIdx = 0; chanIdx < anim->mNumChannels; ++chanIdx)
-    {
-      auto& animChan = anim->mChannels[chanIdx];
-      auto chanName = ToString(animChan->mNodeName);
-      if (auto animNode = scene->mRootNode->FindNode(animChan->mNodeName))
+      auto& anim = scene->mAnimations[animIdx];
+      auto animName = ToString(anim->mName);
+      if (animName.empty())
       {
-        chanName = this->dataPtr->GetSkeletonNodeName(animNode, extension);
+        animName = "animation" +
+                   std::to_string(rootSkeleton->AnimationCount() + 1);
       }
-      auto numKeys = std::max(
-          animChan->mNumPositionKeys, animChan->mNumRotationKeys);
-      // Position and rotation arrays might be different lengths,
-      // iterate over the maximum of the two, safely access by checking
-      // number of keys
-      for (unsigned keyIdx = 0; keyIdx < numKeys; ++keyIdx)
+      SkeletonAnimation* skelAnim = new SkeletonAnimation(animName);
+      for (unsigned chanIdx = 0; chanIdx < anim->mNumChannels; ++chanIdx)
       {
-        // Note, Scaling keys are not supported right now
-        // Compute the position into a math pose
-        auto& posKey = animChan->mPositionKeys[
-          std::min(keyIdx, animChan->mNumPositionKeys - 1)];
-        auto& quatKey = animChan->mRotationKeys[
-          std::min(keyIdx, animChan->mNumRotationKeys - 1)];
-        math::Vector3d pos(posKey.mValue.x, posKey.mValue.y, posKey.mValue.z);
-        math::Quaterniond quat(quatKey.mValue.w, quatKey.mValue.x,
-            quatKey.mValue.y, quatKey.mValue.z);
-        math::Pose3d pose(pos, quat);
-        // Time is in ms
-        skelAnim->AddKeyFrame(chanName, posKey.mTime / 1000.0, pose);
+        auto& animChan = anim->mChannels[chanIdx];
+        auto chanName = ToString(animChan->mNodeName);
+        if (auto animNode = scene->mRootNode->FindNode(animChan->mNodeName))
+        {
+          chanName = this->dataPtr->GetSkeletonNodeName(animNode, extension);
+        }
+        auto numKeys = std::max(
+            animChan->mNumPositionKeys, animChan->mNumRotationKeys);
+        // Position and rotation arrays might be different lengths,
+        // iterate over the maximum of the two, safely access by checking
+        // number of keys
+        for (unsigned keyIdx = 0; keyIdx < numKeys; ++keyIdx)
+        {
+          // Note, Scaling keys are not supported right now
+          // Compute the position into a math pose
+          auto& posKey = animChan->mPositionKeys[
+            std::min(keyIdx, animChan->mNumPositionKeys - 1)];
+          auto& quatKey = animChan->mRotationKeys[
+            std::min(keyIdx, animChan->mNumRotationKeys - 1)];
+          math::Vector3d pos(posKey.mValue.x, posKey.mValue.y, posKey.mValue.z);
+          math::Quaterniond quat(quatKey.mValue.w, quatKey.mValue.x,
+              quatKey.mValue.y, quatKey.mValue.z);
+          math::Pose3d pose(pos, quat);
+          // Time is in ms
+          skelAnim->AddKeyFrame(chanName, posKey.mTime / 1000.0, pose);
+        }
       }
+      rootSkeleton->AddAnimation(skelAnim);
     }
-    mesh->MeshSkeleton()->AddAnimation(skelAnim);
-  }
 
-  this->dataPtr->ApplyInvBindTransform(mesh->MeshSkeleton());
+    this->dataPtr->ApplyInvBindTransform(rootSkeleton);
+  }
+  else if (scene->mNumAnimations > 0)
+  {
+    gzwarn << "Mesh [" << _filename
+           << "] contains animations but no skeleton was found. "
+           << "Animations will not be loaded." << std::endl;
+  }
 
   return mesh;
 }
