@@ -631,14 +631,12 @@ MaterialPtr AssimpLoader::Implementation::CreateMaterial(
   {
     std::string textureKey = this->FullTextureKey(texturePath.C_Str());
 
-    // Check if the texture is embedded or not
-    auto embeddedTexture = _scene->GetEmbeddedTexture(texturePath.C_Str());
     auto [texName, texData] = this->LoadTexture(
         _scene, texturePath, this->GenerateTextureName(textureKey, "Diffuse"),
         true, false);
     // If texture is not embedded, just set the texture
     // image to the path to the parent folder of the texture.
-    if (embeddedTexture)
+    if (texData)
       mat->SetTextureImage(texName, texData);
     else
       mat->SetTextureImage(texName, _path);
