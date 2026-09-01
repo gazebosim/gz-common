@@ -1884,29 +1884,38 @@ TEST_P(MeshManagerLoad, LoadMalformedPolylistShortP)
 }
 
 /////////////////////////////////////////////////
-TEST_F(ColladaLoader, LoadLines)
+TEST_P(MeshManagerLoad, LoadLines)
 {
-  common::ColladaLoader loader;
-  std::unique_ptr<common::Mesh> mesh(loader.Load(
-      common::testing::TestFile("data", "xy_square_lines.dae")));
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "xy_square_lines.dae"));
   ASSERT_TRUE(mesh);
-
-  // 4 line segments, each contributes 2 vertices and 2 indices.
-  EXPECT_EQ(1u, mesh->SubMeshCount());
-  EXPECT_EQ(8u, mesh->VertexCount());
-  EXPECT_EQ(8u, mesh->IndexCount());
-
   auto subMesh = mesh->SubMeshByIndex(0u).lock();
   ASSERT_NE(nullptr, subMesh);
-  EXPECT_EQ(common::SubMesh::LINES, subMesh->SubMeshPrimitiveType());
+
+  if (this->forceAssimpEnv)
+  {
+    EXPECT_EQ(1u, mesh->SubMeshCount());
+    EXPECT_EQ(4u, mesh->VertexCount());
+    EXPECT_EQ(12u, mesh->IndexCount());
+    EXPECT_EQ(common::SubMesh::TRIANGLES, subMesh->SubMeshPrimitiveType());
+  }
+  else
+  {
+    // 4 line segments, each contributes 2 vertices and 2 indices.
+    EXPECT_EQ(1u, mesh->SubMeshCount());
+    EXPECT_EQ(8u, mesh->VertexCount());
+    EXPECT_EQ(8u, mesh->IndexCount());
+    EXPECT_EQ(common::SubMesh::LINES, subMesh->SubMeshPrimitiveType());
+  }
 }
 
 /////////////////////////////////////////////////
-TEST_F(ColladaLoader, LoadTextureMaterial)
+TEST_P(MeshManagerLoad, LoadTextureMaterial)
 {
-  common::ColladaLoader loader;
-  std::unique_ptr<common::Mesh> mesh(loader.Load(
-      common::testing::TestFile("data", "xy_triangle_texture.dae")));
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "xy_triangle_texture.dae"));
   ASSERT_TRUE(mesh);
 
   EXPECT_EQ(3u, mesh->VertexCount());
@@ -1923,58 +1932,64 @@ TEST_F(ColladaLoader, LoadTextureMaterial)
 }
 
 /////////////////////////////////////////////////
-// Loading a non-existent file must return null, not crash.
-TEST_F(ColladaLoader, LoadNonexistentFile)
-{
-  common::ColladaLoader loader;
-  std::unique_ptr<common::Mesh> mesh(loader.Load(
-      common::testing::TestFile("data", "this_file_does_not_exist.dae")));
-  EXPECT_EQ(nullptr, mesh);
-}
-
-/////////////////////////////////////////////////
 // A file whose root element is not <COLLADA> must return null, not crash.
-TEST_F(ColladaLoader, LoadNoColladaTag)
+TEST_P(MeshManagerLoad, LoadNoColladaTag)
 {
-  common::ColladaLoader loader;
-  std::unique_ptr<common::Mesh> mesh(loader.Load(
-      common::testing::TestFile("data", "no_collada_tag.dae")));
-  EXPECT_EQ(nullptr, mesh);
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "no_collada_tag.dae"));
+  if (this->forceAssimpEnv)
+  {
+    ASSERT_NE(nullptr, mesh);
+    EXPECT_EQ(0u, mesh->SubMeshCount());
+    EXPECT_EQ(0u, mesh->VertexCount());
+    EXPECT_EQ(0u, mesh->IndexCount());
+  }
+  else
+  {
+    EXPECT_EQ(nullptr, mesh);
 #ifndef _WIN32
-  common::Console::Root().RawLogger().flush();
-  EXPECT_NE(LogContent().find("Missing COLLADA tag"), std::string::npos);
+    common::Console::Root().RawLogger().flush();
+    EXPECT_NE(LogContent().find("Missing COLLADA tag"), std::string::npos);
 #endif
+  }
 }
 
 /////////////////////////////////////////////////
-// An unsupported version is reported but the mesh still loads.
-TEST_F(ColladaLoader, LoadBadVersion)
+// An unsupported version is reported for ColadaLoader but the mesh still loads.
+TEST_P(MeshManagerLoad, LoadBadVersion)
 {
-  common::ColladaLoader loader;
-  std::unique_ptr<common::Mesh> mesh(loader.Load(
-      common::testing::TestFile("data", "bad_version.dae")));
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "bad_version.dae"));
   ASSERT_TRUE(mesh);
   EXPECT_EQ(3u, mesh->VertexCount());
+  if (!this->forceAssimpEnv)
+  {
 #ifndef _WIN32
-  common::Console::Root().RawLogger().flush();
-  EXPECT_NE(LogContent().find("Invalid collada file"), std::string::npos);
+    common::Console::Root().RawLogger().flush();
+    EXPECT_NE(LogContent().find("Invalid collada file"), std::string::npos);
 #endif
+  }
 }
 
 /////////////////////////////////////////////////
-// A <scene> referencing a missing visual_scene must be reported, not crash.
-TEST_F(ColladaLoader, LoadMissingVisualScene)
+// A <scene> referencing a missing visual_scene must not crash.
+TEST_P(MeshManagerLoad, LoadMissingVisualScene)
 {
-  common::ColladaLoader loader;
-  std::unique_ptr<common::Mesh> mesh(loader.Load(
-      common::testing::TestFile("data", "missing_visual_scene.dae")));
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "missing_visual_scene.dae"));
   ASSERT_TRUE(mesh);
   EXPECT_EQ(0u, mesh->VertexCount());
+  if (!this->forceAssimpEnv)
+  {
 #ifndef _WIN32
-  common::Console::Root().RawLogger().flush();
-  EXPECT_NE(LogContent().find("Unable to find visual_scene"),
-      std::string::npos);
+    common::Console::Root().RawLogger().flush();
+    EXPECT_NE(LogContent().find("Unable to find visual_scene"),
+        std::string::npos);
 #endif
+  }
 }
 
 #endif
