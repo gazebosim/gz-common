@@ -29,8 +29,6 @@
 
 using namespace gz;
 
-#ifndef _WIN32
-
 // Only runs each test once. For cases where the GZ_MESH_FORCE_ASSIMP
 // does not affect the behavior of the test
 class MeshManager : public common::testing::AutoLogFixture {
@@ -77,6 +75,7 @@ INSTANTIATE_TEST_SUITE_P(
     MeshManagerLoad,
     testing::Bool());
 
+#ifndef _WIN32
 /////////////////////////////////////////////////
 TEST_F(MeshManager, CreateExtrudedPolyline)
 {
@@ -315,6 +314,7 @@ TEST_F(MeshManager, CreateExtrudedPolylineInvalid)
   // check mesh does not exist due to extrusion failure
   EXPECT_TRUE(!common::MeshManager::Instance()->HasMesh(meshName));
 }
+#endif
 
 /////////////////////////////////////////////////
 TEST_F(MeshManager, Remove)
@@ -584,12 +584,12 @@ TEST_P(MeshManagerLoad, LoadZeroCount)
   const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "zero_count.dae"));
   ASSERT_TRUE(mesh);
-  common::Console::Root().RawLogger().flush();
-  std::string log = LogContent();
-
   if (!this->forceAssimpEnv)
   {
+#ifndef _WIN32
     // Expect no errors about missing values
+    common::Console::Root().RawLogger().flush();
+    std::string log = LogContent();
     EXPECT_EQ(log.find("Loading what we can..."), std::string::npos);
     EXPECT_EQ(log.find("Vertex source missing float_array"), std::string::npos);
     EXPECT_EQ(log.find("Normal source missing float_array"), std::string::npos);
@@ -600,6 +600,7 @@ TEST_P(MeshManagerLoad, LoadZeroCount)
         std::string::npos);
     EXPECT_NE(log.find("Normal source has a float_array with a count of zero"),
         std::string::npos);
+#endif
   }
 }
 
@@ -993,7 +994,6 @@ TEST_P(MeshManagerLoad, LoadCylinderAnimatedFrom3dsMax)
   }
   else
   {
-    // possibly delete vertex/normal + ask maybe in pr
     EXPECT_EQ(202u, mesh->VertexCount());
     EXPECT_EQ(202u, mesh->NormalCount());
   }
@@ -1962,7 +1962,7 @@ TEST_P(MeshManagerLoad, LoadNoColladaTag)
 }
 
 /////////////////////////////////////////////////
-// An unsupported version is reported for ColadaLoader but the mesh still loads.
+// An unsupported version is reported for ColladaLoader but the mesh still loads
 TEST_P(MeshManagerLoad, LoadBadVersion)
 {
   auto *mgr = common::MeshManager::Instance();
@@ -1997,5 +1997,3 @@ TEST_P(MeshManagerLoad, LoadMissingVisualScene)
 #endif
   }
 }
-
-#endif
