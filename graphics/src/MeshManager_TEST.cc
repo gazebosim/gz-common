@@ -1476,6 +1476,7 @@ TEST_F(MeshManager, LoadGlbPbrAsset)
   EXPECT_STREQ("Action3", skel->Animation(2)->Name().c_str());
 }
 
+/////////////////////////////////////////////////
 TEST_F(MeshManager, LoadGLTF2Triangle)
 {
   auto *mgr = common::MeshManager::Instance();
