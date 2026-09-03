@@ -843,6 +843,21 @@ TEST_P(MeshManagerLoad, LoadBoxWithHierarchicalNodes)
 }
 
 /////////////////////////////////////////////////
+TEST_P(MeshManagerLoad, MergeBoxWithDoubleSkeleton)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "box_with_double_skeleton.dae"));
+  std::string skeletonRootName = "Armature";
+  EXPECT_TRUE(mesh->HasSkeleton());
+  auto skeleton_ptr = mesh->MeshSkeleton();
+  // The two skeletons have been joined and their root is the
+  // animation root, called Armature
+  EXPECT_EQ(skeleton_ptr->RootNode()->Name(), std::string(skeletonRootName));
+  mgr->RemoveAll();
+}
+
+/////////////////////////////////////////////////
 // Load animation without a name
 TEST_P(MeshManagerLoad, NoAnimName)
 {
@@ -856,6 +871,23 @@ TEST_P(MeshManagerLoad, NoAnimName)
   common::SkeletonAnimation *anim = skeleton->Animation(0);
   auto animName = anim->Name();
   EXPECT_EQ(animName, "animation1");
+}
+
+/////////////////////////////////////////////////
+// Checks for null root node animation and valid
+// x displacement in non root node's animation.
+TEST_P(MeshManagerLoad, CheckNonRootDisplacement)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(common::testing::TestFile("data",
+        "walk.dae"));
+  auto meshSkel =  mesh->MeshSkeleton();
+  std::string rootNodeName = meshSkel->RootNode()->Name();
+  common::SkeletonAnimation *skelAnim = meshSkel->Animation(0);
+  common::NodeAnimation *rootNode = skelAnim->NodeAnimationByName(rootNodeName);
+  EXPECT_NE(rootNode, nullptr);
+  auto xDisplacement = skelAnim->XDisplacement();
+  ASSERT_TRUE(xDisplacement);
 }
 
 /////////////////////////////////////////////////
@@ -948,9 +980,12 @@ TEST_P(MeshManagerLoad, PBR)
     const common::Pbr *pbr = mat->PbrMaterial();
     EXPECT_DOUBLE_EQ(0, pbr->Roughness());
     EXPECT_DOUBLE_EQ(0, pbr->Metalness());
-    EXPECT_EQ("LightDome_Metalness.png", pbr->MetalnessMap());
-    EXPECT_EQ("LightDome_Roughness.png", pbr->RoughnessMap());
-    EXPECT_EQ("LightDome_Normal.png", pbr->NormalMap());
+    EXPECT_EQ(common::testing::TestFile("data", "LightDome_Metalness.png"),
+        pbr->MetalnessMap());
+    EXPECT_EQ(common::testing::TestFile("data", "LightDome_Roughness.png"),
+        pbr->RoughnessMap());
+    EXPECT_EQ(common::testing::TestFile("data", "LightDome_Normal.png"),
+        pbr->NormalMap());
     mgr->RemoveAll();
   }
 
@@ -1005,10 +1040,13 @@ TEST_P(MeshManagerLoad, PBR)
     else
     {
       EXPECT_DOUBLE_EQ(0.0, pbr->Roughness());
-      EXPECT_EQ("mesh_Rough.png", pbr->RoughnessMap());  // map_Ns
-      EXPECT_EQ("mesh_Metal.png", pbr->MetalnessMap());  // refl
+      EXPECT_EQ(common::testing::TestFile("data", "mesh_Rough.png"),
+          pbr->RoughnessMap());  // map_Ns
+      EXPECT_EQ(common::testing::TestFile("data", "mesh_Metal.png"),
+          pbr->MetalnessMap());  // refl
     }
-    EXPECT_EQ("mesh_Normal.png", pbr->NormalMap());
+    EXPECT_EQ(common::testing::TestFile("data", "mesh_Normal.png"),
+        pbr->NormalMap());
   }
 }
 
@@ -1185,11 +1223,11 @@ TEST_F(MeshManager, LoadGlTF2BoxExternalTexture)
 
   const common::MaterialPtr mat = mesh->MaterialByIndex(0u);
   ASSERT_TRUE(mat.get());
-  // Data is now loaded in memory
-  EXPECT_NE(nullptr, mat->TextureData());
+  // External textures are not immediately loaded by AssimpLoader
+  EXPECT_EQ(nullptr, mat->TextureData());
   auto testTextureFile =
     common::testing::TestFile("data/gltf", "PurpleCube_Diffuse.png");
-  EXPECT_EQ("PurpleCube_Diffuse.png", mat->TextureImage());
+  EXPECT_EQ(testTextureFile, mat->TextureImage());
 
   // Test that SpecularMap has data
   auto materialId = mesh->SubMeshByIndex(0).lock()->GetMaterialIndex();
@@ -1198,7 +1236,7 @@ TEST_F(MeshManager, LoadGlTF2BoxExternalTexture)
   ASSERT_NE(material, nullptr);
   auto pbr = material->PbrMaterial();
   ASSERT_NE(pbr, nullptr);
-  EXPECT_NE(pbr->SpecularMap(), testTextureFile);
+  EXPECT_EQ(pbr->SpecularMap(), testTextureFile);
 }
 
 /////////////////////////////////////////////////
