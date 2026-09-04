@@ -234,6 +234,13 @@ class AssimpLoader::Implementation
   /// \brief Utility function to get the current file extension of the mesh file
   /// \return the file extension
   public: std::string GetFileExtension() const;
+
+  /// \brief Convert aiPrimitiveType to a SubMesh::PrimitiveType. Defaults to
+  /// SubMesh::PrimitiveType::Triangles
+  /// \param[in] _meshPrimitive the Assimp primitive type to convert
+  /// \return the submesh primitive type
+  public: SubMesh::PrimitiveType GetSubMeshPrimitiveType(
+    const unsigned int _meshPrimitive) const;
 };
 
 //////////////////////////////////////////////////
@@ -252,6 +259,22 @@ bool AssimpLoader::Implementation::IsDefaultNodeName(
     return _name.find("$ColladaAutoName$") == 0;
   }
   return false;
+}
+
+//////////////////////////////////////////////////
+SubMesh::PrimitiveType AssimpLoader::Implementation::GetSubMeshPrimitiveType(
+    const unsigned int _meshPrimitive) const
+{
+  switch (_meshPrimitive) {
+    case aiPrimitiveType_POINT:
+      return SubMesh::PrimitiveType::POINTS;
+    case aiPrimitiveType_LINE:
+      return SubMesh::PrimitiveType::LINES;
+    case aiPrimitiveType_TRIANGLE:
+      return SubMesh::PrimitiveType::TRIANGLES;
+    default:
+      return SubMesh::PrimitiveType::TRIANGLES;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -991,6 +1014,8 @@ SubMesh AssimpLoader::Implementation::CreateSubMesh(
   math::Matrix4d rot = _transform;
   rot.SetTranslation(math::Vector3d::Zero);
   // Now create the submesh
+  subMesh.SetPrimitiveType(
+      this->GetSubMeshPrimitiveType(_assimpMesh->mPrimitiveTypes));
   for (unsigned vertexIdx = 0; vertexIdx < _assimpMesh->mNumVertices;
       ++vertexIdx)
   {
@@ -1024,9 +1049,10 @@ SubMesh AssimpLoader::Implementation::CreateSubMesh(
   for (unsigned faceIdx = 0; faceIdx < _assimpMesh->mNumFaces; ++faceIdx)
   {
     auto& face = _assimpMesh->mFaces[faceIdx];
-    subMesh.AddIndex(face.mIndices[0]);
-    subMesh.AddIndex(face.mIndices[1]);
-    subMesh.AddIndex(face.mIndices[2]);
+    for (unsigned int i = 0; i < face.mNumIndices; ++i)
+    {
+      subMesh.AddIndex(face.mIndices[i]);
+    }
   }
   subMesh.SetMaterialIndex(_assimpMesh->mMaterialIndex);
   if (subMesh.NormalCount() == 0u){

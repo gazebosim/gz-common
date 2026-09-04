@@ -29,8 +29,6 @@
 
 using namespace gz;
 
-#ifndef _WIN32
-
 // Only runs each test once. For cases where the GZ_MESH_FORCE_ASSIMP
 // does not affect the behavior of the test
 class MeshManager : public common::testing::AutoLogFixture {
@@ -77,6 +75,7 @@ INSTANTIATE_TEST_SUITE_P(
     MeshManagerLoad,
     testing::Bool());
 
+#ifndef _WIN32
 /////////////////////////////////////////////////
 TEST_F(MeshManager, CreateExtrudedPolyline)
 {
@@ -315,6 +314,7 @@ TEST_F(MeshManager, CreateExtrudedPolylineInvalid)
   // check mesh does not exist due to extrusion failure
   EXPECT_TRUE(!common::MeshManager::Instance()->HasMesh(meshName));
 }
+#endif
 
 /////////////////////////////////////////////////
 TEST_F(MeshManager, Remove)
@@ -578,6 +578,33 @@ TEST_P(MeshManagerLoad, ShareVertices)
 }
 
 /////////////////////////////////////////////////
+TEST_P(MeshManagerLoad, LoadZeroCount)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "zero_count.dae"));
+  ASSERT_TRUE(mesh);
+  if (!this->forceAssimpEnv)
+  {
+#ifndef _WIN32
+    // Expect no errors about missing values
+    common::Console::Root().RawLogger().flush();
+    std::string log = LogContent();
+    EXPECT_EQ(log.find("Loading what we can..."), std::string::npos);
+    EXPECT_EQ(log.find("Vertex source missing float_array"), std::string::npos);
+    EXPECT_EQ(log.find("Normal source missing float_array"), std::string::npos);
+    // Expect the logs to contain information
+    EXPECT_NE(log.find("Triangle input has a count of zero"),
+        std::string::npos);
+    EXPECT_NE(log.find("Vertex source has a float_array with a count of zero"),
+        std::string::npos);
+    EXPECT_NE(log.find("Normal source has a float_array with a count of zero"),
+        std::string::npos);
+#endif
+  }
+}
+
+/////////////////////////////////////////////////
 TEST_P(MeshManagerLoad, Material)
 {
   auto *mgr = common::MeshManager::Instance();
@@ -754,13 +781,84 @@ TEST_P(MeshManagerLoad, LoadBoxWithAnimationOutsideSkeleton)
 }
 
 /////////////////////////////////////////////////
+TEST_P(MeshManagerLoad, LoadBoxInstControllerWithoutSkeleton)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data",
+        "box_inst_controller_without_skeleton.dae"));
+
+  if (this->forceAssimpEnv)
+  {
+    EXPECT_EQ(24u, mesh->VertexCount());
+    EXPECT_EQ(24u, mesh->TexCoordCount());
+  }
+  else
+  {
+    EXPECT_EQ(35u, mesh->VertexCount());
+    EXPECT_EQ(35u, mesh->TexCoordCount());
+  }
+  EXPECT_EQ(36u, mesh->IndexCount());
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(1u, mesh->MaterialCount());
+  common::SkeletonPtr skeleton = mesh->MeshSkeleton();
+  EXPECT_LT(0u, skeleton->NodeCount());
+  EXPECT_NE(nullptr, skeleton->NodeById("Armature_Bone"));
+}
+
+/////////////////////////////////////////////////
+TEST_P(MeshManagerLoad, LoadBoxMultipleInstControllers)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "box_multiple_inst_controllers.dae"));
+
+  if (this->forceAssimpEnv)
+  {
+    EXPECT_EQ(48u, mesh->VertexCount());
+    EXPECT_EQ(48u, mesh->TexCoordCount());
+  }
+  else
+  {
+    EXPECT_EQ(70u, mesh->VertexCount());
+    EXPECT_EQ(70u, mesh->TexCoordCount());
+  }
+  EXPECT_EQ(72u, mesh->IndexCount());
+  EXPECT_EQ(2u, mesh->SubMeshCount());
+  EXPECT_EQ(1u, mesh->MaterialCount());
+
+  std::shared_ptr<common::SubMesh> submesh = mesh->SubMeshByIndex(0).lock();
+  std::shared_ptr<common::SubMesh> submesh2 = mesh->SubMeshByIndex(1).lock();
+  EXPECT_EQ(36u, submesh->IndexCount());
+  EXPECT_EQ(36u, submesh2->IndexCount());
+  if (this->forceAssimpEnv)
+  {
+    EXPECT_EQ(24u, submesh->VertexCount());
+    EXPECT_EQ(24u, submesh2->VertexCount());
+    EXPECT_EQ(24u, submesh->TexCoordCount());
+    EXPECT_EQ(24u, submesh2->TexCoordCount());
+  }
+  else
+  {
+    EXPECT_EQ(35u, submesh->VertexCount());
+    EXPECT_EQ(35u, submesh2->VertexCount());
+    EXPECT_EQ(35u, submesh->TexCoordCount());
+    EXPECT_EQ(35u, submesh2->TexCoordCount());
+  }
+
+  common::SkeletonPtr skeleton = mesh->MeshSkeleton();
+  EXPECT_NE(nullptr, skeleton->NodeById("Armature_Bone"));
+  EXPECT_NE(nullptr, skeleton->NodeById("Armature_Bone2"));
+}
+
+/////////////////////////////////////////////////
 TEST_P(MeshManagerLoad, LoadBoxNestedAnimation)
 {
   auto *mgr = common::MeshManager::Instance();
   const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "box_nested_animation.dae"));
 
-  if (forceAssimpEnv)
+  if (this->forceAssimpEnv)
   {
     EXPECT_EQ(24u, mesh->VertexCount());
     EXPECT_EQ(24u, mesh->TexCoordCount());
@@ -796,6 +894,28 @@ TEST_P(MeshManagerLoad, LoadBoxNestedAnimation)
         0, 0, 1, 0,
         0, 0, 0, 1);
   EXPECT_EQ(expectedTrans, poseEnd.at("Bone"));
+}
+
+/////////////////////////////////////////////////
+TEST_P(MeshManagerLoad, LoadBoxWithDefaultStride)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "box_with_default_stride.dae"));
+
+  if (this->forceAssimpEnv)
+  {
+    EXPECT_EQ(24u, mesh->VertexCount());
+    EXPECT_EQ(24u, mesh->TexCoordCount());
+  }
+  else
+  {
+    EXPECT_EQ(35u, mesh->VertexCount());
+    EXPECT_EQ(35u, mesh->TexCoordCount());
+  }
+  EXPECT_EQ(36u, mesh->IndexCount());
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(1u, mesh->MaterialCount());
 }
 
 /////////////////////////////////////////////////
@@ -854,7 +974,47 @@ TEST_P(MeshManagerLoad, MergeBoxWithDoubleSkeleton)
   // The two skeletons have been joined and their root is the
   // animation root, called Armature
   EXPECT_EQ(skeleton_ptr->RootNode()->Name(), std::string(skeletonRootName));
-  mgr->RemoveAll();
+}
+
+/////////////////////////////////////////////////
+TEST_P(MeshManagerLoad, LoadCylinderAnimatedFrom3dsMax)
+{
+  // TODO(anyone) This test shows that the mesh loads without crashing, but the
+  // mesh animation looks deformed when loaded. That still needs to be
+  // addressed.
+  auto *mgr = common::MeshManager::Instance();
+  std::string filename = common::testing::TestFile("data",
+        "cylinder_animated_from_3ds_max.dae");
+  const common::Mesh *mesh = mgr->Load(filename);
+  EXPECT_EQ(filename, mesh->Name());
+  if (this->forceAssimpEnv)
+  {
+    EXPECT_EQ(194u, mesh->VertexCount());
+    EXPECT_EQ(194u, mesh->NormalCount());
+  }
+  else
+  {
+    EXPECT_EQ(202u, mesh->VertexCount());
+    EXPECT_EQ(202u, mesh->NormalCount());
+  }
+  EXPECT_EQ(0u, mesh->MaterialCount());
+  EXPECT_EQ(852u, mesh->IndexCount());
+  EXPECT_LT(0u, mesh->TexCoordCount());
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  auto subMesh = mesh->SubMeshByIndex(0);
+  ASSERT_NE(nullptr, subMesh.lock());
+  EXPECT_EQ("Cylinder01", subMesh.lock()->Name());
+
+  EXPECT_TRUE(mesh->HasSkeleton());
+  auto skeleton = mesh->MeshSkeleton();
+  ASSERT_NE(nullptr, skeleton);
+  ASSERT_EQ(1u, skeleton->AnimationCount());
+
+  auto anim = skeleton->Animation(0);
+  ASSERT_NE(nullptr, anim);
+  EXPECT_EQ("Bone02", anim->Name());
+  EXPECT_EQ(1u, anim->NodeCount());
+  EXPECT_TRUE(anim->HasNode("Bone02"));
 }
 
 /////////////////////////////////////////////////
@@ -1730,4 +1890,108 @@ TEST_P(MeshManagerLoad, LoadMalformedPolylistShortP)
   }
 }
 
+/////////////////////////////////////////////////
+TEST_P(MeshManagerLoad, LoadLines)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "xy_square_lines.dae"));
+  ASSERT_TRUE(mesh);
+  auto subMesh = mesh->SubMeshByIndex(0u).lock();
+  ASSERT_NE(nullptr, subMesh);
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(common::SubMesh::LINES, subMesh->SubMeshPrimitiveType());
+  EXPECT_EQ(8u, mesh->IndexCount());
+
+  if (this->forceAssimpEnv)
+  {
+    EXPECT_EQ(4u, mesh->VertexCount());
+  }
+  else
+  {
+    // 4 line segments, each contributes 2 vertices and 2 indices.
+    EXPECT_EQ(8u, mesh->VertexCount());
+  }
+}
+
+/////////////////////////////////////////////////
+TEST_P(MeshManagerLoad, LoadTextureMaterial)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "xy_triangle_texture.dae"));
+  ASSERT_TRUE(mesh);
+
+  EXPECT_EQ(3u, mesh->VertexCount());
+  EXPECT_EQ(3u, mesh->TexCoordCount());
+  ASSERT_EQ(1u, mesh->MaterialCount());
+
+  common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+  ASSERT_NE(nullptr, mat);
+
+  // The diffuse texture chain should have been resolved and stored.
+  EXPECT_FALSE(mat->TextureImage().empty());
+  EXPECT_NE(mat->TextureImage().find("xy_triangle_texture.png"),
+      std::string::npos);
+}
+
+/////////////////////////////////////////////////
+// A file whose root element is not <COLLADA> must return null, not crash.
+TEST_P(MeshManagerLoad, LoadNoColladaTag)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "no_collada_tag.dae"));
+  if (this->forceAssimpEnv)
+  {
+    ASSERT_NE(nullptr, mesh);
+    EXPECT_EQ(0u, mesh->SubMeshCount());
+    EXPECT_EQ(0u, mesh->VertexCount());
+    EXPECT_EQ(0u, mesh->IndexCount());
+  }
+  else
+  {
+    EXPECT_EQ(nullptr, mesh);
+#ifndef _WIN32
+    common::Console::Root().RawLogger().flush();
+    EXPECT_NE(LogContent().find("Missing COLLADA tag"), std::string::npos);
 #endif
+  }
+}
+
+/////////////////////////////////////////////////
+// An unsupported version is reported for ColladaLoader but the mesh still loads
+TEST_P(MeshManagerLoad, LoadBadVersion)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "bad_version.dae"));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(3u, mesh->VertexCount());
+  if (!this->forceAssimpEnv)
+  {
+#ifndef _WIN32
+    common::Console::Root().RawLogger().flush();
+    EXPECT_NE(LogContent().find("Invalid collada file"), std::string::npos);
+#endif
+  }
+}
+
+/////////////////////////////////////////////////
+// A <scene> referencing a missing visual_scene must not crash.
+TEST_P(MeshManagerLoad, LoadMissingVisualScene)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "missing_visual_scene.dae"));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->VertexCount());
+  if (!this->forceAssimpEnv)
+  {
+#ifndef _WIN32
+    common::Console::Root().RawLogger().flush();
+    EXPECT_NE(LogContent().find("Unable to find visual_scene"),
+        std::string::npos);
+#endif
+  }
+}
