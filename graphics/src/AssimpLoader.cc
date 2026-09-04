@@ -1049,9 +1049,10 @@ SubMesh AssimpLoader::Implementation::CreateSubMesh(
   for (unsigned faceIdx = 0; faceIdx < _assimpMesh->mNumFaces; ++faceIdx)
   {
     auto& face = _assimpMesh->mFaces[faceIdx];
-    subMesh.AddIndex(face.mIndices[0]);
-    subMesh.AddIndex(face.mIndices[1]);
-    subMesh.AddIndex(face.mIndices[2]);
+    for (unsigned int i = 0; i < face.mNumIndices; ++i)
+    {
+      subMesh.AddIndex(face.mIndices[i]);
+    }
   }
   subMesh.SetMaterialIndex(_assimpMesh->mMaterialIndex);
   if (subMesh.NormalCount() == 0u){

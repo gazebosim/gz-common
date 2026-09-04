@@ -1901,17 +1901,16 @@ TEST_P(MeshManagerLoad, LoadLines)
   ASSERT_NE(nullptr, subMesh);
   EXPECT_EQ(1u, mesh->SubMeshCount());
   EXPECT_EQ(common::SubMesh::LINES, subMesh->SubMeshPrimitiveType());
+  EXPECT_EQ(8u, mesh->IndexCount());
 
   if (this->forceAssimpEnv)
   {
     EXPECT_EQ(4u, mesh->VertexCount());
-    EXPECT_EQ(12u, mesh->IndexCount());
   }
   else
   {
     // 4 line segments, each contributes 2 vertices and 2 indices.
     EXPECT_EQ(8u, mesh->VertexCount());
-    EXPECT_EQ(8u, mesh->IndexCount());
   }
 }
 
