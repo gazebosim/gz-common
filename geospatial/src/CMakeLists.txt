@@ -14,6 +14,7 @@ if (TARGET ${PROJECT_LIBRARY_TARGET_NAME}-graphics)
       ${GDAL_LIBRARY})
 
   target_include_directories(${geospatial_target}
+    SYSTEM
     PRIVATE
       ${GDAL_INCLUDE_DIR})
 

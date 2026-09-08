@@ -60,14 +60,14 @@ namespace common
     public: Pbr();
 
     /// \brief Return true if both Pbr objects contain the same values.
-    /// \param[_in] _pbr Pbr value to compare.
-    /// \returen True if 'this' == _pbr.
+    /// \param[in] _pbr Pbr value to compare.
+    /// \return True if 'this' == _pbr.
     public: bool operator==(const Pbr &_pbr) const;
 
     /// \brief Return true this Pbr object does not contain the same
     /// values as the passed in parameter.
-    /// \param[_in] _pbr Pbr value to compare.
-    /// \returen True if 'this' != _pbr.
+    /// \param[in] _pbr Pbr value to compare.
+    /// \return True if 'this' != _pbr.
     public: bool operator!=(const Pbr &_pbr) const;
 
     /// \brief Get the albedo map filename. This will be an empty string if

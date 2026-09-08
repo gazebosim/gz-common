@@ -147,7 +147,9 @@ namespace gz
 
     /// \brief Append one or more additional path elements to the first
     ///        passed in argument.
-    /// \param[in] args  The paths to append together
+    /// \param[in] _path1 First path element.
+    /// \param[in] _path2 Second path element.
+    /// \param[in] _args Additional path elements to append together.
     /// \return A new string with the paths appended together.
     template<typename... Args>
     inline std::string joinPaths(const std::string &_path1,
@@ -191,8 +193,9 @@ namespace gz
         const FilesystemWarningOp _warningOp = FSWO_LOG_WARNINGS);
 
     /// \brief Copy a directory, overwrite the destination directory if exists.
-    /// \param[in] _source Path to an existing directory to copy from.
-    /// \param[in] _destination Path to the destination directory.
+    /// \param[in] _existingDirname Path to an existing directory to copy from.
+    /// \param[in] _newDirname Path to the destination directory.
+    /// \param[in] _warningOp Log or suppress warnings that may occur.
     /// \return True on success.
     bool GZ_COMMON_VISIBLE copyDirectory(
         const std::string &_existingDirname,
@@ -253,7 +256,7 @@ namespace gz
         const std::string &_pathAndName, const std::string &_extension);
 
     /// \brief Unique directory path to not overwrite existing directory
-    /// \param[in] _pathAndName Full absolute path
+    /// \param[in] _dir Full absolute path
     /// \return Full path which doesn't collide with existing files
     std::string GZ_COMMON_VISIBLE uniqueDirectoryPath(
         const std::string &_dir);

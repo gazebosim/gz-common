@@ -35,7 +35,6 @@ namespace gz
       : public gz::common::HeightmapData
     {
       /// \brief Constructor
-      /// \param[in] _filename the path to the image
       public: ImageHeightmap();
 
       /// \brief Load an image file as a heightmap.

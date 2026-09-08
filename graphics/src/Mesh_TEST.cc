@@ -19,6 +19,7 @@
 
 #include "gz/common/Material.hh"
 #include "gz/common/Mesh.hh"
+#include "gz/common/MeshManager.hh"
 #include "gz/common/Skeleton.hh"
 #include "gz/common/SubMesh.hh"
 #include "gz/math/Vector3.hh"
@@ -158,4 +159,27 @@ TEST_F(MeshTest, Mesh)
 
   delete [] vertices;
   delete [] indices;
+}
+
+/////////////////////////////////////////////////
+TEST_F(MeshTest, Centroid)
+{
+  common::MeshManager::Instance()->CreateBox("mesh_centroid_box",
+      gz::math::Vector3d::One, gz::math::Vector2d::One);
+  const common::Mesh *box =
+    common::MeshManager::Instance()->MeshByName("mesh_centroid_box");
+  ASSERT_NE(nullptr, box);
+  EXPECT_EQ(gz::math::Vector3d::Zero, box->Centroid());
+
+  // A mesh whose submesh sits away from the origin.
+  auto submesh = box->SubMeshByIndex(0).lock();
+  ASSERT_NE(nullptr, submesh);
+  common::SubMesh offset(*submesh);
+  const gz::math::Vector3d shift(-1, 2, -3);
+  offset.Translate(shift);
+
+  common::Mesh mesh;
+  mesh.AddSubMesh(offset);
+  EXPECT_DOUBLE_EQ(1.0, mesh.Volume());
+  EXPECT_EQ(shift, mesh.Centroid());
 }

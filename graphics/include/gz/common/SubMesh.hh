@@ -72,7 +72,7 @@ namespace gz
       public: virtual ~SubMesh();
 
       /// \brief Set the name of this mesh
-      /// \param[in] _n The name to set
+      /// \param[in] _name The name to set
       public: void SetName(const std::string &_name);
 
       /// \brief Get the name of this mesh
@@ -136,8 +136,7 @@ namespace gz
           unsigned int _setIndex);
 
       /// \brief Add a texture coord to a texture coordinate set of the mesh
-      /// \param[in] _u Position along u
-      /// \param[in] _v Position along v
+      /// \param[in] _uv The texture coordinate
       /// \param[in] _setIndex Texture coordinate set index
       public: void AddTexCoordBySet(const gz::math::Vector2d &_uv,
           unsigned int _setIndex);
@@ -215,7 +214,7 @@ namespace gz
       /// \param[in] _setIndex Texture coordinate set index
       public: void SetTexCoordBySet(unsigned int _index,
                                const gz::math::Vector2d &_uv,
-                               unsigned int _setIdex);
+                               unsigned int _setIndex);
 
       /// \brief Get an index value from the index array
       /// \param[in] _index Array index.
@@ -353,7 +352,7 @@ namespace gz
       public: int IndexOfVertex(const gz::math::Vector3d &_v) const;
 
       /// \brief Put all the data into flat arrays
-      /// \param[in] _verArr The vertex array to be filled.
+      /// \param[in] _vertArr The vertex array to be filled.
       /// \param[in] _indexndArr The index array to be filled.
       public: void FillArrays(double **_vertArr, int **_indexndArr) const;
 
@@ -404,6 +403,17 @@ namespace gz
       /// \return The submesh's volume. The volume can be zero if
       /// the primitive type is not TRIANGLES, or there are no triangles.
       public: double Volume() const;
+
+      /// \brief Get the volumetric centroid of the submesh, the centre of
+      /// the enclosed solid rather than the average of the vertices. Only
+      /// meaningful for a closed mesh; the formula does not check for one.
+      ///
+      /// This sums signed tetrahedron first moments, from the same family
+      /// of methods as B. Mirtich, "Fast and Accurate Computation of
+      /// Polyhedral Mass Properties", Journal of Graphics Tools, 1996.
+      /// \return The centroid position. The zero vector if the primitive
+      /// type is not TRIANGLES or there are no triangles.
+      public: gz::math::Vector3d Centroid() const;
 
       /// \brief Verify that all indices point to a valid vertex in the submesh
       /// \return True if all values of indices are valid, false otherwise.

@@ -1,5 +1,59 @@
 ## Gazebo Common 7.x
 
+### Gazebo Common 7.4.0 (2026-08-24)
+
+1. COLLADA loader updates:
+    * [Pull request #893](https://github.com/gazebosim/gz-common/pull/893)
+    * [Pull request #883](https://github.com/gazebosim/gz-common/pull/883)
+
+1. Adds mesh Centroid() and fix Volume() for meshes offset from the origin
+    * [Pull request #887](https://github.com/gazebosim/gz-common/pull/887)
+
+1. Merge mesh loader tests with common expectations into MeshManager_TEST
+    * [Pull request #867](https://github.com/gazebosim/gz-common/pull/867)
+
+### Gazebo Common 7.3.1 (2026-08-18)
+
+1. Build STB with static linkage
+    * [Pull request #878](https://github.com/gazebosim/gz-common/pull/878)
+
+1. ci: test on Ubuntu Resolute (26.04)
+    * [Pull request #876](https://github.com/gazebosim/gz-common/pull/876)
+
+1. Minor AssimpLoader changes (#858)
+    * [Pull request #861](https://github.com/gazebosim/gz-common/pull/861)
+
+1. Improve COLLADA loader (supersedes #569) - Part 1/3
+    * [Pull request #854](https://github.com/gazebosim/gz-common/pull/854)
+
+### Gazebo Common 7.3.0 (2026-07-21)
+
+1. feat: Add API for requesting a new mesh from the MeshManager (backport #796)
+    * [Pull request #811](https://github.com/gazebosim/gz-common/pull/811)
+
+### Gazebo Common 7.2.0 (2026-07-10)
+
+1. [bazel] Bump default bazel version to 9.1.1 and bump CI workflow version (backport #840)
+    * [Pull request #841](https://github.com/gazebosim/gz-common/pull/841)
+
+1. Improve performance on STL loader (ASCII)
+    * [Pull request #833](https://github.com/gazebosim/gz-common/pull/833)
+
+1. macos CI: use brew trust
+    * [Pull request #827](https://github.com/gazebosim/gz-common/pull/827)
+
+1. Fix SystemPaths_TEST in sandboxed builds
+    * [Pull request #806](https://github.com/gazebosim/gz-common/pull/806)
+
+1. Replace FreeImage dependency with stb
+    * [Pull request #803](https://github.com/gazebosim/gz-common/pull/803)
+
+1. [bazel/infra] Minimize manual steps in publish to BCR workflow
+    * [Pull request #786](https://github.com/gazebosim/gz-common/pull/786)
+
+1. Refactor `RedirectConsoleStream` to use portable C++ stream buffer redirection
+    * [Pull request #785](https://github.com/gazebosim/gz-common/pull/785)
+
 ### Gazebo Common 7.1.1 (2026-02-25)
 
 1. graphics: Optimize Texture Processing and Memory in AssimpLoader

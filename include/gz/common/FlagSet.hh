@@ -138,7 +138,7 @@ class FlagSet
   }
 
   /// \brief Return a bit AND of this FlagSet and the argument.
-  /// \param[in] _o The other FlagSet.
+  /// \param[in] _val The other FlagSet.
   /// \return The new FlagSet.
   public: FlagSet operator&(const FlagSet& _val) const
   {
@@ -162,7 +162,7 @@ class FlagSet
   }
 
   /// \brief Return a bit OR of this FlagSet and the argument.
-  /// \param[in] _o The other FlagSet.
+  /// \param[in] _val The other FlagSet.
   /// \return The new FlagSet.
   public: FlagSet operator|(const FlagSet& _val) const
   {

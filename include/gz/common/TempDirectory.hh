@@ -80,7 +80,7 @@ namespace gz
       ///
       /// The TempDirectory will have the form _root/_subdir/_prefixXXXXX/
       ///
-      /// \param[in[ _root Explicitly set the root directory
+      /// \param[in] _root Explicitly set the root directory
       /// \param[in] _prefix String to be expanded for the template
       /// \param[in] _subDir Subdirectory in OS _root, if desired
       /// \param[in] _cleanup True to indicate that the filesystem should

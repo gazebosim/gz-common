@@ -3,6 +3,13 @@
         "generator" : "Khronos glTF Blender I/O v1.8.19",
         "version" : "2.0"
     },
+    "extensionsUsed": [
+        "KHR_materials_pbrSpecularGlossiness"
+    ],
+    "extensionsRequired": [
+        "KHR_materials_pbrSpecularGlossiness"
+    ],
+
     "scene" : 0,
     "scenes" : [
         {
@@ -20,14 +27,15 @@
     ],
     "materials" : [
         {
-            "doubleSided" : true,
-            "name" : "PurpleCube",
-            "pbrMetallicRoughness" : {
-                "baseColorTexture" : {
-                    "index" : 0
-                },
-                "metallicFactor" : 0,
-                "roughnessFactor" : 0.5
+            "extensions": {
+                "KHR_materials_pbrSpecularGlossiness": {
+                    "diffuseTexture": {
+                        "index": 0
+                    },
+                    "specularGlossinessTexture": {
+                        "index": 1
+                    }
+                }
             }
         }
     ],
@@ -51,12 +59,17 @@
         {
             "sampler" : 0,
             "source" : 0
+        },
+        {
+            "sampler" : 0,
+            "source" : 1
         }
     ],
     "images" : [
         {
-            "mimeType" : "image/png",
-            "name" : "PurpleCube_Diffuse",
+            "uri" : "PurpleCube_Diffuse.png"
+        },
+        {
             "uri" : "PurpleCube_Diffuse.png"
         }
     ],

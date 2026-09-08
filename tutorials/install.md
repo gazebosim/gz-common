@@ -221,7 +221,7 @@ You can also generate the documentation from a clone of this repository by follo
 
 Follow these steps to run tests and static code analysis in your clone of this repository.
 
-1. Follow the [source install instruction](#source-install).
+1. Follow the [source install instruction](#source-installation).
 
 2. Run tests.
   ```

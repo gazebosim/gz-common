@@ -81,7 +81,7 @@ namespace gz
       public: unsigned int JointCount() const;
 
       /// \brief Scale all nodes, transforms and animation data
-      /// \param[in] the scaling factor
+      /// \param[in] _scale The scaling factor
       public: void Scale(const double _scale);
 
       /// \brief Set the bind pose skeletal transform

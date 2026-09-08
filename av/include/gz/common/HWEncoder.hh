@@ -42,7 +42,7 @@ namespace gz::common
     /// match for an encoder, it will limit its search to only this device.
     /// However, if another encoder is tried earlier and succeeds, it will
     /// return with its default device.
-    /// \param[in] _useHwSurface. If set, specifies whether the HW encoder
+    /// \param[in] _useHwSurface If set, specifies whether the HW encoder
     /// should explicitly upload frames to the GPU, or whether that is left for
     /// the internals of the codec. If the value is unset, a HW-specific
     /// default is used that was experimentally found to be faster.

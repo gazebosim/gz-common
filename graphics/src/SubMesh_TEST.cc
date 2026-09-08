@@ -632,3 +632,28 @@ TEST_F(SubMeshTest, HasValidIndices)
   EXPECT_EQ(24u, unitBoxSubmesh->NormalCount());
   EXPECT_DOUBLE_EQ(0.0, unitBoxSubmesh->Volume());
 }
+
+/////////////////////////////////////////////////
+TEST_F(SubMeshTest, VolumeAndCentroidOffsetMesh)
+{
+  common::MeshManager::Instance()->CreateBox("centroid_box",
+      gz::math::Vector3d(2, 3, 4), gz::math::Vector2d::One);
+  const common::Mesh *box =
+    common::MeshManager::Instance()->MeshByName("centroid_box");
+  ASSERT_NE(nullptr, box);
+  ASSERT_LT(0u, box->SubMeshCount());
+  auto submesh = box->SubMeshByIndex(0).lock();
+  ASSERT_NE(nullptr, submesh);
+
+  // Centred box: centroid at the origin.
+  EXPECT_EQ(gz::math::Vector3d::Zero, submesh->Centroid());
+
+  // A translated copy no longer encloses the origin. The signed
+  // tetrahedron sums must still report the same volume and the
+  // translated centroid.
+  common::SubMesh offset(*submesh);
+  const gz::math::Vector3d shift(10, -20, 30);
+  offset.Translate(shift);
+  EXPECT_DOUBLE_EQ(24.0, offset.Volume());
+  EXPECT_EQ(shift, offset.Centroid());
+}

@@ -51,19 +51,20 @@ namespace gz
       /// \brief Start the encoder. This should be called once. Add new
       /// frames to the video using the AddFrame function. Use SaveToFile
       /// when the video is complete.
-      /// \param[in] _width Width in pixels of the output video.
-      /// \param[in] _height Height in pixels of the output video.
       /// \param[in] _format String that represents the video type.
-      /// Supported types include: "avi", "ogv", mp4", "v4l2". If using
-      /// "v4l2", you must also specify a _filename.
-      /// \param[in] _bitRate Bit rate to encode the video. A value of zero
-      /// will cause this function to automatically compute a bitrate.
+      /// Supported types include: "avi", "ogv", "mp4", "v4l2". If using
+      /// "v4l2", you must also specify a filename.
       /// \param[in] _filename Name of the file that stores the video while it
       /// is being created. This is a temporary file when recording to
       /// disk, or a video4linux loopback device like /dev/video0 when
-      /// the _format is "v4l2". If blank, a default temporary file is used.
-      /// However, the "v4l2" _format must be accompanied with a video
+      /// the format is "v4l2". If blank, a default temporary file is used.
+      /// However, the "v4l2" format must be accompanied with a video
       /// loopback device filename.
+      /// \param[in] _width Width in pixels of the output video.
+      /// \param[in] _height Height in pixels of the output video.
+      /// \param[in] _fps Frame rate of the output video in frames per second.
+      /// \param[in] _bitRate Bit rate to encode the video. A value of zero
+      /// will cause this function to automatically compute a bitrate.
       /// \return True on success. Do NOT ignore the return value. If Start()
       /// failed, encoding will not work. If Start() function failed, you can
       /// try running the overload with _allowHwAccel=false to see if the
@@ -100,19 +101,20 @@ namespace gz
       /// \brief Start the encoder. This should be called once. Add new
       /// frames to the video using the AddFrame function. Use SaveToFile
       /// when the video is complete.
-      /// \param[in] _width Width in pixels of the output video.
-      /// \param[in] _height Height in pixels of the output video.
       /// \param[in] _format String that represents the video type.
-      /// Supported types include: "avi", "ogv", mp4", "v4l2". If using
-      /// "v4l2", you must also specify a _filename.
-      /// \param[in] _bitRate Bit rate to encode the video. A value of zero
-      /// will cause this function to automatically compute a bitrate.
+      /// Supported types include: "avi", "ogv", "mp4", "v4l2". If using
+      /// "v4l2", you must also specify a filename.
       /// \param[in] _filename Name of the file that stores the video while it
       /// is being created. This is a temporary file when recording to
       /// disk, or a video4linux loopback device like /dev/video0 when
-      /// the _format is "v4l2". If blank, a default temporary file is used.
-      /// However, the "v4l2" _format must be accompanied with a video
+      /// the format is "v4l2". If blank, a default temporary file is used.
+      /// However, the "v4l2" format must be accompanied with a video
       /// loopback device filename.
+      /// \param[in] _width Width in pixels of the output video.
+      /// \param[in] _height Height in pixels of the output video.
+      /// \param[in] _fps Frame rate of the output video in frames per second.
+      /// \param[in] _bitRate Bit rate to encode the video. A value of zero
+      /// will cause this function to automatically compute a bitrate.
       /// \param[in] _allowHwAccel If true, HW acceleration settings are read
       /// from environment variables (see the other Start() overload for the
       /// loading mechanism description). If set to false, only SW encoding will
@@ -135,25 +137,30 @@ namespace gz
       /// \brief Start the encoder. This should be called once. Add new
       /// frames to the video using the AddFrame function. Use SaveToFile
       /// when the video is complete.
-      /// \param[in] _width Width in pixels of the output video.
-      /// \param[in] _height Height in pixels of the output video.
       /// \param[in] _format String that represents the video type.
-      /// Supported types include: "avi", "ogv", mp4", "v4l2". If using
-      /// "v4l2", you must also specify a _filename.
-      /// \param[in] _bitRate Bit rate to encode the video. A value of zero
-      /// will cause this function to automatically compute a bitrate.
+      /// Supported types include: "avi", "ogv", "mp4", "v4l2". If using
+      /// "v4l2", you must also specify a filename.
       /// \param[in] _filename Name of the file that stores the video while it
       /// is being created. This is a temporary file when recording to
       /// disk, or a video4linux loopback device like /dev/video0 when
-      /// the _format is "v4l2". If blank, a default temporary file is used.
-      /// However, the "v4l2" _format must be accompanied with a video
+      /// the format is "v4l2". If blank, a default temporary file is used.
+      /// However, the "v4l2" format must be accompanied with a video
       /// loopback device filename.
+      /// \param[in] _width Width in pixels of the output video.
+      /// \param[in] _height Height in pixels of the output video.
+      /// \param[in] _fps Frame rate of the output video in frames per second.
+      /// \param[in] _bitRate Bit rate to encode the video. A value of zero
+      /// will cause this function to automatically compute a bitrate.
       /// \param[in] _allowedHwAccel Allowed HW acceleration frameworks to
       /// probe (as a bitmask of values of HWAccelerationDevice enum).
       /// Set to HWAccelerationDevice::NONE to force software encoding only.
       /// \param[in] _hwAccelDevice If nonempty, specifies the HW device to use
       /// for encoding. If empty, the framework search method will look for some
       /// default devices.
+      /// \param[in] _useHwSurface If set, specifies whether the HW encoder
+      /// should explicitly upload frames to the GPU (true) or leave that to
+      /// the internals of the codec (false). If unset, a HW-specific default
+      /// is used that was experimentally found to be faster.
       /// \return True on success. Do NOT ignore the return value. If Start()
       /// failed, encoding will not work. If Start() function failed and you ran
       /// it with some HW acceleration, you can try running it once more
