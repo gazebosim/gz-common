@@ -101,7 +101,7 @@ class GZ_COMMON_AV_HIDDEN common::VideoEncoder::Implementation
   public: uint64_t frameCount = 0;
 
   /// \brief Mutex for thread safety.
-  public: std::mutex mutex;
+  public: std::recursive_mutex mutex;
 
 #ifdef GZ_COMMON_BUILD_HW_VIDEO
   /// \brief The HW encoder configuration (optional).
@@ -255,6 +255,8 @@ bool VideoEncoder::Start(
   [[maybe_unused]] const std::string& _hwAccelDevice,
   [[maybe_unused]] std::optional<bool> _useHwSurface)
 {
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
+
   // Do not allow Start to be called more than once without Stop or Reset
   // being called first.
   if (this->dataPtr->encoding)
@@ -539,7 +541,7 @@ bool VideoEncoder::Start(
 
   // av_image_alloc() could also allocate the image, but av_frame_get_buffer()
   // allocates a refcounted buffer, which is easier to manage
-  if (av_frame_get_buffer(this->dataPtr->avOutFrame, 32) > 0)
+  if (av_frame_get_buffer(this->dataPtr->avOutFrame, 32) < 0)
   {
     gzerr << "Could not allocate raw picture buffer. "
            << "Video encoding is not started\n";
@@ -580,7 +582,13 @@ bool VideoEncoder::Start(
   }
 
   // Write the stream header, if any.
-  ret = avformat_write_header(this->dataPtr->formatCtx, nullptr);
+  AVDictionary *opts = nullptr;
+  if (this->dataPtr->format == "mp4")
+  {
+    av_dict_set(&opts, "movflags", "faststart", 0);
+  }
+  ret = avformat_write_header(this->dataPtr->formatCtx, &opts);
+  av_dict_free(&opts);
   if (ret < 0)
   {
     gzerr << "Error occured when opening output file: " << av_err2str_cpp(ret)
@@ -615,7 +623,7 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
     const unsigned int _height,
     const std::chrono::steady_clock::time_point &_timestamp)
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
 
   if (!this->dataPtr->encoding)
   {
@@ -687,11 +695,18 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
   // encode
 
   // copy the unaligned input buffer to the 32-byte-aligned avInFrame
+  const uint8_t *srcData[4] = {_frame, nullptr, nullptr, nullptr};
   av_image_copy(
       this->dataPtr->avInFrame->data, this->dataPtr->avInFrame->linesize,
-      &_frame, this->dataPtr->inputLineSizes,
+      srcData, this->dataPtr->inputLineSizes,
       this->dataPtr->inPixFormat,
       this->dataPtr->inWidth, this->dataPtr->inHeight);
+
+  if (av_frame_make_writable(this->dataPtr->avOutFrame) < 0)
+  {
+    gzerr << "Could not make output frame writable\n";
+    return false;
+  }
 
   sws_scale(this->dataPtr->swsCtx,
       this->dataPtr->avInFrame->data,
@@ -707,9 +722,19 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
   auto timeSinceStart = std::chrono::duration_cast<std::chrono::milliseconds>(
       _timestamp - this->dataPtr->timeStart);
   double durationSec = timeSinceStart.count() / 1000.0;
-  uint64_t frameNumber = static_cast<uint64_t>(durationSec / period);
+  int64_t targetFrameNumber = static_cast<int64_t>(durationSec / period);
+  int64_t signedFrameDiff =
+      targetFrameNumber + 1 - static_cast<int64_t>(this->dataPtr->frameCount);
 
-  uint64_t frameDiff = frameNumber + 1 - this->dataPtr->frameCount;
+  if (signedFrameDiff <= 0 || signedFrameDiff > 5)
+  {
+    auto expectedElapsed = std::chrono::duration_cast<std::chrono::steady_clock::duration>(
+        std::chrono::duration<double>(this->dataPtr->frameCount * period));
+    this->dataPtr->timeStart = _timestamp - expectedElapsed;
+    signedFrameDiff = 1;
+  }
+
+  uint64_t frameDiff = static_cast<uint64_t>(signedFrameDiff);
 
   int ret = 0;
 
@@ -787,6 +812,8 @@ int VideoEncoder::Implementation::ProcessPacket(AVPacket* avPacket)
 /////////////////////////////////////////////////
 bool VideoEncoder::Stop()
 {
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
+
   // drain remaining packets from the encoder
   if (this->dataPtr->encoding && this->dataPtr->codecCtx)
   {
@@ -849,6 +876,8 @@ bool VideoEncoder::Stop()
 /////////////////////////////////////////////////
 bool VideoEncoder::SaveToFile(const std::string &_filename)
 {
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
+
   // First stop the recording
   this->Stop();
 
@@ -856,12 +885,15 @@ bool VideoEncoder::SaveToFile(const std::string &_filename)
 
   if (this->dataPtr->format != "v4l2")
   {
-    result = moveFile(this->dataPtr->filename, _filename);
-
-    if (!result)
+    if (this->dataPtr->filename != _filename)
     {
-      gzerr << "Unable to rename file from[" << this->dataPtr->filename
-        << "] to [" << _filename << "]\n";
+      result = moveFile(this->dataPtr->filename, _filename);
+
+      if (!result)
+      {
+        gzerr << "Unable to rename file from[" << this->dataPtr->filename
+          << "] to [" << _filename << "]\n";
+      }
     }
   }
 
@@ -875,6 +907,8 @@ bool VideoEncoder::SaveToFile(const std::string &_filename)
 /////////////////////////////////////////////////
 void VideoEncoder::Reset()
 {
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
+
   // Make sure the video has been stopped.
   this->Stop();
 
