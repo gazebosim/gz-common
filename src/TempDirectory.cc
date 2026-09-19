@@ -128,7 +128,12 @@ std::string gz::common::createTempDirectory(
     ret = "";
     if(FSWO_LOG_WARNINGS == _warningOp)
     {
-      gzwarn << "Failed to create temp directory: " << ex.what() << "\n";
+      fs::path parentPath{_parentPath};
+      fs::path templatePath = _baseName + "XXXXXX";
+      auto fullTemplateStr = (parentPath / templatePath).string();
+      gzwarn << "Failed to create temp directory: " << ex.what()
+             << " | parentPath: " << parentPath.string()
+             << " | templatePath: " << fullTemplateStr << "\n";
     }
   }
   return ret;
