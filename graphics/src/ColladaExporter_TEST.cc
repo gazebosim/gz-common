@@ -213,6 +213,39 @@ TEST_F(ColladaExporter, ExportCordlessDrill)
 }
 
 /////////////////////////////////////////////////
+TEST_F(ColladaExporter, ExportAsset)
+{
+  const auto filenameIn = common::testing::TestFile("data", "box.dae");
+  const auto filenameOut = common::joinPaths(this->pathOut, "box_asset");
+  const auto filenameOutExt = filenameOut + ".dae";
+
+  common::ColladaLoader loader;
+  const common::Mesh *meshOriginal = loader.Load(filenameIn);
+
+  common::ColladaExporter exporter;
+  exporter.Export(meshOriginal, filenameOut, false);
+
+  tinyxml2::XMLDocument xmlDoc;
+  ASSERT_EQ(xmlDoc.LoadFile(filenameOutExt.c_str()), tinyxml2::XML_SUCCESS);
+
+  auto *colladaXml = xmlDoc.FirstChildElement("COLLADA");
+  ASSERT_NE(colladaXml, nullptr);
+
+  // Consumers assume Y_UP when <up_axis> is absent, so the Z_UP declaration
+  // has to reach the file for the geometry to be read back in the same frame.
+  auto *assetXml = colladaXml->FirstChildElement("asset");
+  ASSERT_NE(assetXml, nullptr);
+
+  auto *upAxisXml = assetXml->FirstChildElement("up_axis");
+  ASSERT_NE(upAxisXml, nullptr);
+  EXPECT_STREQ(upAxisXml->GetText(), "Z_UP");
+
+  auto *unitXml = assetXml->FirstChildElement("unit");
+  ASSERT_NE(unitXml, nullptr);
+  EXPECT_STREQ(unitXml->Attribute("meter"), "1");
+}
+
+/////////////////////////////////////////////////
 TEST_F(ColladaExporter, ExportMeshWithSubmeshes)
 {
   const auto boxFilenameIn = common::testing::TestFile("data", "box.dae");
