@@ -1186,10 +1186,10 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   // Assimp's BVH loader puts the animation data into mAnimation
   if (extension == "bvh")
   {
-    for (unsigned animIdx = 0; animIdx < scene->mNumAnimations; ++animIdx)
+    for (unsigned int animIdx = 0; animIdx < scene->mNumAnimations; ++animIdx)
     {
       auto& anim = scene->mAnimations[animIdx];
-      for (unsigned chanIdx = 0; chanIdx < anim->mNumChannels; ++chanIdx)
+      for (unsigned int chanIdx = 0; chanIdx < anim->mNumChannels; ++chanIdx)
       {
         const auto animChan = anim->mChannels[chanIdx];
         boneNames.insert(ToString(animChan->mNodeName));
@@ -1241,7 +1241,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   // Add the animations
   if (rootSkeleton)
   {
-    for (unsigned animIdx = 0; animIdx < scene->mNumAnimations; ++animIdx)
+    for (unsigned int animIdx = 0; animIdx < scene->mNumAnimations; ++animIdx)
     {
       auto& anim = scene->mAnimations[animIdx];
       auto animName = ToString(anim->mName);
@@ -1259,7 +1259,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
                          ? anim->mTicksPerSecond
                          : 1.0;
       }
-      for (unsigned chanIdx = 0; chanIdx < anim->mNumChannels; ++chanIdx)
+      for (unsigned int chanIdx = 0; chanIdx < anim->mNumChannels; ++chanIdx)
       {
         auto& animChan = anim->mChannels[chanIdx];
         auto chanName = ToString(animChan->mNodeName);
@@ -1280,7 +1280,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
         // Position and rotation arrays might be different lengths,
         // iterate over the maximum of the two, safely access by checking
         // number of keys
-        for (unsigned keyIdx = 0; keyIdx < numKeys; ++keyIdx)
+        for (unsigned int keyIdx = 0; keyIdx < numKeys; ++keyIdx)
         {
           math::Vector3d pos = defaultPos;
           double keyTime = 0.0;

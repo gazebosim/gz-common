@@ -356,7 +356,7 @@ static SkeletonPtr GetSkeletonFromBvh(const std::string &_bvhFile,
   common::env("GZ_MESH_FORCE_ASSIMP", forceAssimpEnv);
   if (forceAssimpEnv == "true")
   {
-    gzmsg << "Using assimp to load BVH animation"  << std::endl;
+    gzmsg << "Using assimp to load BVH animation" << std::endl;
     AssimpLoader loader;
     std::unique_ptr<Mesh> mesh(loader.Load(fullname));
     if (!mesh)
