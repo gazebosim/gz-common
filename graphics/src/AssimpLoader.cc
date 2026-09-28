@@ -1258,6 +1258,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
         ticksPerSecond = anim->mTicksPerSecond > 0.0
                          ? anim->mTicksPerSecond
                          : 1.0;
+        skelAnim->SetName(_filename);
       }
       for (unsigned int chanIdx = 0; chanIdx < anim->mNumChannels; ++chanIdx)
       {
