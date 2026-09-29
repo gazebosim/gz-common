@@ -4,7 +4,7 @@
   <version>6.4.0</version>
   <description>Gazebo Common : AV, Graphics, Events, and much more.</description>
   <maintainer email="natekoenig@gmail.com">Nate Koenig</maintainer>
-  <license>Apache License 2.0</license>
+  <license>Apache-2.0</license>
   <url type="website">https://github.com/gazebosim/gz-common</url>
 
   <buildtool_depend>cmake</buildtool_depend>
