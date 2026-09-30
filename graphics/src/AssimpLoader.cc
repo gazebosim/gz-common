@@ -1251,13 +1251,11 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
                    std::to_string(rootSkeleton->AnimationCount() + 1);
       }
       SkeletonAnimation* skelAnim = new SkeletonAnimation(animName);
-      double ticksPerSecond = 1000.0;
-      // BVH defines the ticksPerSecond in the file
+      const double ticksPerSecond = anim->mTicksPerSecond > 0.0
+                                    ? anim->mTicksPerSecond
+                                    : 1.0;
       if (extension == "bvh")
       {
-        ticksPerSecond = anim->mTicksPerSecond > 0.0
-                         ? anim->mTicksPerSecond
-                         : 1.0;
         skelAnim->SetName(_filename);
       }
       for (unsigned int chanIdx = 0; chanIdx < anim->mNumChannels; ++chanIdx)
