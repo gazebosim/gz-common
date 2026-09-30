@@ -530,6 +530,28 @@ void AssimpLoader::Implementation::RecursiveStoreBoneNames(
     return;
 
   const std::string extension = this->GetFileExtension();
+  if (_scene->HasAnimations())
+  {
+    for (unsigned int animIdx = 0; animIdx < _scene->mNumAnimations; ++animIdx)
+    {
+      const auto &anim = _scene->mAnimations[animIdx];
+      for (unsigned int chanIdx = 0; chanIdx < anim->mNumChannels; ++chanIdx)
+      {
+        const auto animChan = anim->mChannels[chanIdx];
+        const aiNode *animNode =
+            _scene->mRootNode->FindNode(animChan->mNodeName);
+        if (animNode)
+        {
+          _boneNames.insert(this->GetSkeletonNodeName(animNode, extension));
+        }
+        else
+        {
+          _boneNames.insert(ToString(animChan->mNodeName));
+        }
+      }
+    }
+    return;
+  }
   for (unsigned meshIdx = 0; meshIdx < _node->mNumMeshes; ++meshIdx)
   {
     auto assimpMeshIdx = _node->mMeshes[meshIdx];
@@ -1183,23 +1205,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   }
   // Create the skeleton
   std::unordered_set<std::string> boneNames;
-  // Assimp's BVH loader puts the animation data into mAnimation
-  if (extension == "bvh")
-  {
-    for (unsigned int animIdx = 0; animIdx < scene->mNumAnimations; ++animIdx)
-    {
-      auto& anim = scene->mAnimations[animIdx];
-      for (unsigned int chanIdx = 0; chanIdx < anim->mNumChannels; ++chanIdx)
-      {
-        const auto animChan = anim->mChannels[chanIdx];
-        boneNames.insert(ToString(animChan->mNodeName));
-      }
-    }
-  }
-  else
-  {
-    this->dataPtr->RecursiveStoreBoneNames(scene, rootNode, boneNames);
-  }
+  this->dataPtr->RecursiveStoreBoneNames(scene, rootNode, boneNames);
   if (!boneNames.empty())
   {
     const aiNode* lcaNode = this->dataPtr->FindLowestCommonAncestor(rootNode,
