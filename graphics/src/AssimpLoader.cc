@@ -163,14 +163,14 @@ class AssimpLoader::Implementation
           const math::Matrix4d& _transform,
           const std::unordered_set<std::string> &_boneNames) const;
 
-  /// \brief Recursively store the bone names starting from the root node
-  /// to make sure that only nodes that map to a bone are added to the skeleton
+  /// \brief Collect bone names from the scene's animation channels
+  /// or if there are no animations, gathers bone names from the scene's meshes.
+  /// Used to ensure that only nodes that map to a bone are added to the
+  /// skeleton.
   /// \param[in] _scene the assimp scene
-  /// \param[in] _node the node being processed
-  /// \param[out] _boneNames set of bone names populated while recursing
-  public: void RecursiveStoreBoneNames(
+  /// \param[out] _boneNames set of bone names populated from the scene
+  public: void StoreBoneNames(
           const aiScene *_scene,
-          const aiNode* _node,
           std::unordered_set<std::string>& _boneNames) const;
 
   /// \brief Apply the the inv bind transform to the skeleton pose.
@@ -522,13 +522,10 @@ void AssimpLoader::Implementation::RecursiveCreate(const aiScene* _scene,
   }
 }
 
-void AssimpLoader::Implementation::RecursiveStoreBoneNames(
-    const aiScene *_scene, const aiNode *_node,
+void AssimpLoader::Implementation::StoreBoneNames(
+    const aiScene *_scene,
     std::unordered_set<std::string>& _boneNames) const
 {
-  if (!_node)
-    return;
-
   const std::string extension = this->GetFileExtension();
   if (_scene->HasAnimations())
   {
@@ -552,10 +549,9 @@ void AssimpLoader::Implementation::RecursiveStoreBoneNames(
     }
     return;
   }
-  for (unsigned meshIdx = 0; meshIdx < _node->mNumMeshes; ++meshIdx)
+  for (unsigned meshIdx = 0; meshIdx < _scene->mNumMeshes; ++meshIdx)
   {
-    auto assimpMeshIdx = _node->mMeshes[meshIdx];
-    auto assimpMesh = _scene->mMeshes[assimpMeshIdx];
+    auto assimpMesh = _scene->mMeshes[meshIdx];
     for (unsigned boneIdx = 0; boneIdx < assimpMesh->mNumBones; ++boneIdx)
     {
       auto bone = assimpMesh->mBones[boneIdx];
@@ -569,14 +565,7 @@ void AssimpLoader::Implementation::RecursiveStoreBoneNames(
       }
     }
   }
-
-  // Iterate over children
-  for (unsigned childIdx = 0; childIdx < _node->mNumChildren; ++childIdx)
-  {
-    auto child_node = _node->mChildren[childIdx];
-    // Finally recursive call to explore subnode
-    this->RecursiveStoreBoneNames(_scene, child_node, _boneNames);
-  }
+  return;
 }
 
 //////////////////////////////////////////////////
@@ -1205,7 +1194,7 @@ Mesh *AssimpLoader::Load(const std::string &_filename)
   }
   // Create the skeleton
   std::unordered_set<std::string> boneNames;
-  this->dataPtr->RecursiveStoreBoneNames(scene, rootNode, boneNames);
+  this->dataPtr->StoreBoneNames(scene, boneNames);
   if (!boneNames.empty())
   {
     const aiNode* lcaNode = this->dataPtr->FindLowestCommonAncestor(rootNode,
