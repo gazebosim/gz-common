@@ -1673,6 +1673,7 @@ void MeshManager::SetAssimpEnvs()
   common::env("GZ_MESH_FORCE_ASSIMP", forceAssimpEnv);
   common::env("GZ_COLLADA_FORCE_ASSIMP", forceAssimpColladaEnv);
   this->dataPtr->forceAssimp = false;
+  this->dataPtr->forceAssimpCollada = false;
   if (forceAssimpEnv == "true")
   {
     gzmsg << "Using assimp to load all mesh formats"  << std::endl;
