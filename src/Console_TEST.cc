@@ -549,3 +549,71 @@ TEST_F(Console_TEST, NoInitAndLogNoHome)
   // This should not throw
   gzlog << "this is a test" << std::endl;
 }
+
+/////////////////////////////////////////////////
+/// \brief Test Console color output with GZ_CONSOLE_COLOR=yes
+TEST_F(Console_TEST, ConsoleColorYes)
+{
+  common::Console::SetVerbosity(3);
+  EXPECT_TRUE(common::setenv("GZ_CONSOLE_COLOR", "yes"));
+
+  // Initialize 
+  auto path = common::uuid();
+  gzLogInit(path, "test.log");
+
+  // stdout to check for ANSI codes
+  testing::internal::CaptureStdout();
+  gzmsg << "color yes test" << std::endl;
+  std::string output = testing::internal::GetCapturedStdout();
+
+#ifndef _WIN32
+  // Check for ANSI escape sequence
+  EXPECT_TRUE(output.find("\033[") != std::string::npos);
+#endif
+
+  EXPECT_TRUE(common::unsetenv("GZ_CONSOLE_COLOR"));
+  common::Console::SetVerbosity(1);
+  gzLogClose();
+}
+
+/////////////////////////////////////////////////
+/// \brief Test Console color output with GZ_CONSOLE_COLOR=no
+TEST_F(Console_TEST, ConsoleColorNo)
+{
+  common::Console::SetVerbosity(3);
+  EXPECT_TRUE(common::setenv("GZ_CONSOLE_COLOR", "no"));
+
+  // Initialize 
+  auto path = common::uuid();
+  gzLogInit(path, "test.log");
+
+  // stdout to check for no ANSI codes
+  testing::internal::CaptureStdout();
+  gzmsg << "color no test" << std::endl;
+  std::string output = testing::internal::GetCapturedStdout();
+
+  // Check for no ANSI escape sequence
+  EXPECT_TRUE(output.find("\033[") == std::string::npos);
+
+  EXPECT_TRUE(common::unsetenv("GZ_CONSOLE_COLOR"));
+  common::Console::SetVerbosity(1);
+  gzLogClose();
+}
+
+/////////////////////////////////////////////////
+/// \brief Test invalid GZ_CONSOLE_COLOR value warning
+TEST_F(Console_TEST, ConsoleColorInvalid)
+{
+  EXPECT_TRUE(common::setenv("GZ_CONSOLE_COLOR", "maybe"));
+
+  // check stderr to check for warning message
+  testing::internal::CaptureStderr();
+  auto path = common::uuid();
+  gzLogInit(path, "test.log");
+  std::string output = testing::internal::GetCapturedStderr();
+
+  EXPECT_TRUE(output.find("Invalid value for GZ_CONSOLE_COLOR") != std::string::npos);
+
+  EXPECT_TRUE(common::unsetenv("GZ_CONSOLE_COLOR"));
+  gzLogClose();
+}

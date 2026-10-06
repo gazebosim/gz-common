@@ -28,6 +28,34 @@
 using namespace gz;
 using namespace common;
 
+#define CONSOLE_COLOR_ON 1
+#define CONSOLE_COLOR_OFF 0
+
+static int consoleColorMode = CONSOLE_COLOR_ON;
+
+/////////////////////////////////////////////////
+static void UpdateConsoleColorMode()
+{
+  std::string consoleColor;
+  if (!env("GZ_CONSOLE_COLOR", consoleColor))
+    return;
+
+  const auto value = lowercase(trimmed(consoleColor));
+  if (value == "yes")
+  {
+    consoleColorMode = CONSOLE_COLOR_ON;
+  }
+  else if (value == "no")
+  {
+    consoleColorMode = CONSOLE_COLOR_OFF;
+  }
+  else
+  {
+    std::cerr << "Invalid value for GZ_CONSOLE_COLOR='" << consoleColor
+      << "'. Valid values are: yes, no." << std::endl;
+  }
+}
+
 
 FileLogger common::Console::log("");
 
@@ -156,7 +184,11 @@ int Logger::Buffer::sync()
       outstr.pop_back();
 
     std::stringstream ss;
-    ss << "\033[1;" << this->color << "m" << outstr << "\033[0m";
+    if (consoleColorMode == CONSOLE_COLOR_OFF)
+      ss << outstr;
+    else
+      ss << "\033[1;" << this->color << "m" << outstr << "\033[0m";
+
     if (lastNewLine)
       ss << std::endl;
 
@@ -190,7 +222,7 @@ int Logger::Buffer::sync()
 
     {
       std::lock_guard<std::mutex> lk(this->syncMutex);
-      if (vtProcessing)
+      if (vtProcessing && consoleColorMode != CONSOLE_COLOR_OFF)
         outStream << "\x1b[" << this->color << "m" << outstr << "\x1b[m";
       else
         outStream << outstr;
@@ -233,6 +265,8 @@ void FileLogger::Init(const std::string &_directory,
                       const std::string &_filename)
 {
   std::string logPath;
+
+  UpdateConsoleColorMode();
 
   if (_directory.empty() ||
 #ifndef _WIN32
