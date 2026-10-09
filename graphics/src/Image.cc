@@ -961,14 +961,10 @@ std::vector<unsigned char> Image::ChannelData(Channel _channel) const
     return this->Data();
   }
 
-<<<<<<< HEAD
   const int bpc = this->dataPtr->bits_per_channel;
   const int ch = this->dataPtr->channels;
   const void *bitmap = this->dataPtr->bitmap;
 
-  if ((ch == 1 && _channel != Channel::RED) ||
-      (ch == 3 && _channel == Channel::ALPHA))
-=======
   int ch_i = static_cast<int>(_channel);
 
   // Grayscale + alpha images store the alpha value in the second channel
@@ -979,7 +975,6 @@ std::vector<unsigned char> Image::ChannelData(Channel _channel) const
   // would read past the end of the bitmap.
   if (ch_i < 0 || ch_i >= ch ||
       (ch == 2 && _channel != Channel::RED && _channel != Channel::ALPHA))
->>>>>>> 5c41ffa (Fix heap buffer overflow in Image::ChannelData (#952))
   {
     gzerr << "Failed to extract channel data for input channel: "
           << static_cast<int>(_channel) << std::endl;
