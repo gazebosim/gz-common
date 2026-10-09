@@ -1608,7 +1608,8 @@ TEST_P(MeshManagerLoad, LoadSTL)
 /////////////////////////////////////////////////
 // A <float_array> without a count attribute must not crash any loader.
 // The malformed source is rejected and an empty mesh is returned.
-TEST_P(MeshManagerLoad, LoadMalformedPositionNoCount) {
+TEST_P(MeshManagerLoad, LoadMalformedPositionNoCount)
+{
   auto *mgr = common::MeshManager::Instance();
   const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "malformed_position_no_count.dae"));
@@ -1625,7 +1626,8 @@ TEST_P(MeshManagerLoad, LoadMalformedPositionNoCount) {
 /////////////////////////////////////////////////
 // A non numeric count attribute must be caught, not throw. The
 // malformed source is rejected and an empty mesh is returned.
-TEST_P(MeshManagerLoad, LoadMalformedPositionBadCount) {
+TEST_P(MeshManagerLoad, LoadMalformedPositionBadCount)
+{
   auto *mgr = common::MeshManager::Instance();
   const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "malformed_position_bad_count.dae"));
@@ -1642,7 +1644,8 @@ TEST_P(MeshManagerLoad, LoadMalformedPositionBadCount) {
 /////////////////////////////////////////////////
 // A missing accessor stride attribute must not crash any loader. The
 // source is rejected and an empty mesh is returned.
-TEST_P(MeshManagerLoad, LoadMalformedPositionNoStride) {
+TEST_P(MeshManagerLoad, LoadMalformedPositionNoStride)
+{
   auto *mgr = common::MeshManager::Instance();
   const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "malformed_position_no_stride.dae"));
@@ -1659,7 +1662,8 @@ TEST_P(MeshManagerLoad, LoadMalformedPositionNoStride) {
 /////////////////////////////////////////////////
 // An overflowing float value must be handled gracefully, not throw.
 // The malformed source is rejected and an empty mesh is returned.
-TEST_P(MeshManagerLoad, LoadMalformedPositionOverflow) {
+TEST_P(MeshManagerLoad, LoadMalformedPositionOverflow)
+{
   auto *mgr = common::MeshManager::Instance();
   const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "malformed_position_overflow.dae"));
@@ -1676,7 +1680,8 @@ TEST_P(MeshManagerLoad, LoadMalformedPositionOverflow) {
 /////////////////////////////////////////////////
 // A zero accessor stride must be rejected: it previously caused an
 // infinite read loop in the COLLADA loader. An empty mesh is returned.
-TEST_P(MeshManagerLoad, LoadMalformedPositionZeroStride) {
+TEST_P(MeshManagerLoad, LoadMalformedPositionZeroStride)
+{
   auto *mgr = common::MeshManager::Instance();
   const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "malformed_position_zero_stride.dae"));
@@ -1693,10 +1698,12 @@ TEST_P(MeshManagerLoad, LoadMalformedPositionZeroStride) {
 /////////////////////////////////////////////////
 // A negative float_array count must be rejected: it previously drove a
 // huge (wrapped around) allocation. An empty mesh is returned.
-TEST_P(MeshManagerLoad, LoadMalformedPositionNegativeCount) {
+TEST_P(MeshManagerLoad, LoadMalformedPositionNegativeCount)
+{
   auto *mgr = common::MeshManager::Instance();
-  const common::Mesh *mesh = mgr->Load(common::testing::TestFile(
-      "data", "malformed_position_negative_count.dae"));
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data",
+      "malformed_position_negative_count.dae"));
   ASSERT_NE(nullptr, mesh);
   // AssimpLoader behavior is verified by the load completing without a crash
   if (!this->forceAssimpEnv)
@@ -1710,7 +1717,8 @@ TEST_P(MeshManagerLoad, LoadMalformedPositionNegativeCount) {
 /////////////////////////////////////////////////
 // A normal source without a count attribute must not crash any loader.
 // The submesh that references it is skipped.
-TEST_P(MeshManagerLoad, LoadMalformedNormalNoCount) {
+TEST_P(MeshManagerLoad, LoadMalformedNormalNoCount)
+{
   auto *mgr = common::MeshManager::Instance();
   const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "malformed_normal_no_count.dae"));
@@ -1727,7 +1735,8 @@ TEST_P(MeshManagerLoad, LoadMalformedNormalNoCount) {
 /////////////////////////////////////////////////
 // A non numeric count attribute in a normal source must be caught, not
 // throw. The submesh that references it is skipped.
-TEST_P(MeshManagerLoad, LoadMalformedNormalBadCount) {
+TEST_P(MeshManagerLoad, LoadMalformedNormalBadCount)
+{
   auto *mgr = common::MeshManager::Instance();
   const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "malformed_normal_bad_count.dae"));
@@ -1744,7 +1753,8 @@ TEST_P(MeshManagerLoad, LoadMalformedNormalBadCount) {
 /////////////////////////////////////////////////
 // A missing accessor stride attribute in a normal source must not crash
 // any loader. The submesh that references it is skipped.
-TEST_P(MeshManagerLoad, LoadMalformedNormalNoStride) {
+TEST_P(MeshManagerLoad, LoadMalformedNormalNoStride)
+{
   auto *mgr = common::MeshManager::Instance();
   const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "malformed_normal_no_stride.dae"));
@@ -1761,7 +1771,8 @@ TEST_P(MeshManagerLoad, LoadMalformedNormalNoStride) {
 /////////////////////////////////////////////////
 // A texcoord source without a count attribute must not crash any loader.
 // The submesh that references it is skipped.
-TEST_P(MeshManagerLoad, LoadMalformedTexcoordNoCount) {
+TEST_P(MeshManagerLoad, LoadMalformedTexcoordNoCount)
+{
   auto *mgr = common::MeshManager::Instance();
   const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "malformed_texcoord_no_count.dae"));
@@ -1778,7 +1789,8 @@ TEST_P(MeshManagerLoad, LoadMalformedTexcoordNoCount) {
 /////////////////////////////////////////////////
 // A non numeric count attribute in a texcoord source must be caught, not
 // throw. The submesh that references it is skipped.
-TEST_P(MeshManagerLoad, LoadMalformedTexcoordBadCount) {
+TEST_P(MeshManagerLoad, LoadMalformedTexcoordBadCount)
+{
   auto *mgr = common::MeshManager::Instance();
   const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "malformed_texcoord_bad_count.dae"));
@@ -1795,7 +1807,8 @@ TEST_P(MeshManagerLoad, LoadMalformedTexcoordBadCount) {
 /////////////////////////////////////////////////
 // A missing accessor stride attribute in a texcoord source must not
 // crash any loader. The submesh that references it is skipped.
-TEST_P(MeshManagerLoad, LoadMalformedTexcoordNoStride) {
+TEST_P(MeshManagerLoad, LoadMalformedTexcoordNoStride)
+{
   auto *mgr = common::MeshManager::Instance();
   const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "malformed_texcoord_no_stride.dae"));
@@ -1812,7 +1825,8 @@ TEST_P(MeshManagerLoad, LoadMalformedTexcoordNoStride) {
 /////////////////////////////////////////////////
 // A texcoord source whose accessor count times stride disagrees with
 // the float_array count must not crash. The submesh is skipped.
-TEST_P(MeshManagerLoad, LoadMalformedTexcoordMismatch) {
+TEST_P(MeshManagerLoad, LoadMalformedTexcoordMismatch)
+{
   auto *mgr = common::MeshManager::Instance();
   const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "malformed_texcoord_mismatch.dae"));
@@ -1830,16 +1844,20 @@ TEST_P(MeshManagerLoad, LoadMalformedTexcoordMismatch) {
 // A count far larger than the actual data must neither over allocate nor
 // read out of bounds. Recovery policies differ: the COLLADA loader keeps
 // the values that are present, assimp discards the geometry.
-TEST_P(MeshManagerLoad, LoadMalformedPositionHugeCount) {
+TEST_P(MeshManagerLoad, LoadMalformedPositionHugeCount)
+{
   auto *mgr = common::MeshManager::Instance();
   const common::Mesh *mesh = mgr->Load(
       common::testing::TestFile("data", "malformed_position_huge_count.dae"));
   ASSERT_NE(nullptr, mesh);
-  if (this->forceAssimpEnv) {
+  if (this->forceAssimpEnv)
+  {
     EXPECT_EQ(0u, mesh->SubMeshCount());
     EXPECT_EQ(0u, mesh->VertexCount());
     EXPECT_EQ(0u, mesh->IndexCount());
-  } else {
+  }
+  else
+  {
     EXPECT_EQ(1u, mesh->SubMeshCount());
     EXPECT_EQ(3u, mesh->VertexCount());
     EXPECT_EQ(3u, mesh->IndexCount());
@@ -1853,15 +1871,19 @@ TEST_P(MeshManagerLoad, LoadMalformedPositionHugeCount) {
 // built: with assertions enabled (e.g. the Ubuntu packages) the import
 // fails and an empty mesh is returned, without assertions (e.g. Homebrew)
 // the geometry is imported. Either way the process must not crash.
-TEST_P(MeshManagerLoad, LoadEmptyInitFrom) {
+TEST_P(MeshManagerLoad, LoadEmptyInitFrom)
+{
   auto *mgr = common::MeshManager::Instance();
-  const common::Mesh *mesh =
-      mgr->Load(common::testing::TestFile("data", "empty_init_from.dae"));
+  const common::Mesh *mesh = mgr->Load(
+      common::testing::TestFile("data", "empty_init_from.dae"));
   ASSERT_NE(nullptr, mesh);
-  if (this->forceAssimpEnv) {
+  if (this->forceAssimpEnv)
+  {
     EXPECT_TRUE(mesh->VertexCount() == 0u || mesh->VertexCount() == 3u)
         << "unexpected vertex count " << mesh->VertexCount();
-  } else {
+  }
+  else
+  {
     EXPECT_EQ(3u, mesh->VertexCount());
     ASSERT_EQ(1u, mesh->MaterialCount());
     common::MaterialPtr mat = mesh->MaterialByIndex(0u);
