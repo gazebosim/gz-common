@@ -120,37 +120,37 @@
     <controller id="Armature_Cube-skin2" name="Armature2">
       <skin source="#Cube-mesh">
         <bind_shape_matrix>1 0 0 -5 0 1 0 1 0 0 1 1 0 0 0 1</bind_shape_matrix>
-        <source id="Armature_Cube-skin-joints">
-          <Name_array id="Armature_Cube-skin-joints-array" count="1">Bone</Name_array>
+        <source id="Armature_Cube-skin2-joints">
+          <Name_array id="Armature_Cube-skin2-joints-array" count="1">Bone2</Name_array>
           <technique_common>
-            <accessor source="#Armature_Cube-skin-joints-array" count="1" stride="1">
+            <accessor source="#Armature_Cube-skin2-joints-array" count="1" stride="1">
               <param name="JOINT" type="name"/>
             </accessor>
           </technique_common>
         </source>
-        <source id="Armature_Cube-skin-bind_poses">
-          <float_array id="Armature_Cube-skin-bind_poses-array" count="16">1 0 0 1 0 1 0 -1 0 0 1 0 0 0 0 1</float_array>
+        <source id="Armature_Cube-skin2-bind_poses">
+          <float_array id="Armature_Cube-skin2-bind_poses-array" count="16">1 0 0 1 0 1 0 -1 0 0 1 0 0 0 0 1</float_array>
           <technique_common>
-            <accessor source="#Armature_Cube-skin-bind_poses-array" count="1" stride="16">
+            <accessor source="#Armature_Cube-skin2-bind_poses-array" count="1" stride="16">
               <param name="TRANSFORM" type="float4x4"/>
             </accessor>
           </technique_common>
         </source>
-        <source id="Armature_Cube-skin-weights">
-          <float_array id="Armature_Cube-skin-weights-array" count="8">1 1 1 1 1 1 1 1</float_array>
+        <source id="Armature_Cube-skin2-weights">
+          <float_array id="Armature_Cube-skin2-weights-array" count="8">1 1 1 1 1 1 1 1</float_array>
           <technique_common>
-            <accessor source="#Armature_Cube-skin-weights-array" count="8" stride="1">
+            <accessor source="#Armature_Cube-skin2-weights-array" count="8" stride="1">
               <param name="WEIGHT" type="float"/>
             </accessor>
           </technique_common>
         </source>
         <joints>
-          <input semantic="JOINT" source="#Armature_Cube-skin-joints"/>
-          <input semantic="INV_BIND_MATRIX" source="#Armature_Cube-skin-bind_poses"/>
+          <input semantic="JOINT" source="#Armature_Cube-skin2-joints"/>
+          <input semantic="INV_BIND_MATRIX" source="#Armature_Cube-skin2-bind_poses"/>
         </joints>
         <vertex_weights count="8">
-          <input semantic="JOINT" source="#Armature_Cube-skin-joints" offset="0"/>
-          <input semantic="WEIGHT" source="#Armature_Cube-skin-weights" offset="1"/>
+          <input semantic="JOINT" source="#Armature_Cube-skin2-joints" offset="0"/>
+          <input semantic="WEIGHT" source="#Armature_Cube-skin2-weights" offset="1"/>
           <vcount>1 1 1 1 1 1 1 1 </vcount>
           <v>0 0 0 1 0 2 0 3 0 4 0 5 0 6 0 7</v>
         </vertex_weights>
