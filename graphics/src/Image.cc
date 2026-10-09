@@ -965,8 +965,16 @@ std::vector<unsigned char> Image::ChannelData(Channel _channel) const
   const int ch = this->dataPtr->channels;
   const void *bitmap = this->dataPtr->bitmap;
 
-  if ((ch == 1 && _channel != Channel::RED) ||
-      (ch == 3 && _channel == Channel::ALPHA))
+  int ch_i = static_cast<int>(_channel);
+
+  // Grayscale + alpha images store the alpha value in the second channel
+  if (ch == 2 && _channel == Channel::ALPHA)
+    ch_i = 1;
+
+  // Reject channels not present in the image, otherwise the loop below
+  // would read past the end of the bitmap.
+  if (ch_i < 0 || ch_i >= ch ||
+      (ch == 2 && _channel != Channel::RED && _channel != Channel::ALPHA))
   {
     gzerr << "Failed to extract channel data for input channel: "
           << static_cast<int>(_channel) << std::endl;
@@ -974,8 +982,6 @@ std::vector<unsigned char> Image::ChannelData(Channel _channel) const
   }
   std::vector<unsigned char> data;
   data.resize(Width() * Height());
-
-  int ch_i = static_cast<int>(_channel);
 
   for (size_t i = 0; i < Width() * Height(); i++)
   {
