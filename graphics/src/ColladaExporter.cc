@@ -221,6 +221,7 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
   // Asset element
   tinyxml2::XMLElement *assetXml = xmlDoc.NewElement("asset");
   this->dataPtr->ExportAsset(assetXml);
+  colladaXml->LinkEndChild(assetXml);
 
   // Library geometries element
   tinyxml2::XMLElement *libraryGeometriesXml =
