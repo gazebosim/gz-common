@@ -89,6 +89,10 @@ class gz::common::MeshManager::Implementation
 
   /// \brief True if assimp is used for loading all supported mesh formats
   public: bool forceAssimp;
+
+  /// \brief True if assimp is used for loading COLLADA meshes
+  public: bool forceAssimpCollada;
+
 #ifdef _WIN32
 #pragma warning(pop)
 #endif
@@ -173,7 +177,12 @@ const Mesh *MeshManager::Load(const std::string &_filename)
       if (extension == "stl" || extension == "stlb" || extension == "stla")
           loader = &this->dataPtr->stlLoader;
       else if (extension == "dae")
-        loader = &this->dataPtr->colladaLoader;
+      {
+        if (this->dataPtr->forceAssimpCollada)
+          loader = &this->dataPtr->assimpLoader;
+        else
+          loader = &this->dataPtr->colladaLoader;
+      }
       else if (extension == "obj")
         loader = &this->dataPtr->objLoader;
       else if (extension == "gltf" || extension == "glb" || extension == "fbx")
@@ -1660,12 +1669,20 @@ MeshManager* MeshManager::Instance()
 void MeshManager::SetAssimpEnvs()
 {
   std::string forceAssimpEnv;
+  std::string forceAssimpColladaEnv;
   common::env("GZ_MESH_FORCE_ASSIMP", forceAssimpEnv);
+  common::env("GZ_COLLADA_FORCE_ASSIMP", forceAssimpColladaEnv);
   this->dataPtr->forceAssimp = false;
+  this->dataPtr->forceAssimpCollada = false;
   if (forceAssimpEnv == "true")
   {
     gzmsg << "Using assimp to load all mesh formats"  << std::endl;
     this->dataPtr->forceAssimp = true;
+  }
+  if (forceAssimpColladaEnv == "true")
+  {
+    gzmsg << "Using assimp to load COLLADA meshes"  << std::endl;
+    this->dataPtr->forceAssimpCollada = true;
   }
 }
 
