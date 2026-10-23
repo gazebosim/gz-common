@@ -44,6 +44,39 @@ namespace gz
     class Mesh;
     class SubMesh;
 
+    /// \brief Describes a convex decomposition of a mesh whose result is
+    /// cached by the MeshManager.
+    /// \sa MeshManager::ConvexDecomposition(
+    /// const ConvexDecompositionDescriptor &)
+    struct ConvexDecompositionDescriptor
+    {
+      /// \brief Input mesh to decompose. The mesh must outlive the
+      /// decomposition call.
+      const Mesh *mesh{nullptr};
+
+      /// \brief Name of the submesh to decompose. If empty, all the
+      /// submeshes of the mesh are merged and decomposed together.
+      std::string submesh;
+
+      /// \brief True to center the submesh at the origin before
+      /// decomposing it. Only used if \ref submesh is not empty.
+      bool centerSubmesh{false};
+
+      /// \brief Maximum number of convex hull submeshes to produce. Ignored
+      /// if \ref assumeConvex is true.
+      std::size_t maxConvexHulls{16u};
+
+      /// \brief Voxel resolution to use. Higher value produces more
+      /// accurate shapes. Ignored if \ref assumeConvex is true.
+      std::size_t voxelResolution{200000u};
+
+      /// \brief True to assume that the mesh is convex. The result is then
+      /// the convex hull of the mesh's vertices, which is much faster to
+      /// compute than a convex decomposition. The convexity of the mesh is
+      /// not verified, see MeshManager::IsConvex.
+      bool assumeConvex{false};
+    };
+
     /// \class MeshManager MeshManager.hh gz/common/MeshManager.hh
     /// \brief Maintains and manages all meshes. Supported mesh formats are
     /// STL (STLA, STLB), COLLADA, OBJ, GLTF (GLB) and FBX. By default only GLTF
@@ -295,6 +328,50 @@ namespace gz
                   const common::SubMesh &_subMesh,
                   std::size_t _maxConvexHulls = 16u,
                   std::size_t _voxelResolution = 200000u);
+
+      /// \brief Perform convex decomposition on a mesh and cache the result.
+      /// The decomposed mesh is stored in the MeshManager under a name that
+      /// is unique to the input mesh and decomposition parameters, so
+      /// decomposing the same mesh again with the same parameters returns
+      /// the cached mesh without decomposing it again.
+      /// \param[in] _desc Mesh to decompose and decomposition parameters.
+      /// \return The decomposed mesh, owned by the MeshManager, or nullptr if
+      /// the input mesh is null or the requested submesh does not exist. If
+      /// no convex hull could be produced, the returned mesh has no
+      /// submeshes.
+      public: const Mesh *ConvexDecomposition(
+                  const ConvexDecompositionDescriptor &_desc);
+
+      /// \brief Check whether a submesh is convex, i.e. its surface lies on
+      /// the surface of the convex hull of its vertices. The vertices and the
+      /// centroids of the triangles of the submesh are checked: a vertex or
+      /// a triangle inside the convex hull means that the submesh has a
+      /// concavity. Note that a mesh with internal faces, e.g. made of
+      /// convex parts that touch each other, is not considered convex even
+      /// if the union of its parts is.
+      /// \param[in] _subMesh Submesh to check.
+      /// \param[in] _tolerance Maximum distance a vertex or a triangle
+      /// centroid may lie inside the convex hull, relative to the largest
+      /// extent of the submesh's bounding box.
+      /// \return True if the submesh is convex. False if it is not convex or
+      /// if it has too few vertices to form a convex hull.
+      public: static bool IsConvex(const common::SubMesh &_subMesh,
+                                   double _tolerance = 1e-3);
+
+      /// \brief Check whether a mesh is convex. See
+      /// IsConvex(const common::SubMesh &, double).
+      /// \param[in] _mesh Mesh to check.
+      /// \param[in] _submesh Name of the submesh to check. If empty, all the
+      /// submeshes are checked together as a single mesh.
+      /// \param[in] _tolerance Maximum distance a vertex or a triangle
+      /// centroid may lie inside the convex hull, relative to the largest
+      /// extent of the bounding box of the checked vertices.
+      /// \return True if the mesh is convex. False if it is not convex, if
+      /// the submesh does not exist, or if there are too few vertices to form
+      /// a convex hull.
+      public: static bool IsConvex(const common::Mesh &_mesh,
+                                   const std::string &_submesh = "",
+                                   double _tolerance = 1e-3);
 
       /// \brief Merge all submeshes from one mesh into one single submesh.
       /// \param[in] _mesh Input mesh with submeshes to merge.
