@@ -20,6 +20,7 @@
 #include "test_config.h"
 #include "gz/common/Material.hh"
 #include "gz/common/Mesh.hh"
+#include "gz/common/MeshManager.hh"
 #include "gz/common/Skeleton.hh"
 #include "gz/common/SubMesh.hh"
 #include "gz/math/Vector3.hh"
@@ -157,4 +158,27 @@ int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
+}
+
+/////////////////////////////////////////////////
+TEST_F(MeshTest, Centroid)
+{
+  common::MeshManager::Instance()->CreateBox("mesh_centroid_box",
+      ignition::math::Vector3d::One, ignition::math::Vector2d::One);
+  const common::Mesh *box =
+    common::MeshManager::Instance()->MeshByName("mesh_centroid_box");
+  ASSERT_NE(nullptr, box);
+  EXPECT_EQ(ignition::math::Vector3d::Zero, box->Centroid());
+
+  // A mesh whose submesh sits away from the origin.
+  auto submesh = box->SubMeshByIndex(0).lock();
+  ASSERT_NE(nullptr, submesh);
+  common::SubMesh offset(*submesh);
+  const ignition::math::Vector3d shift(-1, 2, -3);
+  offset.Translate(shift);
+
+  common::Mesh mesh;
+  mesh.AddSubMesh(offset);
+  EXPECT_DOUBLE_EQ(1.0, mesh.Volume());
+  EXPECT_EQ(shift, mesh.Centroid());
 }

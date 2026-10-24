@@ -394,6 +394,17 @@ namespace ignition
       /// the primitive type is not TRIANGLES, or there are no triangles.
       public: double Volume() const;
 
+      /// \brief Get the volumetric centroid of the submesh, the centre of
+      /// the enclosed solid rather than the average of the vertices. Only
+      /// meaningful for a closed mesh; the formula does not check for one.
+      ///
+      /// This sums signed tetrahedron first moments, from the same family
+      /// of methods as B. Mirtich, "Fast and Accurate Computation of
+      /// Polyhedral Mass Properties", Journal of Graphics Tools, 1996.
+      /// \return The centroid position. The zero vector if the primitive
+      /// type is not TRIANGLES or there are no triangles.
+      public: ignition::math::Vector3d Centroid() const;
+
       /// \brief Private data pointer.
       IGN_UTILS_IMPL_PTR(dataPtr)
     };

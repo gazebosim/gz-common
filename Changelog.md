@@ -1,5 +1,21 @@
 ## Gazebo Common 4.x
 
+### Gazebo Common 4.9.0 (2026-08-24)
+
+1. COLLADA loader updates:
+    * [Pull request #896](https://github.com/gazebosim/gz-common/pull/896)
+    * [Pull request #886](https://github.com/gazebosim/gz-common/pull/886)
+    * [Pull request #857](https://github.com/gazebosim/gz-common/pull/857)
+
+1. Adds mesh Centroid() and fix Volume() for meshes offset from the origin
+    * [Pull request #890](https://github.com/gazebosim/gz-common/pull/890)
+
+1. Improve performance on STL loader (ASCII)
+    * [Pull request #838](https://github.com/gazebosim/gz-common/pull/838)
+
+1. Fix flakiness in PluginSpecialization.AccessTime performance test
+    * [Pull request #821](https://github.com/gazebosim/gz-common/pull/821)
+
 ### Gazebo Common 4.8.1 (2026-06-09)
 
 1. Added missing includes

@@ -16,6 +16,8 @@
 */
 #include <gtest/gtest.h>
 
+#include <memory>
+
 #include "test_config.h"
 #include "gz/common/Mesh.hh"
 #include "gz/common/SubMesh.hh"
@@ -31,8 +33,8 @@ class ColladaLoader : public common::testing::AutoLogFixture { };
 TEST_F(ColladaLoader, LoadBox)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "box.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "box.dae")));
 
   EXPECT_STREQ("unknown", mesh->Name().c_str());
   EXPECT_EQ(math::Vector3d(1, 1, 1), mesh->Max());
@@ -53,8 +55,8 @@ TEST_F(ColladaLoader, LoadBox)
 TEST_F(ColladaLoader, ShareVertices)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "box.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "box.dae")));
 
   // check number of shared vertices
   std::set<unsigned int> uniqueIndices;
@@ -104,8 +106,8 @@ TEST_F(ColladaLoader, ShareVertices)
 TEST_F(ColladaLoader, LoadZeroCount)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "zero_count.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "zero_count.dae")));
   ASSERT_TRUE(mesh);
 #ifndef _WIN32
   std::string log = LogContent();
@@ -128,8 +130,8 @@ TEST_F(ColladaLoader, LoadZeroCount)
 TEST_F(ColladaLoader, Material)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "box.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "box.dae")));
   ASSERT_TRUE(mesh);
 
   EXPECT_EQ(mesh->MaterialCount(), 1u);
@@ -153,8 +155,8 @@ TEST_F(ColladaLoader, Material)
   EXPECT_DOUBLE_EQ(1.0, srcFactor);
   EXPECT_DOUBLE_EQ(0.0, dstFactor);
 
-  common::Mesh *meshOpaque = loader.Load(
-      common::testing::TestFile("data", "box_opaque.dae"));
+  std::unique_ptr<common::Mesh> meshOpaque(loader.Load(
+      common::testing::TestFile("data", "box_opaque.dae")));
   ASSERT_TRUE(meshOpaque);
 
   EXPECT_EQ(meshOpaque->MaterialCount(), 1u);
@@ -185,9 +187,9 @@ TEST_F(ColladaLoader, TexCoordSets)
   common::ColladaLoader loader;
   // This triangle mesh has multiple uv sets and vertices separated by
   // line breaks
-  common::Mesh *mesh = loader.Load(
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
       common::testing::TestFile("data",
-        "multiple_texture_coordinates_triangle.dae"));
+        "multiple_texture_coordinates_triangle.dae")));
   ASSERT_TRUE(mesh);
 
   EXPECT_EQ(6u, mesh->VertexCount());
@@ -270,9 +272,9 @@ TEST_F(ColladaLoader, TexCoordSets)
 TEST_F(ColladaLoader, LoadBoxWithAnimationOutsideSkeleton)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
       common::testing::TestFile("data",
-        "box_with_animation_outside_skeleton.dae"));
+        "box_with_animation_outside_skeleton.dae")));
 
   EXPECT_EQ(36u, mesh->IndexCount());
   EXPECT_EQ(1u, mesh->SubMeshCount());
@@ -306,9 +308,9 @@ TEST_F(ColladaLoader, LoadBoxWithAnimationOutsideSkeleton)
 TEST_F(ColladaLoader, LoadBoxInstControllerWithoutSkeleton)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
       common::testing::TestFile("data",
-        "box_inst_controller_without_skeleton.dae"));
+        "box_inst_controller_without_skeleton.dae")));
 
   EXPECT_EQ(36u, mesh->IndexCount());
   EXPECT_EQ(35u, mesh->VertexCount());
@@ -324,8 +326,8 @@ TEST_F(ColladaLoader, LoadBoxInstControllerWithoutSkeleton)
 TEST_F(ColladaLoader, LoadBoxMultipleInstControllers)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "box_multiple_inst_controllers.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "box_multiple_inst_controllers.dae")));
 
   EXPECT_EQ(72u, mesh->IndexCount());
   EXPECT_EQ(70u, mesh->VertexCount());
@@ -351,8 +353,8 @@ TEST_F(ColladaLoader, LoadBoxMultipleInstControllers)
 TEST_F(ColladaLoader, LoadBoxNestedAnimation)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "box_nested_animation.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "box_nested_animation.dae")));
 
   EXPECT_EQ(36u, mesh->IndexCount());
   EXPECT_EQ(35u, mesh->VertexCount());
@@ -387,8 +389,8 @@ TEST_F(ColladaLoader, LoadBoxNestedAnimation)
 TEST_F(ColladaLoader, LoadBoxWithDefaultStride)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "box_with_default_stride.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "box_with_default_stride.dae")));
 
   EXPECT_EQ(36u, mesh->IndexCount());
   EXPECT_EQ(35u, mesh->VertexCount());
@@ -402,8 +404,8 @@ TEST_F(ColladaLoader, LoadBoxWithDefaultStride)
 TEST_F(ColladaLoader, LoadBoxWithMultipleGeoms)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "box_with_multiple_geoms.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "box_with_multiple_geoms.dae")));
 
   EXPECT_EQ(72u, mesh->IndexCount());
   EXPECT_EQ(48u, mesh->VertexCount());
@@ -419,8 +421,8 @@ TEST_F(ColladaLoader, LoadBoxWithMultipleGeoms)
 TEST_F(ColladaLoader, LoadBoxWithHierarchicalNodes)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "box_with_hierarchical_nodes.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "box_with_hierarchical_nodes.dae")));
 
   ASSERT_EQ(5u, mesh->SubMeshCount());
 
@@ -444,8 +446,8 @@ TEST_F(ColladaLoader, LoadBoxWithHierarchicalNodes)
 TEST_F(ColladaLoader, MergeBoxWithDoubleSkeleton)
 {
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      common::testing::TestFile("data", "box_with_double_skeleton.dae"));
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "box_with_double_skeleton.dae")));
   EXPECT_TRUE(mesh->HasSkeleton());
   auto skeleton_ptr = mesh->MeshSkeleton();
   // The two skeletons have been joined and their root is the
@@ -460,9 +462,9 @@ TEST_F(ColladaLoader, LoadCylinderAnimatedFrom3dsMax)
   // mesh animation looks deformed when loaded. That still needs to be
   // addressed.
   common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
       common::testing::TestFile("data",
-        "cylinder_animated_from_3ds_max.dae"));
+        "cylinder_animated_from_3ds_max.dae")));
 
   EXPECT_EQ("unknown", mesh->Name());
   EXPECT_EQ(202u, mesh->VertexCount());
@@ -486,6 +488,344 @@ TEST_F(ColladaLoader, LoadCylinderAnimatedFrom3dsMax)
   EXPECT_EQ("Bone02", anim->Name());
   EXPECT_EQ(1u, anim->NodeCount());
   EXPECT_TRUE(anim->HasNode("Bone02"));
+}
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadLines)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "xy_square_lines.dae")));
+  ASSERT_TRUE(mesh);
+
+  // 4 line segments, each contributes 2 vertices and 2 indices.
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(8u, mesh->VertexCount());
+  EXPECT_EQ(8u, mesh->IndexCount());
+
+  auto subMesh = mesh->SubMeshByIndex(0u).lock();
+  ASSERT_NE(nullptr, subMesh);
+  EXPECT_EQ(common::SubMesh::LINES, subMesh->SubMeshPrimitiveType());
+}
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadTextureMaterial)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "xy_triangle_texture.dae")));
+  ASSERT_TRUE(mesh);
+
+  EXPECT_EQ(3u, mesh->VertexCount());
+  EXPECT_EQ(3u, mesh->TexCoordCount());
+  ASSERT_EQ(1u, mesh->MaterialCount());
+
+  common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+  ASSERT_NE(nullptr, mat);
+
+  // The diffuse texture chain should have been resolved and stored.
+  EXPECT_FALSE(mat->TextureImage().empty());
+  EXPECT_NE(mat->TextureImage().find("xy_triangle_texture.png"),
+      std::string::npos);
+}
+
+/////////////////////////////////////////////////
+// Loading a non-existent file must return null, not crash.
+TEST_F(ColladaLoader, LoadNonexistentFile)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "this_file_does_not_exist.dae")));
+  EXPECT_EQ(nullptr, mesh);
+}
+
+/////////////////////////////////////////////////
+// A file whose root element is not <COLLADA> must return null, not crash.
+TEST_F(ColladaLoader, LoadNoColladaTag)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "no_collada_tag.dae")));
+  EXPECT_EQ(nullptr, mesh);
+#ifndef _WIN32
+  EXPECT_NE(LogContent().find("Missing COLLADA tag"), std::string::npos);
+#endif
+}
+
+/////////////////////////////////////////////////
+// An unsupported version is reported but the mesh still loads.
+TEST_F(ColladaLoader, LoadBadVersion)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "bad_version.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(3u, mesh->VertexCount());
+#ifndef _WIN32
+  EXPECT_NE(LogContent().find("Invalid collada file"), std::string::npos);
+#endif
+}
+
+/////////////////////////////////////////////////
+// A <scene> referencing a missing visual_scene must be reported, not crash.
+TEST_F(ColladaLoader, LoadMissingVisualScene)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "missing_visual_scene.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->VertexCount());
+#ifndef _WIN32
+  EXPECT_NE(LogContent().find("Unable to find visual_scene"),
+      std::string::npos);
+#endif
+}
+
+
+
+/////////////////////////////////////////////////
+// A <float_array> without a count attribute must not crash the loader.
+// The position source is rejected and the loader returns an empty mesh.
+TEST_F(ColladaLoader, LoadMalformedPositionNoCount)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_position_no_count.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A non numeric count attribute must be caught, not throw. The position
+// source is rejected and the loader returns an empty mesh.
+TEST_F(ColladaLoader, LoadMalformedPositionBadCount)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_position_bad_count.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A missing accessor stride attribute must not crash the loader. The
+// position source is rejected and the loader returns an empty mesh.
+TEST_F(ColladaLoader, LoadMalformedPositionNoStride)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_position_no_stride.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// An overflowing float value must be handled gracefully, not throw. The
+// position source is rejected and the loader returns an empty mesh.
+TEST_F(ColladaLoader, LoadMalformedPositionOverflow)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_position_overflow.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A normal source without a count attribute must not crash the loader.
+// The submesh that references it is skipped.
+TEST_F(ColladaLoader, LoadMalformedNormalNoCount)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_normal_no_count.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A non numeric count attribute in a normal source must be caught, not
+// throw. The submesh that references it is skipped.
+TEST_F(ColladaLoader, LoadMalformedNormalBadCount)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_normal_bad_count.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A missing accessor stride attribute in a normal source must not crash
+// the loader. The submesh that references it is skipped.
+TEST_F(ColladaLoader, LoadMalformedNormalNoStride)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_normal_no_stride.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A texcoord source without a count attribute must not crash the loader.
+// The submesh that references it is skipped.
+TEST_F(ColladaLoader, LoadMalformedTexcoordNoCount)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_texcoord_no_count.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A non numeric count attribute in a texcoord source must be caught, not
+// throw. The submesh that references it is skipped.
+TEST_F(ColladaLoader, LoadMalformedTexcoordBadCount)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_texcoord_bad_count.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A missing accessor stride attribute in a texcoord source must not crash
+// the loader. The submesh that references it is skipped.
+TEST_F(ColladaLoader, LoadMalformedTexcoordNoStride)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_texcoord_no_stride.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A texcoord source whose accessor count times stride disagrees with the
+// float_array count must not crash. The submesh that references it is
+// skipped.
+TEST_F(ColladaLoader, LoadMalformedTexcoordMismatch)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_texcoord_mismatch.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A zero accessor stride must be rejected: it previously caused an
+// infinite read loop (and a division by zero in later revisions). The
+// position source is rejected and the loader returns an empty mesh.
+TEST_F(ColladaLoader, LoadMalformedPositionZeroStride)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_position_zero_stride.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A negative float_array count must be rejected: it previously drove a
+// huge (wrapped around) allocation that threw std::length_error. The
+// position source is rejected and the loader returns an empty mesh.
+TEST_F(ColladaLoader, LoadMalformedPositionNegativeCount)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data",
+      "malformed_position_negative_count.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(0u, mesh->SubMeshCount());
+  EXPECT_EQ(0u, mesh->VertexCount());
+  EXPECT_EQ(0u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A count far larger than the actual data must neither over allocate nor
+// read out of bounds; the values that are present are loaded.
+TEST_F(ColladaLoader, LoadMalformedPositionHugeCount)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_position_huge_count.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(3u, mesh->VertexCount());
+  EXPECT_EQ(3u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// An empty <init_from/> element must not crash. The geometry loads and
+// the material is created with no texture assigned.
+TEST_F(ColladaLoader, LoadEmptyInitFrom)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "empty_init_from.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(3u, mesh->VertexCount());
+  ASSERT_EQ(1u, mesh->MaterialCount());
+  common::MaterialPtr mat = mesh->MaterialByIndex(0u);
+  ASSERT_NE(nullptr, mat);
+  EXPECT_TRUE(mat->TextureImage().empty());
+}
+
+/////////////////////////////////////////////////
+// A negative index in <p> must be rejected: strtoul would silently wrap
+// it to a huge unsigned value that reads out of bounds. The indices
+// parsed before the invalid one are kept.
+TEST_F(ColladaLoader, LoadMalformedPNegativeIndex)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_p_negative_index.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(1u, mesh->VertexCount());
+  EXPECT_EQ(1u, mesh->IndexCount());
+}
+
+/////////////////////////////////////////////////
+// A polylist whose <p> holds fewer indices than <vcount> declares must be
+// truncated, not read out of bounds. The complete first triangle is kept.
+TEST_F(ColladaLoader, LoadMalformedPolylistShortP)
+{
+  common::ColladaLoader loader;
+  std::unique_ptr<common::Mesh> mesh(loader.Load(
+      common::testing::TestFile("data", "malformed_polylist_short_p.dae")));
+  ASSERT_TRUE(mesh);
+  EXPECT_EQ(1u, mesh->SubMeshCount());
+  EXPECT_EQ(3u, mesh->VertexCount());
+  EXPECT_EQ(3u, mesh->IndexCount());
 }
 
 /////////////////////////////////////////////////
