@@ -138,6 +138,9 @@ namespace gz
       public: void AddAnimation(SkeletonAnimation *_anim);
 
       /// \brief Add an animation from BVH file.
+      /// By default, BVHLoader is used to parse the file. If the environment
+      /// variable GZ_MESH_FORCE_ASSIMP is set to "true", AssimpLoader is used
+      /// instead.
       /// \param[in] _bvhFile the bvh file to load animation from
       /// \param[in] _scale the scale of the animation
       /// \return True if the BVH animation is compatible with skeleton

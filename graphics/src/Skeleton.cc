@@ -15,7 +15,11 @@
  *
  */
 #include <list>
+#include <memory>
+
+#include <gz/common/AssimpLoader.hh>
 #include <gz/common/Console.hh>
+#include <gz/common/Mesh.hh>
 #include <gz/common/SkeletonAnimation.hh>
 #include <gz/common/Skeleton.hh>
 #include <gz/common/BVHLoader.hh>
@@ -336,10 +340,55 @@ void Skeleton::AddAnimation(SkeletonAnimation *_anim)
 }
 
 //////////////////////////////////////////////////
+// Helper function to get skeleton from the BVH file.
+// Returns pointer to skeleton or nullptr if none is present
+static SkeletonPtr GetSkeletonFromBvh(const std::string &_bvhFile,
+      double _scale)
+{
+  const std::string fullname = common::findFile(_bvhFile);
+  if (fullname.empty())
+  {
+    gzerr << "Unable to find file [" << _bvhFile << "]" << std::endl;
+    return nullptr;
+  }
+
+  std::string forceAssimpEnv;
+  common::env("GZ_MESH_FORCE_ASSIMP", forceAssimpEnv);
+  if (forceAssimpEnv == "true")
+  {
+    gzmsg << "Using assimp to load BVH animation" << std::endl;
+    AssimpLoader loader;
+    std::unique_ptr<Mesh> mesh(loader.Load(fullname));
+    if (!mesh)
+      return nullptr;
+
+    auto skel = mesh->MeshSkeleton();
+    if (nullptr == skel)
+    {
+      gzerr << "AssimpLoader loaded mesh but MeshSkeleton is null for ["
+            << fullname << "]" << std::endl;
+      return nullptr;
+    }
+    if (skel->AnimationCount() == 0)
+    {
+      gzerr << "AssimpLoader loaded skeleton but AnimationCount is 0 for ["
+            << fullname << "]" << std::endl;
+      return nullptr;
+    }
+
+    skel->Scale(_scale);
+    return skel;
+  }
+
+  // If not using assimp, use custom BVHLoader
+  BVHLoader loader;
+  return loader.Load(fullname, _scale);
+}
+
+//////////////////////////////////////////////////
 bool Skeleton::AddBvhAnimation(const std::string &_bvhFile, double _scale)
 {
-  BVHLoader loader;
-  auto skel = loader.Load(_bvhFile, _scale);
+  auto skel = GetSkeletonFromBvh(_bvhFile, _scale);
   if (nullptr == skel)
     return false;
 
@@ -348,6 +397,8 @@ bool Skeleton::AddBvhAnimation(const std::string &_bvhFile, double _scale)
   std::map<std::string, std::string> skelMap;
   if (this->NodeCount() != skel->NodeCount())
   {
+    gzerr << "BVH animation skeleton node count mismatch: skin="
+          << this->NodeCount() << " vs anim=" << skel->NodeCount() << std::endl;
     compatible = false;
   }
   else
@@ -358,6 +409,11 @@ bool Skeleton::AddBvhAnimation(const std::string &_bvhFile, double _scale)
       SkeletonNode *animNode = skel->NodeByHandle(i);
       if (skinNode->ChildCount() != animNode->ChildCount())
       {
+        gzerr << "BVH animation child count mismatch at node " << i
+              << " (" << skinNode->Name() << " has "
+              << skinNode->ChildCount() << " children vs "
+              << animNode->Name() << " has " << animNode->ChildCount()
+              << " children)" << std::endl;
         compatible = false;
         break;
       }
