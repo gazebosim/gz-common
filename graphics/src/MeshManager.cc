@@ -234,13 +234,13 @@ Mesh *MeshManager::CreateMesh(const std::string &_name)
 {
   if (_name.empty())
   {
-    gzerr << "Valid mesh name required." << std::endl;
+    ignerr << "Valid mesh name required." << std::endl;
     return nullptr;
   }
 
   if (this->HasMesh(_name))
   {
-    gzerr << "Mesh [" << _name << "] already exists." << std::endl;
+    ignerr << "Mesh [" << _name << "] already exists." << std::endl;
     return nullptr;
   }
 
