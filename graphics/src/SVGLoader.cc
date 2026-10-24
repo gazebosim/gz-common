@@ -718,9 +718,9 @@ bool SVGLoader::Implementation::PathCommands(
     {
       // its just numbers
       std::vector<std::string> numberStrs = split(token, ",");
-      for (std::string numberStr : numberStrs)
+      for (const auto &numberStr : numberStrs)
       {
-        double f = std::atof(numberStr.c_str());
+        double f = std::stof(numberStr);
         numbers.push_back(f);
        }
      }
