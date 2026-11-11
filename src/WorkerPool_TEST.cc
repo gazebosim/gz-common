@@ -18,6 +18,9 @@
 #include <gtest/gtest.h>
 
 #include <atomic>
+#include <algorithm>
+#include <chrono>
+#include <future>
 #include <thread>
 
 #include "gz/common/Console.hh"
@@ -97,24 +100,25 @@ TEST(WorkerPool, WaitWithTimeout)
 }
 
 //////////////////////////////////////////////////
-// /TODO(anyone) Deflake this test
-// ref: https://github.com/gazebosim/gz-common/issues/52
-TEST(WorkerPool,
-     GZ_UTILS_TEST_ENABLED_ONLY_ON_LINUX(WaitWithTimeoutThatTimesOut))
+TEST(WorkerPool, WaitWithTimeoutThatTimesOut)
 {
   common::WorkerPool pool;
-  pool.AddWork([] ()
+  std::promise<void> release;
+  std::future<void> released = release.get_future();
+
+  // Worker waits until it is signalled to stop, therefore
+  // timeout length doesn't matter here
+  pool.AddWork([&released] ()
       {
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        released.wait();
       });
   EXPECT_FALSE(pool.WaitForResults(std::chrono::nanoseconds(100000)));
+  release.set_value();
+  EXPECT_TRUE(pool.WaitForResults());
 }
 
 //////////////////////////////////////////////////
-// /TODO(anyone) Deflake this test
-// ref: https://github.com/gazebosim/gz-common/issues/53
-TEST(WorkerPool,
-     GZ_UTILS_TEST_ENABLED_ONLY_ON_LINUX(ThingsRunInParallel))
+TEST(WorkerPool, ThingsRunInParallel)
 {
   const unsigned int hc = std::thread::hardware_concurrency();
   if (2 > hc)
@@ -126,23 +130,42 @@ TEST(WorkerPool,
   }
 
   common::WorkerPool pool;
-  std::atomic<int> sentinel(0);
-  pool.AddWork([&sentinel] ()
-      {
-        ++sentinel;
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
-      });
-  pool.AddWork([&sentinel] ()
-      {
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
-        ++sentinel;
-      });
-  bool result = pool.WaitForResults(std::chrono::milliseconds(9));
-  // the timing test is flaky on windows and mac
-  EXPECT_TRUE(result);
-  if (!result)
-  {
-    gzdbg << "WaitForResults failed" << std::endl;
-  }
-  EXPECT_EQ(2, sentinel);
+  std::promise<void> release;
+  std::shared_future<void> released = release.get_future();
+  std::atomic<int> started_count{0};
+  std::atomic<int64_t> worker_1_start{0}, worker_1_end{0}, worker_2_start{0}, worker_2_end{0};
+  const auto base_time = std::chrono::steady_clock::now().time_since_epoch();
+  auto sinceBase = [base_time](const std::chrono::steady_clock::time_point &t) {
+    return std::chrono::duration_cast<std::chrono::nanoseconds>(
+        t.time_since_epoch() - base_time).count();
+  };
+
+  // Worker waits until signal
+  auto work = [&](std::atomic<int64_t> &start_time, std::atomic<int64_t> &end_time) {
+    start_time = sinceBase(std::chrono::steady_clock::now());
+    ++started_count;
+    released.wait();
+    end_time = sinceBase(std::chrono::steady_clock::now());
+  };
+
+  pool.AddWork([&] { work(worker_1_start, worker_1_end); });
+  pool.AddWork([&] { work(worker_2_start, worker_2_end); });
+
+  // Wait until both workers are running, then let them finish
+  const unsigned int deadline_seconds = 10;
+  const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(deadline_seconds);
+  while (started_count.load() < 2 && std::chrono::steady_clock::now() < deadline)
+    std::this_thread::yield();
+
+  const bool bothStarted = started_count.load() == 2;
+  release.set_value();
+
+  EXPECT_TRUE(pool.WaitForResults(std::chrono::seconds(10)));
+  ASSERT_TRUE(bothStarted)
+    << "pool did not dispatch both work items before the deadline ("
+    << deadline_seconds << " seconds)";
+
+  const int64_t overlapStart = std::max(worker_1_start.load(), worker_2_start.load());
+  const int64_t overlapEnd   = std::min(worker_1_end.load(), worker_2_end.load());
+  EXPECT_LT(overlapStart, overlapEnd);
 }
