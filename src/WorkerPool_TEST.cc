@@ -18,14 +18,12 @@
 #include <gtest/gtest.h>
 
 #include <atomic>
-#include <algorithm>
 #include <chrono>
 #include <future>
 #include <thread>
 
 #include "gz/common/Console.hh"
 #include "gz/common/WorkerPool.hh"
-#include "gz/utils/ExtraTestMacros.hh"
 
 using namespace gz;
 
@@ -102,19 +100,22 @@ TEST(WorkerPool, WaitWithTimeout)
 //////////////////////////////////////////////////
 TEST(WorkerPool, WaitWithTimeoutThatTimesOut)
 {
-  common::WorkerPool pool;
   std::promise<void> release;
-  std::future<void> released = release.get_future();
+  std::shared_future<void> released = release.get_future();
 
-  // Worker waits until it is signalled to stop, therefore
-  // timeout length doesn't matter here
-  pool.AddWork([&released] ()
+  // Declared after the objects captured by the work so that its destructor
+  // joins the workers before those objects are destroyed.
+  common::WorkerPool pool;
+
+  // The worker blocks until it is released, so the wait below always times
+  // out regardless of the timeout length.
+  pool.AddWork([released] ()
       {
         released.wait();
       });
   EXPECT_FALSE(pool.WaitForResults(std::chrono::nanoseconds(100000)));
   release.set_value();
-  EXPECT_TRUE(pool.WaitForResults());
+  EXPECT_TRUE(pool.WaitForResults(std::chrono::seconds(10)));
 }
 
 //////////////////////////////////////////////////
@@ -129,43 +130,36 @@ TEST(WorkerPool, ThingsRunInParallel)
     return;
   }
 
-  common::WorkerPool pool;
   std::promise<void> release;
   std::shared_future<void> released = release.get_future();
-  std::atomic<int> started_count{0};
-  std::atomic<int64_t> worker_1_start{0}, worker_1_end{0}, worker_2_start{0}, worker_2_end{0};
-  const auto base_time = std::chrono::steady_clock::now().time_since_epoch();
-  auto sinceBase = [base_time](const std::chrono::steady_clock::time_point &t) {
-    return std::chrono::duration_cast<std::chrono::nanoseconds>(
-        t.time_since_epoch() - base_time).count();
-  };
+  std::atomic<int> startedCount{0};
 
-  // Worker waits until signal
-  auto work = [&](std::atomic<int64_t> &start_time, std::atomic<int64_t> &end_time) {
-    start_time = sinceBase(std::chrono::steady_clock::now());
-    ++started_count;
-    released.wait();
-    end_time = sinceBase(std::chrono::steady_clock::now());
-  };
+  // Declared after the objects captured by the work so that its destructor
+  // joins the workers before those objects are destroyed.
+  common::WorkerPool pool;
 
-  pool.AddWork([&] { work(worker_1_start, worker_1_end); });
-  pool.AddWork([&] { work(worker_2_start, worker_2_end); });
+  // Each worker blocks until released, so both can only have started if the
+  // pool runs them in parallel.
+  auto work = [&startedCount, released] ()
+    {
+      ++startedCount;
+      released.wait();
+    };
+  pool.AddWork(work);
+  pool.AddWork(work);
 
-  // Wait until both workers are running, then let them finish
-  const unsigned int deadline_seconds = 10;
-  const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(deadline_seconds);
-  while (started_count.load() < 2 && std::chrono::steady_clock::now() < deadline)
+  const auto timeout = std::chrono::seconds(10);
+  const auto deadline = std::chrono::steady_clock::now() + timeout;
+  while (startedCount.load() < 2 && std::chrono::steady_clock::now() < deadline)
     std::this_thread::yield();
 
-  const bool bothStarted = started_count.load() == 2;
+  const bool bothStarted = startedCount.load() == 2;
+
+  // Release the workers before any assertion, otherwise a failure would
+  // leave them blocked forever.
   release.set_value();
-
-  EXPECT_TRUE(pool.WaitForResults(std::chrono::seconds(10)));
-  ASSERT_TRUE(bothStarted)
-    << "pool did not dispatch both work items before the deadline ("
-    << deadline_seconds << " seconds)";
-
-  const int64_t overlapStart = std::max(worker_1_start.load(), worker_2_start.load());
-  const int64_t overlapEnd   = std::min(worker_1_end.load(), worker_2_end.load());
-  EXPECT_LT(overlapStart, overlapEnd);
+  EXPECT_TRUE(pool.WaitForResults(timeout));
+  EXPECT_TRUE(bothStarted)
+    << "pool did not run both work items in parallel within "
+    << timeout.count() << " seconds";
 }

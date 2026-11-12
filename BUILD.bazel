@@ -93,10 +93,7 @@ test_sources = glob(
     ],
 )
 
-flaky_test_srcs = [
-    # https://github.com/gazebosim/gz-common/issues/53
-    "src/WorkerPool_TEST.cc",
-]
+flaky_test_srcs = []
 
 [cc_test(
     name = src.replace("/", "_").replace(".cc", "").replace("src_", ""),
