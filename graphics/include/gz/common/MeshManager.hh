@@ -17,11 +17,12 @@
 #ifndef GZ_COMMON_MESHMANAGER_HH_
 #define GZ_COMMON_MESHMANAGER_HH_
 
+#include <cstddef>
 #include <map>
-#include <utility>
-#include <string>
-#include <vector>
 #include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <gz/math/Plane.hh>
 #include <gz/math/Matrix3.hh>

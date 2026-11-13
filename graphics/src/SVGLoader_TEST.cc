@@ -17,6 +17,13 @@
 
 #include <gtest/gtest.h>
 
+#include <cmath>
+#include <fstream>
+#include <iostream>
+#include <ostream>
+#include <string>
+#include <vector>
+
 #include "gz/common/SVGLoader.hh"
 
 #include "gz/common/testing/AutoLogFixture.hh"

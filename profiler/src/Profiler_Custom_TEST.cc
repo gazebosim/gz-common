@@ -18,8 +18,10 @@
 #include "gz/common/Profiler.hh" // NOLINT(*)
 #include <gtest/gtest.h> // NOLINT(*)
 
-#include <atomic> // NOLINT(*)
-#include <thread> // NOLINT(*)
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <utility>
 #include "gz/common/Console.hh"
 #include "gz/common/ProfilerImpl.hh"
 #include "gz/common/Util.hh" // NOLINT(*)

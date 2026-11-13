@@ -15,8 +15,14 @@
  *
  */
 
-#include <string>
 #include <algorithm>
+#include <cstddef>
+#include <cstring>
+#include <memory>
+#include <ostream>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "gz/math/Helpers.hh"
 

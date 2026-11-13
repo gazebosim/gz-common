@@ -16,6 +16,7 @@
 */
 
 #include <filesystem>
+#include <string>
 
 #include "gz/common/Filesystem.hh"
 

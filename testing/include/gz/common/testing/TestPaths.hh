@@ -17,6 +17,7 @@
 #ifndef GZ_COMMON_TESTING_TESTPATHS_HH_
 #define GZ_COMMON_TESTING_TESTPATHS_HH_
 
+#include <cassert>
 #include <memory>
 #include <string>
 

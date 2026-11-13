@@ -14,6 +14,12 @@
  * limitations under the License.
  *
 */
+
+#include <cerrno>
+#include <cstdint>
+#include <ostream>
+#include <string>
+
 #include "gz/common/config.hh"
 #include "gz/common/Console.hh"
 #include "gz/common/ffmpeg_inc.hh"

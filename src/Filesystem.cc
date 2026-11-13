@@ -15,15 +15,12 @@
  *
 */
 
-#include <array>
 #include <algorithm>
-#include <sstream>
-#include <filesystem>
-#include <fstream>
 #include <cstdlib>
 #include <cstring>
-#include <cctype>
-#include <regex>
+#include <filesystem>
+#include <string>
+#include <system_error>
 
 #include <gz/common/config.hh>
 #include <gz/common/SystemPaths.hh>

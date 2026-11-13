@@ -18,6 +18,8 @@
 #include <gtest/gtest.h>
 
 #include <atomic>
+#include <chrono>
+#include <ostream>
 #include <thread>
 
 #include "gz/common/Console.hh"

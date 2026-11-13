@@ -15,6 +15,7 @@
 */
 #include <gtest/gtest.h>
 #include <array>
+#include <chrono>
 #include "gz/common/VideoEncoder.hh"
 #include "gz/common/Video.hh"
 

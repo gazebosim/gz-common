@@ -17,6 +17,9 @@
 #ifndef GZ_COMMON_VIDEO_HH_
 #define GZ_COMMON_VIDEO_HH_
 
+#include <chrono>
+#include <cstdint>
+#include <ratio>
 #include <string>
 
 #include <gz/common/av/Export.hh>

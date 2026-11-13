@@ -16,6 +16,8 @@
 */
 #include <gtest/gtest.h>
 
+#include <ostream>
+
 #include <gz/common/Console.hh>
 #include <gz/common/testing/AutoLogFixture.hh>
 

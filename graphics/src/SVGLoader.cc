@@ -16,10 +16,15 @@
  */
 
 #include <algorithm>
-#include <list>
-#include <utility>
-#include <cmath>
 #include <cctype>
+#include <cmath>
+#include <cstddef>
+#include <cstdlib>
+#include <list>
+#include <ostream>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "tinyxml2.h"
 

@@ -17,6 +17,7 @@
 #ifndef GZ_COMMON_ANIMATION_HH_
 #define GZ_COMMON_ANIMATION_HH_
 
+#include <chrono>
 #include <map>
 #include <string>
 #include <vector>

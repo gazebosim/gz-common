@@ -14,7 +14,12 @@
 * limitations under the License.
 *
 */
+
 #include "gz/common/testing/TestPaths.hh"
+
+#include <memory>
+#include <string>
+
 #include "gz/common/testing/BazelTestPaths.hh"
 #include "gz/common/testing/CMakeTestPaths.hh"
 

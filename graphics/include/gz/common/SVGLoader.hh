@@ -18,6 +18,7 @@
 #define GZ_COMMON_SVGLOADER_HH_
 
 #include <memory>
+#include <ostream>
 #include <string>
 #include <vector>
 

@@ -17,6 +17,8 @@
 
 #include "gz/common/testing/CMakeTestPaths.hh"
 
+#include <string>
+
 namespace gz::common::testing
 {
 

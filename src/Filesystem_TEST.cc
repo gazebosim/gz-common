@@ -26,8 +26,15 @@
 
 #include <gz/common/testing/Utils.hh>
 
+#include <cstdio>
+#include <exception>
 #include <filesystem>
 #include <fstream>
+#include <iterator>
+#include <memory>
+#include <ostream>
+#include <set>
+#include <string>
 
 // The symlink tests should always work on UNIX systems
 #ifndef _WIN32

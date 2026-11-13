@@ -15,6 +15,7 @@
  *
  */
 #include <algorithm>
+#include <ostream>
 // Compile STB with internal linkage to avoid duplicated symbols errors
 // when building targets that statically link both stb and gz-common
 #define STB_IMAGE_STATIC

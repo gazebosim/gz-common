@@ -17,6 +17,12 @@
 
 #include <gtest/gtest.h>
 
+#include <cstddef>
+#include <memory>
+#include <set>
+#include <string>
+#include <vector>
+
 #include "gz/common/Material.hh"
 #include "gz/common/Mesh.hh"
 #include "gz/common/Skeleton.hh"

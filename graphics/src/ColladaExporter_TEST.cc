@@ -15,6 +15,14 @@
  *
 */
 #include <gtest/gtest.h>
+
+#include <cstdio>
+#include <ios>
+#include <memory>
+#include <sstream>
+#include <string>
+#include <vector>
+
 #include "tinyxml2.h"
 
 #include "gz/common/ColladaLoader.hh"

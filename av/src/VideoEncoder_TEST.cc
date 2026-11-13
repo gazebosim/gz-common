@@ -15,6 +15,8 @@
 */
 #include <gtest/gtest.h>
 
+#include <memory>
+
 #include "gz/common/Console.hh"
 #include "gz/common/VideoEncoder.hh"
 

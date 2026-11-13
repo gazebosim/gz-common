@@ -17,7 +17,9 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
-#include <memory>
+#include <cstdint>
+#include <cwctype>
+#include <string>
 
 #include "gz/math/Helpers.hh"
 #include "gz/common/Console.hh"
@@ -382,5 +384,3 @@ bool STLLoader::ShortIntRead(FILE *_filein, uint16_t &_value)
 
   return true;
 }
-
-

@@ -16,8 +16,11 @@
  */
 
 #include <algorithm>
-#include <limits>
+#include <cmath>
+#include <cstdlib>
 #include <map>
+#include <optional>
+#include <ostream>
 #include <string>
 #include <vector>
 
@@ -841,4 +844,3 @@ NodeAssignment::NodeAssignment()
   : vertexIndex(0), nodeIndex(0), weight(0.0)
 {
 }
-
