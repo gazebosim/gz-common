@@ -18,11 +18,12 @@
 #include <gtest/gtest.h>
 
 #include <atomic>
+#include <chrono>
+#include <future>
 #include <thread>
 
 #include "gz/common/Console.hh"
 #include "gz/common/WorkerPool.hh"
-#include "gz/utils/ExtraTestMacros.hh"
 
 using namespace gz;
 
@@ -97,24 +98,28 @@ TEST(WorkerPool, WaitWithTimeout)
 }
 
 //////////////////////////////////////////////////
-// /TODO(anyone) Deflake this test
-// ref: https://github.com/gazebosim/gz-common/issues/52
-TEST(WorkerPool,
-     GZ_UTILS_TEST_ENABLED_ONLY_ON_LINUX(WaitWithTimeoutThatTimesOut))
+TEST(WorkerPool, WaitWithTimeoutThatTimesOut)
 {
+  std::promise<void> release;
+  std::shared_future<void> released = release.get_future();
+
+  // Declared after the objects captured by the work so that its destructor
+  // joins the workers before those objects are destroyed.
   common::WorkerPool pool;
-  pool.AddWork([] ()
+
+  // The worker blocks until it is released, so the wait below always times
+  // out regardless of the timeout length.
+  pool.AddWork([released] ()
       {
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        released.wait();
       });
   EXPECT_FALSE(pool.WaitForResults(std::chrono::nanoseconds(100000)));
+  release.set_value();
+  EXPECT_TRUE(pool.WaitForResults(std::chrono::seconds(10)));
 }
 
 //////////////////////////////////////////////////
-// /TODO(anyone) Deflake this test
-// ref: https://github.com/gazebosim/gz-common/issues/53
-TEST(WorkerPool,
-     GZ_UTILS_TEST_ENABLED_ONLY_ON_LINUX(ThingsRunInParallel))
+TEST(WorkerPool, ThingsRunInParallel)
 {
   const unsigned int hc = std::thread::hardware_concurrency();
   if (2 > hc)
@@ -125,24 +130,36 @@ TEST(WorkerPool,
     return;
   }
 
+  std::promise<void> release;
+  std::shared_future<void> released = release.get_future();
+  std::atomic<int> startedCount{0};
+
+  // Declared after the objects captured by the work so that its destructor
+  // joins the workers before those objects are destroyed.
   common::WorkerPool pool;
-  std::atomic<int> sentinel(0);
-  pool.AddWork([&sentinel] ()
-      {
-        ++sentinel;
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
-      });
-  pool.AddWork([&sentinel] ()
-      {
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
-        ++sentinel;
-      });
-  bool result = pool.WaitForResults(std::chrono::milliseconds(9));
-  // the timing test is flaky on windows and mac
-  EXPECT_TRUE(result);
-  if (!result)
-  {
-    gzdbg << "WaitForResults failed" << std::endl;
-  }
-  EXPECT_EQ(2, sentinel);
+
+  // Each worker blocks until released, so both can only have started if the
+  // pool runs them in parallel.
+  auto work = [&startedCount, released] ()
+    {
+      ++startedCount;
+      released.wait();
+    };
+  pool.AddWork(work);
+  pool.AddWork(work);
+
+  const auto timeout = std::chrono::seconds(10);
+  const auto deadline = std::chrono::steady_clock::now() + timeout;
+  while (startedCount.load() < 2 && std::chrono::steady_clock::now() < deadline)
+    std::this_thread::yield();
+
+  const bool bothStarted = startedCount.load() == 2;
+
+  // Release the workers before any assertion, otherwise a failure would
+  // leave them blocked forever.
+  release.set_value();
+  EXPECT_TRUE(pool.WaitForResults(timeout));
+  EXPECT_TRUE(bothStarted)
+    << "pool did not run both work items in parallel within "
+    << timeout.count() << " seconds";
 }
