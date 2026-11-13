@@ -17,6 +17,10 @@
 
 #include <gtest/gtest.h>
 
+#include <atomic>
+#include <string>
+#include <thread>
+
 #include "gz/common/Material.hh"
 #include "gz/common/Mesh.hh"
 #include "gz/common/Skeleton.hh"
@@ -309,6 +313,44 @@ TEST_F(MeshManager, CreateExtrudedPolylineInvalid)
 
   // check mesh does not exist due to extrusion failure
   EXPECT_TRUE(!common::MeshManager::Instance()->HasMesh(meshName));
+}
+
+/////////////////////////////////////////////////
+TEST_F(MeshManager, ConcurrentAccess)
+{
+  auto *mgr = common::MeshManager::Instance();
+  constexpr int kMeshes{30000};
+  const auto meshName = [](int _i)
+  {
+    return "concurrent_mesh_" + std::to_string(_i);
+  };
+
+  // Looking up meshes while another thread adds them, which is what happens
+  // when rendering and physics load the meshes of a model.
+  std::atomic<bool> done{false};
+  std::thread reader([&]()
+  {
+    int i{0};
+    while (!done)
+    {
+      i = (i + 37) % kMeshes;
+      const auto name = meshName(i);
+      mgr->HasMesh(name);
+      mgr->MeshByName(name);
+    }
+  });
+
+  for (int i = 0; i < kMeshes; ++i)
+    EXPECT_NE(nullptr, mgr->CreateMesh(meshName(i)));
+
+  done = true;
+  reader.join();
+
+  for (int i = 0; i < kMeshes; ++i)
+  {
+    EXPECT_TRUE(mgr->HasMesh(meshName(i)));
+    EXPECT_TRUE(mgr->RemoveMesh(meshName(i)));
+  }
 }
 
 /////////////////////////////////////////////////
