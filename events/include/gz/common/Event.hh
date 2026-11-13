@@ -24,6 +24,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <type_traits>
 #include <utility>
 
 #include <gz/common/config.hh>

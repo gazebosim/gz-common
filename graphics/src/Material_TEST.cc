@@ -16,6 +16,9 @@
 
 #include <gtest/gtest.h>
 
+#include <memory>
+#include <string>
+
 #include "gz/common/Image.hh"
 #include "gz/common/Material.hh"
 #include "gz/common/Pbr.hh"

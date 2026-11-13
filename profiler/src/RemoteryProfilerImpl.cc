@@ -15,6 +15,10 @@
  *
  */
 
+#include <cstdint>
+#include <ostream>
+#include <string>
+
 #include "gz/common/config.hh"
 #include <gz/common/profiler/Export.hh>
 

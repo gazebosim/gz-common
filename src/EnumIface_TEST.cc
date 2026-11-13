@@ -17,6 +17,8 @@
 
 #include <gtest/gtest.h>
 
+#include <string>
+
 #include "gz/common/EnumIface.hh"
 
 #include "gz/common/testing/AutoLogFixture.hh"

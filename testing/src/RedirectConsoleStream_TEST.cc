@@ -16,6 +16,10 @@
 */
 #include <gtest/gtest.h>
 
+#include <iostream>
+#include <ostream>
+#include <string>
+
 #include "gz/common/Console.hh"
 #include "gz/common/testing/RedirectConsoleStream.hh"
 #include "gz/common/testing/TestPaths.hh"

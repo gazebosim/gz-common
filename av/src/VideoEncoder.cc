@@ -17,7 +17,14 @@
 
 #include <stdio.h>
 
+#include <cerrno>
+#include <chrono>
+#include <cstdint>
+#include <memory>
 #include <mutex>
+#include <optional>
+#include <ostream>
+#include <string>
 
 #include <gz/common/av/Util.hh>
 #include "gz/common/ffmpeg_inc.hh"

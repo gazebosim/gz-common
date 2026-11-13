@@ -31,6 +31,7 @@
 #include <gz/common/FlagSet.hh>
 
 #include <cstdint>
+#include <functional>
 #include <unordered_set>
 
 #include "gtest/gtest.h"

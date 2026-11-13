@@ -14,7 +14,11 @@
  * limitations under the License.
  *
 */
+
 #include "gz/common/KeyEvent.hh"
+
+#include <string>
+#include <utility>
 
 using namespace gz;
 using namespace common;

@@ -19,16 +19,22 @@
 #include <sys/sendfile.h>
 #endif
 
-#include <array>
 #include <algorithm>
+#include <array>
+#include <cctype>
+#include <cerrno>
+#include <chrono>
 #include <cstdlib>
 #include <cstring>
-#include <cctype>
-#include <fstream>
+#include <ctime>
 #include <functional>
 #include <iomanip>
+#include <ios>
 #include <locale>
+#include <ostream>
 #include <sstream>
+#include <string>
+#include <vector>
 
 #include <gz/common/config.hh>
 #include <gz/common/Console.hh>
@@ -41,7 +47,6 @@
 #ifndef _WIN32
 #include <dirent.h>
 #include <limits.h>
-#include <climits>
 #else
 #include <io.h>
 #include "win_dirent.h"

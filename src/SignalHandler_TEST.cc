@@ -20,6 +20,9 @@
 #include "gz/common/SignalHandler.hh" // NOLINT(*)
 #include <gtest/gtest.h> // NOLINT(*)
 #include <chrono>
+#include <functional>
+#include <utility>
+#include <vector>
 #include <csignal> // NOLINT(*)
 #include <condition_variable> // NOLINT(*)
 #include <map> // NOLINT(*)

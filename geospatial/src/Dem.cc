@@ -15,7 +15,13 @@
  *
 */
 #include <algorithm>
+#include <cassert>
+#include <cmath>
+#include <cstdint>
 #include <limits>
+#include <ostream>
+#include <string>
+#include <vector>
 
 #include <gdal_priv.h>
 #include <ogr_spatialref.h>

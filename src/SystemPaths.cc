@@ -17,11 +17,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <algorithm>
-#include <cctype>
-#include <cstring>
 #include <functional>
 #include <list>
-#include <locale>
+#include <ostream>
 #include <string>
 #include <vector>
 

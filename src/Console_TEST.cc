@@ -18,6 +18,13 @@
 #include <gtest/gtest.h>
 #include <stdlib.h>
 
+#include <fstream>
+#include <ios>
+#include <memory>
+#include <ostream>
+#include <sstream>
+#include <string>
+
 #include "gz/common/Console.hh"
 #include "gz/common/Filesystem.hh"
 #include "gz/common/TempDirectory.hh"

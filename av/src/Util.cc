@@ -15,6 +15,9 @@
  *
 */
 
+#include <cstdarg>
+#include <cstdio>
+#include <ostream>
 #include <string>
 
 #include <gz/common/Console.hh>

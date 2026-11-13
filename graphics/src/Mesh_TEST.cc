@@ -17,6 +17,8 @@
 
 #include <gtest/gtest.h>
 
+#include <memory>
+
 #include "gz/common/Material.hh"
 #include "gz/common/Mesh.hh"
 #include "gz/common/MeshManager.hh"

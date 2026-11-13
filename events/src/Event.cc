@@ -15,6 +15,8 @@
  *
  */
 
+#include <chrono>
+
 #include "gz/common/Console.hh"
 #include "gz/common/Event.hh"
 #include "gz/common/Util.hh"

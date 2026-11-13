@@ -15,6 +15,13 @@
 *
 */
 
+#include <cerrno>
+#include <cstdint>
+#include <cstdlib>
+#include <cstring>
+#include <ostream>
+#include <string>
+
 #include <gz/common/av/Util.hh>
 #include <gz/common/ffmpeg_inc.hh>
 #include <gz/common/AudioDecoder.hh>

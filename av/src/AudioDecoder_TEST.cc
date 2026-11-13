@@ -16,6 +16,10 @@
 */
 #include <gtest/gtest.h>
 
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
+
 #include <gz/common/AudioDecoder.hh>
 #include <gz/utils/ExtraTestMacros.hh>
 #include <gz/common/testing/TestPaths.hh>

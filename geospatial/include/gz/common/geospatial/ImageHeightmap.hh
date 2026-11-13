@@ -17,6 +17,7 @@
 #ifndef GZ_COMMON_GEOSPATIAL_IMAGEHEIGHTMAPDATA_HH_
 #define GZ_COMMON_GEOSPATIAL_IMAGEHEIGHTMAPDATA_HH_
 
+#include <cmath>
 #include <limits>
 #include <string>
 #include <vector>

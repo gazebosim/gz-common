@@ -20,6 +20,8 @@
 #include "gz/common/testing/AutoLogFixture.hh"
 
 #include <functional>
+#include <memory>
+#include <string>
 #include <gz/common/Event.hh>
 #include <gz/common/Util.hh>
 using namespace gz;

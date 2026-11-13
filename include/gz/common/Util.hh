@@ -19,9 +19,14 @@
 
 #include <cassert>
 #include <chrono>
+#include <cstddef>
+#include <cstdint>
+#include <functional>
 #include <future>
 #include <memory>
+#include <stdexcept>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <vector>
 

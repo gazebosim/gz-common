@@ -16,13 +16,12 @@
 */
 
 #include <algorithm>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <mutex>
 #include <sstream>
+#include <string>
 #include <vector>
 
 #include <gz/common/testing/RedirectConsoleStream.hh>

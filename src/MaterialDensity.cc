@@ -16,6 +16,9 @@
 */
 #include <cmath>
 #include <limits>
+#include <map>
+#include <string>
+#include <tuple>
 #include "gz/common/EnumIface.hh"
 #include "gz/common/MaterialDensity.hh"
 

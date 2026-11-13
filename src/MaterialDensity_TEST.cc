@@ -16,6 +16,8 @@
 */
 #include <gtest/gtest.h>
 
+#include <tuple>
+
 #include "gz/common/MaterialDensity.hh"
 #include "gz/common/testing/AutoLogFixture.hh"
 

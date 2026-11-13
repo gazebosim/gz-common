@@ -41,8 +41,9 @@
 */
 #include "gz/common/Base64.hh"
 #include <algorithm>
+#include <cctype>
 #include <cstring>
-#include <iostream>
+#include <string>
 
 using namespace gz;
 using namespace common;

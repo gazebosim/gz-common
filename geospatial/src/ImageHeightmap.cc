@@ -14,6 +14,12 @@
  * limitations under the License.
  *
  */
+
+#include <cstdint>
+#include <ostream>
+#include <string>
+#include <vector>
+
 #include "gz/common/Console.hh"
 #include "gz/common/geospatial/ImageHeightmap.hh"
 #include "gz/common/Util.hh"

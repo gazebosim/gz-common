@@ -31,9 +31,13 @@
 // Licence: MIT
 
 #include <bitset>
-#include <iostream>
 #include <cassert>
+#include <cstddef>
+#include <functional>
+#include <initializer_list>
+#include <iostream>
 #include <string>
+#include <type_traits>
 
 namespace gz::common
 {

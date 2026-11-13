@@ -17,6 +17,8 @@
 
 #include <gtest/gtest.h>
 
+#include <chrono>
+#include <ostream>
 #include <thread>
 
 #include <gz/common/Console.hh>

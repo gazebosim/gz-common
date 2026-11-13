@@ -15,7 +15,15 @@
  *
 */
 #include <algorithm>
+#include <chrono>
+#include <cmath>
+#include <cstddef>
+#include <iterator>
+#include <map>
 #include <memory>
+#include <sstream>
+#include <string>
+#include <vector>
 
 #include <gz/math/Spline.hh>
 #include <gz/math/Vector2.hh>

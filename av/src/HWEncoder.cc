@@ -17,8 +17,14 @@
  * https://stackoverflow.com/questions/59666753
 */
 
+#include <cerrno>
+#include <cstdio>
 #include <map>
+#include <optional>
+#include <ostream>
+#include <string>
 #include <utility>
+#include <vector>
 
 #include "gz/common/ffmpeg_inc.hh"
 #include "gz/common/HWEncoder.hh"

@@ -17,6 +17,7 @@
 
 #include <gtest/gtest.h>
 #include <memory>
+#include <vector>
 
 #include "gz/common/DelaunayTriangulation.hh"
 #include "gz/common/Mesh.hh"

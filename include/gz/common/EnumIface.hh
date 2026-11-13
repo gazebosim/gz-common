@@ -17,10 +17,11 @@
 #ifndef GZ_COMMON_ENUMITERATOR_HH_
 #define GZ_COMMON_ENUMITERATOR_HH_
 
+#include <algorithm>
+#include <cstddef>
 #include <iterator>
 #include <string>
 #include <vector>
-#include <algorithm>
 
 #include <gz/common/Export.hh>
 #include <gz/common/Util.hh>
