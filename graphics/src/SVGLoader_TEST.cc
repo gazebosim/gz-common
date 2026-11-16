@@ -347,7 +347,7 @@ TEST_F(SVGLoaderTest, MultipleFiles)
   // save the html for inspection
   std::vector<std::string> files;
   files.push_back("issue_1489_5.svg");
-  for (auto file : files)
+  for (const auto &file : files)
   {
     // this tests the skewY and skewX transforms
     SVGLoader loader(3);

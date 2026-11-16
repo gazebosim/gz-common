@@ -67,7 +67,6 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
     imgFormat == common::Image::PixelFormatType::BAYER_BGGR8 ||
     imgFormat == common::Image::PixelFormatType::BAYER_GBRG8 ||
     imgFormat == common::Image::PixelFormatType::BAYER_GRBG8 ||
-    imgFormat == common::Image::PixelFormatType::BAYER_GRBG8 ||
     imgFormat == common::Image::PixelFormatType::BAYER_RGGB8 ||
     imgFormat == common::Image::PixelFormatType::BGR_INT8 ||
     imgFormat == common::Image::PixelFormatType::BGRA_INT8)
