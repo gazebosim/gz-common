@@ -1,5 +1,28 @@
 ## Gazebo Common 6.x
 
+### Gazebo Common 6.4.1 (2026-11-18)
+
+1. update codeowners (#963)
+    * [Pull request #963) (#965](https://github.com/gazebosim/gz-common/pull/963) (#965)
+
+1. Use the SPDX identifier Apache-2.0 in the license declaration
+    * [Pull request #943](https://github.com/gazebosim/gz-common/pull/943)
+
+1. Update BCR maintainers
+    * [Pull request #931](https://github.com/gazebosim/gz-common/pull/931)
+
+1. Switch to homebrew/actions@main in macOS github actions
+    * [Pull request #934](https://github.com/gazebosim/gz-common/pull/934)
+
+1. Change Bazel to use Clang for layering checks (backport #921)
+    * [Pull request #921) (#922](https://github.com/gazebosim/gz-common/pull/921) (#922)
+
+1. Annotate WorkerPool_TEST as flaky in bazel (#924)
+    * [Pull request #924) (#926](https://github.com/gazebosim/gz-common/pull/924) (#926)
+
+1. Fix differing MaterialCount for STL files in AssimpLoader (#863)
+    * [Pull request #863) (#881](https://github.com/gazebosim/gz-common/pull/863) (#881)
+
 ### Gazebo Common 6.4.0 (2026-08-24)
 
 1. COLLADA loader updates:
