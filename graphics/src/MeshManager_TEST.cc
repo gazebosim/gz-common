@@ -385,6 +385,347 @@ TEST_P(MeshManagerLoad, ConvexDecomposition)
 }
 
 /////////////////////////////////////////////////
+TEST_P(MeshManagerLoad, IsConvex)
+{
+  auto *mgr = common::MeshManager::Instance();
+
+  // A box is convex
+  const common::Mesh *boxMesh = mgr->Load(
+      common::testing::TestFile("data", "box.dae"));
+  ASSERT_NE(nullptr, boxMesh);
+  ASSERT_EQ(1u, boxMesh->SubMeshCount());
+  auto boxSubmesh = boxMesh->SubMeshByIndex(0u).lock();
+  ASSERT_NE(nullptr, boxSubmesh);
+  EXPECT_TRUE(common::MeshManager::IsConvex(*boxSubmesh));
+  // Mesh vertices have single precision
+  EXPECT_TRUE(common::MeshManager::IsConvex(*boxSubmesh, 1e-6));
+  EXPECT_TRUE(common::MeshManager::IsConvex(*boxMesh));
+
+  // A drill is not convex
+  const common::Mesh *drillMesh = mgr->Load(
+      common::testing::TestFile("data", "cordless_drill",
+      "meshes", "cordless_drill.dae"));
+  ASSERT_NE(nullptr, drillMesh);
+  ASSERT_EQ(1u, drillMesh->SubMeshCount());
+  auto drillSubmesh = drillMesh->SubMeshByIndex(0u).lock();
+  ASSERT_NE(nullptr, drillSubmesh);
+  EXPECT_FALSE(common::MeshManager::IsConvex(*drillSubmesh));
+  EXPECT_FALSE(common::MeshManager::IsConvex(*drillMesh));
+  // Unless the tolerance is absurdly large
+  EXPECT_TRUE(common::MeshManager::IsConvex(*drillSubmesh, 1.0));
+
+  // A box with a vertex pushed slightly inwards is convex within tolerance
+  common::SubMesh dentedBox(*boxSubmesh);
+  math::Vector3d extent = dentedBox.Max() - dentedBox.Min();
+  math::Vector3d dented = dentedBox.Vertex(0u);
+  dented -= (dented - dentedBox.Min() - extent / 2.0) * 1e-4;
+  dentedBox.SetVertex(0u, dented);
+  EXPECT_TRUE(common::MeshManager::IsConvex(dentedBox));
+  EXPECT_FALSE(common::MeshManager::IsConvex(dentedBox, 1e-6));
+
+  // Too few points to form a hull
+  common::SubMesh triangle;
+  triangle.AddVertex(0, 0, 0);
+  triangle.AddVertex(1, 0, 0);
+  triangle.AddVertex(0, 1, 0);
+  EXPECT_FALSE(common::MeshManager::IsConvex(triangle));
+}
+
+/////////////////////////////////////////////////
+TEST_F(MeshManager, IsConvexSubMesh)
+{
+  auto *mgr = common::MeshManager::Instance();
+  mgr->CreateBox("box", math::Vector3d(1, 1, 1), math::Vector2d(1, 1));
+  const common::Mesh *box = mgr->MeshByName("box");
+  ASSERT_NE(nullptr, box);
+  ASSERT_EQ(1u, box->SubMeshCount());
+  auto boxSubmesh = box->SubMeshByIndex(0u).lock();
+  ASSERT_NE(nullptr, boxSubmesh);
+
+  // Two unit boxes forming an L shape: each submesh is convex but the mesh
+  // is not
+  common::Mesh *lShape = mgr->CreateMesh("l_shape");
+  ASSERT_NE(nullptr, lShape);
+  common::SubMesh submeshA(*boxSubmesh);
+  submeshA.SetName("a");
+  common::SubMesh submeshB(*boxSubmesh);
+  submeshB.SetName("b");
+  submeshB.Translate(math::Vector3d(1, 1, 0));
+  lShape->AddSubMesh(submeshA);
+  lShape->AddSubMesh(submeshB);
+
+  EXPECT_FALSE(common::MeshManager::IsConvex(*lShape));
+  EXPECT_FALSE(common::MeshManager::IsConvex(*lShape, ""));
+  EXPECT_TRUE(common::MeshManager::IsConvex(*lShape, "a"));
+  EXPECT_TRUE(common::MeshManager::IsConvex(*lShape, "b"));
+  EXPECT_FALSE(common::MeshManager::IsConvex(*lShape, "does_not_exist"));
+
+  // Two unit boxes side by side: the union of their volumes is convex, but
+  // the faces where the boxes touch are inside the convex hull, so the mesh
+  // is not considered convex. Each submesh is.
+  common::Mesh *twoBoxes = mgr->CreateMesh("two_boxes");
+  ASSERT_NE(nullptr, twoBoxes);
+  submeshB.Translate(math::Vector3d(0, -1, 0));
+  twoBoxes->AddSubMesh(submeshA);
+  twoBoxes->AddSubMesh(submeshB);
+  EXPECT_FALSE(common::MeshManager::IsConvex(*twoBoxes));
+  EXPECT_TRUE(common::MeshManager::IsConvex(*twoBoxes, "a"));
+  EXPECT_TRUE(common::MeshManager::IsConvex(*twoBoxes, "b"));
+
+  // A single box made of two submeshes, each with half of the faces, is
+  // convex
+  common::Mesh *splitBox = mgr->CreateMesh("split_box");
+  ASSERT_NE(nullptr, splitBox);
+  common::SubMesh halfA("half_a");
+  common::SubMesh halfB("half_b");
+  for (unsigned int i = 0; i < boxSubmesh->VertexCount(); ++i)
+  {
+    halfA.AddVertex(boxSubmesh->Vertex(i));
+    halfB.AddVertex(boxSubmesh->Vertex(i));
+  }
+  const unsigned int halfIndexCount = boxSubmesh->IndexCount() / 2u;
+  for (unsigned int i = 0; i < boxSubmesh->IndexCount(); ++i)
+  {
+    if (i < halfIndexCount)
+      halfA.AddIndex(boxSubmesh->Index(i));
+    else
+      halfB.AddIndex(boxSubmesh->Index(i));
+  }
+  splitBox->AddSubMesh(halfA);
+  splitBox->AddSubMesh(halfB);
+  EXPECT_TRUE(common::MeshManager::IsConvex(*splitBox));
+  EXPECT_TRUE(common::MeshManager::IsConvex(*splitBox, "half_a"));
+  EXPECT_TRUE(common::MeshManager::IsConvex(*splitBox, "half_b"));
+}
+
+/////////////////////////////////////////////////
+TEST_P(MeshManagerLoad, ConvexDecompositionCached)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *boxMesh = mgr->Load(
+      common::testing::TestFile("data", "box.dae"));
+  ASSERT_NE(nullptr, boxMesh);
+  const common::Mesh *drillMesh = mgr->Load(
+      common::testing::TestFile("data", "cordless_drill",
+      "meshes", "cordless_drill.dae"));
+  ASSERT_NE(nullptr, drillMesh);
+
+  common::ConvexDecompositionDescriptor desc;
+  desc.mesh = boxMesh;
+  desc.maxConvexHulls = 4u;
+  desc.voxelResolution = 1000u;
+
+  const common::Mesh *decomposed = mgr->ConvexDecomposition(desc);
+  ASSERT_NE(nullptr, decomposed);
+  EXPECT_NE(boxMesh, decomposed);
+
+  // The decomposed mesh is owned by the mesh manager
+  EXPECT_FALSE(decomposed->Name().empty());
+  EXPECT_TRUE(mgr->HasMesh(decomposed->Name()));
+  EXPECT_EQ(decomposed, mgr->MeshByName(decomposed->Name()));
+
+  // Decomposing a box should just produce a box
+  ASSERT_EQ(1u, decomposed->SubMeshCount());
+  auto boxSubmesh = decomposed->SubMeshByIndex(0u).lock();
+  ASSERT_NE(nullptr, boxSubmesh);
+  EXPECT_EQ(8u, boxSubmesh->VertexCount());
+  EXPECT_EQ(8u, boxSubmesh->NormalCount());
+  EXPECT_EQ(36u, boxSubmesh->IndexCount());
+
+  // Decomposing again with the same parameters returns the cached mesh
+  EXPECT_EQ(decomposed, mgr->ConvexDecomposition(desc));
+
+  // Different parameters produce a different mesh
+  desc.maxConvexHulls = 1u;
+  const common::Mesh *hull = mgr->ConvexDecomposition(desc);
+  ASSERT_NE(nullptr, hull);
+  EXPECT_NE(decomposed, hull);
+  EXPECT_NE(decomposed->Name(), hull->Name());
+  EXPECT_EQ(1u, hull->SubMeshCount());
+  EXPECT_EQ(hull, mgr->ConvexDecomposition(desc));
+
+  desc.voxelResolution = 2000u;
+  const common::Mesh *hullHighRes = mgr->ConvexDecomposition(desc);
+  ASSERT_NE(nullptr, hullHighRes);
+  EXPECT_NE(hull, hullHighRes);
+  EXPECT_NE(hull->Name(), hullHighRes->Name());
+
+  // A drill is decomposed into multiple hulls
+  desc.mesh = drillMesh;
+  desc.maxConvexHulls = 4u;
+  const common::Mesh *drill = mgr->ConvexDecomposition(desc);
+  ASSERT_NE(nullptr, drill);
+  EXPECT_LT(1u, drill->SubMeshCount());
+  EXPECT_GE(desc.maxConvexHulls, drill->SubMeshCount());
+  for (unsigned int i = 0; i < drill->SubMeshCount(); ++i)
+  {
+    auto submesh = drill->SubMeshByIndex(i).lock();
+    ASSERT_NE(nullptr, submesh);
+    EXPECT_LT(3u, submesh->VertexCount());
+    EXPECT_EQ(submesh->VertexCount(), submesh->NormalCount());
+    EXPECT_LT(3u, submesh->IndexCount());
+  }
+  EXPECT_EQ(drill, mgr->ConvexDecomposition(desc));
+
+  // A null mesh can not be decomposed
+  desc.mesh = nullptr;
+  EXPECT_EQ(nullptr, mgr->ConvexDecomposition(desc));
+
+  // A submesh that does not exist can not be decomposed
+  desc.mesh = boxMesh;
+  desc.submesh = "does_not_exist";
+  EXPECT_EQ(nullptr, mgr->ConvexDecomposition(desc));
+}
+
+/////////////////////////////////////////////////
+TEST_P(MeshManagerLoad, ConvexDecompositionAssumeConvex)
+{
+  auto *mgr = common::MeshManager::Instance();
+  const common::Mesh *boxMesh = mgr->Load(
+      common::testing::TestFile("data", "box.dae"));
+  ASSERT_NE(nullptr, boxMesh);
+  const common::Mesh *drillMesh = mgr->Load(
+      common::testing::TestFile("data", "cordless_drill",
+      "meshes", "cordless_drill.dae"));
+  ASSERT_NE(nullptr, drillMesh);
+
+  common::ConvexDecompositionDescriptor desc;
+  desc.mesh = boxMesh;
+  desc.assumeConvex = true;
+
+  // The convex hull of a box is a box
+  const common::Mesh *boxHull = mgr->ConvexDecomposition(desc);
+  ASSERT_NE(nullptr, boxHull);
+  EXPECT_NE(boxMesh, boxHull);
+  EXPECT_EQ(boxHull, mgr->MeshByName(boxHull->Name()));
+  ASSERT_EQ(1u, boxHull->SubMeshCount());
+  auto boxSubmesh = boxHull->SubMeshByIndex(0u).lock();
+  ASSERT_NE(nullptr, boxSubmesh);
+  EXPECT_EQ(8u, boxSubmesh->VertexCount());
+  EXPECT_EQ(8u, boxSubmesh->NormalCount());
+  EXPECT_EQ(36u, boxSubmesh->IndexCount());
+  EXPECT_TRUE(common::MeshManager::IsConvex(*boxSubmesh));
+  math::Vector3d center, min, max, hullCenter, hullMin, hullMax;
+  boxMesh->AABB(center, min, max);
+  boxHull->AABB(hullCenter, hullMin, hullMax);
+  EXPECT_EQ(min, hullMin);
+  EXPECT_EQ(max, hullMax);
+
+  // The cached mesh is returned, and is different from the convex
+  // decomposition cache
+  EXPECT_EQ(boxHull, mgr->ConvexDecomposition(desc));
+  desc.assumeConvex = false;
+  desc.maxConvexHulls = 1u;
+  desc.voxelResolution = 1000u;
+  const common::Mesh *boxDecomposed = mgr->ConvexDecomposition(desc);
+  ASSERT_NE(nullptr, boxDecomposed);
+  EXPECT_NE(boxHull, boxDecomposed);
+  EXPECT_NE(boxHull->Name(), boxDecomposed->Name());
+
+  // The convex hull of a drill is a single convex submesh enclosing it
+  desc.mesh = drillMesh;
+  desc.assumeConvex = true;
+  const common::Mesh *drillHull = mgr->ConvexDecomposition(desc);
+  ASSERT_NE(nullptr, drillHull);
+  ASSERT_EQ(1u, drillHull->SubMeshCount());
+  auto drillSubmesh = drillHull->SubMeshByIndex(0u).lock();
+  ASSERT_NE(nullptr, drillSubmesh);
+  EXPECT_LT(3u, drillSubmesh->VertexCount());
+  EXPECT_GT(drillMesh->SubMeshByIndex(0u).lock()->VertexCount(),
+      drillSubmesh->VertexCount());
+  EXPECT_EQ(drillSubmesh->VertexCount(), drillSubmesh->NormalCount());
+  EXPECT_TRUE(common::MeshManager::IsConvex(*drillSubmesh));
+  drillMesh->AABB(center, min, max);
+  drillHull->AABB(hullCenter, hullMin, hullMax);
+  EXPECT_EQ(min, hullMin);
+  EXPECT_EQ(max, hullMax);
+}
+
+/////////////////////////////////////////////////
+TEST_F(MeshManager, ConvexDecompositionSubMesh)
+{
+  auto *mgr = common::MeshManager::Instance();
+  mgr->CreateBox("box", math::Vector3d(1, 1, 1), math::Vector2d(1, 1));
+  const common::Mesh *box = mgr->MeshByName("box");
+  ASSERT_NE(nullptr, box);
+  ASSERT_EQ(1u, box->SubMeshCount());
+  auto boxSubmesh = box->SubMeshByIndex(0u).lock();
+  ASSERT_NE(nullptr, boxSubmesh);
+
+  // Create a mesh with two unit box submeshes, 5m apart along x
+  common::Mesh *twoBoxes = mgr->CreateMesh("two_boxes");
+  ASSERT_NE(nullptr, twoBoxes);
+  common::SubMesh submeshA(*boxSubmesh);
+  submeshA.SetName("a");
+  common::SubMesh submeshB(*boxSubmesh);
+  submeshB.SetName("b");
+  submeshB.Translate(math::Vector3d(5, 0, 0));
+  twoBoxes->AddSubMesh(submeshA);
+  twoBoxes->AddSubMesh(submeshB);
+  ASSERT_EQ(2u, twoBoxes->SubMeshCount());
+
+  common::ConvexDecompositionDescriptor desc;
+  desc.mesh = twoBoxes;
+  desc.maxConvexHulls = 4u;
+  desc.voxelResolution = 10000u;
+
+  math::Vector3d center, min, max;
+
+  // No submesh specified: all submeshes are merged and decomposed together
+  const common::Mesh *decomposed = mgr->ConvexDecomposition(desc);
+  ASSERT_NE(nullptr, decomposed);
+  EXPECT_LE(1u, decomposed->SubMeshCount());
+  EXPECT_GE(desc.maxConvexHulls, decomposed->SubMeshCount());
+  decomposed->AABB(center, min, max);
+  EXPECT_NEAR(-0.5, min.X(), 0.1);
+  EXPECT_NEAR(5.5, max.X(), 0.1);
+
+  // Decompose submesh "b" only
+  desc.submesh = "b";
+  const common::Mesh *decomposedB = mgr->ConvexDecomposition(desc);
+  ASSERT_NE(nullptr, decomposedB);
+  EXPECT_NE(decomposed, decomposedB);
+  EXPECT_EQ(1u, decomposedB->SubMeshCount());
+  decomposedB->AABB(center, min, max);
+  EXPECT_NEAR(4.5, min.X(), 0.1);
+  EXPECT_NEAR(5.5, max.X(), 0.1);
+
+  // Center submesh "b" before decomposing it
+  desc.centerSubmesh = true;
+  const common::Mesh *decomposedBCentered = mgr->ConvexDecomposition(desc);
+  ASSERT_NE(nullptr, decomposedBCentered);
+  EXPECT_NE(decomposedB, decomposedBCentered);
+  EXPECT_EQ(1u, decomposedBCentered->SubMeshCount());
+  decomposedBCentered->AABB(center, min, max);
+  EXPECT_NEAR(-0.5, min.X(), 0.1);
+  EXPECT_NEAR(0.5, max.X(), 0.1);
+
+  // Same with the convex hull of the submesh
+  desc.assumeConvex = true;
+  const common::Mesh *hullBCentered = mgr->ConvexDecomposition(desc);
+  ASSERT_NE(nullptr, hullBCentered);
+  EXPECT_NE(decomposedBCentered, hullBCentered);
+  EXPECT_EQ(1u, hullBCentered->SubMeshCount());
+  hullBCentered->AABB(center, min, max);
+  EXPECT_EQ(math::Vector3d(-0.5, -0.5, -0.5), min);
+  EXPECT_EQ(math::Vector3d(0.5, 0.5, 0.5), max);
+
+  desc.centerSubmesh = false;
+  const common::Mesh *hullB = mgr->ConvexDecomposition(desc);
+  ASSERT_NE(nullptr, hullB);
+  EXPECT_NE(hullBCentered, hullB);
+  hullB->AABB(center, min, max);
+  EXPECT_EQ(math::Vector3d(4.5, -0.5, -0.5), min);
+  EXPECT_EQ(math::Vector3d(5.5, 0.5, 0.5), max);
+
+  // Centering the submesh for decomposition does not modify the input mesh
+  auto inputSubmeshB = twoBoxes->SubMeshByName("b").lock();
+  ASSERT_NE(nullptr, inputSubmeshB);
+  EXPECT_EQ(math::Vector3d(4.5, -0.5, -0.5), inputSubmeshB->Min());
+  EXPECT_EQ(math::Vector3d(5.5, 0.5, 0.5), inputSubmeshB->Max());
+}
+
+/////////////////////////////////////////////////
 TEST_P(MeshManagerLoad, MergeSubMeshes)
 {
   auto *mgr = common::MeshManager::Instance();

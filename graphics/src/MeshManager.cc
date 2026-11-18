@@ -17,10 +17,12 @@
 
 #include <sys/stat.h>
 
+#include <algorithm>
 #include <cctype>
 #include <cstdint>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -97,6 +99,245 @@ class gz::common::MeshManager::Implementation
 #pragma warning(pop)
 #endif
 };
+
+namespace
+{
+//////////////////////////////////////////////////
+/// \brief Get the name under which the result of a convex decomposition is
+/// cached in the MeshManager. The name is unique to the input mesh and
+/// decomposition parameters.
+/// \param[in] _desc Convex decomposition descriptor
+/// \return Name of the decomposed mesh.
+std::string ConvexMeshName(const ConvexDecompositionDescriptor &_desc)
+{
+  std::string name = _desc.mesh->Name() + "_" + _desc.submesh;
+  if (!_desc.submesh.empty() && _desc.centerSubmesh)
+    name += "_CENTERED";
+  if (_desc.assumeConvex)
+    return name + "_CONVEX_HULL";
+  return name + "_CONVEX_" + std::to_string(_desc.maxConvexHulls) + "_" +
+      std::to_string(_desc.voxelResolution);
+}
+
+//////////////////////////////////////////////////
+/// \brief Get the submesh to decompose from a convex decomposition
+/// descriptor: either a copy of the requested submesh, or all the submeshes
+/// of the mesh merged into one.
+/// \param[in] _desc Convex decomposition descriptor
+/// \return The submesh to decompose, or nullptr if the requested submesh
+/// does not exist.
+std::unique_ptr<SubMesh> SubMeshToDecompose(
+    const ConvexDecompositionDescriptor &_desc)
+{
+  if (!_desc.submesh.empty())
+  {
+    auto submesh = _desc.mesh->SubMeshByName(_desc.submesh).lock();
+    if (!submesh)
+    {
+      gzwarn << "Unable to perform convex decomposition. Submesh ["
+             << _desc.submesh << "] not found in mesh ["
+             << _desc.mesh->Name() << "]." << std::endl;
+      return nullptr;
+    }
+    // Copy the submesh so that the input mesh is not modified when the
+    // submesh is centered.
+    auto copy = std::make_unique<SubMesh>(*submesh);
+    if (_desc.centerSubmesh)
+      copy->Center(gz::math::Vector3d::Zero);
+    return copy;
+  }
+
+  if (_desc.mesh->SubMeshCount() == 1u)
+  {
+    // Nothing to merge
+    return std::make_unique<SubMesh>(*_desc.mesh->SubMeshByIndex(0u).lock());
+  }
+
+  auto merged = MeshManager::MergeSubMeshes(*_desc.mesh);
+  if (!merged || merged->SubMeshCount() != 1u)
+    return nullptr;
+  return std::make_unique<SubMesh>(*merged->SubMeshByIndex(0u).lock());
+}
+
+//////////////////////////////////////////////////
+/// \brief Append the vertices of a submesh to a vector of VHACD vertices.
+/// \param[in] _subMesh Submesh to get the vertices from.
+/// \param[out] _points Vector to append the vertices to.
+void AppendVertices(const SubMesh &_subMesh,
+    std::vector<VHACD::Vertex> &_points)
+{
+  _points.reserve(_points.size() + _subMesh.VertexCount());
+  for (unsigned int i = 0; i < _subMesh.VertexCount(); ++i)
+  {
+    const gz::math::Vector3d &v = _subMesh.Vertex(i);
+    _points.emplace_back(v.X(), v.Y(), v.Z());
+  }
+}
+
+//////////////////////////////////////////////////
+/// \brief Append the centroids of the triangles of a submesh to a vector of
+/// VHACD vertices. Nothing is appended if the submesh is not made of
+/// triangles.
+/// \param[in] _subMesh Submesh to get the triangles from.
+/// \param[out] _points Vector to append the centroids to.
+void AppendTriangleCentroids(const SubMesh &_subMesh,
+    std::vector<VHACD::Vertex> &_points)
+{
+  if (_subMesh.SubMeshPrimitiveType() != SubMesh::TRIANGLES ||
+      _subMesh.IndexCount() % 3u != 0u || !_subMesh.HasValidIndices())
+  {
+    return;
+  }
+
+  _points.reserve(_points.size() + _subMesh.IndexCount() / 3u);
+  for (unsigned int i = 0; i + 2 < _subMesh.IndexCount(); i += 3)
+  {
+    const gz::math::Vector3d centroid = (
+        _subMesh.Vertex(_subMesh.Index(i)) +
+        _subMesh.Vertex(_subMesh.Index(i + 1)) +
+        _subMesh.Vertex(_subMesh.Index(i + 2))) / 3.0;
+    _points.emplace_back(centroid.X(), centroid.Y(), centroid.Z());
+  }
+}
+
+//////////////////////////////////////////////////
+/// \brief Compute the convex hull of a set of points.
+/// \param[in] _points Input points.
+/// \param[out] _hullPoints Vertices of the convex hull.
+/// \param[out] _hullTriangles Triangles of the convex hull.
+/// \return True if a convex hull could be computed.
+bool ComputeConvexHull(const std::vector<VHACD::Vertex> &_points,
+    std::vector<VHACD::Vertex> &_hullPoints,
+    std::vector<VHACD::Triangle> &_hullTriangles)
+{
+  if (_points.size() < 4u)
+    return false;
+
+  VHACD::QuickHull quickHull;
+  if (quickHull.ComputeConvexHull(_points,
+      static_cast<uint32_t>(_points.size())) == 0u)
+  {
+    return false;
+  }
+  _hullPoints = quickHull.GetVertices();
+  _hullTriangles = quickHull.GetIndices();
+  return !_hullPoints.empty() && !_hullTriangles.empty();
+}
+
+//////////////////////////////////////////////////
+/// \brief Check whether a mesh is convex: all the sample points of its
+/// surface lie on the surface of the convex hull of its vertices. A sample
+/// point strictly inside the hull means that the mesh has a concavity.
+/// The sample points should include the vertices and the centroids of the
+/// faces: a concave mesh may have all its vertices on the hull (e.g. an L
+/// shaped prism), but then some of its faces are inside the hull.
+/// \param[in] _vertices Vertices of the mesh.
+/// \param[in] _samples Sample points of the surface of the mesh.
+/// \param[in] _tolerance Maximum distance a sample point may lie inside the
+/// convex hull, relative to the largest extent of the vertices' bounding
+/// box.
+/// \return True if the mesh is convex. False if it is not or if its
+/// vertices have no convex hull.
+bool IsConvexImpl(const std::vector<VHACD::Vertex> &_vertices,
+    const std::vector<VHACD::Vertex> &_samples, double _tolerance)
+{
+  std::vector<VHACD::Vertex> hullPoints;
+  std::vector<VHACD::Triangle> hullTriangles;
+  if (!ComputeConvexHull(_vertices, hullPoints, hullTriangles))
+    return false;
+
+  auto toVector3d = [](const VHACD::Vertex &_v)
+  {
+    return gz::math::Vector3d(_v.mX, _v.mY, _v.mZ);
+  };
+
+  // Bounding box and centroid of the hull. The centroid is used to orient
+  // the face planes, so that the winding of the hull triangles does not
+  // matter.
+  gz::math::Vector3d min(gz::math::MAX_D, gz::math::MAX_D, gz::math::MAX_D);
+  gz::math::Vector3d max(-gz::math::MAX_D, -gz::math::MAX_D, -gz::math::MAX_D);
+  gz::math::Vector3d centroid;
+  for (const auto &p : hullPoints)
+  {
+    const gz::math::Vector3d v = toVector3d(p);
+    min.Min(v);
+    max.Max(v);
+    centroid += v;
+  }
+  centroid /= static_cast<double>(hullPoints.size());
+  const double maxDepth = _tolerance * (max - min).Max();
+
+  // Outward facing planes of the hull faces
+  struct Plane
+  {
+    gz::math::Vector3d normal;
+    gz::math::Vector3d point;
+  };
+  std::vector<Plane> planes;
+  planes.reserve(hullTriangles.size());
+  for (const auto &tri : hullTriangles)
+  {
+    const gz::math::Vector3d p0 = toVector3d(hullPoints[tri.mI0]);
+    const gz::math::Vector3d p1 = toVector3d(hullPoints[tri.mI1]);
+    const gz::math::Vector3d p2 = toVector3d(hullPoints[tri.mI2]);
+    gz::math::Vector3d normal = (p1 - p0).Cross(p2 - p0);
+    if (normal.SquaredLength() <= 0.0)
+      continue;
+    normal.Normalize();
+    if (normal.Dot(centroid - p0) > 0.0)
+      normal = -normal;
+    planes.push_back({normal, p0});
+  }
+  if (planes.empty())
+    return false;
+
+  // A sample point is on the hull surface if it lies on at least one face
+  // plane, i.e. its signed distance to the nearest plane is zero. All the
+  // sample points are inside the hull, so that is the largest signed
+  // distance.
+  for (const auto &p : _samples)
+  {
+    const gz::math::Vector3d v = toVector3d(p);
+    double depth = -gz::math::MAX_D;
+    for (const auto &plane : planes)
+    {
+      depth = std::max(depth, plane.normal.Dot(v - plane.point));
+      if (depth >= -maxDepth)
+        break;
+    }
+    if (depth < -maxDepth)
+      return false;
+  }
+  return true;
+}
+
+//////////////////////////////////////////////////
+/// \brief Create a submesh from the vertices and triangles of a convex hull.
+/// \param[in] _hullPoints Vertices of the convex hull.
+/// \param[in] _hullTriangles Triangles of the convex hull.
+/// \return The convex hull submesh.
+SubMesh ConvexHullSubMesh(const std::vector<VHACD::Vertex> &_hullPoints,
+    const std::vector<VHACD::Triangle> &_hullTriangles)
+{
+  SubMesh convexMesh;
+  for (const auto &p : _hullPoints)
+  {
+    gz::math::Vector3d vertex(p.mX, p.mY, p.mZ);
+    convexMesh.AddVertex(vertex);
+    // add dummy normal - this will be overriden by the
+    // RecalculateNormals call
+    convexMesh.AddNormal(vertex);
+  }
+  for (const auto &tri : _hullTriangles)
+  {
+    convexMesh.AddIndex(tri.mI0);
+    convexMesh.AddIndex(tri.mI1);
+    convexMesh.AddIndex(tri.mI2);
+  }
+  convexMesh.RecalculateNormals();
+  return convexMesh;
+}
+}  // namespace
 
 //////////////////////////////////////////////////
 MeshManager::MeshManager()
@@ -1855,4 +2096,106 @@ std::unique_ptr<Mesh> MeshManager::MergeSubMeshes(const Mesh &_mesh)
   mesh->AddSubMesh(mergedSubMesh);
 
   return mesh;
+}
+
+//////////////////////////////////////////////////
+const Mesh *MeshManager::ConvexDecomposition(
+    const ConvexDecompositionDescriptor &_desc)
+{
+  if (nullptr == _desc.mesh)
+  {
+    gzwarn << "Unable to perform convex decomposition on a null mesh."
+           << std::endl;
+    return nullptr;
+  }
+
+  // Check if the decomposed mesh is cached already
+  const std::string name = ConvexMeshName(_desc);
+  if (const Mesh *cached = this->MeshByName(name))
+    return cached;
+
+  auto submesh = SubMeshToDecompose(_desc);
+  if (!submesh)
+    return nullptr;
+
+  std::vector<SubMesh> decomposed;
+  if (_desc.assumeConvex)
+  {
+    std::vector<VHACD::Vertex> points;
+    AppendVertices(*submesh, points);
+    std::vector<VHACD::Vertex> hullPoints;
+    std::vector<VHACD::Triangle> hullTriangles;
+    if (ComputeConvexHull(points, hullPoints, hullTriangles))
+      decomposed.push_back(ConvexHullSubMesh(hullPoints, hullTriangles));
+  }
+  else
+  {
+    gzdbg << "Performing convex decomposition of mesh ["
+          << _desc.mesh->Name() << "]" << std::endl;
+    decomposed = ConvexDecomposition(*submesh, _desc.maxConvexHulls,
+        _desc.voxelResolution);
+  }
+
+  if (decomposed.empty())
+  {
+    // Print an error but still cache the empty mesh, so that the expensive
+    // decomposition is not attempted again for the same mesh.
+    gzerr << "Convex decomposition generated zero meshes: "
+          << _desc.mesh->Name() << std::endl;
+  }
+
+  Mesh *convexMesh = this->CreateMesh(name);
+  if (!convexMesh)
+    return nullptr;
+  for (const auto &s : decomposed)
+    convexMesh->AddSubMesh(s);
+  return convexMesh;
+}
+
+//////////////////////////////////////////////////
+bool MeshManager::IsConvex(const SubMesh &_subMesh, double _tolerance)
+{
+  std::vector<VHACD::Vertex> vertices;
+  AppendVertices(_subMesh, vertices);
+  std::vector<VHACD::Vertex> samples = vertices;
+  AppendTriangleCentroids(_subMesh, samples);
+  return IsConvexImpl(vertices, samples, _tolerance);
+}
+
+//////////////////////////////////////////////////
+bool MeshManager::IsConvex(const Mesh &_mesh, const std::string &_submesh,
+    double _tolerance)
+{
+  std::vector<std::shared_ptr<SubMesh>> submeshPtrs;
+  if (!_submesh.empty())
+  {
+    auto submesh = _mesh.SubMeshByName(_submesh).lock();
+    if (!submesh)
+    {
+      gzwarn << "Unable to check convexity. Submesh [" << _submesh
+             << "] not found in mesh [" << _mesh.Name() << "]." << std::endl;
+      return false;
+    }
+    submeshPtrs.push_back(submesh);
+  }
+  else
+  {
+    for (unsigned int i = 0; i < _mesh.SubMeshCount(); ++i)
+    {
+      auto submesh = _mesh.SubMeshByIndex(i).lock();
+      if (submesh)
+        submeshPtrs.push_back(submesh);
+    }
+  }
+
+  std::vector<VHACD::Vertex> vertices;
+  std::vector<VHACD::Vertex> centroids;
+  for (const auto &submesh : submeshPtrs)
+  {
+    AppendVertices(*submesh, vertices);
+    AppendTriangleCentroids(*submesh, centroids);
+  }
+  std::vector<VHACD::Vertex> samples = vertices;
+  samples.insert(samples.end(), centroids.begin(), centroids.end());
+  return IsConvexImpl(vertices, samples, _tolerance);
 }
