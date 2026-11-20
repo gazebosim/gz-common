@@ -85,7 +85,26 @@ class gz::common::MeshManager::Implementation
   public: std::unordered_set<std::string> fileExtensions;
 
   /// \brief Mutex to protect the mesh map
-  public: std::mutex mutex;
+  public: mutable std::mutex mutex;
+
+  /// \brief Find a mesh by name.
+  /// \param[in] _name Name of the mesh
+  /// \return The mesh, null if there isn't one with that name
+  public: Mesh *Find(const std::string &_name) const
+  {
+    std::lock_guard<std::mutex> lock(this->mutex);
+    auto iter = this->meshes.find(_name);
+    return iter == this->meshes.end() ? nullptr : iter->second;
+  }
+
+  /// \brief Add a mesh, unless one with that name exists.
+  /// \param[in] _name Name of the mesh
+  /// \param[in] _mesh The mesh
+  public: void Insert(const std::string &_name, Mesh *_mesh)
+  {
+    std::lock_guard<std::mutex> lock(this->mutex);
+    this->meshes.insert(std::make_pair(_name, _mesh));
+  }
 
   /// \brief True if assimp is used for loading all supported mesh formats
   public: bool forceAssimp;
@@ -156,7 +175,7 @@ const Mesh *MeshManager::Load(const std::string &_filename)
 
   if (this->HasMesh(_filename))
   {
-    return this->dataPtr->meshes[_filename];
+    return this->dataPtr->Find(_filename);
   }
 
   std::string fullname = common::findFile(_filename);
@@ -196,7 +215,7 @@ const Mesh *MeshManager::Load(const std::string &_filename)
     // This mutex prevents two threads from loading the same mesh at the
     // same time.
     std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-    if (!this->HasMesh(_filename))
+    if (this->dataPtr->meshes.find(_filename) == this->dataPtr->meshes.end())
     {
       if ((mesh = loader->Load(fullname)) != nullptr)
       {
@@ -251,23 +270,26 @@ void MeshManager::MeshAABB(const Mesh *_mesh,
     gz::math::Vector3d &_center,
     gz::math::Vector3d &_minXYZ, gz::math::Vector3d &_maxXYZ)
 {
-  if (this->HasMesh(_mesh->Name()))
-    this->dataPtr->meshes[_mesh->Name()]->AABB(_center, _minXYZ, _maxXYZ);
+  if (auto *mesh = this->dataPtr->Find(_mesh->Name()))
+    mesh->AABB(_center, _minXYZ, _maxXYZ);
 }
 
 //////////////////////////////////////////////////
 void MeshManager::GenSphericalTexCoord(const Mesh *_mesh,
     const gz::math::Vector3d &_center)
 {
-  if (this->HasMesh(_mesh->Name()))
-    this->dataPtr->meshes[_mesh->Name()]->GenSphericalTexCoord(_center);
+  if (auto *mesh = this->dataPtr->Find(_mesh->Name()))
+    mesh->GenSphericalTexCoord(_center);
 }
 
 //////////////////////////////////////////////////
 void MeshManager::AddMesh(Mesh *_mesh)
 {
   if (!this->HasMesh(_mesh->Name()))
+  {
+    std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
     this->dataPtr->meshes[_mesh->Name()] = _mesh;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -287,6 +309,7 @@ Mesh *MeshManager::CreateMesh(const std::string &_name)
 
   Mesh *newMesh = new Mesh();
   newMesh->SetName(_name);
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   this->dataPtr->meshes[_name] = newMesh;
   return newMesh;
 }
@@ -294,12 +317,7 @@ Mesh *MeshManager::CreateMesh(const std::string &_name)
 //////////////////////////////////////////////////
 const Mesh *MeshManager::MeshByName(const std::string &_name) const
 {
-  auto iter = this->dataPtr->meshes.find(_name);
-
-  if (iter != this->dataPtr->meshes.end())
-    return iter->second;
-
-  return nullptr;
+  return this->dataPtr->Find(_name);
 }
 
 //////////////////////////////////////////////////
@@ -335,9 +353,7 @@ bool MeshManager::HasMesh(const std::string &_name) const
   if (_name.empty())
     return false;
 
-  auto iter = this->dataPtr->meshes.find(_name);
-
-  return iter != this->dataPtr->meshes.end();
+  return this->dataPtr->Find(_name) != nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -357,7 +373,7 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
 
   Mesh *mesh = new Mesh();
   mesh->SetName(name);
-  this->dataPtr->meshes.insert(std::make_pair(name, mesh));
+  this->dataPtr->Insert(name, mesh);
 
   SubMesh subMesh;
 
@@ -425,7 +441,7 @@ void MeshManager::CreatePlane(const std::string &_name,
 
   Mesh *mesh = new Mesh();
   mesh->SetName(_name);
-  this->dataPtr->meshes.insert(std::make_pair(_name, mesh));
+  this->dataPtr->Insert(_name, mesh);
 
   SubMesh subMesh;
 
@@ -511,7 +527,7 @@ void MeshManager::CreateBox(const std::string &_name,
 
   Mesh *mesh = new Mesh();
   mesh->SetName(_name);
-  this->dataPtr->meshes.insert(std::make_pair(_name, mesh));
+  this->dataPtr->Insert(_name, mesh);
 
   SubMesh subMesh;
 
@@ -807,7 +823,7 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
   }
 
   mesh->AddSubMesh(subMesh);
-  this->dataPtr->meshes.insert(std::make_pair(_name, mesh));
+  this->dataPtr->Insert(_name, mesh);
 #endif
   return;
 }
@@ -824,7 +840,7 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
 
   Mesh *mesh = new Mesh();
   mesh->SetName(_name);
-  this->dataPtr->meshes.insert(std::make_pair(_name, mesh));
+  this->dataPtr->Insert(_name, mesh);
 
   SubMesh subMesh;
 
@@ -922,7 +938,7 @@ void MeshManager::CreateEllipsoid(const std::string &_name,
 
   Mesh *mesh = new Mesh();
   mesh->SetName(_name);
-  this->dataPtr->meshes.insert(std::make_pair(_name, mesh));
+  this->dataPtr->Insert(_name, mesh);
 
   SubMesh subMesh;
 
@@ -1002,7 +1018,7 @@ void MeshManager::CreateCapsule(const std::string &_name,
 
   Mesh *mesh = new Mesh();
   mesh->SetName(_name);
-  this->dataPtr->meshes.insert(std::make_pair(_name, mesh));
+  this->dataPtr->Insert(_name, mesh);
 
   SubMesh subMesh;
 
@@ -1163,7 +1179,7 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
 
   Mesh *mesh = new Mesh();
   mesh->SetName(name);
-  this->dataPtr->meshes.insert(std::make_pair(name, mesh));
+  this->dataPtr->Insert(name, mesh);
 
   SubMesh subMesh;
 
@@ -1280,7 +1296,7 @@ void MeshManager::CreateCone(const std::string &name, float radius,
 
   Mesh *mesh = new Mesh();
   mesh->SetName(name);
-  this->dataPtr->meshes.insert(std::make_pair(name, mesh));
+  this->dataPtr->Insert(name, mesh);
 
   SubMesh subMesh;
 
@@ -1397,7 +1413,7 @@ void MeshManager::CreateTube(const std::string &_name, float _innerRadius,
 
   Mesh *mesh = new Mesh();
   mesh->SetName(_name);
-  this->dataPtr->meshes.insert(std::make_pair(_name, mesh));
+  this->dataPtr->Insert(_name, mesh);
   SubMesh subMesh;
 
   // Generate the group of rings for the outsides of the cylinder
