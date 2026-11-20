@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
+#include <memory>
 #include <string>
-#include <vector>
 #include <gz/math/Vector3.hh>
 
 #include "gz/common/Pbr.hh"
@@ -90,7 +90,6 @@ class gz::common::Pbr::Implementation
   /// \brief Glossiness value (specular workflow only)
   public: double glossiness = 0.0;
 };
-
 
 using namespace gz;
 using namespace common;
@@ -354,4 +353,3 @@ void Pbr::SetType(PbrType _type)
 {
   this->dataPtr->type = _type;
 }
-

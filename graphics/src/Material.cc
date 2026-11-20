@@ -15,6 +15,8 @@
  *
  */
 #include <algorithm>
+#include <memory>
+#include <string>
 #include <gz/math/Color.hh>
 
 #include "gz/common/Material.hh"

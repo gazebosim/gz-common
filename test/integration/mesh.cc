@@ -15,6 +15,7 @@
  *
 */
 #include <fstream>
+#include <ios>
 
 #include <gtest/gtest.h>
 

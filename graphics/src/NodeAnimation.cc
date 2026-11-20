@@ -14,7 +14,10 @@
  * limitations under the License.
  *
 */
+#include <iterator>
 #include <map>
+#include <string>
+#include <utility>
 #include "gz/common/Console.hh"
 #include "gz/common/NodeAnimation.hh"
 

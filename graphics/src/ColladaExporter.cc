@@ -14,6 +14,15 @@
  * limitations under the License.
  *
  */
+
+#include <cstdio>
+#include <ios>
+#include <memory>
+#include <ostream>
+#include <sstream>
+#include <string>
+#include <vector>
+
 #include <gz/math/Vector3.hh>
 
 #include <gz/common/Material.hh>

@@ -15,6 +15,8 @@
  *
 */
 #include <gtest/gtest.h>
+#include <cstdio>
+#include <ostream>
 #include <sstream>
 #include <string>
 #include <vector>

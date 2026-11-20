@@ -18,6 +18,7 @@
 #define GZ_COMMON_STLLOADER_HH_
 
 #include <stdint.h>
+#include <cstdio>
 #include <string>
 
 #include <gz/utils/ImplPtr.hh>

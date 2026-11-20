@@ -16,7 +16,10 @@
 #include <gtest/gtest.h>
 
 // needed on MacOS
+#include <chrono>
 #include <cmath>
+#include <cstddef>
+#include <ostream>
 
 #include "gz/common/Console.hh"
 #include "gz/common/VideoEncoder.hh"

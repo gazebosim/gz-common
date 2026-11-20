@@ -71,6 +71,7 @@
 // libpostproc    56.  3.100 / 56.  3.100
 
 
+#include <cstring>
 #include <string>
 
 #include <gz/common/config.hh>

@@ -16,6 +16,8 @@
 */
 #include <gtest/gtest.h>
 
+#include <string>
+
 #include "gz/common/Filesystem.hh"
 #include "gz/common/testing/TestPaths.hh"
 #include "gz/common/testing/BazelTestPaths.hh"

@@ -15,12 +15,14 @@
  *
 */
 
-#include <algorithm>
 #include <cstring>
 #include <list>
-#include <map>
+#include <optional>
+#include <ostream>
 #include <regex>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "gz/common/Console.hh"
 #include "gz/common/URI.hh"

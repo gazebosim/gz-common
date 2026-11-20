@@ -15,7 +15,10 @@
  *
 */
 
+#include <cstddef>
 #include <list>
+#include <string>
+#include <vector>
 
 #include "gz/common/Console.hh"
 #include "gz/common/SkeletonNode.hh"

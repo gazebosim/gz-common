@@ -16,7 +16,10 @@
 */
 
 #include <gtest/gtest.h>
+#include <cmath>
 #include <limits>
+#include <new>
+#include <vector>
 #include <gz/math/Angle.hh>
 #include <gz/math/Vector3.hh>
 

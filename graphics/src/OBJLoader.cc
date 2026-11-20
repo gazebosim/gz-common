@@ -15,7 +15,16 @@
  *
  */
 
+#include <algorithm>
+#include <cctype>
+#include <cstddef>
+#include <fstream>
+#include <map>
 #include <memory>
+#include <ostream>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "gz/common/Console.hh"
 #include "gz/common/Filesystem.hh"

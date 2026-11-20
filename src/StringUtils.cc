@@ -16,6 +16,8 @@
  */
 
 #include <cstdlib>
+#include <string>
+#include <vector>
 #include "gz/common/StringUtils.hh"
 
 namespace gz

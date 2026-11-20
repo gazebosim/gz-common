@@ -17,8 +17,11 @@
 
 #include "gz/common/testing/Utils.hh"
 
+#include <cstdint>
 #include <fstream>
+#include <ios>
 #include <random>
+#include <string>
 
 namespace gz::common::testing
 {

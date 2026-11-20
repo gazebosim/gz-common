@@ -17,6 +17,10 @@
 
 #include <gtest/gtest.h>
 
+#include <memory>
+#include <string>
+#include <utility>
+
 #include <gz/math/Color.hh>
 #include "gz/common/Image.hh"
 #include "gz/common/Pbr.hh"

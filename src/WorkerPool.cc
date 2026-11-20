@@ -15,11 +15,15 @@
  *
 */
 
+#include <algorithm>
+#include <chrono>
 #include <condition_variable>
+#include <functional>
 #include <mutex>
 #include <queue>
 #include <thread>
 #include <utility>
+#include <vector>
 
 #include "gz/common/WorkerPool.hh"
 

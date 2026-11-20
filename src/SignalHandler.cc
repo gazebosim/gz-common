@@ -19,7 +19,11 @@
 // comments when upgrading to gz-cmake's "make codecheck"
 #include "gz/common/SignalHandler.hh" // NOLINT(*)
 #include <atomic>
+#include <cerrno>
+#include <cstdint>
 #include <cstring>
+#include <ostream>
+#include <thread>
 #include <csignal> // NOLINT(*)
 #include <functional> // NOLINT(*)
 #include <fcntl.h>

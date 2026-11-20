@@ -18,6 +18,9 @@
 #include <benchmark/benchmark.h>
 #include <gtest/gtest.h>
 
+#include <cstdint>
+#include <string>
+
 #include "gz/common/testing/TestPaths.hh"
 #include "gz/common/ColladaLoader.hh"
 #include "gz/common/Mesh.hh"

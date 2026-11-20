@@ -14,9 +14,13 @@
  * limitations under the License.
  *
 */
+#include <cstddef>
+#include <cstdint>
 #include <fstream>
+#include <ios>
 #include <optional>
 #include <string>
+#include <tuple>
 #include <vector>
 
 #include <gtest/gtest.h>

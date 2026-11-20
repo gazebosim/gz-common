@@ -15,6 +15,7 @@
  *
 */
 #include <filesystem>
+#include <ostream>
 #include <gz/common/Console.hh>
 
 int main(int argc, char **argv)

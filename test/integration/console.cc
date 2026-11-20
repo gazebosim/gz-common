@@ -17,6 +17,11 @@
 
 #include <gtest/gtest.h>
 
+#include <fstream>
+#include <iterator>
+#include <ostream>
+#include <string>
+
 #include <gz/common/Console.hh>
 #include <gz/common/testing/TestPaths.hh>
 

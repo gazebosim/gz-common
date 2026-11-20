@@ -17,11 +17,14 @@
 #ifndef GZ_COMMON_DATAFRAME_HH_
 #define GZ_COMMON_DATAFRAME_HH_
 
+#include <algorithm>
 #include <array>
+#include <cstddef>
+#include <iterator>
 #include <numeric>
 #include <sstream>
-#include <string>
 #include <stdexcept>
+#include <string>
 #include <unordered_map>
 #include <vector>
 

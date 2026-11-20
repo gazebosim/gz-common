@@ -17,13 +17,20 @@
 
 #include <sys/stat.h>
 
+#include <algorithm>
 #include <cctype>
+#include <chrono>
+#include <cmath>
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <mutex>
+#include <ostream>
 #include <string>
+#include <thread>
 #include <unordered_map>
 #include <unordered_set>
+#include <utility>
 #include <vector>
 
 // Suppress warnings for VHACD

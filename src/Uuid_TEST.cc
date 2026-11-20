@@ -16,8 +16,7 @@
 */
 
 #include <cctype>
-#include <iostream>
-#include <string>
+#include <sstream>
 
 #include "gz/common/Uuid.hh"
 #include "gtest/gtest.h"

@@ -16,6 +16,9 @@
  */
 
 #include <atomic>
+#include <chrono>
+#include <cstddef>
+#include <ostream>
 #include <thread>
 
 #include "gz/common/Console.hh"

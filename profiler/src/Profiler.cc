@@ -14,7 +14,15 @@
  * limitations under the License.
  *
  */
+
 #include "gz/common/Profiler.hh" // NOLINT(*)
+
+#include <cstdint>
+#include <memory>
+#include <ostream>
+#include <string>
+#include <utility>
+
 #include "gz/common/ProfilerImpl.hh"
 #include "gz/common/Console.hh"
 

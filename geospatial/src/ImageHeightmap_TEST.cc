@@ -16,6 +16,10 @@
 */
 #include <gtest/gtest.h>
 
+#include <cmath>
+#include <iostream>
+#include <vector>
+
 #include "gz/common/geospatial/ImageHeightmap.hh"
 
 #include "gz/common/testing/AutoLogFixture.hh"

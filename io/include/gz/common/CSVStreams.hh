@@ -17,7 +17,9 @@
 #ifndef GZ_COMMON_CSVSTREAMS_HH_
 #define GZ_COMMON_CSVSTREAMS_HH_
 
+#include <cstddef>
 #include <istream>
+#include <iterator>
 #include <string>
 #include <vector>
 

@@ -15,6 +15,9 @@
  *
 */
 #include <gtest/gtest.h>
+#include <cctype>
+#include <iostream>
+#include <ostream>
 #include <string>
 #include <gz/common/Base64.hh>
 

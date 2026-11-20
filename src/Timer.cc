@@ -17,6 +17,8 @@
 
 #include <gz/common/Timer.hh>
 
+#include <chrono>
+
 using namespace gz;
 using namespace common;
 

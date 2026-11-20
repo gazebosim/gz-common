@@ -18,8 +18,20 @@
 
 #include <algorithm>
 #include <atomic>
+#include <chrono>
+#include <cstddef>
+#include <cstdint>
+#include <fstream>
+#include <functional>
+#include <ios>
+#include <iostream>
 #include <map>
+#include <memory>
+#include <ostream>
+#include <sstream>
+#include <string>
 #include <thread>
+#include <vector>
 
 #include <gz/common/Console.hh>
 #include <gz/common/testing/TestPaths.hh>

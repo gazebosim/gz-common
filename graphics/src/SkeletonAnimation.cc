@@ -15,6 +15,11 @@
  *
 */
 
+#include <map>
+#include <memory>
+#include <ostream>
+#include <string>
+
 #include "gz/common/Console.hh"
 #include "gz/common/NodeAnimation.hh"
 #include "gz/common/SkeletonAnimation.hh"

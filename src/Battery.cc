@@ -15,7 +15,14 @@
  *
 */
 
+#include <algorithm>
 #include <cmath>
+#include <cstdint>
+#include <functional>
+#include <map>
+#include <mutex>
+#include <string>
+#include <utility>
 
 #include <gz/common/Console.hh>
 #include <gz/common/Battery.hh>

@@ -17,6 +17,10 @@
 
 #include <gtest/gtest.h>
 
+#include <chrono>
+#include <map>
+#include <utility>
+
 #include <gz/math/Vector3.hh>
 #include <gz/math/Quaternion.hh>
 #include <gz/common/KeyFrame.hh>

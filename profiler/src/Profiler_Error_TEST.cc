@@ -16,6 +16,9 @@
 */
 
 #include <gtest/gtest.h> // NOLINT(*)
+
+#include <string>
+
 #include "Remotery.h"
 
 #include <gz/common/Export.hh>

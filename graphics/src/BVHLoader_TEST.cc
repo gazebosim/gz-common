@@ -17,6 +17,8 @@
 
 #include <gtest/gtest.h>
 
+#include <string>
+
 #include "gz/common/BVHLoader.hh"
 #include "gz/common/Skeleton.hh"
 #include "gz/common/SkeletonAnimation.hh"

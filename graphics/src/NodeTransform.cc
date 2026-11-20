@@ -18,6 +18,8 @@
 #include <gz/common/NodeTransform.hh>
 
 #include <iostream>
+#include <string>
+#include <vector>
 
 using namespace gz;
 using namespace common;

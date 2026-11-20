@@ -14,7 +14,15 @@
  * limitations under the License.
  *
  */
+#include <cmath>
+#include <cstddef>
+#include <iostream>
 #include <list>
+#include <map>
+#include <ostream>
+#include <string>
+#include <utility>
+#include <vector>
 #include <gz/common/Console.hh>
 #include <gz/common/SkeletonAnimation.hh>
 #include <gz/common/Skeleton.hh>

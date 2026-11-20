@@ -17,6 +17,8 @@
 
 #include "gz/common/testing/BazelTestPaths.hh"
 
+#include <string>
+
 #include <gz/common/Console.hh>
 #include <gz/common/Util.hh>
 

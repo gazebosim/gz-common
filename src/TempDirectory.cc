@@ -19,7 +19,10 @@
 
 #include <gz/common/Console.hh>
 
+#include <cerrno>
 #include <filesystem>
+#include <string>
+#include <system_error>
 
 #ifdef _WIN32
 #include <windows.h>

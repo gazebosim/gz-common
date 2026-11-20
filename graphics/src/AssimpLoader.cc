@@ -15,13 +15,19 @@
  *
  */
 
+#include <algorithm>
+#include <cctype>
 #include <cstddef>
+#include <cstring>
+#include <exception>
 #include <memory>
+#include <ostream>
 #include <queue>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <utility>
 #include <vector>
 
 #include "gz/common/graphics/Types.hh"

@@ -16,7 +16,10 @@
 */
 #include <gtest/gtest.h>
 
+#include <cstdint>
 #include <fstream>
+#include <sstream>
+#include <vector>
 #include <stdlib.h>
 #include <string>
 

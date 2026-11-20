@@ -16,6 +16,9 @@
 */
 
 #include <gtest/gtest.h>
+
+#include <utility>
+
 #include "gz/common/KeyEvent.hh"
 
 using namespace gz;

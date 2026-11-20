@@ -17,6 +17,10 @@
 
 #include <gtest/gtest.h>
 
+#include <cmath>
+#include <cstddef>
+#include <memory>
+
 #include "gz/math/Vector3.hh"
 #include "gz/common/Mesh.hh"
 #include "gz/common/SubMesh.hh"

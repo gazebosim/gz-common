@@ -14,9 +14,11 @@
  * limitations under the License.
  *
 */
-#include <algorithm>
+#include <cstddef>
 #include <fstream>
-#include <sstream>
+#include <memory>
+#include <string>
+#include <vector>
 
 #include <gz/common/SystemPaths.hh>
 #include <gz/common/Skeleton.hh>

@@ -17,6 +17,7 @@
 #ifndef GZ_COMMON_IO_HH_
 #define GZ_COMMON_IO_HH_
 
+#include <istream>
 #include <sstream>
 #include <string>
 

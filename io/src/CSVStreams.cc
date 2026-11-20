@@ -17,7 +17,12 @@
 
 #include "gz/common/CSVStreams.hh"
 
+#include <cstdio>
+#include <istream>
 #include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace gz
 {

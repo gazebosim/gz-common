@@ -17,6 +17,8 @@
 
 #include <gtest/gtest.h>
 
+#include <string>
+
 #include <gz/common/TempDirectory.hh>
 #include <gz/utils/ExtraTestMacros.hh>
 
